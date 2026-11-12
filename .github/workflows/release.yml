@@ -1,0 +1,31 @@
+name: Release
+
+# Publish a GitHub release (tag like v0.1.0) and this workflow attaches
+# system.json + spycraft2.zip so Foundry can install/update from the manifest URL.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stamp version and download URL into system.json
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          jq --arg v "$VERSION" \
+             --arg dl "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/spycraft2.zip" \
+             '.version = $v | .download = $dl' system.json > system.tmp && mv system.tmp system.json
+
+      - name: Build zip
+        run: zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" system.json spycraft2.zip --clobber

@@ -8,32 +8,78 @@
     "verified": "13"
   },
   "authors": [
-    { "name": "Sacha" }
+    {
+      "name": "Sacha"
+    }
   ],
-  "esmodules": ["spycraft2.mjs"],
-  "styles": ["styles/spycraft2.css"],
+  "esmodules": [
+    "spycraft2.mjs"
+  ],
+  "styles": [
+    "styles/spycraft2.css"
+  ],
   "languages": [
-    { "lang": "en", "name": "English", "path": "lang/en.json" }
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
   ],
   "documentTypes": {
     "Actor": {
-      "agent": { "htmlFields": ["biography"] },
-      "npc": { "htmlFields": ["biography"] }
+      "agent": {
+        "htmlFields": [
+          "biography"
+        ]
+      },
+      "npc": {
+        "htmlFields": [
+          "biography"
+        ]
+      }
     },
     "Item": {
-      "class": { "htmlFields": ["description"] },
-      "origin": { "htmlFields": ["description"] },
-      "feat": { "htmlFields": ["description"] },
-      "gear": { "htmlFields": ["description"] },
-      "weapon": { "htmlFields": ["description"] },
-      "armor": { "htmlFields": ["description"] }
+      "class": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "origin": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "feat": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "gear": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "weapon": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "armor": {
+        "htmlFields": [
+          "description"
+        ]
+      }
     }
   },
   "packs": [],
-  "grid": { "distance": 5, "units": "ft" },
+  "grid": {
+    "distance": 5,
+    "units": "ft"
+  },
   "primaryTokenAttribute": "vitality",
   "secondaryTokenAttribute": "wounds",
-  "url": "",
-  "manifest": "",
-  "download": ""
+  "url": "https://github.com/sachamm/foundry4spycraft2",
+  "manifest": "https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.json",
+  "download": "https://github.com/sachamm/foundry4spycraft2/releases/download/v0.1.0/spycraft2.zip",
+  "bugs": "https://github.com/sachamm/foundry4spycraft2/issues"
 }

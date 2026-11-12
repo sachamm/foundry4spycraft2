@@ -34,3 +34,17 @@ Then create a world using the **Spycraft 2.0** system.
 ## Legal
 
 Spycraft is a trademark of Crafty Games. This project is unofficial and not affiliated with or endorsed by Crafty Games. Only Open Game Content may be included in compendiums.
+
+## Installing in Foundry
+
+In Foundry's **Install System** dialog, paste this manifest URL:
+
+```
+https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.json
+```
+
+## Releasing
+
+1. Bump `version` in `system.json` and add a `CHANGELOG.md` entry.
+2. Commit and push, then publish a GitHub release tagged `v<version>` (e.g. `v0.1.0`).
+3. The **Release** workflow attaches `system.json` and `spycraft2.zip` to the release.
