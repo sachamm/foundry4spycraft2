@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
 - Now requires Foundry VTT v14 (verified on 14.370).
 - Fixed the agent sheet failing to open ("header must render a single HTML element").

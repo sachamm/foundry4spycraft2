@@ -2,7 +2,7 @@
   "id": "spycraft2",
   "title": "Spycraft 2.0",
   "description": "Core rules and character options for the Spycraft 2.0 roleplaying game.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "compatibility": {
     "minimum": "14",
     "verified": "14.370"
@@ -141,7 +141,7 @@
   "secondaryTokenAttribute": "wounds",
   "url": "https://github.com/sachamm/foundry4spycraft2",
   "manifest": "https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.json",
-  "download": "https://github.com/sachamm/foundry4spycraft2/releases/download/v0.2.0/spycraft2.zip",
+  "download": "https://github.com/sachamm/foundry4spycraft2/releases/download/v0.3.0/spycraft2.zip",
   "bugs": "https://github.com/sachamm/foundry4spycraft2/issues",
   "packFolders": [
     {
