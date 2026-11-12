@@ -1,0 +1,39 @@
+{
+  "id": "spycraft2",
+  "title": "Spycraft 2.0",
+  "description": "Core rules and character options for the Spycraft 2.0 roleplaying game.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    { "name": "Sacha" }
+  ],
+  "esmodules": ["spycraft2.mjs"],
+  "styles": ["styles/spycraft2.css"],
+  "languages": [
+    { "lang": "en", "name": "English", "path": "lang/en.json" }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "agent": { "htmlFields": ["biography"] },
+      "npc": { "htmlFields": ["biography"] }
+    },
+    "Item": {
+      "class": { "htmlFields": ["description"] },
+      "origin": { "htmlFields": ["description"] },
+      "feat": { "htmlFields": ["description"] },
+      "gear": { "htmlFields": ["description"] },
+      "weapon": { "htmlFields": ["description"] },
+      "armor": { "htmlFields": ["description"] }
+    }
+  },
+  "packs": [],
+  "grid": { "distance": 5, "units": "ft" },
+  "primaryTokenAttribute": "vitality",
+  "secondaryTokenAttribute": "wounds",
+  "url": "",
+  "manifest": "",
+  "download": ""
+}

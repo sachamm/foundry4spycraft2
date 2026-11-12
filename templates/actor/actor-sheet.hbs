@@ -1,0 +1,32 @@
+<section class="spycraft2-sheet">
+  <header class="sheet-header">
+    <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+    <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" />
+    {{#if isAgent}}
+    <label>{{localize "SPYCRAFT.Level"}} <input name="system.level" type="number" value="{{system.level}}" /></label>
+    {{/if}}
+  </header>
+
+  <div class="abilities">
+    {{#each config.abilities as |label key|}}
+    <div class="ability">
+      <a data-action="rollAbility" data-ability="{{key}}">{{localize label}}</a>
+      <input name="system.abilities.{{key}}.value" type="number" value="{{lookup (lookup ../system.abilities key) 'value'}}" />
+      <span class="mod">{{numberFormat (lookup (lookup ../system.abilities key) 'mod') sign=true}}</span>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="resources">
+    <label>{{localize "SPYCRAFT.Vitality"}}
+      <input name="system.vitality.value" type="number" value="{{system.vitality.value}}" /> /
+      <input name="system.vitality.max" type="number" value="{{system.vitality.max}}" />
+    </label>
+    <label>{{localize "SPYCRAFT.Wounds"}}
+      <input name="system.wounds.value" type="number" value="{{system.wounds.value}}" /> /
+      <input name="system.wounds.max" type="number" value="{{system.wounds.max}}" />
+    </label>
+    <span>{{localize "SPYCRAFT.Defense"}}: {{system.defense.total}}</span>
+    <span>{{localize "SPYCRAFT.Initiative"}}: {{numberFormat system.initiative.total sign=true}}</span>
+  </div>
+</section>

@@ -1,0 +1,30 @@
+{
+  "TYPES": {
+    "Actor": { "agent": "Agent", "npc": "NPC" },
+    "Item": {
+      "class": "Class",
+      "origin": "Origin",
+      "feat": "Feat",
+      "gear": "Gear",
+      "weapon": "Weapon",
+      "armor": "Armor"
+    }
+  },
+  "SPYCRAFT": {
+    "Sheet": { "Actor": "Spycraft Actor Sheet" },
+    "Ability": {
+      "str": "Strength",
+      "dex": "Dexterity",
+      "con": "Constitution",
+      "int": "Intelligence",
+      "wis": "Wisdom",
+      "cha": "Charisma"
+    },
+    "Save": { "fort": "Fortitude", "ref": "Reflex", "will": "Will" },
+    "Level": "Level",
+    "Vitality": "Vitality",
+    "Wounds": "Wounds",
+    "Defense": "Defense",
+    "Initiative": "Initiative"
+  }
+}

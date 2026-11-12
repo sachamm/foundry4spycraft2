@@ -1,0 +1,7 @@
+.spycraft2.sheet .sheet-header { display: flex; gap: 8px; align-items: center; }
+.spycraft2.sheet .sheet-header img { width: 64px; height: 64px; }
+.spycraft2.sheet .abilities { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 8px 0; }
+.spycraft2.sheet .ability { display: flex; flex-direction: column; align-items: center; }
+.spycraft2.sheet .ability a { font-weight: bold; cursor: pointer; }
+.spycraft2.sheet .resources { display: flex; flex-wrap: wrap; gap: 12px; }
+.spycraft2.sheet .resources input { width: 3.5em; }
