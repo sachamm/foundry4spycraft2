@@ -11,7 +11,8 @@
     {{#each progression}}
       <tr>
         <td>{{level}}</td><td>{{className}}</td><td>{{classLevel}}</td>
-        <td>{{#if first}}<span class="muted">{{vitalityDie}} ({{localize "SPYCRAFT.Max"}})</span>{{else}}<input type="number" name="progression.{{index}}.vitality" value="{{vitality}}" class="w-2" /> <span class="muted">d{{vitalityDie}}</span>{{/if}}</td>
+        <td>{{#if first}}<span class="muted">{{vitalityDie}} ({{localize "SPYCRAFT.Max"}})</span>{{else}}<input type="number" name="progression.{{index}}.vitality" value="{{vitality}}" class="w-2" /> <span class="muted">d{{vitalityDie}}</span>
+          <a data-action="rollVitality" data-index="{{index}}" data-tooltip="SPYCRAFT.VitalityRollHint"><i class="fa-solid fa-dice"></i></a>{{/if}}</td>
         <td class="{{#if (sc2lt skillPoints.remaining 0)}}bad{{/if}}">{{skillPoints.spent}} / {{skillPoints.available}}</td>
       </tr>
     {{else}}

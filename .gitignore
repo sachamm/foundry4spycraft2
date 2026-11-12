@@ -5,6 +5,9 @@ Thumbs.db
 .idea/
 *.swp
 
+# Python
+__pycache__/
+
 # Node
 node_modules/
 npm-debug.log*

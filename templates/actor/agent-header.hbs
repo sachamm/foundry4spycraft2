@@ -1,3 +1,5 @@
+{{!-- A template part must render exactly one root element, so the header, to-do and warnings share a wrapper. --}}
+<div class="sheet-top">
 <header class="sheet-header">
   <img class="portrait" src="{{actor.img}}" data-edit="img" data-action="editImage" alt="{{actor.name}}" />
   <div class="header-main">
@@ -9,25 +11,36 @@
       <span class="level"><b>{{localize "SPYCRAFT.CareerLevel"}} {{system.level}}</b></span>
       <label>{{localize "SPYCRAFT.XP"}} <input type="number" name="system.xp" value="{{system.xp}}" class="w-xp" /></label>
       {{#if xpNext}}<span class="muted">/ {{xpNext}}</span>{{/if}}
-      <span class="talent">{{#if talent}}{{talent.name}}{{else}}<a data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>
-      <span class="specialty">{{#if specialty}}{{specialty.name}}{{else}}<a data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</a>{{/if}}</span>
+      <span class="talent origin" {{#if talent}}data-item-id="{{talent.id}}"{{/if}}>{{#if talent}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.talent">{{talent.name}}</a>
+        <a data-action="browse" data-type="origin" data-origin-type="talent" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
+        <a data-action="itemDelete" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>
+      <span class="specialty origin" {{#if specialty}}data-item-id="{{specialty.id}}"{{/if}}>{{#if specialty}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.specialty">{{specialty.name}}</a>
+        <a data-action="browse" data-type="origin" data-origin-type="specialty" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
+        <a data-action="itemDelete" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</a>{{/if}}</span>
     </div>
     <div class="resources">
       <label class="res vitality">{{localize "SPYCRAFT.Vitality"}}
-        <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /> <span>/ {{system.vitality.max}}</span></label>
+        <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /> <span {{sc2tip tips.vitality}}>/ {{system.vitality.max}}</span></label>
       <label class="res wounds">{{localize "SPYCRAFT.Wounds"}}
-        <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span>/ {{system.wounds.max}}</span></label>
+        <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span {{sc2tip tips.wounds}}>/ {{system.wounds.max}}</span></label>
       <span class="res action-dice">{{localize "SPYCRAFT.ActionDice.Label"}}
-        <input type="number" name="system.actionDice.value" value="{{system.actionDice.value}}" /> <span>/ {{system.actionDice.max}} (d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}})</span>
+        <input type="number" name="system.actionDice.value" value="{{system.actionDice.value}}" /> <span {{sc2tip tips.actionDice}}>/ {{system.actionDice.max}} (d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}})</span>
         <a data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend"><i class="fa-solid fa-dice"></i></a>
         <a data-action="refreshActionDice" data-tooltip="SPYCRAFT.ActionDice.Refresh"><i class="fa-solid fa-rotate"></i></a>
       </span>
     </div>
   </div>
 </header>
+{{#if todo.length}}
+<details class="todo" data-key="todo" {{#if open.todo}}open{{/if}}>
+  <summary><i class="fa-solid fa-list-check"></i> {{localize "SPYCRAFT.Todo"}} ({{todo.length}})</summary>
+  <ul>{{#each todo}}<li>{{#if browse}}<a data-action="browse" data-type="{{browse.type}}" data-origin-type="{{browse.originType}}">{{text}}</a>{{else}}<a data-action="todo" data-tab="{{tab}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}}>{{text}}</a>{{/if}}</li>{{/each}}</ul>
+</details>
+{{/if}}
 {{#if warnings.length}}
-<details class="warnings">
+<details class="warnings" data-key="warnings" {{#if open.warnings}}open{{/if}}>
   <summary><i class="fa-solid fa-triangle-exclamation"></i> {{localize "SPYCRAFT.Warnings" count=warnings.length}} ({{warnings.length}})</summary>
   <ul>{{#each warnings}}<li>{{this}}</li>{{/each}}</ul>
 </details>
 {{/if}}
+</div>

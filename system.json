@@ -4,8 +4,8 @@
   "description": "Core rules and character options for the Spycraft 2.0 roleplaying game.",
   "version": "0.2.0",
   "compatibility": {
-    "minimum": "13",
-    "verified": "13"
+    "minimum": "14",
+    "verified": "14.370"
   },
   "authors": [
     {

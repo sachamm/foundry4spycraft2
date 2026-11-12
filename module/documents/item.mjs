@@ -1,8 +1,31 @@
+/**
+ * Identifies this browser session. The same user can be logged in from several clients at once, so comparing user ids
+ * is not enough to make sure only the client that made a change follows it up.
+ */
+const CLIENT_ID = foundry.utils.randomID();
+
 export class SpycraftItem extends Item {
+  /** @override */
+  async _preCreate(data, options, user) {
+    if ((await super._preCreate(data, options, user)) === false) return false;
+    options.spycraft2Client = CLIENT_ID;
+  }
+
+  /** @override */
+  async _preDelete(options, user) {
+    if ((await super._preDelete(options, user)) === false) return false;
+    options.spycraft2Client = CLIENT_ID;
+  }
+
+  /** Did this client start the operation? (_preCreate/_preDelete only run on the originating client.) */
+  static #isOrigin(options, userId) {
+    return userId === game.user.id && options?.spycraft2Client === CLIENT_ID;
+  }
+
   /** @override */
   _onCreate(data, options, userId) {
     super._onCreate(data, options, userId);
-    if (userId !== game.user.id || this.parent?.type !== "agent") return;
+    if (!SpycraftItem.#isOrigin(options, userId) || this.parent?.type !== "agent") return;
     if (this.type === "origin") this.parent.syncGrantedFeats();
   }
 
@@ -10,7 +33,7 @@ export class SpycraftItem extends Item {
   _onDelete(options, userId) {
     super._onDelete(options, userId);
     const actor = this.parent;
-    if (userId !== game.user.id || actor?.type !== "agent") return;
+    if (!SpycraftItem.#isOrigin(options, userId) || actor?.type !== "agent") return;
     if (this.type === "origin") actor.syncGrantedFeats();
     if (this.type === "class") {
       // Deleting a class item removes its levels from the progression.

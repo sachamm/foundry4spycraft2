@@ -14,6 +14,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   /** Career level whose skill points are being edited on the Skills tab. */
   _skillLevel = null;
 
+  /** Which collapsible header panels (to-do, warnings) are open, so re-renders keep them that way. */
+  _open = { todo: true, warnings: false };
+
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "agent"],
     position: { width: 820, height: 860 },
@@ -26,6 +29,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       rollAttack: SpycraftAgentSheet.#onRollAttack,
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
+      rollVitality: SpycraftAgentSheet.#onRollVitality,
+      todo: SpycraftAgentSheet.#onTodo,
       spendActionDie: SpycraftAgentSheet.#onSpendActionDie,
       refreshActionDice: SpycraftAgentSheet.#onRefreshActionDice,
       addLevel: SpycraftAgentSheet.#onAddLevel,
@@ -82,8 +87,34 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     Object.assign(context, {
       actor, system: sys, source: actor.system._source, config: cfg, editable: this.isEditable,
       tabs: this._prepareTabs("primary"),
-      warnings: sys.warnings ?? []
+      warnings: sys.warnings ?? [], todo: sys.todo ?? [], open: this._open
     });
+
+    // Hover breakdowns: fixed parts first, then every origin/feat/class bonus the engine recorded.
+    const src = sys.bonusSources ?? {};
+    const misc = sys.misc ?? {};
+    const tip = (parts, ...targets) => {
+      const rows = parts.filter(([, v]) => v);
+      for (const t of targets) for (const s of src[t] ?? []) rows.push([s.source, s.value]);
+      return rows;
+    };
+    const abilTip = k => [k.toUpperCase(), sys.abilities[k].mod];
+    const miscLabel = game.i18n.localize("SPYCRAFT.Misc");
+    const classLabel = game.i18n.localize("SPYCRAFT.Class.Label");
+    const armorLabel = game.i18n.localize("SPYCRAFT.Armor");
+    const vitBonus = (src.vitality ?? []).reduce((n, s) => n + s.value, 0);
+    const conPart = sys.abilities.con.mod * sys.level;
+    context.tips = {
+      defense: tip([[game.i18n.localize("SPYCRAFT.Base"), 10], [classLabel, sys.defense.base], abilTip("dex"), [armorLabel, sys.defense.armor], [miscLabel, misc.defense]], "defense"),
+      initiative: tip([[classLabel, sys.initiative.base], abilTip("dex"), [miscLabel, misc.initiative]], "initiative"),
+      speed: tip([[game.i18n.localize("SPYCRAFT.Base"), 30], [armorLabel, sys.armor?.speed], [miscLabel, misc.speed]], "speed"),
+      knowledge: tip([[game.i18n.localize("SPYCRAFT.Level"), sys.level], abilTip("int"), [miscLabel, misc.knowledge]], "knowledge"),
+      vitality: tip([[game.i18n.localize("SPYCRAFT.VitalityDice"), sys.vitality.max - vitBonus - conPart - (misc.vitality ?? 0)],
+        [`CON × ${sys.level}`, conPart], [miscLabel, misc.vitality]], "vitality"),
+      wounds: tip([["CON", sys.abilities.con.value], [miscLabel, misc.wounds]], "wounds"),
+      actionDice: tip([[game.i18n.localize("SPYCRAFT.Level"), sys.actionDice.max - (src["actionDice.count"] ?? []).reduce((n, s) => n + s.value, 0) - (misc.actionDice ?? 0)],
+        [miscLabel, misc.actionDice]], "actionDice.count")
+    };
 
     // Abilities
     context.abilities = Object.entries(cfg.abilities).map(([key, label]) => ({
@@ -94,7 +125,10 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     }));
     context.abilityOptions = Object.fromEntries(Object.entries(cfg.abilities).map(([k, v]) => [k, game.i18n.localize(v)]));
 
-    context.saves = Object.entries(cfg.saves).map(([key, s]) => ({ key, label: game.i18n.localize(s.label), ...sys.saves[key] }));
+    context.saves = Object.entries(cfg.saves).map(([key, s]) => ({
+      key, label: game.i18n.localize(s.label), ...sys.saves[key],
+      tip: tip([[classLabel, sys.saves[key].base], abilTip(s.ability), key === "ref" ? [armorLabel, sys.armor?.check] : [armorLabel, 0], [miscLabel, misc[key]]], `saves.${key}`)
+    }));
 
     // Items by type
     const items = actor.items.contents.sort((a, b) => (a.sort || 0) - (b.sort || 0));
@@ -145,7 +179,13 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       points: entry?.skills?.[s.key] ?? 0,
       classAtLevel: !!(lvlClass?.system.classSkills?.includes(s.key) || s.classOverride),
       abilityLabel: s.abilities.map(a => a.toUpperCase()).join("/"),
-      totalsLabel: s.totals.map(t => `${t.total >= 0 ? "+" : ""}${t.total}`).join(" / ")
+      totalsLabel: s.totals.map(t => `${t.total >= 0 ? "+" : ""}${t.total}`).join(" / "),
+      bonusTip: tip([[miscLabel, s.misc]], `skills.${s.key}.misc`),
+      threatTip: tip([], `skills.${s.key}.threat`),
+      capTip: tip([], `skills.${s.key}.cap`),
+      totals: s.totals.map(t => ({
+        ...t, tip: tip([[game.i18n.localize("SPYCRAFT.Skill.Ranks"), s.ranks], abilTip(t.ability), [miscLabel, s.misc]], `skills.${s.key}.misc`)
+      }))
     }));
 
     // Feats
@@ -179,6 +219,14 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
 
     context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.biography, { secrets: actor.isOwner, rollData });
     return context;
+  }
+
+  /** Remember which header panels the player has opened or closed. */
+  _onRender(context, options) {
+    super._onRender(context, options);
+    for (const d of this.element.querySelectorAll("details[data-key]")) {
+      d.addEventListener("toggle", () => { this._open[d.dataset.key] = d.open; });
+    }
   }
 
   async _preparePartContext(partId, context, options) {
@@ -264,6 +312,24 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   static #onRollAttack(event, target) { return this.actor.rollAttack(this._item(target)); }
   static #onRollDamage(event, target) { return this.actor.rollDamage(this._item(target)); }
   static #onRollInitiative() { return this.actor.rollInitiative({ createCombatants: true }); }
+  static async #onRollVitality(event, target) {
+    const index = Number(target.dataset.index);
+    if (this.actor.system.progression[index]?.vitality) {
+      const ok = await foundry.applications.api.DialogV2.confirm({
+        window: { title: game.i18n.localize("SPYCRAFT.VitalityRoll") },
+        content: `<p>${game.i18n.format("SPYCRAFT.VitalityReroll", { level: index + 1 })}</p>`
+      });
+      if (!ok) return;
+    }
+    return this.actor.rollVitality(index);
+  }
+  /** Jump from a to-do entry to the tab where it gets resolved. */
+  static #onTodo(event, target) {
+    const { tab, skillLevel } = target.dataset;
+    if (skillLevel) this._skillLevel = Number(skillLevel);
+    this.changeTab(tab, "primary");
+    if (skillLevel) return this.render({ parts: ["skills"] });
+  }
   static #onSpendActionDie() { return this.actor.rollActionDie(); }
   static #onRefreshActionDice() { return this.actor.update({ "system.actionDice.value": this.actor.system.actionDice.max }); }
   static #onAddLevel() { return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true); }

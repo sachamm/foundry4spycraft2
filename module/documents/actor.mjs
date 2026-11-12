@@ -100,7 +100,7 @@ export class SpycraftActor extends Actor {
    * Add a career level in a class. Creates the class item on the actor if needed.
    * @param {Item|object} classData  a class Item (world/compendium/embedded) or its data
    */
-  async addClassLevel(classData) {
+  async addClassLevel(classData, { promptVitality = true } = {}) {
     if (this.type !== "agent") return;
     const sys = this.system;
     if (sys.progression.length >= 20) return ui.notifications.warn(game.i18n.localize("SPYCRAFT.Class.MaxLevel"));
@@ -117,7 +117,36 @@ export class SpycraftActor extends Actor {
     const progression = [...sys.progression.map(p => ({ ...p })), { classId: ident, vitality: 0, skills: {} }];
     await this.update({ "system.progression": progression });
     await this.syncGrantedFeats();
+    if (promptVitality && progression.length > 1 && cls.system.vitalityDie) {
+      const roll = await foundry.applications.api.DialogV2.confirm({
+        window: { title: game.i18n.localize("SPYCRAFT.VitalityRoll") },
+        content: `<p>${game.i18n.format("SPYCRAFT.VitalityPrompt", { level: progression.length, name: cls.name, die: cls.system.vitalityDie })}</p>`
+      });
+      if (roll) await this.rollVitality(progression.length - 1);
+    }
     return cls;
+  }
+
+  /**
+   * Roll the class vitality die for one career level and store the result.
+   * @param {number} index  zero-based index into the level progression (level 1 is always the maximum)
+   */
+  async rollVitality(index) {
+    if (this.type !== "agent") return null;
+    const entry = this.system.progression[index];
+    if (!entry || index < 1) return null;
+    const cls = this.items.find(i => i.type === "class" && (i.system.identifier || i.name) === entry.classId);
+    const die = cls?.system.vitalityDie;
+    if (!die) return null;
+    const roll = await new Roll(`1d${die}`).evaluate();
+    await roll.toMessage({
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      flavor: game.i18n.format("SPYCRAFT.VitalityFlavor", { level: index + 1, name: cls.name })
+    });
+    const progression = this.system.progression.map(p => ({ ...p }));
+    progression[index].vitality = roll.total;
+    await this.update({ "system.progression": progression });
+    return roll;
   }
 
   /** Remove the most recent career level. Deletes the class item when no levels remain. */
@@ -156,8 +185,15 @@ export class SpycraftActor extends Actor {
   async #syncGrantedFeats() {
     const required = this.requiredGrants();
     const norm = s => s.trim().toLowerCase();
-    const have = new Map(this.items.filter(i => i.type === "feat").map(i => [norm(i.name), i]));
-    const toDelete = this.items.filter(i => i.type === "feat" && i.system.granted && ![...required.keys()].some(n => norm(n) === norm(i.name)));
+    const have = new Map();
+    const toDelete = [];
+    for (const i of this.items.filter(i => i.type === "feat")) {
+      const key = norm(i.name);
+      const needed = [...required.keys()].some(n => norm(n) === key);
+      // Drop granted feats that are no longer granted, and any second granted copy of the same feat.
+      if (i.system.granted && (!needed || have.get(key)?.system.granted)) toDelete.push(i);
+      else if (!have.has(key) || i.system.granted) have.set(key, i);
+    }
     const toCreate = [];
     const missing = [...required.keys()].filter(n => !have.has(norm(n)));
     if (missing.length) {

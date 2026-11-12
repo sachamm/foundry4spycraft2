@@ -4,12 +4,21 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 const PACKS = { class: "spycraft2.classes", origin: "spycraft2.origins", feat: "spycraft2.feats", weapon: "spycraft2.weapons", armor: "spycraft2.armor" };
 const FIELDS = {
-  class: ["system.identifier", "system.expert", "system.requirements", "system.vitalityDie", "system.skillPoints"],
+  class: ["system.identifier", "system.expert", "system.requirements", "system.vitalityDie", "system.skillPoints", "system.description"],
   origin: ["system.originType", "system.description"],
   feat: ["system.tree", "system.prerequisites", "system.prerequisitesNotChecked", "system.description"],
   weapon: ["system.proficiency", "system.caliber", "system.damage", "system.errorThreat", "system.range", "system.qualities"],
   armor: ["system.caliber", "system.damageReduction", "system.damageReductionSubdual", "system.defensePenalty", "system.armorCheck"]
 };
+
+/** Item types an agent can only hold once; the browser won't add a second copy. */
+const UNIQUE = new Set(["feat", "origin"]);
+
+/** Plain text of a stored HTML description (parsed inertly, nothing is loaded or run). */
+function plainText(html) {
+  if (!html) return "";
+  return new DOMParser().parseFromString(String(html), "text/html").body.textContent.replace(/\s+/g, " ").trim();
+}
 
 /**
  * Compendium browser that shows which options a character
@@ -65,12 +74,14 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       }
       groups[group] = groupLabel;
       if (this.filters.group && group !== this.filters.group) continue;
-      if (search && !e.name.toLowerCase().includes(search)) continue;
+      const summary = plainText(s.description);
+      if (search && !e.name.toLowerCase().includes(search) && !summary.toLowerCase().includes(search)) continue;
       const check = req && this.actor ? this.actor.checkPrerequisites(req) : { ok: true, unmet: [] };
       if (this.filters.qualifiedOnly && !check.ok) continue;
       rows.push({
-        uuid: e.uuid, id: e._id, name: e.name, groupLabel, extra,
+        uuid: e.uuid, id: e._id, name: e.name, groupLabel, extra, summary,
         owned: owned.has(e.name.toLowerCase()),
+        locked: UNIQUE.has(this.itemType) && owned.has(e.name.toLowerCase()),
         qualified: check.ok, unmet: check.unmet.join("; "), prereq: req ? describe(req) : "",
         notChecked: s.prerequisitesNotChecked
       });
@@ -101,6 +112,9 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onAdd(event, target) {
     const doc = await fromUuid(target.closest("[data-uuid]").dataset.uuid);
     if (!doc || !this.actor) return;
+    if (UNIQUE.has(doc.type) && this.actor.items.some(i => i.type === doc.type && i.name.toLowerCase() === doc.name.toLowerCase())) {
+      return ui.notifications.warn(game.i18n.format(`SPYCRAFT.Browser.Owned.${doc.type}`, { name: doc.name, actor: this.actor.name }));
+    }
     if (doc.type === "class") await this.actor.addClassLevel(doc);
     else {
       if (doc.type === "origin") {

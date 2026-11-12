@@ -9,7 +9,7 @@
     "Ability": { "str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma" },
     "Save": { "fort": "Fortitude", "ref": "Reflex", "will": "Will" },
     "Origin": { "Label": "Origin", "talent": "Talent", "specialty": "Specialty", "Type": "Origin type", "Grants": "Grants feats",
-      "ChooseTalent": "Choose talent…", "ChooseSpecialty": "Choose specialty…" },
+      "ChooseTalent": "Choose talent…", "ChooseSpecialty": "Choose specialty…", "Change": "Choose a different one", "Remove": "Remove" },
     "Class": {
       "Label": "Class", "Level": "Class level", "Base": "Base class", "Expert": "Expert class", "Identifier": "Identifier",
       "AddLevel": "Add level", "RemoveLevel": "Remove last level", "RemoveLevelConfirm": "Remove the most recent career level (and its skill points)?",
@@ -34,7 +34,9 @@
     },
     "Browser": {
       "Title": "Browse {type}", "Search": "Search…", "All": "All", "QualifiedOnly": "Qualified only",
-      "Added": "Added {name} to {actor}.", "Empty": "Nothing matches.", "MissingPack": "Compendium not found — run `npm run build`."
+      "Added": "Added {name} to {actor}.", "Empty": "Nothing matches.", "OwnedHint": "Already on this agent.",
+      "Owned": { "feat": "{actor} already has {name}. To take a feat more than once, raise “Times taken” on the feat itself.",
+        "origin": "{actor} already has {name}." }, "MissingPack": "Compendium not found — run `npm run build`."
     },
     "Roll": { "Threat": "Threat!", "Error": "Error!", "Capped": "Result capped at {cap}.", "Range": "(error {error}, threat {threat})" },
     "ActionDice": { "Label": "Action dice", "Spend": "Spend an action die", "Refresh": "Refresh to maximum", "None": "No action dice left." },
@@ -52,7 +54,10 @@
     "Weapons": "Weapons", "NoWeapons": "No weapons.", "Carrying": "Carrying capacity",
     "Carry": { "Light": "Light", "Medium": "Med", "Heavy": "Heavy", "Extreme": "Extreme", "Lift": "Lift overhead/ground", "Push": "Push" },
     "MiscModifiers": "Miscellaneous modifiers (Final Totals “Misc” column)",
-    "Progression": "Level progression", "VitalityRoll": "Vitality roll", "SkillPoints": "Skill points", "Max": "max",
+    "Progression": "Level progression", "VitalityRoll": "Vitality roll", "VitalityRollHint": "Roll this level's vitality die",
+    "VitalityPrompt": "Roll vitality for career level {level} ({name}, d{die}) now?", "VitalityFlavor": "Vitality — career level {level} ({name})",
+    "VitalityReroll": "Level {level} already has a vitality roll. Roll again and replace it?", "VitalityDice": "Class dice",
+    "Todo": "Still to do", "SkillPoints": "Skill points", "Max": "max",
     "CoreAbilities": "Core abilities", "CoreAbility": "Core ability",
     "Proficiencies": "Weapon proficiencies", "Proficient": "Prof.", "Forte": "Forte", "Proficiency": "Proficiency",
     "ProficiencyHint": "Something you have grants this proficiency — tick it to claim it.",

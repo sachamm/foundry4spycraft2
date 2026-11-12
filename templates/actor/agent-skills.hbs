@@ -20,11 +20,11 @@
         <td><input type="checkbox" name="system.skills.{{key}}.classSkill" {{checked classOverride}} /></td>
         <td>{{#if ../skillLevel}}<input type="number" name="skillpts.{{key}}" value="{{points}}" class="w-2" min="0" />{{/if}}</td>
         <td class="{{#if overMax}}bad{{/if}}">{{ranks}}</td>
-        <td>{{#if bonus}}{{signed bonus}}{{/if}}</td>
+        <td>{{#if bonus}}<span {{sc2tip bonusTip}}>{{signed bonus}}</span>{{/if}}</td>
         <td><input type="number" name="system.skills.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
-        <td>{{#each totals}}<a data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" data-tooltip="{{ability}}">{{signed total}}</a>{{#unless @last}} / {{/unless}}{{/each}}</td>
-        <td>{{#if (sc2lt threat 20)}}{{threat}}-20{{else}}20{{/if}}</td>
-        <td>{{cap}}</td>
+        <td>{{#each totals}}<a data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" {{sc2tip tip}}>{{signed total}}</a>{{#unless @last}} / {{/unless}}{{/each}}</td>
+        <td><span {{sc2tip threatTip}}>{{#if (sc2lt threat 20)}}{{threat}}-20{{else}}20{{/if}}</span></td>
+        <td><span {{sc2tip capTip}}>{{cap}}</span></td>
       </tr>
     {{/each}}
     </tbody>

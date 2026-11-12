@@ -124,3 +124,14 @@
 /* Chat */
 .spycraft2-threat { color: var(--sc2-good, #2e7d32); font-weight: bold; }
 .spycraft2-error { color: var(--sc2-bad, #c0392b); font-weight: bold; }
+
+/* To-do checklist & origin controls */
+.spycraft2 details.todo { border: 1px solid var(--sc2-accent); border-radius: 4px; padding: 2px 8px; margin: 4px 0; }
+.spycraft2 details.todo summary { color: var(--sc2-accent); cursor: pointer; font-weight: bold; }
+.spycraft2 details.todo ul { margin: 4px 0; padding-left: 18px; font-size: 0.9em; columns: 2; column-gap: 24px; }
+.spycraft2 .summary .origin a + a { margin-left: 4px; opacity: 0.6; font-size: 0.85em; }
+.spycraft2 .summary .origin a + a:hover { opacity: 1; }
+.spycraft2 [data-tooltip-html] { cursor: help; }
+.spycraft2 a[data-tooltip-html] { cursor: pointer; }
+.spycraft2.browser .row-main .summary { font-size: 0.85em; opacity: 0.85; }
+.spycraft2.browser li button:disabled { opacity: 0.5; cursor: default; }

@@ -3,7 +3,7 @@
 An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com) implementing the core rules and character options of the Spycraft 2.0 RPG.
 
 - **System ID:** `spycraft2`
-- **Foundry compatibility:** v13
+- **Foundry compatibility:** v14 (minimum 14, verified on 14.370)
 
 ## Development setup
 

@@ -49,6 +49,9 @@ class Bonuses {
 export function computeAgent(sys, items, cfg) {
   const T = cfg.tables;
   const warnings = [];
+  /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
+  let todo = [];
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   const levelRow = l => T.levels[clamp(l, 0, 20)];
 
   /* ---------------- Classes & career level ---------------- */
@@ -81,6 +84,12 @@ export function computeAgent(sys, items, cfg) {
     if (lvl > ci.system.table.length && ci.system.table.length) warnings.push(`${ci.name} has a maximum of ${ci.system.table.length} levels.`);
   }
   sys.base = base;
+  for (const originType of ["talent", "specialty"]) {
+    if (!items.some(i => i.type === "origin" && i.system.originType === originType)) {
+      todo.push({ order: originType === "talent" ? 1 : 2, always: true, tab: "main", browse: { type: "origin", originType }, text: `Choose a ${originType}.` });
+    }
+  }
+  if (!level) todo.push({ order: 3, always: true, tab: "classes", browse: { type: "class", originType: "" }, text: "Take a first class level." });
 
   /* ---------------- Collect bonus sources ---------------- */
   const sources = [];   // { name, bonuses, rank }
@@ -92,12 +101,16 @@ export function computeAgent(sys, items, cfg) {
       if (!lvl) continue;
       sources.push({ name: i.name, bonuses: (i.system.bonuses ?? []).filter(b => (b.level ?? 0) <= lvl), rank: 1 });
       const lists = Object.fromEntries((i.system.choiceLists ?? []).map(L => [L.key, L]));
+      let unpicked = 0;
       (i.system.choiceSchedule ?? []).forEach((slot, idx) => {
         if (slot.level > lvl) return;
         const pick = i.system.choices?.[idx];
-        const opt = lists[slot.list]?.options?.find(o => o.index === Number(pick));
+        const options = lists[slot.list]?.options ?? [];
+        const opt = pick === null || pick === undefined || pick === "" ? null : options.find(o => o.index === Number(pick));
         if (opt) sources.push({ name: `${i.name}: ${opt.name}`, bonuses: opt.bonuses ?? [], rank: 1 });
+        else if (options.length) unpicked += 1;
       });
+      if (unpicked) todo.push({ order: 20, tab: "classes", text: `${i.name}: ${plural(unpicked, "class-ability choice")} to make.` });
     }
   }
 
@@ -130,10 +143,11 @@ export function computeAgent(sys, items, cfg) {
   }
   const increasesDue = cfg.abilityIncreaseLevels.filter(l => l <= level);
   const increasesMissing = increasesDue.filter(l => !increaseAt(l)).length;
-  if (increasesMissing) warnings.push(`${increasesMissing} attribute increase(s) not yet assigned.`);
+  if (increasesMissing) todo.push({ order: 11, tab: "main", text: `${plural(increasesMissing, "attribute increase")} to assign.` });
   sys.pointBuy = { budget: sys.pointBuyBudget ?? cfg.pointBuy, spent: pointCost };
   sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
   if (sys.pointBuy.remaining < 0) warnings.push(`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
+  if (sys.pointBuy.remaining > 0) todo.push({ order: 10, always: true, tab: "main", text: `${plural(sys.pointBuy.remaining, "attribute point")} left to spend.` });
   const abil = Object.fromEntries(ABILITIES.map(k => [k, { value: sys.abilities[k].value, mod: sys.abilities[k].mod }]));
   /** Attribute modifier as it stood at a given career level (only earlier increases). */
   const modAt = (k, l) => {
@@ -220,13 +234,15 @@ export function computeAgent(sys, items, cfg) {
 
   // Vitality: max die at level 1, then rolls; Con modifier every level.
   let vit = 0;
+  const vitMissing = [];
   progression.forEach((entry, idx) => {
     const ci = classAtLevel[idx];
     const die = ci?.system.vitalityDie ?? 0;
     const roll = idx === 0 ? die : Number(entry.vitality) || 0;
-    if (idx > 0 && !entry.vitality) warnings.push(`Vitality roll for level ${idx + 1} not entered.`);
+    if (idx > 0 && !entry.vitality) vitMissing.push(idx + 1);
     vit += roll + abil.con.mod;
   });
+  if (vitMissing.length) todo.push({ order: 15, tab: "classes", text: `Vitality not rolled for level ${vitMissing.join(", ")}.` });
   sys.vitality ??= { value: 0 };
   sys.vitality.max = Math.max(0, vit + B.get("vitality") + (misc.vitality ?? 0));
   sys.wounds ??= { value: 0 };
@@ -270,6 +286,9 @@ export function computeAgent(sys, items, cfg) {
   sys.skillTotals = derivedSkills;
   const overrides = skillDefs.filter(s => sys.skills?.[s.key]?.classSkill).length;
   sys.classSkillPicks = { available: B.get("classSkillPicks"), used: overrides };
+  if (sys.classSkillPicks.available > overrides) {
+    todo.push({ order: 31, tab: "skills", text: `${plural(sys.classSkillPicks.available - overrides, "extra class skill")} to choose.` });
+  }
 
   // Skill points per level.
   const spBonus = B.get("skillPoints") > 0 ? 1 : 0;
@@ -282,6 +301,11 @@ export function computeAgent(sys, items, cfg) {
     if (sp.remaining < 0) warnings.push(`Level ${idx + 1}: ${-sp.remaining} skill point(s) overspent.`);
   });
   sys.skillPoints = skillPoints;
+  const spLeft = skillPoints.filter(sp => sp.remaining > 0);
+  if (spLeft.length) {
+    todo.push({ order: 30, tab: "skills", skillLevel: spLeft[0].level,
+      text: `Skill points unspent: ${spLeft.map(sp => `level ${sp.level} (${sp.remaining})`).join(", ")}.` });
+  }
 
   /* ---------------- Feat slots ---------------- */
   const slots = { any: (lr?.feats ?? 0) + B.get("featSlots.any") };
@@ -300,6 +324,8 @@ export function computeAgent(sys, items, cfg) {
   if (overflow > slots.any) warnings.push(`${overflow - slots.any} more feat(s) taken than available.`);
   const unusedTree = Object.entries(trees).filter(([, v]) => v.slots > v.spent).map(([t, v]) => `${v.slots - v.spent} ${cfg.featTrees[t]}`);
   sys.feats.unusedTreeSlots = unusedTree;
+  if (sys.feats.any.remaining > 0) todo.push({ order: 40, tab: "feats", text: `${plural(sys.feats.any.remaining, "feat slot")} open (any tree).` });
+  if (unusedTree.length) todo.push({ order: 41, tab: "feats", text: `Bonus feat slots open: ${unusedTree.join(", ")}.` });
 
   /* ---------------- Proficiencies, focuses, interests, contacts ---------------- */
   const firstClass = classAtLevel[0];
@@ -313,6 +339,7 @@ export function computeAgent(sys, items, cfg) {
   }
   sys.proficiencyPicks = { available: profAvail, used: profUsed, remaining: profAvail - profUsed, hints: profHints };
   if (profUsed > profAvail) warnings.push(`${profUsed - profAvail} more weapon proficiencies/fortes than available.`);
+  if (profUsed < profAvail) todo.push({ order: 50, tab: "training", text: `${plural(profAvail - profUsed, "weapon proficiency/forte pick")} left.` });
 
   const focusCount = (skill, target) => 1 + B.get(`focus.${target}`) + Math.floor((skillRanks[skill] ?? 0) / 4);
   const fx = sys.focuses ?? {};
@@ -327,14 +354,20 @@ export function computeAgent(sys, items, cfg) {
     v.remaining = v.available - v.used;
     if (v.remaining < 0) warnings.push(`${k} focuses: ${-v.remaining} over the limit.`);
   }
+  const focusLeft = Object.entries(sys.focusPicks).filter(([, v]) => v.remaining > 0)
+    .map(([k, v]) => `${k === "generic" ? "extra" : (cfg.skills[k]?.name ?? k)} ${v.remaining}`);
+  if (focusLeft.length) todo.push({ order: 51, tab: "training", text: `Focuses to choose: ${focusLeft.join(", ")}.` });
 
   const interestList = String(sys.interests ?? "").split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
   sys.interestPicks = { available: tb.interestBase + B.get("interests"), used: interestList.length };
+  sys.interestPicks.remaining = sys.interestPicks.available - sys.interestPicks.used;
+  if (sys.interestPicks.remaining > 0) todo.push({ order: 52, tab: "training", text: `${plural(sys.interestPicks.remaining, "interest")} to choose.` });
 
   const contactsAvail = 1 + B.get("contacts") + Math.floor((skillRanks.networking ?? 0) / 4);
   const contactsUsed = (sys.contacts ?? []).reduce((n, c) => n + (Number(c.rank) || 0), 0);
   sys.contactPicks = { available: contactsAvail, used: contactsUsed, remaining: contactsAvail - contactsUsed };
   if (contactsUsed > contactsAvail) warnings.push(`Contacts: ${contactsUsed - contactsAvail} choice(s) over the limit.`);
+  if (contactsUsed < contactsAvail) todo.push({ order: 53, tab: "training", text: `${plural(contactsAvail - contactsUsed, "contact choice")} unused.` });
 
   sys.subplotPicks = { available: (lr?.subplots ?? 0) + B.get("subplots"), used: (sys.subplots ?? []).length };
 
@@ -353,6 +386,7 @@ export function computeAgent(sys, items, cfg) {
     spendingCash: { rank: cash, amount: 100 * cash * cash }
   };
   if (allocated > wealthTotal) warnings.push(`Wealth overspent by ${allocated - wealthTotal}.`);
+  if (allocated < wealthTotal) todo.push({ order: 60, tab: "gear", text: `${plural(wealthTotal - allocated, "wealth point")} to allocate.` });
 
   const picks = {};
   for (const g of GEAR) picks[g] = { available: gearBase[g] + (misc[`gear${g}`] ?? 0), spent: 0 };
@@ -394,6 +428,9 @@ export function computeAgent(sys, items, cfg) {
 
   sys.rollDataExtras = rd;
   sys.warnings = warnings;
+  // Before the first class level only the opening steps are worth listing.
+  if (!level) todo = todo.filter(t => t.always);
+  sys.todo = todo.sort((a, b) => a.order - b.order);
   return sys;
 }
 

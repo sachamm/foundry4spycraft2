@@ -31,11 +31,11 @@
       <h3>{{localize "SPYCRAFT.Defenses"}}</h3>
       <div class="stat-grid">
         {{#each saves}}
-          <div class="stat"><a data-action="rollSave" data-save="{{key}}">{{label}}</a><b>{{signed total}}</b><small>{{localize "SPYCRAFT.Base"}} {{base}}{{#if bonus}}, {{signed bonus}}{{/if}}</small></div>
+          <div class="stat"><a data-action="rollSave" data-save="{{key}}">{{label}}</a><b {{sc2tip tip}}>{{signed total}}</b><small>{{localize "SPYCRAFT.Base"}} {{base}}{{#if bonus}}, {{signed bonus}}{{/if}}</small></div>
         {{/each}}
-        <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><b>{{system.defense.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.defense.base}}{{#if system.defense.armor}}, {{localize "SPYCRAFT.Armor"}} {{signed system.defense.armor}}{{/if}}</small></div>
-        <div class="stat"><a data-action="rollInitiative">{{localize "SPYCRAFT.Initiative"}}</a><b>{{signed system.initiative.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.initiative.base}}</small></div>
-        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b>{{system.speed}} ft</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><b {{sc2tip tips.defense}}>{{system.defense.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.defense.base}}{{#if system.defense.armor}}, {{localize "SPYCRAFT.Armor"}} {{signed system.defense.armor}}{{/if}}</small></div>
+        <div class="stat"><a data-action="rollInitiative">{{localize "SPYCRAFT.Initiative"}}</a><b {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.initiative.base}}</small></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b {{sc2tip tips.speed}}>{{system.speed}} ft</b></div>
       </div>
     </div>
 
@@ -51,7 +51,7 @@
       </div>
       <h3>{{localize "SPYCRAFT.Checks"}}</h3>
       <div class="stat-grid">
-        <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><b>{{signed system.knowledge}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><b {{sc2tip tips.knowledge}}>{{signed system.knowledge}}</b></div>
         <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><b>{{signed system.requestCheck}}</b></div>
         <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><b>{{signed system.gearCheck}}</b></div>
       </div>

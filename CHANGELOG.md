@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+- Now requires Foundry VTT v14 (verified on 14.370).
+- Fixed the agent sheet failing to open ("header must render a single HTML element").
+- Fixed the Graceful talent applying −2 Intelligence; it is −2 Constitution.
+- Fixed granted feats being added twice when the same user is logged in from two browsers; syncing grants also
+  removes surplus copies.
+- Fixed an editor error when the agent sheet re-rendered twice in quick succession (the biography editor is no longer
+  collaborative).
+- "Still to do" checklist in the agent sheet header: unspent attribute points, skill points, feat slots, proficiencies,
+  focuses, interests, contacts, wealth, unmade class-ability choices and unrolled vitality. Each entry jumps to its tab.
+  (Unassigned attribute increases and missing vitality rolls moved here from the warnings list.)
+- Talent and specialty in the header can be opened, swapped or removed.
+- Compendium browser shows each entry's summary, searches it, and no longer adds a second copy of a feat or origin.
+- Vitality roll button per career level, and an offer to roll when a level is added.
+- Hover breakdowns showing where saves, Defense, Initiative, Speed, vitality, wounds, action dice and skill bonuses come from.
+- Bio tab no longer shows a stray "level" field.
+
 ## 0.2.0
 
 - Full character-builder engine: point-buy attributes,

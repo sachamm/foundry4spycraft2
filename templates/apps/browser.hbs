@@ -11,9 +11,10 @@
         <div class="row-main">
           <a data-action="open" class="name">{{name}}</a>
           <span class="muted">{{groupLabel}}{{#if extra}} · {{extra}}{{/if}}</span>
+          {{#if summary}}<div class="summary">{{summary}}</div>{{/if}}
           {{#if prereq}}<div class="prereq {{#unless qualified}}bad{{/unless}}" data-tooltip="{{unmet}}">{{prereq}}{{#if notChecked}} <span class="tag">{{localize "SPYCRAFT.Feat.NotChecked"}}</span>{{/if}}</div>{{/if}}
         </div>
-        {{#if ../actor}}<button type="button" data-action="add" {{#if owned}}class="owned"{{/if}}>{{#if owned}}<i class="fa-solid fa-check"></i>{{else}}<i class="fa-solid fa-plus"></i>{{/if}}</button>{{/if}}
+        {{#if ../actor}}<button type="button" data-action="add" {{#if owned}}class="owned"{{/if}} {{#if locked}}disabled data-tooltip="SPYCRAFT.Browser.OwnedHint"{{/if}}>{{#if owned}}<i class="fa-solid fa-check"></i>{{else}}<i class="fa-solid fa-plus"></i>{{/if}}</button>{{/if}}
       </li>
     {{else}}<li class="muted">{{localize "SPYCRAFT.Browser.Empty"}}</li>{{/each}}
   </ul>

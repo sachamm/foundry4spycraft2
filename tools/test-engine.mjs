@@ -119,6 +119,7 @@ for (const file of fixtures) {
     expect(`${k} cap`, s.skillTotals[k].cap, v.cap);
   }
   if (s.warnings.length) console.log(`  warnings: ${s.warnings.join(" | ")}`);
+  if (process.env.SHOW_TODO) console.log(`  to do: ${s.todo.map(t => t.text).join(" | ")}`);
 }
 console.log(`\n${checks - failures}/${checks} checks passed across ${fixtures.length} fixture(s).`);
 process.exit(failures ? 1 : 0);
