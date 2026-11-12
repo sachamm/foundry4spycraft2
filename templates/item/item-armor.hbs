@@ -1,0 +1,19 @@
+<section class="item-details">
+  <div class="form-fields-grid">
+    <label>DR <input type="number" name="system.damageReduction" value="{{system.damageReduction}}" class="w-2" /> / <input type="number" name="system.damageReductionSubdual" value="{{system.damageReductionSubdual}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.ArmorField.Defense"}} <input type="number" name="system.defensePenalty" value="{{system.defensePenalty}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.ArmorField.Check"}} <input type="number" name="system.armorCheck" value="{{system.armorCheck}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Speed"}} <input type="number" name="system.speedPenalty" value="{{system.speedPenalty}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.ArmorField.Notice"}} <input type="text" name="system.notice" value="{{system.notice}}" class="w-4" /></label>
+    <label class="wide">{{localize "SPYCRAFT.ArmorField.Resistances"}} <input type="text" name="system.resistances" value="{{system.resistances}}" /></label>
+    <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
+    <label>{{localize "SPYCRAFT.Weight"}} <input type="number" step="any" name="system.weight" value="{{system.weight}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Pick"}} <select name="system.pick">{{selectOptions pickOptions selected=system.pick}}</select></label>
+    <label><input type="checkbox" name="system.equipped" {{checked system.equipped}} /> {{localize "SPYCRAFT.Equipped"}}</label>
+    <label><input type="checkbox" name="system.reserve" {{checked system.reserve}} /> {{localize "SPYCRAFT.Reserve"}}</label>
+    <label><input type="checkbox" name="system.common" {{checked system.common}} /> {{localize "SPYCRAFT.TeamPool"}}</label>
+  </div>
+  <h3>{{localize "SPYCRAFT.Description"}}</h3>
+  {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+</section>

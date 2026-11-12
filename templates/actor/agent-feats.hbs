@@ -1,0 +1,22 @@
+<section class="tab feats {{tab.cssClass}}" data-tab="feats" data-group="primary">
+  <h3>{{localize "SPYCRAFT.Feat.Slots"}}
+    <span class="controls">
+      <a data-action="browse" data-type="feat"><i class="fa-solid fa-book-open"></i> {{localize "SPYCRAFT.Feat.Browse"}}</a>
+      <a data-action="syncGrants" data-tooltip="SPYCRAFT.Feat.SyncGrantsHint"><i class="fa-solid fa-rotate"></i></a>
+    </span></h3>
+  <div class="feat-slots">
+    <span class="slot {{#if (sc2lt system.feats.any.remaining 0)}}bad{{/if}}"><b>{{localize "SPYCRAFT.Feat.Any"}}</b> {{system.feats.any.spent}} / {{system.feats.any.slots}}</span>
+    {{#each featTrees}}<span class="slot"><b>{{label}}</b> {{#if slots}}{{spent}} / {{slots}}{{else}}{{owned}}{{/if}}</span>{{/each}}
+  </div>
+  <ul class="item-list feats-list">
+    {{#each feats}}
+      <li data-item-id="{{item.id}}" class="{{#unless status.ok}}unqualified{{/unless}} {{#if item.system.granted}}granted{{/if}}">
+        <a data-action="itemEdit" class="name">{{item.name}}{{#if (sc2lt 1 item.system.ranks)}} ×{{item.system.ranks}}{{/if}}</a>
+        <span class="tree">{{treeLabel}}</span>
+        {{#if item.system.granted}}<span class="tag">{{localize "SPYCRAFT.Feat.Granted"}}: {{item.system.grantSource}}</span>{{/if}}
+        {{#unless status.ok}}<span class="bad" data-tooltip="{{prereqText}}"><i class="fa-solid fa-triangle-exclamation"></i> {{#each status.unmet}}{{this}}{{#unless @last}}; {{/unless}}{{/each}}</span>{{/unless}}
+        <span class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></span>
+      </li>
+    {{else}}<li class="muted">{{localize "SPYCRAFT.Feat.None"}}</li>{{/each}}
+  </ul>
+</section>

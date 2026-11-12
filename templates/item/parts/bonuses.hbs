@@ -1,0 +1,16 @@
+<h3>{{localize "SPYCRAFT.Bonuses"}} {{#if editable}}<span class="controls"><a data-action="addBonus"><i class="fa-solid fa-plus"></i></a></span>{{/if}}</h3>
+<table class="bonuses">
+  <thead><tr><th>{{localize "SPYCRAFT.Bonus.Target"}}</th><th>{{localize "SPYCRAFT.Bonus.Value"}}</th>{{#if showLevel}}<th>{{localize "SPYCRAFT.Level"}}</th>{{/if}}<th></th></tr></thead>
+  <tbody>
+  {{#each bonuses}}
+    <tr>
+      <td><input type="text" name="bonuses.{{index}}.target" value="{{target}}" list="sc2-bonus-targets" data-tooltip="{{label}}" /></td>
+      <td><input type="text" name="bonuses.{{index}}.value" value="{{value}}" /></td>
+      {{#if ../showLevel}}<td><input type="number" name="bonuses.{{index}}.level" value="{{level}}" class="w-2" /></td>{{/if}}
+      <td>{{#if ../editable}}<a data-action="removeBonus" data-index="{{index}}"><i class="fa-solid fa-trash"></i></a>{{/if}}</td>
+    </tr>
+  {{else}}<tr><td colspan="4" class="muted">{{localize "SPYCRAFT.Bonus.None"}}</td></tr>{{/each}}
+  </tbody>
+</table>
+<datalist id="sc2-bonus-targets">{{#each bonusTargets}}<option value="{{@key}}">{{this}}</option>{{/each}}</datalist>
+<p class="hint muted">{{localize "SPYCRAFT.Bonus.Hint"}}</p>

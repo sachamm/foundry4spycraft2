@@ -1,0 +1,12442 @@
+[
+ {
+  "num": 2,
+  "name": "Advocate",
+  "key": "advocate",
+  "expert": false,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 4,
+  "coreAbility": {
+   "name": "Persistent"
+  },
+  "classSkills": [
+   "bluff",
+   "bureaucracy",
+   "cultures",
+   "impress",
+   "intimidate",
+   "manipulate",
+   "medicine",
+   "networking",
+   "notice",
+   "profession",
+   "resolve",
+   "science"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 0,
+    "will": 2,
+    "defense": 0,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 0,
+    "will": 3,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 2,
+    "ref": 1,
+    "will": 3,
+    "defense": 1,
+    "initiative": 4,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 2,
+    "ref": 1,
+    "will": 4,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 3,
+    "ref": 1,
+    "will": 4,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 3,
+    "ref": 2,
+    "will": 5,
+    "defense": 2,
+    "initiative": 6,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 4,
+    "ref": 2,
+    "will": 5,
+    "defense": 3,
+    "initiative": 7,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 4,
+    "ref": 2,
+    "will": 6,
+    "defense": 3,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 4,
+    "ref": 3,
+    "will": 6,
+    "defense": 4,
+    "initiative": 9,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 5,
+    "ref": 3,
+    "will": 7,
+    "defense": 4,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 8,
+    "fort": 5,
+    "ref": 3,
+    "will": 7,
+    "defense": 4,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 12,
+    "bab": 9,
+    "fort": 6,
+    "ref": 4,
+    "will": 8,
+    "defense": 5,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 13,
+    "bab": 9,
+    "fort": 6,
+    "ref": 4,
+    "will": 8,
+    "defense": 5,
+    "initiative": 12,
+    "wealth": 8,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 14,
+    "bab": 10,
+    "fort": 6,
+    "ref": 4,
+    "will": 9,
+    "defense": 6,
+    "initiative": 13,
+    "wealth": 9,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 15,
+    "bab": 11,
+    "fort": 7,
+    "ref": 5,
+    "will": 9,
+    "defense": 6,
+    "initiative": 14,
+    "wealth": 9,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 16,
+    "bab": 12,
+    "fort": 7,
+    "ref": 5,
+    "will": 10,
+    "defense": 6,
+    "initiative": 15,
+    "wealth": 10,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 17,
+    "bab": 12,
+    "fort": 8,
+    "ref": 5,
+    "will": 10,
+    "defense": 7,
+    "initiative": 15,
+    "wealth": 10,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 18,
+    "bab": 13,
+    "fort": 8,
+    "ref": 6,
+    "will": 11,
+    "defense": 7,
+    "initiative": 16,
+    "wealth": 11,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 19,
+    "bab": 14,
+    "fort": 8,
+    "ref": 6,
+    "will": 11,
+    "defense": 8,
+    "initiative": 17,
+    "wealth": 11,
+    "gearR": 3,
+    "gearT": 3,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 20,
+    "bab": 15,
+    "fort": 9,
+    "ref": 6,
+    "will": 12,
+    "defense": 8,
+    "initiative": 18,
+    "wealth": 12,
+    "gearR": 3,
+    "gearT": 3,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Absolute certainity"
+   },
+   {
+    "level": 2,
+    "name": "Behind the scenes (DC 10)"
+   },
+   {
+    "level": 3,
+    "name": "Networks"
+   },
+   {
+    "level": 4,
+    "name": "By any means"
+   },
+   {
+    "level": 5,
+    "name": "Networks"
+   },
+   {
+    "level": 6,
+    "name": "Small steps"
+   },
+   {
+    "level": 7,
+    "name": "Networks"
+   },
+   {
+    "level": 8,
+    "name": "By any means"
+   },
+   {
+    "level": 9,
+    "name": "Networks, small steps"
+   },
+   {
+    "level": 10,
+    "name": "Crusade 1/session"
+   },
+   {
+    "level": 11,
+    "name": "Behind the scenes II (DC 20), networks"
+   },
+   {
+    "level": 12,
+    "name": "By any means, small steps"
+   },
+   {
+    "level": 13,
+    "name": "Networks"
+   },
+   {
+    "level": 14,
+    "name": "True believer 1/session"
+   },
+   {
+    "level": 15,
+    "name": "Networks, small steps"
+   },
+   {
+    "level": 16,
+    "name": "By any means"
+   },
+   {
+    "level": 17,
+    "name": "Networks"
+   },
+   {
+    "level": 18,
+    "name": "Small steps"
+   },
+   {
+    "level": 19,
+    "name": "Behind the scenes III (DC 30), networks"
+   },
+   {
+    "level": 20,
+    "name": "By any means, crusade 2/session"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Network",
+    "key": "network",
+    "options": [
+     {
+      "index": 2,
+      "name": "Contact",
+      "bonuses": [
+       {
+        "target": "contacts",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Gear Feat",
+      "bonuses": [
+       {
+        "target": "featSlots.gear",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "option"
+   },
+   {
+    "name": "Small Steps",
+    "key": "smallSteps",
+    "options": [
+     {
+      "index": 2,
+      "name": "Backers",
+      "bonuses": [
+       {
+        "target": "spendingCash",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Charm",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Cover-up (city)",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Favor for a favor",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Inner Drive",
+      "bonuses": [
+       {
+        "target": "vitality",
+        "value": "@classes.advocate.levels"
+       },
+       {
+        "target": "wounds",
+        "value": "max(1, @abilities.cha.mod)"
+       }
+      ]
+     },
+     {
+      "index": 7,
+      "name": "Media Personality",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Professional Recognition",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "network"
+   },
+   {
+    "level": 5,
+    "list": "network"
+   },
+   {
+    "level": 6,
+    "list": "smallSteps"
+   },
+   {
+    "level": 7,
+    "list": "network"
+   },
+   {
+    "level": 9,
+    "list": "network"
+   },
+   {
+    "level": 9,
+    "list": "smallSteps"
+   },
+   {
+    "level": 11,
+    "list": "network"
+   },
+   {
+    "level": 12,
+    "list": "smallSteps"
+   },
+   {
+    "level": 13,
+    "list": "network"
+   },
+   {
+    "level": 15,
+    "list": "network"
+   },
+   {
+    "level": 15,
+    "list": "smallSteps"
+   },
+   {
+    "level": 17,
+    "list": "network"
+   },
+   {
+    "level": 18,
+    "list": "smallSteps"
+   },
+   {
+    "level": 19,
+    "list": "network"
+   }
+  ]
+ },
+ {
+  "num": 3,
+  "name": "Explorer",
+  "key": "explorer",
+  "expert": false,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 4,
+  "coreAbility": {
+   "name": "Connected"
+  },
+  "classSkills": [
+   "athletics",
+   "blend",
+   "cultures",
+   "drive",
+   "investigation",
+   "notice",
+   "resolve",
+   "science",
+   "search",
+   "security",
+   "streetwise",
+   "survival"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 2,
+    "ref": 1,
+    "will": 0,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 3,
+    "ref": 2,
+    "will": 0,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 3,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 4,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 4,
+    "ref": 3,
+    "will": 1,
+    "defense": 3,
+    "initiative": 3,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 5,
+    "ref": 3,
+    "will": 2,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 5,
+    "ref": 4,
+    "will": 2,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 6,
+    "ref": 4,
+    "will": 2,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 6,
+    "ref": 4,
+    "will": 3,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 1,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 7,
+    "ref": 5,
+    "will": 3,
+    "defense": 6,
+    "initiative": 6,
+    "wealth": 7,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 1,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 8,
+    "fort": 7,
+    "ref": 5,
+    "will": 3,
+    "defense": 7,
+    "initiative": 7,
+    "wealth": 7,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 1,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 12,
+    "bab": 9,
+    "fort": 8,
+    "ref": 6,
+    "will": 4,
+    "defense": 7,
+    "initiative": 7,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 2,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 13,
+    "bab": 9,
+    "fort": 8,
+    "ref": 6,
+    "will": 4,
+    "defense": 8,
+    "initiative": 8,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 2,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 14,
+    "bab": 10,
+    "fort": 9,
+    "ref": 6,
+    "will": 4,
+    "defense": 8,
+    "initiative": 8,
+    "wealth": 9,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 2,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 15,
+    "bab": 11,
+    "fort": 9,
+    "ref": 7,
+    "will": 5,
+    "defense": 9,
+    "initiative": 9,
+    "wealth": 9,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 2,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 16,
+    "bab": 12,
+    "fort": 10,
+    "ref": 7,
+    "will": 5,
+    "defense": 10,
+    "initiative": 10,
+    "wealth": 10,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 2,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 17,
+    "bab": 12,
+    "fort": 10,
+    "ref": 8,
+    "will": 5,
+    "defense": 10,
+    "initiative": 10,
+    "wealth": 10,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 2,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 18,
+    "bab": 13,
+    "fort": 11,
+    "ref": 8,
+    "will": 6,
+    "defense": 11,
+    "initiative": 11,
+    "wealth": 11,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 2,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 19,
+    "bab": 14,
+    "fort": 11,
+    "ref": 8,
+    "will": 6,
+    "defense": 11,
+    "initiative": 11,
+    "wealth": 11,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 3,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 20,
+    "bab": 15,
+    "fort": 12,
+    "ref": 9,
+    "will": 6,
+    "defense": 12,
+    "initiative": 12,
+    "wealth": 12,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 3,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "All over the world"
+   },
+   {
+    "level": 2,
+    "name": "Bookworm I (1/2)"
+   },
+   {
+    "level": 3,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 4,
+    "name": "Uncanny Dodge I"
+   },
+   {
+    "level": 5,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 6,
+    "name": "Rugged +1"
+   },
+   {
+    "level": 7,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 8,
+    "name": "Uncanny Dodge II"
+   },
+   {
+    "level": 9,
+    "name": "Bonus feat, Rugged +2"
+   },
+   {
+    "level": 10,
+    "name": "The notebook 1/session"
+   },
+   {
+    "level": 11,
+    "name": "Bonus feat, bookworm II (1/4)"
+   },
+   {
+    "level": 12,
+    "name": "Rugged +3, uncanny dodge III"
+   },
+   {
+    "level": 13,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 14,
+    "name": "Lifeline"
+   },
+   {
+    "level": 15,
+    "name": "Bonus feat, Rugged +4"
+   },
+   {
+    "level": 16,
+    "name": "Uncanny Dodge IV"
+   },
+   {
+    "level": 17,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 18,
+    "name": "Rugged +5"
+   },
+   {
+    "level": 19,
+    "name": "Bonus feat, bookworm III (1/10)"
+   },
+   {
+    "level": 20,
+    "name": "The notebook 2/session, uncanny dodge V"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Basic Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.basicCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Chance",
+      "bonuses": [
+       {
+        "target": "featSlots.chance",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 5,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 7,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 11,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 13,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 15,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 17,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 19,
+    "list": "bonusFeat"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "abilities.con",
+    "value": "1",
+    "level": 6
+   },
+   {
+    "target": "abilities.con",
+    "value": "1",
+    "level": 9
+   },
+   {
+    "target": "abilities.con",
+    "value": "1",
+    "level": 12
+   },
+   {
+    "target": "abilities.con",
+    "value": "1",
+    "level": 15
+   },
+   {
+    "target": "abilities.con",
+    "value": "1",
+    "level": 18
+   }
+  ]
+ },
+ {
+  "num": 4,
+  "name": "Faceman",
+  "key": "faceman",
+  "expert": false,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 4,
+  "coreAbility": {
+   "name": "Doublespeak"
+  },
+  "classSkills": [
+   "blend",
+   "bluff",
+   "bureaucracy",
+   "cultures",
+   "falsify",
+   "impress",
+   "manipulate",
+   "networking",
+   "notice",
+   "profession",
+   "search",
+   "senseMotive"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 0,
+    "will": 1,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 0,
+    "will": 2,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 2,
+    "ref": 1,
+    "will": 2,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 2,
+    "ref": 1,
+    "will": 2,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 3,
+    "ref": 1,
+    "will": 3,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 3,
+    "ref": 2,
+    "will": 3,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 4,
+    "ref": 2,
+    "will": 4,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 4,
+    "ref": 2,
+    "will": 4,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 4,
+    "ref": 3,
+    "will": 4,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 6,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 5,
+    "ref": 3,
+    "will": 5,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 8,
+    "fort": 5,
+    "ref": 3,
+    "will": 5,
+    "defense": 7,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 12,
+    "bab": 9,
+    "fort": 6,
+    "ref": 4,
+    "will": 6,
+    "defense": 7,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 13,
+    "bab": 9,
+    "fort": 6,
+    "ref": 4,
+    "will": 6,
+    "defense": 8,
+    "initiative": 12,
+    "wealth": 8,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 14,
+    "bab": 10,
+    "fort": 6,
+    "ref": 4,
+    "will": 6,
+    "defense": 8,
+    "initiative": 13,
+    "wealth": 9,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 15,
+    "bab": 11,
+    "fort": 7,
+    "ref": 5,
+    "will": 7,
+    "defense": 9,
+    "initiative": 14,
+    "wealth": 9,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 16,
+    "bab": 12,
+    "fort": 7,
+    "ref": 5,
+    "will": 7,
+    "defense": 10,
+    "initiative": 15,
+    "wealth": 10,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 17,
+    "bab": 12,
+    "fort": 8,
+    "ref": 5,
+    "will": 8,
+    "defense": 10,
+    "initiative": 15,
+    "wealth": 10,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 18,
+    "bab": 13,
+    "fort": 8,
+    "ref": 6,
+    "will": 8,
+    "defense": 11,
+    "initiative": 16,
+    "wealth": 11,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 19,
+    "bab": 14,
+    "fort": 8,
+    "ref": 6,
+    "will": 8,
+    "defense": 11,
+    "initiative": 17,
+    "wealth": 11,
+    "gearR": 3,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 20,
+    "bab": 15,
+    "fort": 9,
+    "ref": 6,
+    "will": 9,
+    "defense": 12,
+    "initiative": 18,
+    "wealth": 12,
+    "gearR": 3,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "1,000 faces"
+   },
+   {
+    "level": 2,
+    "name": "Cold read 1/session"
+   },
+   {
+    "level": 3,
+    "name": "Quick change 2/session"
+   },
+   {
+    "level": 4,
+    "name": "Masks"
+   },
+   {
+    "level": 5,
+    "name": "Backup I"
+   },
+   {
+    "level": 6,
+    "name": "Smooth operator (1 feat)"
+   },
+   {
+    "level": 7,
+    "name": "Quick change 4/session"
+   },
+   {
+    "level": 8,
+    "name": "Masks"
+   },
+   {
+    "level": 9,
+    "name": "Backup II, smooth operator (2 feats)"
+   },
+   {
+    "level": 10,
+    "name": "Bald-faced lie 1/session"
+   },
+   {
+    "level": 11,
+    "name": "Cold read 2/session, quick change 6/session"
+   },
+   {
+    "level": 12,
+    "name": "Masks, smooth operator (3 feats)"
+   },
+   {
+    "level": 13,
+    "name": "Backup III"
+   },
+   {
+    "level": 14,
+    "name": "Doppleganger 1/mission"
+   },
+   {
+    "level": 15,
+    "name": "Quick change 8/session, smooth operator (4 feats)"
+   },
+   {
+    "level": 16,
+    "name": "Masks"
+   },
+   {
+    "level": 17,
+    "name": "Backup IV"
+   },
+   {
+    "level": 18,
+    "name": "Smooth operator (5 feats)"
+   },
+   {
+    "level": 19,
+    "name": "Cold read 3/session, quick change 10/session"
+   },
+   {
+    "level": 20,
+    "name": "Bald-faced lie 2/session, masks"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Masks",
+    "key": "masks",
+    "options": [
+     {
+      "index": 2,
+      "name": "Convincing",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Favor for a Favor",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Fake It",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Follow my Lead",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Old Debts",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Ready for the Worst",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Schmooze",
+      "bonuses": [
+       {
+        "target": "contacts",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 4,
+    "list": "masks"
+   },
+   {
+    "level": 8,
+    "list": "masks"
+   },
+   {
+    "level": 12,
+    "list": "masks"
+   },
+   {
+    "level": 16,
+    "list": "masks"
+   },
+   {
+    "level": 20,
+    "list": "masks"
+   }
+  ],
+  "featGrants": [
+   {
+    "level": 1,
+    "feat": "Flawless Identity"
+   }
+  ]
+ },
+ {
+  "num": 5,
+  "name": "Hacker",
+  "key": "hacker",
+  "expert": false,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 2,
+  "coreAbility": {
+   "name": "Custom 'ware"
+  },
+  "classSkills": [
+   "bureaucracy",
+   "computers",
+   "cultures",
+   "drive",
+   "electronics",
+   "falsify",
+   "mechanics",
+   "notice",
+   "profession",
+   "resolve",
+   "science",
+   "security",
+   "sleightOfHand",
+   "sneak",
+   "streetwise"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 2,
+    "ref": 1,
+    "will": 2,
+    "defense": 0,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 3,
+    "ref": 2,
+    "will": 3,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 3,
+    "bab": 1,
+    "fort": 3,
+    "ref": 2,
+    "will": 3,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 4,
+    "bab": 2,
+    "fort": 4,
+    "ref": 2,
+    "will": 4,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 5,
+    "bab": 2,
+    "fort": 4,
+    "ref": 3,
+    "will": 4,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 6,
+    "bab": 3,
+    "fort": 5,
+    "ref": 3,
+    "will": 5,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 7,
+    "bab": 3,
+    "fort": 5,
+    "ref": 4,
+    "will": 5,
+    "defense": 3,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 8,
+    "bab": 4,
+    "fort": 6,
+    "ref": 4,
+    "will": 6,
+    "defense": 3,
+    "initiative": 2,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 9,
+    "bab": 4,
+    "fort": 6,
+    "ref": 4,
+    "will": 6,
+    "defense": 4,
+    "initiative": 3,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 10,
+    "bab": 5,
+    "fort": 7,
+    "ref": 5,
+    "will": 7,
+    "defense": 4,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 11,
+    "bab": 5,
+    "fort": 7,
+    "ref": 5,
+    "will": 7,
+    "defense": 4,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 12,
+    "bab": 6,
+    "fort": 8,
+    "ref": 6,
+    "will": 8,
+    "defense": 5,
+    "initiative": 4,
+    "wealth": 8,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 13,
+    "bab": 6,
+    "fort": 8,
+    "ref": 6,
+    "will": 8,
+    "defense": 5,
+    "initiative": 4,
+    "wealth": 8,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 14,
+    "bab": 7,
+    "fort": 9,
+    "ref": 6,
+    "will": 9,
+    "defense": 6,
+    "initiative": 4,
+    "wealth": 9,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 15,
+    "bab": 7,
+    "fort": 9,
+    "ref": 7,
+    "will": 9,
+    "defense": 6,
+    "initiative": 5,
+    "wealth": 9,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 16,
+    "bab": 8,
+    "fort": 10,
+    "ref": 7,
+    "will": 10,
+    "defense": 6,
+    "initiative": 5,
+    "wealth": 10,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 4
+   },
+   {
+    "level": 17,
+    "bab": 8,
+    "fort": 10,
+    "ref": 8,
+    "will": 10,
+    "defense": 7,
+    "initiative": 5,
+    "wealth": 10,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 4
+   },
+   {
+    "level": 18,
+    "bab": 9,
+    "fort": 11,
+    "ref": 8,
+    "will": 11,
+    "defense": 7,
+    "initiative": 6,
+    "wealth": 11,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 4
+   },
+   {
+    "level": 19,
+    "bab": 9,
+    "fort": 11,
+    "ref": 8,
+    "will": 11,
+    "defense": 8,
+    "initiative": 6,
+    "wealth": 11,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 4
+   },
+   {
+    "level": 20,
+    "bab": 10,
+    "fort": 12,
+    "ref": 9,
+    "will": 12,
+    "defense": 8,
+    "initiative": 6,
+    "wealth": 12,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 4
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "lee7"
+   },
+   {
+    "level": 2,
+    "name": "Master Key I"
+   },
+   {
+    "level": 3,
+    "name": "Trap door 1/mission"
+   },
+   {
+    "level": 4,
+    "name": "Bonus Feat"
+   },
+   {
+    "level": 5,
+    "name": "Master Cracker 1/session"
+   },
+   {
+    "level": 6,
+    "name": "Mad Skillz"
+   },
+   {
+    "level": 7,
+    "name": "Trap door 2/mission"
+   },
+   {
+    "level": 8,
+    "name": "Bonus Feat"
+   },
+   {
+    "level": 9,
+    "name": "Mad skillz, master cracker 2/session"
+   },
+   {
+    "level": 10,
+    "name": "Synchronized (1 teammate)"
+   },
+   {
+    "level": 11,
+    "name": "Master Key II, trap door 3/mission"
+   },
+   {
+    "level": 12,
+    "name": "Bonus feat, mad skillz"
+   },
+   {
+    "level": 13,
+    "name": "Master cracker 3/session"
+   },
+   {
+    "level": 14,
+    "name": "Ghost in the machine"
+   },
+   {
+    "level": 15,
+    "name": "Mad skillz, trap door 4/mission"
+   },
+   {
+    "level": 16,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 17,
+    "name": "Master cracker 4/session"
+   },
+   {
+    "level": 18,
+    "name": "Mad skillz"
+   },
+   {
+    "level": 19,
+    "name": "Master key III, trap door 5/mission"
+   },
+   {
+    "level": 20,
+    "name": "Bonus feat, synchronization (all teammates)"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Gear",
+      "bonuses": [
+       {
+        "target": "featSlots.gear",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Advanced Skill",
+      "bonuses": [
+       {
+        "target": "featSlots.advancedSkill",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Mad Skillz",
+    "key": "madSkillz",
+    "options": [
+     {
+      "index": 2,
+      "name": "Complex Substitution",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Digital Fingerprints",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Electronics Familiarity",
+      "bonuses": [
+       {
+        "target": "skills.electronics.misc",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 5,
+      "name": "Hacker Culture",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Hard-Wired",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Ice Man",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Intelligence Analysis",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Skill Mastery",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 4,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 6,
+    "list": "madSkillz"
+   },
+   {
+    "level": 8,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "madSkillz"
+   },
+   {
+    "level": 12,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 12,
+    "list": "madSkillz"
+   },
+   {
+    "level": 15,
+    "list": "madSkillz"
+   },
+   {
+    "level": 16,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 18,
+    "list": "madSkillz"
+   },
+   {
+    "level": 20,
+    "list": "bonusFeat"
+   }
+  ]
+ },
+ {
+  "num": 6,
+  "name": "Intruder",
+  "key": "intruder",
+  "expert": false,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 3,
+  "coreAbility": {
+   "name": "Dexterous"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "blend",
+   "bluff",
+   "drive",
+   "electronics",
+   "mechanics",
+   "notice",
+   "science",
+   "search",
+   "security",
+   "sleightOfHand",
+   "sneak",
+   "streetwise",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 2,
+    "will": 0,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 3,
+    "will": 0,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 1,
+    "ref": 3,
+    "will": 1,
+    "defense": 3,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 1,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 1,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 2,
+    "ref": 5,
+    "will": 2,
+    "defense": 6,
+    "initiative": 4,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 2,
+    "ref": 5,
+    "will": 2,
+    "defense": 6,
+    "initiative": 4,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 2,
+    "ref": 6,
+    "will": 2,
+    "defense": 7,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 3,
+    "ref": 6,
+    "will": 3,
+    "defense": 8,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 3,
+    "ref": 7,
+    "will": 3,
+    "defense": 9,
+    "initiative": 6,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 8,
+    "fort": 3,
+    "ref": 7,
+    "will": 3,
+    "defense": 9,
+    "initiative": 7,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 12,
+    "bab": 9,
+    "fort": 4,
+    "ref": 8,
+    "will": 4,
+    "defense": 10,
+    "initiative": 7,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 13,
+    "bab": 9,
+    "fort": 4,
+    "ref": 8,
+    "will": 4,
+    "defense": 11,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 14,
+    "bab": 10,
+    "fort": 4,
+    "ref": 9,
+    "will": 4,
+    "defense": 12,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 15,
+    "bab": 11,
+    "fort": 5,
+    "ref": 9,
+    "will": 5,
+    "defense": 12,
+    "initiative": 9,
+    "wealth": 7,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 16,
+    "bab": 12,
+    "fort": 5,
+    "ref": 10,
+    "will": 5,
+    "defense": 13,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 4,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 17,
+    "bab": 12,
+    "fort": 5,
+    "ref": 10,
+    "will": 5,
+    "defense": 14,
+    "initiative": 10,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 4,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 18,
+    "bab": 13,
+    "fort": 6,
+    "ref": 11,
+    "will": 6,
+    "defense": 15,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 4,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 19,
+    "bab": 14,
+    "fort": 6,
+    "ref": 11,
+    "will": 6,
+    "defense": 15,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 4,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 20,
+    "bab": 15,
+    "fort": 6,
+    "ref": 12,
+    "will": 6,
+    "defense": 16,
+    "initiative": 12,
+    "wealth": 9,
+    "gearR": 0,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 4,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Gear prep"
+   },
+   {
+    "level": 2,
+    "name": "Evasion I (no dam w save)"
+   },
+   {
+    "level": 3,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 4,
+    "name": "Uncanny dodge I"
+   },
+   {
+    "level": 5,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 6,
+    "name": "Criminal mind"
+   },
+   {
+    "level": 7,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 8,
+    "name": "Uncanny dodge II"
+   },
+   {
+    "level": 9,
+    "name": "Bonus feat, criminal mind"
+   },
+   {
+    "level": 10,
+    "name": "Wildcard gear, 1/session"
+   },
+   {
+    "level": 11,
+    "name": "Bonus feat, evasion II (1/2 dam w/ fail)"
+   },
+   {
+    "level": 12,
+    "name": "Criminal mind, uncanny dodge III"
+   },
+   {
+    "level": 13,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 14,
+    "name": "The great escape"
+   },
+   {
+    "level": 15,
+    "name": "Bonus feat, criminal mind"
+   },
+   {
+    "level": 16,
+    "name": "Uncanny dodge IV"
+   },
+   {
+    "level": 17,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 18,
+    "name": "Criminal mind"
+   },
+   {
+    "level": 19,
+    "name": "Bonus feat, evasion III (take 10)"
+   },
+   {
+    "level": 20,
+    "name": "Uncanny dodge V, wildcard gear 2/session"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Basic Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.basicCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Covert",
+      "bonuses": [
+       {
+        "target": "featSlots.covert",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Criminal Mind",
+    "key": "criminalMind",
+    "options": [
+     {
+      "index": 2,
+      "name": "Booby Trap",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Improvisation",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Master Thief",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Procure",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Skill Mastery",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Sprint",
+      "bonuses": [
+       {
+        "target": "speed",
+        "value": "10"
+       }
+      ]
+     },
+     {
+      "index": 8,
+      "name": "Stash It",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Tricky",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 5,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 6,
+    "list": "criminalMind"
+   },
+   {
+    "level": 7,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 11,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 12,
+    "list": "criminalMind"
+   },
+   {
+    "level": 13,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 15,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 15,
+    "list": "criminalMind"
+   },
+   {
+    "level": 17,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 18,
+    "list": "criminalMind"
+   },
+   {
+    "level": 19,
+    "list": "bonusFeat"
+   }
+  ]
+ },
+ {
+  "num": 7,
+  "name": "Pointman",
+  "key": "pointman",
+  "expert": false,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 4,
+  "coreAbility": {
+   "name": "Generous"
+  },
+  "classSkills": [
+   "cultures",
+   "drive",
+   "notice",
+   "profession",
+   "science",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 1,
+    "will": 1,
+    "defense": 0,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 2,
+    "will": 2,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 2,
+    "ref": 2,
+    "will": 2,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 2,
+    "ref": 2,
+    "will": 2,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 3,
+    "ref": 3,
+    "will": 3,
+    "defense": 2,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 3,
+    "ref": 3,
+    "will": 3,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 3,
+    "gearR": 3,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 4,
+    "ref": 4,
+    "will": 4,
+    "defense": 3,
+    "initiative": 4,
+    "wealth": 4,
+    "gearR": 3,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 4,
+    "ref": 4,
+    "will": 4,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 4,
+    "ref": 4,
+    "will": 4,
+    "defense": 4,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 5,
+    "ref": 5,
+    "will": 5,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 5,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 8,
+    "fort": 5,
+    "ref": 5,
+    "will": 5,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 5,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 12,
+    "bab": 9,
+    "fort": 6,
+    "ref": 6,
+    "will": 6,
+    "defense": 5,
+    "initiative": 7,
+    "wealth": 6,
+    "gearR": 4,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 13,
+    "bab": 9,
+    "fort": 6,
+    "ref": 6,
+    "will": 6,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 4,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 1,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 14,
+    "bab": 10,
+    "fort": 6,
+    "ref": 6,
+    "will": 6,
+    "defense": 6,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 1,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 15,
+    "bab": 11,
+    "fort": 7,
+    "ref": 7,
+    "will": 7,
+    "defense": 6,
+    "initiative": 9,
+    "wealth": 7,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 1,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 16,
+    "bab": 12,
+    "fort": 7,
+    "ref": 7,
+    "will": 7,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 3,
+    "gearG": 1,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 17,
+    "bab": 12,
+    "fort": 8,
+    "ref": 8,
+    "will": 8,
+    "defense": 7,
+    "initiative": 10,
+    "wealth": 8,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 4,
+    "gearG": 1,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 18,
+    "bab": 13,
+    "fort": 8,
+    "ref": 8,
+    "will": 8,
+    "defense": 7,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 5,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 4,
+    "gearG": 1,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 19,
+    "bab": 14,
+    "fort": 8,
+    "ref": 8,
+    "will": 8,
+    "defense": 8,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 5,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 4,
+    "gearG": 1,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 20,
+    "bab": 15,
+    "fort": 9,
+    "ref": 9,
+    "will": 9,
+    "defense": 8,
+    "initiative": 12,
+    "wealth": 9,
+    "gearR": 5,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 4,
+    "gearG": 2,
+    "gearW": 3,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Versatility (4)"
+   },
+   {
+    "level": 2,
+    "name": "Assistance (1/2)"
+   },
+   {
+    "level": 3,
+    "name": "Lead 1/session"
+   },
+   {
+    "level": 4,
+    "name": "Orders I"
+   },
+   {
+    "level": 5,
+    "name": "Lead 2/session, versatility (5)"
+   },
+   {
+    "level": 6,
+    "name": "Cross-class ability"
+   },
+   {
+    "level": 7,
+    "name": "Lead 3/session"
+   },
+   {
+    "level": 8,
+    "name": "Orders II"
+   },
+   {
+    "level": 9,
+    "name": "Cross-class ability, lead 4/session"
+   },
+   {
+    "level": 10,
+    "name": "Improved fortune (1 die), versatility (6)"
+   },
+   {
+    "level": 11,
+    "name": "Assistance (1/4), lead 5/session"
+   },
+   {
+    "level": 12,
+    "name": "Cross-class ability, orders III"
+   },
+   {
+    "level": 13,
+    "name": "Lead 6/session"
+   },
+   {
+    "level": 14,
+    "name": "Serendipity 1/session"
+   },
+   {
+    "level": 15,
+    "name": "Cross-class ablity, lead 7/session, versatility (7)"
+   },
+   {
+    "level": 16,
+    "name": "Orders IV"
+   },
+   {
+    "level": 17,
+    "name": "Lead 8/session"
+   },
+   {
+    "level": 18,
+    "name": "Cross-class ability"
+   },
+   {
+    "level": 19,
+    "name": "Assistance (1/10), lead 9/session"
+   },
+   {
+    "level": 20,
+    "name": "Improved fortune (2 die), orders V, versatility (8)"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Cross Class",
+    "key": "crossClass",
+    "options": [
+     {
+      "index": 2,
+      "name": "Advocate",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Explorer",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Faceman",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Hacker",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Intruder",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Scientist",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Scout",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Sleuth",
+      "bonuses": []
+     },
+     {
+      "index": 10,
+      "name": "Snoop",
+      "bonuses": []
+     },
+     {
+      "index": 11,
+      "name": "Soldier",
+      "bonuses": []
+     },
+     {
+      "index": 12,
+      "name": "Wheelman",
+      "bonuses": []
+     }
+    ],
+    "kind": "crossClass"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 6,
+    "list": "crossClass"
+   },
+   {
+    "level": 9,
+    "list": "crossClass"
+   },
+   {
+    "level": 12,
+    "list": "crossClass"
+   },
+   {
+    "level": 15,
+    "list": "crossClass"
+   },
+   {
+    "level": 18,
+    "list": "crossClass"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "classSkillPicks",
+    "value": "4",
+    "level": 1
+   },
+   {
+    "target": "classSkillPicks",
+    "value": "1",
+    "level": 5
+   },
+   {
+    "target": "classSkillPicks",
+    "value": "1",
+    "level": 10
+   },
+   {
+    "target": "classSkillPicks",
+    "value": "1",
+    "level": 15
+   },
+   {
+    "target": "classSkillPicks",
+    "value": "1",
+    "level": 20
+   },
+   {
+    "target": "actionDice.count",
+    "value": "1",
+    "level": 10
+   },
+   {
+    "target": "actionDice.count",
+    "value": "1",
+    "level": 20
+   }
+  ]
+ },
+ {
+  "num": 8,
+  "name": "Scientist",
+  "key": "scientist",
+  "expert": false,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 2,
+  "coreAbility": {
+   "name": "Professor"
+  },
+  "classSkills": [
+   "analysis",
+   "bureaucracy",
+   "computers",
+   "cultures",
+   "electronics",
+   "falsify",
+   "mechanics",
+   "medicine",
+   "notice",
+   "profession",
+   "resolve",
+   "science",
+   "search",
+   "senseMotive",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 0,
+    "will": 2,
+    "defense": 2,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 0,
+    "will": 3,
+    "defense": 3,
+    "initiative": 0,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 3,
+    "bab": 1,
+    "fort": 1,
+    "ref": 1,
+    "will": 3,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 4,
+    "bab": 2,
+    "fort": 1,
+    "ref": 1,
+    "will": 4,
+    "defense": 4,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 5,
+    "bab": 2,
+    "fort": 1,
+    "ref": 1,
+    "will": 4,
+    "defense": 5,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 6,
+    "bab": 3,
+    "fort": 2,
+    "ref": 2,
+    "will": 5,
+    "defense": 6,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 7,
+    "bab": 3,
+    "fort": 2,
+    "ref": 2,
+    "will": 5,
+    "defense": 6,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 8,
+    "bab": 4,
+    "fort": 2,
+    "ref": 2,
+    "will": 6,
+    "defense": 7,
+    "initiative": 2,
+    "wealth": 6,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 9,
+    "bab": 4,
+    "fort": 3,
+    "ref": 3,
+    "will": 6,
+    "defense": 8,
+    "initiative": 3,
+    "wealth": 6,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 10,
+    "bab": 5,
+    "fort": 3,
+    "ref": 3,
+    "will": 7,
+    "defense": 9,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 11,
+    "bab": 5,
+    "fort": 3,
+    "ref": 3,
+    "will": 7,
+    "defense": 9,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 12,
+    "bab": 6,
+    "fort": 4,
+    "ref": 4,
+    "will": 8,
+    "defense": 10,
+    "initiative": 4,
+    "wealth": 8,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 13,
+    "bab": 6,
+    "fort": 4,
+    "ref": 4,
+    "will": 8,
+    "defense": 11,
+    "initiative": 4,
+    "wealth": 8,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 14,
+    "bab": 7,
+    "fort": 4,
+    "ref": 4,
+    "will": 9,
+    "defense": 12,
+    "initiative": 4,
+    "wealth": 9,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 15,
+    "bab": 7,
+    "fort": 5,
+    "ref": 5,
+    "will": 9,
+    "defense": 12,
+    "initiative": 5,
+    "wealth": 9,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 16,
+    "bab": 8,
+    "fort": 5,
+    "ref": 5,
+    "will": 10,
+    "defense": 13,
+    "initiative": 5,
+    "wealth": 10,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 17,
+    "bab": 8,
+    "fort": 5,
+    "ref": 5,
+    "will": 10,
+    "defense": 14,
+    "initiative": 5,
+    "wealth": 10,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 4
+   },
+   {
+    "level": 18,
+    "bab": 9,
+    "fort": 6,
+    "ref": 6,
+    "will": 11,
+    "defense": 15,
+    "initiative": 6,
+    "wealth": 11,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 5,
+    "gearW": 0,
+    "gearE": 4
+   },
+   {
+    "level": 19,
+    "bab": 9,
+    "fort": 6,
+    "ref": 6,
+    "will": 11,
+    "defense": 15,
+    "initiative": 6,
+    "wealth": 11,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 5,
+    "gearW": 0,
+    "gearE": 4
+   },
+   {
+    "level": 20,
+    "bab": 10,
+    "fort": 6,
+    "ref": 6,
+    "will": 12,
+    "defense": 16,
+    "initiative": 6,
+    "wealth": 12,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 5,
+    "gearW": 0,
+    "gearE": 4
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Intense study"
+   },
+   {
+    "level": 2,
+    "name": "Ph D (1)"
+   },
+   {
+    "level": 3,
+    "name": "Bright idea 2/session"
+   },
+   {
+    "level": 4,
+    "name": "Intense study"
+   },
+   {
+    "level": 5,
+    "name": "Research project"
+   },
+   {
+    "level": 6,
+    "name": "Brilliant +1"
+   },
+   {
+    "level": 7,
+    "name": "Bright idea 4/session"
+   },
+   {
+    "level": 8,
+    "name": "Intense study"
+   },
+   {
+    "level": 9,
+    "name": "Brilliant +2, research project"
+   },
+   {
+    "level": 10,
+    "name": "Know it all 1/mission"
+   },
+   {
+    "level": 11,
+    "name": "Bright idea 6/session, Ph D (2)"
+   },
+   {
+    "level": 12,
+    "name": "Brilliant +3, intense study"
+   },
+   {
+    "level": 13,
+    "name": "Research project"
+   },
+   {
+    "level": 14,
+    "name": "10-second solution 1/session"
+   },
+   {
+    "level": 15,
+    "name": "Bright idea 8/session, brilliant +4"
+   },
+   {
+    "level": 16,
+    "name": "Intense study"
+   },
+   {
+    "level": 17,
+    "name": "Research project"
+   },
+   {
+    "level": 18,
+    "name": "Brilliant +5"
+   },
+   {
+    "level": 19,
+    "name": "Bright idea 10/session, Ph D (3)"
+   },
+   {
+    "level": 20,
+    "name": "Intense study, know it all 2/mission"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Intense Study",
+    "key": "intenseStudy",
+    "options": [
+     {
+      "index": 2,
+      "name": "Basic Skill",
+      "bonuses": [
+       {
+        "target": "featSlots.basicSkill",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Advanced Skill",
+      "bonuses": [
+       {
+        "target": "featSlots.advancedSkill",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Research Project",
+    "key": "researchProject",
+    "options": [
+     {
+      "index": 2,
+      "name": "Elbow Grease",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Electronics Familiarity",
+      "bonuses": [
+       {
+        "target": "skills.electronics.misc",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 4,
+      "name": "Faculty",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Improvisation",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "No Worries",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Professional Recognition",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Schmooze",
+      "bonuses": [
+       {
+        "target": "contacts",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 9,
+      "name": "Skill Mastery",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 1,
+    "list": "intenseStudy"
+   },
+   {
+    "level": 4,
+    "list": "intenseStudy"
+   },
+   {
+    "level": 5,
+    "list": "researchProject"
+   },
+   {
+    "level": 8,
+    "list": "intenseStudy"
+   },
+   {
+    "level": 9,
+    "list": "researchProject"
+   },
+   {
+    "level": 12,
+    "list": "intenseStudy"
+   },
+   {
+    "level": 13,
+    "list": "researchProject"
+   },
+   {
+    "level": 16,
+    "list": "intenseStudy"
+   },
+   {
+    "level": 17,
+    "list": "researchProject"
+   },
+   {
+    "level": 20,
+    "list": "intenseStudy"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "abilities.int",
+    "value": "1",
+    "level": 6
+   },
+   {
+    "target": "abilities.int",
+    "value": "1",
+    "level": 9
+   },
+   {
+    "target": "abilities.int",
+    "value": "1",
+    "level": 12
+   },
+   {
+    "target": "abilities.int",
+    "value": "1",
+    "level": 15
+   },
+   {
+    "target": "abilities.int",
+    "value": "1",
+    "level": 18
+   }
+  ]
+ },
+ {
+  "num": 9,
+  "name": "Scout",
+  "key": "scout",
+  "expert": false,
+  "skillPoints": 4,
+  "vitality": 12,
+  "proficiencies": 5,
+  "coreAbility": {
+   "name": "Trailblazer"
+  },
+  "classSkills": [
+   "athletics",
+   "cultures",
+   "drive",
+   "notice",
+   "resolve",
+   "search",
+   "sneak",
+   "survival",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 2,
+    "ref": 2,
+    "will": 0,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 3,
+    "ref": 3,
+    "will": 0,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 3,
+    "ref": 3,
+    "will": 1,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 4,
+    "ref": 4,
+    "will": 1,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 4,
+    "ref": 4,
+    "will": 1,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 5,
+    "ref": 5,
+    "will": 2,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 5,
+    "ref": 5,
+    "will": 2,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 6,
+    "ref": 6,
+    "will": 2,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 6,
+    "ref": 6,
+    "will": 3,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 7,
+    "ref": 7,
+    "will": 3,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 8,
+    "fort": 7,
+    "ref": 7,
+    "will": 3,
+    "defense": 7,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 12,
+    "bab": 9,
+    "fort": 8,
+    "ref": 8,
+    "will": 4,
+    "defense": 7,
+    "initiative": 11,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 13,
+    "bab": 9,
+    "fort": 8,
+    "ref": 8,
+    "will": 4,
+    "defense": 8,
+    "initiative": 12,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 14,
+    "bab": 10,
+    "fort": 9,
+    "ref": 9,
+    "will": 4,
+    "defense": 8,
+    "initiative": 13,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 15,
+    "bab": 11,
+    "fort": 9,
+    "ref": 9,
+    "will": 5,
+    "defense": 9,
+    "initiative": 14,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 16,
+    "bab": 12,
+    "fort": 10,
+    "ref": 10,
+    "will": 5,
+    "defense": 10,
+    "initiative": 15,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 17,
+    "bab": 12,
+    "fort": 10,
+    "ref": 10,
+    "will": 5,
+    "defense": 10,
+    "initiative": 15,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 18,
+    "bab": 13,
+    "fort": 11,
+    "ref": 11,
+    "will": 6,
+    "defense": 11,
+    "initiative": 16,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 19,
+    "bab": 14,
+    "fort": 11,
+    "ref": 11,
+    "will": 6,
+    "defense": 11,
+    "initiative": 17,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 20,
+    "bab": 15,
+    "fort": 12,
+    "ref": 12,
+    "will": 6,
+    "defense": 12,
+    "initiative": 18,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Stalker"
+   },
+   {
+    "level": 2,
+    "name": "Rough living +2"
+   },
+   {
+    "level": 3,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 4,
+    "name": "Sneak attack +1d6"
+   },
+   {
+    "level": 5,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 6,
+    "name": "Huntsman"
+   },
+   {
+    "level": 7,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 8,
+    "name": "Sneak attack +2d6"
+   },
+   {
+    "level": 9,
+    "name": "Bonus feat, huntsman"
+   },
+   {
+    "level": 10,
+    "name": "Master tracker 1/session"
+   },
+   {
+    "level": 11,
+    "name": "Bonus feat, rough living +4"
+   },
+   {
+    "level": 12,
+    "name": "Huntsman, sneak attack +3d6"
+   },
+   {
+    "level": 13,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 14,
+    "name": "Overrun 1/session"
+   },
+   {
+    "level": 15,
+    "name": "Bonus feat, huntsman"
+   },
+   {
+    "level": 16,
+    "name": "Sneak attack +4d6"
+   },
+   {
+    "level": 17,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 18,
+    "name": "Huntsman"
+   },
+   {
+    "level": 19,
+    "name": "Bonus feat, rough living +6"
+   },
+   {
+    "level": 20,
+    "name": "Master tracker 2/session, sneak attack +5d6"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Basic Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.basicCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Terrain",
+      "bonuses": [
+       {
+        "target": "featSlots.terrain",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Huntsman",
+    "key": "huntsman",
+    "options": [
+     {
+      "index": 2,
+      "name": "Game Hunter",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Keen Senses",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Low-Light Vision",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Rough Riding",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Silent Rush",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Skill Mastery",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Trail Signs",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Woodcraft",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 5,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 6,
+    "list": "huntsman"
+   },
+   {
+    "level": 7,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "huntsman"
+   },
+   {
+    "level": 11,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 12,
+    "list": "huntsman"
+   },
+   {
+    "level": 13,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 15,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 15,
+    "list": "huntsman"
+   },
+   {
+    "level": 17,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 18,
+    "list": "huntsman"
+   },
+   {
+    "level": 19,
+    "list": "bonusFeat"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "defense",
+    "value": "2",
+    "level": 2
+   },
+   {
+    "target": "defense",
+    "value": "2",
+    "level": 11
+   },
+   {
+    "target": "defense",
+    "value": "2",
+    "level": 19
+   }
+  ]
+ },
+ {
+  "num": 10,
+  "name": "Sleuth",
+  "key": "sleuth",
+  "expert": false,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 3,
+  "coreAbility": {
+   "name": "Sympathetic"
+  },
+  "classSkills": [
+   "analysis",
+   "bureaucracy",
+   "drive",
+   "intimidate",
+   "investigation",
+   "networking",
+   "notice",
+   "profession",
+   "resolve",
+   "science",
+   "search",
+   "security",
+   "senseMotive",
+   "sneak",
+   "streetwise"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 1,
+    "will": 2,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 0,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 2,
+    "will": 3,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 0,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 1,
+    "ref": 2,
+    "will": 3,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 1,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 1,
+    "ref": 2,
+    "will": 4,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 1,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 1,
+    "ref": 3,
+    "will": 4,
+    "defense": 3,
+    "initiative": 3,
+    "wealth": 1,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 2,
+    "ref": 3,
+    "will": 5,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 2,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 2,
+    "ref": 4,
+    "will": 5,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 2,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 2,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 2,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 3,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 3,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 3,
+    "ref": 5,
+    "will": 7,
+    "defense": 6,
+    "initiative": 6,
+    "wealth": 3,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 8,
+    "fort": 3,
+    "ref": 5,
+    "will": 7,
+    "defense": 7,
+    "initiative": 7,
+    "wealth": 3,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 12,
+    "bab": 9,
+    "fort": 4,
+    "ref": 6,
+    "will": 8,
+    "defense": 7,
+    "initiative": 7,
+    "wealth": 4,
+    "gearR": 3,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 13,
+    "bab": 9,
+    "fort": 4,
+    "ref": 6,
+    "will": 8,
+    "defense": 8,
+    "initiative": 8,
+    "wealth": 4,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 14,
+    "bab": 10,
+    "fort": 4,
+    "ref": 6,
+    "will": 9,
+    "defense": 8,
+    "initiative": 8,
+    "wealth": 4,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 15,
+    "bab": 11,
+    "fort": 5,
+    "ref": 7,
+    "will": 9,
+    "defense": 8,
+    "initiative": 9,
+    "wealth": 5,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 1
+   },
+   {
+    "level": 16,
+    "bab": 12,
+    "fort": 5,
+    "ref": 7,
+    "will": 10,
+    "defense": 9,
+    "initiative": 10,
+    "wealth": 5,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 1
+   },
+   {
+    "level": 17,
+    "bab": 12,
+    "fort": 5,
+    "ref": 8,
+    "will": 10,
+    "defense": 10,
+    "initiative": 10,
+    "wealth": 5,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 1
+   },
+   {
+    "level": 18,
+    "bab": 13,
+    "fort": 6,
+    "ref": 8,
+    "will": 11,
+    "defense": 10,
+    "initiative": 11,
+    "wealth": 6,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   },
+   {
+    "level": 19,
+    "bab": 14,
+    "fort": 6,
+    "ref": 8,
+    "will": 11,
+    "defense": 11,
+    "initiative": 11,
+    "wealth": 6,
+    "gearR": 4,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   },
+   {
+    "level": 20,
+    "bab": 15,
+    "fort": 6,
+    "ref": 9,
+    "will": 12,
+    "defense": 11,
+    "initiative": 12,
+    "wealth": 6,
+    "gearR": 4,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Human nature"
+   },
+   {
+    "level": 2,
+    "name": "Sources I (dossier)"
+   },
+   {
+    "level": 3,
+    "name": "Little details 1/session"
+   },
+   {
+    "level": 4,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 5,
+    "name": "It's elementary"
+   },
+   {
+    "level": 6,
+    "name": "Perceptive +1"
+   },
+   {
+    "level": 7,
+    "name": "Little details 2/session"
+   },
+   {
+    "level": 8,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 9,
+    "name": "It's elementary, perceptive +2"
+   },
+   {
+    "level": 10,
+    "name": "Global search 1/mission"
+   },
+   {
+    "level": 11,
+    "name": "Little details 3/session, sources II (skill train)"
+   },
+   {
+    "level": 12,
+    "name": "Bonus feat, perceptive +3"
+   },
+   {
+    "level": 13,
+    "name": "It's elementary"
+   },
+   {
+    "level": 14,
+    "name": "Final deduction 1/session"
+   },
+   {
+    "level": 15,
+    "name": "Little details 4/session, perceptive +4"
+   },
+   {
+    "level": 16,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 17,
+    "name": "It's elementary"
+   },
+   {
+    "level": 18,
+    "name": "Perceptive +5"
+   },
+   {
+    "level": 19,
+    "name": "Little details 5/session, sources III (legal immun)"
+   },
+   {
+    "level": 20,
+    "name": "Bonus feat, global search 2/session"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Basic Skill",
+      "bonuses": [
+       {
+        "target": "featSlots.basicSkill",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Style",
+      "bonuses": [
+       {
+        "target": "featSlots.style",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "It's Elementary",
+    "key": "itsElementary",
+    "options": [
+     {
+      "index": 2,
+      "name": "Alertness",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Friends on the Force",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "The Game is Afoot",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Inner Drive",
+      "bonuses": [
+       {
+        "target": "vitality",
+        "value": "@classes.sleuth.levels"
+       },
+       {
+        "target": "wounds",
+        "value": "max(1, @abilities.cha.mod)"
+       }
+      ]
+     },
+     {
+      "index": 6,
+      "name": "Keen Senses",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Skill Mastery",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "The Truth Will Set you Free",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Trail Signs",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 4,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 5,
+    "list": "itsElementary"
+   },
+   {
+    "level": 8,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "itsElementary"
+   },
+   {
+    "level": 12,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 13,
+    "list": "itsElementary"
+   },
+   {
+    "level": 16,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 17,
+    "list": "itsElementary"
+   },
+   {
+    "level": 20,
+    "list": "bonusFeat"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "abilities.wis",
+    "value": "1",
+    "level": 6
+   },
+   {
+    "target": "abilities.wis",
+    "value": "1",
+    "level": 9
+   },
+   {
+    "target": "abilities.wis",
+    "value": "1",
+    "level": 12
+   },
+   {
+    "target": "abilities.wis",
+    "value": "1",
+    "level": 15
+   },
+   {
+    "target": "abilities.wis",
+    "value": "1",
+    "level": 186
+   }
+  ]
+ },
+ {
+  "num": 11,
+  "name": "Snoop",
+  "key": "snoop",
+  "expert": false,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 2,
+  "coreAbility": {
+   "name": "Astute"
+  },
+  "classSkills": [
+   "analysis",
+   "blend",
+   "bluff",
+   "bureaucracy",
+   "computers",
+   "cultures",
+   "electronics",
+   "investigation",
+   "manipulate",
+   "networking",
+   "notice",
+   "science",
+   "search",
+   "senseMotive",
+   "sleightOfHand"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 1,
+    "will": 2,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 2,
+    "will": 3,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 1,
+    "fort": 2,
+    "ref": 2,
+    "will": 3,
+    "defense": 3,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 2,
+    "fort": 2,
+    "ref": 2,
+    "will": 4,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 2,
+    "fort": 3,
+    "ref": 3,
+    "will": 4,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 3,
+    "fort": 3,
+    "ref": 3,
+    "will": 5,
+    "defense": 6,
+    "initiative": 4,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 3,
+    "fort": 4,
+    "ref": 4,
+    "will": 5,
+    "defense": 6,
+    "initiative": 4,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 4,
+    "fort": 4,
+    "ref": 4,
+    "will": 6,
+    "defense": 7,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 9,
+    "bab": 4,
+    "fort": 4,
+    "ref": 4,
+    "will": 6,
+    "defense": 8,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 10,
+    "bab": 5,
+    "fort": 5,
+    "ref": 5,
+    "will": 7,
+    "defense": 9,
+    "initiative": 6,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 11,
+    "bab": 5,
+    "fort": 5,
+    "ref": 5,
+    "will": 7,
+    "defense": 9,
+    "initiative": 7,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 12,
+    "bab": 6,
+    "fort": 6,
+    "ref": 6,
+    "will": 8,
+    "defense": 10,
+    "initiative": 7,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 4,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 13,
+    "bab": 6,
+    "fort": 6,
+    "ref": 6,
+    "will": 8,
+    "defense": 11,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 4,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 14,
+    "bab": 7,
+    "fort": 6,
+    "ref": 6,
+    "will": 9,
+    "defense": 12,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 4,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 15,
+    "bab": 7,
+    "fort": 7,
+    "ref": 7,
+    "will": 9,
+    "defense": 12,
+    "initiative": 9,
+    "wealth": 7,
+    "gearR": 2,
+    "gearT": 4,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 16,
+    "bab": 8,
+    "fort": 7,
+    "ref": 7,
+    "will": 10,
+    "defense": 13,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 3,
+    "gearT": 4,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 17,
+    "bab": 8,
+    "fort": 8,
+    "ref": 8,
+    "will": 10,
+    "defense": 14,
+    "initiative": 10,
+    "wealth": 8,
+    "gearR": 3,
+    "gearT": 4,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 18,
+    "bab": 9,
+    "fort": 8,
+    "ref": 8,
+    "will": 11,
+    "defense": 15,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 3,
+    "gearT": 5,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 19,
+    "bab": 9,
+    "fort": 8,
+    "ref": 8,
+    "will": 11,
+    "defense": 15,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 3,
+    "gearT": 5,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 20,
+    "bab": 10,
+    "fort": 9,
+    "ref": 9,
+    "will": 12,
+    "defense": 16,
+    "initiative": 12,
+    "wealth": 9,
+    "gearR": 3,
+    "gearT": 5,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 4,
+    "gearW": 0,
+    "gearE": 2
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Flawless search"
+   },
+   {
+    "level": 2,
+    "name": "Intuition I"
+   },
+   {
+    "level": 3,
+    "name": "Intercept communication 1/session"
+   },
+   {
+    "level": 4,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 5,
+    "name": "Spookshow"
+   },
+   {
+    "level": 6,
+    "name": "Black hat (1)"
+   },
+   {
+    "level": 7,
+    "name": "Intercept communication 2/session"
+   },
+   {
+    "level": 8,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 9,
+    "name": "\"Abort!\" 1/session, spookshow"
+   },
+   {
+    "level": 10,
+    "name": "Big brother 1/mission"
+   },
+   {
+    "level": 11,
+    "name": "Intercept communication 3/session, Intuition II"
+   },
+   {
+    "level": 12,
+    "name": "Black hat (2), bonus feat"
+   },
+   {
+    "level": 13,
+    "name": "Spookshow"
+   },
+   {
+    "level": 14,
+    "name": "Eye in the sky"
+   },
+   {
+    "level": 15,
+    "name": "\"Abort!\" 2/session, intercept communication 4/session"
+   },
+   {
+    "level": 16,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 17,
+    "name": "Spookshow"
+   },
+   {
+    "level": 18,
+    "name": "Black hat (3)"
+   },
+   {
+    "level": 19,
+    "name": "Intercept communication 5/session, Intuition III"
+   },
+   {
+    "level": 20,
+    "name": "Big brother 2/mission, bonus feat"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Covert",
+      "bonuses": [
+       {
+        "target": "featSlots.covert",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Gear",
+      "bonuses": [
+       {
+        "target": "featSlots.gear",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Spookshow",
+    "key": "spookshow",
+    "options": [
+     {
+      "index": 2,
+      "name": "Complex Substitution",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Current Dossier",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Intelligence Analysis",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "No Worries",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Schmooze",
+      "bonuses": [
+       {
+        "target": "contacts",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 7,
+      "name": "Skill Mastery",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Spy vs. Spy",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Subvert",
+      "bonuses": []
+     },
+     {
+      "index": 10,
+      "name": "Wired for Sound",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 4,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 5,
+    "list": "spookshow"
+   },
+   {
+    "level": 8,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "spookshow"
+   },
+   {
+    "level": 12,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 13,
+    "list": "spookshow"
+   },
+   {
+    "level": 16,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 17,
+    "list": "spookshow"
+   },
+   {
+    "level": 20,
+    "list": "bonusFeat"
+   }
+  ]
+ },
+ {
+  "num": 12,
+  "name": "Soldier",
+  "key": "soldier",
+  "expert": false,
+  "skillPoints": 4,
+  "vitality": 12,
+  "proficiencies": 6,
+  "coreAbility": {
+   "name": "Accurate"
+  },
+  "classSkills": [
+   "athletics",
+   "intimidate",
+   "medicine",
+   "notice",
+   "profession",
+   "resolve",
+   "search",
+   "survival",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 1,
+    "ref": 0,
+    "will": 2,
+    "defense": 0,
+    "initiative": 2,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 2,
+    "ref": 0,
+    "will": 3,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 2,
+    "ref": 1,
+    "will": 3,
+    "defense": 1,
+    "initiative": 4,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 2,
+    "ref": 1,
+    "will": 4,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 3,
+    "ref": 1,
+    "will": 4,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 3,
+    "ref": 2,
+    "will": 5,
+    "defense": 2,
+    "initiative": 6,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 4,
+    "ref": 2,
+    "will": 5,
+    "defense": 3,
+    "initiative": 7,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 4,
+    "ref": 2,
+    "will": 6,
+    "defense": 3,
+    "initiative": 8,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 4,
+    "ref": 3,
+    "will": 6,
+    "defense": 4,
+    "initiative": 9,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 5,
+    "ref": 3,
+    "will": 7,
+    "defense": 4,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 11,
+    "bab": 11,
+    "fort": 5,
+    "ref": 3,
+    "will": 7,
+    "defense": 4,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 12,
+    "bab": 12,
+    "fort": 6,
+    "ref": 4,
+    "will": 8,
+    "defense": 5,
+    "initiative": 11,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 13,
+    "bab": 13,
+    "fort": 6,
+    "ref": 4,
+    "will": 8,
+    "defense": 5,
+    "initiative": 12,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 14,
+    "bab": 14,
+    "fort": 6,
+    "ref": 4,
+    "will": 9,
+    "defense": 6,
+    "initiative": 13,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 15,
+    "bab": 15,
+    "fort": 7,
+    "ref": 5,
+    "will": 9,
+    "defense": 6,
+    "initiative": 14,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 16,
+    "bab": 16,
+    "fort": 7,
+    "ref": 5,
+    "will": 10,
+    "defense": 6,
+    "initiative": 15,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 4,
+    "gearE": 0
+   },
+   {
+    "level": 17,
+    "bab": 17,
+    "fort": 8,
+    "ref": 5,
+    "will": 10,
+    "defense": 7,
+    "initiative": 15,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 4,
+    "gearE": 0
+   },
+   {
+    "level": 18,
+    "bab": 18,
+    "fort": 8,
+    "ref": 6,
+    "will": 11,
+    "defense": 7,
+    "initiative": 16,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 4,
+    "gearE": 0
+   },
+   {
+    "level": 19,
+    "bab": 19,
+    "fort": 8,
+    "ref": 6,
+    "will": 11,
+    "defense": 8,
+    "initiative": 17,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 4,
+    "gearE": 0
+   },
+   {
+    "level": 20,
+    "bab": 20,
+    "fort": 9,
+    "ref": 6,
+    "will": 12,
+    "defense": 8,
+    "initiative": 18,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 3,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 4,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Fight on"
+   },
+   {
+    "level": 2,
+    "name": "Fortunes of war I"
+   },
+   {
+    "level": 3,
+    "name": "Fight on"
+   },
+   {
+    "level": 4,
+    "name": "Armor use I"
+   },
+   {
+    "level": 5,
+    "name": "Fight on"
+   },
+   {
+    "level": 6,
+    "name": "Weapon specialist"
+   },
+   {
+    "level": 7,
+    "name": "Fight on"
+   },
+   {
+    "level": 8,
+    "name": "Armor use II"
+   },
+   {
+    "level": 9,
+    "name": "Fight on, weapon specialist"
+   },
+   {
+    "level": 10,
+    "name": "Portable cover (1/4)"
+   },
+   {
+    "level": 11,
+    "name": "Fight on, fortunes of war II"
+   },
+   {
+    "level": 12,
+    "name": "Armor use III, weapon specialist"
+   },
+   {
+    "level": 13,
+    "name": "Fight on"
+   },
+   {
+    "level": 14,
+    "name": "One in a million 1/ session"
+   },
+   {
+    "level": 15,
+    "name": "Fight on, weapon specialist"
+   },
+   {
+    "level": 16,
+    "name": "Armor use IV"
+   },
+   {
+    "level": 17,
+    "name": "Fight on"
+   },
+   {
+    "level": 18,
+    "name": "Weapon specialist"
+   },
+   {
+    "level": 19,
+    "name": "Fight on, fortunes of war III"
+   },
+   {
+    "level": 20,
+    "name": "Armor use V, portable cover (1/2)"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Fight On",
+    "key": "fightOn",
+    "options": [
+     {
+      "index": 2,
+      "name": "2 Weapon Prof",
+      "bonuses": [
+       {
+        "target": "prof.generic",
+        "value": "2"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Basic Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.basicCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 4,
+      "name": "Melee Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.meleeCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 5,
+      "name": "Ranged Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.rangedCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 6,
+      "name": "Unarmed Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.unarmedCombat",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Weapon Specialist",
+    "key": "weaponSpecialist",
+    "options": [
+     {
+      "index": 2,
+      "name": "Big Stick",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Foibles",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Killer Instinct",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Most Deadly",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Mow Down",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "No Worries",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Showdown",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 1,
+    "list": "fightOn"
+   },
+   {
+    "level": 3,
+    "list": "fightOn"
+   },
+   {
+    "level": 5,
+    "list": "fightOn"
+   },
+   {
+    "level": 6,
+    "list": "weaponSpecialist"
+   },
+   {
+    "level": 7,
+    "list": "fightOn"
+   },
+   {
+    "level": 9,
+    "list": "fightOn"
+   },
+   {
+    "level": 9,
+    "list": "weaponSpecialist"
+   },
+   {
+    "level": 11,
+    "list": "fightOn"
+   },
+   {
+    "level": 12,
+    "list": "weaponSpecialist"
+   },
+   {
+    "level": 13,
+    "list": "fightOn"
+   },
+   {
+    "level": 15,
+    "list": "fightOn"
+   },
+   {
+    "level": 15,
+    "list": "weaponSpecialist"
+   },
+   {
+    "level": 17,
+    "list": "fightOn"
+   },
+   {
+    "level": 18,
+    "list": "weaponSpecialist"
+   },
+   {
+    "level": 19,
+    "list": "fightOn"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "defenseArmor",
+    "value": "1",
+    "level": 4
+   },
+   {
+    "target": "defenseArmor",
+    "value": "1",
+    "level": 8
+   },
+   {
+    "target": "defenseArmor",
+    "value": "1",
+    "level": 12
+   },
+   {
+    "target": "defenseArmor",
+    "value": "1",
+    "level": 16
+   },
+   {
+    "target": "defenseArmor",
+    "value": "1",
+    "level": 20
+   },
+   {
+    "target": "armorCheck",
+    "value": "1",
+    "level": 4
+   }
+  ]
+ },
+ {
+  "num": 13,
+  "name": "Wheelman",
+  "key": "wheelman",
+  "expert": false,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 5,
+  "coreAbility": {
+   "name": "Driven"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "drive",
+   "electronics",
+   "impress",
+   "intimidate",
+   "mechanics",
+   "notice",
+   "profession",
+   "security",
+   "streetwise",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 0,
+    "ref": 2,
+    "will": 0,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 0,
+    "ref": 3,
+    "will": 0,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 1,
+    "ref": 3,
+    "will": 1,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 1,
+    "ref": 4,
+    "will": 1,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 1,
+    "ref": 4,
+    "will": 1,
+    "defense": 3,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 2,
+    "ref": 5,
+    "will": 2,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 1
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 2,
+    "ref": 5,
+    "will": 2,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 1
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 2,
+    "ref": 6,
+    "will": 2,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 3,
+    "ref": 6,
+    "will": 3,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 3,
+    "ref": 7,
+    "will": 3,
+    "defense": 6,
+    "initiative": 6,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 3,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 11,
+    "bab": 11,
+    "fort": 3,
+    "ref": 7,
+    "will": 3,
+    "defense": 7,
+    "initiative": 7,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 3,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 12,
+    "bab": 12,
+    "fort": 4,
+    "ref": 8,
+    "will": 4,
+    "defense": 7,
+    "initiative": 7,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 3,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 1
+   },
+   {
+    "level": 13,
+    "bab": 13,
+    "fort": 4,
+    "ref": 8,
+    "will": 4,
+    "defense": 8,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 3,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 2
+   },
+   {
+    "level": 14,
+    "bab": 14,
+    "fort": 4,
+    "ref": 9,
+    "will": 4,
+    "defense": 8,
+    "initiative": 8,
+    "wealth": 6,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 3,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 2
+   },
+   {
+    "level": 15,
+    "bab": 15,
+    "fort": 5,
+    "ref": 9,
+    "will": 5,
+    "defense": 9,
+    "initiative": 9,
+    "wealth": 7,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 3,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   },
+   {
+    "level": 16,
+    "bab": 16,
+    "fort": 5,
+    "ref": 10,
+    "will": 5,
+    "defense": 10,
+    "initiative": 10,
+    "wealth": 7,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 4,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   },
+   {
+    "level": 17,
+    "bab": 17,
+    "fort": 5,
+    "ref": 10,
+    "will": 5,
+    "defense": 10,
+    "initiative": 10,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 4,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   },
+   {
+    "level": 18,
+    "bab": 18,
+    "fort": 6,
+    "ref": 11,
+    "will": 6,
+    "defense": 11,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 4,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   },
+   {
+    "level": 19,
+    "bab": 19,
+    "fort": 6,
+    "ref": 11,
+    "will": 6,
+    "defense": 11,
+    "initiative": 11,
+    "wealth": 8,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 4,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 2
+   },
+   {
+    "level": 20,
+    "bab": 20,
+    "fort": 6,
+    "ref": 12,
+    "will": 6,
+    "defense": 12,
+    "initiative": 12,
+    "wealth": 9,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 4,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 3
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Custom ride, daredevil"
+   },
+   {
+    "level": 2,
+    "name": "Manual adjustment (Mechanics)"
+   },
+   {
+    "level": 3,
+    "name": "Crash course"
+   },
+   {
+    "level": 4,
+    "name": "Vehicle familiarity I (bonus)"
+   },
+   {
+    "level": 5,
+    "name": "Crash course"
+   },
+   {
+    "level": 6,
+    "name": "Drivers only"
+   },
+   {
+    "level": 7,
+    "name": "Crash course"
+   },
+   {
+    "level": 8,
+    "name": "Vehicle familiarity II (1/2 time)"
+   },
+   {
+    "level": 9,
+    "name": "Crash course, drivers only"
+   },
+   {
+    "level": 10,
+    "name": "\"That's impossible!\" 1/session"
+   },
+   {
+    "level": 11,
+    "name": "Crash course, manual adjustment (Electronics)"
+   },
+   {
+    "level": 12,
+    "name": "Drivers only, vehicle familiarity III (second vehicle)"
+   },
+   {
+    "level": 13,
+    "name": "Crash course"
+   },
+   {
+    "level": 14,
+    "name": "Soup her up"
+   },
+   {
+    "level": 15,
+    "name": "Crash course, drivers only"
+   },
+   {
+    "level": 16,
+    "name": "Vehicle familiarity IV (1 hour)"
+   },
+   {
+    "level": 17,
+    "name": "Crash course"
+   },
+   {
+    "level": 18,
+    "name": "Drivers only"
+   },
+   {
+    "level": 19,
+    "name": "Crash course, manual adjustment (Security)"
+   },
+   {
+    "level": 20,
+    "name": "\"That's impossible!\" 2/session, vehicle familiarity IV (third vehicle)"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Crash Course",
+    "key": "crashCourse",
+    "options": [
+     {
+      "index": 2,
+      "name": "2 Drive Focus",
+      "bonuses": [
+       {
+        "target": "focus.drive",
+        "value": "2"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Chase",
+      "bonuses": [
+       {
+        "target": "featSlots.chase",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Drivers Only",
+    "key": "driversOnly",
+    "options": [
+     {
+      "index": 2,
+      "name": "Elbow Grease",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Gunnery",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Most Lethal",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Pit Crew",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Rough Riding",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Skill Mastery",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Spare Keys",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Trade-In",
+      "bonuses": []
+     },
+     {
+      "index": 10,
+      "name": "Vehicular Instinct",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "crashCourse"
+   },
+   {
+    "level": 5,
+    "list": "crashCourse"
+   },
+   {
+    "level": 6,
+    "list": "driversOnly"
+   },
+   {
+    "level": 7,
+    "list": "crashCourse"
+   },
+   {
+    "level": 9,
+    "list": "crashCourse"
+   },
+   {
+    "level": 9,
+    "list": "driversOnly"
+   },
+   {
+    "level": 11,
+    "list": "crashCourse"
+   },
+   {
+    "level": 12,
+    "list": "driversOnly"
+   },
+   {
+    "level": 13,
+    "list": "crashCourse"
+   },
+   {
+    "level": 15,
+    "list": "crashCourse"
+   },
+   {
+    "level": 15,
+    "list": "driversOnly"
+   },
+   {
+    "level": 17,
+    "list": "crashCourse"
+   },
+   {
+    "level": 18,
+    "list": "driversOnly"
+   },
+   {
+    "level": 19,
+    "list": "crashCourse"
+   }
+  ],
+  "featGrants": [
+   {
+    "level": 1,
+    "feat": "Daredevil"
+   }
+  ]
+ },
+ {
+  "num": 15,
+  "name": "Brawler",
+  "key": "brawler",
+  "expert": true,
+  "skillPoints": 4,
+  "vitality": 12,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Ferocious"
+  },
+  "classSkills": [
+   "athletics",
+   "drive",
+   "impress",
+   "intimidate",
+   "notice",
+   "resolve",
+   "senseMotive",
+   "sleightOfHand",
+   "streetwise"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 2,
+    "ref": 1,
+    "will": 0,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 3,
+    "ref": 2,
+    "will": 0,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 3,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 4,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 4,
+    "ref": 3,
+    "will": 1,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 5,
+    "ref": 3,
+    "will": 2,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 5,
+    "ref": 4,
+    "will": 2,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 6,
+    "ref": 4,
+    "will": 2,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 6,
+    "ref": 4,
+    "will": 3,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 7,
+    "ref": 5,
+    "will": 3,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Whatever's handy +1"
+   },
+   {
+    "level": 2,
+    "name": "Cheap shot I (damage)"
+   },
+   {
+    "level": 3,
+    "name": "Ploy"
+   },
+   {
+    "level": 4,
+    "name": "Bonus feat, shrug it off"
+   },
+   {
+    "level": 5,
+    "name": "Ploy, whatever's handy +2"
+   },
+   {
+    "level": 6,
+    "name": "Buff"
+   },
+   {
+    "level": 7,
+    "name": "Cheap shot II (flat-footed), ploy"
+   },
+   {
+    "level": 8,
+    "name": "Bonus feat, fight club"
+   },
+   {
+    "level": 9,
+    "name": "Ploy, whatever's handy +3"
+   },
+   {
+    "level": 10,
+    "name": "Juggernaught"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Melee Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.meleeCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Unarmed Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.unarmedCombat",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Ploy",
+    "key": "ploy",
+    "options": [
+     {
+      "index": 2,
+      "name": "Beat Down",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Provoke",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Smack Down",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Stare Down",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Still Standing",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Strut",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "ploy"
+   },
+   {
+    "level": 4,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 5,
+    "list": "ploy"
+   },
+   {
+    "level": 7,
+    "list": "ploy"
+   },
+   {
+    "level": 8,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "ploy"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "abilities.str",
+    "value": "1",
+    "level": 6
+   },
+   {
+    "target": "abilities.con",
+    "value": "1",
+    "level": 6
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    },
+    {
+     "type": "skill",
+     "key": "intimidate",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Improvised Weapon Basics"
+    }
+   ]
+  }
+ },
+ {
+  "num": 16,
+  "name": "Cleaner",
+  "key": "cleaner",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Face in the crowd"
+  },
+  "classSkills": [
+   "analysis",
+   "blend",
+   "bluff",
+   "falsify",
+   "intimidate",
+   "investigation",
+   "manipulate",
+   "notice",
+   "search",
+   "security",
+   "sleightOfHand",
+   "sneak",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 0,
+    "will": 1,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 0,
+    "will": 2,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 2,
+    "ref": 1,
+    "will": 2,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 2,
+    "ref": 1,
+    "will": 2,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 3,
+    "ref": 1,
+    "will": 3,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 3,
+    "ref": 2,
+    "will": 3,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 4,
+    "ref": 2,
+    "will": 4,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 4,
+    "ref": 2,
+    "will": 4,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 4,
+    "ref": 3,
+    "will": 4,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 5,
+    "ref": 3,
+    "will": 5,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Glib explanation (advanced)"
+   },
+   {
+    "level": 2,
+    "name": "Priority request (vehicle or weapon)"
+   },
+   {
+    "level": 3,
+    "name": "Status quo 1/mission"
+   },
+   {
+    "level": 4,
+    "name": "Red herrings, executioner"
+   },
+   {
+    "level": 5,
+    "name": "Glib explanation (grand), status quo 2/mission"
+   },
+   {
+    "level": 6,
+    "name": "Cleaning crew"
+   },
+   {
+    "level": 7,
+    "name": "Priority request (gadget or tradecraft), status quo 3/mission"
+   },
+   {
+    "level": 8,
+    "name": "Must complete mission. Merciless"
+   },
+   {
+    "level": 9,
+    "name": "Glib explanation (perfect), status qup 4/mission"
+   },
+   {
+    "level": 10,
+    "name": "Fatal attack"
+   }
+  ],
+  "choiceLists": [],
+  "featGrants": [
+   {
+    "level": 4,
+    "feat": "Executioner"
+   },
+   {
+    "level": 8,
+    "feat": "Merciless"
+   },
+   {
+    "level": 1,
+    "feat": "Advanced Skill Mastery"
+   },
+   {
+    "level": 5,
+    "feat": "Grand Skill Mastery"
+   },
+   {
+    "level": 9,
+    "feat": "Perfect Skill Mastery"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "falsify",
+     "min": 6
+    },
+    {
+     "type": "skill",
+     "key": "manipulate",
+     "min": 4
+    },
+    {
+     "type": "feat",
+     "name": "Hustler"
+    }
+   ]
+  }
+ },
+ {
+  "num": 17,
+  "name": "Con Artist",
+  "key": "conArtist",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Two-faced"
+  },
+  "classSkills": [
+   "blend",
+   "bluff",
+   "bureaucracy",
+   "falsify",
+   "impress",
+   "investigation",
+   "manipulate",
+   "networking",
+   "search",
+   "security",
+   "senseMotive",
+   "streetwise"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 2,
+    "will": 2,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 3,
+    "will": 3,
+    "defense": 1,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 1,
+    "fort": 1,
+    "ref": 3,
+    "will": 3,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 2,
+    "fort": 1,
+    "ref": 4,
+    "will": 4,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 2,
+    "fort": 1,
+    "ref": 4,
+    "will": 4,
+    "defense": 3,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 3,
+    "fort": 2,
+    "ref": 5,
+    "will": 5,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 3,
+    "fort": 2,
+    "ref": 5,
+    "will": 5,
+    "defense": 4,
+    "initiative": 4,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 4,
+    "fort": 2,
+    "ref": 6,
+    "will": 6,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 4,
+    "fort": 3,
+    "ref": 6,
+    "will": 6,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 5,
+    "fort": 3,
+    "ref": 7,
+    "will": 7,
+    "defense": 6,
+    "initiative": 6,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Short con I (1/2 time)"
+   },
+   {
+    "level": 2,
+    "name": "A sucker born every minute"
+   },
+   {
+    "level": 3,
+    "name": "No hard feelings"
+   },
+   {
+    "level": 4,
+    "name": "Cool customer (mellow), shill"
+   },
+   {
+    "level": 5,
+    "name": "Bait and switch, short con II (1/4 time)"
+   },
+   {
+    "level": 6,
+    "name": "Shortest way to the heart"
+   },
+   {
+    "level": 7,
+    "name": "A sucker born every minute II, no hard feelings"
+   },
+   {
+    "level": 8,
+    "name": "Cool customer (standard scene), long con"
+   },
+   {
+    "level": 9,
+    "name": "Bait and switch, short con III (1/10 time)"
+   },
+   {
+    "level": 10,
+    "name": "100 moves ahead"
+   }
+  ],
+  "choiceLists": [],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "bluff",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Mark"
+    },
+    {
+     "type": "featTree",
+     "tree": "style",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "num": 18,
+  "name": "Counter-Terrorist",
+  "key": "counterterrorist",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Shoot first"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "blend",
+   "intimidate",
+   "investigation",
+   "notice",
+   "resolve",
+   "search",
+   "security",
+   "senseMotive",
+   "sneak",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 0,
+    "ref": 2,
+    "will": 1,
+    "defense": 0,
+    "initiative": 2,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 0,
+    "ref": 3,
+    "will": 2,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 1,
+    "ref": 3,
+    "will": 2,
+    "defense": 1,
+    "initiative": 4,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 1,
+    "ref": 4,
+    "will": 2,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 1,
+    "ref": 4,
+    "will": 3,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 2,
+    "ref": 5,
+    "will": 3,
+    "defense": 2,
+    "initiative": 6,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 2,
+    "ref": 5,
+    "will": 4,
+    "defense": 3,
+    "initiative": 7,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 2,
+    "ref": 6,
+    "will": 4,
+    "defense": 3,
+    "initiative": 8,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 3,
+    "ref": 6,
+    "will": 4,
+    "defense": 4,
+    "initiative": 9,
+    "wealth": 3,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 3,
+    "ref": 7,
+    "will": 5,
+    "defense": 4,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Crowd control"
+   },
+   {
+    "level": 2,
+    "name": "Precision take down I"
+   },
+   {
+    "level": 3,
+    "name": "CQB Mastery"
+   },
+   {
+    "level": 4,
+    "name": "Armor use I, safe attack"
+   },
+   {
+    "level": 5,
+    "name": "SWAT"
+   },
+   {
+    "level": 6,
+    "name": "Hostile negotiator"
+   },
+   {
+    "level": 7,
+    "name": "CQB Supremacy, precision takedown II"
+   },
+   {
+    "level": 8,
+    "name": "Armor use II, tactical commander"
+   },
+   {
+    "level": 9,
+    "name": "SWAT"
+   },
+   {
+    "level": 10,
+    "name": "First strike"
+   }
+  ],
+  "choiceLists": [],
+  "bonuses": [
+   {
+    "target": "defenseArmor",
+    "value": "1",
+    "level": 4
+   },
+   {
+    "target": "defenseArmor",
+    "value": "1",
+    "level": 8
+   }
+  ],
+  "featGrants": [
+   {
+    "level": 3,
+    "feat": "CQB Mastery"
+   },
+   {
+    "level": 7,
+    "feat": "CQB Supremacy"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Ambush Basics"
+    },
+    {
+     "type": "feat",
+     "name": "CQB Basics"
+    }
+   ]
+  }
+ },
+ {
+  "num": 19,
+  "name": "Field Analyst",
+  "key": "fieldAnalyst",
+  "expert": true,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Keen"
+  },
+  "classSkills": [
+   "analysis",
+   "bureaucracy",
+   "computers",
+   "cultures",
+   "drive",
+   "electronics",
+   "investigation",
+   "mechanics",
+   "medicine",
+   "notice",
+   "profession",
+   "resolve",
+   "science",
+   "search",
+   "senseMotive"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 0,
+    "will": 2,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 0,
+    "will": 3,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 2,
+    "ref": 1,
+    "will": 3,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 2,
+    "ref": 1,
+    "will": 4,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 3,
+    "ref": 1,
+    "will": 4,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 3,
+    "ref": 2,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 4,
+    "ref": 2,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 4,
+    "ref": 2,
+    "will": 6,
+    "defense": 5,
+    "initiative": 2,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 4,
+    "ref": 3,
+    "will": 6,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 3
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 5,
+    "ref": 3,
+    "will": 7,
+    "defense": 6,
+    "initiative": 3,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 3,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 3
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "CSI (Advanced)"
+   },
+   {
+    "level": 2,
+    "name": "Priority request (Electronic or Resources)"
+   },
+   {
+    "level": 3,
+    "name": "All the right questions (1/2 time)"
+   },
+   {
+    "level": 4,
+    "name": "Bright idea 2/session, plan of action"
+   },
+   {
+    "level": 5,
+    "name": "CSI (Grand)"
+   },
+   {
+    "level": 6,
+    "name": "All the right answers"
+   },
+   {
+    "level": 7,
+    "name": "All the right questions (1/4 time), priority request (Tradecraft or Vehicle)"
+   },
+   {
+    "level": 8,
+    "name": "Bright idea 4/session, eye for detail"
+   },
+   {
+    "level": 9,
+    "name": "CSI (Perfect)"
+   },
+   {
+    "level": 10,
+    "name": "Sum up 1/mission"
+   }
+  ],
+  "choiceLists": [],
+  "featGrants": [
+   {
+    "level": 1,
+    "feat": "Advanced Skill Mastery"
+   },
+   {
+    "level": 5,
+    "feat": "Grand Skill Mastery"
+   },
+   {
+    "level": 9,
+    "feat": "Perfect Skill Mastery"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "analysis",
+     "min": 6
+    },
+    {
+     "type": "skill",
+     "key": "investigation",
+     "min": 4
+    },
+    {
+     "type": "feat",
+     "name": "Examiner"
+    }
+   ]
+  }
+ },
+ {
+  "num": 20,
+  "name": "Grunt",
+  "key": "grunt",
+  "expert": true,
+  "skillPoints": 4,
+  "vitality": 12,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Hot-blooded"
+  },
+  "classSkills": [
+   "athletics",
+   "drive",
+   "intimidate",
+   "mechanics",
+   "notice",
+   "resolve",
+   "search",
+   "survival",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 1,
+    "ref": 0,
+    "will": 2,
+    "defense": 0,
+    "initiative": 2,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 2,
+    "ref": 0,
+    "will": 3,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 2,
+    "ref": 1,
+    "will": 3,
+    "defense": 1,
+    "initiative": 4,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 2,
+    "ref": 1,
+    "will": 4,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 3,
+    "ref": 1,
+    "will": 4,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 3,
+    "ref": 2,
+    "will": 5,
+    "defense": 2,
+    "initiative": 6,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 4,
+    "ref": 2,
+    "will": 5,
+    "defense": 3,
+    "initiative": 7,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 4,
+    "ref": 2,
+    "will": 6,
+    "defense": 3,
+    "initiative": 8,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 4,
+    "ref": 3,
+    "will": 6,
+    "defense": 4,
+    "initiative": 9,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 5,
+    "ref": 3,
+    "will": 7,
+    "defense": 4,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 3,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Alpha strike"
+   },
+   {
+    "level": 2,
+    "name": "Dead to rights +1d4"
+   },
+   {
+    "level": 3,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 4,
+    "name": "Cool-headed, fire team (Autofire Basics)"
+   },
+   {
+    "level": 5,
+    "name": "Heavily armed (1 pick)"
+   },
+   {
+    "level": 6,
+    "name": "\"Put your backs into it!\""
+   },
+   {
+    "level": 7,
+    "name": "Bonus feat, dead to rights +2d4"
+   },
+   {
+    "level": 8,
+    "name": "Fire team (Autofire Mastery), overkill"
+   },
+   {
+    "level": 9,
+    "name": "Heavily armed (2 picks)"
+   },
+   {
+    "level": 10,
+    "name": "Battle cry"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Basic Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.basicCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Ranged Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.rangedCombat",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 7,
+    "list": "bonusFeat"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "str",
+     "min": 15
+    },
+    {
+     "type": "proficiency",
+     "key": "tactical"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 4
+    }
+   ]
+  }
+ },
+ {
+  "num": 21,
+  "name": "Guide",
+  "key": "guide",
+  "expert": true,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Cultured"
+  },
+  "classSkills": [
+   "athletics",
+   "blend",
+   "bluff",
+   "cultures",
+   "drive",
+   "falsify",
+   "impress",
+   "investigation",
+   "medicine",
+   "networking",
+   "notice",
+   "senseMotive",
+   "sneak",
+   "streetwise",
+   "survival"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 1,
+    "will": 0,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 2,
+    "will": 0,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 2,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 2,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 3,
+    "ref": 3,
+    "will": 1,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 3,
+    "ref": 3,
+    "will": 2,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 4,
+    "ref": 4,
+    "will": 2,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 4,
+    "ref": 4,
+    "will": 2,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 4,
+    "ref": 4,
+    "will": 3,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 2,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 5,
+    "ref": 5,
+    "will": 3,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 3,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Friends in low places I"
+   },
+   {
+    "level": 2,
+    "name": "Home turf"
+   },
+   {
+    "level": 3,
+    "name": "Forage (item)"
+   },
+   {
+    "level": 4,
+    "name": "\"Any time, any place\", interpereter"
+   },
+   {
+    "level": 5,
+    "name": "Backup I, friends in low places II"
+   },
+   {
+    "level": 6,
+    "name": "Overland shortcut"
+   },
+   {
+    "level": 7,
+    "name": "Forage (gear), local hero"
+   },
+   {
+    "level": 8,
+    "name": "\"Any time, any place\", go native"
+   },
+   {
+    "level": 9,
+    "name": "Backup II, friends in low places III"
+   },
+   {
+    "level": 10,
+    "name": "Master of camoflauge"
+   }
+  ],
+  "choiceLists": [],
+  "featGrants": [
+   {
+    "level": 2,
+    "feat": "Home Turf"
+   },
+   {
+    "level": 2,
+    "feat": "Local Hero"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "cultures",
+     "min": 6
+    },
+    {
+     "type": "skill",
+     "key": "streetwise",
+     "min": 4
+    },
+    {
+     "type": "feat",
+     "name": "Safe House"
+    }
+   ]
+  }
+ },
+ {
+  "num": 22,
+  "name": "Illuminatus",
+  "key": "illuminatus",
+  "expert": true,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Perfect cover"
+  },
+  "classSkills": [
+   "analysis",
+   "blend",
+   "bluff",
+   "bureaucracy",
+   "computers",
+   "cultures",
+   "falsify",
+   "investigation",
+   "manipulate",
+   "networking",
+   "profession",
+   "search",
+   "senseMotive",
+   "sleightOfHand",
+   "streetwise"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 1,
+    "ref": 0,
+    "will": 2,
+    "defense": 2,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 2,
+    "ref": 0,
+    "will": 3,
+    "defense": 3,
+    "initiative": 0,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 1,
+    "fort": 2,
+    "ref": 1,
+    "will": 3,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 2,
+    "fort": 2,
+    "ref": 1,
+    "will": 4,
+    "defense": 4,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 2,
+    "fort": 3,
+    "ref": 1,
+    "will": 4,
+    "defense": 5,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 3,
+    "fort": 3,
+    "ref": 2,
+    "will": 5,
+    "defense": 6,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 3,
+    "fort": 4,
+    "ref": 2,
+    "will": 5,
+    "defense": 6,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 4,
+    "fort": 4,
+    "ref": 2,
+    "will": 6,
+    "defense": 7,
+    "initiative": 2,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 4,
+    "fort": 4,
+    "ref": 3,
+    "will": 6,
+    "defense": 8,
+    "initiative": 3,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 5,
+    "fort": 5,
+    "ref": 3,
+    "will": 7,
+    "defense": 9,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Plausible deniability I"
+   },
+   {
+    "level": 2,
+    "name": "Permanent record"
+   },
+   {
+    "level": 3,
+    "name": "Usual suspects I"
+   },
+   {
+    "level": 4,
+    "name": "Bonus feat, terminally harmless"
+   },
+   {
+    "level": 5,
+    "name": "Plausible deniability II"
+   },
+   {
+    "level": 6,
+    "name": "Circumstantial evidence"
+   },
+   {
+    "level": 7,
+    "name": "Permanent record, usual suspects II"
+   },
+   {
+    "level": 8,
+    "name": "Bonus feat, filed in triplicate"
+   },
+   {
+    "level": 9,
+    "name": "Plausible deniability III"
+   },
+   {
+    "level": 10,
+    "name": "Shadow cabinet"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Covert",
+      "bonuses": [
+       {
+        "target": "featSlots.covert",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Tradecraft",
+      "bonuses": [
+       {
+        "target": "featSlots.tradecraft",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 4,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 8,
+    "list": "bonusFeat"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "blend",
+     "min": 6
+    },
+    {
+     "type": "skill",
+     "key": "bureaucracy",
+     "min": 4
+    },
+    {
+     "type": "feat",
+     "name": "Superior Documentation"
+    }
+   ]
+  }
+ },
+ {
+  "num": 23,
+  "name": "Inventor",
+  "key": "inventor",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Technophile"
+  },
+  "classSkills": [
+   "analysis",
+   "computers",
+   "cultures",
+   "drive",
+   "electronics",
+   "mechanics",
+   "medicine",
+   "resolve",
+   "science",
+   "search",
+   "security",
+   "sleightOfHand"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 1,
+    "will": 2,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 2,
+    "will": 3,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 1,
+    "ref": 2,
+    "will": 3,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 1,
+    "ref": 2,
+    "will": 4,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 1,
+    "ref": 3,
+    "will": 4,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 2,
+    "ref": 3,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 2,
+    "ref": 4,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 2,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 2,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 3,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 3,
+    "ref": 5,
+    "will": 7,
+    "defense": 6,
+    "initiative": 3,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 0,
+    "gearE": 3
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Utility belt +1"
+   },
+   {
+    "level": 2,
+    "name": "Field test (1 item)"
+   },
+   {
+    "level": 3,
+    "name": "Assembly (1 table)"
+   },
+   {
+    "level": 4,
+    "name": "Breakdown, mark of a Professional"
+   },
+   {
+    "level": 5,
+    "name": "Assembly (2 tables), utility belt +2"
+   },
+   {
+    "level": 6,
+    "name": "Wildcard gadget 1/session"
+   },
+   {
+    "level": 7,
+    "name": "Assembly (3 tables), field test (2 items)"
+   },
+   {
+    "level": 8,
+    "name": "Practice makes perfect, smartgun"
+   },
+   {
+    "level": 9,
+    "name": "Assembly (4 tables), utility belt +3"
+   },
+   {
+    "level": 10,
+    "name": "Edison, wildcard gadget 2/session"
+   }
+  ],
+  "choiceLists": [],
+  "featGrants": [
+   {
+    "level": 4,
+    "feat": "Mark of a Professional"
+   },
+   {
+    "level": 8,
+    "feat": "Practice Makes Perfect"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "int",
+     "min": 15
+    },
+    {
+     "type": "any",
+     "of": [
+      {
+       "type": "skill",
+       "key": "mechanics",
+       "min": 4
+      },
+      {
+       "type": "skill",
+       "key": "science",
+       "min": 4
+      }
+     ]
+    },
+    {
+     "type": "feat",
+     "name": "Techie"
+    }
+   ]
+  }
+ },
+ {
+  "num": 24,
+  "name": "Politico",
+  "key": "politico",
+  "expert": true,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Halls of power"
+  },
+  "classSkills": [
+   "bluff",
+   "bureaucracy",
+   "cultures",
+   "falsify",
+   "impress",
+   "intimidate",
+   "investigation",
+   "manipulate",
+   "networking",
+   "notice",
+   "profession",
+   "resolve",
+   "science",
+   "search",
+   "senseMotive"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 1,
+    "will": 2,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 2,
+    "will": 3,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 3,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 1,
+    "fort": 1,
+    "ref": 2,
+    "will": 3,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 2,
+    "fort": 1,
+    "ref": 2,
+    "will": 4,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 2,
+    "fort": 1,
+    "ref": 3,
+    "will": 4,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 3,
+    "fort": 2,
+    "ref": 3,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 3,
+    "fort": 2,
+    "ref": 4,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 4,
+    "fort": 2,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 2,
+    "wealth": 6,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 4,
+    "fort": 3,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 6,
+    "gearR": 3,
+    "gearT": 2,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 5,
+    "fort": 3,
+    "ref": 5,
+    "will": 7,
+    "defense": 6,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 3,
+    "gearT": 3,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Statesman (advanced)"
+   },
+   {
+    "level": 2,
+    "name": "Political favors"
+   },
+   {
+    "level": 3,
+    "name": "War chest (self)"
+   },
+   {
+    "level": 4,
+    "name": "Behind closed doors, no hard feelings"
+   },
+   {
+    "level": 5,
+    "name": "Statesman (grand)"
+   },
+   {
+    "level": 6,
+    "name": "Security detail"
+   },
+   {
+    "level": 7,
+    "name": "Political immunity, war chest (team)"
+   },
+   {
+    "level": 8,
+    "name": "Diplomatic solution, no hard feelings"
+   },
+   {
+    "level": 9,
+    "name": "Statesman (perfect)"
+   },
+   {
+    "level": 10,
+    "name": "Executive decision 1/mission"
+   }
+  ],
+  "choiceLists": [],
+  "featGrants": [
+   {
+    "level": 1,
+    "feat": "Advanced Skill Mastery"
+   },
+   {
+    "level": 5,
+    "feat": "Grand Skill Mastery"
+   },
+   {
+    "level": 9,
+    "feat": "Perfect Skill Mastery"
+   },
+   {
+    "level": 2,
+    "feat": "Political Favors"
+   },
+   {
+    "level": 7,
+    "feat": "Political Immunity"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "cha",
+     "min": 13
+    },
+    {
+     "type": "feat",
+     "name": "Diplomat"
+    },
+    {
+     "type": "feat",
+     "name": "Political Clout"
+    }
+   ]
+  }
+ },
+ {
+  "num": 25,
+  "name": "Raptor",
+  "key": "raptor",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Nimble"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "computers",
+   "drive",
+   "electronics",
+   "falsify",
+   "notice",
+   "science",
+   "security",
+   "sleightOfHand",
+   "sneak",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 0,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 3,
+    "will": 2,
+    "defense": 3,
+    "initiative": 0,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 1,
+    "ref": 3,
+    "will": 2,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 2,
+    "defense": 4,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 3,
+    "defense": 5,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 2,
+    "ref": 5,
+    "will": 3,
+    "defense": 6,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 2,
+    "ref": 5,
+    "will": 4,
+    "defense": 6,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 2,
+    "ref": 6,
+    "will": 4,
+    "defense": 7,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 3,
+    "ref": 6,
+    "will": 4,
+    "defense": 8,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 3,
+    "ref": 7,
+    "will": 5,
+    "defense": 9,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 3,
+    "gearS": 1,
+    "gearG": 3,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "secret weapon (favored)"
+   },
+   {
+    "level": 2,
+    "name": "Wuxia I"
+   },
+   {
+    "level": 3,
+    "name": "Cutting edge"
+   },
+   {
+    "level": 4,
+    "name": "Cyclone I, Wolf pack mastery"
+   },
+   {
+    "level": 5,
+    "name": "Secret weapon (signature)"
+   },
+   {
+    "level": 6,
+    "name": "Armor grace"
+   },
+   {
+    "level": 7,
+    "name": "Outrider, wuxia II"
+   },
+   {
+    "level": 8,
+    "name": "Cyclone II, Wolf pack supremacy"
+   },
+   {
+    "level": 9,
+    "name": "Secret weapon (trademark)"
+   },
+   {
+    "level": 10,
+    "name": "Fleeting shadow"
+   }
+  ],
+  "choiceLists": [],
+  "bonuses": [
+   {
+    "target": "defenseArmor",
+    "value": "@actionDice.max",
+    "level": 6
+   }
+  ],
+  "featGrants": [
+   {
+    "level": 4,
+    "feat": "Wolfpack Mastery"
+   },
+   {
+    "level": 8,
+    "feat": "Wolfpack Supremacy"
+   },
+   {
+    "level": 1,
+    "feat": "Favored Gear"
+   },
+   {
+    "level": 5,
+    "feat": "Signature Gear"
+   },
+   {
+    "level": 9,
+    "feat": "Trademark Gear"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "sneak",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Burglar"
+    },
+    {
+     "type": "featTree",
+     "tree": "meleeCombat",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "num": 26,
+  "name": "Schemer",
+  "key": "schemer",
+  "expert": true,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Calculating"
+  },
+  "classSkills": [
+   "blend",
+   "bluff",
+   "bureaucracy",
+   "computers",
+   "electronics",
+   "falsify",
+   "manipulate",
+   "networking",
+   "notice",
+   "profession",
+   "science",
+   "search",
+   "security",
+   "senseMotive",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 2,
+    "will": 1,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 3,
+    "will": 2,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 1,
+    "ref": 3,
+    "will": 2,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 2,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 3,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 2,
+    "ref": 5,
+    "will": 3,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 2,
+    "ref": 5,
+    "will": 4,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 2,
+    "ref": 6,
+    "will": 4,
+    "defense": 5,
+    "initiative": 2,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 3,
+    "ref": 6,
+    "will": 4,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 3,
+    "ref": 7,
+    "will": 5,
+    "defense": 6,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 3,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 2,
+    "gearW": 0,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Mental leap 1/session"
+   },
+   {
+    "level": 2,
+    "name": "Cunning plan 1/session"
+   },
+   {
+    "level": 3,
+    "name": "Renaissance man 1/session"
+   },
+   {
+    "level": 4,
+    "name": "All according to plan, cross-class ability"
+   },
+   {
+    "level": 5,
+    "name": "Mental leap 2/session"
+   },
+   {
+    "level": 6,
+    "name": "Evolved mind"
+   },
+   {
+    "level": 7,
+    "name": "Cunning plan 2/session, renaissance man 2/session"
+   },
+   {
+    "level": 8,
+    "name": "Cross-class ability, master plan"
+   },
+   {
+    "level": 9,
+    "name": "Mental leap 3/session"
+   },
+   {
+    "level": 10,
+    "name": "Hyperconscious"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Cross Class",
+    "key": "crossClass",
+    "options": [
+     {
+      "index": 2,
+      "name": "Advocate",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Explorer",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "Faceman",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Hacker",
+      "bonuses": []
+     },
+     {
+      "index": 6,
+      "name": "Intruder",
+      "bonuses": []
+     },
+     {
+      "index": 7,
+      "name": "Scientist",
+      "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Scout",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Sleuth",
+      "bonuses": []
+     },
+     {
+      "index": 10,
+      "name": "Snoop",
+      "bonuses": []
+     },
+     {
+      "index": 11,
+      "name": "Soldier",
+      "bonuses": []
+     },
+     {
+      "index": 12,
+      "name": "Wheelman",
+      "bonuses": []
+     }
+    ],
+    "kind": "crossClass"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 4,
+    "list": "crossClass"
+   },
+   {
+    "level": 8,
+    "list": "crossClass"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "int",
+     "min": 15
+    },
+    {
+     "type": "skill",
+     "key": "tactics",
+     "min": 4
+    },
+    {
+     "type": "feat",
+     "name": "I Can Swim"
+    }
+   ]
+  }
+ },
+ {
+  "num": 27,
+  "name": "Sniper",
+  "key": "sniper",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Eagle eye"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "blend",
+   "falsify",
+   "notice",
+   "profession",
+   "resolve",
+   "search",
+   "security",
+   "sneak",
+   "survival",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 0,
+    "ref": 1,
+    "will": 0,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 0,
+    "ref": 2,
+    "will": 0,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 1,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 1,
+    "ref": 2,
+    "will": 1,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 1,
+    "ref": 3,
+    "will": 1,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 2,
+    "ref": 3,
+    "will": 2,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 2,
+    "ref": 4,
+    "will": 2,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 2,
+    "ref": 4,
+    "will": 2,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 3,
+    "ref": 4,
+    "will": 3,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 4,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 3,
+    "ref": 5,
+    "will": 3,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 5,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 3,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Expert sharpshooter (Basics)"
+   },
+   {
+    "level": 2,
+    "name": "Surprise shot +1"
+   },
+   {
+    "level": 3,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 4,
+    "name": "Ranged sneak attack +1d6, perfect killer"
+   },
+   {
+    "level": 5,
+    "name": "Expert sharpshooter (Mastery), magic touch"
+   },
+   {
+    "level": 6,
+    "name": "Perfect killer"
+   },
+   {
+    "level": 7,
+    "name": "Bonus feat, surprise shot +2"
+   },
+   {
+    "level": 8,
+    "name": "Ranged sneak attack +3d6, perfect killer"
+   },
+   {
+    "level": 9,
+    "name": "Expert sharpshooter (Supremacy), magic touch"
+   },
+   {
+    "level": 10,
+    "name": "Million dollar skill"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Covert",
+      "bonuses": [
+       {
+        "target": "featSlots.covert",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Terrain",
+      "bonuses": [
+       {
+        "target": "featSlots.terrain",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   },
+   {
+    "name": "Perfect Killer",
+    "key": "perfectKiller",
+    "options": [
+     {
+      "index": 2,
+      "name": "Nest",
+      "bonuses": []
+     },
+     {
+      "index": 3,
+      "name": "Low-Light Vision",
+      "bonuses": []
+     },
+     {
+      "index": 4,
+      "name": "One Shot",
+      "bonuses": []
+     },
+     {
+      "index": 5,
+      "name": "Sprint",
+      "bonuses": [
+       {
+        "target": "speed",
+        "value": "10"
+       }
+      ]
+     },
+     {
+      "index": 6,
+      "name": "Tunnel Vision",
+      "bonuses": []
+     }
+    ],
+    "kind": "option"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 4,
+    "list": "perfectKiller"
+   },
+   {
+    "level": 6,
+    "list": "perfectKiller"
+   },
+   {
+    "level": 7,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 8,
+    "list": "perfectKiller"
+   }
+  ],
+  "featGrants": [
+   {
+    "level": 1,
+    "feat": "Sharpshooter Basics"
+   },
+   {
+    "level": 5,
+    "feat": "Sharpshooter Mastery"
+   },
+   {
+    "level": 9,
+    "feat": "Sharpshooter Supremacy"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "dex",
+     "min": 15
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Marksmanship Basics"
+    }
+   ]
+  }
+ },
+ {
+  "num": 28,
+  "name": "Stuntman",
+  "key": "stuntman",
+  "expert": true,
+  "skillPoints": 4,
+  "vitality": 12,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Adrenaline junkie"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "drive",
+   "impress",
+   "mechanics",
+   "medicine",
+   "resolve",
+   "sleightOfHand",
+   "survival"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 2,
+    "ref": 2,
+    "will": 0,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 3,
+    "ref": 3,
+    "will": 0,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 3,
+    "ref": 3,
+    "will": 1,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 4,
+    "ref": 4,
+    "will": 1,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 1,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 4,
+    "ref": 4,
+    "will": 1,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 5,
+    "ref": 5,
+    "will": 2,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 5,
+    "ref": 5,
+    "will": 2,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 6,
+    "ref": 6,
+    "will": 2,
+    "defense": 5,
+    "initiative": 2,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 1,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 6,
+    "ref": 6,
+    "will": 3,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 2,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 7,
+    "ref": 7,
+    "will": 3,
+    "defense": 6,
+    "initiative": 3,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 3,
+    "gearS": 2,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Life on the edge"
+   },
+   {
+    "level": 2,
+    "name": "No fear I (thresholds)"
+   },
+   {
+    "level": 3,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 4,
+    "name": "Fall guy, \"Trust me\u2026\""
+   },
+   {
+    "level": 5,
+    "name": "Insane stunt 1/session"
+   },
+   {
+    "level": 6,
+    "name": "It's all relative"
+   },
+   {
+    "level": 7,
+    "name": "Bonus feat, no fear II (resistance)"
+   },
+   {
+    "level": 8,
+    "name": "\"\u2026 I know what I'm doing.\", school of hard knocks"
+   },
+   {
+    "level": 9,
+    "name": "Insane stunt 2/session"
+   },
+   {
+    "level": 10,
+    "name": "Cheat death 1/session"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Chance",
+      "bonuses": [
+       {
+        "target": "featSlots.chance",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Chase",
+      "bonuses": [
+       {
+        "target": "featSlots.chase",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 3,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 7,
+    "list": "bonusFeat"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "vitality",
+    "value": "@classes.stuntman.levels",
+    "level": 1
+   },
+   {
+    "target": "wounds",
+    "value": "@featTrees.chance",
+    "level": 1
+   },
+   {
+    "target": "stressDamage",
+    "value": "@classes.stuntman.levels",
+    "level": 2
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "athletics",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Equilibrium Basics"
+    },
+    {
+     "type": "featTree",
+     "tree": "chance",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "num": 29,
+  "name": "Tactician",
+  "key": "tactician",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Wily"
+  },
+  "classSkills": [
+   "bluff",
+   "bureaucracy",
+   "cultures",
+   "notice",
+   "resolve",
+   "search",
+   "security",
+   "senseMotive",
+   "sleightOfHand",
+   "streetwise",
+   "survival",
+   "tactics"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 0,
+    "ref": 1,
+    "will": 1,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 0,
+    "ref": 2,
+    "will": 2,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 1,
+    "ref": 2,
+    "will": 2,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 1,
+    "ref": 2,
+    "will": 2,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 1,
+    "ref": 3,
+    "will": 3,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 2,
+    "ref": 3,
+    "will": 3,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 2,
+    "ref": 4,
+    "will": 4,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 2,
+    "ref": 4,
+    "will": 4,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 3,
+    "ref": 4,
+    "will": 4,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 4,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 1
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 3,
+    "ref": 5,
+    "will": 5,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 5,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 1
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Tempo (self)"
+   },
+   {
+    "level": 2,
+    "name": "Stratagem +1"
+   },
+   {
+    "level": 3,
+    "name": "Art of war"
+   },
+   {
+    "level": 4,
+    "name": "Blood of heroes, orders I"
+   },
+   {
+    "level": 5,
+    "name": "Tempo (teammate)"
+   },
+   {
+    "level": 6,
+    "name": "Commanding presence"
+   },
+   {
+    "level": 7,
+    "name": "Art of war, stratagem +2"
+   },
+   {
+    "level": 8,
+    "name": "Orders II, ten against ten thousand"
+   },
+   {
+    "level": 9,
+    "name": "Tempo (attack)"
+   },
+   {
+    "level": 10,
+    "name": "Seize the moment"
+   }
+  ],
+  "choiceLists": [],
+  "bonuses": [
+   {
+    "target": "abilities.int",
+    "value": "1",
+    "level": 6
+   },
+   {
+    "target": "abilities.cha",
+    "value": "1",
+    "level": 6
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "skill",
+     "key": "tactics",
+     "min": 4
+    },
+    {
+     "type": "feat",
+     "name": "Surge of Speed"
+    },
+    {
+     "type": "feat",
+     "name": "Tactical Advantage"
+    }
+   ]
+  }
+ },
+ {
+  "num": 30,
+  "name": "Transporter",
+  "key": "transporter",
+  "expert": true,
+  "skillPoints": 6,
+  "vitality": 10,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Watchful"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "cultures",
+   "drive",
+   "impress",
+   "intimidate",
+   "mechanics",
+   "notice",
+   "profession",
+   "search",
+   "senseMotive",
+   "streetwise"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 2,
+    "will": 0,
+    "defense": 2,
+    "initiative": 2,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 3,
+    "will": 0,
+    "defense": 3,
+    "initiative": 3,
+    "wealth": 0,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 2,
+    "fort": 1,
+    "ref": 3,
+    "will": 1,
+    "defense": 3,
+    "initiative": 4,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 1,
+    "defense": 4,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 1,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 3,
+    "fort": 1,
+    "ref": 4,
+    "will": 1,
+    "defense": 5,
+    "initiative": 5,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 4,
+    "fort": 2,
+    "ref": 5,
+    "will": 2,
+    "defense": 6,
+    "initiative": 6,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 5,
+    "fort": 2,
+    "ref": 5,
+    "will": 2,
+    "defense": 6,
+    "initiative": 7,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 1,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 6,
+    "fort": 2,
+    "ref": 6,
+    "will": 2,
+    "defense": 7,
+    "initiative": 8,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 6,
+    "fort": 3,
+    "ref": 6,
+    "will": 3,
+    "defense": 8,
+    "initiative": 9,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 2,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 7,
+    "fort": 3,
+    "ref": 7,
+    "will": 3,
+    "defense": 9,
+    "initiative": 10,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 3,
+    "gearV": 2,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Protect the package (initiative/Reflex)"
+   },
+   {
+    "level": 2,
+    "name": "Take the hit I"
+   },
+   {
+    "level": 3,
+    "name": "You better think again (Will)"
+   },
+   {
+    "level": 4,
+    "name": "Bonus feat, the getaway 1/session"
+   },
+   {
+    "level": 5,
+    "name": "Protect the package (cover ID)"
+   },
+   {
+    "level": 6,
+    "name": "Evasion I"
+   },
+   {
+    "level": 7,
+    "name": "Take the hit II, you better think again (stand offs)"
+   },
+   {
+    "level": 8,
+    "name": "Bonus feat, the getaway 2/session"
+   },
+   {
+    "level": 9,
+    "name": "Protect the package (Defense)"
+   },
+   {
+    "level": 10,
+    "name": "The switcheroo"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Basic Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.basicCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Chase",
+      "bonuses": [
+       {
+        "target": "featSlots.chase",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 4,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 8,
+    "list": "bonusFeat"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "wis",
+     "min": 13
+    },
+    {
+     "type": "skill",
+     "key": "drive",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Defensive Driving"
+    }
+   ]
+  }
+ },
+ {
+  "num": 31,
+  "name": "Triggerman",
+  "key": "triggerman",
+  "expert": true,
+  "skillPoints": 4,
+  "vitality": 12,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Trigger-happy"
+  },
+  "classSkills": [
+   "acrobatics",
+   "athletics",
+   "impress",
+   "intimidate",
+   "investigation",
+   "notice",
+   "resolve",
+   "sleightOfHand",
+   "streetwise"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 1,
+    "fort": 0,
+    "ref": 1,
+    "will": 1,
+    "defense": 1,
+    "initiative": 2,
+    "wealth": 1,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 0
+   },
+   {
+    "level": 2,
+    "bab": 2,
+    "fort": 0,
+    "ref": 2,
+    "will": 2,
+    "defense": 1,
+    "initiative": 3,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 3,
+    "bab": 3,
+    "fort": 1,
+    "ref": 2,
+    "will": 2,
+    "defense": 2,
+    "initiative": 4,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 4,
+    "bab": 4,
+    "fort": 1,
+    "ref": 2,
+    "will": 2,
+    "defense": 2,
+    "initiative": 5,
+    "wealth": 2,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 5,
+    "bab": 5,
+    "fort": 1,
+    "ref": 3,
+    "will": 3,
+    "defense": 3,
+    "initiative": 5,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 6,
+    "bab": 6,
+    "fort": 2,
+    "ref": 3,
+    "will": 3,
+    "defense": 4,
+    "initiative": 6,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 1,
+    "gearE": 0
+   },
+   {
+    "level": 7,
+    "bab": 7,
+    "fort": 2,
+    "ref": 4,
+    "will": 4,
+    "defense": 4,
+    "initiative": 7,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 8,
+    "bab": 8,
+    "fort": 2,
+    "ref": 4,
+    "will": 4,
+    "defense": 5,
+    "initiative": 8,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 9,
+    "bab": 9,
+    "fort": 3,
+    "ref": 4,
+    "will": 4,
+    "defense": 5,
+    "initiative": 9,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   },
+   {
+    "level": 10,
+    "bab": 10,
+    "fort": 3,
+    "ref": 5,
+    "will": 5,
+    "defense": 6,
+    "initiative": 10,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 1,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 2,
+    "gearE": 0
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Two-weapon mastery"
+   },
+   {
+    "level": 2,
+    "name": "Gunplay +1"
+   },
+   {
+    "level": 3,
+    "name": "Gun-fu (disarm)"
+   },
+   {
+    "level": 4,
+    "name": "Eye of the storm x2, uncanny dodge I"
+   },
+   {
+    "level": 5,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 6,
+    "name": "Bag full of guns"
+   },
+   {
+    "level": 7,
+    "name": "Gun-fu (vengeance), gunplay+2"
+   },
+   {
+    "level": 8,
+    "name": "Eye of the storm x3, uncanny dodge II"
+   },
+   {
+    "level": 9,
+    "name": "Bonus feat"
+   },
+   {
+    "level": 10,
+    "name": "Both guns blazing"
+   }
+  ],
+  "choiceLists": [
+   {
+    "name": "Bonus Feat",
+    "key": "bonusFeat",
+    "options": [
+     {
+      "index": 2,
+      "name": "Ranged Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.rangedCombat",
+        "value": "1"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "name": "Unarmed Combat",
+      "bonuses": [
+       {
+        "target": "featSlots.unarmedCombat",
+        "value": "1"
+       }
+      ]
+     }
+    ],
+    "kind": "featSlot"
+   }
+  ],
+  "choiceSchedule": [
+   {
+    "level": 5,
+    "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "bonusFeat"
+   }
+  ],
+  "featGrants": [
+   {
+    "level": 1,
+    "feat": "Two-Weapon Mastery"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "proficiency",
+     "key": "handgun"
+    },
+    {
+     "type": "feat",
+     "name": "Combat Expertise"
+    },
+    {
+     "type": "feat",
+     "name": "Two-Weapon Basics"
+    }
+   ]
+  }
+ },
+ {
+  "num": 32,
+  "name": "Virtuoso",
+  "key": "virtuoso",
+  "expert": true,
+  "skillPoints": 8,
+  "vitality": 8,
+  "proficiencies": 0,
+  "coreAbility": {
+   "name": "Meticulous"
+  },
+  "classSkills": [
+   "analysis",
+   "bureaucracy",
+   "computers",
+   "cultures",
+   "impress",
+   "investigation",
+   "medicine",
+   "notice",
+   "profession",
+   "resolve",
+   "science",
+   "search"
+  ],
+  "table": [
+   {
+    "level": 1,
+    "bab": 0,
+    "fort": 0,
+    "ref": 1,
+    "will": 2,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 2,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 2,
+    "bab": 1,
+    "fort": 0,
+    "ref": 2,
+    "will": 3,
+    "defense": 1,
+    "initiative": 0,
+    "wealth": 3,
+    "gearR": 0,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 3,
+    "bab": 1,
+    "fort": 1,
+    "ref": 2,
+    "will": 3,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 3,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 4,
+    "bab": 2,
+    "fort": 1,
+    "ref": 2,
+    "will": 4,
+    "defense": 2,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 1
+   },
+   {
+    "level": 5,
+    "bab": 2,
+    "fort": 1,
+    "ref": 3,
+    "will": 4,
+    "defense": 3,
+    "initiative": 1,
+    "wealth": 4,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 0,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 6,
+    "bab": 3,
+    "fort": 2,
+    "ref": 3,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 7,
+    "bab": 3,
+    "fort": 2,
+    "ref": 4,
+    "will": 5,
+    "defense": 4,
+    "initiative": 2,
+    "wealth": 5,
+    "gearR": 1,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 8,
+    "bab": 4,
+    "fort": 2,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 2,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 9,
+    "bab": 4,
+    "fort": 3,
+    "ref": 4,
+    "will": 6,
+    "defense": 5,
+    "initiative": 3,
+    "wealth": 6,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 2
+   },
+   {
+    "level": 10,
+    "bab": 5,
+    "fort": 3,
+    "ref": 5,
+    "will": 7,
+    "defense": 6,
+    "initiative": 3,
+    "wealth": 7,
+    "gearR": 2,
+    "gearT": 0,
+    "gearV": 0,
+    "gearS": 0,
+    "gearG": 1,
+    "gearW": 0,
+    "gearE": 3
+   }
+  ],
+  "abilities": [
+   {
+    "level": 1,
+    "name": "Field of expertise"
+   },
+   {
+    "level": 2,
+    "name": "Versatility (2)"
+   },
+   {
+    "level": 3,
+    "name": "Field of expertise (advanced)"
+   },
+   {
+    "level": 4,
+    "name": "Brain trust, professional courtesy (1)"
+   },
+   {
+    "level": 5,
+    "name": "Field of expertise (Grand)"
+   },
+   {
+    "level": 6,
+    "name": "Ph D"
+   },
+   {
+    "level": 7,
+    "name": "Field of expertise (false start), versatility (4)"
+   },
+   {
+    "level": 8,
+    "name": "Bamboozle, professional courtsey (2)"
+   },
+   {
+    "level": 9,
+    "name": "Field of expertise (perfect)"
+   },
+   {
+    "level": 10,
+    "name": "Breakthrough 1/scene"
+   }
+  ],
+  "choiceLists": [],
+  "bonuses": [
+   {
+    "target": "classSkillPicks",
+    "value": "2",
+    "level": 2
+   },
+   {
+    "target": "classSkillPicks",
+    "value": "2",
+    "level": 7
+   }
+  ],
+  "featGrants": [
+   {
+    "level": 3,
+    "feat": "Advanced Skill Mastery"
+   },
+   {
+    "level": 5,
+    "feat": "Grand Skill Mastery"
+   },
+   {
+    "level": 9,
+    "feat": "Perfect Skill Mastery"
+   },
+   {
+    "level": 7,
+    "feat": "False Start"
+   }
+  ],
+  "requirements": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "int",
+     "min": 15
+    },
+    {
+     "type": "keySkill",
+     "min": 6
+    },
+    {
+     "type": "featTree",
+     "tree": "advancedSkill",
+     "min": 1
+    }
+   ]
+  }
+ }
+]

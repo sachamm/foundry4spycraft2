@@ -1,0 +1,297 @@
+{
+ "name": "intruder-raptor-8-fit",
+ "spec": {
+  "abilities": {
+   "str": 12,
+   "dex": 16,
+   "con": 13,
+   "int": 12,
+   "wis": 10,
+   "cha": 10
+  },
+  "talent": "Fit",
+  "specialty": "Pickpocket",
+  "increases": {
+   "l4": "dex",
+   "l8": "con"
+  },
+  "classes": [
+   "Intruder",
+   "Intruder",
+   "Intruder",
+   "Intruder",
+   "Raptor",
+   "Raptor",
+   "Raptor",
+   "Raptor"
+  ],
+  "vitality": [
+   0,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   4
+  ],
+  "skillPoints": [
+   {
+    "sneak": 20,
+    "acrobatics": 12
+   },
+   {
+    "sneak": 4
+   },
+   {
+    "sneak": 4
+   },
+   {
+    "sneak": 4
+   },
+   {
+    "sneak": 4
+   },
+   {
+    "sneak": 4
+   },
+   {
+    "sneak": 4
+   },
+   {
+    "sneak": 4
+   }
+  ],
+  "feats": []
+ },
+ "expected": {
+  "abilities": {
+   "str": 14,
+   "dex": 17,
+   "con": 14,
+   "int": 10,
+   "wis": 10,
+   "cha": 10
+  },
+  "pointsRemaining": 4,
+  "level": 8,
+  "bab": 6,
+  "fort": 7,
+  "ref": 11,
+  "will": 3,
+  "defense": 21,
+  "init": 6,
+  "wealth": 3,
+  "gear": {
+   "R": 0,
+   "T": 0,
+   "V": 1,
+   "S": 1,
+   "G": 3,
+   "W": 1,
+   "E": 0
+  },
+  "vitality": 73,
+  "wounds": 14,
+  "knowledge": 8,
+  "speed": 40,
+  "actionDice": 4,
+  "actionDie": 6,
+  "subplots": 2,
+  "contacts": 3,
+  "interests": 4,
+  "maxRanks": 11,
+  "skillPoints": [
+   32,
+   8,
+   8,
+   8,
+   6,
+   6,
+   6,
+   6
+  ],
+  "skills": {
+   "acrobatics": {
+    "ranks": 12,
+    "bonus": 2,
+    "threat": 19,
+    "cap": 50
+   },
+   "analysis": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "athletics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 20
+   },
+   "blend": {
+    "ranks": 0,
+    "bonus": 3,
+    "threat": 20,
+    "cap": 15
+   },
+   "bluff": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "bureaucracy": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "computers": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "cultures": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "drive": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "electronics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "falsify": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "impress": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "intimidate": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "investigation": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "manipulate": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "mechanics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "medicine": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "networking": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "notice": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "profession": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "resolve": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "science": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "search": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "security": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "senseMotive": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "sleightOfHand": {
+    "ranks": 0,
+    "bonus": 3,
+    "threat": 20,
+    "cap": 15
+   },
+   "sneak": {
+    "ranks": 48,
+    "bonus": 2,
+    "threat": 19,
+    "cap": 60
+   },
+   "streetwise": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "survival": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "tactics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   }
+  }
+ }
+}

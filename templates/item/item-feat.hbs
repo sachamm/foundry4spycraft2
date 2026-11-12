@@ -1,0 +1,15 @@
+<section class="item-details">
+  <div class="form-fields-grid">
+    <label>{{localize "SPYCRAFT.Feat.Tree"}} <select name="system.tree">{{selectOptions featTrees selected=system.tree blank="—"}}</select></label>
+    <label>{{localize "SPYCRAFT.Feat.Ranks"}} <input type="number" name="system.ranks" value="{{system.ranks}}" class="w-2" min="1" /></label>
+    <label><input type="checkbox" name="system.granted" {{checked system.granted}} /> {{localize "SPYCRAFT.Feat.Granted"}}{{#if system.grantSource}} ({{system.grantSource}}){{/if}}</label>
+  </div>
+  <p><b>{{localize "SPYCRAFT.Feat.Prerequisites"}}:</b> {{prereqText}}
+    {{#if system.prerequisitesNotChecked}}<span class="tag">{{localize "SPYCRAFT.Feat.NotChecked"}}</span>{{/if}}
+    {{#if status}}{{#unless status.ok}}<span class="bad">({{#each status.unmet}}{{this}}{{#unless @last}}; {{/unless}}{{/each}})</span>{{/unless}}{{/if}}</p>
+  <details><summary class="muted">{{localize "SPYCRAFT.Feat.EditPrereqs"}}</summary>
+    <textarea name="prereqJSON" rows="6" class="mono">{{prereqJSON}}</textarea></details>
+  <h3>{{localize "SPYCRAFT.Description"}}</h3>
+  {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+  {{> "systems/spycraft2/templates/item/parts/bonuses.hbs"}}
+</section>

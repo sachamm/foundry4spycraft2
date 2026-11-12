@@ -1,0 +1,292 @@
+{
+ "name": "faceman-soldier-6-brainy",
+ "spec": {
+  "abilities": {
+   "str": 10,
+   "dex": 12,
+   "con": 12,
+   "int": 14,
+   "wis": 10,
+   "cha": 15
+  },
+  "talent": "Brainy",
+  "specialty": "City Dweller",
+  "increases": {
+   "l4": "cha"
+  },
+  "classes": [
+   "Faceman",
+   "Faceman",
+   "Faceman",
+   "Soldier",
+   "Soldier",
+   "Pointman"
+  ],
+  "vitality": [
+   0,
+   7,
+   3,
+   9,
+   12,
+   5
+  ],
+  "skillPoints": [
+   {
+    "bluff": 16,
+    "impress": 12,
+    "networking": 12,
+    "sneak": 8
+   },
+   {
+    "bluff": 4,
+    "networking": 4
+   },
+   {
+    "bluff": 4,
+    "athletics": 4
+   },
+   {
+    "athletics": 4
+   },
+   {
+    "athletics": 4,
+    "notice": 2
+   },
+   {
+    "notice": 6
+   }
+  ],
+  "feats": [
+   "Burglar",
+   "Trouble Magnet"
+  ]
+ },
+ "expected": {
+  "abilities": {
+   "str": 8,
+   "dex": 12,
+   "con": 12,
+   "int": 16,
+   "wis": 10,
+   "cha": 16
+  },
+  "pointsRemaining": 5,
+  "level": 6,
+  "bab": 4,
+  "fort": 6,
+  "ref": 3,
+  "will": 6,
+  "defense": 14,
+  "init": 9,
+  "wealth": 7,
+  "gear": {
+   "R": 1,
+   "T": 1,
+   "V": 0,
+   "S": 1,
+   "G": 0,
+   "W": 1,
+   "E": 0
+  },
+  "vitality": 52,
+  "wounds": 12,
+  "knowledge": 11,
+  "speed": 30,
+  "actionDice": 4,
+  "actionDie": 6,
+  "subplots": 2,
+  "contacts": 5,
+  "interests": 4,
+  "maxRanks": 9,
+  "skillPoints": [
+   40,
+   10,
+   10,
+   8,
+   8,
+   10
+  ],
+  "skills": {
+   "acrobatics": {
+    "ranks": 0,
+    "bonus": 2,
+    "threat": 19,
+    "cap": 15
+   },
+   "analysis": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "athletics": {
+    "ranks": 10,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 40
+   },
+   "blend": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "bluff": {
+    "ranks": 24,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 60
+   },
+   "bureaucracy": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "computers": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "cultures": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "drive": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "electronics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "falsify": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "impress": {
+    "ranks": 12,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 50
+   },
+   "intimidate": {
+    "ranks": 0,
+    "bonus": 2,
+    "threat": 20,
+    "cap": 15
+   },
+   "investigation": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "manipulate": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "mechanics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "medicine": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "networking": {
+    "ranks": 16,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 60
+   },
+   "notice": {
+    "ranks": 8,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 30
+   },
+   "profession": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "resolve": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "science": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "search": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "security": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "senseMotive": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "sleightOfHand": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "sneak": {
+    "ranks": 4,
+    "bonus": 2,
+    "threat": 19,
+    "cap": 20
+   },
+   "streetwise": {
+    "ranks": 0,
+    "bonus": 2,
+    "threat": 20,
+    "cap": 15
+   },
+   "survival": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "tactics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   }
+  }
+ }
+}

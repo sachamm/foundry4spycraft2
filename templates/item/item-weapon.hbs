@@ -1,0 +1,23 @@
+<section class="item-details">
+  <div class="form-fields-grid">
+    <label>{{localize "SPYCRAFT.Proficiency"}} <select name="system.proficiency">{{selectOptions proficiencies selected=system.proficiency}}</select></label>
+    <label>{{localize "SPYCRAFT.Damage"}} <input type="text" name="system.damage" value="{{system.damage}}" /></label>
+    <label>{{localize "SPYCRAFT.Weapon.Error"}} <input type="number" name="system.error" value="{{system.error}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Weapon.Threat"}} <input type="number" name="system.threat" value="{{system.threat}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Weapon.Ammo"}} <input type="text" name="system.ammo" value="{{system.ammo}}" /></label>
+    <label>{{localize "SPYCRAFT.Weapon.Recoil"}} <input type="number" name="system.recoil" value="{{system.recoil}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Range"}} <input type="number" name="system.range" value="{{system.range}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Weapon.SizeHands"}} <input type="text" name="system.sizeHands" value="{{system.sizeHands}}" class="w-4" /></label>
+    <label>{{localize "SPYCRAFT.Weapon.UntrainedPenalty"}} <input type="number" name="system.untrainedPenalty" value="{{system.untrainedPenalty}}" class="w-2" /></label>
+    <label class="wide">{{localize "SPYCRAFT.Weapon.Qualities"}} <input type="text" name="system.qualities" value="{{system.qualities}}" /></label>
+    <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
+    <label>{{localize "SPYCRAFT.Weight"}} <input type="number" step="any" name="system.weight" value="{{system.weight}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Pick"}} <select name="system.pick">{{selectOptions pickOptions selected=system.pick}}</select></label>
+    <label><input type="checkbox" name="system.equipped" {{checked system.equipped}} /> {{localize "SPYCRAFT.Equipped"}}</label>
+    <label><input type="checkbox" name="system.reserve" {{checked system.reserve}} /> {{localize "SPYCRAFT.Reserve"}}</label>
+    <label><input type="checkbox" name="system.common" {{checked system.common}} /> {{localize "SPYCRAFT.TeamPool"}}</label>
+  </div>
+  <h3>{{localize "SPYCRAFT.Description"}}</h3>
+  {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+</section>

@@ -2,7 +2,7 @@
   "id": "spycraft2",
   "title": "Spycraft 2.0",
   "description": "Core rules and character options for the Spycraft 2.0 roleplaying game.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
@@ -71,7 +71,68 @@
       }
     }
   },
-  "packs": [],
+  "packs": [
+    {
+      "name": "classes",
+      "label": "Classes",
+      "path": "packs/classes",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "origins",
+      "label": "Origins",
+      "path": "packs/origins",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "feats",
+      "label": "Feats",
+      "path": "packs/feats",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "weapons",
+      "label": "Weapons",
+      "path": "packs/weapons",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "armor",
+      "label": "Armor",
+      "path": "packs/armor",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    }
+  ],
   "grid": {
     "distance": 5,
     "units": "ft"
@@ -80,6 +141,20 @@
   "secondaryTokenAttribute": "wounds",
   "url": "https://github.com/sachamm/foundry4spycraft2",
   "manifest": "https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.json",
-  "download": "https://github.com/sachamm/foundry4spycraft2/releases/download/v0.1.0/spycraft2.zip",
-  "bugs": "https://github.com/sachamm/foundry4spycraft2/issues"
+  "download": "https://github.com/sachamm/foundry4spycraft2/releases/download/v0.2.0/spycraft2.zip",
+  "bugs": "https://github.com/sachamm/foundry4spycraft2/issues",
+  "packFolders": [
+    {
+      "name": "Spycraft 2.0",
+      "sorting": "m",
+      "color": "#1d2b3a",
+      "packs": [
+        "classes",
+        "origins",
+        "feats",
+        "weapons",
+        "armor"
+      ]
+    }
+  ]
 }

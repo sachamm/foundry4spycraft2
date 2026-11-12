@@ -13,7 +13,10 @@ npm-debug.log*
 dist/
 *.zip
 
-# Foundry compendium LevelDB runtime files (source JSON is committed instead)
-packs/**/LOCK
-packs/**/LOG
-packs/**/LOG.old
+# Compendium packs are LevelDB builds of src/data/*.json — run `npm run build`
+packs/*/
+!packs/.gitkeep
+
+# Office files never belong in this repository
+*.xls
+*.xlsx

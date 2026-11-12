@@ -1,0 +1,85 @@
+<section class="tab main {{tab.cssClass}}" data-tab="main" data-group="primary">
+  <div class="cols">
+    <div class="col">
+      <h3>{{localize "SPYCRAFT.Attributes"}}
+        <span class="points {{#if (sc2lt system.pointBuy.remaining 0)}}bad{{/if}}">{{localize "SPYCRAFT.PointBuy"}}: {{system.pointBuy.spent}} / <input type="number" name="system.pointBuyBudget" value="{{system.pointBuyBudget}}" class="w-2" /></span></h3>
+      <table class="abilities">
+        <thead><tr><th></th><th>{{localize "SPYCRAFT.Base"}}</th><th>{{localize "SPYCRAFT.Cost"}}</th><th>{{localize "SPYCRAFT.Origin.Label"}}</th><th>{{localize "SPYCRAFT.Increase"}}</th><th>{{localize "SPYCRAFT.Misc"}}</th><th>{{localize "SPYCRAFT.Score"}}</th><th>{{localize "SPYCRAFT.Mod"}}</th></tr></thead>
+        <tbody>
+        {{#each abilities}}
+          <tr>
+            <th><a data-action="rollAbility" data-ability="{{key}}">{{label}}</a></th>
+            <td><input type="number" name="system.abilities.{{key}}.base" value="{{base}}" class="w-2" /></td>
+            <td class="muted">{{cost}}</td>
+            <td>{{#if bonus}}{{signed bonus}}{{/if}}</td>
+            <td>{{#if increase}}+{{increase}}{{/if}}</td>
+            <td><input type="number" name="system.abilities.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
+            <td class="score">{{value}}</td>
+            <td class="mod"><a data-action="rollAbility" data-ability="{{key}}">{{signed mod}}</a></td>
+          </tr>
+        {{/each}}
+        </tbody>
+      </table>
+      <div class="increases">
+        <span>{{localize "SPYCRAFT.AttributeIncreases"}}:</span>
+        {{#each increaseLevels}}
+          <label class="{{#unless reached}}muted{{/unless}}">{{level}}
+            <select name="system.abilityIncreases.{{key}}">{{selectOptions ../abilityOptions selected=value blank="—"}}</select></label>
+        {{/each}}
+      </div>
+
+      <h3>{{localize "SPYCRAFT.Defenses"}}</h3>
+      <div class="stat-grid">
+        {{#each saves}}
+          <div class="stat"><a data-action="rollSave" data-save="{{key}}">{{label}}</a><b>{{signed total}}</b><small>{{localize "SPYCRAFT.Base"}} {{base}}{{#if bonus}}, {{signed bonus}}{{/if}}</small></div>
+        {{/each}}
+        <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><b>{{system.defense.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.defense.base}}{{#if system.defense.armor}}, {{localize "SPYCRAFT.Armor"}} {{signed system.defense.armor}}{{/if}}</small></div>
+        <div class="stat"><a data-action="rollInitiative">{{localize "SPYCRAFT.Initiative"}}</a><b>{{signed system.initiative.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.initiative.base}}</small></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b>{{system.speed}} ft</b></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h3>{{localize "SPYCRAFT.Combat"}}</h3>
+      <div class="stat-grid">
+        <div class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><b>{{signed system.bab}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.AttackUnarmed"}}</span><b>{{signed system.attack.unarmed}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.AttackMelee"}}</span><b>{{signed system.attack.melee}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.AttackRanged"}}</span><b>{{signed system.attack.ranged}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.StressThreshold"}}</span><b>{{system.stressThreshold}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.SubdualThreshold"}}</span><b>{{system.subdualThreshold}}</b></div>
+      </div>
+      <h3>{{localize "SPYCRAFT.Checks"}}</h3>
+      <div class="stat-grid">
+        <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><b>{{signed system.knowledge}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><b>{{signed system.requestCheck}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><b>{{signed system.gearCheck}}</b></div>
+      </div>
+      <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
+      <ul class="item-list compact">
+        {{#each weapons}}
+          <li data-item-id="{{item.id}}">
+            <a data-action="rollAttack" class="name">{{item.name}}</a>
+            <span class="{{#unless attack.trained}}bad{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</span>
+            <a data-action="rollDamage">{{item.system.damage}}</a>
+          </li>
+        {{else}}<li class="muted">{{localize "SPYCRAFT.NoWeapons"}}</li>{{/each}}
+      </ul>
+      <h3>{{localize "SPYCRAFT.Carrying"}}</h3>
+      <div class="carry muted">
+        {{localize "SPYCRAFT.Carry.Light"}} {{system.carry.light}} · {{localize "SPYCRAFT.Carry.Medium"}} {{system.carry.medium}} · {{localize "SPYCRAFT.Carry.Heavy"}} {{system.carry.heavy}} ·
+        {{localize "SPYCRAFT.Carry.Extreme"}} {{system.carry.extreme}} lbs<br>
+        {{localize "SPYCRAFT.Carry.Lift"}} {{system.carry.liftOverhead}} / {{system.carry.liftGround}} · {{localize "SPYCRAFT.Carry.Push"}} {{system.carry.push}} lbs
+      </div>
+    </div>
+  </div>
+
+  <details class="misc-mods">
+    <summary>{{localize "SPYCRAFT.MiscModifiers"}}</summary>
+    <div class="misc-grid">
+      {{#each system.misc as |v k|}}
+        <label>{{k}} <input type="number" name="system.misc.{{k}}" value="{{v}}" class="w-2" /></label>
+      {{/each}}
+    </div>
+  </details>
+</section>

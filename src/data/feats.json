@@ -1,0 +1,4895 @@
+[
+ {
+  "name": "Armor Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 13,
+  "prerequisites": null
+ },
+ {
+  "name": "Armor Mastery",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 14,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "base",
+     "key": "defense",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Armor Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Armor Supremacy",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 15,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "base",
+     "key": "defense",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Armor Mastery"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Bandage",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.medicine.classSkill",
+    "value": "1"
+   }
+  ],
+  "row": 16,
+  "prerequisites": null
+ },
+ {
+  "name": "Battle Hardened",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 17,
+  "prerequisites": null
+ },
+ {
+  "name": "Superior Cover",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 18,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Battle Hardened"
+    },
+    {
+     "type": "base",
+     "key": "defense",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Combat Expertise",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 19,
+  "prerequisites": {
+   "type": "base",
+   "key": "defense",
+   "min": 1
+  }
+ },
+ {
+  "name": "Expert Disarm",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 20,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Combat Expertise"
+  }
+ },
+ {
+  "name": "Combat Instincts",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 21,
+  "prerequisites": null
+ },
+ {
+  "name": "Opportunist",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 22,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Combat Instincts"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Combat Mobility",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 23,
+  "prerequisites": null
+ },
+ {
+  "name": "Mobile Defense",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 24,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Combat Mobility"
+    },
+    {
+     "type": "base",
+     "key": "defense",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Mobile Offense",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 25,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Combat Mobility"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Containment Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 26,
+  "prerequisites": null
+ },
+ {
+  "name": "Containment Mastery",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 27,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Containment Basics"
+  }
+ },
+ {
+  "name": "Containment Supremacy",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 28,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Containment Mastery"
+  }
+ },
+ {
+  "name": "Contempt",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 29,
+  "prerequisites": {
+   "type": "level",
+   "min": 6
+  }
+ },
+ {
+  "name": "Explosive Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 30,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "explosives"
+  }
+ },
+ {
+  "name": "Fire-Team Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 31,
+  "prerequisites": null
+ },
+ {
+  "name": "Fire-Team Mastery",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 32,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Fire-Team Basics"
+  }
+ },
+ {
+  "name": "Fire-Team Supremacy",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 33,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Fire-Team Mastery"
+  }
+ },
+ {
+  "name": "Great Fortitude",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "saves.fort",
+    "value": "3"
+   },
+   {
+    "target": "wounds",
+    "value": "3"
+   }
+  ],
+  "row": 34,
+  "prerequisites": null
+ },
+ {
+  "name": "Guts",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 35,
+  "prerequisites": null
+ },
+ {
+  "name": "Quick Healer",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 36,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Guts"
+  }
+ },
+ {
+  "name": "Horde Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 37,
+  "prerequisites": null
+ },
+ {
+  "name": "Horde Mastery",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 38,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Horde Basics"
+  }
+ },
+ {
+  "name": "Horde Supremacy",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 39,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Horde Mastery"
+  }
+ },
+ {
+  "name": "Iron Will",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "saves.will",
+    "value": "3"
+   }
+  ],
+  "row": 40,
+  "prerequisites": null
+ },
+ {
+  "name": "Lightning Reflexes",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "saves.ref",
+    "value": "3"
+   }
+  ],
+  "row": 41,
+  "prerequisites": null
+ },
+ {
+  "name": "Quick Draw",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 42,
+  "prerequisites": null
+ },
+ {
+  "name": "Snake Strike",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 43,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Quick Draw"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Surge of Speed",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 44,
+  "prerequisites": null
+ },
+ {
+  "name": "Tac-Squad Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 45,
+  "prerequisites": null
+ },
+ {
+  "name": "Tac-Squad Mastery",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 46,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Tac-Squad Basics"
+  }
+ },
+ {
+  "name": "Tac-Squad Supremacy",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 47,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Tac-Squad Mastery"
+  }
+ },
+ {
+  "name": "Tactical Advantage",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 48,
+  "prerequisites": {
+   "type": "skill",
+   "key": "tactics",
+   "min": 3
+  }
+ },
+ {
+  "name": "Toughness",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "vitality",
+    "value": "(@rank * @base.fort)"
+   }
+  ],
+  "row": 49,
+  "prerequisites": null
+ },
+ {
+  "name": "Two-Weapon Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 50,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Two-Weapon Mastery",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 51,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Two-Weapon Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Weapon Focus",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 52,
+  "prerequisites": null
+ },
+ {
+  "name": "Wolfpack Basics",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 53,
+  "prerequisites": {
+   "type": "level",
+   "min": 1
+  }
+ },
+ {
+  "name": "Wolfpack Mastery",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 54,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Wolfpack Basics"
+    },
+    {
+     "type": "level",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Wolfpack Supremacy",
+  "tree": "Basic Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 55,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Wolfpack Mastery"
+    },
+    {
+     "type": "level",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "All-out Attack",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 56,
+  "prerequisites": {
+   "type": "ability",
+   "key": "str",
+   "min": 13
+  }
+ },
+ {
+  "name": "Axe Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 57,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "edged"
+  }
+ },
+ {
+  "name": "Battering Blows",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 58,
+  "prerequisites": null
+ },
+ {
+  "name": "Cleave Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 59,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 1
+  }
+ },
+ {
+  "name": "Cleave Mastery",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 60,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Cleave Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Cleave Supremacy",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 61,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Cleave Mastery"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Club Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 62,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "blunt"
+  }
+ },
+ {
+  "name": "Darting Weapon",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 63,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    },
+    {
+     "type": "featTree",
+     "tree": "meleeCombat",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Flashing Weapon",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 64,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Darting Weapon"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "featTree",
+     "tree": "meleeCombat",
+     "min": 2
+    }
+   ]
+  }
+ },
+ {
+  "name": "Dueling Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 65,
+  "prerequisites": {
+   "type": "base",
+   "key": "defense",
+   "min": 1
+  }
+ },
+ {
+  "name": "Dueling Mastery",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 66,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Dueling Basics"
+    },
+    {
+     "type": "base",
+     "key": "defense",
+     "min": 2
+    }
+   ]
+  }
+ },
+ {
+  "name": "Dueling Supremacy",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 67,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Dueling Mastery"
+    },
+    {
+     "type": "base",
+     "key": "defense",
+     "min": 4
+    }
+   ]
+  }
+ },
+ {
+  "name": "Fencing Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 68,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "edged"
+  }
+ },
+ {
+  "name": "Finesse Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 69,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 1
+  }
+ },
+ {
+  "name": "Finesse Mastery",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 70,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Finesse Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Finesse Supremacy",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 71,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Finesse Mastery"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Flail Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 72,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "exoticBlunt"
+  }
+ },
+ {
+  "name": "Garrote Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 73,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "blunt"
+  }
+ },
+ {
+  "name": "Great Sword Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 74,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "exoticEdged"
+  }
+ },
+ {
+  "name": "Hammer Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 75,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "blunt"
+  }
+ },
+ {
+  "name": "Improvised Weapon Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 76,
+  "prerequisites": null
+ },
+ {
+  "name": "Improvised Weapon Mastery",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 77,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Improvised Weapon Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Knife Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 78,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "edged"
+  }
+ },
+ {
+  "name": "Polearm Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 79,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "exoticEdged"
+  }
+ },
+ {
+  "name": "Spear Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 80,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "exoticEdged"
+  }
+ },
+ {
+  "name": "Staff Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 81,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "exoticBlunt"
+  }
+ },
+ {
+  "name": "Sword Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 82,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "edged"
+  }
+ },
+ {
+  "name": "Whip Basics",
+  "tree": "Melee Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 83,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "exoticBlunt"
+  }
+ },
+ {
+  "name": "Autofire Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 84,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 1
+  }
+ },
+ {
+  "name": "Autofire Mastery",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 85,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Autofire Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Autofire Supremacy",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 86,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Autofire Mastery"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Bombard",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 87,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "indirectFire"
+  }
+ },
+ {
+  "name": "Bullseye",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 88,
+  "prerequisites": {
+   "type": "ability",
+   "key": "dex",
+   "min": 13
+  }
+ },
+ {
+  "name": "CQB Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 89,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 1
+  }
+ },
+ {
+  "name": "CQB Mastery",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 90,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "CQB Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "CQB Supremacy",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 91,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "CQB Mastery"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Flamethrower Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 92,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "tactical"
+  }
+ },
+ {
+  "name": "Follow-up Shot",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 93,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    },
+    {
+     "type": "featTree",
+     "tree": "rangedCombat",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Hail of Fire",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 94,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Follow-up Shot"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "featTree",
+     "tree": "rangedCombat",
+     "min": 2
+    }
+   ]
+  }
+ },
+ {
+  "name": "Grenade Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 95,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "hurled"
+  }
+ },
+ {
+  "name": "Guided Weapon Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 96,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "guided"
+  }
+ },
+ {
+  "name": "Gunslinger's Eye",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 97,
+  "prerequisites": {
+   "type": "featTree",
+   "tree": "rangedCombat",
+   "min": 2
+  }
+ },
+ {
+  "name": "Marksmanship Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 98,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 1
+  }
+ },
+ {
+  "name": "Marksmanship Mastery",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 99,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Marksmanship Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Marksmanship Supremacy",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 100,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Marksmanship Mastery"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Revolver Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 101,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "handgun"
+  }
+ },
+ {
+  "name": "Rock and Roll",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 102,
+  "prerequisites": {
+   "type": "any",
+   "of": [
+    {
+     "type": "proficiency",
+     "key": "rifle"
+    },
+    {
+     "type": "proficiency",
+     "key": "tactical"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Sharpshooter Basics",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 103,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Sharpshooter Mastery",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 104,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Sharpshooter Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Sharpshooter Supremacy",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 105,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Sharpshooter Mastery"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Snap Shot",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 106,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Steel Rain",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 107,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "hurled"
+  }
+ },
+ {
+  "name": "Style Over Caliber",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 108,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "handgun"
+  }
+ },
+ {
+  "name": "This\u2026 is my Boomstick",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 109,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "shotgun"
+  }
+ },
+ {
+  "name": "Trick Shot",
+  "tree": "Ranged Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 110,
+  "prerequisites": {
+   "type": "proficiency",
+   "key": "hurled"
+  }
+ },
+ {
+  "name": "Berserker Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 111,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 1
+  }
+ },
+ {
+  "name": "Berserker Mastery",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 112,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Berserker Basics"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Berserker Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 113,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Berserker Mastery"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Boxing Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "wounds",
+    "value": "2"
+   }
+  ],
+  "row": 114,
+  "prerequisites": null
+ },
+ {
+  "name": "Boxing Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 115,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Boxing Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "abilities.con",
+    "value": "1"
+   }
+  ],
+  "row": 116,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Boxing Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Boxing Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Brawling Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "initiative",
+    "value": "2"
+   }
+  ],
+  "row": 117,
+  "prerequisites": null
+ },
+ {
+  "name": "Brawling Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 118,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Brawling Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 119,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Brawling Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Brawling Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Dirty Fighting Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 120,
+  "prerequisites": null
+ },
+ {
+  "name": "Dirty Fighting Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 121,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Dirty Fighting Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 122,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Dirty Fighting Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Dirty Fighting Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Kicking Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 123,
+  "prerequisites": null
+ },
+ {
+  "name": "Kicking Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 124,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Kicking Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "abilities.dex",
+    "value": "1"
+   }
+  ],
+  "row": 125,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Kicking Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Kicking Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Martial Arts",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 126,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 6
+    },
+    {
+     "type": "proficiency",
+     "key": "unarmed"
+    },
+    {
+     "type": "featTree",
+     "tree": "unarmedCombat",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Master's Arts",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 127,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 15
+    },
+    {
+     "type": "feat",
+     "name": "Martial Arts"
+    },
+    {
+     "type": "featTree",
+     "tree": "unarmedCombat",
+     "min": 2
+    }
+   ]
+  }
+ },
+ {
+  "name": "Rolling Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 128,
+  "prerequisites": null
+ },
+ {
+  "name": "Rolling Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 129,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Rolling Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "speed",
+    "value": "10"
+   }
+  ],
+  "row": 130,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Rolling Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Rolling Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Spirit Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 131,
+  "prerequisites": null
+ },
+ {
+  "name": "Spirit Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 132,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Spirit Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "abilities.wis",
+    "value": "1"
+   }
+  ],
+  "row": 133,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Spirit Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Spirit Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Submission Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 134,
+  "prerequisites": null
+ },
+ {
+  "name": "Submission Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 135,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Submission Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 136,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Submission Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Submission Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Two-hit Combo",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 137,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 3
+    },
+    {
+     "type": "featTree",
+     "tree": "unarmedCombat",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Warrior's Grace",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 138,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Two-hit Combo"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "featTree",
+     "tree": "unarmedCombat",
+     "min": 2
+    }
+   ]
+  }
+ },
+ {
+  "name": "Vital Points Basic",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 139,
+  "prerequisites": null
+ },
+ {
+  "name": "Vital Points Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 140,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Vital Points Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 141,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Vital Points Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Vital Points Basic"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Wrestling Basics",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 142,
+  "prerequisites": null
+ },
+ {
+  "name": "Wrestling Moves",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 143,
+  "prerequisites": {
+   "type": "base",
+   "key": "bab",
+   "min": 3
+  }
+ },
+ {
+  "name": "Wrestling Supremacy",
+  "tree": "Unarmed Combat",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "abilities.str",
+    "value": "1"
+   }
+  ],
+  "row": 144,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Wrestling Moves"
+    },
+    {
+     "type": "base",
+     "key": "bab",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Wrestling Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "All or Nothing",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 145,
+  "prerequisites": null
+ },
+ {
+  "name": "Better Luck Next Time",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 146,
+  "prerequisites": {
+   "type": "feat",
+   "name": "All or Nothing"
+  }
+ },
+ {
+  "name": "Fortune's Fool",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 147,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Better Luck Next Time"
+  }
+ },
+ {
+  "name": "Black Cat",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 148,
+  "prerequisites": null
+ },
+ {
+  "name": "Jinx",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 149,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Black Cat"
+    },
+    {
+     "type": "level",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Tough Luck",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 150,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Jinx"
+    },
+    {
+     "type": "level",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "The Dice are Hot",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "lifestyle",
+    "value": "1"
+   }
+  ],
+  "row": 151,
+  "prerequisites": null
+ },
+ {
+  "name": "Fortunate",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 152,
+  "prerequisites": null
+ },
+ {
+  "name": "Fortune Favors the Bold",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 153,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Fortunate"
+    },
+    {
+     "type": "level",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Lady Luck's Smile",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 154,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Fortune Favors the Bold"
+    },
+    {
+     "type": "level",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Lucky Break",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 155,
+  "prerequisites": null
+ },
+ {
+  "name": "Misfortune",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 156,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Lucky Break"
+    },
+    {
+     "type": "level",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Peculiar Dodge",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 157,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Misfortune"
+    },
+    {
+     "type": "level",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Mark of Conflict",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 158,
+  "prerequisites": {
+   "type": "level",
+   "eq": 1
+  }
+ },
+ {
+  "name": "Mark of Strife",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 159,
+  "prerequisites": {
+   "type": "level",
+   "eq": 1
+  }
+ },
+ {
+  "name": "Mark of Turmoil",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 160,
+  "prerequisites": {
+   "type": "level",
+   "eq": 1
+  }
+ },
+ {
+  "name": "Trouble Magnet",
+  "tree": "Chance",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "subplots",
+    "value": "@rank"
+   }
+  ],
+  "row": 161,
+  "prerequisites": null
+ },
+ {
+  "name": "Baby It",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 162,
+  "prerequisites": null
+ },
+ {
+  "name": "Demolition Derby",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 163,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Baby It"
+    },
+    {
+     "type": "level",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Death Ride",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 164,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Demolition Derby"
+    },
+    {
+     "type": "level",
+     "min": 9
+    },
+    {
+     "type": "ability",
+     "key": "con",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Bail Out!",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 165,
+  "prerequisites": {
+   "type": "skill",
+   "key": "acrobatics",
+   "min": 6
+  }
+ },
+ {
+  "name": "Daredevil",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 166,
+  "prerequisites": {
+   "type": "level",
+   "min": 6
+  }
+ },
+ {
+  "name": "Crew Dog",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 167,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Daredevil"
+    },
+    {
+     "type": "skill",
+     "key": "tactics",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Lane Dancer",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 168,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Daredevil"
+    },
+    {
+     "type": "focus",
+     "skill": "drive",
+     "group": "ground vehicle",
+     "any": [
+      "Personal Ground",
+      "Standard Ground",
+      "Heavy Ground"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "Mount Up",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 169,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Daredevil"
+    },
+    {
+     "type": "skill",
+     "key": "survival",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Photo Finish",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 170,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Daredevil"
+  }
+ },
+ {
+  "name": "Wave Runner",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 171,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Daredevil"
+    },
+    {
+     "type": "focus",
+     "skill": "drive",
+     "group": "watercraft",
+     "any": [
+      "Personal Watercraft",
+      "Standard Watercraft",
+      "Ships",
+      "Submarines"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "Wind Rider",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 172,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Daredevil"
+    },
+    {
+     "type": "focus",
+     "skill": "drive",
+     "group": "aircraft",
+     "any": [
+      "Personal Aircraft",
+      "Performance Aircraft",
+      "Service Aircraft",
+      "Rotary-wing Aircraft"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "name": "Dash",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 173,
+  "prerequisites": {
+   "type": "skill",
+   "key": "athletics",
+   "min": 3
+  }
+ },
+ {
+  "name": "Sprint",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "speed",
+    "value": "10"
+   }
+  ],
+  "row": 174,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Dash"
+  }
+ },
+ {
+  "name": "Defensive Driving",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 175,
+  "prerequisites": null
+ },
+ {
+  "name": "Jackrabbit Start",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 176,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Defensive Driving"
+  }
+ },
+ {
+  "name": "Driving Instincts",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 177,
+  "prerequisites": {
+   "type": "featTree",
+   "tree": "chase",
+   "min": 1
+  }
+ },
+ {
+  "name": "Professional Driver - Closed Course",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 178,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Driving Instincts"
+    },
+    {
+     "type": "skill",
+     "key": "impress",
+     "min": 6
+    },
+    {
+     "type": "featTree",
+     "tree": "chase",
+     "min": 2
+    }
+   ]
+  }
+ },
+ {
+  "name": "Duct Tape and Bubblegum",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 179,
+  "prerequisites": {
+   "type": "skill",
+   "key": "mechanics",
+   "min": 3
+  }
+ },
+ {
+  "name": "Get Radical!",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 180,
+  "prerequisites": null
+ },
+ {
+  "name": "Need for Speed",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 181,
+  "prerequisites": null
+ },
+ {
+  "name": "Offensive Driving",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 182,
+  "prerequisites": null
+ },
+ {
+  "name": "Relentless Pursuit",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 183,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Offensive Driving"
+  }
+ },
+ {
+  "name": "One Hand on the Wheel",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 184,
+  "prerequisites": null
+ },
+ {
+  "name": "Simulator Jockey",
+  "tree": "Chase",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 185,
+  "prerequisites": {
+   "type": "skill",
+   "key": "drive",
+   "min": 4
+  }
+ },
+ {
+  "name": "Ambush Basics",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 186,
+  "prerequisites": {
+   "type": "skill",
+   "key": "tactics",
+   "min": 3
+  }
+ },
+ {
+  "name": "Ambush Mastery",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 187,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Ambush Basics"
+    },
+    {
+     "type": "skill",
+     "key": "tactics",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Ambush Supremacy",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 188,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Ambush Mastery"
+    },
+    {
+     "type": "skill",
+     "key": "tactics",
+     "min": 18
+    }
+   ]
+  }
+ },
+ {
+  "name": "Bludgeon",
+  "tree": "Covert",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 189,
+  "prerequisites": null
+ },
+ {
+  "name": "Whack",
+  "tree": "Covert",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 190,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Bludgeon"
+  }
+ },
+ {
+  "name": "Concealed Carry",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 191,
+  "prerequisites": null
+ },
+ {
+  "name": "Deadly Precision",
+  "tree": "Covert",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 192,
+  "prerequisites": {
+   "type": "level",
+   "min": 9
+  }
+ },
+ {
+  "name": "No Quarter",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 193,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Deadly Precision"
+    },
+    {
+     "type": "level",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Crippling Strike",
+  "tree": "Covert",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 194,
+  "prerequisites": null
+ },
+ {
+  "name": "Equilibrium Basics",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 195,
+  "prerequisites": {
+   "type": "skill",
+   "key": "acrobatics",
+   "min": 3
+  }
+ },
+ {
+  "name": "Equilibrium Mastery",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 196,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Equilibrium Basics"
+    },
+    {
+     "type": "skill",
+     "key": "acrobatics",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Equilibrium Supremacy",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 197,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Equilibrium Mastery"
+    },
+    {
+     "type": "skill",
+     "key": "acrobatics",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Executioner",
+  "tree": "Covert",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 198,
+  "prerequisites": {
+   "type": "level",
+   "min": 9
+  }
+ },
+ {
+  "name": "Merciless",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 199,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Executioner"
+    },
+    {
+     "type": "level",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Faceless",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 200,
+  "prerequisites": {
+   "type": "skill",
+   "key": "blend",
+   "min": 3
+  }
+ },
+ {
+  "name": "Traceless",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 201,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Faceless"
+    },
+    {
+     "type": "skill",
+     "key": "blend",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Zeroed",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 202,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Traceless"
+    },
+    {
+     "type": "skill",
+     "key": "blend",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Ghost Basics",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 203,
+  "prerequisites": {
+   "type": "skill",
+   "key": "sneak",
+   "min": 3
+  }
+ },
+ {
+  "name": "Ghost Mastery",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 204,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Ghost Basics"
+    },
+    {
+     "type": "skill",
+     "key": "sneak",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Ghost Supremacy",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 205,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Ghost Mastery"
+    },
+    {
+     "type": "skill",
+     "key": "sneak",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Mingling Basics",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 206,
+  "prerequisites": {
+   "type": "skill",
+   "key": "blend",
+   "min": 3
+  }
+ },
+ {
+  "name": "Mingling Mastery",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 207,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Mingling Basics"
+    },
+    {
+     "type": "skill",
+     "key": "blend",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Mingling Supremacy",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 208,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Mingling Mastery"
+    },
+    {
+     "type": "skill",
+     "key": "blend",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Spider Basics",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 209,
+  "prerequisites": {
+   "type": "skill",
+   "key": "athletics",
+   "min": 3
+  }
+ },
+ {
+  "name": "Spider Mastery",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 210,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Spider Basics"
+    },
+    {
+     "type": "skill",
+     "key": "athletics",
+     "min": 6
+    }
+   ]
+  }
+ },
+ {
+  "name": "Spider Supremacy",
+  "tree": "Covert",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 211,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Spider Mastery"
+    },
+    {
+     "type": "skill",
+     "key": "athletics",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Clean and Polished",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 212,
+  "prerequisites": null
+ },
+ {
+  "name": "Mother Hen",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 213,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Clean and Polished"
+  }
+ },
+ {
+  "name": "Extra Gear",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 214,
+  "prerequisites": null
+ },
+ {
+  "name": "Electronic Warrior",
+  "tree": "Gear",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 215,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Extra Gear"
+  }
+ },
+ {
+  "name": "Micro-miniaturized",
+  "tree": "Gear",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 216,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Extra Gear"
+  }
+ },
+ {
+  "name": "Trap Master",
+  "tree": "Gear",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 217,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Extra Gear"
+  }
+ },
+ {
+  "name": "Favored Gear",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 218,
+  "prerequisites": null
+ },
+ {
+  "name": "Signature Gear",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 219,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Favored Gear"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Trademark Gear",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 220,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Signature Gear"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Home Sweet Home",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "lifestyle",
+    "value": "2"
+   }
+  ],
+  "row": 221,
+  "prerequisites": null
+ },
+ {
+  "name": "Tool Shed",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 222,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Home Sweet Home"
+  }
+ },
+ {
+  "name": "Pack Rat",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "possessions",
+    "value": "2"
+   }
+  ],
+  "row": 223,
+  "prerequisites": null
+ },
+ {
+  "name": "Personal Stash",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 224,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Pack Rat"
+  }
+ },
+ {
+  "name": "Silver Spoon",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "spendingCash",
+    "value": "2"
+   }
+  ],
+  "row": 225,
+  "prerequisites": null
+ },
+ {
+  "name": "Well-Funded",
+  "tree": "Gear",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 226,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Silver Spoon"
+  }
+ },
+ {
+  "name": "Actor",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.bluff.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.bluff.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.impress.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.impress.threat",
+    "value": "1"
+   }
+  ],
+  "row": 227,
+  "prerequisites": null
+ },
+ {
+  "name": "Advisor",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.profession.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.profession.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.resolve.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.resolve.threat",
+    "value": "1"
+   }
+  ],
+  "row": 228,
+  "prerequisites": null
+ },
+ {
+  "name": "Burglar",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.acrobatics.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.acrobatics.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.sneak.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.sneak.threat",
+    "value": "1"
+   }
+  ],
+  "row": 229,
+  "prerequisites": null
+ },
+ {
+  "name": "Diplomat",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.networking.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.networking.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.senseMotive.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.senseMotive.threat",
+    "value": "1"
+   }
+  ],
+  "row": 230,
+  "prerequisites": null
+ },
+ {
+  "name": "Examiner",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.analysis.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.analysis.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.medicine.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.medicine.threat",
+    "value": "1"
+   }
+  ],
+  "row": 231,
+  "prerequisites": null
+ },
+ {
+  "name": "Fence",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.sleightOfHand.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.sleightOfHand.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.streetwise.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.streetwise.threat",
+    "value": "1"
+   }
+  ],
+  "row": 232,
+  "prerequisites": null
+ },
+ {
+  "name": "Hustler",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.falsify.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.falsify.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.manipulate.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.manipulate.threat",
+    "value": "1"
+   }
+  ],
+  "row": 233,
+  "prerequisites": null
+ },
+ {
+  "name": "Observer",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.notice.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.notice.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.search.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.search.threat",
+    "value": "1"
+   }
+  ],
+  "row": 234,
+  "prerequisites": null
+ },
+ {
+  "name": "Officer",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.intimidate.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.intimidate.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.tactics.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.tactics.threat",
+    "value": "1"
+   }
+  ],
+  "row": 235,
+  "prerequisites": null
+ },
+ {
+  "name": "Private Eye",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.investigation.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.investigation.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.security.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.security.threat",
+    "value": "1"
+   }
+  ],
+  "row": 236,
+  "prerequisites": null
+ },
+ {
+  "name": "Scholar",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.bureaucracy.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.bureaucracy.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.science.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.science.threat",
+    "value": "1"
+   }
+  ],
+  "row": 237,
+  "prerequisites": null
+ },
+ {
+  "name": "Speed Demon",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.drive.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.drive.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.mechanics.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.mechanics.threat",
+    "value": "1"
+   }
+  ],
+  "row": 238,
+  "prerequisites": null
+ },
+ {
+  "name": "Survivalist",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.athletics.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.athletics.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.survival.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.survival.threat",
+    "value": "1"
+   }
+  ],
+  "row": 239,
+  "prerequisites": null
+ },
+ {
+  "name": "Techie",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.computers.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.computers.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.electronics.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.electronics.threat",
+    "value": "1"
+   }
+  ],
+  "row": 240,
+  "prerequisites": null
+ },
+ {
+  "name": "World Traveler",
+  "tree": "Basic Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "skills.blend.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.blend.threat",
+    "value": "1"
+   },
+   {
+    "target": "skills.cultures.misc",
+    "value": "2"
+   },
+   {
+    "target": "skills.cultures.threat",
+    "value": "1"
+   }
+  ],
+  "row": 241,
+  "prerequisites": null
+ },
+ {
+  "name": "Advanced Skill Mastery",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 242,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 6
+    },
+    {
+     "type": "featTree",
+     "tree": "basicSkill",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Grand Skill Mastery",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 243,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 12
+    },
+    {
+     "type": "featTree",
+     "tree": "advancedSkill",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Perfect Skill Mastery",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 244,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Grand Skill Mastery"
+    },
+    {
+     "type": "level",
+     "min": 18
+    }
+   ]
+  }
+ },
+ {
+  "name": "False Start",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 245,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 3
+    },
+    {
+     "type": "featTree",
+     "tree": "basicSkill",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Mark of a Professional",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 246,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "False Start"
+    },
+    {
+     "type": "level",
+     "min": 9
+    }
+   ]
+  }
+ },
+ {
+  "name": "Practice Makes Perfect",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 247,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Mark of a Professional"
+    },
+    {
+     "type": "level",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Unfair Advantage",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 248,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 6
+    },
+    {
+     "type": "featTree",
+     "tree": "basicSkill",
+     "min": 1
+    }
+   ]
+  }
+ },
+ {
+  "name": "Everyday Genius",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 249,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Unfair Advantage"
+    },
+    {
+     "type": "level",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Attention to Detail",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 250,
+  "prerequisites": null
+ },
+ {
+  "name": "Depth of Study",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "focus.generic",
+    "value": "2"
+   }
+  ],
+  "row": 251,
+  "prerequisites": null
+ },
+ {
+  "name": "I Can Swim",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 252,
+  "prerequisites": null
+ },
+ {
+  "name": "Photographic Memory",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 253,
+  "prerequisites": {
+   "type": "level",
+   "eq": 1
+  }
+ },
+ {
+  "name": "Talented",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 254,
+  "prerequisites": null
+ },
+ {
+  "name": "Training",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 255,
+  "prerequisites": null
+ },
+ {
+  "name": "Well Rounded",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 256,
+  "prerequisites": {
+   "type": "feat",
+   "name": "Training"
+  }
+ },
+ {
+  "name": "Unlocked Potential",
+  "tree": "Advanced Skill",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "classSkillPicks",
+    "value": "1"
+   }
+  ],
+  "row": 257,
+  "prerequisites": {
+   "type": "level",
+   "eq": 1
+  }
+ },
+ {
+  "name": "Academic Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 258,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Scholar"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Animal Partner",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 259,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 4
+  }
+ },
+ {
+  "name": "Bloodstain Resistant",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 260,
+  "prerequisites": {
+   "type": "skill",
+   "key": "impress",
+   "min": 3
+  }
+ },
+ {
+  "name": "Blue Collar Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 261,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Speed Demon"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Card Shark",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 262,
+  "prerequisites": {
+   "type": "skill",
+   "key": "streetwise",
+   "min": 3
+  }
+ },
+ {
+  "name": "Charmer",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 263,
+  "prerequisites": {
+   "type": "ability",
+   "key": "cha",
+   "min": 13
+  }
+ },
+ {
+  "name": "Not the Face",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 264,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Charmer"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Criminal Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 265,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Burglar"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Fan Service",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 266,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "impress",
+     "min": 4
+    },
+    {
+     "type": "ability",
+     "key": "cha",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Glint of Madness",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 267,
+  "prerequisites": {
+   "type": "skill",
+   "key": "intimidate",
+   "min": 4
+  }
+ },
+ {
+  "name": "Gorgeous",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 268,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "impress",
+     "min": 3
+    },
+    {
+     "type": "ability",
+     "key": "cha",
+     "min": 13
+    }
+   ]
+  }
+ },
+ {
+  "name": "The Look",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 269,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "impress",
+     "min": 6
+    },
+    {
+     "type": "feat",
+     "name": "Gorgeous"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Simply Irresistible",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 270,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "impress",
+     "min": 9
+    },
+    {
+     "type": "ability",
+     "key": "cha",
+     "min": 15
+    },
+    {
+     "type": "feat",
+     "name": "The Look"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Government Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 271,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Diplomat"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Grifter Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 272,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Hustler"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Hard Core",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 273,
+  "prerequisites": {
+   "type": "ability",
+   "key": "cha",
+   "min": 13
+  }
+ },
+ {
+  "name": "Too Ugly to Die",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 274,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Hard Core"
+    },
+    {
+     "type": "level",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "High-Tech Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 275,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Techie"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Local Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 276,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "World Traveler"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Mark",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 277,
+  "prerequisites": {
+   "type": "skill",
+   "key": "senseMotive",
+   "min": 3
+  }
+ },
+ {
+  "name": "Media Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 278,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Actor"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Medical Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 279,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Examiner"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Military Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 280,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Officer"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Personal Lieutenant",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 281,
+  "prerequisites": {
+   "type": "level",
+   "min": 6
+  }
+ },
+ {
+  "name": "Police Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 282,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Private Eye"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Political Clout",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 283,
+  "prerequisites": {
+   "type": "skill",
+   "key": "bureaucracy",
+   "min": 6
+  }
+ },
+ {
+  "name": "Political Favors",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 284,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "bureaucracy",
+     "min": 12
+    },
+    {
+     "type": "feat",
+     "name": "Political Clout"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Political Immunity",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 285,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "bureaucracy",
+     "min": 18
+    },
+    {
+     "type": "feat",
+     "name": "Political Favors"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Polyglot",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "focus.cultures",
+    "value": "2"
+   }
+  ],
+  "row": 286,
+  "prerequisites": {
+   "type": "skill",
+   "key": "cultures",
+   "min": 4
+  }
+ },
+ {
+  "name": "Research Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 287,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Observer"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Silver Tongue",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 288,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "manipulate",
+     "min": 3
+    },
+    {
+     "type": "ability",
+     "key": "cha",
+     "min": 13
+    }
+   ]
+  }
+ },
+ {
+  "name": "Undermine",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 289,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "manipulate",
+     "min": 9
+    },
+    {
+     "type": "feat",
+     "name": "Silver Tongue"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Venomous Dialogue",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 290,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "manipulate",
+     "min": 9
+    },
+    {
+     "type": "feat",
+     "name": "Undermine"
+    },
+    {
+     "type": "ability",
+     "key": "cha",
+     "min": 15
+    }
+   ]
+  }
+ },
+ {
+  "name": "Stone Cold",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 291,
+  "prerequisites": {
+   "type": "skill",
+   "key": "intimidate",
+   "min": 4
+  }
+ },
+ {
+  "name": "Street Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 292,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Fence"
+    }
+   ]
+  }
+ },
+ {
+  "name": "White Collar Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 293,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Advisor"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Wilderness Contacts",
+  "tree": "Style",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 294,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "networking",
+     "min": 3
+    },
+    {
+     "type": "feat",
+     "name": "Survivalist"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Always Get Your Man",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 295,
+  "prerequisites": {
+   "type": "skill",
+   "key": "investigation",
+   "min": 3
+  }
+ },
+ {
+  "name": "Aquatic Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 296,
+  "prerequisites": {
+   "type": "skill",
+   "key": "athletics",
+   "min": 3
+  }
+ },
+ {
+  "name": "Arctic Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 297,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 3
+  }
+ },
+ {
+  "name": "Desert Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 298,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 3
+  }
+ },
+ {
+  "name": "Escape and Evasion Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 299,
+  "prerequisites": {
+   "type": "skill",
+   "key": "bluff",
+   "min": 3
+  }
+ },
+ {
+  "name": "Firefighter Training",
+  "tree": "Terrain",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 300,
+  "prerequisites": {
+   "type": "skill",
+   "key": "science",
+   "min": 3
+  }
+ },
+ {
+  "name": "Forest Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 301,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 3
+  }
+ },
+ {
+  "name": "Home Turf",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 302,
+  "prerequisites": {
+   "type": "skill",
+   "key": "search",
+   "min": 3
+  }
+ },
+ {
+  "name": "Jungle Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 303,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 3
+  }
+ },
+ {
+  "name": "Local Hero",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 304,
+  "prerequisites": {
+   "type": "skill",
+   "key": "networking",
+   "min": 3
+  }
+ },
+ {
+  "name": "Mountain Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 305,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 3
+  }
+ },
+ {
+  "name": "Night Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 306,
+  "prerequisites": {
+   "type": "skill",
+   "key": "notice",
+   "min": 3
+  }
+ },
+ {
+  "name": "Swamp Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 307,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 3
+  }
+ },
+ {
+  "name": "Tracking Basics",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 308,
+  "prerequisites": {
+   "type": "skill",
+   "key": "survival",
+   "min": 3
+  }
+ },
+ {
+  "name": "Tracking Mastery",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 309,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "survival",
+     "min": 9
+    },
+    {
+     "type": "feat",
+     "name": "Tracking Basics"
+    }
+   ]
+  }
+ },
+ {
+  "name": "Urban Training",
+  "tree": "Terrain",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 310,
+  "prerequisites": {
+   "type": "skill",
+   "key": "streetwise",
+   "min": 3
+  }
+ },
+ {
+  "name": "Breaking Points",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 311,
+  "prerequisites": null
+ },
+ {
+  "name": "Bug Basics",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 312,
+  "prerequisites": {
+   "type": "skill",
+   "key": "sleightOfHand",
+   "min": 3
+  }
+ },
+ {
+  "name": "Candidate",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 313,
+  "prerequisites": {
+   "type": "level",
+   "eq": 1
+  }
+ },
+ {
+  "name": "Career Agent",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [
+   {
+    "target": "saves.ref",
+    "value": "1"
+   },
+   {
+    "target": "saves.fort",
+    "value": "1"
+   },
+   {
+    "target": "saves.will",
+    "value": "1"
+   }
+  ],
+  "row": 314,
+  "prerequisites": {
+   "type": "level",
+   "min": 6
+  }
+ },
+ {
+  "name": "Office Gossip",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 315,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Career Agent"
+    },
+    {
+     "type": "level",
+     "min": 12
+    }
+   ]
+  }
+ },
+ {
+  "name": "Total Control",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 316,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Office Gossip"
+    },
+    {
+     "type": "level",
+     "min": 18
+    }
+   ]
+  }
+ },
+ {
+  "name": "Cryptographer",
+  "tree": "Tradecraft",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 317,
+  "prerequisites": {
+   "type": "skill",
+   "key": "science",
+   "min": 4
+  }
+ },
+ {
+  "name": "Disease Basics",
+  "tree": "Tradecraft",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 318,
+  "prerequisites": {
+   "type": "skill",
+   "key": "science",
+   "min": 3
+  }
+ },
+ {
+  "name": "Flawless Identity",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 319,
+  "prerequisites": {
+   "type": "level",
+   "min": 6
+  }
+ },
+ {
+  "name": "Forensic Genius",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 320,
+  "prerequisites": {
+   "type": "skill",
+   "key": "analysis",
+   "min": 4
+  }
+ },
+ {
+  "name": "Hold Out",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 321,
+  "prerequisites": null
+ },
+ {
+  "name": "Living Cipher",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 322,
+  "prerequisites": {
+   "type": "ability",
+   "key": "int",
+   "min": 15
+  }
+ },
+ {
+  "name": "Old School",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 323,
+  "prerequisites": {
+   "type": "level",
+   "min": 6
+  }
+ },
+ {
+  "name": "Poison Basics",
+  "tree": "Tradecraft",
+  "notChecked": true,
+  "bonuses": [],
+  "row": 324,
+  "prerequisites": {
+   "type": "skill",
+   "key": "science",
+   "min": 3
+  }
+ },
+ {
+  "name": "Safe House",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 325,
+  "prerequisites": {
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 3
+    },
+    {
+     "type": "lifestyle",
+     "min": 3
+    }
+   ]
+  }
+ },
+ {
+  "name": "Superior Documentation",
+  "tree": "Tradecraft",
+  "notChecked": false,
+  "bonuses": [],
+  "row": 326,
+  "prerequisites": {
+   "type": "skill",
+   "key": "networking",
+   "min": 3
+  }
+ }
+]

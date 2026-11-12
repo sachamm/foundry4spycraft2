@@ -1,0 +1,33 @@
+<section class="tab skills {{tab.cssClass}}" data-tab="skills" data-group="primary">
+  {{#if skillLevel}}
+  <div class="skill-levels">
+    <span>{{localize "SPYCRAFT.Skill.SpendAtLevel"}}:</span>
+    {{#each skillLevels}}<a class="lvl {{#if active}}active{{/if}}" data-action="skillLevel" data-level="{{level}}">{{level}}</a>{{/each}}
+    <span class="points {{#if (sc2lt skillLevelInfo.remaining 0)}}bad{{/if}}">{{skillLevelInfo.className}}: {{skillLevelInfo.spent}} / {{skillLevelInfo.available}} {{localize "SPYCRAFT.SkillPoints"}}</span>
+    <span class="muted">{{localize "SPYCRAFT.Skill.MaxRanks"}} {{system.maxRanks}} · {{localize "SPYCRAFT.Skill.ClassPicks"}} {{system.classSkillPicks.used}}/{{system.classSkillPicks.available}}</span>
+  </div>
+  {{else}}<p class="muted">{{localize "SPYCRAFT.Skill.NeedLevel"}}</p>{{/if}}
+  <table class="skills-table">
+    <thead><tr>
+      <th>{{localize "SPYCRAFT.Skill.Label"}}</th><th data-tooltip="SPYCRAFT.Skill.ClassOverrideHint">{{localize "SPYCRAFT.Skill.Class"}}</th>
+      <th>{{localize "SPYCRAFT.Skill.Points"}}</th><th>{{localize "SPYCRAFT.Skill.Ranks"}}</th><th>{{localize "SPYCRAFT.Skill.Bonus"}}</th>
+      <th>{{localize "SPYCRAFT.Skill.Misc"}}</th><th>{{localize "SPYCRAFT.Skill.Total"}}</th><th>{{localize "SPYCRAFT.Skill.Threat"}}</th><th>{{localize "SPYCRAFT.Skill.Cap"}}</th>
+    </tr></thead>
+    <tbody>
+    {{#each skills}}
+      <tr class="{{#if isClass}}class-skill{{/if}} {{#if classAtLevel}}class-at-level{{/if}}">
+        <th><a data-action="rollSkill" data-skill="{{key}}">{{name}}{{#if focus}}*{{/if}}</a> <span class="muted">{{abilityLabel}}</span></th>
+        <td><input type="checkbox" name="system.skills.{{key}}.classSkill" {{checked classOverride}} /></td>
+        <td>{{#if ../skillLevel}}<input type="number" name="skillpts.{{key}}" value="{{points}}" class="w-2" min="0" />{{/if}}</td>
+        <td class="{{#if overMax}}bad{{/if}}">{{ranks}}</td>
+        <td>{{#if bonus}}{{signed bonus}}{{/if}}</td>
+        <td><input type="number" name="system.skills.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
+        <td>{{#each totals}}<a data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" data-tooltip="{{ability}}">{{signed total}}</a>{{#unless @last}} / {{/unless}}{{/each}}</td>
+        <td>{{#if (sc2lt threat 20)}}{{threat}}-20{{else}}20{{/if}}</td>
+        <td>{{cap}}</td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+  <p class="muted hint">{{localize "SPYCRAFT.Skill.Hint"}}</p>
+</section>

@@ -1,0 +1,1552 @@
+{
+ "talents": [
+  {
+   "num": 2,
+   "name": "Adaptable",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "actionDice.bonus",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "interests",
+     "value": "@tb.interestTalent"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 3,
+   "name": "Agile",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.str",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.dex",
+     "value": "2"
+    },
+    {
+     "target": "speed",
+     "value": "5"
+    },
+    {
+     "target": "saves.ref",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.acrobatics.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.acrobatics.classSkill",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 4,
+   "name": "Brainy",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.str",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.int",
+     "value": "2"
+    },
+    {
+     "target": "knowledge",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skillPoints",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 5,
+   "name": "Burly",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.str",
+     "value": "2"
+    },
+    {
+     "target": "abilities.dex",
+     "value": "-(2)"
+    },
+    {
+     "target": "prof.unarmed",
+     "value": "1"
+    },
+    {
+     "target": "defense",
+     "value": "1"
+    },
+    {
+     "target": "wounds",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 6,
+   "name": "Caustic",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.wis",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.cha",
+     "value": "2"
+    },
+    {
+     "target": "skills.intimidate.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.intimidate.classSkill",
+     "value": "1"
+    },
+    {
+     "target": "skills.manipulate.threat",
+     "value": "@tb.t2"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 7,
+   "name": "Clever",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.con",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.int",
+     "value": "2"
+    },
+    {
+     "target": "saves.ref",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 8,
+   "name": "Convincing",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.int",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.cha",
+     "value": "2"
+    },
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "skills.bluff.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.bluff.classSkill",
+     "value": "1"
+    },
+    {
+     "target": "skills.impress.threat",
+     "value": "@tb.t2"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 9,
+   "name": "Cunning",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.int",
+     "value": "2"
+    },
+    {
+     "target": "abilities.wis",
+     "value": "-(2)"
+    },
+    {
+     "target": "skills.networking.threat",
+     "value": "@tb.t2"
+    },
+    {
+     "target": "skills.tactics.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.tactics.classSkill",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 10,
+   "name": "Daring",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.dex",
+     "value": "2"
+    },
+    {
+     "target": "abilities.int",
+     "value": "-(2)"
+    },
+    {
+     "target": "actionDice.bonus",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "initiative",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 11,
+   "name": "Disciplined",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "saves.will",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "focus.generic",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 12,
+   "name": "Fierce",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.str",
+     "value": "2"
+    },
+    {
+     "target": "abilities.cha",
+     "value": "-(2)"
+    },
+    {
+     "target": "initiative",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.intimidate.threat",
+     "value": "@tb.t2"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 13,
+   "name": "Fit",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.str",
+     "value": "2"
+    },
+    {
+     "target": "abilities.int",
+     "value": "-(2)"
+    },
+    {
+     "target": "speed",
+     "value": "5"
+    },
+    {
+     "target": "saves.fort",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.athletics.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.athletics.classSkill",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 14,
+   "name": "Gifted",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "classSkillPicks",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 15,
+   "name": "Gonzo",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "interests",
+     "value": "@tb.interestSpec"
+    },
+    {
+     "target": "wounds",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 16,
+   "name": "Graceful",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.dex",
+     "value": "2"
+    },
+    {
+     "target": "abilities.int",
+     "value": "-(2)"
+    },
+    {
+     "target": "interests",
+     "value": "@tb.interestSpec"
+    },
+    {
+     "target": "skills.impress.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.impress.classSkill",
+     "value": "1"
+    },
+    {
+     "target": "skills.sleightOfHand.threat",
+     "value": "@tb.t2"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 17,
+   "name": "Grizzled",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.dex",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.con",
+     "value": "2"
+    },
+    {
+     "target": "defense",
+     "value": "2"
+    },
+    {
+     "target": "wounds",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 18,
+   "name": "Mysterious",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "defense",
+     "value": "1"
+    },
+    {
+     "target": "skills.blend.threat",
+     "value": "@tb.t2"
+    },
+    {
+     "target": "skills.networking.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.networking.classSkill",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 19,
+   "name": "Orphaned",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "prof.generic",
+     "value": "1"
+    },
+    {
+     "target": "actionDice.count",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 20,
+   "name": "Persistent",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.con",
+     "value": "2"
+    },
+    {
+     "target": "abilities.cha",
+     "value": "-(2)"
+    },
+    {
+     "target": "saves.fort",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.resolve.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.resolve.classSkill",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 21,
+   "name": "Priviledged",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "wealth",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "focus.cultures",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 22,
+   "name": "Reliable",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "classSkillPicks",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "focus.profession",
+     "value": "1"
+    },
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 23,
+   "name": "Resolute",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.dex",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.wis",
+     "value": "2"
+    },
+    {
+     "target": "saves.will",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.resolve.cap",
+     "value": "5"
+    },
+    {
+     "target": "skills.resolve.classSkill",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 24,
+   "name": "Retired",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 25,
+   "name": "Rowdy",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.con",
+     "value": "2"
+    },
+    {
+     "target": "abilities.wis",
+     "value": "-(2)"
+    },
+    {
+     "target": "speed",
+     "value": "5"
+    },
+    {
+     "target": "classSkillPicks",
+     "value": "1"
+    },
+    {
+     "target": "focus.cultures",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 26,
+   "name": "Shrewd",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.con",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.wis",
+     "value": "2"
+    },
+    {
+     "target": "contacts",
+     "value": "(@tb.t3 + 1)"
+    },
+    {
+     "target": "skills.senseMotive.threat",
+     "value": "@tb.t2"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 27,
+   "name": "Veteran",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "skillPoints",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 28,
+   "name": "Vigilant",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.wis",
+     "value": "2"
+    },
+    {
+     "target": "abilities.cha",
+     "value": "-(2)"
+    },
+    {
+     "target": "skills.notice.threat",
+     "value": "@tb.t2"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 29,
+   "name": "Witty",
+   "originType": "talent",
+   "bonuses": [
+    {
+     "target": "abilities.str",
+     "value": "-(2)"
+    },
+    {
+     "target": "abilities.cha",
+     "value": "2"
+    },
+    {
+     "target": "interests",
+     "value": "@tb.interestSpec"
+    },
+    {
+     "target": "skills.bluff.threat",
+     "value": "@tb.t2"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  }
+ ],
+ "specialties": [
+  {
+   "num": 2,
+   "name": "Authority",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.profession",
+     "value": "2"
+    },
+    {
+     "target": "spendingCash",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Advisor"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 3,
+   "name": "Celebrity",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "lifestyle",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Actor"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 4,
+   "name": "City Dweller",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "classSkillPicks",
+     "value": "1"
+    },
+    {
+     "target": "skills.intimidate.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.streetwise.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Home Turf"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 5,
+   "name": "Clergyman",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.cultures",
+     "value": "1"
+    },
+    {
+     "target": "skills.intimidate.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.networking.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Iron Will"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 6,
+   "name": "Contract Pro",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Talented"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 7,
+   "name": "Criminal",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.handgun",
+     "value": "1"
+    },
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "skills.bluff.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.sneak.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Fence"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 8,
+   "name": "Doctor",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.edged",
+     "value": "1"
+    },
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "spendingCash",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Examiner"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 9,
+   "name": "Entertainer",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.cultures",
+     "value": "1"
+    },
+    {
+     "target": "skills.impress.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.profession.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Silver Tongue"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 10,
+   "name": "Financier",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "spendingCash",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Diplomat"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 11,
+   "name": "Geek",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "interests",
+     "value": "@tb.interestSpec"
+    },
+    {
+     "target": "skills.search.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.security.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Techie"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 12,
+   "name": "Grifter",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "lifestyle",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Hustler"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 13,
+   "name": "Hot Rodder",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.drive",
+     "value": "2"
+    },
+    {
+     "target": "skills.drive.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.streetwise.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Lane Dancer"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 14,
+   "name": "Hunter",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "speed",
+     "value": "5"
+    },
+    {
+     "target": "prof.rifle",
+     "value": "1"
+    },
+    {
+     "target": "featSlots.terrain",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 15,
+   "name": "Icon",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "skills.manipulate.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.networking.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Gorgeous"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 16,
+   "name": "Instructor",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "focus.science",
+     "value": "@tb.t3"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Scholar"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 17,
+   "name": "Investigator",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "skills.analysis.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.notice.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Private Eye"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 18,
+   "name": "Jack of All Trades",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "knowledge",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Training"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 19,
+   "name": "Journalist",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "contacts",
+     "value": "(@tb.t3 + 1)"
+    },
+    {
+     "target": "skills.investigation.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.senseMotive.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Observer"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 20,
+   "name": "Mercenary",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.tactical",
+     "value": "1"
+    },
+    {
+     "target": "contacts",
+     "value": "(@tb.t3 + 1)"
+    },
+    {
+     "target": "featSlots.rangedCombat",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 21,
+   "name": "Motorhead",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.drive",
+     "value": "2"
+    },
+    {
+     "target": "possessions",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Speed Demon"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 22,
+   "name": "Operative",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.cultures",
+     "value": "2"
+    },
+    {
+     "target": "featSlots.tradecraft",
+     "value": "1"
+    },
+    {
+     "target": "possessions",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 23,
+   "name": "Outdoorsman",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.hurled",
+     "value": "1"
+    },
+    {
+     "target": "focus.drive",
+     "value": "1"
+    },
+    {
+     "target": "possessions",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Survivalist"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 24,
+   "name": "Pickpocket",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "speed",
+     "value": "5"
+    },
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "skills.blend.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.sleightOfHand.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Burglar"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 25,
+   "name": "Pilot",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.drive",
+     "value": "2"
+    },
+    {
+     "target": "skills.drive.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.search.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Wind Rider"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 26,
+   "name": "Playboy",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "lifestyle",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Personal Lieutenant"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 27,
+   "name": "Recruit",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.handgun",
+     "value": "1"
+    },
+    {
+     "target": "prof.rifle",
+     "value": "1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Officer"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 28,
+   "name": "Rescuer",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "speed",
+     "value": "5"
+    },
+    {
+     "target": "featSlots.chase",
+     "value": "1"
+    },
+    {
+     "target": "skills.athletics.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.medicine.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 29,
+   "name": "Researcher",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "featSlots.advancedSkill",
+     "value": "1"
+    },
+    {
+     "target": "focus.science",
+     "value": "1"
+    },
+    {
+     "target": "skills.science.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 30,
+   "name": "Sailor",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.drive",
+     "value": "2"
+    },
+    {
+     "target": "skills.athletics.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.drive.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Wave Runner"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 31,
+   "name": "Special Ops",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.explosives",
+     "value": "1"
+    },
+    {
+     "target": "featSlots.covert",
+     "value": "1"
+    },
+    {
+     "target": "skills.sneak.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.tactics.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 32,
+   "name": "Spiritualist",
+   "originType": "specialty",
+   "bonuses": [],
+   "grants": [
+    {
+     "feat": "All or Nothing"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 33,
+   "name": "Stranger",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "interests",
+     "value": "@tb.interestSpec"
+    },
+    {
+     "target": "featSlots.chance",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 34,
+   "name": "Student",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "interests",
+     "value": "@tb.interestSpec"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "I Can Swim"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 35,
+   "name": "Suit",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.profession",
+     "value": "1"
+    },
+    {
+     "target": "featSlots.style",
+     "value": "1"
+    },
+    {
+     "target": "skills.bureaucracy.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.profession.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 36,
+   "name": "Test Subject",
+   "originType": "specialty",
+   "bonuses": [],
+   "grants": [
+    {
+     "feat": "Great Fortitude"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 37,
+   "name": "Thrill Seeker",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "speed",
+     "value": "5"
+    },
+    {
+     "target": "focus.drive",
+     "value": "2"
+    },
+    {
+     "target": "skills.acrobatics.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.athletics.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "Lightning Reflexes"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 38,
+   "name": "Tradesman",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "featSlots.gear",
+     "value": "1"
+    },
+    {
+     "target": "focus.science",
+     "value": "1"
+    },
+    {
+     "target": "skills.mechanics.misc",
+     "value": "@tb.t1"
+    },
+    {
+     "target": "skills.profession.misc",
+     "value": "@tb.t1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 39,
+   "name": "Tribesman",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.cultures",
+     "value": "1"
+    },
+    {
+     "target": "featSlots.meleeCombat",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  },
+  {
+   "num": 40,
+   "name": "Wanderer",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "focus.cultures",
+     "value": "1"
+    },
+    {
+     "target": "contacts",
+     "value": "@tb.t3"
+    },
+    {
+     "target": "vitality",
+     "value": "(1 + @level)"
+    }
+   ],
+   "grants": [
+    {
+     "feat": "World Traveler"
+    }
+   ],
+   "classSkills": []
+  },
+  {
+   "num": 41,
+   "name": "Warrior",
+   "originType": "specialty",
+   "bonuses": [
+    {
+     "target": "prof.hurled",
+     "value": "1"
+    },
+    {
+     "target": "prof.unarmed",
+     "value": "1"
+    },
+    {
+     "target": "featSlots.unarmedCombat",
+     "value": "1"
+    }
+   ],
+   "grants": [],
+   "classSkills": []
+  }
+ ]
+}

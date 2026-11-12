@@ -1,0 +1,47 @@
+<section class="tab classes {{tab.cssClass}}" data-tab="classes" data-group="primary">
+  <h3>{{localize "SPYCRAFT.Progression"}}
+    <span class="controls">
+      <a data-action="addLevel"><i class="fa-solid fa-plus"></i> {{localize "SPYCRAFT.Class.AddLevel"}}</a>
+      {{#if progression.length}}<a data-action="removeLevel"><i class="fa-solid fa-minus"></i> {{localize "SPYCRAFT.Class.RemoveLevel"}}</a>{{/if}}
+    </span>
+  </h3>
+  <table class="progression">
+    <thead><tr><th>{{localize "SPYCRAFT.Level"}}</th><th>{{localize "SPYCRAFT.Class.Label"}}</th><th>{{localize "SPYCRAFT.Class.Level"}}</th><th>{{localize "SPYCRAFT.VitalityRoll"}}</th><th>{{localize "SPYCRAFT.SkillPoints"}}</th></tr></thead>
+    <tbody>
+    {{#each progression}}
+      <tr>
+        <td>{{level}}</td><td>{{className}}</td><td>{{classLevel}}</td>
+        <td>{{#if first}}<span class="muted">{{vitalityDie}} ({{localize "SPYCRAFT.Max"}})</span>{{else}}<input type="number" name="progression.{{index}}.vitality" value="{{vitality}}" class="w-2" /> <span class="muted">d{{vitalityDie}}</span>{{/if}}</td>
+        <td class="{{#if (sc2lt skillPoints.remaining 0)}}bad{{/if}}">{{skillPoints.spent}} / {{skillPoints.available}}</td>
+      </tr>
+    {{else}}
+      <tr><td colspan="5" class="muted">{{localize "SPYCRAFT.Class.NoLevels"}}</td></tr>
+    {{/each}}
+    </tbody>
+  </table>
+
+  {{#if coreAbilities.length}}
+  <h3>{{localize "SPYCRAFT.CoreAbilities"}}</h3>
+  <ul class="plain">{{#each coreAbilities}}<li><b>{{name}}</b> <span class="muted">({{className}})</span> — {{description}}</li>{{/each}}</ul>
+  {{/if}}
+
+  {{#each classes}}
+  <div class="class-block" data-item-id="{{item.id}}">
+    <h3><a data-action="itemEdit">{{item.name}}</a> {{levels}}
+      <span class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a></span></h3>
+    {{#if choices.length}}
+    <div class="choices">
+      {{#each choices}}
+        <label>{{localize "SPYCRAFT.Level"}} {{level}} — {{list}}
+          <select name="choice.{{../item.id}}.{{idx}}">{{selectOptions options selected=value blank="—"}}</select>
+          {{#if description}}<span class="muted">{{description}}</span>{{/if}}
+        </label>
+      {{/each}}
+    </div>
+    {{/if}}
+    <ol class="abilities-list">
+      {{#each abilities}}<li><b>{{level}}. {{name}}</b> — {{text}}</li>{{/each}}
+    </ol>
+  </div>
+  {{/each}}
+</section>

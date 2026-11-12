@@ -1,7 +1,126 @@
-.spycraft2.sheet .sheet-header { display: flex; gap: 8px; align-items: center; }
-.spycraft2.sheet .sheet-header img { width: 64px; height: 64px; }
-.spycraft2.sheet .abilities { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 8px 0; }
-.spycraft2.sheet .ability { display: flex; flex-direction: column; align-items: center; }
-.spycraft2.sheet .ability a { font-weight: bold; cursor: pointer; }
-.spycraft2.sheet .resources { display: flex; flex-wrap: wrap; gap: 12px; }
-.spycraft2.sheet .resources input { width: 3.5em; }
+/* Spycraft 2.0 — sheet styles (Foundry v13, works with light & dark themes) */
+.spycraft2 {
+  --sc2-accent: #1d4e89;
+  --sc2-bad: #c0392b;
+  --sc2-good: #2e7d32;
+  --sc2-class: rgba(241, 196, 15, 0.16);
+  --sc2-border: var(--color-border-light-tertiary, rgba(127, 127, 127, 0.35));
+}
+.spycraft2 .window-content { padding: 6px 10px; }
+.spycraft2 h3 { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; padding-bottom: 2px; border-bottom: 1px solid var(--sc2-border); font-size: 1.05em; }
+.spycraft2 h3 .controls, .spycraft2 h3 .points { margin-left: auto; font-size: 0.85em; font-weight: normal; }
+.spycraft2 h3 .controls a { margin-left: 8px; }
+.spycraft2 .muted { opacity: 0.7; }
+.spycraft2 .bad, .spycraft2 .bad input { color: var(--sc2-bad); font-weight: bold; }
+.spycraft2 .tag { font-size: 0.8em; padding: 0 4px; border: 1px solid var(--sc2-border); border-radius: 3px; opacity: 0.8; }
+.spycraft2 input.w-2 { width: 3.2em; text-align: center; }
+.spycraft2 input.w-4 { width: 6em; }
+.spycraft2 input.w-6 { width: 9em; }
+.spycraft2 input.w-xp { width: 6em; }
+.spycraft2 textarea { width: 100%; }
+.spycraft2 .mono { font-family: monospace; font-size: 0.85em; }
+.spycraft2 table { width: 100%; border-collapse: collapse; margin: 0; }
+.spycraft2 table th, .spycraft2 table td { padding: 2px 4px; text-align: center; border-bottom: 1px solid var(--sc2-border); }
+.spycraft2 table th:first-child, .spycraft2 table td:first-child { text-align: left; }
+.spycraft2 table thead th { font-size: 0.85em; opacity: 0.8; }
+.spycraft2 ul.plain, .spycraft2 ol.abilities-list { margin: 4px 0; padding-left: 18px; }
+.spycraft2 ol.abilities-list { list-style: none; padding-left: 0; }
+.spycraft2 ol.abilities-list li { margin: 2px 0; }
+
+/* Header */
+.spycraft2.sheet .sheet-header { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 4px; }
+.spycraft2.sheet .sheet-header .portrait { width: 84px; height: 84px; object-fit: cover; border: none; flex: 0 0 auto; }
+.spycraft2.item .sheet-header .portrait { width: 56px; height: 56px; }
+.spycraft2 .header-main { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.spycraft2 .name-row { display: flex; gap: 6px; }
+.spycraft2 .header-main input.name { font-size: 1.5em; height: auto; flex: 2; }
+.spycraft2 .header-main input.codename { flex: 1; }
+.spycraft2 .summary, .spycraft2 .resources { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.spycraft2 .resources input { width: 3.5em; text-align: center; }
+.spycraft2 .resources a { margin-left: 4px; }
+.spycraft2 .summary .talent, .spycraft2 .summary .specialty { padding: 0 6px; border-left: 2px solid var(--sc2-accent); }
+.spycraft2 details.warnings { border: 1px solid var(--sc2-bad); border-radius: 4px; padding: 2px 8px; margin: 4px 0; }
+.spycraft2 details.warnings summary { color: var(--sc2-bad); cursor: pointer; }
+.spycraft2 details.warnings ul { margin: 4px 0; padding-left: 18px; font-size: 0.9em; }
+
+/* Layout */
+.spycraft2 .cols { display: flex; gap: 14px; }
+.spycraft2 .cols > .col { flex: 1; min-width: 0; }
+.spycraft2 .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.spycraft2 .stat { display: flex; flex-direction: column; align-items: center; border: 1px solid var(--sc2-border); border-radius: 4px; padding: 2px; }
+.spycraft2 .stat b { font-size: 1.3em; }
+.spycraft2 .stat small { opacity: 0.7; font-size: 0.75em; }
+.spycraft2 .abilities td.score { font-weight: bold; font-size: 1.1em; }
+.spycraft2 .abilities td.mod a { font-weight: bold; }
+.spycraft2 .increases { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; font-size: 0.9em; }
+.spycraft2 .increases select { width: auto; }
+.spycraft2 .carry { font-size: 0.85em; }
+.spycraft2 details.misc-mods { margin-top: 10px; }
+.spycraft2 .misc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; font-size: 0.85em; }
+.spycraft2 .misc-grid label, .spycraft2 .details-grid label { display: flex; justify-content: space-between; align-items: center; gap: 4px; text-transform: capitalize; }
+.spycraft2 .details-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; }
+
+/* Lists */
+.spycraft2 .item-list { list-style: none; margin: 0; padding: 0; }
+.spycraft2 .item-list li { display: flex; gap: 8px; align-items: center; padding: 2px 0; border-bottom: 1px solid var(--sc2-border); }
+.spycraft2 .item-list li .name { flex: 1; }
+.spycraft2 .item-list li .controls { margin-left: auto; white-space: nowrap; }
+.spycraft2 .feats-list li .tree { font-size: 0.8em; opacity: 0.7; }
+.spycraft2 .feats-list li.granted .name { font-style: italic; }
+.spycraft2 .feats-list li.unqualified .name { color: var(--sc2-bad); text-decoration: line-through; }
+.spycraft2 .feat-slots, .spycraft2 .gear-picks { display: flex; flex-wrap: wrap; gap: 6px; }
+.spycraft2 .slot { border: 1px solid var(--sc2-border); border-radius: 4px; padding: 1px 6px; font-size: 0.9em; }
+.spycraft2 td.controls a.on, .spycraft2 a.on { color: var(--sc2-good); }
+
+/* Classes */
+.spycraft2 .class-block { border: 1px solid var(--sc2-border); border-radius: 4px; padding: 0 8px 6px; margin-top: 8px; }
+.spycraft2 .choices { display: flex; flex-direction: column; gap: 3px; margin: 4px 0; }
+.spycraft2 .choices label { display: flex; gap: 6px; align-items: center; }
+.spycraft2 .choices select { width: auto; min-width: 12em; }
+
+/* Skills */
+.spycraft2 .skill-levels { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 6px; }
+.spycraft2 .skill-levels a.lvl { min-width: 1.6em; text-align: center; border: 1px solid var(--sc2-border); border-radius: 3px; }
+.spycraft2 .skill-levels a.lvl.active { background: var(--sc2-accent); color: white; }
+.spycraft2 .skill-levels .points { margin-left: 8px; font-weight: bold; }
+.spycraft2 .skills-table tr.class-skill th { font-weight: bold; }
+.spycraft2 .skills-table tr.class-at-level { background: var(--sc2-class); }
+.spycraft2 .hint { font-size: 0.8em; }
+
+/* Training */
+.spycraft2 .focus-list { display: grid; grid-template-columns: 1fr 1fr; font-size: 0.9em; }
+.spycraft2 ul.rows { list-style: none; margin: 0; padding: 0; }
+.spycraft2 ul.rows li { display: flex; gap: 4px; align-items: center; margin: 2px 0; }
+.spycraft2 ul.rows li select { width: auto; }
+.spycraft2 .inline-fields { display: flex; gap: 12px; align-items: center; margin: 6px 0; }
+
+/* Item sheets */
+.spycraft2 .form-fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; margin: 6px 0; }
+.spycraft2 .form-fields-grid label { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.spycraft2 .form-fields-grid label.wide { grid-column: span 2; }
+.spycraft2 .form-fields-grid label input[type=text] { flex: 1; }
+.spycraft2 .class-table { font-size: 0.85em; }
+.spycraft2 table.bonuses input { width: 100%; }
+.spycraft2 prose-mirror { min-height: 120px; }
+
+/* NPC */
+.spycraft2.npc .abilities-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 6px 0; }
+.spycraft2.npc .ability { display: flex; flex-direction: column; align-items: center; }
+
+/* Browser */
+.spycraft2.browser .filters { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.spycraft2.browser .filters input[type=search] { flex: 1; }
+.spycraft2.browser .browser-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+.spycraft2.browser .browser-list li { display: flex; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--sc2-border); }
+.spycraft2.browser .row-main { flex: 1; }
+.spycraft2.browser .row-main .name { font-weight: bold; margin-right: 6px; }
+.spycraft2.browser .prereq { font-size: 0.85em; }
+.spycraft2.browser li.unqualified .name { opacity: 0.6; text-decoration: line-through; }
+.spycraft2.browser li button { flex: 0 0 32px; height: 26px; line-height: 1; }
+.spycraft2.browser li button.owned { color: var(--sc2-good); }
+.spycraft2.browser .window-content { display: flex; flex-direction: column; }
+.spycraft2.browser .browser { display: flex; flex-direction: column; height: 100%; }
+
+/* Chat */
+.spycraft2-threat { color: var(--sc2-good, #2e7d32); font-weight: bold; }
+.spycraft2-error { color: var(--sc2-bad, #c0392b); font-weight: bold; }

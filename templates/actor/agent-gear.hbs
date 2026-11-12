@@ -1,0 +1,70 @@
+<section class="tab gear {{tab.cssClass}}" data-tab="gear" data-group="primary">
+  <h3>{{localize "SPYCRAFT.Wealth"}} <span class="points {{#if (sc2lt system.wealth.remaining 0)}}bad{{/if}}">{{system.wealth.allocated}} / {{system.wealth.total}}</span></h3>
+  <table class="wealth">
+    <thead><tr><th></th><th>{{localize "SPYCRAFT.Spent"}}</th><th>{{localize "SPYCRAFT.Rank"}}</th><th></th></tr></thead>
+    <tbody>
+      <tr><th>{{localize "SPYCRAFT.Lifestyle"}}</th><td><input type="number" name="system.wealthAllocation.lifestyle" value="{{system.wealthAllocation.lifestyle}}" class="w-2" min="0" /></td>
+        <td>{{system.wealth.lifestyle.rank}}</td><td class="muted">{{system.wealth.lifestyle.home}} · {{localize "SPYCRAFT.Vehicle"}} {{system.wealth.lifestyle.vehicle}} · {{system.wealth.lifestyle.appearance}} ({{signed system.wealth.lifestyle.appearanceMod}})</td></tr>
+      <tr><th>{{localize "SPYCRAFT.Possessions"}}</th><td><input type="number" name="system.wealthAllocation.possessions" value="{{system.wealthAllocation.possessions}}" class="w-2" min="0" /></td>
+        <td>{{system.wealth.possessions.rank}}</td><td class="muted">{{system.wealth.possessions.picks}}</td></tr>
+      <tr><th>{{localize "SPYCRAFT.SpendingCash"}}</th><td><input type="number" name="system.wealthAllocation.spendingCash" value="{{system.wealthAllocation.spendingCash}}" class="w-2" min="0" /></td>
+        <td>{{system.wealth.spendingCash.rank}}</td><td class="muted">${{system.wealth.spendingCash.amount}}</td></tr>
+    </tbody>
+  </table>
+  <div class="inline-fields">
+    <label>{{localize "SPYCRAFT.Reputation"}} <input type="number" name="system.reputation" value="{{system.reputation}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.NetWorth"}} <input type="number" name="system.netWorth" value="{{system.netWorth}}" class="w-4" /></label>
+    <span class="muted">{{localize "SPYCRAFT.CommonItems"}}: {{system.commonItems.count}} + {{system.commonItems.perMission}}/{{localize "SPYCRAFT.Mission"}}</span>
+  </div>
+
+  <h3>{{localize "SPYCRAFT.GearPicks"}}</h3>
+  <div class="gear-picks">
+    {{#each gearPicks}}<span class="slot {{#if (sc2lt remaining 0)}}bad{{/if}}" data-tooltip="{{label}}"><b>{{key}}</b> {{spent}} / {{available}}</span>{{/each}}
+  </div>
+
+  <h3>{{localize "SPYCRAFT.Weapons"}} <span class="controls"><a data-action="browse" data-type="weapon"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="weapon"><i class="fa-solid fa-plus"></i></a></span></h3>
+  <table class="items">
+    <thead><tr><th>{{localize "Name"}}</th><th>{{localize "SPYCRAFT.Attack"}}</th><th>{{localize "SPYCRAFT.Damage"}}</th><th>E/T</th><th>{{localize "SPYCRAFT.Range"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
+    <tbody>
+    {{#each weapons}}
+      <tr data-item-id="{{item.id}}">
+        <td><a data-action="itemEdit">{{item.name}}</a></td>
+        <td><a data-action="rollAttack" class="{{#unless attack.trained}}bad{{/unless}}" data-tooltip="{{#unless attack.trained}}SPYCRAFT.Weapon.Untrained{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</a></td>
+        <td><a data-action="rollDamage">{{item.system.damage}}</a></td>
+        <td>{{item.system.error}}/{{item.system.threat}}</td>
+        <td>{{#if item.system.range}}{{item.system.range}} ft{{/if}}</td>
+        <td>{{caliber}}</td><td>{{item.system.pick}}</td>
+        <td class="controls"><a data-action="itemEquip" class="{{#if item.system.equipped}}on{{/if}}"><i class="fa-solid fa-hand-fist"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+
+  <h3>{{localize "SPYCRAFT.Armor"}} <span class="controls"><a data-action="browse" data-type="armor"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="armor"><i class="fa-solid fa-plus"></i></a></span></h3>
+  <table class="items">
+    <thead><tr><th>{{localize "Name"}}</th><th>DR</th><th>{{localize "SPYCRAFT.Defense"}}</th><th>ACP</th><th>{{localize "SPYCRAFT.Speed"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
+    <tbody>
+    {{#each armor}}
+      <tr data-item-id="{{item.id}}">
+        <td><a data-action="itemEdit">{{item.name}}</a></td>
+        <td>{{item.system.damageReduction}}/{{item.system.damageReductionSubdual}}</td><td>{{item.system.defensePenalty}}</td><td>{{item.system.armorCheck}}</td><td>{{item.system.speedPenalty}}</td>
+        <td>{{caliber}}</td><td>{{item.system.pick}}</td>
+        <td class="controls"><a data-action="itemEquip" class="{{#if item.system.equipped}}on{{/if}}" data-tooltip="SPYCRAFT.Equip"><i class="fa-solid fa-shirt"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+
+  <h3>{{localize "SPYCRAFT.Gear"}} <span class="controls"><a data-action="createItem" data-type="gear"><i class="fa-solid fa-plus"></i></a></span></h3>
+  <table class="items">
+    <thead><tr><th>{{localize "Name"}}</th><th>{{localize "SPYCRAFT.Quantity"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
+    <tbody>
+    {{#each gear}}
+      <tr data-item-id="{{item.id}}">
+        <td><a data-action="itemEdit">{{item.name}}</a></td><td>{{item.system.quantity}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
+        <td class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+</section>

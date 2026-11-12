@@ -1,0 +1,20 @@
+<div class="browser">
+  {{#if missingPack}}<p class="bad">{{localize "SPYCRAFT.Browser.MissingPack"}}</p>{{/if}}
+  <div class="filters">
+    <input type="search" name="search" value="{{filters.search}}" placeholder="{{localize 'SPYCRAFT.Browser.Search'}}" />
+    <select name="group">{{selectOptions groups selected=filters.group blank=(localize "SPYCRAFT.Browser.All")}}</select>
+    {{#if hasPrereqs}}<label><input type="checkbox" name="qualifiedOnly" {{checked filters.qualifiedOnly}} /> {{localize "SPYCRAFT.Browser.QualifiedOnly"}}</label>{{/if}}
+  </div>
+  <ul class="browser-list">
+    {{#each rows}}
+      <li data-uuid="{{uuid}}" class="{{#unless qualified}}unqualified{{/unless}} {{#if owned}}owned{{/if}}">
+        <div class="row-main">
+          <a data-action="open" class="name">{{name}}</a>
+          <span class="muted">{{groupLabel}}{{#if extra}} · {{extra}}{{/if}}</span>
+          {{#if prereq}}<div class="prereq {{#unless qualified}}bad{{/unless}}" data-tooltip="{{unmet}}">{{prereq}}{{#if notChecked}} <span class="tag">{{localize "SPYCRAFT.Feat.NotChecked"}}</span>{{/if}}</div>{{/if}}
+        </div>
+        {{#if ../actor}}<button type="button" data-action="add" {{#if owned}}class="owned"{{/if}}>{{#if owned}}<i class="fa-solid fa-check"></i>{{else}}<i class="fa-solid fa-plus"></i>{{/if}}</button>{{/if}}
+      </li>
+    {{else}}<li class="muted">{{localize "SPYCRAFT.Browser.Empty"}}</li>{{/each}}
+  </ul>
+</div>

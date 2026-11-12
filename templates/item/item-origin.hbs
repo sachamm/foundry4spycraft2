@@ -1,0 +1,9 @@
+<section class="item-details">
+  <div class="form-fields-grid">
+    <label>{{localize "SPYCRAFT.Origin.Type"}} <select name="system.originType">{{selectOptions originTypes selected=system.originType}}</select></label>
+    <label>{{localize "SPYCRAFT.Origin.Grants"}} <input type="text" name="grantsText" value="{{grantsText}}" /></label>
+  </div>
+  <h3>{{localize "SPYCRAFT.Description"}}</h3>
+  {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+  {{> "systems/spycraft2/templates/item/parts/bonuses.hbs"}}
+</section>

@@ -1,0 +1,39 @@
+<section class="spycraft2-sheet npc">
+  <header class="sheet-header">
+    <img class="portrait" src="{{actor.img}}" data-edit="img" data-action="editImage" alt="{{actor.name}}" />
+    <div class="header-main">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" />
+      <div class="summary">
+        <label>{{localize "SPYCRAFT.ThreatLevel"}} <input name="system.threatLevel" type="number" value="{{system.threatLevel}}" class="w-2" /></label>
+        <select name="system.npcType">{{selectOptions npcTypes selected=system.npcType}}</select>
+      </div>
+      <div class="resources">
+        <label>{{localize "SPYCRAFT.Vitality"}} <input name="system.vitality.value" type="number" value="{{system.vitality.value}}" /> / <input name="system.vitality.max" type="number" value="{{system.vitality.max}}" /></label>
+        <label>{{localize "SPYCRAFT.Wounds"}} <input name="system.wounds.value" type="number" value="{{system.wounds.value}}" /> / <input name="system.wounds.max" type="number" value="{{system.wounds.max}}" /></label>
+      </div>
+    </div>
+  </header>
+  <div class="abilities-row">
+    {{#each abilities}}
+      <div class="ability"><a data-action="rollAbility" data-ability="{{key}}">{{label}}</a>
+        <input name="system.abilities.{{key}}.value" type="number" value="{{value}}" class="w-2" /> <span class="mod">{{signed mod}}</span></div>
+    {{/each}}
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><input name="system.bab" type="number" value="{{system.bab}}" class="w-2" /></div>
+    {{#each saves}}<div class="stat"><a data-action="rollSave" data-save="{{key}}">{{label}}</a><input name="system.saves.{{key}}.base" type="number" value="{{base}}" class="w-2" /><b>{{signed total}}</b></div>{{/each}}
+    <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><input name="system.defense.bonus" type="number" value="{{system.defense.bonus}}" class="w-2" /><b>{{system.defense.total}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.Initiative"}}</span><input name="system.initiative.bonus" type="number" value="{{system.initiative.bonus}}" class="w-2" /><b>{{signed system.initiative.total}}</b></div>
+  </div>
+  <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
+  <ul class="item-list compact">
+    {{#each weapons}}<li data-item-id="{{item.id}}"><a data-action="rollAttack" class="name">{{item.name}} {{signed attack.total}}</a> <a data-action="rollDamage">{{item.system.damage}}</a>
+      <span class="controls"><a data-action="itemEdit"><i class="fa-solid fa-pen"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></span></li>{{/each}}
+  </ul>
+  <h3>{{localize "SPYCRAFT.Items"}}</h3>
+  <ul class="item-list compact">
+    {{#each otherItems}}<li data-item-id="{{id}}"><a data-action="itemEdit" class="name">{{name}}</a> <span class="muted">{{localize (concat "TYPES.Item." type)}}</span>
+      <span class="controls"><a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></span></li>{{/each}}
+  </ul>
+  {{#if editable}}<prose-mirror name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
+</section>

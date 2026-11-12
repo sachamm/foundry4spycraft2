@@ -1,0 +1,10 @@
+<section class="tab bio {{tab.cssClass}}" data-tab="bio" data-group="primary">
+  <div class="details-grid">
+    {{#each system.details as |v k|}}
+      <label>{{k}} <input type="text" name="system.details.{{k}}" value="{{v}}" /></label>
+    {{/each}}
+  </div>
+  {{#if editable}}
+    <prose-mirror name="system.biography" value="{{system.biography}}" collaborate="true" data-document-uuid="{{actor.uuid}}">{{{enrichedBiography}}}</prose-mirror>
+  {{else}}{{{enrichedBiography}}}{{/if}}
+</section>

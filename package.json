@@ -1,0 +1,13 @@
+{
+  "name": "spycraft2",
+  "private": true,
+  "type": "module",
+  "description": "Spycraft 2.0 game system for Foundry VTT",
+  "scripts": {
+    "build": "node tools/build-packs.mjs",
+    "test": "node tools/test-engine.mjs"
+  },
+  "devDependencies": {
+    "classic-level": "^1.4.1"
+  }
+}

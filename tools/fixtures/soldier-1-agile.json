@@ -1,0 +1,249 @@
+{
+ "name": "soldier-1-agile",
+ "spec": {
+  "abilities": {
+   "str": 14,
+   "dex": 14,
+   "con": 12,
+   "int": 10,
+   "wis": 10,
+   "cha": 8
+  },
+  "talent": "Agile",
+  "specialty": "Special Ops",
+  "classes": [
+   "Soldier"
+  ],
+  "skillPoints": [
+   {
+    "athletics": 8,
+    "notice": 4,
+    "sneak": 4
+   }
+  ],
+  "feats": []
+ },
+ "expected": {
+  "abilities": {
+   "str": 12,
+   "dex": 16,
+   "con": 12,
+   "int": 10,
+   "wis": 10,
+   "cha": 8
+  },
+  "pointsRemaining": 12,
+  "level": 1,
+  "bab": 1,
+  "fort": 2,
+  "ref": 4,
+  "will": 2,
+  "defense": 13,
+  "init": 5,
+  "wealth": 0,
+  "gear": {
+   "R": 0,
+   "T": 0,
+   "V": 0,
+   "S": 0,
+   "G": 0,
+   "W": 1,
+   "E": 0
+  },
+  "vitality": 13,
+  "wounds": 12,
+  "knowledge": 1,
+  "speed": 35,
+  "actionDice": 3,
+  "actionDie": 4,
+  "subplots": 1,
+  "contacts": 1,
+  "interests": 2,
+  "maxRanks": 4,
+  "skillPoints": [
+   16
+  ],
+  "skills": {
+   "acrobatics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 20
+   },
+   "analysis": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "athletics": {
+    "ranks": 8,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 30
+   },
+   "blend": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "bluff": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "bureaucracy": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "computers": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "cultures": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "drive": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "electronics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "falsify": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "impress": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "intimidate": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "investigation": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "manipulate": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "mechanics": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "medicine": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "networking": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "notice": {
+    "ranks": 4,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 20
+   },
+   "profession": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "resolve": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "science": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "search": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "security": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "senseMotive": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "sleightOfHand": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "sneak": {
+    "ranks": 2,
+    "bonus": 1,
+    "threat": 20,
+    "cap": 15
+   },
+   "streetwise": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "survival": {
+    "ranks": 0,
+    "bonus": 0,
+    "threat": 20,
+    "cap": 15
+   },
+   "tactics": {
+    "ranks": 0,
+    "bonus": 1,
+    "threat": 20,
+    "cap": 15
+   }
+  }
+ }
+}

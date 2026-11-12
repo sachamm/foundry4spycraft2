@@ -1,0 +1,52 @@
+<section class="tab training {{tab.cssClass}}" data-tab="training" data-group="primary">
+  <div class="cols">
+    <div class="col">
+      <h3>{{localize "SPYCRAFT.Proficiencies"}} <span class="points {{#if (sc2lt system.proficiencyPicks.remaining 0)}}bad{{/if}}">{{system.proficiencyPicks.used}} / {{system.proficiencyPicks.available}}</span></h3>
+      <table class="profs">
+        <thead><tr><th></th><th>{{localize "SPYCRAFT.Proficient"}}</th><th>{{localize "SPYCRAFT.Forte"}}</th></tr></thead>
+        <tbody>
+        {{#each proficiencies}}
+          <tr><th>{{label}}{{#if hint}} <span class="tag" data-tooltip="SPYCRAFT.ProficiencyHint">x</span>{{/if}}</th>
+            <td><input type="checkbox" name="system.proficiencies.{{key}}.proficient" {{checked proficient}} /></td>
+            <td><input type="checkbox" name="system.proficiencies.{{key}}.forte" {{checked forte}} /></td></tr>
+        {{/each}}
+        </tbody>
+      </table>
+      <h3>{{localize "SPYCRAFT.Interests"}} <span class="points">{{system.interestPicks.used}} / {{system.interestPicks.available}}</span></h3>
+      <textarea name="system.interests" rows="3" placeholder="{{localize 'SPYCRAFT.InterestsHint'}}">{{system.interests}}</textarea>
+      <h3>{{localize "SPYCRAFT.Subplots"}} <span class="points">{{system.subplotPicks.used}} / {{system.subplotPicks.available}}</span>
+        <span class="controls"><a data-action="addRow" data-list="subplots"><i class="fa-solid fa-plus"></i></a></span></h3>
+      <ul class="rows">
+        {{#each system.subplots}}
+          <li><input type="checkbox" name="subplots.{{@index}}.complete" {{checked complete}} />
+            <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="sc2-subplots" />
+            <input type="text" name="subplots.{{@index}}.notes" value="{{notes}}" placeholder="{{localize 'SPYCRAFT.Notes'}}" />
+            <a data-action="removeRow" data-list="subplots" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a></li>
+        {{/each}}
+      </ul>
+      <datalist id="sc2-subplots">{{#each config.tables.subplots}}<option value="{{this}}"></option>{{/each}}</datalist>
+    </div>
+    <div class="col">
+      {{#each focusGroups}}
+        <h3>{{label}} {{localize "SPYCRAFT.Focuses"}} <span class="points {{#if (sc2lt picks.remaining 0)}}bad{{/if}}">{{picks.used}} / {{picks.available}}</span></h3>
+        <div class="focus-list">
+          {{#each options}}<label><input type="checkbox" data-action="toggleFocus" data-skill="{{../skill}}" data-value="{{name}}" {{checked checked}} /> {{name}}</label>{{/each}}
+        </div>
+      {{/each}}
+      <h3>{{localize "SPYCRAFT.ProfessionFocuses"}} <span class="points">{{system.focusPicks.profession.used}} / {{system.focusPicks.profession.available}}</span></h3>
+      <textarea name="professionText" rows="2" placeholder="{{localize 'SPYCRAFT.OnePerLine'}}">{{professionText}}</textarea>
+      <h3>{{localize "SPYCRAFT.GenericFocuses"}} <span class="points">{{system.focusPicks.generic.used}} / {{system.focusPicks.generic.available}}</span></h3>
+      <textarea name="fortesText" rows="2" placeholder="{{localize 'SPYCRAFT.OnePerLine'}}">{{fortesText}}</textarea>
+      <h3>{{localize "SPYCRAFT.Contacts"}} <span class="points {{#if (sc2lt system.contactPicks.remaining 0)}}bad{{/if}}">{{system.contactPicks.used}} / {{system.contactPicks.available}}</span>
+        <span class="controls"><a data-action="addRow" data-list="contacts"><i class="fa-solid fa-plus"></i></a></span></h3>
+      <ul class="rows">
+        {{#each system.contacts}}
+          <li><input type="text" name="contacts.{{@index}}.name" value="{{name}}" placeholder="{{localize 'Name'}}" />
+            <select name="contacts.{{@index}}.rank" data-dtype="Number">{{selectOptions ../contactGrades selected=rank}}</select>
+            <input type="text" name="contacts.{{@index}}.notes" value="{{notes}}" placeholder="{{localize 'SPYCRAFT.Notes'}}" />
+            <a data-action="removeRow" data-list="contacts" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a></li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+</section>

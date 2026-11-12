@@ -1,0 +1,27 @@
+<section class="item-details">
+  <div class="form-fields-grid">
+    <label>{{localize "SPYCRAFT.Class.Identifier"}} <input type="text" name="system.identifier" value="{{system.identifier}}" class="w-6" /></label>
+    <label><input type="checkbox" name="system.expert" {{checked system.expert}} /> {{localize "SPYCRAFT.Class.Expert"}}</label>
+    <label>{{localize "SPYCRAFT.SkillPoints"}} <input type="number" name="system.skillPoints" value="{{system.skillPoints}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Class.VitalityDie"}} d<input type="number" name="system.vitalityDie" value="{{system.vitalityDie}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Proficiencies"}} <input type="number" name="system.proficiencies" value="{{system.proficiencies}}" class="w-2" /></label>
+  </div>
+  <p><b>{{localize "SPYCRAFT.CoreAbility"}}:</b> {{system.coreAbility.name}} — {{system.coreAbility.description}}</p>
+  <p><b>{{localize "SPYCRAFT.Class.Skills"}}:</b> {{classSkills}}</p>
+  {{#if requirementsText}}<p><b>{{localize "SPYCRAFT.Class.Requirements"}}:</b> {{requirementsText}}</p>{{/if}}
+  {{#if grants}}<p><b>{{localize "SPYCRAFT.Class.FeatGrants"}}:</b> {{grants}}</p>{{/if}}
+  {{#if levelBonuses}}<p><b>{{localize "SPYCRAFT.Class.LevelBonuses"}}:</b> {{levelBonuses}}</p>{{/if}}
+  <h3>{{localize "SPYCRAFT.Class.Table"}}</h3>
+  <table class="class-table">
+    <thead><tr><th>Lvl</th><th>BAB</th><th>Fort</th><th>Ref</th><th>Will</th><th>Def</th><th>Init</th><th>{{localize "SPYCRAFT.Wealth"}}</th><th>R</th><th>T</th><th>V</th><th>S</th><th>G</th><th>W</th><th>E</th></tr></thead>
+    <tbody>{{#each system.table}}<tr><td>{{level}}</td><td>+{{bab}}</td><td>+{{fort}}</td><td>+{{ref}}</td><td>+{{will}}</td><td>+{{defense}}</td><td>+{{initiative}}</td><td>{{wealth}}</td><td>{{gearR}}</td><td>{{gearT}}</td><td>{{gearV}}</td><td>{{gearS}}</td><td>{{gearG}}</td><td>{{gearW}}</td><td>{{gearE}}</td></tr>{{/each}}</tbody>
+  </table>
+  <h3>{{localize "SPYCRAFT.Class.Abilities"}}</h3>
+  <ol class="abilities-list">{{#each abilities}}<li><b>{{level}}. {{name}}</b> — {{text}}</li>{{/each}}</ol>
+  {{#each lists}}
+    <h4>{{name}} <span class="muted">({{localize "SPYCRAFT.Class.ChoiceLevels"}} {{levels}})</span></h4>
+    <ul class="plain">{{#each options}}<li><b>{{name}}</b>{{#if description}} — {{description}}{{/if}}</li>{{/each}}</ul>
+  {{/each}}
+  <h3>{{localize "SPYCRAFT.Description"}}</h3>
+  {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+</section>

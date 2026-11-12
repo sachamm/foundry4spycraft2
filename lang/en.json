@@ -1,30 +1,68 @@
 {
   "TYPES": {
     "Actor": { "agent": "Agent", "npc": "NPC" },
-    "Item": {
-      "class": "Class",
-      "origin": "Origin",
-      "feat": "Feat",
-      "gear": "Gear",
-      "weapon": "Weapon",
-      "armor": "Armor"
-    }
+    "Item": { "class": "Class", "origin": "Origin", "feat": "Feat", "gear": "Gear", "weapon": "Weapon", "armor": "Armor" }
   },
   "SPYCRAFT": {
-    "Sheet": { "Actor": "Spycraft Actor Sheet" },
-    "Ability": {
-      "str": "Strength",
-      "dex": "Dexterity",
-      "con": "Constitution",
-      "int": "Intelligence",
-      "wis": "Wisdom",
-      "cha": "Charisma"
-    },
+    "Sheet": { "Agent": "Spycraft Agent Sheet", "Npc": "Spycraft NPC Sheet", "Item": "Spycraft Item Sheet" },
+    "Tab": { "Main": "Main", "Classes": "Classes", "Skills": "Skills", "Feats": "Feats", "Training": "Training", "Gear": "Gear", "Bio": "Bio" },
+    "Ability": { "str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma" },
     "Save": { "fort": "Fortitude", "ref": "Reflex", "will": "Will" },
-    "Level": "Level",
-    "Vitality": "Vitality",
-    "Wounds": "Wounds",
-    "Defense": "Defense",
-    "Initiative": "Initiative"
+    "Origin": { "Label": "Origin", "talent": "Talent", "specialty": "Specialty", "Type": "Origin type", "Grants": "Grants feats",
+      "ChooseTalent": "Choose talent…", "ChooseSpecialty": "Choose specialty…" },
+    "Class": {
+      "Label": "Class", "Level": "Class level", "Base": "Base class", "Expert": "Expert class", "Identifier": "Identifier",
+      "AddLevel": "Add level", "RemoveLevel": "Remove last level", "RemoveLevelConfirm": "Remove the most recent career level (and its skill points)?",
+      "NoLevels": "No levels yet — click “Add level” or drop a class from the Classes compendium.",
+      "MaxLevel": "An agent can't exceed Career Level 20.",
+      "ExpertTooEarly": "{name} is an expert class and can only be taken from Career Level 5.",
+      "VitalityDie": "Vitality die", "Skills": "Class skills", "Requirements": "Requirements", "FeatGrants": "Granted feats",
+      "LevelBonuses": "Level bonuses", "Table": "Class table", "Abilities": "Class abilities", "ChoiceLevels": "chosen at levels"
+    },
+    "Skill": {
+      "Label": "Skill", "Class": "Class", "Points": "Pts", "Ranks": "Ranks", "Bonus": "Bonus", "Misc": "Misc", "Total": "Total",
+      "Threat": "Threat", "Cap": "Cap", "SpendAtLevel": "Spend points for level", "MaxRanks": "Max ranks", "ClassPicks": "Extra class skills",
+      "CrossClass": "cross-class", "NeedLevel": "Add a class level to start buying skill ranks.",
+      "ClassOverrideHint": "Tick to make this a class skill (talents, class abilities, etc.).",
+      "Hint": "Highlighted rows are class skills. Points spent on a skill that isn't a class skill for the class taken at that level buy half ranks. * = focus skill."
+    },
+    "Feat": {
+      "Slots": "Feat slots", "Browse": "Browse feats", "Any": "Any", "Granted": "Granted", "None": "No feats yet.",
+      "SyncGrantsHint": "Re-sync feats granted by your specialty and class levels", "Tree": "Feat tree", "Ranks": "Times taken",
+      "Prerequisites": "Prerequisites", "NotChecked": "partly unchecked", "EditPrereqs": "Edit prerequisites (JSON)",
+      "BadPrereqJSON": "Prerequisites must be valid JSON."
+    },
+    "Browser": {
+      "Title": "Browse {type}", "Search": "Search…", "All": "All", "QualifiedOnly": "Qualified only",
+      "Added": "Added {name} to {actor}.", "Empty": "Nothing matches.", "MissingPack": "Compendium not found — run `npm run build`."
+    },
+    "Roll": { "Threat": "Threat!", "Error": "Error!", "Capped": "Result capped at {cap}.", "Range": "(error {error}, threat {threat})" },
+    "ActionDice": { "Label": "Action dice", "Spend": "Spend an action die", "Refresh": "Refresh to maximum", "None": "No action dice left." },
+    "Weapon": { "Untrained": "untrained (penalty applied, error +2)", "NoDamage": "{name} has no rollable damage.", "Error": "Error", "Threat": "Threat",
+      "Ammo": "Ammo", "Recoil": "Recoil", "SizeHands": "Size/hands", "Qualities": "Qualities", "UntrainedPenalty": "Untrained penalty" },
+    "ArmorField": { "Defense": "Defense", "Check": "Armor check", "Notice": "Notice DC", "Resistances": "Resistances" },
+    "Bonus": { "Target": "Target", "Value": "Value", "None": "No bonuses.",
+      "Hint": "Values may be formulas: @level, @tb.t1 (talent bonus by level), @abilities.cha.mod, @rank, max(1, …)." },
+    "Codename": "Code name", "CareerLevel": "Career Level", "Level": "Level", "XP": "XP", "Vitality": "Vitality", "Wounds": "Wounds",
+    "Defense": "Defense", "Initiative": "Initiative", "Speed": "Speed", "BAB": "Base attack", "Attack": "Attack", "Damage": "Damage",
+    "AttackUnarmed": "Unarmed", "AttackMelee": "Melee", "AttackRanged": "Ranged",
+    "Attributes": "Attributes", "PointBuy": "Points", "Base": "Base", "Cost": "Cost", "Increase": "Level", "Misc": "Misc", "Score": "Score", "Mod": "Mod",
+    "AttributeIncreases": "Attribute increases at level", "Defenses": "Saves & defense", "Combat": "Combat", "Checks": "Checks",
+    "Knowledge": "Knowledge", "Request": "Request", "GearCheck": "Gear check", "StressThreshold": "Stress threshold", "SubdualThreshold": "Subdual threshold",
+    "Weapons": "Weapons", "NoWeapons": "No weapons.", "Carrying": "Carrying capacity",
+    "Carry": { "Light": "Light", "Medium": "Med", "Heavy": "Heavy", "Extreme": "Extreme", "Lift": "Lift overhead/ground", "Push": "Push" },
+    "MiscModifiers": "Miscellaneous modifiers (Final Totals “Misc” column)",
+    "Progression": "Level progression", "VitalityRoll": "Vitality roll", "SkillPoints": "Skill points", "Max": "max",
+    "CoreAbilities": "Core abilities", "CoreAbility": "Core ability",
+    "Proficiencies": "Weapon proficiencies", "Proficient": "Prof.", "Forte": "Forte", "Proficiency": "Proficiency",
+    "ProficiencyHint": "Something you have grants this proficiency — tick it to claim it.",
+    "Interests": "Interests", "InterestsHint": "One interest per line or comma-separated", "Subplots": "Subplots", "Notes": "Notes",
+    "Focuses": "focuses", "ProfessionFocuses": "Profession focuses", "GenericFocuses": "Extra focuses & fortes", "OnePerLine": "One per line",
+    "Contacts": "Contacts", "Wealth": "Wealth", "Spent": "Spent", "Rank": "Rank", "Lifestyle": "Lifestyle", "Vehicle": "vehicle",
+    "Possessions": "Possessions", "SpendingCash": "Spending cash", "Reputation": "Reputation", "NetWorth": "Net worth",
+    "CommonItems": "Common items", "Mission": "mission", "GearPicks": "Mission gear picks", "Armor": "Armor", "Gear": "Gear", "Items": "Items",
+    "Range": "Range", "Caliber": "Caliber", "Pick": "Pick", "Quantity": "Qty", "Weight": "Weight", "Equip": "Equip", "Equipped": "Equipped",
+    "Reserve": "Reserve pick", "TeamPool": "Team pool", "Source": "Source", "ToChat": "Post to chat", "Description": "Description",
+    "Bonuses": "Bonuses", "Warnings": "Character-building warnings", "ThreatLevel": "Threat level"
   }
 }
