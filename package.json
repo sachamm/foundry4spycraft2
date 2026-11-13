@@ -5,7 +5,7 @@
   "description": "Spycraft 2.0 game system for Foundry VTT",
   "scripts": {
     "build": "node tools/build-packs.mjs",
-    "test": "node tools/test-engine.mjs && node --test tools/test-audit.mjs"
+    "test": "node tools/test-engine.mjs && node --test tools/test-audit.mjs tools/test-sheets.mjs"
   },
   "devDependencies": {
     "classic-level": "^1.4.1"
