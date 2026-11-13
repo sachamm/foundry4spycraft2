@@ -1,4 +1,5 @@
 import { resolveSkillResult } from "../rules/checks.mjs";
+import { grantAcquisitionLevel } from "../rules/progression.mjs";
 import { checkPrerequisites } from "../rules/prerequisites.mjs";
 import { prerequisiteContext } from "../rules/engine.mjs";
 
@@ -229,13 +230,24 @@ export class SpycraftActor extends Actor {
           delete data._id;
           data.system.granted = true;
           data.system.grantSource = required.get(name);
+          data.system.acquiredAtLevel = grantAcquisitionLevel(this.items, this.system.progression, name);
           toCreate.push(data);
         } else {
-          toCreate.push({ name, type: "feat", system: { granted: true, grantSource: required.get(name) } });
+          toCreate.push({ name, type: "feat", system: { granted: true, grantSource: required.get(name),
+            acquiredAtLevel: grantAcquisitionLevel(this.items, this.system.progression, name) } });
         }
       }
     }
+    const toUpdate = [];
+    for (const [key, existing] of have) {
+      if (!existing.system.granted || !requiredNames.has(key)) continue;
+      const level = grantAcquisitionLevel(this.items, this.system.progression, existing.name);
+      if (level && existing.system.acquiredAtLevel !== level) {
+        toUpdate.push({ _id: existing.id, "system.acquiredAtLevel": level });
+      }
+    }
     if (toDelete.length) await this.deleteEmbeddedDocuments("Item", toDelete.map(i => i.id));
+    if (toUpdate.length) await this.updateEmbeddedDocuments("Item", toUpdate);
     if (toCreate.length) await this.createEmbeddedDocuments("Item", toCreate);
   }
 
