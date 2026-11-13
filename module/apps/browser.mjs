@@ -123,6 +123,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       }
       const data = doc.toObject();
       delete data._id;
+      if (doc.type === "feat") data.system.acquiredAtLevel = Math.max(1, this.actor.system.level ?? 1);
       await this.actor.createEmbeddedDocuments("Item", [data]);
     }
     ui.notifications.info(game.i18n.format("SPYCRAFT.Browser.Added", { name: doc.name, actor: this.actor.name }));
