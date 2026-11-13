@@ -46,6 +46,21 @@
   padding-right: 6px;
 }
 
+/* NPC sheet viewport. The sheet is a single part whose root is the scroll
+ * container named in PARTS.scrollable, so its position survives re-renders. */
+.spycraft2.sheet.npc .window-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.spycraft2.sheet.npc .window-content > .spycraft2-sheet {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-right: 6px;
+}
+
 /* Biography uses the remaining tab height in both reading and editing modes.
  * Keep this on the active tab so inactive tabs remain hidden. The minimum
  * editor height lets the tab scroll when a short window cannot fit both parts. */
