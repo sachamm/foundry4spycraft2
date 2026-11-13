@@ -47,7 +47,7 @@ export class SpycraftItem extends Item {
 
   /** Post the item's description to chat. */
   async toChat() {
-    const content = `<div class="spycraft2 chat-card"><h3>${this.name}</h3>${this.system.description ?? ""}</div>`;
+    const content = `<div class="spycraft2 chat-card"><h3>${foundry.utils.escapeHTML(this.name)}</h3>${this.system.description ?? ""}</div>`;
     return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this.parent }), content });
   }
 }
