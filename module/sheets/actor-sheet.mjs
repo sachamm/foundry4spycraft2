@@ -354,7 +354,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   static #onItemChat(event, target) { return this._item(target)?.toChat(); }
   static #onItemEquip(event, target) {
     const item = this._item(target);
-    return item?.update({ "system.equipped": !item.system.equipped });
+    if (!item) return;
+    if (item.type === "armor" && !item.system.equipped) {
+      // Toggle all suits in one embedded-document update, so never count two.
+      return this.actor.updateEmbeddedDocuments("Item", [
+        ...this.actor.items.filter(i => i.type === "armor" && i.system.equipped)
+          .map(i => ({ _id: i.id, "system.equipped": false })),
+        { _id: item.id, "system.equipped": true }
+      ]);
+    }
+    return item.update({ "system.equipped": !item.system.equipped });
   }
   static #onCreateItem(event, target) {
     const type = target.dataset.type;
