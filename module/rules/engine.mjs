@@ -7,7 +7,7 @@
  */
 import { evaluate, stepLookup } from "./formula.mjs";
 import { checkPrerequisites } from "./prerequisites.mjs";
-import { purchasedSkillRanks, availableSkillPoints } from "./checks.mjs";
+import { purchasedSkillRanks, availableSkillPoints, skillErrorRange, vitalityGain } from "./checks.mjs";
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const GEAR = ["R", "T", "V", "S", "G", "W", "E"];
@@ -306,15 +306,17 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.gearCheck = level + abil.wis.mod + (misc.gearCheck ?? 0);
   sys.speed = 30 + B.get("speed") + armorSpeed + (misc.speed ?? 0);
 
-  // Vitality: max die at level 1, then rolls; Con modifier every level.
+  // Vitality: max die at level 1, then rolls; Con modifier every level, but never less than 1 per level.
+  // A level that has not been rolled yet only counts a Constitution bonus (never a penalty).
   let vit = 0;
   const vitMissing = [];
   progression.forEach((entry, idx) => {
     const ci = classAtLevel[idx];
     const die = ci?.system.vitalityDie ?? 0;
     const roll = idx === 0 ? die : Number(entry.vitality) || 0;
-    if (idx > 0 && !entry.vitality) vitMissing.push(idx + 1);
-    vit += roll + abil.con.mod;
+    const unrolled = idx > 0 && !entry.vitality;
+    if (unrolled) vitMissing.push(idx + 1);
+    vit += unrolled ? Math.max(0, abil.con.mod) : vitalityGain(roll, abil.con.mod);
   });
   if (vitMissing.length) todo.push({ order: 15, tab: "classes", text: `Vitality not rolled for level ${vitMissing.join(", ")}.` });
   sys.vitality ??= { value: 0 };
@@ -352,6 +354,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
       isClass: anyClass.has(sd.key) || talentClassSkill.has(sd.key) || !!stored.classSkill,
       classOverride: !!stored.classSkill,
       threat: 20 - B.get(`skills.${sd.key}.threat`),
+      untrained: ranks === 0, error: skillErrorRange(ranks),
       cap: Math.min(60, capRow + B.get(`skills.${sd.key}.cap`)),
       overMax: ranks > maxRanks
     };

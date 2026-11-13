@@ -32,7 +32,7 @@
   </div>
   <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
   <ul class="item-list compact">
-    {{#each weapons}}<li data-item-id="{{item.id}}"><a data-action="rollAttack" class="name">{{item.name}} {{signed attack.total}}</a> <a data-action="rollDamage">{{item.system.damage}}</a>
+    {{#each weapons}}<li data-item-id="{{item.id}}"><a data-action="rollAttack" class="name">{{item.name}} {{signed attack.total}}</a> <a data-action="rollDamage">{{item.system.damage}}{{#if attack.damageBonus}} <span data-tooltip="SPYCRAFT.Weapon.StrengthDamageHint">{{signed attack.damageBonus}}</span>{{/if}}</a>
       <span class="controls"><a data-action="itemEdit"><i class="fa-solid fa-pen"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></span></li>{{/each}}
   </ul>
   <h3>{{localize "SPYCRAFT.Items"}}</h3>

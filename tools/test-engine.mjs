@@ -185,5 +185,29 @@ console.log("• legal and illegal purchase-time skill ranks");
     over.warnings.some(w=>w.includes("purchase-time maximum")),true);
 }
 
+console.log("• result caps follow Table 2.4, untrained error range, vitality floor");
+{
+  const soldier = packs.classes.Soldier;
+  const ci = {id:"soldier",name:soldier.name,type:soldier.type,system:clone(soldier.system)};
+  // Class-skill points per level chosen so the running ranks hit each band edge of Table 2.4.
+  const want = {0:15, 1:20, 3:20, 4:30, 6:30, 7:40, 9:40, 10:50, 12:50, 13:60};
+  for (const [ranks, cap] of Object.entries(want)) {
+    const sys = blankAgent();
+    const n = Number(ranks);
+    sys.progression = Array.from({length:10},(_,i)=>({classId:ci.system.identifier,vitality:1,
+      skills: i===0 && n ? {athletics:Math.min(n,4)} : (i>0 && n>3+i ? {athletics:1} : {})}));
+    computeAgent(sys,[ci],cfg);
+    expect(`fixture built ${ranks} Athletics ranks`, sys.skillTotals.athletics.ranks, n);
+    expect(`${ranks} ranks -> result cap ${cap}`, sys.skillTotals.athletics.cap, cap);
+    expect(`${ranks} ranks -> error range`, sys.skillTotals.athletics.error, n ? 1 : 3);
+  }
+  const frail = blankAgent();
+  frail.abilities.con.base = 6;   // -2 modifier
+  frail.progression = [1,1,5,0].map((v,i)=>({classId:ci.system.identifier,vitality:i?v:0,skills:{}}));
+  computeAgent(frail,[ci],cfg);
+  // L1: 12-2 = 10; L2: roll 1-2 -> 1; L3: 5-2 = 3; L4 unrolled: 0 (a penalty is not applied before the roll).
+  expect("Con penalty never takes a level's vitality below 1", frail.vitality.max, 14);
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed across ${fixtures.length} fixture(s).`);
 process.exit(failures ? 1 : 0);

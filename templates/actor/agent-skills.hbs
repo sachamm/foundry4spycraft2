@@ -11,7 +11,7 @@
     <thead><tr>
       <th>{{localize "SPYCRAFT.Skill.Label"}}</th><th data-tooltip="SPYCRAFT.Skill.ClassOverrideHint">{{localize "SPYCRAFT.Skill.Class"}}</th>
       <th>{{localize "SPYCRAFT.Skill.Points"}}</th><th>{{localize "SPYCRAFT.Skill.Ranks"}}</th><th>{{localize "SPYCRAFT.Skill.Bonus"}}</th>
-      <th>{{localize "SPYCRAFT.Skill.Misc"}}</th><th>{{localize "SPYCRAFT.Skill.Total"}}</th><th>{{localize "SPYCRAFT.Skill.Threat"}}</th><th>{{localize "SPYCRAFT.Skill.Cap"}}</th>
+      <th>{{localize "SPYCRAFT.Skill.Misc"}}</th><th>{{localize "SPYCRAFT.Skill.Total"}}</th><th data-tooltip="SPYCRAFT.Skill.ErrorHint">{{localize "SPYCRAFT.Skill.Error"}}</th><th>{{localize "SPYCRAFT.Skill.Threat"}}</th><th>{{localize "SPYCRAFT.Skill.Cap"}}</th>
     </tr></thead>
     <tbody>
     {{#each skills}}
@@ -23,6 +23,7 @@
         <td>{{#if bonus}}<span {{sc2tip bonusTip}}>{{signed bonus}}</span>{{/if}}</td>
         <td><input type="number" name="system.skills.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
         <td>{{#each totals}}<a data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" {{sc2tip tip}}>{{signed total}}</a>{{#unless @last}} / {{/unless}}{{/each}}</td>
+        <td class="{{#if untrained}}bad{{/if}}">{{#if (sc2lt 1 error)}}1-{{error}}{{else}}{{error}}{{/if}}</td>
         <td><span {{sc2tip threatTip}}>{{#if (sc2lt threat 20)}}{{threat}}-20{{else}}20{{/if}}</span></td>
         <td><span {{sc2tip capTip}}>{{cap}}</span></td>
       </tr>

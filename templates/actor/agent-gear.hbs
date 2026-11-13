@@ -30,7 +30,7 @@
       <tr data-item-id="{{item.id}}">
         <td><a data-action="itemEdit">{{item.name}}</a></td>
         <td><a data-action="rollAttack" class="{{#unless attack.trained}}bad{{/unless}}" data-tooltip="{{#unless attack.trained}}SPYCRAFT.Weapon.Untrained{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</a></td>
-        <td><a data-action="rollDamage">{{item.system.damage}}</a></td>
+        <td><a data-action="rollDamage">{{item.system.damage}}{{#if attack.damageBonus}} <span data-tooltip="SPYCRAFT.Weapon.StrengthDamageHint">{{signed attack.damageBonus}}</span>{{/if}}</a></td>
         <td>{{item.system.error}}/{{item.system.threat}}</td>
         <td>{{#if item.system.range}}{{item.system.range}} ft{{/if}}</td>
         <td>{{caliber}}</td><td>{{item.system.pick}}</td>

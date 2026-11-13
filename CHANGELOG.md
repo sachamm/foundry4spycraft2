@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Skill result caps now follow Table 2.4 (1–3 ranks 20, 4–6 ranks 30, 7–9 ranks 40, 10–12 ranks 50); they were one
+  band too low for 1–2, 4–5, 7–8 and 10–11 ranks.
+- Untrained skill checks (0 ranks) roll with an error range of 1–3, and the skills tab shows each skill's error range.
+- Melee, unarmed and non-explosive hurled damage rolls add the Strength modifier; a penalty cannot take damage below 1.
+- A Constitution penalty can no longer reduce the vitality gained at a level below 1.
+
 ## 0.3.0
 
 - Now requires Foundry VTT v14 (verified on 14.370).

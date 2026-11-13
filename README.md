@@ -11,7 +11,7 @@ Foundry loads systems from `{userData}/Data/systems/<id>`. Symlink this folder t
 
 ```bash
 # macOS (default user data path)
-ln -s "/Volumes/New Master/Users/sacha ON NEW MASTER/Development/Foundry/Spycraft" \
+ln -s "/Volumes/New Master/Users/sacha ON NEW MASTER/Development/Foundry/claude/foundry4spycraft2" \
   "$HOME/Library/Application Support/FoundryVTT/Data/systems/spycraft2"
 ```
 

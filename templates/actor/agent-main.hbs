@@ -61,7 +61,7 @@
           <li data-item-id="{{item.id}}">
             <a data-action="rollAttack" class="name">{{item.name}}</a>
             <span class="{{#unless attack.trained}}bad{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</span>
-            <a data-action="rollDamage">{{item.system.damage}}</a>
+            <a data-action="rollDamage">{{item.system.damage}}{{#if attack.damageBonus}} <span data-tooltip="SPYCRAFT.Weapon.StrengthDamageHint">{{signed attack.damageBonus}}</span>{{/if}}</a>
           </li>
         {{else}}<li class="muted">{{localize "SPYCRAFT.NoWeapons"}}</li>{{/each}}
       </ul>

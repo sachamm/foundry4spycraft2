@@ -22,7 +22,7 @@
     },
     "Skill": {
       "Label": "Skill", "Class": "Class", "Points": "Pts", "Ranks": "Ranks", "Bonus": "Bonus", "Misc": "Misc", "Total": "Total",
-      "Threat": "Threat", "Cap": "Cap", "SpendAtLevel": "Spend points for level", "MaxRanks": "Max ranks", "ClassPicks": "Extra class skills",
+      "Threat": "Threat", "Error": "Error", "ErrorHint": "Error range. A skill with 0 ranks is untrained: its error range is 1-3.", "Untrained": "untrained", "Cap": "Cap", "SpendAtLevel": "Spend points for level", "MaxRanks": "Max ranks", "ClassPicks": "Extra class skills",
       "CrossClass": "cross-class", "NeedLevel": "Add a class level to start buying skill ranks.",
       "ClassOverrideHint": "Tick to make this a class skill (talents, class abilities, etc.).",
       "Hint": "Highlighted rows are class skills. Points spent on a skill that isn't a class skill for the class taken at that level buy half ranks. * = focus skill."
@@ -41,7 +41,7 @@
     },
     "Roll": { "Threat": "Threat!", "Error": "Error!", "Capped": "Result capped at {cap}.", "Range": "(error {error}, threat {threat})" },
     "ActionDice": { "Label": "Action dice", "Spend": "Spend an action die", "Refresh": "Refresh to maximum", "None": "No action dice left." },
-    "Weapon": { "Untrained": "untrained (penalty applied, error +2)", "NoDamage": "{name} has no rollable damage.", "Error": "Error", "Threat": "Threat",
+    "Weapon": { "Untrained": "untrained (penalty applied, error +2)", "NoDamage": "{name} has no rollable damage.", "StrengthDamage": "{mod} Str", "StrengthDamageHint": "Strength modifier, added when damage is rolled.", "Error": "Error", "Threat": "Threat",
       "Ammo": "Ammo", "Recoil": "Recoil", "SizeHands": "Size/hands", "Qualities": "Qualities", "UntrainedPenalty": "Untrained penalty" },
     "ArmorField": { "Defense": "Defense", "Check": "Armor check", "Notice": "Notice DC", "Resistances": "Resistances" },
     "Bonus": { "Target": "Target", "Value": "Value", "None": "No bonuses.",

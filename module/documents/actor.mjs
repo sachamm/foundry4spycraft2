@@ -1,4 +1,4 @@
-import { resolveSkillResult } from "../rules/checks.mjs";
+import { resolveSkillResult, damageAddsStrength, strengthDamageFormula } from "../rules/checks.mjs";
 import { grantAcquisitionLevel } from "../rules/progression.mjs";
 import { checkPrerequisites } from "../rules/prerequisites.mjs";
 import { prerequisiteContext } from "../rules/engine.mjs";
@@ -54,8 +54,8 @@ export class SpycraftActor extends Actor {
     const t = sk.totals.find(x => x.ability === (ability ?? sk.ability)) ?? sk.totals[0];
     const abil = game.i18n.localize(CONFIG.SPYCRAFT.abilities[t.ability]);
     return this.rollCheck("1d20 + @total", { total: t.total }, {
-      flavor: `${sk.name} (${abil})${sk.isClass ? "" : ` — ${game.i18n.localize("SPYCRAFT.Skill.CrossClass")}`}`,
-      threat: sk.threat, cap: sk.cap
+      flavor: `${sk.name} (${abil})${sk.isClass ? "" : ` — ${game.i18n.localize("SPYCRAFT.Skill.CrossClass")}`}${sk.untrained ? ` — ${game.i18n.localize("SPYCRAFT.Skill.Untrained")}` : ""}`,
+      threat: sk.threat, error: sk.error ?? 1, cap: sk.cap
     });
   }
 
@@ -71,8 +71,10 @@ export class SpycraftActor extends Actor {
   async rollDamage(item) {
     const formula = item.system.damageFormula;
     if (!formula) return ui.notifications.warn(game.i18n.format("SPYCRAFT.Weapon.NoDamage", { name: item.name }));
-    const roll = await new Roll(formula, this.getRollData()).evaluate();
-    return roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor: this }), flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${item.name} (${item.system.damage})` });
+    const str = this.weaponDamageBonus(item);
+    const roll = await new Roll(strengthDamageFormula(formula, str), this.getRollData()).evaluate();
+    const strNote = str ? ` ${game.i18n.format("SPYCRAFT.Weapon.StrengthDamage", { mod: `${str > 0 ? "+" : ""}${str}` })}` : "";
+    return roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor: this }), flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${item.name} (${item.system.damage})${strNote}` });
   }
 
   /** Spend an action die and roll it (action dice explode). */
@@ -82,6 +84,12 @@ export class SpycraftActor extends Actor {
     await this.update({ "system.actionDice.value": ad.value - 1 });
     const roll = await new Roll(`1d${ad.die}x${ad.bonus ? ` + ${ad.bonus}` : ""}`).evaluate();
     return roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor: this }), flavor: game.i18n.localize("SPYCRAFT.ActionDice.Spend") });
+  }
+
+  /** Strength modifier added to a weapon's damage (melee, unarmed and non-explosive hurled attacks), else 0. */
+  weaponDamageBonus(item) {
+    const w = item.system;
+    return damageAddsStrength(w.proficiency, w.damage) ? (this.system.abilities.str?.mod ?? 0) : 0;
   }
 
   /** Attack bonus for a weapon, including proficiency and forte. */
@@ -94,7 +102,7 @@ export class SpycraftActor extends Actor {
     const trained = this.type !== "agent" || !!p?.proficient;
     const forte = p?.forte ? 1 : 0;
     const total = (this.system.bab ?? 0) + mod + forte + (trained ? 0 : w.untrainedPenalty);
-    return { total, trained, ability: abil, forte, error: w.error + (trained ? 0 : 2) };
+    return { total, trained, ability: abil, forte, error: w.error + (trained ? 0 : 2), damageBonus: this.weaponDamageBonus(item) };
   }
 
   /* -------------------------------------------- */

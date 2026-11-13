@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {resolveSkillResult, purchasedSkillRanks, availableSkillPoints} from "../module/rules/checks.mjs";
+import {resolveSkillResult, purchasedSkillRanks, availableSkillPoints, skillErrorRange, vitalityGain,
+  damageAddsStrength, strengthDamageFormula} from "../module/rules/checks.mjs";
 import {checkPrerequisites} from "../module/rules/prerequisites.mjs";
 import {evaluate} from "../module/rules/formula.mjs";
 import {grantAcquisitionLevel} from "../module/rules/progression.mjs";
@@ -56,4 +57,30 @@ test("origin granting the same feat advances its acquisition to career level one
     {type:"origin",name:"Adaptable",system:{grants:["Quick Draw"]}}
   ];
   assert.equal(grantAcquisitionLevel(items,[{classId:"pointman"},{classId:"pointman"}],"Quick Draw"),1);
+});
+
+test("untrained skill checks widen the error range by 2", () => {
+  assert.equal(skillErrorRange(0), 3);
+  assert.equal(skillErrorRange(1), 1);
+  assert.equal(skillErrorRange(12), 1);
+});
+test("vitality gained at a level is never below 1", () => {
+  assert.equal(vitalityGain(1, -2), 1);
+  assert.equal(vitalityGain(3, -2), 1);
+  assert.equal(vitalityGain(4, -2), 2);
+  assert.equal(vitalityGain(8, 2), 10);
+});
+test("Strength applies to melee, unarmed and non-explosive hurled damage only", () => {
+  assert.equal(damageAddsStrength("blunt", "1d4+1 sub"), true);
+  assert.equal(damageAddsStrength("unarmed", "1d4"), true);
+  assert.equal(damageAddsStrength("hurled", "1d6"), true);
+  assert.equal(damageAddsStrength("hurled", "4d10 expl"), false);
+  assert.equal(damageAddsStrength("hurled", "2d8 fire"), false);
+  assert.equal(damageAddsStrength("handgun", "1d10+1"), false);
+  assert.equal(damageAddsStrength("rifle", "4d4"), false);
+});
+test("Strength damage formula adds a bonus and floors a penalty at 1", () => {
+  assert.equal(strengthDamageFormula("1d4+1", 2), "1d4+1 + 2");
+  assert.equal(strengthDamageFormula("1d4+1", 0), "1d4+1");
+  assert.equal(strengthDamageFormula("1d4", -2), "max(1d4 - 2, 1)");
 });

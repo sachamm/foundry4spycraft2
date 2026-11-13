@@ -80,7 +80,7 @@
     "ranks": 8,
     "bonus": 0,
     "threat": 20,
-    "cap": 30
+    "cap": 40
    },
    "blend": {
     "ranks": 0,
@@ -176,7 +176,7 @@
     "ranks": 4,
     "bonus": 0,
     "threat": 20,
-    "cap": 20
+    "cap": 30
    },
    "profession": {
     "ranks": 0,
@@ -224,7 +224,7 @@
     "ranks": 2,
     "bonus": 1,
     "threat": 20,
-    "cap": 15
+    "cap": 20
    },
    "streetwise": {
     "ranks": 0,
