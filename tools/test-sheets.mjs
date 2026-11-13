@@ -59,3 +59,20 @@ test("item sheet saves structured bonuses and prerequisites from text fields", (
   assert.deepEqual(out["system.bonuses"],[{target:"saves.ref",value:"2",level:3}]);
   assert.deepEqual(out["system.prerequisites"],{type:"level",min:4});
 });
+
+test("equipping armor unequips the previous armor in one batch", async () => {
+  const first={id:"a",type:"armor",system:{equipped:true}};
+  const second={id:"b",type:"armor",system:{equipped:false}};
+  let updates=null;
+  const actor={items:{
+    get:id=>id==="a"?first:second,
+    filter:fn=>[first,second].filter(fn)
+  },updateEmbeddedDocuments:async (_type, batch)=>{updates=batch;}};
+  const sheet=new SpycraftAgentSheet(actor);
+  const target={closest:()=>({dataset:{itemId:"b"}})};
+  await SpycraftAgentSheet.DEFAULT_OPTIONS.actions.itemEquip.call(sheet,null,target);
+  assert.deepEqual(updates,[
+    {_id:"a","system.equipped":false},
+    {_id:"b","system.equipped":true}
+  ]);
+});
