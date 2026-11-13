@@ -93,6 +93,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       progression: new ArrayField(new SchemaField({
         classId: str(),
         vitality: int(0, { min: 0 }),
+        /** Expert-class entry qualification at the time the level was taken. */
+        expertEntry: new ObjectField({ nullable: true, initial: null }),
         /** Skill points spent at this level: { skillKey: points } */
         skills: new ObjectField()
       })),
