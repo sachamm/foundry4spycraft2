@@ -32,7 +32,9 @@ export class SpycraftActor extends Actor {
     const range = `<small>${game.i18n.format("SPYCRAFT.Roll.Range", { error, threat })}</small>`;
     return roll.toMessage({
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: `${flavor} ${range}${notes.length ? `<br>${notes.join(" ")}` : ""}`
+      flavor: `${flavor} ${range}${notes.length ? `<br>${notes.join(" ")}` : ""}`,
+      flags: { spycraft2: { rawTotal: roll.total, effectiveTotal: resolved.total,
+        capped: resolved.limited, naturalDie: die } }
     });
   }
 
