@@ -1,3 +1,4 @@
+import { resolveSkillResult } from "../rules/checks.mjs";
 import { checkPrerequisites } from "../rules/prerequisites.mjs";
 import { prerequisiteContext } from "../rules/engine.mjs";
 
@@ -25,7 +26,8 @@ export class SpycraftActor extends Actor {
     const notes = [];
     if (die >= threat) notes.push(`<span class="spycraft2-threat">${game.i18n.localize("SPYCRAFT.Roll.Threat")}</span>`);
     if (die <= error) notes.push(`<span class="spycraft2-error">${game.i18n.localize("SPYCRAFT.Roll.Error")}</span>`);
-    if (cap && roll.total > cap) notes.push(game.i18n.format("SPYCRAFT.Roll.Capped", { cap }));
+    const resolved = resolveSkillResult(roll.total, die, { cap, threat });
+    if (resolved.limited) notes.push(`<strong>Effective result: ${resolved.total} (cap ${Number(cap)})</strong>`);
     const range = `<small>${game.i18n.format("SPYCRAFT.Roll.Range", { error, threat })}</small>`;
     return roll.toMessage({
       speaker: ChatMessage.getSpeaker({ actor: this }),
