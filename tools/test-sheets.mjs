@@ -9,7 +9,7 @@ class StubSheet {
 }
 globalThis.foundry = {
   applications: {
-    api: { HandlebarsApplicationMixin: Base => Base },
+    api: { HandlebarsApplicationMixin: Base => Base, ApplicationV2: StubSheet },
     sheets: { ActorSheetV2: StubSheet, ItemSheetV2: StubSheet }
   }
 };
