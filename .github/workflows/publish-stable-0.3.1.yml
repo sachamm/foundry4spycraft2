@@ -1,0 +1,77 @@
+name: Publish Spycraft 2.0 Stable 0.3.1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-stable-0.3.1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spycraft-stable-0.3.1
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TAG: v0.3.1
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Build system and verify rules and data
+        run: |
+          npm ci
+          npm run build
+          npm test
+      - name: Verify Foundry sheet layouts
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:layout
+      - name: Check stable manifest
+        run: |
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const m=JSON.parse(readFileSync("system.json","utf8"));
+            if(m.version!=="0.3.1"||m.id!=="spycraft2"||m.compatibility.minimum!=="14")process.exit(1);
+            if(m.download!=="https://github.com/sachamm/foundry4spycraft2/releases/download/v0.3.1/spycraft2.zip")process.exit(1);
+            if(m.manifest!=="https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.json")process.exit(1);
+          '
+      - name: Package and verify ZIP
+        run: |
+          zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md
+          unzip -t spycraft2.zip
+          sha256sum spycraft2.zip system.json > SHA256SUMS.txt
+      - name: Publish as latest stable release
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Refusing to overwrite stable release $TAG"
+            exit 1
+          fi
+          cat > release-notes.md <<EOF
+          Spycraft 2.0 v0.3.1 (Stable)
+
+          Promoted from the validated v0.3.1-rc.1 release candidate. Includes the rules-engine audit fixes, character progression tests, and retro espionage user interface.
+
+          Source: main at ${GITHUB_SHA}
+          Automated rules, lifecycle, data, integration-mock, and Chromium layout tests passed.
+
+          Foundry v14 install/update manifest:
+          https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/system.json
+
+          Back up worlds before updating. System ID: spycraft2.
+          EOF
+          gh release create "$TAG" system.json spycraft2.zip SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "Spycraft 2.0 v0.3.1 — Stable" \
+            --notes-file release-notes.md \
+            --latest
