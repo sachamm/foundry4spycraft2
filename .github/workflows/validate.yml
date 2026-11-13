@@ -15,8 +15,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm test
       - run: npm run build
+      - run: npm test
       - name: Verify built output parses
         run: |
           find module tools -name '*.mjs' -type f -exec node --check {} \;
