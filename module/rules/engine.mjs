@@ -156,12 +156,59 @@ export function computeAgent(sys, items, cfg) {
   if (sys.pointBuy.remaining < 0) warnings.push(`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
   if (sys.pointBuy.remaining > 0) todo.push({ order: 10, always: true, tab: "main", text: `${plural(sys.pointBuy.remaining, "attribute point")} left to spend.` });
   const abil = Object.fromEntries(ABILITIES.map(k => [k, { value: sys.abilities[k].value, mod: sys.abilities[k].mod }]));
-  /** Attribute modifier as it stood at a given career level (only earlier increases). */
-  const modAt = (k, l) => {
-    const a = sys.abilities[k];
-    const inc = cfg.abilityIncreaseLevels.filter(x => x <= l && increaseAt(x) === k).length;
-    return mod(a.base + inc + (a.misc ?? 0) + a.bonus);
+  /**
+   * Reconstruct earned bonuses at each career level. Previously current-level
+   * class/feat bonuses were applied to all earlier skill purchases.
+   * Legacy feats with no acquisition level are assumed to date from level 1.
+   */
+  const stageCache = new Map();
+  const stageAt = career => {
+    if (stageCache.has(career)) return stageCache.get(career);
+    const counts = {};
+    for (const entry of progression.slice(0, career)) {
+      if (classById.has(entry.classId)) counts[entry.classId] = (counts[entry.classId] ?? 0) + 1;
+    }
+    const historicalClasses = {};
+    const historicalBase = Object.fromEntries(Object.keys(base).map(k => [k, 0]));
+    for (const [cid, count] of Object.entries(counts)) {
+      const ci = classById.get(cid);
+      const row = ci.system.table.find(r => r.level === count) ?? ci.system.table.at(-1) ?? {};
+      historicalClasses[cid] = { levels: count, ...row };
+      for (const k of Object.keys(historicalBase)) historicalBase[k] += row[k] ?? 0;
+    }
+    const historicalTb = {
+      t1: stepLookup(T.talentBonus.t1, career),
+      t2: stepLookup(T.talentBonus.t2, career),
+      t3: stepLookup(T.talentBonus.t3, career),
+      interestBase: stepLookup(T.interests.map(r => [r[0], r[1]]), career),
+      interestTalent: stepLookup(T.interests.map(r => [r[0], r[2]]), career),
+      interestSpec: stepLookup(T.interests.map(r => [r[0], r[3]]), career)
+    };
+    const snapshot = { level: career, tb: historicalTb, classes: historicalClasses, base: historicalBase };
+    const bonusAt = (target, extra = {}) => {
+      let value = 0;
+      for (const source of sources) {
+        const taken = source.classId ? (counts[source.classId] ?? 0) >= source.requiredClassLevel
+          : (source.acquiredAtLevel ?? 1) <= career;
+        if (!taken) continue;
+        for (const b of source.bonuses) {
+          if (b.target !== target || (source.classId && (b.level ?? 0) > (counts[source.classId] ?? 0))) continue;
+          value += evaluate(b.value, { ...snapshot, ...extra, rank: source.rank });
+        }
+      }
+      return value;
+    };
+    const abilities = Object.fromEntries(ABILITIES.map(k => {
+      const a = sys.abilities[k];
+      const inc = cfg.abilityIncreaseLevels.filter(x => x <= career && increaseAt(x) === k).length;
+      const value = a.base + inc + (a.misc ?? 0) + bonusAt(`abilities.${k}`);
+      return [k, { value, mod: mod(value) }];
+    }));
+    const stage = { abilities, bonus: target => bonusAt(target, { abilities }) };
+    stageCache.set(career, stage);
+    return stage;
   };
+  const modAt = (k, l) => stageAt(l).abilities[k].mod;
 
   /* ---------------- Skills: ranks ---------------- */
   const skillDefs = Object.values(cfg.skills);
@@ -171,7 +218,7 @@ export function computeAgent(sys, items, cfg) {
     if (m && evaluate(b.value, preData)) talentClassSkill.add(m[1]);
   }
   const isClassSkillAt = (key, idx) => {
-    if (talentClassSkill.has(key) || sys.skills?.[key]?.classSkill) return true;
+    if (stageAt(idx + 1).bonus(`skills.${key}.classSkill`) || sys.skills?.[key]?.classSkill) return true;
     const ci = classAtLevel[idx];
     return !!ci?.system.classSkills?.includes(key);
   };
@@ -305,11 +352,10 @@ export function computeAgent(sys, items, cfg) {
   }
 
   // Skill points per level.
-  const spBonus = B.get("skillPoints") > 0 ? 1 : 0;
   skillPoints.forEach((sp, idx) => {
     const ci = classAtLevel[idx];
     const per = (ci?.system.skillPoints ?? 0) + modAt("int", idx + 1);
-    sp.available = availableSkillPoints(ci?.system.skillPoints ?? 0, modAt("int", idx + 1), spBonus, idx + 1);
+    sp.available = availableSkillPoints(ci?.system.skillPoints ?? 0, modAt("int", idx + 1), stageAt(idx + 1).bonus("skillPoints") > 0 ? 1 : 0, idx + 1);
     sp.remaining = sp.available - sp.spent;
     sp.className = ci?.name ?? "?";
     if (sp.remaining < 0) warnings.push(`Level ${idx + 1}: ${-sp.remaining} skill point(s) overspent.`);
