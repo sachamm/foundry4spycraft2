@@ -241,6 +241,10 @@ export function computeAgent(sys, items, cfg, options = {}) {
       // Spycraft 2.0 has no fractional skill ranks. Do not pool odd
       // cross-class purchases from separate level-up allocations.
       skillRanks[sd.key] = (skillRanks[sd.key] ?? 0) + purchase.ranks;
+      const rankLimit = idx + 4; // Career Level + 3 at the time of purchase.
+      if (skillRanks[sd.key] > rankLimit) {
+        warnings.push(`Level ${idx + 1}: ${sd.name} has ${skillRanks[sd.key]} ranks, exceeding the purchase-time maximum of ${rankLimit}.`);
+      }
     }
     skillPoints.push({ level: idx + 1, spent, available: 0, classId: entry.classId });
   });
