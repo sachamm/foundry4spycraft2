@@ -187,12 +187,26 @@ export class SpycraftActor extends Actor {
     const norm = s => s.trim().toLowerCase();
     const have = new Map();
     const toDelete = [];
+    const requiredNames = new Set([...required.keys()].map(norm));
+    const groups = new Map();
     for (const i of this.items.filter(i => i.type === "feat")) {
       const key = norm(i.name);
-      const needed = [...required.keys()].some(n => norm(n) === key);
-      // Drop granted feats that are no longer granted, and any second granted copy of the same feat.
-      if (i.system.granted && (!needed || have.get(key)?.system.granted)) toDelete.push(i);
-      else if (!have.has(key) || i.system.granted) have.set(key, i);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(i);
+    }
+    for (const [key, copies] of groups) {
+      // Prefer an explicitly selected feat to an automatically granted copy.
+      const manual = copies.find(i => !i.system.granted);
+      const grants = copies.filter(i => i.system.granted);
+      if (manual) {
+        have.set(key, manual);
+        toDelete.push(...grants);
+      } else if (requiredNames.has(key) && grants.length) {
+        have.set(key, grants[0]);
+        toDelete.push(...grants.slice(1));
+      } else {
+        toDelete.push(...grants);
+      }
     }
     const toCreate = [];
     const missing = [...required.keys()].filter(n => !have.has(norm(n)));
