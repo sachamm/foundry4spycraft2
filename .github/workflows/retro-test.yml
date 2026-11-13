@@ -1,0 +1,67 @@
+name: Retro spy test build
+
+on:
+  push:
+    branches: [feat/retro-spy-assets]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Serialize publication so an older build cannot overwrite a newer manifest.
+concurrency:
+  group: retro-spy-test-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/feat/retro-spy-assets'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TEST_TAG: test-retro
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build and validate compendiums
+        run: |
+          npm ci
+          npm run build
+          npm test
+
+      - name: Check character tab scrolling in Chromium
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:layout
+
+      - name: Prepare test manifest
+        run: |
+          node tools/prepare-retro-release.mjs
+
+      - name: Package installable system
+        run: |
+          zip -r "$TEST_ARCHIVE" system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md
+          unzip -t "$TEST_ARCHIVE"
+
+      - name: Publish test download and update manifest
+        run: |
+          printf 'Test build of feat/retro-spy-assets.\n\nCommit: %s\nVersion: %s\n\nInstall manifest: https://github.com/%s/releases/download/%s/system.json\n\nRequires Foundry 14. Uses the spycraft2 system ID and replaces any installed Spycraft 2.0 system.\n' \
+            "$GITHUB_SHA" "$TEST_VERSION" "$GITHUB_REPOSITORY" "$TEST_TAG" > release-notes.md
+          if ! gh release view "$TEST_TAG" >/dev/null 2>&1; then
+            gh release create "$TEST_TAG" --target "$GITHUB_SHA" \
+              --title 'Retro spy assets — test builds' --notes-file release-notes.md \
+              --prerelease --latest=false
+          fi
+          # Each build gets its own ZIP. Publish it first so existing manifests
+          # continue to reference a valid archive during the update.
+          gh release upload "$TEST_TAG" "$TEST_ARCHIVE"
+          gh release upload "$TEST_TAG" system.json --clobber
+          gh release edit "$TEST_TAG" --prerelease --latest=false \
+            --title 'Retro spy assets — test builds' --notes-file release-notes.md
+          printf '### Foundry test install\n\nManifest URL: https://github.com/%s/releases/download/%s/system.json\n\nVersion: %s\n' \
+            "$GITHUB_REPOSITORY" "$TEST_TAG" "$TEST_VERSION" >> "$GITHUB_STEP_SUMMARY"

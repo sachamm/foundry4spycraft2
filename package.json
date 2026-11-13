@@ -5,9 +5,11 @@
   "description": "Spycraft 2.0 game system for Foundry VTT",
   "scripts": {
     "build": "node tools/build-packs.mjs",
-    "test": "node tools/test-engine.mjs"
+    "test": "node tools/test-engine.mjs",
+    "test:layout": "playwright test --config tools/playwright.config.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "1.58.2",
     "classic-level": "^1.4.1"
   }
 }

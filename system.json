@@ -16,7 +16,8 @@
     "spycraft2.mjs"
   ],
   "styles": [
-    "styles/spycraft2.css"
+    "styles/spycraft2.css",
+    "styles/retro.css"
   ],
   "languages": [
     {
