@@ -99,12 +99,14 @@ export function computeAgent(sys, items, cfg) {
   /* ---------------- Collect bonus sources ---------------- */
   const sources = [];   // { name, bonuses, rank }
   for (const i of items) {
-    if (i.type === "origin") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [], rank: 1 });
-    else if (i.type === "feat") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [], rank: i.system.ranks ?? 1 });
+    if (i.type === "origin") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [], rank: 1, acquiredAtLevel: 1 });
+    else if (i.type === "feat") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [],
+      rank: i.system.ranks ?? 1, acquiredAtLevel: i.system.acquiredAtLevel || 1 });
     else if (i.type === "class") {
-      const lvl = classLevels[i.system.identifier || i.name] ?? 0;
+      const cid = i.system.identifier || i.name;
+      const lvl = classLevels[cid] ?? 0;
       if (!lvl) continue;
-      sources.push({ name: i.name, bonuses: (i.system.bonuses ?? []).filter(b => (b.level ?? 0) <= lvl), rank: 1 });
+      sources.push({ name: i.name, bonuses: (i.system.bonuses ?? []).filter(b => (b.level ?? 0) <= lvl), rank: 1, classId: cid, requiredClassLevel: 1 });
       const lists = Object.fromEntries((i.system.choiceLists ?? []).map(L => [L.key, L]));
       let unpicked = 0;
       (i.system.choiceSchedule ?? []).forEach((slot, idx) => {
@@ -112,7 +114,7 @@ export function computeAgent(sys, items, cfg) {
         const pick = i.system.choices?.[idx];
         const options = lists[slot.list]?.options ?? [];
         const opt = pick === null || pick === undefined || pick === "" ? null : options.find(o => o.index === Number(pick));
-        if (opt) sources.push({ name: `${i.name}: ${opt.name}`, bonuses: opt.bonuses ?? [], rank: 1 });
+        if (opt) sources.push({ name: `${i.name}: ${opt.name}`, bonuses: opt.bonuses ?? [], rank: 1, classId: cid, requiredClassLevel: slot.level });
         else if (options.length) unpicked += 1;
       });
       if (unpicked) todo.push({ order: 20, tab: "classes", text: `${i.name}: ${plural(unpicked, "class-ability choice")} to make.` });
