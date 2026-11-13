@@ -4,6 +4,7 @@
     "Item": { "class": "Class", "origin": "Origin", "feat": "Feat", "gear": "Gear", "weapon": "Weapon", "armor": "Armor" }
   },
   "SPYCRAFT": {
+    "Retro": {"AgentDossier": "Agent dossier", "SubjectDossier": "Subject dossier", "EquipmentFile": "Reference file", "Archive": "Operations archive", "Classified": "Classified"},
     "Sheet": { "Agent": "Spycraft Agent Sheet", "Npc": "Spycraft NPC Sheet", "Item": "Spycraft Item Sheet" },
     "Tab": { "Main": "Main", "Classes": "Classes", "Skills": "Skills", "Feats": "Feats", "Training": "Training", "Gear": "Gear", "Bio": "Bio" },
     "Ability": { "str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma" },

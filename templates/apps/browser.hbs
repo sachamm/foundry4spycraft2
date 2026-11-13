@@ -1,4 +1,9 @@
 <div class="browser">
+<div class="dossier-band" aria-hidden="true">
+  <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
+  <span class="file-label">{{localize "SPYCRAFT.Retro.Archive"}}</span>
+  <span class="file-stamp">{{localize "SPYCRAFT.Retro.Classified"}}</span>
+</div>
   {{#if missingPack}}<p class="bad">{{localize "SPYCRAFT.Browser.MissingPack"}}</p>{{/if}}
   <div class="filters">
     <input type="search" name="search" value="{{filters.search}}" placeholder="{{localize 'SPYCRAFT.Browser.Search'}}" />

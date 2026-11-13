@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <g stroke="#cfb77b" stroke-width="1.5">
+    <circle cx="40" cy="40" r="35"/><circle cx="40" cy="40" r="29" stroke-dasharray="1 4"/>
+    <path d="M40 18 55 26v17c0 10-15 19-15 19S25 53 25 43V26Z"/>
+    <circle cx="40" cy="38" r="10"/><path d="M40 23v30M25 38h30"/>
+  </g>
+  <circle cx="40" cy="38" r="3" fill="#cfb77b"/>
+</svg>

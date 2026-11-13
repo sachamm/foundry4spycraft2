@@ -27,6 +27,25 @@
 .spycraft2 ol.abilities-list { list-style: none; padding-left: 0; }
 .spycraft2 ol.abilities-list li { margin: 2px 0; }
 
+/* Agent tab viewport. PARTS.scrollable preserves positions; CSS must provide
+ * the actual scroll container. Let the active tab shrink below its content size
+ * while the header and navigation retain their natural height. */
+.spycraft2.sheet.agent .window-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+.spycraft2.sheet.agent .window-content > .sheet-top,
+.spycraft2.sheet.agent .window-content > .sheet-tabs { flex: 0 0 auto; }
+.spycraft2.sheet.agent .window-content > .tab {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-right: 6px;
+}
+
 /* Header */
 .spycraft2.sheet .sheet-header { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 4px; }
 .spycraft2.sheet .sheet-header .portrait { width: 84px; height: 84px; object-fit: cover; border: none; flex: 0 0 auto; }
