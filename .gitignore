@@ -23,3 +23,7 @@ packs/*/
 # Office files never belong in this repository
 *.xls
 *.xlsx
+
+# Browser layout regression artifacts
+test-results/
+playwright-report/

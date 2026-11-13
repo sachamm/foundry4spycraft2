@@ -34,6 +34,11 @@ jobs:
           npm run build
           npm test
 
+      - name: Check character tab scrolling in Chromium
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:layout
+
       - name: Prepare test manifest
         run: |
           node tools/prepare-retro-release.mjs
