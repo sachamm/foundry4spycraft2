@@ -166,5 +166,24 @@ console.log("• feat prerequisites suppress effects, including self-qualificati
   expect("eligible feat satisfies prerequisites",sys.featStatus.invalid.ok,true);
 }
 
+
+console.log("• legal and illegal purchase-time skill ranks");
+{
+  const soldier = packs.classes.Soldier;
+  const ci = {id:"soldier",name:soldier.name,type:soldier.type,system:clone(soldier.system)};
+  const legal = blankAgent();
+  for (const [k,v] of Object.entries({str:14,dex:14,con:14,int:13,wis:12,cha:10})) legal.abilities[k].base = v;
+  legal.progression = [{classId:ci.system.identifier,vitality:0,skills:{athletics:4}}];
+  computeAgent(legal,[ci],cfg);
+  expect("valid 36-point allocation",legal.pointBuy.remaining,0);
+  expect("legal skill rank allocation has no rank warning",legal.warnings.some(w=>w.includes("ranks")),false);
+
+  const over = blankAgent();
+  over.progression = Array.from({length:8},(_,i)=>({classId:ci.system.identifier,vitality:1,skills:i===0?{athletics:6}:{}}));
+  computeAgent(over,[ci],cfg);
+  expect("front-loaded ranks flagged even after the career cap increases",
+    over.warnings.some(w=>w.includes("purchase-time maximum")),true);
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed across ${fixtures.length} fixture(s).`);
 process.exit(failures ? 1 : 0);
