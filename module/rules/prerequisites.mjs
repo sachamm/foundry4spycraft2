@@ -49,7 +49,7 @@ function test(n, ctx, unmet) {
     case "lifestyle": ok = (ctx.lifestyle ?? 0) >= n.min; break;
     case "keySkill": ok = (ctx.keySkillRanks ?? 0) >= n.min; break;
     case "never": ok = false; break;
-    default: ok = true; // unknown requirement: don't block, the GM decides
+    default: ok = false; // Unsupported requirements must not be reported as satisfied
   }
   if (!ok) unmet.push(describe(n));
   return ok;
