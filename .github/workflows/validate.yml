@@ -1,0 +1,24 @@
+name: Validate
+on:
+  push:
+    branches: [main, "audit/**"]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Verify built output parses
+        run: |
+          find module tools -name '*.mjs' -type f -exec node --check {} \;
+          node --check spycraft2.mjs
+          node -e 'JSON.parse(require("fs").readFileSync("system.json","utf8"))'
