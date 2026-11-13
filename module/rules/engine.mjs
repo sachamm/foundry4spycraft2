@@ -265,7 +265,9 @@ export function computeAgent(sys, items, cfg) {
   const misc = sys.misc ?? {};
 
   /* ---------------- Gear (armor) ---------------- */
-  const armor = items.find(i => i.type === "armor" && i.system.equipped);
+  const equippedArmors = items.filter(i => i.type === "armor" && i.system.equipped);
+  if (equippedArmors.length > 1) warnings.push(`Multiple armor items equipped (${equippedArmors.length}); only the first is being counted.`);
+  const armor = equippedArmors[0];
   const armorDef = armor ? armor.system.defensePenalty + B.get("defenseArmor") : 0;
   const armorCheck = armor ? armor.system.armorCheck + B.get("armorCheck") : 0;
   const armorSpeed = armor ? armor.system.speedPenalty : 0;
