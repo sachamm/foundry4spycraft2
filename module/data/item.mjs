@@ -83,6 +83,8 @@ export class FeatData extends BaseItemData {
       prerequisites: new ObjectField({ nullable: true, initial: null }),
       prerequisitesNotChecked: new BooleanField(),
       ranks: int(1, { min: 1 }),
+      /** Career level when feat was acquired; 0 means legacy/unknown. */
+      acquiredAtLevel: int(0, { min: 0, max: 20 }),
       /** Granted by an origin or class (does not use a feat slot). */
       granted: new BooleanField(),
       grantSource: str(),
