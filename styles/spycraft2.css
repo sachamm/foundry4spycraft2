@@ -46,6 +46,24 @@
   padding-right: 6px;
 }
 
+/* Biography uses the remaining tab height in both reading and editing modes.
+ * Keep this on the active tab so inactive tabs remain hidden. The minimum
+ * editor height lets the tab scroll when a short window cannot fit both parts. */
+.spycraft2.sheet.agent .window-content > .tab.bio.active {
+  display: flex;
+  flex-direction: column;
+}
+.spycraft2.sheet.agent .tab.bio > :not(prose-mirror) { flex: 0 0 auto; }
+.spycraft2.sheet.agent .tab.bio > prose-mirror {
+  flex: 1 0 120px;
+  display: flex;
+  flex-direction: column;
+}
+.spycraft2.sheet.agent .tab.bio > prose-mirror .editor-container {
+  flex: 1;
+  min-height: 0;
+}
+
 /* Header */
 .spycraft2.sheet .sheet-header { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 4px; }
 .spycraft2.sheet .sheet-header .portrait { width: 84px; height: 84px; object-fit: cover; border: none; flex: 0 0 auto; }
