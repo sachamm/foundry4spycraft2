@@ -121,5 +121,29 @@ for (const file of fixtures) {
   if (s.warnings.length) console.log(`  warnings: ${s.warnings.join(" | ")}`);
   if (process.env.SHOW_TODO) console.log(`  to do: ${s.todo.map(t => t.text).join(" | ")}`);
 }
+
+console.log("• historical progression: Scientist Int bonus arrives at class level 6");
+{
+  const sci = packs.classes.Scientist;
+  const sys = blankAgent();
+  sys.abilities.int.base = 13;
+  sys.progression = Array.from({ length: 6 }, () => ({ classId: sci.system.identifier, vitality: 1, skills: {} }));
+  computeAgent(sys, [{ id: "scientist", name: sci.name, type: sci.type, system: clone(sci.system) }], cfg);
+  const basePoints = sci.system.skillPoints;
+  expect("Scientist skill points at career level 1", sys.skillPoints[0].available, 4 * (basePoints + 1));
+  expect("Scientist skill points at career level 5", sys.skillPoints[4].available, basePoints + 1);
+  expect("Scientist skill points at career level 6", sys.skillPoints[5].available, basePoints + 2);
+}
+console.log("• historical expert-class eligibility snapshot");
+{
+  const brawler = packs.classes.Brawler;
+  const sys = blankAgent();
+  sys.progression = [{ classId: brawler.system.identifier, vitality: 0, skills: {},
+    expertEntry: {ok: true, unmet: []} }];
+  computeAgent(sys, [{ id: "brawler", name: brawler.name, type: brawler.type, system: clone(brawler.system) }], cfg);
+  expect("entry snapshot prevents retroactive expert warning",
+    sys.warnings.some(w => w.includes("expert class requirements")), false);
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed across ${fixtures.length} fixture(s).`);
 process.exit(failures ? 1 : 0);
