@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {resolveSkillResult} from "../module/rules/checks.mjs";
+import {resolveSkillResult, purchasedSkillRanks, availableSkillPoints} from "../module/rules/checks.mjs";
 import {checkPrerequisites} from "../module/rules/prerequisites.mjs";
 import {evaluate} from "../module/rules/formula.mjs";
 
@@ -30,4 +30,15 @@ test("prerequisite combinations respect all and any", () => {
 test("formula evaluator rejects executable expressions", () => {
   assert.equal(evaluate("globalThis.process.exit(1)",{}),0);
   assert.equal(evaluate("max(1, @abilities.int.mod)",{abilities:{int:{mod:3}}}),3);
+});
+
+test("cross-class skill purchases never award half ranks", () => {
+  assert.deepEqual(purchasedSkillRanks(3,false),{ranks:1,valid:false});
+  assert.deepEqual(purchasedSkillRanks(4,false),{ranks:2,valid:true});
+  assert.deepEqual(purchasedSkillRanks(3,true),{ranks:3,valid:true});
+});
+test("skill points never drop below 1 per level, or 4 at career level 1", () => {
+  assert.equal(availableSkillPoints(2,-5,0,1),4);
+  assert.equal(availableSkillPoints(2,-5,0,3),1);
+  assert.equal(availableSkillPoints(6,2,1,1),36);
 });
