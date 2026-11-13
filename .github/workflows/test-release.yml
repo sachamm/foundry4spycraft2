@@ -1,0 +1,52 @@
+name: Publish Audit Test Build
+
+on:
+  push:
+    branches:
+      - audit/rules-lifecycle-v14-20261112
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: audit-test-release
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Stamp independent pre-release manifest
+        env:
+          TAG: v0.3.1-audit.1
+        run: |
+          VERSION="${TAG#v}"
+          jq --arg v "$VERSION" \
+             --arg dl "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/spycraft2.zip" \
+             --arg manifest "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/system.json" \
+             '.version = $v | .download = $dl | .manifest = $manifest' system.json > system.tmp
+          mv system.tmp system.json
+          zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md
+      - name: Create or refresh pre-release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v0.3.1-audit.1
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" system.json spycraft2.zip --clobber
+          else
+            gh release create "$TAG" system.json spycraft2.zip \
+              --target "$GITHUB_SHA" \
+              --title "Spycraft 2.0 Audit Test Build 0.3.1" \
+              --notes "Test build from audit/rules-lifecycle-v14-20261112. Install in a separate Foundry user-data environment or back up the stable system first. Uses the same system ID (spycraft2) as the stable release." \
+              --prerelease
+          fi
