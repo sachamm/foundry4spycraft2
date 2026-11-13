@@ -86,6 +86,10 @@ export function computeAgent(sys, items, cfg) {
   }
   sys.base = base;
   for (const originType of ["talent", "specialty"]) {
+    const count = items.filter(i => i.type === "origin" && i.system.originType === originType).length;
+    if (count > 1) warnings.push(`Multiple ${originType}s attached (${count}); only one is permitted.`);
+  }
+  for (const originType of ["talent", "specialty"]) {
     if (!items.some(i => i.type === "origin" && i.system.originType === originType)) {
       todo.push({ order: originType === "talent" ? 1 : 2, always: true, tab: "main", browse: { type: "origin", originType }, text: `Choose a ${originType}.` });
     }
