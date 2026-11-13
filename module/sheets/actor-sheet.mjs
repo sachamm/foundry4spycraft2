@@ -290,6 +290,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     if (!this.actor.isOwner) return null;
     if (item.parent === this.actor) return super._onDropItem(event, item);
     if (item.type === "class") return this.actor.addClassLevel(item);
+    if (item.type === "feat") {
+      const data = item.toObject?.() ?? foundry.utils.deepClone(item);
+      delete data._id;
+      data.system.acquiredAtLevel = Math.max(1, this.actor.system.level ?? 1);
+      return this.actor.createEmbeddedDocuments("Item", [data]);
+    }
     if (item.type === "origin") {
       const old = this.actor.items.filter(i => i.type === "origin" && i.system.originType === item.system.originType);
       if (old.length) await this.actor.deleteEmbeddedDocuments("Item", old.map(i => i.id));
@@ -348,7 +354,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   static #onItemChat(event, target) { return this._item(target)?.toChat(); }
   static #onItemEquip(event, target) {
     const item = this._item(target);
-    return item?.update({ "system.equipped": !item.system.equipped });
+    if (!item) return;
+    if (item.type === "armor" && !item.system.equipped) {
+      // Toggle all suits in one embedded-document update, so never count two.
+      return this.actor.updateEmbeddedDocuments("Item", [
+        ...this.actor.items.filter(i => i.type === "armor" && i.system.equipped)
+          .map(i => ({ _id: i.id, "system.equipped": false })),
+        { _id: item.id, "system.equipped": true }
+      ]);
+    }
+    return item.update({ "system.equipped": !item.system.equipped });
   }
   static #onCreateItem(event, target) {
     const type = target.dataset.type;

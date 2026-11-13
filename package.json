@@ -5,8 +5,9 @@
   "description": "Spycraft 2.0 game system for Foundry VTT",
   "scripts": {
     "build": "node tools/build-packs.mjs",
-    "test": "node tools/test-engine.mjs",
-    "test:layout": "playwright test --config tools/playwright.config.mjs"
+    "test": "npm run validate && node tools/test-engine.mjs && node --test tools/test-audit.mjs tools/test-sheets.mjs tools/test-lifecycle.mjs",
+    "test:layout": "playwright test --config tools/playwright.config.mjs",
+    "validate": "node tools/validate-data.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",

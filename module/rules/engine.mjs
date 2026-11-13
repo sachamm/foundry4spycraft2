@@ -7,6 +7,7 @@
  */
 import { evaluate, stepLookup } from "./formula.mjs";
 import { checkPrerequisites } from "./prerequisites.mjs";
+import { purchasedSkillRanks, availableSkillPoints } from "./checks.mjs";
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const GEAR = ["R", "T", "V", "S", "G", "W", "E"];
@@ -46,9 +47,12 @@ class Bonuses {
  * @param {object[]} items { id, name, type, system } for every embedded item
  * @param {object} cfg     CONFIG.SPYCRAFT
  */
-export function computeAgent(sys, items, cfg) {
+export function computeAgent(sys, items, cfg, options = {}) {
   const T = cfg.tables;
   const warnings = [];
+  // Only granted or presently qualified feats may contribute effects.
+  // Starting from grants prevents a feat from satisfying its own requirements.
+  const activeFeatIds = options.activeFeatIds ?? new Set(items.filter(i => i.type === "feat" && i.system.granted).map(i => i.id));
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
   let todo = [];
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -85,6 +89,10 @@ export function computeAgent(sys, items, cfg) {
   }
   sys.base = base;
   for (const originType of ["talent", "specialty"]) {
+    const count = items.filter(i => i.type === "origin" && i.system.originType === originType).length;
+    if (count > 1) warnings.push(`Multiple ${originType}s attached (${count}); only one is permitted.`);
+  }
+  for (const originType of ["talent", "specialty"]) {
     if (!items.some(i => i.type === "origin" && i.system.originType === originType)) {
       todo.push({ order: originType === "talent" ? 1 : 2, always: true, tab: "main", browse: { type: "origin", originType }, text: `Choose a ${originType}.` });
     }
@@ -94,12 +102,14 @@ export function computeAgent(sys, items, cfg) {
   /* ---------------- Collect bonus sources ---------------- */
   const sources = [];   // { name, bonuses, rank }
   for (const i of items) {
-    if (i.type === "origin") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [], rank: 1 });
-    else if (i.type === "feat") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [], rank: i.system.ranks ?? 1 });
+    if (i.type === "origin") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [], rank: 1, acquiredAtLevel: 1 });
+    else if (i.type === "feat" && activeFeatIds.has(i.id)) sources.push({ name: i.name, bonuses: i.system.bonuses ?? [],
+      rank: i.system.ranks ?? 1, acquiredAtLevel: i.system.acquiredAtLevel || 1 });
     else if (i.type === "class") {
-      const lvl = classLevels[i.system.identifier || i.name] ?? 0;
+      const cid = i.system.identifier || i.name;
+      const lvl = classLevels[cid] ?? 0;
       if (!lvl) continue;
-      sources.push({ name: i.name, bonuses: (i.system.bonuses ?? []).filter(b => (b.level ?? 0) <= lvl), rank: 1 });
+      sources.push({ name: i.name, bonuses: (i.system.bonuses ?? []).filter(b => (b.level ?? 0) <= lvl), rank: 1, classId: cid, requiredClassLevel: 1 });
       const lists = Object.fromEntries((i.system.choiceLists ?? []).map(L => [L.key, L]));
       let unpicked = 0;
       (i.system.choiceSchedule ?? []).forEach((slot, idx) => {
@@ -107,7 +117,7 @@ export function computeAgent(sys, items, cfg) {
         const pick = i.system.choices?.[idx];
         const options = lists[slot.list]?.options ?? [];
         const opt = pick === null || pick === undefined || pick === "" ? null : options.find(o => o.index === Number(pick));
-        if (opt) sources.push({ name: `${i.name}: ${opt.name}`, bonuses: opt.bonuses ?? [], rank: 1 });
+        if (opt) sources.push({ name: `${i.name}: ${opt.name}`, bonuses: opt.bonuses ?? [], rank: 1, classId: cid, requiredClassLevel: slot.level });
         else if (options.length) unpicked += 1;
       });
       if (unpicked) todo.push({ order: 20, tab: "classes", text: `${i.name}: ${plural(unpicked, "class-ability choice")} to make.` });
@@ -149,12 +159,59 @@ export function computeAgent(sys, items, cfg) {
   if (sys.pointBuy.remaining < 0) warnings.push(`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
   if (sys.pointBuy.remaining > 0) todo.push({ order: 10, always: true, tab: "main", text: `${plural(sys.pointBuy.remaining, "attribute point")} left to spend.` });
   const abil = Object.fromEntries(ABILITIES.map(k => [k, { value: sys.abilities[k].value, mod: sys.abilities[k].mod }]));
-  /** Attribute modifier as it stood at a given career level (only earlier increases). */
-  const modAt = (k, l) => {
-    const a = sys.abilities[k];
-    const inc = cfg.abilityIncreaseLevels.filter(x => x <= l && increaseAt(x) === k).length;
-    return mod(a.base + inc + (a.misc ?? 0) + a.bonus);
+  /**
+   * Reconstruct earned bonuses at each career level. Previously current-level
+   * class/feat bonuses were applied to all earlier skill purchases.
+   * Legacy feats with no acquisition level are assumed to date from level 1.
+   */
+  const stageCache = new Map();
+  const stageAt = career => {
+    if (stageCache.has(career)) return stageCache.get(career);
+    const counts = {};
+    for (const entry of progression.slice(0, career)) {
+      if (classById.has(entry.classId)) counts[entry.classId] = (counts[entry.classId] ?? 0) + 1;
+    }
+    const historicalClasses = {};
+    const historicalBase = Object.fromEntries(Object.keys(base).map(k => [k, 0]));
+    for (const [cid, count] of Object.entries(counts)) {
+      const ci = classById.get(cid);
+      const row = ci.system.table.find(r => r.level === count) ?? ci.system.table.at(-1) ?? {};
+      historicalClasses[cid] = { levels: count, ...row };
+      for (const k of Object.keys(historicalBase)) historicalBase[k] += row[k] ?? 0;
+    }
+    const historicalTb = {
+      t1: stepLookup(T.talentBonus.t1, career),
+      t2: stepLookup(T.talentBonus.t2, career),
+      t3: stepLookup(T.talentBonus.t3, career),
+      interestBase: stepLookup(T.interests.map(r => [r[0], r[1]]), career),
+      interestTalent: stepLookup(T.interests.map(r => [r[0], r[2]]), career),
+      interestSpec: stepLookup(T.interests.map(r => [r[0], r[3]]), career)
+    };
+    const snapshot = { level: career, tb: historicalTb, classes: historicalClasses, base: historicalBase };
+    const bonusAt = (target, extra = {}) => {
+      let value = 0;
+      for (const source of sources) {
+        const taken = source.classId ? (counts[source.classId] ?? 0) >= source.requiredClassLevel
+          : (source.acquiredAtLevel ?? 1) <= career;
+        if (!taken) continue;
+        for (const b of source.bonuses) {
+          if (b.target !== target || (source.classId && (b.level ?? 0) > (counts[source.classId] ?? 0))) continue;
+          value += evaluate(b.value, { ...snapshot, ...extra, rank: source.rank });
+        }
+      }
+      return value;
+    };
+    const abilities = Object.fromEntries(ABILITIES.map(k => {
+      const a = sys.abilities[k];
+      const inc = cfg.abilityIncreaseLevels.filter(x => x <= career && increaseAt(x) === k).length;
+      const value = a.base + inc + (a.misc ?? 0) + bonusAt(`abilities.${k}`);
+      return [k, { value, mod: mod(value) }];
+    }));
+    const stage = { abilities, bonus: target => bonusAt(target, { abilities }) };
+    stageCache.set(career, stage);
+    return stage;
   };
+  const modAt = (k, l) => stageAt(l).abilities[k].mod;
 
   /* ---------------- Skills: ranks ---------------- */
   const skillDefs = Object.values(cfg.skills);
@@ -164,7 +221,7 @@ export function computeAgent(sys, items, cfg) {
     if (m && evaluate(b.value, preData)) talentClassSkill.add(m[1]);
   }
   const isClassSkillAt = (key, idx) => {
-    if (talentClassSkill.has(key) || sys.skills?.[key]?.classSkill) return true;
+    if (stageAt(idx + 1).bonus(`skills.${key}.classSkill`) || sys.skills?.[key]?.classSkill) return true;
     const ci = classAtLevel[idx];
     return !!ci?.system.classSkills?.includes(key);
   };
@@ -176,7 +233,18 @@ export function computeAgent(sys, items, cfg) {
       const pts = Number(entry.skills?.[sd.key] ?? 0) || 0;
       if (!pts) continue;
       spent += pts;
-      skillRanks[sd.key] = (skillRanks[sd.key] ?? 0) + (isClassSkillAt(sd.key, idx) ? pts : pts / 2);
+      const classSkill = isClassSkillAt(sd.key, idx);
+      const purchase = purchasedSkillRanks(pts, classSkill);
+      if (!purchase.valid) {
+        warnings.push(`Level ${idx + 1}: ${sd.name} cross-class ranks cost 2 skill points each; ${pts} is invalid.`);
+      }
+      // Spycraft 2.0 has no fractional skill ranks. Do not pool odd
+      // cross-class purchases from separate level-up allocations.
+      skillRanks[sd.key] = (skillRanks[sd.key] ?? 0) + purchase.ranks;
+      const rankLimit = idx + 4; // Career Level + 3 at the time of purchase.
+      if (skillRanks[sd.key] > rankLimit) {
+        warnings.push(`Level ${idx + 1}: ${sd.name} has ${skillRanks[sd.key]} ranks, exceeding the purchase-time maximum of ${rankLimit}.`);
+      }
     }
     skillPoints.push({ level: idx + 1, spent, available: 0, classId: entry.classId });
   });
@@ -184,13 +252,17 @@ export function computeAgent(sys, items, cfg) {
 
   /* ---------------- Feats ---------------- */
   const featItems = items.filter(i => i.type === "feat");
-  const featNames = new Set(featItems.map(i => norm(i.name)));
+  const featNames = new Set(featItems.filter(i => activeFeatIds.has(i.id)).map(i => norm(i.name)));
   const featTrees = {};
-  for (const f of featItems) featTrees[f.system.tree] = (featTrees[f.system.tree] ?? 0) + (f.system.ranks ?? 1);
+  const activeFeatTrees = {};
+  for (const f of featItems) {
+    featTrees[f.system.tree] = (featTrees[f.system.tree] ?? 0) + (f.system.ranks ?? 1);
+    if (activeFeatIds.has(f.id)) activeFeatTrees[f.system.tree] = (activeFeatTrees[f.system.tree] ?? 0) + (f.system.ranks ?? 1);
+  }
 
   /* ---------------- Phase B: all other bonuses ---------------- */
   const rd = {
-    level, tb, classes: classesData, base, abilities: abil, featTrees,
+    level, tb, classes: classesData, base, abilities: abil, featTrees: activeFeatTrees,
     saves: { fort: { base: base.fort }, ref: { base: base.ref }, will: { base: base.will } },
     skills: Object.fromEntries(skillDefs.map(s => [s.key, { ranks: skillRanks[s.key] ?? 0 }])),
     actionDice: { max: (lr?.actionDice ?? 0) }
@@ -204,7 +276,9 @@ export function computeAgent(sys, items, cfg) {
   const misc = sys.misc ?? {};
 
   /* ---------------- Gear (armor) ---------------- */
-  const armor = items.find(i => i.type === "armor" && i.system.equipped);
+  const equippedArmors = items.filter(i => i.type === "armor" && i.system.equipped);
+  if (equippedArmors.length > 1) warnings.push(`Multiple armor items equipped (${equippedArmors.length}); only the first is being counted.`);
+  const armor = equippedArmors[0];
   const armorDef = armor ? armor.system.defensePenalty + B.get("defenseArmor") : 0;
   const armorCheck = armor ? armor.system.armorCheck + B.get("armorCheck") : 0;
   const armorSpeed = armor ? armor.system.speedPenalty : 0;
@@ -291,11 +365,10 @@ export function computeAgent(sys, items, cfg) {
   }
 
   // Skill points per level.
-  const spBonus = B.get("skillPoints") > 0 ? 1 : 0;
   skillPoints.forEach((sp, idx) => {
     const ci = classAtLevel[idx];
     const per = (ci?.system.skillPoints ?? 0) + modAt("int", idx + 1);
-    sp.available = idx === 0 ? 4 * per + 4 * spBonus : per + spBonus;
+    sp.available = availableSkillPoints(ci?.system.skillPoints ?? 0, modAt("int", idx + 1), stageAt(idx + 1).bonus("skillPoints") > 0 ? 1 : 0, idx + 1);
     sp.remaining = sp.available - sp.spent;
     sp.className = ci?.name ?? "?";
     if (sp.remaining < 0) warnings.push(`Level ${idx + 1}: ${-sp.remaining} skill point(s) overspent.`);
@@ -411,7 +484,7 @@ export function computeAgent(sys, items, cfg) {
     .filter(Boolean).map(c => ({ className: c.name, ...c.system.coreAbility }));
 
   /* ---------------- Prerequisites ---------------- */
-  const ctx = prerequisiteContext(sys, featNames, featTrees, skillRanks);
+  const ctx = prerequisiteContext(sys, featNames, activeFeatTrees, skillRanks);
   sys.featStatus = {};
   for (const f of featItems) {
     const res = checkPrerequisites(f.system.prerequisites, ctx);
@@ -422,10 +495,21 @@ export function computeAgent(sys, items, cfg) {
   for (const [cid, lvl] of Object.entries(classLevels)) {
     const ci = classById.get(cid);
     if (!ci?.system.expert || !ci.system.requirements) continue;
-    const res = checkPrerequisites(ci.system.requirements, ctx);
-    if (!res.ok) warnings.push(`${ci.name}: expert class requirements not met (${res.unmet.join("; ")}).`);
+    const firstEntry = progression.find(e => e.classId === cid);
+    // New characters retain the actual entry-time result. Existing imported
+    // characters have no snapshot; their current status is only provisional.
+    const res = firstEntry?.expertEntry ?? checkPrerequisites(ci.system.requirements, ctx);
+    if (!res.ok) warnings.push(`${ci.name}: expert class requirements not met at ${firstEntry?.expertEntry ? "entry" : "current level (entry unknown)"} (${res.unmet.join("; ")}).`);
   }
 
+  // Re-evaluate to a fixed point, since enabling a qualified feat can unlock
+  // other feats. Failed feats stay owned (and consume slots), but are inactive.
+  const eligible = new Set(featItems.filter(f => f.system.granted || sys.featStatus[f.id]?.ok).map(f => f.id));
+  const stable = eligible.size === activeFeatIds.size && [...eligible].every(id => activeFeatIds.has(id));
+  if (!stable && (options.pass ?? 0) < featItems.length + 2) {
+    return computeAgent(sys, items, cfg, { activeFeatIds: eligible, pass: (options.pass ?? 0) + 1 });
+  }
+  if (!stable) warnings.push("Feat prerequisites did not converge; verify cyclic dependencies.");
   sys.rollDataExtras = rd;
   sys.warnings = warnings;
   // Before the first class level only the opening steps are worth listing.

@@ -1,3 +1,5 @@
+import { resolveSkillResult } from "../rules/checks.mjs";
+import { grantAcquisitionLevel } from "../rules/progression.mjs";
 import { checkPrerequisites } from "../rules/prerequisites.mjs";
 import { prerequisiteContext } from "../rules/engine.mjs";
 
@@ -25,11 +27,14 @@ export class SpycraftActor extends Actor {
     const notes = [];
     if (die >= threat) notes.push(`<span class="spycraft2-threat">${game.i18n.localize("SPYCRAFT.Roll.Threat")}</span>`);
     if (die <= error) notes.push(`<span class="spycraft2-error">${game.i18n.localize("SPYCRAFT.Roll.Error")}</span>`);
-    if (cap && roll.total > cap) notes.push(game.i18n.format("SPYCRAFT.Roll.Capped", { cap }));
+    const resolved = resolveSkillResult(roll.total, die, { cap, threat });
+    if (resolved.limited) notes.push(`<strong>Effective result: ${resolved.total} (cap ${Number(cap)})</strong>`);
     const range = `<small>${game.i18n.format("SPYCRAFT.Roll.Range", { error, threat })}</small>`;
     return roll.toMessage({
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: `${flavor} ${range}${notes.length ? `<br>${notes.join(" ")}` : ""}`
+      flavor: `${flavor} ${range}${notes.length ? `<br>${notes.join(" ")}` : ""}`,
+      flags: { spycraft2: { rawTotal: roll.total, effectiveTotal: resolved.total,
+        capped: resolved.limited, naturalDie: die } }
     });
   }
 
@@ -114,7 +119,13 @@ export class SpycraftActor extends Actor {
     if (cls.system.expert && !(sys.classLevels?.[ident])) {
       if (sys.level < 4) ui.notifications.warn(game.i18n.format("SPYCRAFT.Class.ExpertTooEarly", { name: cls.name }));
     }
-    const progression = [...sys.progression.map(p => ({ ...p })), { classId: ident, vitality: 0, skills: {} }];
+    // Record eligibility before taking an expert class, not after its own BAB,
+    // skill and other progression bonuses have been applied.
+    const firstExpertLevel = cls.system.expert && !(sys.classLevels?.[ident]);
+    const expertEntry = firstExpertLevel && cls.system.requirements
+      ? this.checkPrerequisites(cls.system.requirements) : null;
+    const progression = [...sys.progression.map(p => ({ ...p })),
+      { classId: ident, vitality: 0, skills: {}, expertEntry }];
     await this.update({ "system.progression": progression });
     await this.syncGrantedFeats();
     if (promptVitality && progression.length > 1 && cls.system.vitalityDie) {
@@ -187,12 +198,26 @@ export class SpycraftActor extends Actor {
     const norm = s => s.trim().toLowerCase();
     const have = new Map();
     const toDelete = [];
+    const requiredNames = new Set([...required.keys()].map(norm));
+    const groups = new Map();
     for (const i of this.items.filter(i => i.type === "feat")) {
       const key = norm(i.name);
-      const needed = [...required.keys()].some(n => norm(n) === key);
-      // Drop granted feats that are no longer granted, and any second granted copy of the same feat.
-      if (i.system.granted && (!needed || have.get(key)?.system.granted)) toDelete.push(i);
-      else if (!have.has(key) || i.system.granted) have.set(key, i);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(i);
+    }
+    for (const [key, copies] of groups) {
+      // Prefer an explicitly selected feat to an automatically granted copy.
+      const manual = copies.find(i => !i.system.granted);
+      const grants = copies.filter(i => i.system.granted);
+      if (manual) {
+        have.set(key, manual);
+        toDelete.push(...grants);
+      } else if (requiredNames.has(key) && grants.length) {
+        have.set(key, grants[0]);
+        toDelete.push(...grants.slice(1));
+      } else {
+        toDelete.push(...grants);
+      }
     }
     const toCreate = [];
     const missing = [...required.keys()].filter(n => !have.has(norm(n)));
@@ -207,13 +232,24 @@ export class SpycraftActor extends Actor {
           delete data._id;
           data.system.granted = true;
           data.system.grantSource = required.get(name);
+          data.system.acquiredAtLevel = grantAcquisitionLevel(this.items, this.system.progression, name);
           toCreate.push(data);
         } else {
-          toCreate.push({ name, type: "feat", system: { granted: true, grantSource: required.get(name) } });
+          toCreate.push({ name, type: "feat", system: { granted: true, grantSource: required.get(name),
+            acquiredAtLevel: grantAcquisitionLevel(this.items, this.system.progression, name) } });
         }
       }
     }
+    const toUpdate = [];
+    for (const [key, existing] of have) {
+      if (!existing.system.granted || !requiredNames.has(key)) continue;
+      const level = grantAcquisitionLevel(this.items, this.system.progression, existing.name);
+      if (level && existing.system.acquiredAtLevel !== level) {
+        toUpdate.push({ _id: existing.id, "system.acquiredAtLevel": level });
+      }
+    }
     if (toDelete.length) await this.deleteEmbeddedDocuments("Item", toDelete.map(i => i.id));
+    if (toUpdate.length) await this.updateEmbeddedDocuments("Item", toUpdate);
     if (toCreate.length) await this.createEmbeddedDocuments("Item", toCreate);
   }
 

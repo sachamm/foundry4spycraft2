@@ -121,5 +121,69 @@ for (const file of fixtures) {
   if (s.warnings.length) console.log(`  warnings: ${s.warnings.join(" | ")}`);
   if (process.env.SHOW_TODO) console.log(`  to do: ${s.todo.map(t => t.text).join(" | ")}`);
 }
+
+console.log("• historical progression: Scientist Int bonus arrives at class level 6");
+{
+  const sci = packs.classes.Scientist;
+  const sys = blankAgent();
+  sys.abilities.int.base = 13;
+  sys.progression = Array.from({ length: 6 }, () => ({ classId: sci.system.identifier, vitality: 1, skills: {} }));
+  computeAgent(sys, [{ id: "scientist", name: sci.name, type: sci.type, system: clone(sci.system) }], cfg);
+  const basePoints = sci.system.skillPoints;
+  expect("Scientist skill points at career level 1", sys.skillPoints[0].available, 4 * (basePoints + 1));
+  expect("Scientist skill points at career level 5", sys.skillPoints[4].available, basePoints + 1);
+  expect("Scientist skill points at career level 6", sys.skillPoints[5].available, basePoints + 2);
+}
+console.log("• historical expert-class eligibility snapshot");
+{
+  const brawler = packs.classes.Brawler;
+  const sys = blankAgent();
+  sys.progression = [{ classId: brawler.system.identifier, vitality: 0, skills: {},
+    expertEntry: {ok: true, unmet: []} }];
+  computeAgent(sys, [{ id: "brawler", name: brawler.name, type: brawler.type, system: clone(brawler.system) }], cfg);
+  expect("entry snapshot prevents retroactive expert warning",
+    sys.warnings.some(w => w.includes("expert class requirements")), false);
+}
+
+
+console.log("• feat prerequisites suppress effects, including self-qualification");
+{
+  const soldier = packs.classes.Soldier;
+  const sys = blankAgent();
+  sys.abilities.dex.base = 10;
+  sys.progression = [{ classId: soldier.system.identifier, vitality: 0, skills: {} }];
+  const feat = { id: "invalid", name:"Self-boost", type:"feat", system: {
+    tree:"basicCombat", ranks:1, granted:false, prerequisites: {type:"ability",key:"dex",min:20},
+    bonuses:[{target:"abilities.dex",value:"10",level:0}]
+  }};
+  const items=[{id:"soldier",name:"Soldier",type:"class",system:clone(soldier.system)},feat];
+  computeAgent(sys,items,cfg);
+  expect("self-qualification is disallowed",sys.abilities.dex.value,10);
+  expect("self-boost is unavailable",sys.featStatus.invalid.ok,false);
+  sys.abilities.dex.base=20;
+  computeAgent(sys,items,cfg);
+  expect("eligible feat becomes active",sys.abilities.dex.value,30);
+  expect("eligible feat satisfies prerequisites",sys.featStatus.invalid.ok,true);
+}
+
+
+console.log("• legal and illegal purchase-time skill ranks");
+{
+  const soldier = packs.classes.Soldier;
+  const ci = {id:"soldier",name:soldier.name,type:soldier.type,system:clone(soldier.system)};
+  const legal = blankAgent();
+  for (const [k,v] of Object.entries({str:14,dex:14,con:14,int:13,wis:12,cha:10})) legal.abilities[k].base = v;
+  legal.progression = [{classId:ci.system.identifier,vitality:0,skills:{athletics:4}}];
+  computeAgent(legal,[ci],cfg);
+  expect("valid 36-point allocation",legal.pointBuy.remaining,0);
+  expect("legal skill rank allocation has no rank warning",legal.warnings.some(w=>w.includes("ranks")),false);
+
+  const over = blankAgent();
+  over.progression = Array.from({length:8},(_,i)=>({classId:ci.system.identifier,vitality:1,skills:i===0?{athletics:6}:{}}));
+  computeAgent(over,[ci],cfg);
+  expect("front-loaded ranks flagged even after the career cap increases",
+    over.warnings.some(w=>w.includes("purchase-time maximum")),true);
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed across ${fixtures.length} fixture(s).`);
 process.exit(failures ? 1 : 0);
