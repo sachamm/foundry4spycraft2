@@ -7,6 +7,7 @@
  */
 import { evaluate, stepLookup } from "./formula.mjs";
 import { checkPrerequisites } from "./prerequisites.mjs";
+import { purchasedSkillRanks, availableSkillPoints } from "./checks.mjs";
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const GEAR = ["R", "T", "V", "S", "G", "W", "E"];
@@ -177,12 +178,13 @@ export function computeAgent(sys, items, cfg) {
       if (!pts) continue;
       spent += pts;
       const classSkill = isClassSkillAt(sd.key, idx);
-      if (!classSkill && pts % 2 !== 0) {
+      const purchase = purchasedSkillRanks(pts, classSkill);
+      if (!purchase.valid) {
         warnings.push(`Level ${idx + 1}: ${sd.name} cross-class ranks cost 2 skill points each; ${pts} is invalid.`);
       }
       // Spycraft 2.0 has no fractional skill ranks. Do not pool odd
       // cross-class purchases from separate level-up allocations.
-      skillRanks[sd.key] = (skillRanks[sd.key] ?? 0) + (classSkill ? pts : Math.floor(pts / 2));
+      skillRanks[sd.key] = (skillRanks[sd.key] ?? 0) + purchase.ranks;
     }
     skillPoints.push({ level: idx + 1, spent, available: 0, classId: entry.classId });
   });
@@ -301,7 +303,7 @@ export function computeAgent(sys, items, cfg) {
   skillPoints.forEach((sp, idx) => {
     const ci = classAtLevel[idx];
     const per = (ci?.system.skillPoints ?? 0) + modAt("int", idx + 1);
-    sp.available = idx === 0 ? Math.max(4, 4 * (per + spBonus)) : Math.max(1, per + spBonus);
+    sp.available = availableSkillPoints(ci?.system.skillPoints ?? 0, modAt("int", idx + 1), spBonus, idx + 1);
     sp.remaining = sp.available - sp.spent;
     sp.className = ci?.name ?? "?";
     if (sp.remaining < 0) warnings.push(`Level ${idx + 1}: ${-sp.remaining} skill point(s) overspent.`);
