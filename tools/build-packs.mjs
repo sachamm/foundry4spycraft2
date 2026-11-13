@@ -69,7 +69,7 @@ writeFileSync(join(ROOT, "module/rules/tables.mjs"), tablesSrc);
 /* ------------------------------------------------------------------ */
 /*  Compendium documents                                               */
 /* ------------------------------------------------------------------ */
-const stats = { coreVersion: "13.345", systemId: "spycraft2", systemVersion: system.version };
+const stats = { coreVersion: system.compatibility.verified, systemId: "spycraft2", systemVersion: system.version };
 function item(pack, name, type, img, sys, folder = null, sort = 0) {
   return { _id: id(pack, type, name), name, type, img, system: sys, effects: [], folder, sort, ownership: { default: 0 }, flags: {}, _stats: stats };
 }
