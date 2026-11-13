@@ -145,5 +145,26 @@ console.log("• historical expert-class eligibility snapshot");
     sys.warnings.some(w => w.includes("expert class requirements")), false);
 }
 
+
+console.log("• feat prerequisites suppress effects, including self-qualification");
+{
+  const soldier = packs.classes.Soldier;
+  const sys = blankAgent();
+  sys.abilities.dex.base = 10;
+  sys.progression = [{ classId: soldier.system.identifier, vitality: 0, skills: {} }];
+  const feat = { id: "invalid", name:"Self-boost", type:"feat", system: {
+    tree:"basicCombat", ranks:1, granted:false, prerequisites: {type:"ability",key:"dex",min:20},
+    bonuses:[{target:"abilities.dex",value:"10",level:0}]
+  }};
+  const items=[{id:"soldier",name:"Soldier",type:"class",system:clone(soldier.system)},feat];
+  computeAgent(sys,items,cfg);
+  expect("self-qualification is disallowed",sys.abilities.dex.value,10);
+  expect("self-boost is unavailable",sys.featStatus.invalid.ok,false);
+  sys.abilities.dex.base=20;
+  computeAgent(sys,items,cfg);
+  expect("eligible feat becomes active",sys.abilities.dex.value,30);
+  expect("eligible feat satisfies prerequisites",sys.featStatus.invalid.ok,true);
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed across ${fixtures.length} fixture(s).`);
 process.exit(failures ? 1 : 0);
