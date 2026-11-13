@@ -47,9 +47,12 @@ class Bonuses {
  * @param {object[]} items { id, name, type, system } for every embedded item
  * @param {object} cfg     CONFIG.SPYCRAFT
  */
-export function computeAgent(sys, items, cfg) {
+export function computeAgent(sys, items, cfg, options = {}) {
   const T = cfg.tables;
   const warnings = [];
+  // Only granted or presently qualified feats may contribute effects.
+  // Starting from grants prevents a feat from satisfying its own requirements.
+  const activeFeatIds = options.activeFeatIds ?? new Set(items.filter(i => i.type === "feat" && i.system.granted).map(i => i.id));
   /** Things still left to pick: { order, tab, text, always?, browse?, skillLevel? } */
   let todo = [];
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -100,7 +103,7 @@ export function computeAgent(sys, items, cfg) {
   const sources = [];   // { name, bonuses, rank }
   for (const i of items) {
     if (i.type === "origin") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [], rank: 1, acquiredAtLevel: 1 });
-    else if (i.type === "feat") sources.push({ name: i.name, bonuses: i.system.bonuses ?? [],
+    else if (i.type === "feat" && activeFeatIds.has(i.id)) sources.push({ name: i.name, bonuses: i.system.bonuses ?? [],
       rank: i.system.ranks ?? 1, acquiredAtLevel: i.system.acquiredAtLevel || 1 });
     else if (i.type === "class") {
       const cid = i.system.identifier || i.name;
@@ -245,13 +248,17 @@ export function computeAgent(sys, items, cfg) {
 
   /* ---------------- Feats ---------------- */
   const featItems = items.filter(i => i.type === "feat");
-  const featNames = new Set(featItems.map(i => norm(i.name)));
+  const featNames = new Set(featItems.filter(i => activeFeatIds.has(i.id)).map(i => norm(i.name)));
   const featTrees = {};
-  for (const f of featItems) featTrees[f.system.tree] = (featTrees[f.system.tree] ?? 0) + (f.system.ranks ?? 1);
+  const activeFeatTrees = {};
+  for (const f of featItems) {
+    featTrees[f.system.tree] = (featTrees[f.system.tree] ?? 0) + (f.system.ranks ?? 1);
+    if (activeFeatIds.has(f.id)) activeFeatTrees[f.system.tree] = (activeFeatTrees[f.system.tree] ?? 0) + (f.system.ranks ?? 1);
+  }
 
   /* ---------------- Phase B: all other bonuses ---------------- */
   const rd = {
-    level, tb, classes: classesData, base, abilities: abil, featTrees,
+    level, tb, classes: classesData, base, abilities: abil, featTrees: activeFeatTrees,
     saves: { fort: { base: base.fort }, ref: { base: base.ref }, will: { base: base.will } },
     skills: Object.fromEntries(skillDefs.map(s => [s.key, { ranks: skillRanks[s.key] ?? 0 }])),
     actionDice: { max: (lr?.actionDice ?? 0) }
@@ -473,7 +480,7 @@ export function computeAgent(sys, items, cfg) {
     .filter(Boolean).map(c => ({ className: c.name, ...c.system.coreAbility }));
 
   /* ---------------- Prerequisites ---------------- */
-  const ctx = prerequisiteContext(sys, featNames, featTrees, skillRanks);
+  const ctx = prerequisiteContext(sys, featNames, activeFeatTrees, skillRanks);
   sys.featStatus = {};
   for (const f of featItems) {
     const res = checkPrerequisites(f.system.prerequisites, ctx);
@@ -491,6 +498,14 @@ export function computeAgent(sys, items, cfg) {
     if (!res.ok) warnings.push(`${ci.name}: expert class requirements not met at ${firstEntry?.expertEntry ? "entry" : "current level (entry unknown)"} (${res.unmet.join("; ")}).`);
   }
 
+  // Re-evaluate to a fixed point, since enabling a qualified feat can unlock
+  // other feats. Failed feats stay owned (and consume slots), but are inactive.
+  const eligible = new Set(featItems.filter(f => f.system.granted || sys.featStatus[f.id]?.ok).map(f => f.id));
+  const stable = eligible.size === activeFeatIds.size && [...eligible].every(id => activeFeatIds.has(id));
+  if (!stable && (options.pass ?? 0) < featItems.length + 2) {
+    return computeAgent(sys, items, cfg, { activeFeatIds: eligible, pass: (options.pass ?? 0) + 1 });
+  }
+  if (!stable) warnings.push("Feat prerequisites did not converge; verify cyclic dependencies.");
   sys.rollDataExtras = rd;
   sys.warnings = warnings;
   // Before the first class level only the opening steps are worth listing.
