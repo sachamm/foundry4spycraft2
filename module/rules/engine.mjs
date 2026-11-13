@@ -434,8 +434,11 @@ export function computeAgent(sys, items, cfg) {
   for (const [cid, lvl] of Object.entries(classLevels)) {
     const ci = classById.get(cid);
     if (!ci?.system.expert || !ci.system.requirements) continue;
-    const res = checkPrerequisites(ci.system.requirements, ctx);
-    if (!res.ok) warnings.push(`${ci.name}: expert class requirements not met (${res.unmet.join("; ")}).`);
+    const firstEntry = progression.find(e => e.classId === cid);
+    // New characters retain the actual entry-time result. Existing imported
+    // characters have no snapshot; their current status is only provisional.
+    const res = firstEntry?.expertEntry ?? checkPrerequisites(ci.system.requirements, ctx);
+    if (!res.ok) warnings.push(`${ci.name}: expert class requirements not met at ${firstEntry?.expertEntry ? "entry" : "current level (entry unknown)"} (${res.unmet.join("; ")}).`);
   }
 
   sys.rollDataExtras = rd;
