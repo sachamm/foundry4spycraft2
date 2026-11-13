@@ -290,6 +290,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     if (!this.actor.isOwner) return null;
     if (item.parent === this.actor) return super._onDropItem(event, item);
     if (item.type === "class") return this.actor.addClassLevel(item);
+    if (item.type === "feat") {
+      const data = item.toObject?.() ?? foundry.utils.deepClone(item);
+      delete data._id;
+      data.system.acquiredAtLevel = Math.max(1, this.actor.system.level ?? 1);
+      return this.actor.createEmbeddedDocuments("Item", [data]);
+    }
     if (item.type === "origin") {
       const old = this.actor.items.filter(i => i.type === "origin" && i.system.originType === item.system.originType);
       if (old.length) await this.actor.deleteEmbeddedDocuments("Item", old.map(i => i.id));
