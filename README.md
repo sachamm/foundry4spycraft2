@@ -91,3 +91,7 @@ https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.jso
 1. Bump `version` in `system.json` and add a `CHANGELOG.md` entry.
 2. Commit and push, then publish a GitHub release tagged `v<version>` (e.g. `v0.1.0`).
 3. The **Release** workflow attaches `system.json` and `spycraft2.zip` to the release.
+
+## NPC creation
+
+NPC actors now offer opt-in graded creation, source-backed core tables, equipment allowances, quality cost controls, Tier resolution and an XP breakdown. Existing NPC stat blocks keep manual mode. See [NPC creation and implementation boundaries](docs/npc-creation.md).

@@ -1,3 +1,4 @@
+import { NPC_RULES, NPC_STATS, NPC_CATEGORIES, defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
 import { renderTemplate } from "../rules/formula.mjs";
 import { describe as describePrereq } from "../rules/prerequisites.mjs";
 import { SpycraftBrowser } from "../apps/browser.mjs";
@@ -400,10 +401,15 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
 export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "npc"],
-    position: { width: 600, height: 640 },
+    position: { width: 800, height: 800 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      npcEnable: SpycraftNpcSheet.#onEnable,
+      npcAddSkill: SpycraftNpcSheet.#onAddSkill,
+      npcAddQuality: SpycraftNpcSheet.#onAddQuality,
+      npcAddPick: SpycraftNpcSheet.#onAddPick,
+      npcRemoveRow: SpycraftNpcSheet.#onRemoveRow,
       rollAbility: SpycraftNpcSheet.#onRollAbility,
       rollSave: SpycraftNpcSheet.#onRollSave,
       rollAttack: SpycraftNpcSheet.#onRollAttack,
@@ -424,10 +430,82 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       saves: Object.entries(CONFIG.SPYCRAFT.saves).map(([key, s]) => ({ key, label: game.i18n.localize(s.label), ...sys.saves[key] })),
       weapons: this.actor.items.filter(i => i.type === "weapon").map(w => ({ item: w, attack: this.actor.weaponAttack(w) })),
       otherItems: this.actor.items.filter(i => i.type !== "weapon"),
-      npcTypes: { standard: "Standard", special: "Special", villain: "Villain" },
+      npcTypes: { standard: "Standard", special: "Special", villain: "Villain (legacy special)", animal: "Animal" },
+      npc: this._npcContext(),
       enrichedBiography: await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.biography, { secrets: this.actor.isOwner })
     });
     return context;
+  }
+
+  _npcContext() {
+    const sys = this.actor.system, profile = sys.npcProfile ?? defaultNpcProfile();
+    const result = computeNpcProfile(profile, sys.npcType, sys.threatLevel, sys.abilities);
+    const gradeOptions = Object.fromEntries(NPC_RULES.grades.map((g, i) => [i + 1, g]));
+    const skillOptions = Object.fromEntries(Object.entries(CONFIG.SPYCRAFT.skills).map(([k, v]) => [k, v.name]));
+    return { profile, result, gradeOptions, wealthOptions: {0:"None", ...gradeOptions},
+      tierOptions: Object.fromEntries(NPC_RULES.tiers.map(t => [t.tier, `${NPC_RULES.grades[t.tier - 1]} (${t.offset >= 0 ? "+" : ""}${t.offset} TL)`])),
+      caliberOptions: Object.fromEntries(NPC_RULES.grades.slice(0, 5).map((g, i) => [i + 1, g])), skillOptions,
+      grades: Object.entries(NPC_STATS).filter(([key]) => !(result.type === "animal" && ["competence", "wealth"].includes(key))).map(([key, label]) => ({key, label: key === "health" ? result.type === "special" ? "Vitality / wounds" : "Damage save" : label, value: profile.grades[key], options: key === "wealth" ? {0:"None",...gradeOptions} : gradeOptions})),
+      skills: profile.skills.map((s, index) => ({...s,index, resolved:result.skills?.[index]})),
+      equipment: NPC_CATEGORIES.map(category => ({category, picks: (profile.equipment[category] ?? []).map((caliber, index) => ({caliber,index,category}))})),
+      qualityOptions: Object.fromEntries(NPC_RULES.qualities.filter(q => q.types.includes(result.type) && q.mode !== "dedicated").map(q => [q.id, `${q.name} (${q.costLabel})`])),
+      qualities: profile.qualities.map((q, index) => {const rule=NPC_RULES.qualities.find(r=>r.id===q.id);return {...q,index,rule,classLevel:rule?.mode==="classLevel",decision:rule?.mode==="decision",linked:rule?.mode==="linked",movement:rule?.mode==="movement",caliberCost:rule?.mode==="caliber"};}),
+      referenceTables: Object.entries(NPC_RULES.tables).map(([key, rows]) => ({label:key,rows:rows.map((values,i)=>({grade:NPC_RULES.grades[i],values:values.map(v=>Array.isArray(v)?v.join("/"):v)}))})),
+      levels:Array.from({length:20},(_,i)=>i+1),catalog:NPC_RULES.qualities,source:NPC_RULES.source,
+      special: result.type === "special",animal:result.type === "animal"
+    };
+  }
+
+  _prepareSubmitData(event, form, formData, updateData) {
+    const flat=formData.object, profile=structuredClone(this.actor.system.npcProfile ?? defaultNpcProfile());
+    const changed=new Set();
+    for(const [key,value] of Object.entries(flat)) {
+      let m;
+      if((m=key.match(/^npcSkill\.(\d+)\.(key|grade)$/))) {
+        if(profile.skills[m[1]])profile.skills[m[1]][m[2]]=m[2]==="grade"?Number(value):value;
+        changed.add("skills");
+      } else if((m=key.match(/^npcQuality\.(\d+)\.(id|units|details|level|modifier|linkedCost|limited|caliber)$/))) {
+        if(profile.qualities[m[1]])profile.qualities[m[1]][m[2]]=["id","details"].includes(m[2])?value:m[2]==="limited"?!!value:Number(value);
+        changed.add("qualities");
+      } else if((m=key.match(/^npcPick\.(weapons|gear|vehicles)\.(\d+)$/))) {
+        if(profile.equipment[m[1]])profile.equipment[m[1]][m[2]]=Number(value);
+        changed.add("equipment");
+      } else continue;
+      delete flat[key];
+    }
+    for(const key of changed)flat[`system.npcProfile.${key}`]=profile[key];
+    return super._prepareSubmitData(event,form,formData,updateData);
+  }
+
+  static #onEnable() {
+    if(!this.isEditable)return;
+    return this.actor.update({"system.npcProfile.enabled":!this.actor.system.npcProfile?.enabled});
+  }
+  static #onAddSkill() {
+    if(!this.isEditable)return;
+    const rows=structuredClone(this.actor.system.npcProfile.skills);
+    const key=Object.keys(CONFIG.SPYCRAFT.skills).find(key=>!rows.some(s=>s.key===key));
+    if(key)rows.push({key,grade:1});
+    return this.actor.update({"system.npcProfile.skills":rows});
+  }
+  static #onAddQuality() {
+    if(!this.isEditable)return;
+    return this.actor.update({"system.npcProfile.qualities":[...structuredClone(this.actor.system.npcProfile.qualities),{id:"all-thumbs",units:1,details:"",level:1,modifier:0,linkedCost:1,limited:false,caliber:1}]});
+  }
+  static #onAddPick(event,target) {
+    if(!this.isEditable || !NPC_CATEGORIES.includes(target.dataset.category))return;
+    const equipment=structuredClone(this.actor.system.npcProfile.equipment);equipment[target.dataset.category].push(1);
+    return this.actor.update({"system.npcProfile.equipment":equipment});
+  }
+  static #onRemoveRow(event,target) {
+    if(!this.isEditable)return;
+    const {list,index,category}=target.dataset;
+    if(!["skills","qualities","equipment"].includes(list))return;
+    const rows=structuredClone(this.actor.system.npcProfile[list]);
+    const array=list==="equipment"?rows[category]:rows;
+    if(!Array.isArray(array))return;
+    array.splice(Number(index),1);
+    return this.actor.update({[`system.npcProfile.${list}`]:rows});
   }
 
   _item(target) { return this.actor.items.get(target.closest("[data-item-id]")?.dataset.itemId); }

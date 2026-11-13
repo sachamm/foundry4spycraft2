@@ -1,3 +1,4 @@
+import { defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { SKILLS } from "../rules/tables.mjs";
 
@@ -49,11 +50,30 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
 }
 
 export class NpcData extends BaseActorData {
+  prepareDerivedData() {
+    if (!this.npcProfile?.enabled) return super.prepareDerivedData();
+    const result = computeNpcProfile(this.npcProfile, this.npcType, this.threatLevel, this.abilities);
+    this.npcBuild = result;
+    // Table values are base bonuses. Attribute modifiers are applied once by the base model.
+    this.bab = result.stats?.attack ?? 0;
+    this.defense.bonus = result.stats?.defense ?? 0;
+    this.initiative.bonus = result.stats?.initiative ?? 0;
+    for (const save of Object.values(this.saves)) save.base = result.stats?.resilience ?? 0;
+    if (result.type === "special" && Array.isArray(result.health)) {
+      [this.vitality.max, this.wounds.max] = result.health;
+    } else { this.vitality.max = 0; this.wounds.max = 0; }
+    super.prepareDerivedData();
+    this.damageSave = result.type === "special" ? null : result.health;
+    this.competence = result.competence;
+    this.warnings = result.warnings;
+  }
+
   static defineSchema() {
     return {
       ...super.defineSchema(),
       threatLevel: int(1, { min: 1 }),
-      npcType: new StringField({ initial: "standard", choices: ["standard", "special", "villain"] })
+      npcType: new StringField({ initial: "standard", choices: ["standard", "special", "villain", "animal"] }),
+      npcProfile: new ObjectField({ initial: () => defaultNpcProfile() })
     };
   }
 }

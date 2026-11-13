@@ -17,7 +17,8 @@
   ],
   "styles": [
     "styles/spycraft2.css",
-    "styles/retro.css"
+    "styles/retro.css",
+    "styles/npc-builder.css"
   ],
   "languages": [
     {

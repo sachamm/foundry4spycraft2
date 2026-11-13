@@ -1,0 +1,65 @@
+<section class="npc-builder">
+  <div class="npc-builder-title"><h2>NPC creation</h2>{{#if editable}}<button type="button" data-action="npcEnable">{{#if system.npcProfile.enabled}}Use manual stat block{{else}}Use graded NPC creation{{/if}}</button>{{/if}}</div>
+  {{#if system.npcProfile.enabled}}
+  <p class="npc-note">Choose grades, listed skills, equipment picks and qualities. Attributes below start at 10; changes are priced as attribute qualities. Other quality effects require GC adjudication.</p>
+  <fieldset {{#unless editable}}disabled{{/unless}}>
+    <div class="npc-controls">
+      <label>NPC Tier <select name="system.npcProfile.tier" data-dtype="Number">{{selectOptions npc.tierOptions selected=npc.profile.tier}}</select></label>
+      <label><input type="checkbox" name="system.npcProfile.group" {{checked npc.profile.group}} /> NPC group</label>
+      <strong>Effective TL {{npc.result.effectiveLevel}}</strong>
+    </div>
+    <div class="npc-grade-grid">{{#each npc.grades}}<label>{{label}}<select name="system.npcProfile.grades.{{key}}" data-dtype="Number">{{selectOptions options selected=value}}</select></label>{{/each}}</div>
+  </fieldset>
+  <div class="npc-results" aria-live="polite">
+    <span>Initiative <b>{{signed system.initiative.total}}</b></span><span>Attack base <b>{{signed system.bab}}</b></span>
+    <span>Defense <b>{{system.defense.total}}</b></span><span>Resilience base <b>{{signed npc.result.stats.resilience}}</b></span>
+    {{#unless npc.animal}}<span>Competence <b>{{signed npc.result.competence}}</b></span>{{/unless}}
+    {{#if npc.special}}<span>Vitality max <b>{{system.vitality.max}}</b></span><span>Wounds max <b>{{system.wounds.max}}</b></span>
+    {{else}}<span>Damage save <b>{{signed system.damageSave}}</b></span>{{/if}}
+  </div>
+  {{#if npc.special}}<div class="resources"><label>Current vitality <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /></label><label>Current wounds <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /></label></div>{{/if}}
+  {{#if npc.result.warnings}}<ul class="npc-warnings" role="status">{{#each npc.result.warnings}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
+  <fieldset {{#unless editable}}disabled{{/unless}}>
+    <div class="npc-section-title"><h3>Listed skills · Skilled quality</h3><button type="button" data-action="npcAddSkill">Add skill</button></div>
+    <p class="npc-note">Use the higher of the listed bonus and Competence. This is also the effective rank for result caps. Maximum 3 listed skills for standard NPCs; 5 for special NPCs.</p>
+    {{#each npc.skills}}<div class="npc-row">
+      <select aria-label="Listed skill" name="npcSkill.{{index}}.key">{{selectOptions ../npc.skillOptions selected=key}}</select>
+      <select aria-label="Skill grade" name="npcSkill.{{index}}.grade" data-dtype="Number">{{selectOptions ../npc.gradeOptions selected=grade}}</select>
+      <span>Bonus <b>{{signed resolved.bonus}}</b> · cap {{resolved.cap}} · {{grade}} XP</span>
+      <button type="button" data-action="npcRemoveRow" data-list="skills" data-index="{{index}}" aria-label="Remove listed skill">Remove</button>
+    </div>{{/each}}
+    <div class="npc-section-title"><h3>Equipment allowances</h3></div>
+    <p class="npc-note">Starts with one Caliber I weapon, gear pick and vehicle. The vehicle is shared by a standard NPC group. Additional picks cost +1 XP; each Caliber increase costs +1 XP; removing a starting pick gives −2 XP. Wealth grants no equipment. Animals use Augmented.</p>
+    {{#each npc.equipment}}<div class="npc-equipment"><strong>{{category}}</strong>
+      {{#each picks}}<label>Caliber <select aria-label="{{category}} pick Caliber" name="npcPick.{{category}}.{{index}}" data-dtype="Number">{{selectOptions ../../npc.caliberOptions selected=caliber}}</select><button type="button" data-action="npcRemoveRow" data-list="equipment" data-category="{{category}}" data-index="{{index}}" aria-label="Remove {{category}} pick">×</button></label>{{/each}}
+      <button type="button" data-action="npcAddPick" data-category="{{category}}">Add pick</button>
+    </div>{{/each}}
+    <label>Additional ammunition pairs <input type="number" min="0" max="100" name="system.npcProfile.extraAmmoPairs" value="{{npc.profile.extraAmmoPairs}}" data-dtype="Number" /></label>
+    <p class="npc-note">{{npc.result.ammoPerWeapon}} starting stockpile(s) per weapon; each additional pair costs +1 XP. Record the actual selected items in the weapon/item lists below.</p>
+    <div class="npc-section-title"><h3>NPC qualities</h3><button type="button" data-action="npcAddQuality">Add quality</button></div>
+    {{#each npc.qualities}}<div class="npc-quality">
+      <div class="npc-row"><select aria-label="NPC quality" name="npcQuality.{{index}}.id">{{selectOptions ../npc.qualityOptions selected=id}}</select><label>Units <input type="number" min="1" max="100" name="npcQuality.{{index}}.units" value="{{units}}" data-dtype="Number" /></label><button type="button" data-action="npcRemoveRow" data-list="qualities" data-index="{{index}}">Remove</button></div>
+      <small>{{rule.costLabel}} · p.{{rule.page}}</small>
+      {{#if caliberCost}}<label>Caliber <select name="npcQuality.{{index}}.caliber" data-dtype="Number">{{selectOptions ../npc.caliberOptions selected=caliber}}</select></label>{{/if}}
+      {{#if classLevel}}<label>Lowest class level granting the ability <input type="number" min="1" max="20" name="npcQuality.{{index}}.level" value="{{level}}" data-dtype="Number" /></label>{{/if}}
+      {{#if decision}}<label>Decision modifier (−5 to +5) <input type="number" min="-5" max="5" name="npcQuality.{{index}}.modifier" value="{{modifier}}" data-dtype="Number" /></label>{{/if}}
+      {{#if linked}}<label>Original linked quality cost <input type="number" min="0" name="npcQuality.{{index}}.linkedCost" value="{{linkedCost}}" data-dtype="Number" /></label><small>Replaces the linked quality cost; do not add a duplicate quality entry.</small>{{/if}}
+      {{#if movement}}<label><input type="checkbox" name="npcQuality.{{index}}.limited" {{checked limited}} /> Limited to one or two movement modes</label>{{/if}}
+      <input type="text" aria-label="Quality details" name="npcQuality.{{index}}.details" value="{{details}}" placeholder="Chosen feat, ability, terrain, item, damage type or other details" />
+    </div>{{/each}}
+  </fieldset>
+  <details class="npc-xp" open><summary>XP calculation {{#if npc.result.complete}}— {{npc.result.xp}} XP{{else}}— correct the warnings above{{/if}}</summary>
+    <table><thead><tr><th>Component</th><th>XP</th></tr></thead><tbody>{{#each npc.result.breakdown}}<tr><td>{{label}}</td><td>{{signed xp}}</td></tr>{{/each}}</tbody></table>
+    {{#if npc.result.complete}}<p><b>NPC reward: {{npc.result.xp}} XP · Mission contribution: {{npc.result.missionXP}} XP (×{{npc.result.multiplier}})</b></p>{{/if}}
+    <p class="npc-note">Quality reductions cannot lower the statistic base below half (rounded up). Equipment adjustments follow; the reward cannot go below zero. Count each antagonist type once per mission, regardless of numbers or appearances. Mission-level scaling is separate.</p>
+  </details>
+  {{#if npc.result.manual}}<details><summary>GC adjudication & source notes</summary><ul>{{#each npc.result.manual}}<li>{{this}}</li>{{/each}}</ul></details>{{/if}}
+  <details><summary>Core rules tables · pp.443–452</summary>
+    <p class="npc-note">{{npc.source.title}} · Tables 7.11 and 7.13. Values are base bonuses before attribute or situational modifiers. Health pairs are vitality/wounds.</p>
+    {{#each npc.referenceTables}}<details><summary>{{label}}</summary><div class="npc-table-scroll"><table><thead><tr><th>Grade / TL</th>{{#each ../npc.levels}}<th>{{this}}</th>{{/each}}</tr></thead><tbody>{{#each rows}}<tr><th>{{grade}}</th>{{#each values}}<td>{{this}}</td>{{/each}}</tr>{{/each}}</tbody></table></div></details>{{/each}}
+    <h4>Quality costs</h4><table><thead><tr><th>Quality</th><th>Cost / restriction</th><th>Page</th></tr></thead><tbody>{{#each npc.catalog}}<tr><td>{{name}}</td><td>{{costLabel}}</td><td>{{page}}</td></tr>{{/each}}</tbody></table>
+    <p class="npc-note">Tier I: TL−4 · II: TL−2 · III: TL · IV: TL+2 · V: TL+4. Clamp effective TL to 1–20; Tier III is the default. Tiers do not add an invented grade or XP surcharge.</p>
+    {{#each npc.source.notes}}<p class="npc-note">{{this}}</p>{{/each}}
+  </details>
+  {{else}}<p class="npc-note">Manual mode preserves existing NPC stat blocks. Enable graded creation to resolve the core tables and calculate XP.</p>{{/if}}
+</section>

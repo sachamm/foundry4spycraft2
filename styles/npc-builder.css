@@ -1,0 +1,26 @@
+.spycraft2 .npc-builder { margin: 12px 0; border-block: 2px solid #68533b; padding: 12px 0; }
+.spycraft2 .npc-builder-title,.spycraft2 .npc-section-title { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+.spycraft2 .npc-builder h2,.spycraft2 .npc-builder h3 { margin:8px 0; }
+.spycraft2 .npc-builder fieldset { border:0; padding:0; margin:0; min-width:0; }
+.spycraft2 .npc-builder button { width:auto; flex:none; min-height:28px; padding:2px 10px; }
+.spycraft2 .npc-note { font-size:12px; line-height:1.5; opacity:.85; }
+.spycraft2 .npc-controls,.spycraft2 .npc-results,.spycraft2 .npc-equipment,.spycraft2 .npc-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:8px 0; }
+.spycraft2 .npc-grade-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:10px; }
+.spycraft2 .npc-grade-grid label { display:flex; flex-direction:column; gap:4px; }
+.spycraft2 .npc-results { padding:10px; background:rgba(104,83,59,.12); border-radius:4px; }
+.spycraft2 .npc-results span { padding:3px 8px; }
+.spycraft2 .npc-builder input[type=number] { width:65px; }
+.spycraft2 .npc-row > select:first-child { flex:1; min-width:170px; }
+.spycraft2 .npc-row > select { width:auto; }
+.spycraft2 .npc-quality { border:1px solid #88755f; border-radius:4px; padding:8px; margin:8px 0; }
+.spycraft2 .npc-quality > input[type=text] { width:100%; margin-top:6px; }
+.spycraft2 .npc-equipment strong { min-width:65px; text-transform:capitalize; }
+.spycraft2 .npc-equipment label { display:flex; align-items:center; gap:4px; }
+.spycraft2 .npc-equipment select { width:65px; }
+.spycraft2 .npc-builder details { margin:10px 0; padding:8px; border:1px solid #88755f; border-radius:4px; }
+.spycraft2 .npc-builder summary { cursor:pointer; font-weight:bold; }
+.spycraft2 .npc-builder table { width:100%; font-size:12px; margin:8px 0; }
+.spycraft2 .npc-builder th,.spycraft2 .npc-builder td { padding:5px 8px; text-align:left; }
+.spycraft2 .npc-table-scroll { overflow-x:auto; }
+.spycraft2 .npc-table-scroll table { min-width:950px; white-space:nowrap; }
+.spycraft2 .npc-warnings { border-left:4px solid #9a5424; padding:8px 24px; background:rgba(154,84,36,.1); }

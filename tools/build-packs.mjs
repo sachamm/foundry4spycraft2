@@ -16,6 +16,8 @@ import { ClassicLevel } from "classic-level";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = f => JSON.parse(readFileSync(join(ROOT, "src/data", f), "utf8"));
 const core = read("core.json");
+const npcRules = read("npcs.json");
+writeFileSync(join(ROOT, "module/rules/npc-tables.mjs"), `// GENERATED from src/data/npcs.json by tools/build-packs.mjs.\nexport const NPC_RULES = ${JSON.stringify(npcRules, null, 1)};\n`);
 const classes = read("classes.json");
 const origins = read("origins.json");
 const feats = read("feats.json");

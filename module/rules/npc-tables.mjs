@@ -1,0 +1,3473 @@
+// GENERATED from src/data/npcs.json by tools/build-packs.mjs.
+export const NPC_RULES = {
+ "source": {
+  "title": "Spycraft 2.0 Rulebook, Second Printing",
+  "pages": "441–452",
+  "tables": [
+   "7.11",
+   "7.13"
+  ],
+  "notes": [
+   "Transcribed from user-supplied AI rules markdown and cross-checked against both local rulebook PDFs.",
+   "Table 7.11 prints grade I / TL12 vitality as 26 and grade V / TL9 wounds as 10. These cells are preserved, not silently corrected."
+  ]
+ },
+ "grades": [
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII",
+  "IX",
+  "X"
+ ],
+ "tables": {
+  "initiative": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3
+   ],
+   [
+    0,
+    0,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6
+   ],
+   [
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    8,
+    9,
+    9
+   ],
+   [
+    1,
+    1,
+    2,
+    2,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    10,
+    10,
+    11,
+    11,
+    12
+   ],
+   [
+    1,
+    2,
+    3,
+    3,
+    4,
+    5,
+    6,
+    6,
+    7,
+    8,
+    9,
+    9,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    15,
+    15
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    15,
+    16,
+    17,
+    18
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    22,
+    23,
+    24
+   ],
+   [
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    11,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    19,
+    21,
+    22,
+    23,
+    24,
+    26,
+    27
+   ]
+  ],
+  "attack": [
+   [
+    -1,
+    -1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5
+   ],
+   [
+    -1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    6,
+    7
+   ],
+   [
+    0,
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10
+   ],
+   [
+    0,
+    1,
+    1,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    9,
+    9,
+    10,
+    10,
+    11,
+    12
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    3,
+    4,
+    5,
+    6,
+    6,
+    7,
+    8,
+    9,
+    9,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    1,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    15,
+    16,
+    17
+   ],
+   [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+   ],
+   [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    7,
+    8,
+    9,
+    10,
+    11,
+    13,
+    14,
+    15,
+    16,
+    17,
+    19,
+    20,
+    21,
+    22,
+    23,
+    25
+   ],
+   [
+    2,
+    3,
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    13,
+    14,
+    15,
+    17,
+    18,
+    19,
+    21,
+    22,
+    23,
+    25,
+    26,
+    27
+   ]
+  ],
+  "defense": [
+   [
+    -1,
+    -1,
+    -1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4
+   ],
+   [
+    0,
+    0,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6
+   ],
+   [
+    0,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8
+   ],
+   [
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10
+   ],
+   [
+    1,
+    1,
+    2,
+    2,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    10,
+    10,
+    11,
+    11,
+    12
+   ],
+   [
+    2,
+    2,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    10,
+    10,
+    11,
+    11,
+    12,
+    13,
+    14
+   ],
+   [
+    2,
+    3,
+    3,
+    4,
+    5,
+    6,
+    6,
+    7,
+    8,
+    9,
+    9,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    15,
+    15,
+    16
+   ],
+   [
+    3,
+    4,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8,
+    9,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    15,
+    16,
+    16,
+    17,
+    18
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    7,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22
+   ]
+  ],
+  "resilience": [
+   [
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3
+   ],
+   [
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5
+   ],
+   [
+    0,
+    0,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6
+   ],
+   [
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    7,
+    8
+   ],
+   [
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    8,
+    9
+   ],
+   [
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10,
+    11
+   ],
+   [
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10,
+    11,
+    11,
+    12
+   ],
+   [
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    9,
+    9,
+    10,
+    10,
+    11,
+    12,
+    12,
+    13,
+    13
+   ],
+   [
+    2,
+    3,
+    3,
+    4,
+    5,
+    5,
+    6,
+    7,
+    7,
+    8,
+    9,
+    9,
+    10,
+    11,
+    11,
+    12,
+    13,
+    13,
+    14,
+    15
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    6,
+    7,
+    8,
+    9,
+    9,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    15,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  "damageSave": [
+   [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ],
+   [
+    4,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   [
+    5,
+    5,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    8,
+    8
+   ],
+   [
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10
+   ],
+   [
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    8,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    10,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12
+   ],
+   [
+    8,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    11,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12,
+    13,
+    13,
+    13
+   ],
+   [
+    9,
+    9,
+    10,
+    10,
+    10,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12,
+    13,
+    13,
+    13,
+    14,
+    14,
+    14,
+    15,
+    15,
+    15
+   ],
+   [
+    10,
+    10,
+    11,
+    11,
+    11,
+    12,
+    12,
+    13,
+    13,
+    13,
+    14,
+    14,
+    15,
+    15,
+    15,
+    16,
+    16,
+    17,
+    17,
+    17
+   ],
+   [
+    11,
+    12,
+    12,
+    12,
+    13,
+    13,
+    14,
+    14,
+    14,
+    15,
+    15,
+    16,
+    16,
+    16,
+    17,
+    17,
+    18,
+    18,
+    18,
+    19
+   ],
+   [
+    12,
+    13,
+    13,
+    13,
+    14,
+    14,
+    15,
+    15,
+    15,
+    16,
+    16,
+    17,
+    17,
+    17,
+    18,
+    18,
+    19,
+    19,
+    19,
+    20
+   ]
+  ],
+  "health": [
+   [
+    [
+     3,
+     13
+    ],
+    [
+     6,
+     13
+    ],
+    [
+     9,
+     13
+    ],
+    [
+     12,
+     13
+    ],
+    [
+     15,
+     13
+    ],
+    [
+     18,
+     13
+    ],
+    [
+     21,
+     14
+    ],
+    [
+     24,
+     14
+    ],
+    [
+     27,
+     14
+    ],
+    [
+     30,
+     14
+    ],
+    [
+     33,
+     14
+    ],
+    [
+     26,
+     14
+    ],
+    [
+     39,
+     14
+    ],
+    [
+     42,
+     15
+    ],
+    [
+     45,
+     15
+    ],
+    [
+     48,
+     15
+    ],
+    [
+     51,
+     15
+    ],
+    [
+     54,
+     15
+    ],
+    [
+     57,
+     15
+    ],
+    [
+     60,
+     15
+    ]
+   ],
+   [
+    [
+     4,
+     14
+    ],
+    [
+     7,
+     14
+    ],
+    [
+     11,
+     14
+    ],
+    [
+     14,
+     14
+    ],
+    [
+     18,
+     14
+    ],
+    [
+     21,
+     15
+    ],
+    [
+     25,
+     15
+    ],
+    [
+     28,
+     15
+    ],
+    [
+     32,
+     15
+    ],
+    [
+     35,
+     15
+    ],
+    [
+     39,
+     16
+    ],
+    [
+     42,
+     16
+    ],
+    [
+     46,
+     16
+    ],
+    [
+     49,
+     16
+    ],
+    [
+     53,
+     16
+    ],
+    [
+     56,
+     17
+    ],
+    [
+     60,
+     17
+    ],
+    [
+     63,
+     17
+    ],
+    [
+     67,
+     17
+    ],
+    [
+     70,
+     17
+    ]
+   ],
+   [
+    [
+     4,
+     15
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     12,
+     15
+    ],
+    [
+     16,
+     15
+    ],
+    [
+     20,
+     15
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     28,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     40,
+     16
+    ],
+    [
+     44,
+     17
+    ],
+    [
+     48,
+     17
+    ],
+    [
+     52,
+     17
+    ],
+    [
+     56,
+     17
+    ],
+    [
+     60,
+     17
+    ],
+    [
+     64,
+     18
+    ],
+    [
+     68,
+     18
+    ],
+    [
+     72,
+     18
+    ],
+    [
+     76,
+     18
+    ],
+    [
+     80,
+     18
+    ]
+   ],
+   [
+    [
+     5,
+     16
+    ],
+    [
+     9,
+     16
+    ],
+    [
+     14,
+     17
+    ],
+    [
+     18,
+     17
+    ],
+    [
+     23,
+     17
+    ],
+    [
+     27,
+     17
+    ],
+    [
+     32,
+     17
+    ],
+    [
+     36,
+     18
+    ],
+    [
+     41,
+     18
+    ],
+    [
+     45,
+     18
+    ],
+    [
+     50,
+     18
+    ],
+    [
+     54,
+     18
+    ],
+    [
+     59,
+     19
+    ],
+    [
+     63,
+     19
+    ],
+    [
+     68,
+     19
+    ],
+    [
+     72,
+     19
+    ],
+    [
+     77,
+     19
+    ],
+    [
+     81,
+     20
+    ],
+    [
+     86,
+     20
+    ],
+    [
+     90,
+     20
+    ]
+   ],
+   [
+    [
+     5,
+     17
+    ],
+    [
+     10,
+     17
+    ],
+    [
+     15,
+     17
+    ],
+    [
+     20,
+     18
+    ],
+    [
+     25,
+     18
+    ],
+    [
+     30,
+     18
+    ],
+    [
+     35,
+     18
+    ],
+    [
+     40,
+     19
+    ],
+    [
+     45,
+     10
+    ],
+    [
+     50,
+     19
+    ],
+    [
+     55,
+     20
+    ],
+    [
+     60,
+     20
+    ],
+    [
+     65,
+     20
+    ],
+    [
+     70,
+     20
+    ],
+    [
+     75,
+     21
+    ],
+    [
+     80,
+     21
+    ],
+    [
+     85,
+     21
+    ],
+    [
+     90,
+     22
+    ],
+    [
+     95,
+     22
+    ],
+    [
+     100,
+     22
+    ]
+   ],
+   [
+    [
+     6,
+     18
+    ],
+    [
+     11,
+     18
+    ],
+    [
+     17,
+     18
+    ],
+    [
+     22,
+     19
+    ],
+    [
+     28,
+     19
+    ],
+    [
+     33,
+     19
+    ],
+    [
+     39,
+     19
+    ],
+    [
+     44,
+     20
+    ],
+    [
+     50,
+     20
+    ],
+    [
+     55,
+     20
+    ],
+    [
+     61,
+     21
+    ],
+    [
+     66,
+     21
+    ],
+    [
+     72,
+     21
+    ],
+    [
+     77,
+     21
+    ],
+    [
+     83,
+     22
+    ],
+    [
+     88,
+     22
+    ],
+    [
+     94,
+     22
+    ],
+    [
+     99,
+     23
+    ],
+    [
+     105,
+     23
+    ],
+    [
+     110,
+     23
+    ]
+   ],
+   [
+    [
+     6,
+     19
+    ],
+    [
+     12,
+     19
+    ],
+    [
+     18,
+     20
+    ],
+    [
+     24,
+     20
+    ],
+    [
+     30,
+     20
+    ],
+    [
+     36,
+     21
+    ],
+    [
+     42,
+     21
+    ],
+    [
+     48,
+     21
+    ],
+    [
+     54,
+     22
+    ],
+    [
+     60,
+     22
+    ],
+    [
+     66,
+     22
+    ],
+    [
+     72,
+     23
+    ],
+    [
+     78,
+     23
+    ],
+    [
+     84,
+     23
+    ],
+    [
+     90,
+     24
+    ],
+    [
+     96,
+     24
+    ],
+    [
+     102,
+     24
+    ],
+    [
+     108,
+     25
+    ],
+    [
+     114,
+     25
+    ],
+    [
+     120,
+     25
+    ]
+   ],
+   [
+    [
+     7,
+     20
+    ],
+    [
+     13,
+     20
+    ],
+    [
+     20,
+     21
+    ],
+    [
+     26,
+     21
+    ],
+    [
+     33,
+     21
+    ],
+    [
+     39,
+     22
+    ],
+    [
+     46,
+     22
+    ],
+    [
+     52,
+     23
+    ],
+    [
+     59,
+     23
+    ],
+    [
+     65,
+     23
+    ],
+    [
+     72,
+     24
+    ],
+    [
+     78,
+     24
+    ],
+    [
+     85,
+     25
+    ],
+    [
+     91,
+     25
+    ],
+    [
+     98,
+     25
+    ],
+    [
+     104,
+     26
+    ],
+    [
+     111,
+     26
+    ],
+    [
+     117,
+     27
+    ],
+    [
+     124,
+     27
+    ],
+    [
+     130,
+     27
+    ]
+   ],
+   [
+    [
+     7,
+     21
+    ],
+    [
+     14,
+     22
+    ],
+    [
+     21,
+     22
+    ],
+    [
+     28,
+     22
+    ],
+    [
+     35,
+     23
+    ],
+    [
+     42,
+     23
+    ],
+    [
+     49,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     63,
+     24
+    ],
+    [
+     70,
+     25
+    ],
+    [
+     77,
+     25
+    ],
+    [
+     84,
+     26
+    ],
+    [
+     91,
+     26
+    ],
+    [
+     98,
+     26
+    ],
+    [
+     105,
+     27
+    ],
+    [
+     112,
+     27
+    ],
+    [
+     119,
+     28
+    ],
+    [
+     126,
+     28
+    ],
+    [
+     133,
+     28
+    ],
+    [
+     140,
+     29
+    ]
+   ],
+   [
+    [
+     8,
+     22
+    ],
+    [
+     15,
+     23
+    ],
+    [
+     23,
+     23
+    ],
+    [
+     30,
+     23
+    ],
+    [
+     38,
+     24
+    ],
+    [
+     45,
+     24
+    ],
+    [
+     53,
+     25
+    ],
+    [
+     60,
+     25
+    ],
+    [
+     68,
+     25
+    ],
+    [
+     75,
+     26
+    ],
+    [
+     83,
+     26
+    ],
+    [
+     90,
+     27
+    ],
+    [
+     98,
+     27
+    ],
+    [
+     105,
+     27
+    ],
+    [
+     113,
+     28
+    ],
+    [
+     120,
+     28
+    ],
+    [
+     128,
+     29
+    ],
+    [
+     135,
+     29
+    ],
+    [
+     143,
+     29
+    ],
+    [
+     150,
+     30
+    ]
+   ]
+  ],
+  "competence": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2
+   ],
+   [
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    3
+   ],
+   [
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5
+   ],
+   [
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    6
+   ],
+   [
+    2,
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8
+   ],
+   [
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    9,
+    9,
+    9
+   ],
+   [
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    9,
+    10,
+    10,
+    11
+   ],
+   [
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10,
+    10,
+    11,
+    11,
+    12
+   ],
+   [
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10,
+    11,
+    11,
+    12,
+    12,
+    13,
+    13,
+    14
+   ]
+  ],
+  "skill": [
+   [
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10
+   ],
+   [
+    2,
+    3,
+    3,
+    4,
+    4,
+    5,
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    10,
+    10,
+    11,
+    11,
+    12
+   ],
+   [
+    2,
+    3,
+    4,
+    4,
+    5,
+    6,
+    6,
+    7,
+    8,
+    8,
+    9,
+    10,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    14,
+    15
+   ],
+   [
+    3,
+    3,
+    4,
+    5,
+    6,
+    6,
+    7,
+    8,
+    9,
+    9,
+    10,
+    11,
+    12,
+    12,
+    13,
+    14,
+    15,
+    15,
+    16,
+    17
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    16,
+    17,
+    18,
+    19,
+    20
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    8,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+   ],
+   [
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    25,
+    26,
+    27
+   ],
+   [
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    13,
+    14,
+    15,
+    17,
+    18,
+    19,
+    21,
+    22,
+    23,
+    25,
+    26,
+    27,
+    29,
+    30
+   ],
+   [
+    6,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    20,
+    21,
+    22,
+    24,
+    25,
+    26,
+    28,
+    29,
+    30,
+    32
+   ]
+  ]
+ },
+ "tiers": [
+  {
+   "tier": 1,
+   "offset": -4
+  },
+  {
+   "tier": 2,
+   "offset": -2
+  },
+  {
+   "tier": 3,
+   "offset": 0
+  },
+  {
+   "tier": 4,
+   "offset": 2
+  },
+  {
+   "tier": 5,
+   "offset": 4
+  }
+ ],
+ "equipment": {
+  "starting": {
+   "standard": {
+    "weapons": 1,
+    "gear": 1,
+    "vehicles": 1
+   },
+   "special": {
+    "weapons": 1,
+    "gear": 1,
+    "vehicles": 1
+   },
+   "animal": {
+    "weapons": 0,
+    "gear": 0,
+    "vehicles": 0
+   }
+  },
+  "startingCaliber": 1,
+  "additionalPickXP": 1,
+  "caliberRaiseXP": 1,
+  "removedStartingPickXP": -2,
+  "ammo": {
+   "standard": 1,
+   "special": 3,
+   "animal": 0
+  },
+  "additionalAmmoPerXP": 2,
+  "vehicleNote": "One vehicle per standard NPC group; one per special NPC."
+ },
+ "qualityFloorFraction": 0.5,
+ "specialMultiplier": 4,
+ "qualities": [
+  {
+   "id": "achilles-heel",
+   "name": "Achilles Heel",
+   "cost": -3,
+   "costLabel": "–3 XP per damage type",
+   "page": 446,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "all-thumbs",
+   "name": "All Thumbs",
+   "cost": -2,
+   "costLabel": "–2 XP",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "alternate-identity-form",
+   "name": "Alternate Identity/Form",
+   "cost": 4,
+   "costLabel": "+4 XP",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "aquatic",
+   "name": "Aquatic",
+   "cost": 3,
+   "costLabel": "+3 XP",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "attack-on-command",
+   "name": "Attack on Command",
+   "cost": 2,
+   "costLabel": "+2 XP — animals only, ‘trained’",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "augmented",
+   "name": "Augmented",
+   "cost": 3,
+   "costLabel": "+3 XP per Caliber, per item/weapon",
+   "page": 446,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 4,
+   "mode": "caliber"
+  },
+  {
+   "id": "burrow",
+   "name": "Burrow",
+   "cost": 3,
+   "costLabel": "+3 XP — animals only",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "camouflaged",
+   "name": "Camouflaged",
+   "cost": 3,
+   "costLabel": "+3 XP per terrain type",
+   "page": 446,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "captivating",
+   "name": "Captivating",
+   "cost": 5,
+   "costLabel": "+5 XP — special NPCs only",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "special"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "carry-on-command",
+   "name": "Carry on Command",
+   "cost": 1,
+   "costLabel": "+1 XP — animals only, ‘trained’",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "class-ability",
+   "name": "Class Ability",
+   "cost": null,
+   "costLabel": "Special Cost",
+   "page": 446,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "classLevel"
+  },
+  {
+   "id": "clumsy",
+   "name": "Clumsy",
+   "cost": -2,
+   "costLabel": "–2 XP",
+   "page": 446,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "commander",
+   "name": "Commander",
+   "cost": 3,
+   "costLabel": "+3 XP — minions only",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "standard"
+   ],
+   "max": null,
+   "requires": "minion",
+   "mode": "fixed"
+  },
+  {
+   "id": "construct",
+   "name": "Construct",
+   "cost": 8,
+   "costLabel": "+8 XP",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "damage-reduction",
+   "name": "Damage Reduction",
+   "cost": 3,
+   "costLabel": "+3 XP per point",
+   "page": 447,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 8,
+   "mode": "units"
+  },
+  {
+   "id": "damage-resistance",
+   "name": "Damage Resistance",
+   "cost": 1,
+   "costLabel": "+1 XP per point",
+   "page": 447,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 8,
+   "mode": "units"
+  },
+  {
+   "id": "disarm-on-command",
+   "name": "Disarm on Command",
+   "cost": 2,
+   "costLabel": "+2 XP — animals only, ‘trained’",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "diurnal",
+   "name": "Diurnal",
+   "cost": -1,
+   "costLabel": "–1 XP — animals only",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "diving",
+   "name": "Diving",
+   "cost": 1,
+   "costLabel": "+1 XP — animals only",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "entertain-on-command",
+   "name": "Entertain on Command",
+   "cost": 1,
+   "costLabel": "+1 XP — animals only, ‘trained’",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "extended-training",
+   "name": "Extended Training",
+   "cost": 1,
+   "costLabel": "+1 XP — no animals",
+   "page": 447,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "fast-healing",
+   "name": "Fast Healing",
+   "cost": 2,
+   "costLabel": "+2 XP",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "fearless",
+   "name": "Fearless",
+   "cost": 1,
+   "costLabel": "+1 XP per grade, ‘trained’ by grade",
+   "page": 447,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 5,
+   "mode": "units"
+  },
+  {
+   "id": "fearsome",
+   "name": "Fearsome",
+   "cost": 5,
+   "costLabel": "+5 XP",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "feat",
+   "name": "Feat",
+   "cost": 2,
+   "costLabel": "+2 XP per feat",
+   "page": 447,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "feral",
+   "name": "Feral",
+   "cost": 2,
+   "costLabel": "+2 XP",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "fleet",
+   "name": "Fleet",
+   "cost": 3,
+   "costLabel": "+3 XP per 10 ft.",
+   "page": 447,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "movement"
+  },
+  {
+   "id": "flight",
+   "name": "Flight",
+   "cost": 4,
+   "costLabel": "+4 XP per 20 ft.",
+   "page": 447,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "foil",
+   "name": "Foil",
+   "cost": null,
+   "costLabel": "Special Cost — no animals",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "mode": "decision"
+  },
+  {
+   "id": "guard-on-command",
+   "name": "Guard on Command",
+   "cost": 2,
+   "costLabel": "+2 XP — animals only, ‘trained’",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "henchman",
+   "name": "Henchman",
+   "cost": 4,
+   "costLabel": "+4 XP — special NPCs only",
+   "page": 447,
+   "repeatable": false,
+   "types": [
+    "special"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "horde",
+   "name": "Horde",
+   "cost": 4,
+   "costLabel": "+4 XP — minions only",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard"
+   ],
+   "max": null,
+   "requires": "minion",
+   "mode": "fixed"
+  },
+  {
+   "id": "horrific",
+   "name": "Horrific",
+   "cost": 8,
+   "costLabel": "+8 XP",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "hulking",
+   "name": "Hulking",
+   "cost": 5,
+   "costLabel": "+5 XP per Size increase",
+   "page": 448,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "improved-hearing",
+   "name": "Improved Hearing",
+   "cost": 3,
+   "costLabel": "+3 XP",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "improved-scent",
+   "name": "Improved Scent",
+   "cost": 3,
+   "costLabel": "+3 XP",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "improved-vision",
+   "name": "Improved Vision",
+   "cost": 3,
+   "costLabel": "+3 XP",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "inferior-attribute",
+   "name": "Inferior Attribute",
+   "cost": -1,
+   "costLabel": "–1 XP per –1 attribute score",
+   "page": 448,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "dedicated"
+  },
+  {
+   "id": "low-light-vision",
+   "name": "Low-Light Vision",
+   "cost": 2,
+   "costLabel": "+2 XP",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "mastermind",
+   "name": "Mastermind",
+   "cost": 8,
+   "costLabel": "+8 XP — special NPCs only",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "special"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "meek",
+   "name": "Meek",
+   "cost": -1,
+   "costLabel": "-1 XP per grade",
+   "page": 448,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 5,
+   "mode": "units"
+  },
+  {
+   "id": "minion",
+   "name": "Minion",
+   "cost": 2,
+   "costLabel": "+2 XP — standard NPCs only",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "mount",
+   "name": "Mount",
+   "cost": 1,
+   "costLabel": "+1 XP — animals only, ‘trained’",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "natural-attack",
+   "name": "Natural Attack",
+   "cost": 2,
+   "costLabel": "+2 XP per Caliber, per attack",
+   "page": 448,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 4,
+   "mode": "caliber"
+  },
+  {
+   "id": "nocturnal",
+   "name": "Nocturnal",
+   "cost": -1,
+   "costLabel": "–1 XP — animals only",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "non-combatant",
+   "name": "Non-Combatant",
+   "cost": -3,
+   "costLabel": "–3 XP",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "open-doors",
+   "name": "Open Doors",
+   "cost": 1,
+   "costLabel": "+1 XP — animals only, ‘trained’",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "prodigy",
+   "name": "Prodigy",
+   "cost": 5,
+   "costLabel": "+5 XP — standard NPCs only",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "standard"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "removable-quality",
+   "name": "Removable Quality",
+   "cost": null,
+   "costLabel": "linked quality cost –1, minimum 1 — no animals",
+   "page": 448,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "mode": "linked"
+  },
+  {
+   "id": "rescue",
+   "name": "Rescue",
+   "cost": 3,
+   "costLabel": "+3 XP — animals only, ‘trained’",
+   "page": 448,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "retrieve-on-command",
+   "name": "Retrieve on Command",
+   "cost": 1,
+   "costLabel": "+1 XP — animals only, ‘trained’",
+   "page": 450,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "seductive",
+   "name": "Seductive",
+   "cost": 3,
+   "costLabel": "+3 XP — special NPCs only",
+   "page": 450,
+   "repeatable": false,
+   "types": [
+    "special"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "seek-on-command",
+   "name": "Seek on Command",
+   "cost": 2,
+   "costLabel": "+2 XP per target — animals only, ‘trained’",
+   "page": 450,
+   "repeatable": true,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "skilled",
+   "name": "Skilled",
+   "cost": 1,
+   "costLabel": "+1 XP per grade/per skill, ‘trained’ per grade/per skill",
+   "page": 450,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "dedicated"
+  },
+  {
+   "id": "sluggish",
+   "name": "Sluggish",
+   "cost": -2,
+   "costLabel": "–2 XP per 10 ft.",
+   "page": 450,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "movement"
+  },
+  {
+   "id": "specialty",
+   "name": "Specialty",
+   "cost": 5,
+   "costLabel": "+5 XP — no animals",
+   "page": 450,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "squad-item",
+   "name": "Squad Item",
+   "cost": 8,
+   "costLabel": "+8 XP — NPC groups only, no animals",
+   "page": 450,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "groupOnly": true,
+   "mode": "units"
+  },
+  {
+   "id": "squad-weapon",
+   "name": "Squad Weapon",
+   "cost": 8,
+   "costLabel": "+8 XP — NPC groups only, no animals",
+   "page": 451,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "groupOnly": true,
+   "mode": "units"
+  },
+  {
+   "id": "steadfast",
+   "name": "Steadfast",
+   "cost": 3,
+   "costLabel": "+3 XP — no animals",
+   "page": 451,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "story-critical",
+   "name": "Story-Critical",
+   "cost": 3,
+   "costLabel": "+3 XP",
+   "page": 451,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "strong-minded",
+   "name": "Strong-Minded",
+   "cost": 2,
+   "costLabel": "+2 XP per grade",
+   "page": 451,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 5,
+   "mode": "units"
+  },
+  {
+   "id": "subdue-on-command",
+   "name": "Subdue on Command",
+   "cost": 2,
+   "costLabel": "+2 XP — animals only, ‘trained’",
+   "page": 451,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "superior-attribute",
+   "name": "Superior Attribute",
+   "cost": 1,
+   "costLabel": "+1 XP per +1 attribute score",
+   "page": 451,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "dedicated"
+  },
+  {
+   "id": "swarm",
+   "name": "Swarm",
+   "cost": 3,
+   "costLabel": "+3 XP — animals only",
+   "page": 451,
+   "repeatable": false,
+   "types": [
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "synchronized",
+   "name": "Synchronized",
+   "cost": 2,
+   "costLabel": "+2 XP — NPC groups only, ‘trained’",
+   "page": 451,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "groupOnly": true,
+   "mode": "fixed"
+  },
+  {
+   "id": "talented",
+   "name": "Talented",
+   "cost": 5,
+   "costLabel": "+5 XP — no animals",
+   "page": 451,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "tough",
+   "name": "Tough",
+   "cost": 5,
+   "costLabel": "+5 XP per grade — no special NPCs",
+   "page": 451,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "animal"
+   ],
+   "max": 5,
+   "mode": "units"
+  },
+  {
+   "id": "treacherous",
+   "name": "Treacherous",
+   "cost": 5,
+   "costLabel": "+5 XP — no special NPCs",
+   "page": 451,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "animal"
+   ],
+   "max": null,
+   "mode": "fixed"
+  },
+  {
+   "id": "uncoordinated",
+   "name": "Uncoordinated",
+   "cost": -2,
+   "costLabel": "–2 XP — NPC groups only",
+   "page": 451,
+   "repeatable": false,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "groupOnly": true,
+   "mode": "fixed"
+  },
+  {
+   "id": "undersized",
+   "name": "Undersized",
+   "cost": -3,
+   "costLabel": "–3 XP per Size decrease",
+   "page": 451,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": null,
+   "mode": "units"
+  },
+  {
+   "id": "unnerving",
+   "name": "Unnerving",
+   "cost": 3,
+   "costLabel": "+3 XP per grade",
+   "page": 451,
+   "repeatable": true,
+   "types": [
+    "standard",
+    "special",
+    "animal"
+   ],
+   "max": 3,
+   "mode": "units"
+  }
+ ]
+};
