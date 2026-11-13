@@ -27,7 +27,7 @@ jobs:
           node-version: 22
 
       - name: Build compendium packs
-        run: npm ci && npm run build
+        run: npm ci && npm test && npm run build
 
       - name: Build zip
         run: zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md
