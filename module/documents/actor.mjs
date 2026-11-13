@@ -116,7 +116,13 @@ export class SpycraftActor extends Actor {
     if (cls.system.expert && !(sys.classLevels?.[ident])) {
       if (sys.level < 4) ui.notifications.warn(game.i18n.format("SPYCRAFT.Class.ExpertTooEarly", { name: cls.name }));
     }
-    const progression = [...sys.progression.map(p => ({ ...p })), { classId: ident, vitality: 0, skills: {} }];
+    // Record eligibility before taking an expert class, not after its own BAB,
+    // skill and other progression bonuses have been applied.
+    const firstExpertLevel = cls.system.expert && !(sys.classLevels?.[ident]);
+    const expertEntry = firstExpertLevel && cls.system.requirements
+      ? this.checkPrerequisites(cls.system.requirements) : null;
+    const progression = [...sys.progression.map(p => ({ ...p })),
+      { classId: ident, vitality: 0, skills: {}, expertEntry }];
     await this.update({ "system.progression": progression });
     await this.syncGrantedFeats();
     if (promptVitality && progression.length > 1 && cls.system.vitalityDie) {
