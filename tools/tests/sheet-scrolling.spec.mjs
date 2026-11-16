@@ -63,7 +63,49 @@ for (const height of [520, 860]) {
   }
 }
 
-test("fixture reproduces the inaccessible bottom without the viewport fix", async ({ page }) => {
+// The NPC sheet is one part; its root must scroll inside the fixed-height window.
+const npcRoot = /<section class="([^"]+)"/.exec(readFileSync(new URL("../../templates/actor/npc-sheet.hbs", import.meta.url), "utf8"))[1];
+
+async function mountNpc(page, { height = 800, css = baseCSS } = {}) {
+  await page.setContent(`
+    <style>
+      * { box-sizing: border-box; }
+      .application { display:flex; flex-direction:column; width:800px; height:${height}px; overflow:hidden; }
+      .window-header { flex:0 0 30px; }
+      .window-content { display:flex; flex-direction:column; flex:1; overflow:hidden; }
+      ${css}
+      ${retroCSS}
+    </style>
+    <form class="application spycraft2 sheet actor npc">
+      <header class="window-header">NPC</header>
+      <section class="window-content">
+        <section class="${npcRoot}">
+          <div style="height:2000px">Long graded NPC builder</div>
+          <button type="button" class="bottom-control">Last NPC control</button>
+        </section>
+      </section>
+    </form>`);
+}
+
+for (const height of [520, 800]) {
+  test(`NPC sheet reaches its final control: ${height}px window`, async ({ page }) => {
+    await mountNpc(page, { height });
+    const root = page.locator(".window-content > section");
+    expect(await root.evaluate(el => el.scrollHeight > el.clientHeight && el.clientHeight > 0)).toBe(true);
+    await root.evaluate(el => { el.scrollTop = el.scrollHeight; });
+    await expect(root.locator(".bottom-control")).toBeInViewport();
+  });
+}
+
+test("NPC fixture reproduces the inaccessible bottom without the viewport fix", async ({ page }) => {
+  const beforeFix = baseCSS.replace(/\/\* NPC sheet viewport\.[\s\S]*?(?=\/\* Biography )/, "");
+  await mountNpc(page, { css: beforeFix });
+  const root = page.locator(".window-content > section");
+  await root.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await expect(root.locator(".bottom-control")).not.toBeInViewport();
+});
+
+test("fixture reproduces the inaccessible bottom without the viewport fix",async ({ page }) => {
   const beforeFix = baseCSS.replace(/\/\* Agent tab viewport\.[\s\S]*?(?=\/\* Header \*\/)/, "");
   await mount(page, { height: 520, css: beforeFix });
   const tab = page.locator("section.tab.active");

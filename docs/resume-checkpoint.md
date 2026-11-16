@@ -8,7 +8,7 @@ All seven character tabs have completed their numerical/reference pass. Implemen
 
 Latest complete batch329 implements Superior Accuracy: trained+aimed+braced gives threat+1, stacking independently with ACC. Shared owned-source/mode-proficiency evidence protects entry, RNG and replacement checks; optional old records remain compatible. Batch328 fixed Garrote/Punch gloves NKL modifiers and Rock light constant damage while preserving Unicode minus/brass minimum0. Bullwhip mixed damage remains gated pending a ruling.
 
-Latest verification: `npm test` passed482legacy checks and2487Node tests (862+1625). Static checks passed240scripts,19templates and patch whitespace. Browser layout suite last passed47fixtures in batch327;328/329 did not change layout. Native329 audit:13receipts,13guards,4UI observations, reload and cleanup verified. Native328 audit:8receipts,7guards,5UI observations, reload and cleanup verified. Audits are in `docs/qa/`.
+Latest verification: Final integration verification passed513legacy checks and2487Node tests (862+1625); the restored engine block adds31legacy assertions. Static checks passed240scripts,19templates and patch whitespace. The integrated browser layout suite passed50fixtures, including the remote NPC scrolling regressions. Native329 audit:13receipts,13guards,4UI observations, reload and cleanup verified. Native328 audit:8receipts,7guards,5UI observations, reload and cleanup verified. Audits are in `docs/qa/`.
 
 ## Next work — batch330 not started
 
@@ -39,7 +39,7 @@ No source packs were rebuilt after batch122; generated LevelDB packs are ignored
 
 ## Isolated native QA
 
-Temporary QA root `/tmp/codex-spycraft-award-empty`, world `codex-award-empty`, port30028. Final state:six baseline actors,1113messages, world time126, GC1, no effects/combats. Latest temporary actor was deleted; baseline actors, global periods, health and dice were compared exactly. Services may need restarting; never assume old process/session identifiers remain valid. Native scripts/audits may remain in `/tmp`; durable audit JSON is committed under `docs/qa/`.
+Temporary QA root `/tmp/codex-spycraft-award-empty`, world `codex-award-empty`, port30028. Final state:six baseline actors,1113messages, world time126, GC1, no effects/combats. Latest temporary actor was deleted; baseline actors, global periods, health and dice were compared exactly. Both temporary QA servers/proxies and browser drivers were stopped after verification; only their temporary license copies were removed. Restart services deliberately and never assume old process/session identifiers remain valid. Native scripts/audits may remain in `/tmp`; durable audit JSON is committed under `docs/qa/`.
 
 Preserve baseline IDs: `ZTSRy74hgofWcbms` Award, `AerLMt362RZGkene` Starting Entry, `OxCQc5kSXwxC73cw` Hard Knocks, `6uUKAHoclUrgF6Py` Strut, `IPxyxsHoevWRCntb` Contact233, `tBz67h8BpbXLG7S9` Office Gossip253. Never reset their/global resources to simplify a test. Use a new temporary legal actor, drain action-die queues/resource locks before snapshots and reload, normalize JSON key order for comparisons, then delete only that fixture.
 
@@ -48,3 +48,5 @@ Original QA root `/tmp/codex-spycraft-raw-test`, port30027, remains read-only. A
 ## Git scope
 
 The accumulated implementation is committed separately from two pre-existing removals: `CLAUDE.md` and deleted changelog entries. Those working-tree changes were left untouched and uncommitted. The older engine regression block was restored and adapted to the current named-check error API and vitality minimum, preserving all513legacy assertions. Other existing NPC functionality was preserved; the current full suite includes its regressions. Check `git status` before resuming and do not discard unrelated edits.
+
+The remote NPC scrolling fix `8466852` was integrated after the RAW implementation commit `f72fb1e`; the CSS resolution retains its NPC viewport and Biography rules alongside the RAW dialog/agent viewport changes. Final layout suite:50passed.
