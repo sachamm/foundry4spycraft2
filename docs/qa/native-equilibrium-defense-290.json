@@ -1,0 +1,3707 @@
+{
+  "actors": [
+    "Af3O0LWkn7TOzpBA"
+  ],
+  "actor": "Af3O0LWkn7TOzpBA",
+  "checks": [
+    {
+      "message": "ChatMessage.N1FTk5qOnb7OcBoZ",
+      "flags": {
+        "actorUuid": "Actor.Af3O0LWkn7TOzpBA",
+        "checkKind": "totalDefense",
+        "actionDiceAllowed": false,
+        "totalDefense": {
+          "equilibrium": {
+            "version": 1,
+            "source": "Equilibrium Basics",
+            "covertFeats": [
+              {
+                "name": "Equilibrium Basics",
+                "choice": ""
+              },
+              {
+                "name": "Faceless",
+                "choice": ""
+              },
+              {
+                "name": "Traceless",
+                "choice": ""
+              }
+            ],
+            "bonus": 3
+          },
+          "combatId": "hUzVClJO4SAoyZWG",
+          "combatantId": "fkOrixUrWAISbXJv",
+          "startRound": 1,
+          "dueRound": 2,
+          "movement": {
+            "distanceFeet": 0,
+            "maximumFeet": 30,
+            "routeConfirmed": true
+          },
+          "actionConfirmed": true,
+          "id": "M3xQUNdvLohMhaIn"
+        }
+      }
+    },
+    {
+      "message": "ChatMessage.IHYzMTxY4Hktj9ru",
+      "ordinary": true,
+      "flags": {
+        "actorUuid": "Actor.Af3O0LWkn7TOzpBA",
+        "checkKind": "totalDefense",
+        "actionDiceAllowed": false,
+        "totalDefense": {
+          "combatId": "hUzVClJO4SAoyZWG",
+          "combatantId": "fkOrixUrWAISbXJv",
+          "startRound": 2,
+          "dueRound": 3,
+          "movement": {
+            "distanceFeet": 0,
+            "maximumFeet": 30,
+            "routeConfirmed": true
+          },
+          "actionConfirmed": true,
+          "id": "9yacBcAl8njuv2hN"
+        }
+      }
+    }
+  ],
+  "states": [
+    {
+      "label": "Earned Covert3: total7",
+      "defense": 24,
+      "state": {
+        "active": true,
+        "bonus": 7,
+        "dueRound": 2,
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        }
+      },
+      "record": {
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        },
+        "combatId": "hUzVClJO4SAoyZWG",
+        "combatantId": "fkOrixUrWAISbXJv",
+        "startRound": 1,
+        "dueRound": 2,
+        "movement": {
+          "distanceFeet": 0,
+          "maximumFeet": 30,
+          "routeConfirmed": true
+        },
+        "actionConfirmed": true,
+        "id": "M3xQUNdvLohMhaIn"
+      }
+    },
+    {
+      "label": "Covert3→2: total6",
+      "defense": 23,
+      "state": {
+        "active": true,
+        "bonus": 6,
+        "dueRound": 2,
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 2
+        }
+      },
+      "record": {
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        },
+        "combatId": "hUzVClJO4SAoyZWG",
+        "combatantId": "fkOrixUrWAISbXJv",
+        "startRound": 1,
+        "dueRound": 2,
+        "movement": {
+          "distanceFeet": 0,
+          "maximumFeet": 30,
+          "routeConfirmed": true
+        },
+        "actionConfirmed": true,
+        "id": "M3xQUNdvLohMhaIn"
+      }
+    },
+    {
+      "label": "Equilibrium removed: base4",
+      "defense": 21,
+      "state": {
+        "active": true,
+        "bonus": 4,
+        "dueRound": 2
+      },
+      "record": {
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        },
+        "combatId": "hUzVClJO4SAoyZWG",
+        "combatantId": "fkOrixUrWAISbXJv",
+        "startRound": 1,
+        "dueRound": 2,
+        "movement": {
+          "distanceFeet": 0,
+          "maximumFeet": 30,
+          "routeConfirmed": true
+        },
+        "actionConfirmed": true,
+        "id": "M3xQUNdvLohMhaIn"
+      }
+    },
+    {
+      "label": "Vulnerable loses base4+feat3",
+      "defense": 16,
+      "state": {
+        "active": true,
+        "bonus": 7,
+        "dueRound": 2,
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        }
+      },
+      "record": {
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        },
+        "combatId": "hUzVClJO4SAoyZWG",
+        "combatantId": "fkOrixUrWAISbXJv",
+        "startRound": 1,
+        "dueRound": 2,
+        "movement": {
+          "distanceFeet": 0,
+          "maximumFeet": 30,
+          "routeConfirmed": true
+        },
+        "actionConfirmed": true,
+        "id": "M3xQUNdvLohMhaIn"
+      }
+    },
+    {
+      "label": "Next global round before own Count still7",
+      "defense": 24,
+      "state": {
+        "active": true,
+        "bonus": 7,
+        "dueRound": 2,
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        }
+      },
+      "record": {
+        "equilibrium": {
+          "version": 1,
+          "source": "Equilibrium Basics",
+          "covertFeats": [
+            {
+              "name": "Equilibrium Basics",
+              "choice": ""
+            },
+            {
+              "name": "Faceless",
+              "choice": ""
+            },
+            {
+              "name": "Traceless",
+              "choice": ""
+            }
+          ],
+          "bonus": 3
+        },
+        "combatId": "hUzVClJO4SAoyZWG",
+        "combatantId": "fkOrixUrWAISbXJv",
+        "startRound": 1,
+        "dueRound": 2,
+        "movement": {
+          "distanceFeet": 0,
+          "maximumFeet": 30,
+          "routeConfirmed": true
+        },
+        "actionConfirmed": true,
+        "id": "M3xQUNdvLohMhaIn"
+      }
+    },
+    {
+      "label": "Next own Count expires all7",
+      "defense": 17,
+      "state": {
+        "active": false,
+        "bonus": 0,
+        "dueRound": 2
+      }
+    }
+  ],
+  "guards": [
+    {
+      "kind": "Duplicate own-Count declaration",
+      "error": "Total Defense is already active for this full round."
+    },
+    {
+      "kind": "Invisible attacker",
+      "defense": 17
+    },
+    {
+      "kind": "Off-Count full action",
+      "error": "Take Total Defense during this character’s Initiative Count in a started combat."
+    },
+    {
+      "kind": "Later ordinary declaration removes historical proof; restored source cannot retroactively grant bonus",
+      "bonus": 4,
+      "record": {
+        "combatId": "hUzVClJO4SAoyZWG",
+        "combatantId": "fkOrixUrWAISbXJv",
+        "startRound": 2,
+        "dueRound": 3,
+        "movement": {
+          "distanceFeet": 0,
+          "maximumFeet": 30,
+          "routeConfirmed": true
+        },
+        "actionConfirmed": true,
+        "id": "9yacBcAl8njuv2hN"
+      }
+    }
+  ],
+  "ui": [
+    {
+      "kind": "Actual Main Total Defense",
+      "bonus": 7,
+      "equilibrium": 3,
+      "defense": 24
+    }
+  ],
+  "feat": "ji70vfSCwLhTQ63H",
+  "featData": {
+    "name": "Equilibrium Basics",
+    "type": "feat",
+    "img": "icons/svg/combat.svg",
+    "system": {
+      "description": "<p>Total Defense grants dodge Defense equal to your Covert feats, balancing is easier, and falls count as 20 ft. shorter.</p>",
+      "source": "Spycraft 2.0 (summary)",
+      "tree": "covert",
+      "prerequisites": {
+        "type": "skill",
+        "key": "acrobatics",
+        "min": 3
+      },
+      "prerequisitesNotChecked": false,
+      "ranks": 1,
+      "granted": false,
+      "grantSource": "",
+      "repeatable": false,
+      "maxSelections": 0,
+      "bonuses": [],
+      "temporaryGrant": null,
+      "featKind": "permanent",
+      "candidateBasis": null,
+      "choice": "",
+      "contactGrantMode": "associate",
+      "contactTheme": "",
+      "contactThemeConfirmed": false,
+      "restrictions": "",
+      "trainingSkills": {},
+      "focusChoices": [],
+      "manualPrerequisitesConfirmed": false,
+      "acquisitionSource": "",
+      "acquisitionCheck": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"key\":\"acrobatics\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"covert\"}",
+        "manual": true
+      },
+      "historicalPrerequisitesConfirmed": true,
+      "acquiredAtLevel": 3
+    },
+    "effects": [],
+    "folder": "vfqjeZAuivYpwd6h",
+    "sort": 195,
+    "ownership": {
+      "default": 0,
+      "WW1y27MJMt1sWfHr": 3
+    },
+    "flags": {},
+    "_stats": {
+      "coreVersion": "14.370",
+      "systemId": "spycraft2",
+      "systemVersion": "0.3.1",
+      "createdTime": 1794842220199,
+      "modifiedTime": 1794842448659,
+      "lastModifiedBy": "WW1y27MJMt1sWfHr",
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null
+    },
+    "_id": "ji70vfSCwLhTQ63H"
+  },
+  "traceless": "g6R73ah0tYSaKy1U",
+  "traceData": {
+    "name": "Traceless",
+    "type": "feat",
+    "img": "icons/svg/combat.svg",
+    "system": {
+      "description": "<p>Blend gives synergy to Falsify, and checks to detect your presence or passage get harder by your Covert feats.</p>",
+      "source": "Spycraft 2.0 (summary)",
+      "tree": "covert",
+      "prerequisites": {
+        "type": "all",
+        "of": [
+          {
+            "type": "feat",
+            "name": "Faceless"
+          },
+          {
+            "type": "skill",
+            "key": "blend",
+            "min": 6
+          }
+        ]
+      },
+      "prerequisitesNotChecked": false,
+      "ranks": 1,
+      "granted": false,
+      "grantSource": "",
+      "repeatable": false,
+      "maxSelections": 0,
+      "bonuses": [],
+      "temporaryGrant": null,
+      "featKind": "permanent",
+      "candidateBasis": null,
+      "choice": "",
+      "contactGrantMode": "associate",
+      "contactTheme": "",
+      "contactThemeConfirmed": false,
+      "restrictions": "",
+      "trainingSkills": {},
+      "focusChoices": [],
+      "manualPrerequisitesConfirmed": false,
+      "acquisitionSource": "",
+      "acquisitionCheck": {
+        "ok": true,
+        "unmet": [],
+        "level": 6,
+        "signature": "{\"prerequisites\":{\"of\":[{\"name\":\"Faceless\",\"type\":\"feat\"},{\"key\":\"blend\",\"min\":6,\"type\":\"skill\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"covert\"}"
+      },
+      "historicalPrerequisitesConfirmed": false,
+      "acquiredAtLevel": 6
+    },
+    "effects": [],
+    "folder": "vfqjeZAuivYpwd6h",
+    "sort": 201,
+    "ownership": {
+      "default": 0,
+      "WW1y27MJMt1sWfHr": 3
+    },
+    "flags": {},
+    "_stats": {
+      "coreVersion": "14.370",
+      "systemId": "spycraft2",
+      "systemVersion": "0.3.1",
+      "createdTime": 1794842220047,
+      "modifiedTime": 1794842220047,
+      "lastModifiedBy": "WW1y27MJMt1sWfHr",
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null
+    },
+    "_id": "g6R73ah0tYSaKy1U"
+  },
+  "combat": "hUzVClJO4SAoyZWG",
+  "before": {
+    "defense": {
+      "helpless": false,
+      "vulnerable": false,
+      "dexterity": 1,
+      "dodgeLost": 0,
+      "dodgeBonuses": 0,
+      "base": 6,
+      "bonus": 0,
+      "armor": 0,
+      "total": 17
+    },
+    "saves": {
+      "fort": {
+        "base": 2,
+        "bonus": 0,
+        "total": 4,
+        "bonusEntries": []
+      },
+      "ref": {
+        "base": 5,
+        "bonus": 0,
+        "total": 6,
+        "bonusEntries": []
+      },
+      "will": {
+        "base": 2,
+        "bonus": 0,
+        "total": 3,
+        "bonusEntries": []
+      }
+    },
+    "attack": {
+      "unarmed": 5,
+      "melee": 5,
+      "ranged": 5
+    },
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "skills": {
+      "acrobatics": {
+        "ability": "str",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "acrobatics",
+        "name": "Acrobatics",
+        "focus": false,
+        "abilities": [
+          "str",
+          "dex"
+        ],
+        "abilityPenalties": {
+          "str": 0,
+          "dex": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "str",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          },
+          {
+            "ability": "dex",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 10,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "analysis": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "analysis",
+        "name": "Analysis",
+        "focus": false,
+        "abilities": [
+          "int",
+          "wis"
+        ],
+        "abilityPenalties": {
+          "int": 0,
+          "wis": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          },
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 2,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "athletics": {
+        "ability": "con",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "athletics",
+        "name": "Athletics",
+        "focus": false,
+        "abilities": [
+          "str",
+          "con"
+        ],
+        "abilityPenalties": {
+          "str": 0,
+          "con": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "str",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          },
+          {
+            "ability": "con",
+            "normalSkillBonus": 11,
+            "skillBonus": 11,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 11
+          }
+        ],
+        "total": 11,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "blend": {
+        "ability": "dex",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "blend",
+        "name": "Blend",
+        "focus": false,
+        "abilities": [
+          "dex",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "dex": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "dex",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 10,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "bluff": {
+        "ability": "cha",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "bluff",
+        "name": "Bluff",
+        "focus": false,
+        "abilities": [
+          "cha"
+        ],
+        "abilityPenalties": {
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "cha",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 10,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "bureaucracy": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "bureaucracy",
+        "name": "Bureaucracy",
+        "focus": false,
+        "abilities": [
+          "int",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "int": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 2,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "computers": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "computers",
+        "name": "Computers",
+        "focus": false,
+        "abilities": [
+          "int"
+        ],
+        "abilityPenalties": {
+          "int": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          }
+        ],
+        "total": 2,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "cultures": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "cultures",
+        "name": "Cultures",
+        "focus": true,
+        "abilities": [
+          "int"
+        ],
+        "abilityPenalties": {
+          "int": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": -2,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 0,
+            "skillBonus": 0,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 0
+          }
+        ],
+        "total": 0,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "drive": {
+        "ability": "dex",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "drive",
+        "name": "Drive",
+        "focus": true,
+        "abilities": [
+          "dex"
+        ],
+        "abilityPenalties": {
+          "dex": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "dex",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 10,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "electronics": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "electronics",
+        "name": "Electronics",
+        "focus": false,
+        "abilities": [
+          "int",
+          "wis"
+        ],
+        "abilityPenalties": {
+          "int": 0,
+          "wis": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 11,
+            "skillBonus": 11,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 11
+          },
+          {
+            "ability": "wis",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 11,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "falsify": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "falsify",
+        "name": "Falsify",
+        "focus": false,
+        "abilities": [
+          "int",
+          "wis"
+        ],
+        "abilityPenalties": {
+          "int": 0,
+          "wis": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          },
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 2,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "impress": {
+        "ability": "cha",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "impress",
+        "name": "Impress",
+        "focus": false,
+        "abilities": [
+          "cha"
+        ],
+        "abilityPenalties": {
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": -2,
+        "totals": [
+          {
+            "ability": "cha",
+            "normalSkillBonus": -1,
+            "skillBonus": -1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": -1
+          }
+        ],
+        "total": -1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "intimidate": {
+        "ability": "str",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "intimidate",
+        "name": "Intimidate",
+        "focus": false,
+        "abilities": [
+          "str",
+          "wis"
+        ],
+        "abilityPenalties": {
+          "str": 0,
+          "wis": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "str",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "investigation": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "investigation",
+        "name": "Investigation",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "manipulate": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "manipulate",
+        "name": "Manipulate",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "mechanics": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "mechanics",
+        "name": "Mechanics",
+        "focus": false,
+        "abilities": [
+          "int",
+          "wis"
+        ],
+        "abilityPenalties": {
+          "int": 0,
+          "wis": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 11,
+            "skillBonus": 11,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 11
+          },
+          {
+            "ability": "wis",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 11,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "medicine": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "medicine",
+        "name": "Medicine",
+        "focus": false,
+        "abilities": [
+          "int",
+          "wis"
+        ],
+        "abilityPenalties": {
+          "int": 0,
+          "wis": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          },
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 2,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "networking": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "networking",
+        "name": "Networking",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": -2,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": -1,
+            "skillBonus": -1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": -1
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": -1,
+            "skillBonus": -1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": -1
+          }
+        ],
+        "total": -1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "notice": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "notice",
+        "name": "Notice",
+        "focus": false,
+        "abilities": [
+          "wis"
+        ],
+        "abilityPenalties": {
+          "wis": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 10,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "profession": {
+        "ability": "cha",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "profession",
+        "name": "Profession",
+        "focus": true,
+        "abilities": [
+          "cha"
+        ],
+        "abilityPenalties": {
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": -2,
+        "totals": [
+          {
+            "ability": "cha",
+            "normalSkillBonus": -1,
+            "skillBonus": -1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": -1
+          }
+        ],
+        "total": -1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "resolve": {
+        "ability": "con",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "resolve",
+        "name": "Resolve",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "con"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "con": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "con",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          }
+        ],
+        "total": 2,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "science": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "science",
+        "name": "Science",
+        "focus": true,
+        "abilities": [
+          "int"
+        ],
+        "abilityPenalties": {
+          "int": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 11,
+            "skillBonus": 11,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 11
+          }
+        ],
+        "total": 11,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "search": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "search",
+        "name": "Search",
+        "focus": false,
+        "abilities": [
+          "int"
+        ],
+        "abilityPenalties": {
+          "int": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          }
+        ],
+        "total": 2,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "security": {
+        "ability": "int",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "security",
+        "name": "Security",
+        "focus": false,
+        "abilities": [
+          "int"
+        ],
+        "abilityPenalties": {
+          "int": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "int",
+            "normalSkillBonus": 2,
+            "skillBonus": 2,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 2
+          }
+        ],
+        "total": 2,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "senseMotive": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "senseMotive",
+        "name": "Sense Motive",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "sleightOfHand": {
+        "ability": "dex",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "sleightOfHand",
+        "name": "Sleight of Hand",
+        "focus": false,
+        "abilities": [
+          "dex"
+        ],
+        "abilityPenalties": {
+          "dex": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "dex",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "sneak": {
+        "ability": "dex",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "sneak",
+        "name": "Sneak",
+        "focus": false,
+        "abilities": [
+          "dex",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "dex": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 9,
+        "purchasedRanks": 9,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "dex",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 10,
+            "skillBonus": 10,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 10
+          }
+        ],
+        "total": 10,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 40,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "streetwise": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "streetwise",
+        "name": "Streetwise",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "survival": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "survival",
+        "name": "Survival",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": false,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      },
+      "tactics": {
+        "ability": "wis",
+        "misc": 0,
+        "classSkill": false,
+        "classSkillAt": 1,
+        "key": "tactics",
+        "name": "Tactics",
+        "focus": false,
+        "abilities": [
+          "wis",
+          "cha"
+        ],
+        "abilityPenalties": {
+          "wis": 0,
+          "cha": 0
+        },
+        "bonusEntries": [],
+        "threatAdjustment": 0,
+        "ranks": 0,
+        "purchasedRanks": 0,
+        "bonus": 0,
+        "totals": [
+          {
+            "ability": "wis",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          },
+          {
+            "ability": "cha",
+            "normalSkillBonus": 1,
+            "skillBonus": 1,
+            "conditionBonusAdjustment": 0,
+            "checkPenalty": 0,
+            "total": 1
+          }
+        ],
+        "total": 1,
+        "isClass": true,
+        "classOverride": false,
+        "threat": 20,
+        "errorFloor": 0,
+        "take10TimeMultiplier": 2,
+        "errorReductionZero": 0,
+        "errorReduction": 0,
+        "cap": 15,
+        "maxRanks": 9,
+        "overMax": false
+      }
+    }
+  },
+  "historicalReview": {
+    "careerLevel": 3,
+    "acrobaticsRanks": 6,
+    "unfilledGeneralSlot": true,
+    "confirmed": true,
+    "check": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"key\":\"acrobatics\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"covert\"}",
+      "manual": true
+    }
+  },
+  "setupRecovery": "Reload interrupted the QA actor resource synchronization; owning GC recovered its orphaned lock after confirming zero dice and unchanged histories.",
+  "persisted": {
+    "actor": {
+      "name": "RAW QA Equilibrium Defense290",
+      "type": "agent",
+      "flags": {
+        "spycraft2": {
+          "startingDiceCreation": {
+            "id": "HTFKxmGd7osoYa63",
+            "session": "MeCkrj45ff0VaUEr",
+            "at": 126,
+            "claimed": false
+          }
+        }
+      },
+      "system": {
+        "abilities": {
+          "str": {
+            "base": 12,
+            "misc": 0
+          },
+          "dex": {
+            "base": 13,
+            "misc": 0
+          },
+          "con": {
+            "base": 14,
+            "misc": 0
+          },
+          "int": {
+            "base": 15,
+            "misc": 0
+          },
+          "wis": {
+            "base": 12,
+            "misc": 0
+          },
+          "cha": {
+            "base": 11,
+            "misc": 0
+          }
+        },
+        "progression": [
+          {
+            "classId": "intruder",
+            "vitality": 8,
+            "careerEntryId": "",
+            "vitalityRollId": "",
+            "vitalityReviewId": "",
+            "intelligenceModifier": null,
+            "expertEntry": null,
+            "skills": {
+              "blend": 4,
+              "sneak": 4,
+              "acrobatics": 4,
+              "athletics": 4,
+              "bluff": 4,
+              "drive": 4,
+              "electronics": 4,
+              "mechanics": 4,
+              "notice": 4,
+              "science": 4
+            }
+          },
+          {
+            "classId": "intruder",
+            "vitality": 6,
+            "careerEntryId": "lmeIWWk2wwtITvaB",
+            "vitalityRollId": "UvvWFW2ziE4p3qof",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "blend": 1,
+              "sneak": 1,
+              "acrobatics": 1,
+              "athletics": 1,
+              "bluff": 1,
+              "drive": 1,
+              "electronics": 1,
+              "mechanics": 1,
+              "notice": 1,
+              "science": 1
+            }
+          },
+          {
+            "classId": "intruder",
+            "vitality": 8,
+            "careerEntryId": "RAnBjeHdRKZorKxr",
+            "vitalityRollId": "qs1QKZVoCXnPV7zz",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "blend": 1,
+              "sneak": 1,
+              "acrobatics": 1,
+              "athletics": 1,
+              "bluff": 1,
+              "drive": 1,
+              "electronics": 1,
+              "mechanics": 1,
+              "notice": 1,
+              "science": 1
+            }
+          },
+          {
+            "classId": "intruder",
+            "vitality": 5,
+            "careerEntryId": "JQynH2DDpHAy4HcI",
+            "vitalityRollId": "AX1cHAeq70pW1hUH",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "blend": 1,
+              "sneak": 1,
+              "acrobatics": 1,
+              "athletics": 1,
+              "bluff": 1,
+              "drive": 1,
+              "electronics": 1,
+              "mechanics": 1,
+              "notice": 1,
+              "science": 1
+            }
+          },
+          {
+            "classId": "intruder",
+            "vitality": 5,
+            "careerEntryId": "I3H6iYMwxC0QHF3j",
+            "vitalityRollId": "GxfnvJMXXr3lZzrI",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "blend": 1,
+              "sneak": 1,
+              "acrobatics": 1,
+              "athletics": 1,
+              "bluff": 1,
+              "drive": 1,
+              "electronics": 1,
+              "mechanics": 1,
+              "notice": 1,
+              "science": 1
+            }
+          },
+          {
+            "classId": "intruder",
+            "vitality": 4,
+            "careerEntryId": "txj2vRsp2aHFaxfW",
+            "vitalityRollId": "PUbwycHE1EivuISM",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "blend": 1,
+              "sneak": 1,
+              "acrobatics": 1,
+              "athletics": 1,
+              "bluff": 1,
+              "drive": 1,
+              "electronics": 1,
+              "mechanics": 1,
+              "notice": 1,
+              "science": 1
+            }
+          }
+        ],
+        "actionDice": {
+          "value": 0
+        },
+        "vitality": {
+          "value": 4
+        },
+        "wounds": {
+          "value": 4
+        },
+        "pointBuyBudget": 36,
+        "abilityIncreases": {
+          "l4": "cha",
+          "l8": "",
+          "l12": "",
+          "l16": "",
+          "l20": ""
+        },
+        "xp": 0,
+        "codename": "",
+        "details": {
+          "faction": "",
+          "gender": "",
+          "age": "",
+          "height": "",
+          "weight": "",
+          "eyes": "",
+          "hair": ""
+        },
+        "fortuneTeammateIds": [],
+        "actionDieAwards": {},
+        "missionXPRewards": {},
+        "eagleEyeBoost": null,
+        "defenseBoost": null,
+        "noFearBoost": null,
+        "mentalLeaps": [],
+        "fatigueRest": null,
+        "drunkSleep": null,
+        "drunkRepositions": [],
+        "fatigueApplications": [],
+        "mentalLeapFatigueEvents": [],
+        "mentalLeapRecovery": null,
+        "mentalLeapSleep": null,
+        "fortunesOfWarBoost": null,
+        "refreshAction": null,
+        "temporaryShares": {},
+        "assistantGroups": [],
+        "resourceUses": {},
+        "resourcesInitialized": false,
+        "affiliationType": "faction",
+        "reputation": 2,
+        "netWorth": 0,
+        "skills": {
+          "acrobatics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "analysis": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "athletics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "blend": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bluff": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bureaucracy": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "computers": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "cultures": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "drive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "electronics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "falsify": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "impress": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "intimidate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "investigation": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "manipulate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "mechanics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "medicine": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "networking": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "notice": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "profession": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "resolve": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "science": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "search": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "security": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "senseMotive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sleightOfHand": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sneak": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "streetwise": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "survival": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "tactics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          }
+        },
+        "proficiencies": {
+          "unarmed": {
+            "proficient": false,
+            "forte": false
+          },
+          "blunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticBlunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "edged": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticEdged": {
+            "proficient": false,
+            "forte": false
+          },
+          "explosives": {
+            "proficient": false,
+            "forte": false
+          },
+          "guided": {
+            "proficient": false,
+            "forte": false
+          },
+          "handgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "hurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticHurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "indirectFire": {
+            "proficient": false,
+            "forte": false
+          },
+          "rifle": {
+            "proficient": false,
+            "forte": false
+          },
+          "shotgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "submachineGun": {
+            "proficient": false,
+            "forte": false
+          },
+          "tactical": {
+            "proficient": false,
+            "forte": false
+          },
+          "vehicleWeapon": {
+            "proficient": false,
+            "forte": false
+          }
+        },
+        "focuses": {
+          "cultures": [],
+          "drive": [],
+          "profession": [],
+          "science": [],
+          "fortes": []
+        },
+        "startingIntelligenceModifier": null,
+        "skillFortes": [],
+        "crossroadsTitle": "",
+        "relinquishedInterests": 0,
+        "interests": "",
+        "contacts": [],
+        "subplots": [],
+        "gearPickLosses": {},
+        "missionReserves": null,
+        "armorMissionGrant": null,
+        "bigStickMissionPick": null,
+        "missionCaliberPicks": {},
+        "classGearGrants": {},
+        "bonusActionDice": {},
+        "missionReserveHistory": [],
+        "wealthAllocation": {
+          "lifestyle": 0,
+          "possessions": 0,
+          "spendingCash": 0,
+          "dressedForLifestyle": false
+        },
+        "misc": {
+          "bab": 0,
+          "fort": 0,
+          "ref": 0,
+          "will": 0,
+          "defense": 0,
+          "initiative": 0,
+          "wealth": 0,
+          "vitality": 0,
+          "wounds": 0,
+          "speed": 0,
+          "actionDice": 0,
+          "knowledge": 0,
+          "request": 0,
+          "gearCheck": 0,
+          "gearR": 0,
+          "gearT": 0,
+          "gearV": 0,
+          "gearS": 0,
+          "gearG": 0,
+          "gearW": 0,
+          "gearE": 0
+        },
+        "biography": "",
+        "twoWeaponStyle": null,
+        "dartingStyle": null,
+        "totalDefense": {
+          "equilibrium": {
+            "version": 1,
+            "source": "Equilibrium Basics",
+            "covertFeats": [
+              {
+                "name": "Equilibrium Basics",
+                "choice": ""
+              },
+              {
+                "name": "Faceless",
+                "choice": ""
+              },
+              {
+                "name": "Traceless",
+                "choice": ""
+              }
+            ],
+            "bonus": 3
+          },
+          "combatId": "hUzVClJO4SAoyZWG",
+          "combatantId": "fkOrixUrWAISbXJv",
+          "startRound": 1,
+          "dueRound": 2,
+          "movement": {
+            "distanceFeet": 0,
+            "maximumFeet": 30,
+            "routeConfirmed": true
+          },
+          "actionConfirmed": true,
+          "id": "M3xQUNdvLohMhaIn"
+        },
+        "combatExpertise": null,
+        "superiorCover": null,
+        "accumulatedDamage": null,
+        "analysisTasks": {},
+        "safeHouses": {},
+        "careerAgentRewards": {},
+        "wellFundedGrants": {},
+        "attributeDamage": null
+      },
+      "items": [
+        {
+          "name": "Intruder",
+          "type": "class",
+          "img": "icons/svg/book.svg",
+          "system": {
+            "description": "<p><strong>Core Ability — Dexterous:</strong> when you spend an action die on a Dexterity-based skill check, roll it twice and add both.</p><p><strong>Skill points:</strong> 8 + Int modifier per level (×4 at Career Level 1). <strong>Vitality:</strong> 8 + Con modifier per level.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "identifier": "intruder",
+            "expert": false,
+            "skillPoints": 8,
+            "vitalityDie": 8,
+            "proficiencies": 3,
+            "coreAbility": {
+              "name": "Dexterous",
+              "description": "when you spend an action die on a Dexterity-based skill check, roll it twice and add both."
+            },
+            "classSkills": [
+              "acrobatics",
+              "athletics",
+              "blend",
+              "bluff",
+              "drive",
+              "electronics",
+              "mechanics",
+              "notice",
+              "science",
+              "search",
+              "security",
+              "sleightOfHand",
+              "sneak",
+              "streetwise",
+              "tactics"
+            ],
+            "table": [
+              {
+                "level": 1,
+                "bab": 0,
+                "fort": 0,
+                "ref": 2,
+                "will": 0,
+                "defense": 2,
+                "initiative": 1,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 1,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 2,
+                "bab": 1,
+                "fort": 0,
+                "ref": 3,
+                "will": 0,
+                "defense": 3,
+                "initiative": 1,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 1,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 3,
+                "bab": 2,
+                "fort": 1,
+                "ref": 3,
+                "will": 1,
+                "defense": 3,
+                "initiative": 2,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 1,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 4,
+                "bab": 3,
+                "fort": 1,
+                "ref": 4,
+                "will": 1,
+                "defense": 4,
+                "initiative": 2,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 1,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 5,
+                "bab": 3,
+                "fort": 1,
+                "ref": 4,
+                "will": 1,
+                "defense": 5,
+                "initiative": 3,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 2,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 6,
+                "bab": 4,
+                "fort": 2,
+                "ref": 5,
+                "will": 2,
+                "defense": 6,
+                "initiative": 4,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 1,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 2,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 7,
+                "bab": 5,
+                "fort": 2,
+                "ref": 5,
+                "will": 2,
+                "defense": 6,
+                "initiative": 4,
+                "wealth": 4,
+                "gearR": 0,
+                "gearT": 1,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 2,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 8,
+                "bab": 6,
+                "fort": 2,
+                "ref": 6,
+                "will": 2,
+                "defense": 7,
+                "initiative": 5,
+                "wealth": 4,
+                "gearR": 0,
+                "gearT": 1,
+                "gearV": 0,
+                "gearS": 2,
+                "gearG": 2,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 9,
+                "bab": 6,
+                "fort": 3,
+                "ref": 6,
+                "will": 3,
+                "defense": 8,
+                "initiative": 5,
+                "wealth": 4,
+                "gearR": 0,
+                "gearT": 1,
+                "gearV": 0,
+                "gearS": 2,
+                "gearG": 2,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 10,
+                "bab": 7,
+                "fort": 3,
+                "ref": 7,
+                "will": 3,
+                "defense": 9,
+                "initiative": 6,
+                "wealth": 5,
+                "gearR": 0,
+                "gearT": 1,
+                "gearV": 0,
+                "gearS": 2,
+                "gearG": 3,
+                "gearW": 0,
+                "gearE": 0
+              },
+              {
+                "level": 11,
+                "bab": 8,
+                "fort": 3,
+                "ref": 7,
+                "will": 3,
+                "defense": 9,
+                "initiative": 7,
+                "wealth": 5,
+                "gearR": 0,
+                "gearT": 1,
+                "gearV": 0,
+                "gearS": 2,
+                "gearG": 3,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 12,
+                "bab": 9,
+                "fort": 4,
+                "ref": 8,
+                "will": 4,
+                "defense": 10,
+                "initiative": 7,
+                "wealth": 6,
+                "gearR": 0,
+                "gearT": 1,
+                "gearV": 0,
+                "gearS": 2,
+                "gearG": 3,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 13,
+                "bab": 9,
+                "fort": 4,
+                "ref": 8,
+                "will": 4,
+                "defense": 11,
+                "initiative": 8,
+                "wealth": 6,
+                "gearR": 0,
+                "gearT": 2,
+                "gearV": 0,
+                "gearS": 2,
+                "gearG": 3,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 14,
+                "bab": 10,
+                "fort": 4,
+                "ref": 9,
+                "will": 4,
+                "defense": 12,
+                "initiative": 8,
+                "wealth": 6,
+                "gearR": 0,
+                "gearT": 2,
+                "gearV": 0,
+                "gearS": 2,
+                "gearG": 3,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 15,
+                "bab": 11,
+                "fort": 5,
+                "ref": 9,
+                "will": 5,
+                "defense": 12,
+                "initiative": 9,
+                "wealth": 7,
+                "gearR": 0,
+                "gearT": 2,
+                "gearV": 0,
+                "gearS": 3,
+                "gearG": 3,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 16,
+                "bab": 12,
+                "fort": 5,
+                "ref": 10,
+                "will": 5,
+                "defense": 13,
+                "initiative": 10,
+                "wealth": 7,
+                "gearR": 0,
+                "gearT": 2,
+                "gearV": 0,
+                "gearS": 3,
+                "gearG": 4,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 17,
+                "bab": 12,
+                "fort": 5,
+                "ref": 10,
+                "will": 5,
+                "defense": 14,
+                "initiative": 10,
+                "wealth": 8,
+                "gearR": 0,
+                "gearT": 2,
+                "gearV": 0,
+                "gearS": 3,
+                "gearG": 4,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 18,
+                "bab": 13,
+                "fort": 6,
+                "ref": 11,
+                "will": 6,
+                "defense": 15,
+                "initiative": 11,
+                "wealth": 8,
+                "gearR": 0,
+                "gearT": 2,
+                "gearV": 0,
+                "gearS": 3,
+                "gearG": 4,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 19,
+                "bab": 14,
+                "fort": 6,
+                "ref": 11,
+                "will": 6,
+                "defense": 15,
+                "initiative": 11,
+                "wealth": 8,
+                "gearR": 0,
+                "gearT": 2,
+                "gearV": 0,
+                "gearS": 3,
+                "gearG": 4,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 20,
+                "bab": 15,
+                "fort": 6,
+                "ref": 12,
+                "will": 6,
+                "defense": 16,
+                "initiative": 12,
+                "wealth": 9,
+                "gearR": 0,
+                "gearT": 3,
+                "gearV": 0,
+                "gearS": 3,
+                "gearG": 4,
+                "gearW": 2,
+                "gearE": 0
+              }
+            ],
+            "abilities": [
+              {
+                "level": 1,
+                "name": "Gear prep",
+                "description": "Take one mission gear pick as if the mission Caliber were 1 higher."
+              },
+              {
+                "level": 2,
+                "name": "Evasion I (no dam w save)",
+                "description": "When not flat-footed and a Reflex save would halve damage, a success means no damage (II: failure means half; III: take 10 on Reflex saves)."
+              },
+              {
+                "level": 3,
+                "name": "Bonus feat",
+                "description": "Gain a Basic Combat or Covert feat."
+              },
+              {
+                "level": 4,
+                "name": "Uncanny dodge I",
+                "description": "Progressive danger sense: keep Dex to Defense when flat-footed (I), never flanked (II), bonuses vs. traps and surprise attacks (III), halve Initiative Count losses (IV), never flat-footed (V)."
+              },
+              {
+                "level": 5,
+                "name": "Bonus feat",
+                "description": "Gain a Basic Combat or Covert feat."
+              },
+              {
+                "level": 6,
+                "name": "Criminal mind",
+                "description": "Choose one Criminal Mind option (each only once)."
+              },
+              {
+                "level": 7,
+                "name": "Bonus feat",
+                "description": "Gain a Basic Combat or Covert feat."
+              },
+              {
+                "level": 8,
+                "name": "Uncanny dodge II",
+                "description": "Progressive danger sense: keep Dex to Defense when flat-footed (I), never flanked (II), bonuses vs. traps and surprise attacks (III), halve Initiative Count losses (IV), never flat-footed (V)."
+              },
+              {
+                "level": 9,
+                "name": "Bonus feat, criminal mind",
+                "description": "Bonus feat: Gain a Basic Combat or Covert feat. criminal mind: Choose one Criminal Mind option (each only once)."
+              },
+              {
+                "level": 10,
+                "name": "Wildcard gear, 1/session",
+                "description": "Once per session (twice at 20th), reveal you happen to have a small piece of useful gear on you."
+              },
+              {
+                "level": 11,
+                "name": "Bonus feat, evasion II (1/2 dam w/ fail)",
+                "description": "Bonus feat: Gain a Basic Combat or Covert feat. evasion II (1/2 dam w/ fail): When not flat-footed and a Reflex save would halve damage, a success means no damage (II: failure means half; III: take 10 on Reflex saves)."
+              },
+              {
+                "level": 12,
+                "name": "Criminal mind, uncanny dodge III",
+                "description": "Criminal mind: Choose one Criminal Mind option (each only once). uncanny dodge III: Progressive danger sense: keep Dex to Defense when flat-footed (I), never flanked (II), bonuses vs. traps and surprise attacks (III), halve Initiative Count losses (IV), never flat-footed (V)."
+              },
+              {
+                "level": 13,
+                "name": "Bonus feat",
+                "description": "Gain a Basic Combat or Covert feat."
+              },
+              {
+                "level": 14,
+                "name": "The great escape",
+                "description": "As Prey in a chase, beating your pursuer by 4 or more means you get away."
+              },
+              {
+                "level": 15,
+                "name": "Bonus feat, criminal mind",
+                "description": "Bonus feat: Gain a Basic Combat or Covert feat. criminal mind: Choose one Criminal Mind option (each only once)."
+              },
+              {
+                "level": 16,
+                "name": "Uncanny dodge IV",
+                "description": "Progressive danger sense: keep Dex to Defense when flat-footed (I), never flanked (II), bonuses vs. traps and surprise attacks (III), halve Initiative Count losses (IV), never flat-footed (V)."
+              },
+              {
+                "level": 17,
+                "name": "Bonus feat",
+                "description": "Gain a Basic Combat or Covert feat."
+              },
+              {
+                "level": 18,
+                "name": "Criminal mind",
+                "description": "Choose one Criminal Mind option (each only once)."
+              },
+              {
+                "level": 19,
+                "name": "Bonus feat, evasion III (take 10)",
+                "description": "Bonus feat: Gain a Basic Combat or Covert feat. evasion III (take 10): When not flat-footed and a Reflex save would halve damage, a success means no damage (II: failure means half; III: take 10 on Reflex saves)."
+              },
+              {
+                "level": 20,
+                "name": "Uncanny dodge V, wildcard gear 2/session",
+                "description": "Uncanny dodge V: Progressive danger sense: keep Dex to Defense when flat-footed (I), never flanked (II), bonuses vs. traps and surprise attacks (III), halve Initiative Count losses (IV), never flat-footed (V). wildcard gear 2/session: Once per session (twice at 20th), reveal you happen to have a small piece of useful gear on you."
+              }
+            ],
+            "choiceLists": [
+              {
+                "key": "bonusFeat",
+                "name": "Bonus Feat",
+                "kind": "featSlot",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "Basic Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.basicCombat",
+                        "value": "1"
+                      }
+                    ],
+                    "description": "Gain a Basic Combat feat."
+                  },
+                  {
+                    "index": 3,
+                    "name": "Covert",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.covert",
+                        "value": "1"
+                      }
+                    ],
+                    "description": "Gain a Covert feat."
+                  }
+                ]
+              },
+              {
+                "key": "criminalMind",
+                "name": "Criminal Mind",
+                "kind": "option",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "Booby Trap",
+                    "bonuses": [],
+                    "description": "Sabotage devices and set traps in half the time."
+                  },
+                  {
+                    "index": 3,
+                    "name": "Improvisation",
+                    "bonuses": [],
+                    "description": "As a full action, improvise one common item from whatever is at hand."
+                  },
+                  {
+                    "index": 4,
+                    "name": "Master Thief",
+                    "bonuses": [],
+                    "description": "Once per session, set an opposed skill result 1 higher than your opponent's."
+                  },
+                  {
+                    "index": 5,
+                    "name": "Procure",
+                    "bonuses": [],
+                    "description": "Hold extra Reserve picks and improve your Requests through back channels."
+                  },
+                  {
+                    "index": 6,
+                    "name": "Skill Mastery",
+                    "bonuses": [],
+                    "description": "Choose a class skill: –2 error range and taking 10 takes normal time."
+                  },
+                  {
+                    "index": 7,
+                    "name": "Sprint",
+                    "bonuses": [
+                      {
+                        "target": "speed",
+                        "value": "10"
+                      }
+                    ],
+                    "description": "+10 ft. Speed."
+                  },
+                  {
+                    "index": 8,
+                    "name": "Stash It",
+                    "bonuses": [],
+                    "description": "Hidden objects on you are only found on a threat or critical success."
+                  },
+                  {
+                    "index": 9,
+                    "name": "Tricky",
+                    "bonuses": [],
+                    "description": "Once per round, when an adjacent opponent misses you by 5 or more, immediately take a free Tire action against that opponent; you may substitute Acrobatics (Dex) for Resolve (Con)."
+                  }
+                ]
+              }
+            ],
+            "choiceSchedule": [
+              {
+                "level": 3,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 5,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 6,
+                "list": "criminalMind"
+              },
+              {
+                "level": 7,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 9,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 11,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 12,
+                "list": "criminalMind"
+              },
+              {
+                "level": 13,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 15,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 15,
+                "list": "criminalMind"
+              },
+              {
+                "level": 17,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 18,
+                "list": "criminalMind"
+              },
+              {
+                "level": 19,
+                "list": "bonusFeat"
+              },
+              {
+                "level": 9,
+                "list": "criminalMind"
+              }
+            ],
+            "choices": {},
+            "bonuses": [],
+            "featGrants": [],
+            "requirements": null,
+            "inheritedChoices": {},
+            "skillChoices": {},
+            "weaponSpecialist": {},
+            "keySkill": "",
+            "keyFocus": "",
+            "professionFocus": "",
+            "phdSkill": "",
+            "phdSkill1": "",
+            "phdSkill2": ""
+          },
+          "effects": [],
+          "folder": "K8gJfzEIvHabIxSK",
+          "sort": 6,
+          "ownership": {
+            "default": 0
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794842220047,
+            "modifiedTime": 1794842220047,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "qB96X2gLvn7qmgeB"
+        },
+        {
+          "name": "Faceless",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>Sneak gives synergy to Blend, and anyone researching your past or whereabouts takes three times as long.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "covert",
+            "prerequisites": {
+              "type": "skill",
+              "key": "blend",
+              "min": 3
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 1,
+              "signature": "{\"prerequisites\":{\"key\":\"blend\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"covert\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 1
+          },
+          "effects": [],
+          "folder": "vfqjeZAuivYpwd6h",
+          "sort": 200,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794842220047,
+            "modifiedTime": 1794842220047,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "nLjKqfCNIn4QgYBA"
+        },
+        {
+          "name": "Traceless",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>Blend gives synergy to Falsify, and checks to detect your presence or passage get harder by your Covert feats.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "covert",
+            "prerequisites": {
+              "type": "all",
+              "of": [
+                {
+                  "type": "feat",
+                  "name": "Faceless"
+                },
+                {
+                  "type": "skill",
+                  "key": "blend",
+                  "min": 6
+                }
+              ]
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 6,
+              "signature": "{\"prerequisites\":{\"of\":[{\"name\":\"Faceless\",\"type\":\"feat\"},{\"key\":\"blend\",\"min\":6,\"type\":\"skill\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"covert\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 6
+          },
+          "effects": [],
+          "folder": "vfqjeZAuivYpwd6h",
+          "sort": 201,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794842679248,
+            "modifiedTime": 1794842679248,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "g6R73ah0tYSaKy1U"
+        },
+        {
+          "name": "Equilibrium Basics",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>Total Defense grants dodge Defense equal to your Covert feats, balancing is easier, and falls count as 20 ft. shorter.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "covert",
+            "prerequisites": {
+              "type": "skill",
+              "key": "acrobatics",
+              "min": 3
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 3,
+              "signature": "{\"prerequisites\":{\"key\":\"acrobatics\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"covert\"}",
+              "manual": true
+            },
+            "historicalPrerequisitesConfirmed": true,
+            "acquiredAtLevel": 3
+          },
+          "effects": [],
+          "folder": "vfqjeZAuivYpwd6h",
+          "sort": 195,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794842679282,
+            "modifiedTime": 1794842679282,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "ji70vfSCwLhTQ63H"
+        }
+      ],
+      "img": "icons/svg/mystery-man.svg",
+      "prototypeToken": {
+        "name": "RAW QA Starting Entry",
+        "displayName": 0,
+        "actorLink": false,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "texture": {
+          "src": "icons/svg/mystery-man.svg",
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "fit": "contain",
+          "scaleX": 1,
+          "scaleY": 1,
+          "tint": "#ffffff",
+          "alphaThreshold": 0.75
+        },
+        "lockRotation": false,
+        "rotation": 0,
+        "alpha": 1,
+        "disposition": -1,
+        "displayBars": 0,
+        "bar1": {
+          "attribute": "vitality"
+        },
+        "bar2": {
+          "attribute": "wounds"
+        },
+        "light": {
+          "negative": false,
+          "priority": 0,
+          "alpha": 0.5,
+          "angle": 360,
+          "bright": 0,
+          "color": null,
+          "coloration": 1,
+          "dim": 0,
+          "attenuation": 0.5,
+          "luminosity": 0.5,
+          "saturation": 0,
+          "contrast": 0,
+          "shadows": 0,
+          "animation": {
+            "type": null,
+            "speed": 5,
+            "intensity": 5,
+            "reverse": false
+          },
+          "darkness": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        "sight": {
+          "enabled": false,
+          "range": 0,
+          "angle": 360,
+          "visionMode": "basic",
+          "color": null,
+          "attenuation": 0.1,
+          "brightness": 0,
+          "saturation": 0,
+          "contrast": 0
+        },
+        "detectionModes": {},
+        "occludable": {
+          "radius": 0
+        },
+        "ring": {
+          "enabled": false,
+          "colors": {
+            "ring": null,
+            "background": null
+          },
+          "effects": 1,
+          "subject": {
+            "scale": 1,
+            "texture": null
+          }
+        },
+        "turnMarker": {
+          "mode": 1,
+          "animation": null,
+          "src": null,
+          "disposition": false
+        },
+        "movementAction": null,
+        "flags": {},
+        "randomImg": false,
+        "appendNumber": false,
+        "prependAdjective": false
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0,
+        "WW1y27MJMt1sWfHr": 3
+      },
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794842220047,
+        "modifiedTime": 1794842621739,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_id": "Af3O0LWkn7TOzpBA"
+    },
+    "combat": {
+      "scene": "NUEDEFAULTSCENE0",
+      "active": true,
+      "round": 2,
+      "turn": 0,
+      "combatants": [
+        {
+          "actorId": "Af3O0LWkn7TOzpBA",
+          "initiative": 10,
+          "_id": "fkOrixUrWAISbXJv",
+          "type": "base",
+          "system": {},
+          "tokenId": null,
+          "sceneId": null,
+          "img": null,
+          "hidden": false,
+          "defeated": false,
+          "group": null,
+          "roundJoined": 1,
+          "flags": {
+            "spycraft2": {
+              "shakenInitiative": {
+                "id": "clCMiq3rxyCfDssD",
+                "version": 1,
+                "count": 10,
+                "includedPenalty": null,
+                "needsReview": true,
+                "reason": "This existing Initiative Count has no verified Shaken component. Confirm its included full or protected penalty."
+              }
+            }
+          },
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794842220210,
+            "modifiedTime": 1794842621890,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        },
+        {
+          "name": "RAW QA Other Count290",
+          "initiative": 20,
+          "_id": "yY0GASvN5mZHs54F",
+          "type": "base",
+          "system": {},
+          "actorId": null,
+          "tokenId": null,
+          "sceneId": null,
+          "img": null,
+          "hidden": false,
+          "defeated": false,
+          "group": null,
+          "roundJoined": 1,
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794842220210,
+            "modifiedTime": 1794842220210,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        }
+      ],
+      "_id": "hUzVClJO4SAoyZWG",
+      "name": "",
+      "type": "base",
+      "system": {},
+      "groups": [],
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794842220210,
+        "modifiedTime": 1794842679402,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      }
+    },
+    "state": {
+      "active": true,
+      "bonus": 7,
+      "dueRound": 2,
+      "equilibrium": {
+        "version": 1,
+        "source": "Equilibrium Basics",
+        "covertFeats": [
+          {
+            "name": "Equilibrium Basics",
+            "choice": ""
+          },
+          {
+            "name": "Faceless",
+            "choice": ""
+          },
+          {
+            "name": "Traceless",
+            "choice": ""
+          }
+        ],
+        "bonus": 3
+      }
+    }
+  },
+  "baselinesUnchanged": true,
+  "periods": {
+    "mission": "qa-xp-cancel",
+    "session": "MeCkrj45ff0VaUEr",
+    "scene": "M8ZajdPdnHP2gCsS",
+    "sceneSequence": 2
+  },
+  "gc": {
+    "value": 1,
+    "session": "MeCkrj45ff0VaUEr",
+    "playersPresent": 1,
+    "caliber": 1,
+    "lastReason": "Critical activation",
+    "controllerId": "ZTSRy74hgofWcbms",
+    "settlementReview": {
+      "id": "MfK3PHV2iV2wvias",
+      "needsReview": false,
+      "session": "MeCkrj45ff0VaUEr",
+      "before": 2,
+      "count": 1,
+      "purpose": "Critical activation",
+      "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+      "at": 1794752784259,
+      "outcome": "spent"
+    }
+  },
+  "cleanup": {
+    "actors": 6,
+    "messages": 927,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true
+  }
+}

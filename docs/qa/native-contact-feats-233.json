@@ -1,0 +1,1332 @@
+{
+  "actor": "IPxyxsHoevWRCntb",
+  "feat": "2DSS40yiSGZfmpHj",
+  "actorFeat": "uVJODkeAn8Gco55v",
+  "rolls": [
+    7,
+    12
+  ],
+  "family": [
+    {
+      "name": "Academic Contacts",
+      "basic": "Scholar",
+      "theme": "academic",
+      "feat": "KHALrYbi4itBbHVK",
+      "checks": [
+        {
+          "id": "xHzpzHQPnCsjviAV",
+          "source": "Academic Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "b3UL82vg4NB7kvGd",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Blue Collar Contacts",
+      "basic": "Speed Demon",
+      "theme": "vehicular",
+      "feat": "VMXFF386Mjf12UUs",
+      "checks": [
+        {
+          "id": "VqVQ7HiLdqJeNd2h",
+          "source": "Blue Collar Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "ew7V7wBxUNv6FFW0",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Criminal Contacts",
+      "basic": "Burglar",
+      "theme": "criminal",
+      "feat": "0BADHKZDisbSKKSM",
+      "checks": [
+        {
+          "id": "T13mLfS4cDvQshcK",
+          "source": "Criminal Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "JJ5pKZi6nk0G6U6m",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Government Contacts",
+      "basic": "Diplomat",
+      "theme": "government",
+      "feat": "TpH9rsVneylhpWbt",
+      "checks": [
+        {
+          "id": "vQcdZyotlgKM1iSQ",
+          "source": "Government Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 3
+        },
+        {
+          "id": "59QspVA9G5g8b2NG",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 3
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Grifter Contacts",
+      "basic": "Hustler",
+      "theme": "con artist",
+      "feat": "pRwHfR96TSsuGerX",
+      "checks": [
+        {
+          "id": "oLyZxuehb6lxD7LL",
+          "source": "Grifter Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "t6FTdk0VyeLpxpoG",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "High-Tech Contacts",
+      "basic": "Techie",
+      "theme": "technological",
+      "feat": "oH7qbN3ksfKitqNN",
+      "checks": [
+        {
+          "id": "upCtOfbucd0D5xzt",
+          "source": "High-Tech Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "rXDHdqgrhdMVCKvk",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Local Contacts",
+      "basic": "World Traveler",
+      "theme": "traveling",
+      "feat": "LHf4W8RR2zDSW5im",
+      "checks": [
+        {
+          "id": "4SmyUTMel1HNSNF8",
+          "source": "Local Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "43WRKqL3Wp0JjmZ1",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Media Contacts",
+      "basic": "Actor",
+      "theme": "media",
+      "feat": "0VBup6hEZEpkRkf9",
+      "checks": [
+        {
+          "id": "5a2UOLleouwjo2Du",
+          "source": "Media Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "XhaBbd5vdX8zB859",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Medical Contacts",
+      "basic": "Examiner",
+      "theme": "medical",
+      "feat": "obVuiewYJGWRZtyZ",
+      "checks": [
+        {
+          "id": "WczJyPAAzQrVYvuO",
+          "source": "Medical Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "kuIEkRDZ8XWRsfPx",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Military Contacts",
+      "basic": "Officer",
+      "theme": "military",
+      "feat": "3eH76fcWg2YWjQas",
+      "checks": [
+        {
+          "id": "uK68s2jpFfzQ3HDn",
+          "source": "Military Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "6nPu8vwSDKfZl2B9",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Police Contacts",
+      "basic": "Private Eye",
+      "theme": "security",
+      "feat": "AUvkgMWSK2Xoh8xq",
+      "checks": [
+        {
+          "id": "LI1f5muvWpfpqcoU",
+          "source": "Police Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "qixO6LARo853X8qX",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Research Contacts",
+      "basic": "Observer",
+      "theme": "librarian",
+      "feat": "DwVlmjtyM9b223GW",
+      "checks": [
+        {
+          "id": "ZcKEiWEEBMSZgPHp",
+          "source": "Research Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "EE30KV31VRQoW50f",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Street Contacts",
+      "basic": "Fence",
+      "theme": "street",
+      "feat": "NtkVJ82GHUXhjWrP",
+      "checks": [
+        {
+          "id": "dt9E5gSVJMc70T3e",
+          "source": "Street Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "8ZUi91SbWr7Qbk5H",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "White Collar Contacts",
+      "basic": "Advisor",
+      "theme": "business",
+      "feat": "tNw6JCQUwqEJYABo",
+      "checks": [
+        {
+          "id": "5ew14Olb0oybFb0B",
+          "source": "White Collar Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "A6Zm9x0cEp5f9b12",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    },
+    {
+      "name": "Wilderness Contacts",
+      "basic": "Survivalist",
+      "theme": "wilderness",
+      "feat": "2DSS40yiSGZfmpHj",
+      "checks": [
+        {
+          "id": "wPBbJaQediZlPOqk",
+          "source": "Wilderness Contacts",
+          "contact": "Ada",
+          "error": 0,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 1
+        },
+        {
+          "id": "NIpOuiCsopfaBJVh",
+          "source": null,
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 1
+        }
+      ],
+      "picks": {
+        "available": 3,
+        "used": 3,
+        "remaining": 0
+      }
+    }
+  ],
+  "guards": [
+    {
+      "kind": "approval",
+      "evaluated": 1,
+      "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+      "posted": 0
+    },
+    {
+      "kind": "rename",
+      "evaluated": 1,
+      "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+      "posted": 0
+    },
+    {
+      "kind": "source",
+      "evaluated": 1,
+      "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+      "posted": 0
+    }
+  ],
+  "ui": "RRZPto6ZX6GesboJ",
+  "checks": [
+    {
+      "id": "RRZPto6ZX6GesboJ",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Military Contacts",
+        "featId": "3eH76fcWg2YWjQas",
+        "theme": "military",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "xHzpzHQPnCsjviAV",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Academic Contacts",
+        "featId": "KHALrYbi4itBbHVK",
+        "theme": "academic",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "b3UL82vg4NB7kvGd",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "VqVQ7HiLdqJeNd2h",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Blue Collar Contacts",
+        "featId": "VMXFF386Mjf12UUs",
+        "theme": "vehicular",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "ew7V7wBxUNv6FFW0",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "T13mLfS4cDvQshcK",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Criminal Contacts",
+        "featId": "0BADHKZDisbSKKSM",
+        "theme": "criminal",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "JJ5pKZi6nk0G6U6m",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "vQcdZyotlgKM1iSQ",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Government Contacts",
+        "featId": "TpH9rsVneylhpWbt",
+        "theme": "government",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "59QspVA9G5g8b2NG",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "oLyZxuehb6lxD7LL",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Grifter Contacts",
+        "featId": "pRwHfR96TSsuGerX",
+        "theme": "con artist",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "t6FTdk0VyeLpxpoG",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "upCtOfbucd0D5xzt",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "High-Tech Contacts",
+        "featId": "oH7qbN3ksfKitqNN",
+        "theme": "technological",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "rXDHdqgrhdMVCKvk",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "4SmyUTMel1HNSNF8",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Local Contacts",
+        "featId": "LHf4W8RR2zDSW5im",
+        "theme": "traveling",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "43WRKqL3Wp0JjmZ1",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "5a2UOLleouwjo2Du",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Media Contacts",
+        "featId": "0VBup6hEZEpkRkf9",
+        "theme": "media",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "XhaBbd5vdX8zB859",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "WczJyPAAzQrVYvuO",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Medical Contacts",
+        "featId": "obVuiewYJGWRZtyZ",
+        "theme": "medical",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "kuIEkRDZ8XWRsfPx",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "uK68s2jpFfzQ3HDn",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Military Contacts",
+        "featId": "3eH76fcWg2YWjQas",
+        "theme": "military",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "6nPu8vwSDKfZl2B9",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "LI1f5muvWpfpqcoU",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Police Contacts",
+        "featId": "AUvkgMWSK2Xoh8xq",
+        "theme": "security",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "qixO6LARo853X8qX",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "ZcKEiWEEBMSZgPHp",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Research Contacts",
+        "featId": "DwVlmjtyM9b223GW",
+        "theme": "librarian",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "EE30KV31VRQoW50f",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "dt9E5gSVJMc70T3e",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Street Contacts",
+        "featId": "NtkVJ82GHUXhjWrP",
+        "theme": "street",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "8ZUi91SbWr7Qbk5H",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "5ew14Olb0oybFb0B",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "White Collar Contacts",
+        "featId": "tNw6JCQUwqEJYABo",
+        "theme": "business",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "A6Zm9x0cEp5f9b12",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    },
+    {
+      "id": "wPBbJaQediZlPOqk",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Wilderness Contacts",
+        "featId": "2DSS40yiSGZfmpHj",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "NIpOuiCsopfaBJVh",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "errorReduction": 0,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      }
+    }
+  ],
+  "progression": [
+    {
+      "classId": "soldier",
+      "vitality": 6,
+      "careerEntryId": "",
+      "vitalityRollId": "",
+      "vitalityReviewId": "",
+      "intelligenceModifier": null,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 4,
+        "drive": 2,
+        "intimidate": 4,
+        "notice": 4,
+        "resolve": 4,
+        "networking": 6
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 7,
+      "careerEntryId": "pgwPrY50jd30yA0Y",
+      "vitalityRollId": "r3rZQUTXMF32JTCF",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 1,
+        "drive": 3,
+        "intimidate": 1,
+        "notice": 1
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 12,
+      "careerEntryId": "Y1TuQxhHmOIH0d1T",
+      "vitalityRollId": "4NkjRB9EQRQfA0ib",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 1,
+        "drive": 1,
+        "intimidate": 1,
+        "notice": 1,
+        "profession": 2
+      }
+    }
+  ],
+  "skillBudgets": [
+    {
+      "remaining": 0,
+      "issues": []
+    },
+    {
+      "remaining": 0,
+      "issues": []
+    },
+    {
+      "remaining": 0,
+      "issues": []
+    }
+  ],
+  "contacts": [
+    {
+      "name": "Ada",
+      "rank": 2,
+      "notes": "Entertainment producer"
+    },
+    {
+      "name": "Bob",
+      "rank": 1,
+      "notes": "Other contact"
+    }
+  ]
+}

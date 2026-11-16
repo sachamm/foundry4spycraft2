@@ -70,3 +70,19 @@ test("fixture reproduces the inaccessible bottom without the viewport fix", asyn
   await tab.evaluate(el => { el.scrollTop = el.scrollHeight; });
   await expect(tab.locator(".bottom-control")).not.toBeInViewport();
 });
+
+
+test("an oversized expanded header cannot collapse any tab to zero height", async ({ page }) => {
+  const zeroViewport = baseCSS.replace(/min-height: 80px;/, "min-height: 0;");
+  await mount(page, { height: 520, header: 600, css: zeroViewport });
+  expect(await page.locator("section.tab.active").evaluate(el => el.clientHeight)).toBe(0);
+  await mount(page, { height: 520, header: 600 });
+  for (const id of tabs) {
+    await page.locator(`nav button[data-tab="${id}"]`).click();
+    const active = page.locator(`section[data-tab="${id}"]`);
+    expect(await active.evaluate(el => el.clientHeight)).toBeGreaterThanOrEqual(80);
+    await active.locator(".bottom-control").scrollIntoViewIfNeeded();
+    await expect(active.locator(".bottom-control")).toBeInViewport();
+    await active.locator(".bottom-control").click();
+  }
+});

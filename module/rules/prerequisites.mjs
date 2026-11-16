@@ -3,11 +3,13 @@
  *
  * Node shapes:
  *   { type: "all"|"any", of: [...] }
+ *   { type: "featChoice", name, choice }
  *   { type: "feat", name }                 { type: "featTree", tree, min }
  *   { type: "base", key: "bab"|"defense", min }
  *   { type: "level", min } | { type: "level", eq }
  *   { type: "ability", key, min }          { type: "skill", key, min }
  *   { type: "proficiency", key }           { type: "focus", skill, group, any? }
+ *   { type: "sneakAttack", min }
  *   { type: "lifestyle", min }             { type: "keySkill", min }
  *   { type: "never" } | { type: "unknown" }
  */
@@ -39,9 +41,12 @@ function test(n, ctx, unmet) {
       return ok;
     }
     case "feat": ok = ctx.hasFeat(n.name); break;
+    case "featChoice": ok = !!ctx.hasFeatChoice?.(n.name,n.choice); break;
     case "featTree": ok = (ctx.featTrees[n.tree] ?? 0) >= n.min; break;
     case "base": ok = (ctx.base[n.key] ?? 0) >= n.min; break;
-    case "level": ok = n.eq !== undefined ? ctx.level === n.eq : ctx.level >= n.min; break;
+    case "level": ok = n.eq !== undefined ? (ctx.acquisitionLevel ?? ctx.level) === n.eq : (ctx.prerequisiteLevel ?? ctx.level) >= n.min; break;
+    case "sneakAttack": ok = (ctx.sneakAttackDice ?? 0) >= n.min; break;
+    case "manual": ok = !!ctx.manualConfirmed; break;
     case "ability": ok = (ctx.abilities[n.key] ?? 0) >= n.min; break;
     case "skill": ok = (ctx.skills[n.key] ?? 0) >= n.min; break;
     case "proficiency": ok = !!ctx.proficient(n.key); break;
@@ -68,6 +73,7 @@ export function describe(n) {
     case "all": return n.of.map(describe).join(", ");
     case "any": return `(${n.of.map(describe).join(" or ")})`;
     case "feat": return n.name;
+    case "featChoice": return `${n.name} (${n.choice})`;
     case "featTree": return n.min > 1 ? `${n.min} ${tree(n.tree)} feats` : `any ${tree(n.tree)} feat`;
     case "base": return n.key === "bab" ? `BAB +${n.min}` : `Base Defense +${n.min}`;
     case "level": return n.eq !== undefined ? `Career Level ${n.eq}` : `Career Level ${n.min}+`;
@@ -77,6 +83,8 @@ export function describe(n) {
     case "focus": return `${skill(n.skill)} focus (any ${n.group})`;
     case "lifestyle": return `Lifestyle ${n.min}+`;
     case "keySkill": return `Key skill ${n.min}+ ranks`;
+    case "sneakAttack": return `Ability to inflict ${n.min} ${n.min===1?"die":"dice"} of sneak attack damage`;
+    case "manual": return `GC confirmation: ${n.text}`;
     case "never": return "Not available";
     default: return "Special";
   }

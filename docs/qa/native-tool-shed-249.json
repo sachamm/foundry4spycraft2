@@ -1,0 +1,845 @@
+{
+  "actor": "6PrtO3iI1DWwNQKD",
+  "rolls": [
+    4,
+    1,
+    1,
+    3,
+    12
+  ],
+  "checks": [],
+  "feats": [
+    "lcGjKXveH19Q80Bx",
+    "pJ7CjWuz0PBNcRwj"
+  ],
+  "kits": [
+    {
+      "id": "4Dxo86Mm7ICu9QMY",
+      "name": "Authentication Kit III",
+      "weight": 0,
+      "np": true
+    },
+    {
+      "id": "5TP8vWRw1trkjiuT",
+      "name": "Surgery Kit III",
+      "weight": 200,
+      "np": false
+    },
+    {
+      "id": "9YMiZArM6C3wRukR",
+      "name": "Construction Kit III",
+      "weight": 2000,
+      "np": false
+    },
+    {
+      "id": "BdPYymYvrYWh92AL",
+      "name": "Forgery Kit III",
+      "weight": 400,
+      "np": false
+    },
+    {
+      "id": "DzG7rkLUjIGY0Zti",
+      "name": "Climbing Kit III",
+      "weight": 180,
+      "np": false
+    },
+    {
+      "id": "Ne5RTWYO33rsBWZd",
+      "name": "Chemistry Kit III",
+      "weight": 0,
+      "np": true
+    },
+    {
+      "id": "VJIMHHgV4fcXznVu",
+      "name": "First Aid Kit III",
+      "weight": 80,
+      "np": false
+    },
+    {
+      "id": "cJQRnvPqBTBHC7Tu",
+      "name": "Electronics Kit III",
+      "weight": 0,
+      "np": true
+    },
+    {
+      "id": "f1BSS8DMRwpGTi22",
+      "name": "Forensics Kit III",
+      "weight": 50,
+      "np": false
+    },
+    {
+      "id": "fXp8ZynX8JfaDlhi",
+      "name": "Appraisal Kit III",
+      "weight": 0,
+      "np": true
+    },
+    {
+      "id": "ilMbnmZ8G6iTueXe",
+      "name": "Mechanics Kit III",
+      "weight": 4000,
+      "np": false
+    },
+    {
+      "id": "j3kdtfEUvwltNusO",
+      "name": "Architect’s Kit III",
+      "weight": 100,
+      "np": false
+    },
+    {
+      "id": "lJZf3OlEVaBxvSLd",
+      "name": "Lockpicking Kit III",
+      "weight": 150,
+      "np": false
+    },
+    {
+      "id": "qDYCyP4DV9RptQ28",
+      "name": "Demolitions Kit III",
+      "weight": 60,
+      "np": false
+    },
+    {
+      "id": "tAof807Fu5ntB4QC",
+      "name": "Disguise Kit III",
+      "weight": 50,
+      "np": false
+    },
+    {
+      "id": "webv3uuDbxz3bfkM",
+      "name": "Cleaner Kit III",
+      "weight": 75,
+      "np": false
+    }
+  ],
+  "first": "lbFQ3cLxYDkGWLWl",
+  "second": "CzZzboisJIUcC2mA",
+  "payment": {
+    "used": 2,
+    "dice": 0,
+    "reserves": null,
+    "weight": 4000,
+    "noThirdPost": true
+  },
+  "receipt": {
+    "id": "0jtbh9fOlGjYXXBh",
+    "flags": {
+      "gearAllowance": null,
+      "gearCheckContext": null,
+      "improvisedSearch": null,
+      "terrainFeat": null,
+      "pursuitFeat": null,
+      "professionalFeat": null,
+      "contactFeat": null,
+      "polyglot": null,
+      "photographicMemory": null,
+      "charmer": null,
+      "cardSharkKnowledge": null,
+      "cardSharkProfession": null,
+      "appearanceModifiers": null,
+      "hardCore": null,
+      "finalAttackRound": null,
+      "finesseDamage": null,
+      "damageSave": null,
+      "coverSave": null,
+      "cqbRange": null,
+      "finalAttack": null,
+      "twoWeaponFinalAttack": null,
+      "shakenContext": null,
+      "restraintEscape": null,
+      "skillBonusCondition": {
+        "state": "",
+        "normal": 2,
+        "total": 2,
+        "adjustment": 0
+      },
+      "skillCheckAdjustment": 0,
+      "weaponFocusWork": null,
+      "baffledSaveBonus": 0,
+      "gamblingDice": null,
+      "rollCombat": null,
+      "preRollFunding": null,
+      "hailMary": {
+        "untrained": false,
+        "uncap": false,
+        "active": false,
+        "cost": 0
+      },
+      "rerollFunding": null,
+      "rerollReceiptId": null,
+      "rerollOf": null,
+      "sleepSnapshot": null,
+      "conditionAbilityAdjustment": 0,
+      "conditionDamagePenalty": 0,
+      "evasionContext": null,
+      "securityBonus": 0,
+      "fatigueBonus": 0,
+      "fatigueCondition": "",
+      "underwaterContext": {
+        "underwater": false,
+        "aquatic": false,
+        "athleticsRanks": 9,
+        "swimExempt": false,
+        "penalty": 0,
+        "notes": []
+      },
+      "mortarOperation": null,
+      "launcherOperation": null,
+      "unnervingAvailableGrade": 0,
+      "unnervingStress": null,
+      "qualityChecks": {
+        "bonuses": [],
+        "notes": [],
+        "fearless": 0,
+        "strongMinded": 0,
+        "seductive": 0,
+        "camouflaged": 0,
+        "terrain": "",
+        "shiftingDisposition": false,
+        "seductionConflict": false
+      },
+      "medical": null,
+      "littleDetails": null,
+      "sensoryConditions": {
+        "blinded": false,
+        "deafened": false,
+        "targetDeafened": false,
+        "nightTrainingException": false,
+        "capAdjustment": 0,
+        "skillModifier": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillTags": {
+        "nauseated": false,
+        "concentration": false,
+        "mute": false,
+        "oneHanded": false,
+        "noSharedLanguage": false,
+        "bound": false,
+        "conveyingMessage": false,
+        "addedHandsOn": false,
+        "handsOn": true,
+        "grasp": false,
+        "language": false,
+        "twoWeapon": false,
+        "handPenalty": 0,
+        "capAdjustment": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillGear": {
+        "toolShedKit": {
+          "id": "3wlM9Bg0WRmE1hzo",
+          "epoch": "qa-xp-cancel",
+          "itemId": "lbFQ3cLxYDkGWLWl",
+          "fingerprint": "{\"kitType\":\"Authentication Kit\",\"kitGrade\":3,\"kitSize\":\"Large\",\"kitNonPortable\":true,\"kitLocation\":\"Synthetic Tool Shed home\",\"weight\":0,\"caliber\":3,\"quantity\":1,\"gearCategory\":\"\"}"
+        },
+        "required": true,
+        "requirements": [
+          "Authentication Kit"
+        ],
+        "only": false,
+        "status": "available",
+        "kitUuid": "Actor.6PrtO3iI1DWwNQKD.Item.lbFQ3cLxYDkGWLWl",
+        "kitType": "Authentication Kit",
+        "kitGrade": 3,
+        "kitLocation": "Synthetic Tool Shed home",
+        "bonuses": [
+          {
+            "type": "gear",
+            "value": 1,
+            "source": "Authentication Kit III"
+          }
+        ],
+        "capIncrease": 5,
+        "blockedReason": "",
+        "notes": [
+          "Required gear: Authentication Kit; available. Authentication Kit III: Grade 3, +1 gear bonus, cap +5 at Synthetic Tool Shed home."
+        ]
+      },
+      "fogSmoke": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "visualDelta": 0,
+        "notes": []
+      },
+      "terrainSave": null,
+      "localHeroOpposition": null,
+      "cunningPlan": null,
+      "attributeSubstitution": null,
+      "terrain": {
+        "homeTurf": false,
+        "homeTurfEligible": false,
+        "homeTurfCapIncrease": 0,
+        "terrain": "",
+        "underwater": false,
+        "navigating": false,
+        "naturalSurface": false,
+        "hearingCheck": false,
+        "cityPopulation": 0,
+        "nightAmbush": false,
+        "matched": [],
+        "woodcraft": false,
+        "unfair": false,
+        "bonuses": [],
+        "synergies": [],
+        "synergySources": [],
+        "ambushSources": [],
+        "opponentSurprisePenalty": 0,
+        "notes": []
+      },
+      "senses": {
+        "hearing": false,
+        "scent": false,
+        "deafened": false,
+        "bonuses": [],
+        "notes": []
+      },
+      "tracking": null,
+      "gcTakingPermissionConfirmed": false,
+      "ambush": null,
+      "sneakAttackTarget": null,
+      "sneakAttack": null,
+      "ambientLight": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "notes": []
+      },
+      "nest": null,
+      "breakthrough": null,
+      "requiredBonusPoolId": null,
+      "requiredBonusSpent": false,
+      "cannotError": false,
+      "resultSource": "",
+      "opponentResult": null,
+      "oneInAMillion": false,
+      "tenSecondSolution": false,
+      "standaloneCheckConfirmed": false,
+      "forcedThreat": false,
+      "noForcedReroll": false,
+      "normalThreat": 20,
+      "rawTotal": 19,
+      "rolledTotal": 19,
+      "minimumAdjustment": 0,
+      "practiceMakesPerfect": false,
+      "criticalFailureCostIncrease": 0,
+      "crossCheck": false,
+      "alternatives": null,
+      "chosenIndex": 0,
+      "choiceSource": null,
+      "choiceResourceId": null,
+      "effectiveTotal": 19,
+      "actorUuid": "Actor.6PrtO3iI1DWwNQKD",
+      "checkKind": "skill",
+      "ability": "int",
+      "skillKey": "analysis",
+      "checkId": "authenticate",
+      "focus": "Authenticate",
+      "rerollResources": [],
+      "formula": "1d20 + @total",
+      "rollData": {
+        "total": 2
+      },
+      "rollMode": "blindroll",
+      "weaponUuid": "",
+      "weaponProficiency": "",
+      "weaponQualities": "",
+      "cleanAndPolished": false,
+      "gearUuid": "Actor.6PrtO3iI1DWwNQKD.Item.lbFQ3cLxYDkGWLWl",
+      "gearAttempt": null,
+      "attackContext": null,
+      "unarmed": false,
+      "improvised": false,
+      "threat": 20,
+      "error": 3,
+      "cap": 20,
+      "baseFlavor": "Analysis / Authenticate Check (INT)<br><small>         Required gear: Authentication Kit; available. Authentication Kit III: Grade 3, +1 gear bonus, cap +5 at Synthetic Tool Shed home.            1 Minute (Take 10/Take 20). Secret. Gear (Authentication Kit), Hands-On, Vision. Rules p.110.</small>",
+      "boostTotal": 0,
+      "boostSpent": 0,
+      "capped": false,
+      "naturalDie": 17,
+      "checkMethod": "roll",
+      "actionDiceAllowed": true,
+      "successConfirmed": null,
+      "errorConfirmed": false,
+      "threatConfirmed": false,
+      "triumphed": false
+    }
+  },
+  "guard": {
+    "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+    "calls": 1,
+    "noPost": true
+  },
+  "expiry": {
+    "state": {
+      "applicable": true,
+      "valid": true,
+      "expired": true,
+      "blockedReason": "This Tool Shed kit was lost at the end of its mission; choose available gear.",
+      "evidence": {
+        "id": "3wlM9Bg0WRmE1hzo",
+        "epoch": "qa-xp-cancel",
+        "itemId": "lbFQ3cLxYDkGWLWl",
+        "fingerprint": "{\"kitType\":\"Authentication Kit\",\"kitGrade\":3,\"kitSize\":\"Large\",\"kitNonPortable\":true,\"kitLocation\":\"Synthetic Tool Shed home\",\"weight\":0,\"caliber\":3,\"quantity\":1,\"gearCategory\":\"\"}"
+      }
+    },
+    "weight": 0,
+    "warnings": [
+      "Mechanics Kit III: This Tool Shed kit was lost at the end of its mission; choose available gear.",
+      "Authentication Kit III: This Tool Shed kit was lost at the end of its mission; choose available gear."
+    ]
+  },
+  "build": {
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "feats": [
+      {
+        "name": "Home Sweet Home",
+        "choice": "",
+        "tree": "gear"
+      },
+      {
+        "name": "Tool Shed",
+        "choice": "",
+        "tree": "gear"
+      },
+      {
+        "name": "Tool Shed",
+        "choice": "",
+        "tree": "gear"
+      }
+    ],
+    "uses": {
+      "epoch": "qa-xp-cancel",
+      "used": 2
+    }
+  },
+  "reload": {
+    "items": [
+      {
+        "name": "Mechanics Kit III",
+        "type": "gear",
+        "img": "icons/svg/tool.svg",
+        "system": {
+          "description": "<p>Toolkit II + 1-ton crane, hydraulic car lift, bench lathe, bench vise, rotary saw, welding torch, air compressor, angle grinder, block and tackle.</p><p>Grade 3: supplies the corresponding Gear tag requirements. +1 gear bonus. Result cap +5.</p>",
+          "source": "Spycraft 2.0 p.215",
+          "quantity": 1,
+          "caliber": 3,
+          "weight": 4000,
+          "carried": true,
+          "equipped": false,
+          "pick": "",
+          "gearCategory": "",
+          "common": false,
+          "reserve": false,
+          "kitType": "Mechanics Kit",
+          "kitGrade": 3,
+          "kitSize": "Large",
+          "kitNonPortable": false,
+          "kitLocation": "",
+          "pickCount": 1,
+          "possessionSource": "",
+          "possessionApproved": false,
+          "cleanAndPolishedReady": false,
+          "bundleSize": 1,
+          "reserveAcquisition": null,
+          "armorMissionGrant": null,
+          "bigStickMissionPick": null,
+          "missionCaliberGrant": null,
+          "classGearGrant": {
+            "id": "AkAekNnUO2AHUaci",
+            "epoch": "qa-xp-cancel",
+            "source": "toolShed"
+          }
+        },
+        "effects": [],
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0,
+          "WW1y27MJMt1sWfHr": 3
+        },
+        "flags": {},
+        "_stats": {
+          "coreVersion": "14.370",
+          "systemId": "spycraft2",
+          "systemVersion": "0.3.1",
+          "createdTime": 1794805189118,
+          "modifiedTime": 1794805189199,
+          "lastModifiedBy": "WW1y27MJMt1sWfHr",
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null
+        },
+        "_id": "CzZzboisJIUcC2mA"
+      },
+      {
+        "name": "Authentication Kit III",
+        "type": "gear",
+        "img": "icons/svg/tool.svg",
+        "system": {
+          "description": "<p>Authentication kit II + video spectral comparator (with built-in microscope, video camera, and high-resolution color printer), back-illuminated comparison table.</p><p>Grade 3: supplies the corresponding Gear tag requirements. +1 gear bonus. Result cap +5. Non-portable: choose a location before use.</p>",
+          "source": "Spycraft 2.0 p.213",
+          "quantity": 1,
+          "caliber": 3,
+          "weight": 0,
+          "carried": false,
+          "equipped": false,
+          "pick": "",
+          "gearCategory": "",
+          "common": false,
+          "reserve": false,
+          "kitType": "Authentication Kit",
+          "kitGrade": 3,
+          "kitSize": "Large",
+          "kitNonPortable": true,
+          "kitLocation": "Synthetic Tool Shed home",
+          "pickCount": 1,
+          "possessionSource": "",
+          "possessionApproved": false,
+          "cleanAndPolishedReady": false,
+          "bundleSize": 1,
+          "reserveAcquisition": null,
+          "armorMissionGrant": null,
+          "bigStickMissionPick": null,
+          "missionCaliberGrant": null,
+          "classGearGrant": {
+            "id": "3wlM9Bg0WRmE1hzo",
+            "epoch": "qa-xp-cancel",
+            "source": "toolShed"
+          }
+        },
+        "effects": [],
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0,
+          "WW1y27MJMt1sWfHr": 3
+        },
+        "flags": {},
+        "_stats": {
+          "coreVersion": "14.370",
+          "systemId": "spycraft2",
+          "systemVersion": "0.3.1",
+          "createdTime": 1794805270219,
+          "modifiedTime": 1794805270219,
+          "lastModifiedBy": "WW1y27MJMt1sWfHr",
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null
+        },
+        "_id": "lbFQ3cLxYDkGWLWl"
+      }
+    ],
+    "uses": {
+      "epoch": "qa-xp-cancel",
+      "used": 2
+    },
+    "grants": {
+      "3wlM9Bg0WRmE1hzo": {
+        "epoch": "qa-xp-cancel",
+        "source": "toolShed",
+        "name": "Authentication Kit III",
+        "home": "Synthetic Tool Shed home",
+        "hourCompletedConfirmed": true,
+        "at": 126,
+        "fingerprint": "{\"kitType\":\"Authentication Kit\",\"kitGrade\":3,\"kitSize\":\"Large\",\"kitNonPortable\":true,\"kitLocation\":\"Synthetic Tool Shed home\",\"weight\":0,\"caliber\":3,\"quantity\":1,\"gearCategory\":\"\"}",
+        "itemId": "lbFQ3cLxYDkGWLWl"
+      },
+      "AkAekNnUO2AHUaci": {
+        "epoch": "qa-xp-cancel",
+        "source": "toolShed",
+        "name": "Mechanics Kit III",
+        "home": "Synthetic Tool Shed home",
+        "hourCompletedConfirmed": true,
+        "at": 126,
+        "fingerprint": "{\"kitType\":\"Mechanics Kit\",\"kitGrade\":3,\"kitSize\":\"Large\",\"kitNonPortable\":false,\"kitLocation\":\"\",\"weight\":4000,\"caliber\":3,\"quantity\":1,\"gearCategory\":\"\"}",
+        "itemId": "CzZzboisJIUcC2mA"
+      }
+    },
+    "dice": 0,
+    "reserves": null,
+    "weight": 4000,
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "receipt": {
+      "gearAllowance": null,
+      "gearCheckContext": null,
+      "improvisedSearch": null,
+      "terrainFeat": null,
+      "pursuitFeat": null,
+      "professionalFeat": null,
+      "contactFeat": null,
+      "polyglot": null,
+      "photographicMemory": null,
+      "charmer": null,
+      "cardSharkKnowledge": null,
+      "cardSharkProfession": null,
+      "appearanceModifiers": null,
+      "hardCore": null,
+      "finalAttackRound": null,
+      "finesseDamage": null,
+      "damageSave": null,
+      "coverSave": null,
+      "cqbRange": null,
+      "finalAttack": null,
+      "twoWeaponFinalAttack": null,
+      "shakenContext": null,
+      "restraintEscape": null,
+      "skillBonusCondition": {
+        "state": "",
+        "normal": 2,
+        "total": 2,
+        "adjustment": 0
+      },
+      "skillCheckAdjustment": 0,
+      "weaponFocusWork": null,
+      "baffledSaveBonus": 0,
+      "gamblingDice": null,
+      "rollCombat": null,
+      "preRollFunding": null,
+      "hailMary": {
+        "untrained": false,
+        "uncap": false,
+        "active": false,
+        "cost": 0
+      },
+      "rerollFunding": null,
+      "rerollReceiptId": null,
+      "rerollOf": null,
+      "sleepSnapshot": null,
+      "conditionAbilityAdjustment": 0,
+      "conditionDamagePenalty": 0,
+      "evasionContext": null,
+      "securityBonus": 0,
+      "fatigueBonus": 0,
+      "fatigueCondition": "",
+      "underwaterContext": {
+        "underwater": false,
+        "aquatic": false,
+        "athleticsRanks": 9,
+        "swimExempt": false,
+        "penalty": 0,
+        "notes": []
+      },
+      "mortarOperation": null,
+      "launcherOperation": null,
+      "unnervingAvailableGrade": 0,
+      "unnervingStress": null,
+      "qualityChecks": {
+        "bonuses": [],
+        "notes": [],
+        "fearless": 0,
+        "strongMinded": 0,
+        "seductive": 0,
+        "camouflaged": 0,
+        "terrain": "",
+        "shiftingDisposition": false,
+        "seductionConflict": false
+      },
+      "medical": null,
+      "littleDetails": null,
+      "sensoryConditions": {
+        "blinded": false,
+        "deafened": false,
+        "targetDeafened": false,
+        "nightTrainingException": false,
+        "capAdjustment": 0,
+        "skillModifier": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillTags": {
+        "nauseated": false,
+        "concentration": false,
+        "mute": false,
+        "oneHanded": false,
+        "noSharedLanguage": false,
+        "bound": false,
+        "conveyingMessage": false,
+        "addedHandsOn": false,
+        "handsOn": true,
+        "grasp": false,
+        "language": false,
+        "twoWeapon": false,
+        "handPenalty": 0,
+        "capAdjustment": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillGear": {
+        "toolShedKit": {
+          "id": "3wlM9Bg0WRmE1hzo",
+          "epoch": "qa-xp-cancel",
+          "itemId": "lbFQ3cLxYDkGWLWl",
+          "fingerprint": "{\"kitType\":\"Authentication Kit\",\"kitGrade\":3,\"kitSize\":\"Large\",\"kitNonPortable\":true,\"kitLocation\":\"Synthetic Tool Shed home\",\"weight\":0,\"caliber\":3,\"quantity\":1,\"gearCategory\":\"\"}"
+        },
+        "required": true,
+        "requirements": [
+          "Authentication Kit"
+        ],
+        "only": false,
+        "status": "available",
+        "kitUuid": "Actor.6PrtO3iI1DWwNQKD.Item.lbFQ3cLxYDkGWLWl",
+        "kitType": "Authentication Kit",
+        "kitGrade": 3,
+        "kitLocation": "Synthetic Tool Shed home",
+        "bonuses": [
+          {
+            "type": "gear",
+            "value": 1,
+            "source": "Authentication Kit III"
+          }
+        ],
+        "capIncrease": 5,
+        "blockedReason": "",
+        "notes": [
+          "Required gear: Authentication Kit; available. Authentication Kit III: Grade 3, +1 gear bonus, cap +5 at Synthetic Tool Shed home."
+        ]
+      },
+      "fogSmoke": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "visualDelta": 0,
+        "notes": []
+      },
+      "terrainSave": null,
+      "localHeroOpposition": null,
+      "cunningPlan": null,
+      "attributeSubstitution": null,
+      "terrain": {
+        "homeTurf": false,
+        "homeTurfEligible": false,
+        "homeTurfCapIncrease": 0,
+        "terrain": "",
+        "underwater": false,
+        "navigating": false,
+        "naturalSurface": false,
+        "hearingCheck": false,
+        "cityPopulation": 0,
+        "nightAmbush": false,
+        "matched": [],
+        "woodcraft": false,
+        "unfair": false,
+        "bonuses": [],
+        "synergies": [],
+        "synergySources": [],
+        "ambushSources": [],
+        "opponentSurprisePenalty": 0,
+        "notes": []
+      },
+      "senses": {
+        "hearing": false,
+        "scent": false,
+        "deafened": false,
+        "bonuses": [],
+        "notes": []
+      },
+      "tracking": null,
+      "gcTakingPermissionConfirmed": false,
+      "ambush": null,
+      "sneakAttackTarget": null,
+      "sneakAttack": null,
+      "ambientLight": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "notes": []
+      },
+      "nest": null,
+      "breakthrough": null,
+      "requiredBonusPoolId": null,
+      "requiredBonusSpent": false,
+      "cannotError": false,
+      "resultSource": "",
+      "opponentResult": null,
+      "oneInAMillion": false,
+      "tenSecondSolution": false,
+      "standaloneCheckConfirmed": false,
+      "forcedThreat": false,
+      "noForcedReroll": false,
+      "normalThreat": 20,
+      "rawTotal": 19,
+      "rolledTotal": 19,
+      "minimumAdjustment": 0,
+      "practiceMakesPerfect": false,
+      "criticalFailureCostIncrease": 0,
+      "crossCheck": false,
+      "alternatives": null,
+      "chosenIndex": 0,
+      "choiceSource": null,
+      "choiceResourceId": null,
+      "effectiveTotal": 19,
+      "actorUuid": "Actor.6PrtO3iI1DWwNQKD",
+      "checkKind": "skill",
+      "ability": "int",
+      "skillKey": "analysis",
+      "checkId": "authenticate",
+      "focus": "Authenticate",
+      "rerollResources": [],
+      "formula": "1d20 + @total",
+      "rollData": {
+        "total": 2
+      },
+      "rollMode": "blindroll",
+      "weaponUuid": "",
+      "weaponProficiency": "",
+      "weaponQualities": "",
+      "cleanAndPolished": false,
+      "gearUuid": "Actor.6PrtO3iI1DWwNQKD.Item.lbFQ3cLxYDkGWLWl",
+      "gearAttempt": null,
+      "attackContext": null,
+      "unarmed": false,
+      "improvised": false,
+      "threat": 20,
+      "error": 3,
+      "cap": 20,
+      "baseFlavor": "Analysis / Authenticate Check (INT)<br><small>         Required gear: Authentication Kit; available. Authentication Kit III: Grade 3, +1 gear bonus, cap +5 at Synthetic Tool Shed home.            1 Minute (Take 10/Take 20). Secret. Gear (Authentication Kit), Hands-On, Vision. Rules p.110.</small>",
+      "boostTotal": 0,
+      "boostSpent": 0,
+      "capped": false,
+      "naturalDie": 17,
+      "checkMethod": "roll",
+      "actionDiceAllowed": true,
+      "successConfirmed": null,
+      "errorConfirmed": false,
+      "threatConfirmed": false,
+      "triumphed": false
+    },
+    "cleanup": {
+      "actors": 5,
+      "messages": 553,
+      "time": 126,
+      "effects": 0,
+      "combats": 0,
+      "locks": 0
+    }
+  }
+}

@@ -1,0 +1,505 @@
+{
+  "actor": "IPxyxsHoevWRCntb",
+  "feat": "MEiloEJMwaYZplWM",
+  "contacts": [
+    {
+      "name": "Ada",
+      "rank": 2,
+      "notes": "Entertainment producer",
+      "networkingMilestone": 0,
+      "networkingFeat": "",
+      "networkingTheme": "",
+      "networkingFeatConfirmed": false
+    },
+    {
+      "name": "Bob",
+      "rank": 1,
+      "notes": "Other contact",
+      "networkingMilestone": 0,
+      "networkingFeat": "",
+      "networkingTheme": "",
+      "networkingFeatConfirmed": false
+    },
+    {
+      "name": "Claire",
+      "rank": 2,
+      "notes": "",
+      "networkingMilestone": 4,
+      "networkingFeat": "Wilderness Contacts",
+      "networkingTheme": "wilderness",
+      "networkingFeatConfirmed": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "YJnG7Od2yQAKWjVw",
+      "name": "Ada",
+      "tl": 3,
+      "error": 0,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 3,
+        "missionComparison": "lower",
+        "dc": 20,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 1,
+        "minimumError": 1,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 0.5,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "MEiloEJMwaYZplWM",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "nJQ5X8bBxKj29xww",
+      "name": "Ada",
+      "tl": 4,
+      "error": 1,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "MEiloEJMwaYZplWM",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "Q5HFSK1vmfJg0bqX",
+      "name": "Ada",
+      "tl": 5,
+      "error": 3,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 2,
+          "notes": "Entertainment producer"
+        },
+        "source": "Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 5,
+        "missionComparison": "higher",
+        "dc": 30,
+        "baseSummonSeconds": 3600,
+        "errorIncrease": 4,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 2,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "MEiloEJMwaYZplWM",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "zW45iizpJLWwM9qt",
+      "name": "Bob",
+      "tl": 3,
+      "error": 3,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 3,
+        "missionComparison": "lower",
+        "dc": 25,
+        "baseSummonSeconds": 3600,
+        "errorIncrease": 2,
+        "minimumError": 1,
+        "response": {
+          "formula": "4d6",
+          "unit": "hours",
+          "missionMultiplier": 0.5,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "contactMission",
+          "multiplier": 0.5,
+          "rounding": null
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "07jm3vLCgfB73Y3d",
+      "name": "Bob",
+      "tl": 4,
+      "error": 4,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 30,
+        "baseSummonSeconds": 3600,
+        "errorIncrease": 3,
+        "minimumError": 0,
+        "response": {
+          "formula": "4d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 3600,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "SSrbndgDjRe6ku8k",
+      "name": "Bob",
+      "tl": 5,
+      "error": 6,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 1,
+          "notes": "Other contact"
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 5,
+        "missionComparison": "higher",
+        "dc": 35,
+        "baseSummonSeconds": 7200,
+        "errorIncrease": 5,
+        "minimumError": 0,
+        "response": {
+          "formula": "4d6",
+          "unit": "hours",
+          "missionMultiplier": 2,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 7200,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "lVOX5uxdM3kmaCNP",
+      "name": "Claire",
+      "tl": 3,
+      "error": 2,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 3,
+        "missionComparison": "lower",
+        "dc": 20,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 1,
+        "minimumError": 1,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 0.5,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": false,
+          "source": "contactMission",
+          "multiplier": 0.5,
+          "rounding": null
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "cDh1kEt6V12lFzYT",
+      "name": "Claire",
+      "tl": 4,
+      "error": 3,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "UiuaawJU6msO5ItZ",
+      "name": "Claire",
+      "tl": 5,
+      "error": 5,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 5,
+        "missionComparison": "higher",
+        "dc": 30,
+        "baseSummonSeconds": 3600,
+        "errorIncrease": 4,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 2,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 3600,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "hv6zWYDqi4ixkZSn",
+      "name": "Ada",
+      "tl": 4,
+      "error": 0,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 3,
+          "notes": "Entertainment producer"
+        },
+        "source": "Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 20,
+        "baseSummonSeconds": 600,
+        "errorIncrease": 1,
+        "minimumError": 0,
+        "response": {
+          "formula": "2d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "MEiloEJMwaYZplWM",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "requiredSeconds": 300,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "total": 2
+    },
+    {
+      "id": "5olcisaCausBKhy0",
+      "name": "Ada",
+      "tl": 4,
+      "error": 0,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Ada",
+          "rank": 4,
+          "notes": "Entertainment producer"
+        },
+        "source": "Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 15,
+        "baseSummonSeconds": 60,
+        "errorIncrease": 0,
+        "minimumError": 0,
+        "response": {
+          "formula": "1d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "MEiloEJMwaYZplWM",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "errorReduction": 2,
+        "requiredSeconds": 30,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "total": 2
+    }
+  ],
+  "guards": [
+    {
+      "kind": "missingThreat",
+      "evaluated": 0,
+      "error": "",
+      "posted": 0
+    },
+    {
+      "kind": "gradeChanged",
+      "evaluated": 1,
+      "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+      "posted": 0
+    }
+  ],
+  "ui": "kWXS1dpgRShNi03W",
+  "uiContext": {
+    "version": 1,
+    "contact": {
+      "name": "Ada",
+      "rank": 2,
+      "notes": "Entertainment producer"
+    },
+    "source": "Wilderness Contacts",
+    "careerLevel": 4,
+    "threatLevel": 4,
+    "missionComparison": "equal",
+    "dc": 25,
+    "baseSummonSeconds": 1800,
+    "errorIncrease": 2,
+    "minimumError": 0,
+    "response": {
+      "formula": "3d6",
+      "unit": "hours",
+      "missionMultiplier": 1,
+      "afterSuccessfulCheck": true
+    },
+    "featId": "MEiloEJMwaYZplWM",
+    "theme": "wilderness",
+    "themeConfirmed": true,
+    "errorReduction": 2,
+    "requiredSeconds": 900,
+    "timing": {
+      "applied": true,
+      "source": "contactFeat",
+      "multiplier": 0.5,
+      "rounding": "down"
+    }
+  }
+}

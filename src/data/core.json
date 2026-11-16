@@ -8,7 +8,207 @@
     "dex"
    ],
    "focus": false,
-   "row": 5
+   "row": 5,
+   "checks": [
+    {
+     "name": "Balance Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed, Hearing, Vision",
+     "error": 1,
+     "time": "1 Half Action (Take 10/Take 20)",
+     "page": 106,
+     "id": "balance",
+     "synergies": [
+      {
+       "skill": "athletics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "sneak",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Athletics, Resolve, Sneak."
+    },
+    {
+     "name": "Falling Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Vision",
+     "error": 3,
+     "time": "1 Free Action",
+     "page": 106,
+     "id": "falling",
+     "synergies": [
+      {
+       "skill": "athletics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "sneak",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Athletics, Sneak, Survival."
+    },
+    {
+     "name": "Jump Check",
+     "attributes": [
+      "str"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed, Vision",
+     "error": 1,
+     "time": "1 Half Action (Take 10)",
+     "page": 107,
+     "id": "jump",
+     "synergies": [
+      {
+       "skill": "athletics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "sneak",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Athletics, Sneak, Survival."
+    },
+    {
+     "name": "Maneuver Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed, Gear Only (Vehicle), Hands-On, Vision",
+     "error": 1,
+     "time": "1 Half Action (Take 10 with permission)",
+     "page": 108,
+     "id": "maneuver",
+     "synergies": [
+      {
+       "skill": "drive",
+       "focusSkill": true,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a city"
+      }
+     ],
+     "synergyText": "Drive, Sense Motive, Streetwise (in a city)."
+    },
+    {
+     "name": "Skydiving Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed, Gear Only (Parachute), Hands-On, Vision",
+     "error": 3,
+     "time": "Time Varies",
+     "page": 108,
+     "id": "skydiving",
+     "synergies": [
+      {
+       "skill": "athletics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Athletics, Resolve, Survival."
+    },
+    {
+     "name": "Tumble Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed, Vision",
+     "error": 1,
+     "time": "1 Half Action",
+     "page": 109,
+     "id": "tumble",
+     "synergies": [
+      {
+       "skill": "athletics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "blend",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "sneak",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Athletics, Blend, Sneak."
+    }
+   ]
   },
   {
    "key": "analysis",
@@ -18,7 +218,192 @@
     "wis"
    ],
    "focus": false,
-   "row": 6
+   "row": 6,
+   "checks": [
+    {
+     "name": "Appraise Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Secret",
+     "tags": "Gear (Appraisal Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "1 Minute (Take 10/Take 20)",
+     "page": 110,
+     "id": "appraise",
+     "synergies": [
+      {
+       "skill": "falsify",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "investigation",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when appraising something offered on the black market"
+      }
+     ],
+     "synergyText": "Falsify, Investigation, Streetwise (when appraising something offered on the black market)."
+    },
+    {
+     "name": "Authenticate Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Secret",
+     "tags": "Gear (Authentication Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "1 Minute (Take 10/Take 20)",
+     "page": 110,
+     "id": "authenticate",
+     "synergies": [
+      {
+       "skill": "falsify",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "investigation",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Chemistry",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Falsify, Investigation, Science (Chemistry)."
+    },
+    {
+     "name": "Decipher Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Computer), Vision",
+     "error": 0,
+     "time": "Varies Per Challenge",
+     "page": 111,
+     "id": "decipher",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when using a computer"
+      },
+      {
+       "skill": "investigation",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Mathematics",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Computers (when using a computer), Investigation, Science (Mathematics)."
+    },
+    {
+     "name": "Examine Media Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Vision",
+     "error": 1,
+     "time": "1 Hour",
+     "page": 111,
+     "id": "examine-media",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "investigation",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when gaining clues about people seen on media"
+      }
+     ],
+     "synergyText": "Computers, Investigation, Sense Motive (when gaining clues about people seen on media)."
+    },
+    {
+     "name": "Forensics Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Forensics Kit), Vision",
+     "error": 1,
+     "time": "1 Hour Per Challenge",
+     "page": 112,
+     "id": "forensics",
+     "synergies": [
+      {
+       "skill": "investigation",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "medicine",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when the mystery involves biological evidence"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Chemistry",
+       "condition": "when the mystery involves chemical evidence"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": "when the mystery involves gear remnants"
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Investigation, Medicine (when the mystery involves biological evidence), Science (Chemistry) (when the mystery involves chemical evidence), Science (Fabrication) (when the mystery involves gear remnants), Search, Sense Motive."
+    }
+   ]
   },
   {
    "key": "athletics",
@@ -28,7 +413,298 @@
     "con"
    ],
    "focus": false,
-   "row": 7
+   "row": 7,
+   "checks": [
+    {
+     "name": "Bind Check",
+     "attributes": [
+      "str"
+     ],
+     "mode": "Secret",
+     "tags": "Cross-Check, Hands-On, Gear Only (Bindings)",
+     "error": 1,
+     "time": "1 Full Action (Take 10/Take 20)",
+     "page": 113,
+     "id": "bind",
+     "synergies": [
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "sleightOfHand",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Notice, Sleight of Hand, Survival."
+    },
+    {
+     "name": "Climb Check",
+     "attributes": [
+      "con"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed, Gear (Climbing Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "1 Half Action",
+     "page": 113,
+     "id": "climb",
+     "synergies": [
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when using climbing gear"
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Mechanics (when using climbing gear), Resolve, Survival."
+    },
+    {
+     "name": "Escape Check",
+     "attributes": [
+      "str"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 114,
+     "id": "escape",
+     "synergies": [
+      {
+       "skill": "acrobatics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bluff",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when trying to escape unnoticed"
+      },
+      {
+       "skill": "sleightOfHand",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Acrobatics, Bluff (when trying to escape unnoticed), Sleight of Hand."
+    },
+    {
+     "name": "Forced March Check",
+     "attributes": [
+      "con"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "1 Hour",
+     "page": 114,
+     "id": "forced-march",
+     "synergies": [
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "tactics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Resolve, Survival, Tactics."
+    },
+    {
+     "name": "Maneuver Check",
+     "attributes": [
+      "str"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Vision",
+     "error": 1,
+     "time": "1 Half Action",
+     "page": 115,
+     "id": "maneuver",
+     "synergies": [
+      {
+       "skill": "acrobatics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a city"
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in the wild"
+      }
+     ],
+     "synergyText": "Acrobatics, Streetwise (in a city), Survival (in the wild)."
+    },
+    {
+     "name": "Power Lifting Check",
+     "attributes": [
+      "str"
+     ],
+     "mode": "Active",
+     "tags": ", Flat-Footed",
+     "error": 2,
+     "time": "1 Free Action",
+     "page": 116,
+     "id": "power-lifting",
+     "synergies": [
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Resolve."
+    },
+    {
+     "name": "Smash Check",
+     "attributes": [
+      "str"
+     ],
+     "mode": "Active",
+     "tags": "Grasp",
+     "error": 1,
+     "time": "1 Half Action (Take 10/Take 20)",
+     "page": 116,
+     "id": "smash",
+     "synergies": [
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Resolve."
+    },
+    {
+     "name": "Speed Push Check",
+     "attributes": [
+      "con"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed",
+     "error": 2,
+     "time": "1 Free Action",
+     "page": 117,
+     "id": "speed-push",
+     "synergies": [
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Resolve."
+    },
+    {
+     "name": "Sports Check",
+     "attributes": [
+      "str",
+      "con"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Gear Only (Per Sport), Hands-On, Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 117,
+     "id": "sports",
+     "synergies": [
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "tactics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Resolve, Sense Motive, Tactics."
+    },
+    {
+     "name": "Swim Check",
+     "attributes": [
+      "con"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed",
+     "error": 1,
+     "time": "1 Half Action (Take 10/Take 20)",
+     "page": 117,
+     "id": "swim",
+     "synergies": [
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Resolve, Survival."
+    }
+   ]
   },
   {
    "key": "blend",
@@ -38,7 +714,24 @@
     "cha"
    ],
    "focus": false,
-   "row": 8
+   "row": 8,
+   "checks": [
+    {
+     "name": "Stealth Check",
+     "attributes": [
+      "dex",
+      "cha"
+     ],
+     "mode": "Passive",
+     "tags": "Armor Check Penalty, Disposition, Flat-Footed",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 118,
+     "id": "stealth",
+     "synergies": [],
+     "synergyText": "None."
+    }
+   ]
   },
   {
    "key": "bluff",
@@ -47,16 +740,105 @@
     "cha"
    ],
    "focus": false,
-   "row": 9
+   "row": 9,
+   "checks": [
+    {
+     "name": "Deception Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Bribe, Crowd, Disposition, Language",
+     "error": 1,
+     "time": "1 Full Action (Take 10/Take 20)",
+     "page": 120,
+     "id": "deception",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a corporate or government environment"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "in a focus area"
+      },
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when being positive"
+      },
+      {
+       "skill": "intimidate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when being negative"
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a city"
+      }
+     ],
+     "synergyText": "Bureaucracy (in a corporate or government environment), Cultures (in a focus area), Impress (when being positive), Intimidate (when being negative), Sense Motive, Streetwise (in a city)."
+    }
+   ]
   },
   {
    "key": "bureaucracy",
    "name": "Bureaucracy",
    "abilities": [
+    "int",
     "cha"
    ],
    "focus": false,
-   "row": 10
+   "row": 10,
+   "checks": [
+    {
+     "name": "Bribe Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Crowd, Disposition",
+     "error": 0,
+     "time": "1 Full Action",
+     "page": 121,
+     "id": "bribe",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Economy",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Networking, Science (Economy)."
+    }
+   ]
   },
   {
    "key": "computers",
@@ -65,7 +847,42 @@
     "int"
    ],
    "focus": false,
-   "row": 11
+   "row": 11,
+   "checks": [
+    {
+     "name": "Optimize Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Gear Only (Electronics Kit), Hands-On, Project Investment (Low)",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20 with permission)",
+     "page": 122,
+     "id": "optimize",
+     "synergies": [
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Programming",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Electronics, Science (Programming), Science (Super-Science)."
+    }
+   ]
   },
   {
    "key": "cultures",
@@ -74,7 +891,57 @@
     "int"
    ],
    "focus": true,
-   "row": 12
+   "row": 12,
+   "checks": [
+    {
+     "name": "Communication Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Secret",
+     "tags": "Disposition, Hearing",
+     "error": 2,
+     "time": "Time Varies",
+     "page": 123,
+     "id": "communication",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Networking, Sense Motive."
+    },
+    {
+     "name": "Linguistics Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 124,
+     "id": "linguistics",
+     "synergies": [],
+     "synergyText": "Not listed for this optional use.",
+     "optionalRule": "linguistics"
+    }
+   ]
   },
   {
    "key": "drive",
@@ -83,7 +950,48 @@
     "dex"
    ],
    "focus": true,
-   "row": 13
+   "row": 13,
+   "checks": [
+    {
+     "name": "Maneuver Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Gear Only (Vehicle), Hands-On, Vision",
+     "error": 1,
+     "time": "1 Half Action (Take 10 with permission)",
+     "page": 125,
+     "id": "maneuver",
+     "synergies": [
+      {
+       "skill": "intimidate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a city"
+      }
+     ],
+     "synergyText": "Intimidate, Notice, Sense Motive, Streetwise (in a city)."
+    }
+   ]
   },
   {
    "key": "electronics",
@@ -93,7 +1001,219 @@
     "wis"
    ],
    "focus": false,
-   "row": 14
+   "row": 14,
+   "checks": [
+    {
+     "name": "Build Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Electronics Kit), Hands-On, Vision, Project Investment (Medium)",
+     "error": 1,
+     "time": "Time Varies Per Challenge",
+     "page": 126,
+     "id": "build",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      },
+      {
+       "skill": "security",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when building a security device"
+      }
+     ],
+     "synergyText": "Computers, Science (Super-Science), Security (when building a security device)."
+    },
+    {
+     "name": "Disable Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Cross-Check, Gear (Electronics Kit), Grasp, Hands-On, Project Investment (Low), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 126,
+     "id": "disable",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      },
+      {
+       "skill": "security",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when building a security device"
+      }
+     ],
+     "synergyText": "Computers, Science (Super-Science), Security (when building a security device)."
+    },
+    {
+     "name": "Modify Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Electronics Kit), Gear Only (Upgrade), Hands-On, Project Investment (Low), Vision",
+     "error": 1,
+     "time": "Time Varies Per Challenge",
+     "page": 127,
+     "id": "modify",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      },
+      {
+       "skill": "security",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when building a security device"
+      }
+     ],
+     "synergyText": "Analysis, Computers, Science (Super-Science), Security (when building a security device)."
+    },
+    {
+     "name": "Optimize Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Gear Only (Electronics Kit), Hands-On, Project Investment (Low)",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20 with permission)",
+     "page": 127,
+     "id": "optimize",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Computers, Science (Fabrication), Science (Super-Science)."
+    },
+    {
+     "name": "Repair Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Concentration, Gear (Electronics Kit), Hands- On, Project Investment (Medium), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 127,
+     "id": "repair",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      },
+      {
+       "skill": "security",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when repairing a security device"
+      }
+     ],
+     "synergyText": "Computers, Science (Super-Science), Security (when repairing a security device)."
+    },
+    {
+     "name": "Sabotage Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Cross-Check, Gear (Electronics Kit), Grasp, Hands- On, Project Investment (Low), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 128,
+     "id": "sabotage",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      },
+      {
+       "skill": "security",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when sabotaging a security device"
+      }
+     ],
+     "synergyText": "Analysis, Computers, Science (Super-Science), Security (when sabotaging a security device)."
+    }
+   ]
   },
   {
    "key": "falsify",
@@ -103,7 +1223,144 @@
     "wis"
    ],
    "focus": false,
-   "row": 15
+   "row": 15,
+   "checks": [
+    {
+     "name": "Cover Up Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Gear (Cleaner Kit), Vision",
+     "error": 0,
+     "time": "1 Minute",
+     "page": 129,
+     "id": "cover-up",
+     "synergies": [
+      {
+       "skill": "bluff",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a city"
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in the wild"
+      }
+     ],
+     "synergyText": "Bluff, Streetwise (in a city), Survival (in the wild)."
+    },
+    {
+     "name": "Disguise Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Cross-Check, Gear (Disguise Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 129,
+     "id": "disguise",
+     "synergies": [
+      {
+       "skill": "blend",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bluff",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a corporate or government environment"
+      },
+      {
+       "skill": "sneak",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a city"
+      }
+     ],
+     "synergyText": "Blend, Bluff, Bureaucracy (in a corporate or government environment), Sneak, Streetwise (in a city)."
+    },
+    {
+     "name": "Forgery Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Cross-Check, Gear (Forgery Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 130,
+     "id": "forgery",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when creating any document, cover identity, or art object native to a corporate or government environment"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when creating any document, cover identity, or art object native to a focus area"
+      },
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when creating a simulated electronic device"
+      },
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when creating a simulated mechanical device"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when creating any simulated item typically created with a Science focus"
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when creating any document, cover identity, or art object native to a city"
+      }
+     ],
+     "synergyText": "Analysis, Bureaucracy (when creating any document, cover identity, or art object native to a corporate or government environment), Cultures (when creating any document, cover identity, or art object native to a focus area), Electronics (when creating a simulated electronic device), Mechanics (when creating a simulated mechanical device), Science (when creating any simulated item typically created with a Science focus), Streetwise (when creating any document, cover identity, or art object native to a city)."
+    }
+   ]
   },
   {
    "key": "impress",
@@ -112,7 +1369,120 @@
     "cha"
    ],
    "focus": false,
-   "row": 16
+   "row": 16,
+   "checks": [
+    {
+     "name": "Influence Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Bribe, Disposition, Language, Remote",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 132,
+     "id": "influence",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any corporate or government character"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when targeting any character from a focus area"
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any urban character"
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Sense Motive, Streetwise (when targeting any urban character)."
+    },
+    {
+     "name": "Performance Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Bribe, Concentration, Crowd, Disposition, Language, Remote",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 132,
+     "id": "performance",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any crowd consisting of corporate or government characters"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when targeting any crowd from a focus area"
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any crowd consisting of urban characters"
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any crowd consisting of corporate or government characters), Cultures (when targeting any crowd from a focus area), Streetwise (when targeting any crowd consisting of urban characters)."
+    },
+    {
+     "name": "Persuasion Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Bribe, Crowd, Disposition, Language, Remote",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 133,
+     "id": "persuasion",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any corporate or government character"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when targeting any character from a focus area"
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any urban character"
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Resolve, Streetwise (when targeting any urban character)."
+    }
+   ]
   },
   {
    "key": "intimidate",
@@ -122,7 +1492,101 @@
     "wis"
    ],
    "focus": false,
-   "row": 17
+   "row": 17,
+   "checks": [
+    {
+     "name": "Coercion Check",
+     "attributes": [
+      "str",
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Disposition, Gear (weapon), Language",
+     "error": 2,
+     "time": "1 Full Action",
+     "page": 134,
+     "id": "coercion",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any corporate or government character"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when targeting any character from a focus area"
+      },
+      {
+       "skill": "manipulate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any urban character"
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Manipulation, Resolve, Streetwise (when targeting any urban character)."
+    },
+    {
+     "name": "Domination Check",
+     "attributes": [
+      "str",
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Disposition",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 134,
+     "id": "domination",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any corporate or government character"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when targeting any character from a focus area"
+      },
+      {
+       "skill": "manipulate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any urban character"
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Manipulation, Resolve, Streetwise (when targeting any urban character)."
+    }
+   ]
   },
   {
    "key": "investigation",
@@ -132,7 +1596,138 @@
     "cha"
    ],
    "focus": false,
-   "row": 18
+   "row": 18,
+   "checks": [
+    {
+     "name": "Canvass Area Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Language",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 136,
+     "id": "canvass-area",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when in a corporate or government environment"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when in a focus area"
+      },
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when in a city"
+      }
+     ],
+     "synergyText": "Bureaucracy (when in a corporate or government environment), Cultures (when in a focus area), Impress, Networking, Sense Motive, Streetwise (when in a city)."
+    },
+    {
+     "name": "Detect Search Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Vision",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 137,
+     "id": "detect-search",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Notice, Search."
+    },
+    {
+     "name": "Research Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Language, Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 137,
+     "id": "research",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when using a computer"
+      },
+      {
+       "skill": "investigation",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Computers (when using a computer), Investigation, Notice, Search."
+    }
+   ]
   },
   {
    "key": "manipulate",
@@ -142,7 +1737,83 @@
     "cha"
    ],
    "focus": false,
-   "row": 19
+   "row": 19,
+   "checks": [
+    {
+     "name": "Harassment Check",
+     "attributes": [
+      "wis",
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Remote",
+     "error": 1,
+     "time": "1 Day (Take 10/Take 20)",
+     "page": 138,
+     "id": "harassment",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any corporate or government character"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when targeting any character from a focus area"
+      },
+      {
+       "skill": "falsify",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when the harassment involves physical props"
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any urban character"
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Falsify (when the harassment involves physical props), Streetwise (when targeting any urban character)."
+    },
+    {
+     "name": "Slander Check",
+     "attributes": [
+      "wis",
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Bribe, Crowd, Language, Remote",
+     "error": 1,
+     "time": "1 Hour (Take 10/Take 20)",
+     "page": 138,
+     "id": "slander",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Networking, Sense Motive."
+    }
+   ]
   },
   {
    "key": "mechanics",
@@ -152,7 +1823,201 @@
     "wis"
    ],
    "focus": false,
-   "row": 20
+   "row": 20,
+   "checks": [
+    {
+     "name": "Build Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Mechanics Kit), Hands-On, Vision, Project Investment (Medium)",
+     "error": 1,
+     "time": "Time Varies Per Challenge",
+     "page": 139,
+     "id": "build",
+     "synergies": [
+      {
+       "skill": "drive",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when building a vehicle"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      },
+      {
+       "skill": "security",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when building a security device"
+      }
+     ],
+     "synergyText": "Drive (when building a vehicle), Science (Fabrication), Security (when building a security device)."
+    },
+    {
+     "name": "Disable Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Cross-Check, Gear (Mechanics Kit), Grasp, Hands-On, Project Investment (Low), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 139,
+     "id": "disable",
+     "synergies": [
+      {
+       "skill": "drive",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when disabling a vehicle"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Drive (when disabling a vehicle), Science (Fabrication)."
+    },
+    {
+     "name": "Modify Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear Only (Upgrade), Gear (Mechanics Kit), Hands-On, Project Investment (Low), Vision",
+     "error": 1,
+     "time": "Time Varies Per Challenge",
+     "page": 140,
+     "id": "modify",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "drive",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when modifying a vehicle"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Drive (when modifying a vehicle), Science (Fabrication)."
+    },
+    {
+     "name": "Optimize Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Gear Only (Mechanics Kit), Hands-On, Project Investment (Low)",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20 with permission)",
+     "page": 140,
+     "id": "optimize",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Computers, Science (Fabrication), Science (Super-Science)."
+    },
+    {
+     "name": "Repair Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Concentration, Gear (Mechanics Kit), Hands- On, Project Investment (Medium), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 141,
+     "id": "repair",
+     "synergies": [
+      {
+       "skill": "drive",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when repairing a vehicle"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      },
+      {
+       "skill": "security",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when repairing a security device"
+      }
+     ],
+     "synergyText": "Drive (when repairing a vehicle), Science (Fabrication), Security (when repairing a security device)."
+    },
+    {
+     "name": "Sabotage Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Cross-Check, Gear (Mechanics Kit), Grasp, Hands-On, Project Investment (Low), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 141,
+     "id": "sabotage",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "drive",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when sabotaging a vehicle"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Drive (when sabotaging a vehicle), Science (Fabrication)."
+    }
+   ]
   },
   {
    "key": "medicine",
@@ -162,7 +2027,192 @@
     "wis"
    ],
    "focus": false,
-   "row": 21
+   "row": 21,
+   "checks": [
+    {
+     "name": "First Aid Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Concentration, Gear Only (First Aid Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "1 Minute",
+     "page": 141,
+     "id": "first-aid",
+     "synergies": [
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Pharmacology",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Science (Pharmacology), Search, Survival."
+    },
+    {
+     "name": "Stabilize Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Concentration, Gear Only (First Aid Kit), Hands-On, Vision",
+     "error": 2,
+     "time": "1 Full Action",
+     "page": 142,
+     "id": "stabilize",
+     "synergies": [
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Pharmacology",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Resolve, Science (Pharmacology), Search, Survival."
+    },
+    {
+     "name": "Surgery Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Concentration, Gear Only (Surgery Kit), Hands-On, Vision",
+     "error": 4,
+     "time": "8 Hours",
+     "page": 142,
+     "id": "surgery",
+     "synergies": [
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Chemistry",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Genetics",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Notice, Science (Chemistry), Science (Genetics), Search."
+    },
+    {
+     "name": "Therapy Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Concentration, Disposition",
+     "error": 1,
+     "time": "4 Hours",
+     "page": 143,
+     "id": "therapy",
+     "synergies": [
+      {
+       "skill": "manipulate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Pharmacology",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Manipulate, Science (Pharmacology), Sense Motive."
+    },
+    {
+     "name": "Treatment Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Gear (First Aid Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "5 Minutes",
+     "page": 143,
+     "id": "treatment",
+     "synergies": [
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Pharmacology",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Notice, Resolve, Science (Pharmacology), Sense Motive."
+    }
+   ]
   },
   {
    "key": "networking",
@@ -172,7 +2222,128 @@
     "cha"
    ],
    "focus": false,
-   "row": 22
+   "row": 22,
+   "checks": [
+    {
+     "name": "Contact Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 144,
+     "id": "contact",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any corporate or government contact"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "when targeting any character from a focus area"
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any urban contact"
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any wilderness contact"
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any corporate or government contact), Cultures (when targeting any character from a focus area), Streetwise (when targeting any urban contact), Survival (when targeting any wilderness contact)."
+    },
+    {
+     "name": "Endorsement Check",
+     "attributes": [
+      "wis",
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Bribe, Crowd, Disposition, Language, Remote",
+     "error": 1,
+     "time": "1 Hour (Take 10/Take 20)",
+     "page": 144,
+     "id": "endorsement",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "manipulate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Manipulate, Sense Motive."
+    },
+    {
+     "name": "Mediation Check",
+     "attributes": [
+      "wis",
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Bribe, Crowd, Disposition, Language, Remote",
+     "error": 2,
+     "time": "Time Varies",
+     "page": 145,
+     "id": "mediation",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any NPCs from a corporate or government environment"
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any NPCs from an urban environment"
+      },
+      {
+       "skill": "tactics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Bureaucracy (when targeting any NPCs from a corporate or government environment), Resolve, Sense Motive, Streetwise (when targeting any NPCs from an urban environment), Tactics."
+    }
+   ]
   },
   {
    "key": "notice",
@@ -181,7 +2352,23 @@
     "wis"
    ],
    "focus": false,
-   "row": 23
+   "row": 23,
+   "checks": [
+    {
+     "name": "Awareness Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Passive",
+     "tags": "Hearing, Vision",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 146,
+     "id": "awareness",
+     "synergies": [],
+     "synergyText": "None."
+    }
+   ]
   },
   {
    "key": "profession",
@@ -190,17 +2377,118 @@
     "cha"
    ],
    "focus": true,
-   "row": 24
+   "row": 24,
+   "checks": [
+    {
+     "name": "Accomplishment Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 2,
+     "time": "1 Free Action",
+     "page": 146,
+     "id": "accomplishment",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "for a Faction character"
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "for a Freelance character"
+      }
+     ],
+     "synergyText": "Bureaucracy (for a Faction character), Streetwise (for a Freelance character)."
+    }
+   ]
   },
   {
    "key": "resolve",
    "name": "Resolve",
    "abilities": [
-    "con",
-    "wis"
+    "wis",
+    "con"
    ],
    "focus": false,
-   "row": 25
+   "row": 25,
+   "checks": [
+    {
+     "name": "Concentration Check",
+     "attributes": [
+      "con"
+     ],
+     "mode": "Passive",
+     "tags": "",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 147,
+     "id": "concentration",
+     "synergies": [],
+     "synergyText": "None."
+    },
+    {
+     "name": "Morale Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Passive",
+     "tags": "Crowd",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 147,
+     "id": "morale",
+     "synergies": [],
+     "synergyText": "None."
+    },
+    {
+     "name": "R&R Check",
+     "attributes": [
+      "con"
+     ],
+     "mode": "Active",
+     "tags": "Bribe, Concentration",
+     "error": 1,
+     "time": "1 Hour",
+     "page": 149,
+     "id": "r-r",
+     "synergies": [],
+     "synergyText": "None (though Interests are exceptionally helpful — the GC is encouraged to allow a +1 bonus from an Interest with each R&R check)."
+    },
+    {
+     "name": "Resist Impress Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Passive",
+     "tags": "",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 149,
+     "id": "resist-impress",
+     "synergies": [],
+     "synergyText": "None."
+    },
+    {
+     "name": "Resist Intimidate Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Passive",
+     "tags": "",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 149,
+     "id": "resist-intimidate",
+     "synergies": [],
+     "synergyText": "None."
+    }
+   ]
   },
   {
    "key": "science",
@@ -209,7 +2497,330 @@
     "int"
    ],
    "focus": true,
-   "row": 26
+   "row": 26,
+   "checks": [
+    {
+     "name": "Chemistry Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active or Secret",
+     "tags": "Complex, Concentration, Gear (Demolitions Kit), Hands-On, Project Investment (By Mechanics Check), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 149,
+     "id": "chemistry",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "medicine",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Mathematics",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Medicine, Science (Mathematics)."
+    },
+    {
+     "name": "Economy Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "1 Month (Take 10/Take 20)",
+     "page": 150,
+     "id": "economy",
+     "synergies": [
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "profession",
+       "focusSkill": true,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Bureaucracy, Networking, Profession."
+    },
+    {
+     "name": "Engineering Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Architect’s Kit), Hands-On, Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 151,
+     "id": "engineering",
+     "synergies": [
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Electronics, Mechanics, Science (Fabrication)."
+    },
+    {
+     "name": "Fabrication Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active or Secret",
+     "tags": "Complex, Concentration, Gear (Construction Kit), Hands-On, Project Investment (By Mechanics Check), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 152,
+     "id": "fabrication",
+     "synergies": [
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Engineering",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Electronics, Mechanics, Science (Engineering)."
+    },
+    {
+     "name": "Genetics Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Hands-On, Project Investment (High)",
+     "error": 2,
+     "time": "Time Varies Per Challenge",
+     "page": 152,
+     "id": "genetics",
+     "synergies": [
+      {
+       "skill": "medicine",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Chemistry",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Pharmacology",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Medicine, Science (Chemistry), Science (Pharmacology)."
+    },
+    {
+     "name": "Mathematics Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Computer), Project Investment (High), Vision",
+     "error": 2,
+     "time": "Time Varies Per Challenge",
+     "page": 152,
+     "id": "mathematics",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "manipulate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Computers, Manipulate, Science (Super-Science)."
+    },
+    {
+     "name": "Pharmacology Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Hands-On, Project Investment (Low)",
+     "error": 1,
+     "time": "Time Varies Per Challenge",
+     "page": 154,
+     "id": "pharmacology",
+     "synergies": [
+      {
+       "skill": "medicine",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Chemistry",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Genetics",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Medicine, Science (Chemistry), Science (Genetics)."
+    },
+    {
+     "name": "Programming Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Gear (Computer), Hands-On, Project Investment (Medium)",
+     "error": 1,
+     "time": "Time Varies Per Challenge",
+     "page": 155,
+     "id": "programming",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Mathematics",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Super-Science",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Computers, Science (Mathematics), Science (Super-Science)."
+    },
+    {
+     "name": "Super-Science Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Complex, Concentration, Hands-On, Project Investment (High)",
+     "error": 2,
+     "time": "Time Varies Per Challenge",
+     "page": 155,
+     "id": "super-science",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Mathematics",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Computers, Electronics, Mechanics, Science (Fabrication), Science (Mathematics)."
+    }
+   ]
   },
   {
    "key": "search",
@@ -218,7 +2829,23 @@
     "int"
    ],
    "focus": false,
-   "row": 27
+   "row": 27,
+   "checks": [
+    {
+     "name": "Perception Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Hearing, Vision",
+     "error": 1,
+     "time": "1 Full Action",
+     "page": 156,
+     "id": "perception",
+     "synergies": [],
+     "synergyText": "None."
+    }
+   ]
   },
   {
    "key": "security",
@@ -227,7 +2854,132 @@
     "int"
    ],
    "focus": false,
-   "row": 28
+   "row": 28,
+   "checks": [
+    {
+     "name": "Disable Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Secret",
+     "tags": "Concentration, Cross-Check, Gear (Electronics or Mechanics Kit), Grasp, Hands-On, Project Investment (Low), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 156,
+     "id": "disable",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any computerized security device"
+      },
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when disabling any electronic security device"
+      },
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when disabling any mechanical security device"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Chemistry",
+       "condition": "when disabling an explosive security device"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": "when disarming a security weapon"
+      }
+     ],
+     "synergyText": "Computers (when targeting any computerized security device), Electronics (when disabling any electronic security device), Mechanics (when disabling any mechanical security device), Science (Chemistry) (when disabling an explosive security device), Science (Fabrication) (when disarming a security weapon)."
+    },
+    {
+     "name": "Hotwire Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Hands-On",
+     "error": 1,
+     "time": "4 Full Actions (Take 10/Take 20)",
+     "page": 157,
+     "id": "hotwire",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any computerized ignition"
+      },
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any electronic ignition"
+      },
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when targeting any mechanical ignition"
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Computers (when targeting any computerized ignition), Electronics (when targeting any electronic ignition), Mechanics (when targeting any mechanical ignition), Streetwise."
+    },
+    {
+     "name": "Installation Check",
+     "attributes": [
+      "int"
+     ],
+     "mode": "Active",
+     "tags": "Concentration, Gear (Electronics or Mechanics Kit), Hands-On, Project Investment (Medium), Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 157,
+     "id": "installation",
+     "synergies": [
+      {
+       "skill": "computers",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when installing any computerized security device"
+      },
+      {
+       "skill": "electronics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when installing any electronic security device"
+      },
+      {
+       "skill": "mechanics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when installing any mechanical security device"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Fabrication",
+       "condition": "when installing a security weapon"
+      }
+     ],
+     "synergyText": "Computers (when installing any computerized security device), Electronics (when installing any electronic security device), Mechanics (when installing any mechanical security device), Science (Fabrication) (when installing a security weapon)."
+    }
+   ]
   },
   {
    "key": "senseMotive",
@@ -237,7 +2989,70 @@
     "cha"
    ],
    "focus": false,
-   "row": 29
+   "row": 29,
+   "checks": [
+    {
+     "name": "Detect Lie Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Passive",
+     "tags": "Hearing, Vision",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 158,
+     "id": "detect-lie",
+     "synergies": [],
+     "synergyText": "None."
+    },
+    {
+     "name": "Innuendo Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Disposition, Language, Vision",
+     "error": 1,
+     "time": "Time Varies (Take 10 with permission)",
+     "page": 158,
+     "id": "innuendo",
+     "synergies": [
+      {
+       "skill": "blend",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Blend, Impress, Networking."
+    },
+    {
+     "name": "Resist Manipulate Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Passive",
+     "tags": "",
+     "error": 1,
+     "time": "1 Free Action",
+     "page": 159,
+     "id": "resist-manipulate",
+     "synergies": [],
+     "synergyText": "None."
+    }
+   ]
   },
   {
    "key": "sleightOfHand",
@@ -246,7 +3061,75 @@
     "dex"
    ],
    "focus": false,
-   "row": 30
+   "row": 30,
+   "checks": [
+    {
+     "name": "Conceal Action Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Secret",
+     "tags": "",
+     "error": 2,
+     "time": "1 Free Action",
+     "page": 159,
+     "id": "conceal-action",
+     "synergies": [
+      {
+       "skill": "blend",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bluff",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Blend, Bluff, Impress."
+    },
+    {
+     "name": "Stash Item Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Hands-On",
+     "error": 1,
+     "time": "1 Half Action",
+     "page": 159,
+     "id": "stash-item",
+     "synergies": [
+      {
+       "skill": "blend",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bluff",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Blend, Bluff, Search."
+    }
+   ]
   },
   {
    "key": "sneak",
@@ -256,7 +3139,57 @@
     "cha"
    ],
    "focus": false,
-   "row": 31
+   "row": 31,
+   "checks": [
+    {
+     "name": "Hide Check",
+     "attributes": [
+      "dex",
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Flat-Footed",
+     "error": 1,
+     "time": "1 Full Action",
+     "page": 161,
+     "id": "hide",
+     "synergies": [],
+     "synergyText": "None."
+    },
+    {
+     "name": "Stash Item Check",
+     "attributes": [
+      "dex"
+     ],
+     "mode": "Active",
+     "tags": "Hands-On",
+     "error": 1,
+     "time": "1 Half Action",
+     "page": 161,
+     "id": "stash-item",
+     "synergies": [
+      {
+       "skill": "blend",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bluff",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Blend, Bluff, Search."
+    }
+   ]
   },
   {
    "key": "streetwise",
@@ -266,7 +3199,148 @@
     "cha"
    ],
    "focus": false,
-   "row": 32
+   "row": 32,
+   "checks": [
+    {
+     "name": "Black Market Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Secret",
+     "tags": "Bribe, Language",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 162,
+     "id": "black-market",
+     "synergies": [
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "in focus area"
+      },
+      {
+       "skill": "investigation",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Cultures (in focus area), Investigation, Networking."
+    },
+    {
+     "name": "Bribe Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Crowd, Disposition",
+     "error": 0,
+     "time": "1 Full Action",
+     "page": 163,
+     "id": "bribe",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Economy",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Networking, Resolve, Science (Economy)."
+    },
+    {
+     "name": "Gambling Check",
+     "attributes": [
+      "wis",
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 163,
+     "id": "gambling",
+     "synergies": [
+      {
+       "skill": "bluff",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a competitive game"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Mathematics",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a competitive game"
+      }
+     ],
+     "synergyText": "Bluff (in a competitive game), Science (Mathematics), Sense Motive (in a competitive game)."
+    },
+    {
+     "name": "Haggle Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "Disposition, Language",
+     "error": 1,
+     "time": "1 Minute (Take 10/Take 20)",
+     "page": 164,
+     "id": "haggle",
+     "synergies": [
+      {
+       "skill": "analysis",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Analysis, Networking, Sense Motive."
+    }
+   ]
   },
   {
    "key": "survival",
@@ -276,7 +3350,192 @@
     "cha"
    ],
    "focus": false,
-   "row": 33
+   "row": 33,
+   "checks": [
+    {
+     "name": "Animal Training Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20)",
+     "page": 165,
+     "id": "animal-training",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Resolve, Sense Motive."
+    },
+    {
+     "name": "Foraging Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Active",
+     "tags": "",
+     "error": 1,
+     "time": "4 Hours (Take 10/Take 20)",
+     "page": 166,
+     "id": "foraging",
+     "synergies": [
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "in focus area"
+      },
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Cultures (in focus area), Notice, Search."
+    },
+    {
+     "name": "Forecast Weather Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "",
+     "error": 3,
+     "time": "1 Full Action",
+     "page": 166,
+     "id": "forecast-weather",
+     "synergies": [
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "in focus area"
+      },
+      {
+       "skill": "science",
+       "focusSkill": true,
+       "focus": "Mathematics",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Cultures (in focus area), Science (Mathematics)."
+    },
+    {
+     "name": "Maneuver Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Armor Check Penalty, Gear Only (Mount), Hands-On, Vision",
+     "error": 1,
+     "time": "1 Half Action (Take 10 with permission)",
+     "page": 166,
+     "id": "maneuver",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Resolve, Sense Motive."
+    },
+    {
+     "name": "Tracking Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Vision",
+     "error": 1,
+     "time": "Time Varies",
+     "page": 167,
+     "id": "tracking",
+     "synergies": [
+      {
+       "skill": "athletics",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "bureaucracy",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a corporate or government environment"
+      },
+      {
+       "skill": "cultures",
+       "focusSkill": true,
+       "focus": "",
+       "condition": "in focus area"
+      },
+      {
+       "skill": "falsify",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "notice",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "search",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "in a city"
+      }
+     ],
+     "synergyText": "Athletics, Bureaucracy (in a corporate or government environment), Cultures (in focus area), Falsify, Notice, Search, Streetwise (in a city)."
+    }
+   ]
   },
   {
    "key": "tactics",
@@ -286,7 +3545,126 @@
     "cha"
    ],
    "focus": false,
-   "row": 34
+   "row": 34,
+   "checks": [
+    {
+     "name": "Ambush Check",
+     "attributes": [
+      "wis"
+     ],
+     "mode": "Secret",
+     "tags": "Vision",
+     "error": 1,
+     "time": "Time Varies (Take 10/Take 20 with permission)",
+     "page": 168,
+     "id": "ambush",
+     "synergies": [
+      {
+       "skill": "blend",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "falsify",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "senseMotive",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "sneak",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "streetwise",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when preparing an ambush in a city"
+      },
+      {
+       "skill": "survival",
+       "focusSkill": false,
+       "focus": "",
+       "condition": "when preparing an ambush in the wild"
+      }
+     ],
+     "synergyText": "Blend, Falsify, Sense Motive, Sneak, Streetwise (when preparing an ambush in a city), Survival (when preparing an ambush in the wild)."
+    },
+    {
+     "name": "Maneuver Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Gear Only (Vehicle)",
+     "error": 1,
+     "time": "1 Half Action (Take 10 with permission)",
+     "page": 168,
+     "id": "maneuver",
+     "synergies": [
+      {
+       "skill": "intimidate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "networking",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Intimidate, Networking, Resolve."
+    },
+    {
+     "name": "Rally Check",
+     "attributes": [
+      "cha"
+     ],
+     "mode": "Active",
+     "tags": "Crowd, Disposition",
+     "error": 1,
+     "time": "1 Full Action (Take 10)",
+     "page": 169,
+     "id": "rally",
+     "synergies": [
+      {
+       "skill": "impress",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "intimidate",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      },
+      {
+       "skill": "resolve",
+       "focusSkill": false,
+       "focus": "",
+       "condition": ""
+      }
+     ],
+     "synergyText": "Impress, Intimidate, Resolve."
+    }
+   ]
   }
  ],
  "tables": {
@@ -671,7 +4049,7 @@
    },
    {
     "level": 18,
-    "xp": 750000,
+    "xp": 760000,
     "actionDice": 6,
     "actionDie": 10,
     "maxRanks": 21,
@@ -887,19 +4265,19 @@
     18,
     7,
     10,
-    5
+    6
    ],
    [
     19,
     7,
     10,
-    5
+    6
    ],
    [
     20,
     7,
     11,
-    5
+    6
    ]
   ],
   "skillCap": [
@@ -1302,8 +4680,8 @@
     "light": 153,
     "medium": 306,
     "heavy": 460,
-    "extreme": 900,
-    "overload": 901,
+    "extreme": 920,
+    "overload": 921,
     "liftOverhead": 460,
     "liftGround": 920,
     "push": 2300
@@ -1398,32 +4776,32 @@
    }
   ],
   "focuses": {
+   "cultures": [
+    "Central America",
+    "Eastern Asia (including China)",
+    "Eastern Europe (including Russia)",
+    "Northern Africa",
+    "Northern America (including Greenland)",
+    "Oceania (including Australia)",
+    "South America",
+    "Southern Africa",
+    "Southern Asia (including Southeast Asia)",
+    "Western Asia (including the Middle East)",
+    "Western Europe"
+   ],
    "drive": [
-    "Personal Ground",
-    "Standard Ground",
-    "Heavy Ground",
-    "Mounts/Animal",
+    "Personal Ground Vehicles",
+    "Standard Ground Vehicles",
+    "Heavy Ground Vehicles",
+    "Mounts and Animal-Drawn Vehicles",
     "Personal Aircraft",
     "Performance Aircraft",
     "Service Aircraft",
-    "Rotary-wing Aircraft",
+    "Rotary-Wing Aircraft",
     "Personal Watercraft",
     "Standard Watercraft",
     "Ships",
     "Submarines"
-   ],
-   "cultures": [
-    "Central America",
-    "Eastern Asia (inc China)",
-    "Eastern Europe (inc Russia)",
-    "North Africa",
-    "Northern American (inc Greenland)",
-    "Oceania (inc Australia)",
-    "South America",
-    "Southern Africa",
-    "Southern Asia (inc Southeast Asia)",
-    "Western Asia (incl Middle East)",
-    "Western Europe"
    ],
    "science": [
     "Chemistry",
@@ -1434,7 +4812,7 @@
     "Mathematics",
     "Pharmacology",
     "Programming",
-    "Super-science"
+    "Super-Science"
    ]
   },
   "proficiencies": [
@@ -1454,6 +4832,1598 @@
    "Submachine Gun",
    "Tactical",
    "Vehicle Weapon"
-  ]
+  ],
+  "originChoices": {
+   "Disciplined": {
+    "attributes": "any"
+   },
+   "Gifted": {
+    "attributes": "any",
+    "classSkills": 1,
+    "classSkillCap": true,
+    "threatSkill": true
+   },
+   "Gonzo": {
+    "attributes": "any"
+   },
+   "Orphaned": {
+    "attributes": "any"
+   },
+   "Reliable": {
+    "attributes": "lowHigh",
+    "classSkills": "scaling"
+   },
+   "Retired": {
+    "attributes": "lowHigh",
+    "threatSkill": true
+   },
+   "Test Subject": {
+    "attributes": "highLow",
+    "maxAttribute": 20,
+    "npcQualities": 2
+   },
+   "Rowdy": {
+    "classSkills": "scaling"
+   },
+   "City Dweller": {
+    "classSkills": 1,
+    "classSkillCap": true
+   },
+   "Contract Pro": {
+    "maxRankSkills": "scaling"
+   },
+   "Jack of All Trades": {
+    "maxRankSkills": "scaling"
+   }
+  },
+  "testSubjectQualities": {
+   "alternateIdentity": {
+    "label": "Alternate identity",
+    "notes": "Changing identity takes 2 full rounds; checks to see through it have +10 DC. Alternate form is unavailable.",
+    "bonuses": []
+   },
+   "aquatic": {
+    "label": "Aquatic",
+    "notes": "Move at standard Speed underwater; cannot drown; ignore underwater penalties.",
+    "bonuses": []
+   },
+   "augmented": {
+    "label": "Augmented (Caliber I)",
+    "notes": "Choose an installed Caliber I item or weapon. It is always proficient, readies as a free action and cannot be disarmed. Record the chosen item in Gear.",
+    "bonuses": [],
+    "repeatable": true
+   },
+   "burrow": {
+    "label": "Burrow",
+    "notes": "Tunnel through material with a 1-inch Damage save bonus no greater than half STR (rounded up). Cannot Run while burrowing.",
+    "bonuses": []
+   },
+   "camouflaged": {
+    "label": "Camouflaged (one terrain)",
+    "notes": "Choose a terrain: aquatic, arctic, desert, forest, jungle, mountain, plains or swamp. In it, +4 to Blend/Stealth and Sneak/Hide. Record the terrain in the details.",
+    "bonuses": [],
+    "repeatable": true
+   },
+   "damageReduction": {
+    "label": "Damage reduction (2)",
+    "notes": "Natural DR 2; not cumulative with an identical gear or class-ability benefit.",
+    "bonuses": [
+     {
+      "target": "naturalDR",
+      "value": "2"
+     }
+    ],
+    "repeatable": true
+   },
+   "damageResistance": {
+    "label": "Damage resistance (4)",
+    "notes": "Choose a damage type; resistance 4 against that type. Record the type in the details.",
+    "bonuses": [],
+    "repeatable": true
+   },
+   "fastHealing": {
+    "label": "Fast healing",
+    "notes": "Heal every damage type at twice its standard rate.",
+    "bonuses": []
+   },
+   "fearless": {
+    "label": "Fearless I",
+    "notes": "+4 to Resolve/Morale checks; this is not a general Will-save bonus.",
+    "bonuses": [],
+    "repeatable": true
+   },
+   "fleet": {
+    "label": "Fleet (+10 ft.)",
+    "notes": "Speed increases by 10 ft. per application, maximum 60 ft.; does not combine with identical gear or class benefits (pp.446–447).",
+    "bonuses": [],
+    "repeatable": true
+   },
+   "hulking": {
+    "label": "Hulking (Large, 1×1)",
+    "notes": "Large Size: −1 Defense and attack checks, −4 Blend/Stealth and Sneak/Hide, wounds 1.5×CON (round down), carrying limits ×2, Reach 2 squares; footprint 1×1.",
+    "bonuses": [
+     {
+      "target": "largeSize",
+      "value": "1"
+     }
+    ]
+   },
+   "improvedHearing": {
+    "label": "Improved hearing",
+    "notes": "Hearing range WIS×10 ft.; unless deafened, +6 Notice/Awareness and Search/Perception when determining surprise.",
+    "bonuses": []
+   },
+   "improvedScent": {
+    "label": "Improved scent",
+    "notes": "Scent range WIS×10 ft.; +6 Survival/Tracking when scent can be used.",
+    "bonuses": []
+   },
+   "improvedVision": {
+    "label": "Improved vision",
+    "notes": "Visual range WIS×20 ft.; unless blinded, reduce each attack range penalty by 2, to a minimum penalty of 0.",
+    "bonuses": []
+   },
+   "lowLightVision": {
+    "label": "Low-light vision",
+    "notes": "Ignore vision penalties from dawn, dusk and night.",
+    "bonuses": []
+   },
+   "naturalAttack": {
+    "label": "Natural attack (Caliber II)",
+    "notes": "Choose a Caliber II natural attack from Table 7.12 (p.449). Always proficient; readies freely and cannot be disarmed. Record the chosen attack in Gear.",
+    "bonuses": [],
+    "repeatable": true
+   },
+   "seductive": {
+    "label": "Seductive",
+    "notes": "+4 to skill checks that shift disposition and checks in a seduction Dramatic Conflict.",
+    "bonuses": []
+   },
+   "strongMinded": {
+    "label": "Strong-minded I",
+    "notes": "+4 to Resist skill checks; this is not a general Will-save bonus.",
+    "bonuses": [],
+    "repeatable": true
+   },
+   "unnerving": {
+    "label": "Unnerving I",
+    "notes": "Each damaging unarmed or melee attack also inflicts 1d4 stress damage.",
+    "bonuses": [],
+    "repeatable": true
+   }
+  },
+  "basicSkillFeats": {
+   "Actor": [
+    "bluff",
+    "impress"
+   ],
+   "Advisor": [
+    "profession",
+    "resolve"
+   ],
+   "Burglar": [
+    "acrobatics",
+    "sneak"
+   ],
+   "Diplomat": [
+    "networking",
+    "senseMotive"
+   ],
+   "Examiner": [
+    "analysis",
+    "medicine"
+   ],
+   "Fence": [
+    "sleightOfHand",
+    "streetwise"
+   ],
+   "Hustler": [
+    "falsify",
+    "manipulate"
+   ],
+   "Observer": [
+    "notice",
+    "search"
+   ],
+   "Officer": [
+    "intimidate",
+    "tactics"
+   ],
+   "Private Eye": [
+    "investigation",
+    "security"
+   ],
+   "Scholar": [
+    "bureaucracy",
+    "science"
+   ],
+   "Speed Demon": [
+    "drive",
+    "mechanics"
+   ],
+   "Survivalist": [
+    "athletics",
+    "survival"
+   ],
+   "Techie": [
+    "computers",
+    "electronics"
+   ],
+   "World Traveler": [
+    "blend",
+    "cultures"
+   ]
+  },
+  "featRules": {
+   "Armor Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Armor Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Armor Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Bandage": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Battle Hardened": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Superior Cover": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Combat Expertise": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Expert Disarm": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Combat Instincts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Opportunist": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Combat Mobility": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mobile Defense": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mobile Offense": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Containment Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Containment Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Containment Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Contempt": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Explosive Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fire-Team Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fire-Team Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fire-Team Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Great Fortitude": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Guts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Quick Healer": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Horde Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Horde Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Horde Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Iron Will": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Lightning Reflexes": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Quick Draw": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Snake Strike": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Surge of Speed": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tac-Squad Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tac-Squad Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tac-Squad Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tactical Advantage": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Toughness": {
+    "repeatable": true,
+    "maxSelections": 3
+   },
+   "Two-Weapon Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Two-Weapon Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Weapon Focus": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Wolfpack Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wolfpack Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wolfpack Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "All-out Attack": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Axe Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Battering Blows": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Cleave Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Cleave Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Cleave Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Club Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Darting Weapon": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Flashing Weapon": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Dueling Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Dueling Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Dueling Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fencing Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Finesse Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Finesse Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Finesse Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Flail Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Garrote Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Great Sword Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Hammer Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Improvised Weapon Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Improvised Weapon Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Knife Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Polearm Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Spear Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Staff Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Sword Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Whip Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Autofire Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Autofire Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Autofire Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Bombard": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Bullseye": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "CQB Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "CQB Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "CQB Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Flamethrower Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Follow-up Shot": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Hail of Fire": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Grenade Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Guided Weapon Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Gunslinger's Eye": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Marksmanship Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Marksmanship Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Marksmanship Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Revolver Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Rock and Roll": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Sharpshooter Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Sharpshooter Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Sharpshooter Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Snap Shot": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Steel Rain": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Style Over Caliber": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "This… is my Boomstick": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Trick Shot": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Berserker Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Berserker Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Berserker Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Boxing Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Boxing Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Boxing Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Brawling Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Brawling Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Brawling Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Dirty Fighting Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Dirty Fighting Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Dirty Fighting Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Kicking Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Kicking Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Kicking Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Martial Arts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Master's Art": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Rolling Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Rolling Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Rolling Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Spirit Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Spirit Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Spirit Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Submission Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Submission Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Submission Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Two-hit Combo": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Warrior's Grace": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Vital Points Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Vital Points Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Vital Points Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wrestling Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wrestling Moves": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wrestling Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "All or Nothing": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Better Luck Next Time": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fortune's Fool": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Black Cat": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Jinx": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tough Luck": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "The Dice are Hot": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fortunate": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fortune Favors the Bold": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Lady Luck's Smile": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Lucky Break": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Misfortune": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Peculiar Dodge": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mark of Conflict": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mark of Strife": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mark of Turmoil": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Trouble Magnet": {
+    "repeatable": true,
+    "maxSelections": 2
+   },
+   "Baby It": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Demolition Derby": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Death Ride": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Bail Out!": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Daredevil": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Crew Dog": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Lane Dancer": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mount Up": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Photo Finish": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wave Runner": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wind Rider": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Dash": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Sprint": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Defensive Driving": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Jackrabbit Start": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Driving Instincts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Professional Driver - Closed Course": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Duct Tape and Bubblegum": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Get Radical!": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Need for Speed": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Offensive Driving": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Relentless Pursuit": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "One Hand on the Wheel": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Simulator Jockey": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Ambush Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Ambush Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Ambush Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Bludgeon": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Whack": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Concealed Carry": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Deadly Precision": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "No Quarter": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Crippling Strike": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Equilibrium Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Equilibrium Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Equilibrium Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Executioner": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Merciless": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Faceless": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Traceless": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Zeroed": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Ghost Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Ghost Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Ghost Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mingling Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mingling Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mingling Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Spider Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Spider Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Spider Supremacy": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Clean and Polished": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mother Hen": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Extra Gear": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Electronic Warrior": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Micro-miniaturized": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Trap Master": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Favored Gear": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Signature Gear": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Trademark Gear": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Home Sweet Home": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tool Shed": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Pack Rat": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Personal Stash": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Silver Spoon": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Well-Funded": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Actor": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Advisor": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Burglar": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Diplomat": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Examiner": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fence": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Hustler": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Observer": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Officer": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Private Eye": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Scholar": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Speed Demon": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Survivalist": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Techie": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "World Traveler": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Advanced Skill Mastery": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Grand Skill Mastery": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Perfect Skill Mastery": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "False Start": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Mark of a Professional": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Practice Makes Perfect": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Unfair Advantage": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Everyday Genius": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Attention to Detail": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Depth of Study": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "I Can Swim": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Photographic Memory": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Talented": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Training": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Well Rounded": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Unlocked Potential": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Academic Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Animal Partner": {
+    "repeatable": true,
+    "maxSelections": 0
+   },
+   "Bloodstain Resistant": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Blue Collar Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Card Shark": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Charmer": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Not the Face": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Criminal Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Fan Service": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Glint of Madness": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Gorgeous": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "The Look": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Simply Irresistible": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Government Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Grifter Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Hard Core": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Too Ugly to Die": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "High-Tech Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Local Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mark": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Media Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Medical Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Military Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Personal Lieutenant": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Police Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Political Clout": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Political Favors": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Political Immunity": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Polyglot": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Research Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Silver Tongue": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Undermine": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Venomous Dialogue": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Stone Cold": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Street Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "White Collar Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Wilderness Contacts": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Always Get Your Man": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Aquatic Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Arctic Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Desert Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Escape and Evasion Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Firefighter Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Forest Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Home Turf": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Jungle Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Local Hero": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Mountain Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Night Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Swamp Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tracking Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Tracking Mastery": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Urban Training": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Breaking Points": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Bug Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Candidate": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Career Agent": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Office Gossip": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Total Control": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Cryptographer": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Disease Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Flawless Identity": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Forensic Genius": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Hold Out": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Living Cipher": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Old School": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Poison Basics": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Safe House": {
+    "repeatable": false,
+    "maxSelections": 0
+   },
+   "Superior Documentation": {
+    "repeatable": false,
+    "maxSelections": 0
+   }
+  },
+  "focusAliases": {
+   "Eastern Asia (inc China)": "Eastern Asia (including China)",
+   "Eastern Europe (inc Russia)": "Eastern Europe (including Russia)",
+   "North Africa": "Northern Africa",
+   "Northern American (inc Greenland)": "Northern America (including Greenland)",
+   "Oceania (inc Australia)": "Oceania (including Australia)",
+   "Southern Asia (inc Southeast Asia)": "Southern Asia (including Southeast Asia)",
+   "Western Asia (incl Middle East)": "Western Asia (including the Middle East)",
+   "Personal Ground": "Personal Ground Vehicles",
+   "Standard Ground": "Standard Ground Vehicles",
+   "Heavy Ground": "Heavy Ground Vehicles",
+   "Mounts/Animal": "Mounts and Animal-Drawn Vehicles",
+   "Rotary-wing Aircraft": "Rotary-Wing Aircraft",
+   "Super-science": "Super-Science"
+  },
+  "originFocuses": {
+   "Financier": {
+    "fixed": {
+     "science": [
+      "Economy"
+     ]
+    }
+   },
+   "Tradesman": {
+    "fixed": {
+     "science": [
+      "Fabrication"
+     ]
+    }
+   },
+   "Outdoorsman": {
+    "fixed": {
+     "drive": [
+      "Mounts and Animal-Drawn Vehicles"
+     ]
+    }
+   },
+   "Hot Rodder": {
+    "fixed": {
+     "drive": [
+      "Standard Ground Vehicles"
+     ]
+    },
+    "forte": true
+   },
+   "Pilot": {
+    "domain": [
+     "Personal Aircraft",
+     "Performance Aircraft",
+     "Service Aircraft",
+     "Rotary-Wing Aircraft"
+    ],
+    "forte": true,
+    "choiceSkill": "drive"
+   },
+   "Sailor": {
+    "domain": [
+     "Personal Watercraft",
+     "Standard Watercraft",
+     "Ships",
+     "Submarines"
+    ],
+    "forte": true,
+    "choiceSkill": "drive"
+   },
+   "Thrill Seeker": {
+    "domain": [
+     "Personal Ground Vehicles",
+     "Personal Aircraft",
+     "Personal Watercraft"
+    ],
+    "forte": true,
+    "choiceSkill": "drive"
+   },
+   "Authority": {
+    "choiceSkill": "profession",
+    "forte": true
+   }
+  },
+  "crossroads": {
+   "seasoned": {
+    "label": "Seasoned",
+    "level": 2,
+    "completed": 2,
+    "threatIncrease": 2,
+    "xpPercent": 0,
+    "actionDice": 1
+   },
+   "weathered": {
+    "label": "Weathered",
+    "level": 7,
+    "completed": 4,
+    "threatIncrease": 3,
+    "xpPercent": 5,
+    "actionDice": 1
+   },
+   "hardened": {
+    "label": "Hardened",
+    "level": 13,
+    "completed": 8,
+    "threatIncrease": 4,
+    "xpPercent": 5,
+    "actionDice": 2
+   },
+   "crafty": {
+    "label": "Crafty",
+    "level": 19,
+    "completed": 16,
+    "threatIncrease": 5,
+    "xpPercent": 10,
+    "actionDice": 2
+   }
+  }
  }
 }

@@ -133,6 +133,18 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "kits",
+      "label": "Kits",
+      "path": "packs/kits",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -155,7 +167,8 @@
         "origins",
         "feats",
         "weapons",
-        "armor"
+        "armor",
+        "kits"
       ]
     }
   ]

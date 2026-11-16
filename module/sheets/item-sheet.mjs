@@ -1,3 +1,12 @@
+import {CANDIDATE_CHOICES,candidatePlan} from '../rules/candidate.mjs';
+import {reviewCandidate} from '../apps/candidate.mjs';
+import {historicalFeatEligibility} from '../rules/feat-acquisition.mjs';
+import {CONTACT_FEATS} from '../rules/contact-feats.mjs';
+import {armorTrainingAdjustments} from '../rules/armor-training.mjs';
+import {planAmmunitionStockpile} from '../apps/ammunition-planner.mjs';
+import {ammunitionConfiguration,compatibleAmmunition} from '../rules/ammunition.mjs';
+import {FIRE_MODES,FIREARM_CATEGORIES,weaponFireModes} from "../rules/firearms.mjs";
+import {equipmentCategory,armorSlot} from "../rules/gear.mjs";
 import { describe as describePrereq } from "../rules/prerequisites.mjs";
 import { humanizeTemplate, renderTemplate } from "../rules/formula.mjs";
 
@@ -12,6 +21,8 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      reviewCandidate(){return reviewCandidate(this.item);},
+      planAmmunition(){return planAmmunitionStockpile(this.item);},
       addBonus: SpycraftItemSheet.#onAddBonus,
       removeBonus: SpycraftItemSheet.#onRemoveBonus,
       toChat: SpycraftItemSheet.#onToChat
@@ -42,11 +53,54 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       featTrees: cfg.featTrees,
       proficiencies: Object.fromEntries(Object.entries(cfg.proficiencies).map(([k, v]) => [k, v.label])),
       calibers: cfg.calibers,
+      canPlanAmmunition:compatibleAmmunition(sys,cfg.tables?.ammunitionCatalog??[]).length>0,
+      ammunitionConfiguration:ammunitionConfiguration(sys),
+      ammunitionCodeOptions:Object.fromEntries(ammunitionConfiguration(sys).options.map(option=>[option.code,option.label])),
+      hasCollapsibleStock:/\bCLS\b/.test(sys.qualities??""),
+      firearmCategories:{other:"Other / not a firearm",...Object.fromEntries(Object.entries(FIREARM_CATEGORIES).map(([key,value])=>[key,value.label]))},
+      fireModeOptions:Object.fromEntries(weaponFireModes({...sys},item.parent?.system??{}).map(key=>[key,FIRE_MODES[key]??key])),
+      usesProjectiles:item.type==='weapon'&&/as (arrow|bolt)/i.test(sys.damage??''),
+      ammunitionOptions:Object.fromEntries([["","Choose ammunition…"],...(item.parent?.items?.filter(i=>i.type==='weapon'&&(i.system.ammunitionOnly||['Standard arrow','Explosive arrow'].includes(i.name))).map(i=>[i.id,`${i.name} (${i.system.ammunitionKind||'arrow'})`])??[])]),
+      meleeFamilies:{"":"Unclassified / no family bonus",axe:"Axe",spear:"Spear",whip:"Whip",staff:"Staff",hammer:"Hammer",twoHandedSword:"Two-handed sword",polearm:"Polearm"},
+      gripOptions:{0:"Normal required grip",1:"One hand",2:"Both hands"},
       pickOptions: Object.fromEntries([["", "—"], ...Object.entries(cfg.gearPicks).map(([k, v]) => [k, `${k} — ${v}`])]),
       originTypes: Object.fromEntries(Object.entries(cfg.originTypes).map(([k, v]) => [k, game.i18n.localize(v)]))
     });
 
+    if(sys.ammunitionOnly){
+      context.calibers={...cfg.calibers,0:"Ammunition stockpile (no Caliber pick)"};
+      context.pickOptions={"":"— (upgrade/Common Item stockpile)"};
+      if(sys.pick)context.pickOptions[sys.pick]=`${sys.pick} — review legacy ammunition pick`;
+    }
+    if(sys.fireMode&&!Object.hasOwn(context.fireModeOptions,sys.fireMode))context.fireModeOptions[sys.fireMode]="Unavailable mode — review choice";
+    if(sys.loadedAmmoId&&!Object.hasOwn(context.ammunitionOptions,sys.loadedAmmoId))context.ammunitionOptions[sys.loadedAmmoId]="Missing ammunition — review link";
+    if(['weapon','armor','gear'].includes(item.type)){
+      const category=equipmentCategory(item);
+      if(category)context.pickOptions=Object.fromEntries(Object.entries(context.pickOptions).filter(([key])=>!key||key==='CHA'||key===category));
+      if(sys.pick&&!Object.hasOwn(context.pickOptions,sys.pick))context.pickOptions[sys.pick]=`${sys.pick} — review category`;
+    }
+    if(item.type==='armor'&&item.actor){const adjusted=armorTrainingAdjustments(item,item.actor.system.armorTraining,armorSlot(item));if(adjusted.applies)context.armorTraining=adjusted;}
     if (item.type === "feat") {
+      context.acquisitionSources=Object.fromEntries([["","Career/origin/other feat choice"],...(item.actor?.system.featAcquisitionSources??[]).map(source=>[source.id,source.label])]);
+      context.trainingSkills=item.name==="Training"?Object.entries(cfg.skills).map(([key,value])=>({key,name:value.name,points:sys.trainingSkills?.[key]??0})):null;
+      const basicChoices=Object.keys(cfg.tables.basicSkillFeats??{});
+      if(item.actor?.system.classLevels?.virtuoso)basicChoices.push("Field of Expertise");
+      const choiceLists={
+        "Candidate":CANDIDATE_CHOICES,
+        "Armor Basics":{P:"Partial",M:"Moderate",F:"Full"},
+        "Armor Mastery":{P:"Partial",M:"Moderate",F:"Full"},
+        "Extra Gear":{E:"Electronics",G:"Gadgets",R:"Resources",S:"Security",T:"Tradecraft",V:"Vehicles",W:"Weapons"},
+        "Weapon Focus":Object.fromEntries(Object.entries(cfg.proficiencies).filter(([key])=>key!=="unarmed").map(([key,v])=>[key,v.label])),
+        "Martial Arts":cfg.abilities,
+        "Unlocked Potential":Object.fromEntries(Object.entries(cfg.skills).map(([key,v])=>[key,v.name]))
+      };
+      for(const name of ["Advanced Skill Mastery","Grand Skill Mastery","Perfect Skill Mastery","Talented","False Start","Mark of a Professional","Practice Makes Perfect"])choiceLists[name]=Object.fromEntries(basicChoices.map(name=>[name,name]));
+      context.choiceOptions=choiceLists[item.name];
+      if(item.name==='Candidate'){context.candidateBasis=sys.candidateBasis;context.canReviewCandidate=item.isOwner&&game.user?.isGM&&item.parent?.type==='agent';try{candidatePlan(item.parent?.system??{},item);}catch(error){context.candidateReview=error.message;}}
+      if(Object.hasOwn(CONTACT_FEATS,item.name)){context.contactFeatTheme=CONTACT_FEATS[item.name];const names=(item.actor?.system.contacts??[]).map(c=>c.name).filter(n=>n?.trim());if(names.length){context.choiceOptions=Object.fromEntries(names.map(n=>[n,n]));if(sys.choice&&!Object.hasOwn(context.choiceOptions,sys.choice))context.choiceOptions[sys.choice]=sys.choice+' — review contact';}}
+      if(["Armor Basics","Armor Mastery"].includes(item.name)&&sys.choice&&!Object.hasOwn(context.choiceOptions,sys.choice))context.choiceOptions={...context.choiceOptions,[sys.choice]:sys.choice+" — existing choice; review its type"};
+      context.historicalReview=!!item.actor&&(!sys.acquisitionCheck?.ok||!historicalFeatEligibility(sys).ok);
+      context.featKinds = { permanent: "Permanent", temporary: "Temporary", virtual: "Virtual" };
       context.prereqText = describePrereq(sys.prerequisites) || "—";
       context.prereqJSON = sys.prerequisites ? JSON.stringify(sys.prerequisites, null, 1) : "";
       if (item.actor?.type === "agent") context.status = item.actor.system.featStatus?.[item.id];

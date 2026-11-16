@@ -1,0 +1,153 @@
+{
+  "actor": "5Nx2KlhrXXLewPOG",
+  "before": {
+    "normalQuarts": 1,
+    "hotQuarts": 2,
+    "heatThresholdF": 90,
+    "desertTraining": false,
+    "multiplier": 1,
+    "currentQuarts": null
+  },
+  "feat": "PCpnCsdPdzoI5Xwh",
+  "after": {
+    "normalQuarts": 0.5,
+    "hotQuarts": 1,
+    "heatThresholdF": 90,
+    "desertTraining": true,
+    "multiplier": 0.5,
+    "currentQuarts": null
+  },
+  "build": {
+    "progression": [
+      {
+        "classId": "soldier",
+        "vitality": 6,
+        "careerEntryId": "",
+        "vitalityRollId": "",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "survival": 3,
+          "athletics": 4,
+          "drive": 2,
+          "intimidate": 4,
+          "notice": 4,
+          "profession": 4,
+          "resolve": 3
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 7,
+        "careerEntryId": "pgwPrY50jd30yA0Y",
+        "vitalityRollId": "r3rZQUTXMF32JTCF",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 3,
+          "intimidate": 1,
+          "notice": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 12,
+        "careerEntryId": "Y1TuQxhHmOIH0d1T",
+        "vitalityRollId": "4NkjRB9EQRQfA0ib",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 2
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 1,
+        "careerEntryId": "WU3jmbh7PuTi0crq",
+        "vitalityRollId": "F74KMEMGPPi69kmv",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "networking": 2,
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1
+        }
+      }
+    ],
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "history": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"key\":\"survival\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"terrain\"}",
+      "manual": true
+    },
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "survival": 3
+  },
+  "ui": "Daily fluids while active: 0.5 qt.; 1 qt. when exposed to heat above 90°F (Desert Training included).",
+  "removed": {
+    "normalQuarts": 1,
+    "hotQuarts": 2,
+    "heatThresholdF": 90,
+    "desertTraining": false,
+    "multiplier": 1,
+    "currentQuarts": null
+  },
+  "restored": {
+    "normalQuarts": 0.5,
+    "hotQuarts": 1,
+    "heatThresholdF": 90,
+    "desertTraining": true,
+    "multiplier": 0.5,
+    "currentQuarts": null
+  },
+  "reload": {
+    "water": {
+      "normalQuarts": 0.5,
+      "hotQuarts": 1,
+      "heatThresholdF": 90,
+      "desertTraining": true,
+      "multiplier": 0.5,
+      "currentQuarts": null
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "dice": 0,
+    "cleanup": {
+      "actors": 5,
+      "messages": 522,
+      "time": 126,
+      "locks": 0
+    }
+  }
+}

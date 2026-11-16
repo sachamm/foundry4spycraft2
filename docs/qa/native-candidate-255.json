@@ -1,0 +1,3857 @@
+{
+  "actor": "6VLMH3a9VVx7wW6j",
+  "pairs": [
+    {
+      "choice": "str,dex",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 14,
+        "dex": 14,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "str,dex",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "str,con",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 14,
+        "dex": 13,
+        "con": 14,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "str,con",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "str,int",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 14,
+        "dex": 13,
+        "con": 13,
+        "int": 14,
+        "wis": 13,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "str,int",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 24,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 2,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 4,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "str,wis",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 14,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 14,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "str,wis",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "str,cha",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 14,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 14
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "str,cha",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "dex,con",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 14,
+        "con": 14,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "dex,con",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "dex,int",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 14,
+        "con": 13,
+        "int": 14,
+        "wis": 13,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "dex,int",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 24,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 2,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 4,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "dex,wis",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 14,
+        "con": 13,
+        "int": 13,
+        "wis": 14,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "dex,wis",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "dex,cha",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 14,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 14
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "dex,cha",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "con,int",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 13,
+        "con": 14,
+        "int": 14,
+        "wis": 13,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "con,int",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 24,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 2,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 4,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "con,wis",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 13,
+        "con": 14,
+        "int": 13,
+        "wis": 14,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "con,wis",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "con,cha",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 13,
+        "con": 14,
+        "int": 13,
+        "wis": 13,
+        "cha": 14
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "con,cha",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "int,wis",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 14,
+        "wis": 14,
+        "cha": 13
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "int,wis",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 24,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 2,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 4,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "int,cha",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 14,
+        "wis": 13,
+        "cha": 14
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "int,cha",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 24,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 2,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 4,
+        "className": "Soldier",
+        "issues": []
+      }
+    },
+    {
+      "choice": "wis,cha",
+      "status": {
+        "ok": true,
+        "unmet": []
+      },
+      "values": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 14,
+        "cha": 14
+      },
+      "basis": {
+        "level": 1,
+        "source": "firstLevel",
+        "choice": "wis,cha",
+        "scores": {
+          "str": 13,
+          "dex": 13,
+          "con": 13,
+          "int": 13,
+          "wis": 13,
+          "cha": 13
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budget": {
+        "level": 1,
+        "spent": 20,
+        "available": 20,
+        "classId": "soldier",
+        "maxRanks": 4,
+        "skills": {
+          "acrobatics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "analysis": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "athletics": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "blend": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bluff": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "bureaucracy": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "computers": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "cultures": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "drive": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "electronics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "falsify": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "impress": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "intimidate": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "investigation": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "manipulate": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "mechanics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "medicine": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "networking": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "notice": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "profession": {
+            "ranks": 4,
+            "purchasedRanks": 4,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "resolve": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "science": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "search": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "security": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "senseMotive": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sleightOfHand": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "sneak": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "streetwise": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": false
+          },
+          "survival": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          },
+          "tactics": {
+            "ranks": 0,
+            "purchasedRanks": 0,
+            "maxRanks": 4,
+            "classSkill": true
+          }
+        },
+        "classSkills": [
+          "athletics",
+          "drive",
+          "intimidate",
+          "notice",
+          "profession",
+          "resolve",
+          "search",
+          "survival",
+          "tactics"
+        ],
+        "intelligenceModifier": 1,
+        "classGrantPoints": 0,
+        "classGrantName": "",
+        "remaining": 0,
+        "className": "Soldier",
+        "issues": []
+      }
+    }
+  ],
+  "rolls": [
+    8,
+    3,
+    8
+  ],
+  "originalOffice": "tBz67h8BpbXLG7S9",
+  "feat": "1Yt2iENeIIOr6lhG",
+  "start": {
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0
+    ],
+    "scores": {
+      "str": 13,
+      "dex": 13,
+      "con": 13,
+      "int": 13,
+      "wis": 13,
+      "cha": 13
+    },
+    "basis": {
+      "level": 1,
+      "source": "firstLevel",
+      "choice": "",
+      "scores": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      }
+    }
+  },
+  "advanced": {
+    "values": {
+      "str": 14,
+      "dex": 13,
+      "con": 13,
+      "int": 14,
+      "wis": 13,
+      "cha": 14
+    },
+    "basis": {
+      "level": 1,
+      "source": "firstLevel",
+      "choice": "int,cha",
+      "scores": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      }
+    },
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": []
+  },
+  "laterEdit": {
+    "status": {
+      "ok": false,
+      "unmet": [
+        "Candidate: review the original first-level attributes and selected pair; a later change needs a GC history correction."
+      ]
+    },
+    "basis": {
+      "level": 1,
+      "source": "firstLevel",
+      "choice": "int,cha",
+      "scores": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      }
+    }
+  },
+  "missingHistory": {
+    "status": {
+      "ok": false,
+      "unmet": [
+        "Candidate: review the original first-level attributes and selected pair; a later change needs a GC history correction."
+      ]
+    },
+    "issues": [
+      {
+        "code": "career-budget",
+        "level": 1,
+        "message": "Level 1: 4 skill point(s) overspent."
+      }
+    ]
+  },
+  "review": {
+    "basis": {
+      "level": 1,
+      "source": "historicalReview",
+      "choice": "int,cha",
+      "scores": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      },
+      "confirmed": true,
+      "reason": "Synthetic original first-level acquisition record captured before advancement",
+      "reviewedBy": "WW1y27MJMt1sWfHr",
+      "reviewedAt": 126
+    },
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": []
+  },
+  "reload": {
+    "basis": {
+      "level": 1,
+      "source": "historicalReview",
+      "choice": "int,cha",
+      "scores": {
+        "str": 13,
+        "dex": 13,
+        "con": 13,
+        "int": 13,
+        "wis": 13,
+        "cha": 13
+      },
+      "confirmed": true,
+      "reason": "Synthetic original first-level acquisition record captured before advancement",
+      "reviewedBy": "WW1y27MJMt1sWfHr",
+      "reviewedAt": 126
+    },
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "values": {
+      "str": 14,
+      "dex": 13,
+      "con": 13,
+      "int": 14,
+      "wis": 13,
+      "cha": 14
+    },
+    "progression": [
+      {
+        "classId": "soldier",
+        "vitality": 6,
+        "careerEntryId": "",
+        "vitalityRollId": "",
+        "vitalityReviewId": "",
+        "intelligenceModifier": null,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 4,
+          "drive": 4,
+          "intimidate": 4,
+          "notice": 4,
+          "profession": 4,
+          "resolve": 4
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 8,
+        "careerEntryId": "YKKdi0MKT79Pe93Q",
+        "vitalityRollId": "iG3hOnBCHceUPi9k",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 1,
+          "resolve": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 3,
+        "careerEntryId": "dTLu9S5759qOdm8V",
+        "vitalityRollId": "JriVFmDPvKjurp38",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 1,
+          "resolve": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 8,
+        "careerEntryId": "Ev9DJPZW6dp9oMj6",
+        "vitalityRollId": "MJaboax1dapreIVK",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 1,
+          "resolve": 1
+        }
+      }
+    ],
+    "increases": {
+      "l4": "str",
+      "l8": "",
+      "l12": "",
+      "l16": "",
+      "l20": ""
+    },
+    "world": {
+      "actors": 6,
+      "messages": 622,
+      "time": 126,
+      "combats": 0,
+      "effects": 0,
+      "locks": 0
+    }
+  }
+}

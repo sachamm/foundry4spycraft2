@@ -1,0 +1,960 @@
+{
+  "original": "tBz67h8BpbXLG7S9",
+  "actors": [
+    {
+      "id": "gVCgZECDt6LurtMS",
+      "affiliation": "faction",
+      "start": {
+        "reputation": 2,
+        "netWorth": 0,
+        "points": {
+          "budget": 36,
+          "spent": 36,
+          "remaining": 0
+        },
+        "budgets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "issues": [],
+        "career": {
+          "name": "Career Agent",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+1 insight to all saves, and +1 Reputation or extra Net Worth after each mission.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "tradecraft",
+            "prerequisites": {
+              "type": "level",
+              "min": 6
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [
+              {
+                "level": 0,
+                "target": "saves.ref",
+                "value": "1",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "saves.fort",
+                "value": "1",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "saves.will",
+                "value": "1",
+                "bonusType": "insight"
+              }
+            ],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 6,
+              "signature": "{\"prerequisites\":{\"min\":6,\"type\":\"level\"},\"source\":\"\",\"tree\":\"tradecraft\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 6,
+            "candidateBasis": null
+          },
+          "effects": [],
+          "folder": "JWbvWRor4Pg0Oawl",
+          "sort": 314,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794808642879,
+            "modifiedTime": 1794808642879,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "OoOfja3bdcGbzxBD"
+        }
+      }
+    },
+    {
+      "id": "atfia9pr4M5AsAxy",
+      "affiliation": "freelance",
+      "start": {
+        "reputation": 0,
+        "netWorth": 100000,
+        "points": {
+          "budget": 36,
+          "spent": 36,
+          "remaining": 0
+        },
+        "budgets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "issues": [],
+        "career": {
+          "name": "Career Agent",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+1 insight to all saves, and +1 Reputation or extra Net Worth after each mission.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "tradecraft",
+            "prerequisites": {
+              "type": "level",
+              "min": 6
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [
+              {
+                "level": 0,
+                "target": "saves.ref",
+                "value": "1",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "saves.fort",
+                "value": "1",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "saves.will",
+                "value": "1",
+                "bonusType": "insight"
+              }
+            ],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 6,
+              "signature": "{\"prerequisites\":{\"min\":6,\"type\":\"level\"},\"source\":\"\",\"tree\":\"tradecraft\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 6,
+            "candidateBasis": null
+          },
+          "effects": [],
+          "folder": "JWbvWRor4Pg0Oawl",
+          "sort": 314,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794808642906,
+            "modifiedTime": 1794808642906,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "OoOfja3bdcGbzxBD"
+        }
+      }
+    },
+    {
+      "id": "HEs4Y38pNC1XtjZY",
+      "affiliation": "freelanceNormal",
+      "start": {
+        "reputation": 0,
+        "netWorth": 100000
+      }
+    }
+  ],
+  "refund": {
+    "error": "Synthetic Career Agent posting failure",
+    "reputation": 2,
+    "netWorth": 0,
+    "rewards": {}
+  },
+  "partial": {
+    "result": {
+      "needsReview": true,
+      "id": "jD68wLkXAI9XXJC9"
+    },
+    "reputation": 0,
+    "netWorth": 150000,
+    "rewards": {},
+    "review": {
+      "needsReview": true,
+      "id": "jD68wLkXAI9XXJC9",
+      "transaction": {
+        "key": "mission_qa-xp-cancel",
+        "field": "netWorth",
+        "before": 100000,
+        "after": 150000,
+        "record": {
+          "version": 1,
+          "id": "jD68wLkXAI9XXJC9",
+          "source": "Career Agent",
+          "affiliation": "freelance",
+          "field": "netWorth",
+          "amount": 50000,
+          "epoch": "qa-xp-cancel",
+          "before": 100000,
+          "after": 150000,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126
+        }
+      },
+      "reason": "Synthetic balance committed before mission receipt",
+      "at": 126
+    },
+    "retryError": "Review the interrupted Career Agent reward before granting another."
+  },
+  "pendingReload": {
+    "review": {
+      "needsReview": true,
+      "id": "jD68wLkXAI9XXJC9",
+      "transaction": {
+        "key": "mission_qa-xp-cancel",
+        "field": "netWorth",
+        "before": 100000,
+        "after": 150000,
+        "record": {
+          "version": 1,
+          "id": "jD68wLkXAI9XXJC9",
+          "source": "Career Agent",
+          "affiliation": "freelance",
+          "field": "netWorth",
+          "amount": 50000,
+          "epoch": "qa-xp-cancel",
+          "before": 100000,
+          "after": 150000,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126
+        }
+      },
+      "reason": "Synthetic balance committed before mission receipt",
+      "at": 126
+    },
+    "netWorth": 150000,
+    "reputation": 0,
+    "rewards": {}
+  },
+  "recovered": {
+    "reputation": 0,
+    "netWorth": 150000,
+    "rewards": {
+      "mission_qa-xp-cancel": {
+        "version": 1,
+        "id": "jD68wLkXAI9XXJC9",
+        "source": "Career Agent",
+        "affiliation": "freelance",
+        "field": "netWorth",
+        "amount": 50000,
+        "epoch": "qa-xp-cancel",
+        "before": 100000,
+        "after": 150000,
+        "missionCompleteConfirmed": true,
+        "activeAtMissionEndConfirmed": true,
+        "at": 126,
+        "reviewReason": "Synthetic QA: $50,000 was already credited; keep the mission reward and confirmed balances",
+        "reviewedBy": "WW1y27MJMt1sWfHr",
+        "reviewedAt": 126
+      }
+    },
+    "review": {
+      "needsReview": false,
+      "id": "jD68wLkXAI9XXJC9",
+      "transaction": {
+        "key": "mission_qa-xp-cancel",
+        "field": "netWorth",
+        "before": 100000,
+        "after": 150000,
+        "record": {
+          "version": 1,
+          "id": "jD68wLkXAI9XXJC9",
+          "source": "Career Agent",
+          "affiliation": "freelance",
+          "field": "netWorth",
+          "amount": 50000,
+          "epoch": "qa-xp-cancel",
+          "before": 100000,
+          "after": 150000,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126
+        }
+      },
+      "reason": "Synthetic balance committed before mission receipt",
+      "at": 126,
+      "resolution": "Synthetic QA: $50,000 was already credited; keep the mission reward and confirmed balances",
+      "reviewedBy": "WW1y27MJMt1sWfHr",
+      "reviewedAt": 126
+    }
+  },
+  "faction": {
+    "receipt": {
+      "id": "damQYFwjvgLJ8S01",
+      "flags": {
+        "actorUuid": "Actor.gVCgZECDt6LurtMS",
+        "checkKind": "careerAgentReward",
+        "careerAgentReward": {
+          "version": 1,
+          "id": "2EVWQ7ij5zISHeVi",
+          "source": "Career Agent",
+          "affiliation": "faction",
+          "field": "reputation",
+          "amount": 1,
+          "epoch": "qa-xp-cancel",
+          "before": 2,
+          "after": 3,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126
+        },
+        "actionDiceAllowed": false
+      }
+    },
+    "reputation": 3,
+    "netWorth": 0,
+    "rewards": {
+      "mission_qa-xp-cancel": {
+        "version": 1,
+        "id": "2EVWQ7ij5zISHeVi",
+        "source": "Career Agent",
+        "affiliation": "faction",
+        "field": "reputation",
+        "amount": 1,
+        "epoch": "qa-xp-cancel",
+        "before": 2,
+        "after": 3,
+        "missionCompleteConfirmed": true,
+        "activeAtMissionEndConfirmed": true,
+        "at": 126
+      }
+    },
+    "saves": {
+      "fort": {
+        "base": 6,
+        "bonus": 1,
+        "total": 9,
+        "bonusEntries": [
+          {
+            "source": "Career Agent",
+            "value": 1,
+            "type": "insight"
+          }
+        ]
+      },
+      "ref": {
+        "base": 4,
+        "bonus": 1,
+        "total": 6,
+        "bonusEntries": [
+          {
+            "source": "Career Agent",
+            "value": 1,
+            "type": "insight"
+          }
+        ]
+      },
+      "will": {
+        "base": 8,
+        "bonus": 1,
+        "total": 11,
+        "bonusEntries": [
+          {
+            "source": "Career Agent",
+            "value": 1,
+            "type": "insight"
+          }
+        ]
+      }
+    }
+  },
+  "normalFreelance": {
+    "receipt": {
+      "id": "jE8KDW7tVr2RAW2q",
+      "flags": {
+        "actorUuid": "Actor.HEs4Y38pNC1XtjZY",
+        "checkKind": "careerAgentReward",
+        "careerAgentReward": {
+          "version": 1,
+          "id": "fzxCKB4d2gM3v12n",
+          "source": "Career Agent",
+          "affiliation": "freelance",
+          "field": "netWorth",
+          "amount": 50000,
+          "epoch": "qa-xp-cancel",
+          "before": 100000,
+          "after": 150000,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126
+        },
+        "actionDiceAllowed": false
+      }
+    },
+    "reputation": 0,
+    "netWorth": 150000,
+    "rewards": {
+      "mission_qa-xp-cancel": {
+        "version": 1,
+        "id": "fzxCKB4d2gM3v12n",
+        "source": "Career Agent",
+        "affiliation": "freelance",
+        "field": "netWorth",
+        "amount": 50000,
+        "epoch": "qa-xp-cancel",
+        "before": 100000,
+        "after": 150000,
+        "missionCompleteConfirmed": true,
+        "activeAtMissionEndConfirmed": true,
+        "at": 126
+      }
+    }
+  },
+  "limits": [
+    {
+      "actor": "gVCgZECDt6LurtMS",
+      "affiliation": "faction",
+      "balances": {
+        "reputation": 3,
+        "netWorth": 0
+      },
+      "repeated": true,
+      "affiliationBlocked": true,
+      "noPost": true,
+      "record": {
+        "version": 1,
+        "id": "2EVWQ7ij5zISHeVi",
+        "source": "Career Agent",
+        "affiliation": "faction",
+        "field": "reputation",
+        "amount": 1,
+        "epoch": "qa-xp-cancel",
+        "before": 2,
+        "after": 3,
+        "missionCompleteConfirmed": true,
+        "activeAtMissionEndConfirmed": true,
+        "at": 126
+      },
+      "receipt": {
+        "id": "damQYFwjvgLJ8S01",
+        "flags": {
+          "actorUuid": "Actor.gVCgZECDt6LurtMS",
+          "checkKind": "careerAgentReward",
+          "careerAgentReward": {
+            "version": 1,
+            "id": "2EVWQ7ij5zISHeVi",
+            "source": "Career Agent",
+            "affiliation": "faction",
+            "field": "reputation",
+            "amount": 1,
+            "epoch": "qa-xp-cancel",
+            "before": 2,
+            "after": 3,
+            "missionCompleteConfirmed": true,
+            "activeAtMissionEndConfirmed": true,
+            "at": 126
+          },
+          "actionDiceAllowed": false
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budgets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "issues": [],
+      "saves": {
+        "fort": {
+          "base": 6,
+          "bonus": 1,
+          "total": 9,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        },
+        "ref": {
+          "base": 4,
+          "bonus": 1,
+          "total": 6,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        },
+        "will": {
+          "base": 8,
+          "bonus": 1,
+          "total": 11,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "actor": "atfia9pr4M5AsAxy",
+      "affiliation": "freelance",
+      "balances": {
+        "reputation": 0,
+        "netWorth": 150000
+      },
+      "repeated": true,
+      "affiliationBlocked": true,
+      "noPost": true,
+      "record": {
+        "version": 1,
+        "id": "jD68wLkXAI9XXJC9",
+        "source": "Career Agent",
+        "affiliation": "freelance",
+        "field": "netWorth",
+        "amount": 50000,
+        "epoch": "qa-xp-cancel",
+        "before": 100000,
+        "after": 150000,
+        "missionCompleteConfirmed": true,
+        "activeAtMissionEndConfirmed": true,
+        "at": 126,
+        "reviewReason": "Synthetic QA: $50,000 was already credited; keep the mission reward and confirmed balances",
+        "reviewedBy": "WW1y27MJMt1sWfHr",
+        "reviewedAt": 126
+      },
+      "receipt": null,
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budgets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "issues": [],
+      "saves": {
+        "fort": {
+          "base": 6,
+          "bonus": 1,
+          "total": 9,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        },
+        "ref": {
+          "base": 4,
+          "bonus": 1,
+          "total": 6,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        },
+        "will": {
+          "base": 8,
+          "bonus": 1,
+          "total": 11,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "actor": "HEs4Y38pNC1XtjZY",
+      "affiliation": "freelance",
+      "balances": {
+        "reputation": 0,
+        "netWorth": 150000
+      },
+      "repeated": true,
+      "affiliationBlocked": true,
+      "noPost": true,
+      "record": {
+        "version": 1,
+        "id": "fzxCKB4d2gM3v12n",
+        "source": "Career Agent",
+        "affiliation": "freelance",
+        "field": "netWorth",
+        "amount": 50000,
+        "epoch": "qa-xp-cancel",
+        "before": 100000,
+        "after": 150000,
+        "missionCompleteConfirmed": true,
+        "activeAtMissionEndConfirmed": true,
+        "at": 126
+      },
+      "receipt": {
+        "id": "jE8KDW7tVr2RAW2q",
+        "flags": {
+          "actorUuid": "Actor.HEs4Y38pNC1XtjZY",
+          "checkKind": "careerAgentReward",
+          "careerAgentReward": {
+            "version": 1,
+            "id": "fzxCKB4d2gM3v12n",
+            "source": "Career Agent",
+            "affiliation": "freelance",
+            "field": "netWorth",
+            "amount": 50000,
+            "epoch": "qa-xp-cancel",
+            "before": 100000,
+            "after": 150000,
+            "missionCompleteConfirmed": true,
+            "activeAtMissionEndConfirmed": true,
+            "at": 126
+          },
+          "actionDiceAllowed": false
+        }
+      },
+      "points": {
+        "budget": 36,
+        "spent": 36,
+        "remaining": 0
+      },
+      "budgets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "issues": [],
+      "saves": {
+        "fort": {
+          "base": 6,
+          "bonus": 1,
+          "total": 9,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        },
+        "ref": {
+          "base": 4,
+          "bonus": 1,
+          "total": 6,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        },
+        "will": {
+          "base": 8,
+          "bonus": 1,
+          "total": 11,
+          "bonusEntries": [
+            {
+              "source": "Career Agent",
+              "value": 1,
+              "type": "insight"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "reload": {
+    "actors": [
+      {
+        "actor": "gVCgZECDt6LurtMS",
+        "affiliation": "faction",
+        "reputation": 3,
+        "netWorth": 0,
+        "record": {
+          "version": 1,
+          "id": "2EVWQ7ij5zISHeVi",
+          "source": "Career Agent",
+          "affiliation": "faction",
+          "field": "reputation",
+          "amount": 1,
+          "epoch": "qa-xp-cancel",
+          "before": 2,
+          "after": 3,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126
+        },
+        "review": null,
+        "points": {
+          "budget": 36,
+          "spent": 36,
+          "remaining": 0
+        },
+        "budgets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "issues": []
+      },
+      {
+        "actor": "atfia9pr4M5AsAxy",
+        "affiliation": "freelance",
+        "reputation": 0,
+        "netWorth": 150000,
+        "record": {
+          "version": 1,
+          "id": "jD68wLkXAI9XXJC9",
+          "source": "Career Agent",
+          "affiliation": "freelance",
+          "field": "netWorth",
+          "amount": 50000,
+          "epoch": "qa-xp-cancel",
+          "before": 100000,
+          "after": 150000,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126,
+          "reviewReason": "Synthetic QA: $50,000 was already credited; keep the mission reward and confirmed balances",
+          "reviewedBy": "WW1y27MJMt1sWfHr",
+          "reviewedAt": 126
+        },
+        "review": {
+          "needsReview": false,
+          "id": "jD68wLkXAI9XXJC9",
+          "transaction": {
+            "key": "mission_qa-xp-cancel",
+            "field": "netWorth",
+            "before": 100000,
+            "after": 150000,
+            "record": {
+              "version": 1,
+              "id": "jD68wLkXAI9XXJC9",
+              "source": "Career Agent",
+              "affiliation": "freelance",
+              "field": "netWorth",
+              "amount": 50000,
+              "epoch": "qa-xp-cancel",
+              "before": 100000,
+              "after": 150000,
+              "missionCompleteConfirmed": true,
+              "activeAtMissionEndConfirmed": true,
+              "at": 126
+            }
+          },
+          "reason": "Synthetic balance committed before mission receipt",
+          "at": 126,
+          "resolution": "Synthetic QA: $50,000 was already credited; keep the mission reward and confirmed balances",
+          "reviewedBy": "WW1y27MJMt1sWfHr",
+          "reviewedAt": 126
+        },
+        "points": {
+          "budget": 36,
+          "spent": 36,
+          "remaining": 0
+        },
+        "budgets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "issues": []
+      },
+      {
+        "actor": "HEs4Y38pNC1XtjZY",
+        "affiliation": "freelance",
+        "reputation": 0,
+        "netWorth": 150000,
+        "record": {
+          "version": 1,
+          "id": "fzxCKB4d2gM3v12n",
+          "source": "Career Agent",
+          "affiliation": "freelance",
+          "field": "netWorth",
+          "amount": 50000,
+          "epoch": "qa-xp-cancel",
+          "before": 100000,
+          "after": 150000,
+          "missionCompleteConfirmed": true,
+          "activeAtMissionEndConfirmed": true,
+          "at": 126
+        },
+        "review": null,
+        "points": {
+          "budget": 36,
+          "spent": 36,
+          "remaining": 0
+        },
+        "budgets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "issues": []
+      }
+    ],
+    "cleanup": {
+      "actors": 6,
+      "messages": 624,
+      "time": 126,
+      "combats": 0,
+      "effects": 0,
+      "locks": 0,
+      "gc": {
+        "value": 1,
+        "session": "MeCkrj45ff0VaUEr",
+        "playersPresent": 1,
+        "caliber": 1,
+        "lastReason": "Critical activation",
+        "controllerId": "ZTSRy74hgofWcbms",
+        "settlementReview": {
+          "id": "MfK3PHV2iV2wvias",
+          "needsReview": false,
+          "session": "MeCkrj45ff0VaUEr",
+          "before": 2,
+          "count": 1,
+          "purpose": "Critical activation",
+          "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+          "at": 1794752784259,
+          "outcome": "spent"
+        }
+      }
+    }
+  }
+}

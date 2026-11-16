@@ -8,10 +8,21 @@
     <span class="slot {{#if (sc2lt system.feats.any.remaining 0)}}bad{{/if}}"><b>{{localize "SPYCRAFT.Feat.Any"}}</b> {{system.feats.any.spent}} / {{system.feats.any.slots}}</span>
     {{#each featTrees}}<span class="slot"><b>{{label}}</b> {{#if slots}}{{spent}} / {{slots}}{{else}}{{owned}}{{/if}}</span>{{/each}}
   </div>
+  {{#each system.feats.replacementGrants}}<p>{{name}} was also granted by a class: {{count}} replacement feat choice(s) in {{tree}} (p.171).</p>{{/each}}
+  {{#if featFreeActions.length}}<ul class="plain">{{#each featFreeActions}}<li>{{name}}: {{remaining}} / {{limit}} per {{period}}{{#if counterReview}} · <span class="bad">Saved use count needs GC review</span>{{/if}}</li>{{/each}}</ul>{{/if}}
+  {{#if jinxUse}}<p>Jinx: {{jinxUse.remaining}} / {{jinxUse.limit}} per session. Select it when paying to activate an opponent’s error.{{#if jinxUse.counterReview}} <span class="bad">Saved use count needs GC review</span>{{/if}}{{#if isGM}} <a data-action="reviewLimitedUseCounter" data-resource="jinx">Review saved count</a>{{/if}}</p>{{/if}}
+  {{#if markUse}}<p>Mark: {{markUse.remaining}} / {{markUse.limit}} per session {{#if markUse.counterReview}}<span class="bad">Saved use count needs GC review</span>{{/if}}</p>{{/if}}
+  {{#if silverVictories.length}}<details><summary>Silver Tongue seduction victories</summary><ul class="plain">{{#each silverVictories}}<li>{{#if needsReview}}<span class="bad">Victory history needs GC review</span>{{else}}{{conflictId}} — {{targetName}}: {{event.amount}} temporary Wisdom damage; {{status}}.{{#if ../isGM}}{{#if pending}} <a data-action="resumeSilverTongueVictory" data-victory="{{id}}">Resume settlement</a>{{/if}}{{#if correctable}} <a data-action="correctSilverTongueVictory" data-victory="{{id}}">Correct erroneous victory</a>{{/if}}{{/if}}{{/if}}</li>{{/each}}</ul></details>{{/if}}
+  {{#if markObservations.length}}<details><summary>Mark observations</summary><ul class="plain">{{#each markObservations}}<li>{{target}}: {{#if needsReview}}<span class="bad">History needs GC review</span>{{else}}{{#each skills}}{{name}}{{#if ../disclosed}} {{signed bonus}}{{#if context}} ({{context}}){{/if}}{{/if}}{{#unless @last}}; {{/unless}}{{/each}}{{#if pending}} — GC disclosure pending{{/if}}{{/if}}{{#if ../isGM}}{{#if pending}} <a data-action="discloseMark" data-observation="{{id}}">Disclose bonuses</a>{{/if}} <a data-action="correctMark" data-observation="{{id}}">Correct history</a>{{/if}}</li>{{/each}}</ul></details>{{/if}}
   <ul class="item-list feats-list">
     {{#each feats}}
       <li data-item-id="{{item.id}}" class="{{#unless status.ok}}unqualified{{/unless}} {{#if item.system.granted}}granted{{/if}}">
         <a data-action="itemEdit" class="name">{{item.name}}{{#if (sc2lt 1 item.system.ranks)}} ×{{item.system.ranks}}{{/if}}</a>
+        {{#if (sc2eq item.system.featKind "temporary")}}<span class="tag">Temporary{{#if item.system.temporaryGrant}} — until the end of this {{item.system.temporaryGrant.period}}{{/if}}</span>{{/if}}
+        {{#if status.ok}}{{#if (sc2eq item.name "Everyday Genius")}}<a data-action="useEverydayGenius">Gain a temporary Basic Skill feat (full action)</a>{{/if}}{{/if}}
+        {{#if status.ok}}{{#if (sc2eq item.name "Quick Draw")}}<a data-action="useFeatFreeAction" data-resource="quickDraw">Free weapon action (twice/round)</a>{{/if}}{{#if (sc2eq item.name "Surge of Speed")}}<a data-action="useFeatFreeAction" data-resource="surgeOfSpeed">Free non-attack half action</a>{{/if}}{{/if}}
+        {{#if status.ok}}{{#if (sc2eq item.name "Silver Tongue")}}{{#if @root.isGM}}<a data-action="settleSilverTongueVictory">GC: settle seduction victory</a>{{/if}}{{/if}}{{/if}}
+        {{#if status.ok}}{{#if (sc2eq item.name "Mark")}}<a data-action="useMark">Observe three skills (free action)</a>{{/if}}{{/if}}
         <span class="tree">{{treeLabel}}</span>
         {{#if item.system.granted}}<span class="tag">{{localize "SPYCRAFT.Feat.Granted"}}: {{item.system.grantSource}}</span>{{/if}}
         {{#unless status.ok}}<span class="bad" data-tooltip="{{prereqText}}"><i class="fa-solid fa-triangle-exclamation"></i> {{#each status.unmet}}{{this}}{{#unless @last}}; {{/unless}}{{/each}}</span>{{/unless}}

@@ -8,6 +8,7 @@
   <div class="filters">
     <input type="search" name="search" value="{{filters.search}}" placeholder="{{localize 'SPYCRAFT.Browser.Search'}}" />
     <select name="group">{{selectOptions groups selected=filters.group blank=(localize "SPYCRAFT.Browser.All")}}</select>
+    {{#if showAcquisitionSources}}<label>Feat source <select name="acquisitionSource">{{selectOptions acquisitionSources selected=filters.acquisitionSource}}</select></label>{{/if}}
     {{#if hasPrereqs}}<label><input type="checkbox" name="qualifiedOnly" {{checked filters.qualifiedOnly}} /> {{localize "SPYCRAFT.Browser.QualifiedOnly"}}</label>{{/if}}
   </div>
   <ul class="browser-list">

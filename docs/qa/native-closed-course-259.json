@@ -1,0 +1,307 @@
+{
+  "batch": 259,
+  "source": "p.193 both original PDFs",
+  "actor": "dAWffzBG72KgusJf",
+  "rolls": [
+    9,
+    9,
+    4,
+    2,
+    11,
+    11,
+    12,
+    1
+  ],
+  "checks": [
+    {
+      "drive": {
+        "id": "2MvrhM5oXuBk6qzT",
+        "total": 14,
+        "feat": {
+          "version": 1,
+          "source": "Professional Driver - Closed Course",
+          "skillKey": "drive",
+          "checkId": "maneuver",
+          "targetSeesYou": false,
+          "targetSeesVehicle": false,
+          "synergyRanks": {
+            "impress": 6
+          },
+          "selectedSynergy": {
+            "skill": "impress",
+            "value": 1
+          },
+          "totalSynergy": 1
+        }
+      }
+    },
+    {
+      "both": {
+        "id": "K7Ofj684asQfEKxS",
+        "total": 6,
+        "feat": {
+          "version": 1,
+          "source": "Professional Driver - Closed Course",
+          "skillKey": "impress",
+          "checkId": "influence",
+          "targetSeesYou": true,
+          "targetSeesVehicle": true,
+          "synergyRanks": {
+            "acrobatics": 0,
+            "drive": 12
+          },
+          "selectedSynergy": {
+            "skill": "drive",
+            "value": 2
+          },
+          "totalSynergy": 2
+        }
+      },
+      "you": {
+        "id": "HLY1QiDztL2Y6kZU",
+        "total": 4,
+        "feat": {
+          "version": 1,
+          "source": "Professional Driver - Closed Course",
+          "skillKey": "impress",
+          "checkId": "influence",
+          "targetSeesYou": true,
+          "targetSeesVehicle": false,
+          "synergyRanks": {},
+          "selectedSynergy": {
+            "skill": "senseMotive",
+            "value": 0
+          },
+          "totalSynergy": 0
+        }
+      },
+      "vehicle": {
+        "id": "evfdrx9Y2nBASkKb",
+        "total": 4,
+        "feat": {
+          "version": 1,
+          "source": "Professional Driver - Closed Course",
+          "skillKey": "impress",
+          "checkId": "influence",
+          "targetSeesYou": false,
+          "targetSeesVehicle": true,
+          "synergyRanks": {},
+          "selectedSynergy": {
+            "skill": "senseMotive",
+            "value": 0
+          },
+          "totalSynergy": 0
+        }
+      },
+      "neither": {
+        "id": "n51f9cJNOudqF4J9",
+        "total": 4,
+        "feat": {
+          "version": 1,
+          "source": "Professional Driver - Closed Course",
+          "skillKey": "impress",
+          "checkId": "influence",
+          "targetSeesYou": false,
+          "targetSeesVehicle": false,
+          "synergyRanks": {},
+          "selectedSynergy": {
+            "skill": "senseMotive",
+            "value": 0
+          },
+          "totalSynergy": 0
+        }
+      }
+    },
+    "Source drift rejected: The declared skill modifiers or their feat sources changed before the check was posted.",
+    {
+      "ui": "YNU6gTZ5jYzJfuli",
+      "feat": {
+        "version": 1,
+        "source": "Professional Driver - Closed Course",
+        "skillKey": "impress",
+        "checkId": "influence",
+        "targetSeesYou": true,
+        "targetSeesVehicle": true,
+        "synergyRanks": {
+          "acrobatics": 0,
+          "drive": 12
+        },
+        "selectedSynergy": {
+          "skill": "drive",
+          "value": 2
+        },
+        "totalSynergy": 2
+      }
+    }
+  ],
+  "combats": [],
+  "feat": "BSrnAEpFH7lfgUmn",
+  "baseline": {
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "active": [
+      "Dash",
+      "Driving Instincts",
+      "Need for Speed",
+      "Professional Driver - Closed Course"
+    ],
+    "impress": {
+      "ability": "cha",
+      "misc": 0,
+      "classSkill": false,
+      "classSkillAt": 1,
+      "key": "impress",
+      "name": "Impress",
+      "focus": false,
+      "abilities": [
+        "cha"
+      ],
+      "abilityPenalties": {
+        "cha": 0
+      },
+      "bonusEntries": [],
+      "threatAdjustment": 0,
+      "ranks": 6,
+      "purchasedRanks": 6,
+      "bonus": -2,
+      "totals": [
+        {
+          "ability": "cha",
+          "normalSkillBonus": 4,
+          "skillBonus": 4,
+          "conditionBonusAdjustment": 0,
+          "checkPenalty": 0,
+          "total": 4
+        }
+      ],
+      "total": 4,
+      "isClass": false,
+      "classOverride": false,
+      "threat": 20,
+      "errorFloor": 0,
+      "take10TimeMultiplier": 2,
+      "errorReductionZero": 0,
+      "errorReduction": 0,
+      "cap": 30,
+      "maxRanks": 12,
+      "overMax": false
+    },
+    "drive": {
+      "ability": "dex",
+      "misc": 0,
+      "classSkill": false,
+      "classSkillAt": 1,
+      "key": "drive",
+      "name": "Drive",
+      "focus": true,
+      "abilities": [
+        "dex"
+      ],
+      "abilityPenalties": {
+        "dex": 0
+      },
+      "bonusEntries": [],
+      "threatAdjustment": 0,
+      "ranks": 12,
+      "purchasedRanks": 12,
+      "bonus": 0,
+      "totals": [
+        {
+          "ability": "dex",
+          "normalSkillBonus": 13,
+          "skillBonus": 13,
+          "conditionBonusAdjustment": 0,
+          "checkPenalty": 0,
+          "total": 13
+        }
+      ],
+      "total": 13,
+      "isClass": true,
+      "classOverride": false,
+      "threat": 20,
+      "errorFloor": 0,
+      "take10TimeMultiplier": 2,
+      "errorReductionZero": 0,
+      "errorReduction": 0,
+      "cap": 50,
+      "maxRanks": 12,
+      "overMax": false
+    },
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    }
+  },
+  "persisted": {
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "active": [
+      "Dash",
+      "Driving Instincts",
+      "Need for Speed",
+      "Professional Driver - Closed Course"
+    ],
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "dice": 0,
+    "uses": {}
+  },
+  "reload": {
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "active": [
+      "Dash",
+      "Driving Instincts",
+      "Need for Speed",
+      "Professional Driver - Closed Course"
+    ],
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "dice": 0,
+    "uses": {}
+  },
+  "cleanup": {
+    "actors": 6,
+    "messages": 652,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126
+  }
+}

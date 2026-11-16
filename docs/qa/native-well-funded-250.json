@@ -1,0 +1,679 @@
+{
+  "actor": "uaYP13uoGgjqHgpo",
+  "rolls": [
+    12,
+    7
+  ],
+  "checks": [],
+  "feat": "oin9vpbm6mgqCRcK",
+  "build": {
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "gear": 5,
+    "feats": [
+      {
+        "name": "Silver Spoon",
+        "choice": "",
+        "tree": "gear"
+      },
+      {
+        "name": "Well-Funded",
+        "choice": "",
+        "tree": "gear"
+      }
+    ],
+    "history": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"name\":\"Silver Spoon\",\"type\":\"feat\"},\"source\":\"\",\"tree\":\"gear\"}"
+    }
+  },
+  "start": {
+    "wealth": {
+      "total": 2,
+      "allocated": 0,
+      "remaining": 2,
+      "lifestyle": {
+        "rank": 1,
+        "home": "Dorm, trailer, 1 bedroom apt(2)",
+        "vehicle": "I/0",
+        "appearance": "Slummy - poor street look",
+        "appearanceMod": -2,
+        "appearanceFeatBonus": 0
+      },
+      "possessions": {
+        "rank": 1,
+        "picks": "1/II, 2/I",
+        "budget": {
+          "available": {
+            "1": 2,
+            "2": 1,
+            "3": 0,
+            "4": 0,
+            "5": 0
+          },
+          "remaining": {
+            "1": 2,
+            "2": 1,
+            "3": 0,
+            "4": 0,
+            "5": 0
+          },
+          "assignments": [],
+          "spent": 0,
+          "unfunded": 0,
+          "total": 3,
+          "warnings": [],
+          "unclassified": 0
+        }
+      },
+      "spendingCash": {
+        "rank": 3,
+        "amount": 900
+      }
+    },
+    "cash": {},
+    "uses": {},
+    "dice": 0,
+    "mission": "qa-xp-cancel"
+  },
+  "bribe": {
+    "id": "rEWGPv0sAtoFjp86",
+    "flags": {
+      "fundedTaking": {
+        "version": 1,
+        "source": "Well-Funded",
+        "skillKey": "bureaucracy",
+        "checkId": "bribe",
+        "method": "take10",
+        "errorBefore": 2
+      },
+      "gearAllowance": null,
+      "gearCheckContext": null,
+      "improvisedSearch": null,
+      "terrainFeat": null,
+      "pursuitFeat": null,
+      "professionalFeat": null,
+      "contactFeat": null,
+      "polyglot": null,
+      "photographicMemory": null,
+      "charmer": null,
+      "cardSharkKnowledge": null,
+      "cardSharkProfession": null,
+      "appearanceModifiers": null,
+      "hardCore": null,
+      "finalAttackRound": null,
+      "finesseDamage": null,
+      "damageSave": null,
+      "coverSave": null,
+      "cqbRange": null,
+      "finalAttack": null,
+      "twoWeaponFinalAttack": null,
+      "shakenContext": null,
+      "restraintEscape": null,
+      "skillBonusCondition": {
+        "state": "",
+        "normal": 1,
+        "total": 1,
+        "adjustment": 0
+      },
+      "skillCheckAdjustment": 0,
+      "weaponFocusWork": null,
+      "baffledSaveBonus": 0,
+      "gamblingDice": null,
+      "rollCombat": null,
+      "preRollFunding": null,
+      "hailMary": {
+        "untrained": false,
+        "uncap": false,
+        "active": false,
+        "cost": 0
+      },
+      "rerollFunding": null,
+      "rerollReceiptId": null,
+      "rerollOf": null,
+      "sleepSnapshot": null,
+      "conditionAbilityAdjustment": 0,
+      "conditionDamagePenalty": 0,
+      "evasionContext": null,
+      "securityBonus": 0,
+      "fatigueBonus": 0,
+      "fatigueCondition": "",
+      "underwaterContext": {
+        "underwater": false,
+        "aquatic": false,
+        "athleticsRanks": 6,
+        "swimExempt": false,
+        "penalty": 0,
+        "notes": []
+      },
+      "mortarOperation": null,
+      "launcherOperation": null,
+      "unnervingAvailableGrade": 0,
+      "unnervingStress": null,
+      "qualityChecks": {
+        "bonuses": [],
+        "notes": [],
+        "fearless": 0,
+        "strongMinded": 0,
+        "seductive": 0,
+        "camouflaged": 0,
+        "terrain": "",
+        "shiftingDisposition": false,
+        "seductionConflict": false
+      },
+      "medical": null,
+      "littleDetails": null,
+      "sensoryConditions": {
+        "blinded": false,
+        "deafened": false,
+        "targetDeafened": false,
+        "nightTrainingException": false,
+        "capAdjustment": 0,
+        "skillModifier": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillTags": {
+        "nauseated": false,
+        "concentration": false,
+        "mute": false,
+        "oneHanded": false,
+        "noSharedLanguage": false,
+        "bound": false,
+        "conveyingMessage": false,
+        "addedHandsOn": false,
+        "handsOn": false,
+        "grasp": false,
+        "language": false,
+        "twoWeapon": false,
+        "handPenalty": 0,
+        "capAdjustment": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillGear": null,
+      "fogSmoke": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "visualDelta": 0,
+        "notes": []
+      },
+      "terrainSave": null,
+      "localHeroOpposition": null,
+      "cunningPlan": null,
+      "attributeSubstitution": null,
+      "terrain": {
+        "homeTurf": false,
+        "homeTurfEligible": false,
+        "homeTurfCapIncrease": 0,
+        "terrain": "",
+        "underwater": false,
+        "navigating": false,
+        "naturalSurface": false,
+        "hearingCheck": false,
+        "cityPopulation": 0,
+        "nightAmbush": false,
+        "matched": [],
+        "woodcraft": false,
+        "unfair": false,
+        "bonuses": [],
+        "synergies": [],
+        "synergySources": [],
+        "ambushSources": [],
+        "opponentSurprisePenalty": 0,
+        "notes": []
+      },
+      "senses": {
+        "hearing": false,
+        "scent": false,
+        "deafened": false,
+        "bonuses": [],
+        "notes": []
+      },
+      "tracking": null,
+      "gcTakingPermissionConfirmed": false,
+      "ambush": null,
+      "sneakAttackTarget": null,
+      "sneakAttack": null,
+      "ambientLight": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "notes": []
+      },
+      "nest": null,
+      "breakthrough": null,
+      "requiredBonusPoolId": null,
+      "requiredBonusSpent": false,
+      "cannotError": false,
+      "resultSource": "",
+      "opponentResult": null,
+      "oneInAMillion": false,
+      "tenSecondSolution": false,
+      "standaloneCheckConfirmed": false,
+      "forcedThreat": false,
+      "noForcedReroll": false,
+      "normalThreat": 0,
+      "rawTotal": 11,
+      "rolledTotal": 11,
+      "minimumAdjustment": 0,
+      "practiceMakesPerfect": false,
+      "criticalFailureCostIncrease": 0,
+      "crossCheck": false,
+      "alternatives": null,
+      "chosenIndex": 0,
+      "choiceSource": null,
+      "choiceResourceId": null,
+      "effectiveTotal": 11,
+      "actorUuid": "Actor.uaYP13uoGgjqHgpo",
+      "checkKind": "skill",
+      "ability": "cha",
+      "skillKey": "bureaucracy",
+      "checkId": "bribe",
+      "focus": "Bribe",
+      "rerollResources": [],
+      "formula": "10 + @total",
+      "rollData": {
+        "total": 1
+      },
+      "weaponUuid": "",
+      "weaponProficiency": "",
+      "weaponQualities": "",
+      "cleanAndPolished": false,
+      "gearUuid": "",
+      "gearAttempt": null,
+      "attackContext": null,
+      "unarmed": false,
+      "improvised": false,
+      "threat": 0,
+      "error": 0,
+      "cap": 15,
+      "baseFlavor": "Bureaucracy / Bribe Check (CHA)<br><small>Well-Funded: Bribe take 10 ignores the error-range restriction (p.198).                      Taking 10: 2× the listed time; no threat or action-die boost. 1 Full Action. Active. Crowd, Disposition. Rules p.121.</small>",
+      "boostTotal": 0,
+      "boostSpent": 0,
+      "capped": false,
+      "naturalDie": null,
+      "checkMethod": "take10",
+      "actionDiceAllowed": false,
+      "successConfirmed": null,
+      "errorConfirmed": false,
+      "threatConfirmed": false,
+      "triumphed": false
+    }
+  },
+  "bribeGuard": {
+    "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+    "calls": 1,
+    "noPost": true
+  },
+  "refund": {
+    "error": "Synthetic Well-Funded post failure",
+    "used": 0,
+    "grants": {},
+    "dice": 0
+  },
+  "cash": {
+    "id": "iWJ18VFO4DrrjBoa",
+    "flags": {
+      "actorUuid": "Actor.uaYP13uoGgjqHgpo",
+      "wellFunded": {
+        "id": "tkctQ1wvrP7av45b",
+        "version": 1,
+        "source": "Well-Funded",
+        "epoch": "qa-xp-cancel",
+        "wealth": 2,
+        "amount": 400,
+        "home": "Synthetic funded home",
+        "atHome": true,
+        "at": 126
+      }
+    },
+    "grants": {
+      "tkctQ1wvrP7av45b": {
+        "version": 1,
+        "source": "Well-Funded",
+        "epoch": "qa-xp-cancel",
+        "wealth": 2,
+        "amount": 400,
+        "home": "Synthetic funded home",
+        "atHome": true,
+        "at": 126
+      }
+    }
+  },
+  "repeat": {
+    "noPost": true,
+    "used": 1,
+    "grants": 1
+  },
+  "reload": {
+    "cash": {
+      "tkctQ1wvrP7av45b": {
+        "version": 1,
+        "source": "Well-Funded",
+        "epoch": "qa-xp-cancel",
+        "wealth": 2,
+        "amount": 400,
+        "home": "Synthetic funded home",
+        "atHome": true,
+        "at": 126
+      }
+    },
+    "uses": {
+      "epoch": "qa-xp-cancel",
+      "used": 1
+    },
+    "wealth": {
+      "total": 2,
+      "allocated": 0,
+      "remaining": 2,
+      "lifestyle": {
+        "rank": 1,
+        "home": "Dorm, trailer, 1 bedroom apt(2)",
+        "vehicle": "I/0",
+        "appearance": "Slummy - poor street look",
+        "appearanceMod": -2,
+        "appearanceFeatBonus": 0
+      },
+      "possessions": {
+        "rank": 1,
+        "picks": "1/II, 2/I",
+        "budget": {
+          "available": {
+            "1": 2,
+            "2": 1,
+            "3": 0,
+            "4": 0,
+            "5": 0
+          },
+          "remaining": {
+            "1": 2,
+            "2": 1,
+            "3": 0,
+            "4": 0,
+            "5": 0
+          },
+          "assignments": [],
+          "spent": 0,
+          "unfunded": 0,
+          "total": 3,
+          "warnings": [],
+          "unclassified": 0
+        }
+      },
+      "spendingCash": {
+        "rank": 3,
+        "amount": 900
+      }
+    },
+    "dice": 0,
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "bribe": {
+      "fundedTaking": {
+        "version": 1,
+        "source": "Well-Funded",
+        "skillKey": "bureaucracy",
+        "checkId": "bribe",
+        "method": "take10",
+        "errorBefore": 2
+      },
+      "gearAllowance": null,
+      "gearCheckContext": null,
+      "improvisedSearch": null,
+      "terrainFeat": null,
+      "pursuitFeat": null,
+      "professionalFeat": null,
+      "contactFeat": null,
+      "polyglot": null,
+      "photographicMemory": null,
+      "charmer": null,
+      "cardSharkKnowledge": null,
+      "cardSharkProfession": null,
+      "appearanceModifiers": null,
+      "hardCore": null,
+      "finalAttackRound": null,
+      "finesseDamage": null,
+      "damageSave": null,
+      "coverSave": null,
+      "cqbRange": null,
+      "finalAttack": null,
+      "twoWeaponFinalAttack": null,
+      "shakenContext": null,
+      "restraintEscape": null,
+      "skillBonusCondition": {
+        "state": "",
+        "normal": 1,
+        "total": 1,
+        "adjustment": 0
+      },
+      "skillCheckAdjustment": 0,
+      "weaponFocusWork": null,
+      "baffledSaveBonus": 0,
+      "gamblingDice": null,
+      "rollCombat": null,
+      "preRollFunding": null,
+      "hailMary": {
+        "untrained": false,
+        "uncap": false,
+        "active": false,
+        "cost": 0
+      },
+      "rerollFunding": null,
+      "rerollReceiptId": null,
+      "rerollOf": null,
+      "sleepSnapshot": null,
+      "conditionAbilityAdjustment": 0,
+      "conditionDamagePenalty": 0,
+      "evasionContext": null,
+      "securityBonus": 0,
+      "fatigueBonus": 0,
+      "fatigueCondition": "",
+      "underwaterContext": {
+        "underwater": false,
+        "aquatic": false,
+        "athleticsRanks": 6,
+        "swimExempt": false,
+        "penalty": 0,
+        "notes": []
+      },
+      "mortarOperation": null,
+      "launcherOperation": null,
+      "unnervingAvailableGrade": 0,
+      "unnervingStress": null,
+      "qualityChecks": {
+        "bonuses": [],
+        "notes": [],
+        "fearless": 0,
+        "strongMinded": 0,
+        "seductive": 0,
+        "camouflaged": 0,
+        "terrain": "",
+        "shiftingDisposition": false,
+        "seductionConflict": false
+      },
+      "medical": null,
+      "littleDetails": null,
+      "sensoryConditions": {
+        "blinded": false,
+        "deafened": false,
+        "targetDeafened": false,
+        "nightTrainingException": false,
+        "capAdjustment": 0,
+        "skillModifier": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillTags": {
+        "nauseated": false,
+        "concentration": false,
+        "mute": false,
+        "oneHanded": false,
+        "noSharedLanguage": false,
+        "bound": false,
+        "conveyingMessage": false,
+        "addedHandsOn": false,
+        "handsOn": false,
+        "grasp": false,
+        "language": false,
+        "twoWeapon": false,
+        "handPenalty": 0,
+        "capAdjustment": 0,
+        "blockedReason": "",
+        "notes": []
+      },
+      "skillGear": null,
+      "fogSmoke": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "visualDelta": 0,
+        "notes": []
+      },
+      "terrainSave": null,
+      "localHeroOpposition": null,
+      "cunningPlan": null,
+      "attributeSubstitution": null,
+      "terrain": {
+        "homeTurf": false,
+        "homeTurfEligible": false,
+        "homeTurfCapIncrease": 0,
+        "terrain": "",
+        "underwater": false,
+        "navigating": false,
+        "naturalSurface": false,
+        "hearingCheck": false,
+        "cityPopulation": 0,
+        "nightAmbush": false,
+        "matched": [],
+        "woodcraft": false,
+        "unfair": false,
+        "bonuses": [],
+        "synergies": [],
+        "synergySources": [],
+        "ambushSources": [],
+        "opponentSurprisePenalty": 0,
+        "notes": []
+      },
+      "senses": {
+        "hearing": false,
+        "scent": false,
+        "deafened": false,
+        "bonuses": [],
+        "notes": []
+      },
+      "tracking": null,
+      "gcTakingPermissionConfirmed": false,
+      "ambush": null,
+      "sneakAttackTarget": null,
+      "sneakAttack": null,
+      "ambientLight": {
+        "specified": false,
+        "skillModifier": 0,
+        "targetDefenseBonus": 0,
+        "notes": []
+      },
+      "nest": null,
+      "breakthrough": null,
+      "requiredBonusPoolId": null,
+      "requiredBonusSpent": false,
+      "cannotError": false,
+      "resultSource": "",
+      "opponentResult": null,
+      "oneInAMillion": false,
+      "tenSecondSolution": false,
+      "standaloneCheckConfirmed": false,
+      "forcedThreat": false,
+      "noForcedReroll": false,
+      "normalThreat": 0,
+      "rawTotal": 11,
+      "rolledTotal": 11,
+      "minimumAdjustment": 0,
+      "practiceMakesPerfect": false,
+      "criticalFailureCostIncrease": 0,
+      "crossCheck": false,
+      "alternatives": null,
+      "chosenIndex": 0,
+      "choiceSource": null,
+      "choiceResourceId": null,
+      "effectiveTotal": 11,
+      "actorUuid": "Actor.uaYP13uoGgjqHgpo",
+      "checkKind": "skill",
+      "ability": "cha",
+      "skillKey": "bureaucracy",
+      "checkId": "bribe",
+      "focus": "Bribe",
+      "rerollResources": [],
+      "formula": "10 + @total",
+      "rollData": {
+        "total": 1
+      },
+      "weaponUuid": "",
+      "weaponProficiency": "",
+      "weaponQualities": "",
+      "cleanAndPolished": false,
+      "gearUuid": "",
+      "gearAttempt": null,
+      "attackContext": null,
+      "unarmed": false,
+      "improvised": false,
+      "threat": 0,
+      "error": 0,
+      "cap": 15,
+      "baseFlavor": "Bureaucracy / Bribe Check (CHA)<br><small>Well-Funded: Bribe take 10 ignores the error-range restriction (p.198).                      Taking 10: 2× the listed time; no threat or action-die boost. 1 Full Action. Active. Crowd, Disposition. Rules p.121.</small>",
+      "boostTotal": 0,
+      "boostSpent": 0,
+      "capped": false,
+      "naturalDie": null,
+      "checkMethod": "take10",
+      "actionDiceAllowed": false,
+      "successConfirmed": null,
+      "errorConfirmed": false,
+      "threatConfirmed": false,
+      "triumphed": false
+    },
+    "cashReceipt": {
+      "actorUuid": "Actor.uaYP13uoGgjqHgpo",
+      "wellFunded": {
+        "id": "tkctQ1wvrP7av45b",
+        "version": 1,
+        "source": "Well-Funded",
+        "epoch": "qa-xp-cancel",
+        "wealth": 2,
+        "amount": 400,
+        "home": "Synthetic funded home",
+        "atHome": true,
+        "at": 126
+      }
+    },
+    "cleanup": {
+      "actors": 5,
+      "messages": 557,
+      "time": 126,
+      "effects": 0,
+      "combats": 0,
+      "locks": 0
+    }
+  }
+}

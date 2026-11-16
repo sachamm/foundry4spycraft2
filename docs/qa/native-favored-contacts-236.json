@@ -1,0 +1,2743 @@
+{
+  "actor": "IPxyxsHoevWRCntb",
+  "feat": "fn9rxtO50ALaapWd",
+  "basic": "W7OOkBw5RhJ0PIWr",
+  "family": [
+    {
+      "name": "Academic Contacts",
+      "basic": "Scholar",
+      "theme": "academic",
+      "feat": "XqriDXubY4y88W9s",
+      "checks": [
+        {
+          "id": "E32zxjE31pzk9t79",
+          "source": "Academic Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "W4E5W7Z4HUPdIsbU",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Academic Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "XqriDXubY4y88W9s",
+        "featAcquiredAtLevel": 3,
+        "theme": "academic",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "XqriDXubY4y88W9s",
+        "name": "Academic Contacts",
+        "primaryName": "Bob",
+        "theme": "academic",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Scholar\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Blue Collar Contacts",
+      "basic": "Speed Demon",
+      "theme": "vehicular",
+      "feat": "NJ8flEQEb5f5aXpY",
+      "checks": [
+        {
+          "id": "bqjIWnuhvydhXDIL",
+          "source": "Blue Collar Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "cO7kLKMvJlNGmPnh",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Blue Collar Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "NJ8flEQEb5f5aXpY",
+        "featAcquiredAtLevel": 3,
+        "theme": "vehicular",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "NJ8flEQEb5f5aXpY",
+        "name": "Blue Collar Contacts",
+        "primaryName": "Bob",
+        "theme": "vehicular",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Speed Demon\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Criminal Contacts",
+      "basic": "Burglar",
+      "theme": "criminal",
+      "feat": "0mmxI0ewiUBy68i2",
+      "checks": [
+        {
+          "id": "adC568SnkV2jJQnn",
+          "source": "Criminal Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "NyIjuUuX1eMBLKKX",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Criminal Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "0mmxI0ewiUBy68i2",
+        "featAcquiredAtLevel": 3,
+        "theme": "criminal",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "0mmxI0ewiUBy68i2",
+        "name": "Criminal Contacts",
+        "primaryName": "Bob",
+        "theme": "criminal",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Burglar\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Government Contacts",
+      "basic": "Diplomat",
+      "theme": "government",
+      "feat": "azA8nz2TZSWqQtSP",
+      "checks": [
+        {
+          "id": "IjsqJwTx1P1P6IWT",
+          "source": "Government Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 4
+        },
+        {
+          "id": "09MBbayBPrtkGVlL",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 4
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Government Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "azA8nz2TZSWqQtSP",
+        "featAcquiredAtLevel": 3,
+        "theme": "government",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "azA8nz2TZSWqQtSP",
+        "name": "Government Contacts",
+        "primaryName": "Bob",
+        "theme": "government",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Diplomat\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Grifter Contacts",
+      "basic": "Hustler",
+      "theme": "con artist",
+      "feat": "fRCcGp6MTgCTiXsN",
+      "checks": [
+        {
+          "id": "kUmSwp5hb9MyJsBz",
+          "source": "Grifter Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "6X40Hdl0yobjmpTt",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Grifter Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "fRCcGp6MTgCTiXsN",
+        "featAcquiredAtLevel": 3,
+        "theme": "con artist",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "fRCcGp6MTgCTiXsN",
+        "name": "Grifter Contacts",
+        "primaryName": "Bob",
+        "theme": "con artist",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Hustler\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "High-Tech Contacts",
+      "basic": "Techie",
+      "theme": "technological",
+      "feat": "Qsu1b42tNuhWkSgY",
+      "checks": [
+        {
+          "id": "rNBQ9P3JoDcxdNO0",
+          "source": "High-Tech Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "XHRcc14PoaVCgXn5",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "High-Tech Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "Qsu1b42tNuhWkSgY",
+        "featAcquiredAtLevel": 3,
+        "theme": "technological",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "Qsu1b42tNuhWkSgY",
+        "name": "High-Tech Contacts",
+        "primaryName": "Bob",
+        "theme": "technological",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Techie\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Local Contacts",
+      "basic": "World Traveler",
+      "theme": "traveling",
+      "feat": "W2SrTh1mq6W4B9m4",
+      "checks": [
+        {
+          "id": "MoyTFwswLJKIMTqO",
+          "source": "Local Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "KCPtuVBwILyLewY7",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Local Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "W2SrTh1mq6W4B9m4",
+        "featAcquiredAtLevel": 3,
+        "theme": "traveling",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "W2SrTh1mq6W4B9m4",
+        "name": "Local Contacts",
+        "primaryName": "Bob",
+        "theme": "traveling",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"World Traveler\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Media Contacts",
+      "basic": "Actor",
+      "theme": "media",
+      "feat": "dIuorXfj1EmTDYg3",
+      "checks": [
+        {
+          "id": "itlEzoL8hRzOeqSo",
+          "source": "Media Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "mYfCdRm3BlkwCRNA",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Media Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "dIuorXfj1EmTDYg3",
+        "featAcquiredAtLevel": 3,
+        "theme": "media",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "dIuorXfj1EmTDYg3",
+        "name": "Media Contacts",
+        "primaryName": "Bob",
+        "theme": "media",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Actor\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Medical Contacts",
+      "basic": "Examiner",
+      "theme": "medical",
+      "feat": "TlMDjSnPWgA2QzfA",
+      "checks": [
+        {
+          "id": "GnqGgz40gw0mHlUo",
+          "source": "Medical Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "eONnAqRwcvcP8c7s",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Medical Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "TlMDjSnPWgA2QzfA",
+        "featAcquiredAtLevel": 3,
+        "theme": "medical",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "TlMDjSnPWgA2QzfA",
+        "name": "Medical Contacts",
+        "primaryName": "Bob",
+        "theme": "medical",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Examiner\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Military Contacts",
+      "basic": "Officer",
+      "theme": "military",
+      "feat": "CP5ThyQULaYidec6",
+      "checks": [
+        {
+          "id": "KTPBi23LaHSh5v8J",
+          "source": "Military Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "5hisKkhWebuw1Slr",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Military Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "CP5ThyQULaYidec6",
+        "featAcquiredAtLevel": 3,
+        "theme": "military",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "CP5ThyQULaYidec6",
+        "name": "Military Contacts",
+        "primaryName": "Bob",
+        "theme": "military",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Officer\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Police Contacts",
+      "basic": "Private Eye",
+      "theme": "security",
+      "feat": "Y4ewhSJsITU82tly",
+      "checks": [
+        {
+          "id": "BAFtuXmU5BaWrkVC",
+          "source": "Police Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "VpRjcrIDlnr9bizL",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Police Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "Y4ewhSJsITU82tly",
+        "featAcquiredAtLevel": 3,
+        "theme": "security",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "Y4ewhSJsITU82tly",
+        "name": "Police Contacts",
+        "primaryName": "Bob",
+        "theme": "security",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Private Eye\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Research Contacts",
+      "basic": "Observer",
+      "theme": "librarian",
+      "feat": "4nNwesVERwTxcrIb",
+      "checks": [
+        {
+          "id": "UHCN7JWSubtpQrHW",
+          "source": "Research Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "Os1Wh8FdPBfVcqdz",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Research Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "4nNwesVERwTxcrIb",
+        "featAcquiredAtLevel": 3,
+        "theme": "librarian",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "4nNwesVERwTxcrIb",
+        "name": "Research Contacts",
+        "primaryName": "Bob",
+        "theme": "librarian",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Observer\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Street Contacts",
+      "basic": "Fence",
+      "theme": "street",
+      "feat": "LhGpSdl5jpHJ8Ayq",
+      "checks": [
+        {
+          "id": "7mSOkqdhOQMMkEnK",
+          "source": "Street Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "eFNaoNuYTTE204Ss",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Street Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "LhGpSdl5jpHJ8Ayq",
+        "featAcquiredAtLevel": 3,
+        "theme": "street",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "LhGpSdl5jpHJ8Ayq",
+        "name": "Street Contacts",
+        "primaryName": "Bob",
+        "theme": "street",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Fence\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "White Collar Contacts",
+      "basic": "Advisor",
+      "theme": "business",
+      "feat": "2taL5vlBO2I9wIbO",
+      "checks": [
+        {
+          "id": "Eg9tgGVCVqFVGrrS",
+          "source": "White Collar Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "4ZwlyMi7fSOrWpB8",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "White Collar Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "2taL5vlBO2I9wIbO",
+        "featAcquiredAtLevel": 3,
+        "theme": "business",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "2taL5vlBO2I9wIbO",
+        "name": "White Collar Contacts",
+        "primaryName": "Bob",
+        "theme": "business",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Advisor\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    },
+    {
+      "name": "Wilderness Contacts",
+      "basic": "Survivalist",
+      "theme": "wilderness",
+      "feat": "fn9rxtO50ALaapWd",
+      "checks": [
+        {
+          "id": "RJvvDoOgDMvQbYIa",
+          "source": "Wilderness Contacts",
+          "contact": "Bob",
+          "error": 1,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          },
+          "total": 2
+        },
+        {
+          "id": "DnejkKlEargo3lTt",
+          "source": null,
+          "contact": "Claire",
+          "error": 3,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 4,
+        "used": 4,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Wilderness Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "fn9rxtO50ALaapWd",
+        "featAcquiredAtLevel": 3,
+        "theme": "wilderness",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      },
+      "primary": {
+        "id": "fn9rxtO50ALaapWd",
+        "name": "Wilderness Contacts",
+        "primaryName": "Bob",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "mode": "improve",
+        "acquiredAtLevel": 3,
+        "credit": 1,
+        "minimumGrade": 2,
+        "valid": true,
+        "reason": "",
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        }
+      },
+      "history": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      }
+    }
+  ],
+  "combined": {
+    "scopeOnly": true,
+    "checks": [
+      {
+        "id": "dIe3B0IN07J1pxxu",
+        "error": 0,
+        "context": {
+          "version": 1,
+          "contact": {
+            "name": "Bob",
+            "rank": 3,
+            "notes": "Existing acquaintance, before this feat"
+          },
+          "source": "Academic Contacts + Wilderness Contacts",
+          "careerLevel": 4,
+          "threatLevel": 5,
+          "missionComparison": "higher",
+          "dc": 25,
+          "baseSummonSeconds": 1200,
+          "errorIncrease": 3,
+          "minimumError": 0,
+          "response": {
+            "formula": "2d6",
+            "unit": "hours",
+            "missionMultiplier": 2,
+            "afterSuccessfulCheck": true
+          },
+          "featId": "FYWpJdARJSSLM7uF",
+          "theme": "Matching GC-approved combined theme",
+          "themeConfirmed": true,
+          "grantMode": "combined",
+          "sources": [
+            {
+              "id": "FYWpJdARJSSLM7uF",
+              "name": "Academic Contacts",
+              "theme": "Matching GC-approved combined theme",
+              "mode": "improve",
+              "credit": 1
+            },
+            {
+              "id": "fn9rxtO50ALaapWd",
+              "name": "Wilderness Contacts",
+              "theme": "wilderness",
+              "mode": "improve",
+              "credit": 1
+            }
+          ],
+          "errorReduction": 4,
+          "requiredSeconds": 600,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          }
+        }
+      },
+      {
+        "id": "C5UxhYsieKak6CLu",
+        "error": 0,
+        "context": {
+          "version": 1,
+          "contact": {
+            "name": "Bob",
+            "rank": 4,
+            "notes": "Existing acquaintance, before this feat"
+          },
+          "source": "Academic Contacts + Medical Contacts + Wilderness Contacts",
+          "careerLevel": 4,
+          "threatLevel": 5,
+          "missionComparison": "higher",
+          "dc": 20,
+          "baseSummonSeconds": 120,
+          "errorIncrease": 2,
+          "minimumError": 0,
+          "response": {
+            "formula": "1d6",
+            "unit": "hours",
+            "missionMultiplier": 2,
+            "afterSuccessfulCheck": true
+          },
+          "featId": "FYWpJdARJSSLM7uF",
+          "theme": "Matching GC-approved combined theme",
+          "themeConfirmed": true,
+          "grantMode": "combined",
+          "sources": [
+            {
+              "id": "FYWpJdARJSSLM7uF",
+              "name": "Academic Contacts",
+              "theme": "Matching GC-approved combined theme",
+              "mode": "improve",
+              "credit": 1
+            },
+            {
+              "id": "uvS7aTKoush6EeVE",
+              "name": "Medical Contacts",
+              "theme": "Matching GC-approved combined theme",
+              "mode": "improve",
+              "credit": 1
+            },
+            {
+              "id": "fn9rxtO50ALaapWd",
+              "name": "Wilderness Contacts",
+              "theme": "wilderness",
+              "mode": "improve",
+              "credit": 1
+            }
+          ],
+          "errorReduction": 6,
+          "requiredSeconds": 60,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          }
+        }
+      },
+      {
+        "id": "itBLjxmKLODzBl1s",
+        "error": 0,
+        "context": {
+          "version": 1,
+          "contact": {
+            "name": "Claire",
+            "rank": 3,
+            "notes": ""
+          },
+          "source": "Academic Contacts",
+          "careerLevel": 4,
+          "threatLevel": 4,
+          "missionComparison": "equal",
+          "dc": 20,
+          "baseSummonSeconds": 600,
+          "errorIncrease": 1,
+          "minimumError": 0,
+          "response": {
+            "formula": "2d6",
+            "unit": "hours",
+            "missionMultiplier": 1,
+            "afterSuccessfulCheck": true
+          },
+          "featId": "FYWpJdARJSSLM7uF",
+          "theme": "Matching GC-approved combined theme",
+          "themeConfirmed": true,
+          "grantMode": "improve",
+          "errorReduction": 2,
+          "requiredSeconds": 300,
+          "timing": {
+            "applied": true,
+            "source": "contactFeat",
+            "multiplier": 0.5,
+            "rounding": "down"
+          }
+        }
+      }
+    ],
+    "cap": {
+      "evaluated": 0,
+      "posted": 0,
+      "validGrants": 0
+    },
+    "guard": {
+      "evaluated": 1,
+      "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+      "posted": 0
+    }
+  },
+  "uiHistory": {
+    "featId": "fn9rxtO50ALaapWd",
+    "before": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+      "manual": true
+    },
+    "afterEdit": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+      "manual": true
+    },
+    "afterConfirm": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+      "manual": true
+    }
+  },
+  "checks": [
+    {
+      "id": "E32zxjE31pzk9t79",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Academic Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "XqriDXubY4y88W9s",
+        "theme": "academic",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "W4E5W7Z4HUPdIsbU",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "bqjIWnuhvydhXDIL",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Blue Collar Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "NJ8flEQEb5f5aXpY",
+        "theme": "vehicular",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "cO7kLKMvJlNGmPnh",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "adC568SnkV2jJQnn",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Criminal Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "0mmxI0ewiUBy68i2",
+        "theme": "criminal",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "NyIjuUuX1eMBLKKX",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "IjsqJwTx1P1P6IWT",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Government Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "azA8nz2TZSWqQtSP",
+        "theme": "government",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "09MBbayBPrtkGVlL",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "kUmSwp5hb9MyJsBz",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Grifter Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "fRCcGp6MTgCTiXsN",
+        "theme": "con artist",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "6X40Hdl0yobjmpTt",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "rNBQ9P3JoDcxdNO0",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "High-Tech Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "Qsu1b42tNuhWkSgY",
+        "theme": "technological",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "XHRcc14PoaVCgXn5",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "MoyTFwswLJKIMTqO",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Local Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "W2SrTh1mq6W4B9m4",
+        "theme": "traveling",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "KCPtuVBwILyLewY7",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "itlEzoL8hRzOeqSo",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Media Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "dIuorXfj1EmTDYg3",
+        "theme": "media",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "mYfCdRm3BlkwCRNA",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "GnqGgz40gw0mHlUo",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Medical Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "TlMDjSnPWgA2QzfA",
+        "theme": "medical",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "eONnAqRwcvcP8c7s",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "KTPBi23LaHSh5v8J",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Military Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "CP5ThyQULaYidec6",
+        "theme": "military",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "5hisKkhWebuw1Slr",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "BAFtuXmU5BaWrkVC",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Police Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "Y4ewhSJsITU82tly",
+        "theme": "security",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "VpRjcrIDlnr9bizL",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "UHCN7JWSubtpQrHW",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Research Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "4nNwesVERwTxcrIb",
+        "theme": "librarian",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "Os1Wh8FdPBfVcqdz",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "7mSOkqdhOQMMkEnK",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Street Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "LhGpSdl5jpHJ8Ayq",
+        "theme": "street",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "eFNaoNuYTTE204Ss",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "Eg9tgGVCVqFVGrrS",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "White Collar Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "2taL5vlBO2I9wIbO",
+        "theme": "business",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "4ZwlyMi7fSOrWpB8",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "RJvvDoOgDMvQbYIa",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 2,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "fn9rxtO50ALaapWd",
+        "theme": "wilderness",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 900,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      },
+      "error": 1
+    },
+    {
+      "id": "DnejkKlEargo3lTt",
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 2,
+          "notes": ""
+        },
+        "source": null,
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 25,
+        "baseSummonSeconds": 1800,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "3d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "errorReduction": 0,
+        "requiredSeconds": 1800,
+        "timing": {
+          "applied": false,
+          "source": "none",
+          "multiplier": 1,
+          "rounding": null
+        }
+      },
+      "error": 3
+    },
+    {
+      "id": "dIe3B0IN07J1pxxu",
+      "error": 0,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 3,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Academic Contacts + Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 5,
+        "missionComparison": "higher",
+        "dc": 25,
+        "baseSummonSeconds": 1200,
+        "errorIncrease": 3,
+        "minimumError": 0,
+        "response": {
+          "formula": "2d6",
+          "unit": "hours",
+          "missionMultiplier": 2,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "FYWpJdARJSSLM7uF",
+        "theme": "Matching GC-approved combined theme",
+        "themeConfirmed": true,
+        "grantMode": "combined",
+        "sources": [
+          {
+            "id": "FYWpJdARJSSLM7uF",
+            "name": "Academic Contacts",
+            "theme": "Matching GC-approved combined theme",
+            "mode": "improve",
+            "credit": 1
+          },
+          {
+            "id": "fn9rxtO50ALaapWd",
+            "name": "Wilderness Contacts",
+            "theme": "wilderness",
+            "mode": "improve",
+            "credit": 1
+          }
+        ],
+        "errorReduction": 4,
+        "requiredSeconds": 600,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "C5UxhYsieKak6CLu",
+      "error": 0,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Bob",
+          "rank": 4,
+          "notes": "Existing acquaintance, before this feat"
+        },
+        "source": "Academic Contacts + Medical Contacts + Wilderness Contacts",
+        "careerLevel": 4,
+        "threatLevel": 5,
+        "missionComparison": "higher",
+        "dc": 20,
+        "baseSummonSeconds": 120,
+        "errorIncrease": 2,
+        "minimumError": 0,
+        "response": {
+          "formula": "1d6",
+          "unit": "hours",
+          "missionMultiplier": 2,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "FYWpJdARJSSLM7uF",
+        "theme": "Matching GC-approved combined theme",
+        "themeConfirmed": true,
+        "grantMode": "combined",
+        "sources": [
+          {
+            "id": "FYWpJdARJSSLM7uF",
+            "name": "Academic Contacts",
+            "theme": "Matching GC-approved combined theme",
+            "mode": "improve",
+            "credit": 1
+          },
+          {
+            "id": "uvS7aTKoush6EeVE",
+            "name": "Medical Contacts",
+            "theme": "Matching GC-approved combined theme",
+            "mode": "improve",
+            "credit": 1
+          },
+          {
+            "id": "fn9rxtO50ALaapWd",
+            "name": "Wilderness Contacts",
+            "theme": "wilderness",
+            "mode": "improve",
+            "credit": 1
+          }
+        ],
+        "errorReduction": 6,
+        "requiredSeconds": 60,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    },
+    {
+      "id": "itBLjxmKLODzBl1s",
+      "error": 0,
+      "context": {
+        "version": 1,
+        "contact": {
+          "name": "Claire",
+          "rank": 3,
+          "notes": ""
+        },
+        "source": "Academic Contacts",
+        "careerLevel": 4,
+        "threatLevel": 4,
+        "missionComparison": "equal",
+        "dc": 20,
+        "baseSummonSeconds": 600,
+        "errorIncrease": 1,
+        "minimumError": 0,
+        "response": {
+          "formula": "2d6",
+          "unit": "hours",
+          "missionMultiplier": 1,
+          "afterSuccessfulCheck": true
+        },
+        "featId": "FYWpJdARJSSLM7uF",
+        "theme": "Matching GC-approved combined theme",
+        "themeConfirmed": true,
+        "grantMode": "improve",
+        "errorReduction": 2,
+        "requiredSeconds": 300,
+        "timing": {
+          "applied": true,
+          "source": "contactFeat",
+          "multiplier": 0.5,
+          "rounding": "down"
+        }
+      }
+    }
+  ],
+  "contacts": [
+    {
+      "name": "Bob",
+      "rank": 2,
+      "notes": "Existing acquaintance, before this feat",
+      "networkingMilestone": 0,
+      "networkingFeat": "",
+      "networkingTheme": "",
+      "networkingFeatConfirmed": false
+    },
+    {
+      "name": "Claire",
+      "rank": 2,
+      "notes": "",
+      "networkingMilestone": 4,
+      "networkingFeat": "Wilderness Contacts",
+      "networkingTheme": "wilderness",
+      "networkingFeatConfirmed": true
+    }
+  ],
+  "progression": [
+    {
+      "classId": "soldier",
+      "vitality": 6,
+      "careerEntryId": "",
+      "vitalityRollId": "",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 4,
+        "drive": 2,
+        "intimidate": 4,
+        "notice": 4,
+        "resolve": 4,
+        "networking": 6
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 7,
+      "careerEntryId": "pgwPrY50jd30yA0Y",
+      "vitalityRollId": "r3rZQUTXMF32JTCF",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 1,
+        "drive": 3,
+        "intimidate": 1,
+        "notice": 1
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 12,
+      "careerEntryId": "Y1TuQxhHmOIH0d1T",
+      "vitalityRollId": "4NkjRB9EQRQfA0ib",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 1,
+        "drive": 1,
+        "intimidate": 1,
+        "notice": 1,
+        "profession": 2
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 1,
+      "careerEntryId": "WU3jmbh7PuTi0crq",
+      "vitalityRollId": "F74KMEMGPPi69kmv",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "networking": 2,
+        "athletics": 1,
+        "drive": 1,
+        "intimidate": 1,
+        "notice": 1
+      }
+    }
+  ],
+  "history": {
+    "ok": true,
+    "unmet": [],
+    "level": 3,
+    "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+    "manual": true
+  },
+  "source": {
+    "name": "Wilderness Contacts",
+    "type": "feat",
+    "img": "icons/svg/combat.svg",
+    "system": {
+      "description": "<p>Gain an associate-grade contact with a wilderness background; Networking calls to them take half the time and are less error-prone.</p>",
+      "source": "Spycraft 2.0 (summary)",
+      "tree": "style",
+      "prerequisites": {
+        "type": "all",
+        "of": [
+          {
+            "type": "skill",
+            "key": "networking",
+            "min": 3
+          },
+          {
+            "type": "feat",
+            "name": "Survivalist"
+          }
+        ]
+      },
+      "prerequisitesNotChecked": false,
+      "ranks": 1,
+      "granted": false,
+      "grantSource": "",
+      "repeatable": false,
+      "maxSelections": 0,
+      "bonuses": [],
+      "temporaryGrant": null,
+      "featKind": "permanent",
+      "choice": "Bob",
+      "contactGrantMode": "improve",
+      "contactTheme": "Wilderness guide",
+      "contactThemeConfirmed": true,
+      "restrictions": "",
+      "trainingSkills": {},
+      "focusChoices": [],
+      "manualPrerequisitesConfirmed": false,
+      "acquisitionSource": "",
+      "acquisitionCheck": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+        "manual": true
+      },
+      "historicalPrerequisitesConfirmed": true,
+      "acquiredAtLevel": 3
+    },
+    "effects": [],
+    "folder": "78DQIgjJMAHeW2Za",
+    "sort": 294,
+    "ownership": {
+      "default": 0,
+      "WW1y27MJMt1sWfHr": 3
+    },
+    "flags": {},
+    "_stats": {
+      "coreVersion": "14.370",
+      "systemId": "spycraft2",
+      "systemVersion": "0.3.1",
+      "createdTime": 1794792066083,
+      "modifiedTime": 1794792323507,
+      "lastModifiedBy": "WW1y27MJMt1sWfHr",
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null
+    },
+    "_id": "fn9rxtO50ALaapWd"
+  },
+  "picks": {
+    "available": 4,
+    "used": 4,
+    "remaining": 0
+  }
+}

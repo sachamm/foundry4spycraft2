@@ -1,0 +1,482 @@
+[
+  {
+    "name": "Appraisal Kit I",
+    "kitType": "Appraisal Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 5.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Lighted magnifying glass, jeweler’s loupe, tweezers, calipers, tape measure, UV flashlight (for detecting repairs and cracks), magnet (to test metals), sketch pad and pencils, linen and latex gloves."
+  },
+  {
+    "name": "Appraisal Kit II",
+    "kitType": "Appraisal Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 20.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Appraisal kit I + digital scale, high-intensity halogen lamp, black and white drop cloths (for a neutral photographic background), insulated airtight storage bags, auction catalogues (CD-ROM or hardcopy, for estimating relative values)."
+  },
+  {
+    "name": "Appraisal Kit III",
+    "kitType": "Appraisal Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": null,
+    "nonPortable": true,
+    "sourcePage": 213,
+    "contents": "Appraisal kit II + microscope, spectrometer, nitrogen atmosphere storage case, illustrated art history textbooks (CD-ROM or hardcopy)."
+  },
+  {
+    "name": "Architect’s Kit I",
+    "kitType": "Architect’s Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 6.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Drafter’s sketchbook, vellum tablet, protractor, aluminum color-coded triangular scale, compass and bow dividers, straightedges of various lengths, clear plastic triangles of various sizes, various pencils, pens, and erasers, shading tools."
+  },
+  {
+    "name": "Architect’s Kit II",
+    "kitType": "Architect’s Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 60.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Architect’s kit I + drafting table with angling arm lamp, large white board with integral fullwidth straightedge."
+  },
+  {
+    "name": "Architect’s Kit III",
+    "kitType": "Architect’s Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 100.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Architect’s kit II + CAD software (CD-ROM), laser printer, airbrusher, model building supplies (foam-core board, cutting and edging tools, and props like tiny trees and mirror pieces)."
+  },
+  {
+    "name": "Authentication Kit I",
+    "kitType": "Authentication Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 10.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Hand-held microscope, magnifying glass, personal standard and black lights, infrared viewer."
+  },
+  {
+    "name": "Authentication Kit II",
+    "kitType": "Authentication Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 75.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Authentication kit I + document scanner, chemical analyzer, 3D modeling and comparison software, signature analysis software (CD-ROM)."
+  },
+  {
+    "name": "Authentication Kit III",
+    "kitType": "Authentication Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": null,
+    "nonPortable": true,
+    "sourcePage": 213,
+    "contents": "Authentication kit II + video spectral comparator (with built-in microscope, video camera, and high-resolution color printer), back-illuminated comparison table."
+  },
+  {
+    "name": "Chemistry Kit I",
+    "kitType": "Chemistry Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 30.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Personal microscope, scale, test tube stand, analytical and precision balances, multiple variousvolume beakers and styrene cylinders, alcohol lamp, digital multimeter, 12-in. thermometer, ten shallow 4-in. dishes, plastic funnel, legal chemical samples."
+  },
+  {
+    "name": "Chemistry Kit II",
+    "kitType": "Chemistry Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 75.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Chemistry kit I + professional burner, professional microscope with integral camera, ultraviolet examination lamp, personal centrifuge, water bath, flash evaporator, licensed chemical samples."
+  },
+  {
+    "name": "Chemistry Kit III",
+    "kitType": "Chemistry Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": null,
+    "nonPortable": true,
+    "sourcePage": 213,
+    "contents": "Chemistry kit II + wide-angle dissection microscope, electric muffle furnace, draft and vacuum ovens, chromatogram viewer, professional centrifuge, illegal chemical samples."
+  },
+  {
+    "name": "Cleaner Kit I",
+    "kitType": "Cleaner Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 10.0,
+    "nonPortable": false,
+    "sourcePage": 213,
+    "contents": "Jumpsuit, painter’s drop cloth, paper towels, trash bags, commercial cleaning chemicals, latex gloves, cable ties, duct tape, super glue, cigarette lighter, pinescented over cleaner spray (to remove fingerprints), spray bottle of ammonia solution (to destroy DNA evidence in blood)."
+  },
+  {
+    "name": "Cleaner Kit II",
+    "kitType": "Cleaner Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 30.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Cleaner kit I + police scanner, entrenching tool, carpet knife, body bags, baling wire, tear gas powder (to prevent animals from digging up evidence), crowbar, handheld vacuum cleaner, gasoline, road flares, map of local landfills and HAZMAT dump sites, USB flash drive with virus-infected software."
+  },
+  {
+    "name": "Cleaner Kit III",
+    "kitType": "Cleaner Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 75.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Cleaner kit II + chainsaw, hacksaw, high-concentration nitric acid, charcoal briquettes, illegal drugs (false evidence), melee weapon linked to an unrelated local crime (more false evidence), chemical fire extinguisher, portable shower."
+  },
+  {
+    "name": "Climbing Kit I",
+    "kitType": "Climbing Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 15.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Backpack or butt-pack, rope (150 ft., rated for 1,200 lb.), wristwatch altimeter, backpack, climbing harness, leather gloves and finger tape, rock shoes or strap-on foot spikes, carabiners, various markers."
+  },
+  {
+    "name": "Climbing Kit II",
+    "kitType": "Climbing Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 30.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Climbing kit I + belayers, cams, quickdraws, ascenders, cordlettes, chalk bag, pitons and hammer, crampons, ice axe and boots."
+  },
+  {
+    "name": "Climbing Kit III",
+    "kitType": "Climbing Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 180.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Climbing kit II contents for a team of 6."
+  },
+  {
+    "name": "Construction Kit I",
+    "kitType": "Construction Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 50.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Sledgehammer, power drill, power saw, nail gun, chalking gun, shovel, hard hat, work gloves, safety goggles, tool belt, trowel, steel-toe boots, stud finder, duct tape, sand paper, tape measure, and building supplies (cement and drywall mix, lumber, glass, and so on, as needed), paint and painting supplies (brushes, mixing tins, etc.), Do-It-Yourself handbook."
+  },
+  {
+    "name": "Construction Kit II",
+    "kitType": "Construction Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 500.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Construction kit I + drill press, grinder, lathe, table saw, sawhorse, cutting torch, shop vacuum cleaner."
+  },
+  {
+    "name": "Construction Kit III",
+    "kitType": "Construction Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 2000.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Construction kit II + mini-bulldozer, cement mixer, portable generator, two-wheel transport trailer (for use with any non-personal ground vehicle)."
+  },
+  {
+    "name": "Demolitions Kit I",
+    "kitType": "Demolitions Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 5.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Dentist’s mirror, non-conductive simple tools (sticks, tweezers, dull blades), wire crimper/cutter/stripper, needle-nose pliers, folding knife, cigarette lighter or waterproof matches, tape (duct, masking, and electrical), grease pencils, chem lights, flashlight, good-luck charm."
+  },
+  {
+    "name": "Demolitions Kit II",
+    "kitType": "Demolitions Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 40.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Demolitions kit I + hand-held blasting machine, blasting caps (10 each electric and non-electric), electrical wire (500 ft.), non-electric fuse (500 ft.), marker flags."
+  },
+  {
+    "name": "Demolitions Kit III",
+    "kitType": "Demolitions Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 60.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Demolitions kit II + fiberoptic probe, spectrometer, Geiger counter, miscellaneous hand tools, explosives reference manuals (CD-ROM or hardcopy)."
+  },
+  {
+    "name": "Disguise Kit I",
+    "kitType": "Disguise Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 20.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Makeup base (flesh tones, shadows, highlights, rouge, etc.), pigments, makeup binding compound (to prevent sweating off of the disguise), putty and liquid latex compound (for sculpting scars, boils, warts, etc.), spirit gum adhesive, clear adhesive surgical tape, assorted fake facial hair, makeup brushes and sponges, facial cleanser, general personal grooming items (hairbrush, comb, toothbrush, nail clippers, tweezers, razor), lighted makeup mirror."
+  },
+  {
+    "name": "Disguise Kit II",
+    "kitType": "Disguise Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 35.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Disguise kit I + 2 or 3 changes of light street clothing, colored contact lenses, wigs, incidental props (eye patches, gold teeth, glasses, etc.), hair net or bandanna, soap and hand towels, hair dyes and colors (whitener, highlights, etc.)."
+  },
+  {
+    "name": "Disguise Kit III",
+    "kitType": "Disguise Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 50.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Disguise kit II + wound and deformity prostheses with fake blood, full-face latex mask molds, detailed photographic records of potential subjects, minor props (canes, height-altering shoes, etc.), digital photo makeover software."
+  },
+  {
+    "name": "Electronics Kit I",
+    "kitType": "Electronics Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 20.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Wire crimper/cutter/stripper, screwdrivers (assorted small sizes), needle-nose pliers, soldering iron and roll of solder, electrical tape, epoxy glue, voltage meter, circuit tester, compressed air duster, wire (varying lengths and widths), assorted spare components (resistors, capacitors, screws, LEDs, etc.), assorted spare batteries, pocket reference of component color codes and mathematical conversions."
+  },
+  {
+    "name": "Electronics Kit II",
+    "kitType": "Electronics Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 200.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Electronics kit I + electrostatic mat, de-soldering iron/vacuum, personal oscilloscope, signal generator, table arm lamp with magnifying glass, common schematic manuals."
+  },
+  {
+    "name": "Electronics Kit III",
+    "kitType": "Electronics Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": null,
+    "nonPortable": true,
+    "sourcePage": 214,
+    "contents": "Electronics kit II + 2-person clean room, EPROM burner, oscilloscope, microscope, RF meter."
+  },
+  {
+    "name": "First Aid Kit I",
+    "kitType": "First Aid Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 5.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Adhesive bandages (various shapes and sizes), gauze (pads and rolls), elastic compress bandages, blister pads, wooden splints, tourniquets, latex gloves, thermometer, tweezers, razor blades, safety pins, cotton swabs (dry and alcohol-saturated), antibacterial soap, antiseptic solution, antibiotic cream, surgical tape, painkiller pills, antihistamine pills, antacid pills, salt tablets."
+  },
+  {
+    "name": "First Aid Kit II",
+    "kitType": "First Aid Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 20.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "First Aid kit I + CPR mask, stethoscope, shears, forceps, surgical needles and roll of suturing thread, burn gel, sedative pills, folding stretcher, antivenin solution, disposable syringes, blankets, stuffed animal, medical reporting forms and waterproof marker."
+  },
+  {
+    "name": "First Aid Kit III",
+    "kitType": "First Aid Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 80.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "First Aid kit II + portable defibrillator, intravenous blood expander and fluid packs, oxygen tank and mask, backboard, cervical collar, local anaesthetic solution, field surgical tools (treat as a Surgery Kit I)."
+  },
+  {
+    "name": "Forensics Kit I",
+    "kitType": "Forensics Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 10.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Latex gloves, plastic safety goggles, filter masks, chalk, pens, permanent markers, marking paint, calculator, distilled water, ballistic probes, protractor and compass, laser pointer, scalpel, box cutter, scissors, magnifying glass, hand mirror, thermometer, tweezers, ruler, tape measure, glass vials with rubber stoppers, microscope slides and slide protectors, plastic baggies (various sizes), tape (clear, masking, colored, and crime scene barricade), colored string, disinfectant solution, sterile gauze and swabs, sexual assault evidence supplies, fingerprint tools (powders, brushes, glue, lift cards, measurement scale), blank forms (incident report, search authorization, consent), sketch paper pad, flashlight."
+  },
+  {
+    "name": "Forensics Kit II",
+    "kitType": "Forensics Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 20.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Forensics kit I + plastic tarp (to protect evidence from weather), gunshot and blood residue testing chemicals, narcotics test reagents, paper towels, garbage bags, ethanol, hand-held vacuum cleaner, UV flashlight."
+  },
+  {
+    "name": "Forensics Kit III",
+    "kitType": "Forensics Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 50.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Forensics kit II + coveralls, microscope, metal detector, casting kit (plaster mixes), wet-dry shop vacuum, portable floodlights, ballistic penetration probes, keyhole saw, forensics software (ballistic trajectory reconstruction, blood splatter calculation)."
+  },
+  {
+    "name": "Forgery Kit I",
+    "kitType": "Forgery Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 15.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Fine-edge knife set, ink pads with various inks, blank stamps, colored pens, paint and fine brushes, stencils, magnifying glass, disposable camera, scale, calipers, tweezers, fine-grain sandpaper."
+  },
+  {
+    "name": "Forgery Kit II",
+    "kitType": "Forgery Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 30.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Forgery kit I + document scanner, laminator, foil press, shrink wrapper, table arm lamp with magnifying glass, holographic film, currency/document manual, display case."
+  },
+  {
+    "name": "Forgery Kit III",
+    "kitType": "Forgery Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 400.0,
+    "nonPortable": false,
+    "sourcePage": 214,
+    "contents": "Forgery kit II + personal printing press, casting supplies and various molding materials (plaster, plastic, etc.)."
+  },
+  {
+    "name": "Lockpicking Kit I",
+    "kitType": "Lockpicking Kit",
+    "grade": 1,
+    "size": "Tiny",
+    "weight": 1.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Picks and shims (assorted sizes and shapes), tweezers, stethoscope, screwdrivers (assorted small sizes), penlight."
+  },
+  {
+    "name": "Lockpicking Kit II",
+    "kitType": "Lockpicking Kit",
+    "grade": 2,
+    "size": "Small",
+    "weight": 25.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Lockpicking kit I + slim jim auto entry tools, keyhole saw, glass cutter, power drill, ball-peen hammer, metal files, stethoscope."
+  },
+  {
+    "name": "Lockpicking Kit III",
+    "kitType": "Lockpicking Kit",
+    "grade": 3,
+    "size": "Medium",
+    "weight": 150.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Lockpicking kit II + key blanks, key grinder, lock samples (for practice, disassembly, and analysis), fiber optic probe, library of lock manufacturers’ catalogues."
+  },
+  {
+    "name": "Mechanics Kit I",
+    "kitType": "Mechanics Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 30.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Tool box, car jack, screwdrivers (assorted sizes), wrenches (assorted sizes), socket set, pliers (regular and needle-nose), metal file, hammer, measuring tape, flashlight, pressure gauge, waterproof markers, baling wire, epoxy glue, tape (duct, masking, and electrical), machine oil, wax, work gloves, safety goggles, professional solvents/cleaners, rubber gaskets, tarp, electrical wires and tubing, clamps, tap and die set, jerry can with 1 hour’s fuel."
+  },
+  {
+    "name": "Mechanics Kit II",
+    "kitType": "Mechanics Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 100.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Toolkit I + diagnostic machine, timing light, electric drill, hacksaw, shop lights, hot glue gun, air blower, crowbar, snake light, paint sprayer."
+  },
+  {
+    "name": "Mechanics Kit III",
+    "kitType": "Mechanics Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 4000.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Toolkit II + 1-ton crane, hydraulic car lift, bench lathe, bench vise, rotary saw, welding torch, air compressor, angle grinder, block and tackle."
+  },
+  {
+    "name": "Surgery Kit I",
+    "kitType": "Surgery Kit",
+    "grade": 1,
+    "size": "Small",
+    "weight": 15.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Latex gloves, surgical scissors, scalpels and extra blades, surgical needles and suturing thread, forceps, disposable syringes, gauze (pads and rolls), sponges, surgical tape, cotton swabs (dry and alcohol-saturated), disinfectant solution, sedative pills, head-mounted flashlight."
+  },
+  {
+    "name": "Surgery Kit II",
+    "kitType": "Surgery Kit",
+    "grade": 2,
+    "size": "Medium",
+    "weight": 25.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Surgery kit I + surgical masks, sterile draping cloth, plastic safety goggles, surgical staple gun, local anesthetic (injected), antibiotics (injected), blood coagulant solution, suction bulb, clamps, intravenous blood expander and fluid packs."
+  },
+  {
+    "name": "Surgery Kit III",
+    "kitType": "Surgery Kit",
+    "grade": 3,
+    "size": "Large",
+    "weight": 200.0,
+    "nonPortable": false,
+    "sourcePage": 215,
+    "contents": "Surgery kit II + rib spreader, bone saws, heart monitor, defibrillator, intravenous blood packs, anesthesia tank and mask, oxygen tank and mask."
+  }
+]

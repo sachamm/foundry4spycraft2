@@ -1,0 +1,449 @@
+{
+  "batch": 263,
+  "source": "Optional error activation p.62; Complex Tasks pp.99–100",
+  "actor": "oIKSewfXp05LJqKy",
+  "rolls": [
+    9,
+    7
+  ],
+  "checks": [],
+  "combats": [],
+  "feat": "OpZqmFGh1bLurFUo",
+  "baseline": {
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "analysis": 6
+  },
+  "task": "task_ag9iTxxBSYmsAvja",
+  "attempts": 22,
+  "message": "ChatMessage.K38feGcCrgmP5QDK",
+  "blocked": "The GC must confirm opponents declined error activation, or finish activating the critical failure first.",
+  "confirmation": {
+    "x": 500,
+    "y": 582,
+    "width": 366,
+    "height": 40
+  },
+  "receipt": {
+    "analysisTask": {
+      "version": 1,
+      "id": "task_ag9iTxxBSYmsAvja",
+      "revision": 0,
+      "completed": 0,
+      "baseChallenges": 4,
+      "requiredChallenges": 2,
+      "forensicGenius": true,
+      "skillKey": "analysis",
+      "checkId": "appraise",
+      "completedAt": 126
+    },
+    "forensicGenius": {
+      "version": 1,
+      "source": "Forensic Genius",
+      "skillKey": "analysis",
+      "checkId": "appraise",
+      "analysisRanks": 6,
+      "challenges": {
+        "base": 4,
+        "required": 2,
+        "reduction": 2
+      },
+      "selectedSynergy": {
+        "skill": "falsify",
+        "value": 0
+      },
+      "totalSynergy": 0
+    },
+    "closedCourseFeat": null,
+    "wheelFeat": null,
+    "requestBenefit": null,
+    "rerollSource": null,
+    "practiceFeat": null,
+    "fundedTaking": null,
+    "gearAllowance": null,
+    "gearCheckContext": null,
+    "improvisedSearch": null,
+    "terrainFeat": null,
+    "pursuitFeat": null,
+    "professionalFeat": null,
+    "contactFeat": null,
+    "polyglot": null,
+    "photographicMemory": null,
+    "charmer": null,
+    "cardSharkKnowledge": null,
+    "cardSharkProfession": null,
+    "appearanceModifiers": null,
+    "hardCore": null,
+    "finalAttackRound": null,
+    "finesseDamage": null,
+    "damageSave": null,
+    "coverSave": null,
+    "cqbRange": null,
+    "finalAttack": null,
+    "twoWeaponFinalAttack": null,
+    "shakenContext": null,
+    "restraintEscape": null,
+    "skillBonusCondition": {
+      "state": "",
+      "normal": 8,
+      "total": 8,
+      "adjustment": 0
+    },
+    "skillCheckAdjustment": 0,
+    "weaponFocusWork": null,
+    "baffledSaveBonus": 0,
+    "gamblingDice": null,
+    "rollCombat": null,
+    "preRollFunding": null,
+    "hailMary": {
+      "untrained": false,
+      "uncap": false,
+      "active": false,
+      "cost": 0
+    },
+    "rerollFunding": null,
+    "rerollReceiptId": null,
+    "rerollOf": null,
+    "sleepSnapshot": null,
+    "conditionAbilityAdjustment": 0,
+    "conditionDamagePenalty": 0,
+    "evasionContext": null,
+    "securityBonus": 0,
+    "fatigueBonus": 0,
+    "fatigueCondition": "",
+    "underwaterContext": {
+      "underwater": false,
+      "aquatic": false,
+      "athleticsRanks": 6,
+      "swimExempt": false,
+      "penalty": 0,
+      "notes": []
+    },
+    "mortarOperation": null,
+    "launcherOperation": null,
+    "unnervingAvailableGrade": 0,
+    "unnervingStress": null,
+    "qualityChecks": {
+      "bonuses": [],
+      "notes": [],
+      "fearless": 0,
+      "strongMinded": 0,
+      "seductive": 0,
+      "camouflaged": 0,
+      "terrain": "",
+      "shiftingDisposition": false,
+      "seductionConflict": false
+    },
+    "medical": null,
+    "littleDetails": null,
+    "sensoryConditions": {
+      "blinded": false,
+      "deafened": false,
+      "targetDeafened": false,
+      "nightTrainingException": false,
+      "capAdjustment": 0,
+      "skillModifier": 0,
+      "blockedReason": "",
+      "notes": []
+    },
+    "skillTags": {
+      "wheelWaiver": false,
+      "handPenaltyBeforeWheel": 0,
+      "nauseated": false,
+      "concentration": false,
+      "mute": false,
+      "oneHanded": false,
+      "noSharedLanguage": false,
+      "bound": false,
+      "conveyingMessage": false,
+      "addedHandsOn": false,
+      "handsOn": true,
+      "grasp": false,
+      "language": false,
+      "twoWeapon": false,
+      "handPenalty": 0,
+      "capAdjustment": 0,
+      "blockedReason": "",
+      "notes": []
+    },
+    "skillGear": {
+      "toolShedKit": null,
+      "required": true,
+      "requirements": [
+        "Appraisal Kit"
+      ],
+      "only": false,
+      "status": "available",
+      "kitUuid": null,
+      "kitType": "",
+      "kitGrade": 0,
+      "kitLocation": "",
+      "bonuses": [],
+      "capIncrease": 0,
+      "blockedReason": "",
+      "notes": [
+        "Required gear: Appraisal Kit; available."
+      ]
+    },
+    "fogSmoke": {
+      "specified": false,
+      "skillModifier": 0,
+      "targetDefenseBonus": 0,
+      "visualDelta": 0,
+      "notes": []
+    },
+    "terrainSave": null,
+    "localHeroOpposition": null,
+    "cunningPlan": null,
+    "attributeSubstitution": null,
+    "terrain": {
+      "homeTurf": false,
+      "homeTurfEligible": false,
+      "homeTurfCapIncrease": 0,
+      "terrain": "",
+      "underwater": false,
+      "navigating": false,
+      "naturalSurface": false,
+      "hearingCheck": false,
+      "cityPopulation": 0,
+      "nightAmbush": false,
+      "matched": [],
+      "woodcraft": false,
+      "unfair": false,
+      "bonuses": [],
+      "synergies": [],
+      "synergySources": [],
+      "ambushSources": [],
+      "opponentSurprisePenalty": 0,
+      "notes": []
+    },
+    "senses": {
+      "hearing": false,
+      "scent": false,
+      "deafened": false,
+      "bonuses": [],
+      "notes": []
+    },
+    "tracking": null,
+    "gcTakingPermissionConfirmed": false,
+    "ambush": null,
+    "sneakAttackTarget": null,
+    "sneakAttack": null,
+    "ambientLight": {
+      "specified": false,
+      "skillModifier": 0,
+      "targetDefenseBonus": 0,
+      "notes": []
+    },
+    "nest": null,
+    "breakthrough": null,
+    "requiredBonusPoolId": null,
+    "requiredBonusSpent": false,
+    "cannotError": false,
+    "resultSource": "",
+    "opponentResult": null,
+    "oneInAMillion": false,
+    "tenSecondSolution": false,
+    "standaloneCheckConfirmed": false,
+    "forcedThreat": false,
+    "noForcedReroll": false,
+    "normalThreat": 20,
+    "rawTotal": 9,
+    "rolledTotal": 9,
+    "minimumAdjustment": 0,
+    "practiceMakesPerfect": false,
+    "criticalFailureCostIncrease": 0,
+    "crossCheck": false,
+    "alternatives": null,
+    "chosenIndex": 0,
+    "choiceSource": null,
+    "choiceResourceId": null,
+    "effectiveTotal": 9,
+    "actorUuid": "Actor.oIKSewfXp05LJqKy",
+    "checkKind": "skill",
+    "ability": "int",
+    "skillKey": "analysis",
+    "checkId": "appraise",
+    "focus": "Appraise",
+    "rerollResources": [],
+    "formula": "1d20 + @total",
+    "rollData": {
+      "total": 8
+    },
+    "rollMode": "blindroll",
+    "weaponUuid": "",
+    "weaponProficiency": "",
+    "weaponQualities": "",
+    "cleanAndPolished": false,
+    "gearUuid": "",
+    "gearAttempt": null,
+    "attackContext": null,
+    "unarmed": false,
+    "improvised": false,
+    "threat": 20,
+    "error": 1,
+    "cap": 30,
+    "baseFlavor": "Analysis / Appraise Check (INT)<br><small>Complex Analysis Task “QA263 error without critical activation”: 0/2 Challenges completed. The GC settles this recorded Challenge after its outcome and other effects are resolved (pp.99–100). Forensic Genius: this declared Complex Analysis Task requires 2 Challenges instead of 4 (−2, minimum1); resolve task progress separately (p.209).            Required gear: Appraisal Kit; available.            1 Minute (Take 10/Take 20). Secret. Gear (Appraisal Kit), Hands-On, Vision. Rules p.110.</small>",
+    "boostTotal": 0,
+    "boostSpent": 0,
+    "capped": false,
+    "naturalDie": 1,
+    "checkMethod": "roll",
+    "actionDiceAllowed": true,
+    "successConfirmed": false,
+    "errorConfirmed": true,
+    "threatConfirmed": false,
+    "triumphed": false,
+    "flawlessSearch": null,
+    "automaticSkillSuccess": null,
+    "errorActivationDeclined": true,
+    "resolved": true,
+    "analysisTaskSettlement": {
+      "version": 1,
+      "id": "U1npDZFyHgnF8AgW",
+      "taskId": "task_ag9iTxxBSYmsAvja",
+      "revision": 1,
+      "state": "settled",
+      "errorDeclinedByGC": true
+    }
+  },
+  "taskRecord": {
+    "version": 1,
+    "id": "task_ag9iTxxBSYmsAvja",
+    "title": "QA263 error without critical activation",
+    "baseChallenges": 4,
+    "requiredChallenges": 2,
+    "forensicGenius": true,
+    "createdAt": 126,
+    "completed": 0,
+    "status": "active",
+    "revision": 1,
+    "events": [
+      {
+        "messageUuid": "ChatMessage.K38feGcCrgmP5QDK",
+        "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_ag9iTxxBSYmsAvja\\\",\\\"revision\\\":0,\\\"completed\\\":0,\\\"baseChallenges\\\":4,\\\"requiredChallenges\\\":2,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"completedAt\\\":126},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":4,\\\"required\\\":2,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,9,9,1,0,0,false,true,false,null,null,null,null,null]\",\"success\":false,\"criticalSuccess\":false,\"criticalFailure\":false,\"errorActivationDeclined\":true,\"activation\":null}",
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "success": false,
+        "criticalSuccess": false,
+        "criticalFailure": false,
+        "activationCount": 0,
+        "errorActivationDeclined": true,
+        "at": 126
+      }
+    ]
+  },
+  "lateCritical": "This result has already been resolved, replaced or activated.",
+  "persisted": {
+    "tasks": {
+      "task_ag9iTxxBSYmsAvja": {
+        "version": 1,
+        "id": "task_ag9iTxxBSYmsAvja",
+        "title": "QA263 error without critical activation",
+        "baseChallenges": 4,
+        "requiredChallenges": 2,
+        "forensicGenius": true,
+        "createdAt": 126,
+        "completed": 0,
+        "status": "active",
+        "revision": 1,
+        "events": [
+          {
+            "messageUuid": "ChatMessage.K38feGcCrgmP5QDK",
+            "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_ag9iTxxBSYmsAvja\\\",\\\"revision\\\":0,\\\"completed\\\":0,\\\"baseChallenges\\\":4,\\\"requiredChallenges\\\":2,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"completedAt\\\":126},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":4,\\\"required\\\":2,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,9,9,1,0,0,false,true,false,null,null,null,null,null]\",\"success\":false,\"criticalSuccess\":false,\"criticalFailure\":false,\"errorActivationDeclined\":true,\"activation\":null}",
+            "before": 0,
+            "after": 0,
+            "change": 0,
+            "success": false,
+            "criticalSuccess": false,
+            "criticalFailure": false,
+            "activationCount": 0,
+            "errorActivationDeclined": true,
+            "at": 126
+          }
+        ]
+      }
+    },
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "source": {
+      "ok": true,
+      "unmet": []
+    },
+    "dice": 0
+  },
+  "reload": {
+    "tasks": {
+      "task_ag9iTxxBSYmsAvja": {
+        "version": 1,
+        "id": "task_ag9iTxxBSYmsAvja",
+        "title": "QA263 error without critical activation",
+        "baseChallenges": 4,
+        "requiredChallenges": 2,
+        "forensicGenius": true,
+        "createdAt": 126,
+        "completed": 0,
+        "status": "active",
+        "revision": 1,
+        "events": [
+          {
+            "messageUuid": "ChatMessage.K38feGcCrgmP5QDK",
+            "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_ag9iTxxBSYmsAvja\\\",\\\"revision\\\":0,\\\"completed\\\":0,\\\"baseChallenges\\\":4,\\\"requiredChallenges\\\":2,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"completedAt\\\":126},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":4,\\\"required\\\":2,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,9,9,1,0,0,false,true,false,null,null,null,null,null]\",\"success\":false,\"criticalSuccess\":false,\"criticalFailure\":false,\"errorActivationDeclined\":true,\"activation\":null}",
+            "before": 0,
+            "after": 0,
+            "change": 0,
+            "success": false,
+            "criticalSuccess": false,
+            "criticalFailure": false,
+            "activationCount": 0,
+            "errorActivationDeclined": true,
+            "at": 126
+          }
+        ]
+      }
+    },
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "source": {
+      "ok": true,
+      "unmet": []
+    },
+    "dice": 0
+  },
+  "cleanup": {
+    "actors": 6,
+    "messages": 729,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1
+  }
+}

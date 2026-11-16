@@ -1,0 +1,1953 @@
+{
+  "actor": "IPxyxsHoevWRCntb",
+  "feat": "fn9rxtO50ALaapWd",
+  "original": {
+    "type": "all",
+    "of": [
+      {
+        "type": "skill",
+        "key": "networking",
+        "min": 3
+      },
+      {
+        "type": "feat",
+        "name": "Survivalist"
+      }
+    ]
+  },
+  "history": {
+    "ok": true,
+    "unmet": [],
+    "level": 3,
+    "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+    "manual": true
+  },
+  "blocked": {
+    "status": {
+      "ok": false,
+      "unmet": [
+        "The historical acquisition check no longer matches this feat's level, source or prerequisites."
+      ]
+    },
+    "record": {
+      "ok": false,
+      "unmet": [
+        "Review prerequisite eligibility at the recorded acquisition level after changing acquisition details."
+      ],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"type\":\"level\",\"min\":4},\"tree\":\"style\",\"source\":\"\"}",
+      "manual": true,
+      "needsReview": true
+    },
+    "approval": false,
+    "picks": {
+      "available": 2,
+      "used": 4,
+      "remaining": -2
+    }
+  },
+  "mergedPrerequisites": {
+    "type": "all",
+    "of": [
+      {
+        "type": "skill",
+        "key": "networking",
+        "min": 3
+      },
+      {
+        "type": "feat",
+        "name": "Survivalist"
+      }
+    ],
+    "min": 4
+  },
+  "mergedRecord": {
+    "ok": false,
+    "unmet": [
+      "Review prerequisite eligibility at the recorded acquisition level after changing acquisition details."
+    ],
+    "level": 3,
+    "signature": "{\"prerequisites\":{\"type\":\"all\",\"of\":[{\"type\":\"skill\",\"key\":\"networking\",\"min\":3},{\"type\":\"feat\",\"name\":\"Survivalist\"}]},\"tree\":\"style\",\"source\":\"\"}",
+    "manual": true,
+    "needsReview": true
+  },
+  "cleanedPending": {
+    "ok": false,
+    "unmet": [
+      "Review prerequisite eligibility at the recorded acquisition level after changing acquisition details."
+    ],
+    "level": 3,
+    "signature": "{\"prerequisites\":{\"of\":[{\"key\":\"networking\",\"min\":3,\"type\":\"skill\"},{\"name\":\"Survivalist\",\"type\":\"feat\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"style\"}",
+    "needsReview": true
+  },
+  "cleanedPrerequisites": {
+    "type": "all",
+    "of": [
+      {
+        "type": "skill",
+        "key": "networking",
+        "min": 3
+      },
+      {
+        "type": "feat",
+        "name": "Survivalist"
+      }
+    ]
+  },
+  "reviewed": {
+    "ok": true,
+    "unmet": [],
+    "level": 3,
+    "signature": "{\"prerequisites\":{\"of\":[{\"key\":\"networking\",\"min\":3,\"type\":\"skill\"},{\"name\":\"Survivalist\",\"type\":\"feat\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"style\"}",
+    "manual": true
+  },
+  "future": {
+    "actor": "WXGENYLKnXVRtxcp",
+    "rolls": [
+      12,
+      2
+    ],
+    "backdated": {
+      "feat": "RIJiBknEEAs64PFn",
+      "blocked": {
+        "ok": false,
+        "unmet": [
+          "This feat was added after its recorded acquisition; review prerequisite eligibility at that level."
+        ],
+        "level": 3,
+        "signature": "{\"prerequisites\":null,\"source\":\"\",\"tree\":\"basicSkill\"}",
+        "needsReview": true
+      },
+      "before": 2,
+      "reviewed": {
+        "ok": true,
+        "unmet": [],
+        "level": 3,
+        "signature": "{\"prerequisites\":null,\"source\":\"\",\"tree\":\"basicSkill\"}",
+        "manual": true
+      }
+    },
+    "planned": {
+      "feat": "paqTuw45yVcTpWzT",
+      "before": null,
+      "after": {
+        "ok": true,
+        "unmet": [],
+        "level": 6,
+        "signature": "{\"prerequisites\":{\"min\":6,\"type\":\"level\"},\"source\":\"\",\"tree\":\"tradecraft\"}"
+      }
+    },
+    "progression": [
+      {
+        "classId": "soldier",
+        "vitality": 6,
+        "careerEntryId": "",
+        "vitalityRollId": "",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 4,
+          "drive": 2,
+          "intimidate": 4,
+          "notice": 4,
+          "resolve": 4,
+          "networking": 6
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 7,
+        "careerEntryId": "pgwPrY50jd30yA0Y",
+        "vitalityRollId": "r3rZQUTXMF32JTCF",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 3,
+          "intimidate": 1,
+          "notice": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 12,
+        "careerEntryId": "Y1TuQxhHmOIH0d1T",
+        "vitalityRollId": "4NkjRB9EQRQfA0ib",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 2
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 1,
+        "careerEntryId": "WU3jmbh7PuTi0crq",
+        "vitalityRollId": "F74KMEMGPPi69kmv",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "networking": 2,
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 12,
+        "careerEntryId": "mwN89KaIUDLgC6fb",
+        "vitalityRollId": "Wb0sJwvSQbfrHm6Y",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 2
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 2,
+        "careerEntryId": "VrDHz7wPFtHtJGvk",
+        "vitalityRollId": "Nqpl4jZMo8CphHoe",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 2
+        }
+      }
+    ],
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "source": {
+      "name": "RAW QA Acquisition 237",
+      "type": "agent",
+      "flags": {
+        "spycraft2": {
+          "startingDiceCreation": {
+            "id": "dM2s3omg2RfpaJ4F",
+            "session": "MeCkrj45ff0VaUEr",
+            "at": 126,
+            "claimed": false
+          },
+          "vitalityRolls": {
+            "Wb0sJwvSQbfrHm6Y": {
+              "version": 1,
+              "id": "Wb0sJwvSQbfrHm6Y",
+              "actorUuid": "Actor.WXGENYLKnXVRtxcp",
+              "index": 4,
+              "careerLevel": 5,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 12,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 12,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 12,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "jWiGm6ZkJILmHQlq",
+              "actionDiceAllowed": false
+            },
+            "Nqpl4jZMo8CphHoe": {
+              "version": 1,
+              "id": "Nqpl4jZMo8CphHoe",
+              "actorUuid": "Actor.WXGENYLKnXVRtxcp",
+              "index": 5,
+              "careerLevel": 6,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 2,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 2,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 2,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "ZXgx3goxDBG8jm7e",
+              "actionDiceAllowed": false
+            }
+          }
+        }
+      },
+      "system": {
+        "abilities": {
+          "str": {
+            "base": 12,
+            "misc": 0
+          },
+          "dex": {
+            "base": 13,
+            "misc": 0
+          },
+          "con": {
+            "base": 14,
+            "misc": 0
+          },
+          "int": {
+            "base": 15,
+            "misc": 0
+          },
+          "wis": {
+            "base": 12,
+            "misc": 0
+          },
+          "cha": {
+            "base": 11,
+            "misc": 0
+          }
+        },
+        "progression": [
+          {
+            "classId": "soldier",
+            "vitality": 6,
+            "careerEntryId": "",
+            "vitalityRollId": "",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 4,
+              "drive": 2,
+              "intimidate": 4,
+              "notice": 4,
+              "resolve": 4,
+              "networking": 6
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 7,
+            "careerEntryId": "pgwPrY50jd30yA0Y",
+            "vitalityRollId": "r3rZQUTXMF32JTCF",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 3,
+              "intimidate": 1,
+              "notice": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 12,
+            "careerEntryId": "Y1TuQxhHmOIH0d1T",
+            "vitalityRollId": "4NkjRB9EQRQfA0ib",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 2
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 1,
+            "careerEntryId": "WU3jmbh7PuTi0crq",
+            "vitalityRollId": "F74KMEMGPPi69kmv",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "networking": 2,
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 12,
+            "careerEntryId": "mwN89KaIUDLgC6fb",
+            "vitalityRollId": "Wb0sJwvSQbfrHm6Y",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 2
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 2,
+            "careerEntryId": "VrDHz7wPFtHtJGvk",
+            "vitalityRollId": "Nqpl4jZMo8CphHoe",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 2
+            }
+          }
+        ],
+        "actionDice": {
+          "value": 0
+        },
+        "vitality": {
+          "value": 4
+        },
+        "wounds": {
+          "value": 4
+        },
+        "pointBuyBudget": 36,
+        "abilityIncreases": {
+          "l4": "wis",
+          "l8": "",
+          "l12": "",
+          "l16": "",
+          "l20": ""
+        },
+        "xp": 0,
+        "codename": "",
+        "details": {
+          "faction": "",
+          "gender": "",
+          "age": "",
+          "height": "",
+          "weight": "",
+          "eyes": "",
+          "hair": ""
+        },
+        "fortuneTeammateIds": [],
+        "actionDieAwards": {},
+        "missionXPRewards": {},
+        "eagleEyeBoost": null,
+        "defenseBoost": null,
+        "noFearBoost": null,
+        "mentalLeaps": [],
+        "fatigueRest": null,
+        "drunkSleep": null,
+        "drunkRepositions": [],
+        "fatigueApplications": [],
+        "mentalLeapFatigueEvents": [],
+        "mentalLeapRecovery": null,
+        "mentalLeapSleep": null,
+        "fortunesOfWarBoost": null,
+        "refreshAction": null,
+        "temporaryShares": {},
+        "assistantGroups": [],
+        "resourceUses": {},
+        "resourcesInitialized": false,
+        "affiliationType": "faction",
+        "reputation": 2,
+        "netWorth": 0,
+        "skills": {
+          "acrobatics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "analysis": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "athletics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "blend": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bluff": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bureaucracy": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "computers": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "cultures": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "drive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "electronics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "falsify": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "impress": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "intimidate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "investigation": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "manipulate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "mechanics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "medicine": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "networking": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "notice": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "profession": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "resolve": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "science": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "search": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "security": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "senseMotive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sleightOfHand": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sneak": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "streetwise": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "survival": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "tactics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          }
+        },
+        "proficiencies": {
+          "unarmed": {
+            "proficient": false,
+            "forte": false
+          },
+          "blunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticBlunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "edged": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticEdged": {
+            "proficient": false,
+            "forte": false
+          },
+          "explosives": {
+            "proficient": false,
+            "forte": false
+          },
+          "guided": {
+            "proficient": false,
+            "forte": false
+          },
+          "handgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "hurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticHurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "indirectFire": {
+            "proficient": false,
+            "forte": false
+          },
+          "rifle": {
+            "proficient": false,
+            "forte": false
+          },
+          "shotgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "submachineGun": {
+            "proficient": false,
+            "forte": false
+          },
+          "tactical": {
+            "proficient": false,
+            "forte": false
+          },
+          "vehicleWeapon": {
+            "proficient": false,
+            "forte": false
+          }
+        },
+        "focuses": {
+          "cultures": [],
+          "drive": [],
+          "profession": [],
+          "science": [],
+          "fortes": []
+        },
+        "startingIntelligenceModifier": null,
+        "skillFortes": [],
+        "crossroadsTitle": "",
+        "relinquishedInterests": 0,
+        "interests": "",
+        "contacts": [],
+        "subplots": [],
+        "gearPickLosses": {
+          "R": null,
+          "T": null,
+          "V": null,
+          "S": null,
+          "G": null,
+          "W": null,
+          "E": null
+        },
+        "missionReserves": null,
+        "armorMissionGrant": null,
+        "bigStickMissionPick": null,
+        "missionCaliberPicks": {},
+        "classGearGrants": {},
+        "bonusActionDice": {},
+        "missionReserveHistory": [],
+        "wealthAllocation": {
+          "lifestyle": 0,
+          "possessions": 0,
+          "spendingCash": 0,
+          "dressedForLifestyle": false
+        },
+        "misc": {
+          "bab": 0,
+          "fort": 0,
+          "ref": 0,
+          "will": 0,
+          "defense": 0,
+          "initiative": 0,
+          "wealth": 0,
+          "vitality": 0,
+          "wounds": 0,
+          "speed": 0,
+          "actionDice": 0,
+          "knowledge": 0,
+          "request": 0,
+          "gearCheck": 0,
+          "gearR": 0,
+          "gearT": 0,
+          "gearV": 0,
+          "gearS": 0,
+          "gearG": 0,
+          "gearW": 0,
+          "gearE": 0
+        },
+        "biography": "",
+        "twoWeaponStyle": null,
+        "dartingStyle": null,
+        "totalDefense": null,
+        "combatExpertise": null,
+        "superiorCover": null,
+        "accumulatedDamage": null
+      },
+      "items": [
+        {
+          "name": "Soldier",
+          "type": "class",
+          "system": {
+            "expert": false,
+            "skillPoints": 4,
+            "proficiencies": 6,
+            "coreAbility": {
+              "name": "Accurate",
+              "description": ""
+            },
+            "classSkills": [
+              "athletics",
+              "drive",
+              "intimidate",
+              "notice",
+              "profession",
+              "resolve",
+              "search",
+              "survival",
+              "tactics"
+            ],
+            "table": [
+              {
+                "level": 1,
+                "bab": 1,
+                "fort": 1,
+                "ref": 0,
+                "will": 2,
+                "defense": 0,
+                "initiative": 2,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 2,
+                "bab": 2,
+                "fort": 2,
+                "ref": 0,
+                "will": 3,
+                "defense": 1,
+                "initiative": 3,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 3,
+                "bab": 3,
+                "fort": 2,
+                "ref": 1,
+                "will": 3,
+                "defense": 1,
+                "initiative": 4,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 4,
+                "bab": 4,
+                "fort": 2,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 5,
+                "bab": 5,
+                "fort": 3,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 6,
+                "bab": 6,
+                "fort": 3,
+                "ref": 2,
+                "will": 5,
+                "defense": 2,
+                "initiative": 6,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 7,
+                "bab": 7,
+                "fort": 4,
+                "ref": 2,
+                "will": 5,
+                "defense": 3,
+                "initiative": 7,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 8,
+                "bab": 8,
+                "fort": 4,
+                "ref": 2,
+                "will": 6,
+                "defense": 3,
+                "initiative": 8,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 9,
+                "bab": 9,
+                "fort": 4,
+                "ref": 3,
+                "will": 6,
+                "defense": 4,
+                "initiative": 9,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 10,
+                "bab": 10,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 11,
+                "bab": 11,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 12,
+                "bab": 12,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 11,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 13,
+                "bab": 13,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 12,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 14,
+                "bab": 14,
+                "fort": 6,
+                "ref": 4,
+                "will": 9,
+                "defense": 6,
+                "initiative": 13,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 15,
+                "bab": 15,
+                "fort": 7,
+                "ref": 5,
+                "will": 9,
+                "defense": 6,
+                "initiative": 14,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 16,
+                "bab": 16,
+                "fort": 7,
+                "ref": 5,
+                "will": 10,
+                "defense": 6,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 17,
+                "bab": 17,
+                "fort": 8,
+                "ref": 5,
+                "will": 10,
+                "defense": 7,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 18,
+                "bab": 18,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 7,
+                "initiative": 16,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 19,
+                "bab": 19,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 8,
+                "initiative": 17,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 20,
+                "bab": 20,
+                "fort": 9,
+                "ref": 6,
+                "will": 12,
+                "defense": 8,
+                "initiative": 18,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 3,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              }
+            ],
+            "abilities": [
+              {
+                "level": 1,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 2,
+                "name": "Fortunes of war I",
+                "description": ""
+              },
+              {
+                "level": 3,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 4,
+                "name": "Armor use I",
+                "description": ""
+              },
+              {
+                "level": 5,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 6,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 7,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 8,
+                "name": "Armor use II",
+                "description": ""
+              },
+              {
+                "level": 9,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 10,
+                "name": "Portable cover (1/4)",
+                "description": ""
+              },
+              {
+                "level": 11,
+                "name": "Fight on, fortunes of war II",
+                "description": ""
+              },
+              {
+                "level": 12,
+                "name": "Armor use III, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 13,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 14,
+                "name": "One in a million 1/ session",
+                "description": ""
+              },
+              {
+                "level": 15,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 16,
+                "name": "Armor use IV",
+                "description": ""
+              },
+              {
+                "level": 17,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 18,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 19,
+                "name": "Fight on, fortunes of war III",
+                "description": ""
+              },
+              {
+                "level": 20,
+                "name": "Armor use V, portable cover (1/2)",
+                "description": ""
+              }
+            ],
+            "choiceLists": [
+              {
+                "name": "Fight On",
+                "key": "fightOn",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "2 Weapon Prof",
+                    "bonuses": [
+                      {
+                        "target": "prof.generic",
+                        "value": "2"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 3,
+                    "name": "Basic Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.basicCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 4,
+                    "name": "Melee Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.meleeCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 5,
+                    "name": "Ranged Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.rangedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 6,
+                    "name": "Unarmed Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.unarmedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "featSlot"
+              },
+              {
+                "name": "Weapon Specialist",
+                "key": "weaponSpecialist",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "Big Stick",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 3,
+                    "name": "Foibles",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 4,
+                    "name": "Killer Instinct",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 5,
+                    "name": "Most Deadly",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 6,
+                    "name": "Mow Down",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 7,
+                    "name": "No Worries",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 8,
+                    "name": "Showdown",
+                    "bonuses": []
+                  }
+                ],
+                "kind": "option"
+              }
+            ],
+            "choiceSchedule": [
+              {
+                "level": 1,
+                "list": "fightOn"
+              },
+              {
+                "level": 3,
+                "list": "fightOn"
+              },
+              {
+                "level": 5,
+                "list": "fightOn"
+              },
+              {
+                "level": 6,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 7,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 11,
+                "list": "fightOn"
+              },
+              {
+                "level": 12,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 13,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 17,
+                "list": "fightOn"
+              },
+              {
+                "level": 18,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 19,
+                "list": "fightOn"
+              }
+            ],
+            "bonuses": [
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 8,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 12,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 16,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 20,
+                "bonusType": ""
+              },
+              {
+                "target": "armorCheck",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 2,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 11,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 19,
+                "bonusType": ""
+              }
+            ],
+            "identifier": "soldier",
+            "vitalityDie": 12,
+            "description": "",
+            "source": "",
+            "choices": {
+              "0": null,
+              "1": null
+            },
+            "inheritedChoices": {},
+            "skillChoices": {},
+            "weaponSpecialist": {},
+            "keySkill": "",
+            "keyFocus": "",
+            "professionFocus": "",
+            "phdSkill": "",
+            "phdSkill1": "",
+            "phdSkill2": "",
+            "featGrants": [],
+            "requirements": null
+          },
+          "_id": "XouiN2U98v2BkxQ3",
+          "img": "icons/svg/item-bag.svg",
+          "effects": [],
+          "folder": null,
+          "sort": 0,
+          "ownership": {
+            "default": 0
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794794893513,
+            "modifiedTime": 1794794893513,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        },
+        {
+          "name": "Survivalist",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+2 insight bonus and 19–20 threat range with Athletics and Survival.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "basicSkill",
+            "prerequisites": null,
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [
+              {
+                "level": 0,
+                "target": "skills.athletics.misc",
+                "value": "2",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "skills.athletics.baseThreat",
+                "value": "19",
+                "bonusType": ""
+              },
+              {
+                "level": 0,
+                "target": "skills.survival.misc",
+                "value": "2",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "skills.survival.baseThreat",
+                "value": "19",
+                "bonusType": ""
+              }
+            ],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 1,
+              "signature": "{\"prerequisites\":null,\"source\":\"\",\"tree\":\"basicSkill\"}",
+              "manual": true
+            },
+            "historicalPrerequisitesConfirmed": true,
+            "acquiredAtLevel": 1
+          },
+          "effects": [],
+          "folder": "lJAGgKU2jeG205cH",
+          "sort": 239,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794794893513,
+            "modifiedTime": 1794794893662,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "W7OOkBw5RhJ0PIWr"
+        },
+        {
+          "name": "Scholar",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+2 insight bonus and 19–20 threat range with Bureaucracy and Science.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "basicSkill",
+            "prerequisites": null,
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [
+              {
+                "level": 0,
+                "target": "skills.bureaucracy.misc",
+                "value": "2",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "skills.bureaucracy.baseThreat",
+                "value": "19",
+                "bonusType": ""
+              },
+              {
+                "level": 0,
+                "target": "skills.science.misc",
+                "value": "2",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "skills.science.baseThreat",
+                "value": "19",
+                "bonusType": ""
+              }
+            ],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 3,
+              "signature": "{\"prerequisites\":null,\"source\":\"\",\"tree\":\"basicSkill\"}",
+              "manual": true
+            },
+            "historicalPrerequisitesConfirmed": true,
+            "acquiredAtLevel": 3
+          },
+          "effects": [],
+          "folder": "lJAGgKU2jeG205cH",
+          "sort": 237,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794794893694,
+            "modifiedTime": 1794794893704,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "RIJiBknEEAs64PFn"
+        },
+        {
+          "name": "Career Agent",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+1 insight to all saves, and +1 Reputation or extra Net Worth after each mission.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "tradecraft",
+            "prerequisites": {
+              "type": "level",
+              "min": 6
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [
+              {
+                "level": 0,
+                "target": "saves.ref",
+                "value": "1",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "saves.fort",
+                "value": "1",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "saves.will",
+                "value": "1",
+                "bonusType": "insight"
+              }
+            ],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 6,
+              "signature": "{\"prerequisites\":{\"min\":6,\"type\":\"level\"},\"source\":\"\",\"tree\":\"tradecraft\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 6
+          },
+          "effects": [],
+          "folder": "JWbvWRor4Pg0Oawl",
+          "sort": 314,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794794893719,
+            "modifiedTime": 1794794894072,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "paqTuw45yVcTpWzT"
+        }
+      ],
+      "img": "icons/svg/mystery-man.svg",
+      "prototypeToken": {
+        "name": "RAW QA Starting Entry",
+        "displayName": 0,
+        "actorLink": false,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "texture": {
+          "src": "icons/svg/mystery-man.svg",
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "fit": "contain",
+          "scaleX": 1,
+          "scaleY": 1,
+          "tint": "#ffffff",
+          "alphaThreshold": 0.75
+        },
+        "lockRotation": false,
+        "rotation": 0,
+        "alpha": 1,
+        "disposition": -1,
+        "displayBars": 0,
+        "bar1": {
+          "attribute": "vitality"
+        },
+        "bar2": {
+          "attribute": "wounds"
+        },
+        "light": {
+          "negative": false,
+          "priority": 0,
+          "alpha": 0.5,
+          "angle": 360,
+          "bright": 0,
+          "color": null,
+          "coloration": 1,
+          "dim": 0,
+          "attenuation": 0.5,
+          "luminosity": 0.5,
+          "saturation": 0,
+          "contrast": 0,
+          "shadows": 0,
+          "animation": {
+            "type": null,
+            "speed": 5,
+            "intensity": 5,
+            "reverse": false
+          },
+          "darkness": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        "sight": {
+          "enabled": false,
+          "range": 0,
+          "angle": 360,
+          "visionMode": "basic",
+          "color": null,
+          "attenuation": 0.1,
+          "brightness": 0,
+          "saturation": 0,
+          "contrast": 0
+        },
+        "detectionModes": {},
+        "occludable": {
+          "radius": 0
+        },
+        "ring": {
+          "enabled": false,
+          "colors": {
+            "ring": null,
+            "background": null
+          },
+          "effects": 1,
+          "subject": {
+            "scale": 1,
+            "texture": null
+          }
+        },
+        "turnMarker": {
+          "mode": 1,
+          "animation": null,
+          "src": null,
+          "disposition": false
+        },
+        "movementAction": null,
+        "flags": {},
+        "randomImg": false,
+        "appendNumber": false,
+        "prependAdjective": false
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0,
+        "WW1y27MJMt1sWfHr": 3
+      },
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794794893513,
+        "modifiedTime": 1794794894209,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_id": "WXGENYLKnXVRtxcp"
+    }
+  },
+  "originalCurrent": {
+    "prerequisites": {
+      "type": "all",
+      "of": [
+        {
+          "type": "skill",
+          "key": "networking",
+          "min": 3
+        },
+        {
+          "type": "feat",
+          "name": "Survivalist"
+        }
+      ]
+    },
+    "record": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"of\":[{\"key\":\"networking\",\"min\":3,\"type\":\"skill\"},{\"name\":\"Survivalist\",\"type\":\"feat\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"style\"}",
+      "manual": true
+    },
+    "picks": {
+      "available": 4,
+      "used": 4,
+      "remaining": 0
+    }
+  }
+}

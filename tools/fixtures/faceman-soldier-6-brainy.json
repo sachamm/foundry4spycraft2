@@ -151,7 +151,7 @@
    },
    "cultures": {
     "ranks": 0,
-    "bonus": 0,
+    "bonus": -2,
     "threat": 20,
     "cap": 15
    },
@@ -175,7 +175,7 @@
    },
    "impress": {
     "ranks": 12,
-    "bonus": 0,
+    "bonus": -2,
     "threat": 20,
     "cap": 50
    },
@@ -211,7 +211,7 @@
    },
    "networking": {
     "ranks": 16,
-    "bonus": 0,
+    "bonus": -2,
     "threat": 20,
     "cap": 60
    },
@@ -223,7 +223,7 @@
    },
    "profession": {
     "ranks": 0,
-    "bonus": 0,
+    "bonus": -2,
     "threat": 20,
     "cap": 15
    },

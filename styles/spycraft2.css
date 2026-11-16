@@ -29,7 +29,9 @@
 
 /* Agent tab viewport. PARTS.scrollable preserves positions; CSS must provide
  * the actual scroll container. Let the active tab shrink below its content size
- * while the header and navigation retain their natural height. */
+ * while the header and navigation retain their natural height. Keep a usable
+ * tab viewport when an expanded header fills the window; the outer container
+ * can then scroll far enough to expose that viewport. */
 .spycraft2.sheet.agent .window-content {
   display: flex;
   flex-direction: column;
@@ -40,28 +42,10 @@
 .spycraft2.sheet.agent .window-content > .sheet-tabs { flex: 0 0 auto; }
 .spycraft2.sheet.agent .window-content > .tab {
   flex: 1 1 0;
-  min-height: 0;
+  min-height: 80px;
   overflow-y: auto;
   scrollbar-gutter: stable;
   padding-right: 6px;
-}
-
-/* Biography uses the remaining tab height in both reading and editing modes.
- * Keep this on the active tab so inactive tabs remain hidden. The minimum
- * editor height lets the tab scroll when a short window cannot fit both parts. */
-.spycraft2.sheet.agent .window-content > .tab.bio.active {
-  display: flex;
-  flex-direction: column;
-}
-.spycraft2.sheet.agent .tab.bio > :not(prose-mirror) { flex: 0 0 auto; }
-.spycraft2.sheet.agent .tab.bio > prose-mirror {
-  flex: 1 0 120px;
-  display: flex;
-  flex-direction: column;
-}
-.spycraft2.sheet.agent .tab.bio > prose-mirror .editor-container {
-  flex: 1;
-  min-height: 0;
 }
 
 /* Header */
@@ -172,3 +156,40 @@
 .spycraft2 a[data-tooltip-html] { cursor: pointer; }
 .spycraft2.browser .row-main .summary { font-size: 0.85em; opacity: 0.85; }
 .spycraft2.browser li button:disabled { opacity: 0.5; cursor: default; }
+
+
+/* Keep every skill-roll option reachable while the confirmation remains in view. */
+.spycraft2-roll-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+.spycraft2-roll-options details > label {
+  display: block;
+  margin: 0.35rem 0;
+}
+
+/* Keep roster inputs within the modal while its confirmation footer remains reachable. */
+.sc2-numerical-roster {table-layout:fixed;width:100%;}
+.sc2-numerical-roster th,.sc2-numerical-roster td {overflow-wrap:anywhere;}
+.sc2-numerical-roster th:nth-child(1) {width:26%;}
+.sc2-numerical-roster th:nth-child(2),.sc2-numerical-roster th:nth-child(4) {width:12%;}
+.sc2-numerical-roster th:nth-child(3) {width:20%;}
+.sc2-numerical-roster th:nth-child(5) {width:30%;}
+.sc2-numerical-roster input {width:100%;min-width:0;box-sizing:border-box;}
+
+/* Keep target classification usable with long actor names in attack dialogs. */
+.spycraft2-character-target { min-inline-size: 0; overflow-wrap: anywhere; }
+.spycraft2-character-target > label { display: block; margin: 0.35rem 0; }
+.spycraft2-character-target :is(select, input) { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+
+/* New-contact provenance remains within the Training sheet at narrow widths. */
+.spycraft2 ul.contact-rows li { flex-wrap: wrap; }
+.spycraft2 ul.contact-rows li > input { flex: 1 1 110px; min-width: 0; }
+.spycraft2 .contact-upgrade { flex: 1 0 100%; min-width: 0; }
+.spycraft2 .contact-upgrade label { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.spycraft2 .contact-upgrade select, .spycraft2 .contact-upgrade input:not([type="checkbox"]) { max-width: 100%; min-width: 0; }

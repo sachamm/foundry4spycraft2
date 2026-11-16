@@ -1,0 +1,3969 @@
+{
+  "actor": "SScUfOgnm02VOhcA",
+  "rolls": [
+    3,
+    7,
+    4,
+    3,
+    6,
+    8,
+    2,
+    12
+  ],
+  "checks": [],
+  "combats": [],
+  "battle": "5gMVvmzB5Is7opkd",
+  "aquatic": "xboskBNmsmyAjZYU",
+  "home": "ESU6o7wjoZxd9V3V",
+  "feat": "ZptktpZtjFuX7epD",
+  "combat": "JMewYvEB9ir9hQXH",
+  "source": {
+    "name": "Superior Cover",
+    "type": "feat",
+    "img": "icons/svg/combat.svg",
+    "system": {
+      "description": "<p>While in cover you can take –2 to attack and skill checks for a round to gain DR equal to your cover's Reflex bonus.</p>",
+      "source": "Spycraft 2.0 (summary)",
+      "tree": "basicCombat",
+      "prerequisites": {
+        "type": "all",
+        "of": [
+          {
+            "type": "feat",
+            "name": "Battle Hardened"
+          },
+          {
+            "type": "base",
+            "key": "defense",
+            "min": 3
+          }
+        ]
+      },
+      "prerequisitesNotChecked": false,
+      "ranks": 1,
+      "granted": false,
+      "grantSource": "",
+      "repeatable": false,
+      "maxSelections": 0,
+      "bonuses": [],
+      "temporaryGrant": null,
+      "featKind": "permanent",
+      "candidateBasis": null,
+      "choice": "",
+      "contactGrantMode": "associate",
+      "contactTheme": "",
+      "contactThemeConfirmed": false,
+      "restrictions": "",
+      "trainingSkills": {},
+      "focusChoices": [],
+      "manualPrerequisitesConfirmed": false,
+      "acquisitionSource": "",
+      "acquisitionCheck": {
+        "ok": true,
+        "unmet": [],
+        "level": 9,
+        "signature": "{\"prerequisites\":{\"of\":[{\"name\":\"Battle Hardened\",\"type\":\"feat\"},{\"key\":\"defense\",\"min\":3,\"type\":\"base\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"basicCombat\"}"
+      },
+      "historicalPrerequisitesConfirmed": false,
+      "acquiredAtLevel": 9
+    },
+    "effects": [],
+    "folder": "wgTwtcR9OvQEdj6h",
+    "sort": 18,
+    "ownership": {
+      "default": 0,
+      "WW1y27MJMt1sWfHr": 3
+    },
+    "flags": {},
+    "_stats": {
+      "coreVersion": "14.370",
+      "systemId": "spycraft2",
+      "systemVersion": "0.3.1",
+      "createdTime": 1794834773090,
+      "modifiedTime": 1794834773090,
+      "lastModifiedBy": "WW1y27MJMt1sWfHr",
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null
+    },
+    "_id": "ZptktpZtjFuX7epD"
+  },
+  "baseline": {
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "focuses": {
+      "cultures": [],
+      "drive": [],
+      "profession": [],
+      "science": [],
+      "fortes": []
+    },
+    "focusPicks": {
+      "cultures": {
+        "baseAvailable": 1,
+        "available": 1,
+        "used": 0,
+        "remaining": 1,
+        "genericSpent": 0
+      },
+      "drive": {
+        "baseAvailable": 4,
+        "available": 4,
+        "used": 0,
+        "remaining": 4,
+        "genericSpent": 0
+      },
+      "profession": {
+        "baseAvailable": 4,
+        "available": 4,
+        "used": 0,
+        "remaining": 4,
+        "genericSpent": 0
+      },
+      "science": {
+        "baseAvailable": 1,
+        "available": 1,
+        "used": 0,
+        "remaining": 1,
+        "genericSpent": 0
+      },
+      "generic": {
+        "available": 2,
+        "used": 0,
+        "remaining": 2,
+        "reservedAvailable": 0,
+        "reservedUsed": 0,
+        "unscopedAvailable": 2,
+        "unscopedRemaining": 2
+      }
+    },
+    "active": [
+      "Battle Hardened",
+      "Aquatic Training",
+      "Home Turf",
+      "Superior Cover"
+    ],
+    "limited": []
+  },
+  "nativeBuild": {
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "sources": [
+      {
+        "id": "5gMVvmzB5Is7opkd",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      },
+      {
+        "id": "xboskBNmsmyAjZYU",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      },
+      {
+        "id": "ESU6o7wjoZxd9V3V",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      },
+      {
+        "id": "ZptktpZtjFuX7epD",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      }
+    ],
+    "clock": {
+      "id": "JMewYvEB9ir9hQXH",
+      "started": true,
+      "round": 1,
+      "turn": 0,
+      "combatantId": "HNIYe5NQO3zliy8k",
+      "ownTurnIndex": 0
+    }
+  },
+  "sourceGuard": "Home Turf must be currently available.",
+  "saves": [
+    {
+      "message": "ChatMessage.mlR43gxnaLmTUKbx",
+      "base": 4,
+      "flags": {
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": {
+          "version": 1,
+          "terrainCover": {
+            "version": 1,
+            "context": {
+              "personalCover": 0,
+              "sceneryCover": 1,
+              "homeTurfCover": true,
+              "homeTurfCoverSource": "scenery",
+              "partialSubmersionCover": true,
+              "terrainCoverConfirmed": true
+            },
+            "sources": [
+              {
+                "source": "Aquatic Training",
+                "kind": "scenery",
+                "beforeGrade": 1,
+                "afterGrade": 2,
+                "increase": 1
+              },
+              {
+                "source": "Home Turf",
+                "kind": "scenery",
+                "beforeGrade": 2,
+                "afterGrade": 3,
+                "increase": 1
+              }
+            ],
+            "personalCover": 0,
+            "sceneryCover": 3,
+            "beforeGrade": 1,
+            "grade": 3,
+            "increase": 2
+          },
+          "personalCover": 0,
+          "sceneryCover": 3,
+          "grade": 3,
+          "effectBeyondCover": true,
+          "bonus": 3
+        },
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "JMewYvEB9ir9hQXH",
+          "round": 1,
+          "combatantId": "HNIYe5NQO3zliy8k"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": {
+          "version": 1,
+          "grade": 0,
+          "flatFooted": false,
+          "reflexReducesDamage": false
+        },
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 12,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": {
+          "poison": false,
+          "avoidCatchingFire": false,
+          "smokeInhalation": false,
+          "bonuses": [],
+          "adjustment": 0,
+          "notes": []
+        },
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 10,
+        "rolledTotal": 10,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 10,
+        "actorUuid": "Actor.SScUfOgnm02VOhcA",
+        "checkKind": "save",
+        "ability": "",
+        "skillKey": "",
+        "checkId": "ref",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 7
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 0,
+        "cap": null,
+        "baseFlavor": "Reflex — Cover/Reflex +3",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 3,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "message": "ChatMessage.BKgHcuySKMSVzUEc",
+      "base": 4,
+      "flags": {
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": {
+          "version": 1,
+          "personalCover": 0,
+          "sceneryCover": 1,
+          "grade": 1,
+          "effectBeyondCover": true,
+          "bonus": 1
+        },
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "JMewYvEB9ir9hQXH",
+          "round": 1,
+          "combatantId": "HNIYe5NQO3zliy8k"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": {
+          "version": 1,
+          "grade": 0,
+          "flatFooted": false,
+          "reflexReducesDamage": false
+        },
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 12,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": {
+          "poison": false,
+          "avoidCatchingFire": false,
+          "smokeInhalation": false,
+          "bonuses": [],
+          "adjustment": 0,
+          "notes": []
+        },
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 25,
+        "rolledTotal": 25,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 25,
+        "actorUuid": "Actor.SScUfOgnm02VOhcA",
+        "checkKind": "save",
+        "ability": "",
+        "skillKey": "",
+        "checkId": "ref",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 5
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 0,
+        "cap": null,
+        "baseFlavor": "Reflex — Cover/Reflex +1",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 20,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "message": "ChatMessage.sREmKS3is2W6ppo9",
+      "actualUI": true,
+      "base": 4,
+      "flags": {
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": {
+          "version": 1,
+          "terrainCover": {
+            "version": 1,
+            "context": {
+              "personalCover": 0,
+              "sceneryCover": 1,
+              "homeTurfCover": true,
+              "homeTurfCoverSource": "scenery",
+              "partialSubmersionCover": true,
+              "terrainCoverConfirmed": true
+            },
+            "sources": [
+              {
+                "source": "Aquatic Training",
+                "kind": "scenery",
+                "beforeGrade": 1,
+                "afterGrade": 2,
+                "increase": 1
+              },
+              {
+                "source": "Home Turf",
+                "kind": "scenery",
+                "beforeGrade": 2,
+                "afterGrade": 3,
+                "increase": 1
+              }
+            ],
+            "personalCover": 0,
+            "sceneryCover": 3,
+            "beforeGrade": 1,
+            "grade": 3,
+            "increase": 2
+          },
+          "personalCover": 0,
+          "sceneryCover": 3,
+          "grade": 3,
+          "effectBeyondCover": true,
+          "bonus": 3
+        },
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "JMewYvEB9ir9hQXH",
+          "round": 1,
+          "combatantId": "HNIYe5NQO3zliy8k"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": {
+          "version": 1,
+          "grade": 0,
+          "flatFooted": false,
+          "reflexReducesDamage": false
+        },
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 12,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": {
+          "poison": false,
+          "avoidCatchingFire": false,
+          "smokeInhalation": false,
+          "bonuses": [],
+          "adjustment": 0,
+          "notes": []
+        },
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 18,
+        "rolledTotal": 18,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 18,
+        "actorUuid": "Actor.SScUfOgnm02VOhcA",
+        "checkKind": "save",
+        "ability": "",
+        "skillKey": "",
+        "checkId": "ref",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 7
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 0,
+        "cap": null,
+        "baseFlavor": "Reflex — Cover/Reflex +3",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 11,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    }
+  ],
+  "states": [
+    {
+      "stage": "declared",
+      "state": {
+        "active": true,
+        "penalty": 2,
+        "dr": 3,
+        "needsReview": false,
+        "coverLost": false,
+        "dueRound": 2
+      },
+      "record": {
+        "version": 1,
+        "combatId": "JMewYvEB9ir9hQXH",
+        "combatantId": "HNIYe5NQO3zliy8k",
+        "startRound": 1,
+        "dueRound": 2,
+        "personalCover": 0,
+        "sceneryCover": 3,
+        "terrainCover": {
+          "version": 1,
+          "context": {
+            "personalCover": 0,
+            "sceneryCover": 1,
+            "homeTurfCover": true,
+            "homeTurfCoverSource": "scenery",
+            "partialSubmersionCover": true,
+            "terrainCoverConfirmed": true
+          },
+          "sources": [
+            {
+              "source": "Aquatic Training",
+              "kind": "scenery",
+              "beforeGrade": 1,
+              "afterGrade": 2,
+              "increase": 1
+            },
+            {
+              "source": "Home Turf",
+              "kind": "scenery",
+              "beforeGrade": 2,
+              "afterGrade": 3,
+              "increase": 1
+            }
+          ],
+          "personalCover": 0,
+          "sceneryCover": 3,
+          "beforeGrade": 1,
+          "grade": 3,
+          "increase": 2
+        },
+        "reflexBonus": 3,
+        "coverLost": false,
+        "note": "QA home pond partial submersion",
+        "id": "Y6ORA4IrkUAe4wg3",
+        "at": 126,
+        "by": "WW1y27MJMt1sWfHr"
+      }
+    },
+    {
+      "stage": "Aquatic expiry",
+      "state": {
+        "active": true,
+        "penalty": 2,
+        "dr": 2,
+        "needsReview": false,
+        "coverLost": false,
+        "dueRound": 2
+      }
+    },
+    {
+      "stage": "Home expiry",
+      "state": {
+        "active": true,
+        "penalty": 2,
+        "dr": 2,
+        "needsReview": false,
+        "coverLost": false,
+        "dueRound": 2
+      }
+    },
+    {
+      "stage": "Removed terrain declaration",
+      "state": {
+        "active": true,
+        "penalty": 2,
+        "dr": 1,
+        "needsReview": false,
+        "coverLost": false,
+        "dueRound": 2
+      },
+      "record": {
+        "version": 1,
+        "combatId": "JMewYvEB9ir9hQXH",
+        "combatantId": "HNIYe5NQO3zliy8k",
+        "startRound": 1,
+        "dueRound": 2,
+        "personalCover": 0,
+        "sceneryCover": 1,
+        "reflexBonus": 1,
+        "coverLost": false,
+        "note": "QA ordinary pond cover",
+        "id": "Y6ORA4IrkUAe4wg3",
+        "at": 126,
+        "by": "WW1y27MJMt1sWfHr"
+      }
+    },
+    {
+      "stage": "New own-Count declaration after actual cover loss",
+      "state": {
+        "active": true,
+        "penalty": 2,
+        "dr": 3,
+        "needsReview": false,
+        "coverLost": false,
+        "dueRound": 2
+      },
+      "record": {
+        "version": 1,
+        "combatId": "JMewYvEB9ir9hQXH",
+        "combatantId": "HNIYe5NQO3zliy8k",
+        "startRound": 1,
+        "dueRound": 2,
+        "personalCover": 0,
+        "sceneryCover": 3,
+        "reflexBonus": 3,
+        "coverLost": false,
+        "note": "QA corrected native terrain review",
+        "id": "ycaPE8g7guUm5c54",
+        "at": 126,
+        "by": "WW1y27MJMt1sWfHr",
+        "terrainCover": {
+          "version": 1,
+          "context": {
+            "personalCover": 0,
+            "sceneryCover": 1,
+            "homeTurfCover": true,
+            "homeTurfCoverSource": "scenery",
+            "partialSubmersionCover": true,
+            "terrainCoverConfirmed": true
+          },
+          "sources": [
+            {
+              "source": "Aquatic Training",
+              "kind": "scenery",
+              "beforeGrade": 1,
+              "afterGrade": 2,
+              "increase": 1
+            },
+            {
+              "source": "Home Turf",
+              "kind": "scenery",
+              "beforeGrade": 2,
+              "afterGrade": 3,
+              "increase": 1
+            }
+          ],
+          "personalCover": 0,
+          "sceneryCover": 3,
+          "beforeGrade": 1,
+          "grade": 3,
+          "increase": 2
+        }
+      }
+    }
+  ],
+  "reviewNoDouble": true,
+  "coverLostGuard": "Losing cover ended this DR benefit. A new declaration requires your Initiative Count.",
+  "defenseUI": "Incoming attack — result\n\nDefense 21\n\nCover: Three-quarters (3/4), Defense +6; ordinary Reflex bonus +3 against effects beyond the cover (apply separately to the save).\n\nAquatic Training: +1quarter scenery cover before attacker reductions.\n\nHome Turf: +1quarter scenery cover before attacker reductions.\n\nAn attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit.\n\nDEX 1; dodge bonuses removed 0; security-device bonus +0; adjacent Eye of the Storm bonus +0.\n\nUncanny Dodge grade 0; vulnerable no; flat-footed no; flanked no; helpless no.\n\nAttacker modifier +0 (pinned target, adjacent melee/unarmed +0; prone target 0; crouched target 0; blinded target +0; helpless target within Melee Range +0). Coup de Grace target eligible: no.\n\nKnown sneak attack immunity: no.\n\nListed DR before armor piercing/type exceptions: melee weapons 4, unarmed 4, non-grenade hurled weapons 4, other ranged weapons 4, other 4.\n\nPinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).\n\nThe helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.\n\nInvisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation.\n\nConfirm",
+  "superiorUI": {
+    "version": 1,
+    "combatId": "JMewYvEB9ir9hQXH",
+    "combatantId": "HNIYe5NQO3zliy8k",
+    "startRound": 1,
+    "dueRound": 2,
+    "personalCover": 0,
+    "sceneryCover": 3,
+    "reflexBonus": 3,
+    "coverLost": false,
+    "note": "Actual Main UI raw-grade review",
+    "id": "i9Xn4RPMXOTiiMjY",
+    "at": 126,
+    "by": "WW1y27MJMt1sWfHr",
+    "terrainCover": {
+      "version": 1,
+      "context": {
+        "personalCover": 0,
+        "sceneryCover": 1,
+        "homeTurfCover": true,
+        "homeTurfCoverSource": "scenery",
+        "partialSubmersionCover": true,
+        "terrainCoverConfirmed": true
+      },
+      "sources": [
+        {
+          "source": "Aquatic Training",
+          "kind": "scenery",
+          "beforeGrade": 1,
+          "afterGrade": 2,
+          "increase": 1
+        },
+        {
+          "source": "Home Turf",
+          "kind": "scenery",
+          "beforeGrade": 2,
+          "afterGrade": 3,
+          "increase": 1
+        }
+      ],
+      "personalCover": 0,
+      "sceneryCover": 3,
+      "beforeGrade": 1,
+      "grade": 3,
+      "increase": 2
+    }
+  },
+  "persisted": {
+    "actor": {
+      "name": "RAW QA TerrainCover280",
+      "type": "agent",
+      "flags": {
+        "spycraft2": {
+          "startingDiceCreation": {
+            "id": "dCjnIIUuPzzzRGvc",
+            "session": "MeCkrj45ff0VaUEr",
+            "at": 126,
+            "claimed": false
+          },
+          "vitalityRolls": {
+            "YbPEjEh9E70LNNQj": {
+              "version": 1,
+              "id": "YbPEjEh9E70LNNQj",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 1,
+              "careerLevel": 2,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 3,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 3,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 3,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "hveRgcmXTU5dLd4e",
+              "actionDiceAllowed": false
+            },
+            "gGETIWz3EicpuQw5": {
+              "version": 1,
+              "id": "gGETIWz3EicpuQw5",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 2,
+              "careerLevel": 3,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 7,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 7,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 7,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "vpFJZpDIpZjZESFj",
+              "actionDiceAllowed": false
+            },
+            "61mpjgrZVt8Wfq4I": {
+              "version": 1,
+              "id": "61mpjgrZVt8Wfq4I",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 3,
+              "careerLevel": 4,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 4,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 4,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 4,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "iRGrN8V9gdPJMapw",
+              "actionDiceAllowed": false
+            },
+            "LtG12Saxq8LqP1JL": {
+              "version": 1,
+              "id": "LtG12Saxq8LqP1JL",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 4,
+              "careerLevel": 5,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 3,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 3,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 3,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "Ef7l9CanNxjyq1cN",
+              "actionDiceAllowed": false
+            },
+            "kYWpGu1BK7vhiZkT": {
+              "version": 1,
+              "id": "kYWpGu1BK7vhiZkT",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 5,
+              "careerLevel": 6,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 6,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 6,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 6,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "uLGVVxkK7Z58PnoF",
+              "actionDiceAllowed": false
+            },
+            "iKft8dwCX7S6AZgC": {
+              "version": 1,
+              "id": "iKft8dwCX7S6AZgC",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 6,
+              "careerLevel": 7,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 8,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 8,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 8,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "nyX8Xp4S7Mk7OBs3",
+              "actionDiceAllowed": false
+            },
+            "jUzbNsRP8FlxxhDe": {
+              "version": 1,
+              "id": "jUzbNsRP8FlxxhDe",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 7,
+              "careerLevel": 8,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 2,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 2,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 2,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "n0ODM3LBEY7UB5Kf",
+              "actionDiceAllowed": false
+            },
+            "3pjnDmmTLyAaUGPR": {
+              "version": 1,
+              "id": "3pjnDmmTLyAaUGPR",
+              "actorUuid": "Actor.SScUfOgnm02VOhcA",
+              "index": 8,
+              "careerLevel": 9,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 12,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 12,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 12,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "fySNd4aatE8Ah3TO",
+              "actionDiceAllowed": false
+            }
+          },
+          "superiorCoverDeclarations": {
+            "Y6ORA4IrkUAe4wg3": {
+              "version": 1,
+              "combatId": "JMewYvEB9ir9hQXH",
+              "combatantId": "HNIYe5NQO3zliy8k",
+              "startRound": 1,
+              "dueRound": 2,
+              "personalCover": 0,
+              "sceneryCover": 3,
+              "terrainCover": {
+                "version": 1,
+                "context": {
+                  "personalCover": 0,
+                  "sceneryCover": 1,
+                  "homeTurfCover": true,
+                  "homeTurfCoverSource": "scenery",
+                  "partialSubmersionCover": true,
+                  "terrainCoverConfirmed": true
+                },
+                "sources": [
+                  {
+                    "source": "Aquatic Training",
+                    "kind": "scenery",
+                    "beforeGrade": 1,
+                    "afterGrade": 2,
+                    "increase": 1
+                  },
+                  {
+                    "source": "Home Turf",
+                    "kind": "scenery",
+                    "beforeGrade": 2,
+                    "afterGrade": 3,
+                    "increase": 1
+                  }
+                ],
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "beforeGrade": 1,
+                "grade": 3,
+                "increase": 2
+              },
+              "reflexBonus": 3,
+              "coverLost": false,
+              "note": "QA home pond partial submersion",
+              "id": "Y6ORA4IrkUAe4wg3",
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "ycaPE8g7guUm5c54": {
+              "version": 1,
+              "combatId": "JMewYvEB9ir9hQXH",
+              "combatantId": "HNIYe5NQO3zliy8k",
+              "startRound": 1,
+              "dueRound": 2,
+              "personalCover": 0,
+              "sceneryCover": 3,
+              "terrainCover": {
+                "version": 1,
+                "context": {
+                  "personalCover": 0,
+                  "sceneryCover": 1,
+                  "homeTurfCover": true,
+                  "homeTurfCoverSource": "scenery",
+                  "partialSubmersionCover": true,
+                  "terrainCoverConfirmed": true
+                },
+                "sources": [
+                  {
+                    "source": "Aquatic Training",
+                    "kind": "scenery",
+                    "beforeGrade": 1,
+                    "afterGrade": 2,
+                    "increase": 1
+                  },
+                  {
+                    "source": "Home Turf",
+                    "kind": "scenery",
+                    "beforeGrade": 2,
+                    "afterGrade": 3,
+                    "increase": 1
+                  }
+                ],
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "beforeGrade": 1,
+                "grade": 3,
+                "increase": 2
+              },
+              "reflexBonus": 3,
+              "coverLost": false,
+              "note": "QA corrected native terrain review",
+              "id": "ycaPE8g7guUm5c54",
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "i9Xn4RPMXOTiiMjY": {
+              "version": 1,
+              "combatId": "JMewYvEB9ir9hQXH",
+              "combatantId": "HNIYe5NQO3zliy8k",
+              "startRound": 1,
+              "dueRound": 2,
+              "personalCover": 0,
+              "sceneryCover": 3,
+              "terrainCover": {
+                "version": 1,
+                "context": {
+                  "personalCover": 0,
+                  "sceneryCover": 1,
+                  "homeTurfCover": true,
+                  "homeTurfCoverSource": "scenery",
+                  "partialSubmersionCover": true,
+                  "terrainCoverConfirmed": true
+                },
+                "sources": [
+                  {
+                    "source": "Aquatic Training",
+                    "kind": "scenery",
+                    "beforeGrade": 1,
+                    "afterGrade": 2,
+                    "increase": 1
+                  },
+                  {
+                    "source": "Home Turf",
+                    "kind": "scenery",
+                    "beforeGrade": 2,
+                    "afterGrade": 3,
+                    "increase": 1
+                  }
+                ],
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "beforeGrade": 1,
+                "grade": 3,
+                "increase": 2
+              },
+              "reflexBonus": 3,
+              "coverLost": false,
+              "note": "Actual Main UI home pond declaration",
+              "id": "i9Xn4RPMXOTiiMjY",
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            }
+          },
+          "superiorCoverReviews": {
+            "wzlpGOW6GVaDrrjD": {
+              "id": "wzlpGOW6GVaDrrjD",
+              "declarationId": "Y6ORA4IrkUAe4wg3",
+              "before": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                },
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA home pond partial submersion",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr"
+              },
+              "after": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA same raw one-quarter pond",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr",
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                }
+              },
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "YcDBATsO3TiwKmeg": {
+              "id": "YcDBATsO3TiwKmeg",
+              "declarationId": "Y6ORA4IrkUAe4wg3",
+              "before": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                },
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA same raw one-quarter pond",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr"
+              },
+              "after": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA corrected native terrain review",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr",
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                }
+              },
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "uavF3NbNI4gta8ga": {
+              "id": "uavF3NbNI4gta8ga",
+              "declarationId": "Y6ORA4IrkUAe4wg3",
+              "before": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                },
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA corrected native terrain review",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr"
+              },
+              "after": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA corrected native terrain review",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr",
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                }
+              },
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "JZpRsTgENZ2KYdlh": {
+              "id": "JZpRsTgENZ2KYdlh",
+              "declarationId": "Y6ORA4IrkUAe4wg3",
+              "before": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                },
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA corrected native terrain review",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr"
+              },
+              "after": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 1,
+                "reflexBonus": 1,
+                "coverLost": false,
+                "note": "QA ordinary pond cover",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr"
+              },
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "C6sxsnNJCHVn4tRO": {
+              "id": "C6sxsnNJCHVn4tRO",
+              "declarationId": "Y6ORA4IrkUAe4wg3",
+              "before": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 1,
+                "reflexBonus": 1,
+                "coverLost": false,
+                "note": "QA ordinary pond cover",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr"
+              },
+              "after": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA corrected native terrain review",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr",
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                }
+              },
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "DYmb4hnXkyvHn8nd": {
+              "id": "DYmb4hnXkyvHn8nd",
+              "declarationId": "Y6ORA4IrkUAe4wg3",
+              "before": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "QA corrected native terrain review",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr",
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                }
+              },
+              "after": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 0,
+                "reflexBonus": 0,
+                "coverLost": true,
+                "note": "QA lost all physical cover",
+                "id": "Y6ORA4IrkUAe4wg3",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr"
+              },
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            },
+            "xEI7Y15VGgFwYGee": {
+              "id": "xEI7Y15VGgFwYGee",
+              "declarationId": "i9Xn4RPMXOTiiMjY",
+              "before": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "Actual Main UI home pond declaration",
+                "id": "i9Xn4RPMXOTiiMjY",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr",
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                }
+              },
+              "after": {
+                "version": 1,
+                "combatId": "JMewYvEB9ir9hQXH",
+                "combatantId": "HNIYe5NQO3zliy8k",
+                "startRound": 1,
+                "dueRound": 2,
+                "personalCover": 0,
+                "sceneryCover": 3,
+                "reflexBonus": 3,
+                "coverLost": false,
+                "note": "Actual Main UI raw-grade review",
+                "id": "i9Xn4RPMXOTiiMjY",
+                "at": 126,
+                "by": "WW1y27MJMt1sWfHr",
+                "terrainCover": {
+                  "version": 1,
+                  "context": {
+                    "personalCover": 0,
+                    "sceneryCover": 1,
+                    "homeTurfCover": true,
+                    "homeTurfCoverSource": "scenery",
+                    "partialSubmersionCover": true,
+                    "terrainCoverConfirmed": true
+                  },
+                  "sources": [
+                    {
+                      "source": "Aquatic Training",
+                      "kind": "scenery",
+                      "beforeGrade": 1,
+                      "afterGrade": 2,
+                      "increase": 1
+                    },
+                    {
+                      "source": "Home Turf",
+                      "kind": "scenery",
+                      "beforeGrade": 2,
+                      "afterGrade": 3,
+                      "increase": 1
+                    }
+                  ],
+                  "personalCover": 0,
+                  "sceneryCover": 3,
+                  "beforeGrade": 1,
+                  "grade": 3,
+                  "increase": 2
+                }
+              },
+              "at": 126,
+              "by": "WW1y27MJMt1sWfHr"
+            }
+          }
+        }
+      },
+      "system": {
+        "abilities": {
+          "str": {
+            "base": 12,
+            "misc": 0
+          },
+          "dex": {
+            "base": 13,
+            "misc": 0
+          },
+          "con": {
+            "base": 14,
+            "misc": 0
+          },
+          "int": {
+            "base": 15,
+            "misc": 0
+          },
+          "wis": {
+            "base": 12,
+            "misc": 0
+          },
+          "cha": {
+            "base": 11,
+            "misc": 0
+          }
+        },
+        "progression": [
+          {
+            "classId": "soldier",
+            "vitality": 6,
+            "careerEntryId": "",
+            "vitalityRollId": "",
+            "vitalityReviewId": "",
+            "intelligenceModifier": null,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 4,
+              "drive": 4,
+              "intimidate": 4,
+              "notice": 1,
+              "profession": 4,
+              "resolve": 4,
+              "search": 3
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 3,
+            "careerEntryId": "gepbOaBiXH4qYQAL",
+            "vitalityRollId": "YbPEjEh9E70LNNQj",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 3
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 7,
+            "careerEntryId": "UFDpE4zF1xfXEfMq",
+            "vitalityRollId": "gGETIWz3EicpuQw5",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 2,
+              "profession": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 4,
+            "careerEntryId": "APDClYX06HxZF2OJ",
+            "vitalityRollId": "61mpjgrZVt8Wfq4I",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 2
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 3,
+            "careerEntryId": "7LroUE8OapxQVqnh",
+            "vitalityRollId": "LtG12Saxq8LqP1JL",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 6,
+            "careerEntryId": "5tAIiZDkLIofAirV",
+            "vitalityRollId": "kYWpGu1BK7vhiZkT",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 8,
+            "careerEntryId": "XUmOsClgrDYXdNk0",
+            "vitalityRollId": "iKft8dwCX7S6AZgC",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 2,
+            "careerEntryId": "okHPd5Y4kGm5q5aH",
+            "vitalityRollId": "jUzbNsRP8FlxxhDe",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 12,
+            "careerEntryId": "taXimIzd0k2y2vI8",
+            "vitalityRollId": "3pjnDmmTLyAaUGPR",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          }
+        ],
+        "actionDice": {
+          "value": 0
+        },
+        "vitality": {
+          "value": 4
+        },
+        "wounds": {
+          "value": 4
+        },
+        "pointBuyBudget": 36,
+        "abilityIncreases": {
+          "l4": "cha",
+          "l8": "cha",
+          "l12": "",
+          "l16": "",
+          "l20": ""
+        },
+        "xp": 0,
+        "codename": "",
+        "details": {
+          "faction": "",
+          "gender": "",
+          "age": "",
+          "height": "",
+          "weight": "",
+          "eyes": "",
+          "hair": ""
+        },
+        "fortuneTeammateIds": [],
+        "actionDieAwards": {},
+        "missionXPRewards": {},
+        "eagleEyeBoost": null,
+        "defenseBoost": null,
+        "noFearBoost": null,
+        "mentalLeaps": [],
+        "fatigueRest": null,
+        "drunkSleep": null,
+        "drunkRepositions": [],
+        "fatigueApplications": [],
+        "mentalLeapFatigueEvents": [],
+        "mentalLeapRecovery": null,
+        "mentalLeapSleep": null,
+        "fortunesOfWarBoost": null,
+        "refreshAction": null,
+        "temporaryShares": {},
+        "assistantGroups": [],
+        "resourceUses": {},
+        "resourcesInitialized": false,
+        "affiliationType": "faction",
+        "reputation": 2,
+        "netWorth": 0,
+        "skills": {
+          "acrobatics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "analysis": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "athletics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "blend": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bluff": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bureaucracy": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "computers": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "cultures": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "drive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "electronics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "falsify": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "impress": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "intimidate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "investigation": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "manipulate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "mechanics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "medicine": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "networking": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "notice": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "profession": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "resolve": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "science": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "search": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "security": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "senseMotive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sleightOfHand": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sneak": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "streetwise": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "survival": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "tactics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          }
+        },
+        "proficiencies": {
+          "unarmed": {
+            "proficient": false,
+            "forte": false
+          },
+          "blunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticBlunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "edged": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticEdged": {
+            "proficient": false,
+            "forte": false
+          },
+          "explosives": {
+            "proficient": false,
+            "forte": false
+          },
+          "guided": {
+            "proficient": false,
+            "forte": false
+          },
+          "handgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "hurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticHurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "indirectFire": {
+            "proficient": false,
+            "forte": false
+          },
+          "rifle": {
+            "proficient": false,
+            "forte": false
+          },
+          "shotgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "submachineGun": {
+            "proficient": false,
+            "forte": false
+          },
+          "tactical": {
+            "proficient": false,
+            "forte": false
+          },
+          "vehicleWeapon": {
+            "proficient": false,
+            "forte": false
+          }
+        },
+        "focuses": {
+          "cultures": [],
+          "drive": [],
+          "profession": [],
+          "science": [],
+          "fortes": []
+        },
+        "startingIntelligenceModifier": null,
+        "skillFortes": [],
+        "crossroadsTitle": "",
+        "relinquishedInterests": 0,
+        "interests": "",
+        "contacts": [],
+        "subplots": [],
+        "gearPickLosses": {},
+        "missionReserves": null,
+        "armorMissionGrant": null,
+        "bigStickMissionPick": null,
+        "missionCaliberPicks": {},
+        "classGearGrants": {},
+        "bonusActionDice": {},
+        "missionReserveHistory": [],
+        "wealthAllocation": {
+          "lifestyle": 0,
+          "possessions": 0,
+          "spendingCash": 0,
+          "dressedForLifestyle": false
+        },
+        "misc": {
+          "bab": 0,
+          "fort": 0,
+          "ref": 0,
+          "will": 0,
+          "defense": 0,
+          "initiative": 0,
+          "wealth": 0,
+          "vitality": 0,
+          "wounds": 0,
+          "speed": 0,
+          "actionDice": 0,
+          "knowledge": 0,
+          "request": 0,
+          "gearCheck": 0,
+          "gearR": 0,
+          "gearT": 0,
+          "gearV": 0,
+          "gearS": 0,
+          "gearG": 0,
+          "gearW": 0,
+          "gearE": 0
+        },
+        "biography": "",
+        "twoWeaponStyle": null,
+        "dartingStyle": null,
+        "totalDefense": null,
+        "combatExpertise": null,
+        "superiorCover": {
+          "version": 1,
+          "combatId": "JMewYvEB9ir9hQXH",
+          "combatantId": "HNIYe5NQO3zliy8k",
+          "startRound": 1,
+          "dueRound": 2,
+          "personalCover": 0,
+          "sceneryCover": 3,
+          "reflexBonus": 3,
+          "coverLost": false,
+          "note": "Actual Main UI raw-grade review",
+          "id": "i9Xn4RPMXOTiiMjY",
+          "at": 126,
+          "by": "WW1y27MJMt1sWfHr",
+          "terrainCover": {
+            "version": 1,
+            "context": {
+              "personalCover": 0,
+              "sceneryCover": 1,
+              "homeTurfCover": true,
+              "homeTurfCoverSource": "scenery",
+              "partialSubmersionCover": true,
+              "terrainCoverConfirmed": true
+            },
+            "sources": [
+              {
+                "source": "Aquatic Training",
+                "kind": "scenery",
+                "beforeGrade": 1,
+                "afterGrade": 2,
+                "increase": 1
+              },
+              {
+                "source": "Home Turf",
+                "kind": "scenery",
+                "beforeGrade": 2,
+                "afterGrade": 3,
+                "increase": 1
+              }
+            ],
+            "personalCover": 0,
+            "sceneryCover": 3,
+            "beforeGrade": 1,
+            "grade": 3,
+            "increase": 2
+          }
+        },
+        "accumulatedDamage": null,
+        "analysisTasks": {},
+        "safeHouses": {},
+        "careerAgentRewards": {},
+        "wellFundedGrants": {}
+      },
+      "items": [
+        {
+          "name": "Soldier",
+          "type": "class",
+          "system": {
+            "expert": false,
+            "skillPoints": 4,
+            "proficiencies": 6,
+            "coreAbility": {
+              "name": "Accurate",
+              "description": ""
+            },
+            "classSkills": [
+              "athletics",
+              "drive",
+              "intimidate",
+              "notice",
+              "profession",
+              "resolve",
+              "search",
+              "survival",
+              "tactics"
+            ],
+            "table": [
+              {
+                "level": 1,
+                "bab": 1,
+                "fort": 1,
+                "ref": 0,
+                "will": 2,
+                "defense": 0,
+                "initiative": 2,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 2,
+                "bab": 2,
+                "fort": 2,
+                "ref": 0,
+                "will": 3,
+                "defense": 1,
+                "initiative": 3,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 3,
+                "bab": 3,
+                "fort": 2,
+                "ref": 1,
+                "will": 3,
+                "defense": 1,
+                "initiative": 4,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 4,
+                "bab": 4,
+                "fort": 2,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 5,
+                "bab": 5,
+                "fort": 3,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 6,
+                "bab": 6,
+                "fort": 3,
+                "ref": 2,
+                "will": 5,
+                "defense": 2,
+                "initiative": 6,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 7,
+                "bab": 7,
+                "fort": 4,
+                "ref": 2,
+                "will": 5,
+                "defense": 3,
+                "initiative": 7,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 8,
+                "bab": 8,
+                "fort": 4,
+                "ref": 2,
+                "will": 6,
+                "defense": 3,
+                "initiative": 8,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 9,
+                "bab": 9,
+                "fort": 4,
+                "ref": 3,
+                "will": 6,
+                "defense": 4,
+                "initiative": 9,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 10,
+                "bab": 10,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 11,
+                "bab": 11,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 12,
+                "bab": 12,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 11,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 13,
+                "bab": 13,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 12,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 14,
+                "bab": 14,
+                "fort": 6,
+                "ref": 4,
+                "will": 9,
+                "defense": 6,
+                "initiative": 13,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 15,
+                "bab": 15,
+                "fort": 7,
+                "ref": 5,
+                "will": 9,
+                "defense": 6,
+                "initiative": 14,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 16,
+                "bab": 16,
+                "fort": 7,
+                "ref": 5,
+                "will": 10,
+                "defense": 6,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 17,
+                "bab": 17,
+                "fort": 8,
+                "ref": 5,
+                "will": 10,
+                "defense": 7,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 18,
+                "bab": 18,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 7,
+                "initiative": 16,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 19,
+                "bab": 19,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 8,
+                "initiative": 17,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 20,
+                "bab": 20,
+                "fort": 9,
+                "ref": 6,
+                "will": 12,
+                "defense": 8,
+                "initiative": 18,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 3,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              }
+            ],
+            "abilities": [
+              {
+                "level": 1,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 2,
+                "name": "Fortunes of war I",
+                "description": ""
+              },
+              {
+                "level": 3,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 4,
+                "name": "Armor use I",
+                "description": ""
+              },
+              {
+                "level": 5,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 6,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 7,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 8,
+                "name": "Armor use II",
+                "description": ""
+              },
+              {
+                "level": 9,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 10,
+                "name": "Portable cover (1/4)",
+                "description": ""
+              },
+              {
+                "level": 11,
+                "name": "Fight on, fortunes of war II",
+                "description": ""
+              },
+              {
+                "level": 12,
+                "name": "Armor use III, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 13,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 14,
+                "name": "One in a million 1/ session",
+                "description": ""
+              },
+              {
+                "level": 15,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 16,
+                "name": "Armor use IV",
+                "description": ""
+              },
+              {
+                "level": 17,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 18,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 19,
+                "name": "Fight on, fortunes of war III",
+                "description": ""
+              },
+              {
+                "level": 20,
+                "name": "Armor use V, portable cover (1/2)",
+                "description": ""
+              }
+            ],
+            "choiceLists": [
+              {
+                "name": "Fight On",
+                "key": "fightOn",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "2 Weapon Prof",
+                    "bonuses": [
+                      {
+                        "target": "prof.generic",
+                        "value": "2"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 3,
+                    "name": "Basic Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.basicCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 4,
+                    "name": "Melee Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.meleeCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 5,
+                    "name": "Ranged Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.rangedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 6,
+                    "name": "Unarmed Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.unarmedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "featSlot"
+              },
+              {
+                "name": "Weapon Specialist",
+                "key": "weaponSpecialist",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "Big Stick",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 3,
+                    "name": "Foibles",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 4,
+                    "name": "Killer Instinct",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 5,
+                    "name": "Most Deadly",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 6,
+                    "name": "Mow Down",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 7,
+                    "name": "No Worries",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 8,
+                    "name": "Showdown",
+                    "bonuses": []
+                  }
+                ],
+                "kind": "option"
+              }
+            ],
+            "choiceSchedule": [
+              {
+                "level": 1,
+                "list": "fightOn"
+              },
+              {
+                "level": 3,
+                "list": "fightOn"
+              },
+              {
+                "level": 5,
+                "list": "fightOn"
+              },
+              {
+                "level": 6,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 7,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 11,
+                "list": "fightOn"
+              },
+              {
+                "level": 12,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 13,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 17,
+                "list": "fightOn"
+              },
+              {
+                "level": 18,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 19,
+                "list": "fightOn"
+              }
+            ],
+            "bonuses": [
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 8,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 12,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 16,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 20,
+                "bonusType": ""
+              },
+              {
+                "target": "armorCheck",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 2,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 11,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 19,
+                "bonusType": ""
+              }
+            ],
+            "identifier": "soldier",
+            "vitalityDie": 12,
+            "description": "",
+            "source": "",
+            "choices": {},
+            "inheritedChoices": {},
+            "skillChoices": {},
+            "weaponSpecialist": {},
+            "keySkill": "",
+            "keyFocus": "",
+            "professionFocus": "",
+            "phdSkill": "",
+            "phdSkill1": "",
+            "phdSkill2": "",
+            "featGrants": [],
+            "requirements": null
+          },
+          "_id": "XouiN2U98v2BkxQ3",
+          "img": "icons/svg/item-bag.svg",
+          "effects": [],
+          "folder": null,
+          "sort": 0,
+          "ownership": {
+            "default": 0
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794834771164,
+            "modifiedTime": 1794834771164,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        },
+        {
+          "name": "Battle Hardened",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>Gain 2 points of stress damage resistance; Cover Fire and Suppressive Fire aimed at you impose only a –1 penalty.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "basicCombat",
+            "prerequisites": null,
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 1,
+              "signature": "{\"prerequisites\":null,\"source\":\"\",\"tree\":\"basicCombat\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 1
+          },
+          "effects": [],
+          "folder": "wgTwtcR9OvQEdj6h",
+          "sort": 17,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794834771260,
+            "modifiedTime": 1794834771260,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "5gMVvmzB5Is7opkd"
+        },
+        {
+          "name": "Superior Cover",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>While in cover you can take –2 to attack and skill checks for a round to gain DR equal to your cover's Reflex bonus.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "basicCombat",
+            "prerequisites": {
+              "type": "all",
+              "of": [
+                {
+                  "type": "feat",
+                  "name": "Battle Hardened"
+                },
+                {
+                  "type": "base",
+                  "key": "defense",
+                  "min": 3
+                }
+              ]
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 9,
+              "signature": "{\"prerequisites\":{\"of\":[{\"name\":\"Battle Hardened\",\"type\":\"feat\"},{\"key\":\"defense\",\"min\":3,\"type\":\"base\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"basicCombat\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 9
+          },
+          "effects": [],
+          "folder": "wgTwtcR9OvQEdj6h",
+          "sort": 18,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794834773090,
+            "modifiedTime": 1794834773090,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "ZptktpZtjFuX7epD"
+        },
+        {
+          "name": "Aquatic Training",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+2 to Survival, navigation and surprise in water, hold your breath longer, and ambush better there.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "terrain",
+            "prerequisites": {
+              "type": "skill",
+              "key": "athletics",
+              "min": 3
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 3,
+              "signature": "{\"prerequisites\":{\"key\":\"athletics\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"terrain\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 3
+          },
+          "effects": [],
+          "folder": "4F0tD2Ld6zwPOhva",
+          "sort": 296,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794834875012,
+            "modifiedTime": 1794834875012,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "xboskBNmsmyAjZYU"
+        },
+        {
+          "name": "Home Turf",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>Near your home, your result caps with several investigative and outdoor skills rise by 5, among other benefits.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "terrain",
+            "prerequisites": {
+              "type": "skill",
+              "key": "search",
+              "min": 3
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 6,
+              "signature": "{\"prerequisites\":{\"key\":\"search\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"terrain\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 6
+          },
+          "effects": [],
+          "folder": "4F0tD2Ld6zwPOhva",
+          "sort": 302,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794834875056,
+            "modifiedTime": 1794834875056,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "ESU6o7wjoZxd9V3V"
+        }
+      ],
+      "img": "icons/svg/mystery-man.svg",
+      "prototypeToken": {
+        "name": "RAW QA Starting Entry",
+        "displayName": 0,
+        "actorLink": false,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "texture": {
+          "src": "icons/svg/mystery-man.svg",
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "fit": "contain",
+          "scaleX": 1,
+          "scaleY": 1,
+          "tint": "#ffffff",
+          "alphaThreshold": 0.75
+        },
+        "lockRotation": false,
+        "rotation": 0,
+        "alpha": 1,
+        "disposition": -1,
+        "displayBars": 0,
+        "bar1": {
+          "attribute": "vitality"
+        },
+        "bar2": {
+          "attribute": "wounds"
+        },
+        "light": {
+          "negative": false,
+          "priority": 0,
+          "alpha": 0.5,
+          "angle": 360,
+          "bright": 0,
+          "color": null,
+          "coloration": 1,
+          "dim": 0,
+          "attenuation": 0.5,
+          "luminosity": 0.5,
+          "saturation": 0,
+          "contrast": 0,
+          "shadows": 0,
+          "animation": {
+            "type": null,
+            "speed": 5,
+            "intensity": 5,
+            "reverse": false
+          },
+          "darkness": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        "sight": {
+          "enabled": false,
+          "range": 0,
+          "angle": 360,
+          "visionMode": "basic",
+          "color": null,
+          "attenuation": 0.1,
+          "brightness": 0,
+          "saturation": 0,
+          "contrast": 0
+        },
+        "detectionModes": {},
+        "occludable": {
+          "radius": 0
+        },
+        "ring": {
+          "enabled": false,
+          "colors": {
+            "ring": null,
+            "background": null
+          },
+          "effects": 1,
+          "subject": {
+            "scale": 1,
+            "texture": null
+          }
+        },
+        "turnMarker": {
+          "mode": 1,
+          "animation": null,
+          "src": null,
+          "disposition": false
+        },
+        "movementAction": null,
+        "flags": {},
+        "randomImg": false,
+        "appendNumber": false,
+        "prependAdjective": false
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0,
+        "WW1y27MJMt1sWfHr": 3
+      },
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794834771164,
+        "modifiedTime": 1794835122716,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_id": "SScUfOgnm02VOhcA"
+    },
+    "sources": [
+      {
+        "id": "5gMVvmzB5Is7opkd",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      },
+      {
+        "id": "xboskBNmsmyAjZYU",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      },
+      {
+        "id": "ESU6o7wjoZxd9V3V",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      },
+      {
+        "id": "ZptktpZtjFuX7epD",
+        "status": {
+          "ok": true,
+          "unmet": []
+        }
+      }
+    ],
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "state": {
+      "active": true,
+      "penalty": 2,
+      "dr": 3,
+      "needsReview": false,
+      "coverLost": false,
+      "dueRound": 2
+    },
+    "dice": {
+      "value": 0,
+      "max": 4,
+      "die": 6,
+      "explodeAt": 6,
+      "bonus": 0
+    },
+    "combat": {
+      "scene": "NUEDEFAULTSCENE0",
+      "active": true,
+      "round": 1,
+      "turn": 0,
+      "combatants": [
+        {
+          "actorId": "SScUfOgnm02VOhcA",
+          "initiative": 20,
+          "_id": "HNIYe5NQO3zliy8k",
+          "type": "base",
+          "system": {},
+          "tokenId": null,
+          "sceneId": null,
+          "img": null,
+          "hidden": false,
+          "defeated": false,
+          "group": null,
+          "roundJoined": 1,
+          "flags": {
+            "spycraft2": {
+              "shakenInitiative": {
+                "id": "m1YWD3PUDPXyVxt6",
+                "version": 1,
+                "count": 20,
+                "includedPenalty": null,
+                "needsReview": true,
+                "reason": "This existing Initiative Count has no verified Shaken component. Confirm its included full or protected penalty."
+              }
+            }
+          },
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794834773103,
+            "modifiedTime": 1794834857462,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        }
+      ],
+      "_id": "JMewYvEB9ir9hQXH",
+      "name": "",
+      "type": "base",
+      "system": {},
+      "groups": [],
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794834773103,
+        "modifiedTime": 1794834773103,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      }
+    }
+  },
+  "baselinesUnchanged": true,
+  "periods": {
+    "mission": "qa-xp-cancel",
+    "session": "MeCkrj45ff0VaUEr",
+    "scene": "M8ZajdPdnHP2gCsS",
+    "sceneSequence": 2
+  },
+  "gc": {
+    "value": 1,
+    "session": "MeCkrj45ff0VaUEr",
+    "playersPresent": 1,
+    "caliber": 1,
+    "lastReason": "Critical activation",
+    "controllerId": "ZTSRy74hgofWcbms",
+    "settlementReview": {
+      "id": "MfK3PHV2iV2wvias",
+      "needsReview": false,
+      "session": "MeCkrj45ff0VaUEr",
+      "before": 2,
+      "count": 1,
+      "purpose": "Critical activation",
+      "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+      "at": 1794752784259,
+      "outcome": "spent"
+    }
+  },
+  "cleanup": {
+    "actors": 6,
+    "messages": 867,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActor": true,
+    "deletedCombat": true
+  }
+}

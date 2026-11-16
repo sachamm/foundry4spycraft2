@@ -29,9 +29,12 @@
       <label class="res wounds">{{localize "SPYCRAFT.Wounds"}}
         <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span {{sc2tip tips.wounds}}>/ {{system.wounds.max}}</span></label>
       <span class="res action-dice">{{localize "SPYCRAFT.ActionDice.Label"}}
-        <input type="number" name="system.actionDice.value" value="{{system.actionDice.value}}" /> <span {{sc2tip tips.actionDice}}>/ {{system.actionDice.max}} (d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}})</span>
+        <input type="number" name="system.actionDice.value" value="{{system.actionDice.value}}" /> <span {{sc2tip tips.actionDice}}>{{localize "SPYCRAFT.ActionDice.Starting"}} {{system.actionDice.max}} (d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}})</span>
+        {{#unless startingDiceEntry.blocked}}<a data-action="initializeStartingDice" data-tooltip="Begin play once with this character’s starting action dice">Begin play</a>{{/unless}}
         <a data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend"><i class="fa-solid fa-dice"></i></a>
-        <a data-action="refreshActionDice" data-tooltip="SPYCRAFT.ActionDice.Refresh"><i class="fa-solid fa-rotate"></i></a>
+        <a data-action="healActionDice" data-tooltip="Heal outside combat with action dice"><i class="fa-solid fa-heart"></i></a>
+        <a data-action="refreshAction" data-tooltip="Begin or complete a full-round Refresh"><i class="fa-solid fa-hourglass-half"></i></a>
+        <a data-action="boostDefense" data-tooltip="Boost Defense with an action die at round start"><i class="fa-solid fa-shield"></i></a>
       </span>
     </div>
   </div>

@@ -459,7 +459,7 @@
       "bonuses": [
        {
         "target": "contacts",
-        "value": "1"
+        "value": "2"
        }
       ]
      },
@@ -474,7 +474,7 @@
       ]
      }
     ],
-    "kind": "option"
+    "kind": "benefit"
    },
    {
     "name": "Small Steps",
@@ -589,6 +589,13 @@
    {
     "level": 19,
     "list": "network"
+   }
+  ],
+  "bonuses": [
+   {
+    "target": "stressThreshold",
+    "value": "@classes.advocate.levels",
+    "level": 1
    }
   ]
  },
@@ -834,7 +841,7 @@
     "gearR": 0,
     "gearT": 0,
     "gearV": 0,
-    "gearS": 3,
+    "gearS": 2,
     "gearG": 2,
     "gearW": 1,
     "gearE": 0
@@ -1626,9 +1633,14 @@
       "bonuses": [
        {
         "target": "contacts",
-        "value": "1"
+        "value": "2"
        }
       ]
+     },
+     {
+      "index": 9,
+      "name": "Skill Mastery",
+      "bonuses": []
      }
     ],
     "kind": "option"
@@ -1681,7 +1693,7 @@
    "drive",
    "electronics",
    "falsify",
-   "mechanics",
+   "investigation",
    "notice",
    "profession",
    "resolve",
@@ -2824,6 +2836,10 @@
    {
     "level": 19,
     "list": "bonusFeat"
+   },
+   {
+    "level": 9,
+    "list": "criminalMind"
    }
   ]
  },
@@ -3276,59 +3292,443 @@
     "key": "crossClass",
     "options": [
      {
-      "index": 2,
-      "name": "Advocate",
-      "bonuses": []
+      "index": 100,
+      "name": "Advocate: Absolute certainty",
+      "bonuses": [
+       {
+        "target": "stressThreshold",
+        "value": "max(1, @classes.advocate.levels)"
+       }
+      ],
+      "abilityId": "Advocate:Absolute certainty",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "advocate",
+      "description": "Advocate: Absolute certainty. Use assumed class level 1, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 3,
-      "name": "Explorer",
-      "bonuses": []
+      "index": 101,
+      "name": "Advocate: Behind the scenes I",
+      "bonuses": [],
+      "abilityId": "Advocate:Behind the scenes I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "advocate",
+      "description": "Advocate: Behind the scenes I. Use assumed class level 2, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 4,
-      "name": "Faceman",
-      "bonuses": []
+      "index": 102,
+      "name": "Advocate: Networks",
+      "bonuses": [],
+      "abilityId": "Advocate:Networks",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "advocate",
+      "description": "Advocate: Networks. Use assumed class level 3, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 5,
-      "name": "Hacker",
-      "bonuses": []
+      "index": 103,
+      "name": "Advocate: By any means",
+      "bonuses": [],
+      "abilityId": "Advocate:By any means",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "advocate",
+      "description": "Advocate: By any means. Use assumed class level 4, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 6,
-      "name": "Intruder",
-      "bonuses": []
+      "index": 104,
+      "name": "Explorer: All over the world",
+      "bonuses": [],
+      "abilityId": "Explorer:All over the world",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "explorer",
+      "description": "Explorer: All over the world. Use assumed class level 1, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 7,
-      "name": "Scientist",
-      "bonuses": []
+      "index": 105,
+      "name": "Explorer: Bookworm I",
+      "bonuses": [],
+      "abilityId": "Explorer:Bookworm I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "explorer",
+      "description": "Explorer: Bookworm I. Use assumed class level 2, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 8,
-      "name": "Scout",
-      "bonuses": []
+      "index": 106,
+      "name": "Explorer: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Explorer:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "explorer",
+      "description": "Explorer: Bonus feat. Use assumed class level 3, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 9,
-      "name": "Sleuth",
-      "bonuses": []
+      "index": 107,
+      "name": "Explorer: Uncanny dodge I",
+      "bonuses": [],
+      "abilityId": "Explorer:Uncanny dodge I",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "explorer",
+      "description": "Explorer: Uncanny dodge I. Use assumed class level 4, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 10,
-      "name": "Snoop",
-      "bonuses": []
+      "index": 108,
+      "name": "Faceman: 1,000 faces",
+      "bonuses": [],
+      "abilityId": "Faceman:1,000 faces",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "faceman",
+      "description": "Faceman: 1,000 faces. Use assumed class level 1, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 11,
-      "name": "Soldier",
-      "bonuses": []
+      "index": 109,
+      "name": "Faceman: Cold read (1/session)",
+      "bonuses": [],
+      "abilityId": "Faceman:Cold read (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "faceman",
+      "description": "Faceman: Cold read (1/session). Use assumed class level 2, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 12,
-      "name": "Wheelman",
-      "bonuses": []
+      "index": 110,
+      "name": "Faceman: Quick change (2/session)",
+      "bonuses": [],
+      "abilityId": "Faceman:Quick change (2/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "faceman",
+      "description": "Faceman: Quick change (2/session). Use assumed class level 3, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 111,
+      "name": "Faceman: Masks",
+      "bonuses": [],
+      "abilityId": "Faceman:Masks",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "faceman",
+      "description": "Faceman: Masks. Use assumed class level 4, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 112,
+      "name": "Hacker: \u2019L337",
+      "bonuses": [],
+      "abilityId": "Hacker:\u2019L337",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "hacker",
+      "description": "Hacker: \u2019L337. Use assumed class level 1, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 113,
+      "name": "Hacker: Master key I",
+      "bonuses": [],
+      "abilityId": "Hacker:Master key I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "hacker",
+      "description": "Hacker: Master key I. Use assumed class level 2, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 114,
+      "name": "Hacker: Trap door (1/session)",
+      "bonuses": [],
+      "abilityId": "Hacker:Trap door (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "hacker",
+      "description": "Hacker: Trap door (1/session). Use assumed class level 3, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 115,
+      "name": "Hacker: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Hacker:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "hacker",
+      "description": "Hacker: Bonus feat. Use assumed class level 4, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 116,
+      "name": "Intruder: Gear prep",
+      "bonuses": [],
+      "abilityId": "Intruder:Gear prep",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "intruder",
+      "description": "Intruder: Gear prep. Use assumed class level 1, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 117,
+      "name": "Intruder: Evasion I",
+      "bonuses": [],
+      "abilityId": "Intruder:Evasion I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "intruder",
+      "description": "Intruder: Evasion I. Use assumed class level 2, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 118,
+      "name": "Intruder: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Intruder:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "intruder",
+      "description": "Intruder: Bonus feat. Use assumed class level 3, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 119,
+      "name": "Intruder: Uncanny dodge I",
+      "bonuses": [],
+      "abilityId": "Intruder:Uncanny dodge I",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "intruder",
+      "description": "Intruder: Uncanny dodge I. Use assumed class level 4, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 120,
+      "name": "Scientist: Intense study",
+      "bonuses": [],
+      "abilityId": "Scientist:Intense study",
+      "maxSelections": 2,
+      "assumedClassLevel": 1,
+      "classId": "scientist",
+      "description": "Scientist: Intense study. Use assumed class level 1, or actual Scientist level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 121,
+      "name": "Scientist: Ph.D. (1 skill)",
+      "bonuses": [],
+      "abilityId": "Scientist:Ph.D. (1 skill)",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "scientist",
+      "description": "Scientist: Ph.D. (1 skill). Use assumed class level 2, or actual Scientist level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 122,
+      "name": "Scientist: Bright idea (1/session)",
+      "bonuses": [],
+      "abilityId": "Scientist:Bright idea (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "scientist",
+      "description": "Scientist: Bright idea (1/session). Use assumed class level 3, or actual Scientist level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 123,
+      "name": "Scout: Stalker",
+      "bonuses": [],
+      "abilityId": "Scout:Stalker",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "scout",
+      "description": "Scout: Stalker. Use assumed class level 1, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 124,
+      "name": "Scout: Rough living (+1)",
+      "bonuses": [
+       {
+        "target": "defense",
+        "value": "1"
+       }
+      ],
+      "abilityId": "Scout:Rough living (+1)",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "scout",
+      "description": "Scout: Rough living (+1). Use assumed class level 2, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 125,
+      "name": "Scout: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Scout:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "scout",
+      "description": "Scout: Bonus feat. Use assumed class level 3, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 126,
+      "name": "Scout: Sneak attack (1 die)",
+      "bonuses": [],
+      "abilityId": "Scout:Sneak attack (1 die)",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "scout",
+      "description": "Scout: Sneak attack (1 die). Use assumed class level 4, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 127,
+      "name": "Sleuth: Human nature",
+      "bonuses": [],
+      "abilityId": "Sleuth:Human nature",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "sleuth",
+      "description": "Sleuth: Human nature. Use assumed class level 1, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 128,
+      "name": "Sleuth: Sources I",
+      "bonuses": [],
+      "abilityId": "Sleuth:Sources I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "sleuth",
+      "description": "Sleuth: Sources I. Use assumed class level 2, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 129,
+      "name": "Sleuth: Little details (1/session)",
+      "bonuses": [],
+      "abilityId": "Sleuth:Little details (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "sleuth",
+      "description": "Sleuth: Little details (1/session). Use assumed class level 3, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 130,
+      "name": "Sleuth: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Sleuth:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "sleuth",
+      "description": "Sleuth: Bonus feat. Use assumed class level 4, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 131,
+      "name": "Snoop: Flawless search",
+      "bonuses": [],
+      "abilityId": "Snoop:Flawless search",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "snoop",
+      "description": "Snoop: Flawless search. Use assumed class level 1, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 132,
+      "name": "Snoop: Intuition I",
+      "bonuses": [],
+      "abilityId": "Snoop:Intuition I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "snoop",
+      "description": "Snoop: Intuition I. Use assumed class level 2, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 133,
+      "name": "Snoop: Intercept communication (1/session)",
+      "bonuses": [],
+      "abilityId": "Snoop:Intercept communication (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "snoop",
+      "description": "Snoop: Intercept communication (1/session). Use assumed class level 3, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 134,
+      "name": "Snoop: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Snoop:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "snoop",
+      "description": "Snoop: Bonus feat. Use assumed class level 4, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 135,
+      "name": "Soldier: Fight on",
+      "bonuses": [],
+      "abilityId": "Soldier:Fight on",
+      "maxSelections": 2,
+      "assumedClassLevel": 1,
+      "classId": "soldier",
+      "description": "Soldier: Fight on. Use assumed class level 1, or actual Soldier level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 136,
+      "name": "Soldier: Fortunes of war I",
+      "bonuses": [],
+      "abilityId": "Soldier:Fortunes of war I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "soldier",
+      "description": "Soldier: Fortunes of war I. Use assumed class level 2, or actual Soldier level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 137,
+      "name": "Soldier: Armor use I",
+      "bonuses": [
+       {
+        "target": "defenseArmor",
+        "value": "1"
+       },
+       {
+        "target": "armorCheck",
+        "value": "1"
+       }
+      ],
+      "abilityId": "Soldier:Armor use I",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "soldier",
+      "description": "Soldier: Armor use I. Use assumed class level 4, or actual Soldier level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 138,
+      "name": "Wheelman: Custom ride",
+      "bonuses": [],
+      "abilityId": "Wheelman:Custom ride",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "wheelman",
+      "description": "Wheelman: Custom ride. Use assumed class level 1, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 139,
+      "name": "Wheelman: Manual adjustment I",
+      "bonuses": [],
+      "abilityId": "Wheelman:Manual adjustment I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "wheelman",
+      "description": "Wheelman: Manual adjustment I. Use assumed class level 2, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 140,
+      "name": "Wheelman: Driving school",
+      "bonuses": [],
+      "abilityId": "Wheelman:Driving school",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "wheelman",
+      "description": "Wheelman: Driving school. Use assumed class level 3, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 141,
+      "name": "Wheelman: Vehicle familiarity (+1)",
+      "bonuses": [],
+      "abilityId": "Wheelman:Vehicle familiarity (+1)",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "wheelman",
+      "description": "Wheelman: Vehicle familiarity (+1). Use assumed class level 4, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
      }
     ],
     "kind": "crossClass"
@@ -3358,31 +3758,6 @@
   ],
   "bonuses": [
    {
-    "target": "classSkillPicks",
-    "value": "4",
-    "level": 1
-   },
-   {
-    "target": "classSkillPicks",
-    "value": "1",
-    "level": 5
-   },
-   {
-    "target": "classSkillPicks",
-    "value": "1",
-    "level": 10
-   },
-   {
-    "target": "classSkillPicks",
-    "value": "1",
-    "level": 15
-   },
-   {
-    "target": "classSkillPicks",
-    "value": "1",
-    "level": 20
-   },
-   {
     "target": "actionDice.count",
     "value": "1",
     "level": 10
@@ -3410,6 +3785,7 @@
    "bureaucracy",
    "computers",
    "cultures",
+   "drive",
    "electronics",
    "falsify",
    "mechanics",
@@ -3419,7 +3795,6 @@
    "resolve",
    "science",
    "search",
-   "senseMotive",
    "tactics"
   ],
   "table": [
@@ -3919,7 +4294,7 @@
       "bonuses": [
        {
         "target": "contacts",
-        "value": "1"
+        "value": "2"
        }
       ]
      },
@@ -4636,7 +5011,7 @@
     "ref": 1,
     "will": 2,
     "defense": 1,
-    "initiative": 1,
+    "initiative": 2,
     "wealth": 0,
     "gearR": 1,
     "gearT": 0,
@@ -4653,7 +5028,7 @@
     "ref": 2,
     "will": 3,
     "defense": 1,
-    "initiative": 1,
+    "initiative": 3,
     "wealth": 0,
     "gearR": 1,
     "gearT": 0,
@@ -4670,7 +5045,7 @@
     "ref": 2,
     "will": 3,
     "defense": 2,
-    "initiative": 2,
+    "initiative": 4,
     "wealth": 1,
     "gearR": 1,
     "gearT": 0,
@@ -4687,7 +5062,7 @@
     "ref": 2,
     "will": 4,
     "defense": 2,
-    "initiative": 2,
+    "initiative": 5,
     "wealth": 1,
     "gearR": 1,
     "gearT": 0,
@@ -4704,7 +5079,7 @@
     "ref": 3,
     "will": 4,
     "defense": 3,
-    "initiative": 3,
+    "initiative": 5,
     "wealth": 1,
     "gearR": 2,
     "gearT": 0,
@@ -4721,7 +5096,7 @@
     "ref": 3,
     "will": 5,
     "defense": 4,
-    "initiative": 4,
+    "initiative": 6,
     "wealth": 2,
     "gearR": 2,
     "gearT": 1,
@@ -4738,7 +5113,7 @@
     "ref": 4,
     "will": 5,
     "defense": 4,
-    "initiative": 4,
+    "initiative": 7,
     "wealth": 2,
     "gearR": 2,
     "gearT": 1,
@@ -4755,7 +5130,7 @@
     "ref": 4,
     "will": 6,
     "defense": 5,
-    "initiative": 5,
+    "initiative": 8,
     "wealth": 2,
     "gearR": 2,
     "gearT": 1,
@@ -4772,7 +5147,7 @@
     "ref": 4,
     "will": 6,
     "defense": 5,
-    "initiative": 5,
+    "initiative": 9,
     "wealth": 3,
     "gearR": 2,
     "gearT": 1,
@@ -4789,7 +5164,7 @@
     "ref": 5,
     "will": 7,
     "defense": 6,
-    "initiative": 6,
+    "initiative": 10,
     "wealth": 3,
     "gearR": 3,
     "gearT": 1,
@@ -4806,7 +5181,7 @@
     "ref": 5,
     "will": 7,
     "defense": 7,
-    "initiative": 7,
+    "initiative": 10,
     "wealth": 3,
     "gearR": 3,
     "gearT": 1,
@@ -4823,7 +5198,7 @@
     "ref": 6,
     "will": 8,
     "defense": 7,
-    "initiative": 7,
+    "initiative": 11,
     "wealth": 4,
     "gearR": 3,
     "gearT": 1,
@@ -4840,7 +5215,7 @@
     "ref": 6,
     "will": 8,
     "defense": 8,
-    "initiative": 8,
+    "initiative": 12,
     "wealth": 4,
     "gearR": 3,
     "gearT": 2,
@@ -4857,7 +5232,7 @@
     "ref": 6,
     "will": 9,
     "defense": 8,
-    "initiative": 8,
+    "initiative": 13,
     "wealth": 4,
     "gearR": 3,
     "gearT": 2,
@@ -4873,8 +5248,8 @@
     "fort": 5,
     "ref": 7,
     "will": 9,
-    "defense": 8,
-    "initiative": 9,
+    "defense": 9,
+    "initiative": 14,
     "wealth": 5,
     "gearR": 3,
     "gearT": 2,
@@ -4890,8 +5265,8 @@
     "fort": 5,
     "ref": 7,
     "will": 10,
-    "defense": 9,
-    "initiative": 10,
+    "defense": 10,
+    "initiative": 15,
     "wealth": 5,
     "gearR": 4,
     "gearT": 2,
@@ -4908,7 +5283,7 @@
     "ref": 8,
     "will": 10,
     "defense": 10,
-    "initiative": 10,
+    "initiative": 15,
     "wealth": 5,
     "gearR": 4,
     "gearT": 2,
@@ -4924,8 +5299,8 @@
     "fort": 6,
     "ref": 8,
     "will": 11,
-    "defense": 10,
-    "initiative": 11,
+    "defense": 11,
+    "initiative": 16,
     "wealth": 6,
     "gearR": 4,
     "gearT": 2,
@@ -4942,7 +5317,7 @@
     "ref": 8,
     "will": 11,
     "defense": 11,
-    "initiative": 11,
+    "initiative": 17,
     "wealth": 6,
     "gearR": 4,
     "gearT": 2,
@@ -4958,8 +5333,8 @@
     "fort": 6,
     "ref": 9,
     "will": 12,
-    "defense": 11,
-    "initiative": 12,
+    "defense": 12,
+    "initiative": 18,
     "wealth": 6,
     "gearR": 4,
     "gearT": 3,
@@ -5049,7 +5424,7 @@
    },
    {
     "level": 20,
-    "name": "Bonus feat, global search 2/session"
+    "name": "Bonus feat, global search 2/mission"
    }
   ],
   "choiceLists": [
@@ -5199,7 +5574,7 @@
    {
     "target": "abilities.wis",
     "value": "1",
-    "level": 186
+    "level": 18
    }
   ]
  },
@@ -5713,7 +6088,7 @@
       "bonuses": [
        {
         "target": "contacts",
-        "value": "1"
+        "value": "2"
        }
       ]
      },
@@ -5793,8 +6168,8 @@
   },
   "classSkills": [
    "athletics",
+   "drive",
    "intimidate",
-   "medicine",
    "notice",
    "profession",
    "resolve",
@@ -6419,6 +6794,21 @@
     "target": "armorCheck",
     "value": "1",
     "level": 4
+   },
+   {
+    "target": "naturalDR",
+    "value": "1",
+    "level": 2
+   },
+   {
+    "target": "naturalDR",
+    "value": "1",
+    "level": 11
+   },
+   {
+    "target": "naturalDR",
+    "value": "1",
+    "level": 19
    }
   ]
  },
@@ -7314,6 +7704,16 @@
       "index": 7,
       "name": "Strut",
       "bonuses": []
+     },
+     {
+      "index": 8,
+      "name": "Backhand",
+      "bonuses": []
+     },
+     {
+      "index": 9,
+      "name": "Quake Strike",
+      "bonuses": []
      }
     ],
     "kind": "option"
@@ -7355,6 +7755,11 @@
     "target": "abilities.con",
     "value": "1",
     "level": 6
+   },
+   {
+    "target": "subdualThreshold",
+    "value": "@classes.brawler.levels",
+    "level": 4
    }
   ],
   "requirements": {
@@ -7404,7 +7809,6 @@
    "search",
    "security",
    "sleightOfHand",
-   "sneak",
    "tactics"
   ],
   "table": [
@@ -7633,15 +8037,18 @@
    },
    {
     "level": 1,
-    "feat": "Advanced Skill Mastery"
+    "feat": "Advanced Skill Mastery",
+    "choice": "Hustler"
    },
    {
     "level": 5,
-    "feat": "Grand Skill Mastery"
+    "feat": "Grand Skill Mastery",
+    "choice": "Hustler"
    },
    {
     "level": 9,
-    "feat": "Perfect Skill Mastery"
+    "feat": "Perfect Skill Mastery",
+    "choice": "Hustler"
    }
   ],
   "requirements": {
@@ -7687,10 +8094,10 @@
    "impress",
    "investigation",
    "manipulate",
-   "networking",
+   "notice",
    "search",
-   "security",
    "senseMotive",
+   "sleightOfHand",
    "streetwise"
   ],
   "table": [
@@ -7944,7 +8351,7 @@
    "name": "Shoot first"
   },
   "classSkills": [
-   "acrobatics",
+   "analysis",
    "athletics",
    "blend",
    "intimidate",
@@ -8182,6 +8589,11 @@
     "target": "defenseArmor",
     "value": "1",
     "level": 8
+   },
+   {
+    "target": "armorCheck",
+    "value": "1",
+    "level": 4
    }
   ],
   "featGrants": [
@@ -8463,15 +8875,18 @@
   "featGrants": [
    {
     "level": 1,
-    "feat": "Advanced Skill Mastery"
+    "feat": "Advanced Skill Mastery",
+    "choice": "Examiner"
    },
    {
     "level": 5,
-    "feat": "Grand Skill Mastery"
+    "feat": "Grand Skill Mastery",
+    "choice": "Examiner"
    },
    {
     "level": 9,
-    "feat": "Perfect Skill Mastery"
+    "feat": "Perfect Skill Mastery",
+    "choice": "Examiner"
    }
   ],
   "requirements": {
@@ -9909,15 +10324,18 @@
   "featGrants": [
    {
     "level": 1,
-    "feat": "Advanced Skill Mastery"
+    "feat": "Advanced Skill Mastery",
+    "choice": "Diplomat"
    },
    {
     "level": 5,
-    "feat": "Grand Skill Mastery"
+    "feat": "Grand Skill Mastery",
+    "choice": "Diplomat"
    },
    {
     "level": 9,
-    "feat": "Perfect Skill Mastery"
+    "feat": "Perfect Skill Mastery",
+    "choice": "Diplomat"
    },
    {
     "level": 2,
@@ -10193,7 +10611,7 @@
   "choiceLists": [],
   "bonuses": [
    {
-    "target": "defenseArmor",
+    "target": "defensePartialArmor",
     "value": "@actionDice.max",
     "level": 6
    }
@@ -10320,7 +10738,7 @@
     "gearT": 0,
     "gearV": 0,
     "gearS": 0,
-    "gearG": 0,
+    "gearG": 1,
     "gearW": 0,
     "gearE": 0
    },
@@ -10405,7 +10823,7 @@
     "gearT": 0,
     "gearV": 1,
     "gearS": 0,
-    "gearG": 1,
+    "gearG": 2,
     "gearW": 0,
     "gearE": 0
    },
@@ -10451,11 +10869,11 @@
    },
    {
     "level": 2,
-    "name": "Cunning plan 1/session"
+    "name": "Cunning plan 1/scene"
    },
    {
     "level": 3,
-    "name": "Renaissance man 1/session"
+    "name": "Renaissance man 1/mission"
    },
    {
     "level": 4,
@@ -10471,7 +10889,7 @@
    },
    {
     "level": 7,
-    "name": "Cunning plan 2/session, renaissance man 2/session"
+    "name": "Cunning plan 2/scene, renaissance man 2/mission"
    },
    {
     "level": 8,
@@ -10492,59 +10910,443 @@
     "key": "crossClass",
     "options": [
      {
-      "index": 2,
-      "name": "Advocate",
-      "bonuses": []
+      "index": 100,
+      "name": "Advocate: Absolute certainty",
+      "bonuses": [
+       {
+        "target": "stressThreshold",
+        "value": "max(1, @classes.advocate.levels)"
+       }
+      ],
+      "abilityId": "Advocate:Absolute certainty",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "advocate",
+      "description": "Advocate: Absolute certainty. Use assumed class level 1, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 3,
-      "name": "Explorer",
-      "bonuses": []
+      "index": 101,
+      "name": "Advocate: Behind the scenes I",
+      "bonuses": [],
+      "abilityId": "Advocate:Behind the scenes I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "advocate",
+      "description": "Advocate: Behind the scenes I. Use assumed class level 2, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 4,
-      "name": "Faceman",
-      "bonuses": []
+      "index": 102,
+      "name": "Advocate: Networks",
+      "bonuses": [],
+      "abilityId": "Advocate:Networks",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "advocate",
+      "description": "Advocate: Networks. Use assumed class level 3, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 5,
-      "name": "Hacker",
-      "bonuses": []
+      "index": 103,
+      "name": "Advocate: By any means",
+      "bonuses": [],
+      "abilityId": "Advocate:By any means",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "advocate",
+      "description": "Advocate: By any means. Use assumed class level 4, or actual Advocate level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 6,
-      "name": "Intruder",
-      "bonuses": []
+      "index": 104,
+      "name": "Explorer: All over the world",
+      "bonuses": [],
+      "abilityId": "Explorer:All over the world",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "explorer",
+      "description": "Explorer: All over the world. Use assumed class level 1, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 7,
-      "name": "Scientist",
-      "bonuses": []
+      "index": 105,
+      "name": "Explorer: Bookworm I",
+      "bonuses": [],
+      "abilityId": "Explorer:Bookworm I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "explorer",
+      "description": "Explorer: Bookworm I. Use assumed class level 2, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 8,
-      "name": "Scout",
-      "bonuses": []
+      "index": 106,
+      "name": "Explorer: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Explorer:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "explorer",
+      "description": "Explorer: Bonus feat. Use assumed class level 3, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 9,
-      "name": "Sleuth",
-      "bonuses": []
+      "index": 107,
+      "name": "Explorer: Uncanny dodge I",
+      "bonuses": [],
+      "abilityId": "Explorer:Uncanny dodge I",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "explorer",
+      "description": "Explorer: Uncanny dodge I. Use assumed class level 4, or actual Explorer level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 10,
-      "name": "Snoop",
-      "bonuses": []
+      "index": 108,
+      "name": "Faceman: 1,000 faces",
+      "bonuses": [],
+      "abilityId": "Faceman:1,000 faces",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "faceman",
+      "description": "Faceman: 1,000 faces. Use assumed class level 1, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 11,
-      "name": "Soldier",
-      "bonuses": []
+      "index": 109,
+      "name": "Faceman: Cold read (1/session)",
+      "bonuses": [],
+      "abilityId": "Faceman:Cold read (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "faceman",
+      "description": "Faceman: Cold read (1/session). Use assumed class level 2, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
      },
      {
-      "index": 12,
-      "name": "Wheelman",
-      "bonuses": []
+      "index": 110,
+      "name": "Faceman: Quick change (2/session)",
+      "bonuses": [],
+      "abilityId": "Faceman:Quick change (2/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "faceman",
+      "description": "Faceman: Quick change (2/session). Use assumed class level 3, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 111,
+      "name": "Faceman: Masks",
+      "bonuses": [],
+      "abilityId": "Faceman:Masks",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "faceman",
+      "description": "Faceman: Masks. Use assumed class level 4, or actual Faceman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 112,
+      "name": "Hacker: \u2019L337",
+      "bonuses": [],
+      "abilityId": "Hacker:\u2019L337",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "hacker",
+      "description": "Hacker: \u2019L337. Use assumed class level 1, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 113,
+      "name": "Hacker: Master key I",
+      "bonuses": [],
+      "abilityId": "Hacker:Master key I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "hacker",
+      "description": "Hacker: Master key I. Use assumed class level 2, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 114,
+      "name": "Hacker: Trap door (1/session)",
+      "bonuses": [],
+      "abilityId": "Hacker:Trap door (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "hacker",
+      "description": "Hacker: Trap door (1/session). Use assumed class level 3, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 115,
+      "name": "Hacker: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Hacker:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "hacker",
+      "description": "Hacker: Bonus feat. Use assumed class level 4, or actual Hacker level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 116,
+      "name": "Intruder: Gear prep",
+      "bonuses": [],
+      "abilityId": "Intruder:Gear prep",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "intruder",
+      "description": "Intruder: Gear prep. Use assumed class level 1, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 117,
+      "name": "Intruder: Evasion I",
+      "bonuses": [],
+      "abilityId": "Intruder:Evasion I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "intruder",
+      "description": "Intruder: Evasion I. Use assumed class level 2, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 118,
+      "name": "Intruder: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Intruder:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "intruder",
+      "description": "Intruder: Bonus feat. Use assumed class level 3, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 119,
+      "name": "Intruder: Uncanny dodge I",
+      "bonuses": [],
+      "abilityId": "Intruder:Uncanny dodge I",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "intruder",
+      "description": "Intruder: Uncanny dodge I. Use assumed class level 4, or actual Intruder level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 120,
+      "name": "Scientist: Intense study",
+      "bonuses": [],
+      "abilityId": "Scientist:Intense study",
+      "maxSelections": 2,
+      "assumedClassLevel": 1,
+      "classId": "scientist",
+      "description": "Scientist: Intense study. Use assumed class level 1, or actual Scientist level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 121,
+      "name": "Scientist: Ph.D. (1 skill)",
+      "bonuses": [],
+      "abilityId": "Scientist:Ph.D. (1 skill)",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "scientist",
+      "description": "Scientist: Ph.D. (1 skill). Use assumed class level 2, or actual Scientist level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 122,
+      "name": "Scientist: Bright idea (1/session)",
+      "bonuses": [],
+      "abilityId": "Scientist:Bright idea (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "scientist",
+      "description": "Scientist: Bright idea (1/session). Use assumed class level 3, or actual Scientist level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 123,
+      "name": "Scout: Stalker",
+      "bonuses": [],
+      "abilityId": "Scout:Stalker",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "scout",
+      "description": "Scout: Stalker. Use assumed class level 1, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 124,
+      "name": "Scout: Rough living (+1)",
+      "bonuses": [
+       {
+        "target": "defense",
+        "value": "1"
+       }
+      ],
+      "abilityId": "Scout:Rough living (+1)",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "scout",
+      "description": "Scout: Rough living (+1). Use assumed class level 2, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 125,
+      "name": "Scout: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Scout:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "scout",
+      "description": "Scout: Bonus feat. Use assumed class level 3, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 126,
+      "name": "Scout: Sneak attack (1 die)",
+      "bonuses": [],
+      "abilityId": "Scout:Sneak attack (1 die)",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "scout",
+      "description": "Scout: Sneak attack (1 die). Use assumed class level 4, or actual Scout level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 127,
+      "name": "Sleuth: Human nature",
+      "bonuses": [],
+      "abilityId": "Sleuth:Human nature",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "sleuth",
+      "description": "Sleuth: Human nature. Use assumed class level 1, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 128,
+      "name": "Sleuth: Sources I",
+      "bonuses": [],
+      "abilityId": "Sleuth:Sources I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "sleuth",
+      "description": "Sleuth: Sources I. Use assumed class level 2, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 129,
+      "name": "Sleuth: Little details (1/session)",
+      "bonuses": [],
+      "abilityId": "Sleuth:Little details (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "sleuth",
+      "description": "Sleuth: Little details (1/session). Use assumed class level 3, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 130,
+      "name": "Sleuth: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Sleuth:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "sleuth",
+      "description": "Sleuth: Bonus feat. Use assumed class level 4, or actual Sleuth level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 131,
+      "name": "Snoop: Flawless search",
+      "bonuses": [],
+      "abilityId": "Snoop:Flawless search",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "snoop",
+      "description": "Snoop: Flawless search. Use assumed class level 1, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 132,
+      "name": "Snoop: Intuition I",
+      "bonuses": [],
+      "abilityId": "Snoop:Intuition I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "snoop",
+      "description": "Snoop: Intuition I. Use assumed class level 2, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 133,
+      "name": "Snoop: Intercept communication (1/session)",
+      "bonuses": [],
+      "abilityId": "Snoop:Intercept communication (1/session)",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "snoop",
+      "description": "Snoop: Intercept communication (1/session). Use assumed class level 3, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 134,
+      "name": "Snoop: Bonus feat",
+      "bonuses": [],
+      "abilityId": "Snoop:Bonus feat",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "snoop",
+      "description": "Snoop: Bonus feat. Use assumed class level 4, or actual Snoop level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 135,
+      "name": "Soldier: Fight on",
+      "bonuses": [],
+      "abilityId": "Soldier:Fight on",
+      "maxSelections": 2,
+      "assumedClassLevel": 1,
+      "classId": "soldier",
+      "description": "Soldier: Fight on. Use assumed class level 1, or actual Soldier level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 136,
+      "name": "Soldier: Fortunes of war I",
+      "bonuses": [],
+      "abilityId": "Soldier:Fortunes of war I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "soldier",
+      "description": "Soldier: Fortunes of war I. Use assumed class level 2, or actual Soldier level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 137,
+      "name": "Soldier: Armor use I",
+      "bonuses": [
+       {
+        "target": "defenseArmor",
+        "value": "1"
+       },
+       {
+        "target": "armorCheck",
+        "value": "1"
+       }
+      ],
+      "abilityId": "Soldier:Armor use I",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "soldier",
+      "description": "Soldier: Armor use I. Use assumed class level 4, or actual Soldier level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 138,
+      "name": "Wheelman: Custom ride",
+      "bonuses": [],
+      "abilityId": "Wheelman:Custom ride",
+      "maxSelections": 1,
+      "assumedClassLevel": 1,
+      "classId": "wheelman",
+      "description": "Wheelman: Custom ride. Use assumed class level 1, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 139,
+      "name": "Wheelman: Manual adjustment I",
+      "bonuses": [],
+      "abilityId": "Wheelman:Manual adjustment I",
+      "maxSelections": 1,
+      "assumedClassLevel": 2,
+      "classId": "wheelman",
+      "description": "Wheelman: Manual adjustment I. Use assumed class level 2, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 140,
+      "name": "Wheelman: Driving school",
+      "bonuses": [],
+      "abilityId": "Wheelman:Driving school",
+      "maxSelections": 1,
+      "assumedClassLevel": 3,
+      "classId": "wheelman",
+      "description": "Wheelman: Driving school. Use assumed class level 3, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
+     },
+     {
+      "index": 141,
+      "name": "Wheelman: Vehicle familiarity (+1)",
+      "bonuses": [],
+      "abilityId": "Wheelman:Vehicle familiarity (+1)",
+      "maxSelections": 1,
+      "assumedClassLevel": 4,
+      "classId": "wheelman",
+      "description": "Wheelman: Vehicle familiarity (+1). Use assumed class level 4, or actual Wheelman level if higher. Choose a different ability if actual class progression already grants this ability."
      }
     ],
     "kind": "crossClass"
@@ -10596,9 +11398,9 @@
    "name": "Eagle eye"
   },
   "classSkills": [
-   "acrobatics",
    "athletics",
    "blend",
+   "drive",
    "falsify",
    "notice",
    "profession",
@@ -10656,7 +11458,7 @@
     "gearR": 0,
     "gearT": 0,
     "gearV": 0,
-    "gearS": 0,
+    "gearS": 1,
     "gearG": 0,
     "gearW": 1,
     "gearE": 0
@@ -10741,7 +11543,7 @@
     "gearR": 0,
     "gearT": 1,
     "gearV": 0,
-    "gearS": 1,
+    "gearS": 2,
     "gearG": 0,
     "gearW": 2,
     "gearE": 0
@@ -11018,7 +11820,7 @@
     "gearR": 0,
     "gearT": 0,
     "gearV": 1,
-    "gearS": 0,
+    "gearS": 1,
     "gearG": 0,
     "gearW": 0,
     "gearE": 0
@@ -11103,7 +11905,7 @@
     "gearR": 0,
     "gearT": 0,
     "gearV": 2,
-    "gearS": 1,
+    "gearS": 2,
     "gearG": 0,
     "gearW": 1,
     "gearE": 0
@@ -11236,7 +12038,7 @@
     "level": 1
    },
    {
-    "target": "stressDamage",
+    "target": "stressThreshold",
     "value": "@classes.stuntman.levels",
     "level": 2
    }
@@ -12385,34 +13187,27 @@
    }
   ],
   "choiceLists": [],
-  "bonuses": [
-   {
-    "target": "classSkillPicks",
-    "value": "2",
-    "level": 2
-   },
-   {
-    "target": "classSkillPicks",
-    "value": "2",
-    "level": 7
-   }
-  ],
+  "bonuses": [],
   "featGrants": [
    {
     "level": 3,
-    "feat": "Advanced Skill Mastery"
+    "feat": "Advanced Skill Mastery",
+    "choice": "Field of Expertise"
    },
    {
     "level": 5,
-    "feat": "Grand Skill Mastery"
+    "feat": "Grand Skill Mastery",
+    "choice": "Field of Expertise"
    },
    {
     "level": 9,
-    "feat": "Perfect Skill Mastery"
+    "feat": "Perfect Skill Mastery",
+    "choice": "Field of Expertise"
    },
    {
     "level": 7,
-    "feat": "False Start"
+    "feat": "False Start",
+    "choice": "Field of Expertise"
    }
   ],
   "requirements": {

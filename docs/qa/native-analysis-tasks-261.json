@@ -1,0 +1,349 @@
+{
+  "batch": 261,
+  "source": "pp.99–100 both original PDFs verified",
+  "actor": "7ScVH0gyTExTpmP8",
+  "rolls": [
+    11,
+    10
+  ],
+  "checks": [],
+  "combats": [],
+  "feat": "hEH0jobrxeS304WI",
+  "baseline": {
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "analysis": 6
+  },
+  "task": "task_4bch668u6G3b9HlP",
+  "created": {
+    "version": 1,
+    "id": "task_4bch668u6G3b9HlP",
+    "title": "QA261 examine the recovered records",
+    "baseChallenges": 6,
+    "requiredChallenges": 4,
+    "forensicGenius": true,
+    "createdAt": 126,
+    "completed": 0,
+    "status": "active",
+    "revision": 0,
+    "events": []
+  },
+  "first": "ChatMessage.fhBcHZ9BhePMJEtA",
+  "interrupted": {
+    "message": "ChatMessage.ffmsGcvl5dMq5vVZ",
+    "progress": 2,
+    "marker": {
+      "version": 1,
+      "id": "BfQ1vajf5YaGN68w",
+      "taskId": "task_4bch668u6G3b9HlP",
+      "revision": 2,
+      "state": "reserved"
+    }
+  },
+  "review": {
+    "completed": 2,
+    "history": [
+      {
+        "taskId": "task_4bch668u6G3b9HlP",
+        "messageUuid": "ChatMessage.ffmsGcvl5dMq5vVZ",
+        "keep": true,
+        "reason": "Checked the saved task and receipt: keep the one completed Challenge without adding another.",
+        "at": 126
+      }
+    ],
+    "button": {
+      "x": 500,
+      "y": 582,
+      "width": 366,
+      "height": 40
+    }
+  },
+  "failure": "ChatMessage.BKvSYXiUfJ7KhX3C",
+  "criticalAttempts": 31,
+  "critical": {
+    "message": "ChatMessage.ImsKIEgRrFHV6Iz3",
+    "die": 20,
+    "activation": {
+      "kind": "success",
+      "payerUuid": "Actor.7ScVH0gyTExTpmP8",
+      "cost": 1,
+      "baseCost": 1,
+      "effect": "Complex Task breakthrough: complete two Challenges (p.99).",
+      "sources": [],
+      "paymentReceiptId": "SRCIPEe63SSCYxD7",
+      "funding": {
+        "bonusPoolId": "",
+        "die": 4,
+        "count": 1
+      }
+    },
+    "delta": 2
+  },
+  "duplicate": "This Complex Analysis Task has already ended.",
+  "final": {
+    "version": 1,
+    "id": "task_4bch668u6G3b9HlP",
+    "title": "QA261 examine the recovered records",
+    "baseChallenges": 6,
+    "requiredChallenges": 4,
+    "forensicGenius": true,
+    "createdAt": 126,
+    "completed": 4,
+    "status": "complete",
+    "revision": 4,
+    "events": [
+      {
+        "messageUuid": "ChatMessage.fhBcHZ9BhePMJEtA",
+        "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":0,\\\"completed\\\":0,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,26,26,18,0,0,true,false,false,null,null,null,null,null]\",\"success\":true,\"criticalSuccess\":false,\"criticalFailure\":false,\"activation\":null}",
+        "before": 0,
+        "after": 1,
+        "change": 1,
+        "success": true,
+        "criticalSuccess": false,
+        "criticalFailure": false,
+        "activationCount": 0,
+        "at": 126
+      },
+      {
+        "messageUuid": "ChatMessage.ffmsGcvl5dMq5vVZ",
+        "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":1,\\\"completed\\\":1,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,12,12,4,0,0,true,false,false,null,null,null,null,null]\",\"success\":true,\"criticalSuccess\":false,\"criticalFailure\":false,\"activation\":null}",
+        "before": 1,
+        "after": 2,
+        "change": 1,
+        "success": true,
+        "criticalSuccess": false,
+        "criticalFailure": false,
+        "activationCount": 0,
+        "at": 126
+      },
+      {
+        "messageUuid": "ChatMessage.BKvSYXiUfJ7KhX3C",
+        "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":2,\\\"completed\\\":2,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,26,26,18,0,0,false,false,false,null,null,null,null,null]\",\"success\":false,\"criticalSuccess\":false,\"criticalFailure\":false,\"activation\":null}",
+        "before": 2,
+        "after": 2,
+        "change": 0,
+        "success": false,
+        "criticalSuccess": false,
+        "criticalFailure": false,
+        "activationCount": 0,
+        "at": 126
+      },
+      {
+        "messageUuid": "ChatMessage.ImsKIEgRrFHV6Iz3",
+        "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":3,\\\"completed\\\":2,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,28,28,20,0,0,true,false,true,true,null,null,null,null]\",\"success\":true,\"criticalSuccess\":true,\"criticalFailure\":false,\"activation\":{\"kind\":\"success\",\"payerUuid\":\"Actor.7ScVH0gyTExTpmP8\",\"cost\":1,\"baseCost\":1,\"effect\":\"Complex Task breakthrough: complete two Challenges (p.99).\",\"sources\":[],\"paymentReceiptId\":\"SRCIPEe63SSCYxD7\",\"funding\":{\"bonusPoolId\":\"\",\"die\":4,\"count\":1}}}",
+        "before": 2,
+        "after": 4,
+        "change": 2,
+        "success": true,
+        "criticalSuccess": true,
+        "criticalFailure": false,
+        "activationCount": 0,
+        "at": 126
+      }
+    ]
+  },
+  "opponent": "lZnbU1uBjMA21Bdj",
+  "failureAttempts": 5,
+  "setback": {
+    "actor": "lZnbU1uBjMA21Bdj",
+    "task": {
+      "version": 1,
+      "id": "task_7umKbtuPklJsqiSN",
+      "title": "QA261 irreversible setback",
+      "baseChallenges": 2,
+      "requiredChallenges": 2,
+      "forensicGenius": false,
+      "createdAt": 126,
+      "completed": -1,
+      "status": "failed",
+      "revision": 1,
+      "events": [
+        {
+          "messageUuid": "ChatMessage.xPeGAjxNWBYWtRmP",
+          "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_7umKbtuPklJsqiSN\\\",\\\"revision\\\":0,\\\"completed\\\":0,\\\"baseChallenges\\\":2,\\\"requiredChallenges\\\":2,\\\"forensicGenius\\\":false,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"state\\\":\\\"\\\",\\\"normal\\\":2,\\\"total\\\":2,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":2},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",15,null,[],3,null,3,3,1,0,0,false,true,false,null,true,null,null,null]\",\"success\":false,\"criticalSuccess\":false,\"criticalFailure\":true,\"activation\":{\"kind\":\"failure\",\"payerUuid\":\"Actor.7ScVH0gyTExTpmP8\",\"cost\":1,\"baseCost\":1,\"effect\":\"Complex Task setback: undo one completed Challenge; progress below zero fails the task (p.100).\",\"sources\":[],\"paymentReceiptId\":\"evbT4ml4w88rs304\",\"funding\":{\"bonusPoolId\":\"\",\"die\":4,\"count\":1}}}",
+          "before": 0,
+          "after": -1,
+          "change": -1,
+          "success": false,
+          "criticalSuccess": false,
+          "criticalFailure": true,
+          "activationCount": 1,
+          "at": 126
+        }
+      ]
+    },
+    "message": "ChatMessage.xPeGAjxNWBYWtRmP",
+    "activation": {
+      "kind": "failure",
+      "payerUuid": "Actor.7ScVH0gyTExTpmP8",
+      "cost": 1,
+      "baseCost": 1,
+      "effect": "Complex Task setback: undo one completed Challenge; progress below zero fails the task (p.100).",
+      "sources": [],
+      "paymentReceiptId": "evbT4ml4w88rs304",
+      "funding": {
+        "bonusPoolId": "",
+        "die": 4,
+        "count": 1
+      }
+    },
+    "donorBefore": 2,
+    "donorAfter": 1,
+    "attempts": 5,
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0
+    ]
+  },
+  "persisted": {
+    "main": {
+      "task_4bch668u6G3b9HlP": {
+        "version": 1,
+        "id": "task_4bch668u6G3b9HlP",
+        "title": "QA261 examine the recovered records",
+        "baseChallenges": 6,
+        "requiredChallenges": 4,
+        "forensicGenius": true,
+        "createdAt": 126,
+        "completed": 4,
+        "status": "complete",
+        "revision": 4,
+        "events": [
+          {
+            "messageUuid": "ChatMessage.fhBcHZ9BhePMJEtA",
+            "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":0,\\\"completed\\\":0,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,26,26,18,0,0,true,false,false,null,null,null,null,null]\",\"success\":true,\"criticalSuccess\":false,\"criticalFailure\":false,\"activation\":null}",
+            "before": 0,
+            "after": 1,
+            "change": 1,
+            "success": true,
+            "criticalSuccess": false,
+            "criticalFailure": false,
+            "activationCount": 0,
+            "at": 126
+          },
+          {
+            "messageUuid": "ChatMessage.ffmsGcvl5dMq5vVZ",
+            "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":1,\\\"completed\\\":1,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,12,12,4,0,0,true,false,false,null,null,null,null,null]\",\"success\":true,\"criticalSuccess\":false,\"criticalFailure\":false,\"activation\":null}",
+            "before": 1,
+            "after": 2,
+            "change": 1,
+            "success": true,
+            "criticalSuccess": false,
+            "criticalFailure": false,
+            "activationCount": 0,
+            "at": 126
+          },
+          {
+            "messageUuid": "ChatMessage.BKvSYXiUfJ7KhX3C",
+            "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":2,\\\"completed\\\":2,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,26,26,18,0,0,false,false,false,null,null,null,null,null]\",\"success\":false,\"criticalSuccess\":false,\"criticalFailure\":false,\"activation\":null}",
+            "before": 2,
+            "after": 2,
+            "change": 0,
+            "success": false,
+            "criticalSuccess": false,
+            "criticalFailure": false,
+            "activationCount": 0,
+            "at": 126
+          },
+          {
+            "messageUuid": "ChatMessage.ImsKIEgRrFHV6Iz3",
+            "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_4bch668u6G3b9HlP\\\",\\\"revision\\\":3,\\\"completed\\\":2,\\\"baseChallenges\\\":6,\\\"requiredChallenges\\\":4,\\\"forensicGenius\\\":true,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"version\\\":1,\\\"source\\\":\\\"Forensic Genius\\\",\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\",\\\"analysisRanks\\\":6,\\\"challenges\\\":{\\\"base\\\":6,\\\"required\\\":4,\\\"reduction\\\":2},\\\"selectedSynergy\\\":{\\\"skill\\\":\\\"falsify\\\",\\\"value\\\":0},\\\"totalSynergy\\\":0},{\\\"state\\\":\\\"\\\",\\\"normal\\\":8,\\\"total\\\":8,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":8},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",30,null,[],1,null,28,28,20,0,0,true,false,true,true,null,null,null,null]\",\"success\":true,\"criticalSuccess\":true,\"criticalFailure\":false,\"activation\":{\"kind\":\"success\",\"payerUuid\":\"Actor.7ScVH0gyTExTpmP8\",\"cost\":1,\"baseCost\":1,\"effect\":\"Complex Task breakthrough: complete two Challenges (p.99).\",\"sources\":[],\"paymentReceiptId\":\"SRCIPEe63SSCYxD7\",\"funding\":{\"bonusPoolId\":\"\",\"die\":4,\"count\":1}}}",
+            "before": 2,
+            "after": 4,
+            "change": 2,
+            "success": true,
+            "criticalSuccess": true,
+            "criticalFailure": false,
+            "activationCount": 0,
+            "at": 126
+          }
+        ]
+      },
+      "task_brvwdKxe5B3OBmT7": {
+        "version": 1,
+        "id": "task_brvwdKxe5B3OBmT7",
+        "title": "QA261 known combat guard",
+        "baseChallenges": 4,
+        "requiredChallenges": 2,
+        "forensicGenius": true,
+        "createdAt": 126,
+        "completed": 0,
+        "status": "active",
+        "revision": 0,
+        "events": []
+      }
+    },
+    "opponent": {
+      "task_7umKbtuPklJsqiSN": {
+        "version": 1,
+        "id": "task_7umKbtuPklJsqiSN",
+        "title": "QA261 irreversible setback",
+        "baseChallenges": 2,
+        "requiredChallenges": 2,
+        "forensicGenius": false,
+        "createdAt": 126,
+        "completed": -1,
+        "status": "failed",
+        "revision": 1,
+        "events": [
+          {
+            "messageUuid": "ChatMessage.xPeGAjxNWBYWtRmP",
+            "evidence": "{\"roll\":\"[{\\\"version\\\":1,\\\"id\\\":\\\"task_7umKbtuPklJsqiSN\\\",\\\"revision\\\":0,\\\"completed\\\":0,\\\"baseChallenges\\\":2,\\\"requiredChallenges\\\":2,\\\"forensicGenius\\\":false,\\\"skillKey\\\":\\\"analysis\\\",\\\"checkId\\\":\\\"appraise\\\"},{\\\"state\\\":\\\"\\\",\\\"normal\\\":2,\\\"total\\\":2,\\\"adjustment\\\":0},0,null,null,null,\\\"1d20 + @total\\\",{\\\"total\\\":2},\\\"skill\\\",\\\"int\\\",\\\"analysis\\\",\\\"appraise\\\",15,null,[],3,null,3,3,1,0,0,false,true,false,null,true,null,null,null]\",\"success\":false,\"criticalSuccess\":false,\"criticalFailure\":true,\"activation\":{\"kind\":\"failure\",\"payerUuid\":\"Actor.7ScVH0gyTExTpmP8\",\"cost\":1,\"baseCost\":1,\"effect\":\"Complex Task setback: undo one completed Challenge; progress below zero fails the task (p.100).\",\"sources\":[],\"paymentReceiptId\":\"evbT4ml4w88rs304\",\"funding\":{\"bonusPoolId\":\"\",\"die\":4,\"count\":1}}}",
+            "before": 0,
+            "after": -1,
+            "change": -1,
+            "success": false,
+            "criticalSuccess": false,
+            "criticalFailure": true,
+            "activationCount": 1,
+            "at": 126
+          }
+        ]
+      }
+    },
+    "reviewHistory": [
+      {
+        "taskId": "task_4bch668u6G3b9HlP",
+        "messageUuid": "ChatMessage.ffmsGcvl5dMq5vVZ",
+        "keep": true,
+        "reason": "Checked the saved task and receipt: keep the one completed Challenge without adding another.",
+        "at": 126
+      }
+    ],
+    "dice": 1,
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "combatGuard": true
+  },
+  "cleanup": {
+    "actors": 6,
+    "messages": 702,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "locks": 0
+  }
+}

@@ -3,14 +3,14 @@ import { readFileSync } from "node:fs";
 
 const read = name => JSON.parse(readFileSync(new URL(`../src/data/${name}.json`, import.meta.url)));
 const core = read("core"), classes = read("classes"), origins = read("origins"),
-  feats = read("feats"), equipment = read("equipment");
+  feats = read("feats"), equipment = read("equipment"), kits = read("kits");
 const allOrigins = [...origins.talents, ...origins.specialties];
 const skills = new Set(core.skills.map(s => s.key));
 const featNames = new Set(feats.map(f => f.name));
 const featTrees = new Set(["basicCombat","meleeCombat","rangedCombat","unarmedCombat","chance","chase",
   "covert","gear","basicSkill","advancedSkill","style","terrain","tradecraft"]);
-const typeNames = new Set(["all","any","feat","featTree","base","level","ability","skill",
-  "proficiency","focus","lifestyle","keySkill","never","unknown"]);
+const typeNames = new Set(["all","any","feat","featChoice","featTree","base","level","ability","skill",
+  "proficiency","focus","lifestyle","keySkill","sneakAttack","never","unknown","manual"]);
 const attributes = new Set(["str","dex","con","int","wis","cha"]);
 const proficiencies = new Set(["unarmed","blunt","exoticBlunt","edged","exoticEdged",
   "explosives","guided","handgun","hurled","exoticHurled","indirectFire","rifle",
@@ -26,6 +26,8 @@ function checkReq(node, context) {
     assert.ok(Array.isArray(node.of) && node.of.length > 0,`${context}: empty condition`);
     return node.of.forEach(n=>checkReq(n,context));
   }
+  if (node.type==="sneakAttack") assert.ok(Number.isSafeInteger(node.min) && node.min>0,`${context}: invalid sneak attack dice prerequisite`);
+  if (node.type==="featChoice") assert.ok(featNames.has(node.name) && typeof node.choice==="string" && node.choice.trim(),`${context}: invalid chosen-feat prerequisite`);
   if (node.type==="feat") assert.ok(featNames.has(node.name),`${context}: unknown feat ${node.name}`);
   if (node.type==="featTree") assert.ok(featTrees.has(node.tree),`${context}: unknown feat tree ${node.tree}`);
   if (node.type==="skill") assert.ok(skills.has(node.key),`${context}: unknown skill ${node.key}`);
@@ -34,7 +36,7 @@ function checkReq(node, context) {
 }
 function checkBonus(b,context) {
   assert.equal(typeof b.target,"string",`${context}: bonus target`);
-  assert.ok(/^(abilities\.(str|dex|con|int|wis|cha)|skills\.[a-zA-Z]+\.(misc|threat|cap|classSkill)|saves\.(fort|ref|will)|featSlots\.[a-zA-Z]+|focus\.[a-zA-Z]+|prof\.[a-zA-Z]+|actionDice\.(count|bonus)|[a-zA-Z]+)$/.test(b.target),`${context}: malformed bonus target ${b.target}`);
+  assert.ok(/^(abilities\.(str|dex|con|int|wis|cha)|skills\.[a-zA-Z]+\.(misc|threat|baseThreat|cap|classSkill|errorReduction|maxRanks)|(?:saves|baseSave)\.(fort|ref|will)|featSlots\.[a-zA-Z]+|(?:focus|focusForte)\.[a-zA-Z]+|prof\.[a-zA-Z]+|actionDice\.(count|bonus)|[a-zA-Z]+)$/.test(b.target),`${context}: malformed bonus target ${b.target}`);
   assert.ok(typeof b.value === "string" || typeof b.value === "number",`${context}: bonus value`);
 }
 
@@ -62,3 +64,11 @@ for(const origin of allOrigins) {
 }
 assert.ok(equipment.weapons.length>0 && equipment.armor.length>0);
 console.log(`Data integrity: ${classes.length} classes, ${feats.length} feats, ${allOrigins.length} origins, ${equipment.weapons.length} weapons, ${equipment.armor.length} armor.`);
+
+unique(kits.map(k=>k.name),"kits");assert.equal(kits.length,48);
+for(const kit of kits){assert.ok([1,2,3].includes(kit.grade));assert.equal(typeof kit.nonPortable,"boolean");assert.ok(kit.nonPortable?kit.weight===null:Number.isFinite(kit.weight)&&kit.weight>0);assert.ok([213,214,215].includes(kit.sourcePage));assert.ok(kit.contents&&kit.kitType);}
+console.log(`Kit integrity: ${kits.length} records, all three grades across ${new Set(kits.map(k=>k.kitType)).size} kit types.`);
+
+const ammunition=read('ammunition');assert.equal(ammunition.length,63);unique(ammunition.map(a=>a.id),'ammunition IDs');
+for(const a of ammunition){assert.ok(['arrowBolt','bullet','shell','grenade','mortar','rocket'].includes(a.family));assert.ok(Number.isFinite(a.unitWeight)&&a.unitWeight>0);assert.ok(Number.isSafeInteger(a.upgradeCost)&&a.upgradeCost>0);assert.ok(a.commonItemCost===null||Number.isSafeInteger(a.commonItemCost)&&a.commonItemCost>0);assert.ok([274,275].includes(a.sourcePage));assert.equal(typeof a.firstStockpile,'boolean');assert.ok(a.fixedStockpileSize===null||Number.isSafeInteger(a.fixedStockpileSize)&&a.fixedStockpileSize>0);}
+console.log(`Ammunition reference integrity: ${ammunition.length} rows across six families.`);

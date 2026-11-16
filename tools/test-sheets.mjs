@@ -20,6 +20,7 @@ const { SpycraftItemSheet } = await import("../module/sheets/item-sheet.mjs");
 test("agent sheet maps per-level skills, contacts and class selections into updates", async () => {
   const calls = [];
   const actor = {
+    isOwner:true,uuid:"Actor.sheet",
     system: {
       level: 2, progression: [
         { classId:"pointman", skills:{bluff:1}, vitality:0 },
@@ -38,7 +39,7 @@ test("agent sheet maps per-level skills, contacts and class selections into upda
   }};
   const update = sheet._prepareSubmitData(null,null,formData,{});
   assert.equal(update["system.progression"][0].skills.bluff,2);
-  assert.equal(update["system.progression"][1].vitality,7);
+  assert.equal(update["system.progression"][1].vitality,5);
   assert.equal(update["system.contacts"][0].name,"Madeleine");
   assert.equal(update["system.skills.bluff.misc"],"1");
   assert.ok(!("choice.classitem.0" in update));
@@ -75,4 +76,67 @@ test("equipping armor unequips the previous armor in one batch", async () => {
     {_id:"a","system.equipped":false},
     {_id:"b","system.equipped":true}
   ]);
+});
+
+
+test("Main origin selections are persisted to their embedded origin item", async () => {
+  let updates;
+  const actor={system:{level:1,progression:[],contacts:[],subplots:[]},updateEmbeddedDocuments:async (_type,value)=>{updates=value;}};
+  const sheet=new SpycraftAgentSheet(actor);
+  const out=sheet._prepareSubmitData(null,null,{object:{"originChoice.origin1.up":"dex","originChoice.origin1.threatSkill":"notice"}},{});
+  assert.deepEqual(out,{});
+  await sheet._processSubmitData(null,null,out,{});
+  assert.deepEqual(updates,[{_id:"origin1","system.originChoices.up":"dex","system.originChoices.threatSkill":"notice"}]);
+});
+
+
+test("class skill target fields persist as embedded class choices",()=>{
+ const actor={system:{level:4,progression:[],contacts:[],subplots:[]}};
+ const sheet=new SpycraftAgentSheet(actor);
+ const data={object:{"classSkillChoice.adv.byAnyMeans4":"acrobatics","classSkillChoice.face.choice0":"bluff"}};
+ const out=sheet._prepareSubmitData(null,null,data,{});
+ assert.deepEqual(out,{});
+ assert.deepEqual(sheet._pendingItemUpdates,{adv:{"system.skillChoices.byAnyMeans4":"acrobatics"},face:{"system.skillChoices.choice0":"bluff"}});
+});
+
+
+test("inherited class subchoices persist their option and skill on the owning item",()=>{
+ const actor={system:{level:6,progression:[],contacts:[],subplots:[]}},sheet=new SpycraftAgentSheet(actor);
+ const out=sheet._prepareSubmitData(null,null,{object:{"inheritedChoice.pointman.cross0.option":"9","inheritedChoice.pointman.cross0.skill":"bluff"}},{});
+ assert.deepEqual(out,{});assert.deepEqual(sheet._pendingItemUpdates,{pointman:{"system.inheritedChoices.cross0.option":9,"system.inheritedChoices.cross0.skill":"bluff"}});
+});
+
+
+test("Weapon Specialist mode and proficiency persist on the embedded Soldier item",async()=>{
+ const actor={system:{progression:[],contacts:[],subplots:[]},async updateEmbeddedDocuments(type,updates){this.updates=updates;}};
+ const sheet=new SpycraftAgentSheet(actor);const form={object:{"specialistChoice.soldier.9.mode":"proficiency","specialistChoice.soldier.9.proficiency":"edged"}};
+ const update=sheet._prepareSubmitData(null,null,form,{});await sheet._processSubmitData(null,null,update,{});
+ assert.deepEqual(actor.updates,[{_id:"soldier","system.weaponSpecialist.9.mode":"proficiency","system.weaponSpecialist.9.proficiency":"edged"}]);
+});
+
+test('auto-submit cannot overwrite dice or health with stale inputs when another field is edited',async()=>{
+ const sheet=new SpycraftAgentSheet({uuid:'Actor.sheet'}),data={'system.codename':'New','system.actionDice.value':4,'system.vitality.value':9,system:{wounds:{value:8},netWorth:100000}};
+ const result=await sheet._processSubmitData({target:{name:'system.codename'}},null,data,{});assert.equal(result.updated['system.codename'],'New');assert.equal(Object.hasOwn(result.updated,'system.actionDice.value'),false);assert.equal(Object.hasOwn(result.updated,'system.vitality.value'),false);assert.equal(Object.hasOwn(result.updated.system.wounds,'value'),false);assert.equal(Object.hasOwn(result.updated.system,'netWorth'),false);
+});
+test('an explicitly edited resource retains its requested value while unrelated stale resources are discarded',async()=>{
+ const sheet=new SpycraftAgentSheet({uuid:'Actor.sheet'}),data={'system.actionDice.value':2,'system.wounds.value':8};
+ const result=await sheet._processSubmitData({target:{name:'system.actionDice.value'}},null,data,{});assert.equal(result.updated['system.actionDice.value'],2);assert.equal(Object.hasOwn(result.updated,'system.wounds.value'),false);
+});
+
+function careerSheet(){return new SpycraftAgentSheet({uuid:'Actor.career',isOwner:true,system:{level:2,progression:[{classId:'soldier',careerEntryId:'first',vitality:0,intelligenceModifier:2,skills:{athletics:4}},{classId:'soldier',careerEntryId:'second',vitality:0,intelligenceModifier:2,skills:{notice:1}}],contacts:[],subplots:[]}});}
+test('queued skill edits merge fresh vitality, correction references and unrelated skill purchases',async()=>{
+ const sheet=careerSheet();sheet._skillLevel=2;const data=sheet._prepareSubmitData(null,null,{object:{'skillpts.notice':2}},{});let release;sheet.actor._actionDieQueue=new Promise(r=>release=r);const pending=sheet._processSubmitData({target:{name:'skillpts.notice'}},null,data,{});const row=sheet.actor.system.progression[1];Object.assign(row,{vitality:9,vitalityRollId:'original',vitalityReviewId:'review'});row.skills.resolve=1;release();const result=await pending,final=result.updated['system.progression'][1];assert.equal(final.vitality,9);assert.equal(final.vitalityRollId,'original');assert.equal(final.vitalityReviewId,'review');assert.deepEqual(final.skills,{notice:2,resolve:1});assert.equal(row.skills.notice,1);
+});
+test('a stale edit cannot replace a changed skill field, a removed/replaced career row or lost ownership',async()=>{
+ for(const change of [a=>a.system.progression[1].skills.notice=3,a=>a.system.progression.pop(),a=>a.system.progression[1].careerEntryId='replacement',a=>a.isOwner=false]){const sheet=careerSheet();sheet._skillLevel=2;const data=sheet._prepareSubmitData(null,null,{object:{'skillpts.notice':2}},{});change(sheet.actor);await assert.rejects(sheet._processSubmitData(null,null,data,{}),/changed|own/);}
+});
+test('unchanged skill auto-submit and ignored raw vitality fields cannot replay a whole old career array',async()=>{
+ const sheet=careerSheet();sheet._skillLevel=2;const data=sheet._prepareSubmitData(null,null,{object:{'skillpts.notice':1,'progression.1.vitality':12}},{});sheet.actor.system.progression[1].skills.notice=3;sheet.actor.system.progression[1].vitality=8;const result=await sheet._processSubmitData(null,null,data,{});assert.equal(Object.hasOwn(result.updated,'system.progression'),false);
+ const raw=sheet._prepareSubmitData(null,null,{object:{'progression.1.vitality':12}},{});assert.equal(Object.hasOwn(raw,'system.progression'),false);
+});
+test('historical Intelligence edits retain fresh class gains; invalid or unplanned career edits fail explicitly',async()=>{
+ const sheet=careerSheet(),data=sheet._prepareSubmitData(null,null,{object:{'progression.1.intelligenceModifier':3}},{});sheet.actor.system.progression[1].vitality=6;const result=await sheet._processSubmitData(null,null,data,{});assert.equal(result.updated['system.progression'][1].vitality,6);assert.equal(result.updated['system.progression'][1].intelligenceModifier,3);
+ for(const value of ['bad',-1,0.5])assert.throws(()=>sheet._prepareSubmitData(null,null,{object:{'skillpts.notice':value}},{}),/nonnegative whole/);
+ assert.throws(()=>sheet._prepareSubmitData(null,null,{object:{'progression.1.intelligenceModifier':'bad'}},{}),/whole number/);
+ await assert.rejects(sheet._processSubmitData(null,null,{'system.progression':[]},{}),/career form/);
 });

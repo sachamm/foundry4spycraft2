@@ -1,18 +1,33 @@
 <section class="item-details">
+  <p class="muted">DR: melee, unarmed and non-grenade hurled attacks / all other attacks. Helmets with a Vision penalty apply it to Vision checks, not Reflex saves.</p>
+  {{#if armorTraining}}<p>Armor training when worn: Defense modifier {{armorTraining.system.defensePenalty}}, ACP {{armorTraining.system.armorCheck}}, Speed modifier {{armorTraining.system.speedPenalty}} ft.; Notice/Search {{armorTraining.system.notice}}. Additional DR: melee weapons +{{armorTraining.benefits.meleeWeaponDR}}, ranged weapons +{{armorTraining.benefits.rangedWeaponDR}}, melee/ranged attacks +{{armorTraining.benefits.meleeAttackDR}}. Mastery Defense +{{armorTraining.benefits.defense}}. Source fields below retain the equipment’s base statistics.</p>{{/if}}
+  <p class="muted">Notice/Search DC applies when properly concealed or disguised. Partial armor needs at least one clothing layer; moderate armor needs an overcoat or equivalent cover. Obvious armor cannot be concealed.</p>
   <div class="form-fields-grid">
+    <label>Armor type <input name="system.armorType" value="{{system.armorType}}" placeholder="P, M, F or miscellaneous" /></label>
+    <label>Slot <input name="system.armorSlot" value="{{system.armorSlot}}" placeholder="body, helmet, shield or unique type" /></label>
+    <label><input type="checkbox" name="system.sealed" {{checked system.sealed}} /> Sealed (includes helmet)</label>
+    <label><input type="checkbox" name="system.visionPenalty" {{checked system.visionPenalty}} /> ACP applies to Vision instead</label>
     <label>DR <input type="number" name="system.damageReduction" value="{{system.damageReduction}}" class="w-2" /> / <input type="number" name="system.damageReductionSubdual" value="{{system.damageReductionSubdual}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.ArmorField.Defense"}} <input type="number" name="system.defensePenalty" value="{{system.defensePenalty}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.ArmorField.Check"}} <input type="number" name="system.armorCheck" value="{{system.armorCheck}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.Speed"}} <input type="number" name="system.speedPenalty" value="{{system.speedPenalty}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.ArmorField.Notice"}} <input type="text" name="system.notice" value="{{system.notice}}" class="w-4" /></label>
-    <label class="wide">{{localize "SPYCRAFT.ArmorField.Resistances"}} <input type="text" name="system.resistances" value="{{system.resistances}}" /></label>
+    <label class="wide">{{localize "SPYCRAFT.ArmorField.Resistances"}} <input type="text" name="system.resistances" value="{{system.resistances}}" placeholder="AD4, CD4, CN (all)" /></label>
     <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
     <label>{{localize "SPYCRAFT.Weight"}} <input type="number" step="any" name="system.weight" value="{{system.weight}}" class="w-2" /></label>
+    <label>Category (for CHA pick validation) <input name="system.gearCategory" value="{{system.gearCategory}}" placeholder="E/G/R/S/T/V/W" /></label>
+    {{#if system.pick}}<label>Mission picks paid <input type="number" min="1" name="system.pickCount" value="{{system.pickCount}}" class="w-2" /></label>{{/if}}
+    {{#if system.armorMissionGrant}}<p>Armor Use mission armor · mission {{system.armorMissionGrant.epoch}}. No ordinary mission pick is charged; its recorded selection remains used if this item is deleted.</p>{{/if}}
+    {{#if system.missionCaliberGrant}}<p>Mission-Caliber exception: {{#if system.missionCaliberGrant.name}}{{system.missionCaliberGrant.name}}{{else}}Recorded higher-Caliber pick{{/if}} · mission {{system.missionCaliberGrant.epoch}}. Its ordinary mission pick remains charged.</p>{{/if}}
+    <label>Personal gear source <select name="system.possessionSource"><option value="" {{#unless system.possessionSource}}selected{{/unless}}>Unclassified / not a Possession</option><option value="wealth" {{#if (sc2eq system.possessionSource "wealth")}}selected{{/if}}>Wealth Possessions allowance</option><option value="gcGrant" {{#if (sc2eq system.possessionSource "gcGrant")}}selected{{/if}}>Additional GC-granted Possession</option></select></label>
+    {{#if system.possessionSource}}<label><input type="checkbox" name="system.possessionApproved" {{checked system.possessionApproved}} /> The GC approved this Possession</label><label><input type="checkbox" name="system.cleanAndPolishedReady" {{checked system.cleanAndPolishedReady}} /> Clean and Polished is maintained: no absence from my person over 24 hours since the last hour of cleaning/readjustment</label>{{/if}}
+    {{#if (sc2eq system.possessionSource "wealth")}}{{#unless system.pick}}<label>Possessions picks paid <input type="number" min="1" name="system.pickCount" value="{{system.pickCount}}" /></label>{{/unless}}{{/if}}
     <label>{{localize "SPYCRAFT.Pick"}} <select name="system.pick">{{selectOptions pickOptions selected=system.pick}}</select></label>
     <label><input type="checkbox" name="system.equipped" {{checked system.equipped}} /> {{localize "SPYCRAFT.Equipped"}}</label>
+    <label><input type="checkbox" name="system.carried" {{checked system.carried}} /> Carried</label>
     <label><input type="checkbox" name="system.reserve" {{checked system.reserve}} /> {{localize "SPYCRAFT.Reserve"}}</label>
-    <label><input type="checkbox" name="system.common" {{checked system.common}} /> {{localize "SPYCRAFT.TeamPool"}}</label>
+    <label><input type="checkbox" name="system.common" {{checked system.common}} /> Common Item</label>
   </div>
   <h3>{{localize "SPYCRAFT.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}

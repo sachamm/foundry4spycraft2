@@ -1,0 +1,1404 @@
+{
+  "actor": "WqZextFKMPkEN4iC",
+  "before": {
+    "normalQuarts": 1,
+    "hotQuarts": 2,
+    "heatThresholdF": 90,
+    "desertTraining": false,
+    "multiplier": 1,
+    "currentQuarts": null
+  },
+  "feat": "YtxgF732azA7r7Fc",
+  "after": {
+    "normalQuarts": 0.5,
+    "hotQuarts": 1,
+    "heatThresholdF": 90,
+    "desertTraining": true,
+    "multiplier": 0.5,
+    "currentQuarts": null
+  },
+  "build": {
+    "progression": [
+      {
+        "classId": "soldier",
+        "vitality": 6,
+        "careerEntryId": "",
+        "vitalityRollId": "",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "survival": 3,
+          "athletics": 4,
+          "drive": 2,
+          "intimidate": 4,
+          "notice": 4,
+          "profession": 4,
+          "resolve": 3
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 7,
+        "careerEntryId": "pgwPrY50jd30yA0Y",
+        "vitalityRollId": "r3rZQUTXMF32JTCF",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 3,
+          "intimidate": 1,
+          "notice": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 12,
+        "careerEntryId": "Y1TuQxhHmOIH0d1T",
+        "vitalityRollId": "4NkjRB9EQRQfA0ib",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 2
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 1,
+        "careerEntryId": "WU3jmbh7PuTi0crq",
+        "vitalityRollId": "F74KMEMGPPi69kmv",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "networking": 2,
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1
+        }
+      }
+    ],
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "history": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"key\":\"survival\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"terrain\"}",
+      "manual": true
+    },
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "survival": 3
+  },
+  "checks": [
+    {
+      "id": "14sakrB7mgiISnZx",
+      "flags": {
+        "terrainFeat": {
+          "version": 1,
+          "context": {
+            "homeTurf": false,
+            "homeTurfEligible": false,
+            "homeTurfCapIncrease": 0,
+            "terrain": "desert",
+            "underwater": false,
+            "navigating": false,
+            "naturalSurface": false,
+            "hearingCheck": false,
+            "cityPopulation": 0,
+            "nightAmbush": false,
+            "matched": [
+              "Desert Training"
+            ],
+            "woodcraft": false,
+            "unfair": false,
+            "bonuses": [
+              {
+                "type": "insight",
+                "value": 2,
+                "source": "Desert Training"
+              }
+            ],
+            "synergies": [],
+            "synergySources": [],
+            "ambushSources": [],
+            "opponentSurprisePenalty": 0,
+            "notes": [
+              "Terrain training: +2 insight (Desert Training). Matching insight bonuses compete normally (pp.206–207)."
+            ],
+            "surprise": false
+          },
+          "synergyRanks": {},
+          "selectedSynergy": {
+            "skill": "notice",
+            "value": 1
+          },
+          "appliedSynergy": 1
+        },
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 6,
+          "total": 6,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 7,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "desert",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "desert",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [
+            "Desert Training"
+          ],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [
+            {
+              "type": "insight",
+              "value": 2,
+              "source": "Desert Training"
+            }
+          ],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": [
+            "Terrain training: +2 insight (Desert Training). Matching insight bonuses compete normally (pp.206–207)."
+          ]
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 19,
+        "rawTotal": 19,
+        "rolledTotal": 19,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 19,
+        "actorUuid": "Actor.WqZextFKMPkEN4iC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "survival",
+        "checkId": "foraging",
+        "focus": "Foraging",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 7
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 19,
+        "error": 1,
+        "cap": 20,
+        "baseFlavor": "Survival / Foraging Check (WIS)<br><small>            Terrain training: +2 insight (Desert Training). Matching insight bonuses compete normally (pp.206–207).         Synergy +1 (notice). 4 Hours (Take 10/Take 20). Active. No tags. Rules p.166.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 12,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "id": "6iDQckDvzIjO9nTM",
+      "flags": {
+        "terrainFeat": {
+          "version": 1,
+          "context": {
+            "homeTurf": false,
+            "homeTurfEligible": false,
+            "homeTurfCapIncrease": 0,
+            "terrain": "urban",
+            "underwater": false,
+            "navigating": false,
+            "naturalSurface": false,
+            "hearingCheck": false,
+            "cityPopulation": 9999,
+            "nightAmbush": false,
+            "matched": [
+              "Urban Training"
+            ],
+            "woodcraft": false,
+            "unfair": false,
+            "bonuses": [
+              {
+                "type": "insight",
+                "value": 2,
+                "source": "Urban Training"
+              }
+            ],
+            "synergies": [],
+            "synergySources": [],
+            "ambushSources": [],
+            "opponentSurprisePenalty": 0,
+            "notes": [
+              "Terrain training: +2 insight (Urban Training). Matching insight bonuses compete normally (pp.206–207)."
+            ],
+            "surprise": false
+          },
+          "synergyRanks": {},
+          "selectedSynergy": {
+            "skill": "athletics",
+            "value": 1
+          },
+          "appliedSynergy": 1
+        },
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 3,
+          "total": 3,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 7,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "urban",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "urban",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 9999,
+          "nightAmbush": false,
+          "matched": [
+            "Urban Training"
+          ],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [
+            {
+              "type": "insight",
+              "value": 2,
+              "source": "Urban Training"
+            }
+          ],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": [
+            "Terrain training: +2 insight (Urban Training). Matching insight bonuses compete normally (pp.206–207)."
+          ]
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": {
+          "applicable": true,
+          "surface": "firm",
+          "blockedReason": "",
+          "ageHours": 0,
+          "weatherHours": 0,
+          "ageSteps": 0,
+          "weatherSteps": 0,
+          "largeGroup": false,
+          "pace": "half",
+          "trailSigns": false,
+          "errorIncrease": 2,
+          "tableIncrease": 2,
+          "speedIncrease": 0,
+          "dcComponents": {
+            "terrain": 30,
+            "age": 0,
+            "weather": 0,
+            "group": 0,
+            "groupMinimum": null,
+            "sizeRequiresReview": true
+          },
+          "take10Normal": false,
+          "take10Allowed": false,
+          "take20Allowed": false,
+          "take20IgnoresError": false,
+          "bonuses": [],
+          "notes": [
+            "Tracking: Firm (packed earth, woods, thick rugs), base terrain DC 30; trail age DC +0, rain/snow DC +0. Apply the largest target’s size modifier (Table 5.13) and any opposed Falsify/Cover Up result when adjudicating the DC. Table error increase +2; pace increase +0. Follow at no more than half Speed. Track once per mile outdoors or 300 ft. indoors/vessels; also check when the trail becomes harder (p.167)."
+          ],
+          "synergies": []
+        },
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 19,
+        "rawTotal": 23,
+        "rolledTotal": 23,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 23,
+        "actorUuid": "Actor.WqZextFKMPkEN4iC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "survival",
+        "checkId": "tracking",
+        "focus": "Tracking",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "rollMode": "blindroll",
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 19,
+        "error": 5,
+        "cap": 15,
+        "baseFlavor": "Survival / Tracking Check (WIS)<br><small>            Terrain training: +2 insight (Urban Training). Matching insight bonuses compete normally (pp.206–207).   Tracking: Firm (packed earth, woods, thick rugs), base terrain DC 30; trail age DC +0, rain/snow DC +0. Apply the largest target’s size modifier (Table 5.13) and any opposed Falsify/Cover Up result when adjudicating the DC. Table error increase +2; pace increase +0. Follow at no more than half Speed. Track once per mile outdoors or 300 ft. indoors/vessels; also check when the trail becomes harder (p.167).      Synergy +1 (athletics). Time Varies. Secret. Vision. Rules p.167.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 19,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "id": "7Es3lYMSisNArNPy",
+      "flags": {
+        "terrainFeat": {
+          "version": 1,
+          "context": {
+            "homeTurf": false,
+            "homeTurfEligible": false,
+            "homeTurfCapIncrease": 0,
+            "terrain": "urban",
+            "underwater": false,
+            "navigating": false,
+            "naturalSurface": false,
+            "hearingCheck": false,
+            "cityPopulation": 10000,
+            "nightAmbush": false,
+            "matched": [
+              "Urban Training"
+            ],
+            "woodcraft": false,
+            "unfair": false,
+            "bonuses": [
+              {
+                "type": "insight",
+                "value": 2,
+                "source": "Urban Training"
+              }
+            ],
+            "synergies": [
+              {
+                "skill": "streetwise",
+                "focusSkill": false,
+                "focus": "",
+                "condition": ""
+              }
+            ],
+            "synergySources": [
+              {
+                "source": "Urban Training",
+                "skill": "streetwise"
+              }
+            ],
+            "ambushSources": [],
+            "opponentSurprisePenalty": 0,
+            "notes": [
+              "Terrain training: +2 insight (Urban Training). Matching insight bonuses compete normally (pp.206–207).",
+              "Terrain feat synergy available: Urban Training → streetwise. Normal rank, mode and one-best-synergy rules apply."
+            ],
+            "surprise": false
+          },
+          "synergyRanks": {
+            "streetwise": 5
+          },
+          "selectedSynergy": {
+            "skill": "streetwise",
+            "value": 1
+          },
+          "appliedSynergy": 1
+        },
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 3,
+          "total": 3,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 7,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "urban",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "urban",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 10000,
+          "nightAmbush": false,
+          "matched": [
+            "Urban Training"
+          ],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [
+            {
+              "type": "insight",
+              "value": 2,
+              "source": "Urban Training"
+            }
+          ],
+          "synergies": [
+            {
+              "skill": "streetwise",
+              "focusSkill": false,
+              "focus": "",
+              "condition": ""
+            }
+          ],
+          "synergySources": [
+            {
+              "source": "Urban Training",
+              "skill": "streetwise"
+            }
+          ],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": [
+            "Terrain training: +2 insight (Urban Training). Matching insight bonuses compete normally (pp.206–207).",
+            "Terrain feat synergy available: Urban Training → streetwise. Normal rank, mode and one-best-synergy rules apply."
+          ]
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": {
+          "applicable": true,
+          "surface": "firm",
+          "blockedReason": "",
+          "ageHours": 0,
+          "weatherHours": 0,
+          "ageSteps": 0,
+          "weatherSteps": 0,
+          "largeGroup": false,
+          "pace": "half",
+          "trailSigns": false,
+          "errorIncrease": 2,
+          "tableIncrease": 2,
+          "speedIncrease": 0,
+          "dcComponents": {
+            "terrain": 30,
+            "age": 0,
+            "weather": 0,
+            "group": 0,
+            "groupMinimum": null,
+            "sizeRequiresReview": true
+          },
+          "take10Normal": false,
+          "take10Allowed": false,
+          "take20Allowed": false,
+          "take20IgnoresError": false,
+          "bonuses": [],
+          "notes": [
+            "Tracking: Firm (packed earth, woods, thick rugs), base terrain DC 30; trail age DC +0, rain/snow DC +0. Apply the largest target’s size modifier (Table 5.13) and any opposed Falsify/Cover Up result when adjudicating the DC. Table error increase +2; pace increase +0. Follow at no more than half Speed. Track once per mile outdoors or 300 ft. indoors/vessels; also check when the trail becomes harder (p.167)."
+          ],
+          "synergies": []
+        },
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 19,
+        "rawTotal": 15,
+        "rolledTotal": 15,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 15,
+        "actorUuid": "Actor.WqZextFKMPkEN4iC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "survival",
+        "checkId": "tracking",
+        "focus": "Tracking",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "rollMode": "blindroll",
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 19,
+        "error": 5,
+        "cap": 15,
+        "baseFlavor": "Survival / Tracking Check (WIS)<br><small>            Terrain training: +2 insight (Urban Training). Matching insight bonuses compete normally (pp.206–207). Terrain feat synergy available: Urban Training → streetwise. Normal rank, mode and one-best-synergy rules apply.   Tracking: Firm (packed earth, woods, thick rugs), base terrain DC 30; trail age DC +0, rain/snow DC +0. Apply the largest target’s size modifier (Table 5.13) and any opposed Falsify/Cover Up result when adjudicating the DC. Table error increase +2; pace increase +0. Follow at no more than half Speed. Track once per mile outdoors or 300 ft. indoors/vessels; also check when the trail becomes harder (p.167).      Synergy +1 (streetwise). Time Varies. Secret. Vision. Rules p.167.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 11,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "id": "UrBO36A2dQDF3bDg",
+      "flags": {
+        "terrainFeat": {
+          "version": 1,
+          "context": {
+            "homeTurf": false,
+            "homeTurfEligible": false,
+            "homeTurfCapIncrease": 0,
+            "terrain": "urban",
+            "underwater": false,
+            "navigating": false,
+            "naturalSurface": false,
+            "hearingCheck": false,
+            "cityPopulation": 0,
+            "nightAmbush": false,
+            "matched": [
+              "Urban Training"
+            ],
+            "woodcraft": false,
+            "unfair": false,
+            "bonuses": [],
+            "synergies": [],
+            "synergySources": [],
+            "ambushSources": [
+              "Urban Training"
+            ],
+            "opponentSurprisePenalty": -2,
+            "notes": [
+              "Ambush: opponents’ checks to determine surprise suffer -2 (Urban Training). Apply this to the opposition when adjudicating the ambush, not to this preparation check."
+            ],
+            "surprise": false
+          },
+          "synergyRanks": {},
+          "selectedSynergy": {
+            "skill": "blend",
+            "value": 0
+          },
+          "appliedSynergy": 0
+        },
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 1,
+          "total": 1,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 7,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "urban",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "urban",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [
+            "Urban Training"
+          ],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [
+            "Urban Training"
+          ],
+          "opponentSurprisePenalty": -2,
+          "notes": [
+            "Ambush: opponents’ checks to determine surprise suffer -2 (Urban Training). Apply this to the opposition when adjudicating the ambush, not to this preparation check."
+          ]
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": {
+          "applicable": true,
+          "preparation": "slow",
+          "role": "",
+          "baseSeconds": 600,
+          "time": "10 Minutes (Take 10/Take 20 with permission)",
+          "errorIncrease": 0,
+          "threatIncrease": 0,
+          "crossCheckGranted": false,
+          "initiativeBonus": 5,
+          "surpriseSneakDice": 2,
+          "timeChoices": [],
+          "notes": [
+            "Slow Ambush: normal preparation 10 minutes. With success, leader/helpers gain one standard half-action surprise round, +5 Initiative and 2d6 sneak attack damage during that surprise round; adjudicate opposition and rewards at the table (p.168)."
+          ],
+          "requiredPreparationSeconds": 600
+        },
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 20,
+        "rolledTotal": 20,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 15,
+        "actorUuid": "Actor.WqZextFKMPkEN4iC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "tactics",
+        "checkId": "ambush",
+        "focus": "Ambush",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 1
+        },
+        "rollMode": "blindroll",
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 3,
+        "cap": 15,
+        "baseFlavor": "Tactics / Ambush Check (WIS)<br><small>            Ambush: opponents’ checks to determine surprise suffer -2 (Urban Training). Apply this to the opposition when adjudicating the ambush, not to this preparation check.    Slow Ambush: normal preparation 10 minutes. With success, leader/helpers gain one standard half-action surprise round, +5 Initiative and 2d6 sneak attack damage during that surprise round; adjudicate opposition and rewards at the table (p.168). Required Ambush preparation: 600 seconds.     10 Minutes (Take 10/Take 20 with permission). Secret. Vision. Rules p.168.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": true,
+        "naturalDie": 19,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    }
+  ],
+  "guard": {
+    "error": "The declared skill modifiers or their feat sources changed before the check was posted.",
+    "calls": 1,
+    "noPost": true
+  },
+  "urban": {
+    "history": {
+      "ok": true,
+      "unmet": [],
+      "level": 3,
+      "signature": "{\"prerequisites\":{\"key\":\"streetwise\",\"min\":3,\"type\":\"skill\"},\"source\":\"\",\"tree\":\"terrain\"}",
+      "manual": true
+    },
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "progression": [
+      {
+        "classId": "soldier",
+        "vitality": 6,
+        "careerEntryId": "",
+        "vitalityRollId": "",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 4,
+          "drive": 2,
+          "intimidate": 4,
+          "notice": 4,
+          "profession": 4,
+          "streetwise": 6
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 7,
+        "careerEntryId": "pgwPrY50jd30yA0Y",
+        "vitalityRollId": "r3rZQUTXMF32JTCF",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "streetwise": 2
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 12,
+        "careerEntryId": "Y1TuQxhHmOIH0d1T",
+        "vitalityRollId": "4NkjRB9EQRQfA0ib",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "streetwise": 2
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 1,
+        "careerEntryId": "WU3jmbh7PuTi0crq",
+        "vitalityRollId": "F74KMEMGPPi69kmv",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "networking": 2,
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1
+        }
+      }
+    ],
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "streetwise": 5
+  },
+  "cityBlocked": true,
+  "evidenceGuard": true,
+  "reload": {
+    "budgets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "receipts": [
+      {
+        "id": "14sakrB7mgiISnZx",
+        "same": true
+      },
+      {
+        "id": "6iDQckDvzIjO9nTM",
+        "same": true
+      },
+      {
+        "id": "7Es3lYMSisNArNPy",
+        "same": true
+      },
+      {
+        "id": "UrBO36A2dQDF3bDg",
+        "same": true
+      }
+    ],
+    "dice": 0,
+    "cleanup": {
+      "actors": 5,
+      "messages": 526,
+      "time": 126,
+      "locks": 0
+    }
+  }
+}

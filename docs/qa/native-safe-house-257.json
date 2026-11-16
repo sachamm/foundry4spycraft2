@@ -1,0 +1,879 @@
+{
+  "actor": "ISjhf200hOYJu9MF",
+  "rolls": [
+    7,
+    3,
+    7,
+    6,
+    5
+  ],
+  "checks": [],
+  "feat": "ZmVdlY7BQ1E8lqkS",
+  "build": {
+    "points": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "gear": 8,
+    "feats": [
+      {
+        "name": "Home Sweet Home",
+        "choice": "",
+        "tree": "gear"
+      },
+      {
+        "name": "Safe House",
+        "choice": "",
+        "tree": "tradecraft"
+      },
+      {
+        "name": "Career Agent",
+        "choice": "",
+        "tree": "tradecraft"
+      }
+    ],
+    "history": {
+      "ok": true,
+      "unmet": [],
+      "level": 6,
+      "signature": "{\"prerequisites\":{\"min\":6,\"type\":\"level\"},\"source\":\"\",\"tree\":\"tradecraft\"}"
+    }
+  },
+  "start": {
+    "feat": {
+      "name": "Career Agent",
+      "type": "feat",
+      "img": "icons/svg/combat.svg",
+      "system": {
+        "description": "<p>+1 insight to all saves, and +1 Reputation or extra Net Worth after each mission.</p>",
+        "source": "Spycraft 2.0 (summary)",
+        "tree": "tradecraft",
+        "prerequisites": {
+          "type": "level",
+          "min": 6
+        },
+        "prerequisitesNotChecked": false,
+        "ranks": 1,
+        "granted": false,
+        "grantSource": "",
+        "repeatable": false,
+        "maxSelections": 0,
+        "bonuses": [
+          {
+            "level": 0,
+            "target": "saves.ref",
+            "value": "1",
+            "bonusType": "insight"
+          },
+          {
+            "level": 0,
+            "target": "saves.fort",
+            "value": "1",
+            "bonusType": "insight"
+          },
+          {
+            "level": 0,
+            "target": "saves.will",
+            "value": "1",
+            "bonusType": "insight"
+          }
+        ],
+        "temporaryGrant": null,
+        "featKind": "permanent",
+        "candidateBasis": null,
+        "choice": "",
+        "contactGrantMode": "associate",
+        "contactTheme": "",
+        "contactThemeConfirmed": false,
+        "restrictions": "",
+        "trainingSkills": {},
+        "focusChoices": [],
+        "manualPrerequisitesConfirmed": false,
+        "acquisitionSource": "",
+        "acquisitionCheck": {
+          "ok": true,
+          "unmet": [],
+          "level": 6,
+          "signature": "{\"prerequisites\":{\"min\":6,\"type\":\"level\"},\"source\":\"\",\"tree\":\"tradecraft\"}"
+        },
+        "historicalPrerequisitesConfirmed": false,
+        "acquiredAtLevel": 6
+      },
+      "effects": [],
+      "folder": "JWbvWRor4Pg0Oawl",
+      "sort": 314,
+      "ownership": {
+        "default": 0,
+        "WW1y27MJMt1sWfHr": 3
+      },
+      "flags": {},
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794810334690,
+        "modifiedTime": 1794810334690,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_id": "V8h1TlVg8Da5vOjd"
+    },
+    "rules": [],
+    "athletics": {
+      "ability": "con",
+      "misc": 0,
+      "classSkill": false,
+      "classSkillAt": 1,
+      "key": "athletics",
+      "name": "Athletics",
+      "focus": false,
+      "abilities": [
+        "str",
+        "con"
+      ],
+      "abilityPenalties": {
+        "str": 0,
+        "con": 0
+      },
+      "bonusEntries": [],
+      "threatAdjustment": 0,
+      "ranks": 9,
+      "purchasedRanks": 9,
+      "bonus": 0,
+      "totals": [
+        {
+          "ability": "str",
+          "normalSkillBonus": 10,
+          "skillBonus": 10,
+          "conditionBonusAdjustment": 0,
+          "checkPenalty": 0,
+          "total": 10
+        },
+        {
+          "ability": "con",
+          "normalSkillBonus": 11,
+          "skillBonus": 11,
+          "conditionBonusAdjustment": 0,
+          "checkPenalty": 0,
+          "total": 11
+        }
+      ],
+      "total": 11,
+      "isClass": true,
+      "classOverride": false,
+      "threat": 20,
+      "errorFloor": 0,
+      "take10TimeMultiplier": 2,
+      "errorReductionZero": 0,
+      "errorReduction": 0,
+      "cap": 40,
+      "maxRanks": 9,
+      "overMax": false
+    },
+    "resources": []
+  },
+  "houses": [],
+  "input": {
+    "currentLocation": "QA City",
+    "population": 10000,
+    "locationConfirmed": true,
+    "atSceneStartConfirmed": true
+  },
+  "refund": {
+    "error": "Synthetic Safe House post failure",
+    "records": {},
+    "uses": {}
+  },
+  "guard": {
+    "error": "The Safe House source, Lifestyle, mission or scene changed before posting.",
+    "noPost": true,
+    "records": {},
+    "uses": {}
+  },
+  "city": {
+    "house": {
+      "id": "house_P6QN6kTOd1mpR4ap",
+      "version": 1,
+      "source": "Safe House",
+      "epoch": "qa-xp-cancel",
+      "scene": "M8ZajdPdnHP2gCsS",
+      "lifestyle": 3,
+      "houseRank": 1,
+      "limitAtGrant": 2,
+      "currentLocation": "QA City",
+      "population": 10000,
+      "route": "withinTenMiles",
+      "atSceneStartConfirmed": true,
+      "locationConfirmed": true,
+      "placement": null,
+      "missionUse": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "sceneUse": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      },
+      "at": 126
+    },
+    "receipt": {
+      "id": "NbRzlbtI5pyZ2Ykg",
+      "flags": {
+        "actorUuid": "Actor.ISjhf200hOYJu9MF",
+        "safeHouseDeclaration": {
+          "id": "house_P6QN6kTOd1mpR4ap",
+          "version": 1,
+          "source": "Safe House",
+          "epoch": "qa-xp-cancel",
+          "scene": "M8ZajdPdnHP2gCsS",
+          "lifestyle": 3,
+          "houseRank": 1,
+          "limitAtGrant": 2,
+          "currentLocation": "QA City",
+          "population": 10000,
+          "route": "withinTenMiles",
+          "atSceneStartConfirmed": true,
+          "locationConfirmed": true,
+          "placement": null,
+          "missionUse": {
+            "epoch": "qa-xp-cancel",
+            "used": 1
+          },
+          "sceneUse": {
+            "epoch": "M8ZajdPdnHP2gCsS",
+            "used": 1
+          },
+          "at": 126
+        },
+        "actionDiceAllowed": false
+      }
+    },
+    "uses": {
+      "safeHouseMission": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "safeHouseScene": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      }
+    },
+    "placed": {
+      "id": "house_P6QN6kTOd1mpR4ap",
+      "version": 1,
+      "source": "Safe House",
+      "epoch": "qa-xp-cancel",
+      "scene": "M8ZajdPdnHP2gCsS",
+      "lifestyle": 3,
+      "houseRank": 1,
+      "limitAtGrant": 2,
+      "currentLocation": "QA City",
+      "population": 10000,
+      "route": "withinTenMiles",
+      "atSceneStartConfirmed": true,
+      "locationConfirmed": true,
+      "placement": {
+        "city": "QA City",
+        "cityPopulation": 10000,
+        "address": "QA apartment within city",
+        "description": "A tier-one one-bedroom apartment",
+        "gcConfirmed": true,
+        "natureConfirmed": true,
+        "currentCityConfirmed": true,
+        "withinTenMilesConfirmed": true,
+        "nearestCityConfirmed": false,
+        "reviewedBy": "WW1y27MJMt1sWfHr",
+        "at": 126
+      },
+      "missionUse": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "sceneUse": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      },
+      "at": 126
+    }
+  },
+  "placeCancel": {
+    "placement": null,
+    "uses": {
+      "safeHouseMission": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "safeHouseScene": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      }
+    }
+  },
+  "sceneLimit": {
+    "error": "A Safe House was already declared at this scene’s start.",
+    "noPost": true,
+    "uses": {
+      "safeHouseMission": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "safeHouseScene": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      }
+    }
+  },
+  "forecast": {
+    "mission": {
+      "cost": 0,
+      "period": "mission",
+      "id": "safeHouseMission",
+      "name": "Safe House declarations",
+      "limit": 2,
+      "workflow": "safeHouseDeclaration",
+      "manualReviewable": true,
+      "hidden": true,
+      "epoch": "qa-xp-cancel",
+      "used": 1,
+      "remaining": 1
+    },
+    "scene": {
+      "cost": 0,
+      "period": "scene",
+      "id": "safeHouseScene",
+      "name": "Safe House scene-opening declaration",
+      "limit": 1,
+      "workflow": "safeHouseScene",
+      "manualReviewable": true,
+      "hidden": true,
+      "epoch": "qa-safehouse-next-scene",
+      "used": 0,
+      "remaining": 1
+    },
+    "plan": {
+      "source": {
+        "limit": 2,
+        "lifestyle": 3,
+        "houseRank": 1,
+        "mission": "qa-xp-cancel",
+        "scene": "qa-safehouse-next-scene"
+      },
+      "record": {
+        "version": 1,
+        "source": "Safe House",
+        "epoch": "qa-xp-cancel",
+        "scene": "qa-safehouse-next-scene",
+        "lifestyle": 3,
+        "houseRank": 1,
+        "limitAtGrant": 2,
+        "currentLocation": "QA City",
+        "population": 10000,
+        "route": "withinTenMiles",
+        "atSceneStartConfirmed": true,
+        "locationConfirmed": true,
+        "placement": null
+      }
+    },
+    "lost": [
+      {
+        "key": "house_P6QN6kTOd1mpR4ap",
+        "record": {
+          "id": "house_P6QN6kTOd1mpR4ap",
+          "version": 1,
+          "source": "Safe House",
+          "epoch": "qa-xp-cancel",
+          "scene": "M8ZajdPdnHP2gCsS",
+          "lifestyle": 3,
+          "houseRank": 1,
+          "limitAtGrant": 2,
+          "currentLocation": "QA City",
+          "population": 10000,
+          "route": "withinTenMiles",
+          "atSceneStartConfirmed": true,
+          "locationConfirmed": true,
+          "placement": {
+            "city": "QA City",
+            "cityPopulation": 10000,
+            "address": "QA apartment within city",
+            "description": "A tier-one one-bedroom apartment",
+            "gcConfirmed": true,
+            "natureConfirmed": true,
+            "currentCityConfirmed": true,
+            "withinTenMilesConfirmed": true,
+            "nearestCityConfirmed": false,
+            "reviewedBy": "WW1y27MJMt1sWfHr",
+            "at": 126
+          },
+          "missionUse": {
+            "epoch": "qa-xp-cancel",
+            "used": 1
+          },
+          "sceneUse": {
+            "epoch": "M8ZajdPdnHP2gCsS",
+            "used": 1
+          },
+          "at": 126
+        },
+        "state": {
+          "baseValid": true,
+          "canPlace": false,
+          "valid": true,
+          "expired": true,
+          "active": false,
+          "home": "Dorm, trailer, 1 bedroom apt(2)",
+          "rank": 1,
+          "placed": true,
+          "reason": "Lost at the end of its mission."
+        }
+      }
+    ]
+  },
+  "remote": {
+    "actor": "uqyu4mIWC5B67EAm",
+    "house": {
+      "id": "house_uSLp9K2AQcurFkT1",
+      "version": 1,
+      "source": "Safe House",
+      "epoch": "qa-xp-cancel",
+      "scene": "M8ZajdPdnHP2gCsS",
+      "lifestyle": 3,
+      "houseRank": 1,
+      "limitAtGrant": 2,
+      "currentLocation": "QA Small Town",
+      "population": 9999,
+      "route": "nearestCity",
+      "atSceneStartConfirmed": true,
+      "locationConfirmed": true,
+      "placement": null,
+      "missionUse": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "sceneUse": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      },
+      "at": 126
+    },
+    "feat": {
+      "name": "Safe House",
+      "type": "feat",
+      "img": "icons/svg/combat.svg",
+      "system": {
+        "description": "<p>Declare a safe house in or near any sizable city at the start of a scene.</p>",
+        "source": "Spycraft 2.0 (summary)",
+        "tree": "tradecraft",
+        "prerequisites": {
+          "type": "all",
+          "of": [
+            {
+              "type": "level",
+              "min": 3
+            },
+            {
+              "type": "lifestyle",
+              "min": 3
+            }
+          ]
+        },
+        "prerequisitesNotChecked": false,
+        "ranks": 1,
+        "granted": false,
+        "grantSource": "",
+        "repeatable": false,
+        "maxSelections": 0,
+        "bonuses": [],
+        "temporaryGrant": null,
+        "featKind": "permanent",
+        "candidateBasis": null,
+        "choice": "",
+        "contactGrantMode": "associate",
+        "contactTheme": "",
+        "contactThemeConfirmed": false,
+        "restrictions": "",
+        "trainingSkills": {},
+        "focusChoices": [],
+        "manualPrerequisitesConfirmed": false,
+        "acquisitionSource": "",
+        "acquisitionCheck": {
+          "ok": true,
+          "unmet": [],
+          "level": 3,
+          "signature": "{\"prerequisites\":{\"of\":[{\"min\":3,\"type\":\"level\"},{\"min\":3,\"type\":\"lifestyle\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"tradecraft\"}"
+        },
+        "historicalPrerequisitesConfirmed": false,
+        "acquiredAtLevel": 3
+      },
+      "effects": [],
+      "folder": "JWbvWRor4Pg0Oawl",
+      "sort": 325,
+      "ownership": {
+        "default": 0,
+        "WW1y27MJMt1sWfHr": 3
+      },
+      "flags": {},
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794811270225,
+        "modifiedTime": 1794811270225,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_id": "ZmVdlY7BQ1E8lqkS"
+    },
+    "withoutFeat": [
+      {
+        "key": "house_uSLp9K2AQcurFkT1",
+        "record": {
+          "id": "house_uSLp9K2AQcurFkT1",
+          "version": 1,
+          "source": "Safe House",
+          "epoch": "qa-xp-cancel",
+          "scene": "M8ZajdPdnHP2gCsS",
+          "lifestyle": 3,
+          "houseRank": 1,
+          "limitAtGrant": 2,
+          "currentLocation": "QA Small Town",
+          "population": 9999,
+          "route": "nearestCity",
+          "atSceneStartConfirmed": true,
+          "locationConfirmed": true,
+          "placement": null,
+          "missionUse": {
+            "epoch": "qa-xp-cancel",
+            "used": 1
+          },
+          "sceneUse": {
+            "epoch": "M8ZajdPdnHP2gCsS",
+            "used": 1
+          },
+          "at": 126
+        },
+        "state": {
+          "baseValid": true,
+          "canPlace": true,
+          "valid": true,
+          "expired": false,
+          "active": true,
+          "home": "Dorm, trailer, 1 bedroom apt(2)",
+          "rank": 1,
+          "placed": false,
+          "reason": ""
+        }
+      }
+    ],
+    "placed": {
+      "id": "house_uSLp9K2AQcurFkT1",
+      "version": 1,
+      "source": "Safe House",
+      "epoch": "qa-xp-cancel",
+      "scene": "M8ZajdPdnHP2gCsS",
+      "lifestyle": 3,
+      "houseRank": 1,
+      "limitAtGrant": 2,
+      "currentLocation": "QA Small Town",
+      "population": 9999,
+      "route": "nearestCity",
+      "atSceneStartConfirmed": true,
+      "locationConfirmed": true,
+      "placement": {
+        "city": "QA Nearest City",
+        "cityPopulation": 10000,
+        "address": "QA nearest-city apartment",
+        "description": "A tier-one one-bedroom apartment",
+        "gcConfirmed": true,
+        "natureConfirmed": true,
+        "currentCityConfirmed": false,
+        "withinTenMilesConfirmed": false,
+        "nearestCityConfirmed": true,
+        "reviewedBy": "WW1y27MJMt1sWfHr",
+        "at": 126
+      },
+      "missionUse": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "sceneUse": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      },
+      "at": 126
+    },
+    "geometry": {
+      "x": 500,
+      "y": 544.75,
+      "width": 366,
+      "height": 40
+    }
+  },
+  "correction": {
+    "history": [
+      {
+        "id": "bad_qa_record",
+        "record": {
+          "id": "bad_qa_record",
+          "epoch": "qa-xp-cancel",
+          "scene": "M8ZajdPdnHP2gCsS",
+          "source": "Safe House"
+        },
+        "reason": "Synthetic invalid QA declaration; preserve both real use counters",
+        "reviewedBy": "WW1y27MJMt1sWfHr",
+        "at": 126
+      }
+    ],
+    "uses": {
+      "safeHouseMission": {
+        "epoch": "qa-xp-cancel",
+        "used": 1
+      },
+      "safeHouseScene": {
+        "epoch": "M8ZajdPdnHP2gCsS",
+        "used": 1
+      }
+    },
+    "houses": {
+      "house_uSLp9K2AQcurFkT1": {
+        "id": "house_uSLp9K2AQcurFkT1",
+        "version": 1,
+        "source": "Safe House",
+        "epoch": "qa-xp-cancel",
+        "scene": "M8ZajdPdnHP2gCsS",
+        "lifestyle": 3,
+        "houseRank": 1,
+        "limitAtGrant": 2,
+        "currentLocation": "QA Small Town",
+        "population": 9999,
+        "route": "nearestCity",
+        "atSceneStartConfirmed": true,
+        "locationConfirmed": true,
+        "placement": {
+          "city": "QA Nearest City",
+          "cityPopulation": 10000,
+          "address": "QA nearest-city apartment",
+          "description": "A tier-one one-bedroom apartment",
+          "gcConfirmed": true,
+          "natureConfirmed": true,
+          "currentCityConfirmed": false,
+          "withinTenMilesConfirmed": false,
+          "nearestCityConfirmed": true,
+          "reviewedBy": "WW1y27MJMt1sWfHr",
+          "at": 126
+        },
+        "missionUse": {
+          "epoch": "qa-xp-cancel",
+          "used": 1
+        },
+        "sceneUse": {
+          "epoch": "M8ZajdPdnHP2gCsS",
+          "used": 1
+        },
+        "at": 126
+      }
+    }
+  },
+  "reload": {
+    "actors": [
+      {
+        "actor": "ISjhf200hOYJu9MF",
+        "houses": [
+          {
+            "key": "house_P6QN6kTOd1mpR4ap",
+            "record": {
+              "id": "house_P6QN6kTOd1mpR4ap",
+              "version": 1,
+              "source": "Safe House",
+              "epoch": "qa-xp-cancel",
+              "scene": "M8ZajdPdnHP2gCsS",
+              "lifestyle": 3,
+              "houseRank": 1,
+              "limitAtGrant": 2,
+              "currentLocation": "QA City",
+              "population": 10000,
+              "route": "withinTenMiles",
+              "atSceneStartConfirmed": true,
+              "locationConfirmed": true,
+              "placement": {
+                "city": "QA City",
+                "cityPopulation": 10000,
+                "address": "QA apartment within city",
+                "description": "A tier-one one-bedroom apartment",
+                "gcConfirmed": true,
+                "natureConfirmed": true,
+                "currentCityConfirmed": true,
+                "withinTenMilesConfirmed": true,
+                "nearestCityConfirmed": false,
+                "reviewedBy": "WW1y27MJMt1sWfHr",
+                "at": 126
+              },
+              "missionUse": {
+                "epoch": "qa-xp-cancel",
+                "used": 1
+              },
+              "sceneUse": {
+                "epoch": "M8ZajdPdnHP2gCsS",
+                "used": 1
+              },
+              "at": 126
+            },
+            "state": {
+              "baseValid": true,
+              "canPlace": true,
+              "valid": true,
+              "expired": false,
+              "active": true,
+              "home": "Dorm, trailer, 1 bedroom apt(2)",
+              "rank": 1,
+              "placed": true,
+              "reason": ""
+            }
+          }
+        ],
+        "uses": {
+          "safeHouseMission": {
+            "epoch": "qa-xp-cancel",
+            "used": 1
+          },
+          "safeHouseScene": {
+            "epoch": "M8ZajdPdnHP2gCsS",
+            "used": 1
+          }
+        },
+        "points": {
+          "budget": 36,
+          "spent": 36,
+          "remaining": 0
+        },
+        "budgets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "issues": [],
+        "lifestyle": 3,
+        "corrections": []
+      },
+      {
+        "actor": "uqyu4mIWC5B67EAm",
+        "houses": [
+          {
+            "key": "house_uSLp9K2AQcurFkT1",
+            "record": {
+              "id": "house_uSLp9K2AQcurFkT1",
+              "version": 1,
+              "source": "Safe House",
+              "epoch": "qa-xp-cancel",
+              "scene": "M8ZajdPdnHP2gCsS",
+              "lifestyle": 3,
+              "houseRank": 1,
+              "limitAtGrant": 2,
+              "currentLocation": "QA Small Town",
+              "population": 9999,
+              "route": "nearestCity",
+              "atSceneStartConfirmed": true,
+              "locationConfirmed": true,
+              "placement": {
+                "city": "QA Nearest City",
+                "cityPopulation": 10000,
+                "address": "QA nearest-city apartment",
+                "description": "A tier-one one-bedroom apartment",
+                "gcConfirmed": true,
+                "natureConfirmed": true,
+                "currentCityConfirmed": false,
+                "withinTenMilesConfirmed": false,
+                "nearestCityConfirmed": true,
+                "reviewedBy": "WW1y27MJMt1sWfHr",
+                "at": 126
+              },
+              "missionUse": {
+                "epoch": "qa-xp-cancel",
+                "used": 1
+              },
+              "sceneUse": {
+                "epoch": "M8ZajdPdnHP2gCsS",
+                "used": 1
+              },
+              "at": 126
+            },
+            "state": {
+              "baseValid": true,
+              "canPlace": true,
+              "valid": true,
+              "expired": false,
+              "active": true,
+              "home": "Dorm, trailer, 1 bedroom apt(2)",
+              "rank": 1,
+              "placed": true,
+              "reason": ""
+            }
+          }
+        ],
+        "uses": {
+          "safeHouseMission": {
+            "epoch": "qa-xp-cancel",
+            "used": 1
+          },
+          "safeHouseScene": {
+            "epoch": "M8ZajdPdnHP2gCsS",
+            "used": 1
+          }
+        },
+        "points": {
+          "budget": 36,
+          "spent": 36,
+          "remaining": 0
+        },
+        "budgets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "issues": [],
+        "lifestyle": 3,
+        "corrections": [
+          {
+            "id": "bad_qa_record",
+            "record": {
+              "id": "bad_qa_record",
+              "epoch": "qa-xp-cancel",
+              "scene": "M8ZajdPdnHP2gCsS",
+              "source": "Safe House"
+            },
+            "reason": "Synthetic invalid QA declaration; preserve both real use counters",
+            "reviewedBy": "WW1y27MJMt1sWfHr",
+            "at": 126
+          }
+        ]
+      }
+    ],
+    "cleanup": {
+      "actors": 6,
+      "messages": 631,
+      "time": 126,
+      "effects": 0,
+      "combats": 0,
+      "locks": 0
+    }
+  }
+}

@@ -1,0 +1,3487 @@
+{
+  "actor": "UKUnM2XDAGBkuVDC",
+  "rolls": [
+    10,
+    2,
+    12,
+    10,
+    11
+  ],
+  "checks": [
+    {
+      "message": "ChatMessage.Uxchi7Jq4WDZ9uOY",
+      "base": 10,
+      "flags": {
+        "threaten": {
+          "version": 1,
+          "source": "Threaten",
+          "skillKey": "intimidate",
+          "checkId": "threaten",
+          "role": "attacker",
+          "opponentName": "QA opposing guard",
+          "opponentConfirmed": true,
+          "contextConfirmed": true,
+          "basics": true,
+          "mastery": true,
+          "weapon": {
+            "id": "PyCv3FKmhbNlWqlu",
+            "uuid": null,
+            "name": "Walther PPK .380 ACP",
+            "proficiency": "handgun",
+            "hands": 1,
+            "requiredHands": 1
+          },
+          "target": {
+            "distanceFeet": 30,
+            "cqbRange": 30,
+            "vitalityLoss": 5,
+            "woundLoss": 0,
+            "injuryFromYourAttacksConfirmed": true,
+            "injuryQualified": true,
+            "injuryWaived": false
+          },
+          "combat": {
+            "id": "ZlDInxwdwUAhUOcn",
+            "started": true,
+            "round": 1,
+            "turn": 0,
+            "combatantId": "fAGrdLz0Khj1BO1x",
+            "ownTurnIndex": 0
+          },
+          "gearBonus": 2
+        },
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 12,
+          "total": 12,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "ZlDInxwdwUAhUOcn",
+          "round": 1,
+          "combatantId": "fAGrdLz0Khj1BO1x"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 9,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": true,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 28,
+        "rolledTotal": 28,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 28,
+        "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "intimidate",
+        "checkId": "threaten",
+        "focus": "Threaten Action",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 12
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 1,
+        "cap": 40,
+        "baseFlavor": "Intimidate / Threaten Action (WIS)<br><small>Threaten: Intimidate(Wis), half attack action; Hearing/Language, error modifier+0. CQB Basics adds+2gear from the selected held/readied ranged weapon. Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).                            1 Half Action. Active. Hearing, Language. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 16,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "message": "ChatMessage.8son083gA9PtpcoU",
+      "base": 10,
+      "flags": {
+        "threaten": {
+          "version": 1,
+          "source": "Threaten",
+          "skillKey": "intimidate",
+          "checkId": "threaten",
+          "role": "attacker",
+          "opponentName": "QA opposing guard",
+          "opponentConfirmed": true,
+          "contextConfirmed": true,
+          "basics": true,
+          "mastery": true,
+          "weapon": {
+            "id": "PyCv3FKmhbNlWqlu",
+            "uuid": null,
+            "name": "Walther PPK .380 ACP",
+            "proficiency": "handgun",
+            "hands": 1,
+            "requiredHands": 1
+          },
+          "target": {
+            "distanceFeet": 30,
+            "cqbRange": 30,
+            "vitalityLoss": 0,
+            "woundLoss": 0,
+            "injuryFromYourAttacksConfirmed": false,
+            "injuryQualified": false,
+            "injuryWaived": true
+          },
+          "combat": {
+            "id": "ZlDInxwdwUAhUOcn",
+            "started": true,
+            "round": 1,
+            "turn": 0,
+            "combatantId": "fAGrdLz0Khj1BO1x",
+            "ownTurnIndex": 0
+          },
+          "gearBonus": 2
+        },
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 12,
+          "total": 12,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "ZlDInxwdwUAhUOcn",
+          "round": 1,
+          "combatantId": "fAGrdLz0Khj1BO1x"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 9,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": true,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 16,
+        "rolledTotal": 16,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 16,
+        "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "intimidate",
+        "checkId": "threaten",
+        "focus": "Threaten Action",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 12
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 1,
+        "cap": 40,
+        "baseFlavor": "Intimidate / Threaten Action (WIS)<br><small>Threaten: Intimidate(Wis), half attack action; Hearing/Language, error modifier+0. CQB Basics adds+2gear from the selected held/readied ranged weapon. CQB Mastery waives the prior-injury requirement. Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).                            1 Half Action. Active. Hearing, Language. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 4,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "message": "ChatMessage.VynXgYmGsObXLttY",
+      "base": 10,
+      "flags": {
+        "threaten": {
+          "version": 1,
+          "source": "Threaten",
+          "skillKey": "resolve",
+          "checkId": "resist-threaten",
+          "role": "defender",
+          "opponentName": "QA opposing guard",
+          "opponentConfirmed": true,
+          "contextConfirmed": true,
+          "basics": true,
+          "mastery": true,
+          "weapon": {
+            "id": "PyCv3FKmhbNlWqlu",
+            "uuid": null,
+            "name": "Walther PPK .380 ACP",
+            "proficiency": "handgun",
+            "hands": 1,
+            "requiredHands": 1
+          },
+          "target": null,
+          "incomingLegalConfirmed": true,
+          "gearBonus": 2
+        },
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 12,
+          "total": 12,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "ZlDInxwdwUAhUOcn",
+          "round": 1,
+          "combatantId": "fAGrdLz0Khj1BO1x"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 9,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": true,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 25,
+        "rolledTotal": 25,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 25,
+        "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "resolve",
+        "checkId": "resist-threaten",
+        "focus": "Resist Threaten",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 12
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 1,
+        "cap": 40,
+        "baseFlavor": "Resolve / Resist Threaten (WIS)<br><small>Threaten: Resolve(Wis), opposed response; Hearing/Language, error modifier+0. CQB Basics adds+2gear from the selected held/readied ranged weapon. Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).                            Opposed response. Active. Hearing, Language. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 13,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "message": "ChatMessage.xTtyZI236Rl5SQS3",
+      "actualUI": true,
+      "flags": {
+        "threaten": {
+          "version": 1,
+          "source": "Threaten",
+          "skillKey": "intimidate",
+          "checkId": "threaten",
+          "role": "attacker",
+          "opponentName": "QA opposing guard",
+          "opponentConfirmed": true,
+          "contextConfirmed": true,
+          "basics": true,
+          "mastery": true,
+          "weapon": {
+            "id": "PyCv3FKmhbNlWqlu",
+            "uuid": null,
+            "name": "Walther PPK .380 ACP",
+            "proficiency": "handgun",
+            "hands": 1,
+            "requiredHands": 1
+          },
+          "target": {
+            "distanceFeet": 30,
+            "cqbRange": 30,
+            "vitalityLoss": 5,
+            "woundLoss": 0,
+            "injuryFromYourAttacksConfirmed": true,
+            "injuryQualified": true,
+            "injuryWaived": false
+          },
+          "combat": {
+            "id": "ZlDInxwdwUAhUOcn",
+            "started": true,
+            "round": 1,
+            "turn": 0,
+            "combatantId": "fAGrdLz0Khj1BO1x",
+            "ownTurnIndex": 0
+          },
+          "gearBonus": 2
+        },
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 12,
+          "total": 12,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "ZlDInxwdwUAhUOcn",
+          "round": 1,
+          "combatantId": "fAGrdLz0Khj1BO1x"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 9,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": true,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 24,
+        "rolledTotal": 24,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 24,
+        "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "intimidate",
+        "checkId": "threaten",
+        "focus": "Threaten Action",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 12
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 1,
+        "cap": 40,
+        "baseFlavor": "Intimidate / Threaten Action (WIS)<br><small>Threaten: Intimidate(Wis), half attack action; Hearing/Language, error modifier+0. CQB Basics adds+2gear from the selected held/readied ranged weapon. Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).                            1 Half Action. Active. Hearing, Language. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 12,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "message": "ChatMessage.kWEQK6KIpP6CuAhl",
+      "actualUI": true,
+      "flags": {
+        "threaten": {
+          "version": 1,
+          "source": "Threaten",
+          "skillKey": "resolve",
+          "checkId": "resist-threaten",
+          "role": "defender",
+          "opponentName": "QA opposing guard",
+          "opponentConfirmed": true,
+          "contextConfirmed": true,
+          "basics": true,
+          "mastery": true,
+          "weapon": {
+            "id": "PyCv3FKmhbNlWqlu",
+            "uuid": null,
+            "name": "Walther PPK .380 ACP",
+            "proficiency": "handgun",
+            "hands": 1,
+            "requiredHands": 1
+          },
+          "target": null,
+          "incomingLegalConfirmed": true,
+          "gearBonus": 2
+        },
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 12,
+          "total": 12,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "ZlDInxwdwUAhUOcn",
+          "round": 1,
+          "combatantId": "fAGrdLz0Khj1BO1x"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 9,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": true,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 16,
+        "rolledTotal": 16,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 16,
+        "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+        "checkKind": "skill",
+        "ability": "wis",
+        "skillKey": "resolve",
+        "checkId": "resist-threaten",
+        "focus": "Resist Threaten",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 12
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 1,
+        "cap": 40,
+        "baseFlavor": "Resolve / Resist Threaten (WIS)<br><small>Threaten: Resolve(Wis), opposed response; Hearing/Language, error modifier+0. CQB Basics adds+2gear from the selected held/readied ranged weapon. Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).                            Opposed response. Active. Hearing, Language. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 4,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    }
+  ],
+  "combats": [],
+  "basics": "540Ojg1XwU83Kck0",
+  "feat": "lbViWdR2XEWLKsk4",
+  "weapon": "PyCv3FKmhbNlWqlu",
+  "combat": "ZlDInxwdwUAhUOcn",
+  "source": {
+    "name": "CQB Mastery",
+    "type": "feat",
+    "img": "icons/svg/combat.svg",
+    "system": {
+      "description": "<p>+1 ranged threat range within CQB Range and better Threaten actions with a readied ranged weapon.</p>",
+      "source": "Spycraft 2.0 (summary)",
+      "tree": "rangedCombat",
+      "prerequisites": {
+        "type": "all",
+        "of": [
+          {
+            "type": "feat",
+            "name": "CQB Basics"
+          },
+          {
+            "type": "base",
+            "key": "bab",
+            "min": 6
+          }
+        ]
+      },
+      "prerequisitesNotChecked": false,
+      "ranks": 1,
+      "granted": false,
+      "grantSource": "",
+      "repeatable": false,
+      "maxSelections": 0,
+      "bonuses": [],
+      "temporaryGrant": null,
+      "featKind": "permanent",
+      "candidateBasis": null,
+      "choice": "",
+      "contactGrantMode": "associate",
+      "contactTheme": "",
+      "contactThemeConfirmed": false,
+      "restrictions": "",
+      "trainingSkills": {},
+      "focusChoices": [],
+      "manualPrerequisitesConfirmed": false,
+      "acquisitionSource": "",
+      "acquisitionCheck": {
+        "ok": true,
+        "unmet": [],
+        "level": 6,
+        "signature": "{\"prerequisites\":{\"of\":[{\"name\":\"CQB Basics\",\"type\":\"feat\"},{\"key\":\"bab\",\"min\":6,\"type\":\"base\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"rangedCombat\"}"
+      },
+      "historicalPrerequisitesConfirmed": false,
+      "acquiredAtLevel": 6
+    },
+    "effects": [],
+    "folder": "nSvmXqUhEPEvDapy",
+    "sort": 90,
+    "ownership": {
+      "default": 0,
+      "WW1y27MJMt1sWfHr": 3
+    },
+    "flags": {},
+    "_stats": {
+      "coreVersion": "14.370",
+      "systemId": "spycraft2",
+      "systemVersion": "0.3.1",
+      "createdTime": 1794833536214,
+      "modifiedTime": 1794833536214,
+      "lastModifiedBy": "WW1y27MJMt1sWfHr",
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null
+    },
+    "_id": "lbViWdR2XEWLKsk4"
+  },
+  "baseline": {
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "focuses": {
+      "cultures": [],
+      "drive": [],
+      "profession": [],
+      "science": [],
+      "fortes": []
+    },
+    "focusPicks": {
+      "cultures": {
+        "baseAvailable": 1,
+        "available": 1,
+        "used": 0,
+        "remaining": 1,
+        "genericSpent": 0
+      },
+      "drive": {
+        "baseAvailable": 3,
+        "available": 3,
+        "used": 0,
+        "remaining": 3,
+        "genericSpent": 0
+      },
+      "profession": {
+        "baseAvailable": 3,
+        "available": 3,
+        "used": 0,
+        "remaining": 3,
+        "genericSpent": 0
+      },
+      "science": {
+        "baseAvailable": 1,
+        "available": 1,
+        "used": 0,
+        "remaining": 1,
+        "genericSpent": 0
+      },
+      "generic": {
+        "available": 2,
+        "used": 0,
+        "remaining": 2,
+        "reservedAvailable": 0,
+        "reservedUsed": 0,
+        "unscopedAvailable": 2,
+        "unscopedRemaining": 2
+      }
+    },
+    "active": [
+      "CQB Basics",
+      "CQB Mastery"
+    ],
+    "limited": []
+  },
+  "nativeBuild": {
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "basics": {
+      "ok": true,
+      "unmet": []
+    },
+    "mastery": {
+      "ok": true,
+      "unmet": []
+    },
+    "readied": [
+      {
+        "id": "PyCv3FKmhbNlWqlu",
+        "uuid": null,
+        "name": "Walther PPK .380 ACP",
+        "proficiency": "handgun",
+        "hands": 1,
+        "requiredHands": 1
+      }
+    ],
+    "picks": {
+      "available": 2,
+      "spent": 1,
+      "remaining": 1
+    },
+    "clock": {
+      "id": "ZlDInxwdwUAhUOcn",
+      "started": true,
+      "round": 1,
+      "turn": 0,
+      "combatantId": "fAGrdLz0Khj1BO1x",
+      "ownTurnIndex": 0
+    },
+    "worldTime": 126
+  },
+  "sourceGuard": "The selected ranged weapon is no longer held/readied and available.",
+  "invalidBlocked": true,
+  "persisted": {
+    "actor": {
+      "name": "RAW QA Threaten277",
+      "type": "agent",
+      "flags": {
+        "spycraft2": {
+          "startingDiceCreation": {
+            "id": "j6caUKWwHSNE7GxC",
+            "session": "MeCkrj45ff0VaUEr",
+            "at": 126,
+            "claimed": false
+          },
+          "vitalityRolls": {
+            "x01IUv6YNZrr31NP": {
+              "version": 1,
+              "id": "x01IUv6YNZrr31NP",
+              "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+              "index": 1,
+              "careerLevel": 2,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 10,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 10,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 10,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "kVHvmeO3VEzhn0Vv",
+              "actionDiceAllowed": false
+            },
+            "FoMFSMCCWCOIKnme": {
+              "version": 1,
+              "id": "FoMFSMCCWCOIKnme",
+              "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+              "index": 2,
+              "careerLevel": 3,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 2,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 2,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 2,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "7900q4SCGPZEu0jC",
+              "actionDiceAllowed": false
+            },
+            "XrP7UyiBBi1eVcWM": {
+              "version": 1,
+              "id": "XrP7UyiBBi1eVcWM",
+              "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+              "index": 3,
+              "careerLevel": 4,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 12,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 12,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 12,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "Njdiq2FBoPb2WeIA",
+              "actionDiceAllowed": false
+            },
+            "qMvNzcLmTfG81tQV": {
+              "version": 1,
+              "id": "qMvNzcLmTfG81tQV",
+              "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+              "index": 4,
+              "careerLevel": 5,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 10,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 10,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 10,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "ntOw8DqB6HNxwnV6",
+              "actionDiceAllowed": false
+            },
+            "TANOKrTPg1NdErxc": {
+              "version": 1,
+              "id": "TANOKrTPg1NdErxc",
+              "actorUuid": "Actor.UKUnM2XDAGBkuVDC",
+              "index": 5,
+              "careerLevel": 6,
+              "classId": "soldier",
+              "classItemId": "XouiN2U98v2BkxQ3",
+              "className": "Soldier",
+              "die": 12,
+              "value": 11,
+              "formula": "1d12",
+              "rollData": {
+                "class": "Roll",
+                "options": {},
+                "dice": [],
+                "formula": "1d12",
+                "terms": [
+                  {
+                    "class": "Die",
+                    "options": {
+                      "flavor": null
+                    },
+                    "evaluated": true,
+                    "number": 1,
+                    "faces": 12,
+                    "modifiers": [],
+                    "results": [
+                      {
+                        "result": 11,
+                        "active": true
+                      }
+                    ]
+                  }
+                ],
+                "total": 11,
+                "evaluated": true
+              },
+              "at": 126,
+              "rollerId": "WW1y27MJMt1sWfHr",
+              "messageId": "gcC0zz4uQheUVnny",
+              "actionDiceAllowed": false
+            }
+          }
+        }
+      },
+      "system": {
+        "abilities": {
+          "str": {
+            "base": 12,
+            "misc": 0
+          },
+          "dex": {
+            "base": 13,
+            "misc": 0
+          },
+          "con": {
+            "base": 14,
+            "misc": 0
+          },
+          "int": {
+            "base": 15,
+            "misc": 0
+          },
+          "wis": {
+            "base": 12,
+            "misc": 0
+          },
+          "cha": {
+            "base": 11,
+            "misc": 0
+          }
+        },
+        "progression": [
+          {
+            "classId": "soldier",
+            "vitality": 6,
+            "careerEntryId": "",
+            "vitalityRollId": "",
+            "vitalityReviewId": "",
+            "intelligenceModifier": null,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 4,
+              "drive": 4,
+              "intimidate": 4,
+              "notice": 4,
+              "profession": 4,
+              "resolve": 4
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 10,
+            "careerEntryId": "ZLJs4UmlDDozQWc9",
+            "vitalityRollId": "x01IUv6YNZrr31NP",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 2,
+            "careerEntryId": "OEnzBdKEEH7YXVpl",
+            "vitalityRollId": "FoMFSMCCWCOIKnme",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 12,
+            "careerEntryId": "yyqgDeTgxAMjjYCq",
+            "vitalityRollId": "XrP7UyiBBi1eVcWM",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 10,
+            "careerEntryId": "hzNlS1aCL9dVuc9M",
+            "vitalityRollId": "qMvNzcLmTfG81tQV",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          },
+          {
+            "classId": "soldier",
+            "vitality": 11,
+            "careerEntryId": "2qSuawhqlZu5lfHI",
+            "vitalityRollId": "TANOKrTPg1NdErxc",
+            "vitalityReviewId": "",
+            "intelligenceModifier": 2,
+            "expertEntry": null,
+            "skills": {
+              "athletics": 1,
+              "drive": 1,
+              "intimidate": 1,
+              "notice": 1,
+              "profession": 1,
+              "resolve": 1
+            }
+          }
+        ],
+        "actionDice": {
+          "value": 0
+        },
+        "vitality": {
+          "value": 4
+        },
+        "wounds": {
+          "value": 4
+        },
+        "pointBuyBudget": 36,
+        "abilityIncreases": {
+          "l4": "cha",
+          "l8": "",
+          "l12": "",
+          "l16": "",
+          "l20": ""
+        },
+        "xp": 0,
+        "codename": "",
+        "details": {
+          "faction": "",
+          "gender": "",
+          "age": "",
+          "height": "",
+          "weight": "",
+          "eyes": "",
+          "hair": ""
+        },
+        "fortuneTeammateIds": [],
+        "actionDieAwards": {},
+        "missionXPRewards": {},
+        "eagleEyeBoost": null,
+        "defenseBoost": null,
+        "noFearBoost": null,
+        "mentalLeaps": [],
+        "fatigueRest": null,
+        "drunkSleep": null,
+        "drunkRepositions": [],
+        "fatigueApplications": [],
+        "mentalLeapFatigueEvents": [],
+        "mentalLeapRecovery": null,
+        "mentalLeapSleep": null,
+        "fortunesOfWarBoost": null,
+        "refreshAction": null,
+        "temporaryShares": {},
+        "assistantGroups": [],
+        "resourceUses": {},
+        "resourcesInitialized": false,
+        "affiliationType": "faction",
+        "reputation": 2,
+        "netWorth": 0,
+        "skills": {
+          "acrobatics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "analysis": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "athletics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "blend": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bluff": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bureaucracy": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "computers": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "cultures": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "drive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "electronics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "falsify": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "impress": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "intimidate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "investigation": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "manipulate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "mechanics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "medicine": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "networking": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "notice": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "profession": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "resolve": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "science": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "search": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "security": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "senseMotive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sleightOfHand": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sneak": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "streetwise": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "survival": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "tactics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          }
+        },
+        "proficiencies": {
+          "unarmed": {
+            "proficient": false,
+            "forte": false
+          },
+          "blunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticBlunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "edged": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticEdged": {
+            "proficient": false,
+            "forte": false
+          },
+          "explosives": {
+            "proficient": false,
+            "forte": false
+          },
+          "guided": {
+            "proficient": false,
+            "forte": false
+          },
+          "handgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "hurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "exoticHurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "indirectFire": {
+            "proficient": false,
+            "forte": false
+          },
+          "rifle": {
+            "proficient": false,
+            "forte": false
+          },
+          "shotgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "submachineGun": {
+            "proficient": false,
+            "forte": false
+          },
+          "tactical": {
+            "proficient": false,
+            "forte": false
+          },
+          "vehicleWeapon": {
+            "proficient": false,
+            "forte": false
+          }
+        },
+        "focuses": {
+          "cultures": [],
+          "drive": [],
+          "profession": [],
+          "science": [],
+          "fortes": []
+        },
+        "startingIntelligenceModifier": null,
+        "skillFortes": [],
+        "crossroadsTitle": "",
+        "relinquishedInterests": 0,
+        "interests": "",
+        "contacts": [],
+        "subplots": [],
+        "gearPickLosses": {},
+        "missionReserves": null,
+        "armorMissionGrant": null,
+        "bigStickMissionPick": null,
+        "missionCaliberPicks": {},
+        "classGearGrants": {},
+        "bonusActionDice": {},
+        "missionReserveHistory": [],
+        "wealthAllocation": {
+          "lifestyle": 0,
+          "possessions": 0,
+          "spendingCash": 0,
+          "dressedForLifestyle": false
+        },
+        "misc": {
+          "bab": 0,
+          "fort": 0,
+          "ref": 0,
+          "will": 0,
+          "defense": 0,
+          "initiative": 0,
+          "wealth": 0,
+          "vitality": 0,
+          "wounds": 0,
+          "speed": 0,
+          "actionDice": 0,
+          "knowledge": 0,
+          "request": 0,
+          "gearCheck": 0,
+          "gearR": 0,
+          "gearT": 0,
+          "gearV": 0,
+          "gearS": 0,
+          "gearG": 0,
+          "gearW": 0,
+          "gearE": 0
+        },
+        "biography": "",
+        "twoWeaponStyle": null,
+        "dartingStyle": null,
+        "totalDefense": null,
+        "combatExpertise": null,
+        "superiorCover": null,
+        "accumulatedDamage": null,
+        "analysisTasks": {},
+        "safeHouses": {},
+        "careerAgentRewards": {},
+        "wellFundedGrants": {}
+      },
+      "items": [
+        {
+          "name": "Soldier",
+          "type": "class",
+          "system": {
+            "expert": false,
+            "skillPoints": 4,
+            "proficiencies": 6,
+            "coreAbility": {
+              "name": "Accurate",
+              "description": ""
+            },
+            "classSkills": [
+              "athletics",
+              "drive",
+              "intimidate",
+              "notice",
+              "profession",
+              "resolve",
+              "search",
+              "survival",
+              "tactics"
+            ],
+            "table": [
+              {
+                "level": 1,
+                "bab": 1,
+                "fort": 1,
+                "ref": 0,
+                "will": 2,
+                "defense": 0,
+                "initiative": 2,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 2,
+                "bab": 2,
+                "fort": 2,
+                "ref": 0,
+                "will": 3,
+                "defense": 1,
+                "initiative": 3,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 3,
+                "bab": 3,
+                "fort": 2,
+                "ref": 1,
+                "will": 3,
+                "defense": 1,
+                "initiative": 4,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 4,
+                "bab": 4,
+                "fort": 2,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 5,
+                "bab": 5,
+                "fort": 3,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 6,
+                "bab": 6,
+                "fort": 3,
+                "ref": 2,
+                "will": 5,
+                "defense": 2,
+                "initiative": 6,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 7,
+                "bab": 7,
+                "fort": 4,
+                "ref": 2,
+                "will": 5,
+                "defense": 3,
+                "initiative": 7,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 8,
+                "bab": 8,
+                "fort": 4,
+                "ref": 2,
+                "will": 6,
+                "defense": 3,
+                "initiative": 8,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 9,
+                "bab": 9,
+                "fort": 4,
+                "ref": 3,
+                "will": 6,
+                "defense": 4,
+                "initiative": 9,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 10,
+                "bab": 10,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 11,
+                "bab": 11,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 12,
+                "bab": 12,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 11,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 13,
+                "bab": 13,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 12,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 14,
+                "bab": 14,
+                "fort": 6,
+                "ref": 4,
+                "will": 9,
+                "defense": 6,
+                "initiative": 13,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 15,
+                "bab": 15,
+                "fort": 7,
+                "ref": 5,
+                "will": 9,
+                "defense": 6,
+                "initiative": 14,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 16,
+                "bab": 16,
+                "fort": 7,
+                "ref": 5,
+                "will": 10,
+                "defense": 6,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 17,
+                "bab": 17,
+                "fort": 8,
+                "ref": 5,
+                "will": 10,
+                "defense": 7,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 18,
+                "bab": 18,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 7,
+                "initiative": 16,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 19,
+                "bab": 19,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 8,
+                "initiative": 17,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 20,
+                "bab": 20,
+                "fort": 9,
+                "ref": 6,
+                "will": 12,
+                "defense": 8,
+                "initiative": 18,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 3,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              }
+            ],
+            "abilities": [
+              {
+                "level": 1,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 2,
+                "name": "Fortunes of war I",
+                "description": ""
+              },
+              {
+                "level": 3,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 4,
+                "name": "Armor use I",
+                "description": ""
+              },
+              {
+                "level": 5,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 6,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 7,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 8,
+                "name": "Armor use II",
+                "description": ""
+              },
+              {
+                "level": 9,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 10,
+                "name": "Portable cover (1/4)",
+                "description": ""
+              },
+              {
+                "level": 11,
+                "name": "Fight on, fortunes of war II",
+                "description": ""
+              },
+              {
+                "level": 12,
+                "name": "Armor use III, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 13,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 14,
+                "name": "One in a million 1/ session",
+                "description": ""
+              },
+              {
+                "level": 15,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 16,
+                "name": "Armor use IV",
+                "description": ""
+              },
+              {
+                "level": 17,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 18,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 19,
+                "name": "Fight on, fortunes of war III",
+                "description": ""
+              },
+              {
+                "level": 20,
+                "name": "Armor use V, portable cover (1/2)",
+                "description": ""
+              }
+            ],
+            "choiceLists": [
+              {
+                "name": "Fight On",
+                "key": "fightOn",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "2 Weapon Prof",
+                    "bonuses": [
+                      {
+                        "target": "prof.generic",
+                        "value": "2"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 3,
+                    "name": "Basic Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.basicCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 4,
+                    "name": "Melee Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.meleeCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 5,
+                    "name": "Ranged Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.rangedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 6,
+                    "name": "Unarmed Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.unarmedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "featSlot"
+              },
+              {
+                "name": "Weapon Specialist",
+                "key": "weaponSpecialist",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "Big Stick",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 3,
+                    "name": "Foibles",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 4,
+                    "name": "Killer Instinct",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 5,
+                    "name": "Most Deadly",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 6,
+                    "name": "Mow Down",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 7,
+                    "name": "No Worries",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 8,
+                    "name": "Showdown",
+                    "bonuses": []
+                  }
+                ],
+                "kind": "option"
+              }
+            ],
+            "choiceSchedule": [
+              {
+                "level": 1,
+                "list": "fightOn"
+              },
+              {
+                "level": 3,
+                "list": "fightOn"
+              },
+              {
+                "level": 5,
+                "list": "fightOn"
+              },
+              {
+                "level": 6,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 7,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 11,
+                "list": "fightOn"
+              },
+              {
+                "level": 12,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 13,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 17,
+                "list": "fightOn"
+              },
+              {
+                "level": 18,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 19,
+                "list": "fightOn"
+              }
+            ],
+            "bonuses": [
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 8,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 12,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 16,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 20,
+                "bonusType": ""
+              },
+              {
+                "target": "armorCheck",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 2,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 11,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 19,
+                "bonusType": ""
+              }
+            ],
+            "identifier": "soldier",
+            "vitalityDie": 12,
+            "description": "",
+            "source": "",
+            "choices": {},
+            "inheritedChoices": {},
+            "skillChoices": {},
+            "weaponSpecialist": {},
+            "keySkill": "",
+            "keyFocus": "",
+            "professionFocus": "",
+            "phdSkill": "",
+            "phdSkill1": "",
+            "phdSkill2": "",
+            "featGrants": [],
+            "requirements": null
+          },
+          "_id": "XouiN2U98v2BkxQ3",
+          "img": "icons/svg/item-bag.svg",
+          "effects": [],
+          "folder": null,
+          "sort": 0,
+          "ownership": {
+            "default": 0
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794833535552,
+            "modifiedTime": 1794833535552,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        },
+        {
+          "name": "CQB Basics",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+1 to ranged attacks and damage within CQB Range, +2 to Threaten with a readied ranged weapon, and no penalty shooting out of melee.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "rangedCombat",
+            "prerequisites": {
+              "type": "base",
+              "key": "bab",
+              "min": 1
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 1,
+              "signature": "{\"prerequisites\":{\"key\":\"bab\",\"min\":1,\"type\":\"base\"},\"source\":\"\",\"tree\":\"rangedCombat\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 1
+          },
+          "effects": [],
+          "folder": "nSvmXqUhEPEvDapy",
+          "sort": 89,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794833535646,
+            "modifiedTime": 1794833535646,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "540Ojg1XwU83Kck0"
+        },
+        {
+          "name": "CQB Mastery",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>+1 ranged threat range within CQB Range and better Threaten actions with a readied ranged weapon.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "rangedCombat",
+            "prerequisites": {
+              "type": "all",
+              "of": [
+                {
+                  "type": "feat",
+                  "name": "CQB Basics"
+                },
+                {
+                  "type": "base",
+                  "key": "bab",
+                  "min": 6
+                }
+              ]
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 6,
+              "signature": "{\"prerequisites\":{\"of\":[{\"name\":\"CQB Basics\",\"type\":\"feat\"},{\"key\":\"bab\",\"min\":6,\"type\":\"base\"}],\"type\":\"all\"},\"source\":\"\",\"tree\":\"rangedCombat\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 6
+          },
+          "effects": [],
+          "folder": "nSvmXqUhEPEvDapy",
+          "sort": 90,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794833536214,
+            "modifiedTime": 1794833536214,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "lbViWdR2XEWLKsk4"
+        },
+        {
+          "name": "Walther PPK .380 ACP",
+          "type": "weapon",
+          "img": "icons/svg/sword.svg",
+          "system": {
+            "description": "",
+            "source": "Spycraft 2.0 p.253",
+            "quantity": 1,
+            "pickCount": 1,
+            "bundleSize": 1,
+            "equipped": true,
+            "carried": true,
+            "weight": 1.3,
+            "gearCategory": "W",
+            "caliber": 1,
+            "pick": "W",
+            "reserve": false,
+            "common": false,
+            "proficiency": "handgun",
+            "ammunitionOnly": false,
+            "ammunitionKind": "",
+            "explosiveAmmunition": false,
+            "stockpileSize": 0,
+            "shotWeight": 0,
+            "upgradeCost": 0,
+            "upgradeAllowance": null,
+            "commonItemCost": 0,
+            "noStrengthDamage": false,
+            "attackAbility": "",
+            "damage": "2d4",
+            "error": 2,
+            "threat": 20,
+            "errorThreat": "1–2/20",
+            "weaponCategory": "backupPistol",
+            "fireModes": [
+              "single"
+            ],
+            "mountRequirement": "",
+            "assemblyHalfActions": 0,
+            "ammo": "7M8",
+            "ammoCodeOptions": [],
+            "ammoChamber": "",
+            "recoil": 13,
+            "range": 15,
+            "maxRangeIncrements": 0,
+            "sizeHands": "D/1h",
+            "qualities": "DST",
+            "untrainedPenalty": -6,
+            "possessionSource": "",
+            "possessionApproved": false,
+            "cleanAndPolishedReady": false,
+            "kitType": "",
+            "kitGrade": 0,
+            "kitSize": "",
+            "kitNonPortable": false,
+            "kitLocation": "",
+            "reserveAcquisition": null,
+            "armorMissionGrant": null,
+            "bigStickMissionPick": null,
+            "missionCaliberGrant": null,
+            "classGearGrant": null,
+            "improvised": false,
+            "loadedAmmoId": "",
+            "useHands": 1,
+            "useFinesse": false,
+            "grantFinesse": false,
+            "destroyed": false,
+            "destroyedByRoll": "",
+            "ammoCodeChoice": "",
+            "disassembled": false,
+            "fireMode": "",
+            "stockExtended": false
+          },
+          "effects": [],
+          "folder": "6BnF1ZACXjWy3XOw",
+          "sort": 181,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794833536366,
+            "modifiedTime": 1794833599377,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "PyCv3FKmhbNlWqlu"
+        }
+      ],
+      "img": "icons/svg/mystery-man.svg",
+      "prototypeToken": {
+        "name": "RAW QA Starting Entry",
+        "displayName": 0,
+        "actorLink": false,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "texture": {
+          "src": "icons/svg/mystery-man.svg",
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "fit": "contain",
+          "scaleX": 1,
+          "scaleY": 1,
+          "tint": "#ffffff",
+          "alphaThreshold": 0.75
+        },
+        "lockRotation": false,
+        "rotation": 0,
+        "alpha": 1,
+        "disposition": -1,
+        "displayBars": 0,
+        "bar1": {
+          "attribute": "vitality"
+        },
+        "bar2": {
+          "attribute": "wounds"
+        },
+        "light": {
+          "negative": false,
+          "priority": 0,
+          "alpha": 0.5,
+          "angle": 360,
+          "bright": 0,
+          "color": null,
+          "coloration": 1,
+          "dim": 0,
+          "attenuation": 0.5,
+          "luminosity": 0.5,
+          "saturation": 0,
+          "contrast": 0,
+          "shadows": 0,
+          "animation": {
+            "type": null,
+            "speed": 5,
+            "intensity": 5,
+            "reverse": false
+          },
+          "darkness": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        "sight": {
+          "enabled": false,
+          "range": 0,
+          "angle": 360,
+          "visionMode": "basic",
+          "color": null,
+          "attenuation": 0.1,
+          "brightness": 0,
+          "saturation": 0,
+          "contrast": 0
+        },
+        "detectionModes": {},
+        "occludable": {
+          "radius": 0
+        },
+        "ring": {
+          "enabled": false,
+          "colors": {
+            "ring": null,
+            "background": null
+          },
+          "effects": 1,
+          "subject": {
+            "scale": 1,
+            "texture": null
+          }
+        },
+        "turnMarker": {
+          "mode": 1,
+          "animation": null,
+          "src": null,
+          "disposition": false
+        },
+        "movementAction": null,
+        "flags": {},
+        "randomImg": false,
+        "appendNumber": false,
+        "prependAdjective": false
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0,
+        "WW1y27MJMt1sWfHr": 3
+      },
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794833535552,
+        "modifiedTime": 1794833536207,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_id": "UKUnM2XDAGBkuVDC"
+    },
+    "source": {
+      "ok": true,
+      "unmet": []
+    },
+    "basics": {
+      "ok": true,
+      "unmet": []
+    },
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "readied": [
+      {
+        "id": "PyCv3FKmhbNlWqlu",
+        "uuid": null,
+        "name": "Walther PPK .380 ACP",
+        "proficiency": "handgun",
+        "hands": 1,
+        "requiredHands": 1
+      }
+    ],
+    "picks": {
+      "available": 2,
+      "spent": 1,
+      "remaining": 1
+    },
+    "dice": {
+      "value": 0,
+      "max": 4,
+      "die": 6,
+      "explodeAt": 6,
+      "bonus": 0
+    },
+    "combat": {
+      "scene": "NUEDEFAULTSCENE0",
+      "active": true,
+      "round": 1,
+      "turn": 0,
+      "combatants": [
+        {
+          "actorId": "UKUnM2XDAGBkuVDC",
+          "initiative": 20,
+          "_id": "fAGrdLz0Khj1BO1x",
+          "type": "base",
+          "system": {},
+          "tokenId": null,
+          "sceneId": null,
+          "img": null,
+          "hidden": false,
+          "defeated": false,
+          "group": null,
+          "roundJoined": 1,
+          "flags": {
+            "spycraft2": {
+              "shakenInitiative": {
+                "id": "1BfiOYZnr3IsNYRY",
+                "version": 1,
+                "count": 20,
+                "includedPenalty": null,
+                "needsReview": true,
+                "reason": "This existing Initiative Count has no verified Shaken component. Confirm its included full or protected penalty."
+              }
+            }
+          },
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794833536383,
+            "modifiedTime": 1794833599419,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        }
+      ],
+      "_id": "ZlDInxwdwUAhUOcn",
+      "name": "",
+      "type": "base",
+      "system": {},
+      "groups": [],
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794833536383,
+        "modifiedTime": 1794833536383,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      }
+    }
+  },
+  "baselinesUnchanged": true,
+  "periods": {
+    "mission": "qa-xp-cancel",
+    "session": "MeCkrj45ff0VaUEr",
+    "scene": "M8ZajdPdnHP2gCsS",
+    "sceneSequence": 2
+  },
+  "gc": {
+    "value": 1,
+    "session": "MeCkrj45ff0VaUEr",
+    "playersPresent": 1,
+    "caliber": 1,
+    "lastReason": "Critical activation",
+    "controllerId": "ZTSRy74hgofWcbms",
+    "settlementReview": {
+      "id": "MfK3PHV2iV2wvias",
+      "needsReview": false,
+      "session": "MeCkrj45ff0VaUEr",
+      "before": 2,
+      "count": 1,
+      "purpose": "Critical activation",
+      "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+      "at": 1794752784259,
+      "outcome": "spent"
+    }
+  },
+  "cleanup": {
+    "actors": 6,
+    "messages": 855,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActor": true,
+    "deletedCombat": true
+  }
+}

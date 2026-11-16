@@ -1,0 +1,131 @@
+{
+  "actor": "WhzQwJYgirFkVMPg",
+  "rolls": [
+    3,
+    3
+  ],
+  "baselineMessages": 493,
+  "feat": "1kxcesxn0E0QHLIC",
+  "before": {
+    "ranks": 4,
+    "purchased": 4,
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "contacts": 4,
+    "status": {
+      "ok": true,
+      "unmet": []
+    }
+  },
+  "after": {
+    "ranks": 9,
+    "purchased": 9,
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "contacts": 5,
+    "issues": [],
+    "allocation": {
+      "acrobatics": 0,
+      "analysis": 0,
+      "athletics": 0,
+      "blend": 0,
+      "bluff": 0,
+      "bureaucracy": 0,
+      "computers": 0,
+      "cultures": 0,
+      "drive": 0,
+      "electronics": 0,
+      "falsify": 0,
+      "impress": 0,
+      "intimidate": 0,
+      "investigation": 0,
+      "manipulate": 0,
+      "mechanics": 0,
+      "medicine": 0,
+      "networking": 5,
+      "notice": 0,
+      "profession": 0,
+      "resolve": 0,
+      "science": 0,
+      "search": 0,
+      "security": 0,
+      "senseMotive": 0,
+      "sleightOfHand": 0,
+      "sneak": 0,
+      "streetwise": 0,
+      "survival": 0,
+      "tactics": 0
+    },
+    "history": {
+      "ok": true,
+      "unmet": [],
+      "level": 6,
+      "signature": "{\"prerequisites\":null,\"source\":\"\",\"tree\":\"advancedSkill\"}"
+    }
+  },
+  "reload": {
+    "level": 6,
+    "ranks": 9,
+    "purchased": 9,
+    "contacts": 5,
+    "allocation": {
+      "acrobatics": 0,
+      "analysis": 0,
+      "athletics": 0,
+      "blend": 0,
+      "bluff": 0,
+      "bureaucracy": 0,
+      "computers": 0,
+      "cultures": 0,
+      "drive": 0,
+      "electronics": 0,
+      "falsify": 0,
+      "impress": 0,
+      "intimidate": 0,
+      "investigation": 0,
+      "manipulate": 0,
+      "mechanics": 0,
+      "medicine": 0,
+      "networking": 5,
+      "notice": 0,
+      "profession": 0,
+      "resolve": 0,
+      "science": 0,
+      "search": 0,
+      "security": 0,
+      "senseMotive": 0,
+      "sleightOfHand": 0,
+      "sneak": 0,
+      "streetwise": 0,
+      "survival": 0,
+      "tactics": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "cleanup": {
+      "actors": 5,
+      "messages": 495,
+      "time": 126,
+      "locks": 0
+    }
+  }
+}

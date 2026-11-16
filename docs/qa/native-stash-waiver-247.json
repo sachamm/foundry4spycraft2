@@ -1,0 +1,278 @@
+{
+  "actor": "4VbXd77CrIoGjWSi",
+  "feat": "QzTnel0bF35duBxr",
+  "checks": [],
+  "refund": {
+    "error": "Synthetic failed Gear post",
+    "rolled": 1,
+    "noPost": true,
+    "allowance": null,
+    "common": 0,
+    "spentCommon": 2,
+    "dice": 1
+  },
+  "ui": {
+    "id": "jmK0brRglmdC1KlN",
+    "flags": {
+      "gearAllowance": {
+        "id": "personalStash",
+        "record": {
+          "epoch": "MeCkrj45ff0VaUEr",
+          "used": 1
+        },
+        "commonCost": 0
+      },
+      "gearCheckContext": {
+        "version": 1,
+        "atHome": true,
+        "personalStash": true,
+        "gearFeats": [
+          {
+            "name": "Pack Rat",
+            "choice": ""
+          },
+          {
+            "name": "Personal Stash",
+            "choice": ""
+          }
+        ],
+        "baseGearBonus": 5,
+        "personalStashBonus": 2,
+        "bonus": 7
+      },
+      "improvisedSearch": null,
+      "terrainFeat": null,
+      "pursuitFeat": null,
+      "professionalFeat": null,
+      "contactFeat": null,
+      "polyglot": null,
+      "photographicMemory": null,
+      "charmer": null,
+      "cardSharkKnowledge": null,
+      "cardSharkProfession": null,
+      "appearanceModifiers": null,
+      "hardCore": null,
+      "finalAttackRound": null,
+      "finesseDamage": null,
+      "damageSave": null,
+      "coverSave": null,
+      "cqbRange": null,
+      "finalAttack": null,
+      "twoWeaponFinalAttack": null,
+      "shakenContext": null,
+      "restraintEscape": null,
+      "skillBonusCondition": null,
+      "skillCheckAdjustment": null,
+      "weaponFocusWork": null,
+      "baffledSaveBonus": 0,
+      "gamblingDice": null,
+      "rollCombat": null,
+      "preRollFunding": null,
+      "hailMary": null,
+      "rerollFunding": null,
+      "rerollReceiptId": null,
+      "rerollOf": null,
+      "sleepSnapshot": null,
+      "conditionAbilityAdjustment": 0,
+      "conditionDamagePenalty": 0,
+      "evasionContext": null,
+      "securityBonus": 0,
+      "fatigueBonus": 0,
+      "fatigueCondition": "",
+      "underwaterContext": null,
+      "mortarOperation": null,
+      "launcherOperation": null,
+      "unnervingAvailableGrade": 0,
+      "unnervingStress": null,
+      "qualityChecks": null,
+      "medical": null,
+      "littleDetails": null,
+      "sensoryConditions": null,
+      "skillTags": null,
+      "skillGear": null,
+      "fogSmoke": null,
+      "terrainSave": null,
+      "localHeroOpposition": null,
+      "cunningPlan": null,
+      "attributeSubstitution": null,
+      "terrain": null,
+      "senses": null,
+      "tracking": null,
+      "gcTakingPermissionConfirmed": false,
+      "ambush": null,
+      "sneakAttackTarget": null,
+      "sneakAttack": null,
+      "ambientLight": null,
+      "nest": null,
+      "breakthrough": null,
+      "requiredBonusPoolId": null,
+      "requiredBonusSpent": false,
+      "cannotError": false,
+      "resultSource": "",
+      "opponentResult": null,
+      "oneInAMillion": false,
+      "tenSecondSolution": false,
+      "standaloneCheckConfirmed": false,
+      "forcedThreat": false,
+      "noForcedReroll": false,
+      "normalThreat": 0,
+      "rawTotal": 19,
+      "rolledTotal": 19,
+      "minimumAdjustment": 0,
+      "practiceMakesPerfect": false,
+      "criticalFailureCostIncrease": 0,
+      "crossCheck": false,
+      "alternatives": null,
+      "chosenIndex": 0,
+      "choiceSource": null,
+      "choiceResourceId": null,
+      "effectiveTotal": 19,
+      "actorUuid": "Actor.4VbXd77CrIoGjWSi",
+      "checkKind": "common",
+      "ability": "",
+      "skillKey": "",
+      "checkId": "",
+      "focus": "",
+      "rerollResources": [],
+      "formula": "1d20 + @total",
+      "rollData": {
+        "total": 7
+      },
+      "weaponUuid": "",
+      "weaponProficiency": "",
+      "weaponQualities": "",
+      "cleanAndPolished": false,
+      "gearUuid": "",
+      "gearAttempt": {
+        "id": "H7dAgw7TeROUiV29",
+        "epoch": "qa-xp-cancel"
+      },
+      "attackContext": null,
+      "unarmed": false,
+      "improvised": false,
+      "threat": 0,
+      "error": 0,
+      "cap": null,
+      "baseFlavor": "Gear check: Stash cleaning cloth<br>DC 21; Personal Stash (inside home) +2; consumed no Reserve Common Item (Personal Stash session use).",
+      "boostTotal": 0,
+      "boostSpent": 0,
+      "capped": false,
+      "naturalDie": 12,
+      "checkMethod": "roll",
+      "actionDiceAllowed": true,
+      "successConfirmed": null,
+      "errorConfirmed": false,
+      "threatConfirmed": false,
+      "triumphed": false
+    },
+    "dice": 1,
+    "common": 0,
+    "spentCommon": 2,
+    "allowance": {
+      "epoch": "MeCkrj45ff0VaUEr",
+      "used": 1
+    }
+  },
+  "outcome": {
+    "id": "H7dAgw7TeROUiV29",
+    "epoch": "qa-xp-cancel",
+    "kind": "common",
+    "name": "Stash cleaning cloth",
+    "pick": "",
+    "category": "",
+    "caliber": 0,
+    "cost": 0,
+    "baseCost": 0,
+    "surcharge": 0,
+    "dc": 21,
+    "sourcesOption": "",
+    "outsideFaction": false,
+    "requestLevel": null,
+    "bonusSources": [
+      {
+        "name": "Personal Stash (inside home)",
+        "value": 2
+      }
+    ],
+    "gearCheckContext": {
+      "version": 1,
+      "atHome": true,
+      "personalStash": true,
+      "gearFeats": [
+        {
+          "name": "Pack Rat",
+          "choice": ""
+        },
+        {
+          "name": "Personal Stash",
+          "choice": ""
+        }
+      ],
+      "baseGearBonus": 5,
+      "personalStashBonus": 2,
+      "bonus": 7
+    },
+    "homeTurf": false,
+    "localHeroFeats": [],
+    "location": "",
+    "deliveryMultiplier": 1,
+    "delivery": null,
+    "status": "failed",
+    "success": false,
+    "abilityId": "personalStash",
+    "gearAbility": "personalStash",
+    "commonCost": 0,
+    "abilityName": "Personal Stash",
+    "preparationHours": 0,
+    "messageUuid": "ChatMessage.jmK0brRglmdC1KlN",
+    "claimedItemId": "",
+    "funding": [],
+    "settlementId": "9bQeCJAGmRmFcV1t"
+  },
+  "reacquired": {
+    "error": "Personal Stash (Gear check without a Reserve Common Item): no uses remain this session.",
+    "noPost": true,
+    "record": {
+      "epoch": "MeCkrj45ff0VaUEr",
+      "used": 1
+    }
+  },
+  "reload": {
+    "actor": "4VbXd77CrIoGjWSi",
+    "dice": 1,
+    "common": 0,
+    "spentCommon": 2,
+    "allowance": {
+      "epoch": "MeCkrj45ff0VaUEr",
+      "used": 1
+    },
+    "status": {
+      "ok": true,
+      "unmet": []
+    },
+    "receipt": {
+      "id": "personalStash",
+      "record": {
+        "epoch": "MeCkrj45ff0VaUEr",
+        "used": 1
+      },
+      "commonCost": 0
+    },
+    "resolved": true,
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "retainedForNextBatch": true,
+    "world": {
+      "actors": 6,
+      "combats": 0,
+      "effects": 1,
+      "messages": 542,
+      "time": 126,
+      "locks": 0
+    }
+  }
+}

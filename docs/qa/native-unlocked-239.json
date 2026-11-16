@@ -1,0 +1,154 @@
+{
+  "actor": "N0H50AqZnXgzQUO4",
+  "rolls": [
+    12,
+    1,
+    6
+  ],
+  "feat": "Ptgy0dvDJB7W2akb",
+  "initial": {
+    "issues": [
+      {
+        "code": "unlocked-potential",
+        "level": 1,
+        "message": "Level 1: Unlocked Potential requires Networking at its maximum rank (7) before spending points elsewhere.",
+        "skill": "networking"
+      }
+    ],
+    "level": 1,
+    "ranks": 0,
+    "max": 7
+  },
+  "blocked": {
+    "error": "Level 4: Unlocked Potential requires Networking at its maximum rank (10) before spending points elsewhere.",
+    "messages": 498
+  },
+  "after": {
+    "level": 4,
+    "ranks": 10,
+    "max": 10,
+    "issues": [],
+    "progression": [
+      {
+        "classId": "soldier",
+        "vitality": 6,
+        "careerEntryId": "",
+        "vitalityRollId": "",
+        "vitalityReviewId": "",
+        "intelligenceModifier": null,
+        "expertEntry": null,
+        "skills": {
+          "networking": 7,
+          "athletics": 4,
+          "drive": 4,
+          "intimidate": 4,
+          "notice": 4,
+          "profession": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 12,
+        "careerEntryId": "YQW4Up6vTK4HJL2L",
+        "vitalityRollId": "e3qYzBfMxfEPpqJ5",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "networking": 1,
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 1,
+        "careerEntryId": "sulUTzlDMkkgkNmh",
+        "vitalityRollId": "LTP67WAIBSF9insw",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "networking": 1,
+          "athletics": 1,
+          "drive": 1,
+          "intimidate": 1,
+          "notice": 1,
+          "profession": 1
+        }
+      },
+      {
+        "classId": "soldier",
+        "vitality": 6,
+        "careerEntryId": "hKXxp7ihVvmbp4LM",
+        "vitalityRollId": "OqcbNn96Uz5AAmfe",
+        "vitalityReviewId": "",
+        "intelligenceModifier": 2,
+        "expertEntry": null,
+        "skills": {
+          "networking": 1,
+          "resolve": 1
+        }
+      }
+    ],
+    "budgets": [
+      0,
+      0,
+      0,
+      4
+    ],
+    "dice": 0,
+    "messages": [
+      {
+        "id": "cbQtdqCPFDedKeNr",
+        "flags": {
+          "actorUuid": "Actor.N0H50AqZnXgzQUO4",
+          "checkKind": "skillPurchase",
+          "source": "iCanSwim",
+          "skillKey": "networking",
+          "careerLevel": 4,
+          "careerPoints": 1,
+          "trainingPoints": {},
+          "ranks": 1,
+          "actionDiceAllowed": false
+        }
+      },
+      {
+        "id": "1RWYn9erw5bPMSJ2",
+        "flags": {
+          "actorUuid": "Actor.N0H50AqZnXgzQUO4",
+          "checkKind": "skillPurchase",
+          "source": "iCanSwim",
+          "skillKey": "resolve",
+          "careerLevel": 4,
+          "careerPoints": 1,
+          "trainingPoints": {},
+          "ranks": 1,
+          "actionDiceAllowed": false
+        }
+      }
+    ]
+  },
+  "reload": {
+    "level": 4,
+    "ranks": 10,
+    "max": 10,
+    "issues": [],
+    "budgets": [
+      0,
+      0,
+      0,
+      4
+    ],
+    "dice": 0,
+    "cleanup": {
+      "actors": 5,
+      "messages": 500,
+      "time": 126,
+      "locks": 0
+    }
+  }
+}

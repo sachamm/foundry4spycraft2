@@ -1,0 +1,720 @@
+{
+  "actor": "IPxyxsHoevWRCntb",
+  "feat": "MEiloEJMwaYZplWM",
+  "actorFeat": "s1PRvOL1mzP8zbx7",
+  "vitality": 1,
+  "primary": {
+    "id": "ukJGlz86jZgpbwZ3",
+    "context": {
+      "version": 1,
+      "contact": {
+        "name": "Ada",
+        "rank": 2,
+        "notes": "Entertainment producer"
+      },
+      "source": "Wilderness Contacts",
+      "featId": "2DSS40yiSGZfmpHj",
+      "theme": "wilderness",
+      "themeConfirmed": true,
+      "errorReduction": 2,
+      "timing": {
+        "applied": true,
+        "source": "contactFeat",
+        "multiplier": 0.5,
+        "rounding": "down"
+      }
+    }
+  },
+  "family": [
+    {
+      "name": "Academic Contacts",
+      "basic": "Scholar",
+      "theme": "academic",
+      "feat": "5xC9S3eVCYLYVDrO",
+      "checks": [
+        {
+          "id": "rAVa9r6guv7AJvsa",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Academic Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "5xC9S3eVCYLYVDrO",
+        "featAcquiredAtLevel": 3,
+        "theme": "academic",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Blue Collar Contacts",
+      "basic": "Speed Demon",
+      "theme": "vehicular",
+      "feat": "hE4gtPTX2DK8h7WX",
+      "checks": [
+        {
+          "id": "W5ZPfXUQVjncmPQ5",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Blue Collar Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "hE4gtPTX2DK8h7WX",
+        "featAcquiredAtLevel": 3,
+        "theme": "vehicular",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Criminal Contacts",
+      "basic": "Burglar",
+      "theme": "criminal",
+      "feat": "P2LpuRHvo0PEwEtB",
+      "checks": [
+        {
+          "id": "sU9B0ZIbKWPTCIdP",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Criminal Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "P2LpuRHvo0PEwEtB",
+        "featAcquiredAtLevel": 3,
+        "theme": "criminal",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Government Contacts",
+      "basic": "Diplomat",
+      "theme": "government",
+      "feat": "uOSw8bGzCpMBakTT",
+      "checks": [
+        {
+          "id": "INgl8yZPhcSOwfgT",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 4
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Government Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "uOSw8bGzCpMBakTT",
+        "featAcquiredAtLevel": 3,
+        "theme": "government",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Grifter Contacts",
+      "basic": "Hustler",
+      "theme": "con artist",
+      "feat": "0WPEQjmQGi94e66m",
+      "checks": [
+        {
+          "id": "xjK3lH2gyxYD0ZTR",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Grifter Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "0WPEQjmQGi94e66m",
+        "featAcquiredAtLevel": 3,
+        "theme": "con artist",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "High-Tech Contacts",
+      "basic": "Techie",
+      "theme": "technological",
+      "feat": "jiYuR9rPjfntUql2",
+      "checks": [
+        {
+          "id": "yv2zKr2GDOXuZ9ER",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "High-Tech Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "jiYuR9rPjfntUql2",
+        "featAcquiredAtLevel": 3,
+        "theme": "technological",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Local Contacts",
+      "basic": "World Traveler",
+      "theme": "traveling",
+      "feat": "Xp7q0kv30RasKQod",
+      "checks": [
+        {
+          "id": "YgRkwltFQI4k7g8y",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Local Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "Xp7q0kv30RasKQod",
+        "featAcquiredAtLevel": 3,
+        "theme": "traveling",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Media Contacts",
+      "basic": "Actor",
+      "theme": "media",
+      "feat": "2Yq7fO4yXDtOvfOp",
+      "checks": [
+        {
+          "id": "1vSzAbeas3JpNDzl",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Media Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "2Yq7fO4yXDtOvfOp",
+        "featAcquiredAtLevel": 3,
+        "theme": "media",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Medical Contacts",
+      "basic": "Examiner",
+      "theme": "medical",
+      "feat": "U91hDmGdwUEaxFdi",
+      "checks": [
+        {
+          "id": "nCvXHUzTqy4BxOJh",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Medical Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "U91hDmGdwUEaxFdi",
+        "featAcquiredAtLevel": 3,
+        "theme": "medical",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Military Contacts",
+      "basic": "Officer",
+      "theme": "military",
+      "feat": "kzUwyYWNEt4CZh2z",
+      "checks": [
+        {
+          "id": "9GpgdZ39NKeO1O1N",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Military Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "kzUwyYWNEt4CZh2z",
+        "featAcquiredAtLevel": 3,
+        "theme": "military",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Police Contacts",
+      "basic": "Private Eye",
+      "theme": "security",
+      "feat": "bpaciFFbUDW2PDgH",
+      "checks": [
+        {
+          "id": "bEc07wGNYYgz5qUX",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Police Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "bpaciFFbUDW2PDgH",
+        "featAcquiredAtLevel": 3,
+        "theme": "security",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Research Contacts",
+      "basic": "Observer",
+      "theme": "librarian",
+      "feat": "kRkPpfxZOq5Ud8Sp",
+      "checks": [
+        {
+          "id": "0kD4kHbmzTGfmLnJ",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Research Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "kRkPpfxZOq5Ud8Sp",
+        "featAcquiredAtLevel": 3,
+        "theme": "librarian",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Street Contacts",
+      "basic": "Fence",
+      "theme": "street",
+      "feat": "cFI1bqFFtYgRViKI",
+      "checks": [
+        {
+          "id": "wR6m8Qo85eFD6BJp",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Street Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "cFI1bqFFtYgRViKI",
+        "featAcquiredAtLevel": 3,
+        "theme": "street",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "White Collar Contacts",
+      "basic": "Advisor",
+      "theme": "business",
+      "feat": "tX9fGhNpm6OFQIMP",
+      "checks": [
+        {
+          "id": "9jDwaIhi0X2R0OPE",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "White Collar Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "tX9fGhNpm6OFQIMP",
+        "featAcquiredAtLevel": 3,
+        "theme": "business",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    },
+    {
+      "name": "Wilderness Contacts",
+      "basic": "Survivalist",
+      "theme": "wilderness",
+      "feat": "MEiloEJMwaYZplWM",
+      "checks": [
+        {
+          "id": "0cy8M20K2YeYbPtN",
+          "source": null,
+          "contact": "Claire",
+          "error": 1,
+          "timing": {
+            "applied": false,
+            "source": "none",
+            "multiplier": 1,
+            "rounding": null
+          },
+          "total": 2
+        }
+      ],
+      "picks": {
+        "available": 5,
+        "used": 5,
+        "remaining": 0
+      },
+      "grant": {
+        "name": "Claire",
+        "source": "Wilderness Contacts",
+        "milestone": 4,
+        "earnedAtLevel": 4,
+        "featId": "MEiloEJMwaYZplWM",
+        "featAcquiredAtLevel": 3,
+        "theme": "wilderness",
+        "valid": true,
+        "reason": "",
+        "extraGrades": 1
+      }
+    }
+  ],
+  "contacts": [
+    {
+      "name": "Ada",
+      "rank": 2,
+      "notes": "Entertainment producer",
+      "networkingMilestone": 0,
+      "networkingFeat": "",
+      "networkingTheme": "",
+      "networkingFeatConfirmed": false
+    },
+    {
+      "name": "Bob",
+      "rank": 1,
+      "notes": "Other contact",
+      "networkingMilestone": 0,
+      "networkingFeat": "",
+      "networkingTheme": "",
+      "networkingFeatConfirmed": false
+    },
+    {
+      "name": "Claire",
+      "rank": 2,
+      "notes": "",
+      "networkingMilestone": 4,
+      "networkingFeat": "Wilderness Contacts",
+      "networkingTheme": "wilderness",
+      "networkingFeatConfirmed": true
+    }
+  ],
+  "progression": [
+    {
+      "classId": "soldier",
+      "vitality": 6,
+      "careerEntryId": "",
+      "vitalityRollId": "",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 4,
+        "drive": 2,
+        "intimidate": 4,
+        "notice": 4,
+        "resolve": 4,
+        "networking": 6
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 7,
+      "careerEntryId": "pgwPrY50jd30yA0Y",
+      "vitalityRollId": "r3rZQUTXMF32JTCF",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 1,
+        "drive": 3,
+        "intimidate": 1,
+        "notice": 1
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 12,
+      "careerEntryId": "Y1TuQxhHmOIH0d1T",
+      "vitalityRollId": "4NkjRB9EQRQfA0ib",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "athletics": 1,
+        "drive": 1,
+        "intimidate": 1,
+        "notice": 1,
+        "profession": 2
+      }
+    },
+    {
+      "classId": "soldier",
+      "vitality": 1,
+      "careerEntryId": "WU3jmbh7PuTi0crq",
+      "vitalityRollId": "F74KMEMGPPi69kmv",
+      "vitalityReviewId": "",
+      "intelligenceModifier": 2,
+      "expertEntry": null,
+      "skills": {
+        "networking": 2,
+        "athletics": 1,
+        "drive": 1,
+        "intimidate": 1,
+        "notice": 1
+      }
+    }
+  ],
+  "budgets": [
+    {
+      "remaining": 0,
+      "issues": []
+    },
+    {
+      "remaining": 0,
+      "issues": []
+    },
+    {
+      "remaining": 0,
+      "issues": []
+    },
+    {
+      "remaining": 0,
+      "issues": []
+    }
+  ],
+  "abilityIncreases": {
+    "l4": "wis",
+    "l8": "",
+    "l12": "",
+    "l16": "",
+    "l20": ""
+  }
+}

@@ -1,0 +1,334 @@
+{
+  "batch": 228,
+  "actor": "6JzgMv8R9eWwgMI3",
+  "feat": "pEaN51O5plBpQhFA",
+  "initial": 6,
+  "classLevels": {
+    "schemer": 4,
+    "scientist": 14
+  },
+  "intelligence": {
+    "base": 15,
+    "misc": 0,
+    "increase": 0,
+    "bonus": 3,
+    "temporaryBonus": 0,
+    "value": 18,
+    "mod": 4,
+    "cost": 11
+  },
+  "wisdom": {
+    "base": 12,
+    "misc": 0,
+    "increase": 4,
+    "bonus": 0,
+    "temporaryBonus": 0,
+    "value": 16,
+    "mod": 3,
+    "cost": 4
+  },
+  "rolls": [
+    {
+      "career": 2,
+      "classId": "schemer",
+      "total": 1
+    },
+    {
+      "career": 3,
+      "classId": "schemer",
+      "total": 3
+    },
+    {
+      "career": 4,
+      "classId": "schemer",
+      "total": 3
+    },
+    {
+      "career": 5,
+      "classId": "scientist",
+      "total": 5
+    },
+    {
+      "career": 6,
+      "classId": "scientist",
+      "total": 3
+    },
+    {
+      "career": 7,
+      "classId": "scientist",
+      "total": 3
+    },
+    {
+      "career": 8,
+      "classId": "scientist",
+      "total": 2
+    },
+    {
+      "career": 9,
+      "classId": "scientist",
+      "total": 8
+    },
+    {
+      "career": 10,
+      "classId": "scientist",
+      "total": 6
+    },
+    {
+      "career": 11,
+      "classId": "scientist",
+      "total": 5
+    },
+    {
+      "career": 12,
+      "classId": "scientist",
+      "total": 2
+    },
+    {
+      "career": 13,
+      "classId": "scientist",
+      "total": 7
+    },
+    {
+      "career": 14,
+      "classId": "scientist",
+      "total": 4
+    },
+    {
+      "career": 15,
+      "classId": "scientist",
+      "total": 7
+    },
+    {
+      "career": 16,
+      "classId": "scientist",
+      "total": 5
+    },
+    {
+      "career": 17,
+      "classId": "scientist",
+      "total": 4
+    },
+    {
+      "career": 18,
+      "classId": "scientist",
+      "total": 4
+    }
+  ],
+  "skills": [
+    {
+      "available": 40,
+      "spent": 40,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 10,
+      "spent": 10,
+      "remaining": 0,
+      "modifier": 2,
+      "issues": []
+    },
+    {
+      "available": 11,
+      "spent": 11,
+      "remaining": 0,
+      "modifier": 3,
+      "issues": []
+    },
+    {
+      "available": 11,
+      "spent": 11,
+      "remaining": 0,
+      "modifier": 3,
+      "issues": []
+    },
+    {
+      "available": 11,
+      "spent": 11,
+      "remaining": 0,
+      "modifier": 3,
+      "issues": []
+    },
+    {
+      "available": 11,
+      "spent": 11,
+      "remaining": 0,
+      "modifier": 3,
+      "issues": []
+    },
+    {
+      "available": 11,
+      "spent": 11,
+      "remaining": 0,
+      "modifier": 3,
+      "issues": []
+    },
+    {
+      "available": 11,
+      "spent": 11,
+      "remaining": 0,
+      "modifier": 3,
+      "issues": []
+    },
+    {
+      "available": 12,
+      "spent": 12,
+      "remaining": 0,
+      "modifier": 4,
+      "issues": []
+    },
+    {
+      "available": 12,
+      "spent": 12,
+      "remaining": 0,
+      "modifier": 4,
+      "issues": []
+    },
+    {
+      "available": 12,
+      "spent": 12,
+      "remaining": 0,
+      "modifier": 4,
+      "issues": []
+    }
+  ],
+  "cases": [
+    {
+      "id": "hmyTY0zOkugaLkjn",
+      "ability": "wis",
+      "natural": 19,
+      "total": 9,
+      "raw": 28,
+      "owned": 6,
+      "cap": null,
+      "payment": null,
+      "hailMary": {
+        "untrained": false,
+        "uncap": false,
+        "active": false,
+        "cost": 0
+      }
+    },
+    {
+      "id": "GsjR52DoXdQx2yBs",
+      "ability": "int",
+      "natural": 20,
+      "total": 9,
+      "raw": 29,
+      "owned": 5,
+      "cap": null,
+      "payment": {
+        "id": "nQ3nI6Y3sBtVqN2c",
+        "bonusPoolId": "",
+        "die": 10,
+        "count": 1,
+        "shakenSignature": "{\"sourceKind\":\"effects\",\"grade\":0,\"totalGrade\":0,\"sources\":[],\"needsReview\":false,\"warnings\":[],\"label\":\"\",\"skillPenalty\":0,\"fixedResultsForbidden\":false,\"initiativePenalty\":0,\"reflexWillPenalty\":0,\"attackPenalty\":0,\"extraDice\":0,\"spendingForbidden\":false}"
+      },
+      "hailMary": {
+        "untrained": true,
+        "uncap": false,
+        "active": false,
+        "cost": 1
+      }
+    },
+    {
+      "id": "tkTYUt51dX3cNrTs",
+      "ability": "wis",
+      "natural": 11,
+      "total": 7,
+      "raw": 18,
+      "owned": 4,
+      "cap": null,
+      "payment": {
+        "id": "9s5WIyQnDOCMZQyX",
+        "bonusPoolId": "",
+        "die": 10,
+        "count": 1,
+        "shakenSignature": "{\"sourceKind\":\"effects\",\"grade\":0,\"totalGrade\":0,\"sources\":[],\"needsReview\":false,\"warnings\":[],\"label\":\"\",\"skillPenalty\":0,\"fixedResultsForbidden\":false,\"initiativePenalty\":0,\"reflexWillPenalty\":0,\"attackPenalty\":0,\"extraDice\":0,\"spendingForbidden\":false}"
+      },
+      "hailMary": {
+        "untrained": true,
+        "uncap": false,
+        "active": false,
+        "cost": 1
+      }
+    },
+    {
+      "id": "7nBvraDXqEh4ROIE",
+      "ability": "wis",
+      "natural": 7,
+      "total": 6,
+      "raw": 13,
+      "owned": 3,
+      "cap": null,
+      "payment": null,
+      "hailMary": {
+        "untrained": false,
+        "uncap": false,
+        "active": false,
+        "cost": 0
+      }
+    }
+  ],
+  "uses": {
+    "solution": {
+      "epoch": "MeCkrj45ff0VaUEr",
+      "used": 1
+    },
+    "substitution": {
+      "epoch": "MeCkrj45ff0VaUEr",
+      "used": 1
+    }
+  },
+  "wallet": 3
+}

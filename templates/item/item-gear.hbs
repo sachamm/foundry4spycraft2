@@ -2,11 +2,20 @@
   <div class="form-fields-grid">
     <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
-    <label>{{localize "SPYCRAFT.Weight"}} <input type="number" step="any" name="system.weight" value="{{system.weight}}" class="w-2" /></label>
+    {{#if system.kitGrade}}<p>{{system.kitType}} · Grade {{system.kitGrade}} · {{system.kitSize}}</p>{{#if system.kitNonPortable}}<label>Non-portable kit location <input name="system.kitLocation" value="{{system.kitLocation}}" required /></label>{{/if}}{{/if}}
+    {{#unless system.kitNonPortable}}<label>{{localize "SPYCRAFT.Weight"}} <input type="number" step="any" name="system.weight" value="{{system.weight}}" class="w-2" /></label>{{/unless}}
+    <label>Category (for CHA pick validation) <input name="system.gearCategory" value="{{system.gearCategory}}" placeholder="E/G/R/S/T/V/W" /></label>
+    {{#if system.pick}}<label>Mission picks paid <input type="number" min="1" name="system.pickCount" value="{{system.pickCount}}" class="w-2" /></label>{{/if}}
+    {{#if system.missionCaliberGrant}}<p>Mission-Caliber exception: {{#if system.missionCaliberGrant.name}}{{system.missionCaliberGrant.name}}{{else}}Recorded higher-Caliber pick{{/if}} · mission {{system.missionCaliberGrant.epoch}}. Its ordinary mission pick remains charged.</p>{{/if}}
+    {{#if system.classGearGrant}}<p>Improvised Common Item · mission {{system.classGearGrant.epoch}}. One mission use was spent; no ordinary Common Item or reserve was charged.</p>{{/if}}
+    <label>Personal gear source <select name="system.possessionSource"><option value="" {{#unless system.possessionSource}}selected{{/unless}}>Unclassified / not a Possession</option><option value="wealth" {{#if (sc2eq system.possessionSource "wealth")}}selected{{/if}}>Wealth Possessions allowance</option><option value="gcGrant" {{#if (sc2eq system.possessionSource "gcGrant")}}selected{{/if}}>Additional GC-granted Possession</option></select></label>
+    {{#if system.possessionSource}}<label><input type="checkbox" name="system.possessionApproved" {{checked system.possessionApproved}} /> The GC approved this Possession</label><label><input type="checkbox" name="system.cleanAndPolishedReady" {{checked system.cleanAndPolishedReady}} /> Clean and Polished is maintained: no absence from my person over 24 hours since the last hour of cleaning/readjustment</label>{{/if}}
+    {{#if (sc2eq system.possessionSource "wealth")}}{{#unless system.pick}}<label>Possessions picks paid <input type="number" min="1" name="system.pickCount" value="{{system.pickCount}}" /></label>{{/unless}}{{/if}}
     <label>{{localize "SPYCRAFT.Pick"}} <select name="system.pick">{{selectOptions pickOptions selected=system.pick}}</select></label>
     <label><input type="checkbox" name="system.equipped" {{checked system.equipped}} /> {{localize "SPYCRAFT.Equipped"}}</label>
+    {{#unless system.kitNonPortable}}<label><input type="checkbox" name="system.carried" {{checked system.carried}} /> Carried</label>{{/unless}}
     <label><input type="checkbox" name="system.reserve" {{checked system.reserve}} /> {{localize "SPYCRAFT.Reserve"}}</label>
-    <label><input type="checkbox" name="system.common" {{checked system.common}} /> {{localize "SPYCRAFT.TeamPool"}}</label>
+    <label><input type="checkbox" name="system.common" {{checked system.common}} /> Common Item</label>
   </div>
   <h3>{{localize "SPYCRAFT.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}

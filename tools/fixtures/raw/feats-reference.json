@@ -1,0 +1,2514 @@
+{
+ "Armor Basics": {
+  "page": 172,
+  "sourceName": "Armor Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Armor Mastery": {
+  "page": 172,
+  "sourceName": "Armor Mastery",
+  "prerequisites": "Base Defense bonus +3 or higher, Armor Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Armor Supremacy": {
+  "page": 172,
+  "sourceName": "Armor Supremacy",
+  "prerequisites": "Base Defense bonus +6 or higher, Armor Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Bandage": {
+  "page": 172,
+  "sourceName": "Bandage",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Battle Hardened": {
+  "page": 172,
+  "sourceName": "Battle Hardened",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Superior Cover": {
+  "page": 175,
+  "sourceName": "Superior Cover",
+  "prerequisites": "Base Defense bonus +3 or higher, Battle Hardened.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Combat Expertise": {
+  "page": 172,
+  "sourceName": "Combat Expertise",
+  "prerequisites": "Base Defense bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Expert Disarm": {
+  "page": 174,
+  "sourceName": "Expert Disarm",
+  "prerequisites": "Combat Expertise.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Combat Instincts": {
+  "page": 172,
+  "sourceName": "Combat Instincts",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Opportunist": {
+  "page": 175,
+  "sourceName": "Opportunist",
+  "prerequisites": "Base attack bonus +6 or higher, Combat Instincts.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Combat Mobility": {
+  "page": 172,
+  "sourceName": "Combat Mobility",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mobile Defense": {
+  "page": 175,
+  "sourceName": "Mobile Defense",
+  "prerequisites": "Base Defense bonus +1 or higher, Combat Mobility.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mobile Offense": {
+  "page": 175,
+  "sourceName": "Mobile Offense",
+  "prerequisites": "Base attack bonus +1 or higher, Combat Mobility.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Containment Basics": {
+  "page": 172,
+  "sourceName": "Containment Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Containment Mastery": {
+  "page": 172,
+  "sourceName": "Containment Mastery",
+  "prerequisites": "Containment Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Containment Supremacy": {
+  "page": 174,
+  "sourceName": "Containment Supremacy",
+  "prerequisites": "Containment Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Contempt": {
+  "page": 174,
+  "sourceName": "Contempt",
+  "prerequisites": "Career Level 6+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Explosive Basics": {
+  "page": 174,
+  "sourceName": "Explosive Basics",
+  "prerequisites": "Weapon proficiency (Explosives).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fire-Team Basics": {
+  "page": 174,
+  "sourceName": "Fire-Team Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fire-Team Mastery": {
+  "page": 174,
+  "sourceName": "Fire-Team Mastery",
+  "prerequisites": "Fire-Team Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fire-Team Supremacy": {
+  "page": 174,
+  "sourceName": "Fire-Team Supremacy",
+  "prerequisites": "Fire-Team Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Great Fortitude": {
+  "page": 174,
+  "sourceName": "Great Fortitude",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Guts": {
+  "page": 174,
+  "sourceName": "Guts",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Quick Healer": {
+  "page": 175,
+  "sourceName": "Quick Healer",
+  "prerequisites": "Guts.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Horde Basics": {
+  "page": 174,
+  "sourceName": "Horde Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Horde Mastery": {
+  "page": 174,
+  "sourceName": "Horde Mastery",
+  "prerequisites": "Horde Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Horde Supremacy": {
+  "page": 174,
+  "sourceName": "Horde Supremacy",
+  "prerequisites": "Horde Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Iron Will": {
+  "page": 174,
+  "sourceName": "Iron Will",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Lightning Reflexes": {
+  "page": 174,
+  "sourceName": "Lightning Reflexes",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Quick Draw": {
+  "page": 175,
+  "sourceName": "Quick Draw",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Snake Strike": {
+  "page": 175,
+  "sourceName": "Snake Strike",
+  "prerequisites": "Base attack bonus +6 or higher, Quick Draw.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Surge of Speed": {
+  "page": 175,
+  "sourceName": "Surge of Speed",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tac-Squad Basics": {
+  "page": 175,
+  "sourceName": "Tac-Squad Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tac-Squad Mastery": {
+  "page": 175,
+  "sourceName": "Tac-Squad Mastery",
+  "prerequisites": "Tac-Squad Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tac-Squad Supremacy": {
+  "page": 175,
+  "sourceName": "Tac-Squad Supremacy",
+  "prerequisites": "Tac-Squad Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tactical Advantage": {
+  "page": 175,
+  "sourceName": "Tactical Advantage",
+  "prerequisites": "Tactics skill 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Toughness": {
+  "page": 176,
+  "sourceName": "Toughness",
+  "prerequisites": "",
+  "special": "You may choose this feat up to 3 times.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Two-Weapon Basics": {
+  "page": 176,
+  "sourceName": "Two-Weapon Basics",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Two-Weapon Mastery": {
+  "page": 176,
+  "sourceName": "Two-Weapon Mastery",
+  "prerequisites": "Base attack bonus +9 or higher, Two-Weapon Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Weapon Focus": {
+  "page": 176,
+  "sourceName": "Weapon Focus",
+  "prerequisites": "",
+  "special": "You may choose this feat multiple times, each time gaining its benefits with 1 additional weapon proficiency.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Wolfpack Basics": {
+  "page": 176,
+  "sourceName": "Wolf Pack Basics",
+  "prerequisites": "Career Level 1+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wolfpack Mastery": {
+  "page": 176,
+  "sourceName": "Wolf Pack Mastery",
+  "prerequisites": "Career Level 6+, Wolf Pack Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wolfpack Supremacy": {
+  "page": 176,
+  "sourceName": "Wolf Pack Supremacy",
+  "prerequisites": "Career Level 12+, Wolf Pack Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "All-out Attack": {
+  "page": 176,
+  "sourceName": "All-Out Attack",
+  "prerequisites": "Str 13+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Axe Basics": {
+  "page": 176,
+  "sourceName": "Axe Basics",
+  "prerequisites": "Weapon proficiency (Edged).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Battering Blows": {
+  "page": 176,
+  "sourceName": "Battering Blows",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Cleave Basics": {
+  "page": 177,
+  "sourceName": "Cleave Basics",
+  "prerequisites": "Base attack bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Cleave Mastery": {
+  "page": 177,
+  "sourceName": "Cleave Mastery",
+  "prerequisites": "Base attack bonus +6 or higher, Cleave Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Cleave Supremacy": {
+  "page": 177,
+  "sourceName": "Cleave Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Cleave Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Club Basics": {
+  "page": 177,
+  "sourceName": "Club Basics",
+  "prerequisites": "Weapon proficiency (Blunt).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Darting Weapon": {
+  "page": 178,
+  "sourceName": "Darting Weapon",
+  "prerequisites": "Base attack bonus +3 or higher, at least 1 other Melee Combat feat.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Flashing Weapon": {
+  "page": 178,
+  "sourceName": "Flashing Weapon",
+  "prerequisites": "Base attack bonus +12 or higher, Darting Weapon, at least 2 other Melee Combat feats.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Dueling Basics": {
+  "page": 178,
+  "sourceName": "Dueling Basics",
+  "prerequisites": "Base Defense bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Dueling Mastery": {
+  "page": 178,
+  "sourceName": "Dueling Mastery",
+  "prerequisites": "Base Defense bonus +2 or higher, Dueling Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Dueling Supremacy": {
+  "page": 178,
+  "sourceName": "Dueling Supremacy",
+  "prerequisites": "Base Defense bonus +4 or higher, Dueling Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fencing Basics": {
+  "page": 178,
+  "sourceName": "Fencing Basics",
+  "prerequisites": "Weapon proficiency (Edged).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Finesse Basics": {
+  "page": 178,
+  "sourceName": "Finesse Basics",
+  "prerequisites": "Base attack bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Finesse Mastery": {
+  "page": 178,
+  "sourceName": "Finesse Mastery",
+  "prerequisites": "Base attack bonus +6 or higher, Finesse Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Finesse Supremacy": {
+  "page": 178,
+  "sourceName": "Finesse Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Finesse Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Flail Basics": {
+  "page": 178,
+  "sourceName": "Flail Basics",
+  "prerequisites": "Weapon proficiency (Exotic (Blunt)).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Garrote Basics": {
+  "page": 178,
+  "sourceName": "Garrote Basics",
+  "prerequisites": "Weapon proficiency (Blunt).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Great Sword Basics": {
+  "page": 179,
+  "sourceName": "Great Sword Basics",
+  "prerequisites": "Weapon proficiency (Exotic (Edged)).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Hammer Basics": {
+  "page": 179,
+  "sourceName": "Hammer Basics",
+  "prerequisites": "Weapon proficiency (Blunt).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Improvised Weapon Basics": {
+  "page": 179,
+  "sourceName": "Improvised Weapon Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Improvised Weapon Mastery": {
+  "page": 179,
+  "sourceName": "Improvised Weapon Mastery",
+  "prerequisites": "Base attack bonus +3 or higher, Improvised Weapon Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Knife Basics": {
+  "page": 179,
+  "sourceName": "Knife Basics",
+  "prerequisites": "Weapon proficiency (Edged).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Polearm Basics": {
+  "page": 179,
+  "sourceName": "Polearm Basics",
+  "prerequisites": "Weapon proficiency (Exotic (Edged)).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Spear Basics": {
+  "page": 179,
+  "sourceName": "Spear Basics",
+  "prerequisites": "Weapon proficiency (Exotic (Edged)).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Staff Basics": {
+  "page": 179,
+  "sourceName": "Staff Basics",
+  "prerequisites": "Weapon proficiency (Exotic (Blunt)).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Sword Basics": {
+  "page": 180,
+  "sourceName": "Sword Basics",
+  "prerequisites": "Weapon proficiency (Edged).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Whip Basics": {
+  "page": 180,
+  "sourceName": "Whip Basics",
+  "prerequisites": "Weapon proficiency (Exotic (Blunt)).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Autofire Basics": {
+  "page": 180,
+  "sourceName": "Autofire Basics",
+  "prerequisites": "Base attack bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Autofire Mastery": {
+  "page": 180,
+  "sourceName": "Autofire Mastery",
+  "prerequisites": "Base attack bonus +3 or higher, Autofire Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Autofire Supremacy": {
+  "page": 180,
+  "sourceName": "Autofire Supremacy",
+  "prerequisites": "Base attack bonus +9 or higher, Autofire Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Bombard": {
+  "page": 180,
+  "sourceName": "Bombard",
+  "prerequisites": "Weapon proficiency (Indirect).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Bullseye": {
+  "page": 180,
+  "sourceName": "Bullseye",
+  "prerequisites": "Dex 13+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "CQB Basics": {
+  "page": 180,
+  "sourceName": "CQB Basics",
+  "prerequisites": "Base attack bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "CQB Mastery": {
+  "page": 180,
+  "sourceName": "CQB Mastery",
+  "prerequisites": "Base attack bonus +6 or higher, CQB Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "CQB Supremacy": {
+  "page": 181,
+  "sourceName": "CQB Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, CQB Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Flamethrower Basics": {
+  "page": 181,
+  "sourceName": "Flamethrower Basics",
+  "prerequisites": "Weapon proficiency (Tactical).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Follow-up Shot": {
+  "page": 181,
+  "sourceName": "Follow-Up Shot",
+  "prerequisites": "Base attack bonus +3 or higher, at least 1 other Ranged Combat feat. ROCK AND ROLL! Proficiency (Rifle or Tactical) SHARPSHOOTER BASICS BAB +3 SHARPSHOOTER MASTERY BAB +9 SHARPSHOOTER SUPREMACY BAB +15 SNAP SHOT BAB +3 STEEL RAIN Proficiency (Hurled) STYLE OVER CALIBER Proficiency (Handgun) \u201cTHIS... IS MY BOOM STICK!\u201d Proficiency (Shotgun) TRICK SHOT Proficiency (Hurled)",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Hail of Fire": {
+  "page": 182,
+  "sourceName": "Hail of Fire",
+  "prerequisites": "Base attack bonus +12 or higher, Follow-Up Shot, at least 2 other Ranged Combat feats.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Grenade Basics": {
+  "page": 181,
+  "sourceName": "Grenade Basics",
+  "prerequisites": "Weapon proficiency (Hurled).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Guided Weapon Basics": {
+  "page": 181,
+  "sourceName": "Guided Weapon Basics",
+  "prerequisites": "Weapon proficiency (Guided).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Gunslinger's Eye": {
+  "page": 182,
+  "sourceName": "Gunslinger\u2019s Eye",
+  "prerequisites": "At least 2 other Ranged Combat feats.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Marksmanship Basics": {
+  "page": 182,
+  "sourceName": "Marksmanship Basics",
+  "prerequisites": "Base attack bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Marksmanship Mastery": {
+  "page": 182,
+  "sourceName": "Marksmanship Mastery",
+  "prerequisites": "Base attack bonus +3 or higher, Marksmanship Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Marksmanship Supremacy": {
+  "page": 182,
+  "sourceName": "Marksmanship Supremacy",
+  "prerequisites": "Base attack bonus +6 or higher, Marksmanship Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Revolver Basics": {
+  "page": 182,
+  "sourceName": "Revolver Basics",
+  "prerequisites": "Weapon proficiency (Handgun).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Rock and Roll": {
+  "page": 182,
+  "sourceName": "Rock and Roll!",
+  "prerequisites": "Weapon proficiency (Rifle or Tactical).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Sharpshooter Basics": {
+  "page": 182,
+  "sourceName": "Sharpshooter Basics",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Sharpshooter Mastery": {
+  "page": 182,
+  "sourceName": "Sharpshooter Mastery",
+  "prerequisites": "Base attack bonus +9 or higher, Sharpshooter Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Sharpshooter Supremacy": {
+  "page": 182,
+  "sourceName": "Sharpshooter Supremacy",
+  "prerequisites": "Base attack bonus +15 or higher, Sharpshooter Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Snap Shot": {
+  "page": 182,
+  "sourceName": "Snap Shot",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Steel Rain": {
+  "page": 182,
+  "sourceName": "Steel Rain",
+  "prerequisites": "Weapon proficiency (Hurled).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Style Over Caliber": {
+  "page": 183,
+  "sourceName": "Style Over Caliber",
+  "prerequisites": "Weapon proficiency (Handgun).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "This\u2026 is my Boomstick": {
+  "page": 183,
+  "sourceName": "\u201cThis\u2026 is my Boom Stick!\u201d",
+  "prerequisites": "Weapon proficiency (Shotgun).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Trick Shot": {
+  "page": 183,
+  "sourceName": "Trick Shot",
+  "prerequisites": "Weapon proficiency (Hurled).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Berserker Basics": {
+  "page": 183,
+  "sourceName": "Berserker Basics",
+  "prerequisites": "Base attack bonus +1 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Berserker Mastery": {
+  "page": 183,
+  "sourceName": "Berserker Mastery",
+  "prerequisites": "Base attack bonus +6 or higher, Berserker Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Berserker Supremacy": {
+  "page": 184,
+  "sourceName": "Berserker Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Berserker Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Boxing Basics": {
+  "page": 184,
+  "sourceName": "Boxing Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Boxing Moves": {
+  "page": 185,
+  "sourceName": "Boxing Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Boxing Supremacy": {
+  "page": 185,
+  "sourceName": "Boxing Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Boxing Basics, Boxing Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Brawling Basics": {
+  "page": 185,
+  "sourceName": "Brawling Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Brawling Moves": {
+  "page": 185,
+  "sourceName": "Brawling Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Brawling Supremacy": {
+  "page": 185,
+  "sourceName": "Brawling Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Brawling Basics, Brawling Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Dirty Fighting Basics": {
+  "page": 185,
+  "sourceName": "Dirty Fighting Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Dirty Fighting Moves": {
+  "page": 185,
+  "sourceName": "Dirty Fighting Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Dirty Fighting Supremacy": {
+  "page": 185,
+  "sourceName": "Dirty Fighting Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Dirty Fighting Basics, Dirty Fighting Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Kicking Basics": {
+  "page": 186,
+  "sourceName": "Kicking Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Kicking Moves": {
+  "page": 186,
+  "sourceName": "Kicking Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Kicking Supremacy": {
+  "page": 186,
+  "sourceName": "Kicking Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Kicking Basics, Kicking Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Martial Arts": {
+  "page": 186,
+  "sourceName": "Martial Arts",
+  "prerequisites": "Career Level 6+, Weapon proficiency (Unarmed), at least 1 other Unarmed Combat feat. Martial Arts Styles Spycraft 2.0\u2019s unarmed combat feats are designed to provide a modular, interchangeable system for modeling many types of hand-to-hand fighting. The foundation of the system is the Unarmed weapon proficiency, which makes any character a passable fighter. After that, a character can easily mix and match various \u201cbasics\u201d and \u201cmoves\u201d feats to capture the feel of real world styles or create his own original blends. By Career Level 3, most characters can easily combine 2 basics feats in any of 45 combinations. Characters with a high base attack bonus already have access to the moves feats by then, increasing their options to well over 100 two-feat combinations. Add in a feat or two from the melee combat tree for styles that also teach the use of weapons and the number of possibilities skyrockets. Dedicated martial artists can continue to build their feat pools or multiply the effectiveness of all of their unarmed combat feats by taking Martial Artist or Two-Hit Combo. Because many, many different real world martial arts moves are grouped into unarmed Standard Attacks (most hand techniques), Bull Rushing (most overbearing techniques), Kicks (most foot techniques), Trips (a variety or sweeps and sudden take downs), or Grappling (including throws), it\u2019s important to remember that not every move requires a unique mechanic. Likewise, the many stances and tricks in this section may represent more than just the body positions and strikes for which they\u2019re named. In general, when a real world style is examined for its signature moves and characteristics, its essentials can be reasonably presented in 4 feats or less. This flexibility allows even characters with non-combat classes to become formidable and stylish combatants in short order. Many unarmed combat supremacy feats represent extreme displays of skill, training, or ruthlessness. These feats only come into play when characters devote themselves to one particular aspect of unarmed combat, but they provide considerable advantages. Several feat suggestions follow for those interested in modeling a real world martial arts style. These feats are listed in the order in which they might typically be taught (or chosen). They\u2019re only suggestions, as many styles \u2014 kung-fu in particular \u2014 include countless variations and sub-schools. GCs and players are actively encouraged to go beyond these lists to experience to full potential of this powerful system. (Continued on pg. 187)",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Rolling Basics": {
+  "page": 187,
+  "sourceName": "Rolling Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Rolling Moves": {
+  "page": 187,
+  "sourceName": "Rolling Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Rolling Supremacy": {
+  "page": 187,
+  "sourceName": "Rolling Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Rolling Basics, Rolling Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Spirit Basics": {
+  "page": 187,
+  "sourceName": "Spirit Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Spirit Moves": {
+  "page": 187,
+  "sourceName": "Spirit Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Spirit Supremacy": {
+  "page": 187,
+  "sourceName": "Spirit Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Spirit Basics, Spirit Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Submission Basics": {
+  "page": 188,
+  "sourceName": "Submission Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Submission Moves": {
+  "page": 188,
+  "sourceName": "Submission Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Submission Supremacy": {
+  "page": 188,
+  "sourceName": "Submission Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Submission Basics, Submission Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Two-hit Combo": {
+  "page": 188,
+  "sourceName": "Two-Hit Combo",
+  "prerequisites": "Base attack bonus +3 or higher, at least 1 other Unarmed Combat feat.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Warrior's Grace": {
+  "page": 189,
+  "sourceName": "Warrior\u2019s Grace",
+  "prerequisites": "Base attack bonus +12 or higher, Two-Hit Combo, at least 2 other Unarmed Combat feats.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Vital Points Moves": {
+  "page": 188,
+  "sourceName": "Vital Points Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Vital Points Supremacy": {
+  "page": 188,
+  "sourceName": "Vital Points Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Vital Point Basics, Vital Point Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wrestling Basics": {
+  "page": 189,
+  "sourceName": "Wrestling Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wrestling Moves": {
+  "page": 189,
+  "sourceName": "Wrestling Moves",
+  "prerequisites": "Base attack bonus +3 or higher.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wrestling Supremacy": {
+  "page": 189,
+  "sourceName": "Wrestling Supremacy",
+  "prerequisites": "Base attack bonus +12 or higher, Wrestling Basics, Wrestling Moves.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "All or Nothing": {
+  "page": 189,
+  "sourceName": "All or Nothing",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Better Luck Next Time": {
+  "page": 189,
+  "sourceName": "Better Luck Next Time",
+  "prerequisites": "All or Nothing.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fortune's Fool": {
+  "page": 189,
+  "sourceName": "Fortune\u2019s Fool",
+  "prerequisites": "Better Luck Next Time.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Black Cat": {
+  "page": 189,
+  "sourceName": "Black Cat",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Jinx": {
+  "page": 190,
+  "sourceName": "Jinx",
+  "prerequisites": "Career level 3+, Black Cat.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tough Luck": {
+  "page": 191,
+  "sourceName": "Tough Luck",
+  "prerequisites": "Career level 9+, Jinx.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "The Dice are Hot": {
+  "page": 189,
+  "sourceName": "The Dice are Hot",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fortunate": {
+  "page": 189,
+  "sourceName": "Fortunate",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fortune Favors the Bold": {
+  "page": 189,
+  "sourceName": "Fortune Favors the Bold",
+  "prerequisites": "Career level 3+, Fortunate.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Lady Luck's Smile": {
+  "page": 190,
+  "sourceName": "Lady Luck\u2019s Smile",
+  "prerequisites": "Career level 9+, Fortune Favors the Bold.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Lucky Break": {
+  "page": 190,
+  "sourceName": "Lucky Break",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Misfortune": {
+  "page": 190,
+  "sourceName": "Misfortune",
+  "prerequisites": "Career level 6+, Lucky Break.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Peculiar Dodge": {
+  "page": 190,
+  "sourceName": "Peculiar Dodge",
+  "prerequisites": "Career level 12+, Misfortune.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mark of Conflict": {
+  "page": 190,
+  "sourceName": "Mark of Conflict",
+  "prerequisites": "Career level 1 only (when the feat is chosen).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mark of Strife": {
+  "page": 190,
+  "sourceName": "Mark of Strife",
+  "prerequisites": "Career level 1 only (when the feat is chosen).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mark of Turmoil": {
+  "page": 190,
+  "sourceName": "Mark of Turmoil",
+  "prerequisites": "Career level 1 only (when the feat is chosen).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Trouble Magnet": {
+  "page": 191,
+  "sourceName": "Trouble Magnet",
+  "prerequisites": "",
+  "special": "You may choose this feat up to 2 times",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Baby It": {
+  "page": 191,
+  "sourceName": "Baby It",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Demolition Derby": {
+  "page": 192,
+  "sourceName": "Demolition Derby",
+  "prerequisites": "Career level 3+, Baby It.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Death Ride": {
+  "page": 192,
+  "sourceName": "Death Ride",
+  "prerequisites": "Career level 9+, Con 15+, Demolition Derby.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Bail Out!": {
+  "page": 191,
+  "sourceName": "Bail Out!",
+  "prerequisites": "Acrobatics 6+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Daredevil": {
+  "page": 192,
+  "sourceName": "Daredevil",
+  "prerequisites": "Career level 6+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Crew Dog": {
+  "page": 191,
+  "sourceName": "Crew Dog",
+  "prerequisites": "Tactics 3+ ranks, Daredevil.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Lane Dancer": {
+  "page": 192,
+  "sourceName": "Lane Dancer",
+  "prerequisites": "Drive skill focus (any 1 ground), Daredevil.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mount Up": {
+  "page": 192,
+  "sourceName": "Mount Up",
+  "prerequisites": "Survival 3+ ranks, Daredevil.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Photo Finish": {
+  "page": 193,
+  "sourceName": "Photo Finish",
+  "prerequisites": "Daredevil.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wave Runner": {
+  "page": 193,
+  "sourceName": "Wave Runner",
+  "prerequisites": "Drive skill focus (any 1 water), Daredevil.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wind Rider": {
+  "page": 193,
+  "sourceName": "Wind Rider",
+  "prerequisites": "Drive skill focus (any 1 air), Daredevil.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Dash": {
+  "page": 192,
+  "sourceName": "Dash",
+  "prerequisites": "Athletics 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Sprint": {
+  "page": 193,
+  "sourceName": "Sprint",
+  "prerequisites": "Dash.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Defensive Driving": {
+  "page": 192,
+  "sourceName": "Defensive Driving",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Jackrabbit Start": {
+  "page": 192,
+  "sourceName": "Jackrabbit Start",
+  "prerequisites": "Defensive Driving.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Driving Instincts": {
+  "page": 192,
+  "sourceName": "Driving Instincts",
+  "prerequisites": "At least 1 other Chase feat.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Professional Driver - Closed Course": {
+  "page": 193,
+  "sourceName": "Professional Driver \u2014 Closed Course",
+  "prerequisites": "Impress 6+ ranks, Driving Instincts, at least 2 other Chase feats.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Duct Tape and Bubblegum": {
+  "page": 192,
+  "sourceName": "Duct Tape and Bubblegum",
+  "prerequisites": "Mechanics 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Get Radical!": {
+  "page": 192,
+  "sourceName": "Get Radical!",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Need for Speed": {
+  "page": 192,
+  "sourceName": "Need for Speed",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Offensive Driving": {
+  "page": 192,
+  "sourceName": "Offensive Driving",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Relentless Pursuit": {
+  "page": 193,
+  "sourceName": "Relentless Pursuit",
+  "prerequisites": "Offensive Driving.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "One Hand on the Wheel": {
+  "page": 193,
+  "sourceName": "One Hand on the Wheel",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Simulator Jockey": {
+  "page": 193,
+  "sourceName": "Simulator Jockey",
+  "prerequisites": "Drive 4+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Ambush Basics": {
+  "page": 193,
+  "sourceName": "Ambush Basics",
+  "prerequisites": "Tactics 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Ambush Mastery": {
+  "page": 193,
+  "sourceName": "Ambush Mastery",
+  "prerequisites": "Tactics 9+ ranks, Ambush Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Ambush Supremacy": {
+  "page": 193,
+  "sourceName": "Ambush Supremacy",
+  "prerequisites": "Tactics 18+ ranks, Ambush Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Bludgeon": {
+  "page": 193,
+  "sourceName": "Bludgeon",
+  "prerequisites": "Ability to inflict 1 die of sneak attack damage.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Whack": {
+  "page": 196,
+  "sourceName": "Whack",
+  "prerequisites": "Bludgeon, ability to inflict 3 dice of sneak attack damage.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Concealed Carry": {
+  "page": 193,
+  "sourceName": "Concealed Carry",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Deadly Precision": {
+  "page": 194,
+  "sourceName": "Deadly Precision",
+  "prerequisites": "Career level 9+, ability to inflict 2 dice of sneak attack damage.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "No Quarter": {
+  "page": 195,
+  "sourceName": "No Quarter",
+  "prerequisites": "Career level 15+, Deadly Precision.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Crippling Strike": {
+  "page": 194,
+  "sourceName": "Crippling Strike",
+  "prerequisites": "Ability to inflict 3 dice of sneak attack damage.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Equilibrium Basics": {
+  "page": 194,
+  "sourceName": "Equilibrium Basics",
+  "prerequisites": "Acrobatics 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Equilibrium Mastery": {
+  "page": 194,
+  "sourceName": "Equilibrium Mastery",
+  "prerequisites": "Acrobatics 6+ ranks, Equilibrium Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Equilibrium Supremacy": {
+  "page": 194,
+  "sourceName": "Equilibrium Supremacy",
+  "prerequisites": "Acrobatics 12+ ranks, Equilibrium Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Executioner": {
+  "page": 194,
+  "sourceName": "Executioner",
+  "prerequisites": "Career Level 9+, ability to inflict 1 die of sneak attack damage.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Merciless": {
+  "page": 195,
+  "sourceName": "Merciless",
+  "prerequisites": "Career level 15+, Executioner.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Faceless": {
+  "page": 195,
+  "sourceName": "Faceless",
+  "prerequisites": "Blend 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Traceless": {
+  "page": 196,
+  "sourceName": "Traceless",
+  "prerequisites": "Blend 6+ ranks, Faceless.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Zeroed": {
+  "page": 196,
+  "sourceName": "Zeroed",
+  "prerequisites": "Blend 12+ ranks, Traceless.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Ghost Basics": {
+  "page": 195,
+  "sourceName": "Ghost Basics",
+  "prerequisites": "Sneak 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Ghost Mastery": {
+  "page": 195,
+  "sourceName": "Ghost Mastery",
+  "prerequisites": "Sneak 9+ ranks, Ghost Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Ghost Supremacy": {
+  "page": 195,
+  "sourceName": "Ghost Supremacy",
+  "prerequisites": "Sneak 15+ ranks, Ghost Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mingling Basics": {
+  "page": 195,
+  "sourceName": "Mingling Basics",
+  "prerequisites": "Blend 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mingling Mastery": {
+  "page": 195,
+  "sourceName": "Mingling Mastery",
+  "prerequisites": "Blend 9+ ranks, Mingling Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mingling Supremacy": {
+  "page": 195,
+  "sourceName": "Mingling Supremacy",
+  "prerequisites": "Blend 15+ ranks, Mingling Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Spider Basics": {
+  "page": 196,
+  "sourceName": "Spider Basics",
+  "prerequisites": "Athletics 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Spider Mastery": {
+  "page": 196,
+  "sourceName": "Spider Mastery",
+  "prerequisites": "Athletics 6+ ranks, Spider Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Spider Supremacy": {
+  "page": 196,
+  "sourceName": "Spider Supremacy",
+  "prerequisites": "Athletics 12+ ranks, Spider Mastery.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Clean and Polished": {
+  "page": 197,
+  "sourceName": "Clean and Polished",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mother Hen": {
+  "page": 197,
+  "sourceName": "Mother Hen",
+  "prerequisites": "Clean and Polished.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Extra Gear": {
+  "page": 197,
+  "sourceName": "Extra Gear",
+  "prerequisites": "",
+  "special": "You may choose this feat multiple times, each time choosing 1 new gear category.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Electronic Warrior": {
+  "page": 197,
+  "sourceName": "Electronic Warrior",
+  "prerequisites": "Extra Gear (Electronics).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Micro-miniaturized": {
+  "page": 197,
+  "sourceName": "Micro-Miniaturized",
+  "prerequisites": "Extra Gear (Gadgets).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Trap Master": {
+  "page": 198,
+  "sourceName": "Trap Master",
+  "prerequisites": "Extra Gear (Security).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Favored Gear": {
+  "page": 197,
+  "sourceName": "Favored Gear",
+  "prerequisites": "",
+  "special": "You may choose this feat multiple times, each time gaining 1 piece of favored gear",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Signature Gear": {
+  "page": 197,
+  "sourceName": "Signature Gear",
+  "prerequisites": "Career level 6+, Favored Gear.",
+  "special": "You may choose this feat multiple times, each time applying it to 1 different item gained from your Favored Gear feat.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Trademark Gear": {
+  "page": 197,
+  "sourceName": "Trademark Gear",
+  "prerequisites": "Career level 12+, Signature Gear.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Home Sweet Home": {
+  "page": 197,
+  "sourceName": "Home Sweet Home",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tool Shed": {
+  "page": 197,
+  "sourceName": "Tool Shed",
+  "prerequisites": "Home Sweet Home.",
+  "special": "You may choose this feat multiple times, each time gaining the ability to find 1 additional Grade III kit in your home per mission.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Pack Rat": {
+  "page": 197,
+  "sourceName": "Pack Rat",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Personal Stash": {
+  "page": 197,
+  "sourceName": "Personal Stash",
+  "prerequisites": "Pack Rat.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Silver Spoon": {
+  "page": 197,
+  "sourceName": "Silver Spoon",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Well-Funded": {
+  "page": 198,
+  "sourceName": "Well-Funded",
+  "prerequisites": "Silver Spoon.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Actor": {
+  "page": 198,
+  "sourceName": "Actor",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Advisor": {
+  "page": 198,
+  "sourceName": "Advisor",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Burglar": {
+  "page": 198,
+  "sourceName": "Burglar",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Diplomat": {
+  "page": 198,
+  "sourceName": "Diplomat",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Examiner": {
+  "page": 198,
+  "sourceName": "Examiner",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fence": {
+  "page": 198,
+  "sourceName": "Fence",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Hustler": {
+  "page": 198,
+  "sourceName": "Hustler",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Observer": {
+  "page": 198,
+  "sourceName": "Observer",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Officer": {
+  "page": 199,
+  "sourceName": "Officer",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Private Eye": {
+  "page": 199,
+  "sourceName": "Private Eye",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Scholar": {
+  "page": 199,
+  "sourceName": "Scholar",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Speed Demon": {
+  "page": 199,
+  "sourceName": "Speed Demon",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Survivalist": {
+  "page": 199,
+  "sourceName": "Survivalist",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Techie": {
+  "page": 199,
+  "sourceName": "Techie",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "World Traveler": {
+  "page": 199,
+  "sourceName": "World Traveler",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Advanced Skill Mastery": {
+  "page": 199,
+  "sourceName": "Advanced Skill Mastery",
+  "prerequisites": "Career level 6+, any 1 Basic Skill feat.",
+  "special": "You may choose this feat multiple times, each time applying it to a different Basic Skill feat you possess",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Grand Skill Mastery": {
+  "page": 200,
+  "sourceName": "Grand Skill Mastery",
+  "prerequisites": "Career level 12+, any 1 Advanced Skill Mastery feat. ### Table 3.1: False Start Timing ```tsv Standard Time Required Restart Point ``` ```tsv At least 1 round, up to 1 minute Next round More than 1 minute, up to 10 minutes Next minute More than 10 minutes, up to 1 hour Next 10 minutes More than 1 hour, up to 1 day Next hour More than 1 day, up to 1 week Next day More than 1 week, up to 1 month Next week More than 1 month, up to 1 year Next month ```",
+  "special": "You may choose this feat multiple times, each time applying it to a different Advanced Skill Mastery feat you possess.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Perfect Skill Mastery": {
+  "page": 200,
+  "sourceName": "Perfect Skill Mastery",
+  "prerequisites": "Career level 18+, any 1 Grand Skill Mastery feat.",
+  "special": "You may choose this feat multiple times, each time applying it to a different Grand Skill Mastery feat you possess.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "False Start": {
+  "page": 200,
+  "sourceName": "False Start",
+  "prerequisites": "Career level 3+, any 1 Basic Skill feat.",
+  "special": "You may choose this feat multiple times, each time applying it to a different Basic Skill feat you possess.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Mark of a Professional": {
+  "page": 200,
+  "sourceName": "Mark of a Professional",
+  "prerequisites": "Career level 9+, False Start.",
+  "special": "You may choose this feat multiple times, each time applying it to a different False Start feat you possess.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Practice Makes Perfect": {
+  "page": 200,
+  "sourceName": "Practice Makes Perfect",
+  "prerequisites": "Career level 15+, Mark of a Professional.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Unfair Advantage": {
+  "page": 201,
+  "sourceName": "Unfair Advantage",
+  "prerequisites": "Career level 6+, at least 1 Basic Skill feat.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Everyday Genius": {
+  "page": 200,
+  "sourceName": "Everyday Genius",
+  "prerequisites": "Career level 15+, Unfair Advantage.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Attention to Detail": {
+  "page": 200,
+  "sourceName": "Attention to Detail",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Depth of Study": {
+  "page": 200,
+  "sourceName": "Depth of Study",
+  "prerequisites": "",
+  "special": "You may choose this feat multiple times, each time gaining 2 additional skill focuses or fortes.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "I Can Swim": {
+  "page": 200,
+  "sourceName": "I Can Swim",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Photographic Memory": {
+  "page": 200,
+  "sourceName": "Photographic Memory",
+  "prerequisites": "Career level 1 only (when the feat is chosen).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Talented": {
+  "page": 201,
+  "sourceName": "Talented",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Training": {
+  "page": 201,
+  "sourceName": "Training",
+  "prerequisites": "",
+  "special": "You may choose this feat multiple times, each time gaining 5 additional skill points with the same benefits.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Well Rounded": {
+  "page": 201,
+  "sourceName": "Well-Rounded",
+  "prerequisites": "Training.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Unlocked Potential": {
+  "page": 201,
+  "sourceName": "Unlocked Potential",
+  "prerequisites": "Career level 1 only (when the feat is chosen).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Academic Contacts": {
+  "page": 201,
+  "sourceName": "Academic Contacts",
+  "prerequisites": "Networking 3+ ranks, Scholar.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Animal Partner": {
+  "page": 201,
+  "sourceName": "Animal Partner",
+  "prerequisites": "Survival 4+ ranks.",
+  "special": "You may choose this feat multiple times, each time gaining 1 new animal partner built using the same rules.",
+  "repeatable": true,
+  "hasBenefit": true
+ },
+ "Bloodstain Resistant": {
+  "page": 201,
+  "sourceName": "Bloodstain Resistant",
+  "prerequisites": "Impress 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Blue Collar Contacts": {
+  "page": 201,
+  "sourceName": "Blue Collar Contacts",
+  "prerequisites": "Networking 3+ ranks, Speed Demon.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Card Shark": {
+  "page": 201,
+  "sourceName": "Card Shark",
+  "prerequisites": "Streetwise 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Charmer": {
+  "page": 202,
+  "sourceName": "Charmer",
+  "prerequisites": "Cha 13+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Not the Face": {
+  "page": 204,
+  "sourceName": "\u201cNot the Face!\u201d",
+  "prerequisites": "Career Level 3+, Charmer.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Criminal Contacts": {
+  "page": 202,
+  "sourceName": "Criminal Contacts",
+  "prerequisites": "Networking 3+ ranks, Burglar.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Fan Service": {
+  "page": 203,
+  "sourceName": "Fan Service",
+  "prerequisites": "Cha 15+, Impress 4+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Glint of Madness": {
+  "page": 203,
+  "sourceName": "Glint of Madness",
+  "prerequisites": "Intimidate 4+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Gorgeous": {
+  "page": 203,
+  "sourceName": "Gorgeous",
+  "prerequisites": "Cha 13+, Impress 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "The Look": {
+  "page": 203,
+  "sourceName": "The Look",
+  "prerequisites": "Impress 6+ ranks, Gorgeous.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Simply Irresistible": {
+  "page": 205,
+  "sourceName": "Simply Irresistible",
+  "prerequisites": "Cha 15+, Impress 9+ ranks, The Look.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Government Contacts": {
+  "page": 203,
+  "sourceName": "Government Contacts",
+  "prerequisites": "Networking 3+ ranks, Diplomat.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Grifter Contacts": {
+  "page": 203,
+  "sourceName": "Grifter Contacts",
+  "prerequisites": "Networking 3+ ranks, Hustler.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Hard Core": {
+  "page": 203,
+  "sourceName": "Hard Core",
+  "prerequisites": "Cha 13+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Too Ugly to Die": {
+  "page": 205,
+  "sourceName": "Too Ugly To Die",
+  "prerequisites": "Career level 3+, Hard Core.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "High-Tech Contacts": {
+  "page": 203,
+  "sourceName": "High-Tech Contacts",
+  "prerequisites": "Networking 3+ ranks, Techie.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Local Contacts": {
+  "page": 203,
+  "sourceName": "Local Contacts",
+  "prerequisites": "Networking 3+ ranks, World Traveler.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mark": {
+  "page": 203,
+  "sourceName": "Mark",
+  "prerequisites": "Sense Motive 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Media Contacts": {
+  "page": 204,
+  "sourceName": "Media Contacts",
+  "prerequisites": "Networking 3+ ranks, Actor.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Medical Contacts": {
+  "page": 204,
+  "sourceName": "Medical Contacts",
+  "prerequisites": "Networking 3+ ranks, Examiner.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Military Contacts": {
+  "page": 204,
+  "sourceName": "Military Contacts",
+  "prerequisites": "Networking 3+ ranks, Officer.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Personal Lieutenant": {
+  "page": 204,
+  "sourceName": "Personal Lieutenant",
+  "prerequisites": "Career level 6+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Police Contacts": {
+  "page": 204,
+  "sourceName": "Police Contacts",
+  "prerequisites": "Networking 3+ ranks, Private Eye.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Political Clout": {
+  "page": 204,
+  "sourceName": "Political Clout",
+  "prerequisites": "Bureaucracy 6+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Political Favors": {
+  "page": 204,
+  "sourceName": "Political Favors",
+  "prerequisites": "Bureaucracy 12+ ranks, Political Clout.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Political Immunity": {
+  "page": 204,
+  "sourceName": "Political Immunity",
+  "prerequisites": "Bureaucracy 18+ ranks, Political Favors.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Polyglot": {
+  "page": 204,
+  "sourceName": "Polyglot",
+  "prerequisites": "Cultures 4+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Research Contacts": {
+  "page": 205,
+  "sourceName": "Research Contacts",
+  "prerequisites": "Networking 3+ ranks, Observer.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Silver Tongue": {
+  "page": 205,
+  "sourceName": "Silver Tongue",
+  "prerequisites": "Cha 13+, Manipulate 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Undermine": {
+  "page": 205,
+  "sourceName": "Undermine",
+  "prerequisites": "Manipulate 9+ ranks, Silver Tongue.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Venomous Dialogue": {
+  "page": 205,
+  "sourceName": "Venomous Dialogue",
+  "prerequisites": "Cha 15+, Manipulate 18+ ranks, Undermine.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Stone Cold": {
+  "page": 205,
+  "sourceName": "Stone Cold",
+  "prerequisites": "Intimidate 4+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Street Contacts": {
+  "page": 205,
+  "sourceName": "Street Contacts",
+  "prerequisites": "Networking 3+ ranks, Fence.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "White Collar Contacts": {
+  "page": 205,
+  "sourceName": "White Collar Contacts",
+  "prerequisites": "Networking 3+ ranks, Advisor.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Wilderness Contacts": {
+  "page": 205,
+  "sourceName": "Wilderness Contacts",
+  "prerequisites": "Networking 3+ ranks, Survivalist.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Always Get Your Man": {
+  "page": 206,
+  "sourceName": "Always Get Your Man",
+  "prerequisites": "Investigation 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Aquatic Training": {
+  "page": 206,
+  "sourceName": "Aquatic Training",
+  "prerequisites": "Athletics 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Arctic Training": {
+  "page": 206,
+  "sourceName": "Arctic Training",
+  "prerequisites": "Survival 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Desert Training": {
+  "page": 206,
+  "sourceName": "Desert Training",
+  "prerequisites": "Survival 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Escape and Evasion Training": {
+  "page": 206,
+  "sourceName": "Escape and Evasion Training",
+  "prerequisites": "Bluff 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Firefighter Training": {
+  "page": 206,
+  "sourceName": "Firefighter Training",
+  "prerequisites": "Science (Engineering) 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Forest Training": {
+  "page": 207,
+  "sourceName": "Forest Training",
+  "prerequisites": "Survival 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Home Turf": {
+  "page": 207,
+  "sourceName": "Home Turf",
+  "prerequisites": "Search 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Jungle Training": {
+  "page": 207,
+  "sourceName": "Jungle Training",
+  "prerequisites": "Survival 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Local Hero": {
+  "page": 207,
+  "sourceName": "Local Hero",
+  "prerequisites": "Networking 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Mountain Training": {
+  "page": 207,
+  "sourceName": "Mountain Training",
+  "prerequisites": "Survival 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Night Training": {
+  "page": 207,
+  "sourceName": "Night Training",
+  "prerequisites": "Notice 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Swamp Training": {
+  "page": 207,
+  "sourceName": "Swamp Training",
+  "prerequisites": "Survival 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tracking Basics": {
+  "page": 207,
+  "sourceName": "Tracking Basics",
+  "prerequisites": "Survival 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Tracking Mastery": {
+  "page": 207,
+  "sourceName": "Tracking Mastery",
+  "prerequisites": "Survival 9+ ranks, Tracking Basics.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Urban Training": {
+  "page": 207,
+  "sourceName": "Urban Training",
+  "prerequisites": "Streetwise 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Breaking Points": {
+  "page": 208,
+  "sourceName": "Breaking Points",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Bug Basics": {
+  "page": 208,
+  "sourceName": "Bug Basics",
+  "prerequisites": "Sleight of Hand 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Candidate": {
+  "page": 208,
+  "sourceName": "Candidate",
+  "prerequisites": "Career level 1 only (when the feat is chosen).",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Career Agent": {
+  "page": 208,
+  "sourceName": "Career Agent",
+  "prerequisites": "Career level 6+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Office Gossip": {
+  "page": 209,
+  "sourceName": "Office Gossip",
+  "prerequisites": "Career level 12+, Career Agent.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Total Control": {
+  "page": 209,
+  "sourceName": "Total Control",
+  "prerequisites": "Career level 18+, Office Gossip.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Cryptographer": {
+  "page": 208,
+  "sourceName": "Cryptographer",
+  "prerequisites": "Science (Mathematics) 4+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Disease Basics": {
+  "page": 208,
+  "sourceName": "Disease Basics",
+  "prerequisites": "Science (Genetics) 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Flawless Identity": {
+  "page": 209,
+  "sourceName": "Flawless Identity",
+  "prerequisites": "Career level 6+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Forensic Genius": {
+  "page": 209,
+  "sourceName": "Forensic Genius",
+  "prerequisites": "Analysis 4+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Hold Out": {
+  "page": 209,
+  "sourceName": "Hold Out",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Living Cipher": {
+  "page": 209,
+  "sourceName": "Living Cipher",
+  "prerequisites": "Int 15+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Old School": {
+  "page": 209,
+  "sourceName": "Old School",
+  "prerequisites": "Career level 6+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Poison Basics": {
+  "page": 209,
+  "sourceName": "Poison Basics",
+  "prerequisites": "Science (Pharmacology) 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Safe House": {
+  "page": 209,
+  "sourceName": "Safe House",
+  "prerequisites": "Career level 3+, Lifestyle 3+.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Superior Documentation": {
+  "page": 209,
+  "sourceName": "Superior Documentation",
+  "prerequisites": "Networking 3+ ranks.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Master's Art": {
+  "page": 187,
+  "sourceName": "Master\u2019s Art",
+  "prerequisites": "Career Level 15+, Martial Arts, at least 2 other Unarmed Combat feats.",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ },
+ "Vital Points Basics": {
+  "page": 188,
+  "sourceName": "Vital Points Basics",
+  "prerequisites": "",
+  "special": "",
+  "repeatable": false,
+  "hasBenefit": true
+ }
+}

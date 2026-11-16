@@ -7,7 +7,8 @@
    "bonuses": [
     {
      "target": "actionDice.bonus",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "interests",
@@ -36,7 +37,8 @@
     },
     {
      "target": "saves.ref",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.acrobatics.cap",
@@ -93,7 +95,7 @@
      "value": "1"
     },
     {
-     "target": "defense",
+     "target": "baseDefense",
      "value": "1"
     },
     {
@@ -148,7 +150,8 @@
     },
     {
      "target": "saves.ref",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [],
@@ -231,11 +234,13 @@
     },
     {
      "target": "actionDice.bonus",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "initiative",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [],
@@ -248,7 +253,8 @@
    "bonuses": [
     {
      "target": "saves.will",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "focus.generic",
@@ -273,7 +279,8 @@
     },
     {
      "target": "initiative",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.intimidate.threat",
@@ -302,7 +309,8 @@
     },
     {
      "target": "saves.fort",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.athletics.cap",
@@ -320,12 +328,7 @@
    "num": 14,
    "name": "Gifted",
    "originType": "talent",
-   "bonuses": [
-    {
-     "target": "classSkillPicks",
-     "value": "1"
-    }
-   ],
+   "bonuses": [],
    "grants": [],
    "classSkills": []
   },
@@ -393,7 +396,7 @@
      "value": "2"
     },
     {
-     "target": "defense",
+     "target": "baseDefense",
      "value": "2"
     },
     {
@@ -410,7 +413,7 @@
    "originType": "talent",
    "bonuses": [
     {
-     "target": "defense",
+     "target": "baseDefense",
      "value": "1"
     },
     {
@@ -461,7 +464,8 @@
     },
     {
      "target": "saves.fort",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.resolve.cap",
@@ -482,7 +486,7 @@
    "bonuses": [
     {
      "target": "wealth",
-     "value": "@tb.t1"
+     "value": "@tb.t2"
     },
     {
      "target": "focus.cultures",
@@ -497,10 +501,6 @@
    "name": "Reliable",
    "originType": "talent",
    "bonuses": [
-    {
-     "target": "classSkillPicks",
-     "value": "@tb.t1"
-    },
     {
      "target": "focus.profession",
      "value": "1"
@@ -528,7 +528,8 @@
     },
     {
      "target": "saves.will",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.resolve.cap",
@@ -573,10 +574,6 @@
      "value": "5"
     },
     {
-     "target": "classSkillPicks",
-     "value": "1"
-    },
-    {
      "target": "focus.cultures",
      "value": "1"
     }
@@ -599,7 +596,7 @@
     },
     {
      "target": "contacts",
-     "value": "(@tb.t3 + 1)"
+     "value": "(2 * @tb.t3)"
     },
     {
      "target": "skills.senseMotive.threat",
@@ -677,11 +674,15 @@
    "bonuses": [
     {
      "target": "focus.profession",
-     "value": "2"
+     "value": "1"
     },
     {
      "target": "spendingCash",
      "value": "@tb.t1"
+    },
+    {
+     "target": "focusForte.profession",
+     "value": "1"
     }
    ],
    "grants": [
@@ -714,16 +715,14 @@
    "originType": "specialty",
    "bonuses": [
     {
-     "target": "classSkillPicks",
-     "value": "1"
-    },
-    {
      "target": "skills.intimidate.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.streetwise.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -744,11 +743,13 @@
     },
     {
      "target": "skills.intimidate.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.networking.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -790,11 +791,13 @@
     },
     {
      "target": "skills.bluff.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.sneak.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -840,11 +843,13 @@
     },
     {
      "target": "skills.impress.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.profession.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -862,6 +867,10 @@
     {
      "target": "spendingCash",
      "value": "@tb.t1"
+    },
+    {
+     "target": "focus.science",
+     "value": "1"
     }
    ],
    "grants": [
@@ -882,11 +891,13 @@
     },
     {
      "target": "skills.search.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.security.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -920,15 +931,21 @@
    "bonuses": [
     {
      "target": "focus.drive",
-     "value": "2"
+     "value": "1"
     },
     {
      "target": "skills.drive.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.streetwise.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
+    },
+    {
+     "target": "focusForte.drive",
+     "value": "1"
     }
    ],
    "grants": [
@@ -954,6 +971,10 @@
     {
      "target": "featSlots.terrain",
      "value": "1"
+    },
+    {
+     "target": "subdualThreshold",
+     "value": "@tb.t3"
     }
    ],
    "grants": [],
@@ -966,11 +987,13 @@
    "bonuses": [
     {
      "target": "skills.manipulate.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.networking.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -991,7 +1014,7 @@
     },
     {
      "target": "focus.science",
-     "value": "@tb.t3"
+     "value": "1"
     }
    ],
    "grants": [
@@ -1008,11 +1031,13 @@
    "bonuses": [
     {
      "target": "skills.analysis.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.notice.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -1046,15 +1071,17 @@
    "bonuses": [
     {
      "target": "contacts",
-     "value": "(@tb.t3 + 1)"
+     "value": "(2 * @tb.t3)"
     },
     {
      "target": "skills.investigation.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.senseMotive.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -1075,7 +1102,7 @@
     },
     {
      "target": "contacts",
-     "value": "(@tb.t3 + 1)"
+     "value": "@tb.t3"
     },
     {
      "target": "featSlots.rangedCombat",
@@ -1167,11 +1194,13 @@
     },
     {
      "target": "skills.blend.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.sleightOfHand.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [
@@ -1188,15 +1217,21 @@
    "bonuses": [
     {
      "target": "focus.drive",
-     "value": "2"
+     "value": "1"
     },
     {
      "target": "skills.drive.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.search.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
+    },
+    {
+     "target": "focusForte.drive",
+     "value": "1"
     }
    ],
    "grants": [
@@ -1259,11 +1294,13 @@
     },
     {
      "target": "skills.athletics.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.medicine.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [],
@@ -1288,7 +1325,8 @@
     },
     {
      "target": "skills.science.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [],
@@ -1301,15 +1339,21 @@
    "bonuses": [
     {
      "target": "focus.drive",
-     "value": "2"
+     "value": "1"
     },
     {
      "target": "skills.athletics.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.drive.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
+    },
+    {
+     "target": "focusForte.drive",
+     "value": "1"
     }
    ],
    "grants": [
@@ -1334,11 +1378,13 @@
     },
     {
      "target": "skills.sneak.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.tactics.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [],
@@ -1348,7 +1394,16 @@
    "num": 32,
    "name": "Spiritualist",
    "originType": "specialty",
-   "bonuses": [],
+   "bonuses": [
+    {
+     "target": "baseDefense",
+     "value": "1"
+    },
+    {
+     "target": "stressThreshold",
+     "value": "@tb.t3"
+    }
+   ],
    "grants": [
     {
      "feat": "All or Nothing"
@@ -1368,6 +1423,10 @@
     {
      "target": "featSlots.chance",
      "value": "1"
+    },
+    {
+     "target": "stressThreshold",
+     "value": "@tb.t3"
     }
    ],
    "grants": [],
@@ -1405,11 +1464,13 @@
     },
     {
      "target": "skills.bureaucracy.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.profession.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [],
@@ -1438,15 +1499,21 @@
     },
     {
      "target": "focus.drive",
-     "value": "2"
+     "value": "1"
     },
     {
      "target": "skills.acrobatics.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.athletics.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
+    },
+    {
+     "target": "focusForte.drive",
+     "value": "1"
     }
    ],
    "grants": [
@@ -1475,11 +1542,13 @@
     },
     {
      "target": "skills.mechanics.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     },
     {
      "target": "skills.profession.misc",
-     "value": "@tb.t1"
+     "value": "@tb.t1",
+     "bonusType": "insight"
     }
    ],
    "grants": [],

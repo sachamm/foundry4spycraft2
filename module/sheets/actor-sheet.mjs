@@ -1,4 +1,42 @@
+import {settleSilverTongueVictory,resumeSilverTongueVictory,correctSilverTongueVictory,recoverSilverTongueAtMissionEnd,silverVictoryRows} from '../apps/silver-tongue.mjs';
+import {markRows} from '../rules/mark.mjs';
+import {safeHouseSource,safeHouseRows} from '../rules/safe-house.mjs';
+import {careerAgentMissionKey,getCareerAgentReview} from '../rules/career-agent.mjs';
+import {wellFundedCashHistory} from '../rules/well-funded.mjs';
+import {toolShedKitState,toolShedSource} from '../rules/tool-shed.mjs';
+import {declareDarting,takeDartingFinalAttack,reviewDarting} from '../apps/darting.mjs';
+import {declareSuperiorCover,reviewSuperiorCover} from '../apps/superior-cover.mjs';
+import {careerFormPlan,mergeCareerForm} from '../rules/career-form.mjs';
+import {settlePendingDamageSave} from '../apps/damage-settlement.mjs';
+import {rollPendingDamageSave} from '../apps/damage-saves.mjs';
+import {reviewDamageLedger,applyAccumulatedDamage} from '../apps/damage-ledger.mjs';
+import {checkAccumulatedDamage} from '../apps/accumulated-damage.mjs';
+import {takeMobileOffense} from '../apps/mobile-offense.mjs';
+import {takeContempt} from '../apps/contempt.mjs';
+import {takeCombatInstincts} from '../apps/combat-instincts.mjs';
+import {rollDisarm} from '../apps/disarm.mjs';
+import {declareTwoWeapon,reviewTwoWeapon,takeTwoWeaponFinalAttack} from '../apps/two-weapon.mjs';
+import {checkNumericalAdvantage} from '../apps/numerical-advantage.mjs';
+import {criticalInjuryReviews} from '../apps/critical-injuries.mjs';
+import {takeTotalDefense} from '../apps/total-defense.mjs';
+import {checkCombatMovement} from '../apps/combat-movement.mjs';
+import {activateCombatExpertise} from '../apps/combat-expertise.mjs';
+import {checkReflexDamage} from '../apps/reflex-damage.mjs';
+import {checkIncomingDefense} from '../apps/incoming-defense.mjs';
+import {checkBurrowMaterial} from "../apps/burrow-material.mjs";
+import {computeAgent} from "../rules/engine.mjs";
+import {calculateRecoveryRates} from '../apps/recovery-rates.mjs';
+import {planAmmunitionStockpile} from '../apps/ammunition-planner.mjs';
+import {ammunitionConfiguration,compatibleAmmunition} from '../rules/ammunition.mjs';
+import {CAMOUFLAGE_TERRAINS,camouflageTerrain} from '../rules/quality-checks.mjs';
+import {RESISTANCE_TYPES,resistanceType} from '../rules/resistances.mjs';
+import {brightIdeaPoolStatus} from '../rules/bright-idea.mjs';
+import {queueResources,isResourceLock} from "../rules/transactions.mjs";
+import {conditionNpcProfile,npcSkillConditionContext} from '../rules/npc-conditions.mjs';
 import { NPC_RULES, NPC_STATS, NPC_CATEGORIES, defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
+import {reviewActorRules} from "../apps/rules-refresh.mjs";
+import { classSkillSelections,orderedClassChoices } from "../rules/class-skills.mjs";
+import { armorSlot } from "../rules/gear.mjs";
 import { renderTemplate } from "../rules/formula.mjs";
 import { describe as describePrereq } from "../rules/prerequisites.mjs";
 import { SpycraftBrowser } from "../apps/browser.mjs";
@@ -24,16 +62,143 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      applyShaken(){return this.actor.applyShaken();},
+      reviewShakenApplication(){return this.actor.reviewShakenApplication();},
+      editShakenSource(event,target){return this.actor.editShakenSource(target.dataset.sourceUuid);},
+      reviewShakenInitiative(event,target){return this.actor.reviewShakenInitiative(target.dataset.combatId,target.dataset.combatantId);},
+      reviewMissionXP(){return this.actor.reviewMissionXP();},
+      reviewActionDieAward(){return this.actor.reviewActionDieAward();},
+      reviewActionDiceSettlement(){return this.actor.reviewActionDiceSettlement();},
+      activateMasterPlan(){return this.actor.activateMasterPlan();},
+      rollDrunkReposition(){return this.actor.rollDrunkReposition();},
+      applyDrunkReposition(event,target){return this.actor.applyDrunkReposition({id:target.dataset.recordId});},
+      confirmDrunkReposition(event,target){return this.actor.confirmDrunkReposition({id:target.dataset.recordId});},
+      beginDrunkSleep(){return this.actor.beginDrunkSleep();},
+      completeDrunkSleep(){return this.actor.completeDrunkSleep();},
+      beginFatigueRest(){return this.actor.beginFatigueRest();},
+      completeFatigueRest(){return this.actor.completeFatigueRest();},
+      reviewRestraintRelease(){return this.actor.reviewRestraintRelease();},
+      confirmRestraintEscapeMove(event,target){const message=game.messages.get(target.dataset.messageId);if(!message)return ui.notifications.warn('Load the original grapple message before confirming movement.');return this.actor.confirmRestraintEscapeMove(message);},
+      escapeRestraint(){return this.actor.rollSkill('athletics','str',{initialCheck:'restraint-escape'});},
+      applyBaffled(){return this.actor.applyBaffled();},
+      reviewBaffledApplication(){return this.actor.reviewBaffledApplication();},
+      applyFatigue(){return this.actor.applyFatigue();},
+      wakeFromSleep(){return this.actor.wakeFromSleep();},
+      setMovementCondition(event,target){return this.actor.setReviewedCondition(target.dataset.condition);},
+      setSickened(){return this.actor.setSickened();},
+      checkReflexDamage(){return checkReflexDamage(this.actor);},
+      rollCriticalInjury(){return this.actor.rollCriticalInjury();},
+      reviewCriticalInjury(event,target){return this.actor.reviewCriticalInjury(target.dataset.injury);},
+      takeTotalDefense(){return takeTotalDefense(this.actor);},
+      takeMobileOffense(){return takeMobileOffense(this.actor);},
+      takeContempt(){return takeContempt(this.actor);},
+      takeCombatInstincts(){return takeCombatInstincts(this.actor);},
+      rollDisarm(){return rollDisarm(this.actor);},
+      declareTwoWeapon(){return declareTwoWeapon(this.actor);},
+      takeTwoWeaponFinalAttack(){return takeTwoWeaponFinalAttack(this.actor);},
+      reviewTwoWeapon(){return reviewTwoWeapon(this.actor);},
+      checkNumericalAdvantage(){return checkNumericalAdvantage(this.actor);},
+      manageAnalysisTasks(){return this.actor.manageAnalysisTasks();},
+      checkCombatMovement(){return checkCombatMovement(this.actor);},
+      declareDarting(){return declareDarting(this.actor);},
+      takeDartingFinalAttack(){return takeDartingFinalAttack(this.actor);},
+      reviewDarting(){return reviewDarting(this.actor);},
+      declareSuperiorCover(){return declareSuperiorCover(this.actor);},
+      reviewSuperiorCover(){return reviewSuperiorCover(this.actor);},
+      activateCombatExpertise(){return activateCombatExpertise(this.actor);},
+      settlePendingDamageSave(){return settlePendingDamageSave(this.actor);},
+      rollPendingDamageSave(){return rollPendingDamageSave(this.actor);},
+      reviewDamageLedger(){return reviewDamageLedger(this.actor);},
+      applyAccumulatedDamage(){return applyAccumulatedDamage(this.actor);},
+      checkAccumulatedDamage(){return checkAccumulatedDamage(this.actor);},
+      checkIncomingDefense(){return checkIncomingDefense(this.actor);},
+      sufferInitiativeLoss(){return this.actor.sufferInitiativeLoss();},
+      checkBurrowMaterial(){return checkBurrowMaterial(this.actor);},
+      planAmmunition(event,target){return planAmmunitionStockpile(this.actor.items.get(target.closest("[data-item-id]").dataset.itemId));},
       rollAbility: SpycraftAgentSheet.#onRollAbility,
       rollSave: SpycraftAgentSheet.#onRollSave,
       rollSkill: SpycraftAgentSheet.#onRollSkill,
+      shareTemporaryFeats(event,target){return this.actor.shareTemporaryFeats(target.dataset.ability);},
+      reviewLimitedUseCounter(event,target){return this.actor.reviewLimitedUseCounter(target.dataset.resource);},
+      useEagleEye(){return this.actor.useEagleEye();},
+      chooseTemporaryFocuses(event,target){return this.actor.chooseTemporaryFocuses({featId:target.dataset.itemId});},
+      useRenaissanceMan(){return this.actor.useRenaissanceMan();},
+      settleSilverTongueVictory(){return settleSilverTongueVictory(this.actor);},
+      resumeSilverTongueVictory(event,target){return resumeSilverTongueVictory(this.actor,target.dataset.victory);},
+      correctSilverTongueVictory(event,target){return correctSilverTongueVictory(this.actor,target.dataset.victory);},
+      recoverSilverTongueAtMissionEnd(){return recoverSilverTongueAtMissionEnd(this.actor);},
+      useMark(){return this.actor.useMark();},
+      discloseMark(event,target){return this.actor.discloseMark(target.dataset.observation);},
+      correctMark(event,target){return this.actor.correctMark(target.dataset.observation);},
+      useFeatFreeAction(event,target){return this.actor.useFeatFreeAction(target.dataset.resource);},
+      useLimitedAbility(event,target){return this.actor.useManualLimitedAbility(target.dataset.resource);},
+      migrateBrightIdeaUses(){return this.actor.migrateBrightIdeaUses();},
+      recordAdrenalineWoundLoss(){return this.actor.recordAdrenalineWoundLoss();},
+      recordHintResponse(event,target){return this.actor.recordHintResponse({source:target.dataset.resource});},
+      useFinalDeduction(){return this.actor.useFinalDeduction();},
+      useGlobalSearch(){return this.actor.useGlobalSearch();},
+      useLittleDetails(){return this.actor.useLittleDetails();},
+      useMasterThief(){return this.actor.useMasterThief();},
+      useSafeHouse(){return this.actor.useSafeHouse();},
+      correctSafeHouseRecord(event,target){return this.actor.correctSafeHouseRecord(target.dataset.house);},
+      placeSafeHouse(event,target){return this.actor.placeSafeHouse(target.dataset.house);},
+      reviewSafeHouseMission(){return this.actor.reviewLimitedUseCounter('safeHouseMission');},
+      reviewSafeHouseScene(){return this.actor.reviewLimitedUseCounter('safeHouseScene');},
+      useCareerAgentReward(){return this.actor.useCareerAgentReward();},
+      reviewCareerAgentReward(){return this.actor.reviewCareerAgentReward();},
+      useWellFunded(){return this.actor.useWellFunded();},
+      reviewWellFundedCounter(){return this.actor.reviewLimitedUseCounter('wellFunded');},
+      useToolShed(){return this.actor.useToolShed();},
+      reviewToolShedCounter(){return this.actor.reviewLimitedUseCounter('toolShed');},
+      improviseCommonItem(){return this.actor.improviseCommonItem();},
+      useOneInAMillion(){return this.actor.useOneInAMillion();},
+      selectMissionCaliberGear(event,target){return this.actor.selectMissionCaliberGear({source:target.dataset.source});},
+      selectBigStickGear(){return this.actor.selectBigStickGear();},
+      selectArmorUseGear(){return this.actor.selectArmorUseGear();},
+      reviewReserveTransaction(){return this.actor.reviewReserveTransaction();},
+      allocateMissionReserves(){return this.actor.allocateMissionReserves();},
+      findImprovisedWeapon(){return this.actor.findImprovisedWeapon();},
+      rollGearAcquisition(event,target){return this.actor.rollGearAcquisition(target?.dataset.resource?{requestAbility:target.dataset.resource}:{});},
+      claimGearAcquisition(){return this.actor.claimGearAcquisition();},
+      recoverResourceTransaction(){return this.actor.recoverResourceTransaction();},
+      settleMissionXP(){return this.actor.settleMissionXP();},
+      awardActionDice(){return this.actor.awardActionDice();},
+      manageGCDice(){return game.spycraft2.gcDice.manage();},
+      reviewUsagePeriod(){return game.spycraft2.reviewUsagePeriod();},
+      async resetUsagePeriod(event,target){await game.spycraft2.resetUsagePeriod(target.dataset.period);this.render();},
+      rollKnowledge(){return this.actor.rollKnowledge();},
+      initializeResources(){return this.actor.initializeStartingResources();},
+      keepResources(){return this.actor.initializeStartingResources({keepCurrent:true});},
+      reviewRules(){return reviewActorRules(this.actor);},
+      restoreRules(){return reviewActorRules(this.actor,{restore:true});},
       rollAttack: SpycraftAgentSheet.#onRollAttack,
+      rollRangedAttack(event,target){return this.actor.rollRangedAttack(this._item(target));},
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
       rollVitality: SpycraftAgentSheet.#onRollVitality,
+      reviewVitality(event,target){return this.actor.reviewVitality(Number(target.dataset.index));},
       todo: SpycraftAgentSheet.#onTodo,
+      healActionDice(){return this.actor.healWithActionDice();},
+      refreshAction(){return this.actor.refreshWithActionDie();},
+      configureFortuneTeammates(){return this.actor.configureFortuneTeammates();},
+      calculateRecoveryRates(){return calculateRecoveryRates(this.actor);},
+      activateMentalLeap(){return this.actor.activateMentalLeap();},
+      endMentalLeap(event,target){return this.actor.endMentalLeap({id:target.dataset.recordId});},
+      recordFatigueEscalation(){return this.actor.recordFatigueEscalation();},
+      startMentalLeapSleep(){return this.actor.startMentalLeapSleep();},
+      completeMentalLeapSleep(){return this.actor.completeMentalLeapSleep();},
+      rollWisdomCollapse(){return this.actor.rollWisdomCollapse();},
+      summonClassAssistants(event,target){return this.actor.summonClassAssistants(target.dataset.resource);},
+      withdrawClassAssistants(event,target){return this.actor.withdrawClassAssistants(target.dataset.groupId);},
+      useEverydayGenius(){return this.actor.useEverydayGenius();},
+      useKnowItAll(){return this.actor.useKnowItAll();},
+      useAnyTimeAnyPlace(){return this.actor.useAnyTimeAnyPlace();},
+      useIntelTemporaryFeats(event,target){return this.actor.useIntelTemporaryFeats(target.dataset.resource);},
+      activateNoFear(){return this.actor.activateNoFear();},
+      boostFortunesOfWar(){return this.actor.boostFortunesOfWar();},
+      boostDefense(){return this.actor.boostDefenseWithActionDie();},
+      initializeStartingDice(){return this.actor.initializeStartingDice();},
       spendActionDie: SpycraftAgentSheet.#onSpendActionDie,
-      refreshActionDice: SpycraftAgentSheet.#onRefreshActionDice,
       addLevel: SpycraftAgentSheet.#onAddLevel,
       removeLevel: SpycraftAgentSheet.#onRemoveLevel,
       browse: SpycraftAgentSheet.#onBrowse,
@@ -86,7 +251,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     const cfg = CONFIG.SPYCRAFT;
     const rollData = actor.getRollData();
     Object.assign(context, {
-      actor, system: sys, source: actor.system._source, config: cfg, editable: this.isEditable,
+      actor, system: sys, shakenInitiativeReviews:actor.shakenInitiativeReviews, usagePeriodReview:game.spycraft2?.getUsagePeriodReview?.()??{}, startingDiceEntry:actor.startingDiceEntry, source: actor.system._source, config: cfg, editable: this.isEditable,
       tabs: this._prepareTabs("primary"),
       warnings: sys.warnings ?? [], todo: sys.todo ?? [], open: this._open
     });
@@ -106,13 +271,13 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     const vitBonus = (src.vitality ?? []).reduce((n, s) => n + s.value, 0);
     const conPart = sys.abilities.con.mod * sys.level;
     context.tips = {
-      defense: tip([[game.i18n.localize("SPYCRAFT.Base"), 10], [classLabel, sys.defense.base], abilTip("dex"), [armorLabel, sys.defense.armor], [miscLabel, misc.defense]], "defense"),
+      defense: tip([[game.i18n.localize("SPYCRAFT.Base"), 10], [classLabel, sys.defense.base], ["DEX",sys.defense.dexterity], ["Vulnerable: dodge bonuses lost",-sys.defense.dodgeLost], [armorLabel, sys.defense.armor], ["Size", sys.sizeModifier], [miscLabel, misc.defense]], "defense"),
       initiative: tip([[classLabel, sys.initiative.base], abilTip("dex"), [miscLabel, misc.initiative]], "initiative"),
       speed: tip([[game.i18n.localize("SPYCRAFT.Base"), 30], [armorLabel, sys.armor?.speed], [miscLabel, misc.speed]], "speed"),
-      knowledge: tip([[game.i18n.localize("SPYCRAFT.Level"), sys.level], abilTip("int"), [miscLabel, misc.knowledge]], "knowledge"),
-      vitality: tip([[game.i18n.localize("SPYCRAFT.VitalityDice"), sys.vitality.max - vitBonus - conPart - (misc.vitality ?? 0)],
-        [`CON × ${sys.level}`, conPart], [miscLabel, misc.vitality]], "vitality"),
-      wounds: tip([["CON", sys.abilities.con.value], [miscLabel, misc.wounds]], "wounds"),
+      knowledge: tip([[game.i18n.localize("SPYCRAFT.Level"), sys.level], abilTip("int"), [miscLabel, misc.knowledge],["Baffled/Incompetent",sys.knowledgeSkillBonusCondition?.adjustment??0]], "knowledge"),
+      vitality: tip([[game.i18n.localize("SPYCRAFT.VitalityDice"), sys.vitalityBreakdown?.dice ?? 0],
+        [`CON × ${sys.level}`, conPart], ["Minimum 1 per level", sys.vitalityBreakdown?.minimumAdjustment], [miscLabel, misc.vitality]], "vitality"),
+      wounds: tip([["CON", sys.abilities.con.value], ["Size", sys.wounds.max - sys.abilities.con.value - (misc.wounds ?? 0) - (src.wounds ?? []).reduce((n,s)=>n+s.value,0)], [miscLabel, misc.wounds]], "wounds"),
       actionDice: tip([[game.i18n.localize("SPYCRAFT.Level"), sys.actionDice.max - (src["actionDice.count"] ?? []).reduce((n, s) => n + s.value, 0) - (misc.actionDice ?? 0)],
         [miscLabel, misc.actionDice]], "actionDice.count")
     };
@@ -132,14 +297,47 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     }));
 
     // Items by type
-    const items = actor.items.contents.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    const items = actor.items.contents.filter(i=>!isResourceLock(i)).sort((a, b) => (a.sort || 0) - (b.sort || 0));
     const byType = t => items.filter(i => i.type === t);
     context.talent = byType("origin").find(i => i.system.originType === "talent");
     context.specialty = byType("origin").find(i => i.system.originType === "specialty");
+    context.originSelections = byType("origin").map(item => {
+      const rule = cfg.tables.originChoices?.[item.name] ?? {};
+      const choices = item.system.originChoices ?? {};
+      const fields = [];
+      const focusRule=cfg.tables.originFocuses?.[item.name];
+      if(focusRule?.choiceSkill){
+        const skill=focusRule.choiceSkill;
+        fields.push({key:"grantedFocus",label:`Granted ${cfg.skills[skill].name} focus`,value:choices.grantedFocus,text:skill==="profession",options:skill==="profession"?null:Object.fromEntries((focusRule.domain??cfg.focuses[skill]).map(focus=>[focus,focus]))});
+      }
+      if (rule.attributes) {
+        fields.push({ key: "up", label: "+2 attribute", value: choices.up, options: context.abilityOptions });
+        fields.push({ key: "down", label: "−2 attribute", value: choices.down, options: context.abilityOptions });
+      }
+      const skillOptions = Object.fromEntries(Object.values(cfg.skills).map(s => [s.key, s.name]));
+      for (const [kind, number, label] of [
+        ["classSkill", rule.classSkills === "scaling" ? 1 + Math.floor(sys.level / 4) : rule.classSkills ?? 0, "Class skill"],
+        ["maxRank", rule.maxRankSkills === "scaling" ? 1 + Math.floor(sys.level / 4) : 0, "Maximum-rank skill"]
+      ]) for (let index = 0; index < number; index++) fields.push({ key: `${kind}${index}`, label: `${label} ${index + 1}`, value: choices[`${kind}${index}`], options: skillOptions });
+      if (rule.threatSkill) fields.push({ key: "threatSkill", label: "Threat-range skill", value: choices.threatSkill, options: skillOptions });
+      if (rule.npcQualities) {
+        const options = Object.fromEntries(Object.entries(cfg.tables.testSubjectQualities).map(([key, quality]) => [key, quality.label]));
+        for (let index = 0; index < rule.npcQualities; index++) {
+          fields.push({ key: `npcQuality${index}`, label: `NPC quality ${index + 1} (GC approval)`, value: choices[`npcQuality${index}`], options });
+          if(choices[`npcQuality${index}`]==='damageResistance')fields.push({key:`npcDetails${index}`,label:`Quality ${index + 1} resisted damage type`,value:resistanceType(choices[`npcDetails${index}`]),options:RESISTANCE_TYPES});
+          else if(choices[`npcQuality${index}`]==='camouflaged')fields.push({key:`npcDetails${index}`,label:`Quality ${index + 1} camouflage terrain`,value:camouflageTerrain(choices[`npcDetails${index}`]),options:CAMOUFLAGE_TERRAINS});
+          else fields.push({ key: `npcDetails${index}`, label: `Quality ${index + 1} details / chosen item`, value: choices[`npcDetails${index}`], text: true });
+        }
+      }
+      return { id: item.id, name: item.name, fields, description: item.system.description };
+    });
 
     // Classes & progression
     const classItems = byType("class");
     const classById = Object.fromEntries(classItems.map(c => [c.system.identifier || c.name, c]));
+    context.finalAttackRound=this.actor.limitedUseStatus?.find(s=>s.id==='finalAttackRound');
+    context.dartingFinalAttack=this.actor.limitedUseStatus?.find(s=>s.id==='dartingFinalAttack');
+    context.canRecordVitality=this.actor.isOwner===true;
     context.progression = sys.progression.map((p, i) => {
       const ci = classById[p.classId];
       const counts = sys.progression.slice(0, i + 1).filter(x => x.classId === p.classId).length;
@@ -154,12 +352,20 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       const lvl = sys.classLevels?.[ident] ?? 0;
       const lists = Object.fromEntries((ci.system.choiceLists ?? []).map(L => [L.key, L]));
       return {
-        item: ci, levels: lvl,
+        specialistFields:(sys.weaponSpecialist?.fields??[]).filter(field=>field.itemId===ci.id),
+        specialistModes:{ability:"Another ability",proficiency:"Another possessed proficiency"},
+        specialistProficiencies:Object.fromEntries(Object.entries(cfg.proficiencies).filter(([key])=>sys.proficiencyTotals?.[key]?.proficient).map(([key,value])=>[key,value.label])),
+        inheritedChoices:(sys.inheritedClassChoices??[]).filter(entry=>entry.ownerId===ci.id).map(entry=>({...entry,options:Object.fromEntries((entry.menu?.options??[]).map(option=>[option.index,option.name])),skillOptions:Object.fromEntries((entry.skillOptions??[]).map(key=>[key,cfg.skills[key]?.name??key]))})),
+        skillChoiceFields:classSkillSelections(ci,lvl).map(field=>({...field,value:ci.system.skillChoices?.[field.key]??"",options:Object.fromEntries(Object.values(cfg.skills).filter(skill=>field.anySkill||ci.system.classSkills?.includes(skill.key)||sys.universalClassSkills?.includes(skill.key)||sys.skills?.[skill.key]?.classSkill).map(skill=>[skill.key,skill.name]))})),
+        phdOptions:Object.fromEntries((ci.system.classSkills??[]).map(key=>[key,cfg.skills[key]?.name??key])),
+        phdFields:ident==="scientist"?[[2,"phdSkill"],[11,"phdSkill1"],[19,"phdSkill2"]].filter(([level])=>lvl>=level).map(([level,key])=>({level,key,value:ci.system[key]})):[],
+        item: ci, levels: lvl, isVirtuoso: ident === "virtuoso",
+        skillOptions: Object.fromEntries(Object.values(cfg.skills).map(s=>[s.key,s.name])),
         abilities: (ci.system.abilities ?? []).filter(a => a.level <= lvl).map(a => ({
           ...a, text: renderTemplate(a.description, { ...rollData, classes: { ...rollData.classes } })
         })),
-        choices: (ci.system.choiceSchedule ?? []).map((slot, idx) => ({
-          idx, level: slot.level, list: lists[slot.list]?.name ?? slot.list, active: slot.level <= lvl,
+        choices: orderedClassChoices(ci).map(({slot,index:idx}) => ({
+          idx, level: slot.level, list: lists[slot.list]?.name ?? slot.list, active: slot.level <= lvl&&!(ident==="soldier"&&slot.list==="weaponSpecialist"&&slot.level>6&&ci.system.weaponSpecialist?.[slot.level]?.mode==="proficiency"),
           value: ci.system.choices?.[idx] ?? "",
           options: Object.fromEntries((lists[slot.list]?.options ?? []).map(o => [o.index, o.name])),
           description: lists[slot.list]?.options?.find(o => o.index === Number(ci.system.choices?.[idx]))?.description ?? ""
@@ -178,14 +384,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.skills = Object.values(sys.skillTotals ?? {}).map(s => ({
       ...s,
       points: entry?.skills?.[s.key] ?? 0,
-      classAtLevel: !!(lvlClass?.system.classSkills?.includes(s.key) || s.classOverride),
+      historicalRanks:context.skillLevelInfo?.skills?.[s.key]?.ranks??s.ranks,
+      purchaseMaxRanks:context.skillLevelInfo?.skills?.[s.key]?.maxRanks??s.maxRanks,
+      classAtLevel: !!sys.skillPoints?.[lvl-1]?.classSkills?.includes(s.key),
       abilityLabel: s.abilities.map(a => a.toUpperCase()).join("/"),
       totalsLabel: s.totals.map(t => `${t.total >= 0 ? "+" : ""}${t.total}`).join(" / "),
       bonusTip: tip([[miscLabel, s.misc]], `skills.${s.key}.misc`),
       threatTip: tip([], `skills.${s.key}.threat`),
       capTip: tip([], `skills.${s.key}.cap`),
       totals: s.totals.map(t => ({
-        ...t, tip: tip([[game.i18n.localize("SPYCRAFT.Skill.Ranks"), s.ranks], abilTip(t.ability), [miscLabel, s.misc]], `skills.${s.key}.misc`)
+        ...t, tip: tip([[game.i18n.localize("SPYCRAFT.Skill.Ranks"), s.ranks], abilTip(t.ability), ["Attribute-based condition penalty",s.abilityPenalties?.[t.ability]??0],["Baffled/Incompetent",t.conditionBonusAdjustment??0], [miscLabel, s.misc]], `skills.${s.key}.misc`)
       }))
     }));
 
@@ -198,23 +406,53 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.featTrees = Object.entries(sys.feats?.trees ?? {}).filter(([, v]) => v.slots || v.spent || v.owned)
       .map(([k, v]) => ({ key: k, label: cfg.featTrees[k], ...v }));
     context.coreAbilities = sys.coreAbilities ?? [];
+    context.criticalInjuryReviews=criticalInjuryReviews(this.actor);
+    context.startedCharacterCombat=this.actor.participatingCombat?.started===true;
+    context.mobileOffense=(this.actor.limitedUseStatus??[]).find(s=>s.id==='mobileOffense');
+    context.contempt=(this.actor.limitedUseStatus??[]).find(s=>s.id==='contempt');
+    context.contemptRound=(this.actor.limitedUseStatus??[]).find(s=>s.id==='contemptRound');
+    context.combatInstincts=(this.actor.limitedUseStatus??[]).find(s=>s.id==='combatInstincts');
+    context.twoWeaponFinalAttack=(this.actor.limitedUseStatus??[]).find(s=>s.id==='twoWeaponFinalAttack');
+    context.jinxUse=(this.actor.limitedUseStatus??[]).find(s=>s.id==='jinx');
+    context.markUse=(this.actor.limitedUseStatus??[]).find(s=>s.id==='mark');
+    context.silverVictories=silverVictoryRows(this.actor);
+    context.attributeDamageRows=Object.entries(sys.attributeDamageState?.byAbility??{}).filter(([_k,v])=>v.total>0).map(([key,v])=>({key,label:game.i18n.localize(cfg.abilities[key]),...v}));
+    context.attributeDamageHistory=!!sys.attributeDamageState?.events?.length;
+    context.attributeMissionRecovered=(sys.attributeDamage?.recoveries??[]).some(r=>r.kind==='missionEnd'&&r.missionId===(this.actor.usagePeriods?.mission??'initial'));
+    context.markObservations=markRows(this.actor.flags.spycraft2?.markObservations,cfg);
+    context.featFreeActions=(this.actor.limitedUseStatus??[]).filter(spec=>['featFreeAction','featFreeActionRound'].includes(spec.workflow));
+    context.limitedUses=(this.actor.limitedUseStatus??[]).filter(spec=>!spec.hidden||spec.counterReview);
+    const brightStatus=brightIdeaPoolStatus(sys,this.actor.usagePeriods);context.brightIdeaLegacy=brightStatus.needsReview;context.brightIdeaLegacyMalformed=brightStatus.legacyUsed===null;
+    context.isGM=game.user.isGM;
+    context.professor=sys.coreClassIds?.includes("scientist");context.trailblazer=sys.coreClassIds?.includes("scout");
 
     // Training
     context.proficiencies = Object.entries(cfg.proficiencies).map(([k, p]) => ({
-      key: k, label: p.label, ...sys.proficiencies[k], hint: sys.proficiencyPicks?.hints?.[k]
+      key: k, label: p.label, ...(sys.proficiencyTotals ?? sys.proficiencies)[k], hint: sys.proficiencyPicks?.hints?.[k]
     }));
     context.focusGroups = ["cultures", "drive", "science"].map(skill => ({
       skill, label: cfg.skills[skill].name, picks: sys.focusPicks?.[skill],
-      options: cfg.focuses[skill].map(name => ({ name, checked: sys.focuses[skill].includes(name) }))
+      options: cfg.focuses[skill].map(name => ({ name, checked: (sys.focusTotals?.[skill] ?? sys.focuses[skill]).includes(name), granted: sys.forcedFocuses?.[skill]?.includes(name) }))
     }));
     context.professionText = sys.focuses.profession.join("\n");
+    context.forteSkills = {cultures:"Cultures",drive:"Drive",profession:"Profession",science:"Science"};
+    context.crossroadsTitles = Object.fromEntries(Object.entries(cfg.tables.crossroads).map(([key,value])=>[key,value.label]));
     context.fortesText = sys.focuses.fortes.join("\n");
+    context.hasContactFeatUpgrades=!!sys.contactFeatBindings?.length||sys.contacts.some(c=>c.networkingFeat||c.networkingMilestone);
+    context.contactFeatOptions=Object.fromEntries([['','No contact feat'],...(sys.contactFeatBindings??[]).map(b=>[b.name,b.name]),...sys.contacts.filter(c=>c.networkingFeat&&!sys.contactFeatBindings?.some(b=>b.name===c.networkingFeat)).map(c=>[c.networkingFeat,c.networkingFeat+' — source unavailable'])]);
+    const contactMilestones=new Set(Array.from({length:Math.floor((sys.skillTotals?.networking?.purchasedRanks??0)/4)},(_,i)=>(i+1)*4));
+    for(const c of sys.contacts)if(c.networkingMilestone)contactMilestones.add(c.networkingMilestone);
+    context.contactMilestones=Object.fromEntries([['0','No Networking feat upgrade'],...[...contactMilestones].sort((a,b)=>a-b).map(n=>[n,'Networking '+n+' purchased ranks'])]);
     context.contactGrades = Object.fromEntries(cfg.tables.contacts.map(c => [c.rank, `${c.rank} — ${c.grade}`]));
 
     // Gear
-    context.weapons = byType("weapon").map(w => ({ item: w, attack: actor.weaponAttack(w), caliber: cfg.calibers[w.system.caliber] }));
+    context.weapons = byType("weapon").map(w => ({ item: w, ammoConfiguration:ammunitionConfiguration(w.system), canPlanAmmunition:compatibleAmmunition(w.system,CONFIG.SPYCRAFT.tables?.ammunitionCatalog??[]).length>0, attack: actor.weaponAttack(w), caliber: cfg.calibers[w.system.caliber] }));
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
-    context.gear = byType("gear").map(g => ({ item: g, caliber: cfg.calibers[g.system.caliber] }));
+    context.safeHouseSource=safeHouseSource(sys);context.safeHouses=safeHouseRows(sys,cfg);
+    context.careerAgentReward={active:sys.activeFeatNames?.includes('Career Agent'),record:sys.careerAgentRewards?.[careerAgentMissionKey(sys)],review:getCareerAgentReview(this.actor)};
+    context.wellFundedActive=sys.activeFeatNames?.includes('Well-Funded');context.wellFundedCash=wellFundedCashHistory(sys);
+    context.toolShedSource=toolShedSource(sys);
+    context.gear = byType("gear").map(g => ({ item: g, caliber: cfg.calibers[g.system.caliber],toolShed:toolShedKitState(sys,g) }));
     context.gearPicks = Object.entries(sys.gearPicks ?? {}).map(([k, v]) => ({ key: k, label: cfg.gearPicks[k], ...v }));
     context.pickOptions = Object.fromEntries([["", "—"], ...Object.entries(cfg.gearPicks).map(([k]) => [k, k])]);
 
@@ -226,6 +464,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   _onRender(context, options) {
     super._onRender(context, options);
     for (const d of this.element.querySelectorAll("details[data-key]")) {
+      if(Object.hasOwn(this._open,d.dataset.key))d.open=this._open[d.dataset.key];
       d.addEventListener("toggle", () => { this._open[d.dataset.key] = d.open; });
     }
   }
@@ -245,36 +484,59 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     const flat = formData.object;
     const sys = this.actor.system;
     const progression = sys.progression.map(p => ({ ...p, skills: { ...p.skills } }));
-    const rows = { contacts: sys.contacts.map(r => ({ ...r })), subplots: sys.subplots.map(r => ({ ...r })) };
+    const rows = { contacts: sys.contacts.map(r => ({ ...r })), subplots: sys.subplots.map(r => ({ ...r })), skillFortes: (sys.skillFortes ?? []).map(r => ({ ...r })) };
     const changed = new Set();
+    const careerRequests=[];
     const itemUpdates = {};
     const skillIdx = Math.clamp(this._skillLevel ?? sys.level, 1, Math.max(1, sys.level)) - 1;
 
     for (const [k, v] of Object.entries(flat)) {
       let m;
       if ((m = k.match(/^progression\.(\d+)\.vitality$/))) {
-        if (progression[m[1]]) progression[m[1]].vitality = Number(v) || 0;
+        // Raw vitality is recorded through its source/audit control, not a plain form edit.
+      } else if ((m = k.match(/^progression\.(\d+)\.intelligenceModifier$/))) {
+        const value=v === "" || v == null ? null : Number(v);
+        careerRequests.push({index:Number(m[1]),field:"intelligenceModifier",value});
+        if (progression[m[1]]) progression[m[1]].intelligenceModifier=value;
         changed.add("progression");
+      } else if ((m = k.match(/^system\.skills\.(\w+)\.classSkill$/))) {
+        if (v && !sys.skills?.[m[1]]?.classSkill) flat[`system.skills.${m[1]}.classSkillAt`] = skillIdx + 1;
+        continue;
       } else if ((m = k.match(/^skillpts\.(\w+)$/))) {
         if (progression[skillIdx]) {
-          const n = Number(v) || 0;
+          const n = v === "" || v == null ? 0 : Number(v);
+          careerRequests.push({index:skillIdx,field:"skill",key:m[1],value:n});
           if (n) progression[skillIdx].skills[m[1]] = n;
           else delete progression[skillIdx].skills[m[1]];
         }
         changed.add("progression");
+      } else if ((m = k.match(/^inheritedChoice\.(\w+)\.(\w+)\.(option|skill)$/))) {
+        (itemUpdates[m[1]] ??= {})[`system.inheritedChoices.${m[2]}.${m[3]}`] = m[3]==="option"?(v===""||v==null?null:Number(v)):v;
+      } else if ((m = k.match(/^specialistChoice\.(\w+)\.(\d+)\.(mode|proficiency)$/))) {
+        (itemUpdates[m[1]] ??= {})[`system.weaponSpecialist.${m[2]}.${m[3]}`] = v;
+      } else if ((m = k.match(/^classSkillChoice\.(\w+)\.(\w+)$/))) {
+        (itemUpdates[m[1]] ??= {})[`system.skillChoices.${m[2]}`] = v;
+      } else if ((m = k.match(/^classField\.(\w+)\.(\w+)$/))) {
+        (itemUpdates[m[1]] ??= {})[`system.${m[2]}`] = v;
+      } else if ((m = k.match(/^originChoice\.(\w+)\.(\w+)$/))) {
+        (itemUpdates[m[1]] ??= {})[`system.originChoices.${m[2]}`] = v;
       } else if ((m = k.match(/^choice\.(\w+)\.(\d+)$/))) {
-        (itemUpdates[m[1]] ??= {})[`system.choices.${m[2]}`] = v === "" ? null : Number(v);
-      } else if ((m = k.match(/^(contacts|subplots)\.(\d+)\.(\w+)$/))) {
+        (itemUpdates[m[1]] ??= {})[`system.choices.${m[2]}`] = v === "" || v == null || !Number.isFinite(Number(v)) ? null : Number(v);
+      } else if ((m = k.match(/^(contacts|subplots|skillFortes)\.(\d+)\.(\w+)$/))) {
         if (rows[m[1]][m[2]]) rows[m[1]][m[2]][m[3]] = v;
         changed.add(m[1]);
+      } else if (k === "system.startingIntelligenceModifier") {
+        flat[k] = v === "" || v == null || !Number.isFinite(Number(v)) ? null : Number(v);
+        continue;
       } else if (k === "professionText" || k === "fortesText") {
         flat[`system.focuses.${k === "professionText" ? "profession" : "fortes"}`] =
           String(v).split(/\n+/).map(s => s.trim()).filter(Boolean);
       } else continue;
       delete flat[k];
     }
+    this._pendingCareerForm=changed.has("progression")?careerFormPlan(sys.progression,careerRequests):null;
     if (changed.has("progression")) flat["system.progression"] = progression;
-    for (const key of ["contacts", "subplots"]) if (changed.has(key)) flat[`system.${key}`] = rows[key];
+    for (const key of ["contacts", "subplots", "skillFortes"]) if (changed.has(key)) flat[`system.${key}`] = rows[key];
     this._pendingItemUpdates = itemUpdates;
     return super._prepareSubmitData(event, form, formData, updateData);
   }
@@ -282,8 +544,25 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   async _processSubmitData(event, form, submitData, options) {
     const itemUpdates = Object.entries(this._pendingItemUpdates ?? {}).map(([_id, u]) => ({ _id, ...u }));
     this._pendingItemUpdates = null;
-    if (itemUpdates.length) await this.actor.updateEmbeddedDocuments("Item", itemUpdates);
-    return super._processSubmitData(event, form, submitData, options);
+    const careerPlan=this._pendingCareerForm;this._pendingCareerForm=null;
+    if(Object.hasOwn(submitData,"system.progression")&&!careerPlan)throw new Error("Use the career form controls to edit progression.");
+    if(careerPlan&&!careerPlan.edits.length)delete submitData["system.progression"];
+    const resources=['system.actionDice.value','system.vitality.value','system.wounds.value','system.reputation','system.netWorth','system.xp'];
+    const edited=event?.target?.name;
+    // A full auto-submit includes stale resource inputs. Only an explicitly edited resource may overwrite its value.
+    for(const path of resources)if(path!==edited){delete submitData[path];const keys=path.split('.');let parent=submitData;for(const key of keys.slice(0,-1))parent=parent?.[key];if(parent)delete parent[keys.at(-1)];}
+    if(this.actor.system?.focusPicks?.generic.reservedAvailable){
+      const system=foundry.utils.mergeObject(this.actor.system.toObject(),foundry.utils.expandObject(submitData).system??{}, {inplace:false});system.usagePeriods=this.actor.usagePeriods;Object.assign(system,this.actor.attributeRuleContext);
+      computeAgent(system,this.actor.items.map(i=>({id:i.id,name:i.name,type:i.type,system:i.system})),CONFIG.SPYCRAFT);
+      if(system.focusPicks.generic.unscopedRemaining<Math.min(0,this.actor.system.focusPicks.generic.unscopedRemaining)){this.render();return ui.notifications.warn("Use each temporary Depth of Study source to spend its reserved focus/forte picks.");}
+    }
+    const save=async()=>{
+      if(careerPlan?.edits.length){if(this.actor.isOwner!==true)throw new Error("You must own the character before editing its career.");mergeCareerForm(this.actor.system.progression,careerPlan);}
+      if(itemUpdates.length)await this.actor.updateEmbeddedDocuments("Item",itemUpdates);
+      if(careerPlan?.edits.length)submitData["system.progression"]=mergeCareerForm(this.actor.system.progression,careerPlan);
+      return super._processSubmitData(event,form,submitData,options);
+    };
+    return resources.includes(edited)||careerPlan?.edits.length?queueResources([this.actor],save):save();
   }
 
   /** Dropping a class adds a level; origins replace the existing talent/specialty. */
@@ -292,6 +571,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     if (item.parent === this.actor) return super._onDropItem(event, item);
     if (item.type === "class") return this.actor.addClassLevel(item);
     if (item.type === "feat") {
+      if (!item.system.repeatable && this.actor.items.some(i => i.type === "feat" && i.name.trim().toLowerCase() === item.name.trim().toLowerCase())) {
+        return ui.notifications.warn(`${item.name} may only be selected once.`);
+      }
       const data = item.toObject?.() ?? foundry.utils.deepClone(item);
       delete data._id;
       data.system.acquiredAtLevel = Math.max(1, this.actor.system.level ?? 1);
@@ -314,22 +596,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   }
 
   static #onRollAbility(event, target) { return this.actor.rollAbility(target.dataset.ability); }
-  static #onRollSave(event, target) { return this.actor.rollSave(target.dataset.save); }
+  static #onRollSave(event, target) { return this.actor.rollSave(target.dataset.save,{askContext:true}); }
   static #onRollSkill(event, target) { return this.actor.rollSkill(target.dataset.skill, target.dataset.ability || null); }
-  static #onRollAttack(event, target) { return this.actor.rollAttack(this._item(target)); }
+  static #onRollAttack(event, target) { return this.actor.rollAttack(this._item(target),{askContext:true}); }
   static #onRollDamage(event, target) { return this.actor.rollDamage(this._item(target)); }
   static #onRollInitiative() { return this.actor.rollInitiative({ createCombatants: true }); }
-  static async #onRollVitality(event, target) {
-    const index = Number(target.dataset.index);
-    if (this.actor.system.progression[index]?.vitality) {
-      const ok = await foundry.applications.api.DialogV2.confirm({
-        window: { title: game.i18n.localize("SPYCRAFT.VitalityRoll") },
-        content: `<p>${game.i18n.format("SPYCRAFT.VitalityReroll", { level: index + 1 })}</p>`
-      });
-      if (!ok) return;
-    }
-    return this.actor.rollVitality(index);
-  }
+  static #onRollVitality(event,target) {return this.actor.rollVitality(Number(target.dataset.index));}
   /** Jump from a to-do entry to the tab where it gets resolved. */
   static #onTodo(event, target) {
     const { tab, skillLevel } = target.dataset;
@@ -338,7 +610,6 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     if (skillLevel) return this.render({ parts: ["skills"] });
   }
   static #onSpendActionDie() { return this.actor.rollActionDie(); }
-  static #onRefreshActionDice() { return this.actor.update({ "system.actionDice.value": this.actor.system.actionDice.max }); }
   static #onAddLevel() { return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true); }
   static async #onRemoveLevel() {
     const ok = await foundry.applications.api.DialogV2.confirm({
@@ -359,7 +630,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     if (item.type === "armor" && !item.system.equipped) {
       // Toggle all suits in one embedded-document update, so never count two.
       return this.actor.updateEmbeddedDocuments("Item", [
-        ...this.actor.items.filter(i => i.type === "armor" && i.system.equipped)
+        ...this.actor.items.filter(i => i.type === "armor" && i.system.equipped && (armorSlot(i) === armorSlot(item) || (item.system.sealed && armorSlot(i) === "helmet") || (armorSlot(item) === "helmet" && i.system.sealed)))
           .map(i => ({ _id: i.id, "system.equipped": false })),
         { _id: item.id, "system.equipped": true }
       ]);
@@ -372,14 +643,19 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   }
   static #onToggleFocus(event, target) {
     const { skill, value } = target.dataset;
-    const list = new Set(this.actor.system.focuses[skill]);
-    if (list.has(value)) list.delete(value); else list.add(value);
+    const aliases = CONFIG.SPYCRAFT.tables.focusAliases ?? {};
+    const list = new Set(this.actor.system.focuses[skill].map(value=>aliases[value] ?? value));
+    if (list.has(value)) list.delete(value); else {
+      const picks=this.actor.system.focusPicks;
+      if(picks.generic.reservedAvailable&&picks[skill].remaining<=0&&picks.generic.unscopedRemaining<=0){this.render();return ui.notifications.warn("Use the temporary Depth of Study control on Training to spend its source-scoped picks.");}
+      list.add(value);
+    }
     return this.actor.update({ [`system.focuses.${skill}`]: [...list] });
   }
   static #onAddRow(event, target) {
     const key = target.dataset.list;
-    const row = key === "contacts" ? { name: "", rank: 1, notes: "" } : { name: "", notes: "", complete: false };
-    return this.actor.update({ [`system.${key}`]: [...this.actor.system[key].map(r => ({ ...r })), row] });
+    const row = key === "contacts" ? { name: "", rank: 1, notes: "" } : key === "skillFortes" ? {skill:"drive",focus:"",forte:""} : { name: "", notes: "", complete: false };
+    return this.actor.update({ [`system.${key}`]: [...(this.actor.system[key] ?? []).map(r => ({ ...r })), row] });
   }
   static #onRemoveRow(event, target) {
     const key = target.dataset.list;
@@ -405,6 +681,13 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      applyShaken(){return this.actor.applyShaken();},
+      reviewShakenApplication(){return this.actor.reviewShakenApplication();},
+      editShakenSource(event,target){return this.actor.editShakenSource(target.dataset.sourceUuid);},
+      reviewShakenInitiative(event,target){return this.actor.reviewShakenInitiative(target.dataset.combatId,target.dataset.combatantId);},
+      applyBaffled(){return this.actor.applyBaffled();},
+      reviewBaffledApplication(){return this.actor.reviewBaffledApplication();},
+      setNpcSkillCondition(event,target){return this.actor.setReviewedCondition(target.dataset.condition);},
       npcEnable: SpycraftNpcSheet.#onEnable,
       npcAddSkill: SpycraftNpcSheet.#onAddSkill,
       npcAddQuality: SpycraftNpcSheet.#onAddQuality,
@@ -425,11 +708,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const context = await super._prepareContext(options);
     const sys = this.actor.system;
     Object.assign(context, {
-      actor: this.actor, system: sys, config: CONFIG.SPYCRAFT, editable: this.isEditable,
+      actor: this.actor, system: sys, shakenInitiativeReviews:this.actor.shakenInitiativeReviews, isGM:game.user.isGM, config: CONFIG.SPYCRAFT, editable: this.isEditable,
       abilities: Object.entries(CONFIG.SPYCRAFT.abilities).map(([key, label]) => ({ key, label: game.i18n.localize(label), ...sys.abilities[key] })),
       saves: Object.entries(CONFIG.SPYCRAFT.saves).map(([key, s]) => ({ key, label: game.i18n.localize(s.label), ...sys.saves[key] })),
-      weapons: this.actor.items.filter(i => i.type === "weapon").map(w => ({ item: w, attack: this.actor.weaponAttack(w) })),
-      otherItems: this.actor.items.filter(i => i.type !== "weapon"),
+      weapons: this.actor.items.filter(i => i.type === "weapon").map(w => ({ item: w, ammoConfiguration:ammunitionConfiguration(w.system), canPlanAmmunition:compatibleAmmunition(w.system,CONFIG.SPYCRAFT.tables?.ammunitionCatalog??[]).length>0, attack: this.actor.weaponAttack(w) })),
+      otherItems: this.actor.items.filter(i => i.type !== "weapon"&&!isResourceLock(i)),
       npcTypes: { standard: "Standard", special: "Special", villain: "Villain (legacy special)", animal: "Animal" },
       npc: this._npcContext(),
       enrichedBiography: await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.biography, { secrets: this.actor.isOwner })
@@ -439,7 +722,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   _npcContext() {
     const sys = this.actor.system, profile = sys.npcProfile ?? defaultNpcProfile();
-    const result = computeNpcProfile(profile, sys.npcType, sys.threatLevel, sys.abilities);
+    const result = conditionNpcProfile(computeNpcProfile(profile, sys.npcType, sys.threatLevel, sys.abilities),npcSkillConditionContext(this.actor));
     const gradeOptions = Object.fromEntries(NPC_RULES.grades.map((g, i) => [i + 1, g]));
     const skillOptions = Object.fromEntries(Object.entries(CONFIG.SPYCRAFT.skills).map(([k, v]) => [k, v.name]));
     return { profile, result, gradeOptions, wealthOptions: {0:"None", ...gradeOptions},
@@ -510,8 +793,8 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   _item(target) { return this.actor.items.get(target.closest("[data-item-id]")?.dataset.itemId); }
   static #onRollAbility(event, target) { return this.actor.rollAbility(target.dataset.ability); }
-  static #onRollSave(event, target) { return this.actor.rollSave(target.dataset.save); }
-  static #onRollAttack(event, target) { return this.actor.rollAttack(this._item(target)); }
+  static #onRollSave(event, target) { return this.actor.rollSave(target.dataset.save,{askContext:true}); }
+  static #onRollAttack(event, target) { return this.actor.rollAttack(this._item(target),{askContext:true}); }
   static #onRollDamage(event, target) { return this.actor.rollDamage(this._item(target)); }
   static #onItemEdit(event, target) { return this._item(target)?.sheet.render(true); }
   static #onItemDelete(event, target) { return this._item(target)?.deleteDialog(); }

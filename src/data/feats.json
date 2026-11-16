@@ -5,7 +5,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 13,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Armor Mastery",
@@ -26,7 +28,9 @@
      "name": "Armor Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Armor Supremacy",
@@ -47,7 +51,9 @@
      "name": "Armor Mastery"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Bandage",
@@ -60,7 +66,9 @@
    }
   ],
   "row": 16,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Battle Hardened",
@@ -68,7 +76,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 17,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Superior Cover",
@@ -89,7 +99,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Combat Expertise",
@@ -101,7 +113,9 @@
    "type": "base",
    "key": "defense",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Expert Disarm",
@@ -112,7 +126,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Combat Expertise"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Combat Instincts",
@@ -120,7 +136,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 21,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Opportunist",
@@ -141,7 +159,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Combat Mobility",
@@ -149,7 +169,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 23,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mobile Defense",
@@ -170,7 +192,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mobile Offense",
@@ -191,7 +215,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Containment Basics",
@@ -199,7 +225,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 26,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Containment Mastery",
@@ -210,7 +238,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Containment Basics"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Containment Supremacy",
@@ -221,7 +251,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Containment Mastery"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Contempt",
@@ -232,7 +264,9 @@
   "prerequisites": {
    "type": "level",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Explosive Basics",
@@ -243,7 +277,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "explosives"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fire-Team Basics",
@@ -251,7 +287,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 31,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fire-Team Mastery",
@@ -262,7 +300,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Fire-Team Basics"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fire-Team Supremacy",
@@ -273,7 +313,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Fire-Team Mastery"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Great Fortitude",
@@ -281,7 +323,7 @@
   "notChecked": false,
   "bonuses": [
    {
-    "target": "saves.fort",
+    "target": "baseSave.fort",
     "value": "3"
    },
    {
@@ -290,7 +332,9 @@
    }
   ],
   "row": 34,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Guts",
@@ -298,7 +342,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 35,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Quick Healer",
@@ -309,7 +355,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Guts"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Horde Basics",
@@ -317,7 +365,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 37,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Horde Mastery",
@@ -328,7 +378,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Horde Basics"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Horde Supremacy",
@@ -339,7 +391,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Horde Mastery"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Iron Will",
@@ -347,12 +401,22 @@
   "notChecked": false,
   "bonuses": [
    {
-    "target": "saves.will",
+    "target": "baseSave.will",
+    "value": "3"
+   },
+   {
+    "target": "stressThreshold",
+    "value": "3"
+   },
+   {
+    "target": "subdualThreshold",
     "value": "3"
    }
   ],
   "row": 40,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Lightning Reflexes",
@@ -360,12 +424,14 @@
   "notChecked": false,
   "bonuses": [
    {
-    "target": "saves.ref",
+    "target": "baseSave.ref",
     "value": "3"
    }
   ],
   "row": 41,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Quick Draw",
@@ -373,7 +439,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 42,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Snake Strike",
@@ -394,7 +462,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Surge of Speed",
@@ -402,7 +472,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 44,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tac-Squad Basics",
@@ -410,7 +482,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 45,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tac-Squad Mastery",
@@ -421,7 +495,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Tac-Squad Basics"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tac-Squad Supremacy",
@@ -432,7 +508,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Tac-Squad Mastery"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tactical Advantage",
@@ -444,7 +522,9 @@
    "type": "skill",
    "key": "tactics",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Toughness",
@@ -457,7 +537,9 @@
    }
   ],
   "row": 49,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": true,
+  "maxSelections": 3
  },
  {
   "name": "Two-Weapon Basics",
@@ -469,7 +551,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Two-Weapon Mastery",
@@ -490,7 +574,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Weapon Focus",
@@ -498,7 +584,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 52,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Wolfpack Basics",
@@ -509,7 +597,9 @@
   "prerequisites": {
    "type": "level",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wolfpack Mastery",
@@ -529,7 +619,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wolfpack Supremacy",
@@ -549,7 +641,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "All-out Attack",
@@ -561,7 +655,9 @@
    "type": "ability",
    "key": "str",
    "min": 13
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Axe Basics",
@@ -572,7 +668,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "edged"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Battering Blows",
@@ -580,7 +678,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 58,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Cleave Basics",
@@ -592,7 +692,9 @@
    "type": "base",
    "key": "bab",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Cleave Mastery",
@@ -613,7 +715,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Cleave Supremacy",
@@ -634,7 +738,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Club Basics",
@@ -645,7 +751,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "blunt"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Darting Weapon",
@@ -667,7 +775,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Flashing Weapon",
@@ -693,7 +803,9 @@
      "min": 2
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Dueling Basics",
@@ -705,7 +817,9 @@
    "type": "base",
    "key": "defense",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Dueling Mastery",
@@ -726,7 +840,9 @@
      "min": 2
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Dueling Supremacy",
@@ -747,7 +863,9 @@
      "min": 4
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fencing Basics",
@@ -758,7 +876,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "edged"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Finesse Basics",
@@ -770,7 +890,9 @@
    "type": "base",
    "key": "bab",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Finesse Mastery",
@@ -791,7 +913,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Finesse Supremacy",
@@ -812,7 +936,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Flail Basics",
@@ -823,7 +949,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "exoticBlunt"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Garrote Basics",
@@ -834,7 +962,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "blunt"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Great Sword Basics",
@@ -845,7 +975,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "exoticEdged"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Hammer Basics",
@@ -856,7 +988,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "blunt"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Improvised Weapon Basics",
@@ -864,7 +998,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 76,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Improvised Weapon Mastery",
@@ -885,7 +1021,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Knife Basics",
@@ -896,7 +1034,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "edged"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Polearm Basics",
@@ -907,7 +1047,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "exoticEdged"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Spear Basics",
@@ -918,7 +1060,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "exoticEdged"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Staff Basics",
@@ -929,7 +1073,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "exoticBlunt"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Sword Basics",
@@ -940,7 +1086,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "edged"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Whip Basics",
@@ -951,7 +1099,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "exoticBlunt"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Autofire Basics",
@@ -963,7 +1113,9 @@
    "type": "base",
    "key": "bab",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Autofire Mastery",
@@ -984,7 +1136,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Autofire Supremacy",
@@ -1005,7 +1159,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Bombard",
@@ -1016,7 +1172,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "indirectFire"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Bullseye",
@@ -1028,7 +1186,9 @@
    "type": "ability",
    "key": "dex",
    "min": 13
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "CQB Basics",
@@ -1040,7 +1200,9 @@
    "type": "base",
    "key": "bab",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "CQB Mastery",
@@ -1061,7 +1223,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "CQB Supremacy",
@@ -1082,7 +1246,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Flamethrower Basics",
@@ -1093,7 +1259,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "tactical"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Follow-up Shot",
@@ -1115,7 +1283,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Hail of Fire",
@@ -1141,7 +1311,9 @@
      "min": 2
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Grenade Basics",
@@ -1152,7 +1324,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "hurled"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Guided Weapon Basics",
@@ -1163,7 +1337,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "guided"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Gunslinger's Eye",
@@ -1175,7 +1351,9 @@
    "type": "featTree",
    "tree": "rangedCombat",
    "min": 2
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Marksmanship Basics",
@@ -1187,7 +1365,9 @@
    "type": "base",
    "key": "bab",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Marksmanship Mastery",
@@ -1208,7 +1388,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Marksmanship Supremacy",
@@ -1229,7 +1411,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Revolver Basics",
@@ -1240,7 +1424,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "handgun"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Rock and Roll",
@@ -1260,7 +1446,9 @@
      "key": "tactical"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Sharpshooter Basics",
@@ -1272,7 +1460,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Sharpshooter Mastery",
@@ -1293,7 +1483,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Sharpshooter Supremacy",
@@ -1314,7 +1506,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Snap Shot",
@@ -1326,7 +1520,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Steel Rain",
@@ -1337,7 +1533,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "hurled"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Style Over Caliber",
@@ -1348,10 +1546,12 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "handgun"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
-  "name": "This\u2026 is my Boomstick",
+  "name": "This… is my Boomstick",
   "tree": "Ranged Combat",
   "notChecked": false,
   "bonuses": [],
@@ -1359,7 +1559,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "shotgun"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Trick Shot",
@@ -1370,7 +1572,9 @@
   "prerequisites": {
    "type": "proficiency",
    "key": "hurled"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Berserker Basics",
@@ -1382,7 +1586,9 @@
    "type": "base",
    "key": "bab",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Berserker Mastery",
@@ -1403,7 +1609,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Berserker Supremacy",
@@ -1424,7 +1632,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Boxing Basics",
@@ -1437,7 +1647,9 @@
    }
   ],
   "row": 114,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Boxing Moves",
@@ -1449,7 +1661,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Boxing Supremacy",
@@ -1479,7 +1693,9 @@
      "name": "Boxing Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Brawling Basics",
@@ -1492,7 +1708,9 @@
    }
   ],
   "row": 117,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Brawling Moves",
@@ -1504,7 +1722,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Brawling Supremacy",
@@ -1529,7 +1749,9 @@
      "name": "Brawling Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Dirty Fighting Basics",
@@ -1537,7 +1759,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 120,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Dirty Fighting Moves",
@@ -1549,7 +1773,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Dirty Fighting Supremacy",
@@ -1574,7 +1800,9 @@
      "name": "Dirty Fighting Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Kicking Basics",
@@ -1582,7 +1810,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 123,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Kicking Moves",
@@ -1594,7 +1824,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Kicking Supremacy",
@@ -1624,7 +1856,9 @@
      "name": "Kicking Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Martial Arts",
@@ -1649,10 +1883,12 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
-  "name": "Master's Arts",
+  "name": "Master's Art",
   "tree": "Unarmed Combat",
   "notChecked": false,
   "bonuses": [],
@@ -1674,7 +1910,9 @@
      "min": 2
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Rolling Basics",
@@ -1682,7 +1920,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 128,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Rolling Moves",
@@ -1694,7 +1934,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Rolling Supremacy",
@@ -1724,7 +1966,9 @@
      "name": "Rolling Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Spirit Basics",
@@ -1732,7 +1976,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 131,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Spirit Moves",
@@ -1744,7 +1990,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Spirit Supremacy",
@@ -1774,7 +2022,9 @@
      "name": "Spirit Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Submission Basics",
@@ -1782,7 +2032,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 134,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Submission Moves",
@@ -1794,7 +2046,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Submission Supremacy",
@@ -1819,7 +2073,9 @@
      "name": "Submission Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Two-hit Combo",
@@ -1841,7 +2097,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Warrior's Grace",
@@ -1867,15 +2125,19 @@
      "min": 2
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
-  "name": "Vital Points Basic",
+  "name": "Vital Points Basics",
   "tree": "Unarmed Combat",
   "notChecked": false,
   "bonuses": [],
   "row": 139,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Vital Points Moves",
@@ -1887,7 +2149,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Vital Points Supremacy",
@@ -1909,10 +2173,12 @@
     },
     {
      "type": "feat",
-     "name": "Vital Points Basic"
+     "name": "Vital Points Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wrestling Basics",
@@ -1920,7 +2186,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 142,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wrestling Moves",
@@ -1932,7 +2200,9 @@
    "type": "base",
    "key": "bab",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wrestling Supremacy",
@@ -1962,7 +2232,9 @@
      "name": "Wrestling Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "All or Nothing",
@@ -1970,7 +2242,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 145,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Better Luck Next Time",
@@ -1981,7 +2255,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "All or Nothing"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fortune's Fool",
@@ -1992,7 +2268,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Better Luck Next Time"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Black Cat",
@@ -2000,7 +2278,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 148,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Jinx",
@@ -2020,7 +2300,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tough Luck",
@@ -2040,7 +2322,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "The Dice are Hot",
@@ -2053,7 +2337,9 @@
    }
   ],
   "row": 151,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fortunate",
@@ -2061,7 +2347,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 152,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fortune Favors the Bold",
@@ -2081,7 +2369,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Lady Luck's Smile",
@@ -2101,7 +2391,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Lucky Break",
@@ -2109,7 +2401,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 155,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Misfortune",
@@ -2129,7 +2423,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Peculiar Dodge",
@@ -2149,7 +2445,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mark of Conflict",
@@ -2160,7 +2458,9 @@
   "prerequisites": {
    "type": "level",
    "eq": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mark of Strife",
@@ -2171,7 +2471,9 @@
   "prerequisites": {
    "type": "level",
    "eq": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mark of Turmoil",
@@ -2182,7 +2484,9 @@
   "prerequisites": {
    "type": "level",
    "eq": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Trouble Magnet",
@@ -2195,7 +2499,9 @@
    }
   ],
   "row": 161,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": true,
+  "maxSelections": 2
  },
  {
   "name": "Baby It",
@@ -2203,7 +2509,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 162,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Demolition Derby",
@@ -2223,7 +2531,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Death Ride",
@@ -2248,7 +2558,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Bail Out!",
@@ -2260,7 +2572,9 @@
    "type": "skill",
    "key": "acrobatics",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Daredevil",
@@ -2271,7 +2585,9 @@
   "prerequisites": {
    "type": "level",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Crew Dog",
@@ -2292,7 +2608,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Lane Dancer",
@@ -2318,7 +2636,9 @@
      ]
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mount Up",
@@ -2339,7 +2659,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Photo Finish",
@@ -2350,7 +2672,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Daredevil"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wave Runner",
@@ -2377,7 +2701,9 @@
      ]
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wind Rider",
@@ -2404,7 +2730,9 @@
      ]
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Dash",
@@ -2416,7 +2744,9 @@
    "type": "skill",
    "key": "athletics",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Sprint",
@@ -2432,7 +2762,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Dash"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Defensive Driving",
@@ -2440,7 +2772,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 175,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Jackrabbit Start",
@@ -2451,7 +2785,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Defensive Driving"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Driving Instincts",
@@ -2463,7 +2799,9 @@
    "type": "featTree",
    "tree": "chase",
    "min": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Professional Driver - Closed Course",
@@ -2489,7 +2827,9 @@
      "min": 2
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Duct Tape and Bubblegum",
@@ -2501,7 +2841,9 @@
    "type": "skill",
    "key": "mechanics",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Get Radical!",
@@ -2509,7 +2851,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 180,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Need for Speed",
@@ -2517,7 +2861,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 181,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Offensive Driving",
@@ -2525,7 +2871,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 182,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Relentless Pursuit",
@@ -2536,7 +2884,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Offensive Driving"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "One Hand on the Wheel",
@@ -2544,7 +2894,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 184,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Simulator Jockey",
@@ -2556,7 +2908,9 @@
    "type": "skill",
    "key": "drive",
    "min": 4
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Ambush Basics",
@@ -2568,7 +2922,9 @@
    "type": "skill",
    "key": "tactics",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Ambush Mastery",
@@ -2589,7 +2945,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Ambush Supremacy",
@@ -2610,26 +2968,44 @@
      "min": 18
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Bludgeon",
   "tree": "Covert",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 189,
-  "prerequisites": null
+  "prerequisites": {
+   "type": "sneakAttack",
+   "min": 1
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Whack",
   "tree": "Covert",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 190,
   "prerequisites": {
-   "type": "feat",
-   "name": "Bludgeon"
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Bludgeon"
+    },
+    {
+     "type": "sneakAttack",
+     "min": 3
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Concealed Carry",
@@ -2637,18 +3013,31 @@
   "notChecked": false,
   "bonuses": [],
   "row": 191,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Deadly Precision",
   "tree": "Covert",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 192,
   "prerequisites": {
-   "type": "level",
-   "min": 9
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 9
+    },
+    {
+     "type": "sneakAttack",
+     "min": 2
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "No Quarter",
@@ -2668,15 +3057,22 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Crippling Strike",
   "tree": "Covert",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 194,
-  "prerequisites": null
+  "prerequisites": {
+   "type": "sneakAttack",
+   "min": 3
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Equilibrium Basics",
@@ -2688,7 +3084,9 @@
    "type": "skill",
    "key": "acrobatics",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Equilibrium Mastery",
@@ -2709,7 +3107,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Equilibrium Supremacy",
@@ -2730,18 +3130,31 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Executioner",
   "tree": "Covert",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 198,
   "prerequisites": {
-   "type": "level",
-   "min": 9
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "level",
+     "min": 9
+    },
+    {
+     "type": "sneakAttack",
+     "min": 1
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Merciless",
@@ -2761,7 +3174,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Faceless",
@@ -2773,7 +3188,9 @@
    "type": "skill",
    "key": "blend",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Traceless",
@@ -2794,7 +3211,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Zeroed",
@@ -2815,7 +3234,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Ghost Basics",
@@ -2827,7 +3248,9 @@
    "type": "skill",
    "key": "sneak",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Ghost Mastery",
@@ -2848,7 +3271,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Ghost Supremacy",
@@ -2869,7 +3294,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mingling Basics",
@@ -2881,7 +3308,9 @@
    "type": "skill",
    "key": "blend",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mingling Mastery",
@@ -2902,7 +3331,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mingling Supremacy",
@@ -2923,7 +3354,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Spider Basics",
@@ -2935,7 +3368,9 @@
    "type": "skill",
    "key": "athletics",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Spider Mastery",
@@ -2956,7 +3391,9 @@
      "min": 6
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Spider Supremacy",
@@ -2977,7 +3414,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Clean and Polished",
@@ -2985,7 +3424,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 212,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mother Hen",
@@ -2996,7 +3437,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Clean and Polished"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Extra Gear",
@@ -3004,40 +3447,78 @@
   "notChecked": false,
   "bonuses": [],
   "row": 214,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Electronic Warrior",
   "tree": "Gear",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 215,
   "prerequisites": {
-   "type": "feat",
-   "name": "Extra Gear"
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Extra Gear"
+    },
+    {
+     "type": "featChoice",
+     "name": "Extra Gear",
+     "choice": "Electronics"
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Micro-miniaturized",
   "tree": "Gear",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 216,
   "prerequisites": {
-   "type": "feat",
-   "name": "Extra Gear"
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Extra Gear"
+    },
+    {
+     "type": "featChoice",
+     "name": "Extra Gear",
+     "choice": "Gadgets"
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Trap Master",
   "tree": "Gear",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 217,
   "prerequisites": {
-   "type": "feat",
-   "name": "Extra Gear"
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "feat",
+     "name": "Extra Gear"
+    },
+    {
+     "type": "featChoice",
+     "name": "Extra Gear",
+     "choice": "Security"
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Favored Gear",
@@ -3045,7 +3526,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 218,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Signature Gear",
@@ -3065,7 +3548,9 @@
      "name": "Favored Gear"
     }
    ]
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Trademark Gear",
@@ -3085,7 +3570,9 @@
      "name": "Signature Gear"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Home Sweet Home",
@@ -3098,7 +3585,9 @@
    }
   ],
   "row": 221,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tool Shed",
@@ -3109,7 +3598,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Home Sweet Home"
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Pack Rat",
@@ -3122,7 +3613,9 @@
    }
   ],
   "row": 223,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Personal Stash",
@@ -3133,7 +3626,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Pack Rat"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Silver Spoon",
@@ -3146,7 +3641,9 @@
    }
   ],
   "row": 225,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Well-Funded",
@@ -3157,7 +3654,9 @@
   "prerequisites": {
    "type": "feat",
    "name": "Silver Spoon"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Actor",
@@ -3166,23 +3665,27 @@
   "bonuses": [
    {
     "target": "skills.bluff.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.bluff.threat",
-    "value": "1"
+    "target": "skills.bluff.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.impress.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.impress.threat",
-    "value": "1"
+    "target": "skills.impress.baseThreat",
+    "value": "19"
    }
   ],
   "row": 227,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Advisor",
@@ -3191,23 +3694,27 @@
   "bonuses": [
    {
     "target": "skills.profession.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.profession.threat",
-    "value": "1"
+    "target": "skills.profession.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.resolve.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.resolve.threat",
-    "value": "1"
+    "target": "skills.resolve.baseThreat",
+    "value": "19"
    }
   ],
   "row": 228,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Burglar",
@@ -3216,23 +3723,27 @@
   "bonuses": [
    {
     "target": "skills.acrobatics.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.acrobatics.threat",
-    "value": "1"
+    "target": "skills.acrobatics.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.sneak.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.sneak.threat",
-    "value": "1"
+    "target": "skills.sneak.baseThreat",
+    "value": "19"
    }
   ],
   "row": 229,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Diplomat",
@@ -3241,23 +3752,27 @@
   "bonuses": [
    {
     "target": "skills.networking.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.networking.threat",
-    "value": "1"
+    "target": "skills.networking.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.senseMotive.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.senseMotive.threat",
-    "value": "1"
+    "target": "skills.senseMotive.baseThreat",
+    "value": "19"
    }
   ],
   "row": 230,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Examiner",
@@ -3266,23 +3781,27 @@
   "bonuses": [
    {
     "target": "skills.analysis.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.analysis.threat",
-    "value": "1"
+    "target": "skills.analysis.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.medicine.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.medicine.threat",
-    "value": "1"
+    "target": "skills.medicine.baseThreat",
+    "value": "19"
    }
   ],
   "row": 231,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fence",
@@ -3291,23 +3810,27 @@
   "bonuses": [
    {
     "target": "skills.sleightOfHand.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.sleightOfHand.threat",
-    "value": "1"
+    "target": "skills.sleightOfHand.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.streetwise.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.streetwise.threat",
-    "value": "1"
+    "target": "skills.streetwise.baseThreat",
+    "value": "19"
    }
   ],
   "row": 232,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Hustler",
@@ -3316,23 +3839,27 @@
   "bonuses": [
    {
     "target": "skills.falsify.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.falsify.threat",
-    "value": "1"
+    "target": "skills.falsify.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.manipulate.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.manipulate.threat",
-    "value": "1"
+    "target": "skills.manipulate.baseThreat",
+    "value": "19"
    }
   ],
   "row": 233,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Observer",
@@ -3341,23 +3868,27 @@
   "bonuses": [
    {
     "target": "skills.notice.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.notice.threat",
-    "value": "1"
+    "target": "skills.notice.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.search.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.search.threat",
-    "value": "1"
+    "target": "skills.search.baseThreat",
+    "value": "19"
    }
   ],
   "row": 234,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Officer",
@@ -3366,23 +3897,27 @@
   "bonuses": [
    {
     "target": "skills.intimidate.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.intimidate.threat",
-    "value": "1"
+    "target": "skills.intimidate.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.tactics.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.tactics.threat",
-    "value": "1"
+    "target": "skills.tactics.baseThreat",
+    "value": "19"
    }
   ],
   "row": 235,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Private Eye",
@@ -3391,23 +3926,27 @@
   "bonuses": [
    {
     "target": "skills.investigation.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.investigation.threat",
-    "value": "1"
+    "target": "skills.investigation.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.security.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.security.threat",
-    "value": "1"
+    "target": "skills.security.baseThreat",
+    "value": "19"
    }
   ],
   "row": 236,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Scholar",
@@ -3416,23 +3955,27 @@
   "bonuses": [
    {
     "target": "skills.bureaucracy.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.bureaucracy.threat",
-    "value": "1"
+    "target": "skills.bureaucracy.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.science.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.science.threat",
-    "value": "1"
+    "target": "skills.science.baseThreat",
+    "value": "19"
    }
   ],
   "row": 237,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Speed Demon",
@@ -3441,23 +3984,27 @@
   "bonuses": [
    {
     "target": "skills.drive.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.drive.threat",
-    "value": "1"
+    "target": "skills.drive.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.mechanics.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.mechanics.threat",
-    "value": "1"
+    "target": "skills.mechanics.baseThreat",
+    "value": "19"
    }
   ],
   "row": 238,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Survivalist",
@@ -3466,23 +4013,27 @@
   "bonuses": [
    {
     "target": "skills.athletics.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.athletics.threat",
-    "value": "1"
+    "target": "skills.athletics.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.survival.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.survival.threat",
-    "value": "1"
+    "target": "skills.survival.baseThreat",
+    "value": "19"
    }
   ],
   "row": 239,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Techie",
@@ -3491,23 +4042,27 @@
   "bonuses": [
    {
     "target": "skills.computers.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.computers.threat",
-    "value": "1"
+    "target": "skills.computers.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.electronics.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.electronics.threat",
-    "value": "1"
+    "target": "skills.electronics.baseThreat",
+    "value": "19"
    }
   ],
   "row": 240,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "World Traveler",
@@ -3516,23 +4071,27 @@
   "bonuses": [
    {
     "target": "skills.blend.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.blend.threat",
-    "value": "1"
+    "target": "skills.blend.baseThreat",
+    "value": "19"
    },
    {
     "target": "skills.cultures.misc",
-    "value": "2"
+    "value": "2",
+    "bonusType": "insight"
    },
    {
-    "target": "skills.cultures.threat",
-    "value": "1"
+    "target": "skills.cultures.baseThreat",
+    "value": "19"
    }
   ],
   "row": 241,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Advanced Skill Mastery",
@@ -3553,7 +4112,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Grand Skill Mastery",
@@ -3574,7 +4135,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Perfect Skill Mastery",
@@ -3594,7 +4157,9 @@
      "min": 18
     }
    ]
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "False Start",
@@ -3615,7 +4180,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Mark of a Professional",
@@ -3635,7 +4202,9 @@
      "min": 9
     }
    ]
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Practice Makes Perfect",
@@ -3655,7 +4224,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Unfair Advantage",
@@ -3676,7 +4247,9 @@
      "min": 1
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Everyday Genius",
@@ -3696,7 +4269,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Attention to Detail",
@@ -3704,7 +4279,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 250,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Depth of Study",
@@ -3717,7 +4294,9 @@
    }
   ],
   "row": 251,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "I Can Swim",
@@ -3725,18 +4304,28 @@
   "notChecked": false,
   "bonuses": [],
   "row": 252,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Photographic Memory",
   "tree": "Advanced Skill",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "knowledge",
+    "value": "2",
+    "bonusType": "insight"
+   }
+  ],
   "row": 253,
   "prerequisites": {
    "type": "level",
    "eq": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Talented",
@@ -3744,7 +4333,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 254,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Training",
@@ -3752,40 +4343,55 @@
   "notChecked": false,
   "bonuses": [],
   "row": 255,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Well Rounded",
   "tree": "Advanced Skill",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "discountedSkillRanks",
+    "value": "3"
+   },
+   {
+    "target": "untrainedSkillCap",
+    "value": "5"
+   }
+  ],
   "row": 256,
   "prerequisites": {
    "type": "feat",
    "name": "Training"
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Unlocked Potential",
   "tree": "Advanced Skill",
   "notChecked": false,
-  "bonuses": [
-   {
-    "target": "classSkillPicks",
-    "value": "1"
-   }
-  ],
+  "bonuses": [],
   "row": 257,
   "prerequisites": {
    "type": "level",
    "eq": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Academic Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 258,
   "prerequisites": {
    "type": "all",
@@ -3800,7 +4406,9 @@
      "name": "Scholar"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Animal Partner",
@@ -3812,7 +4420,9 @@
    "type": "skill",
    "key": "survival",
    "min": 4
-  }
+  },
+  "repeatable": true,
+  "maxSelections": 0
  },
  {
   "name": "Bloodstain Resistant",
@@ -3824,13 +4434,20 @@
    "type": "skill",
    "key": "impress",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Blue Collar Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 261,
   "prerequisites": {
    "type": "all",
@@ -3845,7 +4462,9 @@
      "name": "Speed Demon"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Card Shark",
@@ -3857,7 +4476,9 @@
    "type": "skill",
    "key": "streetwise",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Charmer",
@@ -3869,7 +4490,9 @@
    "type": "ability",
    "key": "cha",
    "min": 13
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Not the Face",
@@ -3889,13 +4512,20 @@
      "name": "Charmer"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Criminal Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 265,
   "prerequisites": {
    "type": "all",
@@ -3910,7 +4540,9 @@
      "name": "Burglar"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Fan Service",
@@ -3932,7 +4564,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Glint of Madness",
@@ -3944,7 +4578,9 @@
    "type": "skill",
    "key": "intimidate",
    "min": 4
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Gorgeous",
@@ -3966,7 +4602,9 @@
      "min": 13
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "The Look",
@@ -3987,7 +4625,9 @@
      "name": "Gorgeous"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Simply Irresistible",
@@ -4013,13 +4653,20 @@
      "name": "The Look"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Government Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 271,
   "prerequisites": {
    "type": "all",
@@ -4034,13 +4681,20 @@
      "name": "Diplomat"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Grifter Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 272,
   "prerequisites": {
    "type": "all",
@@ -4055,7 +4709,9 @@
      "name": "Hustler"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Hard Core",
@@ -4067,7 +4723,9 @@
    "type": "ability",
    "key": "cha",
    "min": 13
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Too Ugly to Die",
@@ -4087,13 +4745,20 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "High-Tech Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 275,
   "prerequisites": {
    "type": "all",
@@ -4108,13 +4773,20 @@
      "name": "Techie"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Local Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 276,
   "prerequisites": {
    "type": "all",
@@ -4129,7 +4801,9 @@
      "name": "World Traveler"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mark",
@@ -4141,7 +4815,9 @@
    "type": "skill",
    "key": "senseMotive",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Media Contacts",
@@ -4162,7 +4838,9 @@
      "name": "Actor"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Medical Contacts",
@@ -4183,7 +4861,9 @@
      "name": "Examiner"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Military Contacts",
@@ -4204,7 +4884,9 @@
      "name": "Officer"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Personal Lieutenant",
@@ -4215,7 +4897,9 @@
   "prerequisites": {
    "type": "level",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Police Contacts",
@@ -4236,7 +4920,9 @@
      "name": "Private Eye"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Political Clout",
@@ -4248,7 +4934,9 @@
    "type": "skill",
    "key": "bureaucracy",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Political Favors",
@@ -4269,7 +4957,9 @@
      "name": "Political Clout"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Political Immunity",
@@ -4290,7 +4980,9 @@
      "name": "Political Favors"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Polyglot",
@@ -4307,13 +4999,20 @@
    "type": "skill",
    "key": "cultures",
    "min": 4
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Research Contacts",
   "tree": "Style",
   "notChecked": false,
-  "bonuses": [],
+  "bonuses": [
+   {
+    "target": "contacts",
+    "value": "2"
+   }
+  ],
   "row": 287,
   "prerequisites": {
    "type": "all",
@@ -4328,7 +5027,9 @@
      "name": "Observer"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Silver Tongue",
@@ -4350,7 +5051,9 @@
      "min": 13
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Undermine",
@@ -4371,7 +5074,9 @@
      "name": "Silver Tongue"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Venomous Dialogue",
@@ -4385,7 +5090,7 @@
     {
      "type": "skill",
      "key": "manipulate",
-     "min": 9
+     "min": 18
     },
     {
      "type": "feat",
@@ -4397,7 +5102,9 @@
      "min": 15
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Stone Cold",
@@ -4409,7 +5116,9 @@
    "type": "skill",
    "key": "intimidate",
    "min": 4
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Street Contacts",
@@ -4430,7 +5139,9 @@
      "name": "Fence"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "White Collar Contacts",
@@ -4451,7 +5162,9 @@
      "name": "Advisor"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Wilderness Contacts",
@@ -4472,7 +5185,9 @@
      "name": "Survivalist"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Always Get Your Man",
@@ -4484,7 +5199,9 @@
    "type": "skill",
    "key": "investigation",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Aquatic Training",
@@ -4496,7 +5213,9 @@
    "type": "skill",
    "key": "athletics",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Arctic Training",
@@ -4508,7 +5227,9 @@
    "type": "skill",
    "key": "survival",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Desert Training",
@@ -4520,7 +5241,9 @@
    "type": "skill",
    "key": "survival",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Escape and Evasion Training",
@@ -4532,19 +5255,33 @@
    "type": "skill",
    "key": "bluff",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Firefighter Training",
   "tree": "Terrain",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 300,
   "prerequisites": {
-   "type": "skill",
-   "key": "science",
-   "min": 3
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "science",
+     "min": 3
+    },
+    {
+     "type": "focus",
+     "skill": "science",
+     "group": "Engineering"
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Forest Training",
@@ -4556,7 +5293,9 @@
    "type": "skill",
    "key": "survival",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Home Turf",
@@ -4568,7 +5307,9 @@
    "type": "skill",
    "key": "search",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Jungle Training",
@@ -4580,7 +5321,9 @@
    "type": "skill",
    "key": "survival",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Local Hero",
@@ -4592,7 +5335,9 @@
    "type": "skill",
    "key": "networking",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Mountain Training",
@@ -4604,7 +5349,9 @@
    "type": "skill",
    "key": "survival",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Night Training",
@@ -4616,7 +5363,9 @@
    "type": "skill",
    "key": "notice",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Swamp Training",
@@ -4628,7 +5377,9 @@
    "type": "skill",
    "key": "survival",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tracking Basics",
@@ -4640,7 +5391,9 @@
    "type": "skill",
    "key": "survival",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Tracking Mastery",
@@ -4661,7 +5414,9 @@
      "name": "Tracking Basics"
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Urban Training",
@@ -4673,7 +5428,9 @@
    "type": "skill",
    "key": "streetwise",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Breaking Points",
@@ -4681,7 +5438,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 311,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Bug Basics",
@@ -4693,7 +5452,9 @@
    "type": "skill",
    "key": "sleightOfHand",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Candidate",
@@ -4704,7 +5465,9 @@
   "prerequisites": {
    "type": "level",
    "eq": 1
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Career Agent",
@@ -4713,22 +5476,27 @@
   "bonuses": [
    {
     "target": "saves.ref",
-    "value": "1"
+    "value": "1",
+    "bonusType": "insight"
    },
    {
     "target": "saves.fort",
-    "value": "1"
+    "value": "1",
+    "bonusType": "insight"
    },
    {
     "target": "saves.will",
-    "value": "1"
+    "value": "1",
+    "bonusType": "insight"
    }
   ],
   "row": 314,
   "prerequisites": {
    "type": "level",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Office Gossip",
@@ -4748,7 +5516,9 @@
      "min": 12
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Total Control",
@@ -4768,31 +5538,57 @@
      "min": 18
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Cryptographer",
   "tree": "Tradecraft",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 317,
   "prerequisites": {
-   "type": "skill",
-   "key": "science",
-   "min": 4
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "science",
+     "min": 4
+    },
+    {
+     "type": "focus",
+     "skill": "science",
+     "group": "Mathematics"
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Disease Basics",
   "tree": "Tradecraft",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 318,
   "prerequisites": {
-   "type": "skill",
-   "key": "science",
-   "min": 3
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "science",
+     "min": 3
+    },
+    {
+     "type": "focus",
+     "skill": "science",
+     "group": "Genetics"
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Flawless Identity",
@@ -4803,7 +5599,9 @@
   "prerequisites": {
    "type": "level",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Forensic Genius",
@@ -4815,7 +5613,9 @@
    "type": "skill",
    "key": "analysis",
    "min": 4
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Hold Out",
@@ -4823,7 +5623,9 @@
   "notChecked": false,
   "bonuses": [],
   "row": 321,
-  "prerequisites": null
+  "prerequisites": null,
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Living Cipher",
@@ -4835,7 +5637,9 @@
    "type": "ability",
    "key": "int",
    "min": 15
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Old School",
@@ -4846,19 +5650,33 @@
   "prerequisites": {
    "type": "level",
    "min": 6
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Poison Basics",
   "tree": "Tradecraft",
-  "notChecked": true,
+  "notChecked": false,
   "bonuses": [],
   "row": 324,
   "prerequisites": {
-   "type": "skill",
-   "key": "science",
-   "min": 3
-  }
+   "type": "all",
+   "of": [
+    {
+     "type": "skill",
+     "key": "science",
+     "min": 3
+    },
+    {
+     "type": "focus",
+     "skill": "science",
+     "group": "Pharmacology"
+    }
+   ]
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Safe House",
@@ -4878,7 +5696,9 @@
      "min": 3
     }
    ]
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  },
  {
   "name": "Superior Documentation",
@@ -4890,6 +5710,8 @@
    "type": "skill",
    "key": "networking",
    "min": 3
-  }
+  },
+  "repeatable": false,
+  "maxSelections": 0
  }
 ]

@@ -1,0 +1,203 @@
+{
+  "batch": 260,
+  "source": "p.209, generic tasks pp.99–100",
+  "actor": "EwwDyNyOICyD56Hw",
+  "rolls": [
+    11,
+    4
+  ],
+  "checks": [
+    {
+      "search": {
+        "id": "PDLImQQHxoT5vyXD",
+        "total": 3,
+        "feat": {
+          "version": 1,
+          "source": "Forensic Genius",
+          "skillKey": "search",
+          "checkId": "perception",
+          "analysisRanks": 6,
+          "challenges": null,
+          "selectedSynergy": {
+            "skill": "analysis",
+            "value": 1
+          },
+          "totalSynergy": 1
+        }
+      },
+      "without": {
+        "id": "djP6QcdILb83hT55",
+        "total": 2,
+        "feat": null
+      }
+    },
+    {
+      "id": "ehzADssdanhiCcdQ",
+      "total": 8,
+      "feat": {
+        "version": 1,
+        "source": "Forensic Genius",
+        "skillKey": "analysis",
+        "checkId": "appraise",
+        "analysisRanks": 6,
+        "challenges": {
+          "base": 1,
+          "required": 1,
+          "reduction": 2
+        },
+        "selectedSynergy": {
+          "skill": "falsify",
+          "value": 0
+        },
+        "totalSynergy": 0
+      }
+    },
+    {
+      "id": "hQqatJnkc80TK8Nn",
+      "total": 8,
+      "feat": {
+        "version": 1,
+        "source": "Forensic Genius",
+        "skillKey": "analysis",
+        "checkId": "appraise",
+        "analysisRanks": 6,
+        "challenges": {
+          "base": 2,
+          "required": 1,
+          "reduction": 2
+        },
+        "selectedSynergy": {
+          "skill": "falsify",
+          "value": 0
+        },
+        "totalSynergy": 0
+      }
+    },
+    {
+      "id": "ghx9OCwzmlDzfoqT",
+      "total": 8,
+      "feat": {
+        "version": 1,
+        "source": "Forensic Genius",
+        "skillKey": "analysis",
+        "checkId": "appraise",
+        "analysisRanks": 6,
+        "challenges": {
+          "base": 3,
+          "required": 1,
+          "reduction": 2
+        },
+        "selectedSynergy": {
+          "skill": "falsify",
+          "value": 0
+        },
+        "totalSynergy": 0
+      }
+    },
+    {
+      "id": "PFOsWkAOkWRjc7La",
+      "total": 8,
+      "feat": {
+        "version": 1,
+        "source": "Forensic Genius",
+        "skillKey": "analysis",
+        "checkId": "appraise",
+        "analysisRanks": 6,
+        "challenges": {
+          "base": 10,
+          "required": 8,
+          "reduction": 2
+        },
+        "selectedSynergy": {
+          "skill": "falsify",
+          "value": 0
+        },
+        "totalSynergy": 0
+      }
+    },
+    "Source drift: The declared skill modifiers or their feat sources changed before the check was posted.",
+    {
+      "ui": "56PODGyuyiNDWSgy",
+      "feat": {
+        "version": 1,
+        "source": "Forensic Genius",
+        "skillKey": "analysis",
+        "checkId": "appraise",
+        "analysisRanks": 6,
+        "challenges": {
+          "base": 16,
+          "required": 14,
+          "reduction": 2
+        },
+        "selectedSynergy": {
+          "skill": "falsify",
+          "value": 0
+        },
+        "totalSynergy": 0
+      }
+    }
+  ],
+  "combats": [],
+  "feat": "oOlZrlayioWrwYx7",
+  "baseline": {
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "analysis": 6
+  },
+  "persisted": {
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "analysis": 6,
+    "dice": 0,
+    "uses": {},
+    "status": {
+      "ok": true,
+      "unmet": []
+    }
+  },
+  "reload": {
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "budgets": [
+      0,
+      0,
+      0
+    ],
+    "issues": [],
+    "analysis": 6,
+    "dice": 0,
+    "uses": {},
+    "status": {
+      "ok": true,
+      "unmet": []
+    }
+  },
+  "cleanup": {
+    "actors": 6,
+    "messages": 661,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126
+  }
+}

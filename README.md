@@ -7,11 +7,11 @@ An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com)
 
 ## Development setup
 
-Foundry loads systems from `{userData}/Data/systems/<id>`. Symlink this folder there so edits show up after a reload:
+Foundry loads systems from `{userData}/Data/systems/<id>`. Run this from the repository root to symlink this checkout there so edits show up after a reload:
 
 ```bash
 # macOS (default user data path)
-ln -s "/Volumes/New Master/Users/sacha ON NEW MASTER/Development/Foundry/claude/foundry4spycraft2" \
+ln -s "$PWD" \
   "$HOME/Library/Application Support/FoundryVTT/Data/systems/spycraft2"
 ```
 
@@ -24,7 +24,8 @@ Compendium packs are LevelDB folders generated from `src/data/*.json`. After clo
 ```bash
 npm install
 npm run build   # writes packs/* and module/rules/tables.mjs
-npm test        # checks the rules engine against the saved fixtures in tools/fixtures
+npm test        # validates data, engine fixtures and Node regressions
+npm run test:packs # checks rebuilt LevelDB content after building
 ```
 
 `src/data/*.json` is the source of truth for the rules data (numbers, tables, names and formulas): edit those files
@@ -49,7 +50,11 @@ The agent sheet calculates:
   armor affecting Defense, Reflex and Speed; mission gear picks by category.
 - **Final totals** — vitality, wounds, stress/subdual thresholds, knowledge/request/gear checks, action dice, carrying capacity.
 
-Rule problems (too many ranks, unmet prerequisites, overspent points…) are shown as warnings — nothing is blocked.
+Build problems are shown as warnings. Executable workflows also reject invalid actions, unavailable gear and insufficient resources. The [RAW review and residual implementation ledger](docs/raw-character-review.md) distinguish verified mechanics from remaining manual rules. Personal gear classification, field acquisition, measured attacks and class resource controls are documented there; catalog presence alone does not establish complete automation.
+
+Classes also provides ordinary GC action-die awards and once-per-mission XP settlement using the user-selected p.440 formula. Gear records Armor Use armor and reviewed higher-Caliber mission picks; Caliber V upgrades remain separate. Soldier 14 can declare One in a Million before an eligible roll. See the ledger for each workflow’s limits.
+
+Implemented resource controls coordinate multiple Foundry clients. Classes provides GC recovery controls for interrupted actions; check the recorded result and current resources before retrying an interrupted transaction. Complete character exports omit temporary transaction bookkeeping.
 
 ## Layout
 

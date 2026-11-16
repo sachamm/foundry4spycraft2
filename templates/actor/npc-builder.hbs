@@ -10,10 +10,12 @@
     </div>
     <div class="npc-grade-grid">{{#each npc.grades}}<label>{{label}}<select name="system.npcProfile.grades.{{key}}" data-dtype="Number">{{selectOptions options selected=value}}</select></label>{{/each}}</div>
   </fieldset>
+  <p><a data-action="applyBaffled">Apply new Baffled effect</a> · <a data-action="setNpcSkillCondition" data-condition="baffled">Review Baffled state</a> · <a data-action="setNpcSkillCondition" data-condition="incompetent">Review Incompetent state</a>{{#if system.baffledApplicationReview.needsReview}} · <a data-action="reviewBaffledApplication">GC review interrupted Baffled effect</a>{{/if}}</p>
   <div class="npc-results" aria-live="polite">
     <span>Initiative <b>{{signed system.initiative.total}}</b></span><span>Attack base <b>{{signed system.bab}}</b></span>
     <span>Defense <b>{{system.defense.total}}</b></span><span>Resilience base <b>{{signed npc.result.stats.resilience}}</b></span>
-    {{#unless npc.animal}}<span>Competence <b>{{signed npc.result.competence}}</b></span>{{/unless}}
+    {{#unless npc.animal}}<span>Competence <b title="Standard {{signed npc.result.normalCompetence}}; {{npc.result.competenceCondition.state}}">{{signed npc.result.competence}}</b></span>{{/unless}}
+    {{#if system.conditionContext.incompetent}}<span>Incompetent: skill bonuses +0</span>{{else}}{{#if system.conditionContext.baffled}}<span>Baffled: half skill/Competence bonuses, round up</span>{{/if}}{{/if}}{{#if system.conditionContext.baffled}}<span>+8 saves resisting Baffled</span>{{/if}}
     {{#if npc.special}}<span>Vitality max <b>{{system.vitality.max}}</b></span><span>Wounds max <b>{{system.wounds.max}}</b></span>
     {{else}}<span>Damage save <b>{{signed system.damageSave}}</b></span>{{/if}}
   </div>
@@ -21,11 +23,11 @@
   {{#if npc.result.warnings}}<ul class="npc-warnings" role="status">{{#each npc.result.warnings}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
   <fieldset {{#unless editable}}disabled{{/unless}}>
     <div class="npc-section-title"><h3>Listed skills · Skilled quality</h3><button type="button" data-action="npcAddSkill">Add skill</button></div>
-    <p class="npc-note">Use the higher of the listed bonus and Competence. This is also the effective rank for result caps. Maximum 3 listed skills for standard NPCs; 5 for special NPCs.</p>
+    <p class="npc-note">Use the higher of the listed bonus and Competence. The current bonus after Baffled/Incompetent is also the effective rank for result caps (p.452). Maximum 3 listed skills for standard NPCs; 5 for special NPCs.</p>
     {{#each npc.skills}}<div class="npc-row">
       <select aria-label="Listed skill" name="npcSkill.{{index}}.key">{{selectOptions ../npc.skillOptions selected=key}}</select>
       <select aria-label="Skill grade" name="npcSkill.{{index}}.grade" data-dtype="Number">{{selectOptions ../npc.gradeOptions selected=grade}}</select>
-      <span>Bonus <b>{{signed resolved.bonus}}</b> · cap {{resolved.cap}} · {{grade}} XP</span>
+      <span>Bonus <b title="Standard {{signed resolved.normalBonus}}; {{resolved.skillCondition.state}}">{{signed resolved.bonus}}</b> · cap {{resolved.cap}} · {{grade}} XP</span>
       <button type="button" data-action="npcRemoveRow" data-list="skills" data-index="{{index}}" aria-label="Remove listed skill">Remove</button>
     </div>{{/each}}
     <div class="npc-section-title"><h3>Equipment allowances</h3></div>

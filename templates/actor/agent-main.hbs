@@ -1,4 +1,5 @@
 <section class="tab main {{tab.cssClass}}" data-tab="main" data-group="primary">
+{{#each shakenInitiativeReviews}}<p class="bad">{{name}}: Initiative Count {{count}} needs Shaken review. {{reason}} {{#if @root.isGM}}<a data-action="reviewShakenInitiative" data-combat-id="{{combatId}}" data-combatant-id="{{id}}">Review included penalty</a>{{/if}}</p>{{/each}}
   <div class="cols">
     <div class="col">
       <h3>{{localize "SPYCRAFT.Attributes"}}
@@ -8,14 +9,14 @@
         <tbody>
         {{#each abilities}}
           <tr>
-            <th><a data-action="rollAbility" data-ability="{{key}}">{{label}}</a></th>
-            <td><input type="number" name="system.abilities.{{key}}.base" value="{{base}}" class="w-2" /></td>
+            <th>{{label}}</th>
+            <td><input type="number" name="system.abilities.{{key}}.base" value="{{base}}" min="8" max="18" class="w-2" /></td>
             <td class="muted">{{cost}}</td>
             <td>{{#if bonus}}{{signed bonus}}{{/if}}</td>
             <td>{{#if increase}}+{{increase}}{{/if}}</td>
             <td><input type="number" name="system.abilities.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
-            <td class="score">{{value}}</td>
-            <td class="mod"><a data-action="rollAbility" data-ability="{{key}}">{{signed mod}}</a></td>
+            <td class="score"{{#if temporaryBonus}} data-tooltip="Includes {{signed temporaryBonus}} temporary adjustment"{{/if}}>{{value}}</td>
+            <td class="mod">{{signed mod}}</td>
           </tr>
         {{/each}}
         </tbody>
@@ -28,6 +29,82 @@
         {{/each}}
       </div>
 
+      <h3>{{localize "SPYCRAFT.Origin.Label"}}</h3>
+      {{#each originSelections}}
+        <details><summary>{{name}}</summary>
+          {{#each fields}}
+            <label>{{label}} {{#if text}}<input type="text" name="originChoice.{{../id}}.{{key}}" value="{{value}}" />{{else}}<select name="originChoice.{{../id}}.{{key}}">{{selectOptions options selected=value blank="—"}}</select>{{/if}}</label>
+          {{/each}}
+          <div>{{{description}}}</div>
+        </details>
+      {{/each}}
+
+      {{#each system.originEffects}}<p><b>{{name}}:</b> {{text}} {{details}}</p>{{/each}}
+      {{#if system.legacyAbilities.fortunesOfWar.grade}}<p><a data-action="boostFortunesOfWar">Double Fortunes of War DR (one full round)</a>{{#if system.fortunesOfWarActive}} · Active until own initiative in round {{system.fortunesOfWarActive.dueRound}}{{/if}}</p>{{/if}}
+      {{#if system.survivalStats.noFear}}<p>No Fear II: stress resistance {{system.survivalStats.noFear.resistance}} until own initiative in round {{system.survivalStats.noFear.dueRound}}.</p>{{/if}}
+      {{#if system.eagleEyeActive}}<p>Eagle Eye: range increment {{system.eagleEyeActive.rangeIncrease}} ft. added with 2-handed firearms/hurled weapons for this scene, before range multipliers.</p>{{/if}}
+      <p>{{system.size}}{{#if system.naturalDR}} · Natural DR {{system.naturalDR}}{{/if}}</p>
+      {{#if system.armor}}<p>Listed DR before piercing/type exceptions: melee weapons {{system.armorDRByAttack.meleeWeapon}}, unarmed {{system.armorDRByAttack.unarmed}}, non-grenade hurled weapons {{system.armorDRByAttack.hurledWeapon}}, other ranged weapons {{system.armorDRByAttack.rangedWeapon}}, other {{system.armorDRByAttack.other}}.{{#if system.armorFeatRules.sneakAttackImmune}} Armor Supremacy: immune to sneak attack damage.{{/if}}{{#if system.armorFeatRules.coupDeGraceRequiresHelpless}} Armor Mastery: Coup de Grace requires helplessness.{{/if}}</p>{{/if}}
+      {{#if system.survivalStats.resistanceRows.length}}<p>Damage resistance: {{#each system.survivalStats.resistanceRows}}{{label}} {{value}}{{#unless @last}} · {{/unless}}{{/each}}. Apply after applicable DR.</p>{{/if}}
+      {{#if system.survivalStats.overlandTerrainSpeeds.length}}<p>Overland calculations: {{#each system.survivalStats.overlandTerrainSpeeds}}{{label}} as-if Speed {{speed}} ft.{{#unless @last}} · {{/unless}}{{/each}} Apply terrain/travel multipliers; combat Speed is separate.</p>{{/if}}
+      {{#if system.survivalStats.dailyWater}}<p>Daily fluids while active: {{system.survivalStats.dailyWater.normalQuarts}} qt.; {{system.survivalStats.dailyWater.hotQuarts}} qt. when exposed to heat above {{system.survivalStats.dailyWater.heatThresholdF}}°F{{#if system.survivalStats.dailyWater.desertTraining}} (Desert Training included){{/if}}.</p>{{/if}}
+      {{#if system.survivalStats.aquatic}}<p>Aquatic: underwater Speed {{system.survivalStats.underwaterSpeed}} ft.; cannot drown. Underwater check penalties do not apply.</p>{{else}}<p>Hold breath: {{system.survivalStats.breathRounds}} rounds{{#if system.survivalStats.aquaticRounds}} · Aquatic Training +{{system.survivalStats.aquaticRounds}} included{{/if}}{{#if system.survivalStats.chaseFeats}} · Wave Runner +{{system.survivalStats.chaseFeats}} effective CON included{{/if}} (before suffocation saves).</p>{{/if}}
+      {{#if system.recoveryRates}}<p>Natural recovery: {{system.recoveryRates.vitalityPoints}} vitality/{{system.recoveryRates.vitalityIntervalLabel}} rest; {{system.recoveryRates.woundPoints}} wounds/{{system.recoveryRates.woundIntervalLabel}} rest{{#if system.recoveryRates.fastHealing}} (Fast Healing included){{/if}}{{#if system.recoveryRates.quickHealer}} (Quick Healer intervals){{/if}}. <a data-action="calculateRecoveryRates">Treatment/Interest recovery rates</a></p>{{else}}<p class="bad">Review Career Level before calculating recovery rates.</p>{{/if}}
+      {{#if system.burrowCapabilities}}<p>Burrow: one-inch material Damage save bonus up to +{{system.burrowCapabilities.maximumMaterialSave}}. Cannot Run. Material at +6 or less fills behind you, blocking followers without Burrow. <a data-action="checkBurrowMaterial">Check material and action</a></p>{{/if}}
+      {{#each system.mentalLeapState.rows}}{{#if (sc2eq phase "boost")}}<p>Mental Leap: +{{bonus}} {{ability}}; {{remainingSeconds}} seconds remain. <a data-action="endMentalLeap" data-record-id="{{id}}">End as a free action</a></p>{{/if}}{{/each}}
+      {{#if system.mentalLeapState.exhausted}}<p class="bad">Exhausted: STR/DEX −6; Speed halved; cannot Run. +6 to saves against fatigue/exhaustion. <a data-action="recordFatigueEscalation">Record another fatigue/exhaustion application</a></p>{{else}}{{#if system.mentalLeapState.fatigued}}<p class="bad">{{#if system.mentalLeapState.fatiguedPenaltiesIgnored}}Fatigued: Guts ignores its STR/DEX penalties and Run restriction; the condition remains for escalation/recovery.{{else}}Fatigued: STR/DEX −2; cannot Run.{{/if}} +6 to saves against fatigue.</p>{{/if}}{{/if}}
+      {{#if system.mentalLeapState.unconscious}}<p class="bad">Unconscious: helpless; may take no actions.</p>{{/if}}
+      {{#if system.mentalLeapState.recoveryAvailable}}<p><a data-action="startMentalLeapSleep">Review / track unconsciousness sleep</a>{{#if system.mentalLeapSleep}} · Recorded requirements: {{#if system.mentalLeapSleep.requirements}}{{#each system.mentalLeapSleep.requirements}}{{requiredHours}} full hours{{#unless @last}}; {{/unless}}{{/each}}{{else}}{{system.mentalLeapSleep.requiredHours}} full hours (earlier record){{/if}}{{#if system.mentalLeapState.sleepCauseReview}} · Review current causes before completion{{else}} · <a data-action="completeMentalLeapSleep">Confirm completed sleep</a>{{/if}}{{/if}}</p>{{/if}}
+      {{#each system.attributeCollapse.entries}}<p class="bad"><b>{{label}} {{score}}:</b> {{text}}</p>{{/each}}
+      {{#if attributeDamageRows.length}}<p>Attribute damage: {{#each attributeDamageRows}}{{label}} {{total}} (temporary {{temporary}}, permanent {{permanent}}){{#unless @last}} · {{/unless}}{{/each}}.</p>{{/if}}
+      {{#if attributeDamageHistory}}{{#if attributeMissionRecovered}}<p>Current mission’s temporary attribute recovery recorded.</p>{{else}}{{#if isGM}}<p><a data-action="recoverSilverTongueAtMissionEnd">GC: recover Silver Tongue Wisdom damage at mission end</a></p>{{/if}}{{/if}}{{/if}}
+      {{#if system.attributeCollapse.wisdomEpisode}}<p><a data-action="rollWisdomCollapse">Roll Wisdom-collapse episode for GC adjudication</a></p>{{/if}}
+      {{#if system.cqbReadiedRules.initiativeBonus}}<p>CQB Supremacy: Initiative checks +5 while holding a ranged weapon marked readied and carried on Gear.</p>{{/if}}
+      <p><a data-action="checkNumericalAdvantage">Check numerical advantage</a> · <a data-action="checkCombatMovement">Check combat movement</a> · <a data-action="takeTotalDefense">Take Total Defense</a>{{#if system.totalDefenseState.active}} · Dodge +{{system.totalDefenseState.bonus}}{{#if system.totalDefenseState.equilibrium}} (Equilibrium Basics +{{system.totalDefenseState.equilibrium.bonus}} included){{/if}} until own Count in round {{system.totalDefenseState.dueRound}}{{/if}}</p>
+      <p><a data-action="rollDisarm">Disarm opposed check</a> · <a data-action="declareTwoWeapon">Declare two-weapon combat</a>{{#if system.twoWeaponStyleState.active}} · Declared {{system.twoWeaponStyleState.extraAttacks}} final Standard Attacks; attack penalty −{{system.twoWeaponStyleState.penalty}}; skill penalty {{#if system.twoWeaponStyleState.skillPenalty}}−{{system.twoWeaponStyleState.skillPenalty}}{{else}}0{{/if}}{{#if system.twoWeaponStyleState.handgunSkillWaiver}} (Both Guns Blazing also waives this penalty on handgun attacks){{/if}} until own Count in round {{system.twoWeaponStyleState.dueRound}}{{/if}}{{#if system.twoWeaponStyleState.needsReview}} <span class="bad">{{system.twoWeaponStyleState.reason}}</span>{{/if}}{{#if system.twoWeaponStyle}}{{#if isGM}} · <a data-action="reviewTwoWeapon">GC review remaining tradeoff</a>{{/if}}{{/if}}</p>
+      {{#with mobileOffense}}<p>{{#if @root.startedCharacterCombat}}Mobile Offense: {{remaining}} /{{limit}} this round. {{#if counterReview}}<span class="bad">Saved count needs GC review.</span>{{else}}{{#if remaining}}<a data-action="takeMobileOffense">Final attack during Standard Move</a>{{/if}}{{/if}}{{#if @root.isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="mobileOffense">GC review uses already resolved</a>{{/if}}{{else}}Mobile Offense: start a combat containing this character to track its current allowance.{{/if}}</p>{{/with}}
+      {{#with contempt}}<p>{{#if @root.startedCharacterCombat}}Contempt: {{remaining}} / {{limit}} this combat; {{@root.contemptRound.remaining}} /1 this round. {{#if counterReview}}<span class="bad">Saved combat count needs GC review.</span>{{else}}{{#if @root.contemptRound.counterReview}}<span class="bad">Saved round count needs GC review.</span>{{else}}{{#if remaining}}{{#if @root.contemptRound.remaining}}<a data-action="takeContempt">Final attack against standard character</a>{{/if}}{{/if}}{{/if}}{{/if}}{{#if @root.isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="contempt">GC review combat uses</a> · <a data-action="reviewLimitedUseCounter" data-resource="contemptRound">GC review round uses</a>{{/if}}{{else}}Contempt: start a combat containing this character to track its current allowance.{{/if}}</p>{{/with}}
+      {{#with combatInstincts}}<p>{{#if @root.startedCharacterCombat}}Combat Instincts: {{remaining}} / {{limit}} this round. {{#if counterReview}}<span class="bad">Saved count needs GC review.</span>{{else}}{{#if remaining}}<a data-action="takeCombatInstincts">Immediate final attack after miss</a>{{/if}}{{/if}}{{#if @root.isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="combatInstincts">GC review reactions already used</a>{{/if}}{{else}}Combat Instincts: start a combat containing this character to track its current allowance.{{/if}}</p>{{/with}}
+      {{#with twoWeaponFinalAttack}}<p>Final attacks: {{remaining}} / {{limit}} remaining. {{#if counterReview}}<span class="bad">Saved use history needs GC verification.</span>{{else}}{{#if remaining}}<a data-action="takeTwoWeaponFinalAttack">Take final attack</a>{{/if}}{{/if}}{{#if @root.isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="twoWeaponFinalAttack">GC review attacks already used</a>{{else}}{{#if counterReview}}Ask the GC to review this count.{{/if}}{{/if}}</p>{{/with}}
+      <p><a data-action="setMovementCondition" data-condition="nauseated">Nauseated condition</a>{{#if system.conditionContext.nauseated}} · No Concentration checks; at most one half action (tracked at table) and one final attack per round{{/if}}{{#if startedCharacterCombat}} · Recorded final attacks this round: {{finalAttackRound.used}}{{#if finalAttackRound.counterReview}} <span class="bad">GC review actual current-round count before attacking</span>{{/if}}{{#if isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="finalAttackRound">GC review all final attacks already resolved</a>{{/if}}{{/if}}</p>
+      <p><a data-action="declareDarting">Darting / Flashing Weapon</a>{{#if system.dartingStyleState.active}} · Attack/skill penalty −{{system.dartingStyleState.penalty}} until own Count in round {{system.dartingStyleState.dueRound}}; final attacks {{dartingFinalAttack.remaining}} /{{system.dartingStyleState.extraAttacks}} · <a data-action="takeDartingFinalAttack">Take final melee/hurled attack</a>{{#if isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="dartingFinalAttack">GC review attacks already resolved</a>{{/if}}{{/if}}{{#if system.dartingStyleState.needsReview}} <span class="bad">{{system.dartingStyleState.reason}}</span>{{/if}}{{#if system.dartingStyle}}{{#if isGM}} · <a data-action="reviewDarting">GC review remaining tradeoff</a>{{/if}}{{/if}}</p>
+      <p><a data-action="declareSuperiorCover">Superior Cover</a>{{#if system.superiorCoverState.active}} · Attack/skill penalty −2; DR +{{system.superiorCoverState.dr}} until own Count in round {{system.superiorCoverState.dueRound}} · <a data-action="reviewSuperiorCover">Confirm changed/lost cover</a>{{/if}}{{#if system.superiorCoverState.needsReview}} <span class="bad">{{system.superiorCoverState.reason}}</span>{{/if}}</p>
+      <p><a data-action="activateCombatExpertise">Combat Expertise</a>{{#if system.combatExpertiseState.active}} · Attack/skill penalty −{{system.combatExpertiseState.penalty}}; dodge +{{system.combatExpertiseState.dodgeBonus}} until own Count in round {{system.combatExpertiseState.dueRound}}{{/if}}</p>
+      <p><a data-action="checkIncomingDefense">Check incoming attack Defense</a> · <a data-action="sufferInitiativeLoss">Apply Initiative Count loss</a>{{#if system.uncannyDodge.grade}} · Uncanny Dodge {{system.uncannyDodge.grade}}{{/if}}</p>
+      <p><a data-action="rollCriticalInjury">Roll critical injury (Table of Ouch)</a></p>
+      {{#each criticalInjuryReviews}}<p>Injury {{id}} — {{source}}: {{label}}. {{#if @root.isGM}}<a data-action="reviewCriticalInjury" data-injury="{{id}}">Review / show original result</a>{{/if}}</p>{{/each}}
+      <p><a data-action="checkReflexDamage">Check damage after a recorded Reflex save</a>{{#if system.evasion.grade}} · Evasion {{system.evasion.grade}}{{/if}}</p>
+      <p><a data-action="setMovementCondition" data-condition="sleeping">Sleeping condition</a>{{#if system.conditionContext.sleeping}} · Active: passive actions only; blinded and helpless · <a data-action="wakeFromSleep">Wake from new touch or damage</a>{{/if}}</p>
+      <p><a data-action="setMovementCondition" data-condition="blinded">Blinded condition</a>{{#if system.conditionContext.blinded}} · Active: vulnerable, half Speed; opponents gain +2 attacks; targets gain +8 Defense{{/if}} · <a data-action="setMovementCondition" data-condition="deafened">Deafened condition</a></p>
+      {{#if usagePeriodReview.needsReview}}<p class="bad">Interrupted {{usagePeriodReview.period}} start needs GC review. {{#if isGM}}<a data-action="reviewUsagePeriod">Review starting dice and counters</a>{{else}}Ask the GC to review the start.{{/if}}</p>{{/if}}
+      {{#if actor.flags.spycraft2.missionXPReview.needsReview}}<p class="bad">Interrupted mission XP needs GC review. {{#if isGM}}<a data-action="reviewMissionXP">Review mission XP and reward</a>{{else}}Ask the GC to review mission XP.{{/if}}</p>{{/if}}
+      {{#if actor.flags.spycraft2.actionDieAwardReview.needsReview}}<p class="bad">Interrupted award needs GC review. {{#if isGM}}<a data-action="reviewActionDieAward">Review award and balances</a>{{else}}Ask the GC to review the award and balances.{{/if}}</p>{{/if}}
+      {{#if system.actionDiceSettlementReview.needsReview}}<p class="bad">Interrupted action-die use needs GC review. {{#if isGM}}<a data-action="reviewActionDiceSettlement">Review health and action dice</a>{{else}}Ask the GC to review health and action dice.{{/if}}</p>{{/if}}
+      {{#if system.adrenalineJunkieSource}}{{#if isGM}}<p><a data-action="recordAdrenalineWoundLoss">Adrenaline Junkie: record final wound-loss event</a></p>{{/if}}{{/if}}
+      {{#each system.unrestrictedBonusPools}}<p>{{label}}: {{available}} d{{die}} bonus dice available until {{expiryLabel}}{{#if reason}} · {{reason}}{{/if}}</p>{{/each}}
+      <p><a data-action="setMovementCondition" data-condition="drunk">Drunk condition</a>{{#if system.conditionContext.drunk}} · Active: −2 DEX/WIS checks; GC resolves 5-ft. random reposition each round while standing; four full hours asleep for recovery{{/if}}</p>
+      {{#if system.conditionContext.drunk}}<p><a data-action="rollDrunkReposition">Record Drunk round-start reposition</a></p>{{/if}}
+      {{#each system.drunkPendingRepositions}}<p>Round {{round}}: reposition 5 ft. {{direction}}; no allowed movement spent. <a data-action="applyDrunkReposition" data-record-id="{{id}}">Apply / resume token movement</a> · <a data-action="confirmDrunkReposition" data-record-id="{{id}}">Confirm actual reposition</a></p>{{/each}}
+      <p><a data-action="beginDrunkSleep">Begin Drunk sleep recovery</a>{{#if system.drunkSleepState.pending}} · {{system.drunkSleepState.requiredLabel}}; {{system.drunkSleepState.remainingLabel}} · <a data-action="completeDrunkSleep">Confirm completed Drunk recovery</a>{{/if}}{{#if system.drunkSleepState.needsReview}} · GC review required{{/if}}</p>
+      <p><a data-action="setSickened">Sickened condition</a>{{#if system.conditionPenalties.sickened}} · Active: −2 to attacks, skills, damage rolls and saves{{/if}}</p>
+      <p><a data-action="setMovementCondition" data-condition="prone">Prone condition</a> · <a data-action="setMovementCondition" data-condition="sprawled">Sprawled condition</a>{{#if system.postureMovement.prone}} · Prone: no Standard Move, Bull Rush, Run or Withdraw; 5-ft. crawling steps only; melee −2; free Brace{{/if}}{{#if system.postureMovement.sprawled}} · Sprawled: vulnerable, attacks −2; movement only to Crouch, Drop Prone or Stand Up{{/if}}</p>
+<p><a data-action="applyShaken">Apply a new Shaken source</a></p>
+{{#if actor.shakenApplicationReview.needsReview}}<p class="bad">Interrupted Shaken application needs GC review. {{#if isGM}}<a data-action="reviewShakenApplication">Review actual source effects</a>{{/if}}</p>{{/if}}
+{{#each actor.shakenSourceEntries}}<p>{{name}} · grade {{grade}}{{#unless active}} · ended or disabled{{/unless}}{{#if editable}} · <a data-action="editShakenSource" data-source-uuid="{{uuid}}">Edit or end this source</a>{{/if}}</p>{{/each}}
+      {{#if system.shakenState.label}}<p>{{system.shakenState.label}}{{#if system.shakenState.needsReview}} · Review condition sources before rolling{{else}} · No taking 10/20; CHA/WIS skill checks −4{{#if system.shakenRules.initiativePenalty}}; Initiative checks −4{{/if}}{{#if system.shakenRules.reflexWillPenalty}}; Reflex/Will saves −4{{/if}}{{#if system.shakenRules.attackPenalty}}; attacks −4{{/if}}{{/if}}</p>{{/if}}
+      {{#if system.restraintReleaseReview.needsReview}}<p><a data-action="reviewRestraintRelease">GC review interrupted grapple release</a></p>{{/if}}
+      {{#each system.pendingRestraintMoves}}<p>Escape Hold: complete the immediate Standard Move, at least 5 ft. <a data-action="confirmRestraintEscapeMove" data-message-id="{{id}}">Confirm actual escape movement</a></p>{{/each}}
+      <p><a data-action="setMovementCondition" data-condition="held">Held condition</a> · <a data-action="setMovementCondition" data-condition="pinned">Pinned condition</a>{{#if system.conditionContext.held}} · Held: no movement; free actions or full-action escape only{{/if}}{{#if system.conditionContext.pinned}} · Pinned: no movement/actions except full-action escape; adjacent melee/unarmed attackers +4{{/if}}{{#if system.conditionContext.pinned}} · <a data-action="escapeRestraint">Athletics escape check</a>{{else}}{{#if system.conditionContext.held}} · <a data-action="escapeRestraint">Athletics escape check</a>{{/if}}{{/if}}</p>
+      <p><a data-action="applyBaffled">Apply new Baffled effect</a> · <a data-action="setMovementCondition" data-condition="baffled">Review Baffled state</a> · <a data-action="setMovementCondition" data-condition="incompetent">Review Incompetent state</a>{{#if system.conditionContext.incompetent}} · Skill bonuses +0{{else}}{{#if system.conditionContext.baffled}} · Half skill bonuses (round up){{/if}}{{/if}}{{#if system.conditionContext.baffled}} · +8 saves resisting Baffled{{/if}}{{#if system.baffledApplicationReview.needsReview}} · <a data-action="reviewBaffledApplication">GC review interrupted Baffled effect</a>{{/if}}</p>
+      <p><a data-action="setMovementCondition" data-condition="mute">Mute condition</a>{{#if system.conditionContext.mute}} · Cannot speak, shout, or make Language-tagged skill checks{{/if}}</p>
+      <p><a data-action="setMovementCondition" data-condition="crouched">Crouched condition</a>{{#if system.conditionContext.crouched}} · Half Speed; non-adjacent ranged attackers suffer −1{{/if}}</p>
+      <p><a data-action="setMovementCondition" data-condition="entangled">Entangled condition</a> · <a data-action="setMovementCondition" data-condition="bound">Bound condition</a>{{#if system.conditionPenalties.entangled}} · −2 attacks; −4 DEX skill checks; no Run, Refresh, Regroup, Jump or Tumble{{/if}}{{#if system.conditionPenalties.bound}} · Helpless; no movement or Grasp/Hands-On actions{{/if}}</p>
+      {{#if system.conditionSpeedReview}}<p class="bad">Multiple conditions halve Speed. Their combined Speed awaits the GC ruling.</p>{{/if}}
+      <p><a data-action="applyFatigue">Apply incoming fatigue or exhaustion</a></p>
+      {{#if system.fatigueApplicationHistory.rows.length}}<details><summary>Recorded fatigue applications</summary>{{#each system.fatigueApplicationHistory.rows}}<p>{{source}}: {{kind}} received while {{before}} → {{after}}{{#if needsReview}} · GC review required{{/if}}</p>{{/each}}</details>{{/if}}
+      <p><a data-action="beginFatigueRest">Begin ordinary fatigue recovery</a>{{#if system.fatigueRestState.pending}} · {{system.fatigueRestState.requiredLabel}}; {{system.fatigueRestState.remainingLabel}} · <a data-action="completeFatigueRest">Confirm completed recovery</a>{{/if}}</p>
+      <p>Death threshold: {{system.deathThreshold}} wounds (size adjusted; pp.331,349).</p>
+      {{#if system.actionDieDefense}}<p>Action die: +2 Defense through round {{system.actionDieDefense.lastRound}}.</p>{{/if}}
       <h3>{{localize "SPYCRAFT.Defenses"}}</h3>
       <div class="stat-grid">
         {{#each saves}}
@@ -35,13 +112,14 @@
         {{/each}}
         <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><b {{sc2tip tips.defense}}>{{system.defense.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.defense.base}}{{#if system.defense.armor}}, {{localize "SPYCRAFT.Armor"}} {{signed system.defense.armor}}{{/if}}</small></div>
         <div class="stat"><a data-action="rollInitiative">{{localize "SPYCRAFT.Initiative"}}</a><b {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.initiative.base}}</small></div>
-        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b {{sc2tip tips.speed}}>{{system.speed}} ft</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b {{sc2tip tips.speed}}>{{#if system.conditionSpeedReview}}GC ruling needed{{else}}{{system.speed}} ft{{/if}}</b></div>
       </div>
     </div>
 
     <div class="col">
       <h3>{{localize "SPYCRAFT.Combat"}}</h3>
       <div class="stat-grid">
+        <div class="stat"><span>CQB range (beyond Reach)</span><b>{{system.cqbRange}} ft.</b></div>
         <div class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><b>{{signed system.bab}}</b></div>
         <div class="stat"><span>{{localize "SPYCRAFT.AttackUnarmed"}}</span><b>{{signed system.attack.unarmed}}</b></div>
         <div class="stat"><span>{{localize "SPYCRAFT.AttackMelee"}}</span><b>{{signed system.attack.melee}}</b></div>
@@ -49,19 +127,24 @@
         <div class="stat"><span>{{localize "SPYCRAFT.StressThreshold"}}</span><b>{{system.stressThreshold}}</b></div>
         <div class="stat"><span>{{localize "SPYCRAFT.SubdualThreshold"}}</span><b>{{system.subdualThreshold}}</b></div>
       </div>
+      <p><a data-action="checkAccumulatedDamage">Check stress/subdual thresholds</a>{{#if isGM}} · <a data-action="reviewDamageLedger">Review accumulated totals</a>{{/if}}</p>
+      {{#if system.accumulatedDamage}}<p>Accumulated stress {{system.accumulatedDamage.stress}} · subdual {{system.accumulatedDamage.subdual}} · pending saves {{system.accumulatedDamage.pending.length}}.{{#if system.accumulatedDamage.pending.length}} <a data-action="rollPendingDamageSave">Roll or review next pending save</a> · <a data-action="settlePendingDamageSave">Settle next pending save</a>.{{/if}} <a data-action="applyAccumulatedDamage">Record damage event</a></p>{{else}}<p>Accumulated damage has not been initialized. The GC must confirm the actual totals before events can be recorded.</p>{{/if}}
+      <p>Sight/hearing increments: {{system.senses.visualIncrement}} / {{system.senses.hearingIncrement}} ft. · Scent range: {{system.senses.scentRange}} ft.{{#if system.senses.keenSensesBonus}} Keen Senses +20 ft. included.{{/if}} {{#if system.senses.blinded}} Currently cannot see.{{/if}}{{#if system.senses.deafened}} Currently cannot hear.{{/if}} Apply gear and environment modifiers.</p>
       <h3>{{localize "SPYCRAFT.Checks"}}</h3>
       <div class="stat-grid">
-        <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><b {{sc2tip tips.knowledge}}>{{signed system.knowledge}}</b></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><a data-action="rollKnowledge" {{sc2tip tips.knowledge}}>{{signed system.knowledge}}</a></div>
         <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><b>{{signed system.requestCheck}}</b></div>
         <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><b>{{signed system.gearCheck}}</b></div>
       </div>
+      {{#if system.actionDieAwardSummary.count}}<p>GC action dice awarded this mission: {{system.actionDieAwardSummary.count}} · {{#if system.actionDieAwardSummary.settled}}Mission reward settled: {{system.actionDieAwardSummary.totalXP}} XP.{{else}}+{{system.actionDieAwardSummary.baseXP}} base mission XP before the Career/Threat multiplier; settlement pending.{{/if}}</p>{{/if}}
+      <p><a data-action="configureFortuneTeammates">Improved Fortune teammates</a>{{#if system.improvedFortune.value}} · +{{system.improvedFortune.value}} starting action dice (team cap +3){{/if}}</p>
       <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
       <ul class="item-list compact">
         {{#each weapons}}
           <li data-item-id="{{item.id}}">
             <a data-action="rollAttack" class="name">{{item.name}}</a>
             <span class="{{#unless attack.trained}}bad{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</span>
-            <a data-action="rollDamage">{{item.system.damage}}{{#if attack.damageBonus}} <span data-tooltip="SPYCRAFT.Weapon.StrengthDamageHint">{{signed attack.damageBonus}}</span>{{/if}}</a>
+            <a data-action="rollDamage">{{item.system.damage}}</a>
           </li>
         {{else}}<li class="muted">{{localize "SPYCRAFT.NoWeapons"}}</li>{{/each}}
       </ul>

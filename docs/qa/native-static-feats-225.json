@@ -1,0 +1,517 @@
+{
+  "batch": 225,
+  "kind": "existing implementation verification",
+  "actor": "IcssceTWkhHBsqas",
+  "current": "omvnHTJlfbzBXTt8",
+  "basic": [
+    {
+      "name": "Actor",
+      "covered": [
+        "bluff",
+        "impress"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "9hSsbKrJa2zhQEeB",
+          "kind": "knowledge",
+          "skill": "bluff",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "JHQnYAuTyzGthbeO",
+          "kind": "knowledge",
+          "skill": "impress",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "qTprBnZZeFGflu5g",
+          "kind": "skill",
+          "skill": "bluff",
+          "check": "deception",
+          "total": 3,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Advisor",
+      "covered": [
+        "profession",
+        "resolve"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "xRsdtNjUJEIyde00",
+          "kind": "knowledge",
+          "skill": "profession",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "tdiUUKISuPVaEpSJ",
+          "kind": "knowledge",
+          "skill": "resolve",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "Uzw9mWJkHtpkVrXh",
+          "kind": "skill",
+          "skill": "profession",
+          "check": "accomplishment",
+          "total": 3,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Burglar",
+      "covered": [
+        "acrobatics",
+        "sneak"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "vuVA5jUQQdjpkdg8",
+          "kind": "knowledge",
+          "skill": "acrobatics",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "ozPmiWjHOzJWUueW",
+          "kind": "knowledge",
+          "skill": "sneak",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "kdBhvfqPFAxI7UNp",
+          "kind": "skill",
+          "skill": "acrobatics",
+          "check": "balance",
+          "total": 2,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Diplomat",
+      "covered": [
+        "networking",
+        "senseMotive"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "6rZ7pAHTa2neeoPQ",
+          "kind": "knowledge",
+          "skill": "networking",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "C0YgjGbuh5hLSTwY",
+          "kind": "knowledge",
+          "skill": "senseMotive",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "BotsNRjyWQYYCEkP",
+          "kind": "skill",
+          "skill": "networking",
+          "check": "contact",
+          "total": 1,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Examiner",
+      "covered": [
+        "analysis",
+        "medicine"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "rj4nfKz5d2qyGTgD",
+          "kind": "knowledge",
+          "skill": "analysis",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "twPtsqMIPuuyUoVZ",
+          "kind": "knowledge",
+          "skill": "medicine",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "XGi5H6TcRqxHdNMp",
+          "kind": "skill",
+          "skill": "analysis",
+          "check": "appraise",
+          "total": 4,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Fence",
+      "covered": [
+        "sleightOfHand",
+        "streetwise"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "FpP9K9OOr0IjahlR",
+          "kind": "knowledge",
+          "skill": "sleightOfHand",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "6MFuTesLJU9byao4",
+          "kind": "knowledge",
+          "skill": "streetwise",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "b9DA519UhESjounh",
+          "kind": "skill",
+          "skill": "sleightOfHand",
+          "check": "conceal-action",
+          "total": 2,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Hustler",
+      "covered": [
+        "falsify",
+        "manipulate"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "rChI95fQmAXbam52",
+          "kind": "knowledge",
+          "skill": "falsify",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "NXoDu3n8JKZq8J3K",
+          "kind": "knowledge",
+          "skill": "manipulate",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "dhySRQevQH4KF6r3",
+          "kind": "skill",
+          "skill": "falsify",
+          "check": "cover-up",
+          "total": 3,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Observer",
+      "covered": [
+        "notice",
+        "search"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "wo9p0loGuZ0Kc6Vd",
+          "kind": "knowledge",
+          "skill": "notice",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "cvHEKYHA89nBqSgj",
+          "kind": "knowledge",
+          "skill": "search",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "pjYpg875Fi2o9BuB",
+          "kind": "skill",
+          "skill": "notice",
+          "check": "awareness",
+          "total": 7,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Officer",
+      "covered": [
+        "intimidate",
+        "tactics"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "Zd6iAo3yfZytE7e4",
+          "kind": "knowledge",
+          "skill": "intimidate",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "1hFtUmuIACZEJTSS",
+          "kind": "knowledge",
+          "skill": "tactics",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "jv9N2l72GqQq6TjP",
+          "kind": "skill",
+          "skill": "intimidate",
+          "check": "coercion",
+          "total": 7,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Private Eye",
+      "covered": [
+        "investigation",
+        "security"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "qE08rgez7M1T4B4J",
+          "kind": "knowledge",
+          "skill": "investigation",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "kHBBX6hFiDoLMOjv",
+          "kind": "knowledge",
+          "skill": "security",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "8TjpdCWLEpHB1Khv",
+          "kind": "skill",
+          "skill": "investigation",
+          "check": "canvass-area",
+          "total": 3,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Scholar",
+      "covered": [
+        "bureaucracy",
+        "science"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "qNiCzvdwgvawqE1U",
+          "kind": "knowledge",
+          "skill": "bureaucracy",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "agsWVL4bRZHxIi5O",
+          "kind": "knowledge",
+          "skill": "science",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "AwIs14ErsRsUdQoJ",
+          "kind": "skill",
+          "skill": "bureaucracy",
+          "check": "bribe",
+          "total": 3,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Speed Demon",
+      "covered": [
+        "drive",
+        "mechanics"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "CBzGG7GT7mqwLOhA",
+          "kind": "knowledge",
+          "skill": "drive",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "vej3gf2dROv4stJw",
+          "kind": "knowledge",
+          "skill": "mechanics",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "OjXfIkMb5275Rctp",
+          "kind": "skill",
+          "skill": "drive",
+          "check": "maneuver",
+          "total": 2,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Survivalist",
+      "covered": [
+        "athletics",
+        "survival"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "i9CWb5aaTW18zcre",
+          "kind": "knowledge",
+          "skill": "athletics",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "BktpnlUW7fyBFF08",
+          "kind": "knowledge",
+          "skill": "survival",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "JfsdjQEyKAgmDVeb",
+          "kind": "skill",
+          "skill": "athletics",
+          "check": "bind",
+          "total": 7,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "Techie",
+      "covered": [
+        "computers",
+        "electronics"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "OZm7yXAQ9ndFRdSn",
+          "kind": "knowledge",
+          "skill": "computers",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "pHLEIghG5PDFdrRT",
+          "kind": "knowledge",
+          "skill": "electronics",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "BtSJOqxha2HtV0LB",
+          "kind": "skill",
+          "skill": "computers",
+          "check": "optimize",
+          "total": 4,
+          "threat": 19
+        }
+      ]
+    },
+    {
+      "name": "World Traveler",
+      "covered": [
+        "blend",
+        "cultures"
+      ],
+      "previews": 100,
+      "messages": [
+        {
+          "id": "G06gJjDzKZBr4cNA",
+          "kind": "knowledge",
+          "skill": "blend",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "4GwQRq5V5mL8zJQx",
+          "kind": "knowledge",
+          "skill": "cultures",
+          "total": 5,
+          "threat": 19
+        },
+        {
+          "id": "0tL1RxcGCBFeXZ3X",
+          "kind": "skill",
+          "skill": "blend",
+          "check": "stealth",
+          "total": 2,
+          "threat": 19
+        }
+      ]
+    }
+  ],
+  "wealth": [
+    {
+      "name": "Home Sweet Home",
+      "key": "lifestyle",
+      "rank": 3,
+      "appearance": 0,
+      "cash": 100,
+      "allocated": 0,
+      "total": 1
+    },
+    {
+      "name": "Pack Rat",
+      "key": "possessions",
+      "rank": 3,
+      "appearance": -2,
+      "cash": 100,
+      "allocated": 0,
+      "total": 1
+    },
+    {
+      "name": "Silver Spoon",
+      "key": "spendingCash",
+      "rank": 3,
+      "appearance": -2,
+      "cash": 900,
+      "allocated": 0,
+      "total": 1
+    }
+  ]
+}
