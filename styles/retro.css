@@ -136,7 +136,7 @@
 .spycraft2.sheet.agent.edit-mode .play-only { display: none !important; }
 .spycraft2 .sheet-mode-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
 .spycraft2 .mode-label { font:bold 11px/1.4 'Courier New',monospace; text-transform:uppercase; letter-spacing:.12em; }
-.spycraft2 .sheet-mode-bar button { width:auto; min-height:30px; padding:4px 10px; margin:0; }
+.spycraft2 .sheet-mode-bar button { width:auto; min-height:36px; padding:6px 12px; margin:0; }
 .spycraft2.sheet.agent.play-mode .sheet-header .portrait { width:62px; height:62px; }
 .spycraft2 .agent-name { font:bold 20px/1.25 'Courier New',monospace; }
 .spycraft2 .agent-codename { margin-left:auto; font-style:italic; }
@@ -147,12 +147,12 @@
 .spycraft2.sheet.agent .sheet-tabs a { flex:1; text-align:center; padding:5px 8px; }
 .spycraft2.sheet.agent .sc2-action {
   display:inline-flex; align-items:center; justify-content:center; gap:4px;
-  width:auto; height:auto; min-height:26px; margin:2px 0; padding:3px 7px;
+  width:auto; height:auto; min-height:34px; min-width:34px; margin:2px 0; padding:6px 10px;
   font:inherit; line-height:1.25; white-space:normal; vertical-align:middle;
   color:#24595b; background:#fffcf0; border:1px solid #b7ac92;
 }
 .spycraft2.sheet.agent .sc2-action:hover { background:#e7dec4; color:#142f30; border-color:#24595b; }
-.spycraft2.sheet.agent .controls .sc2-action { min-width:28px; }
+.spycraft2.sheet.agent .controls .sc2-action { min-width:34px; }
 .spycraft2.sheet.agent .stat .sc2-action { border:0; background:transparent; margin:0; }
 .spycraft2.sheet.agent .stat .sc2-action:hover { text-decoration:underline; }
 .spycraft2.sheet.agent .defense-summary .stat-grid { grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; }
@@ -187,3 +187,74 @@
   .spycraft2.sheet.agent .main-reference { flex-direction:column; }
 }
 .spycraft2.sheet.agent { container-type:inline-size; }
+
+/* Distinguish a roll from reference information, and a primary action from tools. */
+.spycraft2.sheet.agent .sc2-primary-action {
+  color:#fff9e9; background:#24595b; border:1px solid #24595b;
+  font-weight:700; min-height:40px; padding:8px 12px;
+}
+.spycraft2.sheet.agent .sc2-primary-action:hover {
+  color:#fff9e9; background:#183c3e; border-color:#183c3e;
+}
+.spycraft2.sheet.agent .defense-summary .sc2-stat-action {
+  width:100%; height:auto; margin:0; line-height:1.3; white-space:normal;
+  font:inherit; color:#183c3e; background:#fffcf0; border:1px solid #24595b;
+  border-top:3px solid #24595b; gap:3px; justify-content:center; cursor:pointer;
+}
+.spycraft2.sheet.agent .defense-summary .sc2-stat-action:hover { background:#e7dec4; }
+.spycraft2.sheet.agent .resources input { min-height:34px; }
+.spycraft2.sheet.agent .quick-actions p { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+.spycraft2.sheet.agent .quick-actions .sc2-action { margin:0; }
+.spycraft2.sheet.agent .sheet-tabs a { min-height:36px; display:flex; align-items:center; justify-content:center; }
+
+/* The next choice stays visible; the grouped checklist has its own bounded space. */
+.spycraft2.sheet.agent .setup-next {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:8px 10px; margin:8px 0; border-left:4px solid #24595b; background:#24595b0d;
+}
+.spycraft2.sheet.agent .setup-next > div { min-width:0; }
+.spycraft2.sheet.agent .setup-next p { margin:4px 0 0; line-height:1.4; }
+.spycraft2.sheet.agent .setup-next button { flex:0 0 auto; width:auto; height:auto; margin:0; }
+.spycraft2.sheet.agent .setup-steps {
+  max-height: min(200px, 26vh); overflow-y:auto; scrollbar-gutter:stable;
+  padding:0 8px 0 28px; margin:6px 0;
+}
+.spycraft2.sheet.agent .setup-steps > li { margin:3px 0; padding-left:3px; }
+.spycraft2.sheet.agent .setup-steps summary { min-height:34px; }
+.spycraft2.sheet.agent .setup-steps ul { padding-left:0; list-style:none; }
+.spycraft2.sheet.agent .setup-steps button {
+  width:100%; height:auto; min-height:36px; white-space:normal; text-align:left;
+  line-height:1.4; padding:6px 10px; margin:3px 0;
+}
+.spycraft2.sheet.agent .setup-count { font-weight:400; margin-left:8px; }
+.spycraft2.sheet.agent .setup-clear { font-size:.9em; margin:6px 0; }
+.spycraft2.sheet.agent.edit-mode .main-reference { flex-direction:column; }
+
+/* Tools are separate disclosures. An open group gets the full sheet width. */
+.spycraft2.sheet.agent .combat-tool-groups {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; align-items:start;
+}
+.spycraft2.sheet.agent .combat-tool-group {
+  min-width:0; padding:0 10px; border:1px solid #b7ac92; background:#fffcf066;
+}
+.spycraft2.sheet.agent .combat-tool-group[open],
+.spycraft2.sheet.agent .combat-review-notice { grid-column:1/-1; }
+.spycraft2.sheet.agent .combat-tool-group > summary {
+  min-height:52px; padding:8px 0; line-height:1.3;
+}
+.spycraft2.sheet.agent .combat-tool-group > summary small {
+  display:block; font-weight:400; padding:3px 0 0 16px; color:#52605a;
+}
+.spycraft2.sheet.agent .combat-tool-group[open] > summary { border-bottom:1px solid #b7ac92; }
+.spycraft2.sheet.agent .combat-tool-group p { margin:10px 0; line-height:1.5; }
+.spycraft2.sheet.agent .tool-actions { display:flex; flex-wrap:wrap; gap:6px; padding:10px 0; }
+.spycraft2.sheet.agent .tool-actions .sc2-action { margin:0; }
+.spycraft2.sheet.agent .condition-group { margin:8px 0; }
+.spycraft2.sheet.agent .condition-group > summary { min-height:36px; padding:7px 0; }
+.spycraft2.sheet.agent .condition-group[open] { border-bottom:1px solid #b7ac92; }
+.spycraft2.sheet.agent .combat-review-notice { border-left:3px solid #942f38; padding:0 10px; }
+@container (max-width:640px) {
+  .spycraft2.sheet.agent .combat-tool-groups { grid-template-columns:minmax(0,1fr); }
+  .spycraft2.sheet.agent .setup-next { flex-wrap:wrap; }
+  .spycraft2.sheet.agent .dashboard-weapons .name { flex-basis:100%; }
+}
