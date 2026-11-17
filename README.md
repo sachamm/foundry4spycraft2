@@ -120,3 +120,17 @@ modifiers under **Advanced options**. Changing the check disables inputs specifi
 to the previous check so they cannot accidentally apply to the next roll. Required
 gear controls stay visible for checks with a Gear tag. The roll button names the
 selected check or taking-10/20 method; existing validation still applies.
+
+Main groups combat tools into attacks/reactions, earned stances and attack styles,
+defense/damage, recorded outcomes, conditions/recovery and GC review. Unowned
+feat declarations are omitted; existing saved styles retain their controls so
+they can be reviewed. Recorded outcomes and GC recovery tools remain available.
+Open tool groups are remembered while the sheet stays open. Saves and Initiative
+use the whole stat card as a roll button; weapon attacks have a primary button.
+
+In Edit, Main starts with attribute creation rather than combat tools. The setup
+guide highlights the earliest outstanding rules reminder and groups the remaining
+reminders by tab. **Continue setup** opens the relevant tab or choice browser,
+selects the reminder's skill level where applicable, and focuses the matching
+build controls. The checklist reports outstanding reminders, not a completion
+percentage; character-building warnings remain separate.

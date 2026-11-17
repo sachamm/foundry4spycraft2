@@ -1,4 +1,5 @@
-import {groupBuildTasks, activeConditionLabels, enhanceAgentSheet} from "./agent-ux.mjs";
+import {buildSetupGuide, combatToolVisibility, focusSetupTask, activeConditionLabels, enhanceAgentSheet} from "./agent-ux.mjs";
+import {COMBAT_STANCES} from "../rules/combat-stance.mjs";
 import {manageThreadNeedle} from '../apps/thread-needle.mjs';
 import {takeStrikingAttack,reviewStrikingAttack} from '../apps/striking-stance.mjs';
 import {recordFendMovement} from '../apps/fend.mjs';
@@ -70,7 +71,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   /** Career level whose skill points are being edited on the Skills tab. */
   _skillLevel = null;
 
-  /** Which collapsible header panels (to-do, warnings) are open, so re-renders keep them that way. */
+  /** Local disclosure preferences survive complete and partial sheet renders. */
   _open = { todo: false, warnings: false };
 
   /** A local view preference, never stored on the character. */
@@ -87,9 +88,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       toggleEditMode(){
         if (!this.isEditable) return;
         this._editMode = !this._editMode;
-        this._open.todo = this._editMode;
         return this.render();
       },
+      setupTask: SpycraftAgentSheet.#onSetupTask,
       applyShaken(){return this.actor.applyShaken();},
       reviewShakenApplication(){return this.actor.reviewShakenApplication();},
       editShakenSource(event,target){return this.actor.editShakenSource(target.dataset.sourceUuid);},
@@ -304,8 +305,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     Object.assign(context, {
       actor, system: sys, shakenInitiativeReviews:actor.shakenInitiativeReviews, usagePeriodReview:game.spycraft2?.getUsagePeriodReview?.()??{}, startingDiceEntry:actor.startingDiceEntry, source: actor.system._source, config: cfg, editable: this.isEditable,
       tabs: this._prepareTabs("primary"),
-      warnings: sys.warnings ?? [], todo: groupBuildTasks(sys.todo), todoCount: sys.todo?.length ?? 0, open: this._open,
-      editMode: this.isEditable && this._editMode, activeConditions: activeConditionLabels(sys)
+      warnings: sys.warnings ?? [], setupGuide: buildSetupGuide(sys.todo), open: this._open,
+      editMode: this.isEditable && this._editMode, activeConditions: activeConditionLabels(sys),
+      combatTools: combatToolVisibility(sys, COMBAT_STANCES)
     });
 
     // Hover breakdowns: fixed parts first, then every origin/feat/class bonus the engine recorded.
@@ -474,6 +476,10 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.markObservations=markRows(this.actor.flags.spycraft2?.markObservations,cfg);
     context.featFreeActions=(this.actor.limitedUseStatus??[]).filter(spec=>['featFreeAction','featFreeActionRound'].includes(spec.workflow));
     context.limitedUses=(this.actor.limitedUseStatus??[]).filter(spec=>!spec.hidden||spec.counterReview);
+    context.combatReviewNeeded = !!(context.usagePeriodReview.needsReview
+      || actor.flags.spycraft2?.missionXPReview?.needsReview
+      || actor.flags.spycraft2?.actionDieAwardReview?.needsReview
+      || sys.actionDiceSettlementReview?.needsReview);
     const brightStatus=brightIdeaPoolStatus(sys,this.actor.usagePeriods);context.brightIdeaLegacy=brightStatus.needsReview;context.brightIdeaLegacyMalformed=brightStatus.legacyUsed===null;
     context.isGM=game.user.isGM;
     context.professor=sys.coreClassIds?.includes("scientist");context.trailblazer=sys.coreClassIds?.includes("scout");
@@ -516,10 +522,6 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   _onRender(context, options) {
     super._onRender(context, options);
     enhanceAgentSheet(this.element, context, this, text => game.i18n.localize(text));
-    for (const d of this.element.querySelectorAll("details[data-key]")) {
-      if(Object.hasOwn(this._open,d.dataset.key))d.open=this._open[d.dataset.key];
-      d.addEventListener("toggle", () => { this._open[d.dataset.key] = d.open; });
-    }
   }
 
   async _preparePartContext(partId, context, options) {
@@ -664,11 +666,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     this._open.todo = false;
     if (tab === "main") this._open.origins = true;
     await this.render();
-    const section = this.element.querySelector(`section[data-tab="${tab}"]`);
-    const missing = [...(section?.querySelectorAll("select:not([disabled])") ?? [])].find(select => !select.value);
-    const field = missing ?? section?.querySelector("input:not([disabled])");
-    field?.scrollIntoView({block: "nearest"});
-    field?.focus();
+    focusSetupTask(this.element, target.dataset);
+  }
+  static async #onSetupTask(event, target) {
+    if (!this.isEditable) return;
+    await SpycraftAgentSheet.#onTodo.call(this, event, target);
+    if (target.dataset.type) return SpycraftAgentSheet.#onBrowse.call(this, event, target);
   }
   static #onSpendActionDie() { return this.actor.rollActionDie(); }
   static #onAddLevel() { return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true); }

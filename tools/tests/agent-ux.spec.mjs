@@ -18,6 +18,8 @@ test('Play/Edit preserves resource access, disables build fields and supports ke
     <div class="edit-only"><input name="system.abilities.str.base" value="10" /><input name="granted" disabled /></div>
     <input class="edit-only" name="system.xp" value="0" />
     <a data-action="rollSave" data-save="fort">Fortitude</a>
+    <a data-action="itemDelete" data-tooltip="SPYCRAFT.Origin.Remove" aria-label="Remove talent"><i aria-hidden="true"></i></a>
+    <div class="play-only" data-testid="play-dashboard">Combat tools</div>
     <input class="skill-search" /><input class="trained-filter" type="checkbox" /><span class="skill-count"></span>
     <table class="skills-table"><tbody><tr data-skill-name="Athletics STR/CON" data-trained="true"><td>Athletics</td></tr><tr data-skill-name="Bluff CHA" data-trained="false"><td>Bluff</td></tr></tbody></table>
   </div>`);
@@ -28,6 +30,8 @@ test('Play/Edit preserves resource access, disables build fields and supports ke
   await expect(page.locator('[name="system.xp"]')).toBeDisabled();
   await expect(page.locator('[name="system.vitality.value"]')).toBeEnabled();
   const action=page.getByRole('button',{name:'Fortitude'});
+  await expect(page.getByRole('button',{name:'Remove talent'})).toBeVisible();
+  await expect(page.getByTestId('play-dashboard')).toBeVisible();
   await action.focus();await expect(action).toBeFocused();
   await page.locator('.skill-search').fill('CHA');
   await expect(page.locator('[data-skill-name="Athletics STR/CON"]')).toBeHidden();
@@ -38,6 +42,7 @@ test('Play/Edit preserves resource access, disables build fields and supports ke
   await expect(page.locator('[name="system.abilities.str.base"]')).toBeVisible();
   await expect(page.locator('[name="system.abilities.str.base"]')).toBeEnabled();
   await expect(page.locator('[name="granted"]')).toBeDisabled();
+  await expect(page.getByTestId('play-dashboard')).toBeHidden();
   await expect(page.locator('.trained-filter')).toBeChecked();
 });
 
@@ -69,4 +74,59 @@ test('named check changes show relevant circumstances, omit stale inputs and upd
   await page.locator('.sc2-advanced-options').evaluate(el=>el.open=true);
   await page.locator('[name="method"]').selectOption('take10');
   await expect(page.getByRole('button')).toHaveText('Take 10: Repair Check');
+});
+
+test('combat disclosures retain independent open states across a complete sheet render',async({page})=>{
+  const markup=`<div class="spycraft2 application sheet agent"><details data-key="combat-attacks"><summary>Attacks and reactions</summary><a data-action="rollDisarm">Disarm</a></details><details data-key="combat-review"><summary>GC review</summary><a data-action="reviewCounterTrip">Recover counter-Trip</a></details></div>`;
+  await page.setContent(`<style>${css}</style>${markup}`);
+  await load(page,sheetUX,'enhanceAgentSheet');
+  await page.evaluate(()=>{window.preferences={_skillSearch:'',_trainedOnly:false};window.enhanceAgentSheet(document.querySelector('.agent'),{editMode:false},window.preferences);});
+  await page.getByText('GC review',{exact:true}).click();
+  await expect(page.getByRole('button',{name:'Recover counter-Trip'})).toBeVisible();
+  await expect.poll(()=>page.evaluate(()=>window.preferences._open['combat-review'])).toBe(true);
+  await page.evaluate(markup=>{document.querySelector('.agent').outerHTML=markup;window.enhanceAgentSheet(document.querySelector('.agent'),{editMode:false},window.preferences);},markup);
+  await expect(page.getByRole('button',{name:'Recover counter-Trip'})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Disarm',exact:true})).toBeHidden();
+  await page.getByText('GC review',{exact:true}).click();
+  await expect.poll(()=>page.evaluate(()=>window.preferences._open['combat-review'])).toBe(false);
+});
+
+test('setup navigation opens the correct collapsed controls without focusing the skill search or changing resources',async({page})=>{
+  await page.setContent(`<div class="spycraft2 application sheet agent">
+    <input name="system.vitality.value" value="11" />
+    <section data-tab="gear"><details><summary>Mission planning</summary><input name="system.wealthAllocation.lifestyle" value="0" /></details></section>
+    <section data-tab="skills"><input class="skill-search" /><input name="skillpts.athletics" value="0" /></section>
+    <section data-tab="training"><input name="system.proficiencies.edged.proficient" type="checkbox" /><textarea name="system.interests"></textarea></section>
+  </div>`);
+  await load(page,sheetUX,'focusSetupTask');
+  await page.evaluate(()=>window.focusSetupTask(document.querySelector('.agent'),{tab:'gear',order:'60'}));
+  await expect(page.locator('[name="system.wealthAllocation.lifestyle"]')).toBeFocused();
+  await expect(page.locator('details')).toHaveAttribute('open','');
+  await page.evaluate(()=>window.focusSetupTask(document.querySelector('.agent'),{tab:'skills',order:'30'}));
+  await expect(page.locator('[name="skillpts.athletics"]')).toBeFocused();
+  await page.evaluate(()=>window.focusSetupTask(document.querySelector('.agent'),{tab:'training',order:'52'}));
+  await expect(page.locator('[name="system.interests"]')).toBeFocused();
+  await expect(page.locator('[name="system.vitality.value"]')).toHaveValue('11');
+  await expect(page.locator('[name="skillpts.athletics"]')).toHaveValue('0');
+});
+
+for(const width of [560,820])test(`primary rolls and combat tools have usable targets without horizontal overflow at ${width}px`,async({page})=>{
+  await page.setContent(`<style>*{box-sizing:border-box}${css}</style><div class="spycraft2 application sheet agent play-mode" style="width:${width}px">
+    <div class="window-content"><div class="defense-summary"><div class="stat-grid">
+      <button type="button" class="stat sc2-stat-action" data-action="rollSave"><span>Fortitude</span><b>+2</b></button>
+      <div class="stat">Defense<b>13</b></div>
+    </div></div>
+    <a class="sc2-primary-action" data-action="rollAttack">Attack: A weapon with a long but ordinary descriptive name</a>
+    <div class="combat-tool-groups"><details class="combat-tool-group" data-key="combat-outcomes"><summary><span>Recorded outcomes</span><small>Resolve an attack already rolled</small></summary><div class="tool-actions"><a data-action="manageTakedown">Takedown saves/outcomes</a><a data-action="manageMeleeTradeoff">Recorded attack benefits</a></div></details><details class="combat-tool-group"><summary>Defense and damage</summary></details></div>
+    </div></div>`);
+  await load(page,sheetUX,'enhanceAgentSheet');
+  await page.evaluate(()=>{window.prefs={};window.enhanceAgentSheet(document.querySelector('.agent'),{editMode:false},window.prefs);window.rolls=0;document.querySelector('[data-action="rollSave"]').addEventListener('click',()=>window.rolls++);});
+  const save=page.getByRole('button',{name:'Fortitude +2'});
+  expect((await save.boundingBox()).height).toBeGreaterThanOrEqual(70);
+  await save.focus();await page.keyboard.press('Enter');await page.keyboard.press('Space');
+  expect(await page.evaluate(()=>window.rolls)).toBe(2);
+  expect((await page.locator('[data-action="rollAttack"]').boundingBox()).height).toBeGreaterThanOrEqual(40);
+  await page.getByText('Recorded outcomes',{exact:true}).click();
+  expect((await page.getByRole('button',{name:'Takedown saves/outcomes'}).boundingBox()).height).toBeGreaterThanOrEqual(34);
+  expect(await page.locator('.window-content').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
 });
