@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      TAG: v0.3.1-rc.1
+      TAG: v0.3.2-rc.1
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
              '.version = $ver | .manifest = ($base + "/system.json") | .download = ($base + "/spycraft2.zip")' \
              system.json > system.tmp
           mv system.tmp system.json
-          node -e 'const m=require("./system.json");if(m.version!=="0.3.1-rc.1"||!m.download.includes("v0.3.1-rc.1"))process.exit(1)'
+          node -e 'const m=require("./system.json");if(m.version!=="0.3.2-rc.1"||!m.download.includes("v0.3.2-rc.1"))process.exit(1)'
       - name: Package and validate archive
         run: |
           zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md
@@ -53,9 +53,9 @@ jobs:
       - name: Publish release candidate without replacing stable latest
         run: |
           cat > release-notes.md <<EOF
-          Spycraft 2.0 v0.3.1-rc.1 — Release Candidate
+          Spycraft 2.0 v0.3.2-rc.1 — Release Candidate
 
-          Includes merged rules audit fixes, Foundry 14 compatibility and retro dossier UI.
+          Includes the merged Play/Edit character-sheet redesign, combat dashboard, skill search, streamlined roll dialogs and current rules implementation.
 
           Built from main commit ${GITHUB_SHA}. Automated engine, data integrity, sheet, lifecycle and browser-layout tests passed.
 
@@ -70,6 +70,6 @@ jobs:
           fi
           gh release create "$TAG" system.json spycraft2.zip SHA256SUMS.txt \
             --target "$GITHUB_SHA" \
-            --title "Spycraft 2.0 v0.3.1-rc.1" \
+            --title "Spycraft 2.0 v0.3.2-rc.1" \
             --notes-file release-notes.md \
             --prerelease --latest=false
