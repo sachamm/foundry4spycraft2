@@ -1,6 +1,10 @@
 {{!-- A template part must render exactly one root element, so the header, to-do and warnings share a wrapper. --}}
 <div class="sheet-top">
-<div class="dossier-band" aria-hidden="true">
+<div class="sheet-mode-bar">
+  <span class="mode-label">{{#if editMode}}Character setup{{else}}Field dossier{{/if}}</span>
+  {{#if editable}}<button type="button" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}Done editing · Return to play{{else}}Edit character{{/if}}</button>{{/if}}
+</div>
+<div class="dossier-band edit-only" aria-hidden="true">
   <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
   <span class="file-label">{{localize "SPYCRAFT.Retro.AgentDossier"}}</span>
   <span class="file-stamp">{{localize "SPYCRAFT.Retro.Classified"}}</span>
@@ -9,19 +13,19 @@
   <img class="portrait" src="{{actor.img}}" data-edit="img" data-action="editImage" alt="{{actor.name}}" />
   <div class="header-main">
     <div class="name-row">
-      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" />
-      <input class="codename" name="system.codename" type="text" value="{{system.codename}}" placeholder="{{localize 'SPYCRAFT.Codename'}}" />
+      {{#if editMode}}<input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" />
+      <input class="codename" name="system.codename" type="text" value="{{system.codename}}" placeholder="{{localize 'SPYCRAFT.Codename'}}" />{{else}}<strong class="agent-name">{{actor.name}}</strong><span class="agent-codename">{{system.codename}}</span>{{/if}}
     </div>
     <div class="summary">
       <span class="level"><b>{{localize "SPYCRAFT.CareerLevel"}} {{system.level}}</b></span>
-      <label>{{localize "SPYCRAFT.XP"}} <input type="number" name="system.xp" value="{{system.xp}}" class="w-xp" /></label>
-      {{#if xpNext}}<span class="muted">/ {{xpNext}}</span>{{/if}}
+      <label class="edit-only">{{localize "SPYCRAFT.XP"}} <input type="number" name="system.xp" value="{{system.xp}}" class="w-xp" /></label>
+      {{#if xpNext}}<span class="muted edit-only">/ {{xpNext}}</span>{{/if}}
       <span class="talent origin" {{#if talent}}data-item-id="{{talent.id}}"{{/if}}>{{#if talent}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.talent">{{talent.name}}</a>
-        <a data-action="browse" data-type="origin" data-origin-type="talent" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
-        <a data-action="itemDelete" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>
+        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent" aria-label="Change talent" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
+        <a class="edit-only" data-action="itemDelete" aria-label="Remove talent" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>
       <span class="specialty origin" {{#if specialty}}data-item-id="{{specialty.id}}"{{/if}}>{{#if specialty}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.specialty">{{specialty.name}}</a>
-        <a data-action="browse" data-type="origin" data-origin-type="specialty" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
-        <a data-action="itemDelete" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</a>{{/if}}</span>
+        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="specialty" aria-label="Change specialty" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
+        <a class="edit-only" data-action="itemDelete" aria-label="Remove specialty" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a class="edit-only" data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</a>{{/if}}</span>
     </div>
     <div class="resources">
       <label class="res vitality">{{localize "SPYCRAFT.Vitality"}}
@@ -29,21 +33,32 @@
       <label class="res wounds">{{localize "SPYCRAFT.Wounds"}}
         <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span {{sc2tip tips.wounds}}>/ {{system.wounds.max}}</span></label>
       <span class="res action-dice">{{localize "SPYCRAFT.ActionDice.Label"}}
-        <input type="number" name="system.actionDice.value" value="{{system.actionDice.value}}" /> <span {{sc2tip tips.actionDice}}>{{localize "SPYCRAFT.ActionDice.Starting"}} {{system.actionDice.max}} (d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}})</span>
+        <input type="number" name="system.actionDice.value" aria-label="{{localize 'SPYCRAFT.ActionDice.Label'}}" value="{{system.actionDice.value}}" /> <span {{sc2tip tips.actionDice}}>{{localize "SPYCRAFT.ActionDice.Starting"}} {{system.actionDice.max}} (d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}})</span>
         {{#unless startingDiceEntry.blocked}}<a data-action="initializeStartingDice" data-tooltip="Begin play once with this character’s starting action dice">Begin play</a>{{/unless}}
-        <a data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend"><i class="fa-solid fa-dice"></i></a>
-        <a data-action="healActionDice" data-tooltip="Heal outside combat with action dice"><i class="fa-solid fa-heart"></i></a>
-        <a data-action="refreshAction" data-tooltip="Begin or complete a full-round Refresh"><i class="fa-solid fa-hourglass-half"></i></a>
-        <a data-action="boostDefense" data-tooltip="Boost Defense with an action die at round start"><i class="fa-solid fa-shield"></i></a>
+        <a data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend"><i class="fa-solid fa-dice" aria-hidden="true"></i> Spend</a>
+        <a data-action="healActionDice" data-tooltip="Heal outside combat with action dice"><i class="fa-solid fa-heart" aria-hidden="true"></i> Heal</a>
+        <a data-action="refreshAction" data-tooltip="Begin or complete a full-round Refresh"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> Refresh</a>
+        <a data-action="boostDefense" data-tooltip="Boost Defense with an action die at round start"><i class="fa-solid fa-shield" aria-hidden="true"></i> Defense</a>
       </span>
     </div>
   </div>
 </header>
-{{#if todo.length}}
+{{#if setupGuide.next}}
+<aside class="setup-next edit-only" aria-label="Next setup choice">
+  <div><strong>Next: {{setupGuide.next.label}}</strong><p>{{setupGuide.next.text}}</p></div>
+  {{#if editable}}<button type="button" class="sc2-primary-action" data-action="setupTask" data-tab="{{setupGuide.next.tab}}" data-order="{{setupGuide.next.order}}" {{#if setupGuide.next.skillLevel}}data-skill-level="{{setupGuide.next.skillLevel}}"{{/if}} {{#if setupGuide.next.browse}}data-type="{{setupGuide.next.browse.type}}" data-origin-type="{{setupGuide.next.browse.originType}}"{{/if}}>Continue setup</button>{{/if}}
+</aside>
 <details class="todo" data-key="todo" {{#if open.todo}}open{{/if}}>
-  <summary><i class="fa-solid fa-list-check"></i> {{localize "SPYCRAFT.Todo"}} ({{todo.length}})</summary>
-  <ul>{{#each todo}}<li>{{#if browse}}<a data-action="browse" data-type="{{browse.type}}" data-origin-type="{{browse.originType}}">{{text}}</a>{{else}}<a data-action="todo" data-tab="{{tab}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}}>{{text}}</a>{{/if}}</li>{{/each}}</ul>
+  <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> Setup checklist · {{setupGuide.count}} reminders</summary>
+  <ol class="setup-steps" aria-label="Remaining character setup">
+    {{#each setupGuide.steps}}<li><details data-key="setup-{{tab}}">
+      <summary>{{label}} <span class="setup-count">{{count}}</span></summary>
+      <ul>{{#each tasks}}<li>{{#if @root.editable}}<button type="button" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{else}}{{text}}{{/if}}</li>{{/each}}</ul>
+    </details></li>{{/each}}
+  </ol>
 </details>
+{{else}}
+<p class="setup-clear edit-only">No setup reminders. Check any character-building warnings before play.</p>
 {{/if}}
 {{#if warnings.length}}
 <details class="warnings" data-key="warnings" {{#if open.warnings}}open{{/if}}>

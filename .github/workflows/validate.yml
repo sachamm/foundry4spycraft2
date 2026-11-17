@@ -22,3 +22,19 @@ jobs:
           find module tools -name '*.mjs' -type f -exec node --check {} \;
           node --check spycraft2.mjs
           node -e 'JSON.parse(require("fs").readFileSync("system.json","utf8"))'
+  layout:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:layout
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: layout-test-results
+          path: test-results/

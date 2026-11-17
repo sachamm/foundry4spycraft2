@@ -1,0 +1,53 @@
+{
+  "batches": [
+    374
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 3067,
+  "nodeGroups": [
+    1412,
+    1655
+  ],
+  "newTests": 17,
+  "builtPackTests": 6,
+  "browserFixtures": 112,
+  "browserLayoutRerun": true,
+  "nativeQA": "not run: no Foundry installation in the cloud session",
+  "sourceCheck": "Spycraft_2.0_AI_Rules.md text, pp.179,339; original PDF not visually checked",
+  "inventory": {
+    "manual": 113,
+    "partial": 54,
+    "other": 147,
+    "total": 314,
+    "minimumUnfinished": 167
+  },
+  "implementedFeats": [
+    "Knife Basics"
+  ],
+  "tableManaged": [
+    "Automatic move into an unoccupied adjacent square after a Circling Stance attack",
+    "Free hand when attacking with a carried knife",
+    "Unoccupied adjacent square confirmation"
+  ],
+  "pendingRulings": [
+    "Between the Ribs: general sneak attack conditions required?"
+  ],
+  "files": [
+    "module/rules/knife-basics.mjs",
+    "module/rules/combat-stance.mjs",
+    "module/rules/defense.mjs",
+    "module/rules/melee-tricks.mjs",
+    "module/rules/readied-weapons.mjs",
+    "module/rules/sneak-attack.mjs",
+    "module/rules/gear.mjs",
+    "module/rules/engine.mjs",
+    "module/apps/incoming-defense.mjs",
+    "module/apps/attack-damage-benefits.mjs",
+    "module/apps/combat-stance.mjs",
+    "module/apps/standard-attack-context.mjs",
+    "module/documents/actor.mjs",
+    "module/data/item.mjs",
+    "module/sheets/item-sheet.mjs",
+    "tools/test-knife-basics.mjs"
+  ]
+}

@@ -1,4 +1,5 @@
 <section class="tab feats {{tab.cssClass}}" data-tab="feats" data-group="primary">
+  <div class="edit-only">
   <h3>{{localize "SPYCRAFT.Feat.Slots"}}
     <span class="controls">
       <a data-action="browse" data-type="feat"><i class="fa-solid fa-book-open"></i> {{localize "SPYCRAFT.Feat.Browse"}}</a>
@@ -9,6 +10,7 @@
     {{#each featTrees}}<span class="slot"><b>{{label}}</b> {{#if slots}}{{spent}} / {{slots}}{{else}}{{owned}}{{/if}}</span>{{/each}}
   </div>
   {{#each system.feats.replacementGrants}}<p>{{name}} was also granted by a class: {{count}} replacement feat choice(s) in {{tree}} (p.171).</p>{{/each}}
+  </div>
   {{#if featFreeActions.length}}<ul class="plain">{{#each featFreeActions}}<li>{{name}}: {{remaining}} / {{limit}} per {{period}}{{#if counterReview}} · <span class="bad">Saved use count needs GC review</span>{{/if}}</li>{{/each}}</ul>{{/if}}
   {{#if jinxUse}}<p>Jinx: {{jinxUse.remaining}} / {{jinxUse.limit}} per session. Select it when paying to activate an opponent’s error.{{#if jinxUse.counterReview}} <span class="bad">Saved use count needs GC review</span>{{/if}}{{#if isGM}} <a data-action="reviewLimitedUseCounter" data-resource="jinx">Review saved count</a>{{/if}}</p>{{/if}}
   {{#if markUse}}<p>Mark: {{markUse.remaining}} / {{markUse.limit}} per session {{#if markUse.counterReview}}<span class="bad">Saved use count needs GC review</span>{{/if}}</p>{{/if}}

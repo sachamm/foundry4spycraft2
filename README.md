@@ -104,3 +104,37 @@ NPC actors now offer opt-in graded creation, source-backed core tables, equipmen
 ## Game Control tools
 
 The GC Console (button in the Actors sidebar) covers the mission record and XP, GC action dice, dramatic scenes, fluid initiative, standard NPC Damage saves, disposition, Dramatic Conflicts, campaign qualities and the security, hazard and possession tables. See [Game Control tools](docs/gc-tools.md) for what each does and what remains manual.
+
+## Character sheet views
+
+Agent sheets open in **Play** with saves, Defense, Initiative, weapon attacks and
+common actions at the top of Main. **Edit character** exposes attribute creation,
+skill purchases, class choices, training and other build controls; **Done editing**
+returns to Play. This view switch changes no character data. Vitality, wounds,
+action dice and biography remain available during play.
+
+Skills supports a name/attribute search and a **Trained skills only** filter.
+Build reminders group repeated choices and open the relevant tab in Edit.
+The Main tab keeps current condition labels visible while detailed condition
+and combat tools are collapsed. Gear shows inventory before wealth and mission
+planning; Classes keeps ability use ahead of the collapsed GC tools.
+
+Skill dialogs show circumstances for the selected named check and put general
+modifiers under **Advanced options**. Changing the check disables inputs specific
+to the previous check so they cannot accidentally apply to the next roll. Required
+gear controls stay visible for checks with a Gear tag. The roll button names the
+selected check or taking-10/20 method; existing validation still applies.
+
+Main groups combat tools into attacks/reactions, earned stances and attack styles,
+defense/damage, recorded outcomes, conditions/recovery and GC review. Unowned
+feat declarations are omitted; existing saved styles retain their controls so
+they can be reviewed. Recorded outcomes and GC recovery tools remain available.
+Open tool groups are remembered while the sheet stays open. Saves and Initiative
+use the whole stat card as a roll button; weapon attacks have a primary button.
+
+In Edit, Main starts with attribute creation rather than combat tools. The setup
+guide highlights the earliest outstanding rules reminder and groups the remaining
+reminders by tab. **Continue setup** opens the relevant tab or choice browser,
+selects the reminder's skill level where applicable, and focuses the matching
+build controls. The checklist reports outstanding reminders, not a completion
+percentage; character-building warnings remain separate.

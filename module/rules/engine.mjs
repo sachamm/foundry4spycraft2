@@ -4,6 +4,7 @@ import {cheapShotPenalty,cheapShotRecords,cheapShotSpeedPenalty} from './cheap-s
 import {readiedDisarmWeapons} from './disarm-response.mjs';
 import {readiedGuardWeapons} from './guard.mjs';
 import {polearmDefensePlan} from './polearm-defense.mjs';
+import {knifeBasicsPlan} from './knife-basics.mjs';
 import {attributeDamageState} from './attribute-damage.mjs';
 import {candidatePlan} from './candidate.mjs';
 import {toolShedKitState} from './tool-shed.mjs';
@@ -34,6 +35,7 @@ import {baseSensoryRanges} from './senses.mjs';
 import {extraGearCategory} from './feats.mjs';
 import {sneakAttackCapacity} from './sneak-attack.mjs';
 import {eagleEyeState,sniperMagicTouchBonus} from './sniper.mjs';
+import {markPrerequisiteBonus} from './marks.mjs';
 import {classGearWarnings} from './class-gear.mjs';
 import {missionCaliberOptions,missionCaliberMatches} from "./mission-gear.mjs";
 import {isResourceLock} from "./transactions.mjs";
@@ -652,6 +654,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.readiedMeleeWeapons=readiedMeleeWeapons(sys,items);
   sys.guardWeapons=readiedGuardWeapons(sys,items);
   sys.disarmWeapons=readiedDisarmWeapons(sys,items);
+  sys.knifeBasics=knifeBasicsPlan(sys,items);
   const heldReview=sys.guardWeapons.blockedReason||sys.disarmWeapons.blockedReason;
   if(heldReview){warnings.push(heldReview);todo.push({order:10,tab:'gear',text:heldReview});}
   sys.polearmDefense=polearmDefensePlan(sys);
@@ -1068,10 +1071,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
 /** Values prerequisite checks need, built from derived data. */
 export function prerequisiteContext(sys, featNames, featTrees, skillRanks, {featTree='',featChoices=sys.activeFeatSelections??[]}={}) {
   const focusSel = sys.focusTotals ?? sys.focuses ?? {};
+  const mark = markPrerequisiteBonus(n => featNames.has(norm(n)), featTree);
   return {
     level: sys.level,
+    levelBonus: mark,
     sneakAttackDice:sneakAttackCapacity(sys,featNames),
-    base: { bab: (sys.base?.bab ?? 0)+(featTree==='rangedCombat'?sniperMagicTouchBonus(sys):0), defense: sys.base?.defense ?? 0 },
+    base: { bab: (sys.base?.bab ?? 0)+(featTree==='rangedCombat'?sniperMagicTouchBonus(sys):0)+mark, defense: sys.base?.defense ?? 0 },
     abilities: Object.fromEntries(ABILITIES.map(k => [k, sys.abilities[k].value])),
     skills: skillRanks,
     featTrees,

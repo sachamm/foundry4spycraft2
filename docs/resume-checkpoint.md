@@ -238,11 +238,22 @@ Verification:513legacy assertions,3041Node tests (1386+1655),6cold pack checks,3
 
 Staff Basics remains explicitly partial pending a whole-feat printed-benefit/source audit; no closure is claimed solely from this escape ruling. Inventory remains117manual/54partial/143other, at least171of314explicitly unfinished,29whole-feat closures. Knife Basics has been researched but no implementation started. User requested wrap-up, checks, commit and push to GitHub main; remaining ledger work is deferred. Audits: qa/implementation-372.json and qa/native-thread-escape-372.json.
 
+## Cloud continuation — batches 373 onward (branch `claude/residual-ledger-nuafqx`)
+
+Work resumed in a cloud container on branch `claude/residual-ledger-nuafqx`, kept separate from concurrent UI/UX work; existing templates, styles and sheet layout are not restructured. The user uploaded `Spycraft_2.0_AI_Rules.md` to the session; it is reference data. The original PDFs and a native Foundry installation are **not** available there, so these batches rely on the extracted rules text plus automated tests, and each records “native QA not run”. Re-run native QA and visual page checks for these batches when a desktop session resumes. Details for each batch are in `raw-option-inventory.md`.
+
+- Batch 373: Mark of Conflict/Strife/Turmoil (p.190) — +1 category damage, +3 BAB/level for own-tree prerequisites. 3050 Node tests.
+- Batch 374: Knife Basics (p.179) — knife family, considered-readied carried knives, Circling Stance dodge halving in the Incoming attack preview, Between the Ribs sneak die on its recorded hit. 3067 Node tests, 112 layout fixtures.
+
+State at wrap-up (user requested finish, commit, push and merge to main): 113 manual / 54 partial / 147 other, at least 167 of 314 feat rows explicitly unfinished. Next candidates: Staff Basics whole-feat source audit, Sword Basics, Club Basics, Dueling chain. Layout fixtures in a cloud container need an explicit Chromium `executablePath` because the pinned Playwright expects a different browser build.
+
 ## Next work — paused at user-requested wrap-up
 
-Continue Knife Basics p.179 only on a new continuation request: free knife draw, knives on the person always readied, Circling Stance and Between the Ribs remain unimplemented. Preserve371 physical hand capacity: carried readiness is distinct from physical holding, does not occupy every knife in a hand, and does not spend Quick Draw’s two-use pool. Research has begun, no Knife source edits exist. Staff Basics needs its whole-feat source audit before closure. Full validators/pack checks require stopped native services. Latest isolated QA root372 is stopped, cleaned and verified as above. Preserve baseline IDs and unanswered rulings.
+Knife Basics p.179 was implemented in batch 374 (see the cloud continuation section). Preserve371 physical hand capacity: carried readiness is distinct from physical holding, does not occupy every knife in a hand, and does not spend Quick Draw’s two-use pool. Research has begun, no Knife source edits exist. Staff Basics needs its whole-feat source audit before closure. Full validators/pack checks require stopped native services. Latest isolated QA root372 is stopped, cleaned and verified as above. Preserve baseline IDs and unanswered rulings.
 
 ## Unanswered rulings — do not assume an answer
+
+- Between the Ribs p.179: does “inflicting 1 die of sneak attack damage with a hit” still require the general sneak attack conditions (target flanked, helpless or vulnerable)? Batch 374 follows the existing precedent and requires them. No answer yet.
 
 - TRP bonus type p.302: asked whether the listed unnamed “bonus” stacks with Axe/Spear/Whip gear bonuses or should count as gear. No answer yet. Source collector/selection tests are isolated in /tmp/spycraft-trp-pending; no numerical integration or default type chosen.
 

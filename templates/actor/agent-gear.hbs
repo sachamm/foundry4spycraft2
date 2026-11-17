@@ -1,50 +1,4 @@
 <section class="tab gear {{tab.cssClass}}" data-tab="gear" data-group="primary">
-  <h3>{{localize "SPYCRAFT.Wealth"}} <span class="points {{#if (sc2lt system.wealth.remaining 0)}}bad{{/if}}">{{system.wealth.allocated}} / {{system.wealth.total}}</span></h3>
-  <table class="wealth">
-    <thead><tr><th></th><th>{{localize "SPYCRAFT.Spent"}}</th><th>{{localize "SPYCRAFT.Rank"}}</th><th></th></tr></thead>
-    <tbody>
-      <tr><th>{{localize "SPYCRAFT.Lifestyle"}}</th><td><input type="number" name="system.wealthAllocation.lifestyle" value="{{system.wealthAllocation.lifestyle}}" class="w-2" min="0" /></td>
-        <td>{{system.wealth.lifestyle.rank}}</td><td class="muted">{{system.wealth.lifestyle.home}} · {{localize "SPYCRAFT.Vehicle"}} {{system.wealth.lifestyle.vehicle}} · {{system.wealth.lifestyle.appearance}} ({{signed system.wealth.lifestyle.appearanceMod}})</td></tr>
-      <tr><th>{{localize "SPYCRAFT.Possessions"}}</th><td><input type="number" name="system.wealthAllocation.possessions" value="{{system.wealthAllocation.possessions}}" class="w-2" min="0" /></td>
-        <td>{{system.wealth.possessions.rank}}</td><td class="muted">{{system.wealth.possessions.picks}}</td></tr>
-      <tr><th>{{localize "SPYCRAFT.SpendingCash"}}</th><td><input type="number" name="system.wealthAllocation.spendingCash" value="{{system.wealthAllocation.spendingCash}}" class="w-2" min="0" /></td>
-        <td>{{system.wealth.spendingCash.rank}}</td><td class="muted">${{system.wealth.spendingCash.amount}}</td></tr>
-    </tbody>
-  </table>
-  {{#if system.bloodstainDefense.earned}}<label><input type="checkbox" name="system.wealthAllocation.dressedForLifestyle" {{checked system.wealthAllocation.dressedForLifestyle}} /> Bloodstain Resistant: I am dressed according to my Lifestyle</label><p>Bloodstain Resistant Defense +{{system.bloodstainDefense.bonus}}. {{system.bloodstainDefense.reason}}</p>{{/if}}
-  <p>Wealth Possessions: {{system.wealth.possessions.budget.spent}} / {{system.wealth.possessions.budget.total}} picks · {{system.wealth.possessions.budget.unfunded}} without an eligible Caliber slot. {{system.wealth.possessions.budget.unclassified}} gear entries have no acquisition classification; review their item editors. Common Items and specific feat grants need their own accounting.</p>
-  <details><summary>Possessions allowance by maximum Caliber</summary>{{#each system.wealth.possessions.budget.available}}<span>Caliber {{@key}}: {{this}} slots, {{lookup ../system.wealth.possessions.budget.remaining @key}} remaining. </span>{{/each}}<p>Lower-Caliber picks may use higher-Caliber slots. Mark actual Wealth Possessions in their item editors; blank mission picks alone do not identify personal gear. Additional GC grants require explicit approval.</p></details>
-  <div class="inline-fields">
-    <label>{{localize "SPYCRAFT.Reputation"}} <input type="number" name="system.reputation" value="{{system.reputation}}" class="w-2" /></label>
-    <label>{{localize "SPYCRAFT.NetWorth"}} <input type="number" name="system.netWorth" value="{{system.netWorth}}" class="w-4" /></label>
-    <span class="muted">{{localize "SPYCRAFT.CommonItems"}}: {{system.commonItems.count}} + {{system.commonItems.perMission}}/{{localize "SPYCRAFT.Mission"}}</span>
-  </div>
-
-  {{#if careerAgentReward.active}}{{#if careerAgentReward.record}}<p>Career Agent mission reward recorded: {{#if (sc2eq careerAgentReward.record.field "reputation")}}+{{careerAgentReward.record.amount}} {{localize "SPYCRAFT.Reputation"}}{{else}}+${{careerAgentReward.record.amount}} {{localize "SPYCRAFT.NetWorth"}}{{/if}}.</p>{{else}}{{#if isGM}}{{#unless careerAgentReward.review.needsReview}}<p><a data-action="useCareerAgentReward">Career Agent: settle additional mission-end reward</a></p>{{/unless}}{{/if}}{{/if}}{{/if}}
-  {{#if careerAgentReward.review.needsReview}}<p class="bad">Career Agent mission reward needs review. {{#if isGM}}<a data-action="reviewCareerAgentReward">GC review actual resource balances and reward</a>{{/if}}</p>{{/if}}
-
-  <p><a data-action="browse" data-type="gear"><i class="fa-solid fa-book-open"></i> Browse kits</a></p>
-  <p>Carried weight: {{system.encumbrance.weight}} lbs. · {{system.encumbrance.load}} load {{system.encumbrance.condition}} · DR {{system.dr.melee}} / {{system.dr.other}} (melee / other attacks).</p>
-  <h3>{{localize "SPYCRAFT.GearPicks"}}</h3>
-  <div class="gear-picks">
-    {{#each gearPicks}}<span class="slot {{#if (sc2lt remaining 0)}}bad{{/if}}" data-tooltip="{{label}}"><b>{{key}}</b> {{spent}} / {{available}}</span>{{/each}}
-  </div>
-
-  {{#if system.armorGrantStatus.caliber}}<p>Armor Use: one armor piece up to Caliber {{system.armorGrantStatus.caliber}} · {{#if system.armorGrantStatus.used}}Selected for this mission{{else}}<a data-action="selectArmorUseGear">Select free Intel Phase armor</a>{{/if}}.</p>{{/if}}
-  {{#if system.bigStickStatus.active}}<p>Big Stick: {{#if (sc2eq system.bigStickStatus.caliber 5)}}{{system.bigStickStatus.upgradeAllowance}} extra upgrades for Weapon mission picks; purchasing and effects require separate adjudication.{{else}}{{#if system.bigStickStatus.used}}Higher-Caliber weapon selected for this mission.{{else}}<a data-action="selectBigStickGear">Select one higher-Caliber mission weapon</a>{{/if}}{{/if}}</p>{{/if}}
-  {{#each system.missionCaliberOptions}}<p>{{name}}: {{#if (sc2eq caliber 5)}}{{upgradeAllowance}} extra upgrades for {{category}} mission picks; purchasing/effects require separate adjudication.{{else}}{{#if used}}Selected for this mission.{{else}}{{#if selected}}{{selected}} / {{limit}} picks selected · {{/if}}<a data-action="selectMissionCaliberGear" data-source="{{key}}">Select one higher-Caliber mission pick</a>{{/if}}{{/if}}</p>{{/each}}
-  <p>Reserve capacity: {{system.reserveUsed}} / {{system.reserveCapacity}} combined picks and Common Items. Reserved gear is excluded from carried weight.</p>
-  {{#if system.reserveTransactionReview.needsReview}}<p><a data-action="reviewReserveTransaction">GC review interrupted Reserve transaction</a></p>{{/if}}
-  <p><a data-action="allocateMissionReserves">Allocate unassigned mission reserves</a> · <a data-action="rollGearAcquisition">Request / Gear check</a> · <a data-action="findImprovisedWeapon">Find improvised weapon</a> · <a data-action="claimGearAcquisition">Claim successful acquisition</a></p>
-  {{#if system.activeMissionReserves}}{{#if (sc2eq system.activeMissionReserves.initialized false)}}<p>Mission reserves are unallocated. Personal Stash acquisitions are recorded.</p>{{else}}<p>Current mission Caliber {{system.activeMissionReserves.caliber}} · Reserve Common Items {{system.activeMissionReserves.common}}. Reserved picks: {{#each system.activeMissionReserves.picks}}{{@key}} {{this}} · {{/each}}</p>{{/if}}{{/if}}
-  {{#if safeHouseSource}}<p><a data-action="useSafeHouse">Safe House: scene-opening declaration</a>{{#if isGM}} · <a data-action="reviewSafeHouseMission">GC review mission uses</a> · <a data-action="reviewSafeHouseScene">GC review scene use</a>{{/if}}</p>{{/if}}
-  {{#if safeHouses.length}}<details><summary>Safe Houses: declarations and GC locations</summary>{{#each safeHouses}}<p><b>{{record.currentLocation}}</b> · home tier {{state.rank}}: {{state.home}}. {{#if state.active}}{{#if state.placed}}{{record.placement.city}}: {{record.placement.address}}. {{record.placement.description}}{{else}}GC exact location pending.{{/if}}{{else}}<span class="bad">{{state.reason}}</span>{{/if}}{{#if @root.isGM}}{{#if state.canPlace}} <a data-action="placeSafeHouse" data-house="{{key}}">GC confirm location</a>{{/if}} · <a data-action="correctSafeHouseRecord" data-house="{{key}}">Correct erroneous declaration</a>{{/if}}</p>{{/each}}</details>{{/if}}
-  {{#if wellFundedActive}}<p><a data-action="useWellFunded">Well-Funded: receive cash at home</a>{{#if isGM}} · <a data-action="reviewWellFundedCounter">GC review Well-Funded uses</a>{{/if}}</p>{{/if}}
-  {{#if wellFundedCash.grants.length}}<details><summary>Well-Funded cash received: ${{wellFundedCash.totalReceived}} (all recorded grants)</summary><p class="muted">Receipts of cash received; spending is tracked at the table.</p>{{#each wellFundedCash.grants}}<p>${{amount}} · Wealth {{wealth}} · {{home}} · mission {{epoch}}</p>{{/each}}</details>{{/if}}{{#if wellFundedCash.needsReview}}<p class="bad">Review invalid Well-Funded cash grant records.</p>{{/if}}
-  {{#if toolShedSource}}<p><a data-action="useToolShed">Tool Shed: find a Grade III kit</a>{{#if isGM}} · <a data-action="reviewToolShedCounter">GC review Tool Shed uses</a>{{/if}}</p>{{/if}}
-  <details><summary>Charisma penalty: remove class-granted picks (p.219)</summary>
-  {{#each gearPicks}}{{#unless (sc2eq key "CHA")}}<label>{{key}} <input type="number" min="0" name="system.gearPickLosses.{{key}}" value="{{lookup ../system.gearPickLosses key}}" class="w-2" /></label>{{/unless}}{{/each}}
-  </details>
   <h3>{{localize "SPYCRAFT.Weapons"}} <span class="controls"><a data-action="browse" data-type="weapon"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="weapon"><i class="fa-solid fa-plus"></i></a></span></h3>
   <table class="items">
     <thead><tr><th>{{localize "Name"}}</th><th>{{localize "SPYCRAFT.Attack"}}</th><th>{{localize "SPYCRAFT.Damage"}}</th><th>E/T</th><th>{{localize "SPYCRAFT.Range"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
@@ -90,4 +44,52 @@
     {{/each}}
     </tbody>
   </table>
+  <details class="reference-panel" data-key="gearPlanning"><summary>Wealth, mission planning and acquisitions</summary>
+  <h3>{{localize "SPYCRAFT.Wealth"}} <span class="points {{#if (sc2lt system.wealth.remaining 0)}}bad{{/if}}">{{system.wealth.allocated}} / {{system.wealth.total}}</span></h3>
+  <table class="wealth">
+    <thead><tr><th></th><th>{{localize "SPYCRAFT.Spent"}}</th><th>{{localize "SPYCRAFT.Rank"}}</th><th></th></tr></thead>
+    <tbody>
+      <tr><th>{{localize "SPYCRAFT.Lifestyle"}}</th><td><input class="w-2 edit-only" type="number" name="system.wealthAllocation.lifestyle" value="{{system.wealthAllocation.lifestyle}}" min="0" /></td>
+        <td>{{system.wealth.lifestyle.rank}}</td><td class="muted">{{system.wealth.lifestyle.home}} · {{localize "SPYCRAFT.Vehicle"}} {{system.wealth.lifestyle.vehicle}} · {{system.wealth.lifestyle.appearance}} ({{signed system.wealth.lifestyle.appearanceMod}})</td></tr>
+      <tr><th>{{localize "SPYCRAFT.Possessions"}}</th><td><input class="w-2 edit-only" type="number" name="system.wealthAllocation.possessions" value="{{system.wealthAllocation.possessions}}" min="0" /></td>
+        <td>{{system.wealth.possessions.rank}}</td><td class="muted">{{system.wealth.possessions.picks}}</td></tr>
+      <tr><th>{{localize "SPYCRAFT.SpendingCash"}}</th><td><input class="w-2 edit-only" type="number" name="system.wealthAllocation.spendingCash" value="{{system.wealthAllocation.spendingCash}}" min="0" /></td>
+        <td>{{system.wealth.spendingCash.rank}}</td><td class="muted">${{system.wealth.spendingCash.amount}}</td></tr>
+    </tbody>
+  </table>
+  {{#if system.bloodstainDefense.earned}}<label><input type="checkbox" name="system.wealthAllocation.dressedForLifestyle" {{checked system.wealthAllocation.dressedForLifestyle}} /> Bloodstain Resistant: I am dressed according to my Lifestyle</label><p>Bloodstain Resistant Defense +{{system.bloodstainDefense.bonus}}. {{system.bloodstainDefense.reason}}</p>{{/if}}
+  <p>Wealth Possessions: {{system.wealth.possessions.budget.spent}} / {{system.wealth.possessions.budget.total}} picks · {{system.wealth.possessions.budget.unfunded}} without an eligible Caliber slot. {{system.wealth.possessions.budget.unclassified}} gear entries have no acquisition classification; review their item editors. Common Items and specific feat grants need their own accounting.</p>
+  <details><summary>Possessions allowance by maximum Caliber</summary>{{#each system.wealth.possessions.budget.available}}<span>Caliber {{@key}}: {{this}} slots, {{lookup ../system.wealth.possessions.budget.remaining @key}} remaining. </span>{{/each}}<p>Lower-Caliber picks may use higher-Caliber slots. Mark actual Wealth Possessions in their item editors; blank mission picks alone do not identify personal gear. Additional GC grants require explicit approval.</p></details>
+  <div class="inline-fields">
+    <label>{{localize "SPYCRAFT.Reputation"}} <input type="number" name="system.reputation" value="{{system.reputation}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.NetWorth"}} <input type="number" name="system.netWorth" value="{{system.netWorth}}" class="w-4" /></label>
+    <span class="muted">{{localize "SPYCRAFT.CommonItems"}}: {{system.commonItems.count}} + {{system.commonItems.perMission}}/{{localize "SPYCRAFT.Mission"}}</span>
+  </div>
+
+  {{#if careerAgentReward.active}}{{#if careerAgentReward.record}}<p>Career Agent mission reward recorded: {{#if (sc2eq careerAgentReward.record.field "reputation")}}+{{careerAgentReward.record.amount}} {{localize "SPYCRAFT.Reputation"}}{{else}}+${{careerAgentReward.record.amount}} {{localize "SPYCRAFT.NetWorth"}}{{/if}}.</p>{{else}}{{#if isGM}}{{#unless careerAgentReward.review.needsReview}}<p><a data-action="useCareerAgentReward">Career Agent: settle additional mission-end reward</a></p>{{/unless}}{{/if}}{{/if}}{{/if}}
+  {{#if careerAgentReward.review.needsReview}}<p class="bad">Career Agent mission reward needs review. {{#if isGM}}<a data-action="reviewCareerAgentReward">GC review actual resource balances and reward</a>{{/if}}</p>{{/if}}
+
+  <p><a data-action="browse" data-type="gear"><i class="fa-solid fa-book-open"></i> Browse kits</a></p>
+  <p>Carried weight: {{system.encumbrance.weight}} lbs. · {{system.encumbrance.load}} load {{system.encumbrance.condition}} · DR {{system.dr.melee}} / {{system.dr.other}} (melee / other attacks).</p>
+  <h3>{{localize "SPYCRAFT.GearPicks"}}</h3>
+  <div class="gear-picks">
+    {{#each gearPicks}}<span class="slot {{#if (sc2lt remaining 0)}}bad{{/if}}" data-tooltip="{{label}}"><b>{{key}}</b> {{spent}} / {{available}}</span>{{/each}}
+  </div>
+
+  {{#if system.armorGrantStatus.caliber}}<p>Armor Use: one armor piece up to Caliber {{system.armorGrantStatus.caliber}} · {{#if system.armorGrantStatus.used}}Selected for this mission{{else}}<a data-action="selectArmorUseGear">Select free Intel Phase armor</a>{{/if}}.</p>{{/if}}
+  {{#if system.bigStickStatus.active}}<p>Big Stick: {{#if (sc2eq system.bigStickStatus.caliber 5)}}{{system.bigStickStatus.upgradeAllowance}} extra upgrades for Weapon mission picks; purchasing and effects require separate adjudication.{{else}}{{#if system.bigStickStatus.used}}Higher-Caliber weapon selected for this mission.{{else}}<a data-action="selectBigStickGear">Select one higher-Caliber mission weapon</a>{{/if}}{{/if}}</p>{{/if}}
+  {{#each system.missionCaliberOptions}}<p>{{name}}: {{#if (sc2eq caliber 5)}}{{upgradeAllowance}} extra upgrades for {{category}} mission picks; purchasing/effects require separate adjudication.{{else}}{{#if used}}Selected for this mission.{{else}}{{#if selected}}{{selected}} / {{limit}} picks selected · {{/if}}<a data-action="selectMissionCaliberGear" data-source="{{key}}">Select one higher-Caliber mission pick</a>{{/if}}{{/if}}</p>{{/each}}
+  <p>Reserve capacity: {{system.reserveUsed}} / {{system.reserveCapacity}} combined picks and Common Items. Reserved gear is excluded from carried weight.</p>
+  {{#if system.reserveTransactionReview.needsReview}}<p><a data-action="reviewReserveTransaction">GC review interrupted Reserve transaction</a></p>{{/if}}
+  <p><a data-action="allocateMissionReserves">Allocate unassigned mission reserves</a> · <a data-action="rollGearAcquisition">Request / Gear check</a> · <a data-action="findImprovisedWeapon">Find improvised weapon</a> · <a data-action="claimGearAcquisition">Claim successful acquisition</a></p>
+  {{#if system.activeMissionReserves}}{{#if (sc2eq system.activeMissionReserves.initialized false)}}<p>Mission reserves are unallocated. Personal Stash acquisitions are recorded.</p>{{else}}<p>Current mission Caliber {{system.activeMissionReserves.caliber}} · Reserve Common Items {{system.activeMissionReserves.common}}. Reserved picks: {{#each system.activeMissionReserves.picks}}{{@key}} {{this}} · {{/each}}</p>{{/if}}{{/if}}
+  {{#if safeHouseSource}}<p><a data-action="useSafeHouse">Safe House: scene-opening declaration</a>{{#if isGM}} · <a data-action="reviewSafeHouseMission">GC review mission uses</a> · <a data-action="reviewSafeHouseScene">GC review scene use</a>{{/if}}</p>{{/if}}
+  {{#if safeHouses.length}}<details><summary>Safe Houses: declarations and GC locations</summary>{{#each safeHouses}}<p><b>{{record.currentLocation}}</b> · home tier {{state.rank}}: {{state.home}}. {{#if state.active}}{{#if state.placed}}{{record.placement.city}}: {{record.placement.address}}. {{record.placement.description}}{{else}}GC exact location pending.{{/if}}{{else}}<span class="bad">{{state.reason}}</span>{{/if}}{{#if @root.isGM}}{{#if state.canPlace}} <a data-action="placeSafeHouse" data-house="{{key}}">GC confirm location</a>{{/if}} · <a data-action="correctSafeHouseRecord" data-house="{{key}}">Correct erroneous declaration</a>{{/if}}</p>{{/each}}</details>{{/if}}
+  {{#if wellFundedActive}}<p><a data-action="useWellFunded">Well-Funded: receive cash at home</a>{{#if isGM}} · <a data-action="reviewWellFundedCounter">GC review Well-Funded uses</a>{{/if}}</p>{{/if}}
+  {{#if wellFundedCash.grants.length}}<details><summary>Well-Funded cash received: ${{wellFundedCash.totalReceived}} (all recorded grants)</summary><p class="muted">Receipts of cash received; spending is tracked at the table.</p>{{#each wellFundedCash.grants}}<p>${{amount}} · Wealth {{wealth}} · {{home}} · mission {{epoch}}</p>{{/each}}</details>{{/if}}{{#if wellFundedCash.needsReview}}<p class="bad">Review invalid Well-Funded cash grant records.</p>{{/if}}
+  {{#if toolShedSource}}<p><a data-action="useToolShed">Tool Shed: find a Grade III kit</a>{{#if isGM}} · <a data-action="reviewToolShedCounter">GC review Tool Shed uses</a>{{/if}}</p>{{/if}}
+  <details><summary>Charisma penalty: remove class-granted picks (p.219)</summary>
+  {{#each gearPicks}}{{#unless (sc2eq key "CHA")}}<label>{{key}} <input type="number" min="0" name="system.gearPickLosses.{{key}}" value="{{lookup ../system.gearPickLosses key}}" class="w-2" /></label>{{/unless}}{{/each}}
+  </details>
+  </details>
 </section>

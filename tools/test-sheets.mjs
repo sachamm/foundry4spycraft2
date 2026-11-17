@@ -16,6 +16,48 @@ globalThis.foundry = {
 Math.clamp ??= (n, low, high) => Math.max(low, Math.min(high, n));
 const { SpycraftAgentSheet } = await import("../module/sheets/actor-sheet.mjs");
 const { SpycraftItemSheet } = await import("../module/sheets/item-sheet.mjs");
+const { SpycraftBrowser } = await import("../module/apps/browser.mjs");
+
+test('continuing setup enters Edit at the requested skill level and focuses the purchase field', async () => {
+  const sheet=new SpycraftAgentSheet({}), visits=[];
+  const field={tagName:'INPUT',disabled:false,parentElement:null,scrollIntoView:()=>visits.push('reveal'),focus:()=>visits.push('focus')};
+  sheet.isEditable=true;
+  sheet.changeTab=(tab,group)=>visits.push([tab,group]);
+  sheet.element={querySelector:selector=>{
+    assert.equal(selector,'section[data-tab="skills"]');
+    return {querySelectorAll:selector=>{assert.equal(selector,'[name^="skillpts."]');return [field];}};
+  }};
+  sheet.render=async()=>{assert.equal(sheet._editMode,true);assert.equal(sheet._skillLevel,4);visits.push('render');};
+  await SpycraftAgentSheet.DEFAULT_OPTIONS.actions.setupTask.call(sheet,null,{dataset:{tab:'skills',skillLevel:'4',order:'30'}});
+  assert.deepEqual(visits,[['skills','primary'],'render','reveal','focus']);
+  assert.equal(sheet._open.todo,false);
+});
+
+test('read-only sheets cannot enter character setup through a reminder', async () => {
+  const sheet=new SpycraftAgentSheet({});sheet.isEditable=false;
+  sheet.render=()=>{throw new Error('Unexpected render');};
+  await SpycraftAgentSheet.DEFAULT_OPTIONS.actions.setupTask.call(sheet,null,{dataset:{tab:'skills'}});
+  assert.equal(sheet._editMode,false);
+});
+
+test('an origin reminder opens its filtered choice browser after entering the destination in Edit', async () => {
+  const sheet=new SpycraftAgentSheet({}), visits=[], original=SpycraftBrowser.prototype.render;
+  sheet.isEditable=true;
+  sheet.changeTab=(tab,group)=>visits.push([tab,group]);
+  sheet.element={querySelector:()=>null};
+  sheet.render=async()=>{assert.equal(sheet._editMode,true);visits.push('sheet');};
+  SpycraftBrowser.prototype.render=function(force){
+    assert.equal(force,true);assert.equal(this.actor,sheet.actor);
+    visits.push([this.itemType,this.filters.group]);return this;
+  };
+  try {
+    await SpycraftAgentSheet.DEFAULT_OPTIONS.actions.setupTask.call(sheet,null,{dataset:{tab:'main',order:'1',type:'origin',originType:'talent'}});
+    assert.deepEqual(visits,[['main','primary'],'sheet',['origin','talent']]);
+  } finally {
+    if(original)SpycraftBrowser.prototype.render=original;
+    else delete SpycraftBrowser.prototype.render;
+  }
+});
 
 test("agent sheet maps per-level skills, contacts and class selections into updates", async () => {
   const calls = [];
