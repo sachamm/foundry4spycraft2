@@ -142,8 +142,8 @@ export async function surpriseRoundDialog(combat = game.combat) {
   if (!game.user.isGM) return null;
   if (!combat) return ui.notifications.warn('Create the combat first.');
   const input = await ask('Surprise round — p.323', `
-    <p>Each group makes an opposed team Blend/Stealth or Sneak/Hide check. Members of the winning group take 1 free, half or full action in Initiative order; a full action cannot be split and only 1 free action is allowed.</p>
-    <label>Awareness <select name="aware">${options([['none', 'No groups aware of each other'], ['some', 'One group is concealing itself'], ['all', 'All groups aware (no surprise round)']], 'none')}</select></label>
+    <p>Enter each side's opposed team Blend/Stealth or Sneak/Hide result. The winners get a single free, half or full action in Initiative order (no splitting a full action, one free action at most).</p>
+    <label>Awareness <select name="aware">${options([['none', 'Neither side knows the other is there'], ['some', 'One group is concealing itself'], ['all', 'Everyone is aware (no surprise round)']], 'none')}</select></label>
     <label>Player characters’ result <input type="number" name="players" value="0" /></label>
     <label>Opponents’ result <input type="number" name="opponents" value="0" /></label>
     <label>Concealing group <select name="actingGroup">${options([['players', 'Player characters'], ['opponents', 'Opponents']], 'opponents')}</select></label>`);

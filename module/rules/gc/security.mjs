@@ -54,7 +54,7 @@ export function resolveDevice(id, pr) {
   };
 }
 
-/** A sensor's Awareness check against the intruder's opposed result; never subject to a result cap. */
+/** A sensor's Awareness check against the intruder's opposed result; no result cap applies. */
 export function sensorCheck(device, roll, opposedResult) {
   if (device.kind !== 'sensor') throw new Error('Only sensors make Awareness checks.');
   if (device.autoTrigger) return {triggered: true, automatic: true};

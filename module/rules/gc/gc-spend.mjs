@@ -1,5 +1,5 @@
 /**
- * What the GC may spend action dice on (pp.397–399, 424, 452) and what each costs.
+ * Uses for GC action dice (pp.397–399, 424, 452) and what each costs.
  * The pool itself is managed by module/rules/gc-dice.mjs.
  */
 import {GC_DATA} from '../gc-tables.mjs';
@@ -62,9 +62,9 @@ export function planSpend(id, context = {}) {
       notes.push('XP is awarded as if the NPC were defeated; the NPC may not return this mission.');
       break;
     case 'campaignQuality':
-      if (!whole(context.qualityCost, 1)) throw new Error('This campaign quality has no action die cost and cannot be added during a mission.');
+      if (!whole(context.qualityCost, 1)) throw new Error('This campaign quality lists no die cost, so it cannot be bought mid-mission.');
       cost = context.qualityCost;
-      notes.push('Lasts until the end of the mission and does not change its XP reward.');
+      notes.push('Stays for the rest of the mission; XP reward unchanged.');
       break;
     case 'dramaticScene':
       if (dramatic) throw new Error('The current scene is already dramatic.');
@@ -85,7 +85,7 @@ export function planSpend(id, context = {}) {
       if (context.inCombat) notes.push('In combat this needs a Refresh action and only 1 die.');
       break;
     case 'boostDefense':
-      notes.push('+2 Defense for a number of rounds equal to the die result; one such boost at a time.');
+      notes.push('+2 Defense; rounds = die result; only one such boost at once.');
       break;
     default:
   }
