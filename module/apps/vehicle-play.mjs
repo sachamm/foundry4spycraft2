@@ -10,6 +10,7 @@ import {
 import {bailOut, controlCheckPlan, hasQuality, heavyArmorDice, secondaryDamage, skeletonCrew, travelFuel} from '../rules/vehicle-play-rules.mjs';
 import {gadgetDamage, gadgetState} from '../rules/gear-play-rules.mjs';
 import {VEHICLE_RULES} from '../rules/tables.mjs';
+import {explosionPlan} from '../rules/vehicle-environment.mjs';
 import {VEHICLE_STAT_KEYS, vehicleStats} from '../data/vehicle-fields.mjs';
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ''));
@@ -90,7 +91,7 @@ export async function rollObjectDamageSave(doc, options = {}) {
   }
   const message = await roll.toMessage({speaker: speakerFor(doc), flavor: lines.join('<br>'), flags: {spycraft2: {objectDamageSave: {uuid: doc.uuid, dc, damage, failed, total: roll.total}}}});
   if (failed && doc.isOwner) await doc.update({'system.failedSaves': after});
-  if (failed && input.critical && vehicle) await rollVehicleDamageResult(doc, {failed, damage, armorPiercing: input.armorPiercing});
+  if (failed && input.critical && vehicle) await rollVehicleDamageResult(doc, {failed, damage, armorPiercing: input.armorPiercing, fire: input.fire});
   return message;
 }
 
@@ -112,8 +113,9 @@ function occupantsOf(actor) {
 /**
  * Roll a Vehicle Damage result (Table 4.72) and apply it once per failed save. Counters update the vehicle's ratings;
  * cargo, occupant, weapon or gear and draft-animal results report the damage passed on; rotors make their own save.
+ * A Fuel result on a burning vehicle, or from fire damage, sets off its remaining fuel (Table 4.73).
  */
-export async function rollVehicleDamageResult(actor, {failed = 1, damage = null, armorPiercing = 0} = {}) {
+export async function rollVehicleDamageResult(actor, {failed = 1, damage = null, armorPiercing = 0, fire = false} = {}) {
   if (!actor.system.vehicleClass) return ui.notifications.warn('Choose this vehicle\'s category before rolling a Vehicle Damage result.');
   let roll, location, rerolls = 0;
   do {
@@ -144,9 +146,27 @@ export async function rollVehicleDamageResult(actor, {failed = 1, damage = null,
     }
   } else lines.push('Resolve this result from the page above; nothing is recorded automatically.');
   for (const [code, label] of [['HOT', 'Hot'], ['LUX', 'Luxury']]) if (hasQuality(actor.system.qualitiesNow, code)) lines.push(`${label} may be lost to this critical hit (p.294); restore it with a Mechanics/Repair check.`);
+  const burning = location.code === 'Fuel' && (fire || actor.system.onFire);
+  if (burning) lines.push(`The vehicle ${actor.system.onFire ? 'is' : 'catches'} on fire: its remaining fuel explodes (Table ${VEHICLE_RULES.explosions.table}).`);
   const message = await roll.toMessage({speaker: speakerFor(actor), flavor: lines.join('<br>')});
-  if (counter && actor.isOwner) await actor.update({[`system.damage.${counter}`]: (actor.system.damage?.[counter] ?? 0) + failed});
+  if (counter && actor.isOwner) await actor.update({[`system.damage.${counter}`]: (actor.system.damage?.[counter] ?? 0) + failed, ...(burning ? {'system.onFire': true} : {})});
+  if (burning) await rollFuelExplosion(actor);
   return message;
+}
+
+/**
+ * A burning vehicle's fuel explodes (Table 4.73, p.291): explosive fire damage by Size and fuel, multiplied by the
+ * hours of fuel left (at least 1, even when the hit used up the last hour), with a blast increment in 5-ft. squares.
+ */
+export async function rollFuelExplosion(actor) {
+  const s = actor.system, plan = explosionPlan({size: objectSize(actor), fuel: s.fuel?.fuel ?? '', remainingHours: s.fuel?.remaining ?? 0});
+  if (!plan.explodes) return ChatMessage.create({speaker: speakerFor(actor), content: `<strong>${esc(actor.name)}</strong> — no fuel explosion. ${esc(plan.reason)}`});
+  const roll = await new Roll(plan.formula).evaluate();
+  return roll.toMessage({
+    speaker: speakerFor(actor),
+    flavor: `<strong>${esc(actor.name)}</strong> — fuel explosion (Table ${VEHICLE_RULES.explosions.table}, p.${plan.page}): ${plan.dice} explosive fire × ${plan.multiplier} hour${plan.multiplier === 1 ? '' : 's'} of fuel, blast increment ${plan.blast} square${plan.blast === 1 ? '' : 's'}, AP ${plan.ap}.${plan.houseRule ? ` ${esc(plan.houseRule)}` : ''}`,
+    flags: {spycraft2: {fuelExplosion: {uuid: actor.uuid, total: roll.total, blast: plan.blast, armorPiercing: plan.ap}}}
+  });
 }
 
 /** A tyre's Damage save after a Traction result; a failure records one punctured tyre. Tracks save against half. */
@@ -185,7 +205,7 @@ export async function spendFuel(actor, {hours = null, rounds = 0, aboveCruising 
   if (hours === null && !rounds) {
     const input = await ask(`${actor.name}: fuel used`, `
       <label>Hours of travel <input name="hours" type="number" min="0" step="any" value="1" /></label>
-      <label><input name="aboveCruising" type="checkbox" /> Above cruising speed (uses fuel twice as fast)</label>
+      <label><input name="aboveCruising" type="checkbox"${actor.system.aboveCruising ? ' checked' : ''} /> Above cruising speed (uses fuel twice as fast)</label>
       <label>Combat or chase rounds (a minute each) <input name="rounds" type="number" min="0" step="1" value="0" /></label>`);
     if (!input) return null;
     ({hours, rounds, aboveCruising} = {hours: Number(input.hours) || 0, rounds: Number(input.rounds) || 0, aboveCruising: input.aboveCruising === true});
@@ -248,12 +268,14 @@ export async function rollControlCheck(actor, {modifier = null, topMphBonus = fa
   if (!driver) return ui.notifications.warn('Drop a character on the vehicle sheet to set the driver first.');
   if (!driver.isOwner) return ui.notifications.warn(`Only ${driver.name}'s owner or the GC can roll this check.`);
   if (typeof driver.rollSkill !== 'function') return ui.notifications.warn(`${driver.name} cannot make skill checks here.`);
-  const plan = controlCheckPlan(actor.system, driver.system);
+  const hazards = actor.system.hazardEffect ?? null;
+  const plan = controlCheckPlan(actor.system, driver.system, {hazards});
   if (plan.blocked) return ui.notifications.warn(plan.blocked);
+  const hazardNote = hazards?.rows?.length ? actor.system.hazardSummary : '';
   if (modifier === null) {
     const input = await ask(`${actor.name}: control check (${plan.skillName}/Maneuver)`, `
-      <p>${esc(plan.note)}</p>
-      <label>Other modifier (Strategy, hazards, situation) <input name="modifier" type="number" step="1" value="0" /></label>
+      <p>${esc(plan.note)}</p>${hazardNote ? `<p>${esc(hazardNote)}</p>` : ''}
+      <label>Other modifier (Strategy, situation) <input name="modifier" type="number" step="1" value="0" /></label>
       <label><input name="topMphBonus" type="checkbox" /> Chase: this vehicle has the fastest top MPH (Maneuvering Room bonus)</label>
       <label>Chase Maneuvering Room <select name="room"><option value="0">—</option><option value="6">Open +6</option><option value="4">Close +4</option><option value="2">Crowded +2</option><option value="0">Tight +0</option></select></label>`);
     if (!input) return null;
@@ -262,7 +284,7 @@ export async function rollControlCheck(actor, {modifier = null, topMphBonus = fa
   }
   return driver.rollSkill(plan.skillKey, null, {
     check: 'maneuver', modifier: (plan.penalty || 0) + modifier, focus: plan.focus, gearStatus: 'available', synergySkill: 'auto',
-    vehicleErrorIncrease: plan.errorIncrease, vehicleControl: {vehicleUuid: actor.uuid, note: `${plan.note}${topMphBonus ? ' Fastest vehicle in the chase.' : ''}`}
+    vehicleErrorIncrease: plan.errorIncrease, vehicleControl: {vehicleUuid: actor.uuid, note: `${plan.note}${hazardNote ? ` ${hazardNote}` : ''}${topMphBonus ? ' Fastest vehicle in the chase.' : ''}`}
   });
 }
 
@@ -326,7 +348,13 @@ export function installVehicleCombatHooks(hooks = globalThis.Hooks) {
   });
   hooks.on('updateCombat', async (combat, changes) => {
     if (!game.user.isGM || !('round' in changes) || !(changes.round > 1)) return;
-    for (const c of combat.combatants) if (c.actor?.type === 'vehicle' && c.actor.system.moving && c.actor.system.fuel) await spendFuel(c.actor, {hours: 0, rounds: 1});
+    for (const c of combat.combatants) {
+      const vehicle = c.actor;
+      if (vehicle?.type !== 'vehicle' || !vehicle.system.moving) continue;
+      if (vehicle.system.fuel) await spendFuel(vehicle, {hours: 0, rounds: 1});
+      // Broken ground damages an off-road or tracked vehicle each round it goes faster than half its cruising speed (Table 4.76).
+      if (vehicle.system.hazardEffect?.damagePerRound) await ChatMessage.create({speaker: speakerFor(vehicle), whisper: ChatMessage.getWhisperRecipients('GM').map(u => u.id), content: `<strong>${esc(vehicle.name)}</strong>: if it is going faster than half its cruising MPH over this ground, roll one Vehicle Damage result this round.`});
+    }
   });
 }
 installVehicleCombatHooks();

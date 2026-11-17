@@ -1,7 +1,7 @@
 /** Dramatic Conflict tracker (pp.363–388): the GC runs each Conflict round through a short series of dialogs. */
 import {CONFLICT_TYPES, startConflict, availableStrategies, chooseStrategy, strategyModifier, resolveCheck, advantageOptions, chooseAdvantages, nextRound, concede, adjustLead, conflictSummary} from '../../rules/gc/conflict.mjs';
 import {requireGC, getConflicts, saveConflict} from './state.mjs';
-import {MANEUVERING_ROOM, chaseScale, leadDistance, participantRatings, startingLead} from '../../rules/chase.mjs';
+import {MANEUVERING_ROOM, chaseScale, leadDistance, participantRatings, smashAfterWin, smashEligible, smashRangeLead, smashState, spendSmash, startingLead} from '../../rules/chase.mjs';
 import {spendFuel} from '../vehicle-play.mjs';
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ''));
@@ -28,8 +28,9 @@ function chaseState(conflict) {
   return {predator, prey, ratings, scale};
 }
 const chaseLine = (conflict, state) => {
-  const r = state.scale, distance = leadDistance(conflict.lead, r.leadFeet);
-  return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${distance !== null ? ` · ${distance.toLocaleString('en-US')} ft. apart (${r.leadFeet} ft. per Lead)` : ''}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ''}${r.fastest ? ` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ''}${r.mismatched ? ' · <b>mismatched scales: settle with one opposed check</b>' : ''}`;
+  const r = state.scale, distance = leadDistance(conflict.lead, r.leadFeet), smash = smashState(conflict.chase?.smash);
+  const smashText = smash ? ` · ${esc(sideName(conflict, smash.side))} holds <b>${smash.points} Smash</b> (attacks on them use Lead ${smashRangeLead(conflict.lead, smash)} for range)` : '';
+  return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${distance !== null ? ` · ${distance.toLocaleString('en-US')} ft. apart (${r.leadFeet} ft. per Lead)` : ''}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ''}${r.fastest ? ` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ''}${r.mismatched ? ' · <b>mismatched scales: settle with one opposed check</b>' : ''}${smashText}`;
 };
 
 export function conflictRows() {
@@ -112,20 +113,33 @@ export async function advanceConflict(id) {
         <label>If tied, winner <select name="tieWinner">${options([['', '—'], ['predator', sideName(conflict, 'predator')], ['prey', sideName(conflict, 'prey')]], '')}</select></label>`);
       if (!input) return null;
       const next = resolveCheck(conflict, {predator: {result: Number(input.predator), critical: input.predatorCritical || null}, prey: {result: Number(input.prey), critical: input.preyCritical || null}, tieWinner: input.tieWinner || null});
+      // Altitude (p.365): the Smash holder gains a point for winning the opposed check and loses one for losing it.
+      const checkWinner = next.pending?.winner ?? next.winner, smashBefore = smashState(next.chase?.smash);
+      if (smashBefore) next.chase.smash = smashAfterWin(smashBefore, checkWinner);
       await saveConflict(id, next);
+      if (smashBefore) await say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(next, smashBefore.side))} ${next.chase.smash ? `now holds ${next.chase.smash.points} Smash point${next.chase.smash.points === 1 ? '' : 's'}` : 'loses the last Smash point and must climb above the opponent again to regain Smash'}.`);
       if (next.winner) return announceEnd(id, next);
       await say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(next, next.pending.winner))} wins the check by ${next.pending.margin} and takes ${next.pending.advantages} Advantage(s).${next.pending.criticalShift ? ` Criticals move the Lead ${next.pending.criticalShift}.` : ''} Lead ${next.lead}.`);
       return next;
     }
     if (conflict.step === 'advantages') {
       const list = advantageOptions(conflict), allowed = conflict.pending.advantages;
+      const smashNow = smashState(conflict.chase?.smash), canSpend = smashNow?.side === conflict.pending.winner;
+      const spendLabel = canSpend ? (smashNow.side === 'predator' ? 'cut the Lead by 1 more' : 'gain +4 Defense until the start of the next Initiative Count') : '';
       const inputs = list.map(advantage => `<label title="${esc(advantage.summary)} ${esc(advantage.repeat ?? '')}">${esc(advantage.name)} — ${esc(advantage.summary)} <input type="number" name="pick-${advantage.id}" min="0" max="${allowed}" value="0" /></label>`).join('');
       const input = await ask(`${conflict.name}: ${sideName(conflict, conflict.pending.winner)} chooses ${allowed} Advantage(s)`, `
         <p>Enter how many times each Advantage is chosen (total 1 to ${allowed}).</p>${inputs}
-        <label>Override the Lead change (leave blank to use the printed rule) <input type="number" name="leadShift" min="0" /></label>`);
+        <label>Override the Lead change (leave blank to use the printed rule) <input type="number" name="leadShift" min="0" /></label>
+        ${canSpend ? `<label><input type="checkbox" name="spendSmash" /> Spend 1 of ${smashNow.points} Smash points to ${spendLabel} (p.365)</label>` : ''}`);
       if (!input) return null;
       const picks = list.flatMap(advantage => Array(Math.max(0, Number(input[`pick-${advantage.id}`]) || 0)).fill(advantage.id));
-      const next = chooseAdvantages(conflict, picks, {leadShift: input.leadShift === '' || input.leadShift === null || input.leadShift === undefined ? null : Number(input.leadShift)});
+      let next = chooseAdvantages(conflict, picks, {leadShift: input.leadShift === '' || input.leadShift === null || input.leadShift === undefined ? null : Number(input.leadShift)});
+      if (canSpend && input.spendSmash && !next.winner) {
+        const spent = spendSmash(next.chase.smash, next.lead);
+        if (spent.lead !== next.lead) next = adjustLead(next, spent.lead);
+        next.chase = {...next.chase, smash: spent.smash};
+        await say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(next, smashNow.side))} — ${esc(spent.note)}`);
+      }
       await saveConflict(id, next);
       const last = next.history.at(-1);
       await say(`<b>${esc(conflict.name)}</b>: ${esc(last.advantages.map(pick => list.find(advantage => advantage.id === pick).name).join(', '))}. Lead <b>${next.lead}</b>.${last.notes?.length ? `<br>${last.notes.map(esc).join('<br>')}` : ''}`);
@@ -166,12 +180,25 @@ export async function manageConflict(id) {
   const input = await ask(`${conflict.name}: manage`, `
     <p>Round ${conflict.round}, Lead ${conflict.lead}. ${esc((rules.notes ?? []).join(' '))}</p>${tables}
     ${conflict.chase ? `<p>${chaseLine(conflict, chaseState(conflict))}.</p>` : ''}
-    <label>Action <select name="action">${options([['lead', 'Set the Lead (outside effect or correction)'], ...(conflict.chase ? [['room', 'Change the Maneuvering Room']] : []), ['concedePredator', `${sideName(conflict, 'predator')} concedes`], ['concedePrey', `${sideName(conflict, 'prey')} concedes`], ['remove', 'Remove this conflict']], 'lead')}</select></label>
+    <label>Action <select name="action">${options([['lead', 'Set the Lead (outside effect or correction)'], ...(conflict.chase ? [['room', 'Change the Maneuvering Room'], ['smash', 'Set Smash points (altitude)']] : []), ['concedePredator', `${sideName(conflict, 'predator')} concedes`], ['concedePrey', `${sideName(conflict, 'prey')} concedes`], ['remove', 'Remove this conflict']], 'lead')}</select></label>
     <label>Lead <input type="number" name="lead" value="${conflict.lead}" /></label>
-    ${conflict.chase ? `<label>Maneuvering Room <select name="room">${options(roomRows(), conflict.chase.room)}</select></label>` : ''}`);
+    ${conflict.chase ? `<label>Maneuvering Room <select name="room">${options(roomRows(), conflict.chase.room)}</select></label>
+    <fieldset><legend>Smash (p.365)</legend>
+      <p>A pilot in a powered aircraft at least 200 ft. above every opponent holds 1 Smash point per Lead point to the next highest opponent; a threat on a Maneuver check gains 1 (or costs the holder 1 when someone else scores it).</p>
+      <label>Held by <select name="smashSide">${options([['', 'Nobody'], ['predator', sideName(conflict, 'predator')], ['prey', sideName(conflict, 'prey')]], smashState(conflict.chase.smash)?.side ?? '')}</select></label>
+      <label>Points <input type="number" name="smashPoints" min="0" value="${smashState(conflict.chase.smash)?.points ?? conflict.lead}" /></label>
+    </fieldset>` : ''}`);
   if (!input) return null;
   try {
     if (input.action === 'remove') return saveConflict(id, null);
+    if (input.action === 'smash') {
+      const next = structuredClone(conflict), side = input.smashSide || '';
+      const source = side ? chaseSource(conflict.chase[side]) : null;
+      if (source && !(source.kind === 'vehicle' && smashEligible(source.system))) return ui.notifications.warn('Only a pilot in a powered aircraft can hold Smash points.');
+      next.chase.smash = side ? smashState({side, points: Number(input.smashPoints)}) : null;
+      await saveConflict(id, next);
+      return say(`<b>${esc(conflict.name)}</b>: ${chaseLine(next, chaseState(next))}.`);
+    }
     if (input.action === 'room') {
       const next = structuredClone(conflict); next.chase.room = input.room;
       await saveConflict(id, next);

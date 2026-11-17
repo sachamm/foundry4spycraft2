@@ -10,7 +10,7 @@ const rootClass = (source, tag) => new RegExp(`<${tag} class="([^"]+)"`).exec(so
 
 const FIXTURES = {
   "vehicle actor sheet": { file: "actor/vehicle-sheet.hbs", tag: "section", app: "spycraft2 sheet actor vehicle", width: 680,
-    controls: ["Control check", "Damage save", "Vehicle Damage result", "Tyre save", "Repaired", "Record use", "Refuel", "Bail out", "Fire"] },
+    controls: ["Control check", "Damage save", "Vehicle Damage result", "Tyre save", "Fuel explosion", "Repaired", "Jamming on", "Record use", "Refuel", "Bail out", "Fire"] },
   "gear item sheet": { file: "item/item-gear.hbs", tag: "section", app: "spycraft2 sheet item", width: 560,
     controls: ["Damage save", "Repair", "Use", "Recharge", "Signal reception DC", "Pay the cost", "Issue to the team"] },
   "vehicle item sheet": { file: "item/item-vehicle.hbs", tag: "section", app: "spycraft2 sheet item", width: 560,

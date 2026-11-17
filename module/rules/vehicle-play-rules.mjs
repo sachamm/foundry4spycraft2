@@ -123,12 +123,13 @@ const norm = text => String(text ?? '').toLowerCase().replace(/[^a-z]+/g, ' ').t
 /**
  * How a driver makes a Maneuver check with a vehicle: the skill, the Drive focus that counts as training, the
  * category's untrained penalty adjusted by Forgiving and Unforgiving, Trained Only, and error increases from
- * Lift damage and the Drone quality.
+ * Lift damage and the Drone quality. `hazards` is a vehicleHazards() result for the current terrain and weather.
  */
-export function controlCheckPlan(vehicle, driver) {
+export function controlCheckPlan(vehicle, driver, {hazards = null} = {}) {
   const cls = vehicleClass(vehicle?.vehicleClass);
   if (!cls) return {blocked: 'Choose the vehicle\'s category first.'};
-  const qualities = vehicle?.qualities ?? '', notes = [];
+  if (hazards?.blocked) return {blocked: hazards.blocked};
+  const qualities = vehicle?.qualitiesNow ?? vehicle?.qualities ?? '', notes = [];
   const crewed = hasQuality(qualities, 'CRW') || hasQuality(qualities, 'CAP');
   const skillName = crewed ? 'Tactics' : cls.skill;
   const skillKey = SKILL_KEYS[skillName];
@@ -148,8 +149,13 @@ export function controlCheckPlan(vehicle, driver) {
   const lift = vehicle?.damage?.lift ?? 0;
   if (lift) { errorIncrease += lift; notes.push(`Lift damage: error +${lift}.`); }
   if (hasQuality(qualities, 'DRN')) { errorIncrease += 1; notes.push('Drone: error +1.'); }
+  if (hazards?.rows?.length) {
+    penalty += hazards.modifier;
+    errorIncrease += hazards.errorIncrease;
+    notes.push(`Hazards ${hazards.modifier >= 0 ? '+' : ''}${hazards.modifier}${hazards.errorIncrease ? `, error +${hazards.errorIncrease}` : ''}.`);
+  }
   const why = !ranks ? `no ${skillName} ranks` : !hasFocus ? `no Drive (${focus}) focus` : '';
-  const note = `Control check, ${cls.label}: ${skillName}${focus ? ` (Drive focus ${focus})` : ''}; ${trained ? 'trained' : `untrained (${why}), penalty ${penalty}`}. ${notes.join(' ')}`.trim();
+  const note = `Control check, ${cls.label}: ${skillName}${focus ? ` (Drive focus ${focus})` : ''}; ${trained ? 'trained' : `untrained (${why})`}, modifier ${penalty}. ${notes.join(' ')}`.trim();
   return {blocked: null, skillKey, skillName, focus, trained, penalty, errorIncrease, note};
 }
 

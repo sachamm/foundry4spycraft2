@@ -2,8 +2,10 @@ import {VEHICLE_RULES} from '../rules/tables.mjs';
 import {VEHICLE_DAMAGE_COUNTERS} from '../rules/vehicles.mjs';
 import {
   bailOutOf, boardVehicle, fireMountedWeapon, leaveVehicle, loadVehicleStats, refuel, repairVehicle, rollControlCheck,
-  rollObjectDamageSave, rollTyreSave, rollVehicleDamageResult, setOccupantRole, skeletonCrewFor, spendFuel
+  rollFuelExplosion, rollObjectDamageSave, rollTyreSave, rollVehicleDamageResult, setOccupantRole, skeletonCrewFor, spendFuel
 } from '../apps/vehicle-play.mjs';
+import {HAZARD_GROUPS, hazardOptions} from '../rules/vehicle-environment.mjs';
+import {hasQuality, parseQualities} from '../rules/vehicle-play-rules.mjs';
 import {getMission, teamActors} from '../apps/gc/state.mjs';
 
 const {HandlebarsApplicationMixin} = foundry.applications.api;
@@ -13,6 +15,9 @@ const COUNTER_LABELS = {
   controls: 'Controls', engine: 'Engine', flotation: 'Flotation', fuelHours: 'Fuel lost (hours)', lift: 'Lift', traction: 'Punctured tyres'
 };
 const hours = n => (Math.round(n * 10) / 10).toLocaleString('en-US');
+const HAZARD_LABELS = {terrain: 'Terrain', surface: 'Surface', weather: 'Weather', wind: 'Wind'};
+const SENSOR_LABELS = {radar: 'Radar', sonar: 'Sonar', thermal: 'Thermal'};
+const share = ([n, d]) => `${n}/${d}`;
 
 /** Sheet for a vehicle placed on a scene: its table statistics, current condition, people aboard and play actions. */
 export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
@@ -25,6 +30,7 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
       damageSave() { return rollObjectDamageSave(this.actor); },
       vehicleDamage() { return rollVehicleDamageResult(this.actor); },
       tyreSave() { return rollTyreSave(this.actor); },
+      fuelExplosion() { return rollFuelExplosion(this.actor); },
       async repair() {
         const confirmed = await foundry.applications.api.DialogV2.confirm({
           window: {title: `${this.actor.name}: repairs`},
@@ -74,6 +80,15 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
       upgrades: items.filter(i => i.system.sourceTable === 'Table 4.28').map(i => ({id: i.id, name: i.name, cost: system.upgradeList.find(u => u.id === i.id)?.cost ?? 0})),
       weapons: items.filter(i => i.type === 'weapon').map(i => ({id: i.id, name: i.name, damage: i.system.damage, errorThreat: i.system.errorThreat})),
       otherItems: items.filter(i => i.type !== 'weapon' && i.system.sourceTable !== 'Table 4.28'),
+      hazardFields: HAZARD_GROUPS.map(group => ({group, label: HAZARD_LABELS[group], value: system.hazards?.[group] ?? '', options: {'': '—', ...Object.fromEntries(hazardOptions(group))}})),
+      toleranceChoice: parseQualities(system.qualitiesNow).some(q => q.code === 'ENV' && /any/i.test(q.param))
+        ? {value: system.hazards?.tolerance ?? '', options: {'': '— choose —', ...Object.fromEntries(HAZARD_GROUPS.flatMap(g => hazardOptions(g)))}} : null,
+      hasJamming: hasQuality(system.qualitiesNow, 'JAM'),
+      signatures: (system.signatures ?? []).map(s => ({label: SENSOR_LABELS[s.sensor], value: s.value ?? '—', detail: s.rows.map(r => `${r.label}${r === s.rows[0] ? ` ${r.value}` : ` ${r.value >= 0 ? '+' : ''}${r.value}`}`).join(', ')})),
+      acceleration: system.accelerationTable ? {
+        ...system.accelerationTable, firstShare: share(system.accelerationTable.firstShare), laterShare: share(system.accelerationTable.laterShare),
+        rounds: system.accelerationTable.speeds.length
+      } : null,
       upgradesOver: system.upgraded.used > system.upgraded.free,
       weaponsOver: items.filter(i => i.type === 'weapon').length > system.weaponSpaces,
       enrichedBiography: await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.biography, {secrets: actor.isOwner})

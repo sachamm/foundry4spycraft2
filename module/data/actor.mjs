@@ -14,6 +14,7 @@ import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { VEHICLE_DAMAGE_COUNTERS, breakState, vehicleClass, vehicleCondition, vehicleDefense } from "../rules/vehicles.mjs";
 import { entryMovement, fuelState, hasQuality, qualityReference, ruggedBonus, upgradedStats, weaponSpaces } from "../rules/vehicle-play-rules.mjs";
 import { SKILLS } from "../rules/tables.mjs";
+import { HAZARD_GROUPS, accelerationSchedule, hazardLine, vehicleHazards, vehicleSignatures } from "../rules/vehicle-environment.mjs";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
 
@@ -319,6 +320,14 @@ export class VehicleActorData extends foundry.abstract.TypeDataModel {
       /** UUID of the character at the controls; their Dexterity modifier counts while the vehicle moves (p.289). */
       driver: str(),
       moving: new BooleanField(),
+      /** Travelling faster than its cruising MPH: lowers its signature (p.292) and doubles fuel use (p.225). */
+      aboveCruising: new BooleanField(),
+      /** Burning: a Fuel damage result makes its fuel explode (Table 4.73, p.291). */
+      onFire: new BooleanField(),
+      /** Jamming gear switched on: a larger radar signature (p.294). */
+      jamming: new BooleanField(),
+      /** Terrain, surface, weather and wind it travels through (Table 4.76), and the hazard an "any one" tolerance ignores. */
+      hazards: new SchemaField({ ...Object.fromEntries(HAZARD_GROUPS.map(group => [group, str()])), tolerance: str() }),
       /** Damage saves failed so far (p.224). */
       failedSaves: int(0, { min: 0 }),
       /** Vehicle Damage results recorded so far (Table 4.72, p.290). */
@@ -374,6 +383,11 @@ export class VehicleActorData extends foundry.abstract.TypeDataModel {
     this.crewCount = this.crew ?? 0;
     this.entryFeet = entryMovement(this);
     this.weaponSpaces = weaponSpaces(this.size || this.sizeLabel);
+    // Surroundings (pp.291–293): terrain and weather, sensor signature and acceleration.
+    this.hazardEffect = vehicleHazards(this, this.hazards);
+    this.hazardSummary = hazardLine(this.hazardEffect);
+    this.signatures = vehicleSignatures(this, { fasterThanCruising: this.aboveCruising, jamming: this.jamming });
+    this.accelerationTable = accelerationSchedule({ acceleration: this.condition.acceleration, topMph: this.condition.topMph });
   }
 
   /**

@@ -11730,5 +11730,629 @@ export const VEHICLE_RULES = {
   ]
  },
  "qualitiesPage": 292,
- "bailOutDC": 15
+ "bailOutDC": 15,
+ "explosions": {
+  "table": "4.73",
+  "page": 291,
+  "_note": "Rows in Size order; the book prints Colossal above Gargantuan.",
+  "columnByFuel": {
+   "G": "gas",
+   "A": "gas",
+   "P": "gas",
+   "V": "aviationGas",
+   "J": "jetFuel"
+  },
+  "columnHouseRule": {
+   "A": "House rule: alcohol uses the gas column.",
+   "P": "House rule: propane uses the gas column."
+  },
+  "noExplosion": [
+   "B",
+   "D",
+   "E",
+   "F",
+   "N"
+  ],
+  "bySize": {
+   "S": {
+    "gas": {
+     "dice": "2d4",
+     "blast": 1,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "2d8",
+     "blast": 1,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "2d10",
+     "blast": 3,
+     "ap": 16
+    }
+   },
+   "M": {
+    "gas": {
+     "dice": "3d4",
+     "blast": 1,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "3d8",
+     "blast": 1,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "3d10",
+     "blast": 4,
+     "ap": 16
+    }
+   },
+   "L": {
+    "gas": {
+     "dice": "3d6",
+     "blast": 2,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "4d8",
+     "blast": 2,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "4d10",
+     "blast": 5,
+     "ap": 16
+    }
+   },
+   "H": {
+    "gas": {
+     "dice": "4d6",
+     "blast": 2,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "5d8",
+     "blast": 2,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "5d10",
+     "blast": 6,
+     "ap": 16
+    }
+   },
+   "G": {
+    "gas": {
+     "dice": "5d6",
+     "blast": 3,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "6d8",
+     "blast": 3,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "6d10",
+     "blast": 8,
+     "ap": 16
+    }
+   },
+   "C": {
+    "gas": {
+     "dice": "6d6",
+     "blast": 3,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "7d8",
+     "blast": 3,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "7d10",
+     "blast": 10,
+     "ap": 16
+    }
+   },
+   "E": {
+    "gas": {
+     "dice": "7d6",
+     "blast": 4,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "8d8",
+     "blast": 4,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "8d10",
+     "blast": 12,
+     "ap": 16
+    }
+   },
+   "V": {
+    "gas": {
+     "dice": "8d6",
+     "blast": 5,
+     "ap": 8
+    },
+    "aviationGas": {
+     "dice": "9d8",
+     "blast": 5,
+     "ap": 12
+    },
+    "jetFuel": {
+     "dice": "9d10",
+     "blast": 15,
+     "ap": 16
+    }
+   }
+  }
+ },
+ "accelerationDistance": {
+  "table": "4.74",
+  "page": 291,
+  "drawnPenalty": 2,
+  "bands": [
+   {
+    "min": 0,
+    "max": 0,
+    "first": [
+     1,
+     10
+    ],
+    "later": [
+     1,
+     20
+    ]
+   },
+   {
+    "min": 1,
+    "max": 3,
+    "first": [
+     1,
+     5
+    ],
+    "later": [
+     1,
+     10
+    ]
+   },
+   {
+    "min": 4,
+    "max": 6,
+    "first": [
+     1,
+     4
+    ],
+    "later": [
+     1,
+     5
+    ]
+   },
+   {
+    "min": 7,
+    "max": 9,
+    "first": [
+     1,
+     3
+    ],
+    "later": [
+     1,
+     4
+    ]
+   },
+   {
+    "min": 10,
+    "max": null,
+    "first": [
+     1,
+     2
+    ],
+    "later": [
+     1,
+     3
+    ]
+   }
+  ]
+ },
+ "signature": {
+  "table": "4.75",
+  "page": 292,
+  "_note": "Rows in Size order; the book prints Colossal above Gargantuan.",
+  "bySize": {
+   "F": 50,
+   "T": 45,
+   "S": 40,
+   "M": 35,
+   "L": 30,
+   "H": 25,
+   "G": 20,
+   "C": 15,
+   "E": 10,
+   "V": 5
+  },
+  "fasterThanCruising": -5,
+  "room": {
+   "open": 5,
+   "close": 0,
+   "crowded": -5,
+   "tight": -10
+  },
+  "sensorsByMode": {
+   "ground": [
+    "radar",
+    "thermal"
+   ],
+   "air": [
+    "radar",
+    "thermal"
+   ],
+   "water": [
+    "radar",
+    "sonar",
+    "thermal"
+   ]
+  }
+ },
+ "hazards": {
+  "table": "4.76",
+  "page": 293,
+  "_note": "Cells: number; x impassable; d damage each round; s speed -25%.",
+  "groundCells": [
+   "standard",
+   "off-road",
+   "tracked"
+  ],
+  "modeByClass": {
+   "PGV": "ground",
+   "SGV": "ground",
+   "HGV": "ground",
+   "M/AD": "ground",
+   "PSA": "air",
+   "PFA": "air",
+   "SVA": "air",
+   "RWA": "air",
+   "PSW": "water",
+   "STW": "water",
+   "SHP": "water",
+   "SUB": "water"
+  },
+  "errorFromTotal": {
+   "ground": 3,
+   "air": 3
+  },
+  "sizeReliefAbove": "L",
+  "groups": {
+   "terrain": [
+    {
+     "key": "aquatic",
+     "label": "Aquatic",
+     "ground": "0",
+     "air": "0",
+     "water": "0"
+    },
+    {
+     "key": "arctic",
+     "label": "Arctic",
+     "ground": "-1",
+     "air": "0",
+     "water": "-1"
+    },
+    {
+     "key": "desert",
+     "label": "Desert",
+     "ground": "-1",
+     "air": "-1",
+     "water": "0"
+    },
+    {
+     "key": "forest",
+     "label": "Forest",
+     "ground": "0",
+     "air": "0",
+     "water": "0"
+    },
+    {
+     "key": "jungle",
+     "label": "Jungle",
+     "ground": "-2",
+     "air": "0",
+     "water": "0"
+    },
+    {
+     "key": "mountain",
+     "label": "Mountain",
+     "ground": "-1",
+     "air": "-1",
+     "water": "0"
+    },
+    {
+     "key": "plains",
+     "label": "Plains",
+     "ground": "0",
+     "air": "0",
+     "water": "0"
+    },
+    {
+     "key": "swamp",
+     "label": "Swamp",
+     "ground": "-2",
+     "air": "0",
+     "water": "-1"
+    }
+   ],
+   "surface": [
+    {
+     "key": "broken",
+     "label": "Broken",
+     "ground": [
+      "x",
+      "-5d",
+      "-2d"
+     ],
+     "air": "0",
+     "water": "-1s"
+    },
+    {
+     "key": "rough",
+     "label": "Rough",
+     "ground": [
+      "-2",
+      "0",
+      "0"
+     ],
+     "air": "0",
+     "water": "-2s"
+    },
+    {
+     "key": "rugged",
+     "label": "Rugged",
+     "ground": [
+      "-5s",
+      "-2",
+      "0"
+     ],
+     "air": "0",
+     "water": "-4s"
+    },
+    {
+     "key": "shifting",
+     "label": "Shifting",
+     "ground": [
+      "x",
+      "-3s",
+      "-1s"
+     ],
+     "air": "0",
+     "water": "0"
+    },
+    {
+     "key": "slippery",
+     "label": "Slippery",
+     "ground": [
+      "-5s",
+      "-2",
+      "0"
+     ],
+     "air": "0",
+     "water": "0"
+    }
+   ],
+   "weather": [
+    {
+     "key": "clear",
+     "label": "Clear skies",
+     "ground": [
+      "0",
+      "0",
+      "0"
+     ],
+     "air": "0",
+     "water": "0"
+    },
+    {
+     "key": "fogLight",
+     "label": "Fog or smoke, light",
+     "ground": [
+      "-1",
+      "-1",
+      "-1"
+     ],
+     "air": "-1",
+     "water": "-1"
+    },
+    {
+     "key": "fogModerate",
+     "label": "Fog or smoke, moderate",
+     "ground": [
+      "-2",
+      "-2",
+      "-2"
+     ],
+     "air": "-2",
+     "water": "-2"
+    },
+    {
+     "key": "fogDense",
+     "label": "Fog or smoke, dense",
+     "ground": [
+      "-3",
+      "-3",
+      "-3"
+     ],
+     "air": "-3",
+     "water": "-3"
+    },
+    {
+     "key": "rainLight",
+     "label": "Rain or snow, light",
+     "ground": [
+      "-1",
+      "0",
+      "0"
+     ],
+     "air": "0",
+     "water": "0",
+     "sizeRelief": true
+    },
+    {
+     "key": "rainModerate",
+     "label": "Rain or snow, moderate",
+     "ground": [
+      "-2",
+      "1",
+      "0"
+     ],
+     "air": "-1",
+     "water": "0",
+     "sizeRelief": true
+    },
+    {
+     "key": "rainHeavy",
+     "label": "Rain or snow, heavy",
+     "ground": [
+      "-3",
+      "-2",
+      "1"
+     ],
+     "air": "-2",
+     "water": "-1",
+     "sizeRelief": true
+    },
+    {
+     "key": "blizzard",
+     "label": "Storm, blizzard",
+     "ground": [
+      "-6",
+      "-5",
+      "-4"
+     ],
+     "air": "-6",
+     "water": "-4"
+    },
+    {
+     "key": "dustStorm",
+     "label": "Storm, dust storm",
+     "ground": [
+      "-5",
+      "-4",
+      "-3"
+     ],
+     "air": "-3",
+     "water": "-3"
+    },
+    {
+     "key": "hurricane",
+     "label": "Storm, hurricane",
+     "ground": [
+      "-6",
+      "-5",
+      "-4"
+     ],
+     "air": "-12",
+     "water": "-10"
+    },
+    {
+     "key": "snowstorm",
+     "label": "Storm, snowstorm",
+     "ground": [
+      "-4",
+      "-3",
+      "-2"
+     ],
+     "air": "-3",
+     "water": "-2"
+    },
+    {
+     "key": "thunderstorm",
+     "label": "Storm, thunderstorm",
+     "ground": [
+      "-3",
+      "-2",
+      "-1"
+     ],
+     "air": "-6",
+     "water": "-3"
+    }
+   ],
+   "wind": [
+    {
+     "key": "windLight",
+     "label": "Wind, light",
+     "ground": [
+      "0",
+      "0",
+      "0"
+     ],
+     "air": "-1",
+     "water": "0",
+     "sizeRelief": true
+    },
+    {
+     "key": "windModerate",
+     "label": "Wind, moderate",
+     "ground": [
+      "0",
+      "0",
+      "0"
+     ],
+     "air": "-2",
+     "water": "0",
+     "sizeRelief": true
+    },
+    {
+     "key": "windStrong",
+     "label": "Wind, strong",
+     "ground": [
+      "-1",
+      "-1",
+      "-1"
+     ],
+     "air": "-3",
+     "water": "-2",
+     "sizeRelief": true
+    },
+    {
+     "key": "windSevere",
+     "label": "Wind, severe",
+     "ground": [
+      "-3",
+      "-3",
+      "-3"
+     ],
+     "air": "-6",
+     "water": "-4",
+     "sizeRelief": true
+    },
+    {
+     "key": "windTornado",
+     "label": "Wind, tornado",
+     "ground": [
+      "-5",
+      "-5",
+      "-5"
+     ],
+     "air": "-12",
+     "water": "-10",
+     "sizeRelief": true
+    }
+   ]
+  }
+ },
+ "smash": {
+  "page": 365,
+  "minAltitudeFeet": 200,
+  "airClasses": [
+   "PSA",
+   "PFA",
+   "SVA",
+   "RWA"
+  ],
+  "predatorLeadCut": 1,
+  "preyDefenseBonus": 4
+ }
 };

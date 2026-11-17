@@ -83,7 +83,7 @@ export const TABLES = ${JSON.stringify({...core.tables,ammunitionCatalog:ammunit
 export const CLASS_FEATURES = ${JSON.stringify(Object.fromEntries(classes.filter(c=>!c.expert).map(c=>[c.key,{name:c.name,classSkills:c.classSkills,choiceLists:c.choiceLists.map(list=>({...list,options:list.options.map(option=>({...option,description:option.description??summaries.classes[c.name]?.options?.[option.name]??""}))}))}])),null,1)};
 export const GEAR_RULES = ${JSON.stringify({categories:gear.categories,damageSaves:gear.damageSaves,housings:gear.housings,skillUses:gear.skillUses}, null, 1)};
 export const CONTAGIONS = ${JSON.stringify(contagions.contagions, null, 1)};
-export const VEHICLE_RULES = ${JSON.stringify({classes:vehicles.classes,damageLocations:vehicles.damageLocations,damagePage:vehicles.damagePage,damageSavePage:vehicles.damageSavePage,tractionSaveBonus:vehicles.tractionSaveBonus,tractionSaveBonusHouseRule:vehicles.tractionSaveBonusHouseRule,qualities:vehicles.qualities,qualitiesPage:vehicles.qualitiesPage,bailOutDC:vehicles.bailOutDC}, null, 1)};
+export const VEHICLE_RULES = ${JSON.stringify({classes:vehicles.classes,damageLocations:vehicles.damageLocations,damagePage:vehicles.damagePage,damageSavePage:vehicles.damageSavePage,tractionSaveBonus:vehicles.tractionSaveBonus,tractionSaveBonusHouseRule:vehicles.tractionSaveBonusHouseRule,qualities:vehicles.qualities,qualitiesPage:vehicles.qualitiesPage,bailOutDC:vehicles.bailOutDC,explosions:vehicles.explosions,accelerationDistance:vehicles.accelerationDistance,signature:vehicles.signature,hazards:vehicles.hazards,smash:vehicles.smash}, null, 1)};
 `;
 writeFileSync(join(ROOT, "module/rules/tables.mjs"), tablesSrc);
 

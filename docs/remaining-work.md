@@ -14,8 +14,9 @@ Checked live in Foundry 14.370 on 2026-11-17 (world `spycraft-test`, throwaway a
 - [x] Agent sheet: a skill (named-check list from the pipeline), a save, an attack and damage post chat cards;
       a boost spends an action die and updates the effective result; the error guard still blocks boosting an
       unresolved error. All 89 pipeline contributors are registered, including both chat controls.
-- [ ] Live-check **Reroll with ability**, **Resolve Unnerving stress** and **Strut** on a character that has them.
-      No sample character qualifies, so only the unit tests cover them so far.
+- [x] Live-check **Reroll with ability**, **Resolve Unnerving stress** and **Strut** (2026-11-17, throwaway copies
+      of a sample agent: Virtuoso Meticulous, Test Subject with Unnerving, Brawler 3 with the Strut ploy in a combat).
+      Each button appeared on the live card, ran, recorded its result once and then disappeared.
 - [x] Agent Gear tab: browse the Gear and Vehicles packs, add an entry, set its pick category and check the mission
       pick totals (an overspent category is flagged).
 - [x] Gear item sheet: table values show, **Damage save** rolls and the failed-save count updates.
@@ -29,8 +30,7 @@ Checked live in Foundry 14.370 on 2026-11-17 (world `spycraft-test`, throwaway a
       `module/apps/browser.mjs` now separates block elements.
 - [x] A vehicle in combat takes its driver's initiative: rolled alone it uses the driver's bonus, and a combat hook
       copies the driver's result. New vehicle actors get linked tokens so fuel and damage stay on the vehicle.
-- [ ] Rebuild the real packs with Foundry closed (`npm run build`): the vehicle weapons, contagions, equipment
-      upgrades, footnotes and summaries are only in packs built since 2026-11-17.
+- [x] Rebuild the real packs (`npm run build`, with no world open): every pack rebuilt; `test:packs` passes.
 
 ## Gear and vehicle data
 
@@ -51,7 +51,7 @@ Checked live in Foundry 14.370 on 2026-11-17 (world `spycraft-test`, throwaway a
 
 - [x] Chases: the tracker takes each side's vehicle (or a character on foot) and the Maneuvering Room, fills in ratings
       and starting Lead, shows distance, chase speed, fastest-vehicle bonus and Crisis DC, refreshes ratings and uses
-      fuel each round, and lets the GC change the room. Not modelled: Smash/altitude, chained pairs, crashes.
+      fuel each round, and lets the GC change the room. Not modelled: chained pairs, crashes.
 - [x] Defense against a specific attacker: choose the attacking vehicle on the sheet.
 - [x] Cargo, occupant, weapon/gear and draft-animal results report the damage passed on (armor-piercing included);
       occupants are picked from the people aboard; rotors roll their own save; results that cannot apply are rerolled.
@@ -67,8 +67,14 @@ Checked live in Foundry 14.370 on 2026-11-17 (world `spycraft-test`, throwaway a
 - [x] Mounts: drop an NPC on a mount whose statistics say "NPC" to use its Defense and Damage save.
 - [x] Control checks: the driver rolls the category's skill and Drive focus, with the untrained penalty and error
       increases from qualities and Lift damage.
-- [ ] Not yet automated: vehicle hazards (Table 4.76), explosions (4.73), signature (4.75), acceleration to distance
-      (4.74), Smash.
+- [x] Hazards (Table 4.76): terrain, surface, weather and wind chosen on the vehicle sheet feed its control checks
+      (off-road/tracked figures, error increase, impassable ground, speed cut, Size relief, Stabilized, tolerance).
+- [x] Fuel explosions (Table 4.73): a Fuel result on a burning vehicle (or from fire damage) rolls the explosion
+      multiplied by the remaining fuel hours; also a sheet button. Alcohol and propane use the gas column (house rule).
+- [x] Signature (Table 4.75) per sensor from Size, HOB/LOB sizes, jamming and speed; acceleration to distance (4.74).
+- [x] Smash: the chase tracker records who holds Smash points, moves them with opposed checks, lets the winner spend
+      one, and shows the range Lead against the holder.
+- Tables 4.73 and 4.75 print Colossal above Gargantuan; the data follows Size order instead (Gargantuan smaller).
 
 ## Gear in play
 

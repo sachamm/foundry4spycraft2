@@ -34,6 +34,8 @@
   </p>
   <p>
     <label><input type="checkbox" name="system.moving" {{checked system.moving}} /> In motion</label>
+    · <label><input type="checkbox" name="system.aboveCruising" {{checked system.aboveCruising}} /> Above cruising MPH</label>
+    · <label><input type="checkbox" name="system.onFire" {{checked system.onFire}} /> On fire</label>
     · <label>Defense against <select name="system.attacker">{{selectOptions attackerOptions selected=system.attacker}}</select></label>
   </p>
   <p class="controls">
@@ -41,11 +43,23 @@
     · <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
     · <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> Vehicle Damage result</a>
     · <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> Tyre save</a>
+    · <a data-action="fuelExplosion"><i class="fa-solid fa-fire"></i> Fuel explosion</a>
     · <a data-action="repair"><i class="fa-solid fa-wrench"></i> Repaired</a>
   </p>
   <div class="form-fields-grid">
     {{#each counters}}<label>{{label}} <input name="system.damage.{{key}}" type="number" min="0" value="{{value}}" class="w-2" /></label>{{/each}}
   </div>
+
+  <h3>Surroundings</h3>
+  <div class="form-fields-grid">
+    {{#each hazardFields}}<label>{{label}} <select name="system.hazards.{{group}}">{{selectOptions options selected=value}}</select></label>{{/each}}
+    {{#if toleranceChoice}}<label>Tolerance ignores <select name="system.hazards.tolerance">{{selectOptions toleranceChoice.options selected=toleranceChoice.value}}</select></label>{{/if}}
+  </div>
+  {{#if system.hazardSummary}}<p class="{{#if system.hazardEffect.blocked}}bad{{/if}}">{{system.hazardSummary}} <span class="muted">Applied to control checks.</span></p>{{/if}}
+  {{#if signatures.length}}<p>Signature Defense/DC: {{#each signatures}}<strong data-tooltip="{{detail}}">{{label}} {{value}}</strong>{{#unless @last}} · {{/unless}}{{/each}}
+    {{#if hasJamming}}· <label><input type="checkbox" name="system.jamming" {{checked system.jamming}} /> Jamming on</label>{{/if}}
+    <span class="muted">(Table 4.75; Maneuvering Room adds Open +5, Crowded −5, Tight −10)</span></p>{{/if}}
+  {{#if acceleration}}<p>Acceleration to distance: <strong>{{acceleration.first}}</strong> in round 1 ({{acceleration.firstShare}} top MPH), then <strong>{{acceleration.later}}</strong> a round ({{acceleration.laterShare}}){{#if acceleration.rounds}}, top MPH after {{acceleration.rounds}} round{{#unless (sc2eq acceleration.rounds 1)}}s{{/unless}}{{/if}} <span class="muted">(Table 4.74; a drawn vehicle uses its puller's rating −2)</span></p>{{/if}}
 
   <h3>Aboard</h3>
   <p>

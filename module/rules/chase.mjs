@@ -58,3 +58,46 @@ export function chaseScale(roomKey, predator, prey) {
 
 /** Distance between the participants at a given Lead. */
 export const leadDistance = (lead, leadFeet) => Number.isFinite(leadFeet) ? lead * leadFeet : null;
+
+/* ---------------------------------------------------------------------- */
+/*  Altitude: Smash points (p.365)                                        */
+/* ---------------------------------------------------------------------- */
+
+/** Only a pilot in a powered air vehicle can hold Smash points. */
+export function smashEligible(system) {
+  const s = system ?? {};
+  return VEHICLE_RULES.smash.airClasses.includes(s.vehicleClass) && !/\bUNP\b/.test(s.qualitiesNow ?? s.qualities ?? '');
+}
+
+/** Normalised Smash record: {side, points}, or null when nobody holds any. */
+export function smashState(smash) {
+  const points = Math.floor(Number(smash?.points) || 0);
+  return smash && ['predator', 'prey'].includes(smash.side) && points > 0 ? {side: smash.side, points} : null;
+}
+
+/**
+ * Smash after an opposed check or a Maneuver threat: the holder gains 1 when they win (or score the threat) and
+ * loses 1 when anyone else does. At 0 the points are gone and the pilot must qualify again.
+ */
+export function smashAfterWin(smash, winner) {
+  const now = smashState(smash);
+  if (!now || !['predator', 'prey'].includes(winner)) return now;
+  return smashState({side: now.side, points: now.points + (winner === now.side ? 1 : -1)});
+}
+
+/**
+ * Spending 1 Smash point after winning an opposed check: a Predator cuts the Lead by 1; a Prey gains +4 Defense
+ * until the start of its next Initiative Count.
+ */
+export function spendSmash(smash, lead) {
+  const now = smashState(smash);
+  if (!now) throw new Error('Nobody holds Smash points.');
+  const {predatorLeadCut, preyDefenseBonus} = VEHICLE_RULES.smash;
+  const after = smashState({side: now.side, points: now.points - 1});
+  return now.side === 'predator'
+    ? {smash: after, lead: lead - predatorLeadCut, note: `Smash spent: Lead −${predatorLeadCut}.`}
+    : {smash: after, lead, defenseBonus: preyDefenseBonus, note: `Smash spent: +${preyDefenseBonus} Defense until the start of the Prey's next Initiative Count.`};
+}
+
+/** Lead used for the range of attacks against the Smash holder: the current Lead plus their Smash points. */
+export const smashRangeLead = (lead, smash) => lead + (smashState(smash)?.points ?? 0);
