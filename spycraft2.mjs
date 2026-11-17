@@ -1,3 +1,4 @@
+import {installDialogThemeHooks} from './module/apps/dialog-theme.mjs';
 import {installChatSearchHooks} from './module/apps/chat-search.mjs';
 import {installPowerStanceInitiativeHooks} from './module/apps/power-stance.mjs';
 import {installCombatStanceHooks} from './module/apps/combat-stance.mjs';
@@ -32,6 +33,7 @@ import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
 Hooks.once("init", () => {
   console.log("Spycraft 2.0 | Initializing system");
   installChatSearchHooks();
+  installDialogThemeHooks();
   CONFIG.SPYCRAFT = SPYCRAFT;
   CONFIG.time.roundTime=6;CONFIG.time.turnTime=0;
   CONFIG.statusEffects??=[];

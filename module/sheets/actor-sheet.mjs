@@ -1,3 +1,4 @@
+import {systemDialog} from '../apps/dialog-theme.mjs';
 import {vehicleClass} from '../rules/vehicles.mjs';
 import {buildSetupGuide, combatToolVisibility, focusSetupTask, activeConditionLabels, enhanceAgentSheet} from "./agent-ux.mjs";
 import {COMBAT_STANCES} from "../rules/combat-stance.mjs";
@@ -679,7 +680,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   static #onSpendActionDie() { return this.actor.rollActionDie(); }
   static #onAddLevel() { return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true); }
   static async #onRemoveLevel() {
-    const ok = await foundry.applications.api.DialogV2.confirm({
+    const ok = await systemDialog.confirm({
       window: { title: game.i18n.localize("SPYCRAFT.Class.RemoveLevel") },
       content: `<p>${game.i18n.localize("SPYCRAFT.Class.RemoveLevelConfirm")}</p>`
     });
