@@ -21,7 +21,9 @@ const UNIQUE = new Set(["origin"]);
 /** Plain text of a stored HTML description (parsed inertly, nothing is loaded or run). */
 function plainText(html) {
   if (!html) return "";
-  return new DOMParser().parseFromString(String(html), "text/html").body.textContent.replace(/\s+/g, " ").trim();
+  // Separate block elements so adjacent paragraphs do not run together.
+  const spaced = String(html).replace(/<\/(p|div|li|h[1-6])>|<br\s*\/?>/gi, "$& ");
+  return new DOMParser().parseFromString(spaced, "text/html").body.textContent.replace(/\s+/g, " ").trim();
 }
 
 /**

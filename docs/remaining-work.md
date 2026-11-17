@@ -5,20 +5,29 @@ Items are grouped by area and ordered roughly by how much they block. Tick them 
 
 ## Verify what was just built
 
-None of the new work has been opened in a running Foundry.
+Checked live in Foundry 14.370 on 2026-11-17 (world `spycraft-test`, throwaway actors deleted afterwards).
 
-- [ ] Restart Foundry so it loads the new document types (`Item.vehicle`, `Actor.vehicle`) and packs.
-- [ ] Run `npm run build` with Foundry closed and confirm it exits 0 with every pack rebuilt.
-- [ ] Agent sheet: roll a skill, a save, an attack and damage; confirm chat cards, boosts, rerolls and the
-      Unnerving and Strut buttons behave as before.
-- [ ] Agent Gear tab: browse the Gear and Vehicles packs, add an entry, set its pick category and check the mission
-      pick totals.
-- [ ] Gear item sheet: table values show, **Damage save** rolls and the failed-save count updates.
-- [ ] Vehicle item sheet: **Place on a scene** creates a Vehicle actor with the same statistics.
-- [ ] Vehicle actor sheet: drop a character to set the driver, toggle In motion, roll a Damage save with a critical
-      hit, check the Vehicle Damage result changes the current ratings, then **Repaired**.
-- [ ] Put a vehicle token into a combat encounter and confirm the tracker and the combat hooks do not throw.
+- [x] Restart Foundry so it loads the new document types (`Item.vehicle`, `Actor.vehicle`) and packs.
+- [x] Run `npm run build` and confirm it exits 0 with every pack rebuilt. Built into a scratch folder with
+      `SPYCRAFT_PACKS_DIR` (Foundry had the packs open); generated files matched the commit and the live pack counts
+      match (gear 382, vehicles 213, vehicle-upgrades 201). `npm test`, `test:packs` and `test:layout` all passed.
+- [x] Agent sheet: a skill (named-check list from the pipeline), a save, an attack and damage post chat cards;
+      a boost spends an action die and updates the effective result; the error guard still blocks boosting an
+      unresolved error. All 89 pipeline contributors are registered, including both chat controls.
+- [ ] Live-check **Reroll with ability**, **Resolve Unnerving stress** and **Strut** on a character that has them.
+      No sample character qualifies, so only the unit tests cover them so far.
+- [x] Agent Gear tab: browse the Gear and Vehicles packs, add an entry, set its pick category and check the mission
+      pick totals (an overspent category is flagged).
+- [x] Gear item sheet: table values show, **Damage save** rolls and the failed-save count updates.
+- [x] Vehicle item sheet: **Place on a scene** creates a Vehicle actor with the same statistics.
+- [x] Vehicle actor sheet: drop a character to set the driver, toggle In motion, roll a Damage save with a critical
+      hit, check the Vehicle Damage result changes the current ratings, then **Repaired**. Tyre save also checked.
+- [x] Put a vehicle token into a combat encounter and confirm the tracker and the combat hooks do not throw.
 - [ ] Add Playwright layout fixtures for the vehicle sheet and the two changed item templates.
+- [x] Compendium browser summaries ran paragraphs together ("p.276.The printed table…"); `plainText` in
+      `module/apps/browser.mjs` now separates block elements.
+- [ ] A vehicle in combat rolls its own initiative (`1d20 + 0`); decide whether it should use its driver's or stay
+      out of the tracker.
 
 ## Gear and vehicle data
 
