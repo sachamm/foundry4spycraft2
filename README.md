@@ -28,6 +28,10 @@ npm test        # validates data, engine fixtures and Node regressions
 npm run test:packs # checks rebuilt LevelDB content after building
 ```
 
+The build leaves any pack that another process has open (a running Foundry) untouched and says so; close Foundry and
+run it again to refresh those. To build or test somewhere else, set `SPYCRAFT_PACKS_DIR=/some/folder` for
+`npm run build`, `npm test` and `npm run test:packs`.
+
 `src/data/*.json` is the source of truth for the rules data (numbers, tables, names and formulas): edit those files
 directly. All descriptive text (feats, origins, class abilities) comes from `src/data/summaries.json`: original,
 condensed summaries written for this system; none of it is copied from the rulebook. The test fixtures in `tools/fixtures/` are saved
@@ -69,6 +73,7 @@ Implemented resource controls coordinate multiple Foundry clients. Classes provi
 | `templates/` | Handlebars templates |
 | `lang/` | Localization |
 | `module/rules/` | Rules engine (`engine.mjs`), prerequisite checks, formula evaluator, generated tables |
+| `module/rolls/` | Roll pipeline contributors: reservations, validators, named checks and chat buttons (registry in `module/rules/roll-pipeline.mjs`) |
 | `module/apps/` | Compendium browser |
 | `src/data/` | Rules data (source of truth; edit directly) |
 | `tools/` | Pack build and engine test scripts |
@@ -98,6 +103,35 @@ https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.jso
 1. Bump `version` in `system.json` and add a `CHANGELOG.md` entry.
 2. Commit and push, then publish a GitHub release tagged `v<version>` (e.g. `v0.1.0`).
 3. The **Release** workflow attaches `system.json` and `spycraft2.zip` to the release.
+
+## Gear catalog and vehicles
+
+The **Gear** pack lists the Electronics, Gadgets, Resources, Security and Tradecraft picks with their table values
+(Caliber, Power Rating, range, Size/hands, battery, Damage save, Complexity, year, street value, Reputation/Net Worth
+cost), plus gadget housing sizes. The **Vehicles** pack holds every vehicle from the twelve vehicle tables, and
+**Vehicle Upgrades** holds upgrades and vehicle weapons. Entries carry numbers and page references only; the rules for
+each item are in the book. The agent sheet's Gear tab browses all three, and anything given a pick category counts
+against mission gear picks as weapons and armor already do.
+
+A vehicle is an Item (the pick) with its own sheet. **Place on a scene** creates a Vehicle actor with the same
+statistics, so it can have a token. The Vehicle sheet tracks failed Damage saves, shows whether the vehicle is intact,
+broken or destroyed for its Size, and applies recorded Vehicle Damage results to its current Acceleration, Turning and
+speeds. Drop a character on it to set the driver, whose Dexterity modifier counts toward Defense while the vehicle is
+in motion. **Damage save** (also on gear items that list a save bonus) asks for the damage, rolls against DC 10 + half
+of it, and counts extra failures for blast damage and critical hits; a critical hit on a vehicle also rolls its
+Vehicle Damage result. Results that affect cargo, occupants, weapons, rotors or draft animals are reported for the GC
+rather than applied. Chases do not read vehicle statistics yet, and armor, weapon and vehicle upgrades are reference
+entries: nothing installs them onto an item.
+
+## Roll pipeline
+
+Every roll made through the Actor's `rollCheck` (skill, Knowledge, attack, damage, save and ability rolls) passes through one
+registry, `module/rules/roll-pipeline.mjs`. A rule joins it by
+registering a contributor from `module/rolls/` instead of being edited into the Actor document. A contributor may:
+offer named skill checks, hold a reservation while the roll is made, validate before and after the dice, add a labelled
+modifier, add fields to the posted check, and add buttons under it. The existing validators, reservations, named-check
+additions and two of the chat buttons run this way; dialog content and most modifier arithmetic are still inside
+`rollSkill`, `rollAttack` and `weaponAttack`. `game.spycraft2.rollPipeline` exposes the registry to macros and modules.
 
 ## NPC creation
 

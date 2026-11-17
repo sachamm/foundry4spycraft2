@@ -1,10 +1,13 @@
 import { checkPrerequisites, describe } from "../rules/prerequisites.mjs";
+import { VEHICLE_RULES } from "../rules/tables.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-const PACKS = { gear:"spycraft2.kits", class: "spycraft2.classes", origin: "spycraft2.origins", feat: "spycraft2.feats", weapon: "spycraft2.weapons", armor: "spycraft2.armor" };
+/** Compendium packs searched for each item type; gear is spread over several. */
+const PACKS = { gear: ["spycraft2.gear", "spycraft2.kits", "spycraft2.vehicle-upgrades"], vehicle: "spycraft2.vehicles", class: "spycraft2.classes", origin: "spycraft2.origins", feat: "spycraft2.feats", weapon: "spycraft2.weapons", armor: "spycraft2.armor" };
 const FIELDS = {
-  gear:["system.kitType","system.kitGrade","system.kitSize","system.kitNonPortable","system.weight","system.caliber","system.description"],
+  gear:["system.kitType","system.kitGrade","system.kitSize","system.kitNonPortable","system.weight","system.caliber","system.description","system.gearCategory","system.powerRating","system.streetValue","system.standingOnly","system.standingCost","system.sourceTable"],
+  vehicle: ["system.vehicleClass", "system.caliber", "system.sizeLabel", "system.occupancy", "system.accelerationTurning", "system.mph", "system.defenseSave", "system.standingOnly", "system.standingCost"],
   class: ["system.identifier", "system.expert", "system.requirements", "system.vitalityDie", "system.skillPoints", "system.description"],
   origin: ["system.originType", "system.description"],
   feat: ["system.tree", "system.prerequisites", "system.prerequisitesNotChecked", "system.repeatable", "system.maxSelections", "system.description"],
@@ -52,8 +55,8 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   async _prepareContext(options) {
-    const pack = game.packs.get(PACKS[this.itemType]);
-    const index = pack ? await pack.getIndex({ fields: FIELDS[this.itemType] }) : [];
+    const packs = [PACKS[this.itemType]].flat().map(id => game.packs.get(id)).filter(Boolean);
+    const index = (await Promise.all(packs.map(pack => pack.getIndex({ fields: FIELDS[this.itemType] })))).flatMap(entries => [...entries]);
     const cfg = CONFIG.SPYCRAFT;
     const owned = new Set(this.actor?.items.filter(i => i.type === this.itemType).map(i => i.name.toLowerCase()) ?? []);
     const search = this.filters.search.toLowerCase();
@@ -73,7 +76,26 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
         case "origin": group = s.originType; groupLabel = game.i18n.localize(cfg.originTypes[s.originType]); break;
         case "weapon": group = s.proficiency; groupLabel = cfg.proficiencies[s.proficiency]?.label ?? s.proficiency;
           extra = `${cfg.calibers[s.caliber]} · ${s.damage} · ${s.errorThreat}${s.range ? ` · ${s.range} ft` : ""}`; break;
-        case "gear": group=s.kitType;groupLabel=s.kitType;extra=`Grade ${s.kitGrade} · Caliber ${cfg.calibers[s.caliber]} · ${s.kitSize} · ${s.kitNonPortable?'Non-portable':s.weight+' lbs.'}`;break;
+        case "gear":
+          if (s.kitGrade) {
+            group = `kit:${s.kitType}`; groupLabel = `Kit — ${s.kitType}`;
+            extra = `Grade ${s.kitGrade} · Caliber ${cfg.calibers[s.caliber]} · ${s.kitSize} · ${s.kitNonPortable ? 'Non-portable' : s.weight + ' lbs.'}`;
+          } else {
+            const upgrade = /^Table 4\.2[89]$/.test(s.sourceTable ?? "");
+            group = upgrade ? "vehicleUpgrade" : s.gearCategory || "other";
+            groupLabel = upgrade ? "Vehicle upgrades" : cfg.gearPicks[s.gearCategory] ?? "Other gear";
+            extra = [s.standingOnly ? `Reputation/Net Worth${s.standingCost ? ` ${s.standingCost}` : ""}` : s.caliber ? `Caliber ${cfg.calibers[s.caliber]}` : "",
+              s.powerRating ? `PR ${s.powerRating}` : "", s.streetValue].filter(Boolean).join(" · ");
+          }
+          break;
+        case "vehicle": {
+          const cls = VEHICLE_RULES.classes.find(c => c.code === s.vehicleClass);
+          group = s.vehicleClass; groupLabel = cls?.label ?? s.vehicleClass;
+          extra = [s.standingOnly ? `Reputation/Net Worth${s.standingCost ? ` ${s.standingCost}` : ""}` : `Caliber ${cfg.calibers[s.caliber]}`,
+            s.sizeLabel, s.occupancy ? `Occ ${s.occupancy}` : "", s.accelerationTurning ? `A/T ${s.accelerationTurning}` : "",
+            s.mph ? `${s.mph} MPH` : "", s.defenseSave ? `D/S ${s.defenseSave}` : ""].filter(Boolean).join(" · ");
+          break;
+        }
         case "armor": group = String(s.caliber); groupLabel = `Caliber ${cfg.calibers[s.caliber]}`;
           extra = `DR ${s.damageReduction}/${s.damageReductionSubdual} · Def ${s.defensePenalty} · ACP ${s.armorCheck}`; break;
       }
@@ -96,7 +118,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       acquisitionSources,showAcquisitionSources:this.itemType==="feat"&&freeSources.length>0,
       rows, filters: this.filters, hasPrereqs: ["feat", "class"].includes(this.itemType),
       groups: Object.fromEntries(Object.entries(groups).sort((a, b) => a[1].localeCompare(b[1]))),
-      actor: this.actor, missingPack: !pack
+      actor: this.actor, missingPack: !packs.length
     };
   }
 

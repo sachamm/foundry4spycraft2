@@ -1,7 +1,7 @@
 import {equipmentCategory} from './gear.mjs';
 import {currentReserves,missionEpoch} from './gear-acquisition.mjs';
 /** Reviewed mission-pick exceptions. Upgrade buying/effects at Caliber V remain separate. */
-export const MISSION_CALIBER_SOURCES={heavilyArmed:{name:'Heavily Armed',category:'W',types:['weapon'],classId:'grunt',level:5,extraAt:9,page:72},spyVsSpy:{name:'Spy vs. Spy',category:'T',classId:'snoop',option:'Spy vs. Spy',page:48},executiveDecision:{name:'Executive Decision (Resource pick)',category:'R',classId:'politico',level:10,page:77},cuttingEdge:{name:'Cutting Edge',category:'G',classId:'raptor',level:3,page:78},gearPrep:{name:'Gear Prep',category:'*',types:['weapon','armor','gear'],classId:'intruder',level:1,inherited:'Intruder: Gear prep',page:37},customRide:{name:'Custom Ride',category:'V',classId:'wheelman',level:1,inherited:'Wheelman: Custom ride',page:50}};
+export const MISSION_CALIBER_SOURCES={heavilyArmed:{name:'Heavily Armed',category:'W',types:['weapon'],classId:'grunt',level:5,extraAt:9,page:72},spyVsSpy:{name:'Spy vs. Spy',category:'T',classId:'snoop',option:'Spy vs. Spy',page:48},executiveDecision:{name:'Executive Decision (Resource pick)',category:'R',classId:'politico',level:10,page:77},cuttingEdge:{name:'Cutting Edge',category:'G',classId:'raptor',level:3,page:78},gearPrep:{name:'Gear Prep',category:'*',types:['weapon','armor','gear'],classId:'intruder',level:1,inherited:'Intruder: Gear prep',page:37},customRide:{name:'Custom Ride',category:'V',types:['gear','vehicle'],classId:'wheelman',level:1,inherited:'Wheelman: Custom ride',page:50}};
 export function missionCaliberSourceActive(system,key){
  const source=MISSION_CALIBER_SOURCES[key];
  if(!source)return false;

@@ -10,6 +10,8 @@ import {pointmanLevel} from "../rules/action-dice.mjs";
 import { defaultNpcProfile, computeNpcProfile, npcTableValue } from "../rules/npcs.mjs";
 const missionThreatLevelSetting=()=>{try{const m=globalThis.game?.settings?.get("spycraft2","mission");return m?.active&&Number.isSafeInteger(m.threatLevel)&&m.threatLevel>=1&&m.threatLevel<=20?m.threatLevel:null;}catch{return null;}};
 import { computeAgent } from "../rules/engine.mjs";
+import { vehicleStatFields } from "./vehicle-fields.mjs";
+import { VEHICLE_DAMAGE_COUNTERS, breakState, vehicleClass, vehicleCondition, vehicleDefense } from "../rules/vehicles.mjs";
 import { SKILLS } from "../rules/tables.mjs";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
@@ -298,5 +300,42 @@ export class AgentData extends foundry.abstract.TypeDataModel {
     data.initiative = this.initiative;
     data.bab = this.bab;
     return data;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Vehicle (a gear pick placed on a scene)                                   */
+/* -------------------------------------------------------------------------- */
+
+export class VehicleActorData extends foundry.abstract.TypeDataModel {
+  static defineSchema() {
+    return {
+      ...vehicleStatFields(),
+      caliber: int(0, { min: 0, max: 5 }),
+      /** UUID of the gear pick this vehicle was deployed from, if any. */
+      sourceItem: str(),
+      /** UUID of the character at the controls; their Dexterity modifier counts while the vehicle moves (p.289). */
+      driver: str(),
+      moving: new BooleanField(),
+      /** Damage saves failed so far (p.224). */
+      failedSaves: int(0, { min: 0 }),
+      /** Vehicle Damage results recorded so far (Table 4.72, p.290). */
+      damage: new SchemaField(Object.fromEntries(VEHICLE_DAMAGE_COUNTERS.map(key => [key, int(0, { min: 0 })]))),
+      biography: new HTMLField()
+    };
+  }
+
+  prepareDerivedData() {
+    this.classInfo = vehicleClass(this.vehicleClass);
+    this.condition = vehicleCondition(this, this.damage);
+    this.breakState = breakState(this.size || this.sizeLabel, this.failedSaves);
+    const driver = this.driver ? globalThis.fromUuidSync?.(this.driver) ?? null : null;
+    this.driverName = driver?.name ?? "";
+    this.defenseNow = vehicleDefense({ defense: this.defense, moving: this.moving, driverDexMod: driver?.system?.abilities?.dex?.mod ?? 0 });
+  }
+
+  /** Vehicles have no Initiative of their own; they act on their driver's count. */
+  getRollData() {
+    return { initiative: { total: 0 }, defense: this.defenseNow?.total ?? this.defense ?? 0, damageSave: this.damageSave ?? 0 };
   }
 }

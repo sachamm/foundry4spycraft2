@@ -1,6 +1,6 @@
 import {fileURLToPath} from 'node:url';import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {ClassicLevel} from 'classic-level';import {firearmDefaults} from '../module/rules/firearms.mjs';
 const source=JSON.parse(readFileSync(new URL('../src/data/equipment.json',import.meta.url)));
-async function items(name){const db=new ClassicLevel(fileURLToPath(new URL(`../packs/${name}`,import.meta.url)),{valueEncoding:'json',createIfMissing:false});await db.open();try{const docs=[];for await(const [key,value] of db.iterator())if(key.startsWith('!items!'))docs.push(value);return docs;}finally{await db.close();}}
+async function items(name){const db=new ClassicLevel(process.env.SPYCRAFT_PACKS_DIR?`${process.env.SPYCRAFT_PACKS_DIR}/${name}`:fileURLToPath(new URL(`../packs/${name}`,import.meta.url)),{valueEncoding:'json',createIfMissing:false});await db.open();try{const docs=[];for await(const [key,value] of db.iterator())if(key.startsWith('!items!'))docs.push(value);return docs;}finally{await db.close();}}
 test('rebuilt weapon pack retains every source record, complete bundle/stockpile weights and firing metadata',async()=>{
  const docs=await items('weapons');assert.equal(docs.length,458);
  for(const item of source.weapons){const doc=docs.find(d=>d.name===item.name);assert.ok(doc,item.name);const s=doc.system,expected=firearmDefaults(item.sourceTable,item.qualities);
@@ -30,4 +30,37 @@ test('rebuilt kit pack retains all forty-eight grades, source weight/size/locati
 
 test('rebuilt QKY weapons retain category base penalties, including COP holdout -6, for exactly one runtime adjustment',async()=>{
  const docs=await items('weapons'),quirky=docs.filter(d=>/\bQKY\b/.test(d.system.qualities)),bases={blunt:-2,edged:-4,exoticBlunt:-6,handgun:-6,shotgun:-4,submachineGun:-4};assert.equal(quirky.length,13);for(const d of quirky)assert.equal(d.system.untrainedPenalty,bases[d.system.proficiency],d.name);assert.equal(quirky.find(d=>d.name==='COP Inc. COP .357 Magnum').system.weaponCategory,'holdoutPistol');
+});
+
+test('rebuilt gear, vehicle and vehicle-upgrade packs hold every source row under its own name and id', async () => {
+  const read = name => JSON.parse(readFileSync(new URL(`../src/data/${name}.json`, import.meta.url)));
+  const gear = read('gear'), vehicles = read('vehicles');
+  const expected = {
+    gear: gear.electronics.length + gear.gadgets.length + gear.resources.length + gear.security.length + gear.tradecraft.length + gear.housings.length,
+    vehicles: vehicles.vehicles.length,
+    'vehicle-upgrades': vehicles.upgrades.length + vehicles.weapons.length
+  };
+  for (const [pack, count] of Object.entries(expected)) {
+    const docs = await items(pack);
+    assert.equal(docs.length, count, pack);
+    assert.equal(new Set(docs.map(d => d._id)).size, count, `${pack}: ids`);
+    assert.equal(new Set(docs.map(d => d.name)).size, count, `${pack}: names`);
+    for (const doc of docs) {
+      assert.equal(doc.type, pack === 'vehicles' ? 'vehicle' : 'gear', doc.name);
+      assert.match(doc.system.source, /^Spycraft 2\.0 p\.\d+$/, doc.name);
+      assert.match(doc.system.sourceTable, /^Table 4\.\d+$/, doc.name);
+      assert.ok(doc.folder, doc.name);
+    }
+  }
+  const gearDocs = await items('gear');
+  assert.deepEqual([...new Set(gearDocs.map(d => d.system.gearCategory))].sort(), ['E', 'G', 'R', 'S', 'T']);
+  const bug = gearDocs.find(d => d.name === 'Bug, audio (Caliber I)');
+  assert.equal(bug.system.caliber, 1);
+  assert.equal(bug.system.quantity, 4);
+  assert.equal(bug.system.damageSave, 2);
+  assert.equal(bug.system.sizeHands, 'F/1h');
+  const car = (await items('vehicles')).find(d => d.name === 'Car, muscle (modern)');
+  assert.equal(car.system.vehicleClass, 'SGV');
+  assert.equal(car.system.gearCategory, 'V');
+  assert.deepEqual([car.system.acceleration, car.system.turning, car.system.cruiseMph, car.system.topMph, car.system.defense, car.system.damageSave], [6, 5, 70, 150, 9, 8]);
 });

@@ -9,6 +9,9 @@ import {FIRE_MODES,FIREARM_CATEGORIES,weaponFireModes} from "../rules/firearms.m
 import {equipmentCategory,armorSlot} from "../rules/gear.mjs";
 import { describe as describePrereq } from "../rules/prerequisites.mjs";
 import { humanizeTemplate, renderTemplate } from "../rules/formula.mjs";
+import { VEHICLE_RULES } from "../rules/tables.mjs";
+import { breakState, vehicleClass } from "../rules/vehicles.mjs";
+import { deployVehicle, objectSize, rollObjectDamageSave } from "../apps/vehicle-play.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
@@ -25,7 +28,9 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       planAmmunition(){return planAmmunitionStockpile(this.item);},
       addBonus: SpycraftItemSheet.#onAddBonus,
       removeBonus: SpycraftItemSheet.#onRemoveBonus,
-      toChat: SpycraftItemSheet.#onToChat
+      toChat: SpycraftItemSheet.#onToChat,
+      damageSave() { return rollObjectDamageSave(this.item); },
+      deployVehicle() { return deployVehicle(this.item); }
     }
   };
 
@@ -117,6 +122,19 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       context.levelBonuses = (sys.bonuses ?? []).map(b => `${cfg.bonusTargets[b.target] ?? b.target} ${b.value}${b.level ? ` @ ${b.level}` : ""}`).join("; ");
     }
     if (item.type === "origin") context.grantsText = (sys.grants ?? []).join(", ");
+    // Gear table values, vehicle statistics and Damage save state.
+    if (["gear", "vehicle"].includes(item.type)) {
+      const size = objectSize(item);
+      context.hasGearStats = ["powerRating", "resultCap", "effectRange", "sizeHands", "battery", "complexity", "year", "streetValue", "standingCost"]
+        .some(key => sys[key]) || sys.damageSave !== null || sys.stats.length > 0;
+      context.hasDamageSave = Number.isSafeInteger(sys.damageSave);
+      context.breakState = breakState(size, sys.failedSaves ?? 0);
+    }
+    if (item.type === "vehicle") {
+      context.vehicleClassOptions = { "": "—", ...Object.fromEntries(VEHICLE_RULES.classes.map(c => [c.code, c.label])) };
+      context.vehicleClassInfo = vehicleClass(sys.vehicleClass);
+      context.pickOptions = Object.fromEntries(Object.entries(context.pickOptions).filter(([key]) => !key || key === "V" || key === "CHA"));
+    }
     return context;
   }
 

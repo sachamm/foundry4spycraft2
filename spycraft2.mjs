@@ -1,8 +1,7 @@
 import {installPowerStanceInitiativeHooks} from './module/apps/power-stance.mjs';
 import {installCombatStanceHooks} from './module/apps/combat-stance.mjs';
 import {installShakenInitiativeHooks,shakenCombatantClass} from './module/apps/shaken-initiative.mjs';
-import {hasStrut} from './module/rules/strut.mjs';
-import {unnervingEligible} from './module/rules/unnerving.mjs';
+import {rollPipeline} from './module/rolls/index.mjs';
 import {automaticSkillSuccessSources,manualAdjustmentSource,cunningPlanCheck} from './module/rules/class-checks.mjs';
 import {startUsagePeriod,refreshUsagePeriodActors,getUsagePeriodReview,reviewUsagePeriod} from './module/rules/periods.mjs';
 import {nativeResourceLocks,periodResourceActors} from "./module/rules/transactions.mjs";
@@ -23,6 +22,8 @@ import { SpycraftActor } from "./module/documents/actor.mjs";
 import { SpycraftItem } from "./module/documents/item.mjs";
 import { SpycraftAgentSheet, SpycraftNpcSheet } from "./module/sheets/actor-sheet.mjs";
 import { SpycraftItemSheet } from "./module/sheets/item-sheet.mjs";
+import { SpycraftVehicleSheet } from "./module/sheets/vehicle-sheet.mjs";
+import * as vehiclePlay from "./module/apps/vehicle-play.mjs";
 import { SpycraftBrowser } from "./module/apps/browser.mjs";
 import { evaluate, renderTemplate } from "./module/rules/formula.mjs";
 import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
@@ -53,16 +54,18 @@ Hooks.once("init", () => {
   Object.assign(CONFIG.Item.dataModels, dataModels.item);
   CONFIG.Actor.trackableAttributes = {
     agent: { bar: ["vitality", "wounds", "actionDice"], value: [] },
-    npc: { bar: ["vitality", "wounds"], value: [] }
+    npc: { bar: ["vitality", "wounds"], value: [] },
+    vehicle: { bar: [], value: ["failedSaves", "defense", "damageSave"] }
   };
 
   CONFIG.Combat.initiative = { formula: "1d20 + @initiative.total", decimals: 0 };
 
-  game.spycraft2 = { gc:{open:openGCConsole,console:null,mission:{...gcMission,get:getMission,threatLevel:missionThreatLevel,xp:missionXP},spend:spendGCDice,setDramaticScene,isDramaticScene,doubleOpponentInitiative,fluidEvent:fluidEventDialog,recordFluidEvent,rollGroupInitiative,surpriseRound:surpriseRoundDialog,conflicts:{start:startConflictDialog,advance:advanceConflict,manage:manageConflict},npc:{rollSkill:rollNpcSkill,damageSave:npcDamageSave,resetDamage:resetDamageTrack,disposition:manageDisposition},campaign:{qualities:qualitiesInForce,effects:currentCampaignEffects},tables:gcTables}, resourceLocks:nativeResourceLocks, SpycraftBrowser, gcDice:{status:gcDiceStatus,initialize:initializeGCDice,adjust:adjustGCDice,manage:manageGCDice,review:reviewGCDiceSettlement,hint:recordGCHint}, resetUsagePeriod:startUsagePeriod, getUsagePeriodReview, reviewUsagePeriod, rules: { evaluate, renderTemplate, checkPrerequisites, describe } };
+  game.spycraft2 = { gc:{open:openGCConsole,console:null,mission:{...gcMission,get:getMission,threatLevel:missionThreatLevel,xp:missionXP},spend:spendGCDice,setDramaticScene,isDramaticScene,doubleOpponentInitiative,fluidEvent:fluidEventDialog,recordFluidEvent,rollGroupInitiative,surpriseRound:surpriseRoundDialog,conflicts:{start:startConflictDialog,advance:advanceConflict,manage:manageConflict},npc:{rollSkill:rollNpcSkill,damageSave:npcDamageSave,resetDamage:resetDamageTrack,disposition:manageDisposition},campaign:{qualities:qualitiesInForce,effects:currentCampaignEffects},tables:gcTables}, resourceLocks:nativeResourceLocks, SpycraftBrowser, gcDice:{status:gcDiceStatus,initialize:initializeGCDice,adjust:adjustGCDice,manage:manageGCDice,review:reviewGCDiceSettlement,hint:recordGCHint}, resetUsagePeriod:startUsagePeriod, getUsagePeriodReview, reviewUsagePeriod, rules: { evaluate, renderTemplate, checkPrerequisites, describe }, rollPipeline, vehicles: vehiclePlay };
 
   const { Actors, Items } = foundry.documents.collections;
   Actors.registerSheet("spycraft2", SpycraftAgentSheet, { types: ["agent"], makeDefault: true, label: "SPYCRAFT.Sheet.Agent" });
   Actors.registerSheet("spycraft2", SpycraftNpcSheet, { types: ["npc"], makeDefault: true, label: "SPYCRAFT.Sheet.Npc" });
+  Actors.registerSheet("spycraft2", SpycraftVehicleSheet, { types: ["vehicle"], makeDefault: true, label: "SPYCRAFT.Sheet.Vehicle" });
   Items.registerSheet("spycraft2", SpycraftItemSheet, { makeDefault: true, label: "SPYCRAFT.Sheet.Item" });
 
   Handlebars.registerHelper("signed", n => (Number(n) >= 0 ? `+${Number(n)}` : `${Number(n)}`));
@@ -79,7 +82,9 @@ Hooks.once("init", () => {
   foundry.applications.handlebars.loadTemplates([
     "systems/spycraft2/templates/item/parts/bonuses.hbs",
     "systems/spycraft2/templates/actor/npc-builder.hbs",
-    "systems/spycraft2/templates/apps/gc-console.hbs"
+    "systems/spycraft2/templates/apps/gc-console.hbs",
+    "systems/spycraft2/templates/actor/vehicle-sheet.hbs",
+    "systems/spycraft2/templates/item/item-vehicle.hbs"
   ]);
 });
 
@@ -155,21 +160,23 @@ Hooks.on('updateActor',(actor,changed)=>{if(changed.system?.progression||Object.
 Hooks.on('deleteActor',refreshFortuneRecipients);
 for(const event of ['createItem','updateItem','deleteItem'])Hooks.on(event,item=>{if(item.type==='class'&&item.parent?.documentName==='Actor')refreshFortuneRecipients(item.parent);});
 
-// A damaging attack's added stress may be recorded after its ordinary outcome is resolved.
-Hooks.on('renderChatMessageHTML',(message,html)=>{
- const check=message.flags?.spycraft2;if(!check?.actorUuid||!(message.isAuthor||game.user.isGM)||message.blind&&!game.user.isGM)return;
- const actor=fromUuidSync(check.actorUuid);if(!actor?.isOwner||!unnervingEligible(actor.system,check))return;
- const button=document.createElement('button');button.type='button';button.textContent='Resolve Unnerving stress';
- button.addEventListener('click',async()=>{button.disabled=true;try{await actor.resolveUnnerving(message);}finally{button.disabled=false;}});
- html.append(button);
-});
-
-// Strut can follow a resolved attack, so it has a separate receipt control.
-Hooks.on('renderChatMessageHTML',(message,html)=>{
- const check=message.flags?.spycraft2;if(!check?.actorUuid||message.blind&&!game.user.isGM)return;
- const actor=fromUuidSync(check.actorUuid);if(!actor?.isOwner||!hasStrut(actor.system)||check.checkKind!=='attack'||check.superseded||check.strutPoolId||!(check.threatConfirmed||check.criticalSuccess))return;
- if(!(check.unarmed||check.weaponProficiency==='unarmed'||check.attackContext?.ranged===false)||!check.rollCombat?.id)return;
- const button=document.createElement('button');button.type='button';button.textContent='Strut: posture next half action';button.addEventListener('click',async()=>{button.disabled=true;try{await actor.useStrut(message);}finally{button.disabled=false;}});html.append(button);
+// Buttons that roll contributors add under a posted check (module/rolls/chat-controls.mjs).
+Hooks.on('renderChatMessageHTML', (message, html) => {
+  const check = message.flags?.spycraft2;
+  if (!check?.actorUuid || message.blind && !game.user.isGM) return;
+  const actor = fromUuidSync(check.actorUuid);
+  if (!actor?.isOwner) return;
+  for (const control of rollPipeline.chatControls({message, check, actor, user: game.user, checkKind: check.checkKind})) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = control.label;
+    button.dataset.rollControl = control.id;
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      try { await control.run(); } finally { button.disabled = false; }
+    });
+    html.append(button);
+  }
 });
 
 

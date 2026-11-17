@@ -28,7 +28,7 @@ const cfg = {
 };
 
 async function loadPack(name) {
-  const db = new ClassicLevel(join(ROOT, "packs", name), { valueEncoding: "json" });
+  const db = new ClassicLevel(join(process.env.SPYCRAFT_PACKS_DIR || join(ROOT, "packs"), name), { valueEncoding: "json" });
   const docs = [];
   for await (const [k, v] of db.iterator()) if (k.startsWith("!items!")) docs.push(v);
   await db.close();

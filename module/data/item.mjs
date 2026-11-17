@@ -1,4 +1,5 @@
 import {weaponDamageExpression} from '../rules/weapon-damage-expression.mjs';
+import {vehicleStatFields} from './vehicle-fields.mjs';
 const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
 
 const int = (initial = 0, opts = {}) => new NumberField({ required: true, nullable: false, integer: true, initial, ...opts });
@@ -151,7 +152,42 @@ export class GearData extends BaseItemData {
       bigStickMissionPick: new ObjectField({nullable:true,initial:null}),
       missionCaliberGrant: new ObjectField({nullable:true,initial:null}),
       classGearGrant: new ObjectField({nullable:true,initial:null}),
-      common: new BooleanField()
+      common: new BooleanField(),
+      /** Gear table columns (pp.226–235), kept as the printed labels. */
+      powerRating: str(),
+      resultCap: str(),
+      effectRange: str(),
+      sizeHands: str(),
+      battery: str(),
+      /** Damage save bonus (p.224); null when the table lists none. */
+      damageSave: new NumberField({ required: true, nullable: true, integer: true, initial: null }),
+      /** Damage saves this item has failed; its Size decides when that breaks or destroys it. */
+      failedSaves: int(0, { min: 0 }),
+      complexity: str(),
+      year: str(),
+      streetValue: str(),
+      restricted: new BooleanField(),
+      /** Reputation/Net Worth cost, and whether that is the only way to request the item. */
+      standingCost: str(),
+      standingOnly: new BooleanField(),
+      /** Name of the entry this one is an option for. */
+      optionOf: str(),
+      sourceTable: str(),
+      /** The printed row carries a table footnote. */
+      noted: new BooleanField(),
+      /** Columns particular to one table, as label/value pairs. */
+      stats: new ArrayField(new SchemaField({ label: str(), value: str() }))
+    };
+  }
+}
+
+/** A vehicle taken as gear (Tables 4.16–4.27). The same statistics drive the vehicle Actor on a scene. */
+export class VehicleData extends GearData {
+  static defineSchema() {
+    return {
+      ...super.defineSchema(),
+      ...vehicleStatFields(),
+      gearCategory: str("V")
     };
   }
 }

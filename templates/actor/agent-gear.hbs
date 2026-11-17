@@ -32,13 +32,26 @@
     </tbody>
   </table>
 
-  <h3>{{localize "SPYCRAFT.Gear"}} <span class="controls"><a data-action="createItem" data-type="gear"><i class="fa-solid fa-plus"></i></a></span></h3>
+  <h3>{{localize "SPYCRAFT.Gear"}} <span class="controls"><a data-action="browse" data-type="gear"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="gear"><i class="fa-solid fa-plus"></i></a></span></h3>
   <table class="items">
     <thead><tr><th>{{localize "Name"}}</th><th>{{localize "SPYCRAFT.Quantity"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
     <tbody>
     {{#each gear}}
       <tr data-item-id="{{item.id}}">
         <td><a data-action="itemEdit">{{item.name}}</a>{{#if toolShed.expired}} <span class="bad">Lost at mission end</span>{{else}}{{#if toolShed.blockedReason}} <span class="bad">Grant needs review</span>{{/if}}{{/if}}</td><td>{{item.system.quantity}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
+        <td class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+  <h3>{{localize "TYPES.Item.vehicle"}}s <span class="controls"><a data-action="browse" data-type="vehicle"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="vehicle"><i class="fa-solid fa-plus"></i></a></span></h3>
+  <table class="items">
+    <thead><tr><th>{{localize "Name"}}</th><th>Category</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th>A/T</th><th>MPH</th><th>D/S</th><th></th></tr></thead>
+    <tbody>
+    {{#each vehicles}}
+      <tr data-item-id="{{item.id}}">
+        <td><a data-action="itemEdit">{{item.name}}</a></td><td>{{classLabel}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
+        <td>{{item.system.accelerationTurning}}</td><td>{{item.system.mph}}</td><td>{{item.system.defenseSave}}</td>
         <td class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
       </tr>
     {{/each}}

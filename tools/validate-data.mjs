@@ -72,3 +72,18 @@ console.log(`Kit integrity: ${kits.length} records, all three grades across ${ne
 const ammunition=read('ammunition');assert.equal(ammunition.length,63);unique(ammunition.map(a=>a.id),'ammunition IDs');
 for(const a of ammunition){assert.ok(['arrowBolt','bullet','shell','grenade','mortar','rocket'].includes(a.family));assert.ok(Number.isFinite(a.unitWeight)&&a.unitWeight>0);assert.ok(Number.isSafeInteger(a.upgradeCost)&&a.upgradeCost>0);assert.ok(a.commonItemCost===null||Number.isSafeInteger(a.commonItemCost)&&a.commonItemCost>0);assert.ok([274,275].includes(a.sourcePage));assert.equal(typeof a.firstStockpile,'boolean');assert.ok(a.fixedStockpileSize===null||Number.isSafeInteger(a.fixedStockpileSize)&&a.fixedStockpileSize>0);}
 console.log(`Ammunition reference integrity: ${ammunition.length} rows across six families.`);
+
+// Gear pick tables other than weapons and armor, and vehicles. Detailed checks live in tools/test-vehicles.mjs.
+const gear = read('gear'), vehicles = read('vehicles');
+const gearLists = { electronics: 'E', gadgets: 'G', resources: 'R', security: 'S', tradecraft: 'T' };
+for (const [list, category] of Object.entries(gearLists)) {
+  assert.ok(Array.isArray(gear[list]) && gear[list].length > 0, `gear.${list} is empty`);
+  assert.ok(gear.categories[category], `gear category ${category} has no table reference`);
+  for (const row of gear[list]) assert.ok(row.name && row.category === category && Number.isSafeInteger(row.sourcePage), `gear.${list}: ${row.name}`);
+}
+const vehicleClasses = new Set(vehicles.classes.map(c => c.code));
+assert.equal(vehicleClasses.size, 12);
+for (const v of vehicles.vehicles) assert.ok(v.name && vehicleClasses.has(v.vehicleClass) && Number.isSafeInteger(v.sourcePage), `vehicle: ${v.name}`);
+for (const c of vehicles.classes) for (const code of c.damageLocations) assert.ok(vehicles.damageLocations[code], `vehicle damage location ${code}`);
+console.log(`Gear integrity: ${Object.keys(gearLists).map(l => gear[l].length).reduce((a, b) => a + b)} picks across five categories, ${gear.housings.length} gadget housings.`);
+console.log(`Vehicle integrity: ${vehicles.vehicles.length} vehicles in ${vehicleClasses.size} categories, ${vehicles.upgrades.length} upgrades, ${vehicles.weapons.length} vehicle weapon rows.`);

@@ -2,7 +2,8 @@
  "TYPES": {
   "Actor": {
    "agent": "Agent",
-   "npc": "NPC"
+   "npc": "NPC",
+   "vehicle": "Vehicle"
   },
   "Item": {
    "class": "Class",
@@ -10,7 +11,8 @@
    "feat": "Feat",
    "gear": "Gear",
    "weapon": "Weapon",
-   "armor": "Armor"
+   "armor": "Armor",
+   "vehicle": "Vehicle"
   }
  },
  "SPYCRAFT": {
@@ -24,7 +26,8 @@
   "Sheet": {
    "Agent": "Spycraft Agent Sheet",
    "Npc": "Spycraft NPC Sheet",
-   "Item": "Spycraft Item Sheet"
+   "Item": "Spycraft Item Sheet",
+   "Vehicle": "Spycraft Vehicle Sheet"
   },
   "Tab": {
    "Main": "Main",

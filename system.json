@@ -38,6 +38,11 @@
         "htmlFields": [
           "biography"
         ]
+      },
+      "vehicle": {
+        "htmlFields": [
+          "biography"
+        ]
       }
     },
     "Item": {
@@ -67,6 +72,11 @@
         ]
       },
       "armor": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "vehicle": {
         "htmlFields": [
           "description"
         ]
@@ -147,6 +157,42 @@
       "flags": {}
     },
     {
+      "name": "gear",
+      "label": "Gear",
+      "path": "packs/gear",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "vehicles",
+      "label": "Vehicles",
+      "path": "packs/vehicles",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "vehicle-upgrades",
+      "label": "Vehicle Upgrades",
+      "path": "packs/vehicle-upgrades",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
       "name": "gc-tables",
       "label": "GC Tables",
       "path": "packs/gc-tables",
@@ -181,6 +227,9 @@
         "weapons",
         "armor",
         "kits",
+        "gear",
+        "vehicles",
+        "vehicle-upgrades",
         "gc-tables"
       ]
     }

@@ -1,0 +1,72 @@
+<section class="spycraft2-sheet vehicle">
+  <div class="dossier-band" aria-hidden="true">
+    <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
+    <span class="file-label">{{localize "SPYCRAFT.Retro.EquipmentFile"}}</span>
+    <span class="file-stamp">{{localize "SPYCRAFT.Retro.Classified"}}</span>
+  </div>
+  <header class="sheet-header">
+    <img class="portrait" src="{{actor.img}}" data-edit="img" data-action="editImage" alt="{{actor.name}}" />
+    <div class="header-main">
+      <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" />
+      <div class="summary">
+        <label>Category <select name="system.vehicleClass">{{selectOptions classOptions selected=system.vehicleClass}}</select></label>
+        <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
+        {{#if system.sourceItem}}<a data-action="openSource">Open gear pick</a>{{/if}}
+      </div>
+      {{#if control}}<p class="muted">Controlled with {{control.skill}}{{#if control.focus}} · Drive focus: {{control.focus}}{{/if}} · untrained {{control.untrainedPenalty}}</p>{{/if}}
+    </div>
+  </header>
+
+  <h3>Condition</h3>
+  <p>
+    <strong class="{{#unless (sc2eq system.breakState.state 'intact')}}bad{{/unless}}">{{system.breakState.state}}</strong>
+    · failed Damage saves <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
+    (broken at {{system.breakState.brokenAt}}, destroyed at {{system.breakState.destroyedAt}})
+    {{#if system.condition.immobilized}}· <strong class="bad">immobilized</strong>{{/if}}
+  </p>
+  <p>
+    Defense <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>
+    · Damage save <strong>{{#if (sc2eq system.damageSave null)}}—{{else}}{{signed system.damageSave}}{{/if}}</strong>
+    · Acceleration <strong>{{#if (sc2eq system.condition.acceleration null)}}{{system.accelerationTurning}}{{else}}{{system.condition.acceleration}}{{/if}}</strong>
+    · Turning <strong>{{#if (sc2eq system.condition.turning null)}}—{{else}}{{system.condition.turning}}{{/if}}</strong>
+    · MPH <strong>{{#if (sc2eq system.condition.cruiseMph null)}}{{system.mph}}{{else}}{{system.condition.cruiseMph}}/{{system.condition.topMph}}{{/if}}</strong>
+    {{#if system.condition.maneuverErrorIncrease}}· Maneuver error +{{system.condition.maneuverErrorIncrease}}{{/if}}
+    {{#if system.condition.fuelHoursLost}}· fuel −{{system.condition.fuelHoursLost}} hr{{/if}}
+  </p>
+  <p>
+    <label><input type="checkbox" name="system.moving" {{checked system.moving}} /> In motion</label>
+    · Driver: {{#if system.driverName}}<strong>{{system.driverName}}</strong> <a data-action="clearDriver" data-tooltip="Remove driver"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">drop a character here</span>{{/if}}
+  </p>
+  <p class="controls">
+    <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
+    · <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> Vehicle Damage result</a>
+    · <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> Tyre save</a>
+    · <a data-action="repair"><i class="fa-solid fa-wrench"></i> Repaired</a>
+  </p>
+  <div class="form-fields-grid">
+    {{#each counters}}<label>{{label}} <input name="system.damage.{{key}}" type="number" min="0" value="{{value}}" class="w-2" /></label>{{/each}}
+  </div>
+
+  <h3>Statistics</h3>
+  <div class="form-fields-grid">
+    <label>Size <input name="system.size" value="{{system.size}}" class="w-2" maxlength="1" /></label>
+    <label>Size and footprint <input name="system.sizeLabel" value="{{system.sizeLabel}}" /></label>
+    <label>Occupancy <input name="system.occupancy" value="{{system.occupancy}}" /></label>
+    <label>Acceleration <input name="system.acceleration" type="number" value="{{system.acceleration}}" class="w-2" /></label>
+    <label>Turning <input name="system.turning" type="number" value="{{system.turning}}" class="w-2" /></label>
+    <label>Cruising MPH <input name="system.cruiseMph" type="number" value="{{system.cruiseMph}}" /></label>
+    <label>Top MPH <input name="system.topMph" type="number" value="{{system.topMph}}" /></label>
+    <label>Defense <input name="system.defense" type="number" value="{{system.defense}}" class="w-2" /></label>
+    <label>Damage save <input name="system.damageSave" type="number" value="{{system.damageSave}}" class="w-2" /></label>
+    <label>Upgrades <input name="system.upgrades" type="number" min="0" value="{{system.upgrades}}" class="w-2" /></label>
+    <label>Complexity <input name="system.complexity" value="{{system.complexity}}" /></label>
+    <label>Cargo <input name="system.cargo" value="{{system.cargo}}" /></label>
+    <label>Range/Fuel <input name="system.rangeFuel" value="{{system.rangeFuel}}" /></label>
+    <label>Year <input name="system.year" value="{{system.year}}" /></label>
+    <label>Street value <input name="system.streetValue" value="{{system.streetValue}}" /></label>
+  </div>
+  <label>Qualities <input name="system.qualities" value="{{system.qualities}}" /></label>
+
+  <h3>Notes</h3>
+  {{#if editable}}<prose-mirror name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
+</section>

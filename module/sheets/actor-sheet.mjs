@@ -1,3 +1,4 @@
+import {vehicleClass} from '../rules/vehicles.mjs';
 import {buildSetupGuide, combatToolVisibility, focusSetupTask, activeConditionLabels, enhanceAgentSheet} from "./agent-ux.mjs";
 import {COMBAT_STANCES} from "../rules/combat-stance.mjs";
 import {manageThreadNeedle} from '../apps/thread-needle.mjs';
@@ -512,6 +513,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.wellFundedActive=sys.activeFeatNames?.includes('Well-Funded');context.wellFundedCash=wellFundedCashHistory(sys);
     context.toolShedSource=toolShedSource(sys);
     context.gear = byType("gear").map(g => ({ item: g, caliber: cfg.calibers[g.system.caliber],toolShed:toolShedKitState(sys,g) }));
+    context.vehicles = byType("vehicle").map(v => ({ item: v, caliber: cfg.calibers[v.system.caliber], classLabel: vehicleClass(v.system.vehicleClass)?.label ?? "" }));
     context.gearPicks = Object.entries(sys.gearPicks ?? {}).map(([k, v]) => ({ key: k, label: cfg.gearPicks[k], ...v }));
     context.pickOptions = Object.fromEntries([["", "—"], ...Object.entries(cfg.gearPicks).map(([k]) => [k, k])]);
 

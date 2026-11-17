@@ -1,0 +1,45 @@
+<section class="item-details">
+  <div class="form-fields-grid">
+    <label>Category <select name="system.vehicleClass">{{selectOptions vehicleClassOptions selected=system.vehicleClass}}</select></label>
+    <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
+    <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Pick"}} <select name="system.pick">{{selectOptions pickOptions selected=system.pick}}</select></label>
+    {{#if system.pick}}<label>Mission picks paid <input type="number" min="1" name="system.pickCount" value="{{system.pickCount}}" class="w-2" /></label>{{/if}}
+    <label><input type="checkbox" name="system.reserve" {{checked system.reserve}} /> {{localize "SPYCRAFT.Reserve"}}</label>
+  </div>
+  {{#if vehicleClassInfo}}<p class="muted">Controlled with {{vehicleClassInfo.skill}}{{#if vehicleClassInfo.focus}} · Drive focus: {{vehicleClassInfo.focus}}{{/if}} · untrained {{vehicleClassInfo.untrainedPenalty}}</p>{{/if}}
+  {{#if system.standingOnly}}<p class="muted">Requested with Reputation or Net Worth only{{#if system.standingCost}}: {{system.standingCost}}{{/if}}.</p>{{/if}}
+  {{#if system.optionOf}}<p class="muted">Option for {{system.optionOf}}.</p>{{/if}}
+  {{#if system.noted}}<p class="muted">The printed row carries a table footnote; see {{system.source}}.</p>{{/if}}
+
+  <h3>Statistics{{#if system.sourceTable}} — {{system.sourceTable}}{{/if}}</h3>
+  <div class="form-fields-grid">
+    <label>Size <input name="system.size" value="{{system.size}}" class="w-2" maxlength="1" /></label>
+    <label>Size and footprint <input name="system.sizeLabel" value="{{system.sizeLabel}}" /></label>
+    <label>Occupancy <input name="system.occupancy" value="{{system.occupancy}}" /></label>
+    <label>Acceleration/Turning <input name="system.accelerationTurning" value="{{system.accelerationTurning}}" /></label>
+    <label>Acceleration <input name="system.acceleration" type="number" value="{{system.acceleration}}" class="w-2" /></label>
+    <label>Turning <input name="system.turning" type="number" value="{{system.turning}}" class="w-2" /></label>
+    <label>MPH <input name="system.mph" value="{{system.mph}}" /></label>
+    <label>Cruising MPH <input name="system.cruiseMph" type="number" value="{{system.cruiseMph}}" /></label>
+    <label>Top MPH <input name="system.topMph" type="number" value="{{system.topMph}}" /></label>
+    <label>Defense <input name="system.defense" type="number" value="{{system.defense}}" class="w-2" /></label>
+    <label>Damage save <input name="system.damageSave" type="number" value="{{system.damageSave}}" class="w-2" /></label>
+    <label>Upgrades <input name="system.upgrades" type="number" min="0" value="{{system.upgrades}}" class="w-2" /></label>
+    <label>Complexity <input name="system.complexity" value="{{system.complexity}}" /></label>
+    <label>Cargo <input name="system.cargo" value="{{system.cargo}}" /></label>
+    <label>Range/Fuel <input name="system.rangeFuel" value="{{system.rangeFuel}}" /></label>
+    <label>Year <input name="system.year" value="{{system.year}}" /></label>
+    <label>Street value <input name="system.streetValue" value="{{system.streetValue}}" /></label>
+    <label><input type="checkbox" name="system.restricted" {{checked system.restricted}} /> Restricted sale</label>
+  </div>
+  <label>Qualities <input name="system.qualities" value="{{system.qualities}}" /></label>
+  <p class="controls">
+    {{#if hasDamageSave}}<a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
+    · failed saves <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
+    · <strong class="{{#unless (sc2eq breakState.state 'intact')}}bad{{/unless}}">{{breakState.state}}</strong> ·{{/if}}
+    <a data-action="deployVehicle"><i class="fa-solid fa-map-location-dot"></i> Place on a scene</a>
+  </p>
+  <h3>{{localize "SPYCRAFT.Description"}}</h3>
+  {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+</section>

@@ -1,4 +1,5 @@
 import {resolveSkillResult} from './checks.mjs';
+import {describeModifiers} from './roll-pipeline.mjs';
 const skillCheck=check=>['skill','knowledge'].includes(check.checkKind);
 const triumphCheck=check=>skillCheck(check)||check.checkKind==='attack';
 /** A natural range is a candidate until success/failure is known, pp.96–97,329–330. */
@@ -61,6 +62,7 @@ export function checkFlavor(check) {
  if(check.oneInAMillion)notes.push('One in a Million: declared natural 20; may be activated as a critical success after confirming success. This natural 20 cannot be forcibly rerolled.');
  if(check.alternatives)notes.push(`${String(check.choiceSource??'Bright Idea').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}: chose roll ${(check.chosenIndex??0)+1}; alternatives ${check.alternatives.map(r=>`${r.total} (natural ${r.naturalDie})`).join(' / ')}.`);
  if(check.capped||check.boostTotal||check.oldSchool||known)notes.push(`<strong>Effective result: ${check.effectiveTotal}</strong>${check.boostTotal?` · action dice ${check.boostTotal>=0?'+':''}${check.boostTotal}`:''}`);
+ if(check.pipelineModifiers?.length)notes.push(`${esc(describeModifiers(check.pipelineModifiers))}.`);
  return `${check.baseFlavor??'Check'}${notes.length?`<br>${notes.join(' ')}`:''}`;
 }
 

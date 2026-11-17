@@ -17,6 +17,31 @@
     <label><input type="checkbox" name="system.reserve" {{checked system.reserve}} /> {{localize "SPYCRAFT.Reserve"}}</label>
     <label><input type="checkbox" name="system.common" {{checked system.common}} /> Common Item</label>
   </div>
+  <details class="reference-panel" {{#if hasGearStats}}open{{/if}}>
+    <summary>Table values{{#if system.sourceTable}} — {{system.sourceTable}}{{/if}}</summary>
+    {{#if system.optionOf}}<p class="muted">Option for {{system.optionOf}}.</p>{{/if}}
+    {{#if system.noted}}<p class="muted">The printed row carries a table footnote; see {{system.source}}.</p>{{/if}}
+    <div class="form-fields-grid">
+      <label>Power Rating <input name="system.powerRating" value="{{system.powerRating}}" /></label>
+      <label>Result cap <input name="system.resultCap" value="{{system.resultCap}}" /></label>
+      <label>Range <input name="system.effectRange" value="{{system.effectRange}}" /></label>
+      <label>Size/Hands <input name="system.sizeHands" value="{{system.sizeHands}}" /></label>
+      <label>Battery <input name="system.battery" value="{{system.battery}}" /></label>
+      <label>Damage save <input name="system.damageSave" type="number" value="{{system.damageSave}}" class="w-2" /></label>
+      <label>Complexity <input name="system.complexity" value="{{system.complexity}}" /></label>
+      <label>Year <input name="system.year" value="{{system.year}}" /></label>
+      <label>Street value <input name="system.streetValue" value="{{system.streetValue}}" /></label>
+      <label><input type="checkbox" name="system.restricted" {{checked system.restricted}} /> Restricted sale</label>
+      <label>Reputation/Net Worth cost <input name="system.standingCost" value="{{system.standingCost}}" /></label>
+      <label><input type="checkbox" name="system.standingOnly" {{checked system.standingOnly}} /> Reputation/Net Worth only</label>
+    </div>
+    {{#if system.stats.length}}<table class="items"><tbody>{{#each system.stats}}<tr><th>{{label}}</th><td>{{value}}</td></tr>{{/each}}</tbody></table>{{/if}}
+    {{#if hasDamageSave}}<p>
+      <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
+      · failed saves <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
+      · <strong class="{{#unless (sc2eq breakState.state 'intact')}}bad{{/unless}}">{{breakState.state}}</strong>
+    </p>{{/if}}
+  </details>
   <h3>{{localize "SPYCRAFT.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
 </section>

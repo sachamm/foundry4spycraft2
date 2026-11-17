@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Roll pipeline: rules register reservations, validators, modifiers, record fields, named skill checks and chat buttons
+  in `module/rolls/` instead of being wired into the Actor document. Existing behaviour is unchanged.
+- Gear pack: Electronics, Gadgets, Resources, Security and Tradecraft picks with their table values, and gadget housings.
+- Vehicles: a Vehicle item type and pack (213 vehicles in twelve categories), a Vehicle Upgrades pack (upgrades and
+  vehicle weapons), and a Vehicle actor with its own sheet that can be placed on a scene from a pick.
+- Damage saves for gear and vehicles, with breakage by Size, blast and critical-hit failures, Vehicle Damage results
+  and tyre saves.
+- The compendium browser searches the new packs; the agent Gear tab lists vehicles.
+- `npm run build` no longer deletes a pack that Foundry has open; `SPYCRAFT_PACKS_DIR` builds and tests elsewhere.
+- New persisted fields: gear items gain table-value fields, `failedSaves` and `stats`; new document types
+  `Item.vehicle` and `Actor.vehicle`. Existing documents need no migration.
+
 ## 0.3.0
 
 - Now requires Foundry VTT v14 (verified on 14.370).
