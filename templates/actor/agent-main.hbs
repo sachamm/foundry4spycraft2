@@ -30,6 +30,7 @@
     <div class="combat-tool-groups">
     <details class="combat-tool-group" data-key="combat-attacks">
       <summary><span>Attacks &amp; reactions</span><small>Disarm, tricks and final attacks</small></summary>
+      <p class="tool-hint">Choose a new action here. Counter-Trip and Trip final attack use an opportunity from a recorded Trip result.</p>
       <div class="tool-actions">
         {{#if combatTools.striking}}<a data-action="takeStrikingAttack">Striking reaction</a>{{/if}}
         {{#if combatTools.missTrick}}<a data-action="takeMissTrick">Double Twirl / Remiss</a>{{/if}}
@@ -46,6 +47,7 @@
     {{#if combatTools.styles}}
     <details class="combat-tool-group" data-key="combat-movement">
       <summary><span>Stances &amp; movement</span><small>Your stance and attack styles</small></summary>
+      <p class="tool-hint">These controls use this character’s earned stances and attack styles. Each dialog checks its timing and requirements.</p>
       {{#if combatTools.stance}}<p><a data-action="declareCombatStance">Combat stance</a>{{#if system.combatStance}} · Current: {{system.combatStance.key}}{{/if}}</p>{{/if}}
       {{#if combatTools.movement}}<p><a data-action="reviewStanceMovement">Record round movement</a></p>{{/if}}
       {{#if combatTools.twoWeapon}}<p><a data-action="declareTwoWeapon">Declare two-weapon combat</a>{{#if system.twoWeaponStyleState.active}} · Declared {{system.twoWeaponStyleState.extraAttacks}} final Standard Attacks; attack penalty −{{system.twoWeaponStyleState.penalty}}; skill penalty {{#if system.twoWeaponStyleState.skillPenalty}}−{{system.twoWeaponStyleState.skillPenalty}}{{else}}0{{/if}}{{#if system.twoWeaponStyleState.handgunSkillWaiver}} (Both Guns Blazing also waives this penalty on handgun attacks){{/if}} until own Count in round {{system.twoWeaponStyleState.dueRound}}{{/if}}{{#if system.twoWeaponStyleState.needsReview}} <span class="bad">{{system.twoWeaponStyleState.reason}}</span>{{/if}}{{#if system.twoWeaponStyle}}{{#if isGM}} · <a data-action="reviewTwoWeapon">GC review remaining tradeoff</a>{{/if}}{{/if}}</p>{{/if}}
@@ -56,6 +58,7 @@
     {{/if}}
     <details class="combat-tool-group" data-key="combat-defense">
       <summary><span>Defense &amp; damage</span><small>Incoming attacks, saves and injuries</small></summary>
+      <p class="tool-hint">Review an incoming attack or a damage-related save or injury. Ordinary saving throws are at the top of Main.</p>
       {{#if combatTools.expertise}}
       <p><a data-action="activateCombatExpertise">Combat Expertise</a>{{#if system.combatExpertiseState.active}} · Attack/skill penalty −{{system.combatExpertiseState.penalty}}; dodge +{{system.combatExpertiseState.dodgeBonus}} until own Count in round {{system.combatExpertiseState.dueRound}}{{/if}}</p>
       {{/if}}
@@ -72,7 +75,7 @@
     </details>
     <details class="combat-tool-group" data-key="combat-outcomes">
       <summary><span>Recorded outcomes</span><small>Resolve an attack already rolled</small></summary>
-      <p class="hint">Choose the original recorded result in each tool.</p>
+      <p class="hint">Use these tools after an attack or check is resolved. Select its original chat result inside the tool.</p>
       <div class="tool-actions">
         <a data-action="manageTripOutcomes">Trip outcomes</a>
         <a data-action="manageFeintOutcomes">Feint outcomes</a>
@@ -124,6 +127,7 @@
     {{#if isGM}}
     <details class="combat-tool-group" data-key="combat-review" {{#if combatReviewNeeded}}open{{/if}}>
       <summary><span>GC review &amp; recovery</span><small>{{#if combatReviewNeeded}}Review needed{{else}}Interrupted actions and saved resources{{/if}}</small></summary>
+      <p class="tool-hint">For interrupted actions: check the saved results and resource totals before resuming. GC refers to your game moderator.</p>
       {{#if usagePeriodReview.needsReview}}<p class="bad">Interrupted {{usagePeriodReview.period}} start needs GC review. {{#if isGM}}<a data-action="reviewUsagePeriod">Review starting dice and counters</a>{{else}}Ask the GC to review the start.{{/if}}</p>{{/if}}
       {{#if actor.flags.spycraft2.missionXPReview.needsReview}}<p class="bad">Interrupted mission XP needs GC review. {{#if isGM}}<a data-action="reviewMissionXP">Review mission XP and reward</a>{{else}}Ask the GC to review mission XP.{{/if}}</p>{{/if}}
       {{#if actor.flags.spycraft2.actionDieAwardReview.needsReview}}<p class="bad">Interrupted award needs GC review. {{#if isGM}}<a data-action="reviewActionDieAward">Review award and balances</a>{{else}}Ask the GC to review the award and balances.{{/if}}</p>{{/if}}

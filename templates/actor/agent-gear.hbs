@@ -1,62 +1,70 @@
 <section class="tab gear {{tab.cssClass}}" data-tab="gear" data-group="primary">
-  <h3>{{localize "SPYCRAFT.Weapons"}} <span class="controls"><a data-action="browse" data-type="weapon"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="weapon"><i class="fa-solid fa-plus"></i></a></span></h3>
-  <table class="items">
-    <thead><tr><th>{{localize "Name"}}</th><th>{{localize "SPYCRAFT.Attack"}}</th><th>{{localize "SPYCRAFT.Damage"}}</th><th>E/T</th><th>{{localize "SPYCRAFT.Range"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
-    <tbody>
+  <h3>{{localize "SPYCRAFT.Weapons"}} <span class="controls"><a data-action="browse" data-type="weapon"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Browse weapons</a> <a data-action="createItem" data-type="weapon"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add weapon</a></span></h3>
+  <ul class="inventory-weapons" aria-label="Weapons">
     {{#each weapons}}
-      <tr data-item-id="{{item.id}}">
-        <td><a data-action="itemEdit">{{item.name}}</a>{{#if canResistDisarm}} <small>· <a data-action="rollDisarmResponse">Resist Disarm</a></small>{{/if}}{{#if ammoConfiguration.selected}}<small class="muted"> · {{ammoConfiguration.selected.code}}: {{ammoConfiguration.selected.shots}} shots per printed stockpile{{#if canPlanAmmunition}} · <a data-action="planAmmunition">Calculate ammo cost</a>{{/if}}</small>{{else}}{{#if ammoConfiguration.reason}}<small class="bad"> · {{ammoConfiguration.reason}}</small>{{/if}}{{/if}}</td>
-        <td><a data-action="rollAttack" class="{{#unless attack.trained}}bad{{/unless}}" data-tooltip="{{#unless attack.trained}}SPYCRAFT.Weapon.Untrained{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</a>{{#if attack.quirky.quirky}}{{#unless attack.trained}} <small class="bad">Quirky −4</small>{{/unless}}{{/if}}{{#if attack.trainedOnly.trainedOnly}}{{#unless attack.trained}} <small class="bad">Training required (TRO)</small>{{/unless}}{{/if}}{{#if attack.firearm}} <small>{{attack.fireModeLabel}}</small>{{/if}}{{#if attack.range}} <a data-action="rollRangedAttack" data-tooltip="Attack at a measured distance"><i class="fa-solid fa-crosshairs"></i></a>{{/if}}</td>
-        <td><a data-action="rollDamage">{{item.system.damage}}</a></td>
-        <td>{{attack.error}}/{{attack.threat}}</td>
-        <td>{{#if attack.range}}{{attack.range}} ft{{/if}}</td>
-        <td>{{caliber}}</td><td>{{item.system.pick}}</td>
-        <td class="controls"><a data-action="itemEquip" class="{{#if item.system.equipped}}on{{/if}}"><i class="fa-solid fa-hand-fist"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
-      </tr>
-    {{/each}}
-    </tbody>
-  </table>
+    <li class="inventory-weapon" data-item-id="{{item.id}}">
+      <div class="inventory-title"><a data-action="itemEdit" class="inventory-name" aria-label="Open {{item.name}}">{{item.name}}</a><span class="equipment-state">{{#if item.system.equipped}}Equipped{{else}}Not equipped{{/if}}</span></div>
+      <div class="inventory-rolls">
+        <a data-action="rollAttack" class="sc2-primary-action {{#unless attack.trained}}bad{{/unless}}" aria-label="Roll attack with {{item.name}}">Attack {{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</a>
+        <a data-action="rollDamage" aria-label="Roll damage for {{item.name}}">Damage {{item.system.damage}}</a>
+        {{#if attack.range}}<a data-action="rollRangedAttack" aria-label="Attack with {{item.name}} at a measured distance">Measured attack</a>{{/if}}
+      </div>
+      <dl class="inventory-stats">
+        {{#if attack.firearm}}<div><dt>Fire mode</dt><dd>{{attack.fireModeLabel}}</dd></div>{{/if}}
+        <div><dt>Error</dt><dd>{{attack.error}}</dd></div><div><dt>Threat</dt><dd>{{attack.threat}}</dd></div>
+        {{#if attack.range}}<div><dt>Range increment</dt><dd>{{attack.range}} ft</dd></div>{{/if}}
+      </dl>
+      {{#unless attack.trained}}<p class="inventory-warning">* Untrained attack. The attack dialog checks the applicable penalties and restrictions.</p>{{/unless}}
+      {{#if attack.quirky.quirky}}{{#unless attack.trained}}<p class="inventory-warning">Quirky: −4 while untrained.</p>{{/unless}}{{/if}}
+      {{#if attack.trainedOnly.trainedOnly}}{{#unless attack.trained}}<p class="inventory-warning">Training required for this weapon.</p>{{/unless}}{{/if}}
+      {{#if ammoConfiguration.reason}}<p class="inventory-warning">{{ammoConfiguration.reason}}</p>{{/if}}
+      <details class="inventory-details" data-key="weapon-{{item.id}}"><summary>Equipment &amp; ammunition</summary>
+        <dl class="inventory-stats"><div><dt>Caliber</dt><dd>{{caliber}}</dd></div><div><dt>Mission pick</dt><dd>{{#if item.system.pick}}{{item.system.pick}}{{else}}None recorded{{/if}}</dd></div></dl>
+        {{#if ammoConfiguration.selected}}<p>Printed ammunition stockpile: <b>{{ammoConfiguration.selected.shots}} shots</b> ({{ammoConfiguration.selected.code}}). This is the stockpile size, not ammunition remaining.</p>{{/if}}
+        <div class="inventory-utilities">
+          {{#if canPlanAmmunition}}<a data-action="planAmmunition">Calculate ammunition cost</a>{{/if}}
+          {{#if canResistDisarm}}<a data-action="rollDisarmResponse">Resist a Disarm</a>{{/if}}
+          <a data-action="itemEquip" aria-pressed="{{item.system.equipped}}" aria-label="{{#if item.system.equipped}}Unequip{{else}}Equip{{/if}} {{item.name}}">{{#if item.system.equipped}}Unequip{{else}}Equip{{/if}}</a>
+          <a data-action="itemDelete" aria-label="Remove {{item.name}}">Remove weapon</a>
+        </div>
+      </details>
+    </li>
+    {{else}}<li class="inventory-empty">No weapons recorded. Choose Browse weapons to find one, or Add weapon to create an entry.</li>{{/each}}
+  </ul>
 
-  <h3>{{localize "SPYCRAFT.Armor"}} <span class="controls"><a data-action="browse" data-type="armor"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="armor"><i class="fa-solid fa-plus"></i></a></span></h3>
-  <table class="items">
-    <thead><tr><th>{{localize "Name"}}</th><th>DR</th><th>{{localize "SPYCRAFT.Defense"}}</th><th>ACP</th><th>{{localize "SPYCRAFT.Speed"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
-    <tbody>
-    {{#each armor}}
+  <h3>{{localize "SPYCRAFT.Armor"}} <span class="controls"><a data-action="browse" data-type="armor"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Browse armor</a> <a data-action="createItem" data-type="armor"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add armor</a></span></h3>
+  <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="Armor">
+    <thead><tr><th scope="col">Name</th><th scope="col"><abbr title="Damage reduction: ordinary / subdual">Damage reduction</abbr></th><th scope="col">Defense</th><th scope="col"><abbr title="Armor check penalty">Check penalty</abbr></th><th scope="col">Speed</th><th scope="col">Caliber</th><th scope="col">Pick</th><th scope="col">Actions</th></tr></thead>
+    <tbody>{{#each armor}}
       <tr data-item-id="{{item.id}}">
         <td><a data-action="itemEdit">{{item.name}}</a></td>
-        <td>{{item.system.damageReduction}}/{{item.system.damageReductionSubdual}}</td><td>{{item.system.defensePenalty}}</td><td>{{item.system.armorCheck}}</td><td>{{item.system.speedPenalty}}</td>
-        <td>{{caliber}}</td><td>{{item.system.pick}}</td>
-        <td class="controls"><a data-action="itemEquip" class="{{#if item.system.equipped}}on{{/if}}" data-tooltip="SPYCRAFT.Equip"><i class="fa-solid fa-shirt"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
+        <td>{{item.system.damageReduction}}/{{item.system.damageReductionSubdual}}</td><td>{{item.system.defensePenalty}}</td><td>{{item.system.armorCheck}}</td><td>{{item.system.speedPenalty}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
+        <td class="controls"><a data-action="itemEquip" aria-pressed="{{item.system.equipped}}" aria-label="{{#if item.system.equipped}}Unequip{{else}}Equip{{/if}} {{item.name}}">{{#if item.system.equipped}}Unequip{{else}}Equip{{/if}}</a> <a data-action="itemDelete" aria-label="Remove {{item.name}}">Remove</a></td>
       </tr>
-    {{/each}}
-    </tbody>
-  </table>
+    {{else}}<tr><td colspan="8" class="inventory-empty">No armor recorded. Use Browse armor to choose a suit or piece.</td></tr>{{/each}}</tbody>
+  </table></div>
 
-  <h3>{{localize "SPYCRAFT.Gear"}} <span class="controls"><a data-action="browse" data-type="gear"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="gear"><i class="fa-solid fa-plus"></i></a></span></h3>
-  <table class="items">
-    <thead><tr><th>{{localize "Name"}}</th><th>{{localize "SPYCRAFT.Quantity"}}</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th></th></tr></thead>
-    <tbody>
-    {{#each gear}}
+  <h3>{{localize "SPYCRAFT.Gear"}} <span class="controls"><a data-action="browse" data-type="gear"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Browse gear</a> <a data-action="createItem" data-type="gear"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add gear</a></span></h3>
+  <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="Gear">
+    <thead><tr><th scope="col">Name</th><th scope="col">Quantity</th><th scope="col">Caliber</th><th scope="col">Pick</th><th scope="col">Actions</th></tr></thead>
+    <tbody>{{#each gear}}
       <tr data-item-id="{{item.id}}">
         <td><a data-action="itemEdit">{{item.name}}</a>{{#if toolShed.expired}} <span class="bad">Lost at mission end</span>{{else}}{{#if toolShed.blockedReason}} <span class="bad">Grant needs review</span>{{/if}}{{/if}}</td><td>{{item.system.quantity}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
-        <td class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
+        <td class="controls"><a data-action="itemChat" aria-label="Share {{item.name}} in chat">Share</a> <a data-action="itemDelete" aria-label="Remove {{item.name}}">Remove</a></td>
       </tr>
-    {{/each}}
-    </tbody>
-  </table>
-  <h3>{{localize "TYPES.Item.vehicle"}}s <span class="controls"><a data-action="browse" data-type="vehicle"><i class="fa-solid fa-book-open"></i></a> <a data-action="createItem" data-type="vehicle"><i class="fa-solid fa-plus"></i></a></span></h3>
-  <table class="items">
-    <thead><tr><th>{{localize "Name"}}</th><th>Category</th><th>{{localize "SPYCRAFT.Caliber"}}</th><th>{{localize "SPYCRAFT.Pick"}}</th><th>A/T</th><th>MPH</th><th>D/S</th><th></th></tr></thead>
-    <tbody>
-    {{#each vehicles}}
+    {{else}}<tr><td colspan="5" class="inventory-empty">No gear recorded. Use Browse gear to find equipment.</td></tr>{{/each}}</tbody>
+  </table></div>
+
+  <h3>Vehicles <span class="controls"><a data-action="browse" data-type="vehicle"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Browse vehicles</a> <a data-action="createItem" data-type="vehicle"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add vehicle</a></span></h3>
+  <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="Vehicles">
+    <thead><tr><th scope="col">Name</th><th scope="col">Category</th><th scope="col">Caliber</th><th scope="col">Pick</th><th scope="col"><abbr title="Acceleration / Turning">Accel. / Turn</abbr></th><th scope="col">MPH</th><th scope="col">Defense / Save</th><th scope="col">Actions</th></tr></thead>
+    <tbody>{{#each vehicles}}
       <tr data-item-id="{{item.id}}">
-        <td><a data-action="itemEdit">{{item.name}}</a></td><td>{{classLabel}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
-        <td>{{item.system.accelerationTurning}}</td><td>{{item.system.mph}}</td><td>{{item.system.defenseSave}}</td>
-        <td class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></td>
+        <td><a data-action="itemEdit">{{item.name}}</a></td><td>{{classLabel}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td><td>{{item.system.accelerationTurning}}</td><td>{{item.system.mph}}</td><td>{{item.system.defenseSave}}</td>
+        <td class="controls"><a data-action="itemChat" aria-label="Share {{item.name}} in chat">Share</a> <a data-action="itemDelete" aria-label="Remove {{item.name}}">Remove</a></td>
       </tr>
-    {{/each}}
-    </tbody>
-  </table>
+    {{else}}<tr><td colspan="8" class="inventory-empty">No vehicles recorded. Use Browse vehicles to choose one.</td></tr>{{/each}}</tbody>
+  </table></div>
   <details class="reference-panel" data-key="gearPlanning"><summary>Wealth, mission planning and acquisitions</summary>
   <h3>{{localize "SPYCRAFT.Wealth"}} <span class="points {{#if (sc2lt system.wealth.remaining 0)}}bad{{/if}}">{{system.wealth.allocated}} / {{system.wealth.total}}</span></h3>
   <table class="wealth">
