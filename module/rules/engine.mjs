@@ -4,6 +4,7 @@ import {cheapShotPenalty,cheapShotRecords,cheapShotSpeedPenalty} from './cheap-s
 import {readiedDisarmWeapons} from './disarm-response.mjs';
 import {readiedGuardWeapons} from './guard.mjs';
 import {polearmDefensePlan} from './polearm-defense.mjs';
+import {knifeBasicsPlan} from './knife-basics.mjs';
 import {attributeDamageState} from './attribute-damage.mjs';
 import {candidatePlan} from './candidate.mjs';
 import {toolShedKitState} from './tool-shed.mjs';
@@ -653,6 +654,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.readiedMeleeWeapons=readiedMeleeWeapons(sys,items);
   sys.guardWeapons=readiedGuardWeapons(sys,items);
   sys.disarmWeapons=readiedDisarmWeapons(sys,items);
+  sys.knifeBasics=knifeBasicsPlan(sys,items);
   const heldReview=sys.guardWeapons.blockedReason||sys.disarmWeapons.blockedReason;
   if(heldReview){warnings.push(heldReview);todo.push({order:10,tab:'gear',text:heldReview});}
   sys.polearmDefense=polearmDefensePlan(sys);

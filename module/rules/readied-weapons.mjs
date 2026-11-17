@@ -17,8 +17,8 @@ export function readiedRangedWeapons(system,items=[]){
  * Only a physically held/readied, usable melee weapon can supply these benefits.
  * A held throwing axe can still be a readied axe; attack proficiency alone does not define its family.
  */
-export const MELEE_SKILL_FAMILIES=['axe','spear','whip','staff','hammer','twoHandedSword','oneHandedSword','polearm','flail'];
-const familyProficiencies={flail:['exoticBlunt'],polearm:['exoticEdged'],axe:['edged','exoticEdged','hurled','exoticHurled'],spear:['edged','exoticEdged','hurled','exoticHurled'],whip:['exoticBlunt'],staff:['blunt','exoticBlunt'],hammer:['blunt','exoticBlunt','hurled','exoticHurled'],twoHandedSword:['edged','exoticEdged'],oneHandedSword:['edged','exoticEdged']};
+export const MELEE_SKILL_FAMILIES=['axe','spear','whip','staff','hammer','twoHandedSword','oneHandedSword','polearm','flail','knife'];
+const familyProficiencies={knife:['edged','exoticEdged','hurled','exoticHurled'],flail:['exoticBlunt'],polearm:['exoticEdged'],axe:['edged','exoticEdged','hurled','exoticHurled'],spear:['edged','exoticEdged','hurled','exoticHurled'],whip:['exoticBlunt'],staff:['blunt','exoticBlunt'],hammer:['blunt','exoticBlunt','hurled','exoticHurled'],twoHandedSword:['edged','exoticEdged'],oneHandedSword:['edged','exoticEdged']};
 export const meleeFamilyProficiency=(family,proficiency)=>familyProficiencies[family]?.includes(proficiency)===true;
 export function readiedMeleeWeapons(system,items=[]){
  const ready=[];
