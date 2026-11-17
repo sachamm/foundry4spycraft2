@@ -30,7 +30,7 @@ npm run test:packs # checks rebuilt LevelDB content after building
 
 `src/data/*.json` is the source of truth for the rules data (numbers, tables, names and formulas): edit those files
 directly. All descriptive text (feats, origins, class abilities) comes from `src/data/summaries.json`: original,
-condensed summaries of the Spycraft 2.0 rules (Open Game Content). The test fixtures in `tools/fixtures/` are saved
+condensed summaries written for this system; none of it is copied from the rulebook. The test fixtures in `tools/fixtures/` are saved
 reference results.
 
 ## What the character sheet does
@@ -81,7 +81,9 @@ was initially imported into it.
 
 ## Legal
 
-Spycraft is a trademark of Crafty Games. This project is unofficial and not affiliated with or endorsed by Crafty Games. Only Open Game Content may be included in compendiums.
+Spycraft is a trademark of Crafty Games. This project is unofficial and not affiliated with or endorsed by Crafty Games.
+
+The Spycraft 2.0 rulebook is copyrighted and is not open content. This repository must not contain its text: data files hold names, numbers and table values as bare labels, and every description is an original summary. You need the rulebook to play. Contributors, see [AGENTS.md](AGENTS.md).
 
 ## Installing in Foundry
 
