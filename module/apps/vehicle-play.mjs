@@ -98,11 +98,12 @@ export async function rollTyreSave(actor, options = {}) {
     damage = Number(input.damage);
   }
   if (!Number.isSafeInteger(damage) || damage < 1) return ui.notifications.warn('Enter the whole number of damage points.');
-  const bonus = tractionSaveBonus(objectSize(actor)), dc = damageSaveDC(damage);
+  const size = sizeCode(objectSize(actor)), bonus = tractionSaveBonus(size), dc = damageSaveDC(damage);
+  const houseRule = VEHICLE_RULES.tractionSaveBonusHouseRule?.[size];
   const roll = await new Roll('1d20 + @bonus', {bonus}).evaluate(), punctured = roll.total < dc;
   const message = await roll.toMessage({
     speaker: speakerFor(actor),
-    flavor: `<strong>${esc(actor.name)}</strong> — tyre Damage save, DC ${dc}<br>${punctured ? 'Punctured: recorded on the vehicle.' : 'The tyre holds.'}`
+    flavor: `<strong>${esc(actor.name)}</strong> — tyre Damage save, DC ${dc} (bonus +${bonus}${houseRule ? ', house rule' : ''})<br>${punctured ? 'Punctured: recorded on the vehicle.' : 'The tyre holds.'}`
   });
   if (punctured && actor.isOwner) await actor.update({'system.damage.traction': (actor.system.damage?.traction ?? 0) + 1});
   return message;

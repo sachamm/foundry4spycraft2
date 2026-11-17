@@ -153,12 +153,12 @@ test('gear data covers every pick category with labelled table rows', () => {
 });
 
 test('vehicle data covers all twelve categories with usable statistics', () => {
-  assert.equal(vehicles.vehicles.length, 213);
+  assert.equal(vehicles.vehicles.length, 211);
   const perClass = Object.groupBy(vehicles.vehicles, v => v.vehicleClass);
   assert.deepEqual(Object.keys(perClass).sort(), vehicles.classes.map(c => c.code).sort());
   for (const v of vehicles.vehicles) {
     assert.ok(v.name && !/[*†∆Ω↳]/.test(v.name), v.name);
-    assert.ok(v.caliber === '' ? v.standingOnly : ROMAN.has(v.caliber), `${v.name}: caliber`);
+    assert.ok(v.caliber === '' ? v.standingOnly || v.optionOf : ROMAN.has(v.caliber), `${v.name}: caliber`);
     assert.ok(v.sourcePage >= 236 && v.sourcePage <= 244, `${v.name}: page`);
     if (v.optionOf) continue;
     assert.ok(v.size, `${v.name}: size`);
@@ -175,6 +175,42 @@ test('vehicle data covers all twelve categories with usable statistics', () => {
   for (const u of vehicles.upgrades) for (const kind of ['ground', 'air', 'water']) assert.ok(u[kind].streetValue && u[kind].complexity, `${u.name}: ${kind}`);
   for (const w of vehicles.weapons) assert.ok(w.name && w.sourcePage >= 246 && w.sourcePage <= 249, w.name);
   assert.deepEqual(VEHICLE_RULES.classes, vehicles.classes);
+});
+
+test('PDF cross-check corrections hold', () => {
+  const byName = name => vehicles.vehicles.filter(v => v.name === name);
+  // Turning is read on its own when Acceleration is per driver, per crew or set by the wind.
+  assert.equal(byName('Bicycle, mountain')[0].turning, 6);
+  assert.equal(byName('Sailboat, coastal')[0].turning, 1);
+  assert.equal(byName('Canoe')[0].turning, 0);
+  // A/T misprinted as "3.4".
+  assert.deepEqual([byName('Pickup truck, light')[0].acceleration, byName('Pickup truck, light')[0].turning], [3, 4]);
+  // Bundled extras sit in their own field, not in the Size label.
+  assert.equal(byName('ATV, sport')[0].sizeLabel, 'M (1×1)');
+  assert.equal(byName('ATV, sport')[0].bundled, '+2 racing helmets');
+  for (const v of vehicles.vehicles) assert.doesNotMatch(v.sizeLabel, /\+/, v.name);
+  // One tractor-trailer per Caliber; trailers are options for it, not Caliber V picks.
+  assert.deepEqual(byName('Tractor-trailer').map(v => [v.caliber, v.upgrades]), [['II', 2], ['III', 2]]);
+  for (const v of vehicles.vehicles.filter(v => /^Trailer, /.test(v.name))) assert.deepEqual([v.optionOf, v.caliber], ['Tractor-trailer', '']);
+  // Missile launcher names were wrapped into the Cost column.
+  const missiles = vehicles.weapons.filter(w => w.name.startsWith('Missile launcher'));
+  assert.equal(missiles.length, 18);
+  for (const w of missiles) { assert.match(w.name, /^Missile launcher, \S/); assert.match(w.cost, /^\d+$/); }
+  // Gargantuan tyre bonus is a recorded house rule.
+  assert.equal(VEHICLE_RULES.tractionSaveBonus.G, 5);
+  assert.ok(VEHICLE_RULES.tractionSaveBonusHouseRule.G);
+});
+
+test('every footnote code has a short label and noted rows carry at least one', () => {
+  const lists = [...['electronics', 'gadgets', 'resources', 'security', 'tradecraft'].map(k => [gear[k], gear.footnotes]),
+    [vehicles.vehicles, vehicles.footnotes], [vehicles.upgrades, vehicles.upgradeFootnotes], [vehicles.weapons, vehicles.upgradeFootnotes]];
+  for (const [rows, labels] of lists) for (const row of rows) {
+    assert.equal(row.noted, row.notes.length > 0, row.name);
+    for (const code of row.notes) assert.ok(labels[code], `${row.name}: ${code}`);
+  }
+  // A team-wide pick is flagged for the radios, bicycles and parachutes.
+  assert.ok(gear.electronics.filter(r => r.notes.includes('teamIssue')).every(r => r.name.startsWith('Radio, tactical')));
+  assert.ok(vehicles.vehicles.find(v => v.name === 'Parachute, standard').notes.includes('teamIssue'));
 });
 
 test('the new data files hold labels and numbers, not prose', () => {

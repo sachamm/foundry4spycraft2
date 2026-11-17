@@ -12,6 +12,7 @@ import { humanizeTemplate, renderTemplate } from "../rules/formula.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { breakState, vehicleClass } from "../rules/vehicles.mjs";
 import { deployVehicle, objectSize, rollObjectDamageSave } from "../apps/vehicle-play.mjs";
+import { issueToTeam } from "../apps/gear-play.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
@@ -30,7 +31,8 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       removeBonus: SpycraftItemSheet.#onRemoveBonus,
       toChat: SpycraftItemSheet.#onToChat,
       damageSave() { return rollObjectDamageSave(this.item); },
-      deployVehicle() { return deployVehicle(this.item); }
+      deployVehicle() { return deployVehicle(this.item); },
+      issueToTeam() { return issueToTeam(this.item); }
     }
   };
 
@@ -129,6 +131,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         .some(key => sys[key]) || sys.damageSave !== null || sys.stats.length > 0;
       context.hasDamageSave = Number.isSafeInteger(sys.damageSave);
       context.breakState = breakState(size, sys.failedSaves ?? 0);
+      context.canIssueTeam = game.user.isGM && !!item.parent && sys.perTeamMember && !item.getFlag("spycraft2", "issuedFrom");
     }
     if (item.type === "vehicle") {
       context.vehicleClassOptions = { "": "—", ...Object.fromEntries(VEHICLE_RULES.classes.map(c => [c.code, c.label])) };

@@ -79,7 +79,7 @@ export const SKILLS = ${JSON.stringify(core.skills.map(({ row, ...s }) => s), nu
 export const TABLES = ${JSON.stringify({...core.tables,ammunitionCatalog:ammunition}, null, 1)};
 export const CLASS_FEATURES = ${JSON.stringify(Object.fromEntries(classes.filter(c=>!c.expert).map(c=>[c.key,{name:c.name,classSkills:c.classSkills,choiceLists:c.choiceLists.map(list=>({...list,options:list.options.map(option=>({...option,description:option.description??summaries.classes[c.name]?.options?.[option.name]??""}))}))}])),null,1)};
 export const GEAR_RULES = ${JSON.stringify({categories:gear.categories,damageSaves:gear.damageSaves,housings:gear.housings}, null, 1)};
-export const VEHICLE_RULES = ${JSON.stringify({classes:vehicles.classes,damageLocations:vehicles.damageLocations,damagePage:vehicles.damagePage,damageSavePage:vehicles.damageSavePage,tractionSaveBonus:vehicles.tractionSaveBonus,bailOutDC:vehicles.bailOutDC}, null, 1)};
+export const VEHICLE_RULES = ${JSON.stringify({classes:vehicles.classes,damageLocations:vehicles.damageLocations,damagePage:vehicles.damagePage,damageSavePage:vehicles.damageSavePage,tractionSaveBonus:vehicles.tractionSaveBonus,tractionSaveBonusHouseRule:vehicles.tractionSaveBonusHouseRule,bailOutDC:vehicles.bailOutDC}, null, 1)};
 `;
 writeFileSync(join(ROOT, "module/rules/tables.mjs"), tablesSrc);
 
@@ -206,8 +206,15 @@ for(const kit of kits)packs.kits.docs.push(item("kits",kit.name,"gear","icons/sv
 // Gear picks other than weapons and armor (Tables 4.9–4.12, 4.15, 4.66). Table values only; rules stay in the book.
 const pageNote = (table, page, descriptionsPage, row) =>
   p(`Table ${table}, p.${page}.${descriptionsPage ? ` Rules for this entry start on p.${descriptionsPage}.` : ""}`)
-  + (row.optionOf ? p(`An option for ${row.optionOf}.`) : "")
-  + (row.noted ? p("The printed table attaches a footnote to this row.") : "");
+  + (row.optionOf ? p(`An option for ${row.optionOf}.`) : "");
+/** The footnote dictionary for a table: gear (4.9–4.15), vehicles (4.16–4.27) or vehicle upgrades (4.28–4.29). */
+const footnotesFor = table => { const n = Number(String(table).split(".")[1]); return n >= 28 ? vehicles.upgradeFootnotes : n >= 16 ? vehicles.footnotes : gear.footnotes; };
+/** Footnote codes on a row, turned into their short labels. */
+const footnoteLabels = (row, ...dictionaries) => (row.notes ?? []).map(code => {
+  const label = dictionaries.map(d => d?.[code]).find(Boolean);
+  if (!label) throw new Error(`No footnote label for "${code}" on ${row.name}`);
+  return label;
+});
 /** Give repeated table names a distinguishing suffix so every pack entry has its own name and id. */
 function uniqueNames(rows, qualifier) {
   const count = new Map(), seen = new Map();
@@ -223,7 +230,9 @@ const caliberLabel = r => r.caliber ? `Caliber ${r.caliber}` : "Reputation/Net W
 const gearBase = (row, category) => ({
   source: `Spycraft 2.0 p.${row.sourcePage}`, quantity: row.bundleSize ?? 1, bundleSize: row.bundleSize ?? 1, pickCount: 1,
   caliber: ROMAN[row.caliber] ?? 0, weight: Number(row.weight) || 0, carried: true, equipped: false, pick: "", gearCategory: category,
-  common: false, reserve: false, optionOf: row.optionOf ?? "", sourceTable: `Table ${row.sourceTable}`, noted: !!row.noted
+  common: false, reserve: false, optionOf: row.optionOf ?? "", sourceTable: `Table ${row.sourceTable}`, noted: !!row.noted,
+  footnotes: footnoteLabels(row, footnotesFor(row.sourceTable)),
+  bundled: row.bundled ?? "", perTeamMember: (row.notes ?? []).includes("teamIssue")
 });
 const GEAR_LISTS = [["electronics", "E"], ["gadgets", "G"], ["resources", "R"], ["security", "S"], ["tradecraft", "T"]];
 packs.gear = { label: "Gear", folders: [...GEAR_LISTS.map(([, c], i) => folder("gear", gear.categories[c].label, i)), folder("gear", "Gadget Housings", GEAR_LISTS.length)], docs: [] };

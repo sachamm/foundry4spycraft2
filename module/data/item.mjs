@@ -175,6 +175,12 @@ export class GearData extends BaseItemData {
       sourceTable: str(),
       /** The printed row carries a table footnote. */
       noted: new BooleanField(),
+      /** Short labels for the row's table footnotes (our wording, not the book's). */
+      footnotes: new ArrayField(str()),
+      /** Extra items printed as coming with this pick. */
+      bundled: str(),
+      /** One pick issues a copy to every team member. */
+      perTeamMember: new BooleanField(),
       /** Columns particular to one table, as label/value pairs. */
       stats: new ArrayField(new SchemaField({ label: str(), value: str() }))
     };

@@ -10059,10 +10059,13 @@ export const VEHICLE_RULES = {
   "M": 1,
   "L": 2,
   "H": 4,
-  "G": 4,
+  "G": 5,
   "C": 6,
   "E": 6,
   "V": 6
+ },
+ "tractionSaveBonusHouseRule": {
+  "G": "House rule: +5, between Huge (+4) and Colossal (+6); none printed."
  },
  "bailOutDC": 15
 };
