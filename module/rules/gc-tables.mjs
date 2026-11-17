@@ -76,44 +76,44 @@ export const GC_DATA = {
     },
     {
      "id": "terrain",
-     "group": "Attacks and Movement",
-     "label": "Movement penalty from terrain",
+     "group": "Attacks, movement",
+     "label": "Terrain slowed movement",
      "amount": -2
     },
     {
      "id": "oneHandedTwoHands",
-     "group": "Attacks and Movement",
-     "label": "Fire a 1-handed weapon with 2 hands",
+     "group": "Attacks, movement",
+     "label": "Two-handed grip on a one-handed firearm",
      "amount": -2
     },
     {
      "id": "tactical",
-     "group": "Attacks and Movement",
-     "label": "Fire a tactical weapon",
+     "group": "Attacks, movement",
+     "label": "Tactical weapon fired",
      "amount": -2
     },
     {
      "id": "unproficient",
-     "group": "Attacks and Movement",
-     "label": "Use a weapon without proficiency (once per weapon)",
+     "group": "Attacks, movement",
+     "label": "Unproficient weapon (once per weapon)",
      "amount": -4
     },
     {
      "id": "finalAttack",
-     "group": "Attacks and Movement",
+     "group": "Attacks, movement",
      "label": "Final attack (each)",
      "amount": -2
     },
     {
      "id": "criticalMiss",
-     "group": "Attacks and Movement",
-     "label": "Critical miss or failure (per action die spent)",
+     "group": "Attacks, movement",
+     "label": "Critical miss/failure (per die spent on it)",
      "amount": -2
     },
     {
      "id": "triumph",
-     "group": "Attacks and Movement",
-     "label": "Score a Triumph",
+     "group": "Attacks, movement",
+     "label": "Triumph",
      "amount": 10
     },
     {
@@ -147,20 +147,20 @@ export const GC_DATA = {
     {
      "id": "criticalInjury",
      "group": "Conditions",
-     "label": "Suffer a critical injury",
+     "label": "Critical injury taken",
      "amount": -10,
      "oncePerRound": true
     },
     {
      "id": "woundLoss",
      "group": "Injuries",
-     "label": "Lose 1 or more wounds (per injury)",
+     "label": "Wound loss (per injury)",
      "amount": -2
     },
     {
      "id": "criticalWoundLoss",
      "group": "Injuries",
-     "label": "Critical hit that costs wounds (per injury; replaces the wound-loss modifier)",
+     "label": "Critical hit with wound loss (per injury; instead of the wound-loss modifier)",
      "amount": -5
     },
     {
@@ -171,27 +171,27 @@ export const GC_DATA = {
     },
     {
      "id": "diversion",
-     "group": "Skill Checks and Saving Throws",
-     "label": "Fail Sense Motive against a Diversion (1d4, or 2d4 with a critical)",
+     "group": "Checks and saves",
+     "label": "Diversion: failed Sense Motive (1d4; 2d4 on a critical)",
      "amount": null,
      "variable": "diversion"
     },
     {
      "id": "failedSave",
-     "group": "Skill Checks and Saving Throws",
-     "label": "Fail a saving throw",
+     "group": "Checks and saves",
+     "label": "Failed save",
      "amount": -2
     },
     {
      "id": "failedStressSave",
-     "group": "Skill Checks and Saving Throws",
-     "label": "Fail a save against stress damage",
+     "group": "Checks and saves",
+     "label": "Failed save vs. stress damage",
      "amount": -5
     },
     {
      "id": "failedExplosiveSave",
-     "group": "Skill Checks and Saving Throws",
-     "label": "Fail a save to reduce explosive damage",
+     "group": "Checks and saves",
+     "label": "Failed save vs. explosive damage",
      "amount": -5
     }
    ]
@@ -228,7 +228,7 @@ export const GC_DATA = {
    "spends": [
     {
      "id": "boostRoll",
-     "label": "Boost an NPC die roll",
+     "label": "NPC roll boost",
      "cost": 1,
      "rolls": "npc",
      "needsNpc": true,
@@ -236,7 +236,7 @@ export const GC_DATA = {
     },
     {
      "id": "boostDefense",
-     "label": "Boost an NPC's Defense (+2 for the die result in rounds)",
+     "label": "NPC Defense boost (+2, rounds = die result)",
      "cost": 1,
      "rolls": "npc",
      "needsNpc": true,
@@ -244,7 +244,7 @@ export const GC_DATA = {
     },
     {
      "id": "boostDefenseAfterHit",
-     "label": "Dramatic scene: boost an NPC's Defense against one attack that hit",
+     "label": "Dramatic scene: NPC Defense boost against one landed attack",
      "cost": 1,
      "rolls": "npc",
      "needsNpc": true,
@@ -254,14 +254,14 @@ export const GC_DATA = {
     },
     {
      "id": "boostDC",
-     "label": "Boost a skill check DC (d12, before the check)",
+     "label": "DC boost (d12, declared before the check)",
      "cost": 1,
      "rolls": "d12",
      "page": 397
     },
     {
      "id": "boostInitiative",
-     "label": "Dramatic scene: raise an opponent's Initiative Count",
+     "label": "Dramatic scene: opponent Initiative Count boost",
      "cost": 1,
      "rolls": "npc",
      "needsNpc": true,
@@ -271,7 +271,7 @@ export const GC_DATA = {
     },
     {
      "id": "activateThreat",
-     "label": "Activate an NPC threat",
+     "label": "NPC threat activation",
      "cost": 1,
      "variableCost": true,
      "needsNpc": true,
@@ -279,14 +279,14 @@ export const GC_DATA = {
     },
     {
      "id": "activateError",
-     "label": "Activate an error suffered by an NPC's opponent",
+     "label": "Error activation against an NPC's opponent",
      "cost": 1,
      "variableCost": true,
      "page": 398
     },
     {
      "id": "healNpc",
-     "label": "Heal an NPC",
+     "label": "NPC healing",
      "cost": 1,
      "rolls": "npc",
      "needsNpc": true,
@@ -295,39 +295,39 @@ export const GC_DATA = {
     },
     {
      "id": "promote",
-     "label": "Promote a standard NPC to special for this mission",
+     "label": "Standard NPC promotion (special until mission end)",
      "cost": 2,
      "needsNpc": true,
      "page": 398
     },
     {
      "id": "saveNpc",
-     "label": "Save a special NPC from death or capture",
+     "label": "Special NPC escape from death or capture",
      "cost": 4,
      "needsNpc": true,
      "page": 398
     },
     {
      "id": "campaignQuality",
-     "label": "Add a campaign quality for this mission (Intel Phase)",
+     "label": "Campaign quality added in the Intel Phase",
      "cost": null,
      "page": 398
     },
     {
      "id": "dramaticScene",
-     "label": "Make the current scene dramatic",
+     "label": "Dramatic scene declared",
      "cost": 4,
      "page": 398
     },
     {
      "id": "event",
-     "label": "Prompt an event (1–4 dice, 1 less with a listed trigger)",
+     "label": "Event (1–4 dice; 1 less with a trigger)",
      "cost": null,
      "page": 399
     },
     {
      "id": "knowsNothing",
-     "label": "Decide a questioned NPC knows nothing (1 standard/minion, 2 special/henchman)",
+     "label": "Questioned NPC knows nothing (1 standard or minion; 2 special or henchman)",
      "cost": null,
      "needsNpc": true,
      "page": 459
