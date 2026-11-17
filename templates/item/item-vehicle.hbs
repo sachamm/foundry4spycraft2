@@ -10,6 +10,7 @@
   {{#if vehicleClassInfo}}<p class="muted">Controlled with {{vehicleClassInfo.skill}}{{#if vehicleClassInfo.focus}} · Drive focus: {{vehicleClassInfo.focus}}{{/if}} · untrained {{vehicleClassInfo.untrainedPenalty}}</p>{{/if}}
   {{#if system.standingOnly}}<p class="muted">Requested with Reputation or Net Worth only{{#if system.standingCost}}: {{system.standingCost}}{{/if}}.</p>{{/if}}
   {{#if system.optionOf}}<p class="muted">Option for {{system.optionOf}}.</p>{{/if}}
+  {{#if standing}}<p class="muted">Request cost: {{standing.cost.reputation}} Reputation or {{standing.netWorthLabel}} Net Worth{{#if standing.charge}} · <strong>paid</strong> ({{standing.charge.amount}} {{standing.charge.currency}}){{/if}}{{#if standing.canCharge}} · <a data-action="chargeStanding"><i class="fa-solid fa-coins"></i> Pay the cost</a>{{/if}}{{#if standing.canRefund}} · <a data-action="refundStanding"><i class="fa-solid fa-rotate-left"></i> Refund</a>{{/if}}</p>{{/if}}
   {{#if system.footnotes.length}}<ul class="footnotes muted">{{#each system.footnotes}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
   {{#if system.bundled}}<p class="muted">Comes with: {{system.bundled}}</p>{{/if}}
   {{#if system.perTeamMember}}<p class="muted">Issued to every team member{{#if canIssueTeam}} · <a data-action="issueToTeam"><i class="fa-solid fa-users"></i> Issue to the team</a>{{/if}}</p>{{/if}}

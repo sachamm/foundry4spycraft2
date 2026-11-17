@@ -12,7 +12,8 @@ import { humanizeTemplate, renderTemplate } from "../rules/formula.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { breakState, vehicleClass } from "../rules/vehicles.mjs";
 import { deployVehicle, objectSize, rollObjectDamageSave } from "../apps/vehicle-play.mjs";
-import { issueToTeam } from "../apps/gear-play.mjs";
+import { issueToTeam, chargeStandingCost, refundStandingCost } from "../apps/gear-play.mjs";
+import { parseStandingCost } from "../rules/standing.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
@@ -32,7 +33,9 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       toChat: SpycraftItemSheet.#onToChat,
       damageSave() { return rollObjectDamageSave(this.item); },
       deployVehicle() { return deployVehicle(this.item); },
-      issueToTeam() { return issueToTeam(this.item); }
+      issueToTeam() { return issueToTeam(this.item); },
+      chargeStanding() { return chargeStandingCost(this.item); },
+      refundStanding() { return refundStandingCost(this.item); }
     }
   };
 
@@ -131,6 +134,8 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         .some(key => sys[key]) || sys.damageSave !== null || sys.stats.length > 0;
       context.hasDamageSave = Number.isSafeInteger(sys.damageSave);
       context.breakState = breakState(size, sys.failedSaves ?? 0);
+      const standingCost = parseStandingCost(sys.standingCost), standingCharge = item.getFlag("spycraft2", "standingCharge");
+      context.standing = standingCost && item.parent ? { cost: standingCost, netWorthLabel: `$${standingCost.netWorth.toLocaleString("en-US")}`, charge: standingCharge, canCharge: item.parent.isOwner && !standingCharge, canRefund: game.user.isGM && !!standingCharge } : null;
       context.canIssueTeam = game.user.isGM && !!item.parent && sys.perTeamMember && !item.getFlag("spycraft2", "issuedFrom");
     }
     if (item.type === "vehicle") {
