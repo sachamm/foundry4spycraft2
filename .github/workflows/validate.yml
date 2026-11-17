@@ -23,7 +23,7 @@ jobs:
           node --check spycraft2.mjs
           node -e 'JSON.parse(require("fs").readFileSync("system.json","utf8"))'
   layout:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
