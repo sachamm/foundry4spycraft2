@@ -193,6 +193,30 @@
       "flags": {}
     },
     {
+      "name": "equipment-upgrades",
+      "label": "Equipment Upgrades",
+      "path": "packs/equipment-upgrades",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "contagions",
+      "label": "Contagions",
+      "path": "packs/contagions",
+      "type": "Item",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
       "name": "gc-tables",
       "label": "GC Tables",
       "path": "packs/gc-tables",
@@ -230,6 +254,8 @@
         "gear",
         "vehicles",
         "vehicle-upgrades",
+        "equipment-upgrades",
+        "contagions",
         "gc-tables"
       ]
     }

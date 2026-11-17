@@ -4,7 +4,7 @@ import { VEHICLE_RULES } from "../rules/tables.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /** Compendium packs searched for each item type; gear is spread over several. */
-const PACKS = { gear: ["spycraft2.gear", "spycraft2.kits", "spycraft2.vehicle-upgrades"], vehicle: "spycraft2.vehicles", class: "spycraft2.classes", origin: "spycraft2.origins", feat: "spycraft2.feats", weapon: "spycraft2.weapons", armor: "spycraft2.armor" };
+const PACKS = { gear: ["spycraft2.gear", "spycraft2.kits", "spycraft2.vehicle-upgrades", "spycraft2.equipment-upgrades", "spycraft2.contagions"], vehicle: "spycraft2.vehicles", class: "spycraft2.classes", origin: "spycraft2.origins", feat: "spycraft2.feats", weapon: "spycraft2.weapons", armor: "spycraft2.armor" };
 const FIELDS = {
   gear:["system.kitType","system.kitGrade","system.kitSize","system.kitNonPortable","system.weight","system.caliber","system.description","system.gearCategory","system.powerRating","system.streetValue","system.standingOnly","system.standingCost","system.sourceTable"],
   vehicle: ["system.vehicleClass", "system.caliber", "system.sizeLabel", "system.occupancy", "system.accelerationTurning", "system.mph", "system.defenseSave", "system.standingOnly", "system.standingCost"],

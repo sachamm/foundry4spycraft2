@@ -8,7 +8,7 @@ import {
 import {GEAR_RULES, VEHICLE_RULES} from '../module/rules/tables.mjs';
 
 const read = name => JSON.parse(readFileSync(new URL(`../src/data/${name}.json`, import.meta.url)));
-const gear = read('gear'), vehicles = read('vehicles');
+const gear = read('gear'), vehicles = read('vehicles'), upgrades = read('upgrades'), contagions = read('contagions');
 
 /* ---------------------------------------------------------------------- */
 /*  Rules                                                                  */
@@ -201,6 +201,22 @@ test('PDF cross-check corrections hold', () => {
   assert.ok(VEHICLE_RULES.tractionSaveBonusHouseRule.G);
 });
 
+test('armor, weapon upgrade, detonator and contagion tables are complete', () => {
+  assert.equal(upgrades.armor.length, 22);
+  assert.equal(upgrades.weapons.length, 87);
+  assert.equal(upgrades.detonators.length, 12);
+  assert.deepEqual(Object.entries(Object.groupBy(contagions.contagions, c => c.grade || c.kind)).map(([k, v]) => [k, v.length]), [['disease', 30], ['basic', 14], ['improved', 14], ['advanced', 14]]);
+  for (const c of contagions.contagions) {
+    assert.ok(/^\d+\/\+\d+$/.test(c.complexity), c.name);
+    for (const phase of [c.primary, c.secondary]) assert.ok(Number.isSafeInteger(phase.saveDC) && phase.onset && phase.effect, c.name);
+  }
+  const ebola = contagions.contagions.find(c => c.name === 'Ebola');
+  assert.equal(ebola.secondary.effect, '2d6 Con (permanent), 2d6 Str (half permanent)');
+  assert.ok(contagions.contagions.find(c => c.name === 'Chickenpox').notes.includes('oneTime'));
+  for (const row of [...upgrades.armor, ...upgrades.weapons, ...upgrades.detonators]) for (const code of row.notes) assert.ok(upgrades.footnotes[code], `${row.name}: ${code}`);
+  assert.equal(upgrades.detonators.find(d => d.name === 'Det cord, 1 ft.').damage, '3d4');
+});
+
 test('every footnote code has a short label and noted rows carry at least one', () => {
   const lists = [...['electronics', 'gadgets', 'resources', 'security', 'tradecraft'].map(k => [gear[k], gear.footnotes]),
     [vehicles.vehicles, vehicles.footnotes], [vehicles.upgrades, vehicles.upgradeFootnotes], [vehicles.weapons, vehicles.upgradeFootnotes]];
@@ -214,7 +230,7 @@ test('every footnote code has a short label and noted rows carry at least one', 
 });
 
 test('the new data files hold labels and numbers, not prose', () => {
-  for (const [file, data] of [['gear', gear], ['vehicles', vehicles]]) {
+  for (const [file, data] of [['gear', gear], ['vehicles', vehicles], ['upgrades', upgrades], ['contagions', contagions]]) {
     for (const [key, value] of Object.entries(data)) {
       if (key === '_note') continue;
       for (const text of strings(value)) {

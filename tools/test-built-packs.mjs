@@ -34,8 +34,10 @@ test('rebuilt QKY weapons retain category base penalties, including COP holdout 
 
 test('rebuilt gear, vehicle and vehicle-upgrade packs hold every source row under its own name and id', async () => {
   const read = name => JSON.parse(readFileSync(new URL(`../src/data/${name}.json`, import.meta.url)));
-  const gear = read('gear'), vehicles = read('vehicles');
+  const gear = read('gear'), vehicles = read('vehicles'), upgrades = read('upgrades'), contagions = read('contagions');
   const expected = {
+    'equipment-upgrades': upgrades.armor.length + upgrades.weapons.length + upgrades.detonators.length,
+    contagions: contagions.contagions.length,
     gear: gear.electronics.length + gear.gadgets.length + gear.resources.length + gear.security.length + gear.tradecraft.length + gear.housings.length,
     vehicles: vehicles.vehicles.length,
     'vehicle-upgrades': vehicles.upgrades.length + vehicles.weapons.length

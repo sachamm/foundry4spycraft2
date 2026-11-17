@@ -35,6 +35,8 @@ const ammunition = read("ammunition.json");
 const summaries = read("summaries.json");
 const gear = read("gear.json");
 const vehicles = read("vehicles.json");
+const upgrades = read("upgrades.json");
+const contagions = read("contagions.json");
 const system = JSON.parse(readFileSync(join(ROOT, "system.json"), "utf8"));
 
 const camel = s => {
@@ -79,6 +81,7 @@ export const SKILLS = ${JSON.stringify(core.skills.map(({ row, ...s }) => s), nu
 export const TABLES = ${JSON.stringify({...core.tables,ammunitionCatalog:ammunition}, null, 1)};
 export const CLASS_FEATURES = ${JSON.stringify(Object.fromEntries(classes.filter(c=>!c.expert).map(c=>[c.key,{name:c.name,classSkills:c.classSkills,choiceLists:c.choiceLists.map(list=>({...list,options:list.options.map(option=>({...option,description:option.description??summaries.classes[c.name]?.options?.[option.name]??""}))}))}])),null,1)};
 export const GEAR_RULES = ${JSON.stringify({categories:gear.categories,damageSaves:gear.damageSaves,housings:gear.housings}, null, 1)};
+export const CONTAGIONS = ${JSON.stringify(contagions.contagions, null, 1)};
 export const VEHICLE_RULES = ${JSON.stringify({classes:vehicles.classes,damageLocations:vehicles.damageLocations,damagePage:vehicles.damagePage,damageSavePage:vehicles.damageSavePage,tractionSaveBonus:vehicles.tractionSaveBonus,tractionSaveBonusHouseRule:vehicles.tractionSaveBonusHouseRule,bailOutDC:vehicles.bailOutDC}, null, 1)};
 `;
 writeFileSync(join(ROOT, "module/rules/tables.mjs"), tablesSrc);
@@ -208,7 +211,7 @@ const pageNote = (table, page, descriptionsPage, row) =>
   p(`Table ${table}, p.${page}.${descriptionsPage ? ` Rules for this entry start on p.${descriptionsPage}.` : ""}`)
   + (row.optionOf ? p(`An option for ${row.optionOf}.`) : "");
 /** The footnote dictionary for a table: gear (4.9–4.15), vehicles (4.16–4.27) or vehicle upgrades (4.28–4.29). */
-const footnotesFor = table => { const n = Number(String(table).split(".")[1]); return n >= 28 ? vehicles.upgradeFootnotes : n >= 16 ? vehicles.footnotes : gear.footnotes; };
+const footnotesFor = table => { const n = Number(String(table).split(".")[1]); return n === 70 ? contagions.footnotes : n >= 60 || n === 14 ? upgrades.footnotes : n >= 28 ? vehicles.upgradeFootnotes : n >= 16 ? vehicles.footnotes : gear.footnotes; };
 /** Footnote codes on a row, turned into their short labels. */
 const footnoteLabels = (row, ...dictionaries) => (row.notes ?? []).map(code => {
   const label = dictionaries.map(d => d?.[code]).find(Boolean);
@@ -295,6 +298,47 @@ packs.vehicles = { label: "Vehicles", folders: vehicles.classes.map((c, i) => fo
         ...stat("Range", w.range), ...stat("Qualities", w.qualities), ...stat("Install time", w.time)
       ]
     }, pack.folders.at(-1)._id, i));
+  });
+}
+
+// Armor and weapon upgrades and explosive detonators (Tables 4.14, 4.60, 4.61): reference entries with their table values.
+{
+  const stat = (label, value) => value ? [{ label, value: String(value) }] : [];
+  const groups = ["Armor and Protective Gear Upgrades", ...new Set(upgrades.weapons.map(w => `${w.group}`)), "Explosive Detonators"];
+  const pack = packs["equipment-upgrades"] = { label: "Equipment Upgrades", folders: groups.map((g, i) => folder("equipment-upgrades", g, i)), docs: [] };
+  const folderOf = g => pack.folders[groups.indexOf(g)]._id;
+  upgrades.armor.forEach((u, i) => pack.docs.push(item("equipment-upgrades", u.name, "gear", "icons/svg/shield.svg", {
+    ...gearBase(u, "S"), description: pageNote("4.14", u.sourcePage, 285, u), weight: parseFloat(u.weight) || 0,
+    complexity: u.complexity, year: u.year, streetValue: u.streetValue,
+    footnotes: [...(u.dr ? [upgrades.armorDRNote] : []), ...footnoteLabels(u, upgrades.footnotes)],
+    stats: [...stat("Upgrade cost", u.cost), ...stat("DR", u.dr), ...stat("Resistances", u.resistances), ...stat("Defense penalty", u.defensePenalty),
+      ...stat("ACP", u.acp), ...stat("Speed", u.speed), ...stat("Notice/Search DC", u.noticeDC), ...stat("Weight", u.weight)]
+  }, folderOf(groups[0]), i)));
+  uniqueNames(upgrades.weapons, w => w.group.replace(/ Upgrades$/, "").toLowerCase()).forEach((name, i) => {
+    const u = upgrades.weapons[i];
+    pack.docs.push(item("equipment-upgrades", name, "gear", "icons/svg/upgrade.svg", {
+      ...gearBase(u, "W"), description: pageNote("4.60", u.sourcePage, 315, u), weight: parseFloat(u.weight) || 0,
+      complexity: u.complexity, streetValue: u.streetValue, restricted: /^R\$/.test(u.streetValue),
+      stats: [...stat("Available for", u.availableFor), ...stat("Location", u.location), ...stat("Upgrade cost", u.cost), ...stat("Install time", u.time), ...stat("Weight", u.weight)]
+    }, folderOf(u.group), i));
+  });
+  upgrades.detonators.forEach((d, i) => pack.docs.push(item("equipment-upgrades", d.name, "gear", "icons/svg/explosion.svg", {
+    ...gearBase(d, "W"), description: pageNote("4.61", d.sourcePage, 312, d), weight: parseFloat(d.weight) || 0,
+    complexity: d.complexity, year: d.year, streetValue: d.streetValue, restricted: d.restricted, sizeHands: d.sizeHands,
+    stats: [...stat("Upgrade cost", d.cost), ...stat("Damage", d.damage), ...stat("Error/Threat", d.errorThreat), ...stat("Qualities", d.qualities), ...stat("Weight", d.weight)]
+  }, folderOf("Explosive Detonators"), i)));
+}
+
+// Contagions (Table 4.70): diseases and poisons as reference entries; nothing applies them to a character yet.
+{
+  const kinds = { disease: "Diseases", basic: "Basic Poisons", improved: "Improved Poisons", advanced: "Advanced Poisons" };
+  const pack = packs.contagions = { label: "Contagions", folders: Object.values(kinds).map((k, i) => folder("contagions", k, i)), docs: [] };
+  uniqueNames(contagions.contagions, c => c.grade || c.kind).forEach((name, i) => {
+    const c = contagions.contagions[i], phase = (label, ph) => [{ label: `${label}: onset`, value: ph.onset }, { label: `${label}: Fortitude DC`, value: String(ph.saveDC) }, { label: `${label}: damage/effect`, value: ph.effect }];
+    pack.docs.push(item("contagions", name, "gear", c.kind === "disease" ? "icons/svg/biohazard.svg" : "icons/svg/poison.svg", {
+      ...gearBase({ ...c, caliber: "" }, ""), description: p(`Table 4.70, p.${c.sourcePage}. ${c.kind === "disease" ? "Disease" : `${c.grade[0].toUpperCase()}${c.grade.slice(1)} poison`}.`),
+      complexity: c.complexity, standingOnly: false, stats: [...phase("Primary", c.primary), ...phase("Secondary", c.secondary)]
+    }, pack.folders[Object.keys(kinds).indexOf(c.kind === "disease" ? "disease" : c.grade)]._id, i));
   });
 }
 
