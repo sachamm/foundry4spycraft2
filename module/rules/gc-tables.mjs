@@ -559,7 +559,7 @@ export const GC_DATA = {
     "costMin": 1,
     "costMax": 4,
     "triggers": [
-     "Earlier in this mission the team completed every listed objective"
+     "This mission: the team has already finished all of its listed objectives"
     ],
     "summary": "Bystanders are put in peril. Each die buys 1d12 bystanders (or a flat 5), or lowers their stat tier by 1 from Tier IV (min Tier I). A bystander death usually causes exposure.",
     "perDie": [
@@ -574,7 +574,7 @@ export const GC_DATA = {
     "costMin": 1,
     "costMax": 4,
     "triggers": [
-     "This scene: error on a Knowledge check to navigate a war zone or other dangerous area",
+     "This scene: error on a Knowledge check made to navigate a war zone or similarly hazardous area",
      "This scene: error on a ranged attack"
     ],
     "summary": "A dangerous interruption: contagion, explosion, crossfire, runaway vehicle or security device. Effect by dice spent is in lookups.hazards (contagion alone can exceed 4 dice).",
@@ -616,7 +616,7 @@ export const GC_DATA = {
     "costMin": 1,
     "costMax": 4,
     "triggers": [
-     "This mission: target erred on any Cultures, Impress, Intimidate, Manipulate or Networking check"
+     "This mission: target erred on any Networking, Manipulate, Intimidate, Impress or Cultures check"
     ],
     "summary": "A character is taken for someone else. Clearing it up is a Complex Impress/Persuasion Task: 1 Challenge + 1 per die (max 5); first DC 10 + Threat Level, +2 per later Challenge. After failure a retry needs both people present and DCs +5.",
     "intensities": [
@@ -658,7 +658,7 @@ export const GC_DATA = {
     "summary": "The team is saddled with a Tier II NPC or a fragile item (Damage save bonus +10 or less). Dice buy duration or enemies; losing it usually causes exposure.",
     "perDie": [
      "Responsibility lingers 1 scene (min 1)",
-     "1 Tier III NPC wants it killed, captured or destroyed (min 1)"
+     "+1 Tier III NPC out to kill, capture or destroy it (min 1)"
     ]
    },
    {
@@ -757,7 +757,7 @@ export const GC_DATA = {
     "costMin": 1,
     "costMax": 4,
     "triggers": [
-     "Previous or current mission, after and outside the Intel Phase: the team acquired a Caliber III+ item or one costing over $50,000"
+     "This or the previous mission, once the Intel Phase is over: the team gained an item of Caliber III+ or worth over $50,000"
     ],
     "summary": "A Tier III thief with 3 Caliber II items goes after the team's valuables. Each die adds +1 Tier (max V), +1 item, or +1 Caliber to all the thief's items.",
     "perDie": [
@@ -804,7 +804,7 @@ export const GC_DATA = {
     "costMin": 1,
     "costMax": 4,
     "triggers": [
-     "This mission: team within 1 mile of a public explosion dealing 20+ damage, front-page news, or public tumult involving 100+ people",
+     "This mission: team no more than 1 mile from a public explosion dealing 20+ damage, front-page news, or public tumult involving 100+ people",
      "This mission: team members lost a combined 4+ Reputation or $200,000+ Net Worth to incident, noise or anonymity exposure"
     ],
     "summary": "A journalist or similar NPC threatens to expose the team. Complex Task: 1 Challenge + 1 per die (max 5); first DC 10 + Threat Level, +2 each after; skills must vary. Failure costs 3 Reputation or $150,000 per die and forces new names.",
@@ -856,7 +856,7 @@ export const GC_DATA = {
        1,
        1
       ],
-      "text": "Nothing (hole in pocket), or lint",
+      "text": "Nothing, or pocket lint",
       "data": {}
      },
      {
@@ -864,7 +864,7 @@ export const GC_DATA = {
        2,
        2
       ],
-      "text": "Pocket book (appropriate to genre)",
+      "text": "Paperback (genre-appropriate)",
       "data": {}
      },
      {
@@ -872,7 +872,7 @@ export const GC_DATA = {
        3,
        3
       ],
-      "text": "Club business card with a \"hot date\" number",
+      "text": "Nightclub card with a date's phone number",
       "data": {}
      },
      {
@@ -880,7 +880,7 @@ export const GC_DATA = {
        4,
        4
       ],
-      "text": "Portable music recorder and earbud headphones",
+      "text": "Portable music player with earbuds",
       "data": {}
      },
      {
@@ -888,7 +888,7 @@ export const GC_DATA = {
        5,
        7
       ],
-      "text": "Cell phone (1d12 random numbers, including family and friends)",
+      "text": "Cell phone with 1d12 stored contacts (family, friends, others)",
       "data": {
        "numbers": "1d12"
       }
@@ -898,7 +898,7 @@ export const GC_DATA = {
        8,
        10
       ],
-      "text": "Keys: Caliber I or II vehicle within 1d4 blocks, and house within 2d20 miles (Lifestyle 1d6)",
+      "text": "Keys to a Caliber I or II vehicle parked within 1d4 blocks and a home within 2d20 miles (Lifestyle 1d6)",
       "data": {
        "vehicleCaliber": "I or II",
        "vehicleBlocks": "1d4",
@@ -911,7 +911,7 @@ export const GC_DATA = {
        11,
        18
       ],
-      "text": "Wallet: ID, personal photos, scribbled paper scraps, cash and credit cards worth 2d6 x $50",
+      "text": "Wallet: ID, family photos, scribbled notes, and 2d6 x $50 in cash and cards",
       "data": {
        "cash": "2d6 * 50"
       }
@@ -921,7 +921,7 @@ export const GC_DATA = {
        19,
        19
       ],
-      "text": "Detective shield (undercover police officer); team becomes Wanted (p.404) if implicated in violence against this civilian",
+      "text": "Detective's badge (undercover cop); violence against this civilian traced to the team makes it Wanted (p.404)",
       "data": {
        "event": "wanted"
       }
@@ -931,7 +931,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "1 Caliber I melee weapon or firearm (GC choice or random)",
+      "text": "1 Caliber I firearm or melee weapon (GC picks or rolls)",
       "data": {
        "caliber": "I"
       }
@@ -954,7 +954,7 @@ export const GC_DATA = {
        1,
        1
       ],
-      "text": "Suicide tooth (recently removed) in a bloody handkerchief",
+      "text": "Freshly pulled suicide tooth wrapped in a bloodstained hanky",
       "data": {}
      },
      {
@@ -962,7 +962,7 @@ export const GC_DATA = {
        2,
        3
       ],
-      "text": "Pack of foreign cigarettes",
+      "text": "Pack of imported cigarettes",
       "data": {}
      },
      {
@@ -970,7 +970,7 @@ export const GC_DATA = {
        4,
        5
       ],
-      "text": "Deck of cards picturing people on the villain organization's hit list",
+      "text": "Playing cards showing faces from the villain group's hit list",
       "data": {}
      },
      {
@@ -978,7 +978,7 @@ export const GC_DATA = {
        6,
        6
       ],
-      "text": "Pocket video game console with an espionage stealth action game",
+      "text": "Handheld game console loaded with a spy stealth game",
       "data": {}
      },
      {
@@ -986,7 +986,7 @@ export const GC_DATA = {
        7,
        7
       ],
-      "text": "\"Lucky\" double-headed quarter",
+      "text": "Two-headed \"lucky\" quarter",
       "data": {}
      },
      {
@@ -994,7 +994,7 @@ export const GC_DATA = {
        8,
        8
       ],
-      "text": "Ear plugs and a tape player with a self-help audio book for low-ranking minions",
+      "text": "Ear plugs and tape player with a self-help audiobook aimed at junior minions",
       "data": {}
      },
      {
@@ -1002,7 +1002,7 @@ export const GC_DATA = {
        9,
        9
       ],
-      "text": "\"Authentication\" kit (to-scale picture and tape measure)",
+      "text": "Joke \"Authentication\" kit: scale picture, tape measure",
       "data": {}
      },
      {
@@ -1010,7 +1010,7 @@ export const GC_DATA = {
        10,
        10
       ],
-      "text": "\"Climbing\" kit (Velcro and a low-opening parachute)",
+      "text": "Joke \"Climbing\" kit: Velcro, low-opening parachute",
       "data": {}
      },
      {
@@ -1018,7 +1018,7 @@ export const GC_DATA = {
        11,
        11
       ],
-      "text": "\"Disguise\" kit (Groucho glasses and yesterday's newspaper)",
+      "text": "Joke \"Disguise\" kit: Groucho glasses, yesterday's paper",
       "data": {}
      },
      {
@@ -1026,7 +1026,7 @@ export const GC_DATA = {
        12,
        12
       ],
-      "text": "\"Electronics\" kit (blunt scissors and a magnet)",
+      "text": "Joke \"Electronics\" kit: blunt scissors, magnet",
       "data": {}
      },
      {
@@ -1034,7 +1034,7 @@ export const GC_DATA = {
        13,
        13
       ],
-      "text": "\"Forgery\" kit (pocket scanner and number of the nearest copy shop)",
+      "text": "Joke \"Forgery\" kit: pocket scanner, nearest copy shop's number",
       "data": {}
      },
      {
@@ -1042,7 +1042,7 @@ export const GC_DATA = {
        14,
        14
       ],
-      "text": "\"Mechanics\" kit (Swiss army knife and a hammer)",
+      "text": "Joke \"Mechanics\" kit: Swiss army knife, hammer",
       "data": {}
      },
      {
@@ -1050,7 +1050,7 @@ export const GC_DATA = {
        15,
        15
       ],
-      "text": "PDA with stock portfolio, paid-up life insurance plan and a 5-year retirement business plan",
+      "text": "PDA holding a stock portfolio, paid-up life insurance and a 5-year retirement plan",
       "data": {}
      },
      {
@@ -1058,7 +1058,7 @@ export const GC_DATA = {
        16,
        18
       ],
-      "text": "Code name ID (e.g. uniform patch, subdermal ID chip)",
+      "text": "Code-name ID (uniform patch, implanted chip, etc.)",
       "data": {}
      },
      {
@@ -1066,7 +1066,7 @@ export const GC_DATA = {
        19,
        20
       ],
-      "text": "Real name ID (e.g. day-job business card, training notes)",
+      "text": "Real-name ID (day-job business card, training notes, etc.)",
       "data": {}
      },
      {
@@ -1074,7 +1074,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "Clue leading to a henchman in the same organization",
+      "text": "Clue pointing to a henchman of the same organization",
       "data": {
        "clue": "henchman"
       }
@@ -1105,7 +1105,7 @@ export const GC_DATA = {
        2,
        2
       ],
-      "text": "Ominous-looking capsules in an unmarked tin (actually designer candies)",
+      "text": "Unmarked tin of sinister-looking capsules (really designer candy)",
       "data": {}
      },
      {
@@ -1113,7 +1113,7 @@ export const GC_DATA = {
        3,
        3
       ],
-      "text": "Designer flask bearing a real-world military branch emblem",
+      "text": "Designer flask with the emblem of a real military branch",
       "data": {}
      },
      {
@@ -1121,7 +1121,7 @@ export const GC_DATA = {
        4,
        4
       ],
-      "text": "Matchbook from a faraway bar or cafe with a foil's name and number inside",
+      "text": "Matchbook from a distant bar or cafe, with a foil's name and phone number jotted in it",
       "data": {}
      },
      {
@@ -1129,7 +1129,7 @@ export const GC_DATA = {
        5,
        5
       ],
-      "text": "Bullet engraved \"Not today\" (owner has a gunshot scar in a vital area)",
+      "text": "Bullet engraved \"Not today\"; owner bears a gunshot scar somewhere vital",
       "data": {}
      },
      {
@@ -1137,7 +1137,7 @@ export const GC_DATA = {
        6,
        6
       ],
-      "text": "Dead drop spike holding 1 freshly severed finger in cellophane",
+      "text": "Dead-drop spike containing 1 freshly cut finger in cellophane",
       "data": {}
      },
      {
@@ -1145,7 +1145,7 @@ export const GC_DATA = {
        7,
        7
       ],
-      "text": "Two identical clear bottles: one vintage vodka, the other inflicts 2d10 acid damage",
+      "text": "Two matching clear bottles: vintage vodka in one, the other deals 2d10 acid damage",
       "data": {
        "damage": "2d10",
        "damageType": "acid"
@@ -1156,7 +1156,7 @@ export const GC_DATA = {
        8,
        8
       ],
-      "text": "A Chinese fortune slip",
+      "text": "Fortune-cookie slip",
       "data": {}
      },
      {
@@ -1164,7 +1164,7 @@ export const GC_DATA = {
        9,
        9
       ],
-      "text": "1 can of gold body paint",
+      "text": "Gold body paint, 1 can",
       "data": {}
      },
      {
@@ -1172,7 +1172,7 @@ export const GC_DATA = {
        10,
        10
       ],
-      "text": "Half-whittled wooden caricature of the mastermind or another superior",
+      "text": "Half-carved wooden caricature of the mastermind or another boss",
       "data": {}
      },
      {
@@ -1180,7 +1180,7 @@ export const GC_DATA = {
        11,
        11
       ],
-      "text": "\"Lockpicking\" kit (steel-toed boots)",
+      "text": "Joke \"Lockpicking\" kit: steel-toed boots",
       "data": {}
      },
      {
@@ -1188,7 +1188,7 @@ export const GC_DATA = {
        12,
        12
       ],
-      "text": "\"Surgery\" kit (needle, thread and an ice pack)",
+      "text": "Joke \"Surgery\" kit: needle, thread, ice pack",
       "data": {}
      },
      {
@@ -1196,7 +1196,7 @@ export const GC_DATA = {
        13,
        13
       ],
-      "text": "Organization watch, ring, pin or other jewelry (worn)",
+      "text": "Organization jewelry, worn (watch, ring, pin, etc.)",
       "data": {}
      },
      {
@@ -1204,7 +1204,7 @@ export const GC_DATA = {
        14,
        14
       ],
-      "text": "Pistol, rifle, SMG or shotgun firing pin, or grenade pin",
+      "text": "Firing pin (pistol, rifle, SMG or shotgun) or grenade pin",
       "data": {}
      },
      {
@@ -1212,7 +1212,7 @@ export const GC_DATA = {
        15,
        16
       ],
-      "text": "Code name ID (e.g. bar code tattoo, sub-dermal ID chip)",
+      "text": "Code-name ID (bar code tattoo, implanted chip, etc.)",
       "data": {}
      },
      {
@@ -1220,7 +1220,7 @@ export const GC_DATA = {
        17,
        17
       ],
-      "text": "Real name ID (e.g. written threat from another henchman, annotated photo)",
+      "text": "Real-name ID (threat note from a fellow henchman, annotated photo, etc.)",
       "data": {}
      },
      {
@@ -1228,7 +1228,7 @@ export const GC_DATA = {
        18,
        18
       ],
-      "text": "Clue leading to another henchman in the same organization",
+      "text": "Clue pointing to another henchman of the same organization",
       "data": {
        "clue": "henchman"
       }
@@ -1238,7 +1238,7 @@ export const GC_DATA = {
        19,
        19
       ],
-      "text": "Clue leading to the mastermind of the same organization",
+      "text": "Clue pointing to the same organization's mastermind",
       "data": {
        "clue": "mastermind"
       }
@@ -1248,7 +1248,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "Minor clue about the current mission (GC choice)",
+      "text": "Minor clue to the current mission (GC picks)",
       "data": {
        "clue": "mission-minor"
       }
@@ -1271,7 +1271,7 @@ export const GC_DATA = {
        1,
        1
       ],
-      "text": "Dossier and photos of 1 player character, including recent private shots",
+      "text": "File and photos on 1 player character, some recent and private",
       "data": {}
      },
      {
@@ -1279,7 +1279,7 @@ export const GC_DATA = {
        2,
        2
       ],
-      "text": "Photos of recently AWOL operatives, each gruesomely slain",
+      "text": "Photos of operatives who recently deserted, each grisly dead",
       "data": {}
      },
      {
@@ -1287,7 +1287,7 @@ export const GC_DATA = {
        3,
        3
       ],
-      "text": "Two tickets to a social event this evening",
+      "text": "Pair of tickets to tonight's social event",
       "data": {}
      },
      {
@@ -1295,7 +1295,7 @@ export const GC_DATA = {
        4,
        4
       ],
-      "text": "Blackmail photos of 1 local police official",
+      "text": "Compromising pictures of a local police official",
       "data": {}
      },
      {
@@ -1303,7 +1303,7 @@ export const GC_DATA = {
        5,
        5
       ],
-      "text": "Name of 1 contact (will not work with the team but may have information)",
+      "text": "Name of 1 contact who won't work with the team but may know something",
       "data": {}
      },
      {
@@ -1311,7 +1311,7 @@ export const GC_DATA = {
        6,
        6
       ],
-      "text": "Medication for a nervous tic or mental disorder",
+      "text": "Pills for a nervous tic or mental illness",
       "data": {}
      },
      {
@@ -1319,7 +1319,7 @@ export const GC_DATA = {
        7,
        7
       ],
-      "text": "Micro-cassette recorder with a tape of the mastermind rehearsing an evil laugh",
+      "text": "Micro-cassette of the mastermind practicing an evil laugh",
       "data": {}
      },
      {
@@ -1327,7 +1327,7 @@ export const GC_DATA = {
        8,
        8
       ],
-      "text": "Unfinished sketch of his latest slow death mechanism",
+      "text": "Half-drawn sketch of his newest slow-death device",
       "data": {}
      },
      {
@@ -1335,7 +1335,7 @@ export const GC_DATA = {
        9,
        9
       ],
-      "text": "Unfinished monologue meant for that mechanism's victim",
+      "text": "Draft monologue for that device's victim",
       "data": {}
      },
      {
@@ -1343,7 +1343,7 @@ export const GC_DATA = {
        10,
        10
       ],
-      "text": "Hardback how-to manual on executions for masterminds",
+      "text": "Hardcover guide to executions, written for masterminds",
       "data": {}
      },
      {
@@ -1351,7 +1351,7 @@ export const GC_DATA = {
        11,
        11
       ],
-      "text": "Action figure of himself",
+      "text": "Action figure in his own likeness",
       "data": {}
      },
      {
@@ -1359,7 +1359,7 @@ export const GC_DATA = {
        12,
        12
       ],
-      "text": "Bank receipts for black-market purchase of 1 exotic animal and 1 piece of military hardware",
+      "text": "Bank receipts: black-market buys of 1 exotic animal and 1 military hardware item",
       "data": {}
      },
      {
@@ -1367,7 +1367,7 @@ export const GC_DATA = {
        13,
        13
       ],
-      "text": "Holographic recording: inconclusive proof of a conspiracy cover-up",
+      "text": "Hologram recording: inconclusive evidence of a covered-up conspiracy",
       "data": {}
      },
      {
@@ -1375,7 +1375,7 @@ export const GC_DATA = {
        14,
        14
       ],
-      "text": "Pocket-sized poisonous \"pet\" (Tier II attack bonus + poison chosen by GC or random)",
+      "text": "Pocket-sized venomous \"pet\": Tier II attack bonus, poison picked by GC or rolled",
       "data": {
        "attackTier": "II"
       }
@@ -1385,7 +1385,7 @@ export const GC_DATA = {
        15,
        15
       ],
-      "text": "\"To Do\" list mixing villainy and mundane chores",
+      "text": "\"To Do\" list mixing evil schemes with everyday errands",
       "data": {}
      },
      {
@@ -1393,7 +1393,7 @@ export const GC_DATA = {
        16,
        16
       ],
-      "text": "List of 1d6 cities targeted for destruction",
+      "text": "List of 1d6 cities slated for destruction",
       "data": {
        "count": "1d6"
       }
@@ -1403,7 +1403,7 @@ export const GC_DATA = {
        17,
        17
       ],
-      "text": "List of 1d6 henchmen who displeased him, each Marked for Death (p.399)",
+      "text": "List of 1d6 henchmen in his bad books, each Marked for Death (p.399)",
       "data": {
        "count": "1d6",
        "event": "marked-for-death"
@@ -1414,7 +1414,7 @@ export const GC_DATA = {
        18,
        18
       ],
-      "text": "1 Caliber I gadget (GC choice or random)",
+      "text": "1 Caliber I gadget (GC picks or rolls)",
       "data": {
        "caliber": "I"
       }
@@ -1424,7 +1424,7 @@ export const GC_DATA = {
        19,
        19
       ],
-      "text": "Single-button remote with a random effect (e.g. teleport to safe house, trap door, detonation for 6d6 explosive damage)",
+      "text": "One-button remote, random effect (e.g. teleport to a safe house, trap door, 6d6 explosive detonation)",
       "data": {
        "damage": "6d6",
        "damageType": "explosive"
@@ -1435,7 +1435,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "Major clue about the current or next mission (GC choice)",
+      "text": "Major clue to this mission or the next (GC picks)",
       "data": {
        "clue": "mission-major"
       }
@@ -1457,122 +1457,122 @@ export const GC_DATA = {
      [
       "Contagion",
       "1",
-      "Exposure to 1 sample of any basic poison, or a disease with Complexity DC up to 50"
+      "1 dose: any basic poison, or any disease of Complexity DC 50 or less"
      ],
      [
       "Contagion",
       "2",
-      "Exposure to 1 sample of any improved poison, or a disease with Complexity DC 55-60"
+      "1 dose: any improved poison, or any disease of Complexity DC 55-60"
      ],
      [
       "Contagion",
       "3",
-      "Exposure to 1 sample of advanced dementia, fear, necrotizing, neurotoxin, psychotropic, truth serum or weakening poison, or a disease with Complexity DC 65-70"
+      "1 dose: an advanced poison (weakening, truth serum, psychotropic, neurotoxin, necrotizing, fear, dementia), or any disease of Complexity DC 65-70"
      ],
      [
       "Contagion",
       "4",
-      "Exposure to 1 sample of advanced blister, hallucinogen, knockout, lethal, paralytic or radiation poison, or a disease with Complexity DC 75-80"
+      "1 dose: an advanced poison (radiation, paralytic, lethal, knockout, hallucinogen, blister), or any disease of Complexity DC 75-80"
      ],
      [
       "Contagion",
       "5*",
-      "Exposure to 1 sample of Encephalitis/Meningitis, or a disease with Complexity DC 85-90"
+      "1 dose: Encephalitis/Meningitis, or any disease of Complexity DC 85-90"
      ],
      [
       "Contagion",
       "6*",
-      "Exposure to 1 sample of Tuberculosis, or a disease with Complexity DC 95-105"
+      "1 dose: Tuberculosis, or any disease of Complexity DC 95-105"
      ],
      [
       "Contagion",
       "7*",
-      "Exposure to 1 sample of Bubonic plague, or a disease with Complexity DC 110-125"
+      "1 dose: Bubonic plague, or any disease of Complexity DC 110-125"
      ],
      [
       "Contagion",
       "8*",
-      "Exposure to 1 sample of Ebola, or a disease with Complexity DC 130+"
+      "1 dose: Ebola, or any disease of Complexity DC 130+"
      ],
      [
       "Explosion",
       "1",
-      "Ground Zero 3d4 squares from 1 chosen character; 2d10 explosive damage; blast increment 1 square"
+      "Centered 3d4 squares from a chosen character; 2d10 explosive; blast increment 1 square"
      ],
      [
       "Explosion",
       "2",
-      "Ground Zero 2d4 squares from 1 chosen character; 4d10 explosive damage; blast increment 1 square"
+      "Centered 2d4 squares from a chosen character; 4d10 explosive; blast increment 1 square"
      ],
      [
       "Explosion",
       "3",
-      "Ground Zero 1d4 squares from 1 chosen character; 6d10 explosive damage; blast increment 2 squares"
+      "Centered 1d4 squares from a chosen character; 6d10 explosive; blast increment 2 squares"
      ],
      [
       "Explosion",
       "4",
-      "1 chosen character is Ground Zero; 8d10 explosive damage; blast increment 2 squares"
+      "Centered on a chosen character; 8d10 explosive; blast increment 2 squares"
      ],
      [
       "Random Fire/Crossfire",
       "1",
-      "1 character targeted with a grade II NPC attack bonus, using any Caliber I firearm"
+      "Attack on 1 character: grade II NPC attack bonus, any Caliber I firearm"
      ],
      [
       "Random Fire/Crossfire",
       "2",
-      "1 character targeted with a grade IV NPC attack bonus, using any Caliber II firearm"
+      "Attack on 1 character: grade IV NPC attack bonus, any Caliber II firearm"
      ],
      [
       "Random Fire/Crossfire",
       "3",
-      "1 character targeted with a grade VI NPC attack bonus, using any Caliber III firearm"
+      "Attack on 1 character: grade VI NPC attack bonus, any Caliber III firearm"
      ],
      [
       "Random Fire/Crossfire",
       "4",
-      "1 character targeted with a grade VIII NPC attack bonus, using any Caliber IV firearm"
+      "Attack on 1 character: grade VIII NPC attack bonus, any Caliber IV firearm"
      ],
      [
       "Runaway Vehicle",
       "1",
-      "1d4 characters targeted with a grade II NPC skill bonus, using any Caliber I vehicle"
+      "Runs at 1d4 characters: grade II NPC skill bonus, any Caliber I vehicle"
      ],
      [
       "Runaway Vehicle",
       "2",
-      "1d4 characters targeted with a grade IV NPC skill bonus, using any Caliber II vehicle"
+      "Runs at 1d4 characters: grade IV NPC skill bonus, any Caliber II vehicle"
      ],
      [
       "Runaway Vehicle",
       "3",
-      "1d4 characters targeted with a grade VI NPC skill bonus, using any Caliber III vehicle"
+      "Runs at 1d4 characters: grade VI NPC skill bonus, any Caliber III vehicle"
      ],
      [
       "Runaway Vehicle",
       "4",
-      "1d4 characters targeted with a grade VIII NPC skill bonus, using any Caliber IV vehicle"
+      "Runs at 1d4 characters: grade VIII NPC skill bonus, any Caliber IV vehicle"
      ],
      [
       "Security",
       "1",
-      "Characters impeded by a security device with a Power Rating of 2"
+      "Blocked by a Power Rating 2 security device"
      ],
      [
       "Security",
       "2",
-      "Characters impeded by a security device with a Power Rating of 4"
+      "Blocked by a Power Rating 4 security device"
      ],
      [
       "Security",
       "3",
-      "Characters impeded by a security device with a Power Rating of 6"
+      "Blocked by a Power Rating 6 security device"
      ],
      [
       "Security",
       "4",
-      "Characters impeded by a security device with a Power Rating of 8"
+      "Blocked by a Power Rating 8 security device"
      ]
     ],
     "rowData": [
@@ -1588,12 +1588,12 @@ export const GC_DATA = {
      },
      {
       "cost": 3,
-      "poison": "advanced (dementia, fear, necrotizing, neurotoxin, psychotropic, truth serum, weakening)",
+      "poison": "advanced (weakening, truth serum, psychotropic, neurotoxin, necrotizing, fear, dementia)",
       "diseaseComplexityDC": "65-70"
      },
      {
       "cost": 4,
-      "poison": "advanced (blister, hallucinogen, knockout, lethal, paralytic, radiation)",
+      "poison": "advanced (radiation, paralytic, lethal, knockout, hallucinogen, blister)",
       "diseaseComplexityDC": "75-80"
      },
      {
@@ -1714,7 +1714,7 @@ export const GC_DATA = {
      }
     ],
     "notes": [
-     "* Contagion costs of 5-8 dice exceed the normal 4-dice cap per hazard; reserve them for plot-critical use when the team is ready."
+     "* Contagion at 5-8 dice breaks the usual 4-dice ceiling for a hazard; keep it for plot-critical moments the team can handle."
     ]
    },
    "naturesFury": {
@@ -1732,205 +1732,205 @@ export const GC_DATA = {
       "Earthquake",
       "1",
       "Tremor",
-      "Duration 1 round; -2 to attack and Dex-based skill checks; Ref save (DC 10) or 1d4 lethal and stress damage and sprawled"
+      "1 round; -2 attack and Dex skills; Ref DC 10 or 1d4 lethal + stress and sprawled"
      ],
      [
       "Earthquake",
       "2",
       "Minor quake",
-      "Duration 1d4 rounds; -4 to attack and Dex-based skill checks; each round Ref save (DC 15) or 1d4 lethal and stress damage and sprawled"
+      "1d4 rounds; -4 attack and Dex skills; each round Ref DC 15 or 1d4 lethal + stress and sprawled"
      ],
      [
       "Earthquake",
       "3",
       "Moderate quake",
-      "Duration 2d4 rounds; -6 to attack and Dex-based skill checks; each round Ref save (DC 20) or 1d4 lethal and stress damage and sprawled"
+      "2d4 rounds; -6 attack and Dex skills; each round Ref DC 20 or 1d4 lethal + stress and sprawled"
      ],
      [
       "Earthquake",
       "4",
       "Major quake",
-      "Duration 3d4 rounds; -8 to attack and Dex-based skill checks; each round Ref save (DC 25) or 1d4 lethal and stress damage and sprawled"
+      "3d4 rounds; -8 attack and Dex skills; each round Ref DC 25 or 1d4 lethal + stress and sprawled"
      ],
      [
       "Fog",
       "1",
       "Light",
-      "Duration 1d4 hours; vision effects only (see p.350); halfway through GC rolls 1d10, on 1 becomes moderate"
+      "1d4 hours; vision effects only (p.350); at the midpoint GC rolls 1d10: 1 = turns moderate"
      ],
      [
       "Fog",
       "2",
       "Moderate",
-      "Duration 2d4 hours; vision effects only (see p.350); halfway through GC rolls 1d10, on 1 becomes dense"
+      "2d4 hours; vision effects only (p.350); at the midpoint GC rolls 1d10: 1 = turns dense"
      ],
      [
       "Fog",
       "3",
       "Dense",
-      "Duration 3d4 hours; vision effects only (see p.350)"
+      "3d4 hours; vision effects only (p.350)"
      ],
      [
       "Landslide",
       "1",
       "Indirect slide zone††",
-      "Ref save (DC 15) or 3d6 lethal and stress damage and buried"
+      "Ref DC 15 or 3d6 lethal + stress and buried"
      ],
      [
       "Landslide",
       "2",
       "Direct slide zone††",
-      "Ref save (DC 20) or 6d6 lethal and stress damage and buried"
+      "Ref DC 20 or 6d6 lethal + stress and buried"
      ],
      [
       "Landslide",
       "3",
       "Indirect bury zone††",
-      "Buried; 4d6 lethal and stress damage, Ref save (DC 15) for 1/2 (rounded down)"
+      "Buried; 4d6 lethal + stress, Ref DC 15 halves (round down)"
      ],
      [
       "Landslide",
       "4",
       "Direct bury zone††",
-      "Buried; 8d6 lethal and stress damage, Ref save (DC 20) for 1/2 (rounded down)"
+      "Buried; 8d6 lethal + stress, Ref DC 20 halves (round down)"
      ],
      [
       "Lightning",
       "1",
       "Distant strike",
-      "This round: +20 ft. visual range, visual Awareness/Perception penalties reduced by 2 (min +0). Next round (thunder): -20 ft. hearing range, -2 to hearing Awareness/Perception"
+      "Flash round: sight range +20 ft., sight-based Awareness/Perception penalties eased by 2 (to +0 at best). Thunder next round: hearing range -20 ft., hearing-based Awareness/Perception -2"
      ],
      [
       "Lightning",
       "2",
       "Local strike",
-      "This round: 1d6 stress damage; +40 ft. visual range, visual Awareness/Perception penalties reduced by 4 (min +0). Next round (thunder): -40 ft. hearing range, -4 to hearing Awareness/Perception"
+      "Flash round: 1d6 stress; sight range +40 ft., sight-based Awareness/Perception penalties eased by 4 (to +0 at best). Thunder next round: hearing range -40 ft., hearing-based Awareness/Perception -4"
      ],
      [
       "Lightning",
       "3",
       "Near strike",
-      "This round: 2d6 flash, bang and stress damage; Fort save (DC 10) or sprawled; 1 object or scenery piece within 100 ft. takes 4d10+20 electrical and fire damage; +60 ft. visual range, visual penalties reduced by 6 (min +0). Next round (thunder): -60 ft. hearing range, -6 to hearing Awareness/Perception"
+      "Flash round: 2d6 flash + bang + stress; Fort DC 10 or sprawled; 1 object or scenery piece within 100 ft. takes 4d10+20 electrical + fire; sight range +60 ft., sight-based penalties eased by 6 (to +0 at best). Thunder next round: hearing range -60 ft., hearing-based Awareness/Perception -6"
      ],
      [
       "Lightning",
       "4",
       "Direct strike",
-      "This round: 3d6 flash, bang and stress damage; Fort save (DC 20) or sprawled; 1 character takes 4d10+20 electrical and fire damage and is sprawled; +80 ft. visual range, visual penalties reduced by 8 (min +0). Next round (thunder): -80 ft. hearing range, -8 to hearing Awareness/Perception"
+      "Flash round: 3d6 flash + bang + stress; Fort DC 20 or sprawled; 1 character takes 4d10+20 electrical + fire and is sprawled; sight range +80 ft., sight-based penalties eased by 8 (to +0 at best). Thunder next round: hearing range -80 ft., hearing-based Awareness/Perception -8"
      ],
      [
       "Rain/Snow",
       "1",
       "Light",
-      "Duration 3d20 minutes; like 1 gallon of water per minute on each unprotected flame; halfway through GC rolls 1d10, on 1 becomes moderate"
+      "3d20 minutes; douses each open flame like 1 gal. of water/minute; at the midpoint GC rolls 1d10: 1 = turns moderate"
      ],
      [
       "Rain/Snow",
       "2",
       "Moderate",
-      "Duration 1d4 hours; like 2 gallons of water per minute on each unprotected flame; halfway through GC rolls 1d10, on 1 becomes heavy"
+      "1d4 hours; douses each open flame like 2 gal. of water/minute; at the midpoint GC rolls 1d10: 1 = turns heavy"
      ],
      [
       "Rain/Snow",
       "3",
       "Heavy",
-      "Duration 2d4 hours; like 3 gallons of water per minute on each unprotected flame; halfway through GC rolls 1d10, on 1 becomes a storm"
+      "2d4 hours; douses each open flame like 3 gal. of water/minute; at the midpoint GC rolls 1d10: 1 = turns to a storm"
      ],
      [
       "Rain/Snow",
       "4",
       "Thunderstorm/Snowstorm",
-      "Duration 3d4 hours; like 4 gallons of water per minute on each unprotected flame; halfway through GC rolls 1d10: on 1 becomes hurricane or blizzard, on 2 a flash flood or flash freeze occurs"
+      "3d4 hours; douses each open flame like 4 gal. of water/minute; at the midpoint GC rolls 1d10: 1 = hurricane or blizzard, 2 = flash flood or flash freeze"
      ],
      [
       "Rain/Snow",
       "—",
       "Flash Flood",
-      "3d6 subdual damage; Ref save (DC 15) or sprawled and pushed 3d6 x 10 ft., taking 1d6 lethal damage per 30 ft. pushed"
+      "3d6 subdual; Ref DC 15 or sprawled and swept 3d6 x 10 ft., 1d6 lethal per 30 ft. swept"
      ],
      [
       "Rain/Snow",
       "—",
       "Flash Freeze",
-      "3d6 cold damage and exposure to cold contagion (see p.231)"
+      "3d6 cold, plus exposure to the cold contagion (p.231)"
      ],
      [
       "Rain/Snow",
       "—",
       "Hurricane",
-      "Duration 3d4 hours; as severe wind; puts out any unprotected flame; halfway through GC rolls 1d10, on 1-4 a flash flood occurs"
+      "3d4 hours; treat as severe wind; open flames go out; at the midpoint GC rolls 1d10: 1-4 = flash flood"
      ],
      [
       "Rain/Snow",
       "—",
       "Blizzard",
-      "Duration 3d4 hours; as strong wind; puts out any unprotected flame; 1d6 cold damage per hour; halfway through GC rolls 1d10, on 1-4 a flash freeze occurs"
+      "3d4 hours; treat as strong wind; open flames go out; 1d6 cold per hour; at the midpoint GC rolls 1d10: 1-4 = flash freeze"
      ],
      [
       "Volcanic Eruption",
       "1",
       "Gentle",
-      "Duration 1d6 hours, within 1/4 mile; 1d6 stress damage; vision and hearing ranges x 3/4 (rounded down); Fort save (DC 10) or deafened until 1d6 hours after the eruption ends; GC may spend 1 action die to hit 1 character with a volcanic bomb for 1d10 fire and stress damage"
+      "1d6 hours, 1/4-mile radius; 1d6 stress; sight and hearing ranges x 3/4 (round down); Fort DC 10 or deafened through the eruption and 1d6 hours beyond; GC may pay 1 action die for a volcanic bomb on 1 character: 1d10 fire + stress"
      ],
      [
       "Volcanic Eruption",
       "2",
       "Minor",
-      "Duration 2d6 hours, within 1/2 mile; 2d6 stress damage; vision and hearing ranges x 1/2 (rounded down); Fort save (DC 15) or deafened until 2d6 hours after the eruption ends; GC may spend 2 action dice to hit 1 character with a volcanic bomb for 1d10 fire and stress damage per die"
+      "2d6 hours, 1/2-mile radius; 2d6 stress; sight and hearing ranges x 1/2 (round down); Fort DC 15 or deafened through the eruption and 2d6 hours beyond; GC may pay 2 action dice for a volcanic bomb on 1 character: 1d10 fire + stress per die"
      ],
      [
       "Volcanic Eruption",
       "3",
       "Moderate",
-      "Duration 3d6 hours, within 1 mile; 3d6 stress damage; vision and hearing ranges x 1/4 (rounded down); Fort save (DC 20) or deafened until 3d6 hours after [text garbled in source]; volcanic bomb 1d10 fire and stress damage per action die spent; halfway through GC rolls 1d10, on 1 poison gas rises at the team's location"
+      "3d6 hours, 1-mile radius; 3d6 stress; sight and hearing ranges x 1/4 (round down); Fort DC 20 or deafened for 3d6 hours beyond [source text garbled]; volcanic bomb: 1d10 fire + stress per action die; at the midpoint GC rolls 1d10: 1 = poison gas at the team's position"
      ],
      [
       "Volcanic Eruption",
       "4",
       "Major",
-      "Duration 4d6 hours, within 2 miles; 4d6 stress damage; vision and hearing ranges [multiplier, save and deafness text missing in source]; GC may spend 4 action dice to hit 1 character with a volcanic bomb for 1d10 fire and stress damage per die; halfway through GC rolls 1d10, on 1 poison gas rises at the team's location"
+      "4d6 hours, 2-mile radius; 4d6 stress; sight and hearing ranges [multiplier, save and deafness missing in source]; GC may pay 4 action dice for a volcanic bomb on 1 character: 1d10 fire + stress per die; at the midpoint GC rolls 1d10: 1 = poison gas at the team's position"
      ],
      [
       "Volcanic Eruption",
       "—",
       "Poison gas",
-      "Acts as a contagion: Primary Onset 1d4 rounds, Primary Save DC 15, Primary Effect 1d2 Con damage + fatigued; Secondary Onset 1d4 minutes, Secondary Save DC 20, Secondary Effect 1d4 Con damage + fatigued"
+      "Contagion. Primary: onset 1d4 rounds, save DC 15, 1d2 Con damage + fatigued. Secondary: onset 1d4 minutes, save DC 20, 1d4 Con damage + fatigued"
      ],
      [
       "Wind",
       "1",
       "Light",
-      "Duration 3d20 minutes; -2 to Damage saves to stop fire spreading; -2 to hurled attack checks; halfway through GC rolls 1d10, on 1 becomes moderate"
+      "3d20 minutes; -2 on Damage saves against fire spread; -2 hurled attacks; at the midpoint GC rolls 1d10: 1 = turns moderate"
      ],
      [
       "Wind",
       "2",
       "Moderate",
-      "Duration 1d4 hours; -4 to Damage saves to stop fire spreading; -4 to hurled attack and hearing Awareness/Perception checks; -5 ft. Speed; halfway through GC rolls 1d10, on 1 becomes strong"
+      "1d4 hours; -4 on Damage saves against fire spread; -4 hurled attacks and hearing-based Awareness/Perception; Speed -5 ft.; at the midpoint GC rolls 1d10: 1 = turns strong"
      ],
      [
       "Wind",
       "3",
       "Strong",
-      "Duration 2d4 hours; -6 to Damage saves to stop fire spreading; -6 to hurled attacks; -2 to other ranged attacks; -10 ft. Speed; Fort save (DC 15) or sprawled and pushed 1d6 x 5 ft., taking 1d6 lethal damage per 10 ft. pushed; halfway through GC rolls 1d10, on 1 becomes severe"
+      "2d4 hours; -6 on Damage saves against fire spread; -6 hurled attacks, -2 other ranged attacks; Speed -10 ft.; Fort DC 15 or sprawled and blown 1d6 x 5 ft., 1d6 lethal per 10 ft. blown; at the midpoint GC rolls 1d10: 1 = turns severe"
      ],
      [
       "Wind",
       "4",
       "Severe",
-      "Duration 3d4 hours; -8 to Damage saves to stop fire spreading; -8 to hurled attacks; -4 to other ranged attacks; -15 ft. Speed; Fort save (DC 20) or sprawled and pushed 1d6 x 10 ft., taking 1d6 lethal damage per 10 ft. pushed; halfway through GC rolls 1d10, on 1 becomes a dust storm or spawns a tornado (by terrain)"
+      "3d4 hours; -8 on Damage saves against fire spread; -8 hurled attacks, -4 other ranged attacks; Speed -15 ft.; Fort DC 20 or sprawled and blown 1d6 x 10 ft., 1d6 lethal per 10 ft. blown; at the midpoint GC rolls 1d10: 1 = dust storm or tornado, by terrain"
      ],
      [
       "Wind",
       "—",
       "Dust storm",
-      "Duration 3d4 hours; as severe wind, plus vision effects (see p.350)"
+      "3d4 hours; treat as severe wind and add vision effects (p.350)"
      ],
      [
       "Wind",
       "—",
       "Tornado",
-      "Duration 1d12 minutes; puts out any unprotected flame; hurled attacks impossible; -8 to other ranged attacks; only movement is a 5-ft. bonus step; within 100 ft. Fort save (DC 30) or sucked in for 2d6 rounds, taking 1d10 lethal damage per round, then expelled 1d4 miles away at a height of 2d20+20 ft. (falling damage, p.336)"
+      "1d12 minutes; open flames go out; no hurled attacks; -8 other ranged attacks; movement limited to the 5-ft. bonus step; within 100 ft., Fort DC 30 or pulled in for 2d6 rounds at 1d10 lethal per round, then thrown out 1d4 miles away, 2d20+20 ft. up (falling damage, p.336)"
      ]
     ],
     "rowData": [
@@ -2364,10 +2364,10 @@ export const GC_DATA = {
      }
     ],
     "notes": [
-     "* Intensity is as felt at the characters' location.",
-     "** Each character suffers the effect individually unless stated; separate groups in different areas need separate events.",
-     "† Some conditions add effects from Table 5.14: Vision and Hearing (p.350).",
-     "†† Slide zone = area the debris slides across; bury zone = area directly in the debris path.",
+     "* Intensity is measured where the characters are.",
+     "** Effects hit each character separately unless noted; groups in different places each need their own event.",
+     "† Table 5.14: Vision and Hearing (p.350) adds effects for some conditions.",
+     "†† Slide zone: ground the debris crosses. Bury zone: ground squarely in the debris path.",
      "Rows with cost \"—\" cannot be bought directly; they arise from the escalation rolls of other rows.",
      "Earthquake through Rain/Snow are on p.401; Volcanic Eruption and Wind on p.402."
     ]
@@ -2386,7 +2386,7 @@ export const GC_DATA = {
      ],
      [
       "**",
-      "Civilian result 19: if implicated in violence against this civilian, the characters become Wanted (p.404)."
+      "Civilian result 19: violence against this civilian traced to the team makes it Wanted (p.404)."
      ]
     ],
     "notes": [
@@ -2403,7 +2403,7 @@ export const GC_DATA = {
     "rows": [
      [
       "Penalty applies",
-      "Immediately, each time a character commits a listed infraction; mission Reputation/Net Worth reward unaffected"
+      "At once, whenever a listed infraction is committed; end-of-mission Reputation/Net Worth pay is not reduced"
      ],
      [
       "Infraction committed to prevent/stop an equal or worse infraction",
@@ -2438,15 +2438,15 @@ export const GC_DATA = {
      ],
      [
       "**",
-      "Skill checks to avoid a sensor carry the Armor Check Penalty tag."
+      "Skill checks to slip past a sensor take the Armor Check Penalty."
      ],
      [
       "†",
-      "Breaking this lock does not open the portal/container; it only prevents further skill checks to open it."
+      "A broken lock of this kind stays shut; breaking it just rules out more skill attempts to open it."
      ],
      [
       "††",
-      "Check gains a Computers synergy bonus when a computer is used to forge the access item."
+      "Forging the access item with a computer adds a Computers synergy bonus to the check."
      ],
      [
       "∆",
@@ -2466,11 +2466,11 @@ export const GC_DATA = {
      ],
      [
       "§",
-      "Attacks 1 character in its area each round until disabled or out of ammunition; ranged weapons hold PR × 5 shots unless stated."
+      "Each round it attacks 1 character in its area, stopping when disabled or empty; a ranged weapon carries PR × 5 shots unless noted."
      ],
      [
       "§§",
-      "Per die of explosive damage (maximum +10)."
+      "XP counts each die of explosive damage (cap +10)."
      ],
      [
       "∞",
@@ -2482,7 +2482,7 @@ export const GC_DATA = {
      ],
      [
       "◊",
-      "Rarely linked to locks or sensors; used to catch animals or people in the wild."
+      "Seldom wired to locks or sensors; meant for catching animals or people outdoors."
      ],
      [
       "◊◊",
@@ -2492,16 +2492,16 @@ export const GC_DATA = {
     "notes": [
      "XP for a device counts once per time the team must overcome it; identical duplicate devices on alternate entrances count once.",
      "Devices are found with Notice/Awareness or Search/Perception vs. Detect DC and neutralized with Security/Disable vs. Disable DC.",
-     "A device that can be attacked has Defense equal to its Detect DC.",
+     "Where a device can be attacked, use its Detect DC as its Defense.",
      "Traps with an attack bonus have error range 1 and threat range 20 and make a Standard Attack on whoever tripped the sensor; traps with a save DC deal 1/2 damage (rounded down) on a successful Reflex save.",
-     "Sensor Awareness checks are never subject to a result cap."
+     "No result cap ever applies to a sensor's Awareness check."
     ]
    }
   },
   "objectives": [
    {
     "category": "Crucial Skill Check",
-    "name": "Standard skill check (DC 10 + Threat Level); opposed check (skill bonus up to 1/2 highest in team)",
+    "name": "Plain check at DC 10 + Threat Level, or opposed check against a bonus no higher than half the team's best",
     "grade": 1,
     "xp": 25,
     "page": 431,
@@ -2509,7 +2509,7 @@ export const GC_DATA = {
    },
    {
     "category": "Crucial Skill Check",
-    "name": "Standard skill check (DC 15 + Threat Level); opposed check (skill bonus over 1/2 highest, up to highest in team)",
+    "name": "Plain check at DC 15 + Threat Level, or opposed check against a bonus above half the team's best but not beyond it",
     "grade": 2,
     "xp": 50,
     "page": 431,
@@ -2517,7 +2517,7 @@ export const GC_DATA = {
    },
    {
     "category": "Crucial Skill Check",
-    "name": "Standard skill check (DC 20 + Threat Level); Complex Task (2-4 Challenges, DC 10 + Threat Level); opposed check (skill bonus over highest in team)",
+    "name": "Plain check at DC 20 + Threat Level; Complex Task of 2-4 Challenges at DC 10 + Threat Level; or opposed check against a bonus beyond the team's best",
     "grade": 3,
     "xp": 75,
     "page": 431,
@@ -2525,7 +2525,7 @@ export const GC_DATA = {
    },
    {
     "category": "Crucial Skill Check",
-    "name": "Standard skill check (DC 25 + Threat Level); Complex Task (5-7 Challenges, DC 15 + Threat Level); Dramatic Conflict (Lead 2-6, opposing bonus up to highest in team)",
+    "name": "Plain check at DC 25 + Threat Level; Complex Task of 5-7 Challenges at DC 15 + Threat Level; or Dramatic Conflict at Lead 2-6 against a bonus no higher than the team's best",
     "grade": 4,
     "xp": 100,
     "page": 431,
@@ -2533,7 +2533,7 @@ export const GC_DATA = {
    },
    {
     "category": "Crucial Skill Check",
-    "name": "Complex Task (8-10 Challenges, DC 20 + Threat Level); Dramatic Conflict (Lead 7-10, opposing bonus over highest in team)",
+    "name": "Complex Task of 8-10 Challenges at DC 20 + Threat Level; or Dramatic Conflict at Lead 7-10 against a bonus beyond the team's best",
     "grade": 5,
     "xp": 125,
     "page": 431,
@@ -2541,7 +2541,7 @@ export const GC_DATA = {
    },
    {
     "category": "Aid/Advise",
-    "name": "See a delicate but not very dangerous transaction through; help mediate a warmly contested point with a shaky ally",
+    "name": "Oversee a touchy, low-danger deal; or mediate a mild dispute with an uncertain ally",
     "grade": 1,
     "xp": 25,
     "page": 431,
@@ -2549,7 +2549,7 @@ export const GC_DATA = {
    },
    {
     "category": "Aid/Advise",
-    "name": "See a delicate and dangerous transaction through; help mediate a hotly contested point with a bitter enemy",
+    "name": "Oversee a touchy, high-danger deal; or mediate a heated dispute with a sworn enemy",
     "grade": 2,
     "xp": 50,
     "page": 431,
@@ -2557,7 +2557,7 @@ export const GC_DATA = {
    },
    {
     "category": "Aid/Advise",
-    "name": "Clear a character of minor crimes or mild slander; help root out a single well-placed mole",
+    "name": "Clear someone of petty crimes or light slander; or expose one highly placed mole",
     "grade": 3,
     "xp": 75,
     "page": 431,
@@ -2565,7 +2565,7 @@ export const GC_DATA = {
    },
    {
     "category": "Aid/Advise",
-    "name": "Clear a character of a single felony or severe slander; help root out a new or unstable mole network",
+    "name": "Clear someone of one felony or serious slander; or expose a young or shaky mole ring",
     "grade": 4,
     "xp": 100,
     "page": 431,
@@ -2573,7 +2573,7 @@ export const GC_DATA = {
    },
    {
     "category": "Aid/Advise",
-    "name": "Clear a character of multiple felonies; help root out an entrenched, well-informed mole network",
+    "name": "Clear someone of several felonies; or expose an established, well-informed mole ring",
     "grade": 5,
     "xp": 125,
     "page": 431,
@@ -2581,7 +2581,7 @@ export const GC_DATA = {
    },
    {
     "category": "Acquire",
-    "name": "Recover a single obscure artifact; hijack a poorly armed civilian transport; steal a poorly defended object (owner interest mild)",
+    "name": "Recover 1 little-known artifact; hijack a lightly armed civilian transport; or steal a weakly guarded object (owner mildly interested)",
     "grade": 1,
     "xp": 25,
     "page": 431,
@@ -2589,7 +2589,7 @@ export const GC_DATA = {
    },
    {
     "category": "Acquire",
-    "name": "Recover several obscure artifacts lost under a year; hijack a well-armed private transport; steal a well-defended object (owner interest moderate)",
+    "name": "Recover a few little-known artifacts missing under 1 year; hijack a heavily armed private transport; or steal a well-guarded object (owner moderately interested)",
     "grade": 2,
     "xp": 50,
     "page": 431,
@@ -2597,7 +2597,7 @@ export const GC_DATA = {
    },
    {
     "category": "Acquire",
-    "name": "Recover many obscure artifacts lost up to a decade; hijack a well-armed government transport; steal an intensely defended object (owner interest moderate)",
+    "name": "Recover many little-known artifacts missing up to 10 years; hijack a heavily armed government transport; or steal a heavily guarded object (owner moderately interested)",
     "grade": 3,
     "xp": 75,
     "page": 431,
@@ -2605,7 +2605,7 @@ export const GC_DATA = {
    },
    {
     "category": "Acquire",
-    "name": "Recover many obscure artifacts lost up to a century; hijack a well-armed villain transport; steal a well-defended object (owner interest fanatic)",
+    "name": "Recover many little-known artifacts missing up to 100 years; hijack a heavily armed villain transport; or steal a well-guarded object (owner fanatical)",
     "grade": 4,
     "xp": 100,
     "page": 431,
@@ -2613,7 +2613,7 @@ export const GC_DATA = {
    },
    {
     "category": "Acquire",
-    "name": "Recover many obscure artifacts lost for millennia; hijack several well-armed transports; steal an intensely defended object (owner interest fanatic)",
+    "name": "Recover many little-known artifacts missing for thousands of years; hijack several heavily armed transports; or steal a heavily guarded object (owner fanatical)",
     "grade": 5,
     "xp": 125,
     "page": 431,
@@ -2621,7 +2621,7 @@ export const GC_DATA = {
    },
    {
     "category": "Capture",
-    "name": "Arrest an unarmed but elusive minor criminal; abduct a civilian authority backing the enemy",
+    "name": "Arrest an elusive, unarmed petty criminal; or abduct a civilian official who supports the enemy",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2629,7 +2629,7 @@ export const GC_DATA = {
    },
    {
     "category": "Capture",
-    "name": "Arrest an armed minor criminal; abduct a trained non-military authority backing the enemy",
+    "name": "Arrest an armed petty criminal; or abduct a trained non-military official who supports the enemy",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2637,7 +2637,7 @@ export const GC_DATA = {
    },
    {
     "category": "Capture",
-    "name": "Arrest an armed felon; abduct a trained military authority backing the enemy",
+    "name": "Arrest 1 armed felon; or abduct a trained military official who supports the enemy",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2645,7 +2645,7 @@ export const GC_DATA = {
    },
    {
     "category": "Capture",
-    "name": "Arrest several armed felons; abduct a trained military combatant backing the enemy",
+    "name": "Arrest a group of armed felons; or abduct 1 trained enemy-side soldier",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2653,7 +2653,7 @@ export const GC_DATA = {
    },
    {
     "category": "Capture",
-    "name": "Arrest a criminal mastermind; abduct several trained military combatants backing the enemy",
+    "name": "Arrest a mastermind; or abduct a group of trained enemy-side soldiers",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2661,7 +2661,7 @@ export const GC_DATA = {
    },
    {
     "category": "Confirm",
-    "name": "Verify one defined piece of information, or the motives of one unwitting character",
+    "name": "Verify 1 well-defined fact, or the motives of 1 unaware person",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2669,7 +2669,7 @@ export const GC_DATA = {
    },
    {
     "category": "Confirm",
-    "name": "Verify several obviously linked, defined pieces of information, or motives of several obviously linked unwitting characters",
+    "name": "Verify a few well-defined, clearly related facts, or the motives of a few clearly related unaware people",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2677,7 +2677,7 @@ export const GC_DATA = {
    },
    {
     "category": "Confirm",
-    "name": "Verify several seemingly linked, poorly researched pieces of information, or motives of several seemingly linked unwitting characters",
+    "name": "Verify a few apparently related, thinly researched facts, or the motives of a few apparently related unaware people",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2685,7 +2685,7 @@ export const GC_DATA = {
    },
    {
     "category": "Confirm",
-    "name": "Verify several seemingly unlinked, poorly researched pieces of information, or motives of several seemingly unlinked unwitting characters",
+    "name": "Verify a few apparently unrelated, thinly researched facts, or the motives of a few apparently unrelated unaware people",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2693,7 +2693,7 @@ export const GC_DATA = {
    },
    {
     "category": "Confirm",
-    "name": "Verify several seemingly unlinked, unresearched pieces of information, or motives of several seemingly unlinked characters who know they are being evaluated",
+    "name": "Verify a few apparently unrelated facts with no research, or the motives of a few apparently unrelated people aware of the scrutiny",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2701,7 +2701,7 @@ export const GC_DATA = {
    },
    {
     "category": "Contain",
-    "name": "Contain 1 minor secret in a small group; cover up a minor botch in a sparsely populated area",
+    "name": "Keep 1 small secret within a small group; or hide a small blunder in a thinly populated area",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2709,7 +2709,7 @@ export const GC_DATA = {
    },
    {
     "category": "Contain",
-    "name": "Contain several minor secrets in a small group; cover up a minor botch in a well-populated area",
+    "name": "Keep a few small secrets within a small group; or hide a small blunder in a populous area",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2717,7 +2717,7 @@ export const GC_DATA = {
    },
    {
     "category": "Contain",
-    "name": "Contain several minor secrets in a large group; cover up a moderate botch in a well-populated area",
+    "name": "Keep a few small secrets within a large group; or hide a medium blunder in a populous area",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2725,7 +2725,7 @@ export const GC_DATA = {
    },
    {
     "category": "Contain",
-    "name": "Contain several moderate secrets in a large group; cover up a major botch in a well-populated area",
+    "name": "Keep a few medium secrets within a large group; or hide a big blunder in a populous area",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2733,7 +2733,7 @@ export const GC_DATA = {
    },
    {
     "category": "Contain",
-    "name": "Contain one or more major secrets in a large group; cover up a publicized major botch",
+    "name": "Keep 1+ big secrets within a large group; or hide a big blunder already made public",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2741,7 +2741,7 @@ export const GC_DATA = {
    },
    {
     "category": "Defend",
-    "name": "Defend 1 easily protected location or 1 attentive NPC vs. enemies with lower than recommended statistics",
+    "name": "Guard 1 easy-to-hold site or 1 alert NPC; enemy stats below the recommended level",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2749,7 +2749,7 @@ export const GC_DATA = {
    },
    {
     "category": "Defend",
-    "name": "Defend 1 hard-to-protect location or 1 inattentive NPC vs. enemies with lower than recommended statistics",
+    "name": "Guard 1 hard-to-hold site or 1 careless NPC; enemy stats below the recommended level",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2757,7 +2757,7 @@ export const GC_DATA = {
    },
    {
     "category": "Defend",
-    "name": "Defend 1 hard-to-protect location or 1 inattentive NPC vs. enemies with recommended statistics",
+    "name": "Guard 1 hard-to-hold site or 1 careless NPC; enemy stats at the recommended level",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2765,7 +2765,7 @@ export const GC_DATA = {
    },
    {
     "category": "Defend",
-    "name": "Defend 1 easily protected location or 1 attentive NPC vs. enemies with higher than recommended statistics",
+    "name": "Guard 1 easy-to-hold site or 1 alert NPC; enemy stats above the recommended level",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2773,7 +2773,7 @@ export const GC_DATA = {
    },
    {
     "category": "Defend",
-    "name": "Defend 1 hard-to-protect location or 1 inattentive NPC vs. enemies with higher than recommended statistics",
+    "name": "Guard 1 hard-to-hold site or 1 careless NPC; enemy stats above the recommended level",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2781,7 +2781,7 @@ export const GC_DATA = {
    },
    {
     "category": "Destroy",
-    "name": "Destroy an undefended civilian location, or sabotage an undefended civilian vehicle or gear item",
+    "name": "Demolish an unguarded civilian site, or sabotage unguarded civilian gear or a vehicle",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2789,7 +2789,7 @@ export const GC_DATA = {
    },
    {
     "category": "Destroy",
-    "name": "Destroy a poorly defended civilian location, or sabotage a poorly defended civilian vehicle or gear item",
+    "name": "Demolish a weakly guarded civilian site, or sabotage weakly guarded civilian gear or a vehicle",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2797,7 +2797,7 @@ export const GC_DATA = {
    },
    {
     "category": "Destroy",
-    "name": "Destroy a well-defended civilian location, or sabotage a well-defended civilian vehicle or gear item",
+    "name": "Demolish a well-guarded civilian site, or sabotage well-guarded civilian gear or a vehicle",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2805,7 +2805,7 @@ export const GC_DATA = {
    },
    {
     "category": "Destroy",
-    "name": "Destroy a well-defended military location, or sabotage a well-defended military vehicle or gear item",
+    "name": "Demolish a well-guarded military site, or sabotage well-guarded military gear or a vehicle",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2813,7 +2813,7 @@ export const GC_DATA = {
    },
    {
     "category": "Destroy",
-    "name": "Destroy a well-defended villain location, or sabotage a well-defended villain vehicle or gear item",
+    "name": "Demolish a well-guarded villain site, or sabotage well-guarded villain gear or a vehicle",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2821,7 +2821,7 @@ export const GC_DATA = {
    },
    {
     "category": "Distract",
-    "name": "Keep 1 person from noticing a quiet incident",
+    "name": "Stop 1 person spotting a quiet event",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2829,7 +2829,7 @@ export const GC_DATA = {
    },
    {
     "category": "Distract",
-    "name": "Keep 1 person from noticing a noisy incident",
+    "name": "Stop 1 person spotting a loud event",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2837,7 +2837,7 @@ export const GC_DATA = {
    },
    {
     "category": "Distract",
-    "name": "Keep several people from noticing a quiet incident",
+    "name": "Stop a group spotting a quiet event",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2845,7 +2845,7 @@ export const GC_DATA = {
    },
    {
     "category": "Distract",
-    "name": "Keep several people from noticing a noisy incident",
+    "name": "Stop a group spotting a loud event",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2853,7 +2853,7 @@ export const GC_DATA = {
    },
    {
     "category": "Distract",
-    "name": "Keep everyone from noticing an obvious incident",
+    "name": "Stop anyone at all spotting a blatant event",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2861,7 +2861,7 @@ export const GC_DATA = {
    },
    {
     "category": "Evade",
-    "name": "Escape or avoid capture by an inferior force in familiar territory",
+    "name": "Elude a weaker force on home ground",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2869,7 +2869,7 @@ export const GC_DATA = {
    },
    {
     "category": "Evade",
-    "name": "Escape or avoid capture by an inferior force in unfamiliar territory",
+    "name": "Elude a weaker force on unknown ground",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2877,7 +2877,7 @@ export const GC_DATA = {
    },
    {
     "category": "Evade",
-    "name": "Escape or avoid capture by an equal force in unfamiliar territory",
+    "name": "Elude an evenly matched force on unknown ground",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2885,7 +2885,7 @@ export const GC_DATA = {
    },
    {
     "category": "Evade",
-    "name": "Escape or avoid capture by a superior force in unfamiliar territory",
+    "name": "Elude a stronger force on unknown ground",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2893,7 +2893,7 @@ export const GC_DATA = {
    },
    {
     "category": "Evade",
-    "name": "Escape or avoid capture by a superior force in enemy territory",
+    "name": "Elude a stronger force on enemy ground",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2901,7 +2901,7 @@ export const GC_DATA = {
    },
    {
     "category": "Infiltrate",
-    "name": "Infiltrate an undefended civilian location",
+    "name": "Enter an unguarded civilian site",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2909,7 +2909,7 @@ export const GC_DATA = {
    },
    {
     "category": "Infiltrate",
-    "name": "Infiltrate a poorly defended civilian location",
+    "name": "Enter a weakly guarded civilian site",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2917,7 +2917,7 @@ export const GC_DATA = {
    },
    {
     "category": "Infiltrate",
-    "name": "Infiltrate a well-defended civilian location",
+    "name": "Enter a well-guarded civilian site",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2925,7 +2925,7 @@ export const GC_DATA = {
    },
    {
     "category": "Infiltrate",
-    "name": "Infiltrate a well-defended military location",
+    "name": "Enter a well-guarded military site",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2933,7 +2933,7 @@ export const GC_DATA = {
    },
    {
     "category": "Infiltrate",
-    "name": "Infiltrate a well-defended villain location",
+    "name": "Enter a well-guarded villain site",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2941,7 +2941,7 @@ export const GC_DATA = {
    },
    {
     "category": "Investigate",
-    "name": "1 clue, minor research, or a minutes-long search or scouting mission",
+    "name": "1 clue; light research; or a search/scouting job lasting minutes",
     "grade": 1,
     "xp": 25,
     "page": 432,
@@ -2949,7 +2949,7 @@ export const GC_DATA = {
    },
    {
     "category": "Investigate",
-    "name": "2-4 clues, 1 simple puzzle, moderate research, or an hour-long search or scouting mission",
+    "name": "2-4 clues; 1 easy puzzle; medium research; or a search/scouting job lasting an hour",
     "grade": 2,
     "xp": 50,
     "page": 432,
@@ -2957,7 +2957,7 @@ export const GC_DATA = {
    },
    {
     "category": "Investigate",
-    "name": "5-6 clues, 1 tricky puzzle, extensive research, or an hours-long search or scouting mission",
+    "name": "5-6 clues; 1 awkward puzzle; heavy research; or a search/scouting job lasting hours",
     "grade": 3,
     "xp": 75,
     "page": 432,
@@ -2965,7 +2965,7 @@ export const GC_DATA = {
    },
    {
     "category": "Investigate",
-    "name": "7-9 clues, 1 complicated puzzle, exhaustive research, or a day-long search or scouting mission",
+    "name": "7-9 clues; 1 complex puzzle; near-complete research; or a search/scouting job lasting a day",
     "grade": 4,
     "xp": 100,
     "page": 432,
@@ -2973,7 +2973,7 @@ export const GC_DATA = {
    },
    {
     "category": "Investigate",
-    "name": "10 clues, 1 nearly impossible puzzle, impeccable research, or a days-long search or scouting mission",
+    "name": "10 clues; 1 almost unsolvable puzzle; flawless research; or a search/scouting job lasting days",
     "grade": 5,
     "xp": 125,
     "page": 432,
@@ -2981,7 +2981,7 @@ export const GC_DATA = {
    },
    {
     "category": "Neutralize",
-    "name": "Liquidate or force-retire a civilian authority",
+    "name": "Kill or forcibly retire a civilian official",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -2989,7 +2989,7 @@ export const GC_DATA = {
    },
    {
     "category": "Neutralize",
-    "name": "Liquidate or force-retire a trained non-military authority or several civilian authorities",
+    "name": "Kill or forcibly retire a trained non-military official, or several civilian officials",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -2997,7 +2997,7 @@ export const GC_DATA = {
    },
    {
     "category": "Neutralize",
-    "name": "Liquidate or force-retire a trained military authority or several trained non-military authorities",
+    "name": "Kill or forcibly retire a trained military official, or several trained non-military officials",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3005,7 +3005,7 @@ export const GC_DATA = {
    },
    {
     "category": "Neutralize",
-    "name": "Liquidate or force-retire a trained military combatant or several trained military authorities",
+    "name": "Kill or forcibly retire a trained soldier, or several trained military officials",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3013,7 +3013,7 @@ export const GC_DATA = {
    },
    {
     "category": "Neutralize",
-    "name": "Liquidate or force-retire several trained military combatants",
+    "name": "Kill or forcibly retire several trained soldiers",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3021,7 +3021,7 @@ export const GC_DATA = {
    },
    {
     "category": "Observe",
-    "name": "Detect 1 activity at a busy/easy-to-navigate location with heavy concealment",
+    "name": "Spot 1 activity at a busy, easily navigated site with plenty of cover",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -3029,7 +3029,7 @@ export const GC_DATA = {
    },
    {
     "category": "Observe",
-    "name": "Detect 1 activity at a quiet/hard-to-navigate location with moderate concealment; or 2+ activities at a busy/easy location with heavy concealment",
+    "name": "Spot 1 activity at a quiet, awkward site with some cover; or 2+ at a busy, easily navigated site with plenty of cover",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -3037,7 +3037,7 @@ export const GC_DATA = {
    },
    {
     "category": "Observe",
-    "name": "Detect 1 activity at a silent/near-impossible location with little or no concealment; or 2+ activities at a quiet/hard location with moderate concealment",
+    "name": "Spot 1 activity at a silent, nearly impassable site with almost no cover; or 2+ at a quiet, awkward site with some cover",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3045,7 +3045,7 @@ export const GC_DATA = {
    },
    {
     "category": "Observe",
-    "name": "Detect 1 activity while evading enemy surveillance or guards; or 2+ activities at a silent/near-impossible location with little or no concealment",
+    "name": "Spot 1 activity while dodging enemy watchers or guards; or 2+ at a silent, nearly impassable site with almost no cover",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3053,7 +3053,7 @@ export const GC_DATA = {
    },
    {
     "category": "Observe",
-    "name": "Detect 2+ activities while evading enemy surveillance or guards",
+    "name": "Spot 2+ activities while dodging enemy watchers or guards",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3061,7 +3061,7 @@ export const GC_DATA = {
    },
    {
     "category": "Recruit",
-    "name": "Convince an uninvolved, reticent NPC to join a cause with no obvious risk",
+    "name": "Win over a reluctant outsider NPC; the cause carries no visible risk",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -3069,7 +3069,7 @@ export const GC_DATA = {
    },
    {
     "category": "Recruit",
-    "name": "Convince an uninvolved, opposed NPC to join a cause with no obvious risk",
+    "name": "Win over an outsider NPC who opposes the cause; the cause carries no visible risk",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -3077,7 +3077,7 @@ export const GC_DATA = {
    },
    {
     "category": "Recruit",
-    "name": "Convince an uninvolved NPC to join a cause with minor risk; or an enemy to betray weak masters",
+    "name": "Win over an outsider NPC to a cause with small risk; or turn an enemy against weak masters",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3085,7 +3085,7 @@ export const GC_DATA = {
    },
    {
     "category": "Recruit",
-    "name": "Convince an uninvolved NPC to join a cause with moderate risk; or an enemy to betray strong masters",
+    "name": "Win over an outsider NPC to a cause with medium risk; or turn an enemy against strong masters",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3093,7 +3093,7 @@ export const GC_DATA = {
    },
    {
     "category": "Recruit",
-    "name": "Convince an uninvolved NPC to join a cause with major risk; or an enemy to betray fearsome masters",
+    "name": "Win over an outsider NPC to a cause with large risk; or turn an enemy against terrifying masters",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3101,7 +3101,7 @@ export const GC_DATA = {
    },
    {
     "category": "Repair",
-    "name": "Fix a simple object with a short time frame or under enemy fire",
+    "name": "Fix 1 simple object, either on a tight deadline or while being shot at",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -3109,7 +3109,7 @@ export const GC_DATA = {
    },
    {
     "category": "Repair",
-    "name": "Fix a simple object with a short time frame and under enemy fire",
+    "name": "Fix 1 simple object on a tight deadline while being shot at",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -3117,7 +3117,7 @@ export const GC_DATA = {
    },
    {
     "category": "Repair",
-    "name": "Fix a complex object with a short time frame or under enemy fire",
+    "name": "Fix 1 complex object, either on a tight deadline or while being shot at",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3125,7 +3125,7 @@ export const GC_DATA = {
    },
    {
     "category": "Repair",
-    "name": "Fix a complex object with a short time frame and under enemy fire",
+    "name": "Fix 1 complex object on a tight deadline while being shot at",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3133,7 +3133,7 @@ export const GC_DATA = {
    },
    {
     "category": "Repair",
-    "name": "Fix several complex objects with a short time frame and under threatening enemy fire",
+    "name": "Fix several complex objects on a tight deadline under dangerous fire",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3141,7 +3141,7 @@ export const GC_DATA = {
    },
    {
     "category": "Rescue",
-    "name": "Rescue 1 uninjured character or salvage 1 undamaged vehicle/item from minor environmental danger or enemies with lower than recommended statistics",
+    "name": "Save 1 unhurt person or 1 intact vehicle/item; small environmental danger or enemy stats below recommended",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -3149,7 +3149,7 @@ export const GC_DATA = {
    },
    {
     "category": "Rescue",
-    "name": "Rescue 1 slightly injured character or salvage 1 slightly damaged vehicle/item from minor environmental danger or enemies with lower than recommended statistics",
+    "name": "Save 1 lightly hurt person or 1 lightly damaged vehicle/item; small environmental danger or enemy stats below recommended",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -3157,7 +3157,7 @@ export const GC_DATA = {
    },
    {
     "category": "Rescue",
-    "name": "Rescue 1 moderately injured character or salvage 1 moderately damaged vehicle/item from moderate environmental danger or enemies with recommended statistics",
+    "name": "Save 1 moderately hurt person or 1 moderately damaged vehicle/item; medium environmental danger or enemy stats as recommended",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3165,7 +3165,7 @@ export const GC_DATA = {
    },
    {
     "category": "Rescue",
-    "name": "Rescue 1 moderately injured character or salvage 1 moderately damaged vehicle/item from moderate environmental danger or enemies with higher than recommended statistics",
+    "name": "Save 1 moderately hurt person or 1 moderately damaged vehicle/item; medium environmental danger or enemy stats above recommended",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3173,7 +3173,7 @@ export const GC_DATA = {
    },
    {
     "category": "Rescue",
-    "name": "Rescue 1 severely injured character or salvage 1 highly damaged vehicle/item from major environmental danger or enemies with higher than recommended statistics",
+    "name": "Save 1 badly hurt person or 1 badly damaged vehicle/item; large environmental danger or enemy stats above recommended",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3181,7 +3181,7 @@ export const GC_DATA = {
    },
    {
     "category": "Sting",
-    "name": "Execute a thorough pre-planned operation targeting 1 mark",
+    "name": "Run a solid ready-made plan against 1 mark",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -3189,7 +3189,7 @@ export const GC_DATA = {
    },
    {
     "category": "Sting",
-    "name": "Execute a shaky pre-planned operation targeting 1 mark; or concoct and execute an original plan targeting 1 mark",
+    "name": "Run a flimsy ready-made plan against 1 mark; or devise and run a new plan against 1 mark",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -3197,7 +3197,7 @@ export const GC_DATA = {
    },
    {
     "category": "Sting",
-    "name": "Execute a crazy pre-planned operation targeting 1 mark; or concoct and execute an original plan targeting 2+ marks",
+    "name": "Run a wild ready-made plan against 1 mark; or devise and run a new plan against 2+ marks",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3205,7 +3205,7 @@ export const GC_DATA = {
    },
    {
     "category": "Sting",
-    "name": "Concoct and execute an original plan targeting 2+ marks in short time or with few resources",
+    "name": "Devise and run a new plan against 2+ marks, short on either time or resources",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3213,7 +3213,7 @@ export const GC_DATA = {
    },
    {
     "category": "Sting",
-    "name": "Concoct and execute an original plan targeting 2+ marks in short time and with few resources",
+    "name": "Devise and run a new plan against 2+ marks, short on both time and resources",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3221,7 +3221,7 @@ export const GC_DATA = {
    },
    {
     "category": "Test",
-    "name": "Intentionally test gear with unexpected but non-threatening side effects",
+    "name": "Knowingly trial gear whose surprise side effects are harmless",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -3229,7 +3229,7 @@ export const GC_DATA = {
    },
    {
     "category": "Test",
-    "name": "Intentionally test gear with side effects that threaten the user",
+    "name": "Knowingly trial gear whose side effects endanger the user",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -3237,7 +3237,7 @@ export const GC_DATA = {
    },
    {
     "category": "Test",
-    "name": "Intentionally test gear with side effects that threaten the whole team; or unwittingly test gear with unexpected but non-threatening side effects",
+    "name": "Knowingly trial gear whose side effects endanger the team; or unknowingly trial gear whose surprise side effects are harmless",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3245,7 +3245,7 @@ export const GC_DATA = {
    },
    {
     "category": "Test",
-    "name": "Unwittingly test gear with side effects that threaten the user",
+    "name": "Unknowingly trial gear whose side effects endanger the user",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3253,7 +3253,7 @@ export const GC_DATA = {
    },
    {
     "category": "Test",
-    "name": "Unwittingly test gear with side effects that threaten the whole team",
+    "name": "Unknowingly trial gear whose side effects endanger the team",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3261,7 +3261,7 @@ export const GC_DATA = {
    },
    {
     "category": "Transport",
-    "name": "Publicly move an easily carried item/information a short distance with little danger",
+    "name": "Openly carry a portable item/data a short way, low danger",
     "grade": 1,
     "xp": 25,
     "page": 433,
@@ -3269,7 +3269,7 @@ export const GC_DATA = {
    },
    {
     "category": "Transport",
-    "name": "Publicly move an easily carried item/information a moderate distance with mild danger; or secretly a short distance with little danger",
+    "name": "Openly carry a portable item/data a medium way, mild danger; or covertly a short way, low danger",
     "grade": 2,
     "xp": 50,
     "page": 433,
@@ -3277,7 +3277,7 @@ export const GC_DATA = {
    },
    {
     "category": "Transport",
-    "name": "Publicly move a difficult-to-carry item/information a moderate distance with mild danger; or secretly move an easily carried one a moderate distance with mild danger",
+    "name": "Openly carry a bulky item/data a medium way, mild danger; or covertly carry a portable one a medium way, mild danger",
     "grade": 3,
     "xp": 75,
     "page": 433,
@@ -3285,7 +3285,7 @@ export const GC_DATA = {
    },
    {
     "category": "Transport",
-    "name": "Publicly move an easily carried item/information a great distance with substantial danger; or secretly move a difficult-to-carry one a moderate distance with mild danger",
+    "name": "Openly carry a portable item/data a long way, serious danger; or covertly carry a bulky one a medium way, mild danger",
     "grade": 4,
     "xp": 100,
     "page": 433,
@@ -3293,7 +3293,7 @@ export const GC_DATA = {
    },
    {
     "category": "Transport",
-    "name": "Publicly move a difficult-to-carry item/information a great distance with substantial danger; or secretly move any item/information a great distance with substantial danger",
+    "name": "Openly carry a bulky item/data a long way, serious danger; or covertly carry anything a long way, serious danger",
     "grade": 5,
     "xp": 125,
     "page": 433,
@@ -3307,35 +3307,35 @@ export const GC_DATA = {
     "page": 436,
     "xp": 0,
     "xpPrinted": "+0",
-    "note": "Footnoted as recommended for all missions in all games.",
+    "note": "Suggested for every mission in every game (table footnote).",
     "infractions": [
      {
-      "name": "Character steals from any bystander",
+      "name": "Theft from a bystander",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Character intentionally allows bystanders or responsibilities to be harmed/damaged, captured, or killed/destroyed",
+      "name": "Knowingly lets a bystander or responsibility come to harm, capture or death/destruction",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character intentionally harms/damages bystanders or responsibilities",
+      "name": "Deliberately hurts or damages a bystander or responsibility",
       "reputation": -6,
       "netWorth": -300000
      },
      {
-      "name": "Character intentionally allows someone to use brutal force (e.g. mutilation, torture)",
+      "name": "Knowingly lets another person use brutality (torture, mutilation, etc.)",
       "reputation": -8,
       "netWorth": -400000
      },
      {
-      "name": "Character intentionally kills/destroys bystanders or responsibilities",
+      "name": "Deliberately kills or destroys a bystander or responsibility",
       "reputation": -10,
       "netWorth": -500000
      },
      {
-      "name": "Character intentionally uses brutal force for any reason",
+      "name": "Personally uses brutality, whatever the reason",
       "reputation": -10,
       "netWorth": -500000
      }
@@ -3350,27 +3350,27 @@ export const GC_DATA = {
     "note": "",
     "infractions": [
      {
-      "name": "Character responsible for isolated incident (e.g. public brawl, rumors on a sensitive topic)",
+      "name": "Isolated incident (public fight, rumors about a sensitive subject, etc.)",
       "reputation": -1,
       "netWorth": -50000
      },
      {
-      "name": "Character responsible for localized incident (e.g. wanted (1 action die), gang battle, college newspaper story)",
+      "name": "Local incident (Wanted at 1 die, gang fight, campus paper story, etc.)",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Character responsible for citywide incident (e.g. wanted (2 action dice), gang war, city newspaper story)",
+      "name": "Citywide incident (Wanted at 2 dice, gang war, city paper story, etc.)",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character responsible for national incident (e.g. wanted (3 action dice), military battle, national newspaper story)",
+      "name": "National incident (Wanted at 3 dice, military battle, national press story, etc.)",
       "reputation": -6,
       "netWorth": -300000
      },
      {
-      "name": "Character responsible for international incident (e.g. wanted (4 action dice), military war, international newspaper story)",
+      "name": "International incident (Wanted at 4 dice, war, international press story, etc.)",
       "reputation": -8,
       "netWorth": -400000
      }
@@ -3385,82 +3385,82 @@ export const GC_DATA = {
     "note": "",
     "infractions": [
      {
-      "name": "Suspicious activity noticed by up to 10 people",
+      "name": "Suspicious act seen by 1–10 people",
       "reputation": -1,
       "netWorth": -50000
      },
      {
-      "name": "Suspicious activity noticed by 11–100 people",
+      "name": "Suspicious act seen by 11–100 people",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Suspicious activity noticed by 100–500 people",
+      "name": "Suspicious act seen by 100–500 people",
       "reputation": -3,
       "netWorth": -150000
      },
      {
-      "name": "Suspicious activity noticed by 501–1,000 people",
+      "name": "Suspicious act seen by 501–1,000 people",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Suspicious activity noticed by 1,001+ people",
+      "name": "Suspicious act seen by 1,001+ people",
       "reputation": -6,
       "netWorth": -300000
      },
      {
-      "name": "Suspicious activity recorded by civilian",
+      "name": "Suspicious act recorded by a civilian",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Suspicious activity recorded by college or city news agency",
+      "name": "Suspicious act recorded by campus or city news",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Suspicious activity recorded by national or international news agency",
+      "name": "Suspicious act recorded by a national or international news outlet",
       "reputation": -6,
       "netWorth": -300000
      },
      {
-      "name": "Character draws a Small or smaller weapon in public",
+      "name": "Public weapon draw: Small or smaller",
       "reputation": -1,
       "netWorth": -50000
      },
      {
-      "name": "Character draws a Medium or smaller weapon in public",
+      "name": "Public weapon draw: Medium or smaller",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Character draws a Large or bigger weapon in public",
+      "name": "Public weapon draw: Large or bigger",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character attacks with a 1-handed melee weapon in public's visual or hearing range",
+      "name": "Attack within public sight or earshot: 1-handed melee weapon",
       "reputation": 0,
       "netWorth": 0
      },
      {
-      "name": "Character attacks with a 2-handed melee weapon, or any ranged weapon, in public's visual or hearing range",
+      "name": "Attack within public sight or earshot: 2-handed melee weapon or any ranged weapon",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character attacks with an explosive or tactical weapon in public's visual or hearing range",
+      "name": "Attack within public sight or earshot: explosive or tactical weapon",
       "reputation": -8,
       "netWorth": -400000
      },
      {
-      "name": "Character breaks or destroys public vehicle or item of up to Large size",
+      "name": "Wrecks a public vehicle or item, Large or smaller",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character breaks or destroys public building or item of Huge or bigger size",
+      "name": "Wrecks a public building or item, Huge or bigger",
       "reputation": -8,
       "netWorth": -400000
      }
@@ -3475,27 +3475,27 @@ export const GC_DATA = {
     "note": "XP is +25 per critical objective beyond the first; the first is free, and a mission with none loses 50 XP (p.435).",
     "infractions": [
      {
-      "name": "Character fails to complete Grade I mission objective",
+      "name": "Grade I mission objective not completed",
       "reputation": -1,
       "netWorth": -50000
      },
      {
-      "name": "Character fails to complete Grade II mission objective",
+      "name": "Grade II mission objective not completed",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Character fails to complete Grade III mission objective",
+      "name": "Grade III mission objective not completed",
       "reputation": -3,
       "netWorth": -100000
      },
      {
-      "name": "Character fails to complete Grade IV mission objective",
+      "name": "Grade IV mission objective not completed",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character fails to complete Grade V mission objective",
+      "name": "Grade V mission objective not completed",
       "reputation": -5,
       "netWorth": -250000
      }
@@ -3507,30 +3507,30 @@ export const GC_DATA = {
     "page": 436,
     "xp": 0,
     "xpPrinted": "+0",
-    "note": "Footnoted as recommended for all missions in all games.",
+    "note": "Suggested for every mission in every game (table footnote).",
     "infractions": [
      {
-      "name": "Character betrays assigned teammate",
+      "name": "Betrays an assigned teammate",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Character attacks assigned teammate",
+      "name": "Attacks an assigned teammate",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character refuses assignment from Faction or Freelance network",
+      "name": "Turns down a Faction/Freelance network assignment",
       "reputation": -5,
       "netWorth": -250000
      },
      {
-      "name": "Character betrays Faction or Freelance network",
+      "name": "Betrays own Faction/Freelance network",
       "reputation": -10,
       "netWorth": -500000
      },
      {
-      "name": "Character attacks Faction or Freelance network",
+      "name": "Attacks own Faction/Freelance network",
       "reputation": -15,
       "netWorth": -750000
      }
@@ -3545,121 +3545,121 @@ export const GC_DATA = {
     "note": "Infraction list continues on p.437.",
     "infractions": [
      {
-      "name": "Character identified by up to 10 people",
+      "name": "Identified by 1–10 people",
       "reputation": -2,
       "netWorth": -100000
      },
      {
-      "name": "Character identified by 11–100 people",
+      "name": "Identified by 11–100 people",
       "reputation": -4,
       "netWorth": -200000
      },
      {
-      "name": "Character identified by 100–500 people",
+      "name": "Identified by 100–500 people",
       "reputation": -6,
       "netWorth": -300000
      },
      {
-      "name": "Character identified by 501–1,000 people",
+      "name": "Identified by 501–1,000 people",
       "reputation": -8,
       "netWorth": -400000
      },
      {
-      "name": "Character identified by 1,001+ people",
+      "name": "Identified by 1,001+ people",
       "reputation": -10,
       "netWorth": -500000
      },
      {
-      "name": "Character identified by enemy operative",
+      "name": "Identified by an enemy operative",
       "reputation": -12,
       "netWorth": -600000
      },
      {
-      "name": "Character identified by enemy organization or nation",
+      "name": "Identified by an enemy organization or country",
       "reputation": -15,
       "netWorth": -750000,
       "page": 437
      },
      {
-      "name": "Character linked to suspicious activity",
+      "name": "Tied to suspicious activity",
       "reputation": -4,
       "netWorth": -200000,
       "page": 437
      },
      {
-      "name": "Character linked to criminal activity",
+      "name": "Tied to criminal activity",
       "reputation": -8,
       "netWorth": -400000,
       "page": 437
      },
      {
-      "name": "Character responsible for teammate being identified",
+      "name": "Causes a teammate to be identified",
       "reputation": -2,
       "netWorth": -100000,
       "page": 437
      },
      {
-      "name": "Character responsible for teammate being linked to suspicious activity",
+      "name": "Causes a teammate to be tied to suspicious activity",
       "reputation": -4,
       "netWorth": -200000,
       "page": 437
      },
      {
-      "name": "Character responsible for teammate being linked to criminal activity",
+      "name": "Causes a teammate to be tied to criminal activity",
       "reputation": -6,
       "netWorth": -300000,
       "page": 437
      },
      {
-      "name": "Character responsible for Faction or Freelance network being identified",
+      "name": "Causes own Faction/Freelance network to be identified",
       "reputation": -5,
       "netWorth": -250000,
       "page": 437
      },
      {
-      "name": "Character responsible for organization being linked to suspicious activity",
+      "name": "Causes own organization to be tied to suspicious activity",
       "reputation": -10,
       "netWorth": -500000,
       "page": 437
      },
      {
-      "name": "Character responsible for organization being linked to criminal activity",
+      "name": "Causes own organization to be tied to criminal activity",
       "reputation": -15,
       "netWorth": -750000,
       "page": 437
      },
      {
-      "name": "Character allows prototype or unique item to fall into enemy hands",
+      "name": "Lets the enemy obtain a prototype or one-of-a-kind item",
       "reputation": -5,
       "netWorth": -250000,
       "page": 437
      },
      {
-      "name": "Character leaves minor evidence of presence (e.g. issued shell casings; rental under cover identity with Power Rating +1 to +4)",
+      "name": "Minor evidence left behind (issued shell casings; rental on a cover identity of Power Rating +1 to +4)",
       "reputation": -2,
       "netWorth": -100000,
       "page": 437
      },
      {
-      "name": "Character leaves moderate evidence of presence (e.g. issued weapon; rental under cover identity with Power Rating +5 to +8)",
+      "name": "Moderate evidence left behind (issued weapon; rental on a cover identity of Power Rating +5 to +8)",
       "reputation": -4,
       "netWorth": -200000,
       "page": 437
      },
      {
-      "name": "Character leaves major evidence of presence (e.g. issued vehicle; rental without cover identity)",
+      "name": "Major evidence left behind (issued vehicle; rental with no cover identity)",
       "reputation": -8,
       "netWorth": -400000,
       "page": 437
      },
      {
-      "name": "Character incarcerated for minor crime",
+      "name": "Jailed for a minor crime",
       "reputation": -10,
       "netWorth": -500000,
       "page": 437
      },
      {
-      "name": "Character incarcerated for felony",
+      "name": "Jailed for a felony",
       "reputation": -15,
       "netWorth": -750000,
       "page": 437
@@ -3670,7 +3670,7 @@ export const GC_DATA = {
   "gearRestrictions": [
    {
     "id": "minus-1-gear-pick-players-choice",
-    "name": "-1 gear pick (player’s choice)",
+    "name": "-1 gear pick, player picks",
     "xp": 25,
     "page": 437,
     "summary": "Each character loses 1 mission gear pick, chosen by the player.",
@@ -3681,7 +3681,7 @@ export const GC_DATA = {
    },
    {
     "id": "minus-1-gear-pick-gcs-choice",
-    "name": "-1 gear pick (GC’s choice)",
+    "name": "-1 gear pick, GC picks",
     "xp": 50,
     "page": 437,
     "summary": "Each character loses 1 mission gear pick, chosen by the GC.",
@@ -3692,7 +3692,7 @@ export const GC_DATA = {
    },
    {
     "id": "minus-2-gear-picks-players-choice",
-    "name": "-2 gear picks (player’s choice)",
+    "name": "-2 gear picks, player picks",
     "xp": 75,
     "page": 437,
     "summary": "Each character loses 2 mission gear picks, chosen by the player.",
@@ -3703,7 +3703,7 @@ export const GC_DATA = {
    },
    {
     "id": "minus-2-gear-picks-gcs-choice",
-    "name": "-2 gear picks (GC’s choice)",
+    "name": "-2 gear picks, GC picks",
     "xp": 100,
     "page": 437,
     "summary": "Each character loses 2 mission gear picks, chosen by the GC.",
@@ -3714,7 +3714,7 @@ export const GC_DATA = {
    },
    {
     "id": "minus-3-gear-picks-players-choice",
-    "name": "-3 gear picks (player’s choice)",
+    "name": "-3 gear picks, player picks",
     "xp": 125,
     "page": 437,
     "summary": "Each character loses 3 mission gear picks, chosen by the player.",
@@ -3725,7 +3725,7 @@ export const GC_DATA = {
    },
    {
     "id": "minus-3-gear-picks-gcs-choice",
-    "name": "-3 gear picks (GC’s choice)",
+    "name": "-3 gear picks, GC picks",
     "xp": 150,
     "page": 437,
     "summary": "Each character loses 3 mission gear picks, chosen by the GC.",
@@ -3736,7 +3736,7 @@ export const GC_DATA = {
    },
    {
     "id": "restricted-weapon-options",
-    "name": "Restricted weapon options (12 specific weapons available, chosen by GC)",
+    "name": "Weapons limited to 12 GC-picked models",
     "xp": 75,
     "page": 437,
     "summary": "Weapon picks limited to a GC-chosen list of 12 specific weapons.",
@@ -3747,7 +3747,7 @@ export const GC_DATA = {
    },
    {
     "id": "restricted-gadget-options",
-    "name": "Restricted gadget options (12 specific Mechanisms available, chosen by GC)",
+    "name": "Gadgets limited to 12 GC-picked Mechanisms",
     "xp": 75,
     "page": 437,
     "summary": "Gadget picks limited to a GC-chosen list of 12 specific Mechanisms.",
@@ -3778,15 +3778,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable or Falsify/Forgery",
     "openDC": "10 + (PR × 2)",
     "breakingOpens": false,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 2); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
-    "raw": {
-     "Lock": "Badge/card/strip reader",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR) †",
-     "Open Skill*": "Security/Disable or Falsify/Forgery ††",
-     "Open DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 2"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 2); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item."
    },
    {
     "id": "car-door-lock",
@@ -3808,15 +3800,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 2)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 2).",
-    "raw": {
-     "Lock": "Car door lock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 2)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 3"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 2)."
    },
    {
     "id": "combination-lock",
@@ -3838,15 +3822,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 2)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 2).",
-    "raw": {
-     "Lock": "Combination lock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 2)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 2"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 2)."
    },
    {
     "id": "dead-bolt-lock",
@@ -3868,15 +3844,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 3)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 3).",
-    "raw": {
-     "Lock": "Dead bolt lock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 3)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 3)."
    },
    {
     "id": "door-hinge",
@@ -3898,15 +3866,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 1)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 1); Damage save +(PR × 2).",
-    "raw": {
-     "Lock": "Door hinge",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 2)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 1)",
-     "XP Reward*": "PR × 1"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 1); Damage save +(PR × 2)."
    },
    {
     "id": "electronic-keypad-lock",
@@ -3928,15 +3888,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 2)",
     "breakingOpens": false,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks.",
-    "raw": {
-     "Lock": "Electronic keypad lock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR) †",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 2"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks."
    },
    {
     "id": "finger-palm-print-scanner",
@@ -3958,15 +3910,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable or Falsify/Forgery",
     "openDC": "10 + (PR × 3)",
     "breakingOpens": false,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 3); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
-    "raw": {
-     "Lock": "Finger/palm print scanner",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR) †",
-     "Open Skill*": "Security/Disable or Falsify/Forgery ††",
-     "Open DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 3); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item."
    },
    {
     "id": "maglock",
@@ -3988,15 +3932,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 3)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 3).",
-    "raw": {
-     "Lock": "Maglock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 3)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 7"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 3)."
    },
    {
     "id": "padlock",
@@ -4018,15 +3954,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 1)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 1); Damage save +(PR × 2).",
-    "raw": {
-     "Lock": "Padlock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 2)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 1)",
-     "XP Reward*": "PR × 1"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 1); Damage save +(PR × 2)."
    },
    {
     "id": "puzzle-box",
@@ -4048,15 +3976,7 @@ export const GC_DATA = {
     "openSkill": "Analysis (Int)",
     "openDC": "10 + (PR × 4)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Analysis (Int) against DC 10 + (PR × 4); Damage save +(PR × 2).",
-    "raw": {
-     "Lock": "Puzzle box",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 2)",
-     "Open Skill*": "Analysis (Int)",
-     "Open DC*": "10 + (PR × 4)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Secures 1 portal or container. Opened with Analysis (Int) against DC 10 + (PR × 4); Damage save +(PR × 2)."
    },
    {
     "id": "retinal-dna-scanner",
@@ -4078,15 +3998,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable or Falsify/Forgery",
     "openDC": "10 + (PR × 5)",
     "breakingOpens": false,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 5); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
-    "raw": {
-     "Lock": "Retinal/DNA scanner",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR) †",
-     "Open Skill*": "Security/Disable or Falsify/Forgery ††",
-     "Open DC*": "10 + (PR × 5)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 5); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item."
    },
    {
     "id": "safe-lock",
@@ -4108,15 +4020,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 3)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 4).",
-    "raw": {
-     "Lock": "Safe lock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 4)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 7"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 4)."
    },
    {
     "id": "signature-analyzer",
@@ -4138,15 +4042,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable or Falsify/Forgery",
     "openDC": "10 + (PR × 3)",
     "breakingOpens": false,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 3); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
-    "raw": {
-     "Lock": "Signature analyzer",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR) †",
-     "Open Skill*": "Security/Disable or Falsify/Forgery ††",
-     "Open DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 3); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item."
    },
    {
     "id": "tumbler-lock",
@@ -4168,15 +4064,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 2)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 3).",
-    "raw": {
-     "Lock": "Tumbler lock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 3)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 3"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 3)."
    },
    {
     "id": "vault-lock",
@@ -4198,15 +4086,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable",
     "openDC": "10 + (PR × 5)",
     "breakingOpens": true,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 5); Damage save +(PR × 5).",
-    "raw": {
-     "Lock": "Vault lock",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR × 5)",
-     "Open Skill*": "Security/Disable",
-     "Open DC*": "10 + (PR × 5)",
-     "XP Reward*": "PR × 10"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 5); Damage save +(PR × 5)."
    },
    {
     "id": "voice-print-scanner",
@@ -4228,15 +4108,7 @@ export const GC_DATA = {
     "openSkill": "Security/Disable or Bluff/Deception",
     "openDC": "10 + (PR × 4)",
     "breakingOpens": false,
-    "summary": "Secures 1 portal or container. Opened with Security/Disable or Bluff/Deception against DC 10 + (PR × 4); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks.",
-    "raw": {
-     "Lock": "Voice print scanner",
-     "Target Area*": "1 portal or container",
-     "Damage Save Bonus*": "+(PR)†",
-     "Open Skill*": "Security/Disable or Bluff/Deception",
-     "Open DC*": "10 + (PR × 4)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Secures 1 portal or container. Opened with Security/Disable or Bluff/Deception against DC 10 + (PR × 4); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks."
    },
    {
     "id": "chemical-sniffer",
@@ -4257,16 +4129,7 @@ export const GC_DATA = {
     "targetArea": "PR × 5 ft. radius",
     "autoTrigger": true,
     "autoDetected": false,
-    "summary": "Covers PR × 5 ft. radius. Trips automatically unless disabled. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "Chemical sniffer",
-     "Target Area*": "PR × 5 ft. radius",
-     "Awareness Bonus*": "None ∆∆",
-     "Opposed Skill**": "None ∆∆",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Covers PR × 5 ft. radius. Trips automatically unless disabled. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "circuit-wires-embedded",
@@ -4287,16 +4150,7 @@ export const GC_DATA = {
     "targetArea": "1 window or door",
     "autoTrigger": true,
     "autoDetected": false,
-    "summary": "Covers 1 window or door. Trips automatically unless disabled. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 4).",
-    "raw": {
-     "Sensor": "Circuit wires (embedded)",
-     "Target Area*": "1 window or door",
-     "Awareness Bonus*": "None ∆∆",
-     "Opposed Skill**": "None ∆∆",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 4)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Covers 1 window or door. Trips automatically unless disabled. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 4)."
    },
    {
     "id": "contact-plate",
@@ -4317,16 +4171,7 @@ export const GC_DATA = {
     "targetArea": "1 lock",
     "autoTrigger": true,
     "autoDetected": false,
-    "summary": "Covers 1 lock. Trips automatically unless disabled. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Sensor": "Contact plate",
-     "Target Area*": "1 lock",
-     "Awareness Bonus*": "None ∆∆",
-     "Opposed Skill**": "None ∆∆",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Covers 1 lock. Trips automatically unless disabled. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "heat-sensor",
@@ -4347,16 +4192,7 @@ export const GC_DATA = {
     "targetArea": "PR × 5 ft. radius",
     "autoTrigger": true,
     "autoDetected": false,
-    "summary": "Covers PR × 5 ft. radius. Trips automatically unless disabled. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "Heat sensor",
-     "Target Area*": "PR × 5 ft. radius",
-     "Awareness Bonus*": "None ∆∆",
-     "Opposed Skill**": "None ∆∆",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 10"
-    }
+    "summary": "Covers PR × 5 ft. radius. Trips automatically unless disabled. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "metal-detector",
@@ -4377,16 +4213,7 @@ export const GC_DATA = {
     "targetArea": "1 entry point",
     "autoTrigger": true,
     "autoDetected": true,
-    "summary": "Covers 1 entry point. Trips automatically unless disabled. Obvious, no check to detect; Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "Metal detector",
-     "Target Area*": "1 entry point",
-     "Awareness Bonus*": "None ∆∆",
-     "Opposed Skill**": "None ∆∆",
-     "Detect DC*∆": "None (automatic)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Covers 1 entry point. Trips automatically unless disabled. Obvious, no check to detect; Disable DC 10 + (PR × 3)."
    },
    {
     "id": "motion-sensor",
@@ -4407,16 +4234,7 @@ export const GC_DATA = {
     "targetArea": "PR × 25 ft. cone",
     "autoTrigger": false,
     "autoDetected": false,
-    "summary": "Covers PR × 25 ft. cone. Awareness +(PR × 2) opposed by the intruder's Acrobatics (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "Motion sensor",
-     "Target Area*": "PR × 25 ft. cone",
-     "Awareness Bonus*": "+(PR × 2)",
-     "Opposed Skill**": "Acrobatics (Dex)",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Covers PR × 25 ft. cone. Awareness +(PR × 2) opposed by the intruder's Acrobatics (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "noise-sensor",
@@ -4437,16 +4255,7 @@ export const GC_DATA = {
     "targetArea": "PR × 10 ft. radius",
     "autoTrigger": false,
     "autoDetected": false,
-    "summary": "Covers PR × 10 ft. radius. Awareness +(PR × 3) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "Noise sensor",
-     "Target Area*": "PR × 10 ft. radius",
-     "Awareness Bonus*": "+(PR × 3)",
-     "Opposed Skill**": "Blend (Dex) or Sneak (Dex)",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Covers PR × 10 ft. radius. Awareness +(PR × 3) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "pressure-plate",
@@ -4467,16 +4276,7 @@ export const GC_DATA = {
     "targetArea": "(PR) 5-ft. squares",
     "autoTrigger": true,
     "autoDetected": false,
-    "summary": "Covers (PR) 5-ft. squares. Trips automatically unless disabled. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 4).",
-    "raw": {
-     "Sensor": "Pressure plate",
-     "Target Area*": "(PR) 5-ft. squares",
-     "Awareness Bonus*": "None ∆∆",
-     "Opposed Skill**": "None ∆∆",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 4)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Covers (PR) 5-ft. squares. Trips automatically unless disabled. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 4)."
    },
    {
     "id": "tripwire",
@@ -4494,19 +4294,10 @@ export const GC_DATA = {
     "saveDC": null,
     "damage": "",
     "repeats": false,
-    "targetArea": "(PR) 5-ft. squares in a line",
+    "targetArea": "Line of (PR) 5-ft. squares",
     "autoTrigger": false,
     "autoDetected": false,
-    "summary": "Covers (PR) 5-ft. squares in a line. Avoided with a Reflex save DC 10 + PR. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Sensor": "Tripwire",
-     "Target Area*": "(PR) 5-ft. squares in a line",
-     "Awareness Bonus*": "—",
-     "Opposed Skill**": "Special ΩΩ",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Covers a line of (PR) 5-ft. squares. Avoided with a Reflex save DC 10 + PR. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "tripwire-laser",
@@ -4524,19 +4315,10 @@ export const GC_DATA = {
     "saveDC": null,
     "damage": "",
     "repeats": false,
-    "targetArea": "(PR × 2) 5-ft. squares in a line",
+    "targetArea": "Line of (PR × 2) 5-ft. squares",
     "autoTrigger": false,
     "autoDetected": false,
-    "summary": "Covers (PR × 2) 5-ft. squares in a line. Avoided with a Reflex save DC 15 + PR. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "Tripwire, laser",
-     "Target Area*": "(PR × 2) 5-ft. squares in a line",
-     "Awareness Bonus*": "—",
-     "Opposed Skill**": "Special ΩΩ",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Covers a line of (PR × 2) 5-ft. squares. Avoided with a Reflex save DC 15 + PR. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "vibration-sensor",
@@ -4557,16 +4339,7 @@ export const GC_DATA = {
     "targetArea": "PR × 5 ft. radius",
     "autoTrigger": false,
     "autoDetected": false,
-    "summary": "Covers PR × 5 ft. radius. Awareness +(PR × 4) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "Vibration sensor",
-     "Target Area*": "PR × 5 ft. radius",
-     "Awareness Bonus*": "+(PR × 4)",
-     "Opposed Skill**": "Blend (Dex) or Sneak (Dex)",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Covers PR × 5 ft. radius. Awareness +(PR × 4) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "video-camera",
@@ -4587,16 +4360,7 @@ export const GC_DATA = {
     "targetArea": "PR × 25 ft. cone",
     "autoTrigger": false,
     "autoDetected": false,
-    "summary": "Covers PR × 25 ft. cone. Awareness +(PR × 2) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3). Awareness bonus is for an automated eye; a human watching the feed uses their own bonus.",
-    "raw": {
-     "Sensor": "Video camera Ω",
-     "Target Area*": "PR × 25 ft. cone",
-     "Awareness Bonus*": "+(PR × 2)",
-     "Opposed Skill**": "Blend (Dex) or Sneak (Dex)",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Covers PR × 25 ft. cone. Awareness +(PR × 2) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3). Awareness bonus is for an automated eye; a human watching the feed uses their own bonus."
    },
    {
     "id": "x-ray-checkpoint",
@@ -4617,16 +4381,7 @@ export const GC_DATA = {
     "targetArea": "1 entry point",
     "autoTrigger": true,
     "autoDetected": true,
-    "summary": "Covers 1 entry point. Trips automatically unless disabled. Obvious, no check to detect; Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Sensor": "X-ray checkpoint",
-     "Target Area*": "1 entry point",
-     "Awareness Bonus*": "None ∆∆",
-     "Opposed Skill**": "None ∆∆",
-     "Detect DC*∆": "None (automatic)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Covers 1 entry point. Trips automatically unless disabled. Obvious, no check to detect; Disable DC 10 + (PR × 3)."
    },
    {
     "id": "acid-jet",
@@ -4648,16 +4403,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": true,
-    "summary": "Area/range: (PR) ft. (min. 5 ft.). Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d6 acid. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Acid jet",
-     "Target Area/Range*": "(PR) ft. (min. 5 ft.) ∞∞",
-     "Attack Bonus/Save DC*": "DC 10 + PR",
-     "Damage*": "(PR)d6 acid",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 10"
-    }
+    "summary": "Area/range: (PR) ft. (min. 5 ft.). Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d6 acid. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "automated-weapon-explosive",
@@ -4675,20 +4421,11 @@ export const GC_DATA = {
     "saveDC": "per explosive",
     "damage": "Per explosive",
     "repeats": false,
-    "targetArea": "Per Blast (see page 343)",
+    "targetArea": "As the explosive's blast (p.343)",
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Per Blast (see page 343). Reflex save DC per explosive for half damage (rounded down). Damage: Per explosive. XP is per die of explosive damage (max +10). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Automated weapon, explosive",
-     "Target Area/Range*": "Per Blast (see page 343)",
-     "Attack Bonus/Save DC*": "DC per explosive",
-     "Damage*": "Per explosive",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8 §§"
-    }
+    "summary": "Area/range: As the explosive's blast (p.343). Reflex save DC per explosive for half damage (rounded down). Damage: Per explosive. XP counts each die of explosive damage (cap +10). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "automated-weapon-handgun",
@@ -4710,16 +4447,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Automated weapon, handgun",
-     "Target Area/Range*": "Per weapon",
-     "Attack Bonus/Save DC*": "+(PR × 2) §",
-     "Damage*": "Per weapon",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 5"
-    }
+    "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "automated-weapon-rifle",
@@ -4741,16 +4469,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Automated weapon, rifle",
-     "Target Area/Range*": "Per weapon",
-     "Attack Bonus/Save DC*": "+(PR × 2) §",
-     "Damage*": "Per weapon",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "automated-weapon-tactical",
@@ -4772,16 +4491,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Automated weapon, tactical",
-     "Target Area/Range*": "Per weapon",
-     "Attack Bonus/Save DC*": "+(PR × 2) §",
-     "Damage*": "Per weapon",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 10"
-    }
+    "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "bear-trap",
@@ -4803,16 +4513,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: 1 square. Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d4 lethal. Usually set in the wild rather than linked to locks or sensors. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Bear trap ◊",
-     "Target Area/Range*": "1 square",
-     "Attack Bonus/Save DC*": "DC 10 + PR",
-     "Damage*": "(PR)d4 lethal",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Area/range: 1 square. Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d4 lethal. Usually set in the wild rather than linked to locks or sensors. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "cage-trap",
@@ -4834,16 +4535,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: 1 square. Reflex save DC 10 + PR for half damage (rounded down). No damage; victim is caged (cage Damage save PR × 3, Security/Disable DC 10 + (PR × 2)). Usually set in the wild rather than linked to locks or sensors. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Cage trap ◊",
-     "Target Area/Range*": "1 square",
-     "Attack Bonus/Save DC*": "DC 10 + PR",
-     "Damage*": "None ◊◊",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: 1 square. Reflex save DC 10 + PR for half damage (rounded down). No damage; victim is caged (cage Damage save PR × 3, Security/Disable DC 10 + (PR × 2)). Usually set in the wild rather than linked to locks or sensors. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "crushing-wall",
@@ -4861,20 +4553,11 @@ export const GC_DATA = {
     "saveDC": null,
     "damage": "(PR × 2)d6 lethal",
     "repeats": false,
-    "targetArea": "Up to (10 + PR) squares",
+    "targetArea": "(10 + PR) squares at most",
     "autoHit": true,
     "delayRounds": "1d4+1",
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Up to (10 + PR) squares. Hits automatically. Effect applies after 1d4+1 rounds. Damage: (PR × 2)d6 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Crushing wall",
-     "Target Area/Range*": "Up to (10 + PR) squares",
-     "Attack Bonus/Save DC*": "Automatic hit ∞",
-     "Damage*": "(PR × 2)d6 lethal",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: (10 + PR) squares at most. Hits automatically. Effect applies after 1d4+1 rounds. Damage: (PR × 2)d6 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "crushing-wall-spiked",
@@ -4892,20 +4575,11 @@ export const GC_DATA = {
     "saveDC": null,
     "damage": "(PR × 2)d8 lethal",
     "repeats": false,
-    "targetArea": "Up to (10 + PR) squares",
+    "targetArea": "(10 + PR) squares at most",
     "autoHit": true,
     "delayRounds": "1d4+1",
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Up to (10 + PR) squares. Hits automatically. Effect applies after 1d4+1 rounds. Damage: (PR × 2)d8 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Crushing wall, spiked",
-     "Target Area/Range*": "Up to (10 + PR) squares",
-     "Attack Bonus/Save DC*": "Automatic hit ∞",
-     "Damage*": "(PR × 2)d8 lethal",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: (10 + PR) squares at most. Hits automatically. Effect applies after 1d4+1 rounds. Damage: (PR × 2)d8 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "electrified-surface",
@@ -4923,20 +4597,11 @@ export const GC_DATA = {
     "saveDC": null,
     "damage": "(PR)d10 electrical",
     "repeats": false,
-    "targetArea": "Up to (10 + PR) squares",
+    "targetArea": "(10 + PR) squares at most",
     "autoHit": true,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Up to (10 + PR) squares. Hits automatically. Damage: (PR)d10 electrical. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Electrified surface",
-     "Target Area/Range*": "Up to (10 + PR) squares",
-     "Attack Bonus/Save DC*": "Automatic hit",
-     "Damage*": "(PR)d10 electrical",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: (10 + PR) squares at most. Hits automatically. Damage: (PR)d10 electrical. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "fire-jet",
@@ -4958,16 +4623,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": true,
-    "summary": "Area/range: (PR) ft. (min. 5 ft.). Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d6 fire. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Fire jet",
-     "Target Area/Range*": "(PR) ft. (min. 5 ft.) ∞∞",
-     "Attack Bonus/Save DC*": "DC 10 + PR",
-     "Damage*": "(PR)d6 fire",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 10"
-    }
+    "summary": "Area/range: (PR) ft. (min. 5 ft.). Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d6 fire. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "flooding-chamber",
@@ -4985,20 +4641,11 @@ export const GC_DATA = {
     "saveDC": null,
     "damage": "Per drowning",
     "repeats": false,
-    "targetArea": "Up to (10 + PR) squares",
+    "targetArea": "(10 + PR) squares at most",
     "autoHit": false,
     "delayRounds": "1d4+1",
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Up to (10 + PR) squares. No attack roll or save listed. Effect applies after 1d4+1 rounds. Damage: Per drowning. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Flooding chamber",
-     "Target Area/Range*": "Up to (10 + PR) squares",
-     "Attack Bonus/Save DC*": "None ∞",
-     "Damage*": "Per drowning",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: (10 + PR) squares at most. No attack roll or save listed. Effect applies after 1d4+1 rounds. Damage: Per drowning. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "gas-vent",
@@ -5020,16 +4667,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: (PR × 5) ft. radius. No attack roll or save listed. Damage: Per contagion. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Gas vent",
-     "Target Area/Range*": "(PR × 5) ft. radius",
-     "Attack Bonus/Save DC*": "None",
-     "Damage*": "Per contagion",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: (PR × 5) ft. radius. No attack roll or save listed. Damage: Per contagion. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "hydraulic-buzz-saw",
@@ -5051,16 +4689,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Same or adjacent square. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: (PR + 2)d6 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Hydraulic buzz-saw",
-     "Target Area/Range*": "Same or adjacent square",
-     "Attack Bonus/Save DC*": "+(PR × 2) §",
-     "Damage*": "(PR + 2)d6 lethal",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Area/range: Same or adjacent square. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: (PR + 2)d6 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "klaxon",
@@ -5082,16 +4711,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: (PR × 10) ft. radius. No attack roll or save listed. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Klaxon",
-     "Target Area/Range*": "(PR × 10) ft. radius",
-     "Attack Bonus/Save DC*": "None",
-     "Damage*": "None",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Area/range: (PR × 10) ft. radius. No attack roll or save listed. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "laser-mesh",
@@ -5109,20 +4729,11 @@ export const GC_DATA = {
     "saveDC": "12 + PR",
     "damage": "(PR × 2)d6 laser",
     "repeats": false,
-    "targetArea": "Room’s entire height and width (up to PR in squares)",
+    "targetArea": "Full cross-section of a room (PR squares at most)",
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Room’s entire height and width (up to PR in squares). Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR × 2)d6 laser. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Laser mesh",
-     "Target Area/Range*": "Room’s entire height and width (up to PR in squares)",
-     "Attack Bonus/Save DC*": "DC 12 + PR",
-     "Damage*": "(PR × 2)d6 laser",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 10"
-    }
+    "summary": "Area/range: Full cross-section of a room (PR squares at most). Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR × 2)d6 laser. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "laser-turret",
@@ -5144,16 +4755,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": true,
-    "summary": "Area/range: (PR × 25) ft.. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: (PR)d6 laser. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 4).",
-    "raw": {
-     "Trap": "Laser Turret",
-     "Target Area/Range*": "(PR × 25) ft. ∞∞",
-     "Attack Bonus/Save DC*": "+(PR × 2) §",
-     "Damage*": "(PR)d6 laser",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 4)",
-     "XP Reward*": "PR × 10"
-    }
+    "summary": "Area/range: (PR × 25) ft. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: (PR)d6 laser. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 4)."
    },
    {
     "id": "net-gun",
@@ -5175,16 +4777,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": true,
-    "summary": "Area/range: (PR × 10) ft.. Attacks at +(PR × 3) (error 1, threat 20). Damage: Entangled. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Net gun",
-     "Target Area/Range*": "(PR × 10) ft. ∞∞",
-     "Attack Bonus/Save DC*": "+(PR × 3)",
-     "Damage*": "Entangled",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Area/range: (PR × 10) ft. Attacks at +(PR × 3) (error 1, threat 20). Damage: Entangled. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "pit",
@@ -5202,20 +4795,11 @@ export const GC_DATA = {
     "saveDC": "12 + PR",
     "damage": "(PR)d6 falling",
     "repeats": false,
-    "targetArea": "Up to (PR) squares",
+    "targetArea": "(PR) squares at most",
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Up to (PR) squares. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d6 falling. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Pit",
-     "Target Area/Range*": "Up to (PR) squares",
-     "Attack Bonus/Save DC*": "DC 12 + PR",
-     "Damage*": "(PR)d6 falling",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: (PR) squares at most. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d6 falling. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "pit-spiked",
@@ -5233,20 +4817,11 @@ export const GC_DATA = {
     "saveDC": "12 + PR",
     "damage": "(PR)d8 falling",
     "repeats": false,
-    "targetArea": "Up to (PR) squares",
+    "targetArea": "(PR) squares at most",
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Up to (PR) squares. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 falling. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Pit, spiked",
-     "Target Area/Range*": "Up to (PR) squares",
-     "Attack Bonus/Save DC*": "DC 12 + PR",
-     "Damage*": "(PR)d8 falling",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: (PR) squares at most. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 falling. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "poison-dart",
@@ -5268,16 +4843,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": true,
-    "summary": "Area/range: (PR × 5) ft.. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per contagion. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Poison dart",
-     "Target Area/Range*": "(PR × 5) ft. ∞∞",
-     "Attack Bonus/Save DC*": "+(PR × 2) §",
-     "Damage*": "Per contagion",
-     "Detect DC*∆": "10 + (PR × 3)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Area/range: (PR × 5) ft. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per contagion. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "spring-loaded-blade",
@@ -5299,16 +4865,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: 1 adjacent square. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 lethal. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Spring-loaded blade",
-     "Target Area/Range*": "1 adjacent square",
-     "Attack Bonus/Save DC*": "DC 12 + PR",
-     "Damage*": "(PR)d8 lethal",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: 1 adjacent square. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 lethal. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "spring-loaded-ram",
@@ -5330,16 +4887,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: 1 adjacent square. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 subdual. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Spring-loaded ram",
-     "Target Area/Range*": "1 adjacent square",
-     "Attack Bonus/Save DC*": "DC 12 + PR",
-     "Damage*": "(PR)d8 subdual",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 4"
-    }
+    "summary": "Area/range: 1 adjacent square. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 subdual. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "steam-jet",
@@ -5361,16 +4909,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: Same or adjacent square. Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d4 heat. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
-    "raw": {
-     "Trap": "Steam jet",
-     "Target Area/Range*": "Same or adjacent square",
-     "Attack Bonus/Save DC*": "DC 10 + PR",
-     "Damage*": "(PR)d4 heat",
-     "Detect DC*∆": "10 + (PR × 4)",
-     "Disable DC*": "10 + (PR × 2)",
-     "XP Reward*": "PR × 6"
-    }
+    "summary": "Area/range: Same or adjacent square. Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d4 heat. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2)."
    },
    {
     "id": "strobe-flash",
@@ -5392,16 +4931,7 @@ export const GC_DATA = {
     "autoHit": false,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: (PR × 5) ft. radius. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d6 flash. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Strobe flash",
-     "Target Area/Range*": "(PR × 5) ft. radius",
-     "Attack Bonus/Save DC*": "DC 12 + PR",
-     "Damage*": "(PR)d6 flash",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Area/range: (PR × 5) ft. radius. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d6 flash. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3)."
    },
    {
     "id": "ultrasonic-siren",
@@ -5423,16 +4953,7 @@ export const GC_DATA = {
     "autoHit": true,
     "delayRounds": null,
     "rangeIncrementFromPR": false,
-    "summary": "Area/range: (PR × 5) ft. radius. Hits automatically. Damage: (PR)d6 bang. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
-    "raw": {
-     "Trap": "Ultrasonic siren",
-     "Target Area/Range*": "(PR × 5) ft. radius",
-     "Attack Bonus/Save DC*": "Automatic hit",
-     "Damage*": "(PR)d6 bang",
-     "Detect DC*∆": "10 + (PR × 2)",
-     "Disable DC*": "10 + (PR × 3)",
-     "XP Reward*": "PR × 8"
-    }
+    "summary": "Area/range: (PR × 5) ft. radius. Hits automatically. Damage: (PR)d6 bang. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3)."
    }
   ],
   "reputation": {
@@ -5493,148 +5014,119 @@ export const GC_DATA = {
   "anomalies": [
    {
     "where": "Table 7.2 Hazards / Table 7.3 Nature's Fury (schema)",
-    "printed": "Rows are keyed by \"Action Die Cost\" (1-4, contagion 1-8*), with no dice ranges",
-    "comment": "Neither table is rolled; both are placed under lookups (hazards, naturesFury) instead of rollTables. Only Table 7.16 is a rolled table."
+    "comment": "Both tables are keyed by action dice spent (1-4; contagion up to 8), with no dice ranges. Neither is rolled; both are placed under lookups (hazards, naturesFury) instead of rollTables. Only Table 7.16 is a rolled table."
    },
    {
     "where": "Table 7.2 Hazards, Contagion cost 3",
-    "printed": "any disease with a Complexity DC up to 65–70",
-    "comment": "\"up to\" combined with a range; other rows say \"of 55–60\" etc. Transcribed as 65-70."
+    "comment": "The source combines \"up to\" with a DC range in this row, unlike the neighbouring rows. Stored as 65-70."
    },
    {
     "where": "Table 7.2 Hazards, Contagion costs 5*-8*",
-    "printed": "5*, 6*, 7*, 8*",
-    "comment": "Costs above the general 1-4 dice event cap, allowed by footnote. Event costMax left at 4; rows flagged exceedsLimit."
+    "comment": "Costs 5-8 are above the general 1-4 dice event cap, allowed by footnote. Event costMax left at 4; rows flagged exceedsLimit."
    },
    {
     "where": "Table 7.3 Nature's Fury, Volcanic Eruption cost 3 (Moderate), p.402",
-    "printed": "Fort save (DC 20) or become deafened until 3d6 hours after inflicting 1d10 fire and stress damage per action die spent",
-    "comment": "Text lines swapped with the cost 4 row in the source. \"after end of eruption; GC may spend 3 action dice to hit 1 character with 1 volcanic bomb\" is presumably intended but the bomb cost is not printed here; bombDice left null."
+    "comment": "Source lines for this row are scrambled with the cost 4 row: the deafness clause runs straight into the volcanic bomb damage. An until-the-eruption-ends duration and a 3-dice bomb are presumably intended, but the bomb cost does not appear here; bombDice left null."
    },
    {
     "where": "Table 7.3 Nature's Fury, Volcanic Eruption cost 4 (Major), p.402",
-    "printed": "vision and hearing ranges end of eruption; GC may spend 4 action dice ...",
-    "comment": "Range multiplier, Fort save DC and deafness duration are missing from the source (pattern would suggest DC 25 and 4d6 hours, but not printed). Fields left null."
+    "comment": "Range multiplier, Fort save DC and deafness duration are absent from the source (the pattern would suggest DC 25 and 4d6 hours). Fields left null."
    },
    {
     "where": "Table 7.3 Nature's Fury footnotes",
-    "printed": "† Some natural conditions prompt additional effects, as shown on Table 5.14",
-    "comment": "The single-dagger footnote has no visible reference mark in the table header or rows."
+    "comment": "The single-dagger footnote (extra effects from Table 5.14) has no visible reference mark in the table header or rows."
    },
    {
     "where": "Table 7.3 Nature's Fury, Fog",
-    "printed": "Only costs 1-3 listed",
-    "comment": "Fog has no 4-dice row; other types have 4."
+    "comment": "Fog has only costs 1-3; other types have 4."
    },
    {
     "where": "Table 7.16 Random Possessions, Minion",
-    "printed": "19–20 Real name ID; 20 Clue leading to a henchman",
-    "comment": "Overlap on 20 (two rows claim it). Kept as printed; likely intended 19 = Real name ID, 20 = Clue (matching the Henchman sub-table pattern)."
+    "comment": "Results 19-20 (real-name ID) and 20 (henchman clue) overlap on 20. Kept as in the source; likely intended 19 and 20 respectively, matching the Henchman sub-table pattern."
    },
    {
     "where": "Table 7.7 Exposure, Complete Critical Objective, Grade III",
-    "printed": "–3/–$100,000",
-    "comment": "Breaks the $50,000-per-point pattern (expected -$150,000). Kept as printed."
+    "comment": "Grade III row: -3 Reputation but only -$100,000, breaking the $50,000-per-point pattern (expected -$150,000). Kept as in the source."
    },
    {
     "where": "Table 7.7 Exposure, Avoid \"Noise\" and Maintain Anonymity crowd bands",
-    "printed": "11–100 people, then 100–500 people",
-    "comment": "Bands overlap at exactly 100 (probably 101-500). Kept as printed."
+    "comment": "Crowd bands 11-100 and 100-500 overlap at exactly 100 (probably 101-500). Kept as in the source."
    },
    {
     "where": "Table 7.7 Exposure, Avoid \"Noise\"",
-    "printed": "Character attacks with a 1-handed melee weapon ... –0/–$0",
-    "comment": "Zero penalty row; stored as reputation 0, netWorth 0."
+    "comment": "The 1-handed melee attack row carries a zero penalty; stored as reputation 0, netWorth 0."
    },
    {
     "where": "Table 7.7 Exposure, Avoid \"Noise\"",
-    "printed": "draws a Small or smaller weapon ... –1; draws a Medium or smaller weapon ... –2",
-    "comment": "\"Medium or smaller\" overlaps \"Small or smaller\"; probably means Medium. Kept as printed."
+    "comment": "The Medium weapon-draw row says \"or smaller\", overlapping the Small row; probably means Medium only. Kept as in the source."
    },
    {
     "where": "Table 7.7 Exposure, Maintain Anonymity",
-    "printed": "–10/–$500,000t",
-    "comment": "Stray \"t\" after the Net Worth value (OCR/typo); stored as -500000."
+    "comment": "Stray letter after the -$500,000 Net Worth value (OCR/typo); stored as -500000."
    },
    {
     "where": "Table 7.7 Exposure, objective header",
-    "printed": "Complete Critical Objective (Complicaton)**  +25 per add. objective",
-    "comment": "Typo \"Complicaton\" corrected in the name. XP is per additional critical objective, stored as xp 25 with xpPrinted and note. Footnote ** cites page 437 for critical objectives but the rule is on p.435."
+    "comment": "Source misspells \"Complication\"; corrected in the name. XP is per additional critical objective, stored as xp 25 with xpPrinted and note. The footnote cites page 437 for critical objectives but the rule is on p.435."
    },
    {
     "where": "Table 7.7 Exposure, column header",
-    "printed": "XP Reward Worth | Reputation/Net Penalty*",
-    "comment": "Header words appear shuffled (should read \"XP Reward\" and \"Reputation/Net Worth Penalty\")."
+    "comment": "Header words appear shuffled in the source (should read \"XP Reward\" and \"Reputation/Net Worth Penalty\")."
    },
    {
     "where": "Table 7.9 Security Options, sensor header",
-    "printed": "Target Area* Awareness / Sensor Bonus* Skill** Opposed",
-    "comment": "Header cells garbled by layout; interpreted as Sensor | Target Area* | Awareness Bonus* | Opposed Skill** | Detect DC*∆ | Disable DC* | XP Reward*."
+    "comment": "Sensor header cells garbled by layout; interpreted as Sensor | Target Area | Awareness Bonus | Opposed Skill | Detect DC | Disable DC | XP Reward."
    },
    {
     "where": "Table 7.9 Security Options, all rows",
-    "printed": "Values such as +(PR × 2), 10 + (PR × 3), PR × 8",
-    "comment": "Every numeric cell scales with Power Rating, so xp, DCs, bonuses and damage are stored as the printed formula strings (with the \"×\" sign), not numbers."
+    "comment": "Every numeric cell scales with Power Rating, so xp, DCs, bonuses and damage are stored as formula strings in PR (with the \"×\" sign), not numbers."
    },
    {
     "where": "Table 7.9 Security Options, Tripwire / Tripwire, laser",
-    "printed": "Awareness Bonus \"—\", Opposed Skill \"Special ΩΩ\"",
-    "comment": "Resolved from the footnote to opposedBy \"Reflex save DC 10 + PR\" / \"Reflex save DC 15 + PR\"."
+    "comment": "Awareness bonus is blank and the opposed skill is \"Special\" with a footnote; resolved from the footnote to opposedBy \"Reflex save DC 10 + PR\" / \"Reflex save DC 15 + PR\"."
    },
    {
     "where": "Table 7.9 Security Options, Metal detector / X-ray checkpoint",
-    "printed": "Detect DC \"None (automatic)\"",
-    "comment": "detectDC stored as null with autoDetected true."
+    "comment": "Detect DC is none (automatic); detectDC stored as null with autoDetected true."
    },
    {
     "where": "Table 7.9 Security Options, Flooding chamber",
-    "printed": "P er drowning",
-    "comment": "Stray space; stored as \"Per drowning\"."
+    "comment": "Stray space inside \"Per drowning\" in the source; stored corrected."
    },
    {
     "where": "Table 7.9 Security Options, Steam jet",
-    "printed": "Same or adjacent sqaure",
-    "comment": "Typo; stored as \"square\"."
+    "comment": "\"square\" is misspelled in the source; stored corrected."
    },
    {
     "where": "Table 7.9 Security Options, Automated weapon, explosive",
-    "printed": "DC per explosive / Per explosive / PR × 8 §§",
-    "comment": "Save DC and damage defer to the explosive used; XP footnote says per die of explosive damage (maximum +10), whose interaction with \"PR × 8\" is unclear."
+    "comment": "Save DC and damage defer to the explosive used. The XP footnote counts each die of explosive damage (cap +10); how that interacts with the PR × 8 XP cell is unclear."
    },
    {
     "where": "Table 7.9 Security Options, Net gun",
-    "printed": "+(PR × 3) with no § mark",
-    "comment": "Unlike other attack-bonus traps it lacks the repeating-attack footnote; repeats false as printed."
+    "comment": "Attack bonus +(PR × 3) without the repeating-attack footnote that other attack-bonus traps carry; repeats false as in the source."
    },
    {
     "where": "Table 7.9 Security Options, traps with \"Automatic hit\" or \"None\"",
-    "printed": "Automatic hit / Automatic hit ∞ / None / None ∞",
-    "comment": "No attack bonus or save DC; attack and saveDC are null, with extra fields autoHit and delayRounds."
+    "comment": "Traps listed as automatic hits or with no attack entry have no attack bonus or save DC; attack and saveDC are null, with extra fields autoHit and delayRounds."
    },
    {
     "where": "Table 7.9 Security Options, save-DC traps",
-    "printed": "DC 10 + PR on p.438 traps vs DC 12 + PR on p.439 traps",
-    "comment": "Two different base DCs are printed (acid/fire/steam jets, bear and cage traps use 10; laser mesh, pits, spring traps, strobe use 12). Kept as printed."
+    "comment": "Two base save DCs appear: 10 + PR on the p.438 traps (acid/fire/steam jets, bear and cage traps) and 12 + PR on the p.439 traps (laser mesh, pits, spring traps, strobe). Kept as in the source."
    },
    {
     "where": "Table 7.6 Sample Objectives",
-    "printed": "20 categories x grades 1-5; most cells list 2-3 alternative samples separated by semicolons",
-    "comment": "One objectives entry per printed row (category + grade), with the alternatives condensed into one name string. No row has a grade range, so grade is never null."
+    "comment": "20 categories x grades 1-5; most source cells give 2-3 alternative samples. One objectives entry per row (category + grade), with the alternatives summarised in this file's own wording in one name string. No row has a grade range, so grade is never null."
    },
    {
     "where": "Events: Wanted (p.404) vs Table 7.7",
-    "printed": "Table 7.7 refers to \"becomes wanted (1-4 action dice)\"",
-    "comment": "The Wanted event text gives no per-die scaling, so no intensities are recorded for it."
+    "comment": "Table 7.7 mentions Wanted at 1-4 action dice, but the Wanted event text gives no per-die scaling, so no intensities are recorded for it."
    },
    {
     "where": "Events: Surprise Combat (p.403)",
-    "printed": "increase the Tier of all NPCs involved in the chase by 1",
-    "comment": "Says \"chase\" in the combat event; apparent copy-paste from Surprise Chase."
+    "comment": "The per-die Tier increase in this combat event mentions a chase; apparent copy-paste from Surprise Chase."
    },
    {
     "where": "Events: Endangered Bystanders (p.399)",
-    "printed": "spend and roll any number of d12 action dice",
-    "comment": "Bystander count uses a d12 regardless of the GC action die type; overall limit is still 4 dice."
+    "comment": "Bystander count is rolled on d12s regardless of the GC action die type; overall limit is still 4 dice."
    }
   ]
  },
@@ -5654,16 +5146,16 @@ export const GC_DATA = {
    "criticalSuccessLeadShift": 1,
    "criticalFailureLeadShift": 1,
    "steps": [
-    "Step 1: Choose Strategies (secretly; requirements must be met)",
-    "Step 2: Opposed Skill Check (reveal, apply modifiers; winner crit or loser crit failure shifts Lead 1 toward the winner)",
-    "Step 3: Resolution (winner picks 1 Advantage from his Strategy, +1 per 4 by which he won; check Lead for victory)",
+    "Step 1: Strategies — each side picks in secret from those it qualifies for",
+    "Step 2: Opposed check — reveal Strategies and add modifiers; a critical success by the winner or a critical failure by the loser moves Lead 1 the winner's way",
+    "Step 3: Resolve — winner takes 1 Advantage listed for his Strategy, plus 1 per full 4 points of margin; then test Lead for victory",
     "Step 4: Outside Actions (per Conflict type)"
    ],
    "notes": [
-    "Conflict continues while Lead is 1 to 9.",
-    "Several characters on one side make cooperative checks and gain a synergy bonus from Tactics.",
+    "No winner yet while Lead sits anywhere from 1 through 9.",
+    "Groups: one cooperative check per side, with Tactics supplying synergy.",
     "A Strategy cannot be withdrawn once chosen; a participant may concede, giving the opponent his victory result.",
-    "Threats and errors have no effect beyond what each Conflict specifies; criticals only affect Lead and Conflict conditions."
+    "Threats/errors: nothing extra unless a Conflict type says so. Criticals only move Lead or alter Conflict state."
    ]
   },
   "types": {
@@ -5676,18 +5168,18 @@ export const GC_DATA = {
     "predator": "Pursuing character(s) or vehicle(s)",
     "prey": "Fleeing character(s) or vehicle(s)",
     "predatorSkills": [
-     "Acrobatics/Maneuver (personal vehicle)",
-     "Athletics/Maneuver (foot)",
-     "Drive/Maneuver (non-personal vehicle)",
-     "Survival/Maneuver (animal)",
-     "Tactics/Maneuver (any vehicle with the crew quality)"
+     "Maneuver check: Acrobatics (personal vehicle)",
+     "Maneuver check: Athletics (on foot)",
+     "Maneuver check: Drive (other vehicles)",
+     "Maneuver check: Survival (mounted)",
+     "Maneuver check: Tactics (crewed vehicle)"
     ],
     "preySkills": [
-     "Acrobatics/Maneuver (personal vehicle)",
-     "Athletics/Maneuver (foot)",
-     "Drive/Maneuver (non-personal vehicle)",
-     "Survival/Maneuver (animal)",
-     "Tactics/Maneuver (any vehicle with the crew quality)"
+     "Maneuver check: Acrobatics (personal vehicle)",
+     "Maneuver check: Athletics (on foot)",
+     "Maneuver check: Drive (other vehicles)",
+     "Maneuver check: Survival (mounted)",
+     "Maneuver check: Tactics (crewed vehicle)"
     ],
     "roundTime": "6 seconds (2 minutes for Ship vs. Ship)",
     "powerRatings": [
@@ -5752,7 +5244,7 @@ export const GC_DATA = {
       "id": "eat-my-dust",
       "name": "Eat My Dust",
       "side": "general",
-      "requirements": "Acceleration 5+ or Turning 5+",
+      "requirements": "Acceleration 5+ / Turning 5+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -5869,7 +5361,7 @@ export const GC_DATA = {
       "id": "stunt",
       "name": "Stunt",
       "side": "general",
-      "requirements": "Acceleration 6+ or Turning 6+†",
+      "requirements": "Acceleration 6+ / Turning 6+ (either)†",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -5883,7 +5375,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "any",
-      "other": "Daredevil feat (see page 192)",
+      "other": "Feat required: Daredevil (p.192)",
       "modifier": -8,
       "advantages": [
        "Room",
@@ -5896,7 +5388,7 @@ export const GC_DATA = {
       "id": "tactical-ploy",
       "name": "Tactical Ploy",
       "side": "general",
-      "requirements": "Acceleration 8+ or Turning 8+",
+      "requirements": "Acceleration 8+ / Turning 8+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -5929,13 +5421,13 @@ export const GC_DATA = {
       "leadMax": null,
       "ratings": [],
       "ratingsMode": null,
-      "other": "“That’s Impossible!” class ability (see page 52)",
+      "other": "Class ability required: “That’s Impossible!” (p.52)",
       "modifier": 0,
       "advantages": [
        "*"
       ],
-      "summary": "Physics-defying driving; winner spends 1 use of the class ability to pick any Advantages except Victory.",
-      "note": "Printed as \"Any except Victory\"."
+      "summary": "Physics-defying driving. On a win, 1 use of the class ability buys free choice of Advantages (Victory excluded).",
+      "note": "Advantage column allows anything but Victory."
      },
      {
       "id": "weave",
@@ -5952,14 +5444,14 @@ export const GC_DATA = {
        "Defense",
        "Crisis"
       ],
-      "summary": "Use terrain, traffic and bystanders as cover.",
+      "summary": "Hide behind scenery, traffic and crowds.",
       "note": ""
      },
      {
       "id": "attack-run",
       "name": "Attack Run",
       "side": "predator",
-      "requirements": "Acceleration 5+ and Turning 4+",
+      "requirements": "Acceleration 5+ + Turning 4+ (both)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -5979,7 +5471,7 @@ export const GC_DATA = {
        "Attack",
        "Lead"
       ],
-      "summary": "Level out and close in to line up a shot.",
+      "summary": "Steady the ride and draw near for a clean shot.",
       "note": ""
      },
      {
@@ -6009,7 +5501,7 @@ export const GC_DATA = {
       "id": "cut-off",
       "name": "Cut Off",
       "side": "predator",
-      "requirements": "Acceleration 7+ or Turning 7+",
+      "requirements": "Acceleration 7+ / Turning 7+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6058,7 +5550,7 @@ export const GC_DATA = {
       "id": "shortcut",
       "name": "Shortcut",
       "side": "predator",
-      "requirements": "Acceleration 4+ and Turning 6+",
+      "requirements": "Acceleration 4+ + Turning 6+ (both)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6085,7 +5577,7 @@ export const GC_DATA = {
       "id": "stalk",
       "name": "Stalk",
       "side": "predator",
-      "requirements": "Acceleration 6+ or Turning 3+",
+      "requirements": "Acceleration 6+ / Turning 3+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6135,7 +5627,7 @@ export const GC_DATA = {
       "id": "chicken",
       "name": "Chicken",
       "side": "prey",
-      "requirements": "Acceleration 3+ or Turning 6+",
+      "requirements": "Acceleration 3+ / Turning 6+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6162,7 +5654,7 @@ export const GC_DATA = {
       "id": "detour",
       "name": "Detour",
       "side": "prey",
-      "requirements": "Acceleration 6+ and Turning 4+",
+      "requirements": "Acceleration 6+ + Turning 4+ (both)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6189,7 +5681,7 @@ export const GC_DATA = {
       "id": "double-back",
       "name": "Double Back",
       "side": "prey",
-      "requirements": "Acceleration 4+ and Turning 5+",
+      "requirements": "Acceleration 4+ + Turning 5+ (both)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6216,7 +5708,7 @@ export const GC_DATA = {
       "id": "long-gone",
       "name": "Long Gone",
       "side": "prey",
-      "requirements": "Acceleration 7+ or Turning 7+",
+      "requirements": "Acceleration 7+ / Turning 7+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6268,7 +5760,7 @@ export const GC_DATA = {
       "name": "Attack",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner gets +4 on attack checks against other chase participants for 1 full round.",
+      "summary": "Attack bonus: +4 for the winner vs. anyone else in the chase, lasting 1 full round.",
       "repeat": "Each further pick: +2 more and +1 threat range on those attacks.",
       "repeatEvery": 1
      },
@@ -6277,8 +5769,8 @@ export const GC_DATA = {
       "name": "Crisis",
       "leadShift": 0,
       "victory": false,
-      "summary": "An obstacle appears: every participant makes a Maneuver check vs. the current Crisis DC (Table 6.1) or crashes. A participant may skip the check, giving the opponent 3 Lead.",
-      "repeat": "Each further pick lowers the winner's own Crisis DC by 5 (minimum 10).",
+      "summary": "Obstacle: all participants roll Maneuver against the Crisis DC for the current room (Table 6.1); failure = crash. Declining the roll hands the other side 3 Lead.",
+      "repeat": "Extra picks: winner's own Crisis DC -5 each (floor 10).",
       "repeatEvery": 1,
       "skipLeadShift": 3
      },
@@ -6287,7 +5779,7 @@ export const GC_DATA = {
       "name": "Defense",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner gets +4 Defense against attacks from other chase participants for 1 full round.",
+      "summary": "Defense bonus: +4 for the winner vs. attacks by anyone else in the chase, lasting 1 full round.",
       "repeat": "Each further pick: +2 more and +1 error range on attacks against the winner.",
       "repeatEvery": 1
      },
@@ -6296,7 +5788,7 @@ export const GC_DATA = {
       "name": "Impact",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner and one chosen opponent both take collision damage (vehicle: equal to the opponent's check result; both on foot: 1d4 lethal). With GC approval passengers may attempt an Acrobatics/Jump (5 ft.) onto the target vehicle.",
+      "summary": "Collision: the winner picks 1 opponent and both are damaged (vehicles: amount = that opponent's check result; foot vs. foot: 1d4 lethal). GC permitting, passengers can try an Acrobatics/Jump (5 ft.) across to the struck vehicle.",
       "repeat": "Each further pick reduces the winner's own damage by 4 (on foot vs. foot: +1d4 lethal each).",
       "repeatEvery": 1
      },
@@ -6324,14 +5816,14 @@ export const GC_DATA = {
       "leadShift": 0,
       "victory": false,
       "summary": "Maneuvering Room shifts 1 grade in the direction the winner chooses.",
-      "repeat": "Chosen 3 times in a round: winner sets Maneuvering Room to any grade."
+      "repeat": "3 picks in one round: winner names any Maneuvering Room grade outright."
      },
      {
       "id": "stress",
       "name": "Stress",
       "leadShift": 0,
       "victory": false,
-      "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the chase ends.",
+      "summary": "1d4 stress damage to all but the winner; it stays until the chase is over.",
       "repeat": "Each further pick adds +1d4 stress damage.",
       "repeatEvery": 1
      },
@@ -6340,7 +5832,7 @@ export const GC_DATA = {
       "name": "Swap",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator and Prey trade roles, then Lead increases by 1.",
+      "summary": "Sides swap Predator/Prey roles; Lead then goes up 1.",
       "repeat": "",
       "swapRoles": true,
       "absoluteLeadChange": 1
@@ -6350,7 +5842,7 @@ export const GC_DATA = {
       "name": "Twist",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner may use Blend (Dex), Bluff (Cha), Impress (Cha), Intimidate (Cha), Mechanics (Int), Sense Motive (Wis) or Streetwise (Wis), without tags, for the next opposed check.",
+      "summary": "Next opposed check: winner may swap in Blend/Dex, Bluff/Cha, Impress/Cha, Intimidate/Cha, Mechanics/Int, Sense Motive/Wis or Streetwise/Wis (tags ignored).",
       "repeat": "",
       "twistSkills": [
        "Blend (Dex)",
@@ -6372,10 +5864,10 @@ export const GC_DATA = {
      }
     ],
     "victory": {
-     "predator": "Leaders stop adjacent; Prey vehicle is immobilized; Predator side gets a half-action surprise round and may first apply 1 Impact Advantage to the Prey.",
-     "prey": "Prey and team get away and cannot be found for the rest of the scene; Prey may apply 1 Crisis Advantage to the Predator."
+     "predator": "Lead vehicles/runners end side by side with the Prey's ride disabled. Predator's side acts in a surprise round (half action each), optionally after hitting the Prey with 1 Impact Advantage.",
+     "prey": "Prey's side escapes; no locating them again this scene. Optionally the Prey first inflicts 1 Crisis Advantage on the Predator."
     },
-    "outsideActions": "Each driver or runner gets 1 half action; every passenger gets a full action or 2 half actions. Run alongside combat, these fall on each character's Initiative Count.",
+    "outsideActions": "Drivers/runners: 1 half action. Passengers: 1 full or 2 half actions. During combat, taken on the acting character's own Initiative Count.",
     "tables": {
      "maneuveringRoom": {
       "title": "Table 6.1: Maneuvering Room",
@@ -6388,34 +5880,34 @@ export const GC_DATA = {
       ],
       "rows": [
        [
-        "Open (e.g. light traffic, open skies, calm seas, etc.)",
+        "Open — little in the way",
         "×1",
         "+6",
         15
        ],
        [
-        "Close (e.g. moderate traffic, canyon flying, rough seas, etc.)",
+        "Close — some obstacles",
         "×3/4",
         "+4",
         20
        ],
        [
-        "Crowded (e.g. heavy traffic, canyon flying with many intervening ledges, turbulent seas, etc.)",
+        "Crowded — many obstacles",
         "×1/2",
         "+2",
         30
        ],
        [
-        "Tight (e.g. rush hour traffic, aerial dogfight, tsunami seas, etc.)",
+        "Tight — barely room to move",
         "×1/4",
         "+0",
         40
        ]
       ],
       "notes": [
-       "* Everyone travels at this fraction of the slowest vehicle's top MPH (rounded down); mostly matters for crashes.",
-       "** Bonus to all chase Maneuver checks for whoever pilots the vehicle with the highest top MPH.",
-       "† DC of the Maneuver check required each time a crisis occurs."
+       "* Chase pace = slowest participant's top MPH × this factor, rounded down. Chiefly used for crash damage.",
+       "** Added to chase Maneuver checks of the pilot whose vehicle has the best top MPH.",
+       "† Maneuver DC whenever a Crisis comes up."
       ]
      },
      "chaseLead": {
@@ -6492,8 +5984,8 @@ export const GC_DATA = {
        ]
       ],
       "notes": [
-       "* May voluntarily drop to as little as 200 ft. per point to engage other aircraft.",
-       "** Ships can only effectively chase or fight other ships; Ship vs. Ship rounds last 2 minutes."
+       "* Can choose a shorter scale, down to 200 ft. per point, when engaging other aircraft.",
+       "** Ship-on-ship only; such rounds run 2 minutes each."
       ]
      }
     },
@@ -6501,13 +5993,13 @@ export const GC_DATA = {
      "On foot, Acceleration = Strength modifier and Turning = Dexterity modifier (each minimum 0); otherwise the vehicle supplies both ratings.",
      "GC sets Maneuvering Room (Open/Close/Crowded/Tight) at the start; it can change via the Room Advantage.",
      "Chained chases: track a separate Lead per Predator/Prey pair and resolve each step pair by pair from front to back.",
-     "Mismatched vehicles: distance per Lead point is the shortest of those involved; if one vehicle's distance is more than double another's, resolve with a single opposed check instead.",
-     "Each chase round burns 1 minute of fuel. A pilot firing vehicle weapons uses the multi-tasking rules.",
+     "Mixed vehicle types: use the smallest per-point distance among them. Where one type's distance exceeds twice another's, skip the Conflict and settle it with one opposed check.",
+     "Fuel: 1 minute per chase round. Driving and shooting vehicle weapons together falls under multi-tasking.",
      "With simultaneous combat: Step 1 before the first Initiative Count, Steps 2-3 at the (first) Predator's count, Step 4 spread across the round.",
-     "Smash points (powered aircraft only): the single pilot 200+ ft. above the nearest opponent with no enemy above holds 1 per Lead point to the next highest opponent; +1 when he wins an opposed check or scores a Maneuver threat, -1 when another participant does; lost entirely at 0 or when conditions lapse.",
-     "Spending Smash after winning an opposed check: Predator spends 1 to reduce Lead by 1; Prey spends 1 for +4 Defense until his next Initiative Count. Attacks on a Smash holder add his Smash points to Lead when working out range.",
-     "Crash: on foot 1d4 lethal; vehicles take collision damage by size and speed, occupants make a Reflex save (DC half that damage) or take half. Crashed participants leave the chase.",
-     "“That’s Impossible!” winner spends 1 use of the class ability to choose any 1 Advantage, +1 per 4 margin, never Victory."
+     "Smash (powered aircraft only): held by the one pilot who is 200+ ft. higher than the closest opponent with nobody hostile above him. Starts at 1 per Lead point separating him from the next-highest opponent; +1 for each opposed check he wins and each Maneuver threat he rolls, -1 each time someone else does either. Gone at 0 or once the altitude conditions fail.",
+     "Using Smash (only after winning the opposed check): 1 point = Lead -1 for a Predator, or +4 Defense through the Prey's next Initiative Count. Range to a Smash holder is figured as Lead + his Smash total.",
+     "Crash: 1d4 lethal on foot. A vehicle suffers collision damage from its size and speed; each occupant takes half of it unless he passes a Reflex save (DC = half the damage). A crash removes that participant from the pursuit.",
+     "“That’s Impossible!”: a win costs 1 class-ability use and grants free choice of Advantages (1, +1 per 4 points of margin; Victory excluded)."
     ]
    },
    "brainwashing": {
@@ -6538,15 +6030,15 @@ export const GC_DATA = {
     ],
     "startingLead": {
      "default": null,
-     "summary": "Half the Prey's base Fortitude or base Will save bonus, whichever is lower (minimum 2). A result of 10+ means the Prey cannot be brainwashed.",
+     "summary": "Take the lower of the Prey's base Fortitude and base Will bonuses and halve it; floor 2. At 10+ the Prey is immune to brainwashing.",
      "rules": [
       {
-       "when": "Always: 1/2 of the lower of Prey's base Fortitude / base Will save bonus",
+       "when": "Standard: half the Prey's weaker base save (Fort or Will)",
        "lead": null,
        "formula": "max(2, min(baseFort, baseWill) / 2)"
       },
       {
-       "when": "Computed starting Lead is 10 or more",
+       "when": "Result reaches 10+",
        "lead": null,
        "result": "Prey is immune; no Conflict"
       }
@@ -6576,7 +6068,7 @@ export const GC_DATA = {
       "id": "false-hope",
       "name": "False Hope",
       "side": "predator",
-      "requirements": "Base Will save bonus 4+",
+      "requirements": "Will (base) 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6600,7 +6092,7 @@ export const GC_DATA = {
       "id": "fluster",
       "name": "Fluster",
       "side": "predator",
-      "requirements": "Base Will save bonus 6+",
+      "requirements": "Will (base) 6+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6624,7 +6116,7 @@ export const GC_DATA = {
       "id": "mind-games",
       "name": "Mind Games",
       "side": "predator",
-      "requirements": "Base Will save bonus 7+",
+      "requirements": "Will (base) 7+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6705,7 +6197,7 @@ export const GC_DATA = {
       "id": "turn-the-screws",
       "name": "Turn the Screws",
       "side": "predator",
-      "requirements": "Base Will save bonus 5+",
+      "requirements": "Will (base) 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6729,7 +6221,7 @@ export const GC_DATA = {
       "id": "ultimatum",
       "name": "Ultimatum",
       "side": "predator",
-      "requirements": "Base Will save bonus 8+",
+      "requirements": "Will (base) 8+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6753,7 +6245,7 @@ export const GC_DATA = {
       "id": "cling-to-hope",
       "name": "Cling to Hope",
       "side": "prey",
-      "requirements": "Base Will/Fortitude save bonus 5+**",
+      "requirements": "Will/Fort (base) 5+**",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6763,7 +6255,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+      "other": "Prey's base Will if the approach is mental, base Fortitude if physical",
       "modifier": -2,
       "advantages": [
        "Lead",
@@ -6788,7 +6280,7 @@ export const GC_DATA = {
        "Lead",
        "Revelation"
       ],
-      "summary": "Give up some information in exchange for relief.",
+      "summary": "Trade a scrap of information for a respite.",
       "note": "",
       "skill": "Resolve (Wis)"
      },
@@ -6796,7 +6288,7 @@ export const GC_DATA = {
       "id": "hold-fast",
       "name": "Hold Fast",
       "side": "prey",
-      "requirements": "Base Will/Fortitude save bonus 7+**",
+      "requirements": "Will/Fort (base) 7+**",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6806,7 +6298,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+      "other": "Prey's base Will if the approach is mental, base Fortitude if physical",
       "modifier": -2,
       "advantages": [
        "Lead",
@@ -6839,7 +6331,7 @@ export const GC_DATA = {
       "id": "misdirect",
       "name": "Misdirect",
       "side": "prey",
-      "requirements": "Base Will/Fortitude save bonus 4+**",
+      "requirements": "Will/Fort (base) 4+**",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6849,7 +6341,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+      "other": "Prey's base Will if the approach is mental, base Fortitude if physical",
       "modifier": -4,
       "advantages": [
        "Revelation",
@@ -6863,7 +6355,7 @@ export const GC_DATA = {
       "id": "never-surrender",
       "name": "Never Surrender",
       "side": "prey",
-      "requirements": "Base Will/Fortitude save bonus 8+**",
+      "requirements": "Will/Fort (base) 8+**",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6873,7 +6365,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+      "other": "Prey's base Will if the approach is mental, base Fortitude if physical",
       "modifier": -12,
       "advantages": [
        "Haste",
@@ -6925,7 +6417,7 @@ export const GC_DATA = {
       "id": "worrisome-smile",
       "name": "Worrisome Smile",
       "side": "prey",
-      "requirements": "Base Will/Fortitude save bonus 6+**",
+      "requirements": "Will/Fort (base) 6+**",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -6935,7 +6427,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+      "other": "Prey's base Will if the approach is mental, base Fortitude if physical",
       "modifier": -4,
       "advantages": [
        "Lead",
@@ -6952,8 +6444,8 @@ export const GC_DATA = {
       "name": "Alter Memory",
       "leadShift": 0,
       "victory": false,
-      "summary": "Prey gains or loses all memory of 1 event of up to 1 hour, chosen by the Predator.",
-      "repeat": "Each further pick affects 1 more event of up to 1 hour.",
+      "summary": "Predator picks 1 event (1 hour at most) to implant in or wipe from the Prey's memory.",
+      "repeat": "Each further pick: +1 event (1 hour at most).",
       "repeatEvery": 1
      },
      {
@@ -6961,7 +6453,7 @@ export const GC_DATA = {
       "name": "Crisis",
       "leadShift": 0,
       "victory": false,
-      "summary": "Both sides make a Fortitude or Will save (DC 10 + half opponent's career level, rounded up). Failure: 1d3 temporary Wis and 1d3 temporary Cha damage; if only one side fails, the other wins. A side may skip the save, giving the opponent 3 Lead.",
+      "summary": "Crisis save: each side rolls Fortitude or Will, DC 10 + half the other side's career level (round up). A failure costs 1d3 temporary Wis and 1d3 temporary Cha; a lone failure also loses the Conflict. Declining the save hands the other side 3 Lead.",
       "repeat": "Each further pick lowers the winner's own Crisis DC by 2 (minimum 5).",
       "repeatEvery": 1,
       "skipLeadShift": 3,
@@ -6972,7 +6464,7 @@ export const GC_DATA = {
       "name": "Haste",
       "leadShift": 0,
       "victory": false,
-      "summary": "Next Conflict round takes half the standard time (rounded down, minimum 5 minutes).",
+      "summary": "Halve the length of the following round (round down; never under 5 minutes).",
       "repeat": "Each further pick halves the duration again.",
       "repeatEvery": 1
      },
@@ -7007,7 +6499,7 @@ export const GC_DATA = {
       "name": "Revelation",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner may voluntarily disclose 1 fact about his organization (full history, an unknown goal, an unknown Rating, or an unknown Site) to gain 1 bonus action die.",
+      "summary": "Optional trade: winner gives away 1 thing about his own organization (its history, or a goal, Rating or Site the other side lacks) and gets 1 bonus action die.",
       "repeat": "Each further pick: 1 more disclosure for 1 more bonus action die.",
       "repeatEvery": 1
      },
@@ -7034,7 +6526,7 @@ export const GC_DATA = {
       "name": "Splinter",
       "leadShift": 0,
       "victory": false,
-      "summary": "Next round the Prey group must make a team check using its lowest skill bonus.",
+      "summary": "Prey group's check next round is a team check made at its worst member's skill bonus.",
       "repeat": "Each further pick extends this by 1 more round.",
       "repeatEvery": 1
      },
@@ -7043,7 +6535,7 @@ export const GC_DATA = {
       "name": "Stress",
       "leadShift": 0,
       "victory": false,
-      "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the brainwashing attempt ends.",
+      "summary": "1d4 stress damage to all but the winner; it stays until the brainwashing attempt is over.",
       "repeat": "Each further pick adds +1d4 stress damage.",
       "repeatEvery": 1
      },
@@ -7052,7 +6544,7 @@ export const GC_DATA = {
       "name": "Twist",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner may use Analysis (Wis), Cultures (Int), Falsify (Wis), Intimidate (Cha), Investigation (Cha), Science (Int) or Tactics (Int), without tags, for the next opposed check.",
+      "summary": "Next opposed check: winner may swap in Analysis/Wis, Cultures/Int, Falsify/Wis, Intimidate/Cha, Investigation/Cha, Science/Int or Tactics/Int (tags ignored).",
       "repeat": "",
       "twistSkills": [
        "Analysis (Wis)",
@@ -7074,8 +6566,8 @@ export const GC_DATA = {
      }
     ],
     "victory": {
-     "predator": "Prey forgets the brainwashing itself; Predator either permanently erases 1 event of up to 24 hours, or compels 1 action as if an Impress/Persuasion check with up to -18 penalty succeeded (never one that would expose the Prey).",
-     "prey": "Prey proves resistant: the same Predator (or his group) cannot brainwash him again this mission."
+     "predator": "Prey retains no memory of being brainwashed. Predator chooses: wipe 1 event (24 hours at most) for good, or dictate 1 action as though Impress/Persuasion had succeeded at a penalty no worse than -18 (not an action that exposes the Prey).",
+     "prey": "Prey holds out; that Predator or group gets no further brainwashing attempts on him this mission."
     },
     "outsideActions": "",
     "tables": {
@@ -7103,17 +6595,17 @@ export const GC_DATA = {
        ]
       ],
       "notes": [
-       "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's."
+       "* Predator value / Prey value."
       ]
      }
     },
     "notes": [
      "Predator picks a mental or physical approach at the start; it changes only through the New Approach Advantage.",
-     "Predator must be present for at least half of each round; the Prey is present throughout.",
+     "Attendance: Predator for 50%+ of every round, Prey for all of it.",
      "Several participants form a Predator group and a Prey group; each group makes one cooperative opposed check per round.",
      "Each strategy names the skill used for that round's opposed check (\"skill\" field); alternate skill checks have no tags.",
      "Prey save-bonus requirements use base Will vs. a mental approach and base Fortitude vs. a physical approach.",
-     "NPC career level, where a DC needs it, defaults to the team's current Threat Level.",
+     "For DCs keyed to career level, an NPC counts as the current Threat Level.",
      "Altered memories can be undone by a Medicine/Therapy Complex Task: 5 Challenges, 1 hour each, DC 20 + brainwasher's Manipulate bonus; failure blocks further attempts this mission."
     ]
    },
@@ -7148,7 +6640,7 @@ export const GC_DATA = {
     ],
     "startingLead": {
      "default": null,
-     "summary": "Equal to the target system's Security Power Rating (maximum 9); with a previously installed back door, the Lead at which it was installed + 1.",
+     "summary": "System's Security Power Rating, capped at 9. Using an existing back door instead: the Lead recorded when it was planted, +1.",
      "rules": [
       {
        "when": "Normal hack",
@@ -7156,7 +6648,7 @@ export const GC_DATA = {
        "formula": "min(9, system Security Power Rating)"
       },
       {
-       "when": "Predator has a back door in the system",
+       "when": "Entering via back door",
        "lead": null,
        "formula": "back door Lead + 1"
       }
@@ -7185,7 +6677,7 @@ export const GC_DATA = {
       "id": "l337-moves",
       "name": "'L337 Moves",
       "side": "general",
-      "requirements": "Computer Power Rating 7+",
+      "requirements": "Computer PR 7+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7214,13 +6706,13 @@ export const GC_DATA = {
       "leadMax": null,
       "ratings": [],
       "ratingsMode": null,
-      "other": "master cracker class ability (see page 36)",
+      "other": "Class ability required: master cracker (p.36)",
       "modifier": 0,
       "advantages": [
        "*"
       ],
-      "summary": "Expert insight; winner spends 1 use of the class ability to pick any Advantages except Victory.",
-      "note": "Printed as \"Any except Victory\".",
+      "summary": "Expert insight. On a win, 1 use of the class ability buys free choice of Advantages (Victory excluded).",
+      "note": "Advantage column allows anything but Victory.",
       "skill": ""
      },
      {
@@ -7264,7 +6756,7 @@ export const GC_DATA = {
       "id": "shall-we-play-a-game",
       "name": "“Shall We Play A Game?”",
       "side": "general",
-      "requirements": "Computer Power Rating 3+, Probe software",
+      "requirements": "Computer PR 3+, Probe software",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7281,7 +6773,7 @@ export const GC_DATA = {
        "Probe"
       ],
       "summary": "Tie the opponent up in loops while trying a gambit elsewhere.",
-      "note": "Requirement is split across two lines in the printed table.",
+      "note": "The book's table wraps this requirement over two lines.",
       "skill": "Tactics (Wis)"
      },
      {
@@ -7356,7 +6848,7 @@ export const GC_DATA = {
        "Core Command",
        "Elude"
       ],
-      "summary": "Grab brief control, then jump elsewhere in the system.",
+      "summary": "Take over for a moment, then hop to another part of the network.",
       "note": "",
       "skill": ""
      },
@@ -7364,7 +6856,7 @@ export const GC_DATA = {
       "id": "magic-bullet",
       "name": "Magic Bullet",
       "side": "predator",
-      "requirements": "Computer Power Rating 7+",
+      "requirements": "Computer PR 7+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7388,7 +6880,7 @@ export const GC_DATA = {
       "id": "trojan-file-marker",
       "name": "Trojan File Marker",
       "side": "predator",
-      "requirements": "Computer Power Rating 4+",
+      "requirements": "Computer PR 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7431,7 +6923,7 @@ export const GC_DATA = {
       "id": "hard-reboot",
       "name": "Hard Reboot",
       "side": "prey",
-      "requirements": "Computer Power Rating 7+",
+      "requirements": "Computer PR 7+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7474,7 +6966,7 @@ export const GC_DATA = {
       "id": "security-alert",
       "name": "Security Alert",
       "side": "prey",
-      "requirements": "Security Power Rating 4+",
+      "requirements": "Security PR 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7520,7 +7012,7 @@ export const GC_DATA = {
       "name": "Back Door",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator either removes one of the Prey's silhouettes or installs a back door at the current Lead.",
+      "summary": "Predator's choice: wipe 1 silhouette held by the Prey, or plant a back door (record current Lead).",
       "repeat": ""
      },
      {
@@ -7537,7 +7029,7 @@ export const GC_DATA = {
       "name": "Elude",
       "leadShift": 0,
       "victory": false,
-      "summary": "Trace software aimed at the winner has its Power Rating cut by 3 until the end of next round (never more than 3 total).",
+      "summary": "Trace software used on the winner: Power Rating -3 through the close of next round; the reduction never stacks past 3.",
       "repeat": "Each further pick extends the effect 1 more round.",
       "repeatEvery": 1
      },
@@ -7573,7 +7065,7 @@ export const GC_DATA = {
       "name": "Probe",
       "leadShift": 0,
       "victory": false,
-      "summary": "A chosen opponent makes a Computers (Int) check, DC 10 + 5 x winner's Probe software Power Rating; on failure the winner runs 1 core command. Opponent may skip the check, giving the winner 2 Lead.",
+      "summary": "Winner names an opponent, who rolls Computers (Int) vs. DC 10 + (5 x PR of the winner's Probe software). Fail: winner issues 1 core command. Declining the roll gives the winner 2 Lead.",
       "repeat": "Each further pick raises the DC by 5.",
       "repeatEvery": 1,
       "skipLeadShift": 2
@@ -7583,7 +7075,7 @@ export const GC_DATA = {
       "name": "Seize Control",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner makes the target computer run or stop 1 program stored on either machine, or takes over 1 controlled device until Step 2 of next round.",
+      "summary": "Winner starts or halts 1 program (held on either computer) on the target machine, or commandeers 1 device it controls up to next round's Step 2.",
       "repeat": "Each further pick: control of 1 more program or device.",
       "repeatEvery": 1
      },
@@ -7592,7 +7084,7 @@ export const GC_DATA = {
       "name": "Silhouette",
       "leadShift": 0,
       "victory": false,
-      "summary": "Prey either deletes one of the Predator's back doors or builds a profile silhouette; each silhouette gives a cumulative +1 on hacking opposed checks against that Predator for the mission.",
+      "summary": "Prey's choice: erase 1 back door left by the Predator, or record a silhouette of him. Silhouettes stack: +1 apiece to the Prey's opposed hacking checks vs. that Predator, all mission.",
       "repeat": ""
      },
      {
@@ -7600,7 +7092,7 @@ export const GC_DATA = {
       "name": "Stress",
       "leadShift": 0,
       "victory": false,
-      "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the hacking attempt ends.",
+      "summary": "1d4 stress damage to all but the winner; it stays until the hacking attempt is over.",
       "repeat": "Each further pick adds +1d4 stress damage.",
       "repeatEvery": 1
      },
@@ -7609,7 +7101,7 @@ export const GC_DATA = {
       "name": "Trace",
       "leadShift": 0,
       "victory": false,
-      "summary": "A chosen opponent makes a Computers (Int) check, DC 10 + 5 x winner's Trace software Power Rating; on failure his physical location is found and a winning Prey may end the hack in his favor. Skipping gives the winner 2 Lead.",
+      "summary": "Winner names an opponent, who rolls Computers (Int) vs. DC 10 + (5 x PR of the winner's Trace software). Fail: his real-world location is pinpointed, and if the winner is the Prey he may close out the hack as a win. Declining the roll gives the winner 2 Lead.",
       "repeat": "Each further pick raises the DC by 5.",
       "repeatEvery": 1,
       "skipLeadShift": 2,
@@ -7628,7 +7120,7 @@ export const GC_DATA = {
      "predator": "Hacker gains full control and may use any core command freely; the former defender must hack the system back as Predator to retake it.",
      "prey": "Intruder is locked out and cannot hack this system again this mission."
     },
-    "outsideActions": "Not detailed separately; when run alongside combat, Step 4 is spread over the combat round with each participant acting on his Initiative Count.",
+    "outsideActions": "No special rules. In combat, Step 4 happens piecemeal as each participant's Initiative Count comes up.",
     "tables": {
      "hackTiming": {
       "title": "Table 6.6: Hack Timing",
@@ -7686,7 +7178,7 @@ export const GC_DATA = {
        ]
       ],
       "notes": [
-       "Round duration by current Lead and access type; multiply by the Relative Power Ratings factor (hackTimingRelativePower). Both sides must be involved for at least half this time (rounded down, minimum 1 round)."
+       "Round length from current Lead and access type, times the hackTimingRelativePower factor. Each side has to take part for 50%+ of it (round down, 1 round at least)."
       ]
      },
      "hackTimingRelativePower": {
@@ -7699,7 +7191,7 @@ export const GC_DATA = {
       ],
       "rows": [
        [
-        "Predator +5 or more",
+        "Predator +5 and up",
         "×1/5*",
         "×1/5*"
        ],
@@ -7749,13 +7241,13 @@ export const GC_DATA = {
         "×4"
        ],
        [
-        "Prey +5 or more",
+        "Prey +5 and up",
         "×5",
         "×5"
        ]
       ],
       "notes": [
-       "* Rounded up (minimum 1 half action)."
+       "* Round up; never under 1 half action."
       ]
      },
      "coreCommands": {
@@ -7816,25 +7308,25 @@ export const GC_DATA = {
        ]
       ],
       "notes": [
-       "Extract File / Upload Program: full rounds = Complexity DC / lowest Power Rating of the two computers (rounded down, minimum 1); unknown Complexity DC is GC-assigned, 10 to 60.",
-       "Initiate System Purge: 1 minute + 1 minute per foreign program whose Power Rating exceeds the system's.",
-       "Search System: 1 full action to start, then time per Table 2.33: Research Checks; no check needed; one system per use.",
+       "Extract File / Upload Program: takes (Complexity DC ÷ the weaker computer's Power Rating) full rounds, round down, 1 at least. GC sets an unlisted Complexity DC between 10 and 60.",
+       "Initiate System Purge: 1 minute, +1 minute for every intruding program with a higher Power Rating than the system.",
+       "Search System: 1 full action to launch; duration as a Research check (Table 2.33) but no roll; covers a single system.",
        "Use Peripheral: -4 on any separate skill check for remote operation.",
-       "View File: 1 half action to open; read 1 page per full round + 1 per point of Intelligence and of Wisdom above 10."
+       "View File: half action to open. Reading speed per full round: 1 page, +1 per Int point over 10, +1 per Wis point over 10."
       ]
      }
     },
     "notes": [
-     "Unmonitored system (or streamlined variant at GC option): a Complex Task with Challenges = system Power Rating, Computers (Int) DC = known Sys-Op's Computers bonus + 10, or Threat Level + 15 if none.",
+     "No live defender (or GC wants it quick): run a Complex Task instead. Challenges = system Power Rating; Computers (Int) DC = 10 + the Sys-Op's Computers bonus when known, else 15 + Threat Level.",
      "External Access is any indirect connection; Internal Access is a terminal wired straight into the system and is much faster.",
-     "A terminal on the target system is assumed to have Power Rating = system's - 2 (minimum 1) unless stated otherwise.",
+     "Default terminal Power Rating: host system's rating - 2, floor 1.",
      "Several participants form a Predator group and a Prey group; each makes one cooperative opposed check per round.",
      "A blank \"skill\" means the default Computers (Int); alternate skill checks have no tags.",
      "Software requirements (Trace, Probe) are recorded in \"other\". Probe/Trace DCs scale with the winner's software Power Rating.",
-     "Back doors set the starting Lead of later hacks; silhouettes give the defender a cumulative +1 per silhouette against that hacker for the mission. Each can be spent to erase the other.",
+     "Back door: fixes starting Lead for later hacks. Silhouette: +1 each (stacking) for the defender vs. that hacker all mission. Gaining one may instead be used to cancel one of the other kind.",
      "A successful trace by the Prey can end the hack in his favor and is enough to start a manhunt.",
      "With simultaneous combat: Step 1 before the first Initiative Count, Steps 2-3 at the Predator's count.",
-     "Master Cracker winner spends 1 use of the class ability to choose any 1 Advantage, +1 per 4 margin, never Victory."
+     "Master Cracker: a win costs 1 class-ability use and grants free choice of Advantages (1, +1 per 4 points of margin; Victory excluded)."
     ]
    },
    "infiltration": {
@@ -7864,15 +7356,15 @@ export const GC_DATA = {
     ],
     "startingLead": {
      "default": null,
-     "summary": "Organization's Image Rating if the Predator opens low profile; its History Rating if he opens high profile.",
+     "summary": "Low profile opening: organization's Image Rating. High profile opening: its History Rating.",
      "rules": [
       {
-       "when": "Predator opens with a low profile approach",
+       "when": "Opening approach: low profile",
        "lead": null,
        "formula": "organization Image Rating"
       },
       {
-       "when": "Predator opens with a high profile approach",
+       "when": "Opening approach: high profile",
        "lead": null,
        "formula": "organization History Rating"
       }
@@ -7883,7 +7375,7 @@ export const GC_DATA = {
       "id": "after-hours",
       "name": "After Hours",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 3+",
+      "requirements": "Cover Identity PR 3+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7912,13 +7404,13 @@ export const GC_DATA = {
       "leadMax": null,
       "ratings": [],
       "ratingsMode": null,
-      "other": "bald-faced lie class ability (see page 35)",
+      "other": "Class ability required: bald-faced lie (p.35)",
       "modifier": 0,
       "advantages": [
        "*"
       ],
-      "summary": "Outrageous but convincing lies; winner spends 1 use of the class ability to pick any Advantages except Victory.",
-      "note": "Printed as \"Any except Victory\".",
+      "summary": "Outrageous but convincing lies. On a win, 1 use of the class ability buys free choice of Advantages (Victory excluded).",
+      "note": "Advantage column allows anything but Victory.",
       "skill": ""
      },
      {
@@ -7930,7 +7422,7 @@ export const GC_DATA = {
       "leadMax": 3,
       "ratings": [],
       "ratingsMode": null,
-      "other": "Predator must currently be using a high profile approach",
+      "other": "High profile approach only",
       "modifier": -6,
       "advantages": [
        "Raid"
@@ -7962,7 +7454,7 @@ export const GC_DATA = {
       "id": "data-run",
       "name": "Data Run",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 4+",
+      "requirements": "Cover Identity PR 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -7978,7 +7470,7 @@ export const GC_DATA = {
        "Access Point",
        "Intelligence"
       ],
-      "summary": "Risky grab for more information about the organization.",
+      "summary": "Take chances to dig up extra facts on the group.",
       "note": "",
       "skill": ""
      },
@@ -7986,7 +7478,7 @@ export const GC_DATA = {
       "id": "haven",
       "name": "Haven",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 3+",
+      "requirements": "Cover Identity PR 3+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8010,7 +7502,7 @@ export const GC_DATA = {
       "id": "murder-scheme",
       "name": "Murder Scheme",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 5+",
+      "requirements": "Cover Identity PR 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8026,7 +7518,7 @@ export const GC_DATA = {
        "Conspiracy",
        "Showdown"
       ],
-      "summary": "Use position and inside allies to set up a hit on a key figure.",
+      "summary": "Leverage rank and turned insiders to arrange a strike at someone important.",
       "note": "",
       "skill": ""
      },
@@ -8045,7 +7537,7 @@ export const GC_DATA = {
        "Extraction",
        "Reconnaissance"
       ],
-      "summary": "Gather a little intelligence and get out.",
+      "summary": "Quick look around, then leave.",
       "note": "",
       "skill": ""
      },
@@ -8053,7 +7545,7 @@ export const GC_DATA = {
       "id": "risky-declaration",
       "name": "Risky Declaration",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 4+∆",
+      "requirements": "Cover Identity PR 4+∆",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8063,7 +7555,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Predator must currently be using a high profile approach",
+      "other": "High profile approach only",
       "modifier": -8,
       "advantages": [
        "Crisis"
@@ -8076,7 +7568,7 @@ export const GC_DATA = {
       "id": "rotten-apples",
       "name": "Rotten Apples",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 6+",
+      "requirements": "Cover Identity PR 6+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8100,7 +7592,7 @@ export const GC_DATA = {
       "id": "rush-job",
       "name": "Rush Job",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 5+",
+      "requirements": "Cover Identity PR 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8143,7 +7635,7 @@ export const GC_DATA = {
       "id": "step-out",
       "name": "Step Out",
       "side": "predator",
-      "requirements": "Cover Identity Power Rating 2+",
+      "requirements": "Cover Identity PR 2+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8167,7 +7659,7 @@ export const GC_DATA = {
       "id": "background-checks",
       "name": "Background Checks",
       "side": "prey",
-      "requirements": "Organization Goals Rating 3+",
+      "requirements": "Goals 3+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8196,13 +7688,13 @@ export const GC_DATA = {
       "leadMax": null,
       "ratings": [],
       "ratingsMode": null,
-      "other": "big brother or global search class ability (see pages 46 and 48)",
+      "other": "Class ability required: big brother (p.46) / global search (p.48)",
       "modifier": 0,
       "advantages": [
        "*"
       ],
-      "summary": "Security toys with the intruder; winner spends 1 use of the class ability to pick any Advantages except Victory.",
-      "note": "Printed as \"Any except Victory\".",
+      "summary": "Security toys with the intruder. On a win, 1 use of the class ability buys free choice of Advantages (Victory excluded).",
+      "note": "Advantage column allows anything but Victory.",
       "skill": ""
      },
      {
@@ -8227,7 +7719,7 @@ export const GC_DATA = {
       "id": "heightened-security",
       "name": "Heightened Security",
       "side": "prey",
-      "requirements": "Organization Goals Rating 2+",
+      "requirements": "Goals 2+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8263,14 +7755,14 @@ export const GC_DATA = {
        "Stress"
       ],
       "summary": "A final loyalty test before admission to the core.",
-      "note": "Printed footnote mark ** only points to the organization Ratings reference; it may be a misprint for the high-profile mark. See anomalies.",
+      "note": "The ** mark here leads only to the Ratings cross-reference; possibly intended as the high-profile mark. See anomalies.",
       "skill": "Manipulate (Wis)"
      },
      {
       "id": "lockdown",
       "name": "Lockdown",
       "side": "prey",
-      "requirements": "Organization Goals Rating 4+",
+      "requirements": "Goals 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8313,7 +7805,7 @@ export const GC_DATA = {
       "id": "new-procedures",
       "name": "New Procedures",
       "side": "prey",
-      "requirements": "Organization Goals Rating 6+",
+      "requirements": "Goals 6+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8337,7 +7829,7 @@ export const GC_DATA = {
       "id": "restructuring",
       "name": "Restructuring",
       "side": "prey",
-      "requirements": "Organization Goals Rating 5+",
+      "requirements": "Goals 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8360,7 +7852,7 @@ export const GC_DATA = {
       "id": "rising-quotas",
       "name": "Rising Quotas",
       "side": "prey",
-      "requirements": "Organization Goals Rating 4+",
+      "requirements": "Goals 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8383,7 +7875,7 @@ export const GC_DATA = {
       "id": "run-of-the-house",
       "name": "Run of the House",
       "side": "prey",
-      "requirements": "Organization Goals Rating 3+∆",
+      "requirements": "Goals 3+∆",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8393,7 +7885,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Predator must currently be using a high profile approach",
+      "other": "High profile approach only",
       "modifier": -4,
       "advantages": [
        "Convert",
@@ -8425,7 +7917,7 @@ export const GC_DATA = {
       "id": "show-of-strength",
       "name": "Show of Strength",
       "side": "prey",
-      "requirements": "Organization Goals Rating 5+",
+      "requirements": "Goals 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8452,8 +7944,8 @@ export const GC_DATA = {
       "name": "Access Point",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator finds an unwatched terminal and may hack the organization's system with Internal Access for up to 1 hour.",
-      "repeat": "Every 2 further picks: 1 more hour (maximum 4 hours).",
+      "summary": "Predator gets 1 hour (at most) alone at a terminal: Internal Access for a hack on the organization's system.",
+      "repeat": "Every 2 further picks: +1 hour, 4 hours tops.",
       "repeatEvery": 2
      },
      {
@@ -8461,7 +7953,7 @@ export const GC_DATA = {
       "name": "Conspiracy",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator makes an Impress (Cha) check, DC 10 + 5 x organization History Rating, to turn 1 standard NPC or minion squad neutral so it sits out fights and chases this mission. On failure Lead increases by 1.",
+      "summary": "Predator rolls Impress (Cha), DC 10 + (5 x organization History Rating). Success: 1 standard NPC or 1 minion squad goes neutral and stays out of combats and chases all mission. Failure: Lead +1.",
       "repeat": "Each further pick: 1 more target, or shift an already neutral target to Friendly (it then fights alongside the Predator).",
       "repeatEvery": 1
      },
@@ -8490,7 +7982,7 @@ export const GC_DATA = {
       "name": "Extraction",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator leaves the organization cleanly; the Prey cannot trigger any events in response.",
+      "summary": "Clean exit for the Predator: the Prey gets no events in reply.",
       "repeat": ""
      },
      {
@@ -8507,8 +7999,8 @@ export const GC_DATA = {
       "name": "Free Time",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator is unobserved for 1 hour. If he leaves and is late back, he needs Bluff (Cha) DC 20 + 4 x Goals Rating or the Prey wins and gains action dice equal to Lead for hostile events.",
-      "repeat": "Every 2 further picks: 1 more hour (maximum 3 hours).",
+      "summary": "1 hour with nobody watching the Predator. Returning late from an outing calls for Bluff (Cha), DC 20 + (4 x Goals Rating); fail and the Prey wins, banking action dice = Lead to spend on hostile events.",
+      "repeat": "Every 2 further picks: +1 hour, 3 hours tops.",
       "repeatEvery": 2,
       "canEndConflict": true
      },
@@ -8517,7 +8009,7 @@ export const GC_DATA = {
       "name": "Haste",
       "leadShift": 0,
       "victory": false,
-      "summary": "Next Conflict round takes half the standard time (rounded down, minimum 5 minutes).",
+      "summary": "Halve the length of the following round (round down; never under 5 minutes).",
       "repeat": "Each further pick halves the duration again.",
       "repeatEvery": 1
      },
@@ -8526,7 +8018,7 @@ export const GC_DATA = {
       "name": "Intelligence",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator learns 1 item: an unknown goal (Prey's pick), the full history, or the Origin, attributes, qualities, feats and class abilities of 1 player/special character (Prey's pick).",
+      "summary": "Predator gains 1 piece of intel: a goal he lacks (Prey selects), the organization's whole history, or a profile (Origin, attributes, qualities, feats, class abilities) of 1 player or special character the Prey selects.",
       "repeat": "Every 2 further picks: 1 more item.",
       "repeatEvery": 2
      },
@@ -8544,7 +8036,7 @@ export const GC_DATA = {
       "name": "New Approach",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator's approach flips between high profile and low profile.",
+      "summary": "Predator's approach switches: high profile <-> low profile.",
       "repeat": ""
      },
      {
@@ -8561,7 +8053,7 @@ export const GC_DATA = {
       "name": "Raid",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator steals or destroys 1 Site benefit at his location, then must escape; Prey gains action dice equal to current Lead usable only for Surprise Chase, Surprise Combat or Wanted events against him.",
+      "summary": "Predator takes or wrecks 1 Site benefit where he is and has to get out. Prey banks action dice = current Lead, spendable solely on Surprise Chase, Surprise Combat or Wanted events aimed at him.",
       "repeat": ""
      },
      {
@@ -8569,7 +8061,7 @@ export const GC_DATA = {
       "name": "Reconnaissance",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator learns 1 item (Prey chooses which): an unknown Site's location and nature, an unknown Rating, or the full stat block of 1 standard character.",
+      "summary": "Predator gains 1 piece of intel, Prey selecting: where and what 1 undiscovered Site is, 1 Rating he lacks, or complete stats for 1 standard character.",
       "repeat": "Every 2 further picks: 1 more item.",
       "repeatEvery": 2
      },
@@ -8578,7 +8070,7 @@ export const GC_DATA = {
       "name": "Relocate",
       "leadShift": 0,
       "victory": false,
-      "summary": "Prey moves 1 of its Sites to a location the Predator does not know.",
+      "summary": "Prey shifts 1 Site somewhere new; the Predator no longer knows where it is.",
       "repeat": "Every 2 further picks: 1 more Site moved.",
       "repeatEvery": 2
      },
@@ -8587,7 +8079,7 @@ export const GC_DATA = {
       "name": "Revelation",
       "leadShift": 0,
       "victory": false,
-      "summary": "Prey may voluntarily disclose 1 fact (history, unknown goal, unknown Rating, unknown Site, a special character's details, or a standard character's stat block) to gain 1 bonus action die.",
+      "summary": "Optional trade: Prey gives away 1 thing (history; a goal, Rating or Site the Predator lacks; details of a special character; stats of a standard character) and gets 1 bonus action die.",
       "repeat": "Each further pick: 1 more disclosure for 1 more bonus action die.",
       "repeatEvery": 1
      },
@@ -8596,7 +8088,7 @@ export const GC_DATA = {
       "name": "Showdown",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator fights 1 special NPC (plus 1 minion squad if available). If all are captured or killed the infiltration continues with Lead +2; otherwise the Prey wins, the Predator must flee, and the Prey gains action dice equal to Lead for hostile events.",
+      "summary": "Combat: Predator vs. 1 special NPC, with 1 minion squad too when the organization has one. Beat them all (dead or taken) and play goes on at Lead +2. Anything less: Prey wins, Predator runs, and the Prey banks action dice = Lead for hostile events.",
       "repeat": "",
       "canEndConflict": true
      },
@@ -8614,7 +8106,7 @@ export const GC_DATA = {
       "name": "Stress",
       "leadShift": 0,
       "victory": false,
-      "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the infiltration ends.",
+      "summary": "1d4 stress damage to all but the winner; it stays until the infiltration is over.",
       "repeat": "Each further pick adds +1d4 stress damage.",
       "repeatEvery": 1
      },
@@ -8623,16 +8115,16 @@ export const GC_DATA = {
       "name": "Transfer",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator learns the location of 1 known Site (or the HQ if all are located) and may arrange a transfer to any known Site.",
+      "summary": "Predator pinpoints 1 Site he knows of (the HQ once every Site is pinpointed) and can get himself reassigned to any Site he knows of.",
       "repeat": "Every 3 further picks: location of 1 more known Site.",
       "repeatEvery": 3
      }
     ],
     "victory": {
      "predator": "Predator learns all Ratings, goals, standard NPC stats and special NPC code names, then picks one: stay embedded with ongoing access (new Conflicts restart at Lead 2), steal/destroy a Site benefit and escape (cover blown), or ambush the mastermind (quick) or another special NPC (slow).",
-     "prey": "All the Predator's cover identities are blown and he cannot re-infiltrate this mission. Prey picks one: eject him (with possible legal action: -4 Reputation or -$200,000 Net Worth), string him along (Lead reset to 8, +1 error range, 2 action dice; cumulative), or launch a slow ambush with 4 free action dice."
+     "prey": "Every cover identity the Predator has is burned; no new infiltration by him this mission. Prey chooses: throw him out (optionally with legal trouble costing -4 Reputation or -$200,000 Net Worth); play him along (Lead back to 8, +1 error range, 2 action dice; stacks); or spring a slow ambush backed by 4 free action dice."
     },
-    "outsideActions": "At the end of each round the Predator may contact the outside world; each 5 minutes (or part) of contact gives the Prey +4 on next round's opposed check.",
+    "outsideActions": "Round's end: Predator may reach people outside. Every 5 minutes of contact, or fraction, = Prey +4 on next round's opposed check.",
     "tables": {
      "infiltrationApproaches": {
       "title": "Table 6.8: Infiltration Approaches",
@@ -8658,19 +8150,19 @@ export const GC_DATA = {
        ]
       ],
       "notes": [
-       "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's."
+       "* Predator value / Prey value."
       ]
      }
     },
     "notes": [
-     "Organization's Security skill bonus = 2 x its Sites or Tools Rating, whichever is higher.",
+     "Prey's Security bonus: double the better of its Sites and Tools Ratings.",
      "Predator picks a high or low profile approach at the start; it changes only through the New Approach Advantage. Strategies with the high-profile restriction list it in \"other\".",
-     "Predator must be present for the whole round; the Prey only for half of it.",
+     "Attendance: Predator all round, Prey 50% of it.",
      "Multiple infiltrators form one Predator group and multiple defenders one Prey group; each group makes one cooperative opposed check per round.",
      "A blank \"skill\" means the default skill (Bureaucracy for Predator, Security for Prey); alternate skill checks have no tags.",
      "Lead here measures the organization's suspicion: it rises toward discovery and falls as the infiltrator burrows deeper.",
      "This Conflict has no Victory Advantage; it ends only by Lead, Crisis, Showdown, Free Time failure, Extraction or Raid.",
-     "Bald-Faced Lie and “Before I Kill You…” winners spend 1 use of the relevant class ability to choose any 1 Advantage, +1 per 4 margin.",
+     "Bald-Faced Lie / “Before I Kill You…”: a win costs 1 use of the matching class ability and grants free choice of Advantages (1, +1 per 4 points of margin).",
      "The book suggests expanding rounds into full roleplayed scenes rather than streamlining this Conflict."
     ]
    },
@@ -8694,7 +8186,7 @@ export const GC_DATA = {
      "Language"
     ],
     "preySkillTags": [],
-    "roundTime": "Set by the Predator's Strategy (5 minutes to 1 hour), multiplied by the situation factor in interrogationModifiers",
+    "roundTime": "Per Predator Strategy (5 minutes-1 hour) x situation factor from interrogationModifiers",
     "powerRatings": [
      "Base Will Save"
     ],
@@ -8734,7 +8226,7 @@ export const GC_DATA = {
       "id": "head-fake",
       "name": "Head Fake",
       "side": "general",
-      "requirements": "Base Will Save +6†",
+      "requirements": "Will (base) 6+†",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8744,14 +8236,14 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+      "other": "Predator: +1 effective base Will per clue in hand proving the Prey knows something vital",
       "modifier": -2,
       "advantages": [
        "Lead",
        "Slip"
       ],
       "summary": "Elaborate mind game meant to trip the opponent up.",
-      "note": "Listed duration applies only when the Predator chooses this Strategy.",
+      "note": "Duration counts only if it is the Predator who picks this.",
       "skill": "Manipulate (Wis)",
       "roundDuration": "30 minutes"
      },
@@ -8770,7 +8262,7 @@ export const GC_DATA = {
        "Crisis"
       ],
       "summary": "High-pressure push to force an outcome.",
-      "note": "Listed duration applies only when the Predator chooses this Strategy.",
+      "note": "Duration counts only if it is the Predator who picks this.",
       "skill": "",
       "roundDuration": "5 minutes"
      },
@@ -8789,8 +8281,8 @@ export const GC_DATA = {
        "Pause",
        "Stress"
       ],
-      "summary": "Settle in for a long session, waiting on outside developments.",
-      "note": "Listed duration applies only when the Predator chooses this Strategy.",
+      "summary": "Dig in for the long haul until something changes elsewhere.",
+      "note": "Duration counts only if it is the Predator who picks this.",
       "skill": "",
       "roundDuration": "1 hour"
      },
@@ -8798,7 +8290,7 @@ export const GC_DATA = {
       "id": "were-done-here",
       "name": "“We’re Done Here”",
       "side": "general",
-      "requirements": "Base Will Save +7†",
+      "requirements": "Will (base) 7+†",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8808,14 +8300,14 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+      "other": "Predator: +1 effective base Will per clue in hand proving the Prey knows something vital",
       "modifier": -12,
       "advantages": [
        "Stress",
        "Victory"
       ],
       "summary": "Angrily push past the limit for an immediate finish.",
-      "note": "Listed duration applies only when the Predator chooses this Strategy.",
+      "note": "Duration counts only if it is the Predator who picks this.",
       "skill": "",
       "roundDuration": "15 minutes"
      },
@@ -8823,7 +8315,7 @@ export const GC_DATA = {
       "id": "bad-cop",
       "name": "Bad Cop",
       "side": "predator",
-      "requirements": "Base Will Save +4†",
+      "requirements": "Will (base) 4+†",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8833,7 +8325,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+      "other": "Predator: +1 effective base Will per clue in hand proving the Prey knows something vital",
       "modifier": 0,
       "advantages": [
        "Lead",
@@ -8867,7 +8359,7 @@ export const GC_DATA = {
       "id": "good-cop",
       "name": "Good Cop",
       "side": "predator",
-      "requirements": "Base Will Save +5",
+      "requirements": "Will (base) 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8884,7 +8376,7 @@ export const GC_DATA = {
        "Charm"
       ],
       "summary": "Friendly overtures to win the subject over.",
-      "note": "Printed without the † mark carried by the other Predator Will Save requirements.",
+      "note": "Lacks the † mark that the other Predator Will Save requirements carry.",
       "skill": "Networking (Cha)",
       "roundDuration": "30 minutes"
      },
@@ -8892,7 +8384,7 @@ export const GC_DATA = {
       "id": "worse-cop",
       "name": "Worse Cop",
       "side": "predator",
-      "requirements": "Base Will Save +8†",
+      "requirements": "Will (base) 8+†",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8902,7 +8394,7 @@ export const GC_DATA = {
        }
       ],
       "ratingsMode": "all",
-      "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+      "other": "Predator: +1 effective base Will per clue in hand proving the Prey knows something vital",
       "modifier": -8,
       "advantages": [
        "Crisis",
@@ -8917,7 +8409,7 @@ export const GC_DATA = {
       "id": "the-5th",
       "name": "The 5th",
       "side": "prey",
-      "requirements": "Base Will Save +8",
+      "requirements": "Will (base) 8+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8961,7 +8453,7 @@ export const GC_DATA = {
       "id": "nothing-to-say",
       "name": "“Nothing to Say”",
       "side": "prey",
-      "requirements": "Base Will Save +4",
+      "requirements": "Will (base) 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -8986,7 +8478,7 @@ export const GC_DATA = {
       "id": "story-time",
       "name": "Story Time",
       "side": "prey",
-      "requirements": "Base Will Save +5",
+      "requirements": "Will (base) 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9014,7 +8506,7 @@ export const GC_DATA = {
       "name": "Charm",
       "leadShift": 0,
       "victory": false,
-      "summary": "Opponent's disposition toward the winner improves 1 grade until the scene ends (maximum Friendly).",
+      "summary": "Until end of scene, the loser's disposition to the winner is 1 grade better (cap: Friendly).",
       "repeat": "Every 3 further picks: 1 more grade.",
       "repeatEvery": 3
      },
@@ -9023,7 +8515,7 @@ export const GC_DATA = {
       "name": "Crisis",
       "leadShift": 0,
       "victory": false,
-      "summary": "Both sides make a Sense Motive (Wis) check, DC 25 + opponent's career level; whoever fails cracks and loses (if both fail, the Conflict continues). A side may skip its check, giving the opponent 2 Lead.",
+      "summary": "Crisis check: each side rolls Sense Motive (Wis), DC 25 + the other's career level. A lone failure cracks and loses; a double failure changes nothing. Declining the roll hands the other side 2 Lead.",
       "repeat": "Each further pick lowers the winner's own Crisis DC by 4 (minimum 20).",
       "repeatEvery": 1,
       "skipLeadShift": 2,
@@ -9061,7 +8553,7 @@ export const GC_DATA = {
       "name": "Stress",
       "leadShift": 0,
       "victory": false,
-      "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the interrogation ends.",
+      "summary": "1d4 stress damage to all but the winner; it stays until the interrogation is over.",
       "repeat": "Each further pick adds +1d4 stress damage.",
       "repeatEvery": 1
      },
@@ -9075,7 +8567,7 @@ export const GC_DATA = {
      }
     ],
     "victory": {
-     "predator": "Prey truthfully gives up everything he knows about 1 event or topic the Predator names; later interrogations of him by this Predator this mission start 2 Lead lower (minimum 1).",
+     "predator": "Prey tells the truth, in full, about 1 event or subject of the Predator's choosing. Further interrogations of him by the same Predator this mission begin at Lead -2 (floor 1).",
      "prey": "Prey shuts down or sells a believable story; this Predator cannot interrogate him again this mission."
     },
     "outsideActions": "",
@@ -9093,19 +8585,19 @@ export const GC_DATA = {
         3
        ],
        [
-        "Slight (may prompt ridicule or social sanction)",
+        "Slight — embarrassment",
         4
        ],
        [
-        "Moderate (may prompt mild retribution or minor criminal charges)",
+        "Moderate — minor legal trouble or payback",
         5
        ],
        [
-        "Extreme (may prompt a personal vendetta or moderate criminal charges)",
+        "Extreme — a vendetta or serious charges",
         6
        ],
        [
-        "Deadly (may prompt attacks or major criminal charges on self, friends, and family)",
+        "Deadly — lethal danger or gravest charges, extending to loved ones",
         7
        ]
       ],
@@ -9124,133 +8616,133 @@ export const GC_DATA = {
       "rows": [
        [
         "Situation",
-        "Prey may voluntarily leave**",
+        "Prey free to go**",
         "×1/2",
         "-6/+0",
         "+2/+0"
        ],
        [
         "Situation",
-        "Prey is imprisoned or cannot leave",
+        "Prey held / no exit",
         "×1",
         "+0/+0",
         "+0/+0"
        ],
        [
         "Situation",
-        "Prey has legal counsel present",
+        "Lawyer present",
         "×1.5",
         "-6/+0",
         "+2/+0"
        ],
        [
         "Situation",
-        "Prey expects to be released or rescued in the current interval",
+        "Release or rescue expected this round",
         "—",
         "+0/+2",
         "+0/+0"
        ],
        [
         "Situation",
-        "Prey has no hope of rescue",
+        "Rescue ruled out",
         "—",
         "+0/-4",
         "+0/+1"
        ],
        [
         "Duress",
-        "Threat of minor injury or inconvenience",
+        "Threat: minor harm/hassle",
         "—",
         "+0/+0",
         "+0/+0"
        ],
        [
         "Duress",
-        "Threat of incarceration or violence",
+        "Threat: jail or violence",
         "—",
         "+0/-2",
         "+0/+0"
        ],
        [
         "Duress",
-        "Threat of death",
+        "Threat: death",
         "—",
         "+0/-4",
         "+0/+1"
        ],
        [
         "Duress",
-        "Threat of torture",
+        "Threat: torture",
         "—",
         "+0/-6",
         "+1/+2"
        ],
        [
         "Duress",
-        "Act of incarceration or violence (the target or a second character)†",
+        "Act: jail or violence (Prey or another person)†",
         "—",
         "+0/-6",
         "+1/+2"
        ],
        [
         "Duress",
-        "Act of killing (a second character)†",
+        "Act: killing (another person)†",
         "—",
         "+0/-8",
         "+2/+3"
        ],
        [
         "Duress",
-        "Act of torture (the target or a second character)†",
+        "Act: torture (Prey or another person)†",
         "—",
         "+0/-10",
         "+3/+4"
        ],
        [
         "Incentive†",
-        "Offers of money††",
+        "Offer: money††",
         "—",
         "+2/+0",
         "+0/+0"
        ],
        [
         "Incentive†",
-        "Offers of reduced penalty (legal, financial, etc.)",
+        "Offer: lighter penalty",
         "—",
         "+4/+0",
         "+1/+0"
        ],
        [
         "Incentive†",
-        "Offers of protection (from prosecution, injury, etc.)",
+        "Offer: protection",
         "—",
         "+6/+0",
         "+2/+0"
        ],
        [
         "Incentive†",
-        "Offers of immunity (from prosecution, injury, etc.)",
+        "Offer: immunity",
         "—",
         "+8/+0",
         "+3/+0"
        ]
       ],
       "notes": [
-       "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's.",
-       "** The Prey may technically leave but cannot actually do so until he wins the Conflict.",
-       "† A Prey free to leave never willingly submits to this; most such acts also cause exposure.",
+       "* Predator value / Prey value.",
+       "** Free to go in principle, yet stuck there until he wins.",
+       "† Never accepted willingly by a Prey who could walk out; usually counts as exposure too.",
        "†† Minimum sum equals a bribe; each doubling of that base adds +2 more.",
-       "\"Category\" column is added here to preserve the printed sub-headings (Situation, Duress, Incentive†)."
+       "\"Category\" column is added here to carry the table's sub-headings (Situation, Duress, Incentive†)."
       ]
      }
     },
     "notes": [
      "Predator uses Intimidate with Str for physical force or Wis for mental pressure.",
-     "Streamlined variant: one Intimidate (Str or Wis) check, DC = target's Bluff bonus + 10, with Table 6.11 modifiers still applying.",
+     "Quick version: a single Intimidate (Str or Wis) roll vs. DC = 10 + Bluff bonus of the subject; Table 6.11 modifiers apply.",
      "Round length comes from the Predator's Strategy (\"roundDuration\"); Prey strategies list no duration, and General strategy durations count only when the Predator picks them. Both sides must be present for half the round (rounded up).",
      "A blank \"skill\" means the default skill; alternate skill checks have no tags.",
-     "For † requirements the Predator adds +1 to his base Will save bonus per clue showing the Prey holds vital information.",
-     "\"Act of violence\" needs at least 5 lethal damage or 1/4 of the target's wound points (lower of the two); \"act of torture\" needs a critical injury, or 10 lethal damage / 1/3 of wound points (lower).",
+     "† requirements: each clue proving the Prey knows something vital raises the Predator's effective base Will by 1.",
+     "Thresholds — violence: lethal damage of 5 or 1/4 of the victim's wound points, whichever is less. Torture: a critical injury, or lethal damage of 10 or 1/3 of wound points, whichever is less.",
      "Several participants form a Predator group and a Prey group; each makes one cooperative opposed check per round."
     ]
    },
@@ -9261,7 +8753,7 @@ export const GC_DATA = {
      386
     ],
     "predator": "Hunter(s) searching for a missing target",
-    "prey": "Fugitive(s) whose location was known within the last 24 hours",
+    "prey": "Fugitive(s) last located under 24 hours ago",
     "predatorSkills": [
      "Investigation (Wis)"
     ],
@@ -9273,14 +8765,14 @@ export const GC_DATA = {
      "Language"
     ],
     "preySkillTags": [],
-    "roundTime": "1 day (each side involved at least 4 hours per day)",
+    "roundTime": "1 day; 4+ hours of it spent on the hunt by each side",
     "powerRatings": [
      "Spending Cash",
      "Tools Rating"
     ],
     "startingLead": {
      "default": 5,
-     "summary": "Set by the size of the starting search radius, from 4 (neighborhood) to 8 (continent). No manhunt if the area cannot be narrowed to one continent.",
+     "summary": "Depends on how wide the initial search area is: 4 (neighborhood) through 8 (continent). Wider than a single continent = no manhunt possible.",
      "rules": [
       {
        "when": "Starting radius: neighborhood",
@@ -9291,7 +8783,7 @@ export const GC_DATA = {
        "lead": 5
       },
       {
-       "when": "Starting radius: state or small country",
+       "when": "Starting radius: state / small nation",
        "lead": 6
       },
       {
@@ -9353,13 +8845,13 @@ export const GC_DATA = {
       "leadMax": null,
       "ratings": [],
       "ratingsMode": null,
-      "other": "master tracker class ability (see page 44)",
+      "other": "Class ability required: master tracker (p.44)",
       "modifier": 0,
       "advantages": [
        "*"
       ],
-      "summary": "Pin the opponent down or slip the net; winner spends 1 use of the class ability to pick any Advantages except Victory.",
-      "note": "Printed as \"Any except Victory\".",
+      "summary": "Pin the opponent down or slip the net. On a win, 1 use of the class ability buys free choice of Advantages (Victory excluded).",
+      "note": "Advantage column allows anything but Victory.",
       "skill": "",
       "publicityOnChoose": 0
      },
@@ -9367,7 +8859,7 @@ export const GC_DATA = {
       "id": "all-points-bulletin",
       "name": "All Points Bulletin",
       "side": "predator",
-      "requirements": "Spending Cash or Tools Rating 4+",
+      "requirements": "Cash or Tools 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9396,7 +8888,7 @@ export const GC_DATA = {
       "id": "checkpoints",
       "name": "Checkpoints",
       "side": "predator",
-      "requirements": "Spending Cash or Tools Rating 7+",
+      "requirements": "Cash or Tools 7+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9464,7 +8956,7 @@ export const GC_DATA = {
       "id": "gotcha",
       "name": "“Gotcha!”",
       "side": "predator",
-      "requirements": "Spending Cash or Tools Rating 6+",
+      "requirements": "Cash or Tools 6+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9532,7 +9024,7 @@ export const GC_DATA = {
       "id": "media-blitz",
       "name": "Media Blitz",
       "side": "predator",
-      "requirements": "Spending Cash or Tools Rating 6+",
+      "requirements": "Cash or Tools 6+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9572,7 +9064,7 @@ export const GC_DATA = {
        "Lead",
        "Profile"
       ],
-      "summary": "Get inside the fugitive's head to predict his next step.",
+      "summary": "Think like the fugitive to guess where he goes next.",
       "note": "",
       "skill": "Manipulate (Wis)",
       "publicityOnChoose": 0
@@ -9581,7 +9073,7 @@ export const GC_DATA = {
       "id": "surveillance",
       "name": "Surveillance",
       "side": "predator",
-      "requirements": "Spending Cash or Tools Rating 5+",
+      "requirements": "Cash or Tools 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9610,7 +9102,7 @@ export const GC_DATA = {
       "id": "the-usual-suspects",
       "name": "The Usual Suspects",
       "side": "predator",
-      "requirements": "Spending Cash or Tools Rating 3+",
+      "requirements": "Cash or Tools 3+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9658,7 +9150,7 @@ export const GC_DATA = {
       "id": "disgrace",
       "name": "Disgrace",
       "side": "prey",
-      "requirements": "Spending Cash or Tools Rating 5+",
+      "requirements": "Cash or Tools 5+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9707,7 +9199,7 @@ export const GC_DATA = {
       "id": "interference",
       "name": "Interference",
       "side": "prey",
-      "requirements": "Spending Cash or Tools Rating 4+",
+      "requirements": "Cash or Tools 4+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9756,7 +9248,7 @@ export const GC_DATA = {
       "id": "no-witnesses",
       "name": "No Witnesses",
       "side": "prey",
-      "requirements": "Spending Cash or Tools Rating 3+",
+      "requirements": "Cash or Tools 3+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9805,7 +9297,7 @@ export const GC_DATA = {
       "id": "run-for-the-border",
       "name": "Run for the Border",
       "side": "prey",
-      "requirements": "Spending Cash or Tools Rating 6+",
+      "requirements": "Cash or Tools 6+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9824,7 +9316,7 @@ export const GC_DATA = {
       "advantages": [
        "Chase"
       ],
-      "summary": "Make a bold dash out of the search area.",
+      "summary": "Bolt for the edge of the dragnet.",
       "note": "",
       "skill": "",
       "publicityOnChoose": 0
@@ -9853,7 +9345,7 @@ export const GC_DATA = {
       "id": "take-it-public",
       "name": "Take It Public",
       "side": "prey",
-      "requirements": "Spending Cash or Tools Rating 7+",
+      "requirements": "Cash or Tools 7+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9882,7 +9374,7 @@ export const GC_DATA = {
       "id": "without-a-trace",
       "name": "Without a Trace",
       "side": "prey",
-      "requirements": "Spending Cash or Tools Rating 7+",
+      "requirements": "Cash or Tools 7+",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -9914,7 +9406,7 @@ export const GC_DATA = {
       "name": "Chase",
       "leadShift": 0,
       "victory": false,
-      "summary": "A chase Conflict starts with vehicles chosen by the GC, starting Lead equal to the manhunt's Lead; Predator gets 2 bonus action dice for chase skill checks. If the Prey wins the chase he wins the manhunt.",
+      "summary": "Launch a chase: GC assigns vehicles, chase Lead begins at the manhunt's current Lead, and the Predator receives 2 bonus action dice usable on the chase's skill checks. A Prey win in the chase also wins the manhunt.",
       "repeat": "",
       "nestedConflict": "chase",
       "canEndConflict": true
@@ -9960,7 +9452,7 @@ export const GC_DATA = {
       "name": "Outcry",
       "leadShift": 0,
       "victory": false,
-      "summary": "Manhunt publicity increases by 1.",
+      "summary": "Publicity +1.",
       "repeat": "Every 2 further picks: publicity +1 more.",
       "repeatEvery": 2,
       "publicity": 1
@@ -9980,8 +9472,8 @@ export const GC_DATA = {
       "name": "Profile",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator reaches a scene tied to the Prey with timing per Table 6.15 (Lead counts +1 if the Prey has a cover identity); an Investigation/Canvass Area or Search/Perception check at the listed DC yields 1 clue, each worth +2 on later manhunt checks.",
-      "repeat": "Every 2 further picks: treat Lead as 1 lower for the table (actual Lead unchanged).",
+      "summary": "Predator turns up somewhere the Prey has been; Table 6.15 gives when (treat Lead as +1 if the Prey uses a cover identity). Passing Investigation/Canvass Area or Search/Perception at that row's DC finds 1 clue; every clue = +2 to his manhunt checks from then on.",
+      "repeat": "Every 2 further picks: read the table 1 Lead lower (real Lead stays).",
       "repeatEvery": 2
      },
      {
@@ -9989,7 +9481,7 @@ export const GC_DATA = {
       "name": "Public Support",
       "leadShift": 0,
       "victory": false,
-      "summary": "Manhunt publicity decreases by 2.",
+      "summary": "Publicity -2.",
       "repeat": "Every 2 further picks: publicity -1 more.",
       "repeatEvery": 2,
       "publicity": -2
@@ -10017,7 +9509,7 @@ export const GC_DATA = {
       "name": "Stress",
       "leadShift": 0,
       "victory": false,
-      "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the manhunt ends.",
+      "summary": "1d4 stress damage to all but the winner; it stays until the manhunt is over.",
       "repeat": "Each further pick adds +1d4 stress damage.",
       "repeatEvery": 1
      },
@@ -10026,7 +9518,7 @@ export const GC_DATA = {
       "name": "Twist",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner may use Athletics (Str), Bureaucracy (Cha), Computers (Int), Drive (Dex), Networking (Cha), Search (Int), Sneak (Dex) or Streetwise (Wis), without tags, for the next opposed check.",
+      "summary": "Next opposed check: winner may swap in Athletics/Str, Bureaucracy/Cha, Computers/Int, Drive/Dex, Networking/Cha, Search/Int, Sneak/Dex or Streetwise/Wis (tags ignored).",
       "repeat": "",
       "twistSkills": [
        "Athletics (Str)",
@@ -10049,8 +9541,8 @@ export const GC_DATA = {
      }
     ],
     "victory": {
-     "predator": "Prey's exact location is known; Predator may move in (usually combat or chase with a slow ambush) or keep watching, resetting Lead to 1 and continuing next day.",
-     "prey": "Prey and team slip away and cannot be found for the rest of the scene."
+     "predator": "Prey pinpointed. Predator either closes in (typically a fight or chase opened by a slow ambush) or holds back to observe: Lead becomes 1 and the hunt resumes the following day.",
+     "prey": "Prey's side vanishes; no locating them again this scene."
     },
     "outsideActions": "",
     "tables": {
@@ -10065,58 +9557,58 @@ export const GC_DATA = {
       "rows": [
        [
         "Predator Organization’s Authority",
-        "Shadowy conspiracy that fears the light of day",
+        "Secret conspiracy",
         3
        ],
        [
         "Predator Organization’s Authority",
-        "Little-known group that wants to stay that way",
+        "Obscure group avoiding attention",
         5
        ],
        [
         "Predator Organization’s Authority",
-        "Official faction whose motives are easily questioned",
+        "Official body of doubtful standing",
         7
        ],
        [
         "Predator Organization’s Authority",
-        "Faction lead by well-known or feared public figures",
+        "Body with famous or feared leaders",
         9
        ],
        [
         "Predator Organization’s Authority",
-        "Public faction whose primary function is to pursue criminals",
+        "Open law-enforcement body",
         "No limit*"
        ],
        [
         "Prey Notoriety",
-        "Inconsequential (e.g. petty criminal, minor witness)",
+        "Inconsequential — small-time",
         "+0"
        ],
        [
         "Prey Notoriety",
-        "Interesting (e.g. mastermind or witness linked to minor organization)",
+        "Interesting — tied to a small organization",
         "+1"
        ],
        [
         "Prey Notoriety",
-        "Significant (e.g. mastermind or witness linked to major organization)",
+        "Significant — tied to a large organization",
         "+2"
        ],
        [
         "Prey Notoriety",
-        "Urgent (e.g. established long-term threat or witness linked to global organization)",
+        "Urgent — standing menace, or tied to a worldwide organization",
         "+4"
        ],
        [
         "Prey Notoriety",
-        "Vital (e.g. tangible threat to faction’s survival or witness linked to distribution of weapons of mass destruction)",
+        "Vital — existential danger or WMD link",
         "No limit*"
        ]
       ],
       "notes": [
        "* Overrides all other publicity modifiers; the hunt continues whatever disruption it causes.",
-       "Limit = authority base + notoriety modifier. \"Category\" column is added here to preserve the printed sub-headings."
+       "Limit = authority base + notoriety modifier. \"Category\" column is added here to carry the table's sub-headings."
       ]
      },
      "manhuntModifiers": {
@@ -10131,98 +9623,98 @@ export const GC_DATA = {
       "rows": [
        [
         "Situation",
-        "Predator assisted by organization that cannot or may not operate in public",
+        "Predator's backers must stay covert",
         "-6/+0",
         "+2/+0"
        ],
        [
         "Situation",
-        "Per member of Prey group above 3",
+        "Each Prey beyond the 3rd",
         "+0/-1",
         "+0/+0"
        ],
        [
         "Public Opinion",
-        "Local citizens and/or press hate the Predator",
+        "Locals/media: hostile to Predator",
         "-2/+0",
         "+0/+0"
        ],
        [
         "Public Opinion",
-        "Local citizens and/or press fear the Predator",
+        "Locals/media: afraid of Predator",
         "-4/+0",
         "+0/-2"
        ],
        [
         "Public Opinion",
-        "Local citizens and/or press approve of the Predator",
+        "Locals/media: back the Predator",
         "+0/-2",
         "+0/+0"
        ],
        [
         "Public Opinion",
-        "Local citizens and/or press are used to living under scrutiny",
+        "Locals/media: accustomed to surveillance",
         "+0/-4",
         "-2/+0"
        ],
        [
         "Public Opinion",
-        "Local citizens and/or press would recognize the Prey prior to the manhunt",
+        "Locals/media: Prey already a familiar face",
         "+0/-4",
         "+0/+1"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Attempted to use mass or public transportation or rental vehicle",
+        "Prey, Past 24 Hours",
+        "Tried public transit or a rental",
         "+0/-4",
         "+0/+1"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Made 1 or more traceable calls",
+        "Prey, Past 24 Hours",
+        "Traceable call(s)",
         "+0/-2",
         "+0/+0"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Presented any traceable (non-cover) ID",
+        "Prey, Past 24 Hours",
+        "Showed real (non-cover) ID",
         "+0/-2",
         "+0/+0"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Sought medical assistance (per person treated)",
+        "Prey, Past 24 Hours",
+        "Medical care, each patient",
         "+0/-4",
         "+0/+1"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Spent more than $1,000, up to $10,000",
+        "Prey, Past 24 Hours",
+        "Spending $1,001-$10,000",
         "+0/-2",
         "+0/+0"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Spent more than $10,000, up to $50,000",
+        "Prey, Past 24 Hours",
+        "Spending $10,001-$50,000",
         "+0/-4",
         "+0/+0"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Spent more than $50,000",
+        "Prey, Past 24 Hours",
+        "Spending over $50,000",
         "+0/-6",
         "+0/+0"
        ],
        [
-        "Prey Actions in Last 24 Hours",
-        "Traveled more than (5 × Lead) miles",
+        "Prey, Past 24 Hours",
+        "Moved over 5 × Lead miles",
         "+0/-2",
         "+0/+0"
        ]
       ],
       "notes": [
-       "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's.",
-       "\"Category\" column is added here to preserve the printed sub-headings."
+       "* Predator value / Prey value.",
+       "\"Category\" column is added here to carry the table's sub-headings."
       ]
      },
      "profilingDelay": {
@@ -10236,37 +9728,37 @@ export const GC_DATA = {
       "rows": [
        [
         "0",
-        "1d4 hours before the Prey",
+        "Ahead of Prey by 1d4 hours",
         15
        ],
        [
         "1",
-        "At roughly the same time as the Prey (per GC discretion)",
+        "Simultaneous, more or less (GC's call)",
         20
        ],
        [
         "2",
-        "4d4 minutes after the Prey",
+        "Behind Prey by 4d4 minutes",
         25
        ],
        [
         "3",
-        "2d4 × 10 minutes after the Prey",
+        "Behind Prey by 2d4 × 10 minutes",
         30
        ],
        [
         "4",
-        "1d6 hours after the Prey",
+        "Behind Prey by 1d6 hours",
         35
        ],
        [
         "5",
-        "4d6 hours after the Prey",
+        "Behind Prey by 4d6 hours",
         40
        ],
        [
         "6+",
-        "More than 1 day after the Prey",
+        "Behind Prey by over 1 day",
         "Impossible"
        ]
       ],
@@ -10276,14 +9768,14 @@ export const GC_DATA = {
      }
     },
     "notes": [
-     "A manhunt needs the Prey's whereabouts to have been known within the last 24 hours and the search area to be one continent or smaller.",
-     "Streamlined variant: a Complex Task with Challenges = starting Lead, Investigation (Wis) DC = Prey's Blend bonus + 10.",
+     "Preconditions: a fix on the Prey less than 24 hours old, and a search area no bigger than a continent.",
+     "Quick version: Complex Task, Challenges = starting Lead, Investigation (Wis) vs. DC 10 + Prey's Blend bonus.",
      "Track a publicity score. Limit = Predator organization's authority base + Prey notoriety modifier (Table 6.13). At or above the limit the hunt is called off (Prey wins) and the Predator cannot start another manhunt this mission.",
      "Strategies with \"publicityOnChoose\" change publicity when chosen regardless of the check result; Outcry, Pause and Public Support also move it.",
-     "Requirements written \"Spending Cash or Tools Rating N+\" are parsed as two ratings in \"any\" mode: the participant's Spending Cash or his organization's Tools Rating.",
-     "Several hunting groups after one Prey: separate Lead per pair, resolved from lowest to highest Lead; the Prey may pick a different Strategy per pairing. Chains resolve front to back.",
+     "\"Cash or Tools N+\" requirements are stored as two ratings in \"any\" mode: the participant's own Spending Cash, or his organization's Tools.",
+     "Multiple Predator groups on one Prey: each pairing has its own Lead and is handled in ascending Lead order; the Prey can use a separate Strategy against each. Chained hunts go front to back.",
      "A blank \"skill\" means the default skill; alternate skill checks have no tags.",
-     "“Take Him!” winner spends 1 use of the master tracker ability to choose any 1 Advantage, +1 per 4 margin, never Victory."
+     "“Take Him!”: a win costs 1 master tracker use and grants free choice of Advantages (1, +1 per 4 points of margin; Victory excluded)."
     ]
    },
    "seduction": {
@@ -10311,7 +9803,7 @@ export const GC_DATA = {
      "Hearing",
      "Language"
     ],
-    "roundTime": "Set by the Predator's Strategy (1 minute to 1 day); both must be present for half of it (rounded up)",
+    "roundTime": "Per Predator Strategy (1 minute-1 day); both parties attend 50% of it, round up",
     "powerRatings": [
      "Spending Cash",
      "Image Rating",
@@ -10390,14 +9882,14 @@ export const GC_DATA = {
        "Lead"
       ],
       "summary": "Demand proof of the other's commitment.",
-      "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark).",
+      "note": "** mark: on a win, extend the round by however long the favor takes.",
       "roundDuration": "10 minutes"
      },
      {
       "id": "compromising-position",
       "name": "Compromising Position",
       "side": "predator",
-      "requirements": "Spending Cash 5+ or Image Rating 4+",
+      "requirements": "Cash 5+ / Image 4+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10417,7 +9909,7 @@ export const GC_DATA = {
        "Crisis",
        "Stress"
       ],
-      "summary": "Press with veiled threats of embarrassment or loss.",
+      "summary": "Hint at scandal or ruin to apply pressure.",
       "note": "",
       "roundDuration": "1 day"
      },
@@ -10425,7 +9917,7 @@ export const GC_DATA = {
       "id": "extra-incentive",
       "name": "Extra Incentive",
       "side": "predator",
-      "requirements": "Spending Cash 4+ or Image Rating 6+",
+      "requirements": "Cash 4+ / Image 6+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10464,14 +9956,14 @@ export const GC_DATA = {
        "Favor"
       ],
       "summary": "Make a bold, sudden play for the target's affections.",
-      "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark).",
+      "note": "** mark: on a win, extend the round by however long the favor takes.",
       "roundDuration": "1 minute"
      },
      {
       "id": "seal-the-deal",
       "name": "Seal the Deal",
       "side": "predator",
-      "requirements": "Spending Cash 7+ or Image Rating 6+",
+      "requirements": "Cash 7+ / Image 6+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10491,7 +9983,7 @@ export const GC_DATA = {
        "Victory"
       ],
       "summary": "All-in attempt to close the seduction.",
-      "note": "No descriptive entry for this Strategy appears in the printed strategy list.",
+      "note": "The book's strategy descriptions have no entry for this one.",
       "roundDuration": "1 hour"
      },
      {
@@ -10510,14 +10002,14 @@ export const GC_DATA = {
        "Halt"
       ],
       "summary": "Break things off without giving up influence already gained.",
-      "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark).",
+      "note": "** mark: on a win, extend the round by however long the favor takes.",
       "roundDuration": "4 hours"
      },
      {
       "id": "wine-and-dine",
       "name": "Wine and Dine",
       "side": "predator",
-      "requirements": "Spending Cash 4+ or Image Rating 3+",
+      "requirements": "Cash 4+ / Image 3+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10545,7 +10037,7 @@ export const GC_DATA = {
       "id": "i-just-cant",
       "name": "“I Just Can’t”",
       "side": "prey",
-      "requirements": "Lifestyle 7+ or History Rating 6+",
+      "requirements": "Lifestyle 7+ / History 6+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10583,7 +10075,7 @@ export const GC_DATA = {
        "Stress",
        "Swap"
       ],
-      "summary": "As the bond deepens, find a way to turn the tables.",
+      "summary": "Use the growing closeness to reverse who is working whom.",
       "note": "",
       "roundDuration": "—"
      },
@@ -10591,7 +10083,7 @@ export const GC_DATA = {
       "id": "its-not-right",
       "name": "“It’s Not Right!”",
       "side": "prey",
-      "requirements": "Lifestyle 4+ or History Rating 3+",
+      "requirements": "Lifestyle 4+ / History 3+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10619,7 +10111,7 @@ export const GC_DATA = {
       "id": "its-not-you-its-me",
       "name": "“It’s Not You, It’s Me”",
       "side": "prey",
-      "requirements": "Lifestyle 4+ or History Rating 5+",
+      "requirements": "Lifestyle 4+ / History 5+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10640,14 +10132,14 @@ export const GC_DATA = {
        "Favor"
       ],
       "summary": "Pull the seducer into the target's messy life and extract favors.",
-      "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark). Duration cell is printed as only the ** mark.",
+      "note": "** mark: on a win, extend the round by however long the favor takes. The book's duration cell holds nothing but the ** mark.",
       "roundDuration": "**"
      },
      {
       "id": "people-will-talk",
       "name": "“People Will Talk”",
       "side": "prey",
-      "requirements": "Lifestyle 6+ or History Rating 4+",
+      "requirements": "Lifestyle 6+ / History 4+ (either)",
       "leadMin": null,
       "leadMax": null,
       "ratings": [
@@ -10686,7 +10178,7 @@ export const GC_DATA = {
        "Favor"
       ],
       "summary": "Feign interest to test the seducer's intentions.",
-      "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark). Duration cell is printed as only the ** mark.",
+      "note": "** mark: on a win, extend the round by however long the favor takes. The book's duration cell holds nothing but the ** mark.",
       "roundDuration": "**"
      }
     ],
@@ -10696,7 +10188,7 @@ export const GC_DATA = {
       "name": "Charm",
       "leadShift": 0,
       "victory": false,
-      "summary": "Prey's disposition toward the Predator improves 1 grade until the mission ends (maximum Supportive).",
+      "summary": "Until the mission is over, the Prey's disposition to the Predator is 1 grade better (cap: Supportive).",
       "repeat": "Every 3 further picks: 1 more grade.",
       "repeatEvery": 3
      },
@@ -10705,7 +10197,7 @@ export const GC_DATA = {
       "name": "Crisis",
       "leadShift": 0,
       "victory": false,
-      "summary": "Both sides make a Cultures (Cha) check, DC 25 + opponent's career level; whoever fails commits a faux pas and loses (if both fail, the Conflict continues). A side may skip its check, giving the opponent 2 Lead.",
+      "summary": "Crisis check: each side rolls Cultures (Cha), DC 25 + the other's career level. A lone failure is a faux pas that loses the Conflict; a double failure changes nothing. Declining the roll hands the other side 2 Lead.",
       "repeat": "Each further pick lowers the winner's own Crisis DC by 4 (minimum 20).",
       "repeatEvery": 1,
       "skipLeadShift": 2,
@@ -10716,7 +10208,7 @@ export const GC_DATA = {
       "name": "Disappoint",
       "leadShift": 0,
       "victory": false,
-      "summary": "Prey's disposition toward the Predator worsens 1 grade until the mission ends (minimum Hostile).",
+      "summary": "Until the mission is over, the Prey's disposition to the Predator is 1 grade worse (floor: Hostile).",
       "repeat": "Every 3 further picks: 1 more grade.",
       "repeatEvery": 3
      },
@@ -10725,7 +10217,7 @@ export const GC_DATA = {
       "name": "Favor",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner may have the loser perform 1 action as if a Persuasion check with up to -6 penalty had succeeded; actually demanding it moves Lead 1 toward the opponent.",
+      "summary": "Winner can call in 1 action from the loser, treated as a successful Persuasion check at a penalty no worse than -6. Cashing it in shifts Lead 1 the loser's way.",
       "repeat": "Each further pick raises the penalty cap by 2 (-8, -10...).",
       "repeatEvery": 1,
       "leadCostIfUsed": 1
@@ -10762,7 +10254,7 @@ export const GC_DATA = {
       "name": "Stress",
       "leadShift": 0,
       "victory": false,
-      "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the seduction ends.",
+      "summary": "1d4 stress damage to all but the winner; it stays until the seduction is over.",
       "repeat": "Each further pick adds +1d4 stress damage.",
       "repeatEvery": 1
      },
@@ -10771,7 +10263,7 @@ export const GC_DATA = {
       "name": "Swap",
       "leadShift": 0,
       "victory": false,
-      "summary": "Predator and Prey trade roles, then Lead increases by 1.",
+      "summary": "Sides swap Predator/Prey roles; Lead then goes up 1.",
       "repeat": "",
       "swapRoles": true,
       "absoluteLeadChange": 1
@@ -10781,7 +10273,7 @@ export const GC_DATA = {
       "name": "Twist",
       "leadShift": 0,
       "victory": false,
-      "summary": "Winner may use Bluff (Cha), Cultures (Int), Drive (Dex), Manipulate (Cha), Networking (Cha), Profession (Cha) or Resolve (Wis), without tags, for the next opposed check.",
+      "summary": "Next opposed check: winner may swap in Bluff/Cha, Cultures/Int, Drive/Dex, Manipulate/Cha, Networking/Cha, Profession/Cha or Resolve/Wis (tags ignored).",
       "repeat": "",
       "twistSkills": [
        "Bluff (Cha)",
@@ -10803,8 +10295,8 @@ export const GC_DATA = {
      }
     ],
     "victory": {
-     "predator": "Prey's disposition toward the Predator becomes Helpful and stays there until something else changes it.",
-     "prey": "Prey's disposition becomes Adversarial; it cannot improve, and this Predator cannot seduce him again, for the rest of the mission."
+     "predator": "Prey is now Helpful to the Predator, lasting until some later event moves it.",
+     "prey": "Prey is now Adversarial to the Predator. Through mission's end that grade cannot rise and the same Predator gets no further seduction attempts."
     },
     "outsideActions": "",
     "tables": {},
@@ -10821,176 +10313,147 @@ export const GC_DATA = {
    {
     "type": "basics",
     "where": "Step 3: Resolution (p.363)",
-    "printed": "\"...to a newlict round\"",
-    "comment": "Extraction garble for \"new Conflict round\"; no data impact."
+    "comment": "A garbled word in the source text where \"new Conflict round\" is meant; no data impact."
    },
    {
     "type": "chase",
     "where": "Prey Skill line (p.364)",
-    "printed": "\"Athletics Maneuver (foot)\" and \"Survival Maneuver (animal)\"",
-    "comment": "Slash missing in the Prey list only; transcribed as Athletics/Maneuver and Survival/Maneuver to match the Predator list."
+    "comment": "The slash between skill and check is missing for the foot and animal entries in the Prey list only; treated the same as the Predator list."
    },
    {
     "type": "chase",
     "where": "Table 6.3, Set Up row",
-    "printed": "\"Set up\"",
-    "comment": "Capitalized \"Set Up\" in the description; name stored as \"Set Up\"."
+    "comment": "Table uses a lower-case \"up\"; the description capitalizes it. Name stored as \"Set Up\"."
    },
    {
     "type": "brainwashing",
     "where": "Twist Advantage (p.370)",
-    "printed": "\"next opposed check during the same chase\"",
-    "comment": "Says \"chase\" in a brainwashing rule; copy-paste slip in the book."
+    "comment": "The brainwashing Twist text refers to a chase; copy-paste slip in the book."
    },
    {
     "type": "brainwashing",
     "where": "Table 6.5 skill column",
-    "printed": "Patience (Predator) uses Resolve (Wis); Worrisome Smile (Prey) uses Manipulate (Wis)",
-    "comment": "Skills look swapped relative to each side's default but are transcribed as printed."
+    "comment": "Patience (Predator) lists Resolve (Wis) and Worrisome Smile (Prey) lists Manipulate (Wis): the skills look swapped relative to each side's default, but are kept as the book has them."
    },
    {
     "type": "hacking",
     "where": "Table 6.7, “Shall We Play A Game?” row",
-    "printed": "\"Computer Power Rating 3+,\" / continuation line \"Probe software\"",
-    "comment": "Requirement wraps over two lines; merged as \"Computer Power Rating 3+, Probe software\"."
+    "comment": "Requirement wraps over two table lines (rating, then software); stored as one requirement."
    },
    {
     "type": "hacking",
     "where": "Table 6.7 Prey rows",
-    "printed": "\"Lead: 1–2\", \"Lead: 6–9\", \"Lead: 7–9\"",
-    "comment": "Colon after Lead only in the Prey section; kept in \"requirements\", parsed normally."
+    "comment": "Prey rows put a colon after \"Lead\" in the range requirement, unlike other tables; kept in \"requirements\", parsed normally."
    },
    {
     "type": "hacking",
     "where": "Silhouette Advantage (p.373)",
-    "printed": "\"establish a profile silhouette of the Prey\"",
-    "comment": "Context (bonus applies against the target Predator) implies the silhouette is of the Predator."
+    "comment": "The text says the silhouette is of the Prey, but the bonus applies against the Predator, so the silhouette must be of the Predator."
    },
    {
     "type": "hacking",
     "where": "Seize Control Advantage (p.373)",
-    "printed": "\"gains control of 1 program or device\"",
-    "comment": "Repeat clause lacks \"additional\"; interpreted as 1 more per pick."
+    "comment": "Repeat clause omits the word for \"additional\"; read as 1 more program or device per pick."
    },
    {
     "type": "infiltration",
     "where": "Table 6.9, Inner Circle Trial row",
-    "printed": "\"Lead 1–3**\"",
-    "comment": "** is only the Ratings cross-reference from the column header; possibly meant to be the high-profile mark. Left with no extra requirement."
+    "comment": "The ** mark on this Lead 1-3 requirement is only the Ratings cross-reference from the column header; possibly meant to be the high-profile mark. Left with no extra requirement."
    },
    {
     "type": "infiltration",
     "where": "Table 6.9, Mantrap row",
-    "printed": "\"Lead 7-9\"",
-    "comment": "Hyphen instead of en dash; parsed as 7 to 9."
+    "comment": "Range written with a hyphen instead of an en dash; parsed as 7 to 9."
    },
    {
     "type": "infiltration",
     "where": "Conspiracy Advantage (p.377)",
-    "printed": "\"the Prey may target 1 additional character or squad\"",
-    "comment": "Should read Predator, who is the one using this Advantage."
+    "comment": "The repeat clause names the Prey as choosing the extra target; it should be the Predator, who uses this Advantage."
    },
    {
     "type": "infiltration",
     "where": "Table 6.9, “Any except Victory” rows",
-    "printed": "\"Any except Victory\"",
-    "comment": "Infiltration has no Victory Advantage at all (the book says so on p.379); \"*\" still used."
+    "comment": "These rows allow any Advantage but Victory, yet infiltration has no Victory Advantage at all (the book says so on p.379); \"*\" still used."
    },
    {
     "type": "infiltration",
     "where": "Reconnaissance Advantage (p.378)",
-    "printed": "\"standard character s.of the Prey’s choice\"",
-    "comment": "Extraction/typo garble; no data impact."
+    "comment": "Garbled characters in the standard-character clause; no data impact."
    },
    {
     "type": "interrogation",
     "where": "Interrogation Timing (p.380)",
-    "printed": "\"During an infiltration, each Conflict round...\"",
-    "comment": "Says infiltration in the interrogation section."
+    "comment": "The timing paragraph says infiltration in the interrogation section."
    },
    {
     "type": "interrogation",
     "where": "Table 6.12 requirements",
-    "printed": "\"Base Will Save +6†\" etc.",
-    "comment": "Format differs from other tables (\"+N\" rather than \"N+\"); parsed as minimum N. Good Cop \"+5\" lacks the † the other Predator rows carry."
+    "comment": "Will Save requirements are written with the plus before the number, unlike other tables; stored as minimum N. Good Cop lacks the † the other Predator rows carry."
    },
    {
     "type": "interrogation",
     "where": "Table 6.11, Incentive sub-heading",
-    "printed": "\"Incentive†\"",
-    "comment": "The † footnote (Prey never submits willingly; exposure) fits the Duress acts; its attachment to the Incentive heading looks like a misprint."
+    "comment": "The † footnote (Prey never submits willingly; exposure) fits the Duress acts; its attachment to the Incentive sub-heading looks like a misprint."
    },
    {
     "type": "interrogation",
     "where": "Crisis Advantage (p.382)",
-    "printed": "\"If either participant fails this check, he cracks... ending the interrogation in his opponent’s favor; otherwise... (this is the case even if both participants crack...)\"",
-    "comment": "Internally inconsistent; summarized as: exactly one failure ends it, both failing continues."
+    "comment": "Text is internally inconsistent about what happens when both crack; summarized as: exactly one failure ends it, both failing continues."
    },
    {
     "type": "manhunt",
     "where": "Manhunt Strategies intro (p.384)",
-    "printed": "\"Table 6.14: Manhunt Strategies (see above)\"",
-    "comment": "The strategies table is Table 6.16 on p.386."
+    "comment": "The intro cites the strategies table as Table 6.14; it is Table 6.16 on p.386."
    },
    {
     "type": "manhunt",
     "where": "Outcry Advantage (p.385)",
-    "printed": "\"during the same Challenge\"",
-    "comment": "Other Advantages say \"round\"."
+    "comment": "This Advantage's repeat clause says Challenge where other Advantages say round."
    },
    {
     "type": "manhunt",
     "where": "Table 6.16, Take It Public row",
-    "printed": "\"Take it Public\"",
-    "comment": "Description uses \"Take It Public\"; stored with capital I."
+    "comment": "Table uses a lower-case \"it\"; the description capitalizes it. Stored with capital I."
    },
    {
     "type": "manhunt",
     "where": "Table 6.15 header",
-    "printed": "\"Lead / Profiler’s Arrival / Canvass Area/ / Perception Check DC\" (4 header cells, 3 data cells)",
-    "comment": "Header split by extraction; merged to \"Canvass Area/Perception Check DC\"."
+    "comment": "Header split into 4 cells by extraction against 3 data cells; the last two are merged into one column heading."
    },
    {
     "type": "manhunt",
     "where": "Ending a Manhunt (p.386)",
-    "printed": "\"or the chase otherwise ends in the Prey’s favor\"",
     "comment": "Says chase where manhunt is meant."
    },
    {
     "type": "seduction",
     "where": "Table 6.17, Seal the Deal",
-    "printed": "Row present in table",
-    "comment": "No matching entry in the Seduction Strategies description list."
+    "comment": "Row present in the table but no matching entry in the Seduction Strategies description list."
    },
    {
     "type": "seduction",
     "where": "“It’s Not You, It’s Me” (p.387 vs Table 6.17)",
-    "printed": "Description speaks of the Predator; table lists it under Prey Only",
-    "comment": "Transcribed per the table (Prey)."
+    "comment": "Description speaks of the Predator; the table lists it under Prey Only. Stored per the table (Prey)."
    },
    {
     "type": "seduction",
     "where": "Table 6.17 duration cells",
-    "printed": "\"**\" alone for “It’s Not You, It’s Me” and “Tell Me More”",
-    "comment": "Footnote mark with no duration; kept as \"**\"."
+    "comment": "Two Prey duration cells hold only the footnote mark, no duration; kept as \"**\"."
    },
    {
     "type": "seduction",
     "where": "Twist and Victory Advantages (p.388)",
-    "printed": "\"during the same chase\"; \"The interrogation ends in the opposed check winner’s favor\"",
-    "comment": "Wrong Conflict names; copy-paste slips."
+    "comment": "Twist text names a chase and Victory text names an interrogation; wrong Conflict names, copy-paste slips."
    },
    {
     "type": "seduction",
     "where": "Favor Advantage (p.387)",
-    "printed": "\"Influence/Persuasion check\"",
-    "comment": "Elsewhere the check is Impress/Persuasion; no such skill as Influence in this chapter."
+    "comment": "The check is named with an Influence skill here; elsewhere it is Impress/Persuasion and no Influence skill exists in this chapter."
    },
    {
     "type": "seduction",
     "where": "Charm vs. Ending a Seduction",
-    "printed": "Charm maximum \"Supportive\"; Predator victory sets \"Helpful\"; Prey victory sets \"Adversarial\"; Disappoint minimum \"Hostile\"",
-    "comment": "Disposition grade names transcribed as printed; verify against the disposition scale."
+    "comment": "Disposition grades as given in the book (Charm cap Supportive, Predator victory Helpful, Prey victory Adversarial, Disappoint floor Hostile); verify against the disposition scale."
    }
   ]
  },
@@ -11024,7 +10487,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": 75,
    "gcDice": null,
-   "summary": "Player characters start each session with 2 fewer action dice (minimum 0) and their action dice never explode. Class abilities with uses tied to starting action dice are not reduced.",
+   "summary": "PCs open every session 2 action dice short (floor 0), and PC action dice do not explode. Class ability use counts based on starting dice ignore the reduction.",
    "effects": {
     "startingActionDice": -2,
     "actionDiceExplode": false
@@ -11049,7 +10512,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": 0,
    "gcDice": 2,
-   "summary": "Any threat scored on a successful attack by a player or special character becomes a critical hit automatically unless the attacker pays 1 action die to prevent it.",
+   "summary": "Threats on hits by player and special characters become critical hits free of charge; the attacker pays 1 action die only if he wants to decline.",
    "effects": {
     "autoActivateThreats": true
    }
@@ -11071,7 +10534,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": -75,
    "gcDice": 1,
-   "summary": "Activating a critical injury on a player or special character costs 1 more action die. Critical injury saves apply at 36-60 damage and the drop to -9 wounds at 61+. Medicine DCs fall by 5 and error ranges by 2.",
+   "summary": "Critical injuries against player and special characters cost 1 extra action die to activate. The critical injury save band becomes 36-60 damage, with the fall to -9 wounds at 61+. Medicine: DCs -5, error ranges -2.",
    "effects": {
     "criticalInjuryActivationCost": 1,
     "criticalInjuryRange": [
@@ -11103,7 +10566,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": -25,
    "gcDice": 1,
-   "summary": "Once per session, on a threat with an attack or skill check, a player or special character may use a free action to voice a signature line: morale bonus to Defense and Resist checks of 2x Charisma bonus (minimum +1) for half career level rounds, rounded up.",
+   "summary": "1/session, on rolling a threat (attack or skill), a player/special character may deliver a signature line as a free action. Effect: morale bonus on Defense and Resist checks = 2x Charisma bonus (at least +1), lasting half his career level in rounds (round up).",
    "effects": {}
   },
   {
@@ -11149,7 +10612,7 @@ export const GC_DATA = {
    "seasonOnly": true,
    "xp": -25,
    "gcDice": null,
-   "summary": "A Triumph happens on any skill check result of 60 or more, but the XP bonus for a Triumph falls to 5%.",
+   "summary": "Triumph threshold: skill result 60+. Triumph XP bonus: only 5%.",
    "effects": {
     "triumphResult": 60,
     "triumphXPPercent": 5
@@ -11162,7 +10625,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": -25,
    "gcDice": 1,
-   "summary": "The GC cannot spend action dice to mark characters as honorable during bribes. Reputation and Net Worth exposure penalties for breaking an honor code are halved, rounded down.",
+   "summary": "No GC action dice may be spent to flag characters as honorable in bribes. Honor-code breaches cost half the usual Reputation / Net Worth exposure penalty (round down).",
    "effects": {}
   },
   {
@@ -11172,7 +10635,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": -25,
    "gcDice": 1,
-   "summary": "Skill check bonuses a player or special character receives from a target's positive disposition are 1 higher.",
+   "summary": "Player and special characters get +1 on top of any skill bonus granted by a target's favorable disposition.",
    "effects": {}
   },
   {
@@ -11286,7 +10749,7 @@ export const GC_DATA = {
    "seasonOnly": true,
    "xp": 0,
    "gcDice": null,
-   "summary": "All player characters work through a network of supporters and use the Freelance gear rules. They earn only Net Worth, never Reputation. Cannot be combined with Faction.",
+   "summary": "PCs are independents backed by a web of supporters and use the Freelance gear rules. They earn only Net Worth, never Reputation. Cannot be combined with Faction.",
    "effects": {
     "gearRules": "freelance"
    }
@@ -11298,7 +10761,7 @@ export const GC_DATA = {
    "seasonOnly": true,
    "xp": 0,
    "gcDice": null,
-   "summary": "CQB range runs from Melee Range out to 20 ft. Every character, NPCs included, gets a Defense bonus against ranged attacks equal to his count of Melee and Unarmed Combat feats. Nobody may interrupt or join a Stand Off.",
+   "summary": "CQB range covers Melee Range through 20 ft. All characters (NPCs too) gain +1 Defense vs. ranged attacks per Melee or Unarmed Combat feat they hold. Stand Offs cannot be interrupted or joined.",
    "effects": {}
   },
   {
@@ -11320,7 +10783,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": 100,
    "gcDice": 4,
-   "summary": "Activating a critical injury on a player or special character costs 1 fewer action die (minimum 0). Critical injury saves apply at 16-25 damage and the drop to -9 wounds at 26+. Medicine DCs rise by 5 and error ranges by 2.",
+   "summary": "Critical injuries against player and special characters cost 1 less action die to activate (floor 0). The critical injury save band becomes 16-25 damage, with the fall to -9 wounds at 26+. Medicine: DCs +5, error ranges +2.",
    "effects": {
     "criticalInjuryActivationCost": -1,
     "criticalInjuryRange": [
@@ -11363,7 +10826,7 @@ export const GC_DATA = {
    "seasonOnly": true,
    "xp": 0,
    "gcDice": null,
-   "summary": "The season is set in a chosen year. Items not yet introduced count as gadget Housings or effects at +1 Caliber (maximum V). Money values and actual costs are multiplied per Table 7.4, from x0.01 (1875-1900) up to x1 (1990 onward).",
+   "summary": "Pick a year for the season. Gear that did not exist yet is available only as a gadget (Housing or effect), at +1 Caliber (cap V). Table 7.4 scales monetary values and actual costs by era: x0.01 for 1875-1900 rising to x1 from 1990.",
    "effects": {}
   },
   {
@@ -11439,7 +10902,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": -100,
    "gcDice": 1,
-   "summary": "Skill check result caps are removed, all checks count as active, and every skill check penalty is halved (rounded down, minimum -1).",
+   "summary": "No result caps on skill checks; every check is treated as active; skill penalties are cut in half (round down, never better than -1).",
    "effects": {}
   },
   {
@@ -11459,7 +10922,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": 25,
    "gcDice": 4,
-   "summary": "A Triumph happens only on a skill check result of 90 or more.",
+   "summary": "Triumph threshold: skill result 90+.",
    "effects": {
     "triumphResult": 90
    }
@@ -11471,7 +10934,7 @@ export const GC_DATA = {
    "seasonOnly": true,
    "xp": 0,
    "gcDice": null,
-   "summary": "A player character who dies in a standard scene with his body intact may come back at the start of the next mission, at a cost of 200 Reputation or $10,000,000.",
+   "summary": "A PC killed in a standard scene, body still whole, can return when the next mission begins for 200 Reputation or $10,000,000.",
    "effects": {}
   },
   {
@@ -11593,7 +11056,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": -50,
    "gcDice": null,
-   "summary": "Player characters start each session with 2 extra action dice (class ability uses tied to starting dice unchanged). Their action dice also explode on a natural 1, and every action die type steps up 1 size (d4 to d6, d6 to d8, and so on).",
+   "summary": "PCs open every session with +2 action dice (class ability use counts based on starting dice unchanged). PC action dice explode on a natural 1 as well, and each die type is 1 step bigger (d4 becomes d6, d6 becomes d8, etc.).",
    "effects": {
     "startingActionDice": 2
    }
@@ -11639,7 +11102,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": 75,
    "gcDice": 3,
-   "summary": "All stress damage is doubled, and no character of any type may take 10 on a skill check.",
+   "summary": "Stress damage x2. Taking 10 on skill checks is off the table for everybody.",
    "effects": {}
   },
   {
@@ -11669,7 +11132,7 @@ export const GC_DATA = {
    "seasonOnly": false,
    "xp": 25,
    "gcDice": 1,
-   "summary": "Reputation and Net Worth exposure penalties for breaking an honor code are doubled.",
+   "summary": "Honor-code breaches cost double the usual Reputation / Net Worth exposure penalty.",
    "effects": {}
   },
   {
