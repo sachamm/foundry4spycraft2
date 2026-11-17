@@ -1,0 +1,41 @@
+{
+  "batches": [
+    348
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2635,
+  "nodeGroups": [
+    999,
+    1636
+  ],
+  "newTests": 6,
+  "browserFixtures": 63,
+  "builtPackTests": 6,
+  "scriptsChecked": 269,
+  "templatesChecked": 19,
+  "nativeReceipts": 4,
+  "nativeGuards": 5,
+  "nativeUI": 1,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1224,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 120,
+    "partial": 58,
+    "other": 136,
+    "total": 314,
+    "minimumUnfinished": 178
+  },
+  "wholeFeatClosures": 22,
+  "scope": "Spear Basics Gripping Stance; Spear Charge and other action paths remain manual."
+}

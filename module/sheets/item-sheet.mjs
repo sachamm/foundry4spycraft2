@@ -61,7 +61,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       fireModeOptions:Object.fromEntries(weaponFireModes({...sys},item.parent?.system??{}).map(key=>[key,FIRE_MODES[key]??key])),
       usesProjectiles:item.type==='weapon'&&/as (arrow|bolt)/i.test(sys.damage??''),
       ammunitionOptions:Object.fromEntries([["","Choose ammunition…"],...(item.parent?.items?.filter(i=>i.type==='weapon'&&(i.system.ammunitionOnly||['Standard arrow','Explosive arrow'].includes(i.name))).map(i=>[i.id,`${i.name} (${i.system.ammunitionKind||'arrow'})`])??[])]),
-      meleeFamilies:{"":"Unclassified / no family bonus",axe:"Axe",spear:"Spear",whip:"Whip",staff:"Staff",hammer:"Hammer",twoHandedSword:"Two-handed sword",polearm:"Polearm"},
+      meleeFamilies:{"":"Unclassified / no family bonus",axe:"Axe",spear:"Spear",whip:"Whip",staff:"Staff",hammer:"Hammer",twoHandedSword:"Two-handed sword",oneHandedSword:"One-handed sword",polearm:"Polearm",flail:"Flail"},
       gripOptions:{0:"Normal required grip",1:"One hand",2:"Both hands"},
       pickOptions: Object.fromEntries([["", "—"], ...Object.entries(cfg.gearPicks).map(([k, v]) => [k, `${k} — ${v}`])]),
       originTypes: Object.fromEntries(Object.entries(cfg.originTypes).map(([k, v]) => [k, game.i18n.localize(v)]))

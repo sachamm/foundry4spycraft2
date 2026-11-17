@@ -121,12 +121,13 @@ export function gameHunterAttack(system,{targetAnimal=false}={}){
 }
 
 /** Flanked p.341; Wolfpack p.176. The declaration means this attacker is a flanking opponent. */
-export function flankingAttackEffects(system,weapon,{targetFlanked=false,distanceFeet=null}={}){
+export function flankingAttackEffects(system,weapon,{targetFlanked=false,distanceFeet=null,whirlingFlankingProof=null}={}){
  const ranged=!['unarmed','blunt','exoticBlunt','edged','exoticEdged'].includes(weapon.proficiency)&&!/\bNKL\b/.test(weapon.qualities??'');
  if(targetFlanked!==true)return {declared:false,attackBonus:0,threatIncrease:0,blocked:false,notes:[]};
+ if(whirlingFlankingProof?.prevented)return {declared:true,whirling:whirlingFlankingProof,attackBonus:0,threatIncrease:0,blocked:true,reason:'This lower-level attacker cannot flank the actual opponent in Whirling Stance (p.179).',notes:[]};
  const has=name=>(system.activeFeatNames??[]).some(n=>n.toLowerCase().replace(/\s/g,'')===name.toLowerCase().replace(/\s/g,''));
  const distanceKnown=distanceFeet!==null&&distanceFeet!==undefined&&distanceFeet!==''&&Number.isFinite(Number(distanceFeet)),blocked=ranged&&distanceKnown&&Number(distanceFeet)>(system.cqbRange??30);
  const baseBonus=ranged?1:2,wolfpackBonus=has('Wolfpack Basics')?2:0,threatIncrease=has('Wolfpack Supremacy')?1:0;
- return {declared:true,ranged,baseBonus,wolfpackBonus,attackBonus:baseBonus+wolfpackBonus,threatIncrease,blocked,reason:blocked?'A ranged flanking opponent must be within CQB range (p.341).':'',geometryConfirmed:true,
+ return {declared:true,...(whirlingFlankingProof?{whirling:whirlingFlankingProof}:{}),ranged,baseBonus,wolfpackBonus,attackBonus:baseBonus+wolfpackBonus,threatIncrease,blocked,reason:blocked?'A ranged flanking opponent must be within CQB range (p.341).':'',geometryConfirmed:true,
  notes:[`Flanking: +${baseBonus+wolfpackBonus} attack (${ranged?'ranged +1':'unarmed/melee +2'}${wolfpackBonus?', Wolfpack Basics +2':''}). Confirm applicable opposite-side/adjacency and ready-weapon conditions (pp.176,341).`,...(threatIncrease?['Wolfpack Supremacy: threat range +1 against this flanked opponent.']:[])]};
 }

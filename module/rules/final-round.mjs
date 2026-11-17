@@ -1,5 +1,5 @@
 /** Nauseated p.342: the one-final-attack allowance is shared across sources. */
-export const FINAL_ATTACK_WORKFLOWS=new Set(['twoWeaponFinalAttack','dartingFinalAttack','mobileOffense','contempt','combatInstincts']);
+export const FINAL_ATTACK_WORKFLOWS=new Set(['twoWeaponFinalAttack','dartingFinalAttack','mobileOffense','contempt','combatInstincts','missTrick','tripFinalAttack','strikingStance']);
 export function finalAttackRoundSpec(system){
  const nauseated=system.conditionContext?.nauseated===true,stored=system.resourceUses?.finalAttackRound,known=stored!==null&&typeof stored==='object'&&!Array.isArray(stored)&&typeof stored.epoch==='string'&&!!stored.epoch&&Number.isSafeInteger(stored.used)&&stored.used>=0;
  return {id:'finalAttackRound',name:'All final attacks this round'+(nauseated?' (Nauseated maximum1)':''),cost:0,period:'round',limit:nauseated?1:Number.MAX_SAFE_INTEGER,limitLabel:nauseated?'1 while Nauseated':'No Nauseated cap while the condition is absent',workflow:'finalAttackRound',combatScoped:true,manualReviewable:true,hidden:true,requiresEpochReceipt:nauseated&&!known};

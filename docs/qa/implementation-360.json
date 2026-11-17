@@ -1,0 +1,41 @@
+{
+  "batches": [
+    360
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2863,
+  "nodeGroups": [
+    1227,
+    1636
+  ],
+  "newTests": 19,
+  "browserFixtures": 88,
+  "builtPackTests": 6,
+  "scriptsChecked": 285,
+  "templatesChecked": 19,
+  "nativeReceipts": 4,
+  "nativeGuards": 10,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1313,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Ordinary attacking Trip skill check, actual opponent/Size/own Count proof, Axe/Spear/Whip gear scopes. Existing Great Sword response separately verified. Native opposed conditions were GC manual adjudication, not automated settlement."
+}

@@ -1,8 +1,9 @@
 <section class="spycraft2-sheet npc">
-<p><a data-action="applyShaken">Apply a new Shaken source</a></p>
+<p><a data-action="manageTakedown">Takedown saves/outcomes</a> · <a data-action="manageCheapShots">Cheap Shot outcomes/recovery</a> · <a data-action="applyShaken">Apply a new Shaken source</a></p>
 {{#if actor.shakenApplicationReview.needsReview}}<p class="bad">Interrupted Shaken application needs GC review. {{#if isGM}}<a data-action="reviewShakenApplication">Review actual source effects</a>{{/if}}</p>{{/if}}
 {{#each actor.shakenSourceEntries}}<p>{{name}} · grade {{grade}}{{#unless active}} · ended or disabled{{/unless}}{{#if editable}} · <a data-action="editShakenSource" data-source-uuid="{{uuid}}">Edit or end this source</a>{{/if}}</p>{{/each}}
 {{#each shakenInitiativeReviews}}<p class="bad">{{name}}: Initiative Count {{count}} needs Shaken review. {{reason}} {{#if @root.isGM}}<a data-action="reviewShakenInitiative" data-combat-id="{{combatId}}" data-combatant-id="{{id}}">Review included penalty</a>{{/if}}</p>{{/each}}
+{{#each system.cheapShotActive}}<p class="bad">Cheap Shot: {{#if (sc2eq choice "speed")}}Speed −10 ft. (apply to the NPC’s listed movement){{else}}{{choice}} attack/skill checks −2{{/if}}. Ends with the scene or a successful recovery save.</p>{{/each}}
 <div class="dossier-band" aria-hidden="true">
   <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
   <span class="file-label">{{localize "SPYCRAFT.Retro.SubjectDossier"}}</span>

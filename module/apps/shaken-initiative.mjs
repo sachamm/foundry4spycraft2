@@ -1,3 +1,4 @@
+import {queueRuleState} from './rule-resource-scope.mjs';
 import {preferredInitiativeRoll} from './initiative-choice.mjs';
 import {uncannyDodgePlan} from '../rules/defense.mjs';
 import {shakenStateFromActor,shakenRules} from '../rules/shaken.mjs';
@@ -12,13 +13,13 @@ const combatants=a=>[...(globalThis.game?.combats??[])].flatMap(c=>[...(c.combat
 export const shakenInitiativeEvidence=c=>JSON.stringify({actor:c.actor?.uuid,count:c.initiative,record:record(c),shaken:shakenStateFromActor(c.actor),uncanny:uncannyDodgePlan(c.actor?.system??{})});
 export function shakenInitiativeReviews(actor){return combatants(actor).flatMap(c=>{const p=planFor(c);return p.needsReview?[{id:c.id,combatId:c.parent.id,name:c.parent.name??'Combat',count:c.initiative,reason:p.reason}]:[];});}
 const markerMatches=(saved,marker)=>Array.isArray(marker)?Array.isArray(saved)&&saved.length===marker.length&&marker.every((v,i)=>markerMatches(saved[i],v)):marker&&typeof marker==='object'?saved&&Object.entries(marker).every(([key,value])=>markerMatches(saved[key],value)):saved===marker;
-async function writePlan(c,plan,expected){
+async function writePlan(c,plan,expected,{updates={},options={}}={}){return queueRuleState(c.actor,async()=>{
  const marker={...(record(c)?.review?{review:record(c).review}:{}),...plan.record,operationId:foundry.utils.randomID()};
- try{await c.update({initiative:plan.initiative,'flags.spycraft2.shakenInitiative':marker},{spycraft2ShakenInitiative:{expected,marker}});}
+ try{await c.update({...updates,initiative:plan.initiative,'flags.spycraft2.shakenInitiative':marker},{...options,spycraft2ShakenInitiative:{expected,marker}});}
  catch(error){if(c.initiative===plan.initiative&&markerMatches(record(c),marker))return plan;throw error;}
  if(c.initiative!==plan.initiative||!markerMatches(record(c),marker))throw new Error('Initiative Count did not settle. Review its current value.');
  return plan;
-}
+});}
 export function reconcileShakenInitiative(actor){return queueResources([actor],async()=>{
  for(const c of combatants(actor)){
   const expected=shakenInitiativeEvidence(c),plan=planFor(c);
@@ -81,10 +82,12 @@ export function installShakenInitiativeHooks(){
 }
 
 /** Already inside the Actor transaction: another Count loss must retain the actual Shaken component. */
-export async function changeInitiativeCountPreservingShaken(c,initiative){
+export function assertShakenInitiativeCountReady(c){
  if(!c?.actor||!Number.isFinite(c.initiative))throw new Error('Choose a character with an existing numeric Initiative Count.');
  if(c.group&&Number.isFinite(c.group.initiative))throw new Error('An individual Count loss in a shared Initiative group needs GC adjudication.');
- const expected=shakenInitiativeEvidence(c),current=planFor(c);if(current.needsReview||current.delta)throw new Error(current.reason??'Reconcile the pending Shaken Count adjustment before another Initiative loss.');
- const valid=shakenInitiativeMarker(system(c.actor),initiative),plan={...current,initiative,record:{...current.record,count:valid.count}};
- return writePlan(c,plan,expected);
+ const current=planFor(c);if(current.needsReview||current.delta)throw new Error(current.reason??'Reconcile the pending Shaken Count adjustment before another Initiative loss.');return current;
+}
+export async function changeInitiativeCountPreservingShaken(c,initiative,extra={}){
+ const current=assertShakenInitiativeCountReady(c),expected=shakenInitiativeEvidence(c),valid=shakenInitiativeMarker(system(c.actor),initiative),plan={...current,initiative,record:{...current.record,count:valid.count}};
+ return writePlan(c,plan,expected,extra);
 }

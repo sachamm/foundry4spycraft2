@@ -1,3 +1,16 @@
+import {manageThreadNeedle} from '../apps/thread-needle.mjs';
+import {takeStrikingAttack,reviewStrikingAttack} from '../apps/striking-stance.mjs';
+import {recordFendMovement} from '../apps/fend.mjs';
+import {takeCounterTrip,reviewCounterTrip} from '../apps/counter-trip.mjs';
+import {takeTripFinalAttack,reviewTripFinalAttack} from '../apps/trip-final-attack.mjs';
+import {manageTripOutcomes} from '../apps/trip-outcomes.mjs';
+import {managePowerStanceInitiative} from '../apps/power-stance.mjs';
+import {manageDrivingStance} from '../apps/driving-stance.mjs';
+import {manageStanceDamage} from '../apps/stance-damage.mjs';
+import {reviewStanceMovement} from '../apps/stance-movement.mjs';
+import {reviewFeintBenefits} from '../apps/feint-review.mjs';
+import {manageFeintOutcomes} from '../apps/feint-outcomes.mjs';
+import {declareCombatStance,managePunishingDamage} from '../apps/combat-stance.mjs';
 import {settleSilverTongueVictory,resumeSilverTongueVictory,correctSilverTongueVictory,recoverSilverTongueAtMissionEnd,silverVictoryRows} from '../apps/silver-tongue.mjs';
 import {markRows} from '../rules/mark.mjs';
 import {safeHouseSource,safeHouseRows} from '../rules/safe-house.mjs';
@@ -14,6 +27,9 @@ import {checkAccumulatedDamage} from '../apps/accumulated-damage.mjs';
 import {takeMobileOffense} from '../apps/mobile-offense.mjs';
 import {takeContempt} from '../apps/contempt.mjs';
 import {takeCombatInstincts} from '../apps/combat-instincts.mjs';
+import {rollDisarmResponse} from '../apps/disarm-response.mjs';
+import {takeMissTrick} from '../apps/miss-tricks.mjs';
+import {rollCheapShot} from '../apps/cheap-shot.mjs';
 import {rollDisarm} from '../apps/disarm.mjs';
 import {declareTwoWeapon,reviewTwoWeapon,takeTwoWeaponFinalAttack} from '../apps/two-weapon.mjs';
 import {checkNumericalAdvantage} from '../apps/numerical-advantage.mjs';
@@ -93,7 +109,28 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       takeMobileOffense(){return takeMobileOffense(this.actor);},
       takeContempt(){return takeContempt(this.actor);},
       takeCombatInstincts(){return takeCombatInstincts(this.actor);},
+      manageCheapShots(){return this.actor.manageCheapShots();},
+      reviewFeintBonuses(){return reviewFeintBenefits(this.actor);},
+      takeCounterTrip(){return takeCounterTrip(this.actor);},
+      reviewCounterTrip(){return reviewCounterTrip(this.actor);},
+      takeTripFinalAttack(){return takeTripFinalAttack(this.actor);},
+      reviewTripFinalAttack(){return reviewTripFinalAttack(this.actor);},
+      manageTripOutcomes(){return manageTripOutcomes(this.actor);},
+      manageFeintOutcomes(){return manageFeintOutcomes(this.actor);},
+      takeStrikingAttack(){return takeStrikingAttack(this.actor);},
+      reviewStrikingAttack(){return reviewStrikingAttack(this.actor);},
+      manageThreadNeedle(){return manageThreadNeedle(this.actor);},
+      recordFendMovement(){return recordFendMovement(this.actor);},
+      reviewStanceMovement(){return reviewStanceMovement(this.actor);},
+      reviewPowerStanceInitiative(){return managePowerStanceInitiative(this.actor);},
+      declareCombatStance(){return declareCombatStance(this.actor);},
+      manageDrivingStance(){return manageDrivingStance(this.actor);},
+      manageStanceDamage(){return manageStanceDamage(this.actor);},
+      managePunishingDamage(){return managePunishingDamage(this.actor);},
+      takeMissTrick(){return takeMissTrick(this.actor);},
+      rollCheapShot(){return rollCheapShot(this.actor);},
       rollDisarm(){return rollDisarm(this.actor);},
+      rollDisarmResponse(event,target){return rollDisarmResponse(this.actor,{weaponId:target.closest('[data-item-id]')?.dataset.itemId});},
       declareTwoWeapon(){return declareTwoWeapon(this.actor);},
       takeTwoWeaponFinalAttack(){return takeTwoWeaponFinalAttack(this.actor);},
       reviewTwoWeapon(){return reviewTwoWeapon(this.actor);},
@@ -111,6 +148,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       reviewDamageLedger(){return reviewDamageLedger(this.actor);},
       applyAccumulatedDamage(){return applyAccumulatedDamage(this.actor);},
       checkAccumulatedDamage(){return checkAccumulatedDamage(this.actor);},
+      manageTakedown(){return this.actor.manageTakedown();},
+      manageMeleeTradeoff(){return this.actor.manageMeleeTradeoff();},
       checkIncomingDefense(){return checkIncomingDefense(this.actor);},
       sufferInitiativeLoss(){return this.actor.sufferInitiativeLoss();},
       checkBurrowMaterial(){return checkBurrowMaterial(this.actor);},
@@ -446,7 +485,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.contactGrades = Object.fromEntries(cfg.tables.contacts.map(c => [c.rank, `${c.rank} — ${c.grade}`]));
 
     // Gear
-    context.weapons = byType("weapon").map(w => ({ item: w, ammoConfiguration:ammunitionConfiguration(w.system), canPlanAmmunition:compatibleAmmunition(w.system,CONFIG.SPYCRAFT.tables?.ammunitionCatalog??[]).length>0, attack: actor.weaponAttack(w), caliber: cfg.calibers[w.system.caliber] }));
+    context.weapons = byType("weapon").map(w => ({ item: w, canResistDisarm:!sys.disarmWeapons?.blockedReason&&sys.disarmWeapons?.weapons?.some(source=>source.id===w.id)===true, ammoConfiguration:ammunitionConfiguration(w.system), canPlanAmmunition:compatibleAmmunition(w.system,CONFIG.SPYCRAFT.tables?.ammunitionCatalog??[]).length>0, attack: actor.weaponAttack(w), caliber: cfg.calibers[w.system.caliber] }));
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
     context.safeHouseSource=safeHouseSource(sys);context.safeHouses=safeHouseRows(sys,cfg);
     context.careerAgentReward={active:sys.activeFeatNames?.includes('Career Agent'),record:sys.careerAgentRewards?.[careerAgentMissionKey(sys)],review:getCareerAgentReview(this.actor)};
@@ -693,6 +732,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       npcAddQuality: SpycraftNpcSheet.#onAddQuality,
       npcAddPick: SpycraftNpcSheet.#onAddPick,
       npcRemoveRow: SpycraftNpcSheet.#onRemoveRow,
+      manageCheapShots(){return this.actor.manageCheapShots();},
       rollAbility: SpycraftNpcSheet.#onRollAbility,
       rollSave: SpycraftNpcSheet.#onRollSave,
       rollAttack: SpycraftNpcSheet.#onRollAttack,

@@ -1,3 +1,5 @@
+import {installPowerStanceInitiativeHooks} from './module/apps/power-stance.mjs';
+import {installCombatStanceHooks} from './module/apps/combat-stance.mjs';
 import {installShakenInitiativeHooks,shakenCombatantClass} from './module/apps/shaken-initiative.mjs';
 import {hasStrut} from './module/rules/strut.mjs';
 import {unnervingEligible} from './module/rules/unnerving.mjs';
@@ -22,7 +24,7 @@ Hooks.once("init", () => {
   CONFIG.SPYCRAFT = SPYCRAFT;
   CONFIG.time.roundTime=6;CONFIG.time.turnTime=0;
   CONFIG.statusEffects??=[];
-  for(const [id,name]of [['shaken-1','Shaken I'],['shaken-2','Shaken II'],['shaken-3','Shaken III'],['shaken-4','Shaken IV'],['sleep','Sleeping'],['drunk','Drunk'],['crouched','Crouched'],['mute','Mute'],['held','Held'],['pinned','Pinned'],['baffled','Baffled'],['incompetent','Incompetent'],['prone','Prone'],['sprawled','Sprawled'],['blind','Blinded'],['deaf','Deafened'],['entangled','Entangled'],['nauseated','Nauseated'],['sickened','Sickened'],['fatigued','Fatigued'],['exhausted','Exhausted'],['unconscious','Unconscious']])if(!CONFIG.statusEffects.some(effect=>effect.id===id))CONFIG.statusEffects.push({id,name,img:'icons/svg/downgrade.svg'});
+  for(const [id,name]of [['shaken-1','Shaken I'],['shaken-2','Shaken II'],['shaken-3','Shaken III'],['shaken-4','Shaken IV'],['sleep','Sleeping'],['drunk','Drunk'],['crouched','Crouched'],['mute','Mute'],['held','Held'],['pinned','Pinned'],['baffled','Baffled'],['incompetent','Incompetent'],['prone','Prone'],['sprawled','Sprawled'],['blind','Blinded'],['deaf','Deafened'],['entangled','Entangled'],['nauseated','Nauseated'],['sickened','Sickened'],['fatigued','Fatigued'],['exhausted','Exhausted'],['unconscious','Unconscious'],['flat-footed','Flat-footed']])if(!CONFIG.statusEffects.some(effect=>effect.id===id))CONFIG.statusEffects.push({id,name,img:'icons/svg/downgrade.svg'});
   if(!CONFIG.statusEffects.some(effect=>effect.id==="bound"))CONFIG.statusEffects.push({id:"bound",name:"SPYCRAFT.Condition.Bound",img:"icons/svg/net.svg"});
   game.settings.register("spycraft2","linguistics",{name:"Optional Linguistics checks",hint:"Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.",scope:"world",config:true,type:Boolean,default:false});
 
@@ -31,6 +33,8 @@ Hooks.once("init", () => {
   game.settings.register("spycraft2","gcActionDice",{scope:"world",config:false,type:Object,default:{},onChange(){for(const actor of game.actors??[])actor.sheet?.render(false);}});
   CONFIG.Combatant.documentClass=shakenCombatantClass(CONFIG.Combatant.documentClass);
   installShakenInitiativeHooks();
+  installCombatStanceHooks();
+  installPowerStanceInitiativeHooks();
   CONFIG.Actor.documentClass = SpycraftActor;
   CONFIG.Item.documentClass = SpycraftItem;
   Object.assign(CONFIG.Actor.dataModels, dataModels.actor);

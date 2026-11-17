@@ -1,0 +1,44 @@
+{
+  "batches": [
+    363
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2908,
+  "nodeGroups": [
+    1272,
+    1636
+  ],
+  "newTests": 18,
+  "browserFixtures": 94,
+  "builtPackTests": 6,
+  "scriptsChecked": 288,
+  "templatesChecked": 19,
+  "nativeReceipts": 3,
+  "nativeGuards": 11,
+  "nativeUI": 5,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1324,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Winning critical Trip settlement and one source-bound final Standard Attack at\u22124, private original-roll lease, shared Nauseated allowance, unique owned original replacement root and interrupted posted-attack review. Same-active-character turn-index reordering supported. Defender critical-win/free counter-Trip and TRP remain next.",
+  "nativeStartingFixtureDice": 3,
+  "nativeSourceFinalDice": 2,
+  "nativeCriticalCost": 1
+}

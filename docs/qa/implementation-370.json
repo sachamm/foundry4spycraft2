@@ -1,0 +1,63 @@
+{
+  "batches": [
+    370
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 3030,
+  "nodeGroups": [
+    1375,
+    1655
+  ],
+  "newTests": 22,
+  "browserFixtures": 112,
+  "builtPackTests": 6,
+  "scriptsChecked": 301,
+  "templatesChecked": 19,
+  "focusedTests": 49,
+  "nativeReceipts": 3,
+  "nativeGuards": 14,
+  "nativeUI": 10,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1350,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [
+    "Injected Thread applyStamp failure",
+    "Injected Thread endStamp failure"
+  ],
+  "expectedInjectedRecoveryErrors": [
+    "Injected Thread applyStamp failure",
+    "Injected Thread endStamp failure"
+  ],
+  "unexpectedBrowserErrors": [],
+  "reloadMetadataDifference": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 56,
+    "other": 141,
+    "total": 314,
+    "minimumUnfinished": 173
+  },
+  "wholeFeatClosures": 27,
+  "scope": "Thread the Needle actual readied staff Standard Attack with ordinary numeric math and actual target. One-trick gate, legitimate final attack integration, immutable original proof, no invented zero damage benefit. Finished adopted hit grants one source-specific Held effect under both participants resource locks; holder does not enter Grapple. Independent restraints retained. Interrupted effects/history, explicit GC missing-effect review, release and literal holder movement beyond5ft preserve original history and never refresh ended holds. Escape method unanswered and explicitly barred from ordinary Grapple automation for this source only.",
+  "nativeStartingFixtureDice": 3,
+  "nativeDiceSpent": 0,
+  "nativeAttackRolls": 2,
+  "nativeDamageRolls": 1,
+  "nativeDamageApplied": false,
+  "nativeTokenGeometryAutomated": false,
+  "nativeCumulativeMovement": 5,
+  "nativeResultingSecondTargetSeparation": 10,
+  "nativeRandomFaces": "Controlled CONFIG.Dice.randomUniform actual Actor/Roll/card pipeline, natural12 ordinary hits and ordinary staff damage; no fabricated totals/critical flags.",
+  "harnessNotes": [
+    "Movement driver initially read null before the completed movement update; inspecting the actual persisted5ft record recovered the observation without repeating movement. Confirmation bounds were checked before click."
+  ]
+}

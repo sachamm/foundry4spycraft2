@@ -1,0 +1,56 @@
+{
+  "batches": [
+    367
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2969,
+  "nodeGroups": [
+    1331,
+    1638
+  ],
+  "newTests": 16,
+  "browserFixtures": 104,
+  "builtPackTests": 6,
+  "scriptsChecked": 294,
+  "templatesChecked": 19,
+  "nativeReceipts": 5,
+  "nativeGuards": 10,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1341,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [
+    "Injected Fend final-stamp failure"
+  ],
+  "expectedInjectedRecoveryErrors": [
+    "Injected Fend final-stamp failure"
+  ],
+  "unexpectedBrowserErrors": [],
+  "reloadMetadataDifference": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Polearm Fend declaration on an actual readied polearm Standard Attack, no full action or numeric attack/damage benefit. One-trick gate; earned final attacks retain private source/shared limit. Finished adopted hit or miss authorizes one GC-confirmed completed5ft record under rule mutex with atomic cumulative movement/history. Replay and posted/missing-stamp recovery do not move again or reset later totals. Visibility preserved; no hidden die totals copied. Native two legal half-action attacks on one own Count, All-out-only damage and two movement receipts.",
+  "nativeStartingFixtureDice": 3,
+  "nativeDiceSpent": 0,
+  "nativeAttackRolls": 2,
+  "nativeDamageRolls": 1,
+  "nativeMovementReceipts": 2,
+  "nativeCumulativeMovement": 10,
+  "nativeTokenMovementAutomated": false,
+  "nativeRandomFaces": "Controlled CONFIG.Dice.randomUniform actual Actor/Roll/card pipeline; natural5 miss, natural12 hit, actual recorded damage; no published totals/critical flags invented."
+}

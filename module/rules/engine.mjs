@@ -1,3 +1,7 @@
+import {powerStanceBonus} from './power-stance.mjs';
+import {sideStanceDefensePenalty} from './side-stance.mjs';
+import {cheapShotPenalty,cheapShotRecords,cheapShotSpeedPenalty} from './cheap-shot-effects.mjs';
+import {readiedDisarmWeapons} from './disarm-response.mjs';
 import {readiedGuardWeapons} from './guard.mjs';
 import {polearmDefensePlan} from './polearm-defense.mjs';
 import {attributeDamageState} from './attribute-damage.mjs';
@@ -112,6 +116,7 @@ class Bonuses {
  * @param {object} cfg     CONFIG.SPYCRAFT
  */
 export function computeAgent(sys, items, cfg, options = {}) {
+  sys.cheapShotActive=cheapShotRecords(sys).filter(r=>!r.recovered);sys.cheapShotSpeedPenalty=cheapShotSpeedPenalty(sys);
   const allItems=items.filter(i=>!isResourceLock(i));
   items=allItems.filter(i=>!toolShedKitState(sys,i).expired);
   if(sys.shakenState?.sourceKind!=='effects')sys.shakenState=shakenStateFromContext(sys.conditionContext);
@@ -646,7 +651,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.lifestyleAppearance=(T.lifestyle[clamp(1+B.get("lifestyle")+(sys.wealthAllocation?.lifestyle??0),1,10)-1]?.appearanceMod??0)+B.get("appearance");
   sys.readiedMeleeWeapons=readiedMeleeWeapons(sys,items);
   sys.guardWeapons=readiedGuardWeapons(sys,items);
-  if(sys.guardWeapons.blockedReason){warnings.push(sys.guardWeapons.blockedReason);todo.push({order:10,tab:'gear',text:sys.guardWeapons.blockedReason});}
+  sys.disarmWeapons=readiedDisarmWeapons(sys,items);
+  const heldReview=sys.guardWeapons.blockedReason||sys.disarmWeapons.blockedReason;
+  if(heldReview){warnings.push(heldReview);todo.push({order:10,tab:'gear',text:heldReview});}
   sys.polearmDefense=polearmDefensePlan(sys);
   if(sys.polearmDefense.gearBonus)B.add('defense',sys.polearmDefense.gearBonus,'Polearm Basics (readied polearm)','gear');
   sys.bloodstainDefense=bloodstainDefensePlan(sys,{appearance:sys.lifestyleAppearance,wornArmor:sys.armor?.adjustments??[]});
@@ -656,6 +663,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   if(sys.totalDefenseState.active){B.add('defense',4,'Total Defense','dodge');if(sys.totalDefenseState.equilibrium)B.add('defense',sys.totalDefenseState.equilibrium.bonus,'Equilibrium Basics','dodge');}
   sys.combatExpertiseState=combatExpertiseState(sys);
   if(sys.combatExpertiseState.active)B.add('defense',sys.combatExpertiseState.dodgeBonus,'Combat Expertise','dodge');
+  const sideStanceDefense=sideStanceDefensePenalty(sys);if(sideStanceDefense)B.add('defense',sideStanceDefense,'Side Stance');
   sys.bonusSources.defense=B.sources.get("defense")??[];
   sys.defenseBonusEntries=(B.entries.get("defense")??[]).map(e=>({...e}));
   const defenseState=attributeDefensePlan(sys,{dodgeEntries:B.entries.get("defense")??[]});
@@ -667,13 +675,14 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.readiedRangedWeapons=readiedRangedWeapons(sys,items);
   sys.cqbReadiedRules={initiativeBonus:sys.activeFeatNames.includes('CQB Supremacy')&&sys.readiedRangedWeapons.length?5:0,weaponIds:sys.readiedRangedWeapons.map(w=>w.id)};
   if(sys.cqbReadiedRules.initiativeBonus){B.add('initiative',5,'CQB Supremacy (readied ranged weapon)');sys.bonusSources.initiative=B.sources.get('initiative')??[];}
+  const powerInitiative=powerStanceBonus(sys);if(powerInitiative){B.add('initiative',powerInitiative,'Power Stance (Strength score)');sys.bonusSources.initiative=B.sources.get('initiative')??[];}
   sys.initiative = { base: base.initiative, bonus: B.get("initiative"),
     total: base.initiative + B.get("initiative") + abil.dex.mod + (misc.initiative ?? 0) };
   sys.conditionPenalties=conditionRollPenalties(sys);
   sys.attack = {
-    unarmed: sys.bab + abil.str.mod + sys.sizeModifier + B.get("unarmedAttack") + sys.conditionPenalties.attack + sys.conditionPenalties.meleeAttack,
-    melee: sys.bab + abil.str.mod + sys.sizeModifier + sys.conditionPenalties.attack + sys.conditionPenalties.meleeAttack,
-    ranged: sys.bab + abil.dex.mod + sys.sizeModifier + sys.conditionPenalties.attack + conditionAbilityPenalty(sys,'dex')
+    unarmed: cheapShotPenalty(sys,'str') + sys.bab + abil.str.mod + sys.sizeModifier + B.get("unarmedAttack") + sys.conditionPenalties.attack + sys.conditionPenalties.meleeAttack,
+    melee: cheapShotPenalty(sys,'str') + sys.bab + abil.str.mod + sys.sizeModifier + sys.conditionPenalties.attack + sys.conditionPenalties.meleeAttack,
+    ranged: cheapShotPenalty(sys,'dex') + sys.bab + abil.dex.mod + sys.sizeModifier + sys.conditionPenalties.attack + conditionAbilityPenalty(sys,'dex')
   };
   const martialArtsFeat=featItems.find(feat=>feat.name==="Martial Arts"&&activeFeatIds.has(feat.id));
   const mastersArt=featItems.some(feat=>feat.name==="Master's Art"&&activeFeatIds.has(feat.id));
@@ -699,7 +708,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   if(sys.fleetSpeed.qualityIncrease)sys.bonusSources.speed=[...(sys.bonusSources.speed??[]),{source:'Fleet (net benefit replacing identical class/gear Speed)',value:sys.fleetSpeed.qualityIncrease}];
   for(const entry of sys.attributeCollapse.entries)warnings.push(`${entry.label} ${entry.score}: ${entry.text}`);
   sys.incapacitatedForMovement=sys.attributeCollapse.immobile||sys.mentalLeapState.unconscious||['dead','dazed','stunned','paralyzed','bound','sleeping','held','pinned'].some(key=>sys.conditionContext?.[key]===true);
-  const ordinarySpeed=Math.max(0,sys.fleetSpeed.baseSpeed + Math.min(0,armorSpeed) + sys.encumbrance.speed + (misc.speed ?? 0));
+  const ordinarySpeed=Math.max(0,sys.fleetSpeed.baseSpeed + cheapShotSpeedPenalty(sys) + Math.min(0,armorSpeed) + sys.encumbrance.speed + (misc.speed ?? 0));
   const speedHalves=Number(sys.mentalLeapState.exhausted)+Number(sys.conditionPenalties.entangled)+Number(sys.conditionContext?.blinded===true)+Number(sys.conditionContext?.crouched===true);
   sys.conditionSpeedReview=speedHalves>1&&!sys.encumbrance.immobile&&!sys.incapacitatedForMovement;
   sys.speed=sys.encumbrance.immobile||sys.incapacitatedForMovement?0:sys.conditionSpeedReview?null:Math.floor(ordinarySpeed*(speedHalves?0.5:1));

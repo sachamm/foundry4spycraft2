@@ -59,8 +59,10 @@ export function limitedUseAbilities(system,items,cfg) {
  if(system.activeFeatNames?.includes('Personal Stash'))add({id:'personalStash',name:'Personal Stash (Gear check without a Reserve Common Item)',limit:1,workflow:'personalStashGear',manualReviewable:true,hidden:true});
  if(system.activeFeatNames?.includes('Quick Draw'))add({id:'quickDraw',name:'Quick Draw (free weapon action)',period:'round',limit:2,workflow:'featFreeAction',combatScoped:true,manualReviewable:true,hidden:true});
  if(system.activeFeatNames?.includes('Surge of Speed')){add({id:'surgeOfSpeed',name:'Surge of Speed (free non-attack half action)',limit:system.actionDice?.max??0,workflow:'featFreeAction',hidden:true});add({id:'surgeOfSpeedRound',name:'Surge of Speed round allowance',period:'round',limit:1,workflow:'featFreeActionRound',combatScoped:true,manualReviewable:true,hidden:true});}
+ if(system.activeFeatNames?.includes('Polearm Basics'))add({id:'strikingStance',name:'Striking Stance (adjacent entry reaction)',period:'round',limit:1,workflow:'strikingStance',combatScoped:true,manualReviewable:true,hidden:true});
  if(system.activeFeatNames?.includes('Mobile Offense'))add({id:'mobileOffense',name:'Mobile Offense during Standard Move',period:'round',limit:1,workflow:'mobileOffense',combatScoped:true,manualReviewable:true,hidden:true});
  if(system.activeFeatNames?.includes('Contempt')){add({id:'contempt',name:'Contempt combat allowance',period:'combat',limit:system.actionDice?.max,workflow:'contempt',combatScoped:true,manualReviewable:true,hidden:true});add({id:'contemptRound',name:'Contempt round allowance',period:'round',limit:1,workflow:'contemptRound',combatScoped:true,manualReviewable:true,hidden:true});}
+ if(system.activeFeatNames?.some(n=>['Flail Basics','Fencing Basics'].includes(n)))add({id:'missTrick',name:'Immediate miss tricks (one per resolved trigger)',period:'round',limit:Number.MAX_SAFE_INTEGER,workflow:'missTrick',combatScoped:true,hidden:true});
  if(system.activeFeatNames?.includes('Combat Instincts'))add({id:'combatInstincts',name:'Combat Instincts (immediate final attack)',period:'round',limit:1,workflow:'combatInstincts',combatScoped:true,manualReviewable:true,hidden:true});
  const darting=dartingStyleState(system);if(darting.active)add({id:'dartingFinalAttack',name:'Darting Weapon final attacks (recorded declaration)',period:'darting declaration',limit:darting.extraAttacks,workflow:'dartingFinalAttack',hidden:true,requiresEpochReceipt:true,manualReviewable:true});
  const twoWeapon=twoWeaponStyleState(system);if(twoWeapon.active)add({id:'twoWeaponFinalAttack',name:'Two-weapon final attacks (recorded declaration)',period:'two-weapon declaration',limit:twoWeapon.extraAttacks,workflow:'twoWeaponFinalAttack',hidden:true,requiresEpochReceipt:true,manualReviewable:true});
@@ -106,6 +108,7 @@ export function limitedUseAbilities(system,items,cfg) {
   const scoped=(system.skillFeatRules??[]).filter(r=>r.name===rule.name&&norm(r.choice)===norm(rule.choice));
   add({id,name:`${rule.name} (${rule.choice})`,limit:rule.name==='Perfect Skill Mastery'?3:1,workflow:'reroll',mastery:rule.name,skills:scoped});
  }
+ add({id:'tripFinalAttack',name:'Critical Trip final attack (one per earned trigger)',period:'round',limit:Number.MAX_SAFE_INTEGER,workflow:'tripFinalAttack',combatScoped:true,hidden:true});
  add(finalAttackRoundSpec(system));
  return out;
 }

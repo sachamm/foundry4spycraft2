@@ -1,0 +1,43 @@
+{
+  "batches": [
+    359
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2844,
+  "nodeGroups": [
+    1208,
+    1636
+  ],
+  "newTests": 30,
+  "browserFixtures": 85,
+  "builtPackTests": 6,
+  "scriptsChecked": 283,
+  "templatesChecked": 19,
+  "nativeReceipts": 3,
+  "nativeGuards": 13,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1309,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "nativeFinalCount": 17,
+  "nativeListedLoss": 3,
+  "scope": "Power current-Strength Count component, ten-foot movement cap, atomic Shaken coexistence, pre-RNG forced/ranged exit and explicit historical inclusion review. Actual Massive loss retained; no health/dice or initiative baseline reset."
+}

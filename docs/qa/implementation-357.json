@@ -1,0 +1,41 @@
+{
+  "batches": [
+    357
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2799,
+  "nodeGroups": [
+    1163,
+    1636
+  ],
+  "newTests": 27,
+  "browserFixtures": 82,
+  "builtPackTests": 6,
+  "scriptsChecked": 280,
+  "templatesChecked": 19,
+  "nativeReceipts": 10,
+  "nativeGuards": 13,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1298,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 58,
+    "other": 139,
+    "total": 314,
+    "minimumUnfinished": 175
+  },
+  "wholeFeatClosures": 25,
+  "scope": "Driving legal stance entry and authenticated original-hit push/follow or blocked1d4subdual; normal damage boost/condition rules and GC recovery. Table movement, defenses and health remain separate."
+}

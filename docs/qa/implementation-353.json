@@ -1,0 +1,41 @@
+{
+  "batches": [
+    353
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2712,
+  "nodeGroups": [
+    1076,
+    1636
+  ],
+  "newTests": 8,
+  "browserFixtures": 73,
+  "builtPackTests": 6,
+  "scriptsChecked": 275,
+  "templatesChecked": 19,
+  "nativeReceipts": 7,
+  "nativeGuards": 12,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1262,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 58,
+    "other": 139,
+    "total": 314,
+    "minimumUnfinished": 175
+  },
+  "wholeFeatClosures": 25,
+  "scope": "Crush full-action melee trick, +2 attack and exact standalone/combined All-out +5 damage with unchanged threat/qualities; Hammer Basics remains partial."
+}

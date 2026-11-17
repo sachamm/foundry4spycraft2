@@ -1,0 +1,3605 @@
+{
+  "checks": [
+    {
+      "message": "ChatMessage.vBN9ZF8GDIDb29wo",
+      "label": "Actual Gear full-action Crush plus All-out Attack",
+      "flags": {
+        "meleeArmorPiercing": {
+          "version": 1,
+          "feat": "Hammer Basics",
+          "weaponId": "wGQOupceQNBCaxIx",
+          "family": "hammer",
+          "proficiency": "blunt",
+          "hands": 1,
+          "requiredHands": 1,
+          "intrinsicQualities": "\u2014",
+          "effectiveQualities": "AP (2)",
+          "armorPiercing": 2
+        },
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 1,
+          "combatantId": "3AMKv8chbGujnqpF"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 22,
+        "rolledTotal": 22,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 22,
+        "actorUuid": "Actor.1CbOfSuTyFgvwjmL",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 2
+        },
+        "weaponUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+        "weaponProficiency": "blunt",
+        "weaponQualities": "AP (2)",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+        "gearAttempt": null,
+        "attackContext": {
+          "meleeFeatTrick": "crush",
+          "meleeTrick": {
+            "version": 1,
+            "key": "crush",
+            "source": "Crush!",
+            "feat": "Hammer Basics",
+            "weaponId": "wGQOupceQNBCaxIx",
+            "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+            "attackAction": "standard",
+            "fullActionConfirmed": true,
+            "onlyFeatTrickConfirmed": true,
+            "attackBonus": 2,
+            "damageBonus": 5,
+            "threatIncrease": 0,
+            "grip": {
+              "hands": 1,
+              "required": 1,
+              "attackPenalty": 0
+            },
+            "weaponSource": {
+              "weaponId": "wGQOupceQNBCaxIx",
+              "sourceProficiency": "blunt",
+              "sourceCategory": "other",
+              "operatingProficiency": "blunt"
+            },
+            "damageSource": {
+              "damage": "1d4+1 subdual",
+              "qualities": "\u2014",
+              "sizeHands": "T/1h",
+              "useHands": 1,
+              "hurledNoStrength": false,
+              "loadedAmmoId": "",
+              "ammunition": null
+            }
+          },
+          "bullseye": null,
+          "meleeTradeoff": {
+            "version": 1,
+            "source": "All-out Attack",
+            "weaponId": "wGQOupceQNBCaxIx",
+            "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+            "penalty": 2,
+            "maximum": 3,
+            "attackPenalty": -2,
+            "damageBonus": 4
+          },
+          "grippingStance": null,
+          "sideStance": {
+            "version": 1,
+            "stanceId": null,
+            "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+            "sourceMessages": [],
+            "dice": 0
+          },
+          "feintBonus": {
+            "version": 1,
+            "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+            "combatId": "SSLnpCIxi4AdqciW",
+            "attackRound": 1,
+            "sourceMessages": [],
+            "attackBonus": 0
+          },
+          "combatStance": {
+            "version": 1,
+            "stance": null
+          },
+          "targetActorUuid": "Actor.D6fages2qzU3Ab3Y",
+          "missTrickSources": {
+            "version": 2,
+            "held": null,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "family": "hammer",
+            "proficiency": "blunt",
+            "finesse": false,
+            "hands": 1,
+            "requiredHands": 1,
+            "available": true,
+            "sources": [],
+            "combat": {
+              "id": "SSLnpCIxi4AdqciW",
+              "started": true,
+              "round": 1,
+              "turn": 0,
+              "combatantId": "3AMKv8chbGujnqpF",
+              "ownTurnIndex": 0
+            }
+          },
+          "cheapShot": null,
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -2,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "\u2014"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": null,
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 2,
+        "cap": null,
+        "baseFlavor": "Attack: Hammer, tool<br><small>Hammer Basics: this actual readied hammer gains AP (2); preserve higher intrinsic AP and apply the effective quality to weapon damage (pp.179,301,332). Crush!: full-action Standard Attack; +2 attack, +5 recorded-hit damage (pp.176,179). All-out Attack: attack \u22122, this attack\u2019s damage +4; a miss makes you flat-footed (p.176).</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 20,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": true,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true
+      }
+    },
+    {
+      "message": "ChatMessage.gYCSSB4Ev3zQ2vFP",
+      "label": "Actual Gear recorded Crush/All-out hit damage once",
+      "flags": {
+        "meleeArmorPiercing": {
+          "version": 1,
+          "feat": "Hammer Basics",
+          "weaponId": "wGQOupceQNBCaxIx",
+          "family": "hammer",
+          "proficiency": "blunt",
+          "hands": 1,
+          "requiredHands": 1,
+          "intrinsicQualities": "\u2014",
+          "effectiveQualities": "AP (2)",
+          "armorPiercing": 2
+        },
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": {
+          "version": 1,
+          "rootAttackUuid": "ChatMessage.vBN9ZF8GDIDb29wo",
+          "attackUuid": "ChatMessage.vBN9ZF8GDIDb29wo",
+          "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+          "weaponUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+          "sourceEvidence": "[{\"meleeArmorPiercing\":{\"version\":1,\"feat\":\"Hammer Basics\",\"weaponId\":\"wGQOupceQNBCaxIx\",\"family\":\"hammer\",\"proficiency\":\"blunt\",\"hands\":1,\"requiredHands\":1,\"intrinsicQualities\":\"\u2014\",\"effectiveQualities\":\"AP (2)\",\"armorPiercing\":2},\"weaponQualities\":\"AP (2)\"},{\"version\":1,\"key\":\"crush\",\"source\":\"Crush!\",\"feat\":\"Hammer Basics\",\"weaponId\":\"wGQOupceQNBCaxIx\",\"targetUuid\":\"Actor.D6fages2qzU3Ab3Y\",\"attackAction\":\"standard\",\"fullActionConfirmed\":true,\"onlyFeatTrickConfirmed\":true,\"attackBonus\":2,\"damageBonus\":5,\"threatIncrease\":0,\"grip\":{\"hands\":1,\"required\":1,\"attackPenalty\":0},\"weaponSource\":{\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},\"damageSource\":{\"damage\":\"1d4+1 subdual\",\"qualities\":\"\u2014\",\"sizeHands\":\"T/1h\",\"useHands\":1,\"hurledNoStrength\":false,\"loadedAmmoId\":\"\",\"ammunition\":null}},{\"version\":1,\"source\":\"All-out Attack\",\"weaponId\":\"wGQOupceQNBCaxIx\",\"targetUuid\":\"Actor.D6fages2qzU3Ab3Y\",\"penalty\":2,\"maximum\":3,\"attackPenalty\":-2,\"damageBonus\":4},{\"version\":1,\"stanceId\":null,\"targetUuid\":\"Actor.D6fages2qzU3Ab3Y\",\"sourceMessages\":[],\"dice\":0},{\"version\":1,\"targetUuid\":\"Actor.D6fages2qzU3Ab3Y\",\"combatId\":\"SSLnpCIxi4AdqciW\",\"attackRound\":1,\"sourceMessages\":[],\"attackBonus\":0},{\"version\":1,\"stance\":null},{\"declaredAttackTarget\":\"Actor.D6fages2qzU3Ab3Y\"},{\"version\":2,\"held\":null,\"weaponId\":\"wGQOupceQNBCaxIx\",\"family\":\"hammer\",\"proficiency\":\"blunt\",\"finesse\":false,\"hands\":1,\"requiredHands\":1,\"available\":true,\"sources\":[],\"combat\":{\"id\":\"SSLnpCIxi4AdqciW\",\"started\":true,\"round\":1,\"turn\":0,\"combatantId\":\"3AMKv8chbGujnqpF\",\"ownTurnIndex\":0}},{\"version\":1,\"quirky\":false,\"trained\":true,\"baseUntrainedPenalty\":-2,\"adjustment\":0,\"attackPenalty\":0,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"version\":1,\"superiorAccuracy\":false,\"trained\":true,\"aimed\":false,\"braced\":false,\"threatIncrease\":0,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"version\":1,\"trainedOnly\":false,\"trained\":true,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"version\":1,\"accurized\":false,\"trained\":true,\"aimed\":false,\"threatIncrease\":0,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"characterTarget\":null,\"cleaveThreatIncrease\":0},{\"finesseBasic\":{\"eligible\":true,\"intrinsic\":false,\"requested\":false,\"granted\":false,\"effectiveQualities\":\"\u2014\"},\"massive\":{\"active\":false,\"attackPenalty\":0,\"listedInitiativeLoss\":0,\"initiativeLoss\":0,\"waived\":false,\"notes\":[]},\"finesseThreatIncrease\":0,\"ranged\":false},null,null,null,{\"id\":\"SSLnpCIxi4AdqciW\",\"round\":1,\"combatantId\":\"3AMKv8chbGujnqpF\"},null,\"1d20 + @total\",{\"total\":2},\"attack\",\"str\",\"\",\"\",null,null,[],2,null,22,22,20,0,0,true,false,false,null,null,null,true,null]",
+          "source": "All-out Attack + Crush!",
+          "bonus": 9,
+          "operatingProficiency": "blunt",
+          "hands": 1,
+          "reservationId": "2L2GXuLlgJAB8t7n"
+        },
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": {
+          "meleeArmorPiercing": {
+            "version": 1,
+            "feat": "Hammer Basics",
+            "weaponId": "wGQOupceQNBCaxIx",
+            "family": "hammer",
+            "proficiency": "blunt",
+            "hands": 1,
+            "requiredHands": 1,
+            "intrinsicQualities": "\u2014",
+            "effectiveQualities": "AP (2)",
+            "armorPiercing": 2
+          },
+          "formula": "max(1, 1d4+1 + (10))",
+          "damageText": "1d4+1 subdual",
+          "basic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "\u2014"
+          },
+          "used": false,
+          "bonus": 10,
+          "grip": {
+            "required": 1,
+            "hands": 1,
+            "blocked": false,
+            "reason": "",
+            "attackPenalty": 0,
+            "strengthIncrease": 0,
+            "initiativeLoss": 0
+          }
+        },
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 1,
+          "combatantId": "3AMKv8chbGujnqpF"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 12,
+        "rolledTotal": 12,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 12,
+        "actorUuid": "Actor.1CbOfSuTyFgvwjmL",
+        "checkKind": "damage",
+        "ability": "",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "max(1, 1d4+1 + (10))",
+        "rollData": {
+          "level": 1,
+          "tb": {
+            "t1": 1,
+            "t2": 1,
+            "t3": 1,
+            "interestBase": 2,
+            "interestTalent": 1,
+            "interestSpec": 1
+          },
+          "classes": {
+            "soldier": {
+              "levels": 1,
+              "level": 1,
+              "bab": 1,
+              "fort": 1,
+              "ref": 0,
+              "will": 2,
+              "defense": 0,
+              "initiative": 2,
+              "wealth": 0,
+              "gearR": 0,
+              "gearT": 0,
+              "gearV": 0,
+              "gearS": 0,
+              "gearG": 0,
+              "gearW": 1,
+              "gearE": 0
+            }
+          },
+          "base": {
+            "bab": 1,
+            "fort": 1,
+            "ref": 0,
+            "will": 2,
+            "defense": 1,
+            "initiative": 2,
+            "wealth": 0
+          },
+          "abilities": {
+            "str": {
+              "value": 13,
+              "mod": 1
+            },
+            "dex": {
+              "value": 14,
+              "mod": 2
+            },
+            "con": {
+              "value": 12,
+              "mod": 1
+            },
+            "int": {
+              "value": 15,
+              "mod": 2
+            },
+            "wis": {
+              "value": 12,
+              "mod": 1
+            },
+            "cha": {
+              "value": 10,
+              "mod": 0
+            }
+          },
+          "featTrees": {
+            "chance": 1,
+            "meleeCombat": 2
+          },
+          "saves": {
+            "fort": {
+              "base": 1,
+              "bonus": 0,
+              "total": 2,
+              "bonusEntries": []
+            },
+            "ref": {
+              "base": 0,
+              "bonus": 1,
+              "total": 3,
+              "bonusEntries": [
+                {
+                  "source": "Agile",
+                  "value": 1,
+                  "type": "insight"
+                }
+              ]
+            },
+            "will": {
+              "base": 2,
+              "bonus": 0,
+              "total": 3,
+              "bonusEntries": []
+            }
+          },
+          "skills": {
+            "acrobatics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "analysis": {
+              "ranks": 0,
+              "total": 2
+            },
+            "athletics": {
+              "ranks": 4,
+              "total": 5
+            },
+            "blend": {
+              "ranks": 0,
+              "total": 2
+            },
+            "bluff": {
+              "ranks": 0,
+              "total": 0
+            },
+            "bureaucracy": {
+              "ranks": 0,
+              "total": 2
+            },
+            "computers": {
+              "ranks": 0,
+              "total": 2
+            },
+            "cultures": {
+              "ranks": 0,
+              "total": 0
+            },
+            "drive": {
+              "ranks": 4,
+              "total": 6
+            },
+            "electronics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "falsify": {
+              "ranks": 0,
+              "total": 2
+            },
+            "impress": {
+              "ranks": 0,
+              "total": -2
+            },
+            "intimidate": {
+              "ranks": 4,
+              "total": 5
+            },
+            "investigation": {
+              "ranks": 0,
+              "total": 1
+            },
+            "manipulate": {
+              "ranks": 0,
+              "total": 1
+            },
+            "mechanics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "medicine": {
+              "ranks": 0,
+              "total": 2
+            },
+            "networking": {
+              "ranks": 0,
+              "total": -1
+            },
+            "notice": {
+              "ranks": 4,
+              "total": 5
+            },
+            "profession": {
+              "ranks": 4,
+              "total": 2
+            },
+            "resolve": {
+              "ranks": 4,
+              "total": 5
+            },
+            "science": {
+              "ranks": 0,
+              "total": 2
+            },
+            "search": {
+              "ranks": 0,
+              "total": 2
+            },
+            "security": {
+              "ranks": 0,
+              "total": 2
+            },
+            "senseMotive": {
+              "ranks": 0,
+              "total": 1
+            },
+            "sleightOfHand": {
+              "ranks": 0,
+              "total": 2
+            },
+            "sneak": {
+              "ranks": 0,
+              "total": 2
+            },
+            "streetwise": {
+              "ranks": 0,
+              "total": 1
+            },
+            "survival": {
+              "ranks": 0,
+              "total": 1
+            },
+            "tactics": {
+              "ranks": 0,
+              "total": 1
+            }
+          },
+          "actionDice": {
+            "max": 3
+          },
+          "knowledge": 3,
+          "defense": 13,
+          "initiative": {
+            "base": 2,
+            "bonus": 0,
+            "total": 4
+          },
+          "bab": 1
+        },
+        "weaponUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+        "weaponProficiency": "blunt",
+        "weaponQualities": "AP (2)",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 0,
+        "cap": null,
+        "baseFlavor": "Damage: Hammer, tool (1d4+1 subdual)<br><small>Hammer Basics: this actual readied hammer gains AP (2); preserve higher intrinsic AP and apply the effective quality to weapon damage (pp.179,301,332).</small><br><small>All-out Attack + Crush!: recorded attack damage +9, once against the recorded target.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": null,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "resolved": true
+      }
+    },
+    {
+      "message": "ChatMessage.C8p61jhJOvV9Q0pO",
+      "label": "Second one-shot Crush! hit under existing base queue",
+      "flags": {
+        "meleeArmorPiercing": {
+          "version": 1,
+          "feat": "Hammer Basics",
+          "weaponId": "wGQOupceQNBCaxIx",
+          "family": "hammer",
+          "proficiency": "blunt",
+          "hands": 1,
+          "requiredHands": 1,
+          "intrinsicQualities": "\u2014",
+          "effectiveQualities": "AP (2)",
+          "armorPiercing": 2
+        },
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 2,
+          "combatantId": "3AMKv8chbGujnqpF"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 24,
+        "rolledTotal": 24,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 24,
+        "actorUuid": "Actor.1CbOfSuTyFgvwjmL",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "weaponUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+        "weaponProficiency": "blunt",
+        "weaponQualities": "AP (2)",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+        "gearAttempt": null,
+        "attackContext": {
+          "meleeFeatTrick": "crush",
+          "meleeTrick": {
+            "version": 1,
+            "key": "crush",
+            "source": "Crush!",
+            "feat": "Hammer Basics",
+            "weaponId": "wGQOupceQNBCaxIx",
+            "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+            "attackAction": "standard",
+            "fullActionConfirmed": true,
+            "onlyFeatTrickConfirmed": true,
+            "attackBonus": 2,
+            "damageBonus": 5,
+            "threatIncrease": 0,
+            "grip": {
+              "hands": 1,
+              "required": 1,
+              "attackPenalty": 0
+            },
+            "weaponSource": {
+              "weaponId": "wGQOupceQNBCaxIx",
+              "sourceProficiency": "blunt",
+              "sourceCategory": "other",
+              "operatingProficiency": "blunt"
+            },
+            "damageSource": {
+              "damage": "1d4+1 subdual",
+              "qualities": "\u2014",
+              "sizeHands": "T/1h",
+              "useHands": 1,
+              "hurledNoStrength": false,
+              "loadedAmmoId": "",
+              "ammunition": null
+            }
+          },
+          "bullseye": null,
+          "meleeTradeoff": null,
+          "grippingStance": null,
+          "sideStance": {
+            "version": 1,
+            "stanceId": null,
+            "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+            "sourceMessages": [],
+            "dice": 0
+          },
+          "feintBonus": {
+            "version": 1,
+            "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+            "combatId": "SSLnpCIxi4AdqciW",
+            "attackRound": 2,
+            "sourceMessages": [],
+            "attackBonus": 0
+          },
+          "combatStance": {
+            "version": 1,
+            "stance": null
+          },
+          "targetActorUuid": "Actor.D6fages2qzU3Ab3Y",
+          "missTrickSources": {
+            "version": 2,
+            "held": null,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "family": "hammer",
+            "proficiency": "blunt",
+            "finesse": false,
+            "hands": 1,
+            "requiredHands": 1,
+            "available": true,
+            "sources": [],
+            "combat": {
+              "id": "SSLnpCIxi4AdqciW",
+              "started": true,
+              "round": 2,
+              "turn": 0,
+              "combatantId": "3AMKv8chbGujnqpF",
+              "ownTurnIndex": 0
+            }
+          },
+          "cheapShot": null,
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -2,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "wGQOupceQNBCaxIx",
+            "sourceProficiency": "blunt",
+            "sourceCategory": "other",
+            "operatingProficiency": "blunt"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "\u2014"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": null,
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 2,
+        "cap": null,
+        "baseFlavor": "Attack: Hammer, tool<br><small>Hammer Basics: this actual readied hammer gains AP (2); preserve higher intrinsic AP and apply the effective quality to weapon damage (pp.179,301,332). Crush!: full-action Standard Attack; +2 attack, +5 recorded-hit damage (pp.176,179).</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 20,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": true,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true
+      }
+    },
+    {
+      "message": "ChatMessage.IVVjtjuAwkvcqhjO",
+      "label": "Posted Crush! damage retained after two final-stamp failures",
+      "flags": {
+        "meleeArmorPiercing": {
+          "version": 1,
+          "feat": "Hammer Basics",
+          "weaponId": "wGQOupceQNBCaxIx",
+          "family": "hammer",
+          "proficiency": "blunt",
+          "hands": 1,
+          "requiredHands": 1,
+          "intrinsicQualities": "\u2014",
+          "effectiveQualities": "AP (2)",
+          "armorPiercing": 2
+        },
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": {
+          "version": 1,
+          "rootAttackUuid": "ChatMessage.C8p61jhJOvV9Q0pO",
+          "attackUuid": "ChatMessage.C8p61jhJOvV9Q0pO",
+          "targetUuid": "Actor.D6fages2qzU3Ab3Y",
+          "weaponUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+          "sourceEvidence": "[{\"meleeArmorPiercing\":{\"version\":1,\"feat\":\"Hammer Basics\",\"weaponId\":\"wGQOupceQNBCaxIx\",\"family\":\"hammer\",\"proficiency\":\"blunt\",\"hands\":1,\"requiredHands\":1,\"intrinsicQualities\":\"\u2014\",\"effectiveQualities\":\"AP (2)\",\"armorPiercing\":2},\"weaponQualities\":\"AP (2)\"},{\"version\":1,\"key\":\"crush\",\"source\":\"Crush!\",\"feat\":\"Hammer Basics\",\"weaponId\":\"wGQOupceQNBCaxIx\",\"targetUuid\":\"Actor.D6fages2qzU3Ab3Y\",\"attackAction\":\"standard\",\"fullActionConfirmed\":true,\"onlyFeatTrickConfirmed\":true,\"attackBonus\":2,\"damageBonus\":5,\"threatIncrease\":0,\"grip\":{\"hands\":1,\"required\":1,\"attackPenalty\":0},\"weaponSource\":{\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},\"damageSource\":{\"damage\":\"1d4+1 subdual\",\"qualities\":\"\u2014\",\"sizeHands\":\"T/1h\",\"useHands\":1,\"hurledNoStrength\":false,\"loadedAmmoId\":\"\",\"ammunition\":null}},{\"version\":1,\"stanceId\":null,\"targetUuid\":\"Actor.D6fages2qzU3Ab3Y\",\"sourceMessages\":[],\"dice\":0},{\"version\":1,\"targetUuid\":\"Actor.D6fages2qzU3Ab3Y\",\"combatId\":\"SSLnpCIxi4AdqciW\",\"attackRound\":2,\"sourceMessages\":[],\"attackBonus\":0},{\"version\":1,\"stance\":null},{\"declaredAttackTarget\":\"Actor.D6fages2qzU3Ab3Y\"},{\"version\":2,\"held\":null,\"weaponId\":\"wGQOupceQNBCaxIx\",\"family\":\"hammer\",\"proficiency\":\"blunt\",\"finesse\":false,\"hands\":1,\"requiredHands\":1,\"available\":true,\"sources\":[],\"combat\":{\"id\":\"SSLnpCIxi4AdqciW\",\"started\":true,\"round\":2,\"turn\":0,\"combatantId\":\"3AMKv8chbGujnqpF\",\"ownTurnIndex\":0}},{\"version\":1,\"quirky\":false,\"trained\":true,\"baseUntrainedPenalty\":-2,\"adjustment\":0,\"attackPenalty\":0,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"version\":1,\"superiorAccuracy\":false,\"trained\":true,\"aimed\":false,\"braced\":false,\"threatIncrease\":0,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"version\":1,\"trainedOnly\":false,\"trained\":true,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"version\":1,\"accurized\":false,\"trained\":true,\"aimed\":false,\"threatIncrease\":0,\"weaponId\":\"wGQOupceQNBCaxIx\",\"sourceProficiency\":\"blunt\",\"sourceCategory\":\"other\",\"operatingProficiency\":\"blunt\"},{\"characterTarget\":null,\"cleaveThreatIncrease\":0},{\"finesseBasic\":{\"eligible\":true,\"intrinsic\":false,\"requested\":false,\"granted\":false,\"effectiveQualities\":\"\u2014\"},\"massive\":{\"active\":false,\"attackPenalty\":0,\"listedInitiativeLoss\":0,\"initiativeLoss\":0,\"waived\":false,\"notes\":[]},\"finesseThreatIncrease\":0,\"ranged\":false},null,null,null,{\"id\":\"SSLnpCIxi4AdqciW\",\"round\":2,\"combatantId\":\"3AMKv8chbGujnqpF\"},null,\"1d20 + @total\",{\"total\":4},\"attack\",\"str\",\"\",\"\",null,null,[],2,null,24,24,20,0,0,true,false,false,null,null,null,true,null]",
+          "source": "Crush!",
+          "bonus": 5,
+          "operatingProficiency": "blunt",
+          "hands": 1,
+          "reservationId": "4DVFvVuOGzPX0PZt"
+        },
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": {
+          "meleeArmorPiercing": {
+            "version": 1,
+            "feat": "Hammer Basics",
+            "weaponId": "wGQOupceQNBCaxIx",
+            "family": "hammer",
+            "proficiency": "blunt",
+            "hands": 1,
+            "requiredHands": 1,
+            "intrinsicQualities": "\u2014",
+            "effectiveQualities": "AP (2)",
+            "armorPiercing": 2
+          },
+          "formula": "max(1, 1d4+1 + (6))",
+          "damageText": "1d4+1 subdual",
+          "basic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "\u2014"
+          },
+          "used": false,
+          "bonus": 6,
+          "grip": {
+            "required": 1,
+            "hands": 1,
+            "blocked": false,
+            "reason": "",
+            "attackPenalty": 0,
+            "strengthIncrease": 0,
+            "initiativeLoss": 0
+          }
+        },
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 2,
+          "combatantId": "3AMKv8chbGujnqpF"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 8,
+        "rolledTotal": 8,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 8,
+        "actorUuid": "Actor.1CbOfSuTyFgvwjmL",
+        "checkKind": "damage",
+        "ability": "",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "max(1, 1d4+1 + (6))",
+        "rollData": {
+          "level": 1,
+          "tb": {
+            "t1": 1,
+            "t2": 1,
+            "t3": 1,
+            "interestBase": 2,
+            "interestTalent": 1,
+            "interestSpec": 1
+          },
+          "classes": {
+            "soldier": {
+              "levels": 1,
+              "level": 1,
+              "bab": 1,
+              "fort": 1,
+              "ref": 0,
+              "will": 2,
+              "defense": 0,
+              "initiative": 2,
+              "wealth": 0,
+              "gearR": 0,
+              "gearT": 0,
+              "gearV": 0,
+              "gearS": 0,
+              "gearG": 0,
+              "gearW": 1,
+              "gearE": 0
+            }
+          },
+          "base": {
+            "bab": 1,
+            "fort": 1,
+            "ref": 0,
+            "will": 2,
+            "defense": 1,
+            "initiative": 2,
+            "wealth": 0
+          },
+          "abilities": {
+            "str": {
+              "value": 13,
+              "mod": 1
+            },
+            "dex": {
+              "value": 14,
+              "mod": 2
+            },
+            "con": {
+              "value": 12,
+              "mod": 1
+            },
+            "int": {
+              "value": 15,
+              "mod": 2
+            },
+            "wis": {
+              "value": 12,
+              "mod": 1
+            },
+            "cha": {
+              "value": 10,
+              "mod": 0
+            }
+          },
+          "featTrees": {
+            "chance": 1,
+            "meleeCombat": 2
+          },
+          "saves": {
+            "fort": {
+              "base": 1,
+              "bonus": 0,
+              "total": 2,
+              "bonusEntries": []
+            },
+            "ref": {
+              "base": 0,
+              "bonus": 1,
+              "total": 3,
+              "bonusEntries": [
+                {
+                  "source": "Agile",
+                  "value": 1,
+                  "type": "insight"
+                }
+              ]
+            },
+            "will": {
+              "base": 2,
+              "bonus": 0,
+              "total": 3,
+              "bonusEntries": []
+            }
+          },
+          "skills": {
+            "acrobatics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "analysis": {
+              "ranks": 0,
+              "total": 2
+            },
+            "athletics": {
+              "ranks": 4,
+              "total": 5
+            },
+            "blend": {
+              "ranks": 0,
+              "total": 2
+            },
+            "bluff": {
+              "ranks": 0,
+              "total": 0
+            },
+            "bureaucracy": {
+              "ranks": 0,
+              "total": 2
+            },
+            "computers": {
+              "ranks": 0,
+              "total": 2
+            },
+            "cultures": {
+              "ranks": 0,
+              "total": 0
+            },
+            "drive": {
+              "ranks": 4,
+              "total": 6
+            },
+            "electronics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "falsify": {
+              "ranks": 0,
+              "total": 2
+            },
+            "impress": {
+              "ranks": 0,
+              "total": -2
+            },
+            "intimidate": {
+              "ranks": 4,
+              "total": 5
+            },
+            "investigation": {
+              "ranks": 0,
+              "total": 1
+            },
+            "manipulate": {
+              "ranks": 0,
+              "total": 1
+            },
+            "mechanics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "medicine": {
+              "ranks": 0,
+              "total": 2
+            },
+            "networking": {
+              "ranks": 0,
+              "total": -1
+            },
+            "notice": {
+              "ranks": 4,
+              "total": 5
+            },
+            "profession": {
+              "ranks": 4,
+              "total": 2
+            },
+            "resolve": {
+              "ranks": 4,
+              "total": 5
+            },
+            "science": {
+              "ranks": 0,
+              "total": 2
+            },
+            "search": {
+              "ranks": 0,
+              "total": 2
+            },
+            "security": {
+              "ranks": 0,
+              "total": 2
+            },
+            "senseMotive": {
+              "ranks": 0,
+              "total": 1
+            },
+            "sleightOfHand": {
+              "ranks": 0,
+              "total": 2
+            },
+            "sneak": {
+              "ranks": 0,
+              "total": 2
+            },
+            "streetwise": {
+              "ranks": 0,
+              "total": 1
+            },
+            "survival": {
+              "ranks": 0,
+              "total": 1
+            },
+            "tactics": {
+              "ranks": 0,
+              "total": 1
+            }
+          },
+          "actionDice": {
+            "max": 3
+          },
+          "knowledge": 3,
+          "defense": 13,
+          "initiative": {
+            "base": 2,
+            "bonus": 0,
+            "total": 4
+          },
+          "bab": 1
+        },
+        "weaponUuid": "Actor.1CbOfSuTyFgvwjmL.Item.wGQOupceQNBCaxIx",
+        "weaponProficiency": "blunt",
+        "weaponQualities": "AP (2)",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 0,
+        "cap": null,
+        "baseFlavor": "Damage: Hammer, tool (1d4+1 subdual)<br><small>Hammer Basics: this actual readied hammer gains AP (2); preserve higher intrinsic AP and apply the effective quality to weapon damage (pp.179,301,332).</small><br><small>Crush!: recorded attack damage +5, once against the recorded target.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": null,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "resolved": true
+      }
+    },
+    {
+      "message": "ChatMessage.wKOG2mvnPeXpiSCY",
+      "label": "Actual Battleaxe preserves intrinsic AP2",
+      "flags": {
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 5,
+          "combatantId": "fuutXgeXEz5hNxUX"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 22,
+        "rolledTotal": 22,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 22,
+        "actorUuid": "Actor.D6fages2qzU3Ab3Y",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 2
+        },
+        "weaponUuid": "Actor.D6fages2qzU3Ab3Y.Item.pk3ue28gpmJzZQBU",
+        "weaponProficiency": "edged",
+        "weaponQualities": "AP (2), KEN (+3), TRP (+1)",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.D6fages2qzU3Ab3Y.Item.pk3ue28gpmJzZQBU",
+        "gearAttempt": null,
+        "attackContext": {
+          "meleeFeatTrick": null,
+          "meleeTrick": null,
+          "bullseye": null,
+          "meleeTradeoff": null,
+          "grippingStance": null,
+          "sideStance": {
+            "version": 1,
+            "stanceId": null,
+            "targetUuid": "Actor.1CbOfSuTyFgvwjmL",
+            "sourceMessages": [],
+            "dice": 0
+          },
+          "feintBonus": {
+            "version": 1,
+            "targetUuid": "Actor.1CbOfSuTyFgvwjmL",
+            "combatId": "SSLnpCIxi4AdqciW",
+            "attackRound": 5,
+            "sourceMessages": [],
+            "attackBonus": 0
+          },
+          "combatStance": {
+            "version": 1,
+            "stance": null
+          },
+          "targetActorUuid": "Actor.1CbOfSuTyFgvwjmL",
+          "missTrickSources": {
+            "version": 2,
+            "held": null,
+            "weaponId": "pk3ue28gpmJzZQBU",
+            "family": "axe",
+            "proficiency": "edged",
+            "finesse": false,
+            "hands": 2,
+            "requiredHands": 2,
+            "available": true,
+            "sources": [],
+            "combat": {
+              "id": "SSLnpCIxi4AdqciW",
+              "started": true,
+              "round": 5,
+              "turn": 1,
+              "combatantId": "fuutXgeXEz5hNxUX",
+              "ownTurnIndex": 1
+            }
+          },
+          "cheapShot": null,
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "pk3ue28gpmJzZQBU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "pk3ue28gpmJzZQBU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "pk3ue28gpmJzZQBU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "pk3ue28gpmJzZQBU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": false,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "AP (2), KEN (+3), TRP (+1)"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": null,
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 2,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 2,
+        "cap": null,
+        "baseFlavor": "Attack: Battleaxe",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 20,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": true,
+        "errorConfirmed": false,
+        "threatConfirmed": true,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true
+      }
+    },
+    {
+      "message": "ChatMessage.E2pKDaTXkuYPVgwn",
+      "label": "Actual Battleaxe damage retains higher/intrinsic AP2",
+      "flags": {
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": {
+          "meleeArmorPiercing": null,
+          "formula": "max(1, 1d8+1 + (1))",
+          "damageText": "1d8+1",
+          "basic": {
+            "eligible": false,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "AP (2), KEN (+3), TRP (+1)"
+          },
+          "used": false,
+          "bonus": 1,
+          "grip": {
+            "required": 2,
+            "hands": 2,
+            "blocked": false,
+            "reason": "",
+            "attackPenalty": 0,
+            "strengthIncrease": 0,
+            "initiativeLoss": 0
+          }
+        },
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 5,
+          "combatantId": "fuutXgeXEz5hNxUX"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 3,
+        "rolledTotal": 3,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 3,
+        "actorUuid": "Actor.D6fages2qzU3Ab3Y",
+        "checkKind": "damage",
+        "ability": "",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "max(1, 1d8+1 + (1))",
+        "rollData": {
+          "level": 1,
+          "tb": {
+            "t1": 1,
+            "t2": 1,
+            "t3": 1,
+            "interestBase": 2,
+            "interestTalent": 1,
+            "interestSpec": 1
+          },
+          "classes": {
+            "soldier": {
+              "levels": 1,
+              "level": 1,
+              "bab": 1,
+              "fort": 1,
+              "ref": 0,
+              "will": 2,
+              "defense": 0,
+              "initiative": 2,
+              "wealth": 0,
+              "gearR": 0,
+              "gearT": 0,
+              "gearV": 0,
+              "gearS": 0,
+              "gearG": 0,
+              "gearW": 1,
+              "gearE": 0
+            }
+          },
+          "base": {
+            "bab": 1,
+            "fort": 1,
+            "ref": 0,
+            "will": 2,
+            "defense": 1,
+            "initiative": 2,
+            "wealth": 0
+          },
+          "abilities": {
+            "str": {
+              "value": 13,
+              "mod": 1
+            },
+            "dex": {
+              "value": 14,
+              "mod": 2
+            },
+            "con": {
+              "value": 12,
+              "mod": 1
+            },
+            "int": {
+              "value": 15,
+              "mod": 2
+            },
+            "wis": {
+              "value": 12,
+              "mod": 1
+            },
+            "cha": {
+              "value": 10,
+              "mod": 0
+            }
+          },
+          "featTrees": {
+            "chance": 1,
+            "meleeCombat": 1
+          },
+          "saves": {
+            "fort": {
+              "base": 1,
+              "bonus": 0,
+              "total": 2,
+              "bonusEntries": []
+            },
+            "ref": {
+              "base": 0,
+              "bonus": 1,
+              "total": 3,
+              "bonusEntries": [
+                {
+                  "source": "Agile",
+                  "value": 1,
+                  "type": "insight"
+                }
+              ]
+            },
+            "will": {
+              "base": 2,
+              "bonus": 0,
+              "total": 3,
+              "bonusEntries": []
+            }
+          },
+          "skills": {
+            "acrobatics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "analysis": {
+              "ranks": 0,
+              "total": 2
+            },
+            "athletics": {
+              "ranks": 4,
+              "total": 5
+            },
+            "blend": {
+              "ranks": 0,
+              "total": 2
+            },
+            "bluff": {
+              "ranks": 0,
+              "total": 0
+            },
+            "bureaucracy": {
+              "ranks": 0,
+              "total": 2
+            },
+            "computers": {
+              "ranks": 0,
+              "total": 2
+            },
+            "cultures": {
+              "ranks": 0,
+              "total": 0
+            },
+            "drive": {
+              "ranks": 4,
+              "total": 6
+            },
+            "electronics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "falsify": {
+              "ranks": 0,
+              "total": 2
+            },
+            "impress": {
+              "ranks": 0,
+              "total": -2
+            },
+            "intimidate": {
+              "ranks": 4,
+              "total": 5
+            },
+            "investigation": {
+              "ranks": 0,
+              "total": 1
+            },
+            "manipulate": {
+              "ranks": 0,
+              "total": 1
+            },
+            "mechanics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "medicine": {
+              "ranks": 0,
+              "total": 2
+            },
+            "networking": {
+              "ranks": 0,
+              "total": -1
+            },
+            "notice": {
+              "ranks": 4,
+              "total": 5
+            },
+            "profession": {
+              "ranks": 4,
+              "total": 2
+            },
+            "resolve": {
+              "ranks": 4,
+              "total": 5
+            },
+            "science": {
+              "ranks": 0,
+              "total": 2
+            },
+            "search": {
+              "ranks": 0,
+              "total": 2
+            },
+            "security": {
+              "ranks": 0,
+              "total": 2
+            },
+            "senseMotive": {
+              "ranks": 0,
+              "total": 1
+            },
+            "sleightOfHand": {
+              "ranks": 0,
+              "total": 2
+            },
+            "sneak": {
+              "ranks": 0,
+              "total": 2
+            },
+            "streetwise": {
+              "ranks": 0,
+              "total": 1
+            },
+            "survival": {
+              "ranks": 0,
+              "total": 1
+            },
+            "tactics": {
+              "ranks": 0,
+              "total": 1
+            }
+          },
+          "actionDice": {
+            "max": 3
+          },
+          "knowledge": 3,
+          "defense": 13,
+          "initiative": {
+            "base": 2,
+            "bonus": 0,
+            "total": 4
+          },
+          "bab": 1
+        },
+        "weaponUuid": "Actor.D6fages2qzU3Ab3Y.Item.pk3ue28gpmJzZQBU",
+        "weaponProficiency": "edged",
+        "weaponQualities": "AP (2), KEN (+3), TRP (+1)",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 0,
+        "cap": null,
+        "baseFlavor": "Damage: Battleaxe (1d8+1)",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": null,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "resolved": true
+      }
+    },
+    {
+      "message": "ChatMessage.MlLW1jRwbaXfdx6A",
+      "label": "Actual Broad axe preserves intrinsic AP3",
+      "flags": {
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 7,
+          "combatantId": "fuutXgeXEz5hNxUX"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 19,
+        "rawTotal": 18,
+        "rolledTotal": 18,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 18,
+        "actorUuid": "Actor.D6fages2qzU3Ab3Y",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": -2
+        },
+        "weaponUuid": "Actor.D6fages2qzU3Ab3Y.Item.hiWTehOyKUEHTocy",
+        "weaponProficiency": "edged",
+        "weaponQualities": "AP (3), MAS, RGD",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.D6fages2qzU3Ab3Y.Item.hiWTehOyKUEHTocy",
+        "gearAttempt": null,
+        "attackContext": {
+          "meleeFeatTrick": null,
+          "meleeTrick": null,
+          "bullseye": null,
+          "meleeTradeoff": null,
+          "grippingStance": null,
+          "sideStance": {
+            "version": 1,
+            "stanceId": null,
+            "targetUuid": "Actor.1CbOfSuTyFgvwjmL",
+            "sourceMessages": [],
+            "dice": 0
+          },
+          "feintBonus": {
+            "version": 1,
+            "targetUuid": "Actor.1CbOfSuTyFgvwjmL",
+            "combatId": "SSLnpCIxi4AdqciW",
+            "attackRound": 7,
+            "sourceMessages": [],
+            "attackBonus": 0
+          },
+          "combatStance": {
+            "version": 1,
+            "stance": null
+          },
+          "targetActorUuid": "Actor.1CbOfSuTyFgvwjmL",
+          "missTrickSources": {
+            "version": 2,
+            "held": null,
+            "weaponId": "hiWTehOyKUEHTocy",
+            "family": "axe",
+            "proficiency": "edged",
+            "finesse": false,
+            "hands": 2,
+            "requiredHands": 2,
+            "available": true,
+            "sources": [],
+            "combat": {
+              "id": "SSLnpCIxi4AdqciW",
+              "started": true,
+              "round": 7,
+              "turn": 1,
+              "combatantId": "fuutXgeXEz5hNxUX",
+              "ownTurnIndex": 1
+            }
+          },
+          "cheapShot": null,
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "hiWTehOyKUEHTocy",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "hiWTehOyKUEHTocy",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "hiWTehOyKUEHTocy",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "hiWTehOyKUEHTocy",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": false,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "AP (3), MAS, RGD"
+          },
+          "massive": {
+            "active": true,
+            "strength": 13,
+            "strengthModifier": 1,
+            "attackPenalty": -4,
+            "listedInitiativeLoss": 3,
+            "initiativeLoss": 3,
+            "waived": false,
+            "notes": [
+              "Massive: Strength14 or lower, attack \u22124 (p.302).",
+              "Massive: Initiative Count \u22123 for this attack; apply the loss in combat (p.302)."
+            ]
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": null,
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 2,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 19,
+        "error": 1,
+        "cap": null,
+        "baseFlavor": "Attack: Broad axe<br><small>Massive: Strength14 or lower, attack \u22124 (p.302). Massive: Initiative Count \u22123 for this attack; apply the loss in combat (p.302).</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 20,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": true,
+        "errorConfirmed": false,
+        "threatConfirmed": true,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true
+      }
+    },
+    {
+      "message": "ChatMessage.TMZiaCuDLk5xYInM",
+      "label": "Actual Broad axe damage retains higher/intrinsic AP3",
+      "flags": {
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": {
+          "meleeArmorPiercing": null,
+          "formula": "max(1, 1d12 + (1))",
+          "damageText": "1d12",
+          "basic": {
+            "eligible": false,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "AP (3), MAS, RGD"
+          },
+          "used": false,
+          "bonus": 1,
+          "grip": {
+            "required": 2,
+            "hands": 2,
+            "blocked": false,
+            "reason": "",
+            "attackPenalty": 0,
+            "strengthIncrease": 0,
+            "initiativeLoss": 0
+          }
+        },
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "SSLnpCIxi4AdqciW",
+          "round": 7,
+          "combatantId": "fuutXgeXEz5hNxUX"
+        },
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 0,
+        "rawTotal": 2,
+        "rolledTotal": 2,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 2,
+        "actorUuid": "Actor.D6fages2qzU3Ab3Y",
+        "checkKind": "damage",
+        "ability": "",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "max(1, 1d12 + (1))",
+        "rollData": {
+          "level": 1,
+          "tb": {
+            "t1": 1,
+            "t2": 1,
+            "t3": 1,
+            "interestBase": 2,
+            "interestTalent": 1,
+            "interestSpec": 1
+          },
+          "classes": {
+            "soldier": {
+              "levels": 1,
+              "level": 1,
+              "bab": 1,
+              "fort": 1,
+              "ref": 0,
+              "will": 2,
+              "defense": 0,
+              "initiative": 2,
+              "wealth": 0,
+              "gearR": 0,
+              "gearT": 0,
+              "gearV": 0,
+              "gearS": 0,
+              "gearG": 0,
+              "gearW": 1,
+              "gearE": 0
+            }
+          },
+          "base": {
+            "bab": 1,
+            "fort": 1,
+            "ref": 0,
+            "will": 2,
+            "defense": 1,
+            "initiative": 2,
+            "wealth": 0
+          },
+          "abilities": {
+            "str": {
+              "value": 13,
+              "mod": 1
+            },
+            "dex": {
+              "value": 14,
+              "mod": 2
+            },
+            "con": {
+              "value": 12,
+              "mod": 1
+            },
+            "int": {
+              "value": 15,
+              "mod": 2
+            },
+            "wis": {
+              "value": 12,
+              "mod": 1
+            },
+            "cha": {
+              "value": 10,
+              "mod": 0
+            }
+          },
+          "featTrees": {
+            "chance": 1,
+            "meleeCombat": 1
+          },
+          "saves": {
+            "fort": {
+              "base": 1,
+              "bonus": 0,
+              "total": 2,
+              "bonusEntries": []
+            },
+            "ref": {
+              "base": 0,
+              "bonus": 1,
+              "total": 3,
+              "bonusEntries": [
+                {
+                  "source": "Agile",
+                  "value": 1,
+                  "type": "insight"
+                }
+              ]
+            },
+            "will": {
+              "base": 2,
+              "bonus": 0,
+              "total": 3,
+              "bonusEntries": []
+            }
+          },
+          "skills": {
+            "acrobatics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "analysis": {
+              "ranks": 0,
+              "total": 2
+            },
+            "athletics": {
+              "ranks": 4,
+              "total": 5
+            },
+            "blend": {
+              "ranks": 0,
+              "total": 2
+            },
+            "bluff": {
+              "ranks": 0,
+              "total": 0
+            },
+            "bureaucracy": {
+              "ranks": 0,
+              "total": 2
+            },
+            "computers": {
+              "ranks": 0,
+              "total": 2
+            },
+            "cultures": {
+              "ranks": 0,
+              "total": 0
+            },
+            "drive": {
+              "ranks": 4,
+              "total": 6
+            },
+            "electronics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "falsify": {
+              "ranks": 0,
+              "total": 2
+            },
+            "impress": {
+              "ranks": 0,
+              "total": -2
+            },
+            "intimidate": {
+              "ranks": 4,
+              "total": 5
+            },
+            "investigation": {
+              "ranks": 0,
+              "total": 1
+            },
+            "manipulate": {
+              "ranks": 0,
+              "total": 1
+            },
+            "mechanics": {
+              "ranks": 0,
+              "total": 2
+            },
+            "medicine": {
+              "ranks": 0,
+              "total": 2
+            },
+            "networking": {
+              "ranks": 0,
+              "total": -1
+            },
+            "notice": {
+              "ranks": 4,
+              "total": 5
+            },
+            "profession": {
+              "ranks": 4,
+              "total": 2
+            },
+            "resolve": {
+              "ranks": 4,
+              "total": 5
+            },
+            "science": {
+              "ranks": 0,
+              "total": 2
+            },
+            "search": {
+              "ranks": 0,
+              "total": 2
+            },
+            "security": {
+              "ranks": 0,
+              "total": 2
+            },
+            "senseMotive": {
+              "ranks": 0,
+              "total": 1
+            },
+            "sleightOfHand": {
+              "ranks": 0,
+              "total": 2
+            },
+            "sneak": {
+              "ranks": 0,
+              "total": 2
+            },
+            "streetwise": {
+              "ranks": 0,
+              "total": 1
+            },
+            "survival": {
+              "ranks": 0,
+              "total": 1
+            },
+            "tactics": {
+              "ranks": 0,
+              "total": 1
+            }
+          },
+          "actionDice": {
+            "max": 3
+          },
+          "knowledge": 3,
+          "defense": 13,
+          "initiative": {
+            "base": 2,
+            "bonus": 0,
+            "total": 4
+          },
+          "bab": 1
+        },
+        "weaponUuid": "Actor.D6fages2qzU3Ab3Y.Item.hiWTehOyKUEHTocy",
+        "weaponProficiency": "edged",
+        "weaponQualities": "AP (3), MAS, RGD",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 0,
+        "error": 0,
+        "cap": null,
+        "baseFlavor": "Damage: Broad axe (1d12)",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": null,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "resolved": true
+      }
+    }
+  ],
+  "guards": [
+    {
+      "kind": "Actual catalog tool hammer and qualified Hammer Basics derive AP2 plus the ordinary Crush bonus without changing the source Item"
+    },
+    {
+      "kind": "Cancelling actual Crush declaration changes no state or resources"
+    },
+    {
+      "kind": "Actual full-action declaration combines +2 Crush attack and unchanged threat with All-out penalty before RNG"
+    },
+    {
+      "kind": "Actual damage combines Crush +5 and All-out +4 in one root claim"
+    },
+    {
+      "kind": "Base queue and independent damage lease retain an actual posted Crush! result after failed final stamps",
+      "error": "The attack damage bonus needs GC review; inspect its receipt before retrying."
+    },
+    {
+      "kind": "GC refuses a posted AP damage card with its earned quality removed; the same original card is restored before review, with no dice/resource change"
+    },
+    {
+      "kind": "GC attaches existing Crush! result with owned weapon without RNG or a new damage claim"
+    },
+    {
+      "kind": "Target legally reselects its one budgeted feat to Axe Basics, retaining all required proficiencies and zero TODO/warnings"
+    },
+    {
+      "kind": "Actual Battleaxe attack and damage preserve AP2 exactly, without adding or reducing it"
+    },
+    {
+      "kind": "Actual Broad axe attack and damage preserve AP3 exactly, without adding or reducing it"
+    },
+    {
+      "kind": "All three complete legal fixtures retain health4/4/dice0, no damage ledger/DR/health mutation; Hammer source Item remains unchanged"
+    },
+    {
+      "kind": "Exact Actor/combat/receipt reload preserves both AP2grant cards, two root damage claims and original intrinsic higher-AP axe records",
+      "reloadVerified": true
+    }
+  ],
+  "ui": [
+    {
+      "kind": "Actual Crush declaration",
+      "confirmY": 582,
+      "confirmBottom": 622
+    },
+    {
+      "kind": "Actual recorded Crush/All-out damage selector",
+      "confirmY": 582,
+      "confirmBottom": 622
+    },
+    {
+      "kind": "Actual GC Crush! recovery with owned weapon",
+      "confirmY": 488.25,
+      "confirmBottom": 528.25
+    }
+  ],
+  "periods": {
+    "mission": "qa-xp-cancel",
+    "session": "MeCkrj45ff0VaUEr",
+    "scene": "M8ZajdPdnHP2gCsS",
+    "sceneSequence": 2
+  },
+  "gc": {
+    "value": 1,
+    "session": "MeCkrj45ff0VaUEr",
+    "playersPresent": 1,
+    "caliber": 1,
+    "lastReason": "Critical activation",
+    "controllerId": "ZTSRy74hgofWcbms",
+    "settlementReview": {
+      "id": "MfK3PHV2iV2wvias",
+      "needsReview": false,
+      "session": "MeCkrj45ff0VaUEr",
+      "before": 2,
+      "count": 1,
+      "purpose": "Critical activation",
+      "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+      "at": 1794752784259,
+      "outcome": "spent"
+    }
+  },
+  "worldTime": 126,
+  "actor": "1CbOfSuTyFgvwjmL",
+  "actors": [
+    "1CbOfSuTyFgvwjmL",
+    "D6fages2qzU3Ab3Y",
+    "YqZbv2DHba9H7K1Z"
+  ],
+  "feat": "nCegSZx7GTTLHSOd",
+  "sur": "Ve7H7Fvc6a96VEpe",
+  "fin": "mLooN4iRENbUBIsQ",
+  "combat": "SSLnpCIxi4AdqciW",
+  "targets": [
+    "D6fages2qzU3Ab3Y",
+    "YqZbv2DHba9H7K1Z"
+  ],
+  "rapier": "wGQOupceQNBCaxIx",
+  "fencing": "NDT4uVqt6V7bNaMQ",
+  "health": {
+    "vitality": {
+      "value": 4
+    },
+    "wounds": {
+      "value": 4
+    }
+  },
+  "dice": 0,
+  "base": {
+    "speed": 35,
+    "defense": 13,
+    "health": [
+      {
+        "id": "1CbOfSuTyFgvwjmL",
+        "vitality": 4,
+        "wounds": 4,
+        "dice": 0
+      },
+      {
+        "id": "D6fages2qzU3Ab3Y",
+        "vitality": 4,
+        "wounds": 4,
+        "dice": 0
+      },
+      {
+        "id": "YqZbv2DHba9H7K1Z",
+        "vitality": 4,
+        "wounds": 4,
+        "dice": 0
+      }
+    ]
+  },
+  "sourceQualities": "\u2014",
+  "preview": {
+    "normalTotal": 2,
+    "crushTotal": 4,
+    "normalThreat": 0,
+    "crushThreat": 0,
+    "baseDamage": {
+      "meleeArmorPiercing": {
+        "evidence": {
+          "version": 1,
+          "feat": "Hammer Basics",
+          "weaponId": "wGQOupceQNBCaxIx",
+          "family": "hammer",
+          "proficiency": "blunt",
+          "hands": 1,
+          "requiredHands": 1,
+          "intrinsicQualities": "\u2014",
+          "effectiveQualities": "AP (2)",
+          "armorPiercing": 2
+        },
+        "effectiveQualities": "AP (2)",
+        "blockedReason": "",
+        "notes": [
+          "Hammer Basics: this actual readied hammer gains AP (2); preserve higher intrinsic AP and apply the effective quality to weapon damage (pp.179,301,332)."
+        ]
+      },
+      "expression": "1d4+1",
+      "finesseBasic": {
+        "eligible": true,
+        "intrinsic": false,
+        "requested": false,
+        "granted": false,
+        "effectiveQualities": "\u2014"
+      },
+      "effectiveQualities": "AP (2)",
+      "cqbRange": {
+        "active": false,
+        "known": false,
+        "within": false,
+        "attackBonus": 0,
+        "damageBonus": 0,
+        "threatIncrease": 0,
+        "notes": []
+      },
+      "conditionDamagePenalty": 0,
+      "mortarOperation": {
+        "applicable": false,
+        "blocked": false,
+        "notes": []
+      },
+      "launcherOperation": {
+        "applicable": false,
+        "blocked": false,
+        "notes": []
+      },
+      "formula": "max(1, 1d4+1 + (1))",
+      "damageText": "1d4+1 subdual",
+      "ammunition": "",
+      "explosive": false,
+      "bonus": 1,
+      "knuckle": false,
+      "min": 1,
+      "grip": {
+        "required": 1,
+        "hands": 1,
+        "blocked": false,
+        "reason": "",
+        "attackPenalty": 0,
+        "strengthIncrease": 0,
+        "initiativeLoss": 0
+      },
+      "finesse": false,
+      "blocked": false,
+      "blockedReason": ""
+    }
+  },
+  "firstHit": "ChatMessage.vBN9ZF8GDIDb29wo",
+  "secondHit": "ChatMessage.C8p61jhJOvV9Q0pO",
+  "pendingDamage": "4DVFvVuOGzPX0PZt",
+  "pendingReceipt": "ChatMessage.IVVjtjuAwkvcqhjO",
+  "pendingKind": "owned weapon",
+  "axeSetup": true,
+  "axes": [
+    "pk3ue28gpmJzZQBU",
+    "hiWTehOyKUEHTocy"
+  ],
+  "nextAxe": 2,
+  "reloadVerified": true,
+  "cleanup": {
+    "actors": 6,
+    "messages": 1306,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "harnessNotes": [
+    "All three temporary Soldier1 fixtures had complete legal builds with zero TODO/warnings. Target legally reselected its one budgeted feat to Axe before those attacks. No health/dice were changed/reset and no stress/subdual ledger or DR was altered. Tool hammer is an actual catalog subdual weapon with no intrinsic AP; Broad axe retains AP3 and its applicable Massive attack penalty. Quality corruption was deliberately injected into the same pending card, rejected by read-only GC review, then restored exactly before successful UI attachment; no dice were rerolled."
+  ]
+}

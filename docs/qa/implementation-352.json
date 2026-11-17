@@ -1,0 +1,41 @@
+{
+  "batches": [
+    352
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2704,
+  "nodeGroups": [
+    1068,
+    1636
+  ],
+  "newTests": 15,
+  "browserFixtures": 72,
+  "builtPackTests": 6,
+  "scriptsChecked": 275,
+  "templatesChecked": 19,
+  "nativeReceipts": 7,
+  "nativeGuards": 12,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1255,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 58,
+    "other": 139,
+    "total": 314,
+    "minimumUnfinished": 175
+  },
+  "wholeFeatClosures": 25,
+  "scope": "Hack full-action melee trick, attack/threat and exact standalone or combined All-out root damage; Great Sword Basics remains partial, no automatic actions/weapon Count costs or damage application."
+}

@@ -1,0 +1,44 @@
+{
+  "batches": [
+    358
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2814,
+  "nodeGroups": [
+    1178,
+    1636
+  ],
+  "newTests": 15,
+  "browserFixtures": 82,
+  "builtPackTests": 6,
+  "scriptsChecked": 281,
+  "templatesChecked": 19,
+  "nativeReceipts": 8,
+  "nativeGuards": 12,
+  "nativeUI": 3,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1306,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "closedFeats": [
+    "Hammer Basics"
+  ],
+  "scope": "Actual readied Axe/Hammer AP2 floor, original roll quality evidence/replacements and posted-damage recovery invariant. Intrinsic higher AP retained; table DR/health application remains separate."
+}

@@ -1,0 +1,43 @@
+{
+  "batches": [
+    347
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2629,
+  "nodeGroups": [
+    993,
+    1636
+  ],
+  "newTests": 6,
+  "browserFixtures": 62,
+  "builtPackTests": 6,
+  "scriptsChecked": 268,
+  "templatesChecked": 19,
+  "nativeReceipts": 4,
+  "nativeGuards": 5,
+  "nativeUI": 1,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1220,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [
+    "You must select a User in order to log in. "
+  ],
+  "inventory": {
+    "manual": 120,
+    "partial": 58,
+    "other": 136,
+    "total": 314,
+    "minimumUnfinished": 178
+  },
+  "wholeFeatClosures": 22,
+  "scope": "Stalking Stance only; remaining Garrote Grapple benefits and Tighten the Noose remain manual."
+}

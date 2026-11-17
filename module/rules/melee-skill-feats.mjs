@@ -10,6 +10,7 @@ const definitions=[
 ];
 /** Exact currently implemented uses; caller combatAction/role cannot widen scope. */
 export function meleeSkillScope(key,check){
+ if(key==='acrobatics'&&['trip','counter-trip'].includes(check?.id))return 'trip';
  if(key==='acrobatics'&&check?.id==='resist-trip')return 'trip-defense';
  if(key==='acrobatics'&&check?.id==='jump')return 'jump';
  if(key==='athletics'&&['bull-rush','resist-bull-rush'].includes(check?.id)||['acrobatics','drive','survival','tactics'].includes(key)&&check?.id==='conveyance-bull-rush')return 'bull-rush';

@@ -1,0 +1,42 @@
+{
+  "batches": [
+    349
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2643,
+  "nodeGroups": [
+    1007,
+    1636
+  ],
+  "newTests": 8,
+  "browserFixtures": 64,
+  "builtPackTests": 6,
+  "scriptsChecked": 270,
+  "templatesChecked": 19,
+  "nativePreviewChecks": 5,
+  "nativeVitalityReceipts": 2,
+  "nativeGuards": 4,
+  "nativeUI": 1,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1226,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 119,
+    "partial": 58,
+    "other": 137,
+    "total": 314,
+    "minimumUnfinished": 177
+  },
+  "wholeFeatClosures": 23,
+  "scope": "Both Sharpshooter Basics benefits execute through the actual-source incoming Defense preview; generic attack, geometry, cover penetration and damage adjudication remain table workflows."
+}

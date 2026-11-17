@@ -1,3 +1,4 @@
+import {cheapShotPenalty,cheapShotRecords,cheapShotSpeedPenalty} from '../rules/cheap-shot-effects.mjs';
 import {getActionDieSettlementReview} from '../rules/action-die-payments.mjs';
 import {shakenStateFromActor,shakenRules} from '../rules/shaken.mjs';
 import {getRestraintReleaseReview,getPendingRestraintMoves} from '../rules/restraints.mjs';
@@ -39,12 +40,16 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
         ref: new SchemaField({ base: int(0) }),
         will: new SchemaField({ base: int(0) })
       }),
+      feintBonuses: new ArrayField(new ObjectField()),
+      feintHistory: new ArrayField(new ObjectField()),
+      cheapShots: new ArrayField(new ObjectField()),
       biography: new HTMLField()
     };
   }
 
   prepareDerivedData() {
     if(this.parent)this.shakenState=shakenStateFromActor(this.parent);
+    this.cheapShotActive=cheapShotRecords(this).filter(r=>!r.recovered);this.cheapShotSpeedPenalty=cheapShotSpeedPenalty(this);
     const shaken=shakenRules(this);this.shakenRules=shaken;
     for (const ability of Object.values(this.abilities)) ability.mod = Math.floor((ability.value - 10) / 2);
     for (const [key, save] of Object.entries(this.saves)) {
@@ -53,7 +58,7 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
     }
     this.defense.total = 10 + this.defense.bonus + this.abilities.dex.mod;
     this.initiative.total = this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty;
-    this.attack = { melee: this.bab + this.abilities.str.mod + shaken.attackPenalty, unarmed: this.bab + this.abilities.str.mod + shaken.attackPenalty, ranged: this.bab + this.abilities.dex.mod + shaken.attackPenalty };
+    this.attack = { melee: cheapShotPenalty(this,'str') + this.bab + this.abilities.str.mod + shaken.attackPenalty, unarmed: cheapShotPenalty(this,'str') + this.bab + this.abilities.str.mod + shaken.attackPenalty, ranged: cheapShotPenalty(this,'dex') + this.bab + this.abilities.dex.mod + shaken.attackPenalty };
     this.skillTotals = {};
     this.warnings = [];
   }
@@ -61,6 +66,7 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
 
 export class NpcData extends BaseActorData {
   prepareDerivedData() {
+    this.worldTime=globalThis.game?.time?.worldTime;this.usagePeriods=globalThis.game?.settings?.get("spycraft2","usagePeriods")??{};
     this.conditionContext=npcSkillConditionContext(this.parent);
     this.baffledApplicationReview=getBaffledReview(this.parent??{});
     if (!this.npcProfile?.enabled) return super.prepareDerivedData();
@@ -150,6 +156,11 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       actionDieAwards: new ObjectField(),
       missionXPRewards: new ObjectField(),
       eagleEyeBoost: new ObjectField({nullable:true,initial:null}),
+      sideStanceFeints: new ArrayField(new ObjectField()),
+      sideStanceDamageUses: new ArrayField(new ObjectField()),
+      attackDamageUses: new ArrayField(new ObjectField()),
+      stanceRoundMovement: new ObjectField({nullable:true,initial:null}),
+      combatStance: new ObjectField({nullable:true,initial:null}),
       twoWeaponStyle: new ObjectField({nullable:true,initial:null}),
       dartingStyle: new ObjectField({nullable:true,initial:null}),
       totalDefense: new ObjectField({nullable:true,initial:null}),
@@ -208,6 +219,9 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       wellFundedGrants: new ObjectField({initial:{}}),
       wealthAllocation: new SchemaField({ dressedForLifestyle: new BooleanField({initial:false}), lifestyle: int(0, { min: 0 }), possessions: int(0, { min: 0 }), spendingCash: int(0, { min: 0 }) }),
       misc: new SchemaField(misc),
+      feintBonuses: new ArrayField(new ObjectField()),
+      feintHistory: new ArrayField(new ObjectField()),
+      cheapShots: new ArrayField(new ObjectField()),
       biography: new HTMLField()
     };
   }

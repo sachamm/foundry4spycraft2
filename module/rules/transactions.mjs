@@ -3,11 +3,12 @@ import {shakenRules} from './shaken.mjs';
  * Uses the authenticated document API and existing ownership, without a privileged socket relay.
  */
 export const RESOURCE_LOCK_ID='sc2ResourceLock1';
+export const RULE_RESOURCE_LOCK_ID='sc2RuleStateLk01';
 export const GC_RESOURCE_LOCK_ID='sc2GCResourceLk1';
 const scopeQueues=new Map();
 const lockKey=(actor,scope)=>`${actor.uuid}:${scope}`;
 const held=new Map();
-export const isResourceLock=item=>[RESOURCE_LOCK_ID,GC_RESOURCE_LOCK_ID].includes(item?.id??item?._id)&&!!item.flags?.spycraft2?.resourceLock?.token;
+export const isResourceLock=item=>[RESOURCE_LOCK_ID,GC_RESOURCE_LOCK_ID,RULE_RESOURCE_LOCK_ID].includes(item?.id??item?._id)&&!!item.flags?.spycraft2?.resourceLock?.token;
 export class ResourceBusyError extends Error {}
 function requireSettledPeriod(allow){const stored=globalThis.game?.settings?.get?.('spycraft2','usagePeriodReview'),review=stored?.needsReview?stored:globalThis.game?.spycraft2?.pendingUsagePeriodReview??stored;if(!allow&&review?.needsReview)throw new ResourceBusyError('The GC must review the interrupted start before further resource use.');}
 
@@ -146,4 +147,17 @@ export function queueResourceScope(actor,scope,work){
   finally{try{await release(actor,token,scope);}catch(error){ui.notifications.warn('GC resource transaction finished, but its lock needs recovery. Check the result before retrying.');}}
  }).catch(error=>{if(error instanceof ResourceBusyError){ui.notifications.warn(error.message);return null;}throw error;});
  scopeQueues.set(key,pending.catch(()=>{}));return pending;
+}
+
+/** Refresh a rule-scope participant only while its native rule lock is held. */
+export async function refreshResourceActor(actor){if(!held.has(lockKey(actor,RULE_RESOURCE_LOCK_ID)))throw Error('Acquire the rule-state lock before refreshing this actor.');return refreshActor(actor);}
+
+/** Read an actual source card from the server under the participant’s independent rule mutex. */
+export async function refreshRuleStateMessage(actor,message){
+ if(!held.has(lockKey(actor,RULE_RESOURCE_LOCK_ID)))throw Error('Acquire the rule-state lock before refreshing its source message.');
+ const originalActor=message.flags?.spycraft2?.actorUuid,fresh=await readDocument(message);
+ if(fresh.flags?.spycraft2?.actorUuid!==originalActor)throw Error('The roll’s acting character changed before this rule-state transaction.');
+ message.updateSource(fresh.toObject(),{recursive:false});
+ if(message.blind&&!game.user.isGM)throw Error('The GC resolves secret results.');
+ return message;
 }

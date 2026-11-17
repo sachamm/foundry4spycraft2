@@ -1,0 +1,67 @@
+{
+  "batches": [
+    342
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2588,
+  "nodeGroups": [
+    952,
+    1636
+  ],
+  "newTests": 8,
+  "browserFixtures": 57,
+  "builtPackTests": 6,
+  "scriptsChecked": 258,
+  "templatesChecked": 19,
+  "nativeReceipts": 6,
+  "nativeGuards": 6,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1182,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "nativeAudit": "native-feint-outcomes-342.json",
+  "manualFeatRows": 121,
+  "partialFeatRows": 58,
+  "otherFeatRows": 135,
+  "unfinishedFeatMinimum": 179,
+  "wholeFeatClosuresSince237": 21,
+  "remaining": [
+    "Feint critical next-attack bonus automation",
+    "Side Stance",
+    "alternative/free-action Feints",
+    "unrecorded Feint outcomes"
+  ],
+  "acceptedSideRulings": [
+    "Feint while already in stance",
+    "Leaving discards unused die",
+    "One pending die total"
+  ],
+  "files": [
+    "module/rules/feint.mjs",
+    "module/apps/feint.mjs",
+    "module/rules/skills.mjs",
+    "module/documents/actor.mjs",
+    "module/data/actor.mjs",
+    "module/sheets/actor-sheet.mjs",
+    "templates/actor/agent-main.hbs",
+    "package.json",
+    "docs/raw-character-review.md",
+    "docs/raw-option-inventory.md",
+    "docs/resume-checkpoint.md",
+    "tools/tests/skill-dialog-scrolling.spec.mjs",
+    "module/rules/feint-outcomes.mjs",
+    "module/apps/feint-outcomes.mjs",
+    "tools/test-feint-outcomes.mjs",
+    "docs/qa/implementation-342.json",
+    "docs/qa/native-feint-outcomes-342.json"
+  ]
+}

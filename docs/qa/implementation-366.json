@@ -1,0 +1,47 @@
+{
+  "batches": [
+    366
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2953,
+  "nodeGroups": [
+    1315,
+    1638
+  ],
+  "newTests": 13,
+  "browserFixtures": 100,
+  "builtPackTests": 6,
+  "scriptsChecked": 292,
+  "templatesChecked": 19,
+  "nativeReceipts": 3,
+  "nativeGuards": 8,
+  "nativeUI": 5,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1336,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "reloadMetadataDifference": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Staff Basics Whirling Stance uses shared stance lifecycle without an invented held-staff requirement. Strictly lower-level characters cannot flank: actual observed attacker/target career levels bind attack and sneak damage evidence; peers/higher levels retain ordinary geometry. Incoming Defense supports observed or GC-confirmed unrecorded attacker and revalidates source/level and same-attacker identity. NPC career level uses current TL p.452, not Tier-adjusted statistics. No unconditional Defense bonus. Thread the Needle remains open.",
+  "nativeStartingFixtureDice": 3,
+  "nativeDiceSpent": 0,
+  "nativeVitalityRolls": 2,
+  "nativeAttackRolls": 1,
+  "nativeRandomFaces": "Ordinary native RNG for level-up vitality; controlled CONFIG.Dice.randomUniform natural5 for actual peer attack; no receipt totals/critical flags invented."
+}

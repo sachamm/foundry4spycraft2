@@ -1,0 +1,91 @@
+{
+  "batches": [
+    355
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2753,
+  "nodeGroups": [
+    1117,
+    1636
+  ],
+  "newTests": 31,
+  "browserFixtures": 77,
+  "builtPackTests": 6,
+  "scriptsChecked": 277,
+  "templatesChecked": 19,
+  "nativeReceipts": 9,
+  "nativeGuards": 12,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1278,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 58,
+    "other": 139,
+    "total": 314,
+    "minimumUnfinished": 175
+  },
+  "wholeFeatClosures": 25,
+  "scope": "Ordinary recorded weapon TKD Fortitude save/DC and one sprawled outcome, actual Still Standing purpose, NPC prepared-save route, original replacements and GC recovery; health application remains manual and mixed damage grouping remains pending.",
+  "nativeAppliedDamage": [
+    {
+      "target": "Actor.0jQ3qzAYDNiyu1Wd",
+      "damage": "ChatMessage.CdlZczKeWuuSS2xC",
+      "dr": 0,
+      "before": {
+        "vitality": 4,
+        "wounds": 4
+      },
+      "after": {
+        "vitality": 0,
+        "wounds": 2
+      },
+      "preDR": 6,
+      "net": 6,
+      "woundLoss": 2
+    },
+    {
+      "target": "Actor.43GSZoKDlO6Hb5ti",
+      "damage": "ChatMessage.slrhpJHUtbplR7Zp",
+      "dr": 0,
+      "before": {
+        "vitality": 4,
+        "wounds": 4
+      },
+      "after": {
+        "vitality": 0,
+        "wounds": 2
+      },
+      "preDR": 6,
+      "net": 6,
+      "woundLoss": 2
+    },
+    {
+      "target": "Actor.HyHK93jmPGJNlnBm",
+      "damage": "ChatMessage.8JJ6PUWeXTdpwWUp",
+      "dr": 0,
+      "before": {
+        "vitality": 4,
+        "wounds": 4
+      },
+      "after": {
+        "vitality": 0,
+        "wounds": 2
+      },
+      "preDR": 6,
+      "net": 6,
+      "woundLoss": 2
+    }
+  ]
+}

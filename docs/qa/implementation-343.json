@@ -1,0 +1,73 @@
+{
+  "batches": [
+    343
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2597,
+  "nodeGroups": [
+    961,
+    1636
+  ],
+  "newTests": 9,
+  "browserFixtures": 58,
+  "builtPackTests": 6,
+  "scriptsChecked": 261,
+  "templatesChecked": 19,
+  "nativeReceipts": 10,
+  "nativeGuards": 8,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1192,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "nativeAudit": "native-feint-bonus-343.json",
+  "nativeDiceHistory": [
+    0,
+    3,
+    2,
+    1,
+    0
+  ],
+  "manualFeatRows": 121,
+  "partialFeatRows": 58,
+  "otherFeatRows": 135,
+  "unfinishedFeatMinimum": 179,
+  "wholeFeatClosuresSince237": 21,
+  "remaining": [
+    "Side Stance",
+    "alternative/free-action Feints",
+    "unrecorded Feint outcomes",
+    "older manual critical Feint consumption history"
+  ],
+  "files": [
+    "module/rules/transactions.mjs",
+    "module/rules/gear.mjs",
+    "module/rules/outcomes.mjs",
+    "module/data/actor.mjs",
+    "module/documents/actor.mjs",
+    "module/apps/feint-outcomes.mjs",
+    "module/apps/feint.mjs",
+    "package.json",
+    "docs/resume-checkpoint.md",
+    "docs/raw-character-review.md",
+    "docs/raw-option-inventory.md",
+    "tools/tests/skill-dialog-scrolling.spec.mjs",
+    "module/sheets/actor-sheet.mjs",
+    "templates/actor/agent-main.hbs",
+    "tools/test-weapon-context.mjs",
+    "module/rules/feint-bonus.mjs",
+    "module/apps/feint-bonus.mjs",
+    "module/apps/rule-resource-scope.mjs",
+    "tools/test-feint-bonus.mjs",
+    "docs/qa/implementation-343.json",
+    "docs/qa/native-feint-bonus-343.json"
+  ]
+}

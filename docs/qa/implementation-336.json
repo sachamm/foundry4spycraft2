@@ -1,0 +1,57 @@
+{
+  "batch": 336,
+  "legacyAssertions": 513,
+  "nodeTests": 2545,
+  "nodeGroups": [
+    909,
+    1636
+  ],
+  "newTests": 6,
+  "browserFixtures": 52,
+  "browserSeconds": 25.0,
+  "builtPackTests": 6,
+  "scriptsChecked": 248,
+  "templatesChecked": 19,
+  "nativeReceipts": 7,
+  "nativeGuards": 12,
+  "nativeUI": 3,
+  "nativeReload": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1152,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "nativeBrowserErrors": [],
+  "nativeAudit": "native-flail-feint-336.json",
+  "featCounts": {
+    "manual": 121,
+    "partial": 59,
+    "other": 134,
+    "unfinishedMinimum": 180
+  },
+  "remaining": [
+    "Cheap Shot workflow and Flail bonus",
+    "Punishing Stance",
+    "Double Twirl"
+  ],
+  "files": [
+    "module/rules/readied-weapons.mjs",
+    "module/data/item.mjs",
+    "module/sheets/item-sheet.mjs",
+    "module/rules/feint.mjs",
+    "module/apps/feint.mjs",
+    "package.json",
+    "docs/resume-checkpoint.md",
+    "docs/raw-character-review.md",
+    "docs/raw-option-inventory.md",
+    "tools/test-flail-feint.mjs",
+    "docs/qa/implementation-336.json",
+    "docs/qa/native-flail-feint-336.json"
+  ]
+}

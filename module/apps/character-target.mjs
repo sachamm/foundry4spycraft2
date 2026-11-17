@@ -28,3 +28,6 @@ export async function validateCharacterTarget(target){
 }
 
 export function knownCharacterTargetInput(uuid,input={},characterType=''){const observed=attackCharacterTargetChoices().some(a=>a.uuid===uuid);return {...input,targetActorUuid:observed?uuid:'',...(characterType?{targetCharacterType:characterType}:{}),targetName:input.targetName||(observed?'':`Target ${uuid}`)};}
+
+/** Optional actual target for attacks that do not require Cleave classification. */
+export function observedAttackTargetContent(actor,input={}){const esc=foundry.utils.escapeHTML,targets=attackCharacterTargetChoices().filter(a=>a.uuid!==actor.uuid),selected=input.targetActorUuid??(values(game.user?.targets).length===1?values(game.user.targets)[0].actor?.uuid:'')??'';return `<label>Actual opponent (optional; retain in the attack receipt) <select name="targetActorUuid"><option value="">Unrecorded / GC-confirmed target</option>${targets.map(a=>`<option value="${esc(a.uuid)}"${a.uuid===selected?' selected':''}>${esc(a.name)}</option>`).join('')}</select></label>`;}

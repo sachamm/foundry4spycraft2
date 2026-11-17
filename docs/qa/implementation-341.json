@@ -1,0 +1,64 @@
+{
+  "batches": [
+    341
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2580,
+  "nodeGroups": [
+    944,
+    1636
+  ],
+  "newTests": 8,
+  "browserFixtures": 56,
+  "builtPackTests": 6,
+  "scriptsChecked": 256,
+  "templatesChecked": 19,
+  "nativeReceipts": 6,
+  "nativeGuards": 7,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1176,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "nativeAudit": "native-punishing-stance-341.json",
+  "manualFeatRows": 121,
+  "partialFeatRows": 58,
+  "otherFeatRows": 135,
+  "unfinishedFeatMinimum": 179,
+  "wholeFeatClosuresSince237": 21,
+  "closedFeat": "Flail Basics",
+  "acceptedRulings": [
+    "Feint must occur while already in Side Stance",
+    "Leaving Side Stance discards unused die"
+  ],
+  "remaining": [
+    "Side Stance",
+    "Feint outcome/target tracking"
+  ],
+  "files": [
+    "module/data/actor.mjs",
+    "module/documents/actor.mjs",
+    "module/rules/outcomes.mjs",
+    "module/sheets/actor-sheet.mjs",
+    "templates/actor/agent-main.hbs",
+    "spycraft2.mjs",
+    "package.json",
+    "docs/resume-checkpoint.md",
+    "docs/raw-character-review.md",
+    "docs/raw-option-inventory.md",
+    "tools/tests/skill-dialog-scrolling.spec.mjs",
+    "module/rules/combat-stance.mjs",
+    "module/apps/combat-stance.mjs",
+    "tools/test-combat-stance.mjs",
+    "docs/qa/implementation-341.json",
+    "docs/qa/native-punishing-stance-341.json"
+  ]
+}

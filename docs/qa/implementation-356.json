@@ -1,0 +1,44 @@
+{
+  "batches": [
+    356
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2772,
+  "nodeGroups": [
+    1136,
+    1636
+  ],
+  "newTests": 19,
+  "browserFixtures": 79,
+  "builtPackTests": 6,
+  "scriptsChecked": 278,
+  "templatesChecked": 19,
+  "nativeReceipts": 10,
+  "nativeGuards": 13,
+  "nativeUI": 3,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1288,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [
+    "You must select a User in order to log in. "
+  ],
+  "browserErrorExplanation": "Initial join without a selected user; no in-world browser error.",
+  "inventory": {
+    "manual": 117,
+    "partial": 58,
+    "other": 139,
+    "total": 314,
+    "minimumUnfinished": 175
+  },
+  "wholeFeatClosures": 25,
+  "scope": "Menacing fixed stress, authenticated original-hit component recovery and compatible Punishing controller; health and mixed TKD grouping separate."
+}

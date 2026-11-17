@@ -12,5 +12,5 @@ export function ownedWeaponTraining(actor,proof,{checkKind,weaponProficiency,wea
  const weapon={...item.system,id:item.id??item._id},context=attackContext.launcherOperation,launcher=launcherOperationPlan(weapon,{indirectFire:context?.mode==='indirect',underbarrelMountConfirmed:context?.underbarrelMountConfirmed===true,usingIntegralTripod:context?.usingIntegralTripod===true,vehicleMounted:attackContext.vehicleMounted===true}),operatingProficiency=launcher.applicable?launcher.proficiency:weapon.proficiency;
  if(launcher.blocked||operatingProficiency!==weaponProficiency)throw Error('The actual operating proficiency or launcher context changed before posting.');
  const trained=actor.type!=='agent'||(actor.system.proficiencyTotals??actor.system.proficiencies)?.[operatingProficiency]?.proficient===true;
- return {weapon,operatingProficiency,trained};
+ return {weapon,operatingProficiency,trained,launcherOperation:launcher};
 }

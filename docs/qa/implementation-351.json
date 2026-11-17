@@ -1,0 +1,41 @@
+{
+  "batches": [
+    351
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2689,
+  "nodeGroups": [
+    1053,
+    1636
+  ],
+  "newTests": 24,
+  "browserFixtures": 70,
+  "builtPackTests": 6,
+  "scriptsChecked": 274,
+  "templatesChecked": 19,
+  "nativeReceipts": 11,
+  "nativeGuards": 12,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1248,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 58,
+    "other": 139,
+    "total": 314,
+    "minimumUnfinished": 175
+  },
+  "wholeFeatClosures": 25,
+  "scope": "Bullseye one-shot ranged declaration, exact root damage, spent projectile context, named objects, miss outcome and posted receipt recovery; no automatic ammunition/action spending or damage application."
+}

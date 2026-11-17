@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "batches": [
+    332,
+    333
+  ],
+  "acceptedRuling": "Sure Grip +3 gear applies to the targeted weapon opposed defensive Standard Attack check",
+  "verification": {
+    "legacyChecks": 513,
+    "nodeTests": 2528,
+    "nodeGroups": [
+      892,
+      1636
+    ],
+    "focusedTests": 24,
+    "packTests": 6,
+    "syntaxScripts": 246,
+    "templates": 19,
+    "layoutFixtures": 51,
+    "layoutSeconds": 30.8,
+    "finalSheetSourceChecks": 37,
+    "finalReadinessLabelRender": true
+  },
+  "nativeAudit": "native-disarm-response-332-333.json",
+  "nativeFoundryVerified": true,
+  "native": {
+    "checks": 7,
+    "guards": 7,
+    "uiObservations": 4,
+    "reloadVerified": true,
+    "browserErrors": [],
+    "cleanup": {
+      "actors": 6,
+      "messages": 1138,
+      "combats": 0,
+      "effects": 0,
+      "worldTime": 126,
+      "gcDice": 1,
+      "deletedActors": true,
+      "baselinesUnchanged": true
+    }
+  },
+  "inventory": {
+    "totalFeats": 314,
+    "manual": 122,
+    "explicitPartial": 58,
+    "other": 134,
+    "explicitUnfinishedLowerBound": 180,
+    "countCorrection": "Before333the actual table was123/57/134; prior checkpoint120/57/137was stale. Fencing moved one manual row to partial."
+  },
+  "remaining": [
+    "Feint Sleight of Hand/DEX vs Notice/WIS workflow and Fencing skill benefit",
+    "Fencing Side Stance and Remiss",
+    "Tripping weapon Trip/drop response",
+    "Existing unresolved rulings and broader ledger"
+  ]
+}

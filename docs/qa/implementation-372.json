@@ -1,0 +1,62 @@
+{
+  "batch": 372,
+  "scope": "Accepted Thread the Needle opposed Athletics STR escape with required immediate Standard Move; no whole-feat closure",
+  "acceptedRuling": "usual opposed Athletics (STR) grapple escape, including required move",
+  "tests": {
+    "legacyAssertions": 513,
+    "nodeTests": 3041,
+    "nodeGroups": [
+      1386,
+      1655
+    ],
+    "focused": 51,
+    "browserLayouts": 112,
+    "coldPackChecks": 6,
+    "scripts": 301,
+    "templates": 19
+  },
+  "native": {
+    "receipts": 2,
+    "guards": 7,
+    "ui": 5,
+    "audit": "native-thread-escape-372.json",
+    "reloadVerified": true,
+    "baselinesUnchanged": true,
+    "unexpectedBrowserErrors": []
+  },
+  "inventory": {
+    "manual": 117,
+    "partial": 54,
+    "other": 143,
+    "minimumUnfinished": 171,
+    "total": 314,
+    "wholeFeatClosures": 29
+  },
+  "deferred": "Knife Basics unimplemented; user requested wrap-up/commit/push",
+  "sha256": {
+    "module/rules/restraints.mjs": "07de245893882de1afa63d13716eb3813a99c033368912f600e5eca4cbf38361",
+    "module/documents/actor.mjs": "5f5f47d0dab0c22f7f44988544e64dc6995113de98d31b8e486973c20c28ae02",
+    "module/rules/thread-needle.mjs": "9582828293b59677205388a908e470ee34bfed08fe36813d0a2478d95c90efe7",
+    "module/apps/thread-needle.mjs": "1d463b4bf4df5619f9e6f441394f644752e75cb8401c3f8feb261a5a537b5d7f",
+    "tools/test-thread-needle-workflow.mjs": "ac7d334c1c905179ee4b1453fe955de264fa51095a748c7384ffac21fc7793c6",
+    "tools/tests/skill-dialog-scrolling.spec.mjs": "167842683ab220260a2d09832e49174768f4ff647170e1e4f50a4d706dea0fd9",
+    "docs/raw-character-review.md": "e61c7e674132f087fb39bec88584533f2a3b78c9ecda586a0b6d3f852eca5361",
+    "docs/raw-option-inventory.md": "655ba77e04682bdf91c67aea1a1e4c45ce6a0161b9054f5cc697252c12814dad",
+    "docs/resume-checkpoint.md": "35ec1945a178bc7960f036efc5a2dbde3e462579f2dc4b4af387025793d2debb",
+    "docs/qa/native-thread-escape-372.json": "2c139166e451e1be8fe3bec12acf8772ee3548541304937140be25b74230b10a"
+  },
+  "preCommitVerification": {
+    "installedDataValidation": "passed",
+    "installedNodeTests": 3041,
+    "installedNodeGroups": [
+      1386,
+      1655
+    ],
+    "installedDiffCheck": "passed",
+    "installedPackEngine": "blocked by existing user Foundry LevelDB lock; session left running",
+    "isolatedEngineAssertions": 513,
+    "isolatedColdPackChecks": 6,
+    "auditedPendingFiles": 239,
+    "remoteMainBeforeCommit": "matched local HEAD"
+  }
+}

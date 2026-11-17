@@ -1,0 +1,41 @@
+{
+  "batches": [
+    361
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2872,
+  "nodeGroups": [
+    1236,
+    1636
+  ],
+  "newTests": 9,
+  "browserFixtures": 90,
+  "builtPackTests": 6,
+  "scriptsChecked": 285,
+  "templatesChecked": 19,
+  "nativeReceipts": 4,
+  "nativeGuards": 10,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1317,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Observed ordinary Trip response source proof v3: actual selected attacker UUID/Size and authoritative current combat clock; reciprocal Size validation, pre/post RNG and owned replacement guards. Legacy manual responses retain v1/v2 behavior. Paired settlement remains next."
+}

@@ -1,0 +1,41 @@
+{
+  "batches": [
+    350
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2665,
+  "nodeGroups": [
+    1029,
+    1636
+  ],
+  "newTests": 22,
+  "browserFixtures": 67,
+  "builtPackTests": 6,
+  "scriptsChecked": 273,
+  "templatesChecked": 19,
+  "nativeReceipts": 11,
+  "nativeGuards": 10,
+  "nativeUI": 5,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1237,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 118,
+    "partial": 58,
+    "other": 138,
+    "total": 314,
+    "minimumUnfinished": 176
+  },
+  "wholeFeatClosures": 24,
+  "scope": "All-out Attack declaration, exact recorded-hit damage, named GC-confirmed targets/objects, miss consequence and interrupted damage recovery; general attack/action geometry and damage application remain table workflows."
+}

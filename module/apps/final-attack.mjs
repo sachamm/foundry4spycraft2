@@ -7,5 +7,5 @@ export const finalWeaponReady=w=>w?.type==='weapon'&&w.system.equipped===true&&w
 /** Inside the caller’s reserved resource transaction. A committed chat result must not refund a use. */
 export async function postFinalAttack(actor,weaponId,options,receipt,validate){
  await validate();const posted=()=>[...(game.messages??[])].find(m=>m.flags?.spycraft2?.actorUuid===actor.uuid&&m.flags.spycraft2.finalAttack?.id===receipt.id);
- try{const message=await actor.rollAttack(actor.items.get(weaponId),{...options,finalAttack:receipt,validateFinalAttack:validate});if(!message)throw new Error('The final attack was cancelled before posting.');return message;}catch(error){const message=posted();if(message)return message;throw error;}
+ try{const message=await actor.rollAttack(actor.items.get(weaponId),{...options,finalAttack:receipt,validateFinalAttack:validate});if(!message)throw new Error('The final attack was cancelled before posting.');const recorded=posted();if(!message.uuid||!recorded||recorded.uuid!==message.uuid)throw new Error('The final attack did not post an actual recorded result.');return recorded;}catch(error){const message=posted();if(message)return message;throw error;}
 }

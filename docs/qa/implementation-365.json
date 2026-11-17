@@ -1,0 +1,51 @@
+{
+  "batches": [
+    365
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2940,
+  "nodeGroups": [
+    1302,
+    1638
+  ],
+  "newTests": 9,
+  "browserFixtures": 98,
+  "builtPackTests": 6,
+  "scriptsChecked": 290,
+  "templatesChecked": 19,
+  "nativeReceipts": 2,
+  "nativeGuards": 10,
+  "nativeUI": 5,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1333,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [
+    "The attack damage bonus needs GC review; inspect its receipt before retrying."
+  ],
+  "expectedInjectedRecoveryErrors": [
+    "The attack damage bonus needs GC review; inspect its receipt before retrying."
+  ],
+  "unexpectedBrowserErrors": [],
+  "reloadMetadataDifference": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Spear Charge full-action actual readied-spear Standard Attack: attack-2, threat+3, recorded-hit damage+3. Current own Count/Speed, completed legal minimum10ft toward actual target, recorded cumulative movement and stance caps checked before/after RNG. Shared combined damage/recovery and historical original replacements retained. Native one full-action hit/damage; ordinary miss automated only.",
+  "nativeStartingFixtureDice": 3,
+  "nativeDiceSpent": 0,
+  "nativeRandomFaces": "Controlled CONFIG.Dice.randomUniform seam through actual Actor/Roll/card pipeline."
+}

@@ -1,0 +1,222 @@
+{
+  "batches": [
+    371
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 3039,
+  "nodeGroups": [
+    1384,
+    1655
+  ],
+  "newTests": 9,
+  "preImplementationClosureAuditTests": 159,
+  "capacityFocusedTests": 94,
+  "newCapacityTests": 9,
+  "browserFixtures": 112,
+  "browserLayoutEvidenceBatch": 370,
+  "browserLayoutRerun": false,
+  "nativeWarningLayoutVerified": true,
+  "builtPackTests": 6,
+  "scriptsChecked": 301,
+  "templatesChecked": 19,
+  "nativeReceipts": 2,
+  "nativeGuards": 11,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1352,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "unexpectedBrowserErrors": [],
+  "reloadMetadataDifference": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 54,
+    "other": 143,
+    "total": 314,
+    "minimumUnfinished": 171
+  },
+  "wholeFeatClosures": 29,
+  "closedFeats": [
+    "Great Sword Basics",
+    "Spear Basics"
+  ],
+  "benefitEvidence": {
+    "Great Sword Basics": [
+      {
+        "benefit": "Readied two-handed sword: +2 gear Defense against melee only",
+        "source": [
+          "module/rules/great-sword-defense.mjs",
+          "module/rules/defense.mjs"
+        ],
+        "tests": [
+          "tools/test-great-sword-defense.mjs",
+          "tools/test-melee-hand-capacity.mjs"
+        ],
+        "native": [
+          319,
+          371
+        ]
+      },
+      {
+        "benefit": "Readied two-handed sword: +2 gear with actual Trip defense",
+        "source": [
+          "module/rules/melee-skill-feats.mjs",
+          "module/apps/trip.mjs"
+        ],
+        "tests": [
+          "tools/test-melee-skill-feats-workflow.mjs",
+          "tools/test-trip-response-target.mjs",
+          "tools/test-counter-trip.mjs"
+        ],
+        "native": [
+          317,
+          364,
+          371
+        ]
+      },
+      {
+        "benefit": "Power Stance: current Strength-score Count component, maximum10ft whole-round movement",
+        "source": [
+          "module/rules/power-stance.mjs",
+          "module/apps/power-stance.mjs",
+          "module/rules/combat-stance.mjs"
+        ],
+        "tests": [
+          "tools/test-power-stance.mjs",
+          "tools/test-stance-movement.mjs"
+        ],
+        "native": [
+          359
+        ]
+      },
+      {
+        "benefit": "Hack: full-action Standard Attack +1 attack/+4 damage/+1 threat range",
+        "source": [
+          "module/rules/melee-tricks.mjs",
+          "module/apps/attack-damage-benefits.mjs"
+        ],
+        "tests": [
+          "tools/test-melee-tricks.mjs"
+        ],
+        "native": [
+          352
+        ]
+      }
+    ],
+    "Spear Basics": [
+      {
+        "benefit": "Readied spear: +2 gear with actual Bull Rush/Trip skill uses, correct attacking/defending/counter/conveyance scope",
+        "source": [
+          "module/rules/melee-skill-feats.mjs",
+          "module/rules/trip-attack.mjs",
+          "module/rules/trip.mjs",
+          "module/rules/conveyance-bull-rush.mjs"
+        ],
+        "tests": [
+          "tools/test-melee-skill-feats.mjs",
+          "tools/test-melee-skill-feats-workflow.mjs",
+          "tools/test-counter-trip.mjs",
+          "tools/test-conveyance-bull-rush-workflow.mjs"
+        ],
+        "native": [
+          317,
+          360,
+          364,
+          371
+        ]
+      },
+      {
+        "benefit": "Gripping Stance: two-handed weapons in one hand at attack-2, ordinary stance lifecycle/ranged exit",
+        "source": [
+          "module/rules/gripping-stance.mjs",
+          "module/rules/gear.mjs",
+          "module/apps/combat-stance.mjs"
+        ],
+        "tests": [
+          "tools/test-gripping-stance.mjs"
+        ],
+        "native": [
+          348
+        ]
+      },
+      {
+        "benefit": "Spear Charge: full-action Standard Attack after legal completed route up to currentSpeed, at least10ft toward actual target; attack-2/threat+3/damage+3",
+        "source": [
+          "module/rules/spear-charge.mjs",
+          "module/rules/melee-tricks.mjs",
+          "module/apps/attack-damage-benefits.mjs"
+        ],
+        "tests": [
+          "tools/test-spear-charge.mjs"
+        ],
+        "native": [
+          365
+        ]
+      }
+    ]
+  },
+  "sourceAndRegressionHashes": {
+    "module/apps/attack-damage-benefits.mjs": "8c941e58bf54d6f9683aafe887cdadc09b3b42fd2b87d83ccf867fa581a91cde",
+    "module/apps/combat-stance.mjs": "053a14ab9a720c795c5387a5e301608f88d9c7ff3716b2ba7496404f0787e267",
+    "module/apps/power-stance.mjs": "c0880d9d0e288935841bb4edecdf57398e29cb0a7bb5b3bec73797bef0e230df",
+    "module/apps/trip.mjs": "ab88977e3ed7b908118db05892d01634c0a63f8cd71edae819bebe928fab04da",
+    "module/rules/combat-stance.mjs": "1e5a56b9332e2efa9205fc606b32a8554575007c3d41d3e0d1024eea82b5a469",
+    "module/rules/conveyance-bull-rush.mjs": "c4323da8db20d780c90065cf816c5f6099fdc6af3beb90a4da9c719552744525",
+    "module/rules/defense.mjs": "c353115dc1a8efa1d605ceba1dc6288572bebdc232077653d3ec6b216a14a469",
+    "module/rules/disarm-response.mjs": "aeaee9950db5c18e20eb29b8b85d2b915ec429ed9f461318e889f702ea01c2a4",
+    "module/rules/engine.mjs": "22d6778cadb341c6e5ae0a8d9c548aed130227bab2cbf9e97c6dd5cfa791cd47",
+    "module/rules/gear.mjs": "9d50c53dedd5771cb68b75d267f54f37e1336139da8e99c4ec6cde49555f55df",
+    "module/rules/great-sword-defense.mjs": "5cf32e01773545c4d9b51c37b9928bd65e9ce77c10b7225ae65239b4a0366aa9",
+    "module/rules/gripping-stance.mjs": "43ad6cb9c9c03e1a1ed9c730390ac9bb46490923914f180b422bef3a38ca6609",
+    "module/rules/melee-skill-feats.mjs": "eeafeda0f14b892f9d719b056797e207f0d52cbcbca1a8ac1e21f301670c0622",
+    "module/rules/melee-tricks.mjs": "2600a769757efe21e62bc1b94dce6ab172e8ddd1f18db96c67ec396676cdede7",
+    "module/rules/polearm-defense.mjs": "058571f3119d02d2cabe76643a3155670c27de56f2f728c951403a996b9755d2",
+    "module/rules/power-stance.mjs": "f92afeea57992d9aa415eef3bbd2c549c429c4c4023feb96ee0df6b27465ac92",
+    "module/rules/readied-weapons.mjs": "b5935c6053f488258bae25e70687049b9fa5bb9408b08c812904d5f2c76b94b8",
+    "module/rules/spear-charge.mjs": "7a47a909a724e547da5501ebc1c07a5c72799ec91ed3186cb33fa65b9564c4a4",
+    "module/rules/trip-attack.mjs": "ef64d1476393d7409e8a7b4142822988476af47ec96d2b3dcae05755cafaa543",
+    "module/rules/trip.mjs": "41ce755d459b764fcb3e4a6620ded312f1aed6028d3e03512cdfd46d49118524",
+    "tools/test-conveyance-bull-rush-workflow.mjs": "746d2c07043dd3034133ab1392c6a8935b9bf5fcea5a8843317202808a10e12f",
+    "tools/test-counter-trip.mjs": "e7b0dd2fd288f9a62725281b8c3179e9829b1286689fd957661075d7071e05dd",
+    "tools/test-great-sword-defense.mjs": "867025dab0327bf1e110476ebc822a7df1939d768db7b791ee2f27fd6d211c0b",
+    "tools/test-gripping-stance.mjs": "38f19194b7e81fc1511b92d0164329866052302fc6b55e76501e41303795bda4",
+    "tools/test-melee-hand-capacity.mjs": "fd0b2c07068280e4963a8b1d061f2fc66ffea69dd47899f77748dc625500026b",
+    "tools/test-melee-skill-feats-workflow.mjs": "84e75e1ccc4838ffe73ea58ec612b010c6aa9cc35345b53f55113ed90b3e60d7",
+    "tools/test-melee-skill-feats.mjs": "64565348d4522d52febc3f56c433b27dcca8cabf668b6f791cfbfd4c4c2c6136",
+    "tools/test-melee-tricks.mjs": "13c2d8bb5dd6303e6840753198d3d13021c72cc58e890190d2180af0cd824260",
+    "tools/test-power-stance.mjs": "3ac1d62b319890f62e1d0bc930ca86ac9d972e8a26103fe4f6ebcc5a0cc5e681",
+    "tools/test-spear-charge.mjs": "389c9b51e2e8e41dcf134bff39acb810c0a0336890a427810b9c85ec14a73736",
+    "tools/test-stance-movement.mjs": "fec449f018cc1ecec11c58c36abbe45bad9870479cb66417a891a3575d1372e0",
+    "tools/test-trip-response-target.mjs": "5d76f571c9644beca58bddc21fc7faffeb3768d17b42828a62eca54cf5df5eb8"
+  },
+  "scope": "Shared physically held weapon capacity before granting readied melee feat skill/Defense/AP/trick sources, including otherwise unrelated held ranged weapons. Valid source proof shape retained; positive legal one-hand pairs supported. Polearm preparation remains renderable with zero bonus and one Gear review. Legacy omitted quality text defaults empty; malformed explicit quality data stays reviewable. Original provisional improvised-error replacement policy unchanged. Source-by-source printed p179 Great Sword/Spear audit closes stale residual rows after their earlier stance/trick work and fresh native capacity/Trip/Defense verification.",
+  "nativeStartingFixtureDice": 3,
+  "nativeDiceSpent": 0,
+  "nativeAttackSkillRolls": 2,
+  "nativeDamageRolls": 0,
+  "nativeSyntheticInvalidDeclarations": 2,
+  "nativeInvalidDeclarationRng": 0,
+  "nativeGreatSwordMeleeDefense": 15,
+  "nativeGreatSwordMainDefense": 12,
+  "nativeGreatSwordGearIncrement": 2,
+  "nativeGreatSwordSeparateGuardBonus": 1,
+  "nativeGreatSwordRangedDefense": 12,
+  "nativeSpearTripTotal": 16,
+  "nativeGreatSwordTripDefenseTotal": 7,
+  "nativeTokenGeometryAutomated": false,
+  "unansweredGeneralInteractions": [
+    "Thread the Needle escape method",
+    "ordinary Trip melee-stance classification",
+    "TRP bonus typing",
+    "untrained Reach adjacent penalty"
+  ]
+}

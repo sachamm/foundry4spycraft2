@@ -1,0 +1,57 @@
+{
+  "batches": [
+    369
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 3008,
+  "nodeGroups": [
+    1353,
+    1655
+  ],
+  "newTests": 17,
+  "browserFixtures": 110,
+  "builtPackTests": 6,
+  "scriptsChecked": 299,
+  "templatesChecked": 19,
+  "focusedTests": 34,
+  "nativeReceipts": 4,
+  "nativeGuards": 9,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1347,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "unexpectedBrowserErrors": [],
+  "reloadMetadataDifference": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 56,
+    "other": 141,
+    "total": 314,
+    "minimumUnfinished": 173
+  },
+  "wholeFeatClosures": 27,
+  "closedFeat": "Polearm Basics",
+  "closureEvidenceBatches": [
+    320,
+    367,
+    368,
+    369
+  ],
+  "scope": "Trained RCH extra feet and explicit GC-confirmed target geometry. Adjacent trained minus5; qualified Polearm Basics waiver follows actual attacking polearm, not another held weapon. Untrained adjacent without waiver held pending ruling; nonadjacent untrained no extra Reach. Defensive incoming Disarm is not an outgoing target attack. Immutable current/zero-source proof and live guards, historical owned unresolved original replacement waiver. Base character Reach in squares remains unchanged.",
+  "nativeStartingFixtureDice": 3,
+  "nativeDiceSpent": 0,
+  "nativeAttackRolls": 4,
+  "nativeDamageRolls": 0,
+  "nativeTokenGeometryAutomated": false,
+  "nativeRandomFaces": "Controlled CONFIG.Dice.randomUniform through actual Actor/Roll/card pipeline: natural5 ordinary misses, no fabricated totals/critical flags."
+}

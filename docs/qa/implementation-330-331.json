@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "batches": [
+    330,
+    331
+  ],
+  "nativeFoundryVerified": true,
+  "sourceInspection": {
+    "edition": "Second Printing",
+    "printedPages": [
+      254,
+      299,
+      302
+    ],
+    "quirkyCatalogSources": 13,
+    "cop357BasePenalty": -6,
+    "cop357UntrainedPenaltyWithQky": -10
+  },
+  "verification": {
+    "legacyChecks": 513,
+    "nodeTests": 2504,
+    "nodeGroups": [
+      868,
+      1636
+    ],
+    "focusedQuirkyTests": 11,
+    "quickAimAndBraceTests": 12,
+    "isolatedPackTests": 6,
+    "syntaxScripts": 242,
+    "handlebarsTemplates": 19,
+    "layoutFixtures": 50,
+    "layoutSeconds": 13.8,
+    "finalFocusedAfterErrorWording": 36
+  },
+  "packRebuildScope": "isolated /tmp/spycraft-residual-work only",
+  "remaining": [
+    "Sure Grip weapon-targeted resist-Disarm workflow",
+    "Tripping weapon attack/drop response",
+    "Aim/Brace automatic target/movement lifecycle",
+    "Existing unanswered rulings and residual ledger"
+  ],
+  "nativeAudit": "native-quirky-brace-330-331.json",
+  "native": {
+    "finalReceipts": 9,
+    "guards": 5,
+    "uiObservations": 5,
+    "reloadVerified": true,
+    "zeroBrowserErrors": true,
+    "completeFixtureTodo": 0,
+    "completeFixtureWarnings": 0,
+    "cleanup": {
+      "actors": 6,
+      "messages": 1131,
+      "combats": 0,
+      "effects": 0,
+      "worldTime": 126,
+      "gcDice": 1,
+      "deletedActors": true,
+      "baselinesUnchanged": true
+    }
+  }
+}

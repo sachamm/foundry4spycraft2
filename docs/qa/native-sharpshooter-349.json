@@ -1,0 +1,1136 @@
+{
+  "checks": [
+    {
+      "kind": "Native observed Sharp source and actual Small target",
+      "grade": 0,
+      "plan": {
+        "sharpshooter": {
+          "version": 1,
+          "active": true,
+          "originalSizeBonus": 1,
+          "retainedSizeBonus": 0,
+          "sizeReduction": 1
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 0,
+          "personalCover": 0,
+          "sceneryCover": 0,
+          "baseGrade": 0,
+          "grade": 0,
+          "label": "None",
+          "defenseBonus": 0,
+          "reflexBonus": 0,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": true,
+          "sharpshooterReduction": 0,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": []
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 12,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Sharpshooter Basics: target Size Defense bonus +1 becomes +0, rounded down, against this ranged attack (p.182).",
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      },
+      "normal": {
+        "sharpshooter": {
+          "active": false,
+          "sizeReduction": 0
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 0,
+          "personalCover": 0,
+          "sceneryCover": 0,
+          "baseGrade": 0,
+          "grade": 0,
+          "label": "None",
+          "defenseBonus": 0,
+          "reflexBonus": 0,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": false,
+          "sharpshooterReduction": 0,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": []
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 13,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      }
+    },
+    {
+      "kind": "Native observed Sharp source and actual Small target",
+      "grade": 1,
+      "plan": {
+        "sharpshooter": {
+          "version": 1,
+          "active": true,
+          "originalSizeBonus": 1,
+          "retainedSizeBonus": 0,
+          "sizeReduction": 1
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 0,
+          "personalCover": 1,
+          "sceneryCover": 0,
+          "baseGrade": 1,
+          "grade": 0,
+          "label": "None",
+          "defenseBonus": 0,
+          "reflexBonus": 1,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": true,
+          "sharpshooterReduction": 1,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": [
+            "Sharpshooter Basics: opponent loses one quarter cover against this ranged attack (p.182)."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 12,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Sharpshooter Basics: target Size Defense bonus +1 becomes +0, rounded down, against this ranged attack (p.182).",
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      },
+      "normal": {
+        "sharpshooter": {
+          "active": false,
+          "sizeReduction": 0
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 2,
+          "personalCover": 1,
+          "sceneryCover": 0,
+          "baseGrade": 1,
+          "grade": 1,
+          "label": "One-quarter (1/4)",
+          "defenseBonus": 2,
+          "reflexBonus": 1,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": false,
+          "sharpshooterReduction": 0,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": [
+            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 15,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      }
+    },
+    {
+      "kind": "Native observed Sharp source and actual Small target",
+      "grade": 2,
+      "plan": {
+        "sharpshooter": {
+          "version": 1,
+          "active": true,
+          "originalSizeBonus": 1,
+          "retainedSizeBonus": 0,
+          "sizeReduction": 1
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 2,
+          "personalCover": 2,
+          "sceneryCover": 0,
+          "baseGrade": 2,
+          "grade": 1,
+          "label": "One-quarter (1/4)",
+          "defenseBonus": 2,
+          "reflexBonus": 2,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": true,
+          "sharpshooterReduction": 1,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": [
+            "Sharpshooter Basics: opponent loses one quarter cover against this ranged attack (p.182).",
+            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 14,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Sharpshooter Basics: target Size Defense bonus +1 becomes +0, rounded down, against this ranged attack (p.182).",
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      },
+      "normal": {
+        "sharpshooter": {
+          "active": false,
+          "sizeReduction": 0
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 4,
+          "personalCover": 2,
+          "sceneryCover": 0,
+          "baseGrade": 2,
+          "grade": 2,
+          "label": "One-half (1/2)",
+          "defenseBonus": 4,
+          "reflexBonus": 2,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": false,
+          "sharpshooterReduction": 0,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": [
+            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 17,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      }
+    },
+    {
+      "kind": "Native observed Sharp source and actual Small target",
+      "grade": 3,
+      "plan": {
+        "sharpshooter": {
+          "version": 1,
+          "active": true,
+          "originalSizeBonus": 1,
+          "retainedSizeBonus": 0,
+          "sizeReduction": 1
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 4,
+          "personalCover": 3,
+          "sceneryCover": 0,
+          "baseGrade": 3,
+          "grade": 2,
+          "label": "One-half (1/2)",
+          "defenseBonus": 4,
+          "reflexBonus": 3,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": true,
+          "sharpshooterReduction": 1,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": [
+            "Sharpshooter Basics: opponent loses one quarter cover against this ranged attack (p.182).",
+            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 16,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Sharpshooter Basics: target Size Defense bonus +1 becomes +0, rounded down, against this ranged attack (p.182).",
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      },
+      "normal": {
+        "sharpshooter": {
+          "active": false,
+          "sizeReduction": 0
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 6,
+          "personalCover": 3,
+          "sceneryCover": 0,
+          "baseGrade": 3,
+          "grade": 3,
+          "label": "Three-quarters (3/4)",
+          "defenseBonus": 6,
+          "reflexBonus": 3,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": false,
+          "sharpshooterReduction": 0,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": false,
+          "notes": [
+            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 19,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      }
+    },
+    {
+      "kind": "Native observed Sharp source and actual Small target",
+      "grade": 4,
+      "plan": {
+        "sharpshooter": {
+          "version": 1,
+          "active": true,
+          "originalSizeBonus": 1,
+          "retainedSizeBonus": 0,
+          "sizeReduction": 1
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 8,
+          "personalCover": 4,
+          "sceneryCover": 0,
+          "baseGrade": 4,
+          "grade": 4,
+          "label": "Total",
+          "defenseBonus": 8,
+          "reflexBonus": 4,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": true,
+          "sharpshooterReduction": 0,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": true,
+          "notes": [
+            "Total cover: the attack must penetrate the cover before it can hit the target; Defense alone does not permit a direct hit.",
+            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 20,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Sharpshooter Basics: target Size Defense bonus +1 becomes +0, rounded down, against this ranged attack (p.182).",
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      },
+      "normal": {
+        "sharpshooter": {
+          "active": false,
+          "sizeReduction": 0
+        },
+        "guard": {
+          "version": 1,
+          "ranged": true,
+          "weapons": [],
+          "bonus": 0
+        },
+        "greatSword": {
+          "version": 1,
+          "ranged": true,
+          "source": null,
+          "listedBonus": 0,
+          "existingGearBonus": 0,
+          "increment": 0
+        },
+        "cover": {
+          "humanShieldDefense": 0,
+          "humanShieldEffective": 0,
+          "humanShieldConfirmed": false,
+          "safeAttack": false,
+          "safeAttackReduction": 0,
+          "listedDefenseBonus": 8,
+          "personalCover": 4,
+          "sceneryCover": 0,
+          "baseGrade": 4,
+          "grade": 4,
+          "label": "Total",
+          "defenseBonus": 8,
+          "reflexBonus": 4,
+          "precisionGrade": 0,
+          "precisionReduction": 0,
+          "sharpshooter": false,
+          "sharpshooterReduction": 0,
+          "supremacy": false,
+          "supremacyReduction": 0,
+          "within": false,
+          "requiresPenetration": true,
+          "notes": [
+            "Total cover: the attack must penetrate the cover before it can hit the target; Defense alone does not permit a direct hit.",
+            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+          ]
+        },
+        "armorMasteryRequiresHelpless": false,
+        "sneakAttackImmune": false,
+        "listedDR": {
+          "unarmed": 0,
+          "meleeWeapon": 0,
+          "hurledWeapon": 0,
+          "rangedWeapon": 0,
+          "other": 0
+        },
+        "coupDeGraceException": false,
+        "coupDeGraceExceptionSource": "",
+        "pinnedAttackerBonus": 0,
+        "proneAttackerPenalty": 0,
+        "crouchedAttackerPenalty": 0,
+        "total": 21,
+        "dexterity": 2,
+        "dodgeLost": 0,
+        "securityBonus": 0,
+        "eyeOfStorm": 0,
+        "vulnerable": false,
+        "helpless": false,
+        "flatFooted": false,
+        "flanked": false,
+        "blindedAttackerBonus": 0,
+        "helplessAttackerBonus": 0,
+        "attackerBonus": 0,
+        "coupDeGraceEligible": false,
+        "uncanny": {
+          "grade": 0,
+          "sources": [],
+          "retainDexterity": false,
+          "cannotBeFlanked": false,
+          "securityBonus": 0,
+          "halveIncomingInitiative": false,
+          "cannotBeFlatFooted": false
+        },
+        "notes": [
+          "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+          "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+          "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+        ]
+      }
+    }
+  ],
+  "guards": [
+    {
+      "kind": "Five grade previews change no actor, health or resource state"
+    },
+    {
+      "kind": "Actual feat Item loses qualification while result is open; preview rejected",
+      "error": "The actual ranged attacker, weapon, qualified feats or target Size changed. Reopen the incoming attack preview."
+    },
+    {
+      "kind": "Complete legal source/targets, expected Child size warning only; health/dice unchanged"
+    },
+    {
+      "kind": "Reload retained exact legal feat/Small target, preview and vitality receipts",
+      "reloadVerified": true
+    }
+  ],
+  "ui": [
+    {
+      "kind": "Actual Sharpshooter source and Size/cover result",
+      "declarationConfirm": {
+        "x": 517,
+        "y": 582,
+        "width": 366,
+        "height": 40
+      },
+      "resultConfirm": {
+        "x": 517,
+        "y": 582,
+        "width": 366,
+        "height": 40
+      },
+      "text": "Incoming attack — result\n\nDefense 14\n\nCover: One-quarter (1/4), Defense +2; ordinary Reflex bonus +2 against effects beyond the cover (apply separately to the save).\n\nSharpshooter Basics: opponent loses one quarter cover against this ranged attack (p.182).\n\nAn attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit.\n\nDEX 2; dodge bonuses removed 0; security-device bonus +0; adjacent Eye of the Storm bonus +0.\n\nUncanny Dodge grade 0; vulnerable no; flat-footed no; flanked no; helpless no.\n\nAttacker modifier +0 (pinned target, adjacent melee/unarmed +0; prone target 0; crouched target 0; blinded target +0; helpless target within Melee Range +0). Coup de Grace target eligible: no.\n\nKnown sneak attack immunity: no.\n\nListed DR before armor piercing/type exceptions: melee weapons 0, unarmed 0, non-grenade hurled weapons 0, other ranged weapons 0, other 0.\n\nSharpshooter Basics: target Size Defense bonus +1 becomes +0, rounded down, against this ranged attack (p.182).\n\nPinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).\n\nThe helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.\n\nInvisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation.\n\nConfirm"
+    }
+  ],
+  "periods": {
+    "mission": "qa-xp-cancel",
+    "session": "MeCkrj45ff0VaUEr",
+    "scene": "M8ZajdPdnHP2gCsS",
+    "sceneSequence": 2
+  },
+  "gc": {
+    "value": 1,
+    "session": "MeCkrj45ff0VaUEr",
+    "playersPresent": 1,
+    "caliber": 1,
+    "lastReason": "Critical activation",
+    "controllerId": "ZTSRy74hgofWcbms",
+    "settlementReview": {
+      "id": "MfK3PHV2iV2wvias",
+      "needsReview": false,
+      "session": "MeCkrj45ff0VaUEr",
+      "before": 2,
+      "count": 1,
+      "purpose": "Critical activation",
+      "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+      "at": 1794752784259,
+      "outcome": "spent"
+    }
+  },
+  "worldTime": 126,
+  "actor": "g8I0bbl0mXHHL7qi",
+  "actors": [
+    "g8I0bbl0mXHHL7qi",
+    "AP7oF9kdWjPImsBZ",
+    "VMQRR7WPHamuvjgP"
+  ],
+  "feat": "RORLg3BTGkNliq6m",
+  "sur": "2aH8PbpHNrFtg4jE",
+  "fin": "mGR5cUr6jjeWp51a",
+  "combat": "dmY4wnocVdbI9IBK",
+  "targets": [
+    "AP7oF9kdWjPImsBZ",
+    "VMQRR7WPHamuvjgP"
+  ],
+  "rapier": "Qqg2BCbop20xOz8s",
+  "health": [
+    {
+      "id": "g8I0bbl0mXHHL7qi",
+      "vitality": 4,
+      "wounds": 4,
+      "dice": 0
+    },
+    {
+      "id": "AP7oF9kdWjPImsBZ",
+      "vitality": 4,
+      "wounds": 4,
+      "dice": 0
+    },
+    {
+      "id": "VMQRR7WPHamuvjgP",
+      "vitality": 4,
+      "wounds": 4,
+      "dice": 0
+    }
+  ],
+  "dice": 0,
+  "vitality": [
+    {
+      "level": 2,
+      "total": 9,
+      "messages": [
+        "ChatMessage.Tt3K3R2rba7JJ5SV"
+      ]
+    },
+    {
+      "level": 3,
+      "total": 4,
+      "messages": [
+        "ChatMessage.1I2nUUWZedZDYP4H"
+      ]
+    }
+  ],
+  "sharp": "XqZOuvPeCJ80E46f",
+  "gun": "LGta7oSTv9i5FBDX",
+  "childWarning": [
+    "Child: Small size; two-handed weapons cannot be used and one-handed weapons require both hands (p.349)."
+  ],
+  "expectedUI": {
+    "sharpshooter": {
+      "version": 1,
+      "active": true,
+      "originalSizeBonus": 1,
+      "retainedSizeBonus": 0,
+      "sizeReduction": 1
+    },
+    "guard": {
+      "version": 1,
+      "ranged": true,
+      "weapons": [],
+      "bonus": 0
+    },
+    "greatSword": {
+      "version": 1,
+      "ranged": true,
+      "source": null,
+      "listedBonus": 0,
+      "existingGearBonus": 0,
+      "increment": 0
+    },
+    "cover": {
+      "humanShieldDefense": 0,
+      "humanShieldEffective": 0,
+      "humanShieldConfirmed": false,
+      "safeAttack": false,
+      "safeAttackReduction": 0,
+      "listedDefenseBonus": 2,
+      "personalCover": 2,
+      "sceneryCover": 0,
+      "baseGrade": 2,
+      "grade": 1,
+      "label": "One-quarter (1/4)",
+      "defenseBonus": 2,
+      "reflexBonus": 2,
+      "precisionGrade": 0,
+      "precisionReduction": 0,
+      "sharpshooter": true,
+      "sharpshooterReduction": 1,
+      "supremacy": false,
+      "supremacyReduction": 0,
+      "within": false,
+      "requiresPenetration": false,
+      "notes": [
+        "Sharpshooter Basics: opponent loses one quarter cover against this ranged attack (p.182).",
+        "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+      ]
+    },
+    "armorMasteryRequiresHelpless": false,
+    "sneakAttackImmune": false,
+    "listedDR": {
+      "unarmed": 0,
+      "meleeWeapon": 0,
+      "hurledWeapon": 0,
+      "rangedWeapon": 0,
+      "other": 0
+    },
+    "coupDeGraceException": false,
+    "coupDeGraceExceptionSource": "",
+    "pinnedAttackerBonus": 0,
+    "proneAttackerPenalty": 0,
+    "crouchedAttackerPenalty": 0,
+    "total": 14,
+    "dexterity": 2,
+    "dodgeLost": 0,
+    "securityBonus": 0,
+    "eyeOfStorm": 0,
+    "vulnerable": false,
+    "helpless": false,
+    "flatFooted": false,
+    "flanked": false,
+    "blindedAttackerBonus": 0,
+    "helplessAttackerBonus": 0,
+    "attackerBonus": 0,
+    "coupDeGraceEligible": false,
+    "uncanny": {
+      "grade": 0,
+      "sources": [],
+      "retainDexterity": false,
+      "cannotBeFlanked": false,
+      "securityBonus": 0,
+      "halveIncomingInitiative": false,
+      "cannotBeFlatFooted": false
+    },
+    "notes": [
+      "Sharpshooter Basics: target Size Defense bonus +1 becomes +0, rounded down, against this ranged attack (p.182).",
+      "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
+      "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+      "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+    ]
+  },
+  "reloadVerified": true,
+  "cleanup": {
+    "actors": 6,
+    "messages": 1226,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": []
+}

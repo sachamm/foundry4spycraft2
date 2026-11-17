@@ -1,0 +1,43 @@
+{
+  "batches": [
+    344,
+    345,
+    346
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2623,
+  "nodeGroups": [
+    987,
+    1636
+  ],
+  "newTests": 26,
+  "browserFixtures": 61,
+  "builtPackTests": 6,
+  "scriptsChecked": 267,
+  "templatesChecked": 19,
+  "nativeReceipts": 24,
+  "nativeGuards": 15,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1216,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "wholeFeatClosures": 22,
+  "inventory": {
+    "manual": 121,
+    "partial": 57,
+    "other": 136,
+    "total": 314,
+    "minimumUnfinished": 178
+  },
+  "scope": "Fencing Basics Side Stance; one pending die total, attack-root consumption/damage, stance lifecycle and declared per-round movement; no automatic token movement or general combat action adjudication."
+}

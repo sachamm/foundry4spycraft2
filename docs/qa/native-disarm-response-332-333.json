@@ -1,0 +1,4762 @@
+{
+  "checks": [
+    {
+      "label": "Butterfly sword targeted defense",
+      "message": "ChatMessage.o0QGCC11HsQZaY5l",
+      "flags": {
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 14,
+        "rolledTotal": 14,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 14,
+        "actorUuid": "Actor.B9cWfazQc5MlDoda",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "weaponUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "weaponProficiency": "edged",
+        "weaponQualities": "GAR (+1), SUR",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "gearAttempt": null,
+        "attackContext": {
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "GAR (+1), SUR"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": {
+            "version": 1,
+            "active": true,
+            "role": "defender",
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "source": {
+              "id": "OHk1Fmv8hSvmbBNc",
+              "uuid": null,
+              "name": "Butterfly sword",
+              "proficiency": "edged",
+              "sizeHands": "T/1h",
+              "qualities": "GAR (+1), SUR",
+              "hands": 1,
+              "requiredHands": 1,
+              "quantity": 1
+            },
+            "held": [
+              {
+                "id": "OHk1Fmv8hSvmbBNc",
+                "hands": 1
+              },
+              {
+                "id": "OmjcW7HsroYhX6bU",
+                "hands": 1
+              }
+            ],
+            "trained": true,
+            "ranged": false,
+            "ownSize": 3,
+            "opponentSize": 3,
+            "opponentWeaponSize": "Tiny",
+            "opponentCharacterSize": null,
+            "opponentLabel": "Incoming attacker / dagger",
+            "incomingRanged": false,
+            "incomingProficient": true,
+            "confirmed": true,
+            "lineOfSightConfirmed": true,
+            "rangeConfirmed": true,
+            "sureGrip": true,
+            "sureGripBonus": 3,
+            "gearBonus": 3,
+            "fencingBasics": {
+              "feat": "Fencing Basics",
+              "family": "oneHandedSword",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "OmjcW7HsroYhX6bU",
+                  "uuid": null,
+                  "name": "Rapier",
+                  "proficiency": "edged",
+                  "hands": 1,
+                  "requiredHands": 1,
+                  "finesse": true
+                }
+              ],
+              "gearBonus": 2
+            },
+            "axeBasics": {
+              "version": 1,
+              "gearBonus": 0,
+              "source": null
+            },
+            "expert": false,
+            "expertBonus": 0,
+            "twoHandBonus": 0,
+            "sizeBonus": 0,
+            "attackBonus": 3,
+            "errorIncrease": 2,
+            "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+            "shots": 0,
+            "requiresOpposedStandardAttack": true,
+            "loseFlatFooted": false,
+            "loseBonusDisarm": false,
+            "loseFinalAttackStillPossible": false,
+            "notes": [
+              "Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +0 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356).",
+              "Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302).",
+              "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).",
+              "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+              "Weapon Size includes an unarmed attacker’s Size minus two categories.",
+              "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+            ]
+          },
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 3,
+        "cap": null,
+        "baseFlavor": "Attack: Butterfly sword<br><small>Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +0 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356). Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302). Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178). Disarm gear bonuses use the highest applicable bonus; they do not stack. Weapon Size includes an unarmed attacker’s Size minus two categories. The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 10,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "label": "Rapier targeted defense",
+      "message": "ChatMessage.uMsFCiGZzQGelz0t",
+      "flags": {
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 8,
+        "rolledTotal": 8,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 8,
+        "actorUuid": "Actor.B9cWfazQc5MlDoda",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 7
+        },
+        "weaponUuid": "Actor.B9cWfazQc5MlDoda.Item.OmjcW7HsroYhX6bU",
+        "weaponProficiency": "edged",
+        "weaponQualities": "FIN, KEN (+3)",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.B9cWfazQc5MlDoda.Item.OmjcW7HsroYhX6bU",
+        "gearAttempt": null,
+        "attackContext": {
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": true,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "FIN, KEN (+3)"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": {
+            "version": 1,
+            "active": true,
+            "role": "defender",
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "source": {
+              "id": "OmjcW7HsroYhX6bU",
+              "uuid": null,
+              "name": "Rapier",
+              "proficiency": "edged",
+              "sizeHands": "S/1h",
+              "qualities": "FIN, KEN (+3)",
+              "hands": 1,
+              "requiredHands": 1,
+              "quantity": 1
+            },
+            "held": [
+              {
+                "id": "OHk1Fmv8hSvmbBNc",
+                "hands": 1
+              },
+              {
+                "id": "OmjcW7HsroYhX6bU",
+                "hands": 1
+              }
+            ],
+            "trained": true,
+            "ranged": false,
+            "ownSize": 4,
+            "opponentSize": 3,
+            "opponentWeaponSize": "Tiny",
+            "opponentCharacterSize": null,
+            "opponentLabel": "Incoming attacker / dagger",
+            "incomingRanged": false,
+            "incomingProficient": true,
+            "confirmed": true,
+            "lineOfSightConfirmed": true,
+            "rangeConfirmed": true,
+            "sureGrip": false,
+            "sureGripBonus": 0,
+            "gearBonus": 2,
+            "fencingBasics": {
+              "feat": "Fencing Basics",
+              "family": "oneHandedSword",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "OmjcW7HsroYhX6bU",
+                  "uuid": null,
+                  "name": "Rapier",
+                  "proficiency": "edged",
+                  "hands": 1,
+                  "requiredHands": 1,
+                  "finesse": true
+                }
+              ],
+              "gearBonus": 2
+            },
+            "axeBasics": {
+              "version": 1,
+              "gearBonus": 0,
+              "source": null
+            },
+            "expert": false,
+            "expertBonus": 0,
+            "twoHandBonus": 0,
+            "sizeBonus": 4,
+            "attackBonus": 6,
+            "errorIncrease": 2,
+            "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+            "shots": 0,
+            "requiresOpposedStandardAttack": true,
+            "loseFlatFooted": false,
+            "loseBonusDisarm": false,
+            "loseFinalAttackStillPossible": false,
+            "notes": [
+              "Resist Disarm: targeted weapon Rapier; opposed Standard Attack, +0 two-hand grip, +4 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356).",
+              "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).",
+              "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+              "Weapon Size includes an unarmed attacker’s Size minus two categories.",
+              "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+            ]
+          },
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 3,
+        "cap": null,
+        "baseFlavor": "Attack: Rapier<br><small>Resist Disarm: targeted weapon Rapier; opposed Standard Attack, +0 two-hand grip, +4 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356). Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178). Disarm gear bonuses use the highest applicable bonus; they do not stack. Weapon Size includes an unarmed attacker’s Size minus two categories. The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 1,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "label": "Ranged untrained incoming attacker",
+      "message": "ChatMessage.Y6kiaq3rH1bu3smx",
+      "flags": {
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 20,
+        "rolledTotal": 20,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 20,
+        "actorUuid": "Actor.B9cWfazQc5MlDoda",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "weaponUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "weaponProficiency": "edged",
+        "weaponQualities": "GAR (+1), SUR",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "gearAttempt": null,
+        "attackContext": {
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "GAR (+1), SUR"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": {
+            "version": 1,
+            "active": true,
+            "role": "defender",
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "source": {
+              "id": "OHk1Fmv8hSvmbBNc",
+              "uuid": null,
+              "name": "Butterfly sword",
+              "proficiency": "edged",
+              "sizeHands": "T/1h",
+              "qualities": "GAR (+1), SUR",
+              "hands": 1,
+              "requiredHands": 1,
+              "quantity": 1
+            },
+            "held": [
+              {
+                "id": "OHk1Fmv8hSvmbBNc",
+                "hands": 1
+              },
+              {
+                "id": "OmjcW7HsroYhX6bU",
+                "hands": 1
+              }
+            ],
+            "trained": true,
+            "ranged": false,
+            "ownSize": 3,
+            "opponentSize": 0,
+            "opponentWeaponSize": "Nuisance",
+            "opponentCharacterSize": null,
+            "opponentLabel": "Incoming attacker / dagger",
+            "incomingRanged": true,
+            "incomingProficient": false,
+            "confirmed": true,
+            "lineOfSightConfirmed": true,
+            "rangeConfirmed": true,
+            "sureGrip": true,
+            "sureGripBonus": 3,
+            "gearBonus": 3,
+            "fencingBasics": {
+              "feat": "Fencing Basics",
+              "family": "oneHandedSword",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "OmjcW7HsroYhX6bU",
+                  "uuid": null,
+                  "name": "Rapier",
+                  "proficiency": "edged",
+                  "hands": 1,
+                  "requiredHands": 1,
+                  "finesse": true
+                }
+              ],
+              "gearBonus": 2
+            },
+            "axeBasics": {
+              "version": 1,
+              "gearBonus": 0,
+              "source": null
+            },
+            "expert": false,
+            "expertBonus": 0,
+            "twoHandBonus": 0,
+            "sizeBonus": 0,
+            "attackBonus": 3,
+            "errorIncrease": 4,
+            "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+            "shots": 0,
+            "requiresOpposedStandardAttack": true,
+            "loseFlatFooted": false,
+            "loseBonusDisarm": false,
+            "loseFinalAttackStillPossible": false,
+            "notes": [
+              "Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +0 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +4 (pp.352,356).",
+              "Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302).",
+              "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).",
+              "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+              "Incoming ranged Disarm: neither participant receives a weapon-Size bonus.",
+              "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+            ]
+          },
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 5,
+        "cap": null,
+        "baseFlavor": "Attack: Butterfly sword<br><small>Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +0 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +4 (pp.352,356). Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302). Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178). Disarm gear bonuses use the highest applicable bonus; they do not stack. Incoming ranged Disarm: neither participant receives a weapon-Size bonus. The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 16,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "label": "Two-hand target against unarmed Medium attacker",
+      "message": "ChatMessage.sBfShginCvb7YVdq",
+      "flags": {
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 27,
+        "rolledTotal": 27,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 27,
+        "actorUuid": "Actor.B9cWfazQc5MlDoda",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 8
+        },
+        "weaponUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "weaponProficiency": "edged",
+        "weaponQualities": "GAR (+1), SUR",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "gearAttempt": null,
+        "attackContext": {
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "GAR (+1), SUR"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": {
+            "version": 1,
+            "active": true,
+            "role": "defender",
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "source": {
+              "id": "OHk1Fmv8hSvmbBNc",
+              "uuid": null,
+              "name": "Butterfly sword",
+              "proficiency": "edged",
+              "sizeHands": "T/1h",
+              "qualities": "GAR (+1), SUR",
+              "hands": 2,
+              "requiredHands": 1,
+              "quantity": 1
+            },
+            "held": [
+              {
+                "id": "OHk1Fmv8hSvmbBNc",
+                "hands": 2
+              }
+            ],
+            "trained": true,
+            "ranged": false,
+            "ownSize": 3,
+            "opponentSize": 3,
+            "opponentWeaponSize": "Unarmed",
+            "opponentCharacterSize": "Medium",
+            "opponentLabel": "Incoming attacker / dagger",
+            "incomingRanged": false,
+            "incomingProficient": true,
+            "confirmed": true,
+            "lineOfSightConfirmed": true,
+            "rangeConfirmed": true,
+            "sureGrip": true,
+            "sureGripBonus": 3,
+            "gearBonus": 3,
+            "fencingBasics": null,
+            "axeBasics": {
+              "version": 1,
+              "gearBonus": 0,
+              "source": null
+            },
+            "expert": false,
+            "expertBonus": 0,
+            "twoHandBonus": 4,
+            "sizeBonus": 0,
+            "attackBonus": 7,
+            "errorIncrease": 2,
+            "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+            "shots": 0,
+            "requiresOpposedStandardAttack": true,
+            "loseFlatFooted": false,
+            "loseBonusDisarm": false,
+            "loseFinalAttackStillPossible": false,
+            "notes": [
+              "Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +4 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356).",
+              "Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302).",
+              "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+              "Weapon Size includes an unarmed attacker’s Size minus two categories.",
+              "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+            ]
+          },
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 2,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 3,
+        "cap": null,
+        "baseFlavor": "Attack: Butterfly sword<br><small>Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +4 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356). Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302). Disarm gear bonuses use the highest applicable bonus; they do not stack. Weapon Size includes an unarmed attacker’s Size minus two categories. The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition. Initiative Count –2 per attack; apply in combat.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 19,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "label": "Fencing initiating melee Disarm",
+      "message": "ChatMessage.9pxfld20N8JGYMEE",
+      "flags": {
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 19,
+        "rolledTotal": 19,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 19,
+        "actorUuid": "Actor.B9cWfazQc5MlDoda",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 3
+        },
+        "weaponUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "weaponProficiency": "edged",
+        "weaponQualities": "GAR (+1), SUR",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "gearAttempt": null,
+        "attackContext": {
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "GAR (+1), SUR"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": {
+            "active": true,
+            "fencingBasics": {
+              "feat": "Fencing Basics",
+              "family": "oneHandedSword",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "OmjcW7HsroYhX6bU",
+                  "uuid": null,
+                  "name": "Rapier",
+                  "proficiency": "edged",
+                  "hands": 1,
+                  "requiredHands": 1,
+                  "finesse": true
+                }
+              ],
+              "gearBonus": 2
+            },
+            "axeBasics": {
+              "version": 1,
+              "gearBonus": 0,
+              "source": null
+            },
+            "expert": false,
+            "expertBonus": 0,
+            "twoHandBonus": 0,
+            "sizeBonus": 0,
+            "ownSize": 3,
+            "opponentWeaponSize": "Tiny",
+            "opponentLabel": "Opposing dagger",
+            "attackBonus": 2,
+            "errorIncrease": 2,
+            "actionCost": "1 half action",
+            "shots": 1,
+            "requiresOpposedStandardAttack": true,
+            "loseFlatFooted": true,
+            "loseBonusDisarm": true,
+            "loseFinalAttackStillPossible": true,
+            "notes": [
+              "Fencing Basics: +2 gear with this melee Disarm attack while holding a readied one-handed FIN sword; competes with other gear bonuses (p.178).",
+              "Disarm: opposed Standard Attack; +0 two-hand grip, +0 melee weapon Size, +0 Expert Disarm; error range +2.",
+              "Disarm costs 1 half action and 1 shot for ammunition weapons.",
+              "GC resolves the opposed check, landing/deviation, critical effects, weapon transfer and any final attack at the table."
+            ]
+          },
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 3,
+        "cap": null,
+        "baseFlavor": "Attack: Butterfly sword<br><small>Fencing Basics: +2 gear with this melee Disarm attack while holding a readied one-handed FIN sword; competes with other gear bonuses (p.178). Disarm: opposed Standard Attack; +0 two-hand grip, +0 melee weapon Size, +0 Expert Disarm; error range +2. Disarm costs 1 half action and 1 shot for ammunition weapons. GC resolves the opposed check, landing/deviation, critical effects, weapon transfer and any final attack at the table.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 16,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "label": "Actual targeted Gear UI sur",
+      "message": "ChatMessage.EGijA3z8RENRrDSf",
+      "flags": {
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 24,
+        "rolledTotal": 24,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 24,
+        "actorUuid": "Actor.B9cWfazQc5MlDoda",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "weaponUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "weaponProficiency": "edged",
+        "weaponQualities": "GAR (+1), SUR",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.B9cWfazQc5MlDoda.Item.OHk1Fmv8hSvmbBNc",
+        "gearAttempt": null,
+        "attackContext": {
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": false,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "GAR (+1), SUR"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": {
+            "version": 1,
+            "active": true,
+            "role": "defender",
+            "weaponId": "OHk1Fmv8hSvmbBNc",
+            "source": {
+              "id": "OHk1Fmv8hSvmbBNc",
+              "uuid": null,
+              "name": "Butterfly sword",
+              "proficiency": "edged",
+              "sizeHands": "T/1h",
+              "qualities": "GAR (+1), SUR",
+              "hands": 1,
+              "requiredHands": 1,
+              "quantity": 1
+            },
+            "held": [
+              {
+                "id": "OHk1Fmv8hSvmbBNc",
+                "hands": 1
+              },
+              {
+                "id": "OmjcW7HsroYhX6bU",
+                "hands": 1
+              }
+            ],
+            "trained": true,
+            "ranged": false,
+            "ownSize": 3,
+            "opponentSize": 3,
+            "opponentWeaponSize": "Tiny",
+            "opponentCharacterSize": null,
+            "opponentLabel": "Native adjacent attacker / dagger",
+            "incomingRanged": false,
+            "incomingProficient": true,
+            "confirmed": true,
+            "lineOfSightConfirmed": true,
+            "rangeConfirmed": true,
+            "sureGrip": true,
+            "sureGripBonus": 3,
+            "gearBonus": 3,
+            "fencingBasics": {
+              "feat": "Fencing Basics",
+              "family": "oneHandedSword",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "OmjcW7HsroYhX6bU",
+                  "uuid": null,
+                  "name": "Rapier",
+                  "proficiency": "edged",
+                  "hands": 1,
+                  "requiredHands": 1,
+                  "finesse": true
+                }
+              ],
+              "gearBonus": 2
+            },
+            "axeBasics": {
+              "version": 1,
+              "gearBonus": 0,
+              "source": null
+            },
+            "expert": false,
+            "expertBonus": 0,
+            "twoHandBonus": 0,
+            "sizeBonus": 0,
+            "attackBonus": 3,
+            "errorIncrease": 2,
+            "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+            "shots": 0,
+            "requiresOpposedStandardAttack": true,
+            "loseFlatFooted": false,
+            "loseBonusDisarm": false,
+            "loseFinalAttackStillPossible": false,
+            "notes": [
+              "Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +0 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356).",
+              "Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302).",
+              "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).",
+              "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+              "Weapon Size includes an unarmed attacker’s Size minus two categories.",
+              "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+            ]
+          },
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 3,
+        "cap": null,
+        "baseFlavor": "Attack: Butterfly sword<br><small>Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +0 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356). Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302). Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178). Disarm gear bonuses use the highest applicable bonus; they do not stack. Weapon Size includes an unarmed attacker’s Size minus two categories. The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 20,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    },
+    {
+      "label": "Actual targeted Gear UI fin",
+      "message": "ChatMessage.kbFPMFJaXfmWIWSB",
+      "flags": {
+        "attributeDamage": null,
+        "meleeSkillFeats": null,
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": null,
+        "skillCheckAdjustment": null,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": null,
+        "preRollFunding": null,
+        "hailMary": null,
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": null,
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": null,
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": null,
+        "skillTags": null,
+        "skillGear": null,
+        "fogSmoke": null,
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": null,
+        "senses": null,
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": null,
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 20,
+        "rolledTotal": 20,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 20,
+        "actorUuid": "Actor.B9cWfazQc5MlDoda",
+        "checkKind": "attack",
+        "ability": "str",
+        "skillKey": "",
+        "checkId": "",
+        "focus": "",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 7
+        },
+        "weaponUuid": "Actor.B9cWfazQc5MlDoda.Item.OmjcW7HsroYhX6bU",
+        "weaponProficiency": "edged",
+        "weaponQualities": "FIN, KEN (+3)",
+        "cleanAndPolished": false,
+        "gearUuid": "Actor.B9cWfazQc5MlDoda.Item.OmjcW7HsroYhX6bU",
+        "gearAttempt": null,
+        "attackContext": {
+          "quirky": {
+            "version": 1,
+            "quirky": false,
+            "trained": true,
+            "baseUntrainedPenalty": -4,
+            "adjustment": 0,
+            "attackPenalty": 0,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "superiorAccuracy": {
+            "version": 1,
+            "superiorAccuracy": false,
+            "trained": true,
+            "aimed": false,
+            "braced": false,
+            "threatIncrease": 0,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "trainedOnly": {
+            "version": 1,
+            "trainedOnly": false,
+            "trained": true,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "accurized": {
+            "version": 1,
+            "accurized": false,
+            "trained": true,
+            "aimed": false,
+            "threatIncrease": 0,
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "sourceProficiency": "edged",
+            "sourceCategory": "other",
+            "operatingProficiency": "edged"
+          },
+          "characterTarget": null,
+          "cleaveThreatIncrease": 0,
+          "finesseBasic": {
+            "eligible": true,
+            "intrinsic": true,
+            "requested": false,
+            "granted": false,
+            "effectiveQualities": "FIN, KEN (+3)"
+          },
+          "massive": {
+            "active": false,
+            "attackPenalty": 0,
+            "listedInitiativeLoss": 0,
+            "initiativeLoss": 0,
+            "waived": false,
+            "notes": []
+          },
+          "finesseThreatIncrease": 0,
+          "meleeFire": null,
+          "cqbRange": null,
+          "disarm": {
+            "version": 1,
+            "active": true,
+            "role": "defender",
+            "weaponId": "OmjcW7HsroYhX6bU",
+            "source": {
+              "id": "OmjcW7HsroYhX6bU",
+              "uuid": null,
+              "name": "Rapier",
+              "proficiency": "edged",
+              "sizeHands": "S/1h",
+              "qualities": "FIN, KEN (+3)",
+              "hands": 1,
+              "requiredHands": 1,
+              "quantity": 1
+            },
+            "held": [
+              {
+                "id": "OHk1Fmv8hSvmbBNc",
+                "hands": 1
+              },
+              {
+                "id": "OmjcW7HsroYhX6bU",
+                "hands": 1
+              }
+            ],
+            "trained": true,
+            "ranged": false,
+            "ownSize": 4,
+            "opponentSize": 3,
+            "opponentWeaponSize": "Tiny",
+            "opponentCharacterSize": null,
+            "opponentLabel": "Native adjacent attacker / dagger",
+            "incomingRanged": false,
+            "incomingProficient": true,
+            "confirmed": true,
+            "lineOfSightConfirmed": true,
+            "rangeConfirmed": true,
+            "sureGrip": false,
+            "sureGripBonus": 0,
+            "gearBonus": 2,
+            "fencingBasics": {
+              "feat": "Fencing Basics",
+              "family": "oneHandedSword",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "OmjcW7HsroYhX6bU",
+                  "uuid": null,
+                  "name": "Rapier",
+                  "proficiency": "edged",
+                  "hands": 1,
+                  "requiredHands": 1,
+                  "finesse": true
+                }
+              ],
+              "gearBonus": 2
+            },
+            "axeBasics": {
+              "version": 1,
+              "gearBonus": 0,
+              "source": null
+            },
+            "expert": false,
+            "expertBonus": 0,
+            "twoHandBonus": 0,
+            "sizeBonus": 4,
+            "attackBonus": 6,
+            "errorIncrease": 2,
+            "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+            "shots": 0,
+            "requiresOpposedStandardAttack": true,
+            "loseFlatFooted": false,
+            "loseBonusDisarm": false,
+            "loseFinalAttackStillPossible": false,
+            "notes": [
+              "Resist Disarm: targeted weapon Rapier; opposed Standard Attack, +0 two-hand grip, +4 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356).",
+              "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).",
+              "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+              "Weapon Size includes an unarmed attacker’s Size minus two categories.",
+              "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+            ]
+          },
+          "targetPinnedAdjacent": false,
+          "pinnedTargetBonus": 0,
+          "targetProneNonAdjacent": false,
+          "targetCrouchedNonAdjacent": false,
+          "targetPosturePenalty": 0,
+          "sensoryConditions": {
+            "originallyBlinded": false,
+            "deafened": false,
+            "nightTrainingException": false,
+            "blinded": false,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "mortarOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "launcherOperation": {
+            "applicable": false,
+            "blocked": false,
+            "notes": []
+          },
+          "conditionAttackPenalty": 0,
+          "twoWeaponWaiver": 0,
+          "targetFlanked": false,
+          "flanking": {
+            "declared": false,
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "blocked": false,
+            "notes": []
+          },
+          "targetAnimal": false,
+          "gameHunter": {
+            "earned": false,
+            "targetAnimal": false,
+            "threatIncrease": 0
+          },
+          "fogSmoke": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "visualDelta": 0,
+            "notes": []
+          },
+          "ambientLight": {
+            "specified": false,
+            "skillModifier": 0,
+            "targetDefenseBonus": 0,
+            "notes": []
+          },
+          "targetVulnerable": false,
+          "millionDollarSkillDeclared": false,
+          "targetFlatFooted": false,
+          "sniper": {
+            "attackBonus": 0,
+            "threatIncrease": 0,
+            "errorReduction": 0,
+            "notes": []
+          },
+          "fireMode": null,
+          "recoil": 0,
+          "recoilStrength": null,
+          "recoilPenalty": 0,
+          "rangeKnown": false,
+          "distanceFeet": null,
+          "rangeIncrement": 0,
+          "rangePenalty": 0,
+          "rangePenaltyPerIncrement": 2,
+          "rangePenaltyBase": 0,
+          "improvedVisionReduction": 0,
+          "sensoryTarget": null,
+          "maximumRange": null,
+          "hands": 1,
+          "trained": true,
+          "ranged": false,
+          "weaponOperation": {
+            "blocked": false,
+            "baseTime": null,
+            "requiredTime": null,
+            "gunnery": false,
+            "notes": []
+          },
+          "aimed": false,
+          "braced": false,
+          "attackAction": "standard",
+          "aimBonus": 0,
+          "braceBonus": 0,
+          "braceAction": null,
+          "ammunitionId": null
+        },
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 3,
+        "cap": null,
+        "baseFlavor": "Attack: Rapier<br><small>Resist Disarm: targeted weapon Rapier; opposed Standard Attack, +0 two-hand grip, +4 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356). Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178). Disarm gear bonuses use the highest applicable bonus; they do not stack. Weapon Size includes an unarmed attacker’s Size minus two categories. The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 13,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": null,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false
+      }
+    }
+  ],
+  "guards": [
+    {
+      "kind": "sureGripLoss",
+      "error": "The targeted weapon, incoming Disarm circumstances or Initiative Count changed. Review the response again.",
+      "noPost": true
+    },
+    {
+      "kind": "unready",
+      "error": "The targeted weapon, incoming Disarm circumstances or Initiative Count changed. Review the response again.",
+      "noPost": true
+    },
+    {
+      "kind": "fencingFamilyLoss",
+      "error": "The targeted weapon, incoming Disarm circumstances or Initiative Count changed. Review the response again.",
+      "noPost": true
+    },
+    {
+      "kind": "fencingFinLoss",
+      "error": "The targeted weapon, incoming Disarm circumstances or Initiative Count changed. Review the response again.",
+      "noPost": true
+    },
+    {
+      "kind": "capacity",
+      "error": "The targeted weapon, incoming Disarm circumstances or Initiative Count changed. Review the response again.",
+      "noPost": true
+    },
+    {
+      "kind": "Direct replacement unready",
+      "error": "The targeted readied weapon, Sure Grip, Disarm response or current attack sources changed before posting.",
+      "noPost": true
+    },
+    {
+      "kind": "Actual response close",
+      "noPost": true
+    }
+  ],
+  "ui": [
+    {
+      "kind": "Actual targeted Gear response",
+      "key": "sur",
+      "bonus": 3,
+      "footerY": 582
+    },
+    {
+      "kind": "Actual targeted Gear response",
+      "key": "fin",
+      "bonus": 2,
+      "footerY": 582
+    },
+    {
+      "kind": "Close response",
+      "noPost": true
+    },
+    {
+      "kind": "Actual Item editor reviewed one-handed sword family",
+      "persisted": true
+    }
+  ],
+  "periods": {
+    "mission": "qa-xp-cancel",
+    "session": "MeCkrj45ff0VaUEr",
+    "scene": "M8ZajdPdnHP2gCsS",
+    "sceneSequence": 2
+  },
+  "gc": {
+    "value": 1,
+    "session": "MeCkrj45ff0VaUEr",
+    "playersPresent": 1,
+    "caliber": 1,
+    "lastReason": "Critical activation",
+    "controllerId": "ZTSRy74hgofWcbms",
+    "settlementReview": {
+      "id": "MfK3PHV2iV2wvias",
+      "needsReview": false,
+      "session": "MeCkrj45ff0VaUEr",
+      "before": 2,
+      "count": 1,
+      "purpose": "Critical activation",
+      "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+      "at": 1794752784259,
+      "outcome": "spent"
+    }
+  },
+  "worldTime": 126,
+  "actor": "B9cWfazQc5MlDoda",
+  "actors": [
+    "B9cWfazQc5MlDoda"
+  ],
+  "feat": "1W79cUPHciQg9LSP",
+  "sur": "OHk1Fmv8hSvmbBNc",
+  "fin": "OmjcW7HsroYhX6bU",
+  "health": {
+    "vitality": {
+      "value": 4
+    },
+    "wounds": {
+      "value": 4
+    }
+  },
+  "dice": 0,
+  "reloadVerified": true,
+  "persisted": {
+    "actor": {
+      "name": "RAW QA Sure Grip and Fencing332–333",
+      "type": "agent",
+      "flags": {
+        "spycraft2": {
+          "startingDiceCreation": {
+            "id": "4OKZZR69uEeAKMJS",
+            "session": "MeCkrj45ff0VaUEr",
+            "at": 126,
+            "claimed": false
+          }
+        }
+      },
+      "system": {
+        "abilities": {
+          "str": {
+            "base": 12,
+            "misc": 0
+          },
+          "dex": {
+            "base": 13,
+            "misc": 0
+          },
+          "con": {
+            "base": 14,
+            "misc": 0
+          },
+          "int": {
+            "base": 15,
+            "misc": 0
+          },
+          "wis": {
+            "base": 12,
+            "misc": 0
+          },
+          "cha": {
+            "base": 11,
+            "misc": 0
+          }
+        },
+        "progression": [
+          {
+            "classId": "soldier",
+            "vitality": 6,
+            "skills": {
+              "athletics": 4,
+              "drive": 4,
+              "intimidate": 4,
+              "notice": 4,
+              "profession": 4,
+              "resolve": 4
+            },
+            "intelligenceModifier": null,
+            "expertEntry": null,
+            "careerEntryId": "",
+            "vitalityRollId": "",
+            "vitalityReviewId": ""
+          }
+        ],
+        "actionDice": {
+          "value": 0
+        },
+        "vitality": {
+          "value": 4
+        },
+        "wounds": {
+          "value": 4
+        },
+        "pointBuyBudget": 36,
+        "abilityIncreases": {
+          "l4": "",
+          "l8": "",
+          "l12": "",
+          "l16": "",
+          "l20": ""
+        },
+        "xp": 0,
+        "codename": "",
+        "details": {
+          "faction": "",
+          "gender": "",
+          "age": "",
+          "height": "",
+          "weight": "",
+          "eyes": "",
+          "hair": ""
+        },
+        "fortuneTeammateIds": [],
+        "actionDieAwards": {},
+        "missionXPRewards": {},
+        "eagleEyeBoost": null,
+        "defenseBoost": null,
+        "noFearBoost": null,
+        "mentalLeaps": [],
+        "fatigueRest": null,
+        "drunkSleep": null,
+        "drunkRepositions": [],
+        "fatigueApplications": [],
+        "mentalLeapFatigueEvents": [],
+        "mentalLeapRecovery": null,
+        "mentalLeapSleep": null,
+        "fortunesOfWarBoost": null,
+        "refreshAction": null,
+        "temporaryShares": {},
+        "assistantGroups": [],
+        "resourceUses": {},
+        "resourcesInitialized": false,
+        "affiliationType": "faction",
+        "reputation": 2,
+        "netWorth": 0,
+        "skills": {
+          "acrobatics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "analysis": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "athletics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "blend": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bluff": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "bureaucracy": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "computers": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "cultures": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "drive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "electronics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "falsify": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "impress": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "intimidate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "investigation": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "manipulate": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "mechanics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "medicine": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "networking": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "notice": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "profession": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "resolve": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "science": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "search": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "security": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "senseMotive": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sleightOfHand": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "sneak": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "streetwise": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "survival": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          },
+          "tactics": {
+            "ability": "",
+            "misc": 0,
+            "classSkill": false,
+            "classSkillAt": 1
+          }
+        },
+        "proficiencies": {
+          "unarmed": {
+            "proficient": true,
+            "forte": false
+          },
+          "blunt": {
+            "proficient": true,
+            "forte": false
+          },
+          "exoticBlunt": {
+            "proficient": false,
+            "forte": false
+          },
+          "edged": {
+            "proficient": true,
+            "forte": false
+          },
+          "exoticEdged": {
+            "proficient": false,
+            "forte": false
+          },
+          "explosives": {
+            "proficient": false,
+            "forte": false
+          },
+          "guided": {
+            "proficient": false,
+            "forte": false
+          },
+          "handgun": {
+            "proficient": false,
+            "forte": false
+          },
+          "hurled": {
+            "proficient": true,
+            "forte": false
+          },
+          "exoticHurled": {
+            "proficient": false,
+            "forte": false
+          },
+          "indirectFire": {
+            "proficient": false,
+            "forte": false
+          },
+          "rifle": {
+            "proficient": true,
+            "forte": false
+          },
+          "shotgun": {
+            "proficient": true,
+            "forte": false
+          },
+          "submachineGun": {
+            "proficient": true,
+            "forte": false
+          },
+          "tactical": {
+            "proficient": true,
+            "forte": false
+          },
+          "vehicleWeapon": {
+            "proficient": false,
+            "forte": false
+          }
+        },
+        "focuses": {
+          "cultures": [
+            "Western Europe",
+            "Northern America (including Greenland)",
+            "Eastern Asia (including China)"
+          ],
+          "drive": [
+            "Personal Ground Vehicles",
+            "Standard Ground Vehicles"
+          ],
+          "profession": [
+            "Soldier",
+            "Security"
+          ],
+          "science": [
+            "Engineering"
+          ],
+          "fortes": []
+        },
+        "startingIntelligenceModifier": null,
+        "skillFortes": [],
+        "crossroadsTitle": "",
+        "relinquishedInterests": 0,
+        "interests": "Architecture, Chess",
+        "contacts": [
+          {
+            "name": "Synthetic QA contact",
+            "rank": 1,
+            "notes": "Separate QA world only",
+            "networkingMilestone": 0,
+            "networkingFeat": "",
+            "networkingTheme": "",
+            "networkingFeatConfirmed": false
+          }
+        ],
+        "subplots": [],
+        "gearPickLosses": {},
+        "missionReserves": null,
+        "armorMissionGrant": null,
+        "bigStickMissionPick": null,
+        "missionCaliberPicks": {},
+        "classGearGrants": {},
+        "bonusActionDice": {},
+        "missionReserveHistory": [],
+        "wealthAllocation": {
+          "lifestyle": 0,
+          "possessions": 0,
+          "spendingCash": 0,
+          "dressedForLifestyle": false
+        },
+        "misc": {
+          "bab": 0,
+          "fort": 0,
+          "ref": 0,
+          "will": 0,
+          "defense": 0,
+          "initiative": 0,
+          "wealth": 0,
+          "vitality": 0,
+          "wounds": 0,
+          "speed": 0,
+          "actionDice": 0,
+          "knowledge": 0,
+          "request": 0,
+          "gearCheck": 0,
+          "gearR": 0,
+          "gearT": 0,
+          "gearV": 0,
+          "gearS": 0,
+          "gearG": 0,
+          "gearW": 0,
+          "gearE": 0
+        },
+        "biography": "",
+        "twoWeaponStyle": null,
+        "dartingStyle": null,
+        "totalDefense": null,
+        "combatExpertise": null,
+        "superiorCover": null,
+        "attributeDamage": null,
+        "accumulatedDamage": null,
+        "analysisTasks": {},
+        "safeHouses": {},
+        "careerAgentRewards": {},
+        "wellFundedGrants": {}
+      },
+      "items": [
+        {
+          "name": "Soldier",
+          "type": "class",
+          "system": {
+            "expert": false,
+            "skillPoints": 4,
+            "proficiencies": 6,
+            "coreAbility": {
+              "name": "Accurate",
+              "description": ""
+            },
+            "classSkills": [
+              "athletics",
+              "drive",
+              "intimidate",
+              "notice",
+              "profession",
+              "resolve",
+              "search",
+              "survival",
+              "tactics"
+            ],
+            "table": [
+              {
+                "level": 1,
+                "bab": 1,
+                "fort": 1,
+                "ref": 0,
+                "will": 2,
+                "defense": 0,
+                "initiative": 2,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 2,
+                "bab": 2,
+                "fort": 2,
+                "ref": 0,
+                "will": 3,
+                "defense": 1,
+                "initiative": 3,
+                "wealth": 0,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 0,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 3,
+                "bab": 3,
+                "fort": 2,
+                "ref": 1,
+                "will": 3,
+                "defense": 1,
+                "initiative": 4,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 4,
+                "bab": 4,
+                "fort": 2,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 1,
+                "gearE": 0
+              },
+              {
+                "level": 5,
+                "bab": 5,
+                "fort": 3,
+                "ref": 1,
+                "will": 4,
+                "defense": 2,
+                "initiative": 5,
+                "wealth": 1,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 0,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 6,
+                "bab": 6,
+                "fort": 3,
+                "ref": 2,
+                "will": 5,
+                "defense": 2,
+                "initiative": 6,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 7,
+                "bab": 7,
+                "fort": 4,
+                "ref": 2,
+                "will": 5,
+                "defense": 3,
+                "initiative": 7,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 1,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 8,
+                "bab": 8,
+                "fort": 4,
+                "ref": 2,
+                "will": 6,
+                "defense": 3,
+                "initiative": 8,
+                "wealth": 2,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 9,
+                "bab": 9,
+                "fort": 4,
+                "ref": 3,
+                "will": 6,
+                "defense": 4,
+                "initiative": 9,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 2,
+                "gearE": 0
+              },
+              {
+                "level": 10,
+                "bab": 10,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 0,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 11,
+                "bab": 11,
+                "fort": 5,
+                "ref": 3,
+                "will": 7,
+                "defense": 4,
+                "initiative": 10,
+                "wealth": 3,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 12,
+                "bab": 12,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 11,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 1,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 13,
+                "bab": 13,
+                "fort": 6,
+                "ref": 4,
+                "will": 8,
+                "defense": 5,
+                "initiative": 12,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 14,
+                "bab": 14,
+                "fort": 6,
+                "ref": 4,
+                "will": 9,
+                "defense": 6,
+                "initiative": 13,
+                "wealth": 4,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 2,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 15,
+                "bab": 15,
+                "fort": 7,
+                "ref": 5,
+                "will": 9,
+                "defense": 6,
+                "initiative": 14,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 3,
+                "gearE": 0
+              },
+              {
+                "level": 16,
+                "bab": 16,
+                "fort": 7,
+                "ref": 5,
+                "will": 10,
+                "defense": 6,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 17,
+                "bab": 17,
+                "fort": 8,
+                "ref": 5,
+                "will": 10,
+                "defense": 7,
+                "initiative": 15,
+                "wealth": 5,
+                "gearR": 1,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 18,
+                "bab": 18,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 7,
+                "initiative": 16,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 19,
+                "bab": 19,
+                "fort": 8,
+                "ref": 6,
+                "will": 11,
+                "defense": 8,
+                "initiative": 17,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 2,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              },
+              {
+                "level": 20,
+                "bab": 20,
+                "fort": 9,
+                "ref": 6,
+                "will": 12,
+                "defense": 8,
+                "initiative": 18,
+                "wealth": 6,
+                "gearR": 2,
+                "gearT": 0,
+                "gearV": 3,
+                "gearS": 3,
+                "gearG": 0,
+                "gearW": 4,
+                "gearE": 0
+              }
+            ],
+            "abilities": [
+              {
+                "level": 1,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 2,
+                "name": "Fortunes of war I",
+                "description": ""
+              },
+              {
+                "level": 3,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 4,
+                "name": "Armor use I",
+                "description": ""
+              },
+              {
+                "level": 5,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 6,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 7,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 8,
+                "name": "Armor use II",
+                "description": ""
+              },
+              {
+                "level": 9,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 10,
+                "name": "Portable cover (1/4)",
+                "description": ""
+              },
+              {
+                "level": 11,
+                "name": "Fight on, fortunes of war II",
+                "description": ""
+              },
+              {
+                "level": 12,
+                "name": "Armor use III, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 13,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 14,
+                "name": "One in a million 1/ session",
+                "description": ""
+              },
+              {
+                "level": 15,
+                "name": "Fight on, weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 16,
+                "name": "Armor use IV",
+                "description": ""
+              },
+              {
+                "level": 17,
+                "name": "Fight on",
+                "description": ""
+              },
+              {
+                "level": 18,
+                "name": "Weapon specialist",
+                "description": ""
+              },
+              {
+                "level": 19,
+                "name": "Fight on, fortunes of war III",
+                "description": ""
+              },
+              {
+                "level": 20,
+                "name": "Armor use V, portable cover (1/2)",
+                "description": ""
+              }
+            ],
+            "choiceLists": [
+              {
+                "name": "Fight On",
+                "key": "fightOn",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "2 Weapon Prof",
+                    "bonuses": [
+                      {
+                        "target": "prof.generic",
+                        "value": "2"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 3,
+                    "name": "Basic Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.basicCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 4,
+                    "name": "Melee Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.meleeCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 5,
+                    "name": "Ranged Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.rangedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "index": 6,
+                    "name": "Unarmed Combat",
+                    "bonuses": [
+                      {
+                        "target": "featSlots.unarmedCombat",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "featSlot"
+              },
+              {
+                "name": "Weapon Specialist",
+                "key": "weaponSpecialist",
+                "options": [
+                  {
+                    "index": 2,
+                    "name": "Big Stick",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 3,
+                    "name": "Foibles",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 4,
+                    "name": "Killer Instinct",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 5,
+                    "name": "Most Deadly",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 6,
+                    "name": "Mow Down",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 7,
+                    "name": "No Worries",
+                    "bonuses": []
+                  },
+                  {
+                    "index": 8,
+                    "name": "Showdown",
+                    "bonuses": []
+                  }
+                ],
+                "kind": "option"
+              }
+            ],
+            "choiceSchedule": [
+              {
+                "level": 1,
+                "list": "fightOn"
+              },
+              {
+                "level": 3,
+                "list": "fightOn"
+              },
+              {
+                "level": 5,
+                "list": "fightOn"
+              },
+              {
+                "level": 6,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 7,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "fightOn"
+              },
+              {
+                "level": 9,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 11,
+                "list": "fightOn"
+              },
+              {
+                "level": 12,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 13,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "fightOn"
+              },
+              {
+                "level": 15,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 17,
+                "list": "fightOn"
+              },
+              {
+                "level": 18,
+                "list": "weaponSpecialist"
+              },
+              {
+                "level": 19,
+                "list": "fightOn"
+              }
+            ],
+            "bonuses": [
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 8,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 12,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 16,
+                "bonusType": ""
+              },
+              {
+                "target": "defenseArmor",
+                "value": "1",
+                "level": 20,
+                "bonusType": ""
+              },
+              {
+                "target": "armorCheck",
+                "value": "1",
+                "level": 4,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 2,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 11,
+                "bonusType": ""
+              },
+              {
+                "target": "naturalDR",
+                "value": "1",
+                "level": 19,
+                "bonusType": ""
+              }
+            ],
+            "identifier": "soldier",
+            "vitalityDie": 12,
+            "description": "",
+            "source": "",
+            "choices": {
+              "0": 2
+            },
+            "inheritedChoices": {},
+            "skillChoices": {},
+            "weaponSpecialist": {},
+            "keySkill": "",
+            "keyFocus": "",
+            "professionFocus": "",
+            "phdSkill": "",
+            "phdSkill1": "",
+            "phdSkill2": "",
+            "featGrants": [],
+            "requirements": null
+          },
+          "_id": "XouiN2U98v2BkxQ3",
+          "img": "icons/svg/item-bag.svg",
+          "effects": [],
+          "folder": null,
+          "sort": 0,
+          "ownership": {
+            "default": 0
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794868422519,
+            "modifiedTime": 1794868422747,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          }
+        },
+        {
+          "name": "Agile",
+          "type": "origin",
+          "img": "icons/svg/aura.svg",
+          "system": {
+            "description": "<p>+2 Dex, –2 Str. +5 ft. Speed, Acrobatics is a class skill with a higher result cap, and a growing Reflex save bonus.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "originType": "talent",
+            "bonuses": [
+              {
+                "level": 0,
+                "target": "abilities.str",
+                "value": "-(2)",
+                "bonusType": ""
+              },
+              {
+                "level": 0,
+                "target": "abilities.dex",
+                "value": "2",
+                "bonusType": ""
+              },
+              {
+                "level": 0,
+                "target": "speed",
+                "value": "5",
+                "bonusType": ""
+              },
+              {
+                "level": 0,
+                "target": "saves.ref",
+                "value": "@tb.t1",
+                "bonusType": "insight"
+              },
+              {
+                "level": 0,
+                "target": "skills.acrobatics.cap",
+                "value": "5",
+                "bonusType": ""
+              },
+              {
+                "level": 0,
+                "target": "skills.acrobatics.classSkill",
+                "value": "1",
+                "bonusType": ""
+              }
+            ],
+            "grants": [],
+            "originChoices": {}
+          },
+          "effects": [],
+          "folder": "DXDFgO8yy2ZhGVtR",
+          "sort": 3,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794868422658,
+            "modifiedTime": 1794868422660,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "HZkNOwOaNoLY0Cow"
+        },
+        {
+          "name": "Spiritualist",
+          "type": "origin",
+          "img": "icons/svg/mystery-man.svg",
+          "system": {
+            "description": "<p>Bonus feat All or Nothing. A free GC hint, +1 base Defense, and higher stress thresholds.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "originType": "specialty",
+            "bonuses": [
+              {
+                "level": 0,
+                "target": "baseDefense",
+                "value": "1",
+                "bonusType": ""
+              },
+              {
+                "level": 0,
+                "target": "stressThreshold",
+                "value": "@tb.t3",
+                "bonusType": ""
+              }
+            ],
+            "grants": [
+              "All or Nothing"
+            ],
+            "originChoices": {}
+          },
+          "effects": [],
+          "folder": "LUmy56kaWLv3tdIC",
+          "sort": 32,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794868422721,
+            "modifiedTime": 1794868422722,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "N3Dgd2E5BOfOsJvr"
+        },
+        {
+          "name": "All or Nothing",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>Once per session, widen a roll's threat and error ranges by 5 each.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "chance",
+            "prerequisites": null,
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": true,
+            "grantSource": "Spiritualist",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": null,
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 1
+          },
+          "effects": [],
+          "folder": "LZW9c6OWjJb9OOZt",
+          "sort": 145,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794868422774,
+            "modifiedTime": 1794868422775,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "mw7yyVrPluO7N2Gn"
+        },
+        {
+          "name": "Fencing Basics",
+          "type": "feat",
+          "img": "icons/svg/combat.svg",
+          "system": {
+            "description": "<p>With a one-handed finesse sword, +2 to Feint and Disarm; also grants a fencing stance and trick.</p>",
+            "source": "Spycraft 2.0 (summary)",
+            "tree": "meleeCombat",
+            "prerequisites": {
+              "type": "proficiency",
+              "key": "edged"
+            },
+            "prerequisitesNotChecked": false,
+            "ranks": 1,
+            "granted": false,
+            "grantSource": "",
+            "repeatable": false,
+            "maxSelections": 0,
+            "bonuses": [],
+            "temporaryGrant": null,
+            "featKind": "permanent",
+            "candidateBasis": null,
+            "choice": "",
+            "contactGrantMode": "associate",
+            "contactTheme": "",
+            "contactThemeConfirmed": false,
+            "restrictions": "",
+            "trainingSkills": {},
+            "focusChoices": [],
+            "manualPrerequisitesConfirmed": false,
+            "acquisitionSource": "",
+            "acquisitionCheck": {
+              "ok": true,
+              "unmet": [],
+              "level": 1,
+              "signature": "{\"prerequisites\":{\"key\":\"edged\",\"type\":\"proficiency\"},\"source\":\"\",\"tree\":\"meleeCombat\"}"
+            },
+            "historicalPrerequisitesConfirmed": false,
+            "acquiredAtLevel": 1
+          },
+          "effects": [],
+          "folder": "j1FJS6z2sP5fMWH7",
+          "sort": 68,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794868422979,
+            "modifiedTime": 1794868422980,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "1W79cUPHciQg9LSP"
+        },
+        {
+          "name": "Butterfly sword",
+          "type": "weapon",
+          "img": "icons/svg/sword.svg",
+          "system": {
+            "description": "",
+            "source": "Spycraft 2.0 p.251",
+            "quantity": 1,
+            "pickCount": 1,
+            "bundleSize": 1,
+            "equipped": true,
+            "carried": true,
+            "weight": 5,
+            "gearCategory": "W",
+            "caliber": 1,
+            "pick": "",
+            "reserve": false,
+            "common": false,
+            "proficiency": "edged",
+            "ammunitionOnly": false,
+            "ammunitionKind": "",
+            "explosiveAmmunition": false,
+            "stockpileSize": 0,
+            "shotWeight": 0,
+            "upgradeCost": 0,
+            "upgradeAllowance": null,
+            "commonItemCost": 0,
+            "noStrengthDamage": false,
+            "attackAbility": "",
+            "damage": "1d8",
+            "error": 1,
+            "threat": 20,
+            "errorThreat": "1/20",
+            "weaponCategory": "other",
+            "fireModes": [],
+            "mountRequirement": "",
+            "assemblyHalfActions": 0,
+            "ammo": "—",
+            "ammoCodeOptions": [],
+            "ammoChamber": "",
+            "recoil": 0,
+            "range": 0,
+            "maxRangeIncrements": 0,
+            "sizeHands": "T/1h",
+            "qualities": "GAR (+1), SUR",
+            "untrainedPenalty": -4,
+            "possessionSource": "gcGrant",
+            "possessionApproved": true,
+            "cleanAndPolishedReady": false,
+            "kitType": "",
+            "kitGrade": 0,
+            "kitSize": "",
+            "kitNonPortable": false,
+            "kitLocation": "",
+            "reserveAcquisition": null,
+            "armorMissionGrant": null,
+            "bigStickMissionPick": null,
+            "missionCaliberGrant": null,
+            "classGearGrant": null,
+            "improvised": false,
+            "loadedAmmoId": "",
+            "useHands": 0,
+            "useFinesse": false,
+            "grantFinesse": false,
+            "destroyed": false,
+            "destroyedByRoll": "",
+            "ammoCodeChoice": "",
+            "meleeFamily": "oneHandedSword",
+            "disassembled": false,
+            "fireMode": "",
+            "stockExtended": false
+          },
+          "effects": [],
+          "folder": "jPNwisjcsj5BbB8V",
+          "sort": 23,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794868423225,
+            "modifiedTime": 1794868576788,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "OHk1Fmv8hSvmbBNc"
+        },
+        {
+          "name": "Rapier",
+          "type": "weapon",
+          "img": "icons/svg/sword.svg",
+          "system": {
+            "description": "",
+            "source": "Spycraft 2.0 p.251",
+            "quantity": 1,
+            "pickCount": 1,
+            "bundleSize": 1,
+            "equipped": true,
+            "carried": true,
+            "weight": 2,
+            "gearCategory": "W",
+            "caliber": 1,
+            "pick": "",
+            "reserve": false,
+            "common": false,
+            "proficiency": "edged",
+            "ammunitionOnly": false,
+            "ammunitionKind": "",
+            "explosiveAmmunition": false,
+            "stockpileSize": 0,
+            "shotWeight": 0,
+            "upgradeCost": 0,
+            "upgradeAllowance": null,
+            "commonItemCost": 0,
+            "noStrengthDamage": false,
+            "attackAbility": "",
+            "damage": "1d8",
+            "error": 1,
+            "threat": 20,
+            "errorThreat": "1/20",
+            "weaponCategory": "other",
+            "fireModes": [],
+            "mountRequirement": "",
+            "assemblyHalfActions": 0,
+            "ammo": "—",
+            "ammoCodeOptions": [],
+            "ammoChamber": "",
+            "recoil": 0,
+            "range": 0,
+            "maxRangeIncrements": 0,
+            "sizeHands": "S/1h",
+            "qualities": "FIN, KEN (+3)",
+            "untrainedPenalty": -4,
+            "possessionSource": "gcGrant",
+            "possessionApproved": true,
+            "cleanAndPolishedReady": false,
+            "kitType": "",
+            "kitGrade": 0,
+            "kitSize": "",
+            "kitNonPortable": false,
+            "kitLocation": "",
+            "reserveAcquisition": null,
+            "armorMissionGrant": null,
+            "bigStickMissionPick": null,
+            "missionCaliberGrant": null,
+            "classGearGrant": null,
+            "improvised": false,
+            "loadedAmmoId": "",
+            "useHands": 0,
+            "useFinesse": false,
+            "grantFinesse": false,
+            "destroyed": false,
+            "destroyedByRoll": "",
+            "ammoCodeChoice": "",
+            "meleeFamily": "oneHandedSword",
+            "disassembled": false,
+            "fireMode": "",
+            "stockExtended": false
+          },
+          "effects": [],
+          "folder": "jPNwisjcsj5BbB8V",
+          "sort": 33,
+          "ownership": {
+            "default": 0,
+            "WW1y27MJMt1sWfHr": 3
+          },
+          "flags": {},
+          "_stats": {
+            "coreVersion": "14.370",
+            "systemId": "spycraft2",
+            "systemVersion": "0.3.1",
+            "createdTime": 1794868423242,
+            "modifiedTime": 1794868640147,
+            "lastModifiedBy": "WW1y27MJMt1sWfHr",
+            "compendiumSource": null,
+            "duplicateSource": null,
+            "exportSource": null
+          },
+          "_id": "OmjcW7HsroYhX6bU"
+        }
+      ],
+      "img": "icons/svg/mystery-man.svg",
+      "prototypeToken": {
+        "name": "RAW QA Starting Entry",
+        "displayName": 0,
+        "actorLink": false,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
+        "texture": {
+          "src": "icons/svg/mystery-man.svg",
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "fit": "contain",
+          "scaleX": 1,
+          "scaleY": 1,
+          "tint": "#ffffff",
+          "alphaThreshold": 0.75
+        },
+        "lockRotation": false,
+        "rotation": 0,
+        "alpha": 1,
+        "disposition": -1,
+        "displayBars": 0,
+        "bar1": {
+          "attribute": "vitality"
+        },
+        "bar2": {
+          "attribute": "wounds"
+        },
+        "light": {
+          "negative": false,
+          "priority": 0,
+          "alpha": 0.5,
+          "angle": 360,
+          "bright": 0,
+          "color": null,
+          "coloration": 1,
+          "dim": 0,
+          "attenuation": 0.5,
+          "luminosity": 0.5,
+          "saturation": 0,
+          "contrast": 0,
+          "shadows": 0,
+          "animation": {
+            "type": null,
+            "speed": 5,
+            "intensity": 5,
+            "reverse": false
+          },
+          "darkness": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        "sight": {
+          "enabled": false,
+          "range": 0,
+          "angle": 360,
+          "visionMode": "basic",
+          "color": null,
+          "attenuation": 0.1,
+          "brightness": 0,
+          "saturation": 0,
+          "contrast": 0
+        },
+        "detectionModes": {},
+        "occludable": {
+          "radius": 0
+        },
+        "ring": {
+          "enabled": false,
+          "colors": {
+            "ring": null,
+            "background": null
+          },
+          "effects": 1,
+          "subject": {
+            "scale": 1,
+            "texture": null
+          }
+        },
+        "turnMarker": {
+          "mode": 1,
+          "animation": null,
+          "src": null,
+          "disposition": false
+        },
+        "movementAction": null,
+        "flags": {},
+        "randomImg": false,
+        "appendNumber": false,
+        "prependAdjective": false
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0,
+        "WW1y27MJMt1sWfHr": 3
+      },
+      "_stats": {
+        "coreVersion": "14.370",
+        "systemId": "spycraft2",
+        "systemVersion": "0.3.1",
+        "createdTime": 1794868422519,
+        "modifiedTime": 1794868422760,
+        "lastModifiedBy": "WW1y27MJMt1sWfHr",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_id": "B9cWfazQc5MlDoda"
+    },
+    "todo": [],
+    "warnings": [],
+    "proficiencies": {
+      "available": 8,
+      "used": 8,
+      "remaining": 0,
+      "hints": {
+        "unarmed": false,
+        "blunt": false,
+        "exoticBlunt": false,
+        "edged": false,
+        "exoticEdged": false,
+        "explosives": false,
+        "guided": false,
+        "handgun": false,
+        "hurled": false,
+        "exoticHurled": false,
+        "indirectFire": false,
+        "rifle": false,
+        "shotgun": false,
+        "submachineGun": false,
+        "tactical": false,
+        "vehicleWeapon": false
+      }
+    },
+    "skillBudgets": [
+      0
+    ],
+    "pointBuy": {
+      "budget": 36,
+      "spent": 36,
+      "remaining": 0
+    },
+    "plans": {
+      "sur": {
+        "version": 1,
+        "active": true,
+        "role": "defender",
+        "weaponId": "OHk1Fmv8hSvmbBNc",
+        "source": {
+          "id": "OHk1Fmv8hSvmbBNc",
+          "uuid": null,
+          "name": "Butterfly sword",
+          "proficiency": "edged",
+          "sizeHands": "T/1h",
+          "qualities": "GAR (+1), SUR",
+          "hands": 1,
+          "requiredHands": 1,
+          "quantity": 1
+        },
+        "held": [
+          {
+            "id": "OHk1Fmv8hSvmbBNc",
+            "hands": 1
+          },
+          {
+            "id": "OmjcW7HsroYhX6bU",
+            "hands": 1
+          }
+        ],
+        "trained": true,
+        "ranged": false,
+        "ownSize": 3,
+        "opponentSize": 3,
+        "opponentWeaponSize": "Tiny",
+        "opponentCharacterSize": null,
+        "opponentLabel": "Reload attacker",
+        "incomingRanged": false,
+        "incomingProficient": true,
+        "confirmed": true,
+        "lineOfSightConfirmed": true,
+        "rangeConfirmed": true,
+        "sureGrip": true,
+        "sureGripBonus": 3,
+        "gearBonus": 3,
+        "fencingBasics": {
+          "feat": "Fencing Basics",
+          "family": "oneHandedSword",
+          "bonus": 2,
+          "weapons": [
+            {
+              "id": "OmjcW7HsroYhX6bU",
+              "uuid": null,
+              "name": "Rapier",
+              "proficiency": "edged",
+              "hands": 1,
+              "requiredHands": 1,
+              "finesse": true
+            }
+          ],
+          "gearBonus": 2
+        },
+        "axeBasics": {
+          "version": 1,
+          "gearBonus": 0,
+          "source": null
+        },
+        "expert": false,
+        "expertBonus": 0,
+        "twoHandBonus": 0,
+        "sizeBonus": 0,
+        "attackBonus": 3,
+        "errorIncrease": 2,
+        "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+        "shots": 0,
+        "requiresOpposedStandardAttack": true,
+        "loseFlatFooted": false,
+        "loseBonusDisarm": false,
+        "loseFinalAttackStillPossible": false,
+        "notes": [
+          "Resist Disarm: targeted weapon Butterfly sword; opposed Standard Attack, +0 two-hand grip, +0 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356).",
+          "Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302).",
+          "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).",
+          "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+          "Weapon Size includes an unarmed attacker’s Size minus two categories.",
+          "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+        ]
+      },
+      "fin": {
+        "version": 1,
+        "active": true,
+        "role": "defender",
+        "weaponId": "OmjcW7HsroYhX6bU",
+        "source": {
+          "id": "OmjcW7HsroYhX6bU",
+          "uuid": null,
+          "name": "Rapier",
+          "proficiency": "edged",
+          "sizeHands": "S/1h",
+          "qualities": "FIN, KEN (+3)",
+          "hands": 1,
+          "requiredHands": 1,
+          "quantity": 1
+        },
+        "held": [
+          {
+            "id": "OHk1Fmv8hSvmbBNc",
+            "hands": 1
+          },
+          {
+            "id": "OmjcW7HsroYhX6bU",
+            "hands": 1
+          }
+        ],
+        "trained": true,
+        "ranged": false,
+        "ownSize": 4,
+        "opponentSize": 3,
+        "opponentWeaponSize": "Tiny",
+        "opponentCharacterSize": null,
+        "opponentLabel": "Reload attacker",
+        "incomingRanged": false,
+        "incomingProficient": true,
+        "confirmed": true,
+        "lineOfSightConfirmed": true,
+        "rangeConfirmed": true,
+        "sureGrip": false,
+        "sureGripBonus": 0,
+        "gearBonus": 2,
+        "fencingBasics": {
+          "feat": "Fencing Basics",
+          "family": "oneHandedSword",
+          "bonus": 2,
+          "weapons": [
+            {
+              "id": "OmjcW7HsroYhX6bU",
+              "uuid": null,
+              "name": "Rapier",
+              "proficiency": "edged",
+              "hands": 1,
+              "requiredHands": 1,
+              "finesse": true
+            }
+          ],
+          "gearBonus": 2
+        },
+        "axeBasics": {
+          "version": 1,
+          "gearBonus": 0,
+          "source": null
+        },
+        "expert": false,
+        "expertBonus": 0,
+        "twoHandBonus": 0,
+        "sizeBonus": 4,
+        "attackBonus": 6,
+        "errorIncrease": 2,
+        "actionCost": "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+        "shots": 0,
+        "requiresOpposedStandardAttack": true,
+        "loseFlatFooted": false,
+        "loseBonusDisarm": false,
+        "loseFinalAttackStillPossible": false,
+        "notes": [
+          "Resist Disarm: targeted weapon Rapier; opposed Standard Attack, +0 two-hand grip, +4 weapon Size, +0 Expert Disarm; action error +2 (pp.352,356).",
+          "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).",
+          "Disarm gear bonuses use the highest applicable bonus; they do not stack.",
+          "Weapon Size includes an unarmed attacker’s Size minus two categories.",
+          "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+        ]
+      }
+    }
+  },
+  "baselinesUnchanged": true,
+  "cleanup": {
+    "actors": 6,
+    "messages": 1138,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": []
+}

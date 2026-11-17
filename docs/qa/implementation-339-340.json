@@ -1,0 +1,67 @@
+{
+  "batches": [
+    339,
+    340
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2572,
+  "nodeGroups": [
+    936,
+    1636
+  ],
+  "newTests": 10,
+  "browserFixtures": 55,
+  "builtPackTests": 6,
+  "scriptsChecked": 254,
+  "templatesChecked": 19,
+  "nativeReceipts": 11,
+  "nativeGuards": 7,
+  "nativeUI": 4,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1170,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "nativeAudit": "native-miss-tricks-339-340.json",
+  "manualFeatRows": 121,
+  "partialFeatRows": 59,
+  "otherFeatRows": 134,
+  "unfinishedFeatMinimum": 180,
+  "remaining": [
+    "Punishing Stance",
+    "Side Stance",
+    "Feint outcome/target tracking"
+  ],
+  "acceptedRuling": "Side Stance requires the successful Feint while already in the stance",
+  "files": [
+    "module/rules/gear.mjs",
+    "module/documents/actor.mjs",
+    "module/rules/outcomes.mjs",
+    "module/rules/limited-uses.mjs",
+    "module/rules/final-round.mjs",
+    "module/sheets/actor-sheet.mjs",
+    "templates/actor/agent-main.hbs",
+    "package.json",
+    "docs/raw-character-review.md",
+    "docs/raw-option-inventory.md",
+    "docs/resume-checkpoint.md",
+    "tools/tests/skill-dialog-scrolling.spec.mjs",
+    "tools/test-weapon-damage-expression.mjs",
+    "module/apps/character-target.mjs",
+    "module/apps/standard-attack-context.mjs",
+    "module/apps/cheap-shot.mjs",
+    "tools/test-quick-aim.mjs",
+    "module/rules/miss-tricks.mjs",
+    "module/apps/miss-tricks.mjs",
+    "tools/test-miss-tricks.mjs",
+    "docs/qa/implementation-339-340.json",
+    "docs/qa/native-miss-tricks-339-340.json"
+  ]
+}

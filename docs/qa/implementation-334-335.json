@@ -1,0 +1,68 @@
+{
+  "batches": [
+    334,
+    335
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2539,
+  "nodeGroups": [
+    903,
+    1636
+  ],
+  "focusedNewTests": 11,
+  "browserFixtures": 52,
+  "browserSeconds": 16.2,
+  "builtPackTests": 6,
+  "scriptsChecked": 248,
+  "templatesChecked": 19,
+  "nativeAudit": "native-feint-334-335.json",
+  "nativeReceipts": 7,
+  "nativeGuards": 12,
+  "nativeUI": 3,
+  "reloadVerified": true,
+  "baselineCleanup": {
+    "actors": 6,
+    "messages": 1145,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "sourcePagesVisuallyInspected": [
+    178,
+    357
+  ],
+  "manualFeatRows": 122,
+  "partialFeatRows": 58,
+  "otherFeatRows": 134,
+  "explicitlyUnfinishedFeatMinimum": 180,
+  "wholeFeatClosuresUnchanged": 20,
+  "remaining": [
+    "Feint opposed outcome/condition/critical next-attack application",
+    "Automatic same-round successful-target tracking",
+    "Alternative skill and free-action integrations",
+    "Fencing Basics Side Stance and Remiss",
+    "Flail Basics Feint benefit and other benefits"
+  ],
+  "files": [
+    "module/rules/feint.mjs",
+    "module/apps/feint.mjs",
+    "module/rules/skills.mjs",
+    "module/documents/actor.mjs",
+    "module/rules/outcomes.mjs",
+    "module/rules/fencing-disarm.mjs",
+    "tools/test-feint.mjs",
+    "tools/test-feint-workflow.mjs",
+    "tools/fixtures/feint.mjs",
+    "tools/tests/skill-dialog-scrolling.spec.mjs",
+    "package.json",
+    "docs/raw-character-review.md",
+    "docs/raw-option-inventory.md",
+    "docs/resume-checkpoint.md",
+    "docs/qa/native-feint-334-335.json",
+    "docs/qa/implementation-334-335.json"
+  ]
+}

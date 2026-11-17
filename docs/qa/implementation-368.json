@@ -1,0 +1,56 @@
+{
+  "batches": [
+    368
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2991,
+  "nodeGroups": [
+    1353,
+    1638
+  ],
+  "newTests": 22,
+  "browserFixtures": 108,
+  "builtPackTests": 6,
+  "scriptsChecked": 296,
+  "templatesChecked": 19,
+  "focusedTests": 111,
+  "nativeReceipts": 2,
+  "nativeGuards": 10,
+  "nativeUI": 5,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1343,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "unexpectedBrowserErrors": [],
+  "reloadMetadataDifference": null,
+  "reloadComparison": "All gameplay differences rejected; only combat _stats.modifiedTime was allowed. Exact metadata delta was not retained after driver-only final-report errors binding failure, which occurred after verified reload/read-only retry and cleanup.",
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Polearm Striking Stance: actual qualified stance, GC-confirmed immediate adjacent entry, actual opponent and any legal melee weapon. One Striking reaction per combat round plus existing shared final-attack allowance; cap5ft including prior movement. Private new-roll lease, immutable source/history, live source/stat/participant/weapon checks, historical owned original replacements and exact posted-source recovery. Shared final posting requires an actual registered attack card; truthy warnings alone do not commit.",
+  "nativeStartingFixtureDice": 3,
+  "nativeDiceSpent": 0,
+  "nativeAttackRolls": 1,
+  "nativeDamageRolls": 0,
+  "nativeMovementReceipts": 1,
+  "nativeCumulativeMovement": 5,
+  "nativeTokenMovementAutomated": false,
+  "nativeRandomFaces": "Controlled CONFIG.Dice.randomUniform actual Actor/Roll/card pipeline; natural5 finished ordinary miss; no published total/critical flag fabricated.",
+  "harnessNotes": [
+    "Final reporting loader initially omitted lexical errors argument after gameplay verification and cleanup. Recovery checked existing retained cards, exact six baselines/settings/time and absent fixtures, then wrote report without gameplay repetition. Exact combat metadata delta unavailable after cleanup."
+  ]
+}

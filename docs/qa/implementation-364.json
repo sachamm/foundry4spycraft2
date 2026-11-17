@@ -1,0 +1,53 @@
+{
+  "batches": [
+    364
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2931,
+  "nodeGroups": [
+    1293,
+    1638
+  ],
+  "newTests": 23,
+  "browserFixtures": 96,
+  "builtPackTests": 6,
+  "scriptsChecked": 289,
+  "templatesChecked": 19,
+  "nativeReceipts": 7,
+  "nativeGuards": 16,
+  "nativeUI": 8,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1331,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "reloadMetadataDifference": [
+    {
+      "path": "._stats.modifiedTime",
+      "before": 1794923692907,
+      "after": 1794923772239
+    }
+  ],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Critical original defender win or original attacker critical failure earns one authenticated free reciprocal Trip; second step cannot earn a third Trip. Critical counter attacker win can earn the general final attack at -4 off own Count. Private capability, authoritative source refresh under rule mutex, actual GC posted-result recovery, role-correct selectors and Sprawled Power reconciliation. TRP and ordinary-Trip melee stance classification remain open.",
+  "nativeStartingFixtureDice": 3,
+  "nativeCounterFinalDice": 1,
+  "nativeCriticalCost": 2,
+  "nativeInitiativeLoss": 3,
+  "nativeRandomFaces": "Controlled CONFIG.Dice.randomUniform seam, actual Actor/Roll/card pipeline; no invented published totals or critical flags."
+}

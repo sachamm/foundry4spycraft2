@@ -1,6 +1,9 @@
+import {validOwnCountClock} from './own-count-duration.mjs';
 import {stillStandingResistancePlan} from './still-standing.mjs';
 import {attributeDefensePlan} from './attributes.mjs';
 import {uncannyDodgePlan} from './defense.mjs';
+export const TRIP_SIZES=Object.freeze(['Nuisance','Fine','Diminutive','Tiny','Small','Medium','Large','Huge','Gargantuan','Colossal','Enormous','Vast']);
+export const tripSizeIndex=size=>TRIP_SIZES.indexOf(String(size??'').split(/[ (]/)[0]);
 export function responseOwnSize(system){
  const size=system?.size;
  if(size===undefined)return null;
@@ -13,7 +16,7 @@ export function tripDefenseSkillChecks(key,checks=[]){
  return [...checks.filter(c=>c.id!=='resist-trip'),{id:'resist-trip',name:'Resist Trip',attributes:['dex'],mode:'Active',tags:'Armor Check Penalty',error:2,time:'Opposed response',page:361,synergies:[],combatAction:'trip',role:'defender'}];
 }
 /** Ordinary Acrobatics response only; alternative character options and Trip outcomes remain separate. */
-export function tripDefensePlan(system,key,check,{method='roll',tripOpponentName='',tripAdjacent=false,tripSizeDifference=null,tripIncomingConfirmed=false}={}){
+export function tripDefensePlan(system,key,check,{method='roll',tripOpponentName='',tripAdjacent=false,tripSizeDifference=null,tripIncomingConfirmed=false,tripOpponentUuid='',tripOpponentSize=null,tripDefenseCombat=null}={}){
  const empty={evidence:null,bonuses:[],sizeBonus:0,blockedReason:'',notes:[]},reject=blockedReason=>({...empty,blockedReason});
  if(key!=='acrobatics'||check?.id!=='resist-trip')return empty;
  if(method!=='roll')return reject('Trip is opposed and part of a combat action; taking10/20 is unavailable (pp.91,352).');
@@ -22,6 +25,12 @@ export function tripDefensePlan(system,key,check,{method='roll',tripOpponentName
  const names=system?.activeFeatNames;
  if(!Array.isArray(names)||names.some(n=>typeof n!=='string'||!n.trim()))return reject('Review the current qualified Trip-defense feat sources.');
  let stillStanding,ownSize;try{stillStanding=stillStandingResistancePlan(system,'trip');ownSize=responseOwnSize(system);}catch(error){return reject(error.message);}
+ if(typeof tripOpponentUuid!=='string'||tripOpponentUuid.length>500)return reject('Choose the actual opposing character for this Trip response.');
+ if(tripOpponentUuid){
+  if(!validOwnCountClock(tripDefenseCombat))return reject('Record the actual incoming Trip response in a started combat.');
+  if(tripOpponentSize!==null&&(typeof tripOpponentSize!=='string'||!tripOpponentSize.trim()||tripOpponentSize.length>200))return reject('Review the actual Trip attacker Size.');
+  const own=tripSizeIndex(ownSize),other=tripSizeIndex(tripOpponentSize);if(own>=0&&other>=0&&own-other!==tripSizeDifference)return reject('The reviewed Size difference does not match these characters’ known current Sizes.');
+ }
  const mastery=names.includes('Equilibrium Mastery');let covertFeats=[],vulnerable=null;
  if(mastery){
   if(!Array.isArray(system.activeFeatSelections)||system.activeFeatSelections.some(f=>!f||typeof f!=='object'))return reject('Review the current Covert feat selections for Equilibrium Mastery.');
@@ -29,12 +38,12 @@ export function tripDefensePlan(system,key,check,{method='roll',tripOpponentName
   if(!covertFeats.some(f=>f.name==='Equilibrium Mastery')||covertFeats.some(f=>typeof f.name!=='string'||!f.name.trim()||typeof f.choice!=='string'))return reject('Review the qualified Equilibrium Mastery and Covert feat selections.');
   vulnerable=attributeDefensePlan({...system,uncannyDodge:uncannyDodgePlan(system)}).vulnerable;
  }
- const normalDodge=covertFeats.length,dodgeBonus=mastery&&!vulnerable?normalDodge:0,sizeBonus=4*Math.max(0,tripSizeDifference),evidence={version:2,skillKey:key,checkId:check.id,ownSize,opponentName:tripOpponentName.trim(),adjacent:true,incomingConfirmed:true,sizeDifference:tripSizeDifference,sizeBonus,mastery,covertFeats,vulnerable,normalDodge,dodgeBonus,...(stillStanding.source?{stillStanding}:{})};
- return {...empty,evidence,bonuses:[...(dodgeBonus?[{source:'Equilibrium Mastery (resist Trip)',type:'dodge',value:dodgeBonus}]:[]),...(stillStanding.bonus?[{source:'Still Standing',type:'',value:stillStanding.bonus}]:[])],sizeBonus,notes:[`Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier+1; larger participant +4 per Size category (pp.352,361). Your Size bonus +${sizeBonus}.`,...(mastery?[`Equilibrium Mastery: ${normalDodge} current Covert feats; dodge bonus +${dodgeBonus}${vulnerable?' (lost while vulnerable, p.328)':''}. Dodge bonuses stack; this is not a general Defense bonus (p.194).`]:[]),...(stillStanding.source?['Still Standing: +4 unnamed bonus to this skill check resisting Trip (p.66); this is not a dodge bonus.']:[]),'The GC resolves the opposed result, sprawled/flat-footed conditions, critical effects, final attacks and permitted counter-Trip sequence separately.']};
+ const normalDodge=covertFeats.length,dodgeBonus=mastery&&!vulnerable?normalDodge:0,sizeBonus=4*Math.max(0,tripSizeDifference),evidence={version:tripOpponentUuid?3:2,...(tripOpponentUuid?{role:'defender',opponentUuid:tripOpponentUuid,opponentSize:tripOpponentSize,combat:structuredClone(tripDefenseCombat)}:{}),skillKey:key,checkId:check.id,ownSize,opponentName:tripOpponentName.trim(),adjacent:true,incomingConfirmed:true,sizeDifference:tripSizeDifference,sizeBonus,mastery,covertFeats,vulnerable,normalDodge,dodgeBonus,...(stillStanding.source?{stillStanding}:{})};
+ return {...empty,evidence,bonuses:[...(dodgeBonus?[{source:'Equilibrium Mastery (resist Trip)',type:'dodge',value:dodgeBonus}]:[]),...(stillStanding.bonus?[{source:'Still Standing',type:'',value:stillStanding.bonus}]:[])],sizeBonus,notes:[`Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier+1; larger participant +4 per Size category (pp.352,361). Your Size bonus +${sizeBonus}.`,...(mastery?[`Equilibrium Mastery: ${normalDodge} current Covert feats; dodge bonus +${dodgeBonus}${vulnerable?' (lost while vulnerable, p.328)':''}. Dodge bonuses stack; this is not a general Defense bonus (p.194).`]:[]),...(stillStanding.source?['Still Standing: +4 unnamed bonus to this skill check resisting Trip (p.66); this is not a dodge bonus.']:[]),'Finish reciprocal recorded checks in chat, then use Main’s Trip outcomes and any earned Trip final attack at−4. An original critical defensive win earns Main’s Counter-Trip; the second Trip never grants a third. Unrecorded opponents and weapon-quality variants remain for separate adjudication.']};
 }
-export function validateTripDefenseProof(system,proof,{checkKind,skillKey,checkId,checkMethod='roll',ability,attributeSubstitution}={}){
+export function validateTripDefenseProof(system,proof,{checkKind,skillKey,checkId,checkMethod='roll',ability,attributeSubstitution,combat}={}){
  if(!proof)return;
- const p=tripDefensePlan(system,skillKey,{id:checkId},{method:checkMethod,tripOpponentName:proof.opponentName,tripAdjacent:proof.adjacent,tripSizeDifference:proof.sizeDifference,tripIncomingConfirmed:proof.incomingConfirmed});
+ const p=tripDefensePlan(system,skillKey,{id:checkId},{method:checkMethod,tripOpponentName:proof.opponentName,tripAdjacent:proof.adjacent,tripSizeDifference:proof.sizeDifference,tripIncomingConfirmed:proof.incomingConfirmed,...(proof.version===3?{tripOpponentUuid:proof.opponentUuid,tripOpponentSize:proof.opponentSize,tripDefenseCombat:combat}:{})});
  const stable=v=>JSON.stringify(v,(_k,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.fromEntries(Object.keys(x).sort().map(k=>[k,x[k]])):x);
  const substituted=attributeSubstitution?.source==='All According to Plan'&&attributeSubstitution.originalAbility==='dex'&&attributeSubstitution.ability==='int'&&(system.classLevels?.schemer??0)>=4;
  if(ability!==undefined&&ability!==(substituted?'int':'dex'))throw Error('The Trip response key attribute or actual substitution source changed before posting.');

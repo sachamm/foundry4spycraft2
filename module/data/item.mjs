@@ -188,7 +188,7 @@ export class WeaponData extends GearData {
       ammoCodeChoice: str(),
       ammoCodeOptions: new ArrayField(new StringField()),
       recoil: int(0),
-      meleeFamily: str("",{choices:["","axe","spear","whip","staff","hammer","twoHandedSword","polearm"]}),
+      meleeFamily: str("",{choices:["","axe","spear","whip","staff","hammer","twoHandedSword","oneHandedSword","polearm","flail"]}),
       weaponCategory: str(),
       disassembled: new BooleanField(),
       assemblyHalfActions: int(0,{min:0}),

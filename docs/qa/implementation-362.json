@@ -1,0 +1,41 @@
+{
+  "batches": [
+    362
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 2890,
+  "nodeGroups": [
+    1254,
+    1636
+  ],
+  "newTests": 18,
+  "browserFixtures": 92,
+  "builtPackTests": 6,
+  "scriptsChecked": 287,
+  "templatesChecked": 19,
+  "nativeReceipts": 4,
+  "nativeGuards": 13,
+  "nativeUI": 6,
+  "reloadVerified": true,
+  "nativeCleanup": {
+    "actors": 6,
+    "messages": 1321,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "inventory": {
+    "manual": 117,
+    "partial": 57,
+    "other": 140,
+    "total": 314,
+    "minimumUnfinished": 174
+  },
+  "wholeFeatClosures": 26,
+  "scope": "Ordinary paired Trip outcomes with reciprocal source-bound participant checks, two-phase message reservations, idempotent conditions, forced stance exit, explicit GC interrupted-effect review and exact reload retries. Critical and TRP variants remain next."
+}

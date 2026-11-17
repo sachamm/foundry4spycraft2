@@ -1,0 +1,2726 @@
+{
+  "checks": [
+    {
+      "message": "ChatMessage.gUA5G6CVhLHAgHuk",
+      "label": "Actual axeAttack skill dialog Axe Basics",
+      "flags": {
+        "tripAttack": {
+          "version": 1,
+          "skillKey": "acrobatics",
+          "checkId": "trip",
+          "role": "attacker",
+          "ownSize": "Medium",
+          "opponentUuid": "Actor.rfIoVF77rfoPOCR7",
+          "opponentName": "RAW QA Feint Defender362",
+          "opponentSize": "Medium",
+          "adjacent": true,
+          "participantsConfirmed": true,
+          "halfActionConfirmed": true,
+          "sizeDifference": 0,
+          "sizeBonus": 0,
+          "combat": {
+            "id": "7vMiNmJtHdsPXhNB",
+            "started": true,
+            "round": 1,
+            "turn": 0,
+            "combatantId": "iIyVbc8S4ZDeXhGg",
+            "ownTurnIndex": 0
+          }
+        },
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": {
+          "version": 1,
+          "skillKey": "acrobatics",
+          "checkId": "trip",
+          "scope": "trip",
+          "sources": [
+            {
+              "feat": "Axe Basics",
+              "family": "axe",
+              "bonus": 1,
+              "weapons": [
+                {
+                  "id": "PadnffYY7os4ICZK",
+                  "uuid": null,
+                  "name": "Battleaxe",
+                  "proficiency": "edged",
+                  "hands": 2,
+                  "requiredHands": 2
+                }
+              ]
+            }
+          ]
+        },
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 3,
+          "total": 3,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "combatantId": "iIyVbc8S4ZDeXhGg"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 4,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 18,
+        "rolledTotal": 18,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 18,
+        "actorUuid": "Actor.SS9S7sHiVOJRNO1C",
+        "checkKind": "skill",
+        "ability": "dex",
+        "skillKey": "acrobatics",
+        "checkId": "trip",
+        "focus": "Trip Action",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 3
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 4,
+        "cap": 20,
+        "baseFlavor": "Acrobatics / Trip Action (DEX)<br><small>  Axe Basics: +1 gear with this trip skill check while holding a readied axe; gear bonuses do not stack (pp.176,179–180,329).     Trip against RAW QA Feint Defender362: one half action, opposed Acrobatics(DEX), Armor Check Penalty, base error1 plus action error+1; only the larger participant gains+4per Size category. Your Size bonus +0 (pp.352,361). Confirm and resolve both checks in chat; adjudicate the opposed result, sprawled/flat-footed, critical effects, final attacks and counter-Trip sequence separately. This ordinary roll does not authorize a free Trip or a weapon-quality variant.                                      1 Half Action. Active. Armor Check Penalty. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 15,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": true,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true,
+        "tripSettlement": {
+          "version": 1,
+          "attackerUuid": "Actor.SS9S7sHiVOJRNO1C",
+          "defenderUuid": "Actor.rfIoVF77rfoPOCR7",
+          "attackerWon": true,
+          "condition": "sprawled",
+          "conditionActorUuid": "Actor.rfIoVF77rfoPOCR7",
+          "combatId": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "turn": 0,
+          "tieResolved": false,
+          "sourceMessage": "ChatMessage.gUA5G6CVhLHAgHuk",
+          "defenderMessage": "ChatMessage.CnxWjRBoNe5t33eO",
+          "sourceEvidence": [
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "role": "attacker",
+                "ownSize": "Medium",
+                "opponentUuid": "Actor.rfIoVF77rfoPOCR7",
+                "opponentName": "RAW QA Feint Defender362",
+                "opponentSize": "Medium",
+                "adjacent": true,
+                "participantsConfirmed": true,
+                "halfActionConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 0,
+                  "combatantId": "iIyVbc8S4ZDeXhGg",
+                  "ownTurnIndex": 0
+                }
+              },
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "scope": "trip",
+                "sources": [
+                  {
+                    "feat": "Axe Basics",
+                    "family": "axe",
+                    "bonus": 1,
+                    "weapons": [
+                      {
+                        "id": "PadnffYY7os4ICZK",
+                        "uuid": null,
+                        "name": "Battleaxe",
+                        "proficiency": "edged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "",
+                "normal": 3,
+                "total": 3,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "iIyVbc8S4ZDeXhGg"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 3
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              18,
+              18,
+              15,
+              0,
+              0,
+              true,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ],
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "scope": "trip-defense",
+                "sources": [
+                  {
+                    "feat": "Great Sword Basics",
+                    "family": "twoHandedSword",
+                    "bonus": 2,
+                    "weapons": [
+                      {
+                        "id": "O7fCJ8YrC6kXDqQi",
+                        "uuid": null,
+                        "name": "Great sword",
+                        "proficiency": "exoticEdged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "version": 3,
+                "role": "defender",
+                "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+                "opponentSize": "Medium",
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 0,
+                  "combatantId": "Z3DIahIm3Y1APZgS",
+                  "ownTurnIndex": 1
+                },
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "ownSize": "Medium",
+                "opponentName": "RAW QA All-out Attack362",
+                "adjacent": true,
+                "incomingConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "mastery": false,
+                "covertFeats": [],
+                "vulnerable": null,
+                "normalDodge": 0,
+                "dodgeBonus": 0
+              },
+              {
+                "state": "",
+                "normal": 4,
+                "total": 4,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "Z3DIahIm3Y1APZgS"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 4
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "resist-trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              14,
+              14,
+              10,
+              0,
+              0,
+              false,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ]
+          ],
+          "operationId": "trip-y4x0Ia47BouT0HgI",
+          "wasCondition": false,
+          "state": "applied",
+          "gcReviewed": true,
+          "resolution": "alreadyApplied",
+          "conditionChanged": false
+        }
+      }
+    },
+    {
+      "message": "ChatMessage.CnxWjRBoNe5t33eO",
+      "label": "Actual greatDefense skill dialog Great Sword Basics",
+      "flags": {
+        "tripAttack": null,
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": {
+          "version": 1,
+          "skillKey": "acrobatics",
+          "checkId": "resist-trip",
+          "scope": "trip-defense",
+          "sources": [
+            {
+              "feat": "Great Sword Basics",
+              "family": "twoHandedSword",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "O7fCJ8YrC6kXDqQi",
+                  "uuid": null,
+                  "name": "Great sword",
+                  "proficiency": "exoticEdged",
+                  "hands": 2,
+                  "requiredHands": 2
+                }
+              ]
+            }
+          ]
+        },
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": {
+          "version": 3,
+          "role": "defender",
+          "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+          "opponentSize": "Medium",
+          "combat": {
+            "id": "7vMiNmJtHdsPXhNB",
+            "started": true,
+            "round": 1,
+            "turn": 0,
+            "combatantId": "Z3DIahIm3Y1APZgS",
+            "ownTurnIndex": 1
+          },
+          "skillKey": "acrobatics",
+          "checkId": "resist-trip",
+          "ownSize": "Medium",
+          "opponentName": "RAW QA All-out Attack362",
+          "adjacent": true,
+          "incomingConfirmed": true,
+          "sizeDifference": 0,
+          "sizeBonus": 0,
+          "mastery": false,
+          "covertFeats": [],
+          "vulnerable": null,
+          "normalDodge": 0,
+          "dodgeBonus": 0
+        },
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 4,
+          "total": 4,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "combatantId": "Z3DIahIm3Y1APZgS"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 4,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 14,
+        "rolledTotal": 14,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 14,
+        "actorUuid": "Actor.rfIoVF77rfoPOCR7",
+        "checkKind": "skill",
+        "ability": "dex",
+        "skillKey": "acrobatics",
+        "checkId": "resist-trip",
+        "focus": "Resist Trip",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 4,
+        "cap": 20,
+        "baseFlavor": "Acrobatics / Resist Trip (DEX)<br><small>  Great Sword Basics: +2 gear with this trip-defense skill check while holding a readied twoHandedSword; gear bonuses do not stack (pp.176,179–180,329).      Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier+1; larger participant +4 per Size category (pp.352,361). Your Size bonus +0. The GC resolves the opposed result, sprawled/flat-footed conditions, critical effects, final attacks and permitted counter-Trip sequence separately.                                     Opposed response. Active. Armor Check Penalty. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 10,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": false,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true,
+        "tripSettlement": {
+          "version": 1,
+          "attackerUuid": "Actor.SS9S7sHiVOJRNO1C",
+          "defenderUuid": "Actor.rfIoVF77rfoPOCR7",
+          "attackerWon": true,
+          "condition": "sprawled",
+          "conditionActorUuid": "Actor.rfIoVF77rfoPOCR7",
+          "combatId": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "turn": 0,
+          "tieResolved": false,
+          "sourceMessage": "ChatMessage.gUA5G6CVhLHAgHuk",
+          "defenderMessage": "ChatMessage.CnxWjRBoNe5t33eO",
+          "sourceEvidence": [
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "role": "attacker",
+                "ownSize": "Medium",
+                "opponentUuid": "Actor.rfIoVF77rfoPOCR7",
+                "opponentName": "RAW QA Feint Defender362",
+                "opponentSize": "Medium",
+                "adjacent": true,
+                "participantsConfirmed": true,
+                "halfActionConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 0,
+                  "combatantId": "iIyVbc8S4ZDeXhGg",
+                  "ownTurnIndex": 0
+                }
+              },
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "scope": "trip",
+                "sources": [
+                  {
+                    "feat": "Axe Basics",
+                    "family": "axe",
+                    "bonus": 1,
+                    "weapons": [
+                      {
+                        "id": "PadnffYY7os4ICZK",
+                        "uuid": null,
+                        "name": "Battleaxe",
+                        "proficiency": "edged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "",
+                "normal": 3,
+                "total": 3,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "iIyVbc8S4ZDeXhGg"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 3
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              18,
+              18,
+              15,
+              0,
+              0,
+              true,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ],
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "scope": "trip-defense",
+                "sources": [
+                  {
+                    "feat": "Great Sword Basics",
+                    "family": "twoHandedSword",
+                    "bonus": 2,
+                    "weapons": [
+                      {
+                        "id": "O7fCJ8YrC6kXDqQi",
+                        "uuid": null,
+                        "name": "Great sword",
+                        "proficiency": "exoticEdged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "version": 3,
+                "role": "defender",
+                "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+                "opponentSize": "Medium",
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 0,
+                  "combatantId": "Z3DIahIm3Y1APZgS",
+                  "ownTurnIndex": 1
+                },
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "ownSize": "Medium",
+                "opponentName": "RAW QA All-out Attack362",
+                "adjacent": true,
+                "incomingConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "mastery": false,
+                "covertFeats": [],
+                "vulnerable": null,
+                "normalDodge": 0,
+                "dodgeBonus": 0
+              },
+              {
+                "state": "",
+                "normal": 4,
+                "total": 4,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "Z3DIahIm3Y1APZgS"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 4
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "resist-trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              14,
+              14,
+              10,
+              0,
+              0,
+              false,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ]
+          ],
+          "operationId": "trip-y4x0Ia47BouT0HgI",
+          "wasCondition": false,
+          "state": "applied",
+          "gcReviewed": true,
+          "resolution": "alreadyApplied",
+          "conditionChanged": false
+        }
+      }
+    },
+    {
+      "message": "ChatMessage.hvi9mos2J35ylJTO",
+      "label": "Actual spearAttack skill dialog Spear Basics",
+      "flags": {
+        "tripAttack": {
+          "version": 1,
+          "skillKey": "acrobatics",
+          "checkId": "trip",
+          "role": "attacker",
+          "ownSize": "Medium",
+          "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+          "opponentName": "RAW QA All-out Attack362",
+          "opponentSize": "Medium",
+          "adjacent": true,
+          "participantsConfirmed": true,
+          "halfActionConfirmed": true,
+          "sizeDifference": 0,
+          "sizeBonus": 0,
+          "combat": {
+            "id": "7vMiNmJtHdsPXhNB",
+            "started": true,
+            "round": 1,
+            "turn": 2,
+            "combatantId": "p05wQwXm2hMlcmEk",
+            "ownTurnIndex": 2
+          }
+        },
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": {
+          "version": 1,
+          "skillKey": "acrobatics",
+          "checkId": "trip",
+          "scope": "trip",
+          "sources": [
+            {
+              "feat": "Spear Basics",
+              "family": "spear",
+              "bonus": 2,
+              "weapons": [
+                {
+                  "id": "Sn4NxzDPvgyolc0S",
+                  "uuid": null,
+                  "name": "Boar spear",
+                  "proficiency": "exoticEdged",
+                  "hands": 2,
+                  "requiredHands": 2
+                }
+              ]
+            }
+          ]
+        },
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": null,
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 4,
+          "total": 4,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "combatantId": "p05wQwXm2hMlcmEk"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 4,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 14,
+        "rolledTotal": 14,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 14,
+        "actorUuid": "Actor.KjIlrXtWiySSMMQw",
+        "checkKind": "skill",
+        "ability": "dex",
+        "skillKey": "acrobatics",
+        "checkId": "trip",
+        "focus": "Trip Action",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 4
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 4,
+        "cap": 20,
+        "baseFlavor": "Acrobatics / Trip Action (DEX)<br><small>  Spear Basics: +2 gear with this trip skill check while holding a readied spear; gear bonuses do not stack (pp.176,179–180,329).     Trip against RAW QA All-out Attack362: one half action, opposed Acrobatics(DEX), Armor Check Penalty, base error1 plus action error+1; only the larger participant gains+4per Size category. Your Size bonus +0 (pp.352,361). Confirm and resolve both checks in chat; adjudicate the opposed result, sprawled/flat-footed, critical effects, final attacks and counter-Trip sequence separately. This ordinary roll does not authorize a free Trip or a weapon-quality variant.                                      1 Half Action. Active. Armor Check Penalty. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 10,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": false,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true,
+        "tripSettlement": {
+          "version": 1,
+          "attackerUuid": "Actor.KjIlrXtWiySSMMQw",
+          "defenderUuid": "Actor.SS9S7sHiVOJRNO1C",
+          "attackerWon": false,
+          "condition": "flat-footed",
+          "conditionActorUuid": "Actor.KjIlrXtWiySSMMQw",
+          "combatId": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "turn": 2,
+          "tieResolved": false,
+          "sourceMessage": "ChatMessage.hvi9mos2J35ylJTO",
+          "defenderMessage": "ChatMessage.XWJZds5NfDauPLEx",
+          "sourceEvidence": [
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "role": "attacker",
+                "ownSize": "Medium",
+                "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+                "opponentName": "RAW QA All-out Attack362",
+                "opponentSize": "Medium",
+                "adjacent": true,
+                "participantsConfirmed": true,
+                "halfActionConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 2,
+                  "combatantId": "p05wQwXm2hMlcmEk",
+                  "ownTurnIndex": 2
+                }
+              },
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "scope": "trip",
+                "sources": [
+                  {
+                    "feat": "Spear Basics",
+                    "family": "spear",
+                    "bonus": 2,
+                    "weapons": [
+                      {
+                        "id": "Sn4NxzDPvgyolc0S",
+                        "uuid": null,
+                        "name": "Boar spear",
+                        "proficiency": "exoticEdged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "",
+                "normal": 4,
+                "total": 4,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "p05wQwXm2hMlcmEk"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 4
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              14,
+              14,
+              10,
+              0,
+              0,
+              false,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ],
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "scope": "trip-defense",
+                "sources": [
+                  {
+                    "feat": "Axe Basics",
+                    "family": "axe",
+                    "bonus": 1,
+                    "weapons": [
+                      {
+                        "id": "PadnffYY7os4ICZK",
+                        "uuid": null,
+                        "name": "Battleaxe",
+                        "proficiency": "edged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "version": 3,
+                "role": "defender",
+                "opponentUuid": "Actor.KjIlrXtWiySSMMQw",
+                "opponentSize": "Medium",
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 2,
+                  "combatantId": "iIyVbc8S4ZDeXhGg",
+                  "ownTurnIndex": 0
+                },
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "ownSize": "Medium",
+                "opponentName": "RAW QA Feint Bystander362",
+                "adjacent": true,
+                "incomingConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "mastery": false,
+                "covertFeats": [],
+                "vulnerable": null,
+                "normalDodge": 0,
+                "dodgeBonus": 0
+              },
+              {
+                "state": "",
+                "normal": 3,
+                "total": 3,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "iIyVbc8S4ZDeXhGg"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 3
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "resist-trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              18,
+              18,
+              15,
+              0,
+              0,
+              true,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ]
+          ],
+          "operationId": "trip-yz2RyKmbSGneD3zN",
+          "wasCondition": false,
+          "state": "applied",
+          "conditionChanged": true,
+          "effectId": "gKdvvN3E0dzJZMOh"
+        }
+      }
+    },
+    {
+      "message": "ChatMessage.XWJZds5NfDauPLEx",
+      "label": "Actual axeDefense skill dialog Axe Basics",
+      "flags": {
+        "tripAttack": null,
+        "meleeArmorPiercing": null,
+        "drivingStance": null,
+        "takedown": null,
+        "attackDamageBenefit": null,
+        "stalkingStance": null,
+        "sideStanceDamage": null,
+        "cheapShotRecovery": null,
+        "feint": null,
+        "attributeDamage": null,
+        "meleeSkillFeats": {
+          "version": 1,
+          "skillKey": "acrobatics",
+          "checkId": "resist-trip",
+          "scope": "trip-defense",
+          "sources": [
+            {
+              "feat": "Axe Basics",
+              "family": "axe",
+              "bonus": 1,
+              "weapons": [
+                {
+                  "id": "PadnffYY7os4ICZK",
+                  "uuid": null,
+                  "name": "Battleaxe",
+                  "proficiency": "edged",
+                  "hands": 2,
+                  "requiredHands": 2
+                }
+              ]
+            }
+          ]
+        },
+        "conveyanceBullRush": null,
+        "bullRushAttack": null,
+        "bullRushDefense": null,
+        "stillStandingSave": null,
+        "tumblePath": null,
+        "tripDefense": {
+          "version": 3,
+          "role": "defender",
+          "opponentUuid": "Actor.KjIlrXtWiySSMMQw",
+          "opponentSize": "Medium",
+          "combat": {
+            "id": "7vMiNmJtHdsPXhNB",
+            "started": true,
+            "round": 1,
+            "turn": 2,
+            "combatantId": "iIyVbc8S4ZDeXhGg",
+            "ownTurnIndex": 0
+          },
+          "skillKey": "acrobatics",
+          "checkId": "resist-trip",
+          "ownSize": "Medium",
+          "opponentName": "RAW QA Feint Bystander362",
+          "adjacent": true,
+          "incomingConfirmed": true,
+          "sizeDifference": 0,
+          "sizeBonus": 0,
+          "mastery": false,
+          "covertFeats": [],
+          "vulnerable": null,
+          "normalDodge": 0,
+          "dodgeBonus": 0
+        },
+        "fallDistance": null,
+        "balanceSurface": null,
+        "hideCircumstances": null,
+        "detectionObserver": null,
+        "hideMovement": null,
+        "targetSkillEffect": null,
+        "rankSynergyFeats": null,
+        "stoneCold": null,
+        "threaten": null,
+        "bugConcealment": null,
+        "documentation": null,
+        "trackingFeat": null,
+        "trackingMasteryTask": null,
+        "terrainSaveSource": null,
+        "oldSchool": null,
+        "analysisTask": null,
+        "forensicGenius": null,
+        "closedCourseFeat": null,
+        "wheelFeat": null,
+        "requestBenefit": null,
+        "rerollSource": null,
+        "practiceFeat": null,
+        "fundedTaking": null,
+        "gearAllowance": null,
+        "gearCheckContext": null,
+        "improvisedSearch": null,
+        "terrainFeat": null,
+        "pursuitFeat": null,
+        "professionalFeat": null,
+        "contactFeat": null,
+        "polyglot": null,
+        "photographicMemory": null,
+        "charmer": null,
+        "cardSharkKnowledge": null,
+        "cardSharkProfession": null,
+        "appearanceModifiers": null,
+        "hardCore": null,
+        "finalAttackRound": null,
+        "finesseDamage": null,
+        "damageSave": null,
+        "coverSave": null,
+        "cqbRange": null,
+        "finalAttack": null,
+        "twoWeaponFinalAttack": null,
+        "shakenContext": null,
+        "restraintEscape": null,
+        "skillBonusCondition": {
+          "state": "",
+          "normal": 3,
+          "total": 3,
+          "adjustment": 0
+        },
+        "skillCheckAdjustment": 0,
+        "weaponFocusWork": null,
+        "baffledSaveBonus": 0,
+        "gamblingDice": null,
+        "rollCombat": {
+          "id": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "combatantId": "iIyVbc8S4ZDeXhGg"
+        },
+        "preRollFunding": null,
+        "hailMary": {
+          "untrained": false,
+          "uncap": false,
+          "active": false,
+          "cost": 0
+        },
+        "rerollFunding": null,
+        "rerollReceiptId": null,
+        "rerollOf": null,
+        "sleepSnapshot": null,
+        "conditionAbilityAdjustment": 0,
+        "conditionDamagePenalty": 0,
+        "evasionContext": null,
+        "securityBonus": 0,
+        "fatigueBonus": 0,
+        "fatigueCondition": "",
+        "underwaterContext": {
+          "underwater": false,
+          "aquatic": false,
+          "athleticsRanks": 4,
+          "swimExempt": false,
+          "penalty": 0,
+          "notes": []
+        },
+        "mortarOperation": null,
+        "launcherOperation": null,
+        "unnervingAvailableGrade": 0,
+        "unnervingStress": null,
+        "qualityChecks": {
+          "bonuses": [],
+          "notes": [],
+          "fearless": 0,
+          "strongMinded": 0,
+          "seductive": 0,
+          "camouflaged": 0,
+          "terrain": "",
+          "shiftingDisposition": false,
+          "seductionConflict": false
+        },
+        "medical": null,
+        "littleDetails": null,
+        "sensoryConditions": {
+          "blinded": false,
+          "deafened": false,
+          "targetDeafened": false,
+          "nightTrainingException": false,
+          "capAdjustment": 0,
+          "skillModifier": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillTags": {
+          "wheelWaiver": false,
+          "handPenaltyBeforeWheel": 0,
+          "nauseated": false,
+          "concentration": false,
+          "mute": false,
+          "oneHanded": false,
+          "noSharedLanguage": false,
+          "bound": false,
+          "conveyingMessage": false,
+          "addedHandsOn": false,
+          "handsOn": false,
+          "grasp": false,
+          "language": false,
+          "twoWeapon": false,
+          "handPenalty": 0,
+          "capAdjustment": 0,
+          "blockedReason": "",
+          "notes": []
+        },
+        "skillGear": null,
+        "fogSmoke": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "visualDelta": 0,
+          "notes": []
+        },
+        "terrainSave": null,
+        "localHeroOpposition": null,
+        "cunningPlan": null,
+        "attributeSubstitution": null,
+        "terrain": {
+          "homeTurf": false,
+          "homeTurfEligible": false,
+          "homeTurfCapIncrease": 0,
+          "terrain": "",
+          "underwater": false,
+          "navigating": false,
+          "naturalSurface": false,
+          "hearingCheck": false,
+          "cityPopulation": 0,
+          "nightAmbush": false,
+          "matched": [],
+          "woodcraft": false,
+          "unfair": false,
+          "bonuses": [],
+          "synergies": [],
+          "synergySources": [],
+          "ambushSources": [],
+          "opponentSurprisePenalty": 0,
+          "notes": []
+        },
+        "senses": {
+          "hearing": false,
+          "scent": false,
+          "deafened": false,
+          "bonuses": [],
+          "notes": []
+        },
+        "tracking": null,
+        "gcTakingPermissionConfirmed": false,
+        "ambush": null,
+        "sneakAttackTarget": null,
+        "sneakAttack": null,
+        "ambientLight": {
+          "specified": false,
+          "skillModifier": 0,
+          "targetDefenseBonus": 0,
+          "notes": []
+        },
+        "nest": null,
+        "breakthrough": null,
+        "requiredBonusPoolId": null,
+        "requiredBonusSpent": false,
+        "cannotError": false,
+        "resultSource": "",
+        "opponentResult": null,
+        "oneInAMillion": false,
+        "tenSecondSolution": false,
+        "standaloneCheckConfirmed": false,
+        "forcedThreat": false,
+        "noForcedReroll": false,
+        "normalThreat": 20,
+        "rawTotal": 18,
+        "rolledTotal": 18,
+        "minimumAdjustment": 0,
+        "practiceMakesPerfect": false,
+        "criticalFailureCostIncrease": 0,
+        "crossCheck": false,
+        "alternatives": null,
+        "chosenIndex": 0,
+        "choiceSource": null,
+        "choiceResourceId": null,
+        "effectiveTotal": 18,
+        "actorUuid": "Actor.SS9S7sHiVOJRNO1C",
+        "checkKind": "skill",
+        "ability": "dex",
+        "skillKey": "acrobatics",
+        "checkId": "resist-trip",
+        "focus": "Resist Trip",
+        "rerollResources": [],
+        "formula": "1d20 + @total",
+        "rollData": {
+          "total": 3
+        },
+        "weaponUuid": "",
+        "weaponProficiency": "",
+        "weaponQualities": "",
+        "cleanAndPolished": false,
+        "gearUuid": "",
+        "gearAttempt": null,
+        "attackContext": null,
+        "unarmed": false,
+        "improvised": false,
+        "threat": 20,
+        "error": 4,
+        "cap": 20,
+        "baseFlavor": "Acrobatics / Resist Trip (DEX)<br><small>  Axe Basics: +1 gear with this trip-defense skill check while holding a readied axe; gear bonuses do not stack (pp.176,179–180,329).      Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier+1; larger participant +4 per Size category (pp.352,361). Your Size bonus +0. The GC resolves the opposed result, sprawled/flat-footed conditions, critical effects, final attacks and permitted counter-Trip sequence separately.                                     Opposed response. Active. Armor Check Penalty. Rules p.361.</small>",
+        "boostTotal": 0,
+        "boostSpent": 0,
+        "capped": false,
+        "naturalDie": 15,
+        "checkMethod": "roll",
+        "actionDiceAllowed": true,
+        "successConfirmed": true,
+        "errorConfirmed": false,
+        "threatConfirmed": false,
+        "triumphed": false,
+        "flawlessSearch": null,
+        "automaticSkillSuccess": null,
+        "resolved": true,
+        "tripSettlement": {
+          "version": 1,
+          "attackerUuid": "Actor.KjIlrXtWiySSMMQw",
+          "defenderUuid": "Actor.SS9S7sHiVOJRNO1C",
+          "attackerWon": false,
+          "condition": "flat-footed",
+          "conditionActorUuid": "Actor.KjIlrXtWiySSMMQw",
+          "combatId": "7vMiNmJtHdsPXhNB",
+          "round": 1,
+          "turn": 2,
+          "tieResolved": false,
+          "sourceMessage": "ChatMessage.hvi9mos2J35ylJTO",
+          "defenderMessage": "ChatMessage.XWJZds5NfDauPLEx",
+          "sourceEvidence": [
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "role": "attacker",
+                "ownSize": "Medium",
+                "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+                "opponentName": "RAW QA All-out Attack362",
+                "opponentSize": "Medium",
+                "adjacent": true,
+                "participantsConfirmed": true,
+                "halfActionConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 2,
+                  "combatantId": "p05wQwXm2hMlcmEk",
+                  "ownTurnIndex": 2
+                }
+              },
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "trip",
+                "scope": "trip",
+                "sources": [
+                  {
+                    "feat": "Spear Basics",
+                    "family": "spear",
+                    "bonus": 2,
+                    "weapons": [
+                      {
+                        "id": "Sn4NxzDPvgyolc0S",
+                        "uuid": null,
+                        "name": "Boar spear",
+                        "proficiency": "exoticEdged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "state": "",
+                "normal": 4,
+                "total": 4,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "p05wQwXm2hMlcmEk"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 4
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              14,
+              14,
+              10,
+              0,
+              0,
+              false,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ],
+            [
+              {
+                "version": 1,
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "scope": "trip-defense",
+                "sources": [
+                  {
+                    "feat": "Axe Basics",
+                    "family": "axe",
+                    "bonus": 1,
+                    "weapons": [
+                      {
+                        "id": "PadnffYY7os4ICZK",
+                        "uuid": null,
+                        "name": "Battleaxe",
+                        "proficiency": "edged",
+                        "hands": 2,
+                        "requiredHands": 2
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "version": 3,
+                "role": "defender",
+                "opponentUuid": "Actor.KjIlrXtWiySSMMQw",
+                "opponentSize": "Medium",
+                "combat": {
+                  "id": "7vMiNmJtHdsPXhNB",
+                  "started": true,
+                  "round": 1,
+                  "turn": 2,
+                  "combatantId": "iIyVbc8S4ZDeXhGg",
+                  "ownTurnIndex": 0
+                },
+                "skillKey": "acrobatics",
+                "checkId": "resist-trip",
+                "ownSize": "Medium",
+                "opponentName": "RAW QA Feint Bystander362",
+                "adjacent": true,
+                "incomingConfirmed": true,
+                "sizeDifference": 0,
+                "sizeBonus": 0,
+                "mastery": false,
+                "covertFeats": [],
+                "vulnerable": null,
+                "normalDodge": 0,
+                "dodgeBonus": 0
+              },
+              {
+                "state": "",
+                "normal": 3,
+                "total": 3,
+                "adjustment": 0
+              },
+              0,
+              null,
+              {
+                "id": "7vMiNmJtHdsPXhNB",
+                "round": 1,
+                "combatantId": "iIyVbc8S4ZDeXhGg"
+              },
+              null,
+              "1d20 + @total",
+              {
+                "total": 3
+              },
+              "skill",
+              "dex",
+              "acrobatics",
+              "resist-trip",
+              20,
+              null,
+              [],
+              4,
+              null,
+              18,
+              18,
+              15,
+              0,
+              0,
+              true,
+              false,
+              false,
+              null,
+              null,
+              null,
+              true,
+              null
+            ]
+          ],
+          "operationId": "trip-yz2RyKmbSGneD3zN",
+          "wasCondition": false,
+          "state": "applied",
+          "conditionChanged": true,
+          "effectId": "gKdvvN3E0dzJZMOh"
+        }
+      }
+    }
+  ],
+  "guards": [
+    {
+      "kind": "Three complete lawful Soldier1 builds have actual Axe/GreatSword/Spear feats, all proficiency picks used and no TODO/warnings; role refinements preceded every die roll"
+    },
+    {
+      "kind": "Actual attacker Trip uses DEX/ACP and one Axe Basics gear bonus, with canonical action error and recorded facts",
+      "stage": "axeAttack",
+      "total": 3,
+      "error": 4
+    },
+    {
+      "kind": "Actual off-size, too-large, nonadjacent, unconfirmed-half and take10 declarations reject before RNG and leave resources unchanged"
+    },
+    {
+      "kind": "Actual defender Trip uses DEX/ACP and one Great Sword Basics gear bonus, with canonical action error and recorded facts",
+      "stage": "greatDefense",
+      "total": 4,
+      "error": 4
+    },
+    {
+      "kind": "Actual native ordinary attacker win automatically applies one sprawled effect before injected final-stamp failure; both cards retain the same prepared pair"
+    },
+    {
+      "kind": "Defender takes a lawful half-action Stand Up on own Count; ordinary interrupted retry refuses to refresh the ended condition, with no new dice/effect"
+    },
+    {
+      "kind": "GC actual UI records alreadyApplied after lawful Stand Up, with no refreshed effect/RNG; repeated call remains settled"
+    },
+    {
+      "kind": "Actual attacker Trip uses DEX/ACP and one Spear Basics gear bonus, with canonical action error and recorded facts",
+      "stage": "spearAttack",
+      "total": 4,
+      "error": 4
+    },
+    {
+      "kind": "Actual defender Trip uses DEX/ACP and one Axe Basics gear bonus, with canonical action error and recorded facts",
+      "stage": "axeDefense",
+      "total": 3,
+      "error": 4
+    },
+    {
+      "kind": "Actual UI automatically applies flat-footed to losing attacker once, preserving effect through reload and repeated settlement"
+    },
+    {
+      "kind": "Four finished opposed-role receipts; three complete lawful builds retain health4/4/dice0 and original weapon qualities/Counts; only automatically settled ordinary-loss flat-footed remains until cleanup"
+    },
+    {
+      "kind": "Exact Actor/combat/receipt reload retains the automatically settled loss effect and reviewed ended first condition without refreshing it",
+      "reloadVerified": true
+    },
+    {
+      "kind": "Actual settlement retry after reload preserves both the ended first condition and one existing second loss effect, using original receipt evidence without new RNG"
+    }
+  ],
+  "ui": [
+    {
+      "kind": "Actual axeAttack ordinary Trip attacker",
+      "confirmY": 582,
+      "confirmBottom": 622,
+      "total": 3,
+      "error": 4
+    },
+    {
+      "kind": "Actual greatDefense ordinary Trip defender",
+      "confirmY": 582,
+      "confirmBottom": 622,
+      "total": 4,
+      "error": 4
+    },
+    {
+      "kind": "Actual Main GC review of ended interrupted Trip",
+      "confirmY": 582,
+      "confirmBottom": 622
+    },
+    {
+      "kind": "Actual spearAttack ordinary Trip attacker",
+      "confirmY": 582,
+      "confirmBottom": 622,
+      "total": 4,
+      "error": 4
+    },
+    {
+      "kind": "Actual axeDefense ordinary Trip defender",
+      "confirmY": 582,
+      "confirmBottom": 622,
+      "total": 3,
+      "error": 4
+    },
+    {
+      "kind": "Actual Main ordinary losing-attacker settlement",
+      "confirmY": 582,
+      "confirmBottom": 622
+    }
+  ],
+  "periods": {
+    "mission": "qa-xp-cancel",
+    "session": "MeCkrj45ff0VaUEr",
+    "scene": "M8ZajdPdnHP2gCsS",
+    "sceneSequence": 2
+  },
+  "gc": {
+    "value": 1,
+    "session": "MeCkrj45ff0VaUEr",
+    "playersPresent": 1,
+    "caliber": 1,
+    "lastReason": "Critical activation",
+    "controllerId": "ZTSRy74hgofWcbms",
+    "settlementReview": {
+      "id": "MfK3PHV2iV2wvias",
+      "needsReview": false,
+      "session": "MeCkrj45ff0VaUEr",
+      "before": 2,
+      "count": 1,
+      "purpose": "Critical activation",
+      "messageUuid": "ChatMessage.yrwpFKwm4B3kzbAx",
+      "at": 1794752784259,
+      "outcome": "spent"
+    }
+  },
+  "worldTime": 126,
+  "actor": "SS9S7sHiVOJRNO1C",
+  "actors": [
+    "SS9S7sHiVOJRNO1C",
+    "rfIoVF77rfoPOCR7",
+    "KjIlrXtWiySSMMQw"
+  ],
+  "feat": "zNKqonxW43Pev2aJ",
+  "sur": "jBHvRQsWerCrTgic",
+  "fin": "vSzMkGtvaQshkXgi",
+  "combat": "7vMiNmJtHdsPXhNB",
+  "targets": [
+    "rfIoVF77rfoPOCR7",
+    "KjIlrXtWiySSMMQw"
+  ],
+  "rapier": "PadnffYY7os4ICZK",
+  "fencing": "2nUiZKk9rhTB1aUU",
+  "health": {
+    "vitality": {
+      "value": 4
+    },
+    "wounds": {
+      "value": 4
+    }
+  },
+  "dice": 0,
+  "refined": true,
+  "twoHandedSwordWeapon": "O7fCJ8YrC6kXDqQi",
+  "spearWeapon": "Sn4NxzDPvgyolc0S",
+  "base": {
+    "health": [
+      {
+        "id": "SS9S7sHiVOJRNO1C",
+        "vitality": 4,
+        "wounds": 4,
+        "dice": 0
+      },
+      {
+        "id": "rfIoVF77rfoPOCR7",
+        "vitality": 4,
+        "wounds": 4,
+        "dice": 0
+      },
+      {
+        "id": "KjIlrXtWiySSMMQw",
+        "vitality": 4,
+        "wounds": 4,
+        "dice": 0
+      }
+    ],
+    "weaponQualities": [
+      {
+        "id": "SS9S7sHiVOJRNO1C",
+        "weapons": [
+          {
+            "id": "jBHvRQsWerCrTgic",
+            "qualities": "GAR (+1), SUR"
+          },
+          {
+            "id": "vSzMkGtvaQshkXgi",
+            "qualities": "AP (4), QKY"
+          },
+          {
+            "id": "PadnffYY7os4ICZK",
+            "qualities": "AP (2), KEN (+3), TRP (+1)"
+          }
+        ]
+      },
+      {
+        "id": "rfIoVF77rfoPOCR7",
+        "weapons": [
+          {
+            "id": "jBHvRQsWerCrTgic",
+            "qualities": "GAR (+1), SUR"
+          },
+          {
+            "id": "vSzMkGtvaQshkXgi",
+            "qualities": "AP (4), QKY"
+          },
+          {
+            "id": "O7fCJ8YrC6kXDqQi",
+            "qualities": "INA (-1), GAR (+1), MAS, RGD, TKD"
+          }
+        ]
+      },
+      {
+        "id": "KjIlrXtWiySSMMQw",
+        "weapons": [
+          {
+            "id": "jBHvRQsWerCrTgic",
+            "qualities": "GAR (+1), SUR"
+          },
+          {
+            "id": "vSzMkGtvaQshkXgi",
+            "qualities": "AP (4), QKY"
+          },
+          {
+            "id": "Sn4NxzDPvgyolc0S",
+            "qualities": "AP (1)"
+          }
+        ]
+      }
+    ]
+  },
+  "outcomes": [
+    {
+      "sourceMessage": "ChatMessage.gUA5G6CVhLHAgHuk",
+      "defenderMessage": "ChatMessage.CnxWjRBoNe5t33eO",
+      "settlement": {
+        "version": 1,
+        "attackerUuid": "Actor.SS9S7sHiVOJRNO1C",
+        "defenderUuid": "Actor.rfIoVF77rfoPOCR7",
+        "attackerWon": true,
+        "condition": "sprawled",
+        "conditionActorUuid": "Actor.rfIoVF77rfoPOCR7",
+        "combatId": "7vMiNmJtHdsPXhNB",
+        "round": 1,
+        "turn": 0,
+        "tieResolved": false,
+        "sourceMessage": "ChatMessage.gUA5G6CVhLHAgHuk",
+        "defenderMessage": "ChatMessage.CnxWjRBoNe5t33eO",
+        "sourceEvidence": [
+          [
+            {
+              "version": 1,
+              "skillKey": "acrobatics",
+              "checkId": "trip",
+              "role": "attacker",
+              "ownSize": "Medium",
+              "opponentUuid": "Actor.rfIoVF77rfoPOCR7",
+              "opponentName": "RAW QA Feint Defender362",
+              "opponentSize": "Medium",
+              "adjacent": true,
+              "participantsConfirmed": true,
+              "halfActionConfirmed": true,
+              "sizeDifference": 0,
+              "sizeBonus": 0,
+              "combat": {
+                "id": "7vMiNmJtHdsPXhNB",
+                "started": true,
+                "round": 1,
+                "turn": 0,
+                "combatantId": "iIyVbc8S4ZDeXhGg",
+                "ownTurnIndex": 0
+              }
+            },
+            {
+              "version": 1,
+              "skillKey": "acrobatics",
+              "checkId": "trip",
+              "scope": "trip",
+              "sources": [
+                {
+                  "feat": "Axe Basics",
+                  "family": "axe",
+                  "bonus": 1,
+                  "weapons": [
+                    {
+                      "id": "PadnffYY7os4ICZK",
+                      "uuid": null,
+                      "name": "Battleaxe",
+                      "proficiency": "edged",
+                      "hands": 2,
+                      "requiredHands": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "state": "",
+              "normal": 3,
+              "total": 3,
+              "adjustment": 0
+            },
+            0,
+            null,
+            {
+              "id": "7vMiNmJtHdsPXhNB",
+              "round": 1,
+              "combatantId": "iIyVbc8S4ZDeXhGg"
+            },
+            null,
+            "1d20 + @total",
+            {
+              "total": 3
+            },
+            "skill",
+            "dex",
+            "acrobatics",
+            "trip",
+            20,
+            null,
+            [],
+            4,
+            null,
+            18,
+            18,
+            15,
+            0,
+            0,
+            true,
+            false,
+            false,
+            null,
+            null,
+            null,
+            true,
+            null
+          ],
+          [
+            {
+              "version": 1,
+              "skillKey": "acrobatics",
+              "checkId": "resist-trip",
+              "scope": "trip-defense",
+              "sources": [
+                {
+                  "feat": "Great Sword Basics",
+                  "family": "twoHandedSword",
+                  "bonus": 2,
+                  "weapons": [
+                    {
+                      "id": "O7fCJ8YrC6kXDqQi",
+                      "uuid": null,
+                      "name": "Great sword",
+                      "proficiency": "exoticEdged",
+                      "hands": 2,
+                      "requiredHands": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "version": 3,
+              "role": "defender",
+              "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+              "opponentSize": "Medium",
+              "combat": {
+                "id": "7vMiNmJtHdsPXhNB",
+                "started": true,
+                "round": 1,
+                "turn": 0,
+                "combatantId": "Z3DIahIm3Y1APZgS",
+                "ownTurnIndex": 1
+              },
+              "skillKey": "acrobatics",
+              "checkId": "resist-trip",
+              "ownSize": "Medium",
+              "opponentName": "RAW QA All-out Attack362",
+              "adjacent": true,
+              "incomingConfirmed": true,
+              "sizeDifference": 0,
+              "sizeBonus": 0,
+              "mastery": false,
+              "covertFeats": [],
+              "vulnerable": null,
+              "normalDodge": 0,
+              "dodgeBonus": 0
+            },
+            {
+              "state": "",
+              "normal": 4,
+              "total": 4,
+              "adjustment": 0
+            },
+            0,
+            null,
+            {
+              "id": "7vMiNmJtHdsPXhNB",
+              "round": 1,
+              "combatantId": "Z3DIahIm3Y1APZgS"
+            },
+            null,
+            "1d20 + @total",
+            {
+              "total": 4
+            },
+            "skill",
+            "dex",
+            "acrobatics",
+            "resist-trip",
+            20,
+            null,
+            [],
+            4,
+            null,
+            14,
+            14,
+            10,
+            0,
+            0,
+            false,
+            false,
+            false,
+            null,
+            null,
+            null,
+            true,
+            null
+          ]
+        ],
+        "operationId": "trip-y4x0Ia47BouT0HgI",
+        "wasCondition": false,
+        "state": "applied",
+        "gcReviewed": true,
+        "resolution": "alreadyApplied",
+        "conditionChanged": false
+      },
+      "automatedByTrip": true
+    },
+    {
+      "sourceMessage": "ChatMessage.hvi9mos2J35ylJTO",
+      "defenderMessage": "ChatMessage.XWJZds5NfDauPLEx",
+      "settlement": {
+        "version": 1,
+        "attackerUuid": "Actor.KjIlrXtWiySSMMQw",
+        "defenderUuid": "Actor.SS9S7sHiVOJRNO1C",
+        "attackerWon": false,
+        "condition": "flat-footed",
+        "conditionActorUuid": "Actor.KjIlrXtWiySSMMQw",
+        "combatId": "7vMiNmJtHdsPXhNB",
+        "round": 1,
+        "turn": 2,
+        "tieResolved": false,
+        "sourceMessage": "ChatMessage.hvi9mos2J35ylJTO",
+        "defenderMessage": "ChatMessage.XWJZds5NfDauPLEx",
+        "sourceEvidence": [
+          [
+            {
+              "version": 1,
+              "skillKey": "acrobatics",
+              "checkId": "trip",
+              "role": "attacker",
+              "ownSize": "Medium",
+              "opponentUuid": "Actor.SS9S7sHiVOJRNO1C",
+              "opponentName": "RAW QA All-out Attack362",
+              "opponentSize": "Medium",
+              "adjacent": true,
+              "participantsConfirmed": true,
+              "halfActionConfirmed": true,
+              "sizeDifference": 0,
+              "sizeBonus": 0,
+              "combat": {
+                "id": "7vMiNmJtHdsPXhNB",
+                "started": true,
+                "round": 1,
+                "turn": 2,
+                "combatantId": "p05wQwXm2hMlcmEk",
+                "ownTurnIndex": 2
+              }
+            },
+            {
+              "version": 1,
+              "skillKey": "acrobatics",
+              "checkId": "trip",
+              "scope": "trip",
+              "sources": [
+                {
+                  "feat": "Spear Basics",
+                  "family": "spear",
+                  "bonus": 2,
+                  "weapons": [
+                    {
+                      "id": "Sn4NxzDPvgyolc0S",
+                      "uuid": null,
+                      "name": "Boar spear",
+                      "proficiency": "exoticEdged",
+                      "hands": 2,
+                      "requiredHands": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "state": "",
+              "normal": 4,
+              "total": 4,
+              "adjustment": 0
+            },
+            0,
+            null,
+            {
+              "id": "7vMiNmJtHdsPXhNB",
+              "round": 1,
+              "combatantId": "p05wQwXm2hMlcmEk"
+            },
+            null,
+            "1d20 + @total",
+            {
+              "total": 4
+            },
+            "skill",
+            "dex",
+            "acrobatics",
+            "trip",
+            20,
+            null,
+            [],
+            4,
+            null,
+            14,
+            14,
+            10,
+            0,
+            0,
+            false,
+            false,
+            false,
+            null,
+            null,
+            null,
+            true,
+            null
+          ],
+          [
+            {
+              "version": 1,
+              "skillKey": "acrobatics",
+              "checkId": "resist-trip",
+              "scope": "trip-defense",
+              "sources": [
+                {
+                  "feat": "Axe Basics",
+                  "family": "axe",
+                  "bonus": 1,
+                  "weapons": [
+                    {
+                      "id": "PadnffYY7os4ICZK",
+                      "uuid": null,
+                      "name": "Battleaxe",
+                      "proficiency": "edged",
+                      "hands": 2,
+                      "requiredHands": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "version": 3,
+              "role": "defender",
+              "opponentUuid": "Actor.KjIlrXtWiySSMMQw",
+              "opponentSize": "Medium",
+              "combat": {
+                "id": "7vMiNmJtHdsPXhNB",
+                "started": true,
+                "round": 1,
+                "turn": 2,
+                "combatantId": "iIyVbc8S4ZDeXhGg",
+                "ownTurnIndex": 0
+              },
+              "skillKey": "acrobatics",
+              "checkId": "resist-trip",
+              "ownSize": "Medium",
+              "opponentName": "RAW QA Feint Bystander362",
+              "adjacent": true,
+              "incomingConfirmed": true,
+              "sizeDifference": 0,
+              "sizeBonus": 0,
+              "mastery": false,
+              "covertFeats": [],
+              "vulnerable": null,
+              "normalDodge": 0,
+              "dodgeBonus": 0
+            },
+            {
+              "state": "",
+              "normal": 3,
+              "total": 3,
+              "adjustment": 0
+            },
+            0,
+            null,
+            {
+              "id": "7vMiNmJtHdsPXhNB",
+              "round": 1,
+              "combatantId": "iIyVbc8S4ZDeXhGg"
+            },
+            null,
+            "1d20 + @total",
+            {
+              "total": 3
+            },
+            "skill",
+            "dex",
+            "acrobatics",
+            "resist-trip",
+            20,
+            null,
+            [],
+            4,
+            null,
+            18,
+            18,
+            15,
+            0,
+            0,
+            true,
+            false,
+            false,
+            null,
+            null,
+            null,
+            true,
+            null
+          ]
+        ],
+        "operationId": "trip-yz2RyKmbSGneD3zN",
+        "wasCondition": false,
+        "state": "applied",
+        "conditionChanged": true,
+        "effectId": "gKdvvN3E0dzJZMOh"
+      },
+      "automatedByTrip": true
+    }
+  ],
+  "stage": "axeDefense",
+  "axeAttack": "ChatMessage.gUA5G6CVhLHAgHuk",
+  "greatDefense": "ChatMessage.CnxWjRBoNe5t33eO",
+  "settleStage": "second",
+  "spearAttack": "ChatMessage.hvi9mos2J35ylJTO",
+  "axeDefense": "ChatMessage.XWJZds5NfDauPLEx",
+  "reloadVerified": true,
+  "cleanup": {
+    "actors": 6,
+    "messages": 1321,
+    "combats": 0,
+    "effects": 0,
+    "worldTime": 126,
+    "gcDice": 1,
+    "deletedActors": true,
+    "deletedCombat": true,
+    "baselinesUnchanged": true
+  },
+  "browserErrors": [],
+  "harnessNotes": [
+    "Three lawful Soldier1 fixtures were complete before dice, with zero TODO/warnings and unchanged health4/4/dice0/Counts20,10,5. Two ordinary Trip pairs were automatically settled: first winning attacker sprawled its opponent, with a final-stamp failure deliberately injected; that opponent then took a lawful Stand Up on its own Count. Normal retry refused to refresh the ended condition, and actual GC review UI recorded alreadyApplied without another effect/RNG. Second losing attacker became flat-footed through actual Main settlement UI and retained it through reload until fixture cleanup. Critical/final-attack/free-counter-Trip and weapon TRP variants remain separate."
+  ]
+}
