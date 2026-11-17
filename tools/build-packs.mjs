@@ -36,6 +36,7 @@ const summaries = read("summaries.json");
 const gear = read("gear.json");
 const vehicles = read("vehicles.json");
 const upgrades = read("upgrades.json");
+const gearSummaries = read("gear-summaries.json").summaries;
 const contagions = read("contagions.json");
 const system = JSON.parse(readFileSync(join(ROOT, "system.json"), "utf8"));
 
@@ -237,6 +238,8 @@ const gearBase = (row, category) => ({
   footnotes: footnoteLabels(row, footnotesFor(row.sourceTable)),
   bundled: row.bundled ?? "", perTeamMember: (row.notes ?? []).includes("teamIssue")
 });
+/** Our one-line summary for a gear row; every row must have one. */
+const gearSummary = row => { const text = gearSummaries[row.name]; if (!text) throw new Error(`No gear summary for ${row.name}`); return text; };
 const GEAR_LISTS = [["electronics", "E"], ["gadgets", "G"], ["resources", "R"], ["security", "S"], ["tradecraft", "T"]];
 packs.gear = { label: "Gear", folders: [...GEAR_LISTS.map(([, c], i) => folder("gear", gear.categories[c].label, i)), folder("gear", "Gadget Housings", GEAR_LISTS.length)], docs: [] };
 GEAR_LISTS.forEach(([list, category], folderIndex) => {
@@ -244,7 +247,7 @@ GEAR_LISTS.forEach(([list, category], folderIndex) => {
   rows.forEach((row, i) => {
     const stats = row.weightLabel ? [{ label: "Weight", value: row.weightLabel }] : [];
     packs.gear.docs.push(item("gear", names[i], "gear", "icons/svg/item-bag.svg", {
-      ...gearBase(row, category), description: pageNote(info.table, row.sourcePage, info.descriptionsPage, row),
+      ...gearBase(row, category), description: p(gearSummary(row)) + pageNote(info.table, row.sourcePage, info.descriptionsPage, row),
       powerRating: row.powerRating ?? "", resultCap: row.resultCap ?? "", effectRange: row.range ?? "", sizeHands: row.sizeHands ?? "",
       battery: row.battery ?? "", damageSave: row.damageSave ?? null, complexity: row.complexity ?? "", year: row.year ?? "",
       streetValue: row.streetValue ?? "", restricted: !!row.restricted, standingCost: row.standingCost ?? "",

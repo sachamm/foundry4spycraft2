@@ -217,6 +217,16 @@ test('armor, weapon upgrade, detonator and contagion tables are complete', () =>
   assert.equal(upgrades.detonators.find(d => d.name === 'Det cord, 1 ft.').damage, '3d4');
 });
 
+test('every gear pick has a short original summary', () => {
+  const summaries = read('gear-summaries').summaries;
+  for (const list of ['electronics', 'gadgets', 'resources', 'security', 'tradecraft']) for (const row of gear[list]) {
+    const text = summaries[row.name];
+    assert.ok(text, `${row.name}: summary`);
+    assert.ok(text.length <= 80 && !text.includes('\n'), `${row.name}: one short line`);
+    assert.doesNotMatch(row.name, /[*†‡∆Ω\u2126]/, row.name);
+  }
+});
+
 test('every footnote code has a short label and noted rows carry at least one', () => {
   const lists = [...['electronics', 'gadgets', 'resources', 'security', 'tradecraft'].map(k => [gear[k], gear.footnotes]),
     [vehicles.vehicles, vehicles.footnotes], [vehicles.upgrades, vehicles.upgradeFootnotes], [vehicles.weapons, vehicles.upgradeFootnotes]];
