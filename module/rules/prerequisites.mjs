@@ -44,7 +44,7 @@ function test(n, ctx, unmet) {
     case "featChoice": ok = !!ctx.hasFeatChoice?.(n.name,n.choice); break;
     case "featTree": ok = (ctx.featTrees[n.tree] ?? 0) >= n.min; break;
     case "base": ok = (ctx.base[n.key] ?? 0) >= n.min; break;
-    case "level": ok = n.eq !== undefined ? (ctx.acquisitionLevel ?? ctx.level) === n.eq : (ctx.prerequisiteLevel ?? ctx.level) >= n.min; break;
+    case "level": ok = n.eq !== undefined ? (ctx.acquisitionLevel ?? ctx.level) === n.eq : (ctx.prerequisiteLevel ?? ctx.level) + (ctx.levelBonus ?? 0) >= n.min; break;
     case "sneakAttack": ok = (ctx.sneakAttackDice ?? 0) >= n.min; break;
     case "manual": ok = !!ctx.manualConfirmed; break;
     case "ability": ok = (ctx.abilities[n.key] ?? 0) >= n.min; break;

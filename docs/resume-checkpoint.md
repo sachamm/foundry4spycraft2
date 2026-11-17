@@ -238,6 +238,12 @@ Verification:513legacy assertions,3041Node tests (1386+1655),6cold pack checks,3
 
 Staff Basics remains explicitly partial pending a whole-feat printed-benefit/source audit; no closure is claimed solely from this escape ruling. Inventory remains117manual/54partial/143other, at least171of314explicitly unfinished,29whole-feat closures. Knife Basics has been researched but no implementation started. User requested wrap-up, checks, commit and push to GitHub main; remaining ledger work is deferred. Audits: qa/implementation-372.json and qa/native-thread-escape-372.json.
 
+## Cloud continuation — batches 373 onward (branch `claude/residual-ledger-nuafqx`)
+
+Work resumed in a cloud container on branch `claude/residual-ledger-nuafqx`, kept separate from concurrent UI/UX work; existing templates, styles and sheet layout are not restructured. The user uploaded `Spycraft_2.0_AI_Rules.md` to the session; it is reference data. The original PDFs and a native Foundry installation are **not** available there, so these batches rely on the extracted rules text plus automated tests, and each records “native QA not run”. Re-run native QA and visual page checks for these batches when a desktop session resumes. Details for each batch are in `raw-option-inventory.md`.
+
+- Batch 373: Mark of Conflict/Strife/Turmoil (p.190) — +1 category damage, +3 BAB/level for own-tree prerequisites. 3050 Node tests.
+
 ## Next work — paused at user-requested wrap-up
 
 Continue Knife Basics p.179 only on a new continuation request: free knife draw, knives on the person always readied, Circling Stance and Between the Ribs remain unimplemented. Preserve371 physical hand capacity: carried readiness is distinct from physical holding, does not occupy every knife in a hand, and does not spend Quick Draw’s two-use pool. Research has begun, no Knife source edits exist. Staff Basics needs its whole-feat source audit before closure. Full validators/pack checks require stopped native services. Latest isolated QA root372 is stopped, cleaned and verified as above. Preserve baseline IDs and unanswered rulings.

@@ -393,9 +393,9 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Lucky Break | 190 | No | Manual/descriptive | — |
 | Misfortune | 190 | No | Manual/descriptive | — |
 | Peculiar Dodge | 190 | No | Manual/descriptive | — |
-| Mark of Conflict | 190 | No | Manual/descriptive | — |
-| Mark of Strife | 190 | No | Manual/descriptive | — |
-| Mark of Turmoil | 190 | No | Manual/descriptive | — |
+| Mark of Conflict | 190 | No | Implemented: +1 on every ranged weapon damage roll; BAB and career level count 3 higher for Ranged Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Ranged Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
+| Mark of Strife | 190 | No | Implemented: +1 on every unarmed weapon damage roll; BAB and career level count 3 higher for Unarmed Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Unarmed Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
+| Mark of Turmoil | 190 | No | Implemented: +1 on every melee weapon damage roll; BAB and career level count 3 higher for Melee Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Melee Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
 | Trouble Magnet | 191 | Yes | Implemented: one extra Subplot per valid selection (twice maximum), plus minimum-one unfinished Subplot check | Batch226; active named/described records, completion/source changes and visible requirement verified |
 | Baby It | 191 | No | Manual/descriptive | — |
 | Demolition Derby | 192 | No | Manual/descriptive | — |
@@ -1503,3 +1503,13 @@ Verification:513legacy assertions,3041Node tests (1386+1655),6cold pack checks,3
 Staff Basics remains explicitly partial pending a whole-feat printed-benefit/source audit; no closure is claimed solely from this escape ruling. Inventory remains117manual/54partial/143other, at least171of314explicitly unfinished,29whole-feat closures. Knife Basics has been researched but no implementation started. User requested wrap-up, checks, commit and push to GitHub main; remaining ledger work is deferred. Audits: qa/implementation-372.json and qa/native-thread-escape-372.json.
 
 Final pre-commit installed verification: data validation and all3041Node regressions (1386+1655) passed in the actual repository; git diff --check passed. The installed pack-backed513-assertion engine run could not open packs because the user’s existing Foundry app holds their LevelDB locks. That app was left running. The same513engine assertions, full validation and6pack checks passed in the isolated source-identical tree with cold packs. All239pending files matched the recorded session baseline or verified372manifest; no unrelated additions/deletions were staged. GitHub main matched the local base before commit.
+
+## Residual implementation batch 373 — Mark of Conflict, Strife and Turmoil
+
+Source: rules reference p.190 (text read from the user-supplied `Spycraft_2.0_AI_Rules.md` in this session; original PDF pages were not available to the cloud session and were not visually re-checked). Each Mark is a Chance feat restricted to career level 1.
+
+`module/rules/marks.mjs` classifies a weapon damage roll as unarmed (Unarmed proficiency or a knuckle `NKL` weapon), melee (Blunt/Edged and their exotic forms) or ranged (everything else, including hurled and explosive ranged attacks, following “each ranged damage roll”). The matching possessed Mark adds exactly 1 inside the shared `weaponDamage` bonus, before minimum damage, alongside CQB and recorded-attack bonuses; the damage card names its source. Because the bonus is part of the validated damage snapshot, losing the feat during an unpublished roll is rejected by the existing changed-modifier guard.
+
+`prerequisiteContext` adds 3 to base attack bonus and exposes a +3 `levelBonus` only when evaluating a feat of the Mark’s own combat tree. “Career level N only” requirements, base Defense, Main BAB, class requirements and other trees are unchanged. The Mark must itself be an active usable feat. The disposition drawback is descriptive: the system does not track NPC disposition, so the GC applies the 2-grade change.
+
+Verification: 513 legacy assertions, 3050 Node tests (1395+1655) including 9 new Mark tests, and 6 cold pack checks passed. Browser layout fixtures were not re-run (no template or style change). No native Foundry instance exists in the cloud session, so native receipts/reload QA is **not claimed** for this batch. Inventory: 114 manual / 54 partial / 146 other; at least 168 of 314 explicitly unfinished. Audit: `qa/implementation-373.json`.

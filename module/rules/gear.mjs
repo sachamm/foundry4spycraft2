@@ -1,3 +1,4 @@
+import {markDamagePlan} from './marks.mjs';
 import {reachWeaponPlan} from './reach-weapon.mjs';
 import {meleeArmorPiercingPlan} from './melee-armor-piercing.mjs';
 import {grantedMeleeQuality,meleeTrickPlan} from './melee-tricks.mjs';
@@ -218,9 +219,10 @@ export function weaponDamage(system,weapon,{finesse=weapon.useFinesse??false,...
   }
   const meleeArmorPiercing=meleeArmorPiercingPlan(system,weapon,{grip});if(meleeArmorPiercing.blockedReason)return {blocked:true,blockedReason:meleeArmorPiercing.blockedReason};
   const cqbRange=cqbRangePlan(system,weapon,options,'damage');
-  const conditionDamagePenalty=conditionRollPenalties(system).damage;bonus+=conditionDamagePenalty+cqbRange.damageBonus+(options.attackDamageBonus??0);
+  const markDamage=markDamagePlan(system,weapon);
+  const conditionDamagePenalty=conditionRollPenalties(system).damage;bonus+=conditionDamagePenalty+cqbRange.damageBonus+markDamage.bonus+(options.attackDamageBonus??0);
   const min=parsed.minimum;
-  return {meleeArmorPiercing,expression,finesseBasic,effectiveQualities:meleeArmorPiercing.effectiveQualities,cqbRange,conditionDamagePenalty,mortarOperation,launcherOperation,formula:`max(${min}, ${base} + (${bonus}))`,damageText:text,ammunition:projectile.name??"",explosive:projectile.explosive,bonus,knuckle,min,grip,finesse:useFinesse,blocked:grip.blocked,blockedReason:grip.reason};
+  return {markDamage,meleeArmorPiercing,expression,finesseBasic,effectiveQualities:meleeArmorPiercing.effectiveQualities,cqbRange,conditionDamagePenalty,mortarOperation,launcherOperation,formula:`max(${min}, ${base} + (${bonus}))`,damageText:text,ammunition:projectile.name??"",explosive:projectile.explosive,bonus,knuckle,min,grip,finesse:useFinesse,blocked:grip.blocked,blockedReason:grip.reason};
 }
 
 /** Possessions, pp.216–217: each slot allows one pick of any category up to its Caliber. */

@@ -1,0 +1,39 @@
+{
+  "batches": [
+    373
+  ],
+  "legacyAssertions": 513,
+  "nodeTests": 3050,
+  "nodeGroups": [
+    1395,
+    1655
+  ],
+  "newTests": 9,
+  "builtPackTests": 6,
+  "browserLayoutRerun": false,
+  "nativeQA": "not run: no Foundry installation in the cloud session",
+  "sourceCheck": "Spycraft_2.0_AI_Rules.md text, p.190; original PDF not visually checked",
+  "inventory": {
+    "manual": 114,
+    "partial": 54,
+    "other": 146,
+    "total": 314,
+    "minimumUnfinished": 168
+  },
+  "implementedFeats": [
+    "Mark of Conflict",
+    "Mark of Strife",
+    "Mark of Turmoil"
+  ],
+  "tableManaged": [
+    "Disposition worsens by 2 grades for characters with 2+ feats of the tree"
+  ],
+  "files": [
+    "module/rules/marks.mjs",
+    "module/rules/engine.mjs",
+    "module/rules/prerequisites.mjs",
+    "module/rules/gear.mjs",
+    "module/documents/actor.mjs",
+    "tools/test-marks.mjs"
+  ]
+}
