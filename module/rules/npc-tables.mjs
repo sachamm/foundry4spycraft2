@@ -2521,7 +2521,7 @@ export const NPC_RULES = {
    "id": "attack-on-command",
    "name": "Attack on Command",
    "cost": 2,
-   "costLabel": "+2 XP — animals only, ‘trained’",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2534,7 +2534,7 @@ export const NPC_RULES = {
    "id": "augmented",
    "name": "Augmented",
    "cost": 3,
-   "costLabel": "+3 XP per Caliber, per item/weapon",
+   "costLabel": "+3 XP per Caliber for each item or weapon",
    "page": 446,
    "repeatable": true,
    "types": [
@@ -2549,7 +2549,7 @@ export const NPC_RULES = {
    "id": "burrow",
    "name": "Burrow",
    "cost": 3,
-   "costLabel": "+3 XP — animals only",
+   "costLabel": "+3 XP; animals",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2577,7 +2577,7 @@ export const NPC_RULES = {
    "id": "captivating",
    "name": "Captivating",
    "cost": 5,
-   "costLabel": "+5 XP — special NPCs only",
+   "costLabel": "+5 XP; special NPCs",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2590,7 +2590,7 @@ export const NPC_RULES = {
    "id": "carry-on-command",
    "name": "Carry on Command",
    "cost": 1,
-   "costLabel": "+1 XP — animals only, ‘trained’",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2603,7 +2603,7 @@ export const NPC_RULES = {
    "id": "class-ability",
    "name": "Class Ability",
    "cost": null,
-   "costLabel": "Special Cost",
+   "costLabel": "Special cost",
    "page": 446,
    "repeatable": true,
    "types": [
@@ -2633,7 +2633,7 @@ export const NPC_RULES = {
    "id": "commander",
    "name": "Commander",
    "cost": 3,
-   "costLabel": "+3 XP — minions only",
+   "costLabel": "+3 XP; minions",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2692,7 +2692,7 @@ export const NPC_RULES = {
    "id": "disarm-on-command",
    "name": "Disarm on Command",
    "cost": 2,
-   "costLabel": "+2 XP — animals only, ‘trained’",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2705,7 +2705,7 @@ export const NPC_RULES = {
    "id": "diurnal",
    "name": "Diurnal",
    "cost": -1,
-   "costLabel": "–1 XP — animals only",
+   "costLabel": "–1 XP; animals",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2718,7 +2718,7 @@ export const NPC_RULES = {
    "id": "diving",
    "name": "Diving",
    "cost": 1,
-   "costLabel": "+1 XP — animals only",
+   "costLabel": "+1 XP; animals",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2731,7 +2731,7 @@ export const NPC_RULES = {
    "id": "entertain-on-command",
    "name": "Entertain on Command",
    "cost": 1,
-   "costLabel": "+1 XP — animals only, ‘trained’",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2744,7 +2744,7 @@ export const NPC_RULES = {
    "id": "extended-training",
    "name": "Extended Training",
    "cost": 1,
-   "costLabel": "+1 XP — no animals",
+   "costLabel": "+1 XP; not animals",
    "page": 447,
    "repeatable": true,
    "types": [
@@ -2773,7 +2773,7 @@ export const NPC_RULES = {
    "id": "fearless",
    "name": "Fearless",
    "cost": 1,
-   "costLabel": "+1 XP per grade, ‘trained’ by grade",
+   "costLabel": "+1 XP per grade; trainable by grade",
    "page": 447,
    "repeatable": true,
    "types": [
@@ -2863,7 +2863,7 @@ export const NPC_RULES = {
    "id": "foil",
    "name": "Foil",
    "cost": null,
-   "costLabel": "Special Cost — no animals",
+   "costLabel": "Special cost; not animals",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2877,7 +2877,7 @@ export const NPC_RULES = {
    "id": "guard-on-command",
    "name": "Guard on Command",
    "cost": 2,
-   "costLabel": "+2 XP — animals only, ‘trained’",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2890,7 +2890,7 @@ export const NPC_RULES = {
    "id": "henchman",
    "name": "Henchman",
    "cost": 4,
-   "costLabel": "+4 XP — special NPCs only",
+   "costLabel": "+4 XP; special NPCs",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2903,7 +2903,7 @@ export const NPC_RULES = {
    "id": "horde",
    "name": "Horde",
    "cost": 4,
-   "costLabel": "+4 XP — minions only",
+   "costLabel": "+4 XP; minions",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -2991,7 +2991,7 @@ export const NPC_RULES = {
    "id": "inferior-attribute",
    "name": "Inferior Attribute",
    "cost": -1,
-   "costLabel": "–1 XP per –1 attribute score",
+   "costLabel": "–1 XP for each –1 to an attribute",
    "page": 448,
    "repeatable": true,
    "types": [
@@ -3021,7 +3021,7 @@ export const NPC_RULES = {
    "id": "mastermind",
    "name": "Mastermind",
    "cost": 8,
-   "costLabel": "+8 XP — special NPCs only",
+   "costLabel": "+8 XP; special NPCs",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3049,7 +3049,7 @@ export const NPC_RULES = {
    "id": "minion",
    "name": "Minion",
    "cost": 2,
-   "costLabel": "+2 XP — standard NPCs only",
+   "costLabel": "+2 XP; standard NPCs",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3062,7 +3062,7 @@ export const NPC_RULES = {
    "id": "mount",
    "name": "Mount",
    "cost": 1,
-   "costLabel": "+1 XP — animals only, ‘trained’",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3075,7 +3075,7 @@ export const NPC_RULES = {
    "id": "natural-attack",
    "name": "Natural Attack",
    "cost": 2,
-   "costLabel": "+2 XP per Caliber, per attack",
+   "costLabel": "+2 XP per Caliber for each attack",
    "page": 448,
    "repeatable": true,
    "types": [
@@ -3090,7 +3090,7 @@ export const NPC_RULES = {
    "id": "nocturnal",
    "name": "Nocturnal",
    "cost": -1,
-   "costLabel": "–1 XP — animals only",
+   "costLabel": "–1 XP; animals",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3118,7 +3118,7 @@ export const NPC_RULES = {
    "id": "open-doors",
    "name": "Open Doors",
    "cost": 1,
-   "costLabel": "+1 XP — animals only, ‘trained’",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3131,7 +3131,7 @@ export const NPC_RULES = {
    "id": "prodigy",
    "name": "Prodigy",
    "cost": 5,
-   "costLabel": "+5 XP — standard NPCs only",
+   "costLabel": "+5 XP; standard NPCs",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3144,7 +3144,7 @@ export const NPC_RULES = {
    "id": "removable-quality",
    "name": "Removable Quality",
    "cost": null,
-   "costLabel": "linked quality cost –1, minimum 1 — no animals",
+   "costLabel": "linked quality's cost –1 (min 1); not animals",
    "page": 448,
    "repeatable": true,
    "types": [
@@ -3158,7 +3158,7 @@ export const NPC_RULES = {
    "id": "rescue",
    "name": "Rescue",
    "cost": 3,
-   "costLabel": "+3 XP — animals only, ‘trained’",
+   "costLabel": "+3 XP; animals; trainable",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3171,7 +3171,7 @@ export const NPC_RULES = {
    "id": "retrieve-on-command",
    "name": "Retrieve on Command",
    "cost": 1,
-   "costLabel": "+1 XP — animals only, ‘trained’",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 450,
    "repeatable": false,
    "types": [
@@ -3184,7 +3184,7 @@ export const NPC_RULES = {
    "id": "seductive",
    "name": "Seductive",
    "cost": 3,
-   "costLabel": "+3 XP — special NPCs only",
+   "costLabel": "+3 XP; special NPCs",
    "page": 450,
    "repeatable": false,
    "types": [
@@ -3197,7 +3197,7 @@ export const NPC_RULES = {
    "id": "seek-on-command",
    "name": "Seek on Command",
    "cost": 2,
-   "costLabel": "+2 XP per target — animals only, ‘trained’",
+   "costLabel": "+2 XP per target; animals; trainable",
    "page": 450,
    "repeatable": true,
    "types": [
@@ -3210,7 +3210,7 @@ export const NPC_RULES = {
    "id": "skilled",
    "name": "Skilled",
    "cost": 1,
-   "costLabel": "+1 XP per grade/per skill, ‘trained’ per grade/per skill",
+   "costLabel": "+1 XP per grade and skill; trainable likewise",
    "page": 450,
    "repeatable": true,
    "types": [
@@ -3240,7 +3240,7 @@ export const NPC_RULES = {
    "id": "specialty",
    "name": "Specialty",
    "cost": 5,
-   "costLabel": "+5 XP — no animals",
+   "costLabel": "+5 XP; not animals",
    "page": 450,
    "repeatable": false,
    "types": [
@@ -3254,7 +3254,7 @@ export const NPC_RULES = {
    "id": "squad-item",
    "name": "Squad Item",
    "cost": 8,
-   "costLabel": "+8 XP — NPC groups only, no animals",
+   "costLabel": "+8 XP; NPC groups; not animals",
    "page": 450,
    "repeatable": true,
    "types": [
@@ -3269,7 +3269,7 @@ export const NPC_RULES = {
    "id": "squad-weapon",
    "name": "Squad Weapon",
    "cost": 8,
-   "costLabel": "+8 XP — NPC groups only, no animals",
+   "costLabel": "+8 XP; NPC groups; not animals",
    "page": 451,
    "repeatable": true,
    "types": [
@@ -3284,7 +3284,7 @@ export const NPC_RULES = {
    "id": "steadfast",
    "name": "Steadfast",
    "cost": 3,
-   "costLabel": "+3 XP — no animals",
+   "costLabel": "+3 XP; not animals",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3328,7 +3328,7 @@ export const NPC_RULES = {
    "id": "subdue-on-command",
    "name": "Subdue on Command",
    "cost": 2,
-   "costLabel": "+2 XP — animals only, ‘trained’",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3341,7 +3341,7 @@ export const NPC_RULES = {
    "id": "superior-attribute",
    "name": "Superior Attribute",
    "cost": 1,
-   "costLabel": "+1 XP per +1 attribute score",
+   "costLabel": "+1 XP for each +1 to an attribute",
    "page": 451,
    "repeatable": true,
    "types": [
@@ -3356,7 +3356,7 @@ export const NPC_RULES = {
    "id": "swarm",
    "name": "Swarm",
    "cost": 3,
-   "costLabel": "+3 XP — animals only",
+   "costLabel": "+3 XP; animals",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3369,7 +3369,7 @@ export const NPC_RULES = {
    "id": "synchronized",
    "name": "Synchronized",
    "cost": 2,
-   "costLabel": "+2 XP — NPC groups only, ‘trained’",
+   "costLabel": "+2 XP; NPC groups; trainable",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3385,7 +3385,7 @@ export const NPC_RULES = {
    "id": "talented",
    "name": "Talented",
    "cost": 5,
-   "costLabel": "+5 XP — no animals",
+   "costLabel": "+5 XP; not animals",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3399,7 +3399,7 @@ export const NPC_RULES = {
    "id": "tough",
    "name": "Tough",
    "cost": 5,
-   "costLabel": "+5 XP per grade — no special NPCs",
+   "costLabel": "+5 XP per grade; not special NPCs",
    "page": 451,
    "repeatable": true,
    "types": [
@@ -3413,7 +3413,7 @@ export const NPC_RULES = {
    "id": "treacherous",
    "name": "Treacherous",
    "cost": 5,
-   "costLabel": "+5 XP — no special NPCs",
+   "costLabel": "+5 XP; not special NPCs",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3427,7 +3427,7 @@ export const NPC_RULES = {
    "id": "uncoordinated",
    "name": "Uncoordinated",
    "cost": -2,
-   "costLabel": "–2 XP — NPC groups only",
+   "costLabel": "–2 XP; NPC groups",
    "page": 451,
    "repeatable": false,
    "types": [

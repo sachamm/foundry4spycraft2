@@ -36,7 +36,7 @@ export function shakenActionDieCost(system,{baseCost=0,benefitCount=1,surchargeP
  if(!Number.isSafeInteger(baseCost)||baseCost<0||!Number.isSafeInteger(benefitCount)||benefitCount<0||!Number.isSafeInteger(2*benefitCount)||!Number.isSafeInteger(surchargePaid)||surchargePaid<0||surchargePaid>2*benefitCount||typeof payer!=='boolean')return {blocked:true,reason:'Review the whole-die cost, benefit count and previously paid surcharge.'};
  const requiredSurcharge=benefitCount*rules.extraDice,surcharge=Math.max(0,requiredSurcharge-surchargePaid),cost=baseCost+surcharge;
  if(!Number.isSafeInteger(cost))return {blocked:true,reason:'The action-die cost is unsafe.'};
- if(payer&&rules.spendingForbidden&&cost>0)return {blocked:true,reason:'Shaken IV: this character may not spend action dice for any purpose (p.342).'};
+ if(payer&&rules.spendingForbidden&&cost>0)return {blocked:true,reason:'Shaken IV: no action dice may be spent at all (p.342).'};
  return {blocked:false,baseCost,benefitCount,requiredSurcharge,surchargePaid,surcharge,cost,grade:rules.grade,totalGrade:rules.totalGrade,payer,spendingForbidden:rules.spendingForbidden};
 }
 

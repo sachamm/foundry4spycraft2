@@ -22,7 +22,7 @@ export function getActionDieSettlementReview(actor){
 export function multipartActionDicePlan(system,allocations,{id,actorUuid,message=null,periods=system.usagePeriods,purpose='Action-die use'}={}){
  const shaken=shakenRules(system);
  if(shaken.needsReview||system.actionDieAwardReview?.needsReview||system.actionDiceSettlementReview?.needsReview)throw new Error('Review the interrupted action-die or condition records before spending.');
- if(shaken.spendingForbidden)throw new Error('Shaken IV: this character may not spend action dice for any purpose (p.342).');
+ if(shaken.spendingForbidden)throw new Error('Shaken IV: no action dice may be spent at all (p.342).');
  if(!paymentIdValid(id)||typeof actorUuid!=='string'||!actorUuid||typeof purpose!=='string'||!purpose.trim()||purpose.length>500||!Array.isArray(allocations)||!allocations.length||allocations.length>32)throw new Error('Choose a valid payment reference and its action-die sources.');
  const groups=new Map(),parts=[];
  for(const allocation of allocations){

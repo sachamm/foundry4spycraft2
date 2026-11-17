@@ -1,5 +1,5 @@
 {
-  "_note": "Original summaries of Spycraft 2.0 rules text (Open Game Content), written for this system. Keys match names in the other src/data files.",
+  "_note": "Original summaries written for this system; no rulebook text is copied here. Keys match names in the other src/data files.",
   "feats": {
     "Armor Basics": "Pick partial, moderate or full armor; armor of that type works better for you (more DR vs. melee, smaller Defense and armor check penalties, harder to spot).",
     "Armor Mastery": "Your Armor Basics applies to a second armor type; in chosen armor you gain +1 Defense and can only be Coup de Graced while helpless.",
@@ -992,7 +992,7 @@
       "options": {}
     },
     "Transporter": {
-      "core": "Watchful: an action die spent to boost Defense also adds its roll to your Initiative Count.",
+      "core": "Watchful: any action die that boosts your Defense also adds its roll to your Initiative Count.",
       "abilities": {
         "Protect the Package": "Designate a cargo (person, animal or item) that shares your Initiative and Reflex, later your cover identity (5th) and Defense (9th).",
         "Take the Hit": "Step in to take melee hits aimed at adjacent cargo (ranged hits too at 7th).",

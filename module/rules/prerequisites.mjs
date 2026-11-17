@@ -83,7 +83,7 @@ export function describe(n) {
     case "focus": return `${skill(n.skill)} focus (any ${n.group})`;
     case "lifestyle": return `Lifestyle ${n.min}+`;
     case "keySkill": return `Key skill ${n.min}+ ranks`;
-    case "sneakAttack": return `Ability to inflict ${n.min} ${n.min===1?"die":"dice"} of sneak attack damage`;
+    case "sneakAttack": return `Sneak attack damage of ${n.min} ${n.min===1?"die":"dice"} or more`;
     case "manual": return `GC confirmation: ${n.text}`;
     case "never": return "Not available";
     default: return "Special";

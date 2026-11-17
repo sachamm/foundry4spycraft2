@@ -96,7 +96,7 @@ export function actionDiceFundingContext(system,{bonusPoolId='',periods=system.u
  return {blocked:false,bonusPoolId,pool,label:pool.label,paymentPath:'system.bonusActionDice.'+bonusPoolId+'.remaining',balance:pool.remaining,die:pool.die,poolFingerprint:actionDicePoolFingerprint(pool),system:{...system,actionDice:{...ad,value:pool.remaining,die:pool.die,explodeAt:threshold}}};
 }
 export function actionDicePaymentPlan(system,{count,bonusPoolId='',periods=system.usagePeriods}={}){
- const shaken=shakenRules(system);if(shaken.needsReview||shaken.spendingForbidden)return {blocked:true,reason:shaken.needsReview?'Review the current Shaken sources before spending action dice.':'Shaken IV: this character may not spend action dice for any purpose (p.342).'};
+ const shaken=shakenRules(system);if(shaken.needsReview||shaken.spendingForbidden)return {blocked:true,reason:shaken.needsReview?'Review the current Shaken sources before spending action dice.':'Shaken IV: no action dice may be spent at all (p.342).'};
  if(!Number.isSafeInteger(count)||count<1)throw new Error('Spend a positive whole number of action dice.');
  const funding=actionDiceFundingContext(system,{bonusPoolId,periods});if(funding.blocked)return funding;
  if(count>funding.balance)return {blocked:true,reason:'Not enough dice remain in the selected action-die balance.'};

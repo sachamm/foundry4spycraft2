@@ -30,7 +30,7 @@ export function queueResources(actors,work,{messages=[],allowPeriodReview=false}
 /** Call only inside queueResources with the paying actor included in its participants. */
 export async function payLockedActionDice(actor,count,perform){
  if(!actor.isOwner)throw new Error('You must own the paying character.');
- const shaken=shakenRules(actor.system);if(shaken.needsReview||shaken.spendingForbidden)throw new Error(shaken.needsReview?'Review the paying character’s Shaken sources.':'Shaken IV: this character may not spend action dice for any purpose (p.342).');
+ const shaken=shakenRules(actor.system);if(shaken.needsReview||shaken.spendingForbidden)throw new Error(shaken.needsReview?'Review the paying character’s Shaken sources.':'Shaken IV: no action dice may be spent at all (p.342).');
  if(!Number.isSafeInteger(count)||count<1||count>(actor.system.actionDice?.value??0))throw new Error('Not enough action dice remain.');
  await actor.update({'system.actionDice.value':actor.system.actionDice.value-count});
  try{return await perform();}

@@ -1,6 +1,6 @@
 /** Table 5.5 p.332; injury rolls p.331; Guts p.174. Higher totals have no printed row. */
 const rows=[
- [35,'bleeding','Bleeding',20,'1 scene','Gain 1d8 stress damage; this injury heals at the end of the current scene.'],
+ [35,'bleeding','Bleeding',20,'1 scene','Gain 1d8 stress damage; heals when the scene ends.'],
  [40,'brokenLimb','Broken limb',20,'1d4 missions','The GC determines the limb: lose use of an arm or reduce Speed by 20 ft.'],
  [45,'internalRupture','Internal rupture',25,'1d4 missions','Permanent −2 to the highest of STR, DEX or CON; the GC randomly resolves ties.'],
  [50,'maimedLimb','Maimed limb',30,'1d6 missions','The GC determines the limb: lose use of an arm or reduce Speed by 20 ft.'],
@@ -9,7 +9,7 @@ const rows=[
  [65,'nerveDamage','Nerve damage',45,'1d3 missions','Permanently nauseated.'],
  [70,'spinalInjury','Spinal injury',50,'1 mission','Permanently paralyzed; surgery after the current mission is assumed.']
 ];
-export const CRITICAL_INJURY_HEALING_NOTE='Heal one increment before each mission and for each full month of downtime. Successful Medicine/Surgery at the listed DC reduces healing time by 2; at 0 the injury heals. Bleeding instead heals at the end of the current scene.';
+export const CRITICAL_INJURY_HEALING_NOTE='Healing advances one increment per mission started and per whole month of downtime. Successful Medicine/Surgery at the listed DC reduces healing time by 2; at 0 the injury heals. Bleeding instead heals at the end of the current scene.';
 const idOK=id=>typeof id==='string'&&/^[A-Za-z0-9_-]{1,80}$/.test(id)&&!['__proto__','prototype','constructor'].includes(id);
 export function criticalInjuryRollPlan(system,{id,damage,source='',confirmed=false}={}){
  if(!idOK(id)||!Number.isSafeInteger(damage)||damage<0||damage>Number.MAX_SAFE_INTEGER-20||typeof source!=='string'||!source.trim()||source.length>500||confirmed!==true)throw new Error('Confirm the actual Table of Ouch trigger, event reference, source and nonnegative whole damage suffered.');

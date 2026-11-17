@@ -17,7 +17,7 @@ export function stillStandingResistancePlan(system,response){
 }
 export function stillStandingTakedownPlan(system,{saveKey='fort',resistingTakedown=false,takedownAttackConfirmed=false}={}){
  if(resistingTakedown===false)return null;
- if(resistingTakedown!==true||saveKey!=='fort'||takedownAttackConfirmed!==true)throw Error('The GC must confirm this Fortitude save to remain standing after an actual hit by an attack with the takedown quality (p.66).');
+ if(resistingTakedown!==true||saveKey!=='fort'||takedownAttackConfirmed!==true)throw Error('The GC must confirm this Fortitude save to stay standing after a real hit from a takedown-quality attack (p.66).');
  const source=stillStandingSource(system);
  return {version:1,saveKey:'fort',resistingTakedown:true,takedownAttackConfirmed:true,source,bonus:source?8:0};
 }

@@ -3,7 +3,7 @@ import {errorDecisionPending} from "./outcomes.mjs";
 import {resolveSkillResult} from './checks.mjs';
 /** Doubled-die abilities never exceed two dice per die spent (pp.29,62), including Card Shark p.202. */
 export function actionDieBoostPlan(system,check,{count=1,openingRound=false,calculating=false,errorDeclined=false}={}) {
- const shaken=shakenRules(system);if(shaken.needsReview||shaken.spendingForbidden)return {blocked:true,reason:shaken.needsReview?'Review the paying character’s Shaken sources before boosting.':'Shaken IV: this character may not spend action dice for any purpose (p.342).'};
+ const shaken=shakenRules(system);if(shaken.needsReview||shaken.spendingForbidden)return {blocked:true,reason:shaken.needsReview?'Review the paying character’s Shaken sources before boosting.':'Shaken IV: no action dice may be spent at all (p.342).'};
  if(system.actionDieAwardReview?.needsReview)return {blocked:true,reason:'The GC must review the interrupted award before spending more action dice.'};
  if(system.actionDiceSettlementReview?.needsReview)return {blocked:true,reason:'The GC must review the interrupted action-die settlement before further spending.'};
  const core=new Set(system.coreClassIds??[]),kind=check.checkKind??'check',skillLike=['skill','knowledge'].includes(kind);

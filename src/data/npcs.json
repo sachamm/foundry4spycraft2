@@ -2520,7 +2520,7 @@
    "id": "attack-on-command",
    "name": "Attack on Command",
    "cost": 2,
-   "costLabel": "+2 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2533,7 +2533,7 @@
    "id": "augmented",
    "name": "Augmented",
    "cost": 3,
-   "costLabel": "+3 XP per Caliber, per item/weapon",
+   "costLabel": "+3 XP per Caliber for each item or weapon",
    "page": 446,
    "repeatable": true,
    "types": [
@@ -2548,7 +2548,7 @@
    "id": "burrow",
    "name": "Burrow",
    "cost": 3,
-   "costLabel": "+3 XP \u2014 animals only",
+   "costLabel": "+3 XP; animals",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2576,7 +2576,7 @@
    "id": "captivating",
    "name": "Captivating",
    "cost": 5,
-   "costLabel": "+5 XP \u2014 special NPCs only",
+   "costLabel": "+5 XP; special NPCs",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2589,7 +2589,7 @@
    "id": "carry-on-command",
    "name": "Carry on Command",
    "cost": 1,
-   "costLabel": "+1 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 446,
    "repeatable": false,
    "types": [
@@ -2602,7 +2602,7 @@
    "id": "class-ability",
    "name": "Class Ability",
    "cost": null,
-   "costLabel": "Special Cost",
+   "costLabel": "Special cost",
    "page": 446,
    "repeatable": true,
    "types": [
@@ -2632,7 +2632,7 @@
    "id": "commander",
    "name": "Commander",
    "cost": 3,
-   "costLabel": "+3 XP \u2014 minions only",
+   "costLabel": "+3 XP; minions",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2691,7 +2691,7 @@
    "id": "disarm-on-command",
    "name": "Disarm on Command",
    "cost": 2,
-   "costLabel": "+2 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2704,7 +2704,7 @@
    "id": "diurnal",
    "name": "Diurnal",
    "cost": -1,
-   "costLabel": "\u20131 XP \u2014 animals only",
+   "costLabel": "\u20131 XP; animals",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2717,7 +2717,7 @@
    "id": "diving",
    "name": "Diving",
    "cost": 1,
-   "costLabel": "+1 XP \u2014 animals only",
+   "costLabel": "+1 XP; animals",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2730,7 +2730,7 @@
    "id": "entertain-on-command",
    "name": "Entertain on Command",
    "cost": 1,
-   "costLabel": "+1 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2743,7 +2743,7 @@
    "id": "extended-training",
    "name": "Extended Training",
    "cost": 1,
-   "costLabel": "+1 XP \u2014 no animals",
+   "costLabel": "+1 XP; not animals",
    "page": 447,
    "repeatable": true,
    "types": [
@@ -2772,7 +2772,7 @@
    "id": "fearless",
    "name": "Fearless",
    "cost": 1,
-   "costLabel": "+1 XP per grade, \u2018trained\u2019 by grade",
+   "costLabel": "+1 XP per grade; trainable by grade",
    "page": 447,
    "repeatable": true,
    "types": [
@@ -2862,7 +2862,7 @@
    "id": "foil",
    "name": "Foil",
    "cost": null,
-   "costLabel": "Special Cost \u2014 no animals",
+   "costLabel": "Special cost; not animals",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2876,7 +2876,7 @@
    "id": "guard-on-command",
    "name": "Guard on Command",
    "cost": 2,
-   "costLabel": "+2 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2889,7 +2889,7 @@
    "id": "henchman",
    "name": "Henchman",
    "cost": 4,
-   "costLabel": "+4 XP \u2014 special NPCs only",
+   "costLabel": "+4 XP; special NPCs",
    "page": 447,
    "repeatable": false,
    "types": [
@@ -2902,7 +2902,7 @@
    "id": "horde",
    "name": "Horde",
    "cost": 4,
-   "costLabel": "+4 XP \u2014 minions only",
+   "costLabel": "+4 XP; minions",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -2990,7 +2990,7 @@
    "id": "inferior-attribute",
    "name": "Inferior Attribute",
    "cost": -1,
-   "costLabel": "\u20131 XP per \u20131 attribute score",
+   "costLabel": "\u20131 XP for each \u20131 to an attribute",
    "page": 448,
    "repeatable": true,
    "types": [
@@ -3020,7 +3020,7 @@
    "id": "mastermind",
    "name": "Mastermind",
    "cost": 8,
-   "costLabel": "+8 XP \u2014 special NPCs only",
+   "costLabel": "+8 XP; special NPCs",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3048,7 +3048,7 @@
    "id": "minion",
    "name": "Minion",
    "cost": 2,
-   "costLabel": "+2 XP \u2014 standard NPCs only",
+   "costLabel": "+2 XP; standard NPCs",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3061,7 +3061,7 @@
    "id": "mount",
    "name": "Mount",
    "cost": 1,
-   "costLabel": "+1 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3074,7 +3074,7 @@
    "id": "natural-attack",
    "name": "Natural Attack",
    "cost": 2,
-   "costLabel": "+2 XP per Caliber, per attack",
+   "costLabel": "+2 XP per Caliber for each attack",
    "page": 448,
    "repeatable": true,
    "types": [
@@ -3089,7 +3089,7 @@
    "id": "nocturnal",
    "name": "Nocturnal",
    "cost": -1,
-   "costLabel": "\u20131 XP \u2014 animals only",
+   "costLabel": "\u20131 XP; animals",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3117,7 +3117,7 @@
    "id": "open-doors",
    "name": "Open Doors",
    "cost": 1,
-   "costLabel": "+1 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3130,7 +3130,7 @@
    "id": "prodigy",
    "name": "Prodigy",
    "cost": 5,
-   "costLabel": "+5 XP \u2014 standard NPCs only",
+   "costLabel": "+5 XP; standard NPCs",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3143,7 +3143,7 @@
    "id": "removable-quality",
    "name": "Removable Quality",
    "cost": null,
-   "costLabel": "linked quality cost \u20131, minimum 1 \u2014 no animals",
+   "costLabel": "linked quality's cost \u20131 (min 1); not animals",
    "page": 448,
    "repeatable": true,
    "types": [
@@ -3157,7 +3157,7 @@
    "id": "rescue",
    "name": "Rescue",
    "cost": 3,
-   "costLabel": "+3 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+3 XP; animals; trainable",
    "page": 448,
    "repeatable": false,
    "types": [
@@ -3170,7 +3170,7 @@
    "id": "retrieve-on-command",
    "name": "Retrieve on Command",
    "cost": 1,
-   "costLabel": "+1 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+1 XP; animals; trainable",
    "page": 450,
    "repeatable": false,
    "types": [
@@ -3183,7 +3183,7 @@
    "id": "seductive",
    "name": "Seductive",
    "cost": 3,
-   "costLabel": "+3 XP \u2014 special NPCs only",
+   "costLabel": "+3 XP; special NPCs",
    "page": 450,
    "repeatable": false,
    "types": [
@@ -3196,7 +3196,7 @@
    "id": "seek-on-command",
    "name": "Seek on Command",
    "cost": 2,
-   "costLabel": "+2 XP per target \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+2 XP per target; animals; trainable",
    "page": 450,
    "repeatable": true,
    "types": [
@@ -3209,7 +3209,7 @@
    "id": "skilled",
    "name": "Skilled",
    "cost": 1,
-   "costLabel": "+1 XP per grade/per skill, \u2018trained\u2019 per grade/per skill",
+   "costLabel": "+1 XP per grade and skill; trainable likewise",
    "page": 450,
    "repeatable": true,
    "types": [
@@ -3239,7 +3239,7 @@
    "id": "specialty",
    "name": "Specialty",
    "cost": 5,
-   "costLabel": "+5 XP \u2014 no animals",
+   "costLabel": "+5 XP; not animals",
    "page": 450,
    "repeatable": false,
    "types": [
@@ -3253,7 +3253,7 @@
    "id": "squad-item",
    "name": "Squad Item",
    "cost": 8,
-   "costLabel": "+8 XP \u2014 NPC groups only, no animals",
+   "costLabel": "+8 XP; NPC groups; not animals",
    "page": 450,
    "repeatable": true,
    "types": [
@@ -3268,7 +3268,7 @@
    "id": "squad-weapon",
    "name": "Squad Weapon",
    "cost": 8,
-   "costLabel": "+8 XP \u2014 NPC groups only, no animals",
+   "costLabel": "+8 XP; NPC groups; not animals",
    "page": 451,
    "repeatable": true,
    "types": [
@@ -3283,7 +3283,7 @@
    "id": "steadfast",
    "name": "Steadfast",
    "cost": 3,
-   "costLabel": "+3 XP \u2014 no animals",
+   "costLabel": "+3 XP; not animals",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3327,7 +3327,7 @@
    "id": "subdue-on-command",
    "name": "Subdue on Command",
    "cost": 2,
-   "costLabel": "+2 XP \u2014 animals only, \u2018trained\u2019",
+   "costLabel": "+2 XP; animals; trainable",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3340,7 +3340,7 @@
    "id": "superior-attribute",
    "name": "Superior Attribute",
    "cost": 1,
-   "costLabel": "+1 XP per +1 attribute score",
+   "costLabel": "+1 XP for each +1 to an attribute",
    "page": 451,
    "repeatable": true,
    "types": [
@@ -3355,7 +3355,7 @@
    "id": "swarm",
    "name": "Swarm",
    "cost": 3,
-   "costLabel": "+3 XP \u2014 animals only",
+   "costLabel": "+3 XP; animals",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3368,7 +3368,7 @@
    "id": "synchronized",
    "name": "Synchronized",
    "cost": 2,
-   "costLabel": "+2 XP \u2014 NPC groups only, \u2018trained\u2019",
+   "costLabel": "+2 XP; NPC groups; trainable",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3384,7 +3384,7 @@
    "id": "talented",
    "name": "Talented",
    "cost": 5,
-   "costLabel": "+5 XP \u2014 no animals",
+   "costLabel": "+5 XP; not animals",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3398,7 +3398,7 @@
    "id": "tough",
    "name": "Tough",
    "cost": 5,
-   "costLabel": "+5 XP per grade \u2014 no special NPCs",
+   "costLabel": "+5 XP per grade; not special NPCs",
    "page": 451,
    "repeatable": true,
    "types": [
@@ -3412,7 +3412,7 @@
    "id": "treacherous",
    "name": "Treacherous",
    "cost": 5,
-   "costLabel": "+5 XP \u2014 no special NPCs",
+   "costLabel": "+5 XP; not special NPCs",
    "page": 451,
    "repeatable": false,
    "types": [
@@ -3426,7 +3426,7 @@
    "id": "uncoordinated",
    "name": "Uncoordinated",
    "cost": -2,
-   "costLabel": "\u20132 XP \u2014 NPC groups only",
+   "costLabel": "\u20132 XP; NPC groups",
    "page": 451,
    "repeatable": false,
    "types": [

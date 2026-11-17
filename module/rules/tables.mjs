@@ -40,7 +40,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Athletics, Resolve, Sneak."
+    "synergyText": "Athletics; Resolve; Sneak"
    },
    {
     "name": "Falling Check",
@@ -73,7 +73,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Athletics, Sneak, Survival."
+    "synergyText": "Athletics; Sneak; Survival"
    },
    {
     "name": "Jump Check",
@@ -106,7 +106,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Athletics, Sneak, Survival."
+    "synergyText": "Athletics; Sneak; Survival"
    },
    {
     "name": "Maneuver Check",
@@ -136,10 +136,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a city"
+      "condition": "city setting"
      }
     ],
-    "synergyText": "Drive, Sense Motive, Streetwise (in a city)."
+    "synergyText": "Drive; Sense Motive; Streetwise [city setting]"
    },
    {
     "name": "Skydiving Check",
@@ -172,7 +172,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Athletics, Resolve, Survival."
+    "synergyText": "Athletics; Resolve; Survival"
    },
    {
     "name": "Tumble Check",
@@ -205,7 +205,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Athletics, Blend, Sneak."
+    "synergyText": "Athletics; Blend; Sneak"
    }
   ]
  },
@@ -246,10 +246,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when appraising something offered on the black market"
+      "condition": "black-market goods"
      }
     ],
-    "synergyText": "Falsify, Investigation, Streetwise (when appraising something offered on the black market)."
+    "synergyText": "Falsify; Investigation; Streetwise [black-market goods]"
    },
    {
     "name": "Authenticate Check",
@@ -282,7 +282,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Falsify, Investigation, Science (Chemistry)."
+    "synergyText": "Falsify; Investigation; Science (Chemistry)"
    },
    {
     "name": "Decipher Check",
@@ -300,7 +300,7 @@ export const SKILLS = [
       "skill": "computers",
       "focusSkill": false,
       "focus": "",
-      "condition": "when using a computer"
+      "condition": "using a computer"
      },
      {
       "skill": "investigation",
@@ -315,7 +315,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers (when using a computer), Investigation, Science (Mathematics)."
+    "synergyText": "Computers [using a computer]; Investigation; Science (Mathematics)"
    },
    {
     "name": "Examine Media Check",
@@ -345,10 +345,10 @@ export const SKILLS = [
       "skill": "senseMotive",
       "focusSkill": false,
       "focus": "",
-      "condition": "when gaining clues about people seen on media"
+      "condition": "clues about people in the media"
      }
     ],
-    "synergyText": "Computers, Investigation, Sense Motive (when gaining clues about people seen on media)."
+    "synergyText": "Computers; Investigation; Sense Motive [clues about people in the media]"
    },
    {
     "name": "Forensics Check",
@@ -372,19 +372,19 @@ export const SKILLS = [
       "skill": "medicine",
       "focusSkill": false,
       "focus": "",
-      "condition": "when the mystery involves biological evidence"
+      "condition": "biological evidence"
      },
      {
       "skill": "science",
       "focusSkill": true,
       "focus": "Chemistry",
-      "condition": "when the mystery involves chemical evidence"
+      "condition": "chemical evidence"
      },
      {
       "skill": "science",
       "focusSkill": true,
       "focus": "Fabrication",
-      "condition": "when the mystery involves gear remnants"
+      "condition": "gear remnants"
      },
      {
       "skill": "search",
@@ -399,7 +399,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Investigation, Medicine (when the mystery involves biological evidence), Science (Chemistry) (when the mystery involves chemical evidence), Science (Fabrication) (when the mystery involves gear remnants), Search, Sense Motive."
+    "synergyText": "Investigation; Medicine [biological evidence]; Science (Chemistry) [chemical evidence]; Science (Fabrication) [gear remnants]; Search; Sense Motive"
    }
   ]
  },
@@ -443,7 +443,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Notice, Sleight of Hand, Survival."
+    "synergyText": "Notice; Sleight of Hand; Survival"
    },
    {
     "name": "Climb Check",
@@ -461,7 +461,7 @@ export const SKILLS = [
       "skill": "mechanics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when using climbing gear"
+      "condition": "using climbing gear"
      },
      {
       "skill": "resolve",
@@ -476,7 +476,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Mechanics (when using climbing gear), Resolve, Survival."
+    "synergyText": "Mechanics [using climbing gear]; Resolve; Survival"
    },
    {
     "name": "Escape Check",
@@ -500,7 +500,7 @@ export const SKILLS = [
       "skill": "bluff",
       "focusSkill": false,
       "focus": "",
-      "condition": "when trying to escape unnoticed"
+      "condition": "escaping unnoticed"
      },
      {
       "skill": "sleightOfHand",
@@ -509,7 +509,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Acrobatics, Bluff (when trying to escape unnoticed), Sleight of Hand."
+    "synergyText": "Acrobatics; Bluff [escaping unnoticed]; Sleight of Hand"
    },
    {
     "name": "Forced March Check",
@@ -542,7 +542,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve, Survival, Tactics."
+    "synergyText": "Resolve; Survival; Tactics"
    },
    {
     "name": "Maneuver Check",
@@ -566,16 +566,16 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a city"
+      "condition": "city setting"
      },
      {
       "skill": "survival",
       "focusSkill": false,
       "focus": "",
-      "condition": "in the wild"
+      "condition": "wilderness setting"
      }
     ],
-    "synergyText": "Acrobatics, Streetwise (in a city), Survival (in the wild)."
+    "synergyText": "Acrobatics; Streetwise [city setting]; Survival [wilderness setting]"
    },
    {
     "name": "Power Lifting Check",
@@ -596,7 +596,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve."
+    "synergyText": "Resolve"
    },
    {
     "name": "Smash Check",
@@ -617,7 +617,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve."
+    "synergyText": "Resolve"
    },
    {
     "name": "Speed Push Check",
@@ -638,7 +638,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve."
+    "synergyText": "Resolve"
    },
    {
     "name": "Sports Check",
@@ -672,7 +672,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve, Sense Motive, Tactics."
+    "synergyText": "Resolve; Sense Motive; Tactics"
    },
    {
     "name": "Swim Check",
@@ -699,7 +699,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve, Survival."
+    "synergyText": "Resolve; Survival"
    }
   ]
  },
@@ -753,25 +753,25 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a corporate or government environment"
+      "condition": "corporate/government setting"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "in a focus area"
+      "condition": "focus area"
      },
      {
       "skill": "impress",
       "focusSkill": false,
       "focus": "",
-      "condition": "when being positive"
+      "condition": "positive approach"
      },
      {
       "skill": "intimidate",
       "focusSkill": false,
       "focus": "",
-      "condition": "when being negative"
+      "condition": "negative approach"
      },
      {
       "skill": "senseMotive",
@@ -783,10 +783,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a city"
+      "condition": "city setting"
      }
     ],
-    "synergyText": "Bureaucracy (in a corporate or government environment), Cultures (in a focus area), Impress (when being positive), Intimidate (when being negative), Sense Motive, Streetwise (in a city)."
+    "synergyText": "Bureaucracy [corporate/government setting]; Cultures [focus area]; Impress [positive approach]; Intimidate [negative approach]; Sense Motive; Streetwise [city setting]"
    }
   ]
  },
@@ -830,7 +830,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Networking, Science (Economy)."
+    "synergyText": "Impress; Networking; Science (Economy)"
    }
   ]
  },
@@ -873,7 +873,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Electronics, Science (Programming), Science (Super-Science)."
+    "synergyText": "Electronics; Science (Programming); Science (Super-Science)"
    }
   ]
  },
@@ -916,7 +916,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Networking, Sense Motive."
+    "synergyText": "Impress; Networking; Sense Motive"
    },
    {
     "name": "Linguistics Check",
@@ -977,10 +977,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a city"
+      "condition": "city setting"
      }
     ],
-    "synergyText": "Intimidate, Notice, Sense Motive, Streetwise (in a city)."
+    "synergyText": "Intimidate; Notice; Sense Motive; Streetwise [city setting]"
    }
   ]
  },
@@ -1021,10 +1021,10 @@ export const SKILLS = [
       "skill": "security",
       "focusSkill": false,
       "focus": "",
-      "condition": "when building a security device"
+      "condition": "building a security device"
      }
     ],
-    "synergyText": "Computers, Science (Super-Science), Security (when building a security device)."
+    "synergyText": "Computers; Science (Super-Science); Security [building a security device]"
    },
    {
     "name": "Disable Check",
@@ -1054,10 +1054,10 @@ export const SKILLS = [
       "skill": "security",
       "focusSkill": false,
       "focus": "",
-      "condition": "when building a security device"
+      "condition": "building a security device"
      }
     ],
-    "synergyText": "Computers, Science (Super-Science), Security (when building a security device)."
+    "synergyText": "Computers; Science (Super-Science); Security [building a security device]"
    },
    {
     "name": "Modify Check",
@@ -1093,10 +1093,10 @@ export const SKILLS = [
       "skill": "security",
       "focusSkill": false,
       "focus": "",
-      "condition": "when building a security device"
+      "condition": "building a security device"
      }
     ],
-    "synergyText": "Analysis, Computers, Science (Super-Science), Security (when building a security device)."
+    "synergyText": "Analysis; Computers; Science (Super-Science); Security [building a security device]"
    },
    {
     "name": "Optimize Check",
@@ -1129,7 +1129,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers, Science (Fabrication), Science (Super-Science)."
+    "synergyText": "Computers; Science (Fabrication); Science (Super-Science)"
    },
    {
     "name": "Repair Check",
@@ -1159,10 +1159,10 @@ export const SKILLS = [
       "skill": "security",
       "focusSkill": false,
       "focus": "",
-      "condition": "when repairing a security device"
+      "condition": "repairing a security device"
      }
     ],
-    "synergyText": "Computers, Science (Super-Science), Security (when repairing a security device)."
+    "synergyText": "Computers; Science (Super-Science); Security [repairing a security device]"
    },
    {
     "name": "Sabotage Check",
@@ -1198,10 +1198,10 @@ export const SKILLS = [
       "skill": "security",
       "focusSkill": false,
       "focus": "",
-      "condition": "when sabotaging a security device"
+      "condition": "sabotaging a security device"
      }
     ],
-    "synergyText": "Analysis, Computers, Science (Super-Science), Security (when sabotaging a security device)."
+    "synergyText": "Analysis; Computers; Science (Super-Science); Security [sabotaging a security device]"
    }
   ]
  },
@@ -1236,16 +1236,16 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a city"
+      "condition": "city setting"
      },
      {
       "skill": "survival",
       "focusSkill": false,
       "focus": "",
-      "condition": "in the wild"
+      "condition": "wilderness setting"
      }
     ],
-    "synergyText": "Bluff, Streetwise (in a city), Survival (in the wild)."
+    "synergyText": "Bluff; Streetwise [city setting]; Survival [wilderness setting]"
    },
    {
     "name": "Disguise Check",
@@ -1275,7 +1275,7 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a corporate or government environment"
+      "condition": "corporate/government setting"
      },
      {
       "skill": "sneak",
@@ -1287,10 +1287,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a city"
+      "condition": "city setting"
      }
     ],
-    "synergyText": "Blend, Bluff, Bureaucracy (in a corporate or government environment), Sneak, Streetwise (in a city)."
+    "synergyText": "Blend; Bluff; Bureaucracy [corporate/government setting]; Sneak; Streetwise [city setting]"
    },
    {
     "name": "Forgery Check",
@@ -1314,40 +1314,40 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when creating any document, cover identity, or art object native to a corporate or government environment"
+      "condition": "corporate/government document, cover identity or artwork"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when creating any document, cover identity, or art object native to a focus area"
+      "condition": "focus-area document, cover identity or artwork"
      },
      {
       "skill": "electronics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when creating a simulated electronic device"
+      "condition": "fake electronic device"
      },
      {
       "skill": "mechanics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when creating a simulated mechanical device"
+      "condition": "fake mechanical device"
      },
      {
       "skill": "science",
       "focusSkill": true,
       "focus": "",
-      "condition": "when creating any simulated item typically created with a Science focus"
+      "condition": "fake item normally made with a Science focus"
      },
      {
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when creating any document, cover identity, or art object native to a city"
+      "condition": "city-origin document, cover identity or artwork"
      }
     ],
-    "synergyText": "Analysis, Bureaucracy (when creating any document, cover identity, or art object native to a corporate or government environment), Cultures (when creating any document, cover identity, or art object native to a focus area), Electronics (when creating a simulated electronic device), Mechanics (when creating a simulated mechanical device), Science (when creating any simulated item typically created with a Science focus), Streetwise (when creating any document, cover identity, or art object native to a city)."
+    "synergyText": "Analysis; Bureaucracy [corporate/government document, cover identity or artwork]; Cultures [focus-area document, cover identity or artwork]; Electronics [fake electronic device]; Mechanics [fake mechanical device]; Science [fake item normally made with a Science focus]; Streetwise [city-origin document, cover identity or artwork]"
    }
   ]
  },
@@ -1375,13 +1375,13 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any corporate or government character"
+      "condition": "corporate/government target"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when targeting any character from a focus area"
+      "condition": "target from a focus area"
      },
      {
       "skill": "senseMotive",
@@ -1393,10 +1393,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any urban character"
+      "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Sense Motive, Streetwise (when targeting any urban character)."
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Sense Motive; Streetwise [urban target]"
    },
    {
     "name": "Performance Check",
@@ -1414,22 +1414,22 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any crowd consisting of corporate or government characters"
+      "condition": "corporate/government crowd"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when targeting any crowd from a focus area"
+      "condition": "crowd from a focus area"
      },
      {
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any crowd consisting of urban characters"
+      "condition": "urban crowd"
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any crowd consisting of corporate or government characters), Cultures (when targeting any crowd from a focus area), Streetwise (when targeting any crowd consisting of urban characters)."
+    "synergyText": "Bureaucracy [corporate/government crowd]; Cultures [crowd from a focus area]; Streetwise [urban crowd]"
    },
    {
     "name": "Persuasion Check",
@@ -1447,13 +1447,13 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any corporate or government character"
+      "condition": "corporate/government target"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when targeting any character from a focus area"
+      "condition": "target from a focus area"
      },
      {
       "skill": "resolve",
@@ -1465,10 +1465,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any urban character"
+      "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Resolve, Streetwise (when targeting any urban character)."
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Resolve; Streetwise [urban target]"
    }
   ]
  },
@@ -1498,13 +1498,13 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any corporate or government character"
+      "condition": "corporate/government target"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when targeting any character from a focus area"
+      "condition": "target from a focus area"
      },
      {
       "skill": "manipulate",
@@ -1522,10 +1522,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any urban character"
+      "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Manipulation, Resolve, Streetwise (when targeting any urban character)."
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Manipulate; Resolve; Streetwise [urban target]"
    },
    {
     "name": "Domination Check",
@@ -1544,13 +1544,13 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any corporate or government character"
+      "condition": "corporate/government target"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when targeting any character from a focus area"
+      "condition": "target from a focus area"
      },
      {
       "skill": "manipulate",
@@ -1568,10 +1568,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any urban character"
+      "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Manipulation, Resolve, Streetwise (when targeting any urban character)."
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Manipulate; Resolve; Streetwise [urban target]"
    }
   ]
  },
@@ -1600,13 +1600,13 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when in a corporate or government environment"
+      "condition": "corporate/government setting"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when in a focus area"
+      "condition": "focus area"
      },
      {
       "skill": "impress",
@@ -1630,10 +1630,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when in a city"
+      "condition": "city setting"
      }
     ],
-    "synergyText": "Bureaucracy (when in a corporate or government environment), Cultures (when in a focus area), Impress, Networking, Sense Motive, Streetwise (when in a city)."
+    "synergyText": "Bureaucracy [corporate/government setting]; Cultures [focus area]; Impress; Networking; Sense Motive; Streetwise [city setting]"
    },
    {
     "name": "Detect Search Check",
@@ -1666,7 +1666,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Notice, Search."
+    "synergyText": "Analysis; Notice; Search"
    },
    {
     "name": "Research Check",
@@ -1690,7 +1690,7 @@ export const SKILLS = [
       "skill": "computers",
       "focusSkill": false,
       "focus": "",
-      "condition": "when using a computer"
+      "condition": "using a computer"
      },
      {
       "skill": "investigation",
@@ -1711,7 +1711,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Computers (when using a computer), Investigation, Notice, Search."
+    "synergyText": "Analysis; Computers [using a computer]; Investigation; Notice; Search"
    }
   ]
  },
@@ -1741,28 +1741,28 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any corporate or government character"
+      "condition": "corporate/government target"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when targeting any character from a focus area"
+      "condition": "target from a focus area"
      },
      {
       "skill": "falsify",
       "focusSkill": false,
       "focus": "",
-      "condition": "when the harassment involves physical props"
+      "condition": "physical props used"
      },
      {
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any urban character"
+      "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any corporate or government character), Cultures (when targeting any character from a focus area), Falsify (when the harassment involves physical props), Streetwise (when targeting any urban character)."
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Falsify [physical props used]; Streetwise [urban target]"
    },
    {
     "name": "Slander Check",
@@ -1796,7 +1796,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Networking, Sense Motive."
+    "synergyText": "Impress; Networking; Sense Motive"
    }
   ]
  },
@@ -1825,7 +1825,7 @@ export const SKILLS = [
       "skill": "drive",
       "focusSkill": true,
       "focus": "",
-      "condition": "when building a vehicle"
+      "condition": "building a vehicle"
      },
      {
       "skill": "science",
@@ -1837,10 +1837,10 @@ export const SKILLS = [
       "skill": "security",
       "focusSkill": false,
       "focus": "",
-      "condition": "when building a security device"
+      "condition": "building a security device"
      }
     ],
-    "synergyText": "Drive (when building a vehicle), Science (Fabrication), Security (when building a security device)."
+    "synergyText": "Drive [building a vehicle]; Science (Fabrication); Security [building a security device]"
    },
    {
     "name": "Disable Check",
@@ -1858,7 +1858,7 @@ export const SKILLS = [
       "skill": "drive",
       "focusSkill": true,
       "focus": "",
-      "condition": "when disabling a vehicle"
+      "condition": "disabling a vehicle"
      },
      {
       "skill": "science",
@@ -1867,7 +1867,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Drive (when disabling a vehicle), Science (Fabrication)."
+    "synergyText": "Drive [disabling a vehicle]; Science (Fabrication)"
    },
    {
     "name": "Modify Check",
@@ -1891,7 +1891,7 @@ export const SKILLS = [
       "skill": "drive",
       "focusSkill": true,
       "focus": "",
-      "condition": "when modifying a vehicle"
+      "condition": "modifying a vehicle"
      },
      {
       "skill": "science",
@@ -1900,7 +1900,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Drive (when modifying a vehicle), Science (Fabrication)."
+    "synergyText": "Analysis; Drive [modifying a vehicle]; Science (Fabrication)"
    },
    {
     "name": "Optimize Check",
@@ -1933,7 +1933,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers, Science (Fabrication), Science (Super-Science)."
+    "synergyText": "Computers; Science (Fabrication); Science (Super-Science)"
    },
    {
     "name": "Repair Check",
@@ -1951,7 +1951,7 @@ export const SKILLS = [
       "skill": "drive",
       "focusSkill": true,
       "focus": "",
-      "condition": "when repairing a vehicle"
+      "condition": "repairing a vehicle"
      },
      {
       "skill": "science",
@@ -1963,10 +1963,10 @@ export const SKILLS = [
       "skill": "security",
       "focusSkill": false,
       "focus": "",
-      "condition": "when repairing a security device"
+      "condition": "repairing a security device"
      }
     ],
-    "synergyText": "Drive (when repairing a vehicle), Science (Fabrication), Security (when repairing a security device)."
+    "synergyText": "Drive [repairing a vehicle]; Science (Fabrication); Security [repairing a security device]"
    },
    {
     "name": "Sabotage Check",
@@ -1990,7 +1990,7 @@ export const SKILLS = [
       "skill": "drive",
       "focusSkill": true,
       "focus": "",
-      "condition": "when sabotaging a vehicle"
+      "condition": "sabotaging a vehicle"
      },
      {
       "skill": "science",
@@ -1999,7 +1999,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Drive (when sabotaging a vehicle), Science (Fabrication)."
+    "synergyText": "Analysis; Drive [sabotaging a vehicle]; Science (Fabrication)"
    }
   ]
  },
@@ -2043,7 +2043,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Science (Pharmacology), Search, Survival."
+    "synergyText": "Science (Pharmacology); Search; Survival"
    },
    {
     "name": "Stabilize Check",
@@ -2082,7 +2082,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve, Science (Pharmacology), Search, Survival."
+    "synergyText": "Resolve; Science (Pharmacology); Search; Survival"
    },
    {
     "name": "Surgery Check",
@@ -2121,7 +2121,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Notice, Science (Chemistry), Science (Genetics), Search."
+    "synergyText": "Notice; Science (Chemistry); Science (Genetics); Search"
    },
    {
     "name": "Therapy Check",
@@ -2154,7 +2154,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Manipulate, Science (Pharmacology), Sense Motive."
+    "synergyText": "Manipulate; Science (Pharmacology); Sense Motive"
    },
    {
     "name": "Treatment Check",
@@ -2193,7 +2193,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Notice, Resolve, Science (Pharmacology), Sense Motive."
+    "synergyText": "Notice; Resolve; Science (Pharmacology); Sense Motive"
    }
   ]
  },
@@ -2222,28 +2222,28 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any corporate or government contact"
+      "condition": "corporate/government contact"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "when targeting any character from a focus area"
+      "condition": "target from a focus area"
      },
      {
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any urban contact"
+      "condition": "urban contact"
      },
      {
       "skill": "survival",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any wilderness contact"
+      "condition": "wilderness contact"
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any corporate or government contact), Cultures (when targeting any character from a focus area), Streetwise (when targeting any urban contact), Survival (when targeting any wilderness contact)."
+    "synergyText": "Bureaucracy [corporate/government contact]; Cultures [target from a focus area]; Streetwise [urban contact]; Survival [wilderness contact]"
    },
    {
     "name": "Endorsement Check",
@@ -2277,7 +2277,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Manipulate, Sense Motive."
+    "synergyText": "Impress; Manipulate; Sense Motive"
    },
    {
     "name": "Mediation Check",
@@ -2296,7 +2296,7 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any NPCs from a corporate or government environment"
+      "condition": "corporate/government NPCs"
      },
      {
       "skill": "resolve",
@@ -2314,7 +2314,7 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any NPCs from an urban environment"
+      "condition": "urban NPCs"
      },
      {
       "skill": "tactics",
@@ -2323,7 +2323,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Bureaucracy (when targeting any NPCs from a corporate or government environment), Resolve, Sense Motive, Streetwise (when targeting any NPCs from an urban environment), Tactics."
+    "synergyText": "Bureaucracy [corporate/government NPCs]; Resolve; Sense Motive; Streetwise [urban NPCs]; Tactics"
    }
   ]
  },
@@ -2375,16 +2375,16 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "for a Faction character"
+      "condition": "Faction agent"
      },
      {
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "for a Freelance character"
+      "condition": "Freelance agent"
      }
     ],
-    "synergyText": "Bureaucracy (for a Faction character), Streetwise (for a Freelance character)."
+    "synergyText": "Bureaucracy [Faction agent]; Streetwise [Freelance agent]"
    }
   ]
  },
@@ -2437,7 +2437,7 @@ export const SKILLS = [
     "page": 149,
     "id": "r-r",
     "synergies": [],
-    "synergyText": "None (though Interests are exceptionally helpful — the GC is encouraged to allow a +1 bonus from an Interest with each R&R check)."
+    "synergyText": "None listed; an Interest may give +1 per R&R check at the GC's option."
    },
    {
     "name": "Resist Impress Check",
@@ -2508,7 +2508,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Medicine, Science (Mathematics)."
+    "synergyText": "Analysis; Medicine; Science (Mathematics)"
    },
    {
     "name": "Economy Check",
@@ -2541,7 +2541,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Bureaucracy, Networking, Profession."
+    "synergyText": "Bureaucracy; Networking; Profession"
    },
    {
     "name": "Engineering Check",
@@ -2574,7 +2574,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Electronics, Mechanics, Science (Fabrication)."
+    "synergyText": "Electronics; Mechanics; Science (Fabrication)"
    },
    {
     "name": "Fabrication Check",
@@ -2607,7 +2607,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Electronics, Mechanics, Science (Engineering)."
+    "synergyText": "Electronics; Mechanics; Science (Engineering)"
    },
    {
     "name": "Genetics Check",
@@ -2640,7 +2640,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Medicine, Science (Chemistry), Science (Pharmacology)."
+    "synergyText": "Medicine; Science (Chemistry); Science (Pharmacology)"
    },
    {
     "name": "Mathematics Check",
@@ -2679,7 +2679,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Computers, Manipulate, Science (Super-Science)."
+    "synergyText": "Analysis; Computers; Manipulate; Science (Super-Science)"
    },
    {
     "name": "Pharmacology Check",
@@ -2712,7 +2712,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Medicine, Science (Chemistry), Science (Genetics)."
+    "synergyText": "Medicine; Science (Chemistry); Science (Genetics)"
    },
    {
     "name": "Programming Check",
@@ -2751,7 +2751,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Computers, Science (Mathematics), Science (Super-Science)."
+    "synergyText": "Analysis; Computers; Science (Mathematics); Science (Super-Science)"
    },
    {
     "name": "Super-Science Check",
@@ -2796,7 +2796,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers, Electronics, Mechanics, Science (Fabrication), Science (Mathematics)."
+    "synergyText": "Computers; Electronics; Mechanics; Science (Fabrication); Science (Mathematics)"
    }
   ]
  },
@@ -2848,34 +2848,34 @@ export const SKILLS = [
       "skill": "computers",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any computerized security device"
+      "condition": "computerized security device"
      },
      {
       "skill": "electronics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when disabling any electronic security device"
+      "condition": "electronic security device"
      },
      {
       "skill": "mechanics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when disabling any mechanical security device"
+      "condition": "mechanical security device"
      },
      {
       "skill": "science",
       "focusSkill": true,
       "focus": "Chemistry",
-      "condition": "when disabling an explosive security device"
+      "condition": "explosive security device"
      },
      {
       "skill": "science",
       "focusSkill": true,
       "focus": "Fabrication",
-      "condition": "when disarming a security weapon"
+      "condition": "security weapon"
      }
     ],
-    "synergyText": "Computers (when targeting any computerized security device), Electronics (when disabling any electronic security device), Mechanics (when disabling any mechanical security device), Science (Chemistry) (when disabling an explosive security device), Science (Fabrication) (when disarming a security weapon)."
+    "synergyText": "Computers [computerized security device]; Electronics [electronic security device]; Mechanics [mechanical security device]; Science (Chemistry) [explosive security device]; Science (Fabrication) [security weapon]"
    },
    {
     "name": "Hotwire Check",
@@ -2893,19 +2893,19 @@ export const SKILLS = [
       "skill": "computers",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any computerized ignition"
+      "condition": "computerized ignition"
      },
      {
       "skill": "electronics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any electronic ignition"
+      "condition": "electronic ignition"
      },
      {
       "skill": "mechanics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when targeting any mechanical ignition"
+      "condition": "mechanical ignition"
      },
      {
       "skill": "streetwise",
@@ -2914,7 +2914,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers (when targeting any computerized ignition), Electronics (when targeting any electronic ignition), Mechanics (when targeting any mechanical ignition), Streetwise."
+    "synergyText": "Computers [computerized ignition]; Electronics [electronic ignition]; Mechanics [mechanical ignition]; Streetwise"
    },
    {
     "name": "Installation Check",
@@ -2932,28 +2932,28 @@ export const SKILLS = [
       "skill": "computers",
       "focusSkill": false,
       "focus": "",
-      "condition": "when installing any computerized security device"
+      "condition": "computerized security device"
      },
      {
       "skill": "electronics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when installing any electronic security device"
+      "condition": "electronic security device"
      },
      {
       "skill": "mechanics",
       "focusSkill": false,
       "focus": "",
-      "condition": "when installing any mechanical security device"
+      "condition": "mechanical security device"
      },
      {
       "skill": "science",
       "focusSkill": true,
       "focus": "Fabrication",
-      "condition": "when installing a security weapon"
+      "condition": "security weapon"
      }
     ],
-    "synergyText": "Computers (when installing any computerized security device), Electronics (when installing any electronic security device), Mechanics (when installing any mechanical security device), Science (Fabrication) (when installing a security weapon)."
+    "synergyText": "Computers [computerized security device]; Electronics [electronic security device]; Mechanics [mechanical security device]; Science (Fabrication) [security weapon]"
    }
   ]
  },
@@ -3011,7 +3011,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Blend, Impress, Networking."
+    "synergyText": "Blend; Impress; Networking"
    },
    {
     "name": "Resist Manipulate Check",
@@ -3068,7 +3068,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Blend, Bluff, Impress."
+    "synergyText": "Blend; Bluff; Impress"
    },
    {
     "name": "Stash Item Check",
@@ -3101,7 +3101,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Blend, Bluff, Search."
+    "synergyText": "Blend; Bluff; Search"
    }
   ]
  },
@@ -3160,7 +3160,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Blend, Bluff, Search."
+    "synergyText": "Blend; Bluff; Search"
    }
   ]
  },
@@ -3189,7 +3189,7 @@ export const SKILLS = [
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "in focus area"
+      "condition": "focus area"
      },
      {
       "skill": "investigation",
@@ -3204,7 +3204,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Cultures (in focus area), Investigation, Networking."
+    "synergyText": "Cultures [focus area]; Investigation; Networking"
    },
    {
     "name": "Bribe Check",
@@ -3243,7 +3243,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Networking, Resolve, Science (Economy)."
+    "synergyText": "Impress; Networking; Resolve; Science (Economy)"
    },
    {
     "name": "Gambling Check",
@@ -3262,7 +3262,7 @@ export const SKILLS = [
       "skill": "bluff",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a competitive game"
+      "condition": "competitive game"
      },
      {
       "skill": "science",
@@ -3274,10 +3274,10 @@ export const SKILLS = [
       "skill": "senseMotive",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a competitive game"
+      "condition": "competitive game"
      }
     ],
-    "synergyText": "Bluff (in a competitive game), Science (Mathematics), Sense Motive (in a competitive game)."
+    "synergyText": "Bluff [competitive game]; Science (Mathematics); Sense Motive [competitive game]"
    },
    {
     "name": "Haggle Check",
@@ -3310,7 +3310,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis, Networking, Sense Motive."
+    "synergyText": "Analysis; Networking; Sense Motive"
    }
   ]
  },
@@ -3354,7 +3354,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Resolve, Sense Motive."
+    "synergyText": "Impress; Resolve; Sense Motive"
    },
    {
     "name": "Foraging Check",
@@ -3372,7 +3372,7 @@ export const SKILLS = [
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "in focus area"
+      "condition": "focus area"
      },
      {
       "skill": "notice",
@@ -3387,7 +3387,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Cultures (in focus area), Notice, Search."
+    "synergyText": "Cultures [focus area]; Notice; Search"
    },
    {
     "name": "Forecast Weather Check",
@@ -3405,7 +3405,7 @@ export const SKILLS = [
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "in focus area"
+      "condition": "focus area"
      },
      {
       "skill": "science",
@@ -3414,7 +3414,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Cultures (in focus area), Science (Mathematics)."
+    "synergyText": "Cultures [focus area]; Science (Mathematics)"
    },
    {
     "name": "Maneuver Check",
@@ -3447,7 +3447,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Resolve, Sense Motive."
+    "synergyText": "Impress; Resolve; Sense Motive"
    },
    {
     "name": "Tracking Check",
@@ -3471,13 +3471,13 @@ export const SKILLS = [
       "skill": "bureaucracy",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a corporate or government environment"
+      "condition": "corporate/government setting"
      },
      {
       "skill": "cultures",
       "focusSkill": true,
       "focus": "",
-      "condition": "in focus area"
+      "condition": "focus area"
      },
      {
       "skill": "falsify",
@@ -3501,10 +3501,10 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "in a city"
+      "condition": "city setting"
      }
     ],
-    "synergyText": "Athletics, Bureaucracy (in a corporate or government environment), Cultures (in focus area), Falsify, Notice, Search, Streetwise (in a city)."
+    "synergyText": "Athletics; Bureaucracy [corporate/government setting]; Cultures [focus area]; Falsify; Notice; Search; Streetwise [city setting]"
    }
   ]
  },
@@ -3557,16 +3557,16 @@ export const SKILLS = [
       "skill": "streetwise",
       "focusSkill": false,
       "focus": "",
-      "condition": "when preparing an ambush in a city"
+      "condition": "city ambush"
      },
      {
       "skill": "survival",
       "focusSkill": false,
       "focus": "",
-      "condition": "when preparing an ambush in the wild"
+      "condition": "wilderness ambush"
      }
     ],
-    "synergyText": "Blend, Falsify, Sense Motive, Sneak, Streetwise (when preparing an ambush in a city), Survival (when preparing an ambush in the wild)."
+    "synergyText": "Blend; Falsify; Sense Motive; Sneak; Streetwise [city ambush]; Survival [wilderness ambush]"
    },
    {
     "name": "Maneuver Check",
@@ -3599,7 +3599,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Intimidate, Networking, Resolve."
+    "synergyText": "Intimidate; Networking; Resolve"
    },
    {
     "name": "Rally Check",
@@ -3632,7 +3632,7 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress, Intimidate, Resolve."
+    "synergyText": "Impress; Intimidate; Resolve"
    }
   ]
  }
@@ -4302,14 +4302,14 @@ export const TABLES = {
    "rank": 4,
    "home": "Condo, houseboat, 2 bedroom house(8)",
    "vehicle": "II/1",
-   "appearance": "Trendy - outdated high-end street look",
+   "appearance": "Trendy - last season's designer streetwear",
    "appearanceMod": 0
   },
   {
    "rank": 5,
    "home": "3 bedroom house, yacht, or any two (10)",
    "vehicle": "II/2 or any two",
-   "appearance": "Fashionable - constantly updated street look",
+   "appearance": "Fashionable - always-current streetwear",
    "appearanceMod": 1
   },
   {
@@ -4342,7 +4342,7 @@ export const TABLES = {
   },
   {
    "rank": 10,
-   "home": "Private island, palace (100) or any three",
+   "home": "Palace or private island (100), or any three",
    "vehicle": "V/1 or any three",
    "appearance": "Unique - perfect made-to-order",
    "appearanceMod": 4
@@ -4865,12 +4865,12 @@ export const TABLES = {
   },
   "burrow": {
    "label": "Burrow",
-   "notes": "Tunnel through material with a 1-inch Damage save bonus no greater than half STR (rounded up). Cannot Run while burrowing.",
+   "notes": "Tunnel through any material whose 1-inch Damage save bonus is at most half STR (rounded up). Cannot Run while burrowing.",
    "bonuses": []
   },
   "camouflaged": {
    "label": "Camouflaged (one terrain)",
-   "notes": "Choose a terrain: aquatic, arctic, desert, forest, jungle, mountain, plains or swamp. In it, +4 to Blend/Stealth and Sneak/Hide. Record the terrain in the details.",
+   "notes": "Choose one terrain type (swamp, plains, mountain, jungle, forest, desert, arctic or aquatic). In it, +4 to Blend/Stealth and Sneak/Hide. Record the terrain in the details.",
    "bonuses": [],
    "repeatable": true
   },
@@ -8144,7 +8144,7 @@ export const CLASS_FEATURES = {
       "index": 9,
       "name": "Skill Mastery",
       "bonuses": [],
-      "description": "Choose a Faceman class skill: error range decreases by 2 (minimum 1); taking 10 no longer doubles its time."
+      "description": "Choose a Faceman class skill: its error range shrinks by 2 (never below 1); taking 10 no longer doubles its time."
      }
     ],
     "kind": "option"
@@ -8243,7 +8243,7 @@ export const CLASS_FEATURES = {
       "index": 7,
       "name": "Ice Man",
       "bonuses": [],
-      "description": "Your system's Power Rating rises when you're the Prey in a hacking Conflict."
+      "description": "Your system's Power Rating rises while you are Prey during a hacking Conflict."
      },
      {
       "index": 8,
@@ -8366,7 +8366,7 @@ export const CLASS_FEATURES = {
       "index": 9,
       "name": "Tricky",
       "bonuses": [],
-      "description": "Once per round, when an adjacent opponent misses you by 5 or more, immediately take a free Tire action against that opponent; you may substitute Acrobatics (Dex) for Resolve (Con)."
+      "description": "Once each round, if a foe next to you misses by 5+, immediately take a free Tire action against that opponent; you may substitute Acrobatics (Dex) for Resolve (Con)."
      }
     ],
     "kind": "option"
@@ -8906,7 +8906,7 @@ export const CLASS_FEATURES = {
       "index": 4,
       "name": "Faculty",
       "bonuses": [],
-      "description": "In a city of 10,000+ with quick contact, once per mission summon Tier II academics equal to starting action dice. GC-approved non-combat help lasts through the following scene. The whole team leaves if one fails a Damage save or Morale check, or suffers a critical injury. Required-kit checks assume one appropriate grade I kit."
+      "description": "In a city of 10,000+ with quick contact, once per mission summon Tier II academics equal to starting action dice. GC-approved non-combat help lasts through the following scene. The whole team leaves if any member fails a Damage save, fails Morale, or takes a critical injury. Required-kit checks assume one appropriate grade I kit."
      },
      {
       "index": 5,
@@ -9111,7 +9111,7 @@ export const CLASS_FEATURES = {
       "index": 3,
       "name": "Friends on the Force",
       "bonuses": [],
-      "description": "In a city of 10,000+ with quick contact, once per mission summon Tier II police officers equal to starting action dice. GC-approved non-combat help lasts through the following scene. The whole group withdraws if one loses more than half maximum vitality (rounded down), at least one wound, fails Morale, or suffers a critical injury."
+      "description": "In a city of 10,000+ with quick contact, once per mission summon Tier II police officers, as many as your starting action dice. GC-approved non-combat help lasts through the following scene. The whole group withdraws if one loses more than half maximum vitality (rounded down), at least one wound, fails Morale, or suffers a critical injury."
      },
      {
       "index": 4,
@@ -9261,7 +9261,7 @@ export const CLASS_FEATURES = {
       "index": 8,
       "name": "Spy vs. Spy",
       "bonuses": [],
-      "description": "Take one Tradecraft gear pick as if the mission Caliber were 1 higher."
+      "description": "One Tradecraft gear pick is chosen at +1 mission Caliber."
      },
      {
       "index": 9,
@@ -9479,7 +9479,7 @@ export const CLASS_FEATURES = {
       "index": 5,
       "name": "Pit Crew",
       "bonuses": [],
-      "description": "In a city of 10,000+ with quick contact, once per mission summon Tier II tool-pushers equal to starting action dice. GC-approved non-combat help lasts through the following scene. The whole crew leaves if one fails a Damage save or Morale check, or suffers a critical injury. Required-kit checks assume one appropriate grade I kit."
+      "description": "In a city of 10,000+ with quick contact, once per mission summon Tier II tool-pushers equal to starting action dice. GC-approved non-combat help lasts through the following scene. The whole crew leaves if any member fails a Damage save, fails Morale, or takes a critical injury. Required-kit checks assume one appropriate grade I kit."
      },
      {
       "index": 6,

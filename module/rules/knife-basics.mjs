@@ -17,7 +17,7 @@ export function knifeBasicsPlan(system,items=[]){
   knives.push({id,uuid:item.uuid??null,name:item.name??'',proficiency:w.proficiency,held:w.equipped===true,consideredReadied:true});
  }
  knives.sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
- return {version:1,active,freeDraw:active,knives,notes:active?['Knife Basics: drawing a knife is a free action and every knife on your person is always considered readied (p.179). This does not spend Quick Draw uses and does not place the knife in a hand; attacking still requires a free hand.']:[]};
+ return {version:1,active,freeDraw:active,knives,notes:active?['Knife Basics: drawing a knife is a free action and any knife you carry counts as readied (p.179). This does not spend Quick Draw uses and does not place the knife in a hand; attacking still requires a free hand.']:[]};
 }
 
 /**
