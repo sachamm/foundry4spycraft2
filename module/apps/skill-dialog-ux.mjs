@@ -30,6 +30,9 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
   advanced.append(summary);
   const sections = [...root.children].filter(el => el.tagName === 'DETAILS');
   root.insertBefore(advanced, sections[0] ?? null);
+  // Choosing Roll / Take 10 / Take 20 is a common action, not an advanced modifier.
+  const methodLabel = root.querySelector('[name="method"]')?.closest('label');
+  if (methodLabel) root.insertBefore(methodLabel, advanced);
   const submit = dialog.element.querySelector('[data-action="ok"]');
   const ability = root.querySelector('[name="ability"]');
   function update() {
