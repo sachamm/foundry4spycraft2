@@ -856,7 +856,7 @@ export const GC_DATA = {
        1,
        1
       ],
-      "text": "Nothing, or pocket lint",
+      "text": "Nothing of note",
       "data": {}
      },
      {
@@ -864,7 +864,7 @@ export const GC_DATA = {
        2,
        2
       ],
-      "text": "Paperback (genre-appropriate)",
+      "text": "Reading matter",
       "data": {}
      },
      {
@@ -872,7 +872,7 @@ export const GC_DATA = {
        3,
        3
       ],
-      "text": "Nightclub card with a date's phone number",
+      "text": "Social contact detail",
       "data": {}
      },
      {
@@ -880,7 +880,7 @@ export const GC_DATA = {
        4,
        4
       ],
-      "text": "Portable music player with earbuds",
+      "text": "Personal music player",
       "data": {}
      },
      {
@@ -888,7 +888,7 @@ export const GC_DATA = {
        5,
        7
       ],
-      "text": "Cell phone with 1d12 stored contacts (family, friends, others)",
+      "text": "Phone with 1d12 stored contacts",
       "data": {
        "numbers": "1d12"
       }
@@ -898,7 +898,7 @@ export const GC_DATA = {
        8,
        10
       ],
-      "text": "Keys to a Caliber I or II vehicle parked within 1d4 blocks and a home within 2d20 miles (Lifestyle 1d6)",
+      "text": "Keys: Caliber I–II vehicle within 1d4 blocks; home within 2d20 miles (Lifestyle 1d6)",
       "data": {
        "vehicleCaliber": "I or II",
        "vehicleBlocks": "1d4",
@@ -911,7 +911,7 @@ export const GC_DATA = {
        11,
        18
       ],
-      "text": "Wallet: ID, family photos, scribbled notes, and 2d6 x $50 in cash and cards",
+      "text": "Wallet: ID, personal papers, 2d6 × $50",
       "data": {
        "cash": "2d6 * 50"
       }
@@ -921,7 +921,7 @@ export const GC_DATA = {
        19,
        19
       ],
-      "text": "Detective's badge (undercover cop); violence against this civilian traced to the team makes it Wanted (p.404)",
+      "text": "Police badge: harming this person can bring the Wanted event (p.404)",
       "data": {
        "event": "wanted"
       }
@@ -931,7 +931,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "1 Caliber I firearm or melee weapon (GC picks or rolls)",
+      "text": "1 Caliber I firearm or melee weapon (GC's choice or roll)",
       "data": {
        "caliber": "I"
       }
@@ -954,7 +954,7 @@ export const GC_DATA = {
        1,
        1
       ],
-      "text": "Freshly pulled suicide tooth wrapped in a bloodstained hanky",
+      "text": "Grim personal keepsake",
       "data": {}
      },
      {
@@ -962,7 +962,7 @@ export const GC_DATA = {
        2,
        3
       ],
-      "text": "Pack of imported cigarettes",
+      "text": "Tobacco",
       "data": {}
      },
      {
@@ -970,7 +970,7 @@ export const GC_DATA = {
        4,
        5
       ],
-      "text": "Playing cards showing faces from the villain group's hit list",
+      "text": "Organization-themed pastime item",
       "data": {}
      },
      {
@@ -978,7 +978,7 @@ export const GC_DATA = {
        6,
        6
       ],
-      "text": "Handheld game console loaded with a spy stealth game",
+      "text": "Handheld game",
       "data": {}
      },
      {
@@ -986,7 +986,7 @@ export const GC_DATA = {
        7,
        7
       ],
-      "text": "Two-headed \"lucky\" quarter",
+      "text": "Lucky charm",
       "data": {}
      },
      {
@@ -994,7 +994,7 @@ export const GC_DATA = {
        8,
        8
       ],
-      "text": "Ear plugs and tape player with a self-help audiobook aimed at junior minions",
+      "text": "Motivational recording",
       "data": {}
      },
      {
@@ -1002,7 +1002,7 @@ export const GC_DATA = {
        9,
        9
       ],
-      "text": "Joke \"Authentication\" kit: scale picture, tape measure",
+      "text": "Joke kit: Authentication",
       "data": {}
      },
      {
@@ -1010,7 +1010,7 @@ export const GC_DATA = {
        10,
        10
       ],
-      "text": "Joke \"Climbing\" kit: Velcro, low-opening parachute",
+      "text": "Joke kit: Climbing",
       "data": {}
      },
      {
@@ -1018,7 +1018,7 @@ export const GC_DATA = {
        11,
        11
       ],
-      "text": "Joke \"Disguise\" kit: Groucho glasses, yesterday's paper",
+      "text": "Joke kit: Disguise",
       "data": {}
      },
      {
@@ -1026,7 +1026,7 @@ export const GC_DATA = {
        12,
        12
       ],
-      "text": "Joke \"Electronics\" kit: blunt scissors, magnet",
+      "text": "Joke kit: Electronics",
       "data": {}
      },
      {
@@ -1034,7 +1034,7 @@ export const GC_DATA = {
        13,
        13
       ],
-      "text": "Joke \"Forgery\" kit: pocket scanner, nearest copy shop's number",
+      "text": "Joke kit: Forgery",
       "data": {}
      },
      {
@@ -1042,7 +1042,7 @@ export const GC_DATA = {
        14,
        14
       ],
-      "text": "Joke \"Mechanics\" kit: Swiss army knife, hammer",
+      "text": "Joke kit: Mechanics",
       "data": {}
      },
      {
@@ -1050,7 +1050,7 @@ export const GC_DATA = {
        15,
        15
       ],
-      "text": "PDA holding a stock portfolio, paid-up life insurance and a 5-year retirement plan",
+      "text": "Personal financial records",
       "data": {}
      },
      {
@@ -1058,7 +1058,7 @@ export const GC_DATA = {
        16,
        18
       ],
-      "text": "Code-name ID (uniform patch, implanted chip, etc.)",
+      "text": "Code-name ID",
       "data": {}
      },
      {
@@ -1066,7 +1066,7 @@ export const GC_DATA = {
        19,
        20
       ],
-      "text": "Real-name ID (day-job business card, training notes, etc.)",
+      "text": "Real-name ID",
       "data": {}
      },
      {
@@ -1074,7 +1074,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "Clue pointing to a henchman of the same organization",
+      "text": "Clue to a henchman in the same organization",
       "data": {
        "clue": "henchman"
       }
@@ -1097,7 +1097,7 @@ export const GC_DATA = {
        1,
        1
       ],
-      "text": "Beeper",
+      "text": "Pager",
       "data": {}
      },
      {
@@ -1105,7 +1105,7 @@ export const GC_DATA = {
        2,
        2
       ],
-      "text": "Unmarked tin of sinister-looking capsules (really designer candy)",
+      "text": "Unlabelled pills (harmless)",
       "data": {}
      },
      {
@@ -1113,7 +1113,7 @@ export const GC_DATA = {
        3,
        3
       ],
-      "text": "Designer flask with the emblem of a real military branch",
+      "text": "Engraved flask",
       "data": {}
      },
      {
@@ -1121,7 +1121,7 @@ export const GC_DATA = {
        4,
        4
       ],
-      "text": "Matchbook from a distant bar or cafe, with a foil's name and phone number jotted in it",
+      "text": "Note with a foil's name and number",
       "data": {}
      },
      {
@@ -1129,7 +1129,7 @@ export const GC_DATA = {
        5,
        5
       ],
-      "text": "Bullet engraved \"Not today\"; owner bears a gunshot scar somewhere vital",
+      "text": "Memento of an old wound",
       "data": {}
      },
      {
@@ -1137,7 +1137,7 @@ export const GC_DATA = {
        6,
        6
       ],
-      "text": "Dead-drop spike containing 1 freshly cut finger in cellophane",
+      "text": "Grisly dead-drop item",
       "data": {}
      },
      {
@@ -1145,7 +1145,7 @@ export const GC_DATA = {
        7,
        7
       ],
-      "text": "Two matching clear bottles: vintage vodka in one, the other deals 2d10 acid damage",
+      "text": "Two identical bottles: one a drink, one dealing 2d10 acid damage",
       "data": {
        "damage": "2d10",
        "damageType": "acid"
@@ -1156,7 +1156,7 @@ export const GC_DATA = {
        8,
        8
       ],
-      "text": "Fortune-cookie slip",
+      "text": "Scrap of paper with a saying",
       "data": {}
      },
      {
@@ -1164,7 +1164,7 @@ export const GC_DATA = {
        9,
        9
       ],
-      "text": "Gold body paint, 1 can",
+      "text": "Odd cosmetic item",
       "data": {}
      },
      {
@@ -1172,7 +1172,7 @@ export const GC_DATA = {
        10,
        10
       ],
-      "text": "Half-carved wooden caricature of the mastermind or another boss",
+      "text": "Unfinished likeness of a superior",
       "data": {}
      },
      {
@@ -1180,7 +1180,7 @@ export const GC_DATA = {
        11,
        11
       ],
-      "text": "Joke \"Lockpicking\" kit: steel-toed boots",
+      "text": "Joke kit: Lockpicking",
       "data": {}
      },
      {
@@ -1188,7 +1188,7 @@ export const GC_DATA = {
        12,
        12
       ],
-      "text": "Joke \"Surgery\" kit: needle, thread, ice pack",
+      "text": "Joke kit: Surgery",
       "data": {}
      },
      {
@@ -1196,7 +1196,7 @@ export const GC_DATA = {
        13,
        13
       ],
-      "text": "Organization jewelry, worn (watch, ring, pin, etc.)",
+      "text": "Organization insignia, worn",
       "data": {}
      },
      {
@@ -1204,7 +1204,7 @@ export const GC_DATA = {
        14,
        14
       ],
-      "text": "Firing pin (pistol, rifle, SMG or shotgun) or grenade pin",
+      "text": "Weapon part",
       "data": {}
      },
      {
@@ -1212,7 +1212,7 @@ export const GC_DATA = {
        15,
        16
       ],
-      "text": "Code-name ID (bar code tattoo, implanted chip, etc.)",
+      "text": "Code-name ID",
       "data": {}
      },
      {
@@ -1220,7 +1220,7 @@ export const GC_DATA = {
        17,
        17
       ],
-      "text": "Real-name ID (threat note from a fellow henchman, annotated photo, etc.)",
+      "text": "Real-name ID",
       "data": {}
      },
      {
@@ -1228,7 +1228,7 @@ export const GC_DATA = {
        18,
        18
       ],
-      "text": "Clue pointing to another henchman of the same organization",
+      "text": "Clue to another henchman in the same organization",
       "data": {
        "clue": "henchman"
       }
@@ -1238,7 +1238,7 @@ export const GC_DATA = {
        19,
        19
       ],
-      "text": "Clue pointing to the same organization's mastermind",
+      "text": "Clue to the organization's mastermind",
       "data": {
        "clue": "mastermind"
       }
@@ -1248,7 +1248,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "Minor clue to the current mission (GC picks)",
+      "text": "Minor clue to the current mission (GC's choice)",
       "data": {
        "clue": "mission-minor"
       }
@@ -1271,7 +1271,7 @@ export const GC_DATA = {
        1,
        1
       ],
-      "text": "File and photos on 1 player character, some recent and private",
+      "text": "Dossier on 1 player character",
       "data": {}
      },
      {
@@ -1279,7 +1279,7 @@ export const GC_DATA = {
        2,
        2
       ],
-      "text": "Photos of operatives who recently deserted, each grisly dead",
+      "text": "Evidence of punished deserters",
       "data": {}
      },
      {
@@ -1287,7 +1287,7 @@ export const GC_DATA = {
        3,
        3
       ],
-      "text": "Pair of tickets to tonight's social event",
+      "text": "Tickets to an event tonight",
       "data": {}
      },
      {
@@ -1295,7 +1295,7 @@ export const GC_DATA = {
        4,
        4
       ],
-      "text": "Compromising pictures of a local police official",
+      "text": "Blackmail material on a local official",
       "data": {}
      },
      {
@@ -1303,7 +1303,7 @@ export const GC_DATA = {
        5,
        5
       ],
-      "text": "Name of 1 contact who won't work with the team but may know something",
+      "text": "Name of 1 uncooperative but informed contact",
       "data": {}
      },
      {
@@ -1311,7 +1311,7 @@ export const GC_DATA = {
        6,
        6
       ],
-      "text": "Pills for a nervous tic or mental illness",
+      "text": "Prescription medication",
       "data": {}
      },
      {
@@ -1319,7 +1319,7 @@ export const GC_DATA = {
        7,
        7
       ],
-      "text": "Micro-cassette of the mastermind practicing an evil laugh",
+      "text": "Private vanity recording",
       "data": {}
      },
      {
@@ -1327,7 +1327,7 @@ export const GC_DATA = {
        8,
        8
       ],
-      "text": "Half-drawn sketch of his newest slow-death device",
+      "text": "Design sketch for a new deathtrap",
       "data": {}
      },
      {
@@ -1335,7 +1335,7 @@ export const GC_DATA = {
        9,
        9
       ],
-      "text": "Draft monologue for that device's victim",
+      "text": "Draft speech for a captive",
       "data": {}
      },
      {
@@ -1343,7 +1343,7 @@ export const GC_DATA = {
        10,
        10
       ],
-      "text": "Hardcover guide to executions, written for masterminds",
+      "text": "Reference book on his trade",
       "data": {}
      },
      {
@@ -1351,7 +1351,7 @@ export const GC_DATA = {
        11,
        11
       ],
-      "text": "Action figure in his own likeness",
+      "text": "Vanity collectible",
       "data": {}
      },
      {
@@ -1359,7 +1359,7 @@ export const GC_DATA = {
        12,
        12
       ],
-      "text": "Bank receipts: black-market buys of 1 exotic animal and 1 military hardware item",
+      "text": "Receipts for black-market purchases (1 exotic animal, 1 military hardware item)",
       "data": {}
      },
      {
@@ -1367,7 +1367,7 @@ export const GC_DATA = {
        13,
        13
       ],
-      "text": "Hologram recording: inconclusive evidence of a covered-up conspiracy",
+      "text": "Inconclusive conspiracy evidence",
       "data": {}
      },
      {
@@ -1375,7 +1375,7 @@ export const GC_DATA = {
        14,
        14
       ],
-      "text": "Pocket-sized venomous \"pet\": Tier II attack bonus, poison picked by GC or rolled",
+      "text": "Small venomous pet: Tier II attack bonus, poison by GC's choice or roll",
       "data": {
        "attackTier": "II"
       }
@@ -1385,7 +1385,7 @@ export const GC_DATA = {
        15,
        15
       ],
-      "text": "\"To Do\" list mixing evil schemes with everyday errands",
+      "text": "Personal task list",
       "data": {}
      },
      {
@@ -1393,7 +1393,7 @@ export const GC_DATA = {
        16,
        16
       ],
-      "text": "List of 1d6 cities slated for destruction",
+      "text": "List of 1d6 targeted cities",
       "data": {
        "count": "1d6"
       }
@@ -1403,7 +1403,7 @@ export const GC_DATA = {
        17,
        17
       ],
-      "text": "List of 1d6 henchmen in his bad books, each Marked for Death (p.399)",
+      "text": "List of 1d6 henchmen out of favour, each Marked for Death (p.399)",
       "data": {
        "count": "1d6",
        "event": "marked-for-death"
@@ -1414,7 +1414,7 @@ export const GC_DATA = {
        18,
        18
       ],
-      "text": "1 Caliber I gadget (GC picks or rolls)",
+      "text": "1 Caliber I gadget (GC's choice or roll)",
       "data": {
        "caliber": "I"
       }
@@ -1424,7 +1424,7 @@ export const GC_DATA = {
        19,
        19
       ],
-      "text": "One-button remote, random effect (e.g. teleport to a safe house, trap door, 6d6 explosive detonation)",
+      "text": "Single-button remote, random effect (GC's choice; e.g. escape route or 6d6 explosive)",
       "data": {
        "damage": "6d6",
        "damageType": "explosive"
@@ -1435,7 +1435,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "Major clue to this mission or the next (GC picks)",
+      "text": "Major clue to this or the next mission (GC's choice)",
       "data": {
        "clue": "mission-major"
       }
