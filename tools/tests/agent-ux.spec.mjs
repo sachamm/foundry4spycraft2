@@ -48,13 +48,14 @@ test('named check changes show relevant circumstances, omit stale inputs and upd
     <details><summary>Balance</summary><input name="balanceCircumstances" type="checkbox" /><input name="balanceSurface" value="slippery" /></details>
     <details><summary>Tumble</summary><input name="tumbleCircumstances" type="checkbox" /></details>
     <details><summary>Gear</summary><select name="gearStatus"><option value="unknown">Choose gear</option></select></details>
-    <details><summary>Timing</summary><select name="method"><option value="roll">Roll</option><option value="take10">Take 10</option></select></details>
+    <details><summary>Timing</summary><label>Method <select name="method"><option value="roll">Roll</option><option value="take10">Take 10</option></select></label></details>
     <input name="modifier" value="0" />
   </div><button type="button" data-action="ok">Confirm</button></form>`);
   await load(page,skillUX,'enhanceSkillDialog');
   await page.evaluate(()=>window.enhanceSkillDialog(null,{element:document.querySelector('form')},[{id:'balance',attributes:['dex'],tags:'Vision'},{id:'tumble',attributes:['dex'],tags:'Vision'},{id:'repair',attributes:['int'],tags:'Gear'}]));
   await expect(page.locator('.sc2-check-context summary')).toHaveText('Balance');
   await expect(page.getByRole('button')).toHaveText('Roll Balance Check');
+  await expect(page.locator('[name="method"]')).toBeVisible();
   await page.locator('details.sc2-check-context').evaluate(el=>el.open=true);
   await page.locator('[name="balanceCircumstances"]').check();
   await page.locator('[name="check"]').selectOption('tumble');
