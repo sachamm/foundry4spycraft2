@@ -56,6 +56,7 @@ import { armorSlot } from "../rules/gear.mjs";
 import { renderTemplate } from "../rules/formula.mjs";
 import { describe as describePrereq } from "../rules/prerequisites.mjs";
 import { SpycraftBrowser } from "../apps/browser.mjs";
+import {rollNpcSkill,npcDamageSave,resetDamageTrack,manageDisposition,damageSaveState,npcIsSpecial,dispositionRows} from "../apps/gc/npc-play.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -727,6 +728,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       applyBaffled(){return this.actor.applyBaffled();},
       reviewBaffledApplication(){return this.actor.reviewBaffledApplication();},
       setNpcSkillCondition(event,target){return this.actor.setReviewedCondition(target.dataset.condition);},
+      rollNpcSkill(){return rollNpcSkill(this.actor);},
+      npcDamageSave(){return npcDamageSave(this.actor);},
+      async resetDamageTrack(){await resetDamageTrack(this.actor);this.render();},
+      manageDisposition(){return manageDisposition(this.actor);},
+      async endPromotion(){await this.actor.update({'system.promotion':null});},
       npcEnable: SpycraftNpcSheet.#onEnable,
       npcAddSkill: SpycraftNpcSheet.#onAddSkill,
       npcAddQuality: SpycraftNpcSheet.#onAddQuality,
@@ -755,6 +761,8 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       otherItems: this.actor.items.filter(i => i.type !== "weapon"&&!isResourceLock(i)),
       npcTypes: { standard: "Standard", special: "Special", villain: "Villain (legacy special)", animal: "Animal" },
       npc: this._npcContext(),
+      manualRoles: {'': 'None', minion: 'Minion', henchman: 'Henchman', mastermind: 'Mastermind'},
+      gcPlay: {damage: damageSaveState(this.actor), special: npcIsSpecial(this.actor), dispositions: dispositionRows(this.actor), baseDisposition: sys.disposition?.base ?? 'neutral'},
       enrichedBiography: await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.biography, { secrets: this.actor.isOwner })
     });
     return context;
@@ -762,7 +770,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   _npcContext() {
     const sys = this.actor.system, profile = sys.npcProfile ?? defaultNpcProfile();
-    const result = conditionNpcProfile(computeNpcProfile(profile, sys.npcType, sys.threatLevel, sys.abilities),npcSkillConditionContext(this.actor));
+    const result = conditionNpcProfile(computeNpcProfile(profile, sys.npcType, sys.effectiveThreatLevel ?? sys.threatLevel, sys.abilities),npcSkillConditionContext(this.actor));
     const gradeOptions = Object.fromEntries(NPC_RULES.grades.map((g, i) => [i + 1, g]));
     const skillOptions = Object.fromEntries(Object.entries(CONFIG.SPYCRAFT.skills).map(([k, v]) => [k, v.name]));
     return { profile, result, gradeOptions, wealthOptions: {0:"None", ...gradeOptions},

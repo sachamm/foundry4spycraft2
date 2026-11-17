@@ -1,0 +1,57 @@
+<section class="spycraft2 gc-console-body">
+  <h2>Mission{{#if mission.name}}: {{mission.name}}{{/if}} {{#if mission.active}}<span class="tag">active</span>{{else}}<span class="tag muted">not started</span>{{/if}}</h2>
+  <p>Threat Level <b>{{mission.threatLevel}}</b> ({{mission.threatNote}}) · Caliber <b>{{mission.caliberLabel}}</b> · standing reward Reputation {{mission.standing.reputation}} / Net Worth ${{mission.standing.netWorth}}{{#if mission.bonusDice}} · +{{mission.bonusDice}} starting action dice per player (p.61){{/if}}</p>
+  <p>Team: {{#each mission.team}}{{name}} (L{{level}}){{#unless @last}}, {{/unless}}{{else}}no agents{{/each}}</p>
+  <p class="controls">
+    <button type="button" data-action="editMission">Edit mission</button>
+    {{#if mission.active}}<button type="button" data-action="recalculateTL">Recalculate Threat Level</button><button type="button" data-action="endMission">End mission</button>{{else}}<button type="button" data-action="startMission">Start mission</button>{{/if}}
+    <button type="button" data-action="clearMission">Clear record</button>
+    {{#if mission.canRaiseCaliber}}<button type="button" data-action="caliberIncrease">Caliber +1 (GC gains 2 dice)</button>{{/if}}
+    <button type="button" data-action="sessionDice">Apply starting-dice adjustments</button>
+  </p>
+
+  <h3>Objectives <button type="button" data-action="addObjective">Add</button></h3>
+  <ul>{{#each mission.objectives}}<li>{{#if complete}}✔{{else}}○{{/if}} {{name}} — grade {{grade}} ({{xp}} XP){{#if critical}} · <b>critical</b>{{/if}}
+    — <a data-action="entry" data-list="objectives" data-key="{{id}}" data-change="complete">{{#if complete}}undo{{else}}complete{{/if}}</a> · <a data-action="entry" data-list="objectives" data-key="{{id}}" data-change="critical">critical</a> · <a data-action="entry" data-list="objectives" data-key="{{id}}" data-change="remove">remove</a></li>{{else}}<li class="muted">None yet.</li>{{/each}}</ul>
+
+  <h3>Antagonists <button type="button" data-action="addAntagonist">Add</button></h3>
+  <ul>{{#each mission.antagonists}}<li>{{#if encountered}}✔{{else}}○{{/if}} {{name}} — {{#if full}}full special, 300 XP × {{scenes}} scene(s){{else}}{{type}}, {{xp}} XP{{/if}}
+    — <a data-action="entry" data-list="antagonists" data-key="{{id}}" data-change="encountered">{{#if encountered}}not faced{{else}}faced as a threat{{/if}}</a> · <a data-action="entry" data-list="antagonists" data-key="{{id}}" data-change="remove">remove</a></li>{{else}}<li class="muted">None yet.</li>{{/each}}</ul>
+
+  <h3>Complications <button type="button" data-action="addComplication">Add</button></h3>
+  <ul>
+    <li>Scripted dramatic scenes: {{mission.dramaticScenes}}{{#if mission.timeLimit}} · time limit{{/if}}{{#if mission.bundleCommonItems}} · {{mission.bundleCommonItems}} Common Items in the bundle{{/if}}</li>
+    {{#each mission.qualities}}<li>Campaign quality: {{name}} {{#if added}}(added in play, no XP){{else}}({{xp}} XP){{/if}} <a data-action="entry" data-list="qualities" data-key="{{key}}" data-change="remove">remove</a></li>{{/each}}
+    {{#each mission.security}}<li>Security: {{name}} ({{xp}} XP{{#if ignored}}, ignored: half{{/if}}) — <a data-action="entry" data-list="security" data-key="{{key}}" data-change="ignored">ignored</a> · <a data-action="entry" data-list="security" data-key="{{key}}" data-change="remove">remove</a></li>{{/each}}
+    {{#each mission.gearRestrictions}}<li>Gear restriction: {{name}} — <a data-action="entry" data-list="gearRestrictions" data-key="{{key}}" data-change="ignored">ignored</a> · <a data-action="entry" data-list="gearRestrictions" data-key="{{key}}" data-change="remove">remove</a></li>{{/each}}
+    {{#each mission.exposure}}<li>Exposure: {{name}} — <a data-action="entry" data-list="exposure" data-key="{{key}}" data-change="remove">remove</a></li>{{/each}}
+    {{#each mission.bundle}}<li>Bundle: {{name}} (Caliber {{caliber}}) — <a data-action="entry" data-list="bundle" data-key="{{key}}" data-change="remove">remove</a></li>{{/each}}
+    {{#each mission.otherComplications}}<li>{{name}} ({{xp}} XP{{#if ignored}}, ignored: half{{/if}}) — <a data-action="entry" data-list="otherComplications" data-key="{{key}}" data-change="ignored">ignored</a> · <a data-action="entry" data-list="otherComplications" data-key="{{key}}" data-change="remove">remove</a></li>{{/each}}
+  </ul>
+  <p>Base XP earned so far <b>{{xp.earned}}</b> of {{xp.planned}} scripted{{#if xp.perScene}} · {{xp.perScene}} per scene played ({{mission.scenesPlayed}}){{/if}}.
+    {{#each xp.warnings}}<span class="bad">{{this}}</span> {{/each}}</p>
+  <p class="controls"><button type="button" data-action="sceneAdvance">Count a scene played</button><button type="button" data-action="missionReport" data-planned="false">XP report</button><button type="button" data-action="missionReport" data-planned="true">Planned XP</button><button type="button" data-action="recordInfraction">Record exposure infraction</button><button type="button" data-action="awardStanding">Award Reputation / Net Worth</button></p>
+  {{#if mission.infractions.length}}<p>Infractions: {{#each mission.infractions}}{{actorName}} — {{name}} ({{penalty}} {{currency}}){{#unless @last}}; {{/unless}}{{/each}}</p>{{/if}}
+
+  <h2>Scene and GC action dice</h2>
+  <p>GC dice: {{#if dice.current}}<b>{{dice.value}}</b>{{else}}not initialized this session{{/if}} (starting pool {{dice.expected}}: players present + 2 × Caliber). Scene: <b>{{#if scene.dramatic}}dramatic{{else}}standard{{/if}}</b>.</p>
+  <p class="controls"><button type="button" data-action="gcDice">Pool, hints and awards</button><button type="button" data-action="spendDice">Spend dice</button>
+    {{#if scene.dramatic}}<button type="button" data-action="dramaticOff">Return to a standard scene</button><button type="button" data-action="doubleInitiative">Double opponents' Initiative</button>{{else}}<button type="button" data-action="dramaticOn">Scripted dramatic scene (no cost)</button>{{/if}}</p>
+
+  <h2>Combat</h2>
+  {{#if combat}}<p>Round {{combat.round}}{{#if combat.surprise}} · surprise round: {{combat.surprise.winners}} act{{/if}}</p>
+  <ul>{{#each combat.combatants}}<li>{{name}} — Count {{count}}{{#if pending}} ({{pending}} pending){{/if}}{{#if mustPress}} · must Press{{/if}}</li>{{/each}}</ul>{{else}}<p class="muted">No active combat.</p>{{/if}}
+  <p class="controls"><button type="button" data-action="surprise">Surprise round</button><button type="button" data-action="groupInitiative" data-single="false">Roll NPC Initiative by type</button><button type="button" data-action="groupInitiative" data-single="true">One roll for all NPCs</button><button type="button" data-action="fluidEvent">Fluid initiative event</button></p>
+
+  <h2>Dramatic Conflicts <button type="button" data-action="startConflict">Start</button></h2>
+  <ul>{{#each conflicts}}<li><b>{{name}}</b> ({{type}}) — round {{round}}, Lead <b>{{lead}}</b>, {{predator}} vs {{prey}} · {{#if winner}}ended: {{winner}} wins{{else}}step: {{step}}{{/if}}
+    — {{#unless winner}}<a data-action="advanceConflict" data-id="{{id}}">next step</a> · {{/unless}}<a data-action="manageConflict" data-id="{{id}}">manage</a></li>{{else}}<li class="muted">None running.</li>{{/each}}</ul>
+
+  <h2>Campaign qualities <button type="button" data-action="seasonQualities">Season qualities</button></h2>
+  <ul>{{#each season}}<li title="{{summary}}">{{name}} ({{xp}} XP) — {{summary}}</li>{{else}}<li class="muted">No season-long qualities.</li>{{/each}}</ul>
+  {{#if effects.length}}<p>Combined numeric effects: {{#each effects}}{{key}} {{value}}{{#unless @last}}; {{/unless}}{{/each}}</p>{{/if}}
+  {{#each effectConflicts}}<p class="bad">{{key}} is set differently by {{qualities}}: GC ruling needed.</p>{{/each}}
+
+  <h2>Reference</h2>
+  <p class="controls"><button type="button" data-action="securityDevice">Security device</button><button type="button" data-action="hazards">Hazards / nature's fury</button><button type="button" data-action="events">Events</button><button type="button" data-action="possessions">Random possessions</button></p>
+</section>

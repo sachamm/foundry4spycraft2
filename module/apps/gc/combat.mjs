@@ -1,0 +1,182 @@
+/**
+ * Combat tracker support for Spycraft's order of combat (pp.323–324):
+ * flat-footed at the start, tie-breaking by Initiative bonus, fluid initiative at the end of each
+ * round, Delay / Press / Ready, group initiative for NPCs and surprise rounds.
+ */
+import {FLUID_EVENTS, fluidModifier, addFluidModifier, endOfRound, thresholds, delay, press, readyTrigger, compareCombatants, surpriseRound} from '../../rules/gc/fluid-initiative.mjs';
+import {setConditionStatus} from '../../rules/condition-status.mjs';
+
+const esc = text => foundry.utils.escapeHTML(String(text ?? ''));
+const ask = (title, content) => foundry.applications.api.DialogV2.input({window: {title}, rejectClose: false, content: `<div class="spycraft2-roll-options">${content}</div>`});
+const options = (rows, selected) => rows.map(([value, label]) => `<option value="${esc(value)}"${value === selected ? ' selected' : ''}>${esc(label)}</option>`).join('');
+const setting = key => { try { return game.settings.get('spycraft2', key); } catch { return false; } };
+const fluid = combatant => combatant.flags?.spycraft2?.fluid ?? {round: null, modifiers: [], delayed: 0, pressed: false};
+const fluidForRound = (combatant, round) => { const saved = fluid(combatant); return saved.round === round ? saved : {round, modifiers: [], delayed: 0, pressed: false}; };
+const bonusOf = combatant => combatant.actor?.system?.initiative?.total ?? 0;
+const isLeadGM = () => game.users?.activeGM?.id === game.user.id;
+const say = (content, {whisper = false} = {}) => ChatMessage.create({speaker: {alias: 'Game Control'}, content, ...(whisper ? {whisper: ChatMessage.getWhisperRecipients('GM').map(user => user.id)} : {})});
+
+async function condition(actor, id, label) {
+  if (!actor) return;
+  try { await setConditionStatus(actor, id, true, {label}); } catch (error) { console.warn(`Spycraft 2.0 | ${label} not applied to ${actor.name}`, error); }
+}
+
+/** Order combatants by Count, then Initiative bonus, then a stored roll-off (p.323). */
+export function fluidCombatClass(Base) {
+  return class extends Base {
+    _sortCombatants(a, b) {
+      return compareCombatants(
+        {id: a.id, count: a.initiative, bonus: bonusOf(a), tiebreak: a.flags?.spycraft2?.tiebreak},
+        {id: b.id, count: b.initiative, bonus: bonusOf(b), tiebreak: b.flags?.spycraft2?.tiebreak});
+    }
+  };
+}
+
+/** Record one Table 5.2 event against a combatant for the current round; immediate ones change the Count now. */
+export async function recordFluidEvent(combatant, id, input = {}) {
+  if (!combatant?.isOwner) throw new Error('You do not control that combatant.');
+  const combat = combatant.parent, round = combat.round, state = fluidForRound(combatant, round);
+  const count = combatant.initiative;
+  if (!Number.isFinite(count)) throw new Error('Roll Initiative first.');
+  if (id === 'delay') {
+    const result = delay(count, Number(input.times) || 1, {initiativeBonus: bonusOf(combatant), usedThisRound: state.delayed});
+    await combatant.update({initiative: result.count, 'flags.spycraft2.fluid': {...state, delayed: result.used}});
+    return {count: result.count};
+  }
+  if (id === 'press') {
+    const result = press(count, {pressedThisRound: state.pressed});
+    await combatant.update({initiative: result.count, 'flags.spycraft2.fluid': {...state, pressed: true}});
+    return {count: result.count, note: 'Gains 1 extra half action now; other actions happen at the new Count.'};
+  }
+  if (id === 'ready') {
+    const result = readyTrigger(count, Number(input.triggerCount));
+    await combatant.update({initiative: result.count, 'flags.spycraft2.fluid': state});
+    return {count: result.count};
+  }
+  const modifier = fluidModifier(id, {times: Number(input.times) || 1, amount: input.amount === undefined || input.amount === '' ? null : Number(input.amount), weapon: input.weapon ?? '', intBonus: Math.max(0, combatant.actor?.system?.abilities?.int?.mod ?? 0)});
+  const added = addFluidModifier(state.modifiers, modifier);
+  if (!added.added) throw new Error(added.reason);
+  await combatant.update({'flags.spycraft2.fluid': {...state, modifiers: added.list}});
+  return {count, pending: added.list.reduce((sum, entry) => sum + entry.amount, 0)};
+}
+
+/** Dialog: choose a combatant and an event. */
+export async function fluidEventDialog(combat = game.combat, preset = null) {
+  if (!combat?.started) return ui.notifications.warn('Start the combat first.');
+  const mine = combat.combatants.filter(combatant => combatant.isOwner);
+  if (!mine.length) return ui.notifications.warn('You control no combatant in this fight.');
+  const rows = mine.map(combatant => { const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0); return [combatant.id, `${combatant.name} — Count ${combatant.initiative ?? '—'}${pending ? ` (${pending > 0 ? '+' : ''}${pending} pending)` : ''}`]; });
+  const groups = [...new Set(FLUID_EVENTS.map(event => event.group))];
+  const eventOptions = groups.map(group => `<optgroup label="${esc(group)}">${options(FLUID_EVENTS.filter(event => event.group === group).map(event => [event.id, `${event.label}${event.amount === null ? '' : ` (${event.amount > 0 ? '+' : ''}${event.amount})`}`]))}</optgroup>`).join('');
+  const input = await ask('Fluid initiative — Table 5.2', `
+    <p>Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.</p>
+    <label>Combatant <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
+    <label>Event <select name="id">${eventOptions}</select></label>
+    <label>Times it applies (attacks, dice spent, damage points, Counts delayed) <input type="number" name="times" min="1" value="1" /></label>
+    <label>Rolled Count loss (Diversion only) <input type="number" name="amount" min="1" max="8" /></label>
+    <label>Weapon (proficiency penalty only) <input name="weapon" /></label>
+    <label>Count at which the Ready trigger occurred <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`);
+  if (!input) return null;
+  const combatant = combat.combatants.get(input.combatantId);
+  try {
+    const result = await recordFluidEvent(combatant, input.id, input);
+    const label = FLUID_EVENTS.find(event => event.id === input.id).label;
+    await say(`${esc(combatant.name)}: ${esc(label)} — ${result.pending === undefined ? `Initiative Count is now <b>${result.count}</b>.` : `${result.pending > 0 ? '+' : ''}${result.pending} pending at the end of the round.`}${result.note ? ` ${esc(result.note)}` : ''}`);
+    return result;
+  } catch (error) { return ui.notifications.warn(error.message); }
+}
+
+/** Apply every combatant's recorded modifiers for the round that just ended. */
+export async function applyEndOfRound(combat, endedRound) {
+  const lines = [];
+  for (const combatant of combat.combatants) {
+    const state = fluid(combatant);
+    if (state.round !== endedRound || !Number.isFinite(combatant.initiative)) continue;
+    const result = endOfRound(combatant.initiative, state.modifiers);
+    const pieces = result.rows.map(row => `${row.label} ${row.amount > 0 ? '+' : ''}${row.amount}`);
+    if (!result.delta && !result.reeling && !result.mustPress) { if (state.modifiers.length || state.delayed || state.pressed) await combatant.update({'flags.spycraft2.fluid': {round: null, modifiers: [], delayed: 0, pressed: false}}); continue; }
+    await combatant.update({initiative: result.count, 'flags.spycraft2.fluid': {round: null, modifiers: [], delayed: 0, pressed: false}, 'flags.spycraft2.mustPress': result.mustPress});
+    if (result.reeling) { await condition(combatant.actor, 'reeling', 'Reeling'); await condition(combatant.actor, 'flat-footed', 'Flat-footed'); }
+    lines.push(`${esc(combatant.name)}: ${combatant.initiative}${pieces.length ? ` (${esc(pieces.join(', '))}${result.capped ? '; limited to ±10' : ''})` : ''}${result.reeling ? ' — <b>reeling and flat-footed</b>: Count was 0 or less, +20' : ''}${result.mustPress ? ' — <b>must Press</b> as the first action (Count 50+)' : ''}`);
+  }
+  if (lines.length) await say(`<b>Fluid initiative — end of round ${endedRound}</b><br>${lines.join('<br>')}`);
+  return lines;
+}
+
+/** Break remaining ties (same Count and bonus) with a d20 roll-off stored on the combatants. */
+export async function rollTiebreaks(combat = game.combat) {
+  const groups = new Map();
+  for (const combatant of combat?.combatants ?? []) { if (!Number.isFinite(combatant.initiative)) continue; const key = `${combatant.initiative}|${bonusOf(combatant)}`; groups.set(key, [...(groups.get(key) ?? []), combatant]); }
+  let rolled = 0;
+  for (const tied of groups.values()) {
+    if (tied.length < 2 || tied.every(combatant => Number.isFinite(combatant.flags?.spycraft2?.tiebreak))) continue;
+    const seen = new Set();
+    for (const combatant of tied) {
+      let value; do { value = (await new Roll('1d20').evaluate()).total + Math.random(); } while (seen.has(value));
+      seen.add(value); rolled++;
+      await combatant.update({'flags.spycraft2.tiebreak': value});
+    }
+  }
+  return rolled;
+}
+
+/** One Initiative check for a set of NPCs (p.323): by default every unrolled non-player combatant, grouped by actor. */
+export async function rollGroupInitiative(combat = game.combat, {single = false} = {}) {
+  if (!game.user.isGM) return null;
+  if (!combat) return ui.notifications.warn('There is no active combat.');
+  const pending = combat.combatants.filter(combatant => !combatant.hasPlayerOwner && combatant.initiative === null && combatant.actor);
+  const groups = new Map();
+  for (const combatant of pending) { const key = single ? 'all' : combatant.actor.isToken ? combatant.token?.baseActor?.id ?? combatant.actorId : combatant.actorId; groups.set(key, [...(groups.get(key) ?? []), combatant]); }
+  const lines = [];
+  for (const members of groups.values()) {
+    const roll = await new Roll('1d20').evaluate();
+    for (const combatant of members) await combatant.update({initiative: roll.total + bonusOf(combatant)});
+    lines.push(`${esc(members.map(member => member.name).join(', '))}: d20 ${roll.total}`);
+  }
+  if (lines.length) await say(`<b>Group Initiative</b><br>${lines.join('<br>')}`, {whisper: true});
+  return lines.length;
+}
+
+/** Surprise round (p.323): enter each group's opposed result; winners are flagged and announced. */
+export async function surpriseRoundDialog(combat = game.combat) {
+  if (!game.user.isGM) return null;
+  if (!combat) return ui.notifications.warn('Create the combat first.');
+  const input = await ask('Surprise round — p.323', `
+    <p>Each group makes an opposed team Blend/Stealth or Sneak/Hide check. Members of the winning group take 1 free, half or full action in Initiative order; a full action cannot be split and only 1 free action is allowed.</p>
+    <label>Awareness <select name="aware">${options([['none', 'No groups aware of each other'], ['some', 'One group is concealing itself'], ['all', 'All groups aware (no surprise round)']], 'none')}</select></label>
+    <label>Player characters’ result <input type="number" name="players" value="0" /></label>
+    <label>Opponents’ result <input type="number" name="opponents" value="0" /></label>
+    <label>Concealing group <select name="actingGroup">${options([['players', 'Player characters'], ['opponents', 'Opponents']], 'opponents')}</select></label>`);
+  if (!input) return null;
+  let result;
+  try { result = surpriseRound({groups: [{id: 'players', result: Number(input.players)}, {id: 'opponents', result: Number(input.opponents)}], aware: input.aware, actingGroup: input.actingGroup}); } catch (error) { return ui.notifications.warn(error.message); }
+  await combat.update({'flags.spycraft2.surprise': result.occurs ? {winners: result.winners, round: combat.round} : null});
+  await say(result.occurs ? `<b>Surprise round:</b> ${result.winners[0] === 'players' ? 'the player characters' : 'the opponents'} act — 1 free, half or full action each, in Initiative order. Everyone else waits for round 1.` : `<b>No surprise round.</b> ${esc(result.reason)}`);
+  return result;
+}
+
+export function installFluidInitiativeHooks() {
+  // Everyone starts a fight flat-footed unless he joins it deliberately after it begins (p.323).
+  Hooks.on('combatStart', async combat => {
+    if (!isLeadGM() || !setting('startFlatFooted')) return;
+    for (const combatant of combat.combatants) await condition(combatant.actor, 'flat-footed', 'Flat-footed');
+  });
+  Hooks.on('updateCombat', async (combat, changed, options) => {
+    if (!isLeadGM() || !Object.hasOwn(changed, 'round') || !setting('fluidInitiative')) return;
+    const previous = combat.previous?.round ?? changed.round - 1;
+    if (!(options?.direction > 0 || changed.round > previous) || previous < 1) return;
+    try {
+      const changedCounts = await applyEndOfRound(combat, previous);
+      await rollTiebreaks(combat);
+      // The new round starts from the top of the revised order, not from whoever led the last one.
+      if (changedCounts.length) { combat.setupTurns?.(); if (combat.turn !== 0) await combat.update({turn: 0}); }
+      ui.combat?.render();
+    }
+    catch (error) { ui.notifications.warn(`Fluid initiative needs review: ${error.message}`); }
+  });
+  Hooks.on('updateCombatant', (combatant, changed) => { if (Object.hasOwn(changed, 'initiative') && isLeadGM()) rollTiebreaks(combatant.parent).catch(() => {}); });
+  // Combat tracker entries: record an event for one combatant.
+  Hooks.on('getCombatantContextOptions', (_app, entries) => {
+    entries.push({name: 'Fluid initiative event', icon: '<i class="fa-solid fa-arrows-up-down"></i>', callback: li => { const el = li instanceof HTMLElement ? li : li?.[0]; fluidEventDialog(game.combat, game.combat?.combatants.get(el?.dataset?.combatantId)); }});
+  });
+}

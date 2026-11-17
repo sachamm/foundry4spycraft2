@@ -10,6 +10,14 @@ import {manageGCDice,gcDiceStatus,initializeGCDice,adjustGCDice,reviewGCDiceSett
 import {rerollEligibility} from "./module/rules/limited-uses.mjs";
 import {checkCandidates} from "./module/rules/outcomes.mjs";
 import { SPYCRAFT } from "./module/config.mjs";
+import {registerGCSettings,getMission,missionThreatLevel,isDramaticScene,qualitiesInForce,currentCampaignEffects,missionXP} from "./module/apps/gc/state.mjs";
+import {openGCConsole} from "./module/apps/gc/console.mjs";
+import {installFluidInitiativeHooks,fluidCombatClass,fluidEventDialog,recordFluidEvent,rollGroupInitiative,surpriseRoundDialog} from "./module/apps/gc/combat.mjs";
+import {spendGCDice,setDramaticScene,doubleOpponentInitiative} from "./module/apps/gc/spend.mjs";
+import {startConflictDialog,advanceConflict,manageConflict} from "./module/apps/gc/conflicts.mjs";
+import {rollNpcSkill,npcDamageSave,resetDamageTrack,manageDisposition} from "./module/apps/gc/npc-play.mjs";
+import * as gcMission from "./module/apps/gc/mission.mjs";
+import * as gcTables from "./module/apps/gc/tables.mjs";
 import * as dataModels from "./module/data/_module.mjs";
 import { SpycraftActor } from "./module/documents/actor.mjs";
 import { SpycraftItem } from "./module/documents/item.mjs";
@@ -25,12 +33,16 @@ Hooks.once("init", () => {
   CONFIG.time.roundTime=6;CONFIG.time.turnTime=0;
   CONFIG.statusEffects??=[];
   for(const [id,name]of [['shaken-1','Shaken I'],['shaken-2','Shaken II'],['shaken-3','Shaken III'],['shaken-4','Shaken IV'],['sleep','Sleeping'],['drunk','Drunk'],['crouched','Crouched'],['mute','Mute'],['held','Held'],['pinned','Pinned'],['baffled','Baffled'],['incompetent','Incompetent'],['prone','Prone'],['sprawled','Sprawled'],['blind','Blinded'],['deaf','Deafened'],['entangled','Entangled'],['nauseated','Nauseated'],['sickened','Sickened'],['fatigued','Fatigued'],['exhausted','Exhausted'],['unconscious','Unconscious'],['flat-footed','Flat-footed']])if(!CONFIG.statusEffects.some(effect=>effect.id===id))CONFIG.statusEffects.push({id,name,img:'icons/svg/downgrade.svg'});
+  if(!CONFIG.statusEffects.some(effect=>effect.id==="reeling"))CONFIG.statusEffects.push({id:"reeling",name:"Reeling",img:"icons/svg/daze.svg"});
   if(!CONFIG.statusEffects.some(effect=>effect.id==="bound"))CONFIG.statusEffects.push({id:"bound",name:"SPYCRAFT.Condition.Bound",img:"icons/svg/net.svg"});
   game.settings.register("spycraft2","linguistics",{name:"Optional Linguistics checks",hint:"Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.",scope:"world",config:true,type:Boolean,default:false});
 
   game.settings.register("spycraft2","usagePeriods",{scope:"world",config:false,type:Object,default:{},onChange:refreshUsagePeriodActors});
   game.settings.register("spycraft2","usagePeriodReview",{scope:"world",config:false,type:Object,default:{},onChange:refreshUsagePeriodActors});
   game.settings.register("spycraft2","gcActionDice",{scope:"world",config:false,type:Object,default:{},onChange(){for(const actor of game.actors??[])actor.sheet?.render(false);}});
+  registerGCSettings();
+  CONFIG.Combat.documentClass=fluidCombatClass(CONFIG.Combat.documentClass);
+  installFluidInitiativeHooks();
   CONFIG.Combatant.documentClass=shakenCombatantClass(CONFIG.Combatant.documentClass);
   installShakenInitiativeHooks();
   installCombatStanceHooks();
@@ -46,7 +58,7 @@ Hooks.once("init", () => {
 
   CONFIG.Combat.initiative = { formula: "1d20 + @initiative.total", decimals: 0 };
 
-  game.spycraft2 = { resourceLocks:nativeResourceLocks, SpycraftBrowser, gcDice:{status:gcDiceStatus,initialize:initializeGCDice,adjust:adjustGCDice,manage:manageGCDice,review:reviewGCDiceSettlement,hint:recordGCHint}, resetUsagePeriod:startUsagePeriod, getUsagePeriodReview, reviewUsagePeriod, rules: { evaluate, renderTemplate, checkPrerequisites, describe } };
+  game.spycraft2 = { gc:{open:openGCConsole,console:null,mission:{...gcMission,get:getMission,threatLevel:missionThreatLevel,xp:missionXP},spend:spendGCDice,setDramaticScene,isDramaticScene,doubleOpponentInitiative,fluidEvent:fluidEventDialog,recordFluidEvent,rollGroupInitiative,surpriseRound:surpriseRoundDialog,conflicts:{start:startConflictDialog,advance:advanceConflict,manage:manageConflict},npc:{rollSkill:rollNpcSkill,damageSave:npcDamageSave,resetDamage:resetDamageTrack,disposition:manageDisposition},campaign:{qualities:qualitiesInForce,effects:currentCampaignEffects},tables:gcTables}, resourceLocks:nativeResourceLocks, SpycraftBrowser, gcDice:{status:gcDiceStatus,initialize:initializeGCDice,adjust:adjustGCDice,manage:manageGCDice,review:reviewGCDiceSettlement,hint:recordGCHint}, resetUsagePeriod:startUsagePeriod, getUsagePeriodReview, reviewUsagePeriod, rules: { evaluate, renderTemplate, checkPrerequisites, describe } };
 
   const { Actors, Items } = foundry.documents.collections;
   Actors.registerSheet("spycraft2", SpycraftAgentSheet, { types: ["agent"], makeDefault: true, label: "SPYCRAFT.Sheet.Agent" });
@@ -66,7 +78,8 @@ Hooks.once("init", () => {
 
   foundry.applications.handlebars.loadTemplates([
     "systems/spycraft2/templates/item/parts/bonuses.hbs",
-    "systems/spycraft2/templates/actor/npc-builder.hbs"
+    "systems/spycraft2/templates/actor/npc-builder.hbs",
+    "systems/spycraft2/templates/apps/gc-console.hbs"
   ]);
 });
 
@@ -158,3 +171,15 @@ Hooks.on('renderChatMessageHTML',(message,html)=>{
  if(!(check.unarmed||check.weaponProficiency==='unarmed'||check.attackContext?.ranged===false)||!check.rollCombat?.id)return;
  const button=document.createElement('button');button.type='button';button.textContent='Strut: posture next half action';button.addEventListener('click',async()=>{button.disabled=true;try{await actor.useStrut(message);}finally{button.disabled=false;}});html.append(button);
 });
+
+
+// Game Control console: a button at the top of the Actors sidebar for the GC, plus game.spycraft2.gc.open().
+Hooks.on("renderActorDirectory",(app,html)=>{
+ if(!game.user.isGM)return;
+ const root=html instanceof HTMLElement?html:html?.[0];if(!root||root.querySelector(".spycraft2-gc-console-button"))return;
+ const button=document.createElement("button");button.type="button";button.className="spycraft2-gc-console-button";button.innerHTML='<i class="fa-solid fa-user-secret"></i> GC Console';
+ button.addEventListener("click",()=>openGCConsole());
+ (root.querySelector(".header-actions")??root.querySelector(".directory-header")??root).append(button);
+});
+// A mission's Threat Level and campaign qualities affect derived numbers; refresh sheets when a scene or session starts.
+Hooks.on("updateSetting",setting=>{if(setting.key==="spycraft2.usagePeriods")game.spycraft2?.gc?.console?.render(false);});

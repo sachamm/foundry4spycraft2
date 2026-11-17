@@ -1,0 +1,5356 @@
+{
+ "leadMin": 0,
+ "leadMax": 10,
+ "basics": {
+  "pages": [
+   363,
+   364
+  ],
+  "summary": "Predator pushes Lead down to 0; Prey pushes it up to 10. Each round both secretly pick a Strategy, make an opposed check with the Strategy modifier, and the winner takes Advantages.",
+  "advantagesPerWin": {
+   "base": 1,
+   "extraPerMargin": 4
+  },
+  "criticalSuccessLeadShift": 1,
+  "criticalFailureLeadShift": 1,
+  "steps": [
+   "Step 1: Choose Strategies (secretly; requirements must be met)",
+   "Step 2: Opposed Skill Check (reveal, apply modifiers; winner crit or loser crit failure shifts Lead 1 toward the winner)",
+   "Step 3: Resolution (winner picks 1 Advantage from his Strategy, +1 per 4 by which he won; check Lead for victory)",
+   "Step 4: Outside Actions (per Conflict type)"
+  ],
+  "notes": [
+   "Conflict continues while Lead is 1 to 9.",
+   "Several characters on one side make cooperative checks and gain a synergy bonus from Tactics.",
+   "A Strategy cannot be withdrawn once chosen; a participant may concede, giving the opponent his victory result.",
+   "Threats and errors have no effect beyond what each Conflict specifies; criticals only affect Lead and Conflict conditions."
+  ]
+ },
+ "types": {
+  "chase": {
+   "name": "Chase",
+   "pages": [
+    364,
+    367
+   ],
+   "predator": "Pursuing character(s) or vehicle(s)",
+   "prey": "Fleeing character(s) or vehicle(s)",
+   "predatorSkills": [
+    "Acrobatics/Maneuver (personal vehicle)",
+    "Athletics/Maneuver (foot)",
+    "Drive/Maneuver (non-personal vehicle)",
+    "Survival/Maneuver (animal)",
+    "Tactics/Maneuver (any vehicle with the crew quality)"
+   ],
+   "preySkills": [
+    "Acrobatics/Maneuver (personal vehicle)",
+    "Athletics/Maneuver (foot)",
+    "Drive/Maneuver (non-personal vehicle)",
+    "Survival/Maneuver (animal)",
+    "Tactics/Maneuver (any vehicle with the crew quality)"
+   ],
+   "roundTime": "6 seconds (2 minutes for Ship vs. Ship)",
+   "powerRatings": [
+    "Acceleration",
+    "Turning"
+   ],
+   "startingLead": {
+    "default": 5,
+    "summary": "Compare Acceleration (Open/Close room) or Turning (Crowded/Tight room); a side 2+ higher shifts starting Lead 1 its way.",
+    "rules": [
+     {
+      "when": "Predator's relevant Power Rating is 2+ higher than Prey's",
+      "lead": 4
+     },
+     {
+      "when": "Prey's relevant Power Rating is 2+ higher than Predator's",
+      "lead": 6
+     },
+     {
+      "when": "Otherwise",
+      "lead": 5
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "buy-time",
+     "name": "Buy Time",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Pause"
+     ],
+     "summary": "Stall and shadow the opponent until conditions improve.",
+     "note": ""
+    },
+    {
+     "id": "clip",
+     "name": "Clip",
+     "side": "general",
+     "requirements": "Lead 1–2",
+     "leadMin": 1,
+     "leadMax": 2,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Defense",
+      "Impact"
+     ],
+     "summary": "Sideswipe the opponent at close quarters.",
+     "note": ""
+    },
+    {
+     "id": "eat-my-dust",
+     "name": "Eat My Dust",
+     "side": "general",
+     "requirements": "Acceleration 5+ or Turning 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 5
+      },
+      {
+       "rating": "Turning",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Stress"
+     ],
+     "summary": "Open the throttle and leave the opponent rattled.",
+     "note": ""
+    },
+    {
+     "id": "go-go-go",
+     "name": "“Go, Go, Go!”",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Crisis"
+     ],
+     "summary": "Reckless all-out push that invites disaster.",
+     "note": ""
+    },
+    {
+     "id": "parting-shot",
+     "name": "Parting Shot",
+     "side": "general",
+     "requirements": "Lead 8–9",
+     "leadMin": 8,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Attack",
+      "Crisis"
+     ],
+     "summary": "With the chase nearly over, take a moment for violence.",
+     "note": ""
+    },
+    {
+     "id": "quick-reverse",
+     "name": "Quick Reverse",
+     "side": "general",
+     "requirements": "Lead 2–6",
+     "leadMin": 2,
+     "leadMax": 6,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Lead",
+      "Swap"
+     ],
+     "summary": "Turn on the opponent to shake him or flip the roles.",
+     "note": ""
+    },
+    {
+     "id": "ram",
+     "name": "Ram",
+     "side": "general",
+     "requirements": "Lead 1–4",
+     "leadMin": 1,
+     "leadMax": 4,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Attack",
+      "Impact"
+     ],
+     "summary": "Use the vehicle itself as a weapon against the opponent.",
+     "note": ""
+    },
+    {
+     "id": "set-up",
+     "name": "Set Up",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Stress",
+      "Twist"
+     ],
+     "summary": "Prepare an unexpected change of tack for next round.",
+     "note": "Printed as \"Set up\" in Table 6.3 and \"Set Up\" in the description."
+    },
+    {
+     "id": "stunt",
+     "name": "Stunt",
+     "side": "general",
+     "requirements": "Acceleration 6+ or Turning 6+†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 6
+      },
+      {
+       "rating": "Turning",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "Daredevil feat (see page 192)",
+     "modifier": -8,
+     "advantages": [
+      "Room",
+      "Swap"
+     ],
+     "summary": "Daredevil maneuver to change positions or venue.",
+     "note": ""
+    },
+    {
+     "id": "tactical-ploy",
+     "name": "Tactical Ploy",
+     "side": "general",
+     "requirements": "Acceleration 8+ or Turning 8+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 8
+      },
+      {
+       "rating": "Turning",
+       "min": 8
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Attack",
+      "Defense",
+      "Room"
+     ],
+     "summary": "Use the surroundings cleverly for an edge.",
+     "note": ""
+    },
+    {
+     "id": "thats-impossible",
+     "name": "“That’s Impossible!”",
+     "side": "general",
+     "requirements": "††",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "“That’s Impossible!” class ability (see page 52)",
+     "modifier": 0,
+     "advantages": [
+      "*"
+     ],
+     "summary": "Physics-defying driving; winner spends 1 use of the class ability to pick any Advantages except Victory.",
+     "note": "Printed as \"Any except Victory\"."
+    },
+    {
+     "id": "weave",
+     "name": "Weave",
+     "side": "general",
+     "requirements": "Lead 6–9",
+     "leadMin": 6,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Defense",
+      "Crisis"
+     ],
+     "summary": "Use terrain, traffic and bystanders as cover.",
+     "note": ""
+    },
+    {
+     "id": "attack-run",
+     "name": "Attack Run",
+     "side": "predator",
+     "requirements": "Acceleration 5+ and Turning 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 5
+      },
+      {
+       "rating": "Turning",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Attack",
+      "Lead"
+     ],
+     "summary": "Level out and close in to line up a shot.",
+     "note": ""
+    },
+    {
+     "id": "close-in",
+     "name": "Close In",
+     "side": "predator",
+     "requirements": "Turning 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Turning",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Pause",
+      "Stress"
+     ],
+     "summary": "Tailgate to pressure the Prey into a mistake.",
+     "note": ""
+    },
+    {
+     "id": "cut-off",
+     "name": "Cut Off",
+     "side": "predator",
+     "requirements": "Acceleration 7+ or Turning 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 7
+      },
+      {
+       "rating": "Turning",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Attack",
+      "Victory"
+     ],
+     "summary": "Attempt to block and trap the Prey in one move.",
+     "note": ""
+    },
+    {
+     "id": "redline",
+     "name": "Redline",
+     "side": "predator",
+     "requirements": "Acceleration 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": 2,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Dangerous burst of raw speed to catch up.",
+     "note": ""
+    },
+    {
+     "id": "shortcut",
+     "name": "Shortcut",
+     "side": "predator",
+     "requirements": "Acceleration 4+ and Turning 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 4
+      },
+      {
+       "rating": "Turning",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Room"
+     ],
+     "summary": "Drive the Prey through hazardous terrain.",
+     "note": ""
+    },
+    {
+     "id": "stalk",
+     "name": "Stalk",
+     "side": "predator",
+     "requirements": "Acceleration 6+ or Turning 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 6
+      },
+      {
+       "rating": "Turning",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Defense",
+      "Stress"
+     ],
+     "summary": "Follow warily from a safe distance, keeping the Prey guessing.",
+     "note": ""
+    },
+    {
+     "id": "careful-timing",
+     "name": "Careful Timing",
+     "side": "prey",
+     "requirements": "Acceleration 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Pause"
+     ],
+     "summary": "Wait for the right instant to surge ahead.",
+     "note": ""
+    },
+    {
+     "id": "chicken",
+     "name": "Chicken",
+     "side": "prey",
+     "requirements": "Acceleration 3+ or Turning 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 3
+      },
+      {
+       "rating": "Turning",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Attack",
+      "Stress"
+     ],
+     "summary": "Swing around and charge the pursuer head-on.",
+     "note": ""
+    },
+    {
+     "id": "detour",
+     "name": "Detour",
+     "side": "prey",
+     "requirements": "Acceleration 6+ and Turning 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 6
+      },
+      {
+       "rating": "Turning",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Room"
+     ],
+     "summary": "Sudden turn to drag the chase somewhere new.",
+     "note": ""
+    },
+    {
+     "id": "double-back",
+     "name": "Double Back",
+     "side": "prey",
+     "requirements": "Acceleration 4+ and Turning 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 4
+      },
+      {
+       "rating": "Turning",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Defense",
+      "Lead"
+     ],
+     "summary": "Whip around to put scenery between the vehicles.",
+     "note": ""
+    },
+    {
+     "id": "long-gone",
+     "name": "Long Gone",
+     "side": "prey",
+     "requirements": "Acceleration 7+ or Turning 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Acceleration",
+       "min": 7
+      },
+      {
+       "rating": "Turning",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Defense",
+      "Victory"
+     ],
+     "summary": "One decisive dash to lose the tail for good.",
+     "note": ""
+    },
+    {
+     "id": "outfox",
+     "name": "Outfox",
+     "side": "prey",
+     "requirements": "Turning 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Turning",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": 2,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Force the pursuer into turns he cannot make.",
+     "note": ""
+    }
+   ],
+   "advantages": [
+    {
+     "id": "attack",
+     "name": "Attack",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner gets +4 on attack checks against other chase participants for 1 full round.",
+     "repeat": "Each further pick: +2 more and +1 threat range on those attacks.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "crisis",
+     "name": "Crisis",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "An obstacle appears: every participant makes a Maneuver check vs. the current Crisis DC (Table 6.1) or crashes. A participant may skip the check, giving the opponent 3 Lead.",
+     "repeat": "Each further pick lowers the winner's own Crisis DC by 5 (minimum 10).",
+     "repeatEvery": 1,
+     "skipLeadShift": 3
+    },
+    {
+     "id": "defense",
+     "name": "Defense",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner gets +4 Defense against attacks from other chase participants for 1 full round.",
+     "repeat": "Each further pick: +2 more and +1 error range on attacks against the winner.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "impact",
+     "name": "Impact",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner and one chosen opponent both take collision damage (vehicle: equal to the opponent's check result; both on foot: 1d4 lethal). With GC approval passengers may attempt an Acrobatics/Jump (5 ft.) onto the target vehicle.",
+     "repeat": "Each further pick reduces the winner's own damage by 4 (on foot vs. foot: +1d4 lethal each).",
+     "repeatEvery": 1
+    },
+    {
+     "id": "lead",
+     "name": "Lead",
+     "leadShift": 1,
+     "victory": false,
+     "summary": "Lead moves 1 point toward the winner.",
+     "repeat": "Every 2 further picks in the round move Lead 1 more point toward the winner, or instead remove 1 Smash point from an opponent.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "pause",
+     "name": "Pause",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Conflict freezes: Lead stays put and no steps resolve next round, though Step 4 actions still happen.",
+     "repeat": "Each further pick adds 1 more paused round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "room",
+     "name": "Room",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Maneuvering Room shifts 1 grade in the direction the winner chooses.",
+     "repeat": "Chosen 3 times in a round: winner sets Maneuvering Room to any grade."
+    },
+    {
+     "id": "stress",
+     "name": "Stress",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the chase ends.",
+     "repeat": "Each further pick adds +1d4 stress damage.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "swap",
+     "name": "Swap",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator and Prey trade roles, then Lead increases by 1.",
+     "repeat": "",
+     "swapRoles": true,
+     "absoluteLeadChange": 1
+    },
+    {
+     "id": "twist",
+     "name": "Twist",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner may use Blend (Dex), Bluff (Cha), Impress (Cha), Intimidate (Cha), Mechanics (Int), Sense Motive (Wis) or Streetwise (Wis), without tags, for the next opposed check.",
+     "repeat": "",
+     "twistSkills": [
+      "Blend (Dex)",
+      "Bluff (Cha)",
+      "Impress (Cha)",
+      "Intimidate (Cha)",
+      "Mechanics (Int)",
+      "Sense Motive (Wis)",
+      "Streetwise (Wis)"
+     ]
+    },
+    {
+     "id": "victory",
+     "name": "Victory",
+     "leadShift": 0,
+     "victory": true,
+     "summary": "Conflict ends immediately in the winner's favor.",
+     "repeat": ""
+    }
+   ],
+   "victory": {
+    "predator": "Leaders stop adjacent; Prey vehicle is immobilized; Predator side gets a half-action surprise round and may first apply 1 Impact Advantage to the Prey.",
+    "prey": "Prey and team get away and cannot be found for the rest of the scene; Prey may apply 1 Crisis Advantage to the Predator."
+   },
+   "outsideActions": "Each driver or runner gets 1 half action; every passenger gets a full action or 2 half actions. Run alongside combat, these fall on each character's Initiative Count.",
+   "tables": {
+    "maneuveringRoom": {
+     "title": "Table 6.1: Maneuvering Room",
+     "page": 364,
+     "columns": [
+      "Grade",
+      "Chase Speed*",
+      "Top MPH Bonus**",
+      "Crisis DC†"
+     ],
+     "rows": [
+      [
+       "Open (e.g. light traffic, open skies, calm seas, etc.)",
+       "×1",
+       "+6",
+       15
+      ],
+      [
+       "Close (e.g. moderate traffic, canyon flying, rough seas, etc.)",
+       "×3/4",
+       "+4",
+       20
+      ],
+      [
+       "Crowded (e.g. heavy traffic, canyon flying with many intervening ledges, turbulent seas, etc.)",
+       "×1/2",
+       "+2",
+       30
+      ],
+      [
+       "Tight (e.g. rush hour traffic, aerial dogfight, tsunami seas, etc.)",
+       "×1/4",
+       "+0",
+       40
+      ]
+     ],
+     "notes": [
+      "* Everyone travels at this fraction of the slowest vehicle's top MPH (rounded down); mostly matters for crashes.",
+      "** Bonus to all chase Maneuver checks for whoever pilots the vehicle with the highest top MPH.",
+      "† DC of the Maneuver check required each time a crisis occurs."
+     ]
+    },
+    "chaseLead": {
+     "title": "Table 6.2: Chase Lead",
+     "page": 365,
+     "columns": [
+      "Vehicle Type",
+      "Distance Per Lead Point"
+     ],
+     "rows": [
+      [
+       "Aircraft, Heavy",
+       "100 ft."
+      ],
+      [
+       "Aircraft, Light",
+       "200 ft."
+      ],
+      [
+       "Aircraft, Performance*",
+       "1,000 ft."
+      ],
+      [
+       "Aircraft, Personal",
+       "40 ft."
+      ],
+      [
+       "Aircraft, Rotor-Wing",
+       "100 ft."
+      ],
+      [
+       "Foot",
+       "20 ft."
+      ],
+      [
+       "Ground, Commercial",
+       "20 ft."
+      ],
+      [
+       "Ground, Heavy",
+       "30 ft."
+      ],
+      [
+       "Ground, Personal",
+       "40 ft."
+      ],
+      [
+       "Ground, Standard",
+       "50 ft."
+      ],
+      [
+       "Mounts and Animal-Drawn Vehicles",
+       "30 ft."
+      ],
+      [
+       "Ships**",
+       "1 mile"
+      ],
+      [
+       "Space",
+       "1 mile"
+      ],
+      [
+       "Submarines",
+       "30 ft."
+      ],
+      [
+       "Watercraft, Personal",
+       "40 ft."
+      ],
+      [
+       "Watercraft, Standard",
+       "50 ft."
+      ]
+     ],
+     "notes": [
+      "* May voluntarily drop to as little as 200 ft. per point to engage other aircraft.",
+      "** Ships can only effectively chase or fight other ships; Ship vs. Ship rounds last 2 minutes."
+     ]
+    }
+   },
+   "notes": [
+    "On foot, Acceleration = Strength modifier and Turning = Dexterity modifier (each minimum 0); otherwise the vehicle supplies both ratings.",
+    "GC sets Maneuvering Room (Open/Close/Crowded/Tight) at the start; it can change via the Room Advantage.",
+    "Chained chases: track a separate Lead per Predator/Prey pair and resolve each step pair by pair from front to back.",
+    "Mismatched vehicles: distance per Lead point is the shortest of those involved; if one vehicle's distance is more than double another's, resolve with a single opposed check instead.",
+    "Each chase round burns 1 minute of fuel. A pilot firing vehicle weapons uses the multi-tasking rules.",
+    "With simultaneous combat: Step 1 before the first Initiative Count, Steps 2-3 at the (first) Predator's count, Step 4 spread across the round.",
+    "Smash points (powered aircraft only): the single pilot 200+ ft. above the nearest opponent with no enemy above holds 1 per Lead point to the next highest opponent; +1 when he wins an opposed check or scores a Maneuver threat, -1 when another participant does; lost entirely at 0 or when conditions lapse.",
+    "Spending Smash after winning an opposed check: Predator spends 1 to reduce Lead by 1; Prey spends 1 for +4 Defense until his next Initiative Count. Attacks on a Smash holder add his Smash points to Lead when working out range.",
+    "Crash: on foot 1d4 lethal; vehicles take collision damage by size and speed, occupants make a Reflex save (DC half that damage) or take half. Crashed participants leave the chase.",
+    "“That’s Impossible!” winner spends 1 use of the class ability to choose any 1 Advantage, +1 per 4 margin, never Victory."
+   ]
+  },
+  "brainwashing": {
+   "name": "Brainwashing",
+   "pages": [
+    368,
+    370
+   ],
+   "predator": "Character(s) trying to break a captive's will",
+   "prey": "Captive character(s)",
+   "predatorSkills": [
+    "Manipulate (Wis)"
+   ],
+   "preySkills": [
+    "Resolve (Wis)"
+   ],
+   "predatorSkillTags": [
+    "Concentration",
+    "Grasp",
+    "Hearing",
+    "Language"
+   ],
+   "preySkillTags": [],
+   "roundTime": "4 hours (mental approach) or 2 days (physical approach); see brainwashingApproaches table",
+   "powerRatings": [
+    "Base Will save bonus",
+    "Base Will/Fortitude save bonus"
+   ],
+   "startingLead": {
+    "default": null,
+    "summary": "Half the Prey's base Fortitude or base Will save bonus, whichever is lower (minimum 2). A result of 10+ means the Prey cannot be brainwashed.",
+    "rules": [
+     {
+      "when": "Always: 1/2 of the lower of Prey's base Fortitude / base Will save bonus",
+      "lead": null,
+      "formula": "max(2, min(baseFort, baseWill) / 2)"
+     },
+     {
+      "when": "Computed starting Lead is 10 or more",
+      "lead": null,
+      "result": "Prey is immune; no Conflict"
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "chip-away",
+     "name": "Chip Away",
+     "side": "predator",
+     "requirements": "Lead 1–3",
+     "leadMin": 1,
+     "leadMax": 3,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Alter Memory",
+      "Stress"
+     ],
+     "summary": "Wear down the victim's mind or test how firm the hold is.",
+     "note": "",
+     "skill": "Manipulate (Wis)"
+    },
+    {
+     "id": "false-hope",
+     "name": "False Hope",
+     "side": "predator",
+     "requirements": "Base Will save bonus 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will save bonus",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Haste",
+      "Revelation"
+     ],
+     "summary": "Dangle a glimmer of hope to slip past the victim's defenses.",
+     "note": "",
+     "skill": "Manipulate (Wis)"
+    },
+    {
+     "id": "fluster",
+     "name": "Fluster",
+     "side": "predator",
+     "requirements": "Base Will save bonus 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will save bonus",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Shred"
+     ],
+     "summary": "Catch the victim in his own lies.",
+     "note": "",
+     "skill": "Sense Motive (Wis)"
+    },
+    {
+     "id": "mind-games",
+     "name": "Mind Games",
+     "side": "predator",
+     "requirements": "Base Will save bonus 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will save bonus",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Pause",
+      "Slip"
+     ],
+     "summary": "Idle-seeming talk to kill time or get under the victim's skin.",
+     "note": "",
+     "skill": "Manipulate (Wis)"
+    },
+    {
+     "id": "new-tactic",
+     "name": "New Tactic",
+     "side": "predator",
+     "requirements": "Lead 6–9",
+     "leadMin": 6,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Crisis",
+      "New Approach"
+     ],
+     "summary": "Switch methods or unsettle the victim with something unorthodox.",
+     "note": "",
+     "skill": "Manipulate (Wis)"
+    },
+    {
+     "id": "patience",
+     "name": "Patience",
+     "side": "predator",
+     "requirements": "Lead 3–7",
+     "leadMin": 3,
+     "leadMax": 7,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Stress"
+     ],
+     "summary": "Wait and let the victim's own fears do the work.",
+     "note": "",
+     "skill": "Resolve (Wis)"
+    },
+    {
+     "id": "seeds-of-doubt",
+     "name": "Seeds of Doubt",
+     "side": "predator",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead",
+      "Splinter"
+     ],
+     "summary": "Turn the victim against his comrades.",
+     "note": "",
+     "skill": "Manipulate (Wis)"
+    },
+    {
+     "id": "turn-the-screws",
+     "name": "Turn the Screws",
+     "side": "predator",
+     "requirements": "Base Will save bonus 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will save bonus",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Haste",
+      "Lead"
+     ],
+     "summary": "Resort to physical violence.",
+     "note": "",
+     "skill": "Medicine (Wis)"
+    },
+    {
+     "id": "ultimatum",
+     "name": "Ultimatum",
+     "side": "predator",
+     "requirements": "Base Will save bonus 8+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will save bonus",
+       "min": 8
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Slip",
+      "Victory"
+     ],
+     "summary": "Threaten far worse to come in a bid to end it now.",
+     "note": "",
+     "skill": "Manipulate (Wis)"
+    },
+    {
+     "id": "cling-to-hope",
+     "name": "Cling to Hope",
+     "side": "prey",
+     "requirements": "Base Will/Fortitude save bonus 5+**",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will/Fortitude save bonus",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Pause"
+     ],
+     "summary": "Draw strength from belief that friends will come.",
+     "note": "",
+     "skill": "Networking (Wis)"
+    },
+    {
+     "id": "concede",
+     "name": "Concede",
+     "side": "prey",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead",
+      "Revelation"
+     ],
+     "summary": "Give up some information in exchange for relief.",
+     "note": "",
+     "skill": "Resolve (Wis)"
+    },
+    {
+     "id": "hold-fast",
+     "name": "Hold Fast",
+     "side": "prey",
+     "requirements": "Base Will/Fortitude save bonus 7+**",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will/Fortitude save bonus",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Pause"
+     ],
+     "summary": "Openly resist with the strongest front possible.",
+     "note": "",
+     "skill": "Resolve (Wis)"
+    },
+    {
+     "id": "last-stand",
+     "name": "Last Stand",
+     "side": "prey",
+     "requirements": "Lead 1–3",
+     "leadMin": 1,
+     "leadMax": 3,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Crisis",
+      "New Approach"
+     ],
+     "summary": "Nearly broken, make a final act of resistance.",
+     "note": "",
+     "skill": "Resolve (Wis)"
+    },
+    {
+     "id": "misdirect",
+     "name": "Misdirect",
+     "side": "prey",
+     "requirements": "Base Will/Fortitude save bonus 4+**",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will/Fortitude save bonus",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+     "modifier": -4,
+     "advantages": [
+      "Revelation",
+      "Twist"
+     ],
+     "summary": "Time a disclosure to fool the captor.",
+     "note": "",
+     "skill": "Resolve (Wis)"
+    },
+    {
+     "id": "never-surrender",
+     "name": "Never Surrender",
+     "side": "prey",
+     "requirements": "Base Will/Fortitude save bonus 8+**",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will/Fortitude save bonus",
+       "min": 8
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+     "modifier": -12,
+     "advantages": [
+      "Haste",
+      "Victory"
+     ],
+     "summary": "Burn remaining reserves in one great burst of defiance.",
+     "note": "",
+     "skill": "Resolve (Wis)"
+    },
+    {
+     "id": "rebel",
+     "name": "Rebel",
+     "side": "prey",
+     "requirements": "Lead 7–9",
+     "leadMin": 7,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Haste",
+      "Lead"
+     ],
+     "summary": "Press the advantage against captors who seem to be faltering.",
+     "note": "",
+     "skill": "Resolve (Wis)"
+    },
+    {
+     "id": "still-in-the-game",
+     "name": "Still in the Game",
+     "side": "prey",
+     "requirements": "Lead 3–7",
+     "leadMin": 3,
+     "leadMax": 7,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Slip",
+      "Twist"
+     ],
+     "summary": "Play mind games back at the captor.",
+     "note": "",
+     "skill": "Bluff (Cha)"
+    },
+    {
+     "id": "worrisome-smile",
+     "name": "Worrisome Smile",
+     "side": "prey",
+     "requirements": "Base Will/Fortitude save bonus 6+**",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will/Fortitude save bonus",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Uses the Prey's base Will save bonus against a mental approach, base Fortitude save bonus against a physical approach",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Stress"
+     ],
+     "summary": "Unnerve the captor with calm amusement.",
+     "note": "",
+     "skill": "Manipulate (Wis)"
+    }
+   ],
+   "advantages": [
+    {
+     "id": "alter-memory",
+     "name": "Alter Memory",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey gains or loses all memory of 1 event of up to 1 hour, chosen by the Predator.",
+     "repeat": "Each further pick affects 1 more event of up to 1 hour.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "crisis",
+     "name": "Crisis",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Both sides make a Fortitude or Will save (DC 10 + half opponent's career level, rounded up). Failure: 1d3 temporary Wis and 1d3 temporary Cha damage; if only one side fails, the other wins. A side may skip the save, giving the opponent 3 Lead.",
+     "repeat": "Each further pick lowers the winner's own Crisis DC by 2 (minimum 5).",
+     "repeatEvery": 1,
+     "skipLeadShift": 3,
+     "canEndConflict": true
+    },
+    {
+     "id": "haste",
+     "name": "Haste",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Next Conflict round takes half the standard time (rounded down, minimum 5 minutes).",
+     "repeat": "Each further pick halves the duration again.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "lead",
+     "name": "Lead",
+     "leadShift": 1,
+     "victory": false,
+     "summary": "Lead moves 1 point toward the winner.",
+     "repeat": "Every 2 further picks in the round move Lead 1 more point toward the winner.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "new-approach",
+     "name": "New Approach",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator's approach flips between mental and physical.",
+     "repeat": ""
+    },
+    {
+     "id": "pause",
+     "name": "Pause",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Conflict freezes: Lead stays put and no steps resolve next round.",
+     "repeat": "Each further pick adds 1 more paused round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "revelation",
+     "name": "Revelation",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner may voluntarily disclose 1 fact about his organization (full history, an unknown goal, an unknown Rating, or an unknown Site) to gain 1 bonus action die.",
+     "repeat": "Each further pick: 1 more disclosure for 1 more bonus action die.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "shred",
+     "name": "Shred",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "The Prey's lowest-rated cover identity loses 1 Power Rating; at 0 the identity is blown.",
+     "repeat": "Every 2 further picks remove 1 more point, rolling over to the next-lowest identity if one hits 0.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "slip",
+     "name": "Slip",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner either pulls 1 clue/secret from an opponent or passes off 1 lie as if a Bluff/Deception check with up to -6 penalty had succeeded.",
+     "repeat": "Every 2 further picks: 1 more clue/secret, or lie penalty cap rises by 2 (-8, -10...).",
+     "repeatEvery": 2
+    },
+    {
+     "id": "splinter",
+     "name": "Splinter",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Next round the Prey group must make a team check using its lowest skill bonus.",
+     "repeat": "Each further pick extends this by 1 more round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "stress",
+     "name": "Stress",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the brainwashing attempt ends.",
+     "repeat": "Each further pick adds +1d4 stress damage.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "twist",
+     "name": "Twist",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner may use Analysis (Wis), Cultures (Int), Falsify (Wis), Intimidate (Cha), Investigation (Cha), Science (Int) or Tactics (Int), without tags, for the next opposed check.",
+     "repeat": "",
+     "twistSkills": [
+      "Analysis (Wis)",
+      "Cultures (Int)",
+      "Falsify (Wis)",
+      "Intimidate (Cha)",
+      "Investigation (Cha)",
+      "Science (Int)",
+      "Tactics (Int)"
+     ]
+    },
+    {
+     "id": "victory",
+     "name": "Victory",
+     "leadShift": 0,
+     "victory": true,
+     "summary": "Conflict ends immediately in the winner's favor.",
+     "repeat": ""
+    }
+   ],
+   "victory": {
+    "predator": "Prey forgets the brainwashing itself; Predator either permanently erases 1 event of up to 24 hours, or compels 1 action as if an Impress/Persuasion check with up to -18 penalty succeeded (never one that would expose the Prey).",
+    "prey": "Prey proves resistant: the same Predator (or his group) cannot brainwash him again this mission."
+   },
+   "outsideActions": "",
+   "tables": {
+    "brainwashingApproaches": {
+     "title": "Table 6.4: Brainwashing Approaches",
+     "page": 368,
+     "columns": [
+      "Approach",
+      "Conflict Round Duration",
+      "Check Modifiers*",
+      "Error Range Modifiers*"
+     ],
+     "rows": [
+      [
+       "Mental Techniques",
+       "4 hours",
+       "+0/+0",
+       "+3/+0"
+      ],
+      [
+       "Physical Techniques",
+       "2 days",
+       "+0/-2",
+       "+0/+0"
+      ]
+     ],
+     "notes": [
+      "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's."
+     ]
+    }
+   },
+   "notes": [
+    "Predator picks a mental or physical approach at the start; it changes only through the New Approach Advantage.",
+    "Predator must be present for at least half of each round; the Prey is present throughout.",
+    "Several participants form a Predator group and a Prey group; each group makes one cooperative opposed check per round.",
+    "Each strategy names the skill used for that round's opposed check (\"skill\" field); alternate skill checks have no tags.",
+    "Prey save-bonus requirements use base Will vs. a mental approach and base Fortitude vs. a physical approach.",
+    "NPC career level, where a DC needs it, defaults to the team's current Threat Level.",
+    "Altered memories can be undone by a Medicine/Therapy Complex Task: 5 Challenges, 1 hour each, DC 20 + brainwasher's Manipulate bonus; failure blocks further attempts this mission."
+   ]
+  },
+  "hacking": {
+   "name": "Hacking",
+   "pages": [
+    371,
+    374
+   ],
+   "predator": "Invading user (hacker)",
+   "prey": "Defending user / system operator",
+   "predatorSkills": [
+    "Computers (Int)"
+   ],
+   "preySkills": [
+    "Computers (Int)"
+   ],
+   "predatorSkillTags": [
+    "Concentration",
+    "Hands-On",
+    "Vision"
+   ],
+   "preySkillTags": [
+    "Concentration",
+    "Hands-On",
+    "Vision"
+   ],
+   "roundTime": "Variable: set by current Lead, External vs. Internal Access and relative computer Power Ratings (see hackTiming tables)",
+   "powerRatings": [
+    "Computer Power Rating",
+    "Security Power Rating"
+   ],
+   "startingLead": {
+    "default": null,
+    "summary": "Equal to the target system's Security Power Rating (maximum 9); with a previously installed back door, the Lead at which it was installed + 1.",
+    "rules": [
+     {
+      "when": "Normal hack",
+      "lead": null,
+      "formula": "min(9, system Security Power Rating)"
+     },
+     {
+      "when": "Predator has a back door in the system",
+      "lead": null,
+      "formula": "back door Lead + 1"
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "code-slinging",
+     "name": "Code Slinging",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Standard techniques to erode or shore up security.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "l337-moves",
+     "name": "'L337 Moves",
+     "side": "general",
+     "requirements": "Computer Power Rating 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Computer Power Rating",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": 2,
+     "advantages": [
+      "Lead",
+      "Stress"
+     ],
+     "summary": "Lean on superior hardware to grind the opponent down.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "master-cracker",
+     "name": "Master Cracker",
+     "side": "general",
+     "requirements": "†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "master cracker class ability (see page 36)",
+     "modifier": 0,
+     "advantages": [
+      "*"
+     ],
+     "summary": "Expert insight; winner spends 1 use of the class ability to pick any Advantages except Victory.",
+     "note": "Printed as \"Any except Victory\".",
+     "skill": ""
+    },
+    {
+     "id": "phone-phreak",
+     "name": "Phone Phreak",
+     "side": "general",
+     "requirements": "Trace software",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "Trace software",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Trace"
+     ],
+     "summary": "Study communications traffic to read the situation.",
+     "note": "",
+     "skill": "Electronics (Int)"
+    },
+    {
+     "id": "play-through",
+     "name": "Play Through",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Elude"
+     ],
+     "summary": "Bounce through routing tricks to hide one's location.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "shall-we-play-a-game",
+     "name": "“Shall We Play A Game?”",
+     "side": "general",
+     "requirements": "Computer Power Rating 3+, Probe software",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Computer Power Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Probe software",
+     "modifier": -4,
+     "advantages": [
+      "Pause",
+      "Probe"
+     ],
+     "summary": "Tie the opponent up in loops while trying a gambit elsewhere.",
+     "note": "Requirement is split across two lines in the printed table.",
+     "skill": "Tactics (Wis)"
+    },
+    {
+     "id": "social-engineering",
+     "name": "Social Engineering",
+     "side": "general",
+     "requirements": "Probe software",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "Probe software",
+     "modifier": -4,
+     "advantages": [
+      "Probe",
+      "Stress"
+     ],
+     "summary": "Target the human operator instead of the machine.",
+     "note": "",
+     "skill": "Bureaucracy (Cha)"
+    },
+    {
+     "id": "index-snatch",
+     "name": "Index Snatch",
+     "side": "predator",
+     "requirements": "Lead 1–4",
+     "leadMin": 1,
+     "leadMax": 4,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Extract File",
+      "Stress"
+     ],
+     "summary": "Pull a file out through an indirect, legitimate-looking request.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "insert-packet",
+     "name": "Insert Packet",
+     "side": "predator",
+     "requirements": "Lead 1–3",
+     "leadMin": 1,
+     "leadMax": 3,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Pause",
+      "Seize Control"
+     ],
+     "summary": "Plant a payload in an unused corner of the system.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "kernel-interrupt",
+     "name": "Kernel Interrupt",
+     "side": "predator",
+     "requirements": "Lead 1–2",
+     "leadMin": 1,
+     "leadMax": 2,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Core Command",
+      "Elude"
+     ],
+     "summary": "Grab brief control, then jump elsewhere in the system.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "magic-bullet",
+     "name": "Magic Bullet",
+     "side": "predator",
+     "requirements": "Computer Power Rating 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Computer Power Rating",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Trace",
+      "Victory"
+     ],
+     "summary": "Exploit a spotted weakness to find or beat the defender.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "trojan-file-marker",
+     "name": "Trojan File Marker",
+     "side": "predator",
+     "requirements": "Computer Power Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Computer Power Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Back Door",
+      "Lead"
+     ],
+     "summary": "Forge a quasi-legitimate entry point for later use.",
+     "note": "",
+     "skill": "Falsify (Int)"
+    },
+    {
+     "id": "core-counter-measures",
+     "name": "Core Counter-Measures",
+     "side": "prey",
+     "requirements": "Lead: 1–2",
+     "leadMin": 1,
+     "leadMax": 2,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Core Command",
+      "Pause"
+     ],
+     "summary": "Throw the system's full strength at the intruder.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "hard-reboot",
+     "name": "Hard Reboot",
+     "side": "prey",
+     "requirements": "Computer Power Rating 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Computer Power Rating",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Trace",
+      "Victory"
+     ],
+     "summary": "Shut down all access before a breach lands.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "inverse-query",
+     "name": "Inverse Query",
+     "side": "prey",
+     "requirements": "Lead: 6–9",
+     "leadMin": 6,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Extract File",
+      "Lead"
+     ],
+     "summary": "Bait the intruder into trading information for continued access.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "security-alert",
+     "name": "Security Alert",
+     "side": "prey",
+     "requirements": "Security Power Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Security Power Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Silhouette",
+      "Stress"
+     ],
+     "summary": "Spread the intruder's profile across the system to harass him.",
+     "note": "",
+     "skill": "Security (Int)"
+    },
+    {
+     "id": "virus-salvo",
+     "name": "Virus Salvo",
+     "side": "prey",
+     "requirements": "Lead: 7–9",
+     "leadMin": 7,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Lead",
+      "Seize Control"
+     ],
+     "summary": "Fire viruses to cripple or commandeer the intruder's machine.",
+     "note": "",
+     "skill": ""
+    }
+   ],
+   "advantages": [
+    {
+     "id": "back-door",
+     "name": "Back Door",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator either removes one of the Prey's silhouettes or installs a back door at the current Lead.",
+     "repeat": ""
+    },
+    {
+     "id": "core-command",
+     "name": "Core Command",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner executes 1 core command on the target computer (not system purge, power down, or a network change that locks a user out).",
+     "repeat": "Each further pick: 1 more core command.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "elude",
+     "name": "Elude",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Trace software aimed at the winner has its Power Rating cut by 3 until the end of next round (never more than 3 total).",
+     "repeat": "Each further pick extends the effect 1 more round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "extract-file",
+     "name": "Extract File",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner pulls 1 chosen file from an opponent's target computer; an unknown file name/location needs an Investigation/Research check, and overruns give -4 to hacking checks.",
+     "repeat": "Every 2 further picks: 1 more file.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "lead",
+     "name": "Lead",
+     "leadShift": 1,
+     "victory": false,
+     "summary": "Lead moves 1 point toward the winner.",
+     "repeat": "Every 2 further picks in the round move Lead 1 more point toward the winner.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "pause",
+     "name": "Pause",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Conflict freezes: Lead stays put and no steps resolve next round.",
+     "repeat": "Each further pick adds 1 more paused round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "probe",
+     "name": "Probe",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "A chosen opponent makes a Computers (Int) check, DC 10 + 5 x winner's Probe software Power Rating; on failure the winner runs 1 core command. Opponent may skip the check, giving the winner 2 Lead.",
+     "repeat": "Each further pick raises the DC by 5.",
+     "repeatEvery": 1,
+     "skipLeadShift": 2
+    },
+    {
+     "id": "seize-control",
+     "name": "Seize Control",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner makes the target computer run or stop 1 program stored on either machine, or takes over 1 controlled device until Step 2 of next round.",
+     "repeat": "Each further pick: control of 1 more program or device.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "silhouette",
+     "name": "Silhouette",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey either deletes one of the Predator's back doors or builds a profile silhouette; each silhouette gives a cumulative +1 on hacking opposed checks against that Predator for the mission.",
+     "repeat": ""
+    },
+    {
+     "id": "stress",
+     "name": "Stress",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the hacking attempt ends.",
+     "repeat": "Each further pick adds +1d4 stress damage.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "trace",
+     "name": "Trace",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "A chosen opponent makes a Computers (Int) check, DC 10 + 5 x winner's Trace software Power Rating; on failure his physical location is found and a winning Prey may end the hack in his favor. Skipping gives the winner 2 Lead.",
+     "repeat": "Each further pick raises the DC by 5.",
+     "repeatEvery": 1,
+     "skipLeadShift": 2,
+     "canEndConflict": true
+    },
+    {
+     "id": "victory",
+     "name": "Victory",
+     "leadShift": 0,
+     "victory": true,
+     "summary": "Conflict ends immediately in the winner's favor.",
+     "repeat": ""
+    }
+   ],
+   "victory": {
+    "predator": "Hacker gains full control and may use any core command freely; the former defender must hack the system back as Predator to retake it.",
+    "prey": "Intruder is locked out and cannot hack this system again this mission."
+   },
+   "outsideActions": "Not detailed separately; when run alongside combat, Step 4 is spread over the combat round with each participant acting on his Initiative Count.",
+   "tables": {
+    "hackTiming": {
+     "title": "Table 6.6: Hack Timing",
+     "page": 371,
+     "columns": [
+      "Lead",
+      "External Access",
+      "Internal Access"
+     ],
+     "rows": [
+      [
+       1,
+       "1 round",
+       "1 round"
+      ],
+      [
+       2,
+       "5 rounds",
+       "2 rounds"
+      ],
+      [
+       3,
+       "2 minutes",
+       "5 rounds"
+      ],
+      [
+       4,
+       "8 minutes",
+       "1 minute"
+      ],
+      [
+       5,
+       "30 minutes",
+       "2 minutes"
+      ],
+      [
+       6,
+       "2 hours",
+       "5 minutes"
+      ],
+      [
+       7,
+       "1 day",
+       "10 minutes"
+      ],
+      [
+       8,
+       "4 days",
+       "20 minutes"
+      ],
+      [
+       9,
+       "15 days",
+       "1 hour"
+      ]
+     ],
+     "notes": [
+      "Round duration by current Lead and access type; multiply by the Relative Power Ratings factor (hackTimingRelativePower). Both sides must be involved for at least half this time (rounded down, minimum 1 round)."
+     ]
+    },
+    "hackTimingRelativePower": {
+     "title": "Table 6.6: Hack Timing (Relative Power Ratings)",
+     "page": 371,
+     "columns": [
+      "Relative Power Ratings",
+      "External Access",
+      "Internal Access"
+     ],
+     "rows": [
+      [
+       "Predator +5 or more",
+       "×1/5*",
+       "×1/5*"
+      ],
+      [
+       "Predator +4",
+       "×1/4*",
+       "×1/4*"
+      ],
+      [
+       "Predator +3",
+       "×1/3*",
+       "×1/3*"
+      ],
+      [
+       "Predator +2",
+       "×1/2*",
+       "×1/2*"
+      ],
+      [
+       "Predator +1",
+       "×2/3*",
+       "×2/3*"
+      ],
+      [
+       "Equal",
+       "×1",
+       "×1"
+      ],
+      [
+       "Prey +1",
+       "×1.5*",
+       "×1.5*"
+      ],
+      [
+       "Prey +2",
+       "×2",
+       "×2"
+      ],
+      [
+       "Prey +3",
+       "×3",
+       "×3"
+      ],
+      [
+       "Prey +4",
+       "×4",
+       "×4"
+      ],
+      [
+       "Prey +5 or more",
+       "×5",
+       "×5"
+      ]
+     ],
+     "notes": [
+      "* Rounded up (minimum 1 half action)."
+     ]
+    },
+    "coreCommands": {
+     "title": "Core Commands (text list, not a numbered table)",
+     "page": 374,
+     "columns": [
+      "Core Command",
+      "Time"
+     ],
+     "rows": [
+      [
+       "Alter/Delete Records",
+       "Per Falsify/Forgery"
+      ],
+      [
+       "Authorize/Restrict User",
+       "1 full action"
+      ],
+      [
+       "Change Network Structure",
+       "1 full action"
+      ],
+      [
+       "Delete Program",
+       "1 full action"
+      ],
+      [
+       "Execute Program",
+       "1 full action"
+      ],
+      [
+       "Extract File",
+       "Varies"
+      ],
+      [
+       "Initiate System Purge",
+       "Varies"
+      ],
+      [
+       "Power Down",
+       "1 full action"
+      ],
+      [
+       "Search System",
+       "Varies"
+      ],
+      [
+       "Upload Program",
+       "Varies"
+      ],
+      [
+       "Use Peripheral",
+       "Per Device Use"
+      ],
+      [
+       "View File",
+       "Varies"
+      ]
+     ],
+     "notes": [
+      "Extract File / Upload Program: full rounds = Complexity DC / lowest Power Rating of the two computers (rounded down, minimum 1); unknown Complexity DC is GC-assigned, 10 to 60.",
+      "Initiate System Purge: 1 minute + 1 minute per foreign program whose Power Rating exceeds the system's.",
+      "Search System: 1 full action to start, then time per Table 2.33: Research Checks; no check needed; one system per use.",
+      "Use Peripheral: -4 on any separate skill check for remote operation.",
+      "View File: 1 half action to open; read 1 page per full round + 1 per point of Intelligence and of Wisdom above 10."
+     ]
+    }
+   },
+   "notes": [
+    "Unmonitored system (or streamlined variant at GC option): a Complex Task with Challenges = system Power Rating, Computers (Int) DC = known Sys-Op's Computers bonus + 10, or Threat Level + 15 if none.",
+    "External Access is any indirect connection; Internal Access is a terminal wired straight into the system and is much faster.",
+    "A terminal on the target system is assumed to have Power Rating = system's - 2 (minimum 1) unless stated otherwise.",
+    "Several participants form a Predator group and a Prey group; each makes one cooperative opposed check per round.",
+    "A blank \"skill\" means the default Computers (Int); alternate skill checks have no tags.",
+    "Software requirements (Trace, Probe) are recorded in \"other\". Probe/Trace DCs scale with the winner's software Power Rating.",
+    "Back doors set the starting Lead of later hacks; silhouettes give the defender a cumulative +1 per silhouette against that hacker for the mission. Each can be spent to erase the other.",
+    "A successful trace by the Prey can end the hack in his favor and is enough to start a manhunt.",
+    "With simultaneous combat: Step 1 before the first Initiative Count, Steps 2-3 at the Predator's count.",
+    "Master Cracker winner spends 1 use of the class ability to choose any 1 Advantage, +1 per 4 margin, never Victory."
+   ]
+  },
+  "infiltration": {
+   "name": "Infiltration",
+   "pages": [
+    375,
+    379
+   ],
+   "predator": "Infiltrating character(s)",
+   "prey": "Target organization (its security)",
+   "predatorSkills": [
+    "Bureaucracy (Int)"
+   ],
+   "preySkills": [
+    "Security (Int)"
+   ],
+   "predatorSkillTags": [
+    "Bribe",
+    "Disposition",
+    "Language"
+   ],
+   "preySkillTags": [],
+   "roundTime": "4 hours (high profile approach) or 2 days (low profile approach); see infiltrationApproaches table",
+   "powerRatings": [
+    "Cover Identity Power Rating",
+    "Organization Goals Rating"
+   ],
+   "startingLead": {
+    "default": null,
+    "summary": "Organization's Image Rating if the Predator opens low profile; its History Rating if he opens high profile.",
+    "rules": [
+     {
+      "when": "Predator opens with a low profile approach",
+      "lead": null,
+      "formula": "organization Image Rating"
+     },
+     {
+      "when": "Predator opens with a high profile approach",
+      "lead": null,
+      "formula": "organization History Rating"
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "after-hours",
+     "name": "After Hours",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Access Point",
+      "Reconnaissance"
+     ],
+     "summary": "Slip into the facilities during a quiet period.",
+     "note": "",
+     "skill": "Sneak (Dex)"
+    },
+    {
+     "id": "bald-faced-lie",
+     "name": "Bald-Faced Lie",
+     "side": "predator",
+     "requirements": "†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "bald-faced lie class ability (see page 35)",
+     "modifier": 0,
+     "advantages": [
+      "*"
+     ],
+     "summary": "Outrageous but convincing lies; winner spends 1 use of the class ability to pick any Advantages except Victory.",
+     "note": "Printed as \"Any except Victory\".",
+     "skill": ""
+    },
+    {
+     "id": "break-in",
+     "name": "Break-In",
+     "side": "predator",
+     "requirements": "Lead 1–3∆",
+     "leadMin": 1,
+     "leadMax": 3,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "Predator must currently be using a high profile approach",
+     "modifier": -6,
+     "advantages": [
+      "Raid"
+     ],
+     "summary": "Use inside knowledge to hit the organization's guarded assets.",
+     "note": "",
+     "skill": "Security (Int)"
+    },
+    {
+     "id": "change-of-pace",
+     "name": "Change of Pace",
+     "side": "predator",
+     "requirements": "Lead 7–9",
+     "leadMin": 7,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Extraction",
+      "New Approach"
+     ],
+     "summary": "Drop out of sight after a showy stint, or step into the spotlight.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "data-run",
+     "name": "Data Run",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Access Point",
+      "Intelligence"
+     ],
+     "summary": "Risky grab for more information about the organization.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "haven",
+     "name": "Haven",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Fade",
+      "Pause"
+     ],
+     "summary": "Retreat to a prepared bolt-hole or routine to lie low.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "murder-scheme",
+     "name": "Murder Scheme",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Conspiracy",
+      "Showdown"
+     ],
+     "summary": "Use position and inside allies to set up a hit on a key figure.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "quick-peek",
+     "name": "Quick Peek",
+     "side": "predator",
+     "requirements": "Lead 4–6",
+     "leadMin": 4,
+     "leadMax": 6,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Extraction",
+      "Reconnaissance"
+     ],
+     "summary": "Gather a little intelligence and get out.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "risky-declaration",
+     "name": "Risky Declaration",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 4+∆",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Predator must currently be using a high profile approach",
+     "modifier": -8,
+     "advantages": [
+      "Crisis"
+     ],
+     "summary": "Stage a scene to prove devotion and earn deep trust.",
+     "note": "",
+     "skill": "Impress (Cha)"
+    },
+    {
+     "id": "rotten-apples",
+     "name": "Rotten Apples",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Conspiracy"
+     ],
+     "summary": "Cultivate disloyal members into an inside power base.",
+     "note": "",
+     "skill": "Manipulate (Cha)"
+    },
+    {
+     "id": "rush-job",
+     "name": "Rush Job",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Lead",
+      "Haste"
+     ],
+     "summary": "Speed things up to gain ground fast.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "show-of-loyalty",
+     "name": "Show of Loyalty",
+     "side": "predator",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead",
+      "Transfer"
+     ],
+     "summary": "Curry favor with the leadership to rise through the ranks.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "step-out",
+     "name": "Step Out",
+     "side": "predator",
+     "requirements": "Cover Identity Power Rating 2+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Cover Identity Power Rating",
+       "min": 2
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Free Time",
+      "Lead"
+     ],
+     "summary": "Shake any watchers to meet allies outside.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "background-checks",
+     "name": "Background Checks",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Lead",
+      "Shred"
+     ],
+     "summary": "Vet recent recruits, attacking the infiltrator's cover.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "before-i-kill-you",
+     "name": "“Before I Kill You…”",
+     "side": "prey",
+     "requirements": "††",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "big brother or global search class ability (see pages 46 and 48)",
+     "modifier": 0,
+     "advantages": [
+      "*"
+     ],
+     "summary": "Security toys with the intruder; winner spends 1 use of the class ability to pick any Advantages except Victory.",
+     "note": "Printed as \"Any except Victory\".",
+     "skill": ""
+    },
+    {
+     "id": "counter-intelligence",
+     "name": "Counter-Intelligence",
+     "side": "prey",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Security experts pick up the scent and build a file.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "heightened-security",
+     "name": "Heightened Security",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 2+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 2
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Haste",
+      "Stress"
+     ],
+     "summary": "Tighten measures to flush out moles.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "inner-circle-trial",
+     "name": "Inner Circle Trial",
+     "side": "prey",
+     "requirements": "Lead 1–3**",
+     "leadMin": 1,
+     "leadMax": 3,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Crisis",
+      "Stress"
+     ],
+     "summary": "A final loyalty test before admission to the core.",
+     "note": "Printed footnote mark ** only points to the organization Ratings reference; it may be a misprint for the high-profile mark. See anomalies.",
+     "skill": "Manipulate (Wis)"
+    },
+    {
+     "id": "lockdown",
+     "name": "Lockdown",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Pause"
+     ],
+     "summary": "Suspend non-essential activity to limit access.",
+     "note": "",
+     "skill": "Search (Int)"
+    },
+    {
+     "id": "mantrap",
+     "name": "Mantrap",
+     "side": "prey",
+     "requirements": "Lead 7-9",
+     "leadMin": 7,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Crisis",
+      "Showdown"
+     ],
+     "summary": "Engineer an incident aimed at a specific suspect.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "new-procedures",
+     "name": "New Procedures",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "New Approach",
+      "Pause"
+     ],
+     "summary": "Change routines, possibly forcing the infiltrator into a new role.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "restructuring",
+     "name": "Restructuring",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Relocate"
+     ],
+     "summary": "Reorganize, potentially undoing the infiltrator's progress.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "rising-quotas",
+     "name": "Rising Quotas",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Stress"
+     ],
+     "summary": "Increase workload so members have little spare time.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "run-of-the-house",
+     "name": "Run of the House",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 3+∆",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Predator must currently be using a high profile approach",
+     "modifier": -4,
+     "advantages": [
+      "Convert",
+      "Revelation"
+     ],
+     "summary": "Give suspected infiltrators free rein, hoping they slip.",
+     "note": "",
+     "skill": "Impress (Cha)"
+    },
+    {
+     "id": "security-sweep",
+     "name": "Security Sweep",
+     "side": "prey",
+     "requirements": "Lead 4–6",
+     "leadMin": 4,
+     "leadMax": 6,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Showdown"
+     ],
+     "summary": "Routine sweep that may catch the infiltrator off guard.",
+     "note": "",
+     "skill": ""
+    },
+    {
+     "id": "show-of-strength",
+     "name": "Show of Strength",
+     "side": "prey",
+     "requirements": "Organization Goals Rating 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Organization Goals Rating",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Convert",
+      "Stress"
+     ],
+     "summary": "Display of money, ideology, leverage and flattery that may win the infiltrator over.",
+     "note": "",
+     "skill": "Bluff (Cha)"
+    }
+   ],
+   "advantages": [
+    {
+     "id": "access-point",
+     "name": "Access Point",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator finds an unwatched terminal and may hack the organization's system with Internal Access for up to 1 hour.",
+     "repeat": "Every 2 further picks: 1 more hour (maximum 4 hours).",
+     "repeatEvery": 2
+    },
+    {
+     "id": "conspiracy",
+     "name": "Conspiracy",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator makes an Impress (Cha) check, DC 10 + 5 x organization History Rating, to turn 1 standard NPC or minion squad neutral so it sits out fights and chases this mission. On failure Lead increases by 1.",
+     "repeat": "Each further pick: 1 more target, or shift an already neutral target to Friendly (it then fights alongside the Predator).",
+     "repeatEvery": 1
+    },
+    {
+     "id": "convert",
+     "name": "Convert",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey starts or advances a seduction Conflict against the Predator by 1 round per pick, using 2 x its higher of Image/Tools Rating as skill bonus. If it wins, the Predator serves it until he passes an end-of-scene Will save (DC = Prey's Impress bonus).",
+     "repeat": "",
+     "nestedConflict": "seduction"
+    },
+    {
+     "id": "crisis",
+     "name": "Crisis",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator rolls Impress (Cha) vs. DC 25 + organization's two highest Ratings; Prey rolls Security (Int) vs. DC 25 + Predator's career level. If exactly one fails, the other wins. A side may skip its check, giving the opponent 3 Lead.",
+     "repeat": "Each further pick lowers the winner's own Crisis DC by 4 (minimum 20).",
+     "repeatEvery": 1,
+     "skipLeadShift": 3,
+     "canEndConflict": true
+    },
+    {
+     "id": "extraction",
+     "name": "Extraction",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator leaves the organization cleanly; the Prey cannot trigger any events in response.",
+     "repeat": ""
+    },
+    {
+     "id": "fade",
+     "name": "Fade",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator's lowest cover identity gains 1 Power Rating (maximum 7); with no cover identity he gains one at Power Rating 2.",
+     "repeat": "Every 2 further picks: +1 more to the lowest identity.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "free-time",
+     "name": "Free Time",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator is unobserved for 1 hour. If he leaves and is late back, he needs Bluff (Cha) DC 20 + 4 x Goals Rating or the Prey wins and gains action dice equal to Lead for hostile events.",
+     "repeat": "Every 2 further picks: 1 more hour (maximum 3 hours).",
+     "repeatEvery": 2,
+     "canEndConflict": true
+    },
+    {
+     "id": "haste",
+     "name": "Haste",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Next Conflict round takes half the standard time (rounded down, minimum 5 minutes).",
+     "repeat": "Each further pick halves the duration again.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "intelligence",
+     "name": "Intelligence",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator learns 1 item: an unknown goal (Prey's pick), the full history, or the Origin, attributes, qualities, feats and class abilities of 1 player/special character (Prey's pick).",
+     "repeat": "Every 2 further picks: 1 more item.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "lead",
+     "name": "Lead",
+     "leadShift": 1,
+     "victory": false,
+     "summary": "Lead moves 1 point toward the winner.",
+     "repeat": "Every 2 further picks in the round move Lead 1 more point toward the winner.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "new-approach",
+     "name": "New Approach",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator's approach flips between high profile and low profile.",
+     "repeat": ""
+    },
+    {
+     "id": "pause",
+     "name": "Pause",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Conflict freezes: Lead stays put and no steps resolve next round, though Step 4 actions still happen.",
+     "repeat": "Each further pick adds 1 more paused round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "raid",
+     "name": "Raid",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator steals or destroys 1 Site benefit at his location, then must escape; Prey gains action dice equal to current Lead usable only for Surprise Chase, Surprise Combat or Wanted events against him.",
+     "repeat": ""
+    },
+    {
+     "id": "reconnaissance",
+     "name": "Reconnaissance",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator learns 1 item (Prey chooses which): an unknown Site's location and nature, an unknown Rating, or the full stat block of 1 standard character.",
+     "repeat": "Every 2 further picks: 1 more item.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "relocate",
+     "name": "Relocate",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey moves 1 of its Sites to a location the Predator does not know.",
+     "repeat": "Every 2 further picks: 1 more Site moved.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "revelation",
+     "name": "Revelation",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey may voluntarily disclose 1 fact (history, unknown goal, unknown Rating, unknown Site, a special character's details, or a standard character's stat block) to gain 1 bonus action die.",
+     "repeat": "Each further pick: 1 more disclosure for 1 more bonus action die.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "showdown",
+     "name": "Showdown",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator fights 1 special NPC (plus 1 minion squad if available). If all are captured or killed the infiltration continues with Lead +2; otherwise the Prey wins, the Predator must flee, and the Prey gains action dice equal to Lead for hostile events.",
+     "repeat": "",
+     "canEndConflict": true
+    },
+    {
+     "id": "shred",
+     "name": "Shred",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "The Predator's lowest-rated cover identity loses 1 Power Rating; at 0 the identity is blown.",
+     "repeat": "Every 2 further picks remove 1 more point, rolling over to the next-lowest identity if one hits 0.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "stress",
+     "name": "Stress",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the infiltration ends.",
+     "repeat": "Each further pick adds +1d4 stress damage.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "transfer",
+     "name": "Transfer",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator learns the location of 1 known Site (or the HQ if all are located) and may arrange a transfer to any known Site.",
+     "repeat": "Every 3 further picks: location of 1 more known Site.",
+     "repeatEvery": 3
+    }
+   ],
+   "victory": {
+    "predator": "Predator learns all Ratings, goals, standard NPC stats and special NPC code names, then picks one: stay embedded with ongoing access (new Conflicts restart at Lead 2), steal/destroy a Site benefit and escape (cover blown), or ambush the mastermind (quick) or another special NPC (slow).",
+    "prey": "All the Predator's cover identities are blown and he cannot re-infiltrate this mission. Prey picks one: eject him (with possible legal action: -4 Reputation or -$200,000 Net Worth), string him along (Lead reset to 8, +1 error range, 2 action dice; cumulative), or launch a slow ambush with 4 free action dice."
+   },
+   "outsideActions": "At the end of each round the Predator may contact the outside world; each 5 minutes (or part) of contact gives the Prey +4 on next round's opposed check.",
+   "tables": {
+    "infiltrationApproaches": {
+     "title": "Table 6.8: Infiltration Approaches",
+     "page": 375,
+     "columns": [
+      "Approach",
+      "Conflict Round Duration",
+      "Check Modifiers*",
+      "Error Range Modifiers*"
+     ],
+     "rows": [
+      [
+       "High Profile",
+       "4 hours",
+       "-2/+0",
+       "+1/+0"
+      ],
+      [
+       "Low Profile",
+       "2 days",
+       "+0/-2",
+       "+0/+0"
+      ]
+     ],
+     "notes": [
+      "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's."
+     ]
+    }
+   },
+   "notes": [
+    "Organization's Security skill bonus = 2 x its Sites or Tools Rating, whichever is higher.",
+    "Predator picks a high or low profile approach at the start; it changes only through the New Approach Advantage. Strategies with the high-profile restriction list it in \"other\".",
+    "Predator must be present for the whole round; the Prey only for half of it.",
+    "Multiple infiltrators form one Predator group and multiple defenders one Prey group; each group makes one cooperative opposed check per round.",
+    "A blank \"skill\" means the default skill (Bureaucracy for Predator, Security for Prey); alternate skill checks have no tags.",
+    "Lead here measures the organization's suspicion: it rises toward discovery and falls as the infiltrator burrows deeper.",
+    "This Conflict has no Victory Advantage; it ends only by Lead, Crisis, Showdown, Free Time failure, Extraction or Raid.",
+    "Bald-Faced Lie and “Before I Kill You…” winners spend 1 use of the relevant class ability to choose any 1 Advantage, +1 per 4 margin.",
+    "The book suggests expanding rounds into full roleplayed scenes rather than streamlining this Conflict."
+   ]
+  },
+  "interrogation": {
+   "name": "Interrogation",
+   "pages": [
+    380,
+    382
+   ],
+   "predator": "Interrogator(s)",
+   "prey": "Subject(s) holding the information",
+   "predatorSkills": [
+    "Intimidate (Str or Wis)"
+   ],
+   "preySkills": [
+    "Resolve (Wis)"
+   ],
+   "predatorSkillTags": [
+    "Bribe",
+    "Disposition",
+    "Language"
+   ],
+   "preySkillTags": [],
+   "roundTime": "Set by the Predator's Strategy (5 minutes to 1 hour), multiplied by the situation factor in interrogationModifiers",
+   "powerRatings": [
+    "Base Will Save"
+   ],
+   "startingLead": {
+    "default": 5,
+    "summary": "Set by how risky answering is for the Prey (Table 6.10): 3 for no risk up to 7 for deadly risk.",
+    "rules": [
+     {
+      "when": "Risk of answering: None",
+      "lead": 3
+     },
+     {
+      "when": "Risk: Slight",
+      "lead": 4
+     },
+     {
+      "when": "Risk: Moderate",
+      "lead": 5
+     },
+     {
+      "when": "Risk: Extreme",
+      "lead": 6
+     },
+     {
+      "when": "Risk: Deadly",
+      "lead": 7
+     },
+     {
+      "when": "Same Predator previously beat this Prey this mission",
+      "lead": null,
+      "formula": "table value - 2 (minimum 1)"
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "head-fake",
+     "name": "Head Fake",
+     "side": "general",
+     "requirements": "Base Will Save +6†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Slip"
+     ],
+     "summary": "Elaborate mind game meant to trip the opponent up.",
+     "note": "Listed duration applies only when the Predator chooses this Strategy.",
+     "skill": "Manipulate (Wis)",
+     "roundDuration": "30 minutes"
+    },
+    {
+     "id": "moment-of-crisis",
+     "name": "Moment of Crisis",
+     "side": "general",
+     "requirements": "Lead 1–3",
+     "leadMin": 1,
+     "leadMax": 3,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Crisis"
+     ],
+     "summary": "High-pressure push to force an outcome.",
+     "note": "Listed duration applies only when the Predator chooses this Strategy.",
+     "skill": "",
+     "roundDuration": "5 minutes"
+    },
+    {
+     "id": "waiting-game",
+     "name": "Waiting Game",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Pause",
+      "Stress"
+     ],
+     "summary": "Settle in for a long session, waiting on outside developments.",
+     "note": "Listed duration applies only when the Predator chooses this Strategy.",
+     "skill": "",
+     "roundDuration": "1 hour"
+    },
+    {
+     "id": "were-done-here",
+     "name": "“We’re Done Here”",
+     "side": "general",
+     "requirements": "Base Will Save +7†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+     "modifier": -12,
+     "advantages": [
+      "Stress",
+      "Victory"
+     ],
+     "summary": "Angrily push past the limit for an immediate finish.",
+     "note": "Listed duration applies only when the Predator chooses this Strategy.",
+     "skill": "",
+     "roundDuration": "15 minutes"
+    },
+    {
+     "id": "bad-cop",
+     "name": "Bad Cop",
+     "side": "predator",
+     "requirements": "Base Will Save +4†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+     "modifier": 0,
+     "advantages": [
+      "Lead",
+      "Stress"
+     ],
+     "summary": "Lean on authority or menace to rattle the subject.",
+     "note": "",
+     "skill": "",
+     "roundDuration": "15 minutes"
+    },
+    {
+     "id": "goad",
+     "name": "Goad",
+     "side": "predator",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Slip"
+     ],
+     "summary": "Repeat questions and pick apart inconsistencies.",
+     "note": "",
+     "skill": "Investigation (Wis)",
+     "roundDuration": "1 hour"
+    },
+    {
+     "id": "good-cop",
+     "name": "Good Cop",
+     "side": "predator",
+     "requirements": "Base Will Save +5",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Lead",
+      "Charm"
+     ],
+     "summary": "Friendly overtures to win the subject over.",
+     "note": "Printed without the † mark carried by the other Predator Will Save requirements.",
+     "skill": "Networking (Cha)",
+     "roundDuration": "30 minutes"
+    },
+    {
+     "id": "worse-cop",
+     "name": "Worse Cop",
+     "side": "predator",
+     "requirements": "Base Will Save +8†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 8
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "Predator's base Will save bonus counts as +1 higher per clue he holds showing the Prey has vital information",
+     "modifier": -8,
+     "advantages": [
+      "Crisis",
+      "Stress"
+     ],
+     "summary": "Go beyond intimidation into genuinely frightening behavior.",
+     "note": "",
+     "skill": "",
+     "roundDuration": "5 minutes"
+    },
+    {
+     "id": "the-5th",
+     "name": "The 5th",
+     "side": "prey",
+     "requirements": "Base Will Save +8",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 8
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Crisis",
+      "Pause"
+     ],
+     "summary": "Stay coolly detached, answering with logic and legal loopholes.",
+     "note": "",
+     "skill": "",
+     "roundDuration": "—"
+    },
+    {
+     "id": "im-no-rat",
+     "name": "“I’m No Rat”",
+     "side": "prey",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Hold to loyalties, knowing a slip endangers loved ones.",
+     "note": "",
+     "skill": "Networking (Wis)",
+     "roundDuration": "—"
+    },
+    {
+     "id": "nothing-to-say",
+     "name": "“Nothing to Say”",
+     "side": "prey",
+     "requirements": "Base Will Save +4",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead",
+      "Stress"
+     ],
+     "summary": "Clam up completely.",
+     "note": "",
+     "skill": "",
+     "roundDuration": "—"
+    },
+    {
+     "id": "story-time",
+     "name": "Story Time",
+     "side": "prey",
+     "requirements": "Base Will Save +5",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Base Will Save",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "all",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Lead",
+      "Charm"
+     ],
+     "summary": "Ingratiate and distract with talk.",
+     "note": "",
+     "skill": "Bluff (Cha)",
+     "roundDuration": "—"
+    }
+   ],
+   "advantages": [
+    {
+     "id": "charm",
+     "name": "Charm",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Opponent's disposition toward the winner improves 1 grade until the scene ends (maximum Friendly).",
+     "repeat": "Every 3 further picks: 1 more grade.",
+     "repeatEvery": 3
+    },
+    {
+     "id": "crisis",
+     "name": "Crisis",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Both sides make a Sense Motive (Wis) check, DC 25 + opponent's career level; whoever fails cracks and loses (if both fail, the Conflict continues). A side may skip its check, giving the opponent 2 Lead.",
+     "repeat": "Each further pick lowers the winner's own Crisis DC by 4 (minimum 20).",
+     "repeatEvery": 1,
+     "skipLeadShift": 2,
+     "canEndConflict": true
+    },
+    {
+     "id": "lead",
+     "name": "Lead",
+     "leadShift": 1,
+     "victory": false,
+     "summary": "Lead moves 1 point toward the winner.",
+     "repeat": "Every 2 further picks in the round move Lead 1 more point toward the winner.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "pause",
+     "name": "Pause",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Conflict freezes: Lead stays put and no steps resolve next round.",
+     "repeat": "Each further pick adds 1 more paused round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "slip",
+     "name": "Slip",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner either pulls 1 clue/secret from an opponent or passes off 1 lie as if a Bluff/Deception check with up to -6 penalty had succeeded.",
+     "repeat": "Every 2 further picks: 1 more clue/secret, or lie penalty cap rises by 2 (-8, -10...).",
+     "repeatEvery": 2
+    },
+    {
+     "id": "stress",
+     "name": "Stress",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the interrogation ends.",
+     "repeat": "Each further pick adds +1d4 stress damage.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "victory",
+     "name": "Victory",
+     "leadShift": 0,
+     "victory": true,
+     "summary": "Conflict ends immediately in the winner's favor.",
+     "repeat": ""
+    }
+   ],
+   "victory": {
+    "predator": "Prey truthfully gives up everything he knows about 1 event or topic the Predator names; later interrogations of him by this Predator this mission start 2 Lead lower (minimum 1).",
+    "prey": "Prey shuts down or sells a believable story; this Predator cannot interrogate him again this mission."
+   },
+   "outsideActions": "",
+   "tables": {
+    "startingInterrogationLead": {
+     "title": "Table 6.10: Starting Interrogation Lead",
+     "page": 380,
+     "columns": [
+      "Risk of Answering",
+      "Starting Lead"
+     ],
+     "rows": [
+      [
+       "None",
+       3
+      ],
+      [
+       "Slight (may prompt ridicule or social sanction)",
+       4
+      ],
+      [
+       "Moderate (may prompt mild retribution or minor criminal charges)",
+       5
+      ],
+      [
+       "Extreme (may prompt a personal vendetta or moderate criminal charges)",
+       6
+      ],
+      [
+       "Deadly (may prompt attacks or major criminal charges on self, friends, and family)",
+       7
+      ]
+     ],
+     "notes": []
+    },
+    "interrogationModifiers": {
+     "title": "Table 6.11: Interrogation Modifiers",
+     "page": 381,
+     "columns": [
+      "Category",
+      "Circumstance",
+      "Conflict Round Duration",
+      "Check Modifier*",
+      "Error Range*"
+     ],
+     "rows": [
+      [
+       "Situation",
+       "Prey may voluntarily leave**",
+       "×1/2",
+       "-6/+0",
+       "+2/+0"
+      ],
+      [
+       "Situation",
+       "Prey is imprisoned or cannot leave",
+       "×1",
+       "+0/+0",
+       "+0/+0"
+      ],
+      [
+       "Situation",
+       "Prey has legal counsel present",
+       "×1.5",
+       "-6/+0",
+       "+2/+0"
+      ],
+      [
+       "Situation",
+       "Prey expects to be released or rescued in the current interval",
+       "—",
+       "+0/+2",
+       "+0/+0"
+      ],
+      [
+       "Situation",
+       "Prey has no hope of rescue",
+       "—",
+       "+0/-4",
+       "+0/+1"
+      ],
+      [
+       "Duress",
+       "Threat of minor injury or inconvenience",
+       "—",
+       "+0/+0",
+       "+0/+0"
+      ],
+      [
+       "Duress",
+       "Threat of incarceration or violence",
+       "—",
+       "+0/-2",
+       "+0/+0"
+      ],
+      [
+       "Duress",
+       "Threat of death",
+       "—",
+       "+0/-4",
+       "+0/+1"
+      ],
+      [
+       "Duress",
+       "Threat of torture",
+       "—",
+       "+0/-6",
+       "+1/+2"
+      ],
+      [
+       "Duress",
+       "Act of incarceration or violence (the target or a second character)†",
+       "—",
+       "+0/-6",
+       "+1/+2"
+      ],
+      [
+       "Duress",
+       "Act of killing (a second character)†",
+       "—",
+       "+0/-8",
+       "+2/+3"
+      ],
+      [
+       "Duress",
+       "Act of torture (the target or a second character)†",
+       "—",
+       "+0/-10",
+       "+3/+4"
+      ],
+      [
+       "Incentive†",
+       "Offers of money††",
+       "—",
+       "+2/+0",
+       "+0/+0"
+      ],
+      [
+       "Incentive†",
+       "Offers of reduced penalty (legal, financial, etc.)",
+       "—",
+       "+4/+0",
+       "+1/+0"
+      ],
+      [
+       "Incentive†",
+       "Offers of protection (from prosecution, injury, etc.)",
+       "—",
+       "+6/+0",
+       "+2/+0"
+      ],
+      [
+       "Incentive†",
+       "Offers of immunity (from prosecution, injury, etc.)",
+       "—",
+       "+8/+0",
+       "+3/+0"
+      ]
+     ],
+     "notes": [
+      "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's.",
+      "** The Prey may technically leave but cannot actually do so until he wins the Conflict.",
+      "† A Prey free to leave never willingly submits to this; most such acts also cause exposure.",
+      "†† Minimum sum equals a bribe; each doubling of that base adds +2 more.",
+      "\"Category\" column is added here to preserve the printed sub-headings (Situation, Duress, Incentive†)."
+     ]
+    }
+   },
+   "notes": [
+    "Predator uses Intimidate with Str for physical force or Wis for mental pressure.",
+    "Streamlined variant: one Intimidate (Str or Wis) check, DC = target's Bluff bonus + 10, with Table 6.11 modifiers still applying.",
+    "Round length comes from the Predator's Strategy (\"roundDuration\"); Prey strategies list no duration, and General strategy durations count only when the Predator picks them. Both sides must be present for half the round (rounded up).",
+    "A blank \"skill\" means the default skill; alternate skill checks have no tags.",
+    "For † requirements the Predator adds +1 to his base Will save bonus per clue showing the Prey holds vital information.",
+    "\"Act of violence\" needs at least 5 lethal damage or 1/4 of the target's wound points (lower of the two); \"act of torture\" needs a critical injury, or 10 lethal damage / 1/3 of wound points (lower).",
+    "Several participants form a Predator group and a Prey group; each makes one cooperative opposed check per round."
+   ]
+  },
+  "manhunt": {
+   "name": "Manhunt",
+   "pages": [
+    382,
+    386
+   ],
+   "predator": "Hunter(s) searching for a missing target",
+   "prey": "Fugitive(s) whose location was known within the last 24 hours",
+   "predatorSkills": [
+    "Investigation (Wis)"
+   ],
+   "preySkills": [
+    "Blend (Cha)"
+   ],
+   "predatorSkillTags": [
+    "Bribe",
+    "Language"
+   ],
+   "preySkillTags": [],
+   "roundTime": "1 day (each side involved at least 4 hours per day)",
+   "powerRatings": [
+    "Spending Cash",
+    "Tools Rating"
+   ],
+   "startingLead": {
+    "default": 5,
+    "summary": "Set by the size of the starting search radius, from 4 (neighborhood) to 8 (continent). No manhunt if the area cannot be narrowed to one continent.",
+    "rules": [
+     {
+      "when": "Starting radius: neighborhood",
+      "lead": 4
+     },
+     {
+      "when": "Starting radius: city or county",
+      "lead": 5
+     },
+     {
+      "when": "Starting radius: state or small country",
+      "lead": 6
+     },
+     {
+      "when": "Starting radius: large country",
+      "lead": 7
+     },
+     {
+      "when": "Starting radius: entire continent",
+      "lead": 8
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "out-of-bounds",
+     "name": "Out of Bounds",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead",
+      "Stress"
+     ],
+     "summary": "Drag the hunt off the streets into wild or wooded ground.",
+     "note": "",
+     "skill": "Survival (Wis)",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "set-up",
+     "name": "Set Up",
+     "side": "general",
+     "requirements": "Lead 5–9",
+     "leadMin": 5,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Twist"
+     ],
+     "summary": "Prepare an unexpected change of tack for next round.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "take-him",
+     "name": "“Take Him!”",
+     "side": "general",
+     "requirements": "†",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "master tracker class ability (see page 44)",
+     "modifier": 0,
+     "advantages": [
+      "*"
+     ],
+     "summary": "Pin the opponent down or slip the net; winner spends 1 use of the class ability to pick any Advantages except Victory.",
+     "note": "Printed as \"Any except Victory\".",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "all-points-bulletin",
+     "name": "All Points Bulletin",
+     "side": "predator",
+     "requirements": "Spending Cash or Tools Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 4
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Twist"
+     ],
+     "summary": "Broadcast the alert to flush the fugitive out.",
+     "note": "Choosing this Strategy raises publicity by 1, win or lose (†† mark on the strategy name).",
+     "skill": "",
+     "publicityOnChoose": 1
+    },
+    {
+     "id": "checkpoints",
+     "name": "Checkpoints",
+     "side": "predator",
+     "requirements": "Spending Cash or Tools Rating 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 7
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Chase"
+     ],
+     "summary": "Man transit hubs and exit routes to catch a move.",
+     "note": "Choosing this Strategy raises publicity by 1, win or lose (†† mark on the strategy name).",
+     "skill": "",
+     "publicityOnChoose": 1
+    },
+    {
+     "id": "desk-jockey",
+     "name": "Desk Jockey",
+     "side": "predator",
+     "requirements": "Lead 1–4",
+     "leadMin": 1,
+     "leadMax": 4,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Shred"
+     ],
+     "summary": "Mine the data on hand for patterns.",
+     "note": "",
+     "skill": "Analysis (Int)",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "dial-it-back",
+     "name": "Dial It Back",
+     "side": "predator",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Pause",
+      "Public Support"
+     ],
+     "summary": "Pull back from public view to let things cool.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "gotcha",
+     "name": "“Gotcha!”",
+     "side": "predator",
+     "requirements": "Spending Cash or Tools Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 6
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Profile",
+      "Victory"
+     ],
+     "summary": "Stake everything on a hunch to catch the fugitive unawares.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "intense-scrutiny",
+     "name": "Intense Scrutiny",
+     "side": "predator",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Shred",
+      "Stress"
+     ],
+     "summary": "Re-examine past sighting locations in minute detail.",
+     "note": "Choosing this Strategy raises publicity by 1, win or lose (†† mark on the strategy name).",
+     "skill": "Search (Int)",
+     "publicityOnChoose": 1
+    },
+    {
+     "id": "legwork",
+     "name": "Legwork",
+     "side": "predator",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 2,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Hit the streets, chase leads and question locals.",
+     "note": "Choosing this Strategy raises publicity by 1, win or lose (†† mark on the strategy name).",
+     "skill": "",
+     "publicityOnChoose": 1
+    },
+    {
+     "id": "media-blitz",
+     "name": "Media Blitz",
+     "side": "predator",
+     "requirements": "Spending Cash or Tools Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 6
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Lead",
+      "Public Support"
+     ],
+     "summary": "Ask the public for help finding the fugitive.",
+     "note": "Choosing this Strategy raises publicity by 1, win or lose (†† mark on the strategy name).",
+     "skill": "Impress (Cha)",
+     "publicityOnChoose": 1
+    },
+    {
+     "id": "mind-of-a-killer",
+     "name": "Mind of a Killer",
+     "side": "predator",
+     "requirements": "Lead 1–5",
+     "leadMin": 1,
+     "leadMax": 5,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Profile"
+     ],
+     "summary": "Get inside the fugitive's head to predict his next step.",
+     "note": "",
+     "skill": "Manipulate (Wis)",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "surveillance",
+     "name": "Surveillance",
+     "side": "predator",
+     "requirements": "Spending Cash or Tools Rating 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 5
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Fade",
+      "Lead"
+     ],
+     "summary": "Track the fugitive electronically with taps and bugs.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "the-usual-suspects",
+     "name": "The Usual Suspects",
+     "side": "predator",
+     "requirements": "Spending Cash or Tools Rating 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 3
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Lead",
+      "Slip"
+     ],
+     "summary": "Round up and squeeze known associates for information.",
+     "note": "Choosing this Strategy raises publicity by 1, win or lose (†† mark on the strategy name).",
+     "skill": "Intimidate (Str)",
+     "publicityOnChoose": 1
+    },
+    {
+     "id": "act-casual",
+     "name": "Act Casual",
+     "side": "prey",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Adopt a plain, unremarkable routine.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "disgrace",
+     "name": "Disgrace",
+     "side": "prey",
+     "requirements": "Spending Cash or Tools Rating 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 5
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Outcry",
+      "Shred"
+     ],
+     "summary": "Stage a display of the hunter's bungling or overreach.",
+     "note": "Choosing this Strategy raises publicity by 1, win or lose (†† mark on the strategy name).",
+     "skill": "",
+     "publicityOnChoose": 1
+    },
+    {
+     "id": "go-to-ground",
+     "name": "Go to Ground",
+     "side": "prey",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Pause",
+      "Stress"
+     ],
+     "summary": "Stay hidden and buy time.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "interference",
+     "name": "Interference",
+     "side": "prey",
+     "requirements": "Spending Cash or Tools Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 4
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Lead",
+      "Slip"
+     ],
+     "summary": "Feed the hunters false leads to bog them down.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "new-face-new-man",
+     "name": "New Face, New Man",
+     "side": "prey",
+     "requirements": "Lead 6–9",
+     "leadMin": 6,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Fade",
+      "Lead"
+     ],
+     "summary": "Build a fresh cover identity.",
+     "note": "",
+     "skill": "Falsify (Int)",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "no-witnesses",
+     "name": "No Witnesses",
+     "side": "prey",
+     "requirements": "Spending Cash or Tools Rating 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 3
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Confront",
+      "Slip"
+     ],
+     "summary": "Go back and silence bystanders who could talk.",
+     "note": "",
+     "skill": "Intimidate (Str)",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "random-acts",
+     "name": "Random Acts",
+     "side": "prey",
+     "requirements": "Lead 1–5",
+     "leadMin": 1,
+     "leadMax": 5,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Fake Out",
+      "Stress"
+     ],
+     "summary": "Break routine unpredictably to throw off the hunter.",
+     "note": "Choosing this Strategy lowers publicity by 1, win or lose (∆ mark on the strategy name).",
+     "skill": "Manipulate (Wis)",
+     "publicityOnChoose": -1
+    },
+    {
+     "id": "run-for-the-border",
+     "name": "Run for the Border",
+     "side": "prey",
+     "requirements": "Spending Cash or Tools Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 6
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Chase"
+     ],
+     "summary": "Make a bold dash out of the search area.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "sanitize",
+     "name": "Sanitize",
+     "side": "prey",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -2,
+     "advantages": [
+      "Fade",
+      "Pause"
+     ],
+     "summary": "Retrace the trail and erase traces.",
+     "note": "",
+     "skill": "Search (Int)",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "take-it-public",
+     "name": "Take It Public",
+     "side": "prey",
+     "requirements": "Spending Cash or Tools Rating 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 7
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Outcry",
+      "Twist"
+     ],
+     "summary": "Appeal to the public for sympathy.",
+     "note": "Printed \"Take it Public\" in Table 6.16 and \"Take It Public\" in the description.",
+     "skill": "Impress (Cha)",
+     "publicityOnChoose": 0
+    },
+    {
+     "id": "without-a-trace",
+     "name": "Without a Trace",
+     "side": "prey",
+     "requirements": "Spending Cash or Tools Rating 7+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 7
+      },
+      {
+       "rating": "Tools Rating",
+       "min": 7
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Pause",
+      "Victory"
+     ],
+     "summary": "Execute an elaborate plan to disappear completely.",
+     "note": "",
+     "skill": "",
+     "publicityOnChoose": 0
+    }
+   ],
+   "advantages": [
+    {
+     "id": "chase",
+     "name": "Chase",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "A chase Conflict starts with vehicles chosen by the GC, starting Lead equal to the manhunt's Lead; Predator gets 2 bonus action dice for chase skill checks. If the Prey wins the chase he wins the manhunt.",
+     "repeat": "",
+     "nestedConflict": "chase",
+     "canEndConflict": true
+    },
+    {
+     "id": "confront",
+     "name": "Confront",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Combat breaks out with both sides carrying only personal gear and the Prey getting a quick ambush; whoever defeats the other wins the manhunt.",
+     "repeat": "",
+     "canEndConflict": true
+    },
+    {
+     "id": "fade",
+     "name": "Fade",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner's lowest cover identity gains 1 Power Rating (maximum 7); with no cover identity he gains one at Power Rating 2.",
+     "repeat": "Every 2 further picks: +1 more to the lowest identity.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "fake-out",
+     "name": "Fake Out",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey plants false clues: the Predator's next Profile Advantage treats Lead as 2 higher.",
+     "repeat": "Every 2 further picks: affects 1 more later Profile Advantage (the +2 does not grow).",
+     "repeatEvery": 2
+    },
+    {
+     "id": "lead",
+     "name": "Lead",
+     "leadShift": 1,
+     "victory": false,
+     "summary": "Lead moves 1 point toward the winner.",
+     "repeat": "Every 2 further picks in the round move Lead 1 more point toward the winner.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "outcry",
+     "name": "Outcry",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Manhunt publicity increases by 1.",
+     "repeat": "Every 2 further picks: publicity +1 more.",
+     "repeatEvery": 2,
+     "publicity": 1
+    },
+    {
+     "id": "pause",
+     "name": "Pause",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Conflict freezes: Lead stays put and no steps resolve next round and publicity drops by 1; Step 4 actions still happen.",
+     "repeat": "Each further pick adds 1 more paused round and lowers publicity by 1 more.",
+     "repeatEvery": 1,
+     "publicity": -1
+    },
+    {
+     "id": "profile",
+     "name": "Profile",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator reaches a scene tied to the Prey with timing per Table 6.15 (Lead counts +1 if the Prey has a cover identity); an Investigation/Canvass Area or Search/Perception check at the listed DC yields 1 clue, each worth +2 on later manhunt checks.",
+     "repeat": "Every 2 further picks: treat Lead as 1 lower for the table (actual Lead unchanged).",
+     "repeatEvery": 2
+    },
+    {
+     "id": "public-support",
+     "name": "Public Support",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Manhunt publicity decreases by 2.",
+     "repeat": "Every 2 further picks: publicity -1 more.",
+     "repeatEvery": 2,
+     "publicity": -2
+    },
+    {
+     "id": "shred",
+     "name": "Shred",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "The Prey's lowest-rated cover identity loses 1 Power Rating; at 0 the identity is blown.",
+     "repeat": "Every 2 further picks remove 1 more point, rolling over to the next-lowest identity if one hits 0.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "slip",
+     "name": "Slip",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner either pulls 1 clue/secret from an opponent or passes off 1 lie as if a Bluff/Deception check with up to -6 penalty had succeeded.",
+     "repeat": "Every 2 further picks: 1 more clue/secret, or lie penalty cap rises by 2 (-8, -10...).",
+     "repeatEvery": 2
+    },
+    {
+     "id": "stress",
+     "name": "Stress",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the manhunt ends.",
+     "repeat": "Each further pick adds +1d4 stress damage.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "twist",
+     "name": "Twist",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner may use Athletics (Str), Bureaucracy (Cha), Computers (Int), Drive (Dex), Networking (Cha), Search (Int), Sneak (Dex) or Streetwise (Wis), without tags, for the next opposed check.",
+     "repeat": "",
+     "twistSkills": [
+      "Athletics (Str)",
+      "Bureaucracy (Cha)",
+      "Computers (Int)",
+      "Drive (Dex)",
+      "Networking (Cha)",
+      "Search (Int)",
+      "Sneak (Dex)",
+      "Streetwise (Wis)"
+     ]
+    },
+    {
+     "id": "victory",
+     "name": "Victory",
+     "leadShift": 0,
+     "victory": true,
+     "summary": "Conflict ends immediately in the winner's favor.",
+     "repeat": ""
+    }
+   ],
+   "victory": {
+    "predator": "Prey's exact location is known; Predator may move in (usually combat or chase with a slow ambush) or keep watching, resetting Lead to 1 and continuing next day.",
+    "prey": "Prey and team slip away and cannot be found for the rest of the scene."
+   },
+   "outsideActions": "",
+   "tables": {
+    "publicityLimits": {
+     "title": "Table 6.13: Publicity Limits",
+     "page": 383,
+     "columns": [
+      "Category",
+      "Circumstance",
+      "Maximum Publicity"
+     ],
+     "rows": [
+      [
+       "Predator Organization’s Authority",
+       "Shadowy conspiracy that fears the light of day",
+       3
+      ],
+      [
+       "Predator Organization’s Authority",
+       "Little-known group that wants to stay that way",
+       5
+      ],
+      [
+       "Predator Organization’s Authority",
+       "Official faction whose motives are easily questioned",
+       7
+      ],
+      [
+       "Predator Organization’s Authority",
+       "Faction lead by well-known or feared public figures",
+       9
+      ],
+      [
+       "Predator Organization’s Authority",
+       "Public faction whose primary function is to pursue criminals",
+       "No limit*"
+      ],
+      [
+       "Prey Notoriety",
+       "Inconsequential (e.g. petty criminal, minor witness)",
+       "+0"
+      ],
+      [
+       "Prey Notoriety",
+       "Interesting (e.g. mastermind or witness linked to minor organization)",
+       "+1"
+      ],
+      [
+       "Prey Notoriety",
+       "Significant (e.g. mastermind or witness linked to major organization)",
+       "+2"
+      ],
+      [
+       "Prey Notoriety",
+       "Urgent (e.g. established long-term threat or witness linked to global organization)",
+       "+4"
+      ],
+      [
+       "Prey Notoriety",
+       "Vital (e.g. tangible threat to faction’s survival or witness linked to distribution of weapons of mass destruction)",
+       "No limit*"
+      ]
+     ],
+     "notes": [
+      "* Overrides all other publicity modifiers; the hunt continues whatever disruption it causes.",
+      "Limit = authority base + notoriety modifier. \"Category\" column is added here to preserve the printed sub-headings."
+     ]
+    },
+    "manhuntModifiers": {
+     "title": "Table 6.14: Manhunt Modifiers",
+     "page": 384,
+     "columns": [
+      "Category",
+      "Circumstance",
+      "Check Modifier*",
+      "Error Range*"
+     ],
+     "rows": [
+      [
+       "Situation",
+       "Predator assisted by organization that cannot or may not operate in public",
+       "-6/+0",
+       "+2/+0"
+      ],
+      [
+       "Situation",
+       "Per member of Prey group above 3",
+       "+0/-1",
+       "+0/+0"
+      ],
+      [
+       "Public Opinion",
+       "Local citizens and/or press hate the Predator",
+       "-2/+0",
+       "+0/+0"
+      ],
+      [
+       "Public Opinion",
+       "Local citizens and/or press fear the Predator",
+       "-4/+0",
+       "+0/-2"
+      ],
+      [
+       "Public Opinion",
+       "Local citizens and/or press approve of the Predator",
+       "+0/-2",
+       "+0/+0"
+      ],
+      [
+       "Public Opinion",
+       "Local citizens and/or press are used to living under scrutiny",
+       "+0/-4",
+       "-2/+0"
+      ],
+      [
+       "Public Opinion",
+       "Local citizens and/or press would recognize the Prey prior to the manhunt",
+       "+0/-4",
+       "+0/+1"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Attempted to use mass or public transportation or rental vehicle",
+       "+0/-4",
+       "+0/+1"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Made 1 or more traceable calls",
+       "+0/-2",
+       "+0/+0"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Presented any traceable (non-cover) ID",
+       "+0/-2",
+       "+0/+0"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Sought medical assistance (per person treated)",
+       "+0/-4",
+       "+0/+1"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Spent more than $1,000, up to $10,000",
+       "+0/-2",
+       "+0/+0"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Spent more than $10,000, up to $50,000",
+       "+0/-4",
+       "+0/+0"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Spent more than $50,000",
+       "+0/-6",
+       "+0/+0"
+      ],
+      [
+       "Prey Actions in Last 24 Hours",
+       "Traveled more than (5 × Lead) miles",
+       "+0/-2",
+       "+0/+0"
+      ]
+     ],
+     "notes": [
+      "* Left of slash applies to the Predator's opposed check / error range; right of slash applies to the Prey's.",
+      "\"Category\" column is added here to preserve the printed sub-headings."
+     ]
+    },
+    "profilingDelay": {
+     "title": "Table 6.15: Profiling Delay",
+     "page": 385,
+     "columns": [
+      "Lead",
+      "Profiler’s Arrival",
+      "Canvass Area/Perception Check DC"
+     ],
+     "rows": [
+      [
+       "0",
+       "1d4 hours before the Prey",
+       15
+      ],
+      [
+       "1",
+       "At roughly the same time as the Prey (per GC discretion)",
+       20
+      ],
+      [
+       "2",
+       "4d4 minutes after the Prey",
+       25
+      ],
+      [
+       "3",
+       "2d4 × 10 minutes after the Prey",
+       30
+      ],
+      [
+       "4",
+       "1d6 hours after the Prey",
+       35
+      ],
+      [
+       "5",
+       "4d6 hours after the Prey",
+       40
+      ],
+      [
+       "6+",
+       "More than 1 day after the Prey",
+       "Impossible"
+      ]
+     ],
+     "notes": [
+      "Lead column uses the modified Lead from the Profile Advantage (cover identity +1, Fake Out +2, repeat picks -1), not the actual Lead."
+     ]
+    }
+   },
+   "notes": [
+    "A manhunt needs the Prey's whereabouts to have been known within the last 24 hours and the search area to be one continent or smaller.",
+    "Streamlined variant: a Complex Task with Challenges = starting Lead, Investigation (Wis) DC = Prey's Blend bonus + 10.",
+    "Track a publicity score. Limit = Predator organization's authority base + Prey notoriety modifier (Table 6.13). At or above the limit the hunt is called off (Prey wins) and the Predator cannot start another manhunt this mission.",
+    "Strategies with \"publicityOnChoose\" change publicity when chosen regardless of the check result; Outcry, Pause and Public Support also move it.",
+    "Requirements written \"Spending Cash or Tools Rating N+\" are parsed as two ratings in \"any\" mode: the participant's Spending Cash or his organization's Tools Rating.",
+    "Several hunting groups after one Prey: separate Lead per pair, resolved from lowest to highest Lead; the Prey may pick a different Strategy per pairing. Chains resolve front to back.",
+    "A blank \"skill\" means the default skill; alternate skill checks have no tags.",
+    "“Take Him!” winner spends 1 use of the master tracker ability to choose any 1 Advantage, +1 per 4 margin, never Victory."
+   ]
+  },
+  "seduction": {
+   "name": "Seduction",
+   "pages": [
+    387,
+    388
+   ],
+   "predator": "Character trying to subvert another's loyalties",
+   "prey": "Target of the seduction",
+   "predatorSkills": [
+    "Impress (Cha)"
+   ],
+   "preySkills": [
+    "Sense Motive (Wis)"
+   ],
+   "predatorSkillTags": [
+    "Bribe",
+    "Disposition",
+    "Hearing",
+    "Language"
+   ],
+   "preySkillTags": [
+    "Disposition",
+    "Hearing",
+    "Language"
+   ],
+   "roundTime": "Set by the Predator's Strategy (1 minute to 1 day); both must be present for half of it (rounded up)",
+   "powerRatings": [
+    "Spending Cash",
+    "Image Rating",
+    "Lifestyle",
+    "History Rating"
+   ],
+   "startingLead": {
+    "default": 5,
+    "summary": "Compare career levels: a side 2+ levels higher shifts starting Lead 1 its way.",
+    "rules": [
+     {
+      "when": "Predator's career level is 2+ higher than Prey's",
+      "lead": 4
+     },
+     {
+      "when": "Prey's career level is 2+ higher than Predator's",
+      "lead": 6
+     },
+     {
+      "when": "Otherwise",
+      "lead": 5
+     }
+    ]
+   },
+   "strategies": [
+    {
+     "id": "call-me",
+     "name": "“Call Me”",
+     "side": "general",
+     "requirements": "",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead",
+      "Pause"
+     ],
+     "summary": "Keep the other party at arm's length to stay in control.",
+     "note": "",
+     "roundDuration": "1 day"
+    },
+    {
+     "id": "love-is-blind",
+     "name": "Love is Blind",
+     "side": "general",
+     "requirements": "Lead 4–6",
+     "leadMin": 4,
+     "leadMax": 6,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Twist"
+     ],
+     "summary": "Bring unexpected talents into play.",
+     "note": "",
+     "roundDuration": "1 hour"
+    },
+    {
+     "id": "show-of-good-faith",
+     "name": "Show of Good Faith",
+     "side": "general",
+     "requirements": "Lead 3–5",
+     "leadMin": 3,
+     "leadMax": 5,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Favor",
+      "Lead"
+     ],
+     "summary": "Demand proof of the other's commitment.",
+     "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark).",
+     "roundDuration": "10 minutes"
+    },
+    {
+     "id": "compromising-position",
+     "name": "Compromising Position",
+     "side": "predator",
+     "requirements": "Spending Cash 5+ or Image Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 5
+      },
+      {
+       "rating": "Image Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Crisis",
+      "Stress"
+     ],
+     "summary": "Press with veiled threats of embarrassment or loss.",
+     "note": "",
+     "roundDuration": "1 day"
+    },
+    {
+     "id": "extra-incentive",
+     "name": "Extra Incentive",
+     "side": "predator",
+     "requirements": "Spending Cash 4+ or Image Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 4
+      },
+      {
+       "rating": "Image Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Sweeten the offer with kindnesses and gifts.",
+     "note": "",
+     "roundDuration": "10 minutes"
+    },
+    {
+     "id": "hard-sell",
+     "name": "Hard Sell",
+     "side": "predator",
+     "requirements": "Lead 1–4",
+     "leadMin": 1,
+     "leadMax": 4,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Stress",
+      "Favor"
+     ],
+     "summary": "Make a bold, sudden play for the target's affections.",
+     "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark).",
+     "roundDuration": "1 minute"
+    },
+    {
+     "id": "seal-the-deal",
+     "name": "Seal the Deal",
+     "side": "predator",
+     "requirements": "Spending Cash 7+ or Image Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 7
+      },
+      {
+       "rating": "Image Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Victory"
+     ],
+     "summary": "All-in attempt to close the seduction.",
+     "note": "No descriptive entry for this Strategy appears in the printed strategy list.",
+     "roundDuration": "1 hour"
+    },
+    {
+     "id": "we-had-some-good-times",
+     "name": "“We Had Some Good Times”",
+     "side": "predator",
+     "requirements": "Lead 6–9",
+     "leadMin": 6,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Favor",
+      "Halt"
+     ],
+     "summary": "Break things off without giving up influence already gained.",
+     "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark).",
+     "roundDuration": "4 hours"
+    },
+    {
+     "id": "wine-and-dine",
+     "name": "Wine and Dine",
+     "side": "predator",
+     "requirements": "Spending Cash 4+ or Image Rating 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Spending Cash",
+       "min": 4
+      },
+      {
+       "rating": "Image Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Charm",
+      "Lead"
+     ],
+     "summary": "Turn on the charm while quietly steering emotions.",
+     "note": "",
+     "roundDuration": "2 hours"
+    },
+    {
+     "id": "i-just-cant",
+     "name": "“I Just Can’t”",
+     "side": "prey",
+     "requirements": "Lifestyle 7+ or History Rating 6+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Lifestyle",
+       "min": 7
+      },
+      {
+       "rating": "History Rating",
+       "min": 6
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -12,
+     "advantages": [
+      "Victory"
+     ],
+     "summary": "Dig in and refuse outright.",
+     "note": "",
+     "roundDuration": "—"
+    },
+    {
+     "id": "in-too-deep",
+     "name": "In Too Deep",
+     "side": "prey",
+     "requirements": "Lead 1–3",
+     "leadMin": 1,
+     "leadMax": 3,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -8,
+     "advantages": [
+      "Stress",
+      "Swap"
+     ],
+     "summary": "As the bond deepens, find a way to turn the tables.",
+     "note": "",
+     "roundDuration": "—"
+    },
+    {
+     "id": "its-not-right",
+     "name": "“It’s Not Right!”",
+     "side": "prey",
+     "requirements": "Lifestyle 4+ or History Rating 3+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Lifestyle",
+       "min": 4
+      },
+      {
+       "rating": "History Rating",
+       "min": 3
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Lead",
+      "Disappoint"
+     ],
+     "summary": "Raise moral objections, causing arguments and hurt.",
+     "note": "",
+     "roundDuration": "—"
+    },
+    {
+     "id": "its-not-you-its-me",
+     "name": "“It’s Not You, It’s Me”",
+     "side": "prey",
+     "requirements": "Lifestyle 4+ or History Rating 5+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Lifestyle",
+       "min": 4
+      },
+      {
+       "rating": "History Rating",
+       "min": 5
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": -6,
+     "advantages": [
+      "Crisis",
+      "Favor"
+     ],
+     "summary": "Pull the seducer into the target's messy life and extract favors.",
+     "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark). Duration cell is printed as only the ** mark.",
+     "roundDuration": "**"
+    },
+    {
+     "id": "people-will-talk",
+     "name": "“People Will Talk”",
+     "side": "prey",
+     "requirements": "Lifestyle 6+ or History Rating 4+",
+     "leadMin": null,
+     "leadMax": null,
+     "ratings": [
+      {
+       "rating": "Lifestyle",
+       "min": 6
+      },
+      {
+       "rating": "History Rating",
+       "min": 4
+      }
+     ],
+     "ratingsMode": "any",
+     "other": "",
+     "modifier": 0,
+     "advantages": [
+      "Lead"
+     ],
+     "summary": "Back away over concern for appearances.",
+     "note": "",
+     "roundDuration": "—"
+    },
+    {
+     "id": "tell-me-more",
+     "name": "“Tell Me More”",
+     "side": "prey",
+     "requirements": "Lead 6–9",
+     "leadMin": 6,
+     "leadMax": 9,
+     "ratings": [],
+     "ratingsMode": null,
+     "other": "",
+     "modifier": -4,
+     "advantages": [
+      "Stress",
+      "Favor"
+     ],
+     "summary": "Feign interest to test the seducer's intentions.",
+     "note": "If this Strategy succeeds, the time needed to complete the favor is added to the round's duration (** mark). Duration cell is printed as only the ** mark.",
+     "roundDuration": "**"
+    }
+   ],
+   "advantages": [
+    {
+     "id": "charm",
+     "name": "Charm",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey's disposition toward the Predator improves 1 grade until the mission ends (maximum Supportive).",
+     "repeat": "Every 3 further picks: 1 more grade.",
+     "repeatEvery": 3
+    },
+    {
+     "id": "crisis",
+     "name": "Crisis",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Both sides make a Cultures (Cha) check, DC 25 + opponent's career level; whoever fails commits a faux pas and loses (if both fail, the Conflict continues). A side may skip its check, giving the opponent 2 Lead.",
+     "repeat": "Each further pick lowers the winner's own Crisis DC by 4 (minimum 20).",
+     "repeatEvery": 1,
+     "skipLeadShift": 2,
+     "canEndConflict": true
+    },
+    {
+     "id": "disappoint",
+     "name": "Disappoint",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Prey's disposition toward the Predator worsens 1 grade until the mission ends (minimum Hostile).",
+     "repeat": "Every 3 further picks: 1 more grade.",
+     "repeatEvery": 3
+    },
+    {
+     "id": "favor",
+     "name": "Favor",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner may have the loser perform 1 action as if a Persuasion check with up to -6 penalty had succeeded; actually demanding it moves Lead 1 toward the opponent.",
+     "repeat": "Each further pick raises the penalty cap by 2 (-8, -10...).",
+     "repeatEvery": 1,
+     "leadCostIfUsed": 1
+    },
+    {
+     "id": "halt",
+     "name": "Halt",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Seduction ends with no winner; both keep their current dispositions.",
+     "repeat": "",
+     "endsConflictNoWinner": true
+    },
+    {
+     "id": "lead",
+     "name": "Lead",
+     "leadShift": 1,
+     "victory": false,
+     "summary": "Lead moves 1 point toward the winner.",
+     "repeat": "Every 2 further picks in the round move Lead 1 more point toward the winner.",
+     "repeatEvery": 2
+    },
+    {
+     "id": "pause",
+     "name": "Pause",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Conflict freezes: Lead stays put and no steps resolve next round, though Step 4 actions still happen.",
+     "repeat": "Each further pick adds 1 more paused round.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "stress",
+     "name": "Stress",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Everyone except the winner takes 1d4 stress damage that cannot be recovered until the seduction ends.",
+     "repeat": "Each further pick adds +1d4 stress damage.",
+     "repeatEvery": 1
+    },
+    {
+     "id": "swap",
+     "name": "Swap",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Predator and Prey trade roles, then Lead increases by 1.",
+     "repeat": "",
+     "swapRoles": true,
+     "absoluteLeadChange": 1
+    },
+    {
+     "id": "twist",
+     "name": "Twist",
+     "leadShift": 0,
+     "victory": false,
+     "summary": "Winner may use Bluff (Cha), Cultures (Int), Drive (Dex), Manipulate (Cha), Networking (Cha), Profession (Cha) or Resolve (Wis), without tags, for the next opposed check.",
+     "repeat": "",
+     "twistSkills": [
+      "Bluff (Cha)",
+      "Cultures (Int)",
+      "Drive (Dex)",
+      "Manipulate (Cha)",
+      "Networking (Cha)",
+      "Profession (Cha)",
+      "Resolve (Wis)"
+     ]
+    },
+    {
+     "id": "victory",
+     "name": "Victory",
+     "leadShift": 0,
+     "victory": true,
+     "summary": "Conflict ends immediately in the winner's favor.",
+     "repeat": ""
+    }
+   ],
+   "victory": {
+    "predator": "Prey's disposition toward the Predator becomes Helpful and stays there until something else changes it.",
+    "prey": "Prey's disposition becomes Adversarial; it cannot improve, and this Predator cannot seduce him again, for the rest of the mission."
+   },
+   "outsideActions": "",
+   "tables": {},
+   "notes": [
+    "One Predator against one Prey; no group rules are given for this Conflict.",
+    "Round length comes from the Predator's Strategy (\"roundDuration\"); Prey strategies list none.",
+    "Predator rating requirements use his Spending Cash or his organization's Image Rating; Prey requirements use his Lifestyle or his organization's History Rating.",
+    "No alternate skill column: all strategies use Impress (Predator) or Sense Motive (Prey) unless a Twist applies.",
+    "An infiltrated organization can run this Conflict against the infiltrator through the infiltration Convert Advantage."
+   ]
+  }
+ },
+ "anomalies": [
+  {
+   "type": "basics",
+   "where": "Step 3: Resolution (p.363)",
+   "printed": "\"...to a newlict round\"",
+   "comment": "Extraction garble for \"new Conflict round\"; no data impact."
+  },
+  {
+   "type": "chase",
+   "where": "Prey Skill line (p.364)",
+   "printed": "\"Athletics Maneuver (foot)\" and \"Survival Maneuver (animal)\"",
+   "comment": "Slash missing in the Prey list only; transcribed as Athletics/Maneuver and Survival/Maneuver to match the Predator list."
+  },
+  {
+   "type": "chase",
+   "where": "Table 6.3, Set Up row",
+   "printed": "\"Set up\"",
+   "comment": "Capitalized \"Set Up\" in the description; name stored as \"Set Up\"."
+  },
+  {
+   "type": "brainwashing",
+   "where": "Twist Advantage (p.370)",
+   "printed": "\"next opposed check during the same chase\"",
+   "comment": "Says \"chase\" in a brainwashing rule; copy-paste slip in the book."
+  },
+  {
+   "type": "brainwashing",
+   "where": "Table 6.5 skill column",
+   "printed": "Patience (Predator) uses Resolve (Wis); Worrisome Smile (Prey) uses Manipulate (Wis)",
+   "comment": "Skills look swapped relative to each side's default but are transcribed as printed."
+  },
+  {
+   "type": "hacking",
+   "where": "Table 6.7, “Shall We Play A Game?” row",
+   "printed": "\"Computer Power Rating 3+,\" / continuation line \"Probe software\"",
+   "comment": "Requirement wraps over two lines; merged as \"Computer Power Rating 3+, Probe software\"."
+  },
+  {
+   "type": "hacking",
+   "where": "Table 6.7 Prey rows",
+   "printed": "\"Lead: 1–2\", \"Lead: 6–9\", \"Lead: 7–9\"",
+   "comment": "Colon after Lead only in the Prey section; kept in \"requirements\", parsed normally."
+  },
+  {
+   "type": "hacking",
+   "where": "Silhouette Advantage (p.373)",
+   "printed": "\"establish a profile silhouette of the Prey\"",
+   "comment": "Context (bonus applies against the target Predator) implies the silhouette is of the Predator."
+  },
+  {
+   "type": "hacking",
+   "where": "Seize Control Advantage (p.373)",
+   "printed": "\"gains control of 1 program or device\"",
+   "comment": "Repeat clause lacks \"additional\"; interpreted as 1 more per pick."
+  },
+  {
+   "type": "infiltration",
+   "where": "Table 6.9, Inner Circle Trial row",
+   "printed": "\"Lead 1–3**\"",
+   "comment": "** is only the Ratings cross-reference from the column header; possibly meant to be the high-profile mark. Left with no extra requirement."
+  },
+  {
+   "type": "infiltration",
+   "where": "Table 6.9, Mantrap row",
+   "printed": "\"Lead 7-9\"",
+   "comment": "Hyphen instead of en dash; parsed as 7 to 9."
+  },
+  {
+   "type": "infiltration",
+   "where": "Conspiracy Advantage (p.377)",
+   "printed": "\"the Prey may target 1 additional character or squad\"",
+   "comment": "Should read Predator, who is the one using this Advantage."
+  },
+  {
+   "type": "infiltration",
+   "where": "Table 6.9, “Any except Victory” rows",
+   "printed": "\"Any except Victory\"",
+   "comment": "Infiltration has no Victory Advantage at all (the book says so on p.379); \"*\" still used."
+  },
+  {
+   "type": "infiltration",
+   "where": "Reconnaissance Advantage (p.378)",
+   "printed": "\"standard character s.of the Prey’s choice\"",
+   "comment": "Extraction/typo garble; no data impact."
+  },
+  {
+   "type": "interrogation",
+   "where": "Interrogation Timing (p.380)",
+   "printed": "\"During an infiltration, each Conflict round...\"",
+   "comment": "Says infiltration in the interrogation section."
+  },
+  {
+   "type": "interrogation",
+   "where": "Table 6.12 requirements",
+   "printed": "\"Base Will Save +6†\" etc.",
+   "comment": "Format differs from other tables (\"+N\" rather than \"N+\"); parsed as minimum N. Good Cop \"+5\" lacks the † the other Predator rows carry."
+  },
+  {
+   "type": "interrogation",
+   "where": "Table 6.11, Incentive sub-heading",
+   "printed": "\"Incentive†\"",
+   "comment": "The † footnote (Prey never submits willingly; exposure) fits the Duress acts; its attachment to the Incentive heading looks like a misprint."
+  },
+  {
+   "type": "interrogation",
+   "where": "Crisis Advantage (p.382)",
+   "printed": "\"If either participant fails this check, he cracks... ending the interrogation in his opponent’s favor; otherwise... (this is the case even if both participants crack...)\"",
+   "comment": "Internally inconsistent; summarized as: exactly one failure ends it, both failing continues."
+  },
+  {
+   "type": "manhunt",
+   "where": "Manhunt Strategies intro (p.384)",
+   "printed": "\"Table 6.14: Manhunt Strategies (see above)\"",
+   "comment": "The strategies table is Table 6.16 on p.386."
+  },
+  {
+   "type": "manhunt",
+   "where": "Outcry Advantage (p.385)",
+   "printed": "\"during the same Challenge\"",
+   "comment": "Other Advantages say \"round\"."
+  },
+  {
+   "type": "manhunt",
+   "where": "Table 6.16, Take It Public row",
+   "printed": "\"Take it Public\"",
+   "comment": "Description uses \"Take It Public\"; stored with capital I."
+  },
+  {
+   "type": "manhunt",
+   "where": "Table 6.15 header",
+   "printed": "\"Lead / Profiler’s Arrival / Canvass Area/ / Perception Check DC\" (4 header cells, 3 data cells)",
+   "comment": "Header split by extraction; merged to \"Canvass Area/Perception Check DC\"."
+  },
+  {
+   "type": "manhunt",
+   "where": "Ending a Manhunt (p.386)",
+   "printed": "\"or the chase otherwise ends in the Prey’s favor\"",
+   "comment": "Says chase where manhunt is meant."
+  },
+  {
+   "type": "seduction",
+   "where": "Table 6.17, Seal the Deal",
+   "printed": "Row present in table",
+   "comment": "No matching entry in the Seduction Strategies description list."
+  },
+  {
+   "type": "seduction",
+   "where": "“It’s Not You, It’s Me” (p.387 vs Table 6.17)",
+   "printed": "Description speaks of the Predator; table lists it under Prey Only",
+   "comment": "Transcribed per the table (Prey)."
+  },
+  {
+   "type": "seduction",
+   "where": "Table 6.17 duration cells",
+   "printed": "\"**\" alone for “It’s Not You, It’s Me” and “Tell Me More”",
+   "comment": "Footnote mark with no duration; kept as \"**\"."
+  },
+  {
+   "type": "seduction",
+   "where": "Twist and Victory Advantages (p.388)",
+   "printed": "\"during the same chase\"; \"The interrogation ends in the opposed check winner’s favor\"",
+   "comment": "Wrong Conflict names; copy-paste slips."
+  },
+  {
+   "type": "seduction",
+   "where": "Favor Advantage (p.387)",
+   "printed": "\"Influence/Persuasion check\"",
+   "comment": "Elsewhere the check is Impress/Persuasion; no such skill as Influence in this chapter."
+  },
+  {
+   "type": "seduction",
+   "where": "Charm vs. Ending a Seduction",
+   "printed": "Charm maximum \"Supportive\"; Predator victory sets \"Helpful\"; Prey victory sets \"Adversarial\"; Disappoint minimum \"Hostile\"",
+   "comment": "Disposition grade names transcribed as printed; verify against the disposition scale."
+  }
+ ]
+}

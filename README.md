@@ -100,3 +100,7 @@ https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.jso
 ## NPC creation
 
 NPC actors now offer opt-in graded creation, source-backed core tables, equipment allowances, quality cost controls, Tier resolution and an XP breakdown. Existing NPC stat blocks keep manual mode. See [NPC creation and implementation boundaries](docs/npc-creation.md).
+
+## Game Control tools
+
+The GC Console (button in the Actors sidebar) covers the mission record and XP, GC action dice, dramatic scenes, fluid initiative, standard NPC Damage saves, disposition, Dramatic Conflicts, campaign qualities and the security, hazard and possession tables. See [Game Control tools](docs/gc-tools.md) for what each does and what remains manual.

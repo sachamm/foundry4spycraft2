@@ -7,7 +7,8 @@ import {conditionNpcProfile,npcSkillConditionContext} from '../rules/npc-conditi
 import {getBaffledReview} from '../rules/baffled.mjs';
 import {isResourceLock} from "../rules/transactions.mjs";
 import {pointmanLevel} from "../rules/action-dice.mjs";
-import { defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
+import { defaultNpcProfile, computeNpcProfile, npcTableValue } from "../rules/npcs.mjs";
+const missionThreatLevelSetting=()=>{try{const m=globalThis.game?.settings?.get("spycraft2","mission");return m?.active&&Number.isSafeInteger(m.threatLevel)&&m.threatLevel>=1&&m.threatLevel<=20?m.threatLevel:null;}catch{return null;}};
 import { computeAgent } from "../rules/engine.mjs";
 import { SKILLS } from "../rules/tables.mjs";
 
@@ -69,8 +70,13 @@ export class NpcData extends BaseActorData {
     this.worldTime=globalThis.game?.time?.worldTime;this.usagePeriods=globalThis.game?.settings?.get("spycraft2","usagePeriods")??{};
     this.conditionContext=npcSkillConditionContext(this.parent);
     this.baffledApplicationReview=getBaffledReview(this.parent??{});
-    if (!this.npcProfile?.enabled) return super.prepareDerivedData();
-    const result = conditionNpcProfile(computeNpcProfile(this.npcProfile, this.npcType, this.threatLevel, this.abilities),this.conditionContext);
+    // A mission's Threat Level scales every NPC that follows it (p.423); others keep their own number.
+    const missionTL=this.followMission?missionThreatLevelSetting():null;
+    this.effectiveThreatLevel=missionTL??this.threatLevel;this.usesMissionThreatLevel=missionTL!==null;
+    // p.398: a promoted standard NPC is special until the mission ends.
+    this.promoted=!!this.promotion&&this.promotion.mission===String(this.usagePeriods?.mission??'initial');
+    if (!this.npcProfile?.enabled) { super.prepareDerivedData(); if(!['special','villain'].includes(this.npcType)&&!this.promoted)this.damageSave=this.manualDamageSave; return; }
+    const result = conditionNpcProfile(computeNpcProfile(this.npcProfile, this.npcType, this.effectiveThreatLevel, this.abilities),this.conditionContext);
     this.npcBuild = result;
     // Table values are base bonuses. Attribute modifiers are applied once by the base model.
     this.bab = result.stats?.attack ?? 0;
@@ -82,6 +88,10 @@ export class NpcData extends BaseActorData {
     } else { this.vitality.max = 0; this.wounds.max = 0; }
     super.prepareDerivedData();
     this.damageSave = result.type === "special" ? null : result.health;
+    if (this.promoted && result.type !== "special") {
+      const health = npcTableValue("health", this.npcProfile.grades?.health, result.effectiveLevel);
+      if (Array.isArray(health)) { [this.vitality.max, this.wounds.max] = health; this.damageSave = null; }
+    }
     this.competence = result.competence;
     this.warnings = result.warnings;
   }
@@ -90,6 +100,13 @@ export class NpcData extends BaseActorData {
     return {
       ...super.defineSchema(),
       threatLevel: int(1, { min: 1 }),
+      followMission: new BooleanField(),
+      promotion: new ObjectField({nullable:true,initial:null}),
+      manualDamageSave: int(0),
+      damageSaveAdjust: int(0),
+      damageTrack: new ObjectField({nullable:true,initial:null}),
+      disposition: new ObjectField({initial:()=>({base:"neutral",toward:{}})}),
+      manualRole: new StringField({ initial: "", blank: true, choices: ["", "minion", "henchman", "mastermind"] }),
       npcType: new StringField({ initial: "standard", choices: ["standard", "special", "villain", "animal"] }),
       npcProfile: new ObjectField({ initial: () => defaultNpcProfile() })
     };

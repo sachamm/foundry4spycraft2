@@ -226,3 +226,15 @@
 .spycraft2 .contact-upgrade { flex: 1 0 100%; min-width: 0; }
 .spycraft2 .contact-upgrade label { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .spycraft2 .contact-upgrade select, .spycraft2 .contact-upgrade input:not([type="checkbox"]) { max-width: 100%; min-width: 0; }
+
+/* Game Control console */
+.spycraft2.gc-console .window-content { overflow-y: auto; }
+.gc-console-body h2 { margin: 0.8em 0 0.3em; border-bottom: 1px solid currentColor; }
+.gc-console-body h3 { margin: 0.6em 0 0.2em; }
+.gc-console-body h2 button, .gc-console-body h3 button { width: auto; display: inline-block; font-size: 0.75em; line-height: 1.6; padding: 0 0.6em; margin-left: 0.5em; vertical-align: middle; }
+.gc-console-body .controls { display: flex; flex-wrap: wrap; gap: 0.3em; }
+.gc-console-body .controls button { width: auto; flex: 0 0 auto; }
+.gc-console-body ul { margin: 0.2em 0; padding-left: 1.2em; }
+.gc-console-body .tag { font-size: 0.6em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 3px; padding: 0 0.4em; vertical-align: middle; }
+.gc-console-body .muted { opacity: 0.65; }
+.spycraft2-gc-console-button { margin: 0.25em 0; }

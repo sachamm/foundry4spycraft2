@@ -145,6 +145,18 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "gc-tables",
+      "label": "GC Tables",
+      "path": "packs/gc-tables",
+      "type": "RollTable",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "NONE",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -168,7 +180,8 @@
         "feats",
         "weapons",
         "armor",
-        "kits"
+        "kits",
+        "gc-tables"
       ]
     }
   ]

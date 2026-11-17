@@ -20,6 +20,9 @@ const read = f => JSON.parse(readFileSync(join(ROOT, "src/data", f), "utf8"));
 const core = read("core.json");
 const npcRules = read("npcs.json");
 writeFileSync(join(ROOT, "module/rules/npc-tables.mjs"), `// GENERATED from src/data/npcs.json by tools/build-packs.mjs.\nexport const NPC_RULES = ${JSON.stringify(npcRules, null, 1)};\n`);
+// Game Control data: hand-kept core numbers plus the transcribed conflict, campaign-quality and mission tables.
+const gcData = { core: read("gc-core.json"), tables: read("gc-tables.json"), conflicts: read("conflicts.json"), campaignQualities: read("campaign-qualities.json") };
+writeFileSync(join(ROOT, "module/rules/gc-tables.mjs"), `// GENERATED from src/data/gc-core.json, gc-tables.json, conflicts.json and campaign-qualities.json by tools/build-packs.mjs.\nexport const GC_DATA = ${JSON.stringify(gcData, null, 1)};\n`);
 const classes = read("classes.json");
 const origins = read("origins.json");
 const feats = read("feats.json");
@@ -193,6 +196,21 @@ for(const kit of kits)packs.kits.docs.push(item("kits",kit.name,"gear","icons/sv
  kitType:kit.kitType,kitGrade:kit.grade,kitSize:kit.size,kitNonPortable:kit.nonPortable,kitLocation:""
 }));
 
+// Game Control roll tables (Table 7.16). Results are short original summaries of each printed row.
+packs["gc-tables"] = { label: "GC Tables", type: "RollTable", collection: "tables", folders: [], docs: [] };
+for (const table of gcData.tables.rollTables) {
+  const tableId = id("gc-tables", table.id);
+  const results = table.results.map((r, i) => ({
+    _id: id("gc-tables", table.id, String(i)), type: "text", name: "", description: p(r.text), img: "icons/svg/d20-black.svg",
+    weight: r.range[1] - r.range[0] + 1, range: r.range, drawn: false, flags: {}, _stats: stats
+  }));
+  packs["gc-tables"].docs.push({
+    _id: tableId, name: table.name, img: "icons/svg/d20-grey.svg",
+    description: p(`${table.source}, p.${table.page}. Roll ${table.formula}.`), formula: table.formula, replacement: true, displayRoll: true,
+    results: results.map(r => r._id), embedded: { results }, folder: null, sort: 0, ownership: { default: 0 }, flags: {}, _stats: stats
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /*  Write LevelDB                                                      */
 /* ------------------------------------------------------------------ */
@@ -203,7 +221,11 @@ for (const [name, pack] of Object.entries(packs)) {
   const db = new ClassicLevel(dir, { valueEncoding: "json" });
   const batch = db.batch();
   for (const f of pack.folders) batch.put(`!folders!${f._id}`, f);
-  for (const d of pack.docs) batch.put(`!items!${d._id}`, d);
+  const collection = pack.collection ?? "items";
+  for (const { embedded, ...d } of pack.docs) {
+    batch.put(`!${collection}!${d._id}`, d);
+    for (const [name, children] of Object.entries(embedded ?? {})) for (const child of children) batch.put(`!${collection}.${name}!${d._id}.${child._id}`, child);
+  }
   await batch.write();
   await db.compactRange("\x00", "\xff");
   await db.close();
@@ -212,8 +234,8 @@ for (const [name, pack] of Object.entries(packs)) {
 
 // Keep system.json's pack list in sync.
 system.packs = Object.entries(packs).map(([name, pack]) => ({
-  name, label: pack.label, path: `packs/${name}`, type: "Item", system: "spycraft2",
-  ownership: { PLAYER: "OBSERVER", ASSISTANT: "OWNER" }, flags: {}
+  name, label: pack.label, path: `packs/${name}`, type: pack.type ?? "Item", system: "spycraft2",
+  ownership: pack.type === "RollTable" ? { PLAYER: "NONE", ASSISTANT: "OWNER" } : { PLAYER: "OBSERVER", ASSISTANT: "OWNER" }, flags: {}
 }));
 system.packFolders = [{ name: "Spycraft 2.0", sorting: "m", color: "#1d2b3a", packs: Object.keys(packs) }];
 writeFileSync(join(ROOT, "system.json"), JSON.stringify(system, null, 2) + "\n");

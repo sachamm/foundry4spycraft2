@@ -1,0 +1,5088 @@
+{
+  "events": [
+    {
+      "id": "endangered-bystanders",
+      "name": "Endangered Bystanders",
+      "page": 399,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "Earlier in this mission the team completed every listed objective"
+      ],
+      "summary": "Bystanders are put in peril. Each die buys 1d12 bystanders (or a flat 5), or lowers their stat tier by 1 from Tier IV (min Tier I). A bystander death usually causes exposure.",
+      "perDie": [
+        "1d12 bystanders (or 5)",
+        "-1 bystander tier from base Tier IV (min Tier I)"
+      ]
+    },
+    {
+      "id": "hazards",
+      "name": "Hazards",
+      "page": 399,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "This scene: error on a Knowledge check to navigate a war zone or other dangerous area",
+        "This scene: error on a ranged attack"
+      ],
+      "summary": "A dangerous interruption: contagion, explosion, crossfire, runaway vehicle or security device. Effect by dice spent is in lookups.hazards (contagion alone can exceed 4 dice).",
+      "lookup": "hazards"
+    },
+    {
+      "id": "marked-for-death",
+      "name": "Marked for Death",
+      "page": 399,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "This mission: target erred on a Computers/Access System, Investigation/Canvass Area, Networking/Contact, Streetwise/Black Market or Streetwise/Bribe check"
+      ],
+      "summary": "An assassin makes one attempt on a chosen character, following normal rules including morale. Assassin tier equals dice spent.",
+      "intensities": [
+        {
+          "cost": 1,
+          "summary": "Tier I assassin"
+        },
+        {
+          "cost": 2,
+          "summary": "Tier II assassin"
+        },
+        {
+          "cost": 3,
+          "summary": "Tier III assassin"
+        },
+        {
+          "cost": 4,
+          "summary": "Tier IV assassin"
+        }
+      ]
+    },
+    {
+      "id": "mistaken-identity",
+      "name": "Mistaken Identity",
+      "page": 399,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "This mission: target erred on any Cultures, Impress, Intimidate, Manipulate or Networking check"
+      ],
+      "summary": "A character is taken for someone else. Clearing it up is a Complex Impress/Persuasion Task: 1 Challenge + 1 per die (max 5); first DC 10 + Threat Level, +2 per later Challenge. After failure a retry needs both people present and DCs +5.",
+      "intensities": [
+        {
+          "cost": 1,
+          "summary": "2 Challenges"
+        },
+        {
+          "cost": 2,
+          "summary": "3 Challenges"
+        },
+        {
+          "cost": 3,
+          "summary": "4 Challenges"
+        },
+        {
+          "cost": 4,
+          "summary": "5 Challenges (maximum)"
+        }
+      ]
+    },
+    {
+      "id": "natures-fury",
+      "name": "Nature's Fury",
+      "page": 400,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [],
+      "summary": "Weather or natural disaster strikes: earthquake, fog, landslide, lightning, rain/snow, volcanic eruption or wind. Effect by dice spent is in lookups.naturesFury.",
+      "lookup": "naturesFury"
+    },
+    {
+      "id": "responsibility",
+      "name": "Responsibility",
+      "page": 400,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [],
+      "summary": "The team is saddled with a Tier II NPC or a fragile item (Damage save bonus +10 or less). Dice buy duration or enemies; losing it usually causes exposure.",
+      "perDie": [
+        "Responsibility lingers 1 scene (min 1)",
+        "1 Tier III NPC wants it killed, captured or destroyed (min 1)"
+      ]
+    },
+    {
+      "id": "rival-approach",
+      "name": "Rival Approach",
+      "page": 402,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "Previous mission: any character erred on a Profession/Accomplishment check",
+        "Previous mission: any character lost 2+ Reputation or $100,000+ Net Worth to exposure"
+      ],
+      "summary": "A special NPC (tier = dice spent) bribes the team to throw an objective (a one-use contact each) or to defect (+1 Reputation or +$50,000 Net Worth each per die). All must accept.",
+      "intensities": [
+        {
+          "cost": 1,
+          "summary": "Tier I NPC; acquaintance contact, or +1 Reputation/+$50,000"
+        },
+        {
+          "cost": 2,
+          "summary": "Tier II NPC; associate contact, or +2 Reputation/+$100,000"
+        },
+        {
+          "cost": 3,
+          "summary": "Tier III NPC; confederate contact, or +3 Reputation/+$150,000"
+        },
+        {
+          "cost": 4,
+          "summary": "Tier IV NPC; partner contact, or +4 Reputation/+$200,000"
+        }
+      ]
+    },
+    {
+      "id": "shoddy-worthless-item",
+      "name": "Shoddy/Worthless Item",
+      "page": 403,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "This mission: the character erred while using the target item"
+      ],
+      "summary": "One item a character carries turns out flawed. 1-3 dice raise the error range of checks with it by 2 per die; 4 dice make it unusable. Cannot be sprung mid-use.",
+      "intensities": [
+        {
+          "cost": 1,
+          "summary": "Error range +2"
+        },
+        {
+          "cost": 2,
+          "summary": "Error range +4"
+        },
+        {
+          "cost": 3,
+          "summary": "Error range +6"
+        },
+        {
+          "cost": 4,
+          "summary": "Item worthless and unusable"
+        }
+      ]
+    },
+    {
+      "id": "surprise-chase",
+      "name": "Surprise Chase",
+      "page": 403,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "Previous or current scene: the characters let an opponent escape a chase or combat"
+      ],
+      "summary": "A chase starts while the group is moving. Each die adds 1 Tier II hunter (matching vehicle, 1d4 Tier I hired-gun passengers, weapons 1 Caliber below the vehicle) or raises all NPC tiers by 1.",
+      "perDie": [
+        "+1 pursuer (Tier II hunter, min 1)",
+        "+1 Tier to all NPCs in the chase"
+      ]
+    },
+    {
+      "id": "surprise-combat",
+      "name": "Surprise Combat",
+      "page": 403,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "Previous or current scene: the characters let an opponent escape a chase or combat"
+      ],
+      "summary": "A fight starts while the group is stationary. Each die adds 1 Tier II soldier-for-hire leading 1d4 Tier I hired guns (armed to match the PCs, else unarmed fighters) or raises all NPC tiers by 1.",
+      "perDie": [
+        "+1 Tier II soldier-for-hire with 1d4 Tier I hired guns (min 1)",
+        "+1 Tier to all NPCs involved"
+      ]
+    },
+    {
+      "id": "thief",
+      "name": "Thief",
+      "page": 403,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "Previous or current mission, after and outside the Intel Phase: the team acquired a Caliber III+ item or one costing over $50,000"
+      ],
+      "summary": "A Tier III thief with 3 Caliber II items goes after the team's valuables. Each die adds +1 Tier (max V), +1 item, or +1 Caliber to all the thief's items.",
+      "perDie": [
+        "+1 thief Tier (base III, max V)",
+        "+1 item (base 3 Caliber II items)",
+        "+1 Caliber to all thief items"
+      ]
+    },
+    {
+      "id": "under-review",
+      "name": "Under Review",
+      "page": 403,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "Previous mission: the team willfully ignored a mission objective",
+        "Previous mission: the team brought home no more than 1/2 its gear picks (rounded down)",
+        "Previous mission: team members lost a combined 10+ Reputation or $500,000+ Net Worth to exposure"
+      ],
+      "summary": "Only at the start of the Intel Phase, not if already under review. Per die: max gear Caliber -1 (min II), -2 and +1 error range on Profession/Accomplishment. A Tier III observer tags along until the team completes consecutive objectives equal to dice spent.",
+      "intensities": [
+        {
+          "cost": 1,
+          "summary": "Max gear Caliber -1; Profession/Accomplishment -2, error +1; 1 consecutive objective to clear"
+        },
+        {
+          "cost": 2,
+          "summary": "Max gear Caliber -2; Profession/Accomplishment -4, error +2; 2 consecutive objectives to clear"
+        },
+        {
+          "cost": 3,
+          "summary": "Max gear Caliber -3; Profession/Accomplishment -6, error +3; 3 consecutive objectives to clear"
+        },
+        {
+          "cost": 4,
+          "summary": "Max gear Caliber -4; Profession/Accomplishment -8, error +4; 4 consecutive objectives to clear"
+        }
+      ]
+    },
+    {
+      "id": "undesired-attention",
+      "name": "Undesired Attention",
+      "page": 404,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "This mission: team within 1 mile of a public explosion dealing 20+ damage, front-page news, or public tumult involving 100+ people",
+        "This mission: team members lost a combined 4+ Reputation or $200,000+ Net Worth to incident, noise or anonymity exposure"
+      ],
+      "summary": "A journalist or similar NPC threatens to expose the team. Complex Task: 1 Challenge + 1 per die (max 5); first DC 10 + Threat Level, +2 each after; skills must vary. Failure costs 3 Reputation or $150,000 per die and forces new names.",
+      "intensities": [
+        {
+          "cost": 1,
+          "summary": "2 Challenges; failure costs 3 Reputation/$150,000"
+        },
+        {
+          "cost": 2,
+          "summary": "3 Challenges; failure costs 6 Reputation/$300,000"
+        },
+        {
+          "cost": 3,
+          "summary": "4 Challenges; failure costs 9 Reputation/$450,000"
+        },
+        {
+          "cost": 4,
+          "summary": "5 Challenges; failure costs 12 Reputation/$600,000"
+        }
+      ]
+    },
+    {
+      "id": "wanted",
+      "name": "Wanted",
+      "page": 404,
+      "costMin": 1,
+      "costMax": 4,
+      "triggers": [
+        "This mission: the team commits any felony, noticed or not"
+      ],
+      "summary": "A Tier II detective runs a manhunt with Tier II officers (one per known team member). Each violent escape raises the next team a tier (III, IV, then V). Being sprung from custody costs 10 Reputation/$1,000,000, or 20/$2,000,000 if police were attacked."
+    }
+  ],
+  "rollTables": [
+    {
+      "id": "random-possessions-civilian",
+      "name": "Random Possessions: Uninvolved Civilian/Non-Villain Antagonist",
+      "source": "Table 7.16",
+      "page": 460,
+      "formula": "1d20",
+      "columns": [
+        "Result",
+        "Possessions"
+      ],
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Nothing (hole in pocket), or lint",
+          "data": {}
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Pocket book (appropriate to genre)",
+          "data": {}
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Club business card with a \"hot date\" number",
+          "data": {}
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Portable music recorder and earbud headphones",
+          "data": {}
+        },
+        {
+          "range": [
+            5,
+            7
+          ],
+          "text": "Cell phone (1d12 random numbers, including family and friends)",
+          "data": {
+            "numbers": "1d12"
+          }
+        },
+        {
+          "range": [
+            8,
+            10
+          ],
+          "text": "Keys: Caliber I or II vehicle within 1d4 blocks, and house within 2d20 miles (Lifestyle 1d6)",
+          "data": {
+            "vehicleCaliber": "I or II",
+            "vehicleBlocks": "1d4",
+            "houseMiles": "2d20",
+            "lifestyle": "1d6"
+          }
+        },
+        {
+          "range": [
+            11,
+            18
+          ],
+          "text": "Wallet: ID, personal photos, scribbled paper scraps, cash and credit cards worth 2d6 x $50",
+          "data": {
+            "cash": "2d6 * 50"
+          }
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Detective shield (undercover police officer); team becomes Wanted (p.404) if implicated in violence against this civilian",
+          "data": {
+            "event": "wanted"
+          }
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "1 Caliber I melee weapon or firearm (GC choice or random)",
+          "data": {
+            "caliber": "I"
+          }
+        }
+      ]
+    },
+    {
+      "id": "random-possessions-minion",
+      "name": "Random Possessions: Minion",
+      "source": "Table 7.16",
+      "page": 460,
+      "formula": "1d20",
+      "columns": [
+        "Result",
+        "Possessions"
+      ],
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Suicide tooth (recently removed) in a bloody handkerchief",
+          "data": {}
+        },
+        {
+          "range": [
+            2,
+            3
+          ],
+          "text": "Pack of foreign cigarettes",
+          "data": {}
+        },
+        {
+          "range": [
+            4,
+            5
+          ],
+          "text": "Deck of cards picturing people on the villain organization's hit list",
+          "data": {}
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Pocket video game console with an espionage stealth action game",
+          "data": {}
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "\"Lucky\" double-headed quarter",
+          "data": {}
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Ear plugs and a tape player with a self-help audio book for low-ranking minions",
+          "data": {}
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "\"Authentication\" kit (to-scale picture and tape measure)",
+          "data": {}
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "\"Climbing\" kit (Velcro and a low-opening parachute)",
+          "data": {}
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "\"Disguise\" kit (Groucho glasses and yesterday's newspaper)",
+          "data": {}
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "\"Electronics\" kit (blunt scissors and a magnet)",
+          "data": {}
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "\"Forgery\" kit (pocket scanner and number of the nearest copy shop)",
+          "data": {}
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "\"Mechanics\" kit (Swiss army knife and a hammer)",
+          "data": {}
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "PDA with stock portfolio, paid-up life insurance plan and a 5-year retirement business plan",
+          "data": {}
+        },
+        {
+          "range": [
+            16,
+            18
+          ],
+          "text": "Code name ID (e.g. uniform patch, subdermal ID chip)",
+          "data": {}
+        },
+        {
+          "range": [
+            19,
+            20
+          ],
+          "text": "Real name ID (e.g. day-job business card, training notes)",
+          "data": {}
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Clue leading to a henchman in the same organization",
+          "data": {
+            "clue": "henchman"
+          }
+        }
+      ]
+    },
+    {
+      "id": "random-possessions-henchman",
+      "name": "Random Possessions: Henchman",
+      "source": "Table 7.16",
+      "page": 461,
+      "formula": "1d20",
+      "columns": [
+        "Result",
+        "Possessions"
+      ],
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Beeper",
+          "data": {}
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Ominous-looking capsules in an unmarked tin (actually designer candies)",
+          "data": {}
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Designer flask bearing a real-world military branch emblem",
+          "data": {}
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Matchbook from a faraway bar or cafe with a foil's name and number inside",
+          "data": {}
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Bullet engraved \"Not today\" (owner has a gunshot scar in a vital area)",
+          "data": {}
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Dead drop spike holding 1 freshly severed finger in cellophane",
+          "data": {}
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Two identical clear bottles: one vintage vodka, the other inflicts 2d10 acid damage",
+          "data": {
+            "damage": "2d10",
+            "damageType": "acid"
+          }
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "A Chinese fortune slip",
+          "data": {}
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "1 can of gold body paint",
+          "data": {}
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Half-whittled wooden caricature of the mastermind or another superior",
+          "data": {}
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "\"Lockpicking\" kit (steel-toed boots)",
+          "data": {}
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "\"Surgery\" kit (needle, thread and an ice pack)",
+          "data": {}
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Organization watch, ring, pin or other jewelry (worn)",
+          "data": {}
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Pistol, rifle, SMG or shotgun firing pin, or grenade pin",
+          "data": {}
+        },
+        {
+          "range": [
+            15,
+            16
+          ],
+          "text": "Code name ID (e.g. bar code tattoo, sub-dermal ID chip)",
+          "data": {}
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Real name ID (e.g. written threat from another henchman, annotated photo)",
+          "data": {}
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Clue leading to another henchman in the same organization",
+          "data": {
+            "clue": "henchman"
+          }
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Clue leading to the mastermind of the same organization",
+          "data": {
+            "clue": "mastermind"
+          }
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Minor clue about the current mission (GC choice)",
+          "data": {
+            "clue": "mission-minor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "random-possessions-mastermind",
+      "name": "Random Possessions: Mastermind",
+      "source": "Table 7.16",
+      "page": 461,
+      "formula": "1d20",
+      "columns": [
+        "Result",
+        "Possessions"
+      ],
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Dossier and photos of 1 player character, including recent private shots",
+          "data": {}
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Photos of recently AWOL operatives, each gruesomely slain",
+          "data": {}
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Two tickets to a social event this evening",
+          "data": {}
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Blackmail photos of 1 local police official",
+          "data": {}
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Name of 1 contact (will not work with the team but may have information)",
+          "data": {}
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Medication for a nervous tic or mental disorder",
+          "data": {}
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Micro-cassette recorder with a tape of the mastermind rehearsing an evil laugh",
+          "data": {}
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Unfinished sketch of his latest slow death mechanism",
+          "data": {}
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Unfinished monologue meant for that mechanism's victim",
+          "data": {}
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Hardback how-to manual on executions for masterminds",
+          "data": {}
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Action figure of himself",
+          "data": {}
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Bank receipts for black-market purchase of 1 exotic animal and 1 piece of military hardware",
+          "data": {}
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Holographic recording: inconclusive proof of a conspiracy cover-up",
+          "data": {}
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Pocket-sized poisonous \"pet\" (Tier II attack bonus + poison chosen by GC or random)",
+          "data": {
+            "attackTier": "II"
+          }
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "\"To Do\" list mixing villainy and mundane chores",
+          "data": {}
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "List of 1d6 cities targeted for destruction",
+          "data": {
+            "count": "1d6"
+          }
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "List of 1d6 henchmen who displeased him, each Marked for Death (p.399)",
+          "data": {
+            "count": "1d6",
+            "event": "marked-for-death"
+          }
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "1 Caliber I gadget (GC choice or random)",
+          "data": {
+            "caliber": "I"
+          }
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Single-button remote with a random effect (e.g. teleport to safe house, trap door, detonation for 6d6 explosive damage)",
+          "data": {
+            "damage": "6d6",
+            "damageType": "explosive"
+          }
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Major clue about the current or next mission (GC choice)",
+          "data": {
+            "clue": "mission-major"
+          }
+        }
+      ]
+    }
+  ],
+  "lookups": {
+    "hazards": {
+      "title": "Table 7.2: Hazards",
+      "page": 400,
+      "keyedBy": "GC action dice spent (not rolled)",
+      "columns": [
+        "Hazard",
+        "Action Die Cost",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "Contagion",
+          "1",
+          "Exposure to 1 sample of any basic poison, or a disease with Complexity DC up to 50"
+        ],
+        [
+          "Contagion",
+          "2",
+          "Exposure to 1 sample of any improved poison, or a disease with Complexity DC 55-60"
+        ],
+        [
+          "Contagion",
+          "3",
+          "Exposure to 1 sample of advanced dementia, fear, necrotizing, neurotoxin, psychotropic, truth serum or weakening poison, or a disease with Complexity DC 65-70"
+        ],
+        [
+          "Contagion",
+          "4",
+          "Exposure to 1 sample of advanced blister, hallucinogen, knockout, lethal, paralytic or radiation poison, or a disease with Complexity DC 75-80"
+        ],
+        [
+          "Contagion",
+          "5*",
+          "Exposure to 1 sample of Encephalitis/Meningitis, or a disease with Complexity DC 85-90"
+        ],
+        [
+          "Contagion",
+          "6*",
+          "Exposure to 1 sample of Tuberculosis, or a disease with Complexity DC 95-105"
+        ],
+        [
+          "Contagion",
+          "7*",
+          "Exposure to 1 sample of Bubonic plague, or a disease with Complexity DC 110-125"
+        ],
+        [
+          "Contagion",
+          "8*",
+          "Exposure to 1 sample of Ebola, or a disease with Complexity DC 130+"
+        ],
+        [
+          "Explosion",
+          "1",
+          "Ground Zero 3d4 squares from 1 chosen character; 2d10 explosive damage; blast increment 1 square"
+        ],
+        [
+          "Explosion",
+          "2",
+          "Ground Zero 2d4 squares from 1 chosen character; 4d10 explosive damage; blast increment 1 square"
+        ],
+        [
+          "Explosion",
+          "3",
+          "Ground Zero 1d4 squares from 1 chosen character; 6d10 explosive damage; blast increment 2 squares"
+        ],
+        [
+          "Explosion",
+          "4",
+          "1 chosen character is Ground Zero; 8d10 explosive damage; blast increment 2 squares"
+        ],
+        [
+          "Random Fire/Crossfire",
+          "1",
+          "1 character targeted with a grade II NPC attack bonus, using any Caliber I firearm"
+        ],
+        [
+          "Random Fire/Crossfire",
+          "2",
+          "1 character targeted with a grade IV NPC attack bonus, using any Caliber II firearm"
+        ],
+        [
+          "Random Fire/Crossfire",
+          "3",
+          "1 character targeted with a grade VI NPC attack bonus, using any Caliber III firearm"
+        ],
+        [
+          "Random Fire/Crossfire",
+          "4",
+          "1 character targeted with a grade VIII NPC attack bonus, using any Caliber IV firearm"
+        ],
+        [
+          "Runaway Vehicle",
+          "1",
+          "1d4 characters targeted with a grade II NPC skill bonus, using any Caliber I vehicle"
+        ],
+        [
+          "Runaway Vehicle",
+          "2",
+          "1d4 characters targeted with a grade IV NPC skill bonus, using any Caliber II vehicle"
+        ],
+        [
+          "Runaway Vehicle",
+          "3",
+          "1d4 characters targeted with a grade VI NPC skill bonus, using any Caliber III vehicle"
+        ],
+        [
+          "Runaway Vehicle",
+          "4",
+          "1d4 characters targeted with a grade VIII NPC skill bonus, using any Caliber IV vehicle"
+        ],
+        [
+          "Security",
+          "1",
+          "Characters impeded by a security device with a Power Rating of 2"
+        ],
+        [
+          "Security",
+          "2",
+          "Characters impeded by a security device with a Power Rating of 4"
+        ],
+        [
+          "Security",
+          "3",
+          "Characters impeded by a security device with a Power Rating of 6"
+        ],
+        [
+          "Security",
+          "4",
+          "Characters impeded by a security device with a Power Rating of 8"
+        ]
+      ],
+      "rowData": [
+        {
+          "cost": 1,
+          "poison": "basic",
+          "diseaseComplexityDC": "up to 50"
+        },
+        {
+          "cost": 2,
+          "poison": "improved",
+          "diseaseComplexityDC": "55-60"
+        },
+        {
+          "cost": 3,
+          "poison": "advanced (dementia, fear, necrotizing, neurotoxin, psychotropic, truth serum, weakening)",
+          "diseaseComplexityDC": "65-70"
+        },
+        {
+          "cost": 4,
+          "poison": "advanced (blister, hallucinogen, knockout, lethal, paralytic, radiation)",
+          "diseaseComplexityDC": "75-80"
+        },
+        {
+          "cost": 5,
+          "exceedsLimit": true,
+          "disease": "Encephalitis/Meningitis",
+          "diseaseComplexityDC": "85-90"
+        },
+        {
+          "cost": 6,
+          "exceedsLimit": true,
+          "disease": "Tuberculosis",
+          "diseaseComplexityDC": "95-105"
+        },
+        {
+          "cost": 7,
+          "exceedsLimit": true,
+          "disease": "Bubonic plague",
+          "diseaseComplexityDC": "110-125"
+        },
+        {
+          "cost": 8,
+          "exceedsLimit": true,
+          "disease": "Ebola",
+          "diseaseComplexityDC": "130+"
+        },
+        {
+          "cost": 1,
+          "distanceSquares": "3d4",
+          "damage": "2d10",
+          "damageType": "explosive",
+          "blastIncrementSquares": 1
+        },
+        {
+          "cost": 2,
+          "distanceSquares": "2d4",
+          "damage": "4d10",
+          "damageType": "explosive",
+          "blastIncrementSquares": 1
+        },
+        {
+          "cost": 3,
+          "distanceSquares": "1d4",
+          "damage": "6d10",
+          "damageType": "explosive",
+          "blastIncrementSquares": 2
+        },
+        {
+          "cost": 4,
+          "distanceSquares": "0",
+          "damage": "8d10",
+          "damageType": "explosive",
+          "blastIncrementSquares": 2
+        },
+        {
+          "cost": 1,
+          "targets": "1",
+          "npcGrade": "II",
+          "caliber": "I"
+        },
+        {
+          "cost": 2,
+          "targets": "1",
+          "npcGrade": "IV",
+          "caliber": "II"
+        },
+        {
+          "cost": 3,
+          "targets": "1",
+          "npcGrade": "VI",
+          "caliber": "III"
+        },
+        {
+          "cost": 4,
+          "targets": "1",
+          "npcGrade": "VIII",
+          "caliber": "IV"
+        },
+        {
+          "cost": 1,
+          "targets": "1d4",
+          "npcGrade": "II",
+          "caliber": "I"
+        },
+        {
+          "cost": 2,
+          "targets": "1d4",
+          "npcGrade": "IV",
+          "caliber": "II"
+        },
+        {
+          "cost": 3,
+          "targets": "1d4",
+          "npcGrade": "VI",
+          "caliber": "III"
+        },
+        {
+          "cost": 4,
+          "targets": "1d4",
+          "npcGrade": "VIII",
+          "caliber": "IV"
+        },
+        {
+          "cost": 1,
+          "powerRating": 2
+        },
+        {
+          "cost": 2,
+          "powerRating": 4
+        },
+        {
+          "cost": 3,
+          "powerRating": 6
+        },
+        {
+          "cost": 4,
+          "powerRating": 8
+        }
+      ],
+      "notes": [
+        "* Contagion costs of 5-8 dice exceed the normal 4-dice cap per hazard; reserve them for plot-critical use when the team is ready."
+      ]
+    },
+    "naturesFury": {
+      "title": "Table 7.3: Nature's Fury",
+      "page": 401,
+      "keyedBy": "GC action dice spent (not rolled)",
+      "columns": [
+        "Type",
+        "Action Die Cost",
+        "Intensity",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "Earthquake",
+          "1",
+          "Tremor",
+          "Duration 1 round; -2 to attack and Dex-based skill checks; Ref save (DC 10) or 1d4 lethal and stress damage and sprawled"
+        ],
+        [
+          "Earthquake",
+          "2",
+          "Minor quake",
+          "Duration 1d4 rounds; -4 to attack and Dex-based skill checks; each round Ref save (DC 15) or 1d4 lethal and stress damage and sprawled"
+        ],
+        [
+          "Earthquake",
+          "3",
+          "Moderate quake",
+          "Duration 2d4 rounds; -6 to attack and Dex-based skill checks; each round Ref save (DC 20) or 1d4 lethal and stress damage and sprawled"
+        ],
+        [
+          "Earthquake",
+          "4",
+          "Major quake",
+          "Duration 3d4 rounds; -8 to attack and Dex-based skill checks; each round Ref save (DC 25) or 1d4 lethal and stress damage and sprawled"
+        ],
+        [
+          "Fog",
+          "1",
+          "Light",
+          "Duration 1d4 hours; vision effects only (see p.350); halfway through GC rolls 1d10, on 1 becomes moderate"
+        ],
+        [
+          "Fog",
+          "2",
+          "Moderate",
+          "Duration 2d4 hours; vision effects only (see p.350); halfway through GC rolls 1d10, on 1 becomes dense"
+        ],
+        [
+          "Fog",
+          "3",
+          "Dense",
+          "Duration 3d4 hours; vision effects only (see p.350)"
+        ],
+        [
+          "Landslide",
+          "1",
+          "Indirect slide zone††",
+          "Ref save (DC 15) or 3d6 lethal and stress damage and buried"
+        ],
+        [
+          "Landslide",
+          "2",
+          "Direct slide zone††",
+          "Ref save (DC 20) or 6d6 lethal and stress damage and buried"
+        ],
+        [
+          "Landslide",
+          "3",
+          "Indirect bury zone††",
+          "Buried; 4d6 lethal and stress damage, Ref save (DC 15) for 1/2 (rounded down)"
+        ],
+        [
+          "Landslide",
+          "4",
+          "Direct bury zone††",
+          "Buried; 8d6 lethal and stress damage, Ref save (DC 20) for 1/2 (rounded down)"
+        ],
+        [
+          "Lightning",
+          "1",
+          "Distant strike",
+          "This round: +20 ft. visual range, visual Awareness/Perception penalties reduced by 2 (min +0). Next round (thunder): -20 ft. hearing range, -2 to hearing Awareness/Perception"
+        ],
+        [
+          "Lightning",
+          "2",
+          "Local strike",
+          "This round: 1d6 stress damage; +40 ft. visual range, visual Awareness/Perception penalties reduced by 4 (min +0). Next round (thunder): -40 ft. hearing range, -4 to hearing Awareness/Perception"
+        ],
+        [
+          "Lightning",
+          "3",
+          "Near strike",
+          "This round: 2d6 flash, bang and stress damage; Fort save (DC 10) or sprawled; 1 object or scenery piece within 100 ft. takes 4d10+20 electrical and fire damage; +60 ft. visual range, visual penalties reduced by 6 (min +0). Next round (thunder): -60 ft. hearing range, -6 to hearing Awareness/Perception"
+        ],
+        [
+          "Lightning",
+          "4",
+          "Direct strike",
+          "This round: 3d6 flash, bang and stress damage; Fort save (DC 20) or sprawled; 1 character takes 4d10+20 electrical and fire damage and is sprawled; +80 ft. visual range, visual penalties reduced by 8 (min +0). Next round (thunder): -80 ft. hearing range, -8 to hearing Awareness/Perception"
+        ],
+        [
+          "Rain/Snow",
+          "1",
+          "Light",
+          "Duration 3d20 minutes; like 1 gallon of water per minute on each unprotected flame; halfway through GC rolls 1d10, on 1 becomes moderate"
+        ],
+        [
+          "Rain/Snow",
+          "2",
+          "Moderate",
+          "Duration 1d4 hours; like 2 gallons of water per minute on each unprotected flame; halfway through GC rolls 1d10, on 1 becomes heavy"
+        ],
+        [
+          "Rain/Snow",
+          "3",
+          "Heavy",
+          "Duration 2d4 hours; like 3 gallons of water per minute on each unprotected flame; halfway through GC rolls 1d10, on 1 becomes a storm"
+        ],
+        [
+          "Rain/Snow",
+          "4",
+          "Thunderstorm/Snowstorm",
+          "Duration 3d4 hours; like 4 gallons of water per minute on each unprotected flame; halfway through GC rolls 1d10: on 1 becomes hurricane or blizzard, on 2 a flash flood or flash freeze occurs"
+        ],
+        [
+          "Rain/Snow",
+          "—",
+          "Flash Flood",
+          "3d6 subdual damage; Ref save (DC 15) or sprawled and pushed 3d6 x 10 ft., taking 1d6 lethal damage per 30 ft. pushed"
+        ],
+        [
+          "Rain/Snow",
+          "—",
+          "Flash Freeze",
+          "3d6 cold damage and exposure to cold contagion (see p.231)"
+        ],
+        [
+          "Rain/Snow",
+          "—",
+          "Hurricane",
+          "Duration 3d4 hours; as severe wind; puts out any unprotected flame; halfway through GC rolls 1d10, on 1-4 a flash flood occurs"
+        ],
+        [
+          "Rain/Snow",
+          "—",
+          "Blizzard",
+          "Duration 3d4 hours; as strong wind; puts out any unprotected flame; 1d6 cold damage per hour; halfway through GC rolls 1d10, on 1-4 a flash freeze occurs"
+        ],
+        [
+          "Volcanic Eruption",
+          "1",
+          "Gentle",
+          "Duration 1d6 hours, within 1/4 mile; 1d6 stress damage; vision and hearing ranges x 3/4 (rounded down); Fort save (DC 10) or deafened until 1d6 hours after the eruption ends; GC may spend 1 action die to hit 1 character with a volcanic bomb for 1d10 fire and stress damage"
+        ],
+        [
+          "Volcanic Eruption",
+          "2",
+          "Minor",
+          "Duration 2d6 hours, within 1/2 mile; 2d6 stress damage; vision and hearing ranges x 1/2 (rounded down); Fort save (DC 15) or deafened until 2d6 hours after the eruption ends; GC may spend 2 action dice to hit 1 character with a volcanic bomb for 1d10 fire and stress damage per die"
+        ],
+        [
+          "Volcanic Eruption",
+          "3",
+          "Moderate",
+          "Duration 3d6 hours, within 1 mile; 3d6 stress damage; vision and hearing ranges x 1/4 (rounded down); Fort save (DC 20) or deafened until 3d6 hours after [text garbled in source]; volcanic bomb 1d10 fire and stress damage per action die spent; halfway through GC rolls 1d10, on 1 poison gas rises at the team's location"
+        ],
+        [
+          "Volcanic Eruption",
+          "4",
+          "Major",
+          "Duration 4d6 hours, within 2 miles; 4d6 stress damage; vision and hearing ranges [multiplier, save and deafness text missing in source]; GC may spend 4 action dice to hit 1 character with a volcanic bomb for 1d10 fire and stress damage per die; halfway through GC rolls 1d10, on 1 poison gas rises at the team's location"
+        ],
+        [
+          "Volcanic Eruption",
+          "—",
+          "Poison gas",
+          "Acts as a contagion: Primary Onset 1d4 rounds, Primary Save DC 15, Primary Effect 1d2 Con damage + fatigued; Secondary Onset 1d4 minutes, Secondary Save DC 20, Secondary Effect 1d4 Con damage + fatigued"
+        ],
+        [
+          "Wind",
+          "1",
+          "Light",
+          "Duration 3d20 minutes; -2 to Damage saves to stop fire spreading; -2 to hurled attack checks; halfway through GC rolls 1d10, on 1 becomes moderate"
+        ],
+        [
+          "Wind",
+          "2",
+          "Moderate",
+          "Duration 1d4 hours; -4 to Damage saves to stop fire spreading; -4 to hurled attack and hearing Awareness/Perception checks; -5 ft. Speed; halfway through GC rolls 1d10, on 1 becomes strong"
+        ],
+        [
+          "Wind",
+          "3",
+          "Strong",
+          "Duration 2d4 hours; -6 to Damage saves to stop fire spreading; -6 to hurled attacks; -2 to other ranged attacks; -10 ft. Speed; Fort save (DC 15) or sprawled and pushed 1d6 x 5 ft., taking 1d6 lethal damage per 10 ft. pushed; halfway through GC rolls 1d10, on 1 becomes severe"
+        ],
+        [
+          "Wind",
+          "4",
+          "Severe",
+          "Duration 3d4 hours; -8 to Damage saves to stop fire spreading; -8 to hurled attacks; -4 to other ranged attacks; -15 ft. Speed; Fort save (DC 20) or sprawled and pushed 1d6 x 10 ft., taking 1d6 lethal damage per 10 ft. pushed; halfway through GC rolls 1d10, on 1 becomes a dust storm or spawns a tornado (by terrain)"
+        ],
+        [
+          "Wind",
+          "—",
+          "Dust storm",
+          "Duration 3d4 hours; as severe wind, plus vision effects (see p.350)"
+        ],
+        [
+          "Wind",
+          "—",
+          "Tornado",
+          "Duration 1d12 minutes; puts out any unprotected flame; hurled attacks impossible; -8 to other ranged attacks; only movement is a 5-ft. bonus step; within 100 ft. Fort save (DC 30) or sucked in for 2d6 rounds, taking 1d10 lethal damage per round, then expelled 1d4 miles away at a height of 2d20+20 ft. (falling damage, p.336)"
+        ]
+      ],
+      "rowData": [
+        {
+          "cost": 1,
+          "duration": "1 round",
+          "penalty": -2,
+          "save": "Ref",
+          "dc": 10,
+          "damage": "1d4",
+          "damageType": "lethal and stress",
+          "condition": "sprawled",
+          "perRound": false
+        },
+        {
+          "cost": 2,
+          "duration": "1d4 rounds",
+          "penalty": -4,
+          "save": "Ref",
+          "dc": 15,
+          "damage": "1d4",
+          "damageType": "lethal and stress",
+          "condition": "sprawled",
+          "perRound": true
+        },
+        {
+          "cost": 3,
+          "duration": "2d4 rounds",
+          "penalty": -6,
+          "save": "Ref",
+          "dc": 20,
+          "damage": "1d4",
+          "damageType": "lethal and stress",
+          "condition": "sprawled",
+          "perRound": true
+        },
+        {
+          "cost": 4,
+          "duration": "3d4 rounds",
+          "penalty": -8,
+          "save": "Ref",
+          "dc": 25,
+          "damage": "1d4",
+          "damageType": "lethal and stress",
+          "condition": "sprawled",
+          "perRound": true
+        },
+        {
+          "cost": 1,
+          "duration": "1d4 hours",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "moderate"
+          }
+        },
+        {
+          "cost": 2,
+          "duration": "2d4 hours",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "dense"
+          }
+        },
+        {
+          "cost": 3,
+          "duration": "3d4 hours",
+          "escalation": null
+        },
+        {
+          "cost": 1,
+          "save": "Ref",
+          "dc": 15,
+          "damage": "3d6",
+          "damageType": "lethal and stress",
+          "condition": "buried"
+        },
+        {
+          "cost": 2,
+          "save": "Ref",
+          "dc": 20,
+          "damage": "6d6",
+          "damageType": "lethal and stress",
+          "condition": "buried"
+        },
+        {
+          "cost": 3,
+          "save": "Ref",
+          "dc": 15,
+          "damage": "4d6",
+          "damageType": "lethal and stress",
+          "condition": "buried (automatic)",
+          "saveEffect": "half damage"
+        },
+        {
+          "cost": 4,
+          "save": "Ref",
+          "dc": 20,
+          "damage": "8d6",
+          "damageType": "lethal and stress",
+          "condition": "buried (automatic)",
+          "saveEffect": "half damage"
+        },
+        {
+          "cost": 1,
+          "visualRangeFt": 20,
+          "hearingRangeFt": -20,
+          "penaltyShift": 2
+        },
+        {
+          "cost": 2,
+          "damage": "1d6",
+          "damageType": "stress",
+          "visualRangeFt": 40,
+          "hearingRangeFt": -40,
+          "penaltyShift": 4
+        },
+        {
+          "cost": 3,
+          "damage": "2d6",
+          "damageType": "flash, bang and stress",
+          "save": "Fort",
+          "dc": 10,
+          "condition": "sprawled",
+          "strikeDamage": "4d10+20",
+          "strikeDamageType": "electrical and fire",
+          "strikeTarget": "1 object or scenery within 100 ft.",
+          "visualRangeFt": 60,
+          "hearingRangeFt": -60,
+          "penaltyShift": 6
+        },
+        {
+          "cost": 4,
+          "damage": "3d6",
+          "damageType": "flash, bang and stress",
+          "save": "Fort",
+          "dc": 20,
+          "condition": "sprawled",
+          "strikeDamage": "4d10+20",
+          "strikeDamageType": "electrical and fire",
+          "strikeTarget": "1 character (also sprawled)",
+          "visualRangeFt": 80,
+          "hearingRangeFt": -80,
+          "penaltyShift": 8
+        },
+        {
+          "cost": 1,
+          "duration": "3d20 minutes",
+          "gallonsPerMinute": 1,
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "moderate"
+          }
+        },
+        {
+          "cost": 2,
+          "duration": "1d4 hours",
+          "gallonsPerMinute": 2,
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "heavy"
+          }
+        },
+        {
+          "cost": 3,
+          "duration": "2d4 hours",
+          "gallonsPerMinute": 3,
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "thunderstorm/snowstorm"
+          }
+        },
+        {
+          "cost": 4,
+          "duration": "3d4 hours",
+          "gallonsPerMinute": 4,
+          "escalation": [
+            {
+              "roll": "1d10",
+              "on": [
+                1,
+                1
+              ],
+              "becomes": "hurricane or blizzard"
+            },
+            {
+              "roll": "1d10",
+              "on": [
+                2,
+                2
+              ],
+              "becomes": "flash flood or flash freeze"
+            }
+          ]
+        },
+        {
+          "cost": null,
+          "damage": "3d6",
+          "damageType": "subdual",
+          "save": "Ref",
+          "dc": 15,
+          "condition": "sprawled",
+          "pushFt": "3d6 x 10",
+          "pushDamage": "1d6 lethal per 30 ft."
+        },
+        {
+          "cost": null,
+          "damage": "3d6",
+          "damageType": "cold",
+          "contagion": "cold"
+        },
+        {
+          "cost": null,
+          "duration": "3d4 hours",
+          "as": "Wind/Severe",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              4
+            ],
+            "becomes": "flash flood"
+          }
+        },
+        {
+          "cost": null,
+          "duration": "3d4 hours",
+          "as": "Wind/Strong",
+          "damage": "1d6",
+          "damageType": "cold",
+          "damageInterval": "hour",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              4
+            ],
+            "becomes": "flash freeze"
+          }
+        },
+        {
+          "cost": 1,
+          "duration": "1d6 hours",
+          "radius": "1/4 mile",
+          "damage": "1d6",
+          "damageType": "stress",
+          "rangeMultiplier": "3/4",
+          "save": "Fort",
+          "dc": 10,
+          "condition": "deafened",
+          "deafenedHoursAfter": "1d6",
+          "bombDice": 1,
+          "bombDamage": "1d10 fire and stress per action die"
+        },
+        {
+          "cost": 2,
+          "duration": "2d6 hours",
+          "radius": "1/2 mile",
+          "damage": "2d6",
+          "damageType": "stress",
+          "rangeMultiplier": "1/2",
+          "save": "Fort",
+          "dc": 15,
+          "condition": "deafened",
+          "deafenedHoursAfter": "2d6",
+          "bombDice": 2,
+          "bombDamage": "1d10 fire and stress per action die"
+        },
+        {
+          "cost": 3,
+          "duration": "3d6 hours",
+          "radius": "1 mile",
+          "damage": "3d6",
+          "damageType": "stress",
+          "rangeMultiplier": "1/4",
+          "save": "Fort",
+          "dc": 20,
+          "condition": "deafened",
+          "deafenedHoursAfter": "3d6",
+          "bombDice": null,
+          "bombDamage": "1d10 fire and stress per action die",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "poison gas"
+          }
+        },
+        {
+          "cost": 4,
+          "duration": "4d6 hours",
+          "radius": "2 miles",
+          "damage": "4d6",
+          "damageType": "stress",
+          "rangeMultiplier": null,
+          "save": null,
+          "dc": null,
+          "bombDice": 4,
+          "bombDamage": "1d10 fire and stress per action die",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "poison gas"
+          }
+        },
+        {
+          "cost": null,
+          "contagion": {
+            "primaryOnset": "1d4 rounds",
+            "primarySaveDC": 15,
+            "primaryEffect": "1d2 Con damage + fatigued",
+            "secondaryOnset": "1d4 minutes",
+            "secondarySaveDC": 20,
+            "secondaryEffect": "1d4 Con damage + fatigued"
+          }
+        },
+        {
+          "cost": 1,
+          "duration": "3d20 minutes",
+          "fireSpreadSavePenalty": -2,
+          "hurledAttackPenalty": -2,
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "moderate"
+          }
+        },
+        {
+          "cost": 2,
+          "duration": "1d4 hours",
+          "fireSpreadSavePenalty": -4,
+          "hurledAttackPenalty": -4,
+          "hearingPenalty": -4,
+          "speedFt": -5,
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "strong"
+          }
+        },
+        {
+          "cost": 3,
+          "duration": "2d4 hours",
+          "fireSpreadSavePenalty": -6,
+          "hurledAttackPenalty": -6,
+          "rangedAttackPenalty": -2,
+          "speedFt": -10,
+          "save": "Fort",
+          "dc": 15,
+          "condition": "sprawled",
+          "pushFt": "1d6 x 5",
+          "pushDamage": "1d6 lethal per 10 ft.",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "severe"
+          }
+        },
+        {
+          "cost": 4,
+          "duration": "3d4 hours",
+          "fireSpreadSavePenalty": -8,
+          "hurledAttackPenalty": -8,
+          "rangedAttackPenalty": -4,
+          "speedFt": -15,
+          "save": "Fort",
+          "dc": 20,
+          "condition": "sprawled",
+          "pushFt": "1d6 x 10",
+          "pushDamage": "1d6 lethal per 10 ft.",
+          "escalation": {
+            "roll": "1d10",
+            "on": [
+              1,
+              1
+            ],
+            "becomes": "dust storm or tornado"
+          }
+        },
+        {
+          "cost": null,
+          "duration": "3d4 hours",
+          "as": "Wind/Severe"
+        },
+        {
+          "cost": null,
+          "duration": "1d12 minutes",
+          "rangedAttackPenalty": -8,
+          "save": "Fort",
+          "dc": 30,
+          "withinFt": 100,
+          "heldRounds": "2d6",
+          "damage": "1d10",
+          "damageType": "lethal",
+          "damageInterval": "round",
+          "expelledMiles": "1d4",
+          "expelledHeightFt": "2d20+20"
+        }
+      ],
+      "notes": [
+        "* Intensity is as felt at the characters' location.",
+        "** Each character suffers the effect individually unless stated; separate groups in different areas need separate events.",
+        "† Some conditions add effects from Table 5.14: Vision and Hearing (p.350).",
+        "†† Slide zone = area the debris slides across; bury zone = area directly in the debris path.",
+        "Rows with cost \"—\" cannot be bought directly; they arise from the escalation rolls of other rows.",
+        "Earthquake through Rain/Snow are on p.401; Volcanic Eruption and Wind on p.402."
+      ]
+    },
+    "randomPossessionsNotes": {
+      "title": "Table 7.16: Random Possessions - footnotes",
+      "page": 460,
+      "columns": [
+        "Mark",
+        "Note"
+      ],
+      "rows": [
+        [
+          "*",
+          "Any category can also be used for a foil involved with that kind of NPC."
+        ],
+        [
+          "**",
+          "Civilian result 19: if implicated in violence against this civilian, the characters become Wanted (p.404)."
+        ]
+      ],
+      "notes": [
+        "GC rolls 1d20 on the sub-table for the NPC type; results are in addition to gear in the stat block."
+      ]
+    },
+    "exposureRules": {
+      "title": "Exposure rules (text, pp.435-436)",
+      "page": 435,
+      "columns": [
+        "Rule",
+        "Value"
+      ],
+      "rows": [
+        [
+          "Penalty applies",
+          "Immediately, each time a character commits a listed infraction; mission Reputation/Net Worth reward unaffected"
+        ],
+        [
+          "Infraction committed to prevent/stop an equal or worse infraction",
+          "1/2 listed penalty (rounded up)"
+        ],
+        [
+          "Critical objectives",
+          "First is free; +25 XP per additional; -50 XP if the mission has none"
+        ],
+        [
+          "Dramatic scenes",
+          "First is free; +100 XP per additional scripted; -50 XP if the mission has none"
+        ],
+        [
+          "Complication ignored/bypassed",
+          "Its XP reward is 1/2 (rounded up)"
+        ]
+      ],
+      "notes": []
+    },
+    "securityNotes": {
+      "title": "Table 7.9: Security Options - footnotes and general rules",
+      "page": 438,
+      "columns": [
+        "Mark",
+        "Note"
+      ],
+      "rows": [
+        [
+          "*",
+          "PR = device Power Rating, chosen by the GC unless another rule sets it."
+        ],
+        [
+          "**",
+          "Skill checks to avoid a sensor carry the Armor Check Penalty tag."
+        ],
+        [
+          "†",
+          "Breaking this lock does not open the portal/container; it only prevents further skill checks to open it."
+        ],
+        [
+          "††",
+          "Check gains a Computers synergy bonus when a computer is used to forge the access item."
+        ],
+        [
+          "∆",
+          "If a device is deliberately hidden, Detect DC = the hider's Stash Item (Scenery) result."
+        ],
+        [
+          "∆∆",
+          "Sensor trips automatically unless disabled (e.g. pressure plate at 20+ lbs.)."
+        ],
+        [
+          "Ω",
+          "Awareness bonus applies only to an automated eye; a remote human observer uses their own bonus."
+        ],
+        [
+          "ΩΩ",
+          "Tripwire: Reflex save DC 10 + PR. Laser tripwire: Reflex save DC 15 + PR."
+        ],
+        [
+          "§",
+          "Attacks 1 character in its area each round until disabled or out of ammunition; ranged weapons hold PR × 5 shots unless stated."
+        ],
+        [
+          "§§",
+          "Per die of explosive damage (maximum +10)."
+        ],
+        [
+          "∞",
+          "Effects apply after 1d4+1 rounds."
+        ],
+        [
+          "∞∞",
+          "PR multiplier doubles as range increment; error range 1, threat range = 1/2 PR rounded up (e.g. PR 5 = 18-20)."
+        ],
+        [
+          "◊",
+          "Rarely linked to locks or sensors; used to catch animals or people in the wild."
+        ],
+        [
+          "◊◊",
+          "Victim is caged; cage Damage save bonus PR × 3, Security/Disable DC 10 + (PR × 2)."
+        ]
+      ],
+      "notes": [
+        "XP for a device counts once per time the team must overcome it; identical duplicate devices on alternate entrances count once.",
+        "Devices are found with Notice/Awareness or Search/Perception vs. Detect DC and neutralized with Security/Disable vs. Disable DC.",
+        "A device that can be attacked has Defense equal to its Detect DC.",
+        "Traps with an attack bonus have error range 1 and threat range 20 and make a Standard Attack on whoever tripped the sensor; traps with a save DC deal 1/2 damage (rounded down) on a successful Reflex save.",
+        "Sensor Awareness checks are never subject to a result cap."
+      ]
+    }
+  },
+  "objectives": [
+    {
+      "category": "Crucial Skill Check",
+      "name": "Standard skill check (DC 10 + Threat Level); opposed check (skill bonus up to 1/2 highest in team)",
+      "grade": 1,
+      "xp": 25,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Crucial Skill Check",
+      "name": "Standard skill check (DC 15 + Threat Level); opposed check (skill bonus over 1/2 highest, up to highest in team)",
+      "grade": 2,
+      "xp": 50,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Crucial Skill Check",
+      "name": "Standard skill check (DC 20 + Threat Level); Complex Task (2-4 Challenges, DC 10 + Threat Level); opposed check (skill bonus over highest in team)",
+      "grade": 3,
+      "xp": 75,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Crucial Skill Check",
+      "name": "Standard skill check (DC 25 + Threat Level); Complex Task (5-7 Challenges, DC 15 + Threat Level); Dramatic Conflict (Lead 2-6, opposing bonus up to highest in team)",
+      "grade": 4,
+      "xp": 100,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Crucial Skill Check",
+      "name": "Complex Task (8-10 Challenges, DC 20 + Threat Level); Dramatic Conflict (Lead 7-10, opposing bonus over highest in team)",
+      "grade": 5,
+      "xp": 125,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Aid/Advise",
+      "name": "See a delicate but not very dangerous transaction through; help mediate a warmly contested point with a shaky ally",
+      "grade": 1,
+      "xp": 25,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Aid/Advise",
+      "name": "See a delicate and dangerous transaction through; help mediate a hotly contested point with a bitter enemy",
+      "grade": 2,
+      "xp": 50,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Aid/Advise",
+      "name": "Clear a character of minor crimes or mild slander; help root out a single well-placed mole",
+      "grade": 3,
+      "xp": 75,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Aid/Advise",
+      "name": "Clear a character of a single felony or severe slander; help root out a new or unstable mole network",
+      "grade": 4,
+      "xp": 100,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Aid/Advise",
+      "name": "Clear a character of multiple felonies; help root out an entrenched, well-informed mole network",
+      "grade": 5,
+      "xp": 125,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Acquire",
+      "name": "Recover a single obscure artifact; hijack a poorly armed civilian transport; steal a poorly defended object (owner interest mild)",
+      "grade": 1,
+      "xp": 25,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Acquire",
+      "name": "Recover several obscure artifacts lost under a year; hijack a well-armed private transport; steal a well-defended object (owner interest moderate)",
+      "grade": 2,
+      "xp": 50,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Acquire",
+      "name": "Recover many obscure artifacts lost up to a decade; hijack a well-armed government transport; steal an intensely defended object (owner interest moderate)",
+      "grade": 3,
+      "xp": 75,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Acquire",
+      "name": "Recover many obscure artifacts lost up to a century; hijack a well-armed villain transport; steal a well-defended object (owner interest fanatic)",
+      "grade": 4,
+      "xp": 100,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Acquire",
+      "name": "Recover many obscure artifacts lost for millennia; hijack several well-armed transports; steal an intensely defended object (owner interest fanatic)",
+      "grade": 5,
+      "xp": 125,
+      "page": 431,
+      "note": ""
+    },
+    {
+      "category": "Capture",
+      "name": "Arrest an unarmed but elusive minor criminal; abduct a civilian authority backing the enemy",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Capture",
+      "name": "Arrest an armed minor criminal; abduct a trained non-military authority backing the enemy",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Capture",
+      "name": "Arrest an armed felon; abduct a trained military authority backing the enemy",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Capture",
+      "name": "Arrest several armed felons; abduct a trained military combatant backing the enemy",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Capture",
+      "name": "Arrest a criminal mastermind; abduct several trained military combatants backing the enemy",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Confirm",
+      "name": "Verify one defined piece of information, or the motives of one unwitting character",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Confirm",
+      "name": "Verify several obviously linked, defined pieces of information, or motives of several obviously linked unwitting characters",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Confirm",
+      "name": "Verify several seemingly linked, poorly researched pieces of information, or motives of several seemingly linked unwitting characters",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Confirm",
+      "name": "Verify several seemingly unlinked, poorly researched pieces of information, or motives of several seemingly unlinked unwitting characters",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Confirm",
+      "name": "Verify several seemingly unlinked, unresearched pieces of information, or motives of several seemingly unlinked characters who know they are being evaluated",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Contain",
+      "name": "Contain 1 minor secret in a small group; cover up a minor botch in a sparsely populated area",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Contain",
+      "name": "Contain several minor secrets in a small group; cover up a minor botch in a well-populated area",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Contain",
+      "name": "Contain several minor secrets in a large group; cover up a moderate botch in a well-populated area",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Contain",
+      "name": "Contain several moderate secrets in a large group; cover up a major botch in a well-populated area",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Contain",
+      "name": "Contain one or more major secrets in a large group; cover up a publicized major botch",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Defend",
+      "name": "Defend 1 easily protected location or 1 attentive NPC vs. enemies with lower than recommended statistics",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Defend",
+      "name": "Defend 1 hard-to-protect location or 1 inattentive NPC vs. enemies with lower than recommended statistics",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Defend",
+      "name": "Defend 1 hard-to-protect location or 1 inattentive NPC vs. enemies with recommended statistics",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Defend",
+      "name": "Defend 1 easily protected location or 1 attentive NPC vs. enemies with higher than recommended statistics",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Defend",
+      "name": "Defend 1 hard-to-protect location or 1 inattentive NPC vs. enemies with higher than recommended statistics",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Destroy",
+      "name": "Destroy an undefended civilian location, or sabotage an undefended civilian vehicle or gear item",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Destroy",
+      "name": "Destroy a poorly defended civilian location, or sabotage a poorly defended civilian vehicle or gear item",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Destroy",
+      "name": "Destroy a well-defended civilian location, or sabotage a well-defended civilian vehicle or gear item",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Destroy",
+      "name": "Destroy a well-defended military location, or sabotage a well-defended military vehicle or gear item",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Destroy",
+      "name": "Destroy a well-defended villain location, or sabotage a well-defended villain vehicle or gear item",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Distract",
+      "name": "Keep 1 person from noticing a quiet incident",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Distract",
+      "name": "Keep 1 person from noticing a noisy incident",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Distract",
+      "name": "Keep several people from noticing a quiet incident",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Distract",
+      "name": "Keep several people from noticing a noisy incident",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Distract",
+      "name": "Keep everyone from noticing an obvious incident",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Evade",
+      "name": "Escape or avoid capture by an inferior force in familiar territory",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Evade",
+      "name": "Escape or avoid capture by an inferior force in unfamiliar territory",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Evade",
+      "name": "Escape or avoid capture by an equal force in unfamiliar territory",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Evade",
+      "name": "Escape or avoid capture by a superior force in unfamiliar territory",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Evade",
+      "name": "Escape or avoid capture by a superior force in enemy territory",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Infiltrate",
+      "name": "Infiltrate an undefended civilian location",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Infiltrate",
+      "name": "Infiltrate a poorly defended civilian location",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Infiltrate",
+      "name": "Infiltrate a well-defended civilian location",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Infiltrate",
+      "name": "Infiltrate a well-defended military location",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Infiltrate",
+      "name": "Infiltrate a well-defended villain location",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Investigate",
+      "name": "1 clue, minor research, or a minutes-long search or scouting mission",
+      "grade": 1,
+      "xp": 25,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Investigate",
+      "name": "2-4 clues, 1 simple puzzle, moderate research, or an hour-long search or scouting mission",
+      "grade": 2,
+      "xp": 50,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Investigate",
+      "name": "5-6 clues, 1 tricky puzzle, extensive research, or an hours-long search or scouting mission",
+      "grade": 3,
+      "xp": 75,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Investigate",
+      "name": "7-9 clues, 1 complicated puzzle, exhaustive research, or a day-long search or scouting mission",
+      "grade": 4,
+      "xp": 100,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Investigate",
+      "name": "10 clues, 1 nearly impossible puzzle, impeccable research, or a days-long search or scouting mission",
+      "grade": 5,
+      "xp": 125,
+      "page": 432,
+      "note": ""
+    },
+    {
+      "category": "Neutralize",
+      "name": "Liquidate or force-retire a civilian authority",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Neutralize",
+      "name": "Liquidate or force-retire a trained non-military authority or several civilian authorities",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Neutralize",
+      "name": "Liquidate or force-retire a trained military authority or several trained non-military authorities",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Neutralize",
+      "name": "Liquidate or force-retire a trained military combatant or several trained military authorities",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Neutralize",
+      "name": "Liquidate or force-retire several trained military combatants",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Observe",
+      "name": "Detect 1 activity at a busy/easy-to-navigate location with heavy concealment",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Observe",
+      "name": "Detect 1 activity at a quiet/hard-to-navigate location with moderate concealment; or 2+ activities at a busy/easy location with heavy concealment",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Observe",
+      "name": "Detect 1 activity at a silent/near-impossible location with little or no concealment; or 2+ activities at a quiet/hard location with moderate concealment",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Observe",
+      "name": "Detect 1 activity while evading enemy surveillance or guards; or 2+ activities at a silent/near-impossible location with little or no concealment",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Observe",
+      "name": "Detect 2+ activities while evading enemy surveillance or guards",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Recruit",
+      "name": "Convince an uninvolved, reticent NPC to join a cause with no obvious risk",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Recruit",
+      "name": "Convince an uninvolved, opposed NPC to join a cause with no obvious risk",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Recruit",
+      "name": "Convince an uninvolved NPC to join a cause with minor risk; or an enemy to betray weak masters",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Recruit",
+      "name": "Convince an uninvolved NPC to join a cause with moderate risk; or an enemy to betray strong masters",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Recruit",
+      "name": "Convince an uninvolved NPC to join a cause with major risk; or an enemy to betray fearsome masters",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Repair",
+      "name": "Fix a simple object with a short time frame or under enemy fire",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Repair",
+      "name": "Fix a simple object with a short time frame and under enemy fire",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Repair",
+      "name": "Fix a complex object with a short time frame or under enemy fire",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Repair",
+      "name": "Fix a complex object with a short time frame and under enemy fire",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Repair",
+      "name": "Fix several complex objects with a short time frame and under threatening enemy fire",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Rescue",
+      "name": "Rescue 1 uninjured character or salvage 1 undamaged vehicle/item from minor environmental danger or enemies with lower than recommended statistics",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Rescue",
+      "name": "Rescue 1 slightly injured character or salvage 1 slightly damaged vehicle/item from minor environmental danger or enemies with lower than recommended statistics",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Rescue",
+      "name": "Rescue 1 moderately injured character or salvage 1 moderately damaged vehicle/item from moderate environmental danger or enemies with recommended statistics",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Rescue",
+      "name": "Rescue 1 moderately injured character or salvage 1 moderately damaged vehicle/item from moderate environmental danger or enemies with higher than recommended statistics",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Rescue",
+      "name": "Rescue 1 severely injured character or salvage 1 highly damaged vehicle/item from major environmental danger or enemies with higher than recommended statistics",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Sting",
+      "name": "Execute a thorough pre-planned operation targeting 1 mark",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Sting",
+      "name": "Execute a shaky pre-planned operation targeting 1 mark; or concoct and execute an original plan targeting 1 mark",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Sting",
+      "name": "Execute a crazy pre-planned operation targeting 1 mark; or concoct and execute an original plan targeting 2+ marks",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Sting",
+      "name": "Concoct and execute an original plan targeting 2+ marks in short time or with few resources",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Sting",
+      "name": "Concoct and execute an original plan targeting 2+ marks in short time and with few resources",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Test",
+      "name": "Intentionally test gear with unexpected but non-threatening side effects",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Test",
+      "name": "Intentionally test gear with side effects that threaten the user",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Test",
+      "name": "Intentionally test gear with side effects that threaten the whole team; or unwittingly test gear with unexpected but non-threatening side effects",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Test",
+      "name": "Unwittingly test gear with side effects that threaten the user",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Test",
+      "name": "Unwittingly test gear with side effects that threaten the whole team",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Transport",
+      "name": "Publicly move an easily carried item/information a short distance with little danger",
+      "grade": 1,
+      "xp": 25,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Transport",
+      "name": "Publicly move an easily carried item/information a moderate distance with mild danger; or secretly a short distance with little danger",
+      "grade": 2,
+      "xp": 50,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Transport",
+      "name": "Publicly move a difficult-to-carry item/information a moderate distance with mild danger; or secretly move an easily carried one a moderate distance with mild danger",
+      "grade": 3,
+      "xp": 75,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Transport",
+      "name": "Publicly move an easily carried item/information a great distance with substantial danger; or secretly move a difficult-to-carry one a moderate distance with mild danger",
+      "grade": 4,
+      "xp": 100,
+      "page": 433,
+      "note": ""
+    },
+    {
+      "category": "Transport",
+      "name": "Publicly move a difficult-to-carry item/information a great distance with substantial danger; or secretly move any item/information a great distance with substantial danger",
+      "grade": 5,
+      "xp": 125,
+      "page": 433,
+      "note": ""
+    }
+  ],
+  "exposure": [
+    {
+      "id": "adhere-to-honor-code",
+      "objective": "Adhere to Honor Code",
+      "page": 436,
+      "xp": 0,
+      "xpPrinted": "+0",
+      "note": "Footnoted as recommended for all missions in all games.",
+      "infractions": [
+        {
+          "name": "Character steals from any bystander",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Character intentionally allows bystanders or responsibilities to be harmed/damaged, captured, or killed/destroyed",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character intentionally harms/damages bystanders or responsibilities",
+          "reputation": -6,
+          "netWorth": -300000
+        },
+        {
+          "name": "Character intentionally allows someone to use brutal force (e.g. mutilation, torture)",
+          "reputation": -8,
+          "netWorth": -400000
+        },
+        {
+          "name": "Character intentionally kills/destroys bystanders or responsibilities",
+          "reputation": -10,
+          "netWorth": -500000
+        },
+        {
+          "name": "Character intentionally uses brutal force for any reason",
+          "reputation": -10,
+          "netWorth": -500000
+        }
+      ]
+    },
+    {
+      "id": "avoid-incidents",
+      "objective": "Avoid \"Incidents\"",
+      "page": 436,
+      "xp": 25,
+      "xpPrinted": "+25",
+      "note": "",
+      "infractions": [
+        {
+          "name": "Character responsible for isolated incident (e.g. public brawl, rumors on a sensitive topic)",
+          "reputation": -1,
+          "netWorth": -50000
+        },
+        {
+          "name": "Character responsible for localized incident (e.g. wanted (1 action die), gang battle, college newspaper story)",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Character responsible for citywide incident (e.g. wanted (2 action dice), gang war, city newspaper story)",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character responsible for national incident (e.g. wanted (3 action dice), military battle, national newspaper story)",
+          "reputation": -6,
+          "netWorth": -300000
+        },
+        {
+          "name": "Character responsible for international incident (e.g. wanted (4 action dice), military war, international newspaper story)",
+          "reputation": -8,
+          "netWorth": -400000
+        }
+      ]
+    },
+    {
+      "id": "avoid-noise",
+      "objective": "Avoid \"Noise\"",
+      "page": 436,
+      "xp": 50,
+      "xpPrinted": "+50",
+      "note": "",
+      "infractions": [
+        {
+          "name": "Suspicious activity noticed by up to 10 people",
+          "reputation": -1,
+          "netWorth": -50000
+        },
+        {
+          "name": "Suspicious activity noticed by 11–100 people",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Suspicious activity noticed by 100–500 people",
+          "reputation": -3,
+          "netWorth": -150000
+        },
+        {
+          "name": "Suspicious activity noticed by 501–1,000 people",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Suspicious activity noticed by 1,001+ people",
+          "reputation": -6,
+          "netWorth": -300000
+        },
+        {
+          "name": "Suspicious activity recorded by civilian",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Suspicious activity recorded by college or city news agency",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Suspicious activity recorded by national or international news agency",
+          "reputation": -6,
+          "netWorth": -300000
+        },
+        {
+          "name": "Character draws a Small or smaller weapon in public",
+          "reputation": -1,
+          "netWorth": -50000
+        },
+        {
+          "name": "Character draws a Medium or smaller weapon in public",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Character draws a Large or bigger weapon in public",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character attacks with a 1-handed melee weapon in public's visual or hearing range",
+          "reputation": 0,
+          "netWorth": 0
+        },
+        {
+          "name": "Character attacks with a 2-handed melee weapon, or any ranged weapon, in public's visual or hearing range",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character attacks with an explosive or tactical weapon in public's visual or hearing range",
+          "reputation": -8,
+          "netWorth": -400000
+        },
+        {
+          "name": "Character breaks or destroys public vehicle or item of up to Large size",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character breaks or destroys public building or item of Huge or bigger size",
+          "reputation": -8,
+          "netWorth": -400000
+        }
+      ]
+    },
+    {
+      "id": "complete-critical-objective-complication",
+      "objective": "Complete Critical Objective (Complication)",
+      "page": 436,
+      "xp": 25,
+      "xpPrinted": "+25 per add. objective",
+      "note": "XP is +25 per critical objective beyond the first; the first is free, and a mission with none loses 50 XP (p.435).",
+      "infractions": [
+        {
+          "name": "Character fails to complete Grade I mission objective",
+          "reputation": -1,
+          "netWorth": -50000
+        },
+        {
+          "name": "Character fails to complete Grade II mission objective",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Character fails to complete Grade III mission objective",
+          "reputation": -3,
+          "netWorth": -100000
+        },
+        {
+          "name": "Character fails to complete Grade IV mission objective",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character fails to complete Grade V mission objective",
+          "reputation": -5,
+          "netWorth": -250000
+        }
+      ]
+    },
+    {
+      "id": "cooperation-with-others",
+      "objective": "Cooperation With Others",
+      "page": 436,
+      "xp": 0,
+      "xpPrinted": "+0",
+      "note": "Footnoted as recommended for all missions in all games.",
+      "infractions": [
+        {
+          "name": "Character betrays assigned teammate",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Character attacks assigned teammate",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character refuses assignment from Faction or Freelance network",
+          "reputation": -5,
+          "netWorth": -250000
+        },
+        {
+          "name": "Character betrays Faction or Freelance network",
+          "reputation": -10,
+          "netWorth": -500000
+        },
+        {
+          "name": "Character attacks Faction or Freelance network",
+          "reputation": -15,
+          "netWorth": -750000
+        }
+      ]
+    },
+    {
+      "id": "maintain-anonymity",
+      "objective": "Maintain Anonymity",
+      "page": 436,
+      "xp": 25,
+      "xpPrinted": "+25",
+      "note": "Infraction list continues on p.437.",
+      "infractions": [
+        {
+          "name": "Character identified by up to 10 people",
+          "reputation": -2,
+          "netWorth": -100000
+        },
+        {
+          "name": "Character identified by 11–100 people",
+          "reputation": -4,
+          "netWorth": -200000
+        },
+        {
+          "name": "Character identified by 100–500 people",
+          "reputation": -6,
+          "netWorth": -300000
+        },
+        {
+          "name": "Character identified by 501–1,000 people",
+          "reputation": -8,
+          "netWorth": -400000
+        },
+        {
+          "name": "Character identified by 1,001+ people",
+          "reputation": -10,
+          "netWorth": -500000
+        },
+        {
+          "name": "Character identified by enemy operative",
+          "reputation": -12,
+          "netWorth": -600000
+        },
+        {
+          "name": "Character identified by enemy organization or nation",
+          "reputation": -15,
+          "netWorth": -750000,
+          "page": 437
+        },
+        {
+          "name": "Character linked to suspicious activity",
+          "reputation": -4,
+          "netWorth": -200000,
+          "page": 437
+        },
+        {
+          "name": "Character linked to criminal activity",
+          "reputation": -8,
+          "netWorth": -400000,
+          "page": 437
+        },
+        {
+          "name": "Character responsible for teammate being identified",
+          "reputation": -2,
+          "netWorth": -100000,
+          "page": 437
+        },
+        {
+          "name": "Character responsible for teammate being linked to suspicious activity",
+          "reputation": -4,
+          "netWorth": -200000,
+          "page": 437
+        },
+        {
+          "name": "Character responsible for teammate being linked to criminal activity",
+          "reputation": -6,
+          "netWorth": -300000,
+          "page": 437
+        },
+        {
+          "name": "Character responsible for Faction or Freelance network being identified",
+          "reputation": -5,
+          "netWorth": -250000,
+          "page": 437
+        },
+        {
+          "name": "Character responsible for organization being linked to suspicious activity",
+          "reputation": -10,
+          "netWorth": -500000,
+          "page": 437
+        },
+        {
+          "name": "Character responsible for organization being linked to criminal activity",
+          "reputation": -15,
+          "netWorth": -750000,
+          "page": 437
+        },
+        {
+          "name": "Character allows prototype or unique item to fall into enemy hands",
+          "reputation": -5,
+          "netWorth": -250000,
+          "page": 437
+        },
+        {
+          "name": "Character leaves minor evidence of presence (e.g. issued shell casings; rental under cover identity with Power Rating +1 to +4)",
+          "reputation": -2,
+          "netWorth": -100000,
+          "page": 437
+        },
+        {
+          "name": "Character leaves moderate evidence of presence (e.g. issued weapon; rental under cover identity with Power Rating +5 to +8)",
+          "reputation": -4,
+          "netWorth": -200000,
+          "page": 437
+        },
+        {
+          "name": "Character leaves major evidence of presence (e.g. issued vehicle; rental without cover identity)",
+          "reputation": -8,
+          "netWorth": -400000,
+          "page": 437
+        },
+        {
+          "name": "Character incarcerated for minor crime",
+          "reputation": -10,
+          "netWorth": -500000,
+          "page": 437
+        },
+        {
+          "name": "Character incarcerated for felony",
+          "reputation": -15,
+          "netWorth": -750000,
+          "page": 437
+        }
+      ]
+    }
+  ],
+  "gearRestrictions": [
+    {
+      "id": "minus-1-gear-pick-players-choice",
+      "name": "-1 gear pick (player’s choice)",
+      "xp": 25,
+      "page": 437,
+      "summary": "Each character loses 1 mission gear pick, chosen by the player.",
+      "data": {
+        "picks": -1,
+        "chooser": "player"
+      }
+    },
+    {
+      "id": "minus-1-gear-pick-gcs-choice",
+      "name": "-1 gear pick (GC’s choice)",
+      "xp": 50,
+      "page": 437,
+      "summary": "Each character loses 1 mission gear pick, chosen by the GC.",
+      "data": {
+        "picks": -1,
+        "chooser": "gc"
+      }
+    },
+    {
+      "id": "minus-2-gear-picks-players-choice",
+      "name": "-2 gear picks (player’s choice)",
+      "xp": 75,
+      "page": 437,
+      "summary": "Each character loses 2 mission gear picks, chosen by the player.",
+      "data": {
+        "picks": -2,
+        "chooser": "player"
+      }
+    },
+    {
+      "id": "minus-2-gear-picks-gcs-choice",
+      "name": "-2 gear picks (GC’s choice)",
+      "xp": 100,
+      "page": 437,
+      "summary": "Each character loses 2 mission gear picks, chosen by the GC.",
+      "data": {
+        "picks": -2,
+        "chooser": "gc"
+      }
+    },
+    {
+      "id": "minus-3-gear-picks-players-choice",
+      "name": "-3 gear picks (player’s choice)",
+      "xp": 125,
+      "page": 437,
+      "summary": "Each character loses 3 mission gear picks, chosen by the player.",
+      "data": {
+        "picks": -3,
+        "chooser": "player"
+      }
+    },
+    {
+      "id": "minus-3-gear-picks-gcs-choice",
+      "name": "-3 gear picks (GC’s choice)",
+      "xp": 150,
+      "page": 437,
+      "summary": "Each character loses 3 mission gear picks, chosen by the GC.",
+      "data": {
+        "picks": -3,
+        "chooser": "gc"
+      }
+    },
+    {
+      "id": "restricted-weapon-options",
+      "name": "Restricted weapon options (12 specific weapons available, chosen by GC)",
+      "xp": 75,
+      "page": 437,
+      "summary": "Weapon picks limited to a GC-chosen list of 12 specific weapons.",
+      "data": {
+        "category": "weapons",
+        "allowed": 12
+      }
+    },
+    {
+      "id": "restricted-gadget-options",
+      "name": "Restricted gadget options (12 specific Mechanisms available, chosen by GC)",
+      "xp": 75,
+      "page": 437,
+      "summary": "Gadget picks limited to a GC-chosen list of 12 specific Mechanisms.",
+      "data": {
+        "category": "gadgets",
+        "allowed": 12
+      }
+    }
+  ],
+  "security": [
+    {
+      "id": "badge-card-strip-reader",
+      "name": "Badge/card/strip reader",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 2",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR)",
+      "bypass": "Security/Disable or Falsify/Forgery DC 10 + (PR × 2)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable or Falsify/Forgery",
+      "openDC": "10 + (PR × 2)",
+      "breakingOpens": false,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 2); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
+      "raw": {
+        "Lock": "Badge/card/strip reader",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR) †",
+        "Open Skill*": "Security/Disable or Falsify/Forgery ††",
+        "Open DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 2"
+      }
+    },
+    {
+      "id": "car-door-lock",
+      "name": "Car door lock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 3",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 2)",
+      "bypass": "Security/Disable DC 10 + (PR × 2)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 2)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 2).",
+      "raw": {
+        "Lock": "Car door lock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 2)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 3"
+      }
+    },
+    {
+      "id": "combination-lock",
+      "name": "Combination lock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 2",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 2)",
+      "bypass": "Security/Disable DC 10 + (PR × 2)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 2)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 2).",
+      "raw": {
+        "Lock": "Combination lock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 2)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 2"
+      }
+    },
+    {
+      "id": "dead-bolt-lock",
+      "name": "Dead bolt lock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 3)",
+      "bypass": "Security/Disable DC 10 + (PR × 3)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 3)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 3).",
+      "raw": {
+        "Lock": "Dead bolt lock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 3)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "door-hinge",
+      "name": "Door hinge",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 1",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 2)",
+      "bypass": "Security/Disable DC 10 + (PR × 1)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 1)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 1); Damage save +(PR × 2).",
+      "raw": {
+        "Lock": "Door hinge",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 2)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 1)",
+        "XP Reward*": "PR × 1"
+      }
+    },
+    {
+      "id": "electronic-keypad-lock",
+      "name": "Electronic keypad lock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 2",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR)",
+      "bypass": "Security/Disable DC 10 + (PR × 2)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 2)",
+      "breakingOpens": false,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks.",
+      "raw": {
+        "Lock": "Electronic keypad lock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR) †",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 2"
+      }
+    },
+    {
+      "id": "finger-palm-print-scanner",
+      "name": "Finger/palm print scanner",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR)",
+      "bypass": "Security/Disable or Falsify/Forgery DC 10 + (PR × 3)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable or Falsify/Forgery",
+      "openDC": "10 + (PR × 3)",
+      "breakingOpens": false,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 3); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
+      "raw": {
+        "Lock": "Finger/palm print scanner",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR) †",
+        "Open Skill*": "Security/Disable or Falsify/Forgery ††",
+        "Open DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "maglock",
+      "name": "Maglock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 7",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 3)",
+      "bypass": "Security/Disable DC 10 + (PR × 3)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 3)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 3).",
+      "raw": {
+        "Lock": "Maglock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 3)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 7"
+      }
+    },
+    {
+      "id": "padlock",
+      "name": "Padlock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 1",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 2)",
+      "bypass": "Security/Disable DC 10 + (PR × 1)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 1)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 1); Damage save +(PR × 2).",
+      "raw": {
+        "Lock": "Padlock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 2)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 1)",
+        "XP Reward*": "PR × 1"
+      }
+    },
+    {
+      "id": "puzzle-box",
+      "name": "Puzzle box",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 2)",
+      "bypass": "Analysis (Int) DC 10 + (PR × 4)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Analysis (Int)",
+      "openDC": "10 + (PR × 4)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Analysis (Int) against DC 10 + (PR × 4); Damage save +(PR × 2).",
+      "raw": {
+        "Lock": "Puzzle box",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 2)",
+        "Open Skill*": "Analysis (Int)",
+        "Open DC*": "10 + (PR × 4)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "retinal-dna-scanner",
+      "name": "Retinal/DNA scanner",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR)",
+      "bypass": "Security/Disable or Falsify/Forgery DC 10 + (PR × 5)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable or Falsify/Forgery",
+      "openDC": "10 + (PR × 5)",
+      "breakingOpens": false,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 5); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
+      "raw": {
+        "Lock": "Retinal/DNA scanner",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR) †",
+        "Open Skill*": "Security/Disable or Falsify/Forgery ††",
+        "Open DC*": "10 + (PR × 5)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "safe-lock",
+      "name": "Safe lock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 7",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 4)",
+      "bypass": "Security/Disable DC 10 + (PR × 3)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 3)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 3); Damage save +(PR × 4).",
+      "raw": {
+        "Lock": "Safe lock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 4)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 7"
+      }
+    },
+    {
+      "id": "signature-analyzer",
+      "name": "Signature analyzer",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR)",
+      "bypass": "Security/Disable or Falsify/Forgery DC 10 + (PR × 3)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable or Falsify/Forgery",
+      "openDC": "10 + (PR × 3)",
+      "breakingOpens": false,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable or Falsify/Forgery against DC 10 + (PR × 3); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks. Forgery route gets a Computers synergy bonus when a computer forges the access item.",
+      "raw": {
+        "Lock": "Signature analyzer",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR) †",
+        "Open Skill*": "Security/Disable or Falsify/Forgery ††",
+        "Open DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "tumbler-lock",
+      "name": "Tumbler lock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 3",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 3)",
+      "bypass": "Security/Disable DC 10 + (PR × 2)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 2)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 2); Damage save +(PR × 3).",
+      "raw": {
+        "Lock": "Tumbler lock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 3)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 3"
+      }
+    },
+    {
+      "id": "vault-lock",
+      "name": "Vault lock",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 10",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR × 5)",
+      "bypass": "Security/Disable DC 10 + (PR × 5)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable",
+      "openDC": "10 + (PR × 5)",
+      "breakingOpens": true,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable against DC 10 + (PR × 5); Damage save +(PR × 5).",
+      "raw": {
+        "Lock": "Vault lock",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR × 5)",
+        "Open Skill*": "Security/Disable",
+        "Open DC*": "10 + (PR × 5)",
+        "XP Reward*": "PR × 10"
+      }
+    },
+    {
+      "id": "voice-print-scanner",
+      "name": "Voice print scanner",
+      "kind": "lock",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": null,
+      "disableDC": null,
+      "damageSave": "+(PR)",
+      "bypass": "Security/Disable or Bluff/Deception DC 10 + (PR × 4)",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 portal or container",
+      "openSkill": "Security/Disable or Bluff/Deception",
+      "openDC": "10 + (PR × 4)",
+      "breakingOpens": false,
+      "summary": "Secures 1 portal or container. Opened with Security/Disable or Bluff/Deception against DC 10 + (PR × 4); Damage save +(PR). Breaking it does not open the portal, it only blocks further open checks.",
+      "raw": {
+        "Lock": "Voice print scanner",
+        "Target Area*": "1 portal or container",
+        "Damage Save Bonus*": "+(PR)†",
+        "Open Skill*": "Security/Disable or Bluff/Deception",
+        "Open DC*": "10 + (PR × 4)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "chemical-sniffer",
+      "name": "Chemical sniffer",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "PR × 5 ft. radius",
+      "autoTrigger": true,
+      "autoDetected": false,
+      "summary": "Covers PR × 5 ft. radius. Trips automatically unless disabled. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "Chemical sniffer",
+        "Target Area*": "PR × 5 ft. radius",
+        "Awareness Bonus*": "None ∆∆",
+        "Opposed Skill**": "None ∆∆",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "circuit-wires-embedded",
+      "name": "Circuit wires (embedded)",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 4)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 window or door",
+      "autoTrigger": true,
+      "autoDetected": false,
+      "summary": "Covers 1 window or door. Trips automatically unless disabled. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 4).",
+      "raw": {
+        "Sensor": "Circuit wires (embedded)",
+        "Target Area*": "1 window or door",
+        "Awareness Bonus*": "None ∆∆",
+        "Opposed Skill**": "None ∆∆",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 4)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "contact-plate",
+      "name": "Contact plate",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 lock",
+      "autoTrigger": true,
+      "autoDetected": false,
+      "summary": "Covers 1 lock. Trips automatically unless disabled. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Sensor": "Contact plate",
+        "Target Area*": "1 lock",
+        "Awareness Bonus*": "None ∆∆",
+        "Opposed Skill**": "None ∆∆",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "heat-sensor",
+      "name": "Heat sensor",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 10",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "PR × 5 ft. radius",
+      "autoTrigger": true,
+      "autoDetected": false,
+      "summary": "Covers PR × 5 ft. radius. Trips automatically unless disabled. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "Heat sensor",
+        "Target Area*": "PR × 5 ft. radius",
+        "Awareness Bonus*": "None ∆∆",
+        "Opposed Skill**": "None ∆∆",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 10"
+      }
+    },
+    {
+      "id": "metal-detector",
+      "name": "Metal detector",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": null,
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 entry point",
+      "autoTrigger": true,
+      "autoDetected": true,
+      "summary": "Covers 1 entry point. Trips automatically unless disabled. Obvious, no check to detect; Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "Metal detector",
+        "Target Area*": "1 entry point",
+        "Awareness Bonus*": "None ∆∆",
+        "Opposed Skill**": "None ∆∆",
+        "Detect DC*∆": "None (automatic)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "motion-sensor",
+      "name": "Motion sensor",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": "+(PR × 2)",
+      "opposedBy": "Acrobatics (Dex)",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "PR × 25 ft. cone",
+      "autoTrigger": false,
+      "autoDetected": false,
+      "summary": "Covers PR × 25 ft. cone. Awareness +(PR × 2) opposed by the intruder's Acrobatics (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "Motion sensor",
+        "Target Area*": "PR × 25 ft. cone",
+        "Awareness Bonus*": "+(PR × 2)",
+        "Opposed Skill**": "Acrobatics (Dex)",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "noise-sensor",
+      "name": "Noise sensor",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": "+(PR × 3)",
+      "opposedBy": "Blend (Dex) or Sneak (Dex)",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "PR × 10 ft. radius",
+      "autoTrigger": false,
+      "autoDetected": false,
+      "summary": "Covers PR × 10 ft. radius. Awareness +(PR × 3) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "Noise sensor",
+        "Target Area*": "PR × 10 ft. radius",
+        "Awareness Bonus*": "+(PR × 3)",
+        "Opposed Skill**": "Blend (Dex) or Sneak (Dex)",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "pressure-plate",
+      "name": "Pressure plate",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 4)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "(PR) 5-ft. squares",
+      "autoTrigger": true,
+      "autoDetected": false,
+      "summary": "Covers (PR) 5-ft. squares. Trips automatically unless disabled. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 4).",
+      "raw": {
+        "Sensor": "Pressure plate",
+        "Target Area*": "(PR) 5-ft. squares",
+        "Awareness Bonus*": "None ∆∆",
+        "Opposed Skill**": "None ∆∆",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 4)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "tripwire",
+      "name": "Tripwire",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "Reflex save DC 10 + PR",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "(PR) 5-ft. squares in a line",
+      "autoTrigger": false,
+      "autoDetected": false,
+      "summary": "Covers (PR) 5-ft. squares in a line. Avoided with a Reflex save DC 10 + PR. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Sensor": "Tripwire",
+        "Target Area*": "(PR) 5-ft. squares in a line",
+        "Awareness Bonus*": "—",
+        "Opposed Skill**": "Special ΩΩ",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "tripwire-laser",
+      "name": "Tripwire, laser",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "Reflex save DC 15 + PR",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "(PR × 2) 5-ft. squares in a line",
+      "autoTrigger": false,
+      "autoDetected": false,
+      "summary": "Covers (PR × 2) 5-ft. squares in a line. Avoided with a Reflex save DC 15 + PR. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "Tripwire, laser",
+        "Target Area*": "(PR × 2) 5-ft. squares in a line",
+        "Awareness Bonus*": "—",
+        "Opposed Skill**": "Special ΩΩ",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "vibration-sensor",
+      "name": "Vibration sensor",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": "+(PR × 4)",
+      "opposedBy": "Blend (Dex) or Sneak (Dex)",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "PR × 5 ft. radius",
+      "autoTrigger": false,
+      "autoDetected": false,
+      "summary": "Covers PR × 5 ft. radius. Awareness +(PR × 4) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "Vibration sensor",
+        "Target Area*": "PR × 5 ft. radius",
+        "Awareness Bonus*": "+(PR × 4)",
+        "Opposed Skill**": "Blend (Dex) or Sneak (Dex)",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "video-camera",
+      "name": "Video camera",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": "+(PR × 2)",
+      "opposedBy": "Blend (Dex) or Sneak (Dex)",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "PR × 25 ft. cone",
+      "autoTrigger": false,
+      "autoDetected": false,
+      "summary": "Covers PR × 25 ft. cone. Awareness +(PR × 2) opposed by the intruder's Blend (Dex) or Sneak (Dex) (Armor Check Penalty applies). Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3). Awareness bonus is for an automated eye; a human watching the feed uses their own bonus.",
+      "raw": {
+        "Sensor": "Video camera Ω",
+        "Target Area*": "PR × 25 ft. cone",
+        "Awareness Bonus*": "+(PR × 2)",
+        "Opposed Skill**": "Blend (Dex) or Sneak (Dex)",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "x-ray-checkpoint",
+      "name": "X-ray checkpoint",
+      "kind": "sensor",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": null,
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 entry point",
+      "autoTrigger": true,
+      "autoDetected": true,
+      "summary": "Covers 1 entry point. Trips automatically unless disabled. Obvious, no check to detect; Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Sensor": "X-ray checkpoint",
+        "Target Area*": "1 entry point",
+        "Awareness Bonus*": "None ∆∆",
+        "Opposed Skill**": "None ∆∆",
+        "Detect DC*∆": "None (automatic)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "acid-jet",
+      "name": "Acid jet",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 10",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "10 + PR",
+      "damage": "(PR)d6 acid",
+      "repeats": false,
+      "targetArea": "(PR) ft. (min. 5 ft.)",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": true,
+      "summary": "Area/range: (PR) ft. (min. 5 ft.). Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d6 acid. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Acid jet",
+        "Target Area/Range*": "(PR) ft. (min. 5 ft.) ∞∞",
+        "Attack Bonus/Save DC*": "DC 10 + PR",
+        "Damage*": "(PR)d6 acid",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 10"
+      }
+    },
+    {
+      "id": "automated-weapon-explosive",
+      "name": "Automated weapon, explosive",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "per explosive",
+      "damage": "Per explosive",
+      "repeats": false,
+      "targetArea": "Per Blast (see page 343)",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Per Blast (see page 343). Reflex save DC per explosive for half damage (rounded down). Damage: Per explosive. XP is per die of explosive damage (max +10). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Automated weapon, explosive",
+        "Target Area/Range*": "Per Blast (see page 343)",
+        "Attack Bonus/Save DC*": "DC per explosive",
+        "Damage*": "Per explosive",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8 §§"
+      }
+    },
+    {
+      "id": "automated-weapon-handgun",
+      "name": "Automated weapon, handgun",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 5",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": "+(PR × 2)",
+      "saveDC": null,
+      "damage": "Per weapon",
+      "repeats": true,
+      "targetArea": "Per weapon",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Automated weapon, handgun",
+        "Target Area/Range*": "Per weapon",
+        "Attack Bonus/Save DC*": "+(PR × 2) §",
+        "Damage*": "Per weapon",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 5"
+      }
+    },
+    {
+      "id": "automated-weapon-rifle",
+      "name": "Automated weapon, rifle",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": "+(PR × 2)",
+      "saveDC": null,
+      "damage": "Per weapon",
+      "repeats": true,
+      "targetArea": "Per weapon",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Automated weapon, rifle",
+        "Target Area/Range*": "Per weapon",
+        "Attack Bonus/Save DC*": "+(PR × 2) §",
+        "Damage*": "Per weapon",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "automated-weapon-tactical",
+      "name": "Automated weapon, tactical",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 10",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": "+(PR × 2)",
+      "saveDC": null,
+      "damage": "Per weapon",
+      "repeats": true,
+      "targetArea": "Per weapon",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Per weapon. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per weapon. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Automated weapon, tactical",
+        "Target Area/Range*": "Per weapon",
+        "Attack Bonus/Save DC*": "+(PR × 2) §",
+        "Damage*": "Per weapon",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 10"
+      }
+    },
+    {
+      "id": "bear-trap",
+      "name": "Bear trap",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "10 + PR",
+      "damage": "(PR)d4 lethal",
+      "repeats": false,
+      "targetArea": "1 square",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: 1 square. Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d4 lethal. Usually set in the wild rather than linked to locks or sensors. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Bear trap ◊",
+        "Target Area/Range*": "1 square",
+        "Attack Bonus/Save DC*": "DC 10 + PR",
+        "Damage*": "(PR)d4 lethal",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "cage-trap",
+      "name": "Cage trap",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "10 + PR",
+      "damage": "",
+      "repeats": false,
+      "targetArea": "1 square",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: 1 square. Reflex save DC 10 + PR for half damage (rounded down). No damage; victim is caged (cage Damage save PR × 3, Security/Disable DC 10 + (PR × 2)). Usually set in the wild rather than linked to locks or sensors. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Cage trap ◊",
+        "Target Area/Range*": "1 square",
+        "Attack Bonus/Save DC*": "DC 10 + PR",
+        "Damage*": "None ◊◊",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "crushing-wall",
+      "name": "Crushing wall",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "(PR × 2)d6 lethal",
+      "repeats": false,
+      "targetArea": "Up to (10 + PR) squares",
+      "autoHit": true,
+      "delayRounds": "1d4+1",
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Up to (10 + PR) squares. Hits automatically. Effect applies after 1d4+1 rounds. Damage: (PR × 2)d6 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Crushing wall",
+        "Target Area/Range*": "Up to (10 + PR) squares",
+        "Attack Bonus/Save DC*": "Automatic hit ∞",
+        "Damage*": "(PR × 2)d6 lethal",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "crushing-wall-spiked",
+      "name": "Crushing wall, spiked",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "(PR × 2)d8 lethal",
+      "repeats": false,
+      "targetArea": "Up to (10 + PR) squares",
+      "autoHit": true,
+      "delayRounds": "1d4+1",
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Up to (10 + PR) squares. Hits automatically. Effect applies after 1d4+1 rounds. Damage: (PR × 2)d8 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Crushing wall, spiked",
+        "Target Area/Range*": "Up to (10 + PR) squares",
+        "Attack Bonus/Save DC*": "Automatic hit ∞",
+        "Damage*": "(PR × 2)d8 lethal",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "electrified-surface",
+      "name": "Electrified surface",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "(PR)d10 electrical",
+      "repeats": false,
+      "targetArea": "Up to (10 + PR) squares",
+      "autoHit": true,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Up to (10 + PR) squares. Hits automatically. Damage: (PR)d10 electrical. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Electrified surface",
+        "Target Area/Range*": "Up to (10 + PR) squares",
+        "Attack Bonus/Save DC*": "Automatic hit",
+        "Damage*": "(PR)d10 electrical",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "fire-jet",
+      "name": "Fire jet",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 10",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "10 + PR",
+      "damage": "(PR)d6 fire",
+      "repeats": false,
+      "targetArea": "(PR) ft. (min. 5 ft.)",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": true,
+      "summary": "Area/range: (PR) ft. (min. 5 ft.). Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d6 fire. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Fire jet",
+        "Target Area/Range*": "(PR) ft. (min. 5 ft.) ∞∞",
+        "Attack Bonus/Save DC*": "DC 10 + PR",
+        "Damage*": "(PR)d6 fire",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 10"
+      }
+    },
+    {
+      "id": "flooding-chamber",
+      "name": "Flooding chamber",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "Per drowning",
+      "repeats": false,
+      "targetArea": "Up to (10 + PR) squares",
+      "autoHit": false,
+      "delayRounds": "1d4+1",
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Up to (10 + PR) squares. No attack roll or save listed. Effect applies after 1d4+1 rounds. Damage: Per drowning. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Flooding chamber",
+        "Target Area/Range*": "Up to (10 + PR) squares",
+        "Attack Bonus/Save DC*": "None ∞",
+        "Damage*": "Per drowning",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "gas-vent",
+      "name": "Gas vent",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "Per contagion",
+      "repeats": false,
+      "targetArea": "(PR × 5) ft. radius",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: (PR × 5) ft. radius. No attack roll or save listed. Damage: Per contagion. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Gas vent",
+        "Target Area/Range*": "(PR × 5) ft. radius",
+        "Attack Bonus/Save DC*": "None",
+        "Damage*": "Per contagion",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "hydraulic-buzz-saw",
+      "name": "Hydraulic buzz-saw",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": "+(PR × 2)",
+      "saveDC": null,
+      "damage": "(PR + 2)d6 lethal",
+      "repeats": true,
+      "targetArea": "Same or adjacent square",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Same or adjacent square. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: (PR + 2)d6 lethal. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Hydraulic buzz-saw",
+        "Target Area/Range*": "Same or adjacent square",
+        "Attack Bonus/Save DC*": "+(PR × 2) §",
+        "Damage*": "(PR + 2)d6 lethal",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "klaxon",
+      "name": "Klaxon",
+      "kind": "trap",
+      "page": 438,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "",
+      "repeats": false,
+      "targetArea": "(PR × 10) ft. radius",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: (PR × 10) ft. radius. No attack roll or save listed. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Klaxon",
+        "Target Area/Range*": "(PR × 10) ft. radius",
+        "Attack Bonus/Save DC*": "None",
+        "Damage*": "None",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "laser-mesh",
+      "name": "Laser mesh",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 10",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "12 + PR",
+      "damage": "(PR × 2)d6 laser",
+      "repeats": false,
+      "targetArea": "Room’s entire height and width (up to PR in squares)",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Room’s entire height and width (up to PR in squares). Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR × 2)d6 laser. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Laser mesh",
+        "Target Area/Range*": "Room’s entire height and width (up to PR in squares)",
+        "Attack Bonus/Save DC*": "DC 12 + PR",
+        "Damage*": "(PR × 2)d6 laser",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 10"
+      }
+    },
+    {
+      "id": "laser-turret",
+      "name": "Laser Turret",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 10",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 4)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": "+(PR × 2)",
+      "saveDC": null,
+      "damage": "(PR)d6 laser",
+      "repeats": true,
+      "targetArea": "(PR × 25) ft.",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": true,
+      "summary": "Area/range: (PR × 25) ft.. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: (PR)d6 laser. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 4).",
+      "raw": {
+        "Trap": "Laser Turret",
+        "Target Area/Range*": "(PR × 25) ft. ∞∞",
+        "Attack Bonus/Save DC*": "+(PR × 2) §",
+        "Damage*": "(PR)d6 laser",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 4)",
+        "XP Reward*": "PR × 10"
+      }
+    },
+    {
+      "id": "net-gun",
+      "name": "Net gun",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": "+(PR × 3)",
+      "saveDC": null,
+      "damage": "Entangled",
+      "repeats": false,
+      "targetArea": "(PR × 10) ft.",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": true,
+      "summary": "Area/range: (PR × 10) ft.. Attacks at +(PR × 3) (error 1, threat 20). Damage: Entangled. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Net gun",
+        "Target Area/Range*": "(PR × 10) ft. ∞∞",
+        "Attack Bonus/Save DC*": "+(PR × 3)",
+        "Damage*": "Entangled",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "pit",
+      "name": "Pit",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "12 + PR",
+      "damage": "(PR)d6 falling",
+      "repeats": false,
+      "targetArea": "Up to (PR) squares",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Up to (PR) squares. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d6 falling. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Pit",
+        "Target Area/Range*": "Up to (PR) squares",
+        "Attack Bonus/Save DC*": "DC 12 + PR",
+        "Damage*": "(PR)d6 falling",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "pit-spiked",
+      "name": "Pit, spiked",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "12 + PR",
+      "damage": "(PR)d8 falling",
+      "repeats": false,
+      "targetArea": "Up to (PR) squares",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Up to (PR) squares. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 falling. Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Pit, spiked",
+        "Target Area/Range*": "Up to (PR) squares",
+        "Attack Bonus/Save DC*": "DC 12 + PR",
+        "Damage*": "(PR)d8 falling",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "poison-dart",
+      "name": "Poison dart",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 3)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": "+(PR × 2)",
+      "saveDC": null,
+      "damage": "Per contagion",
+      "repeats": true,
+      "targetArea": "(PR × 5) ft.",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": true,
+      "summary": "Area/range: (PR × 5) ft.. Attacks at +(PR × 2) (error 1, threat 20), once per round at 1 target until disabled or out of ammo (PR × 5 shots if ranged). Damage: Per contagion. Its PR multiplier is also its range increment; error 1, threat range 1/2 PR (rounded up). Detect DC 10 + (PR × 3); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Poison dart",
+        "Target Area/Range*": "(PR × 5) ft. ∞∞",
+        "Attack Bonus/Save DC*": "+(PR × 2) §",
+        "Damage*": "Per contagion",
+        "Detect DC*∆": "10 + (PR × 3)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "spring-loaded-blade",
+      "name": "Spring-loaded blade",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "12 + PR",
+      "damage": "(PR)d8 lethal",
+      "repeats": false,
+      "targetArea": "1 adjacent square",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: 1 adjacent square. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 lethal. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Spring-loaded blade",
+        "Target Area/Range*": "1 adjacent square",
+        "Attack Bonus/Save DC*": "DC 12 + PR",
+        "Damage*": "(PR)d8 lethal",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "spring-loaded-ram",
+      "name": "Spring-loaded ram",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 4",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "12 + PR",
+      "damage": "(PR)d8 subdual",
+      "repeats": false,
+      "targetArea": "1 adjacent square",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: 1 adjacent square. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d8 subdual. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Spring-loaded ram",
+        "Target Area/Range*": "1 adjacent square",
+        "Attack Bonus/Save DC*": "DC 12 + PR",
+        "Damage*": "(PR)d8 subdual",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 4"
+      }
+    },
+    {
+      "id": "steam-jet",
+      "name": "Steam jet",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 6",
+      "detectDC": "10 + (PR × 4)",
+      "disableDC": "10 + (PR × 2)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "10 + PR",
+      "damage": "(PR)d4 heat",
+      "repeats": false,
+      "targetArea": "Same or adjacent square",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: Same or adjacent square. Reflex save DC 10 + PR for half damage (rounded down). Damage: (PR)d4 heat. Detect DC 10 + (PR × 4); Disable DC 10 + (PR × 2).",
+      "raw": {
+        "Trap": "Steam jet",
+        "Target Area/Range*": "Same or adjacent square",
+        "Attack Bonus/Save DC*": "DC 10 + PR",
+        "Damage*": "(PR)d4 heat",
+        "Detect DC*∆": "10 + (PR × 4)",
+        "Disable DC*": "10 + (PR × 2)",
+        "XP Reward*": "PR × 6"
+      }
+    },
+    {
+      "id": "strobe-flash",
+      "name": "Strobe flash",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": "12 + PR",
+      "damage": "(PR)d6 flash",
+      "repeats": false,
+      "targetArea": "(PR × 5) ft. radius",
+      "autoHit": false,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: (PR × 5) ft. radius. Reflex save DC 12 + PR for half damage (rounded down). Damage: (PR)d6 flash. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Strobe flash",
+        "Target Area/Range*": "(PR × 5) ft. radius",
+        "Attack Bonus/Save DC*": "DC 12 + PR",
+        "Damage*": "(PR)d6 flash",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8"
+      }
+    },
+    {
+      "id": "ultrasonic-siren",
+      "name": "Ultrasonic siren",
+      "kind": "trap",
+      "page": 439,
+      "xp": "PR × 8",
+      "detectDC": "10 + (PR × 2)",
+      "disableDC": "10 + (PR × 3)",
+      "damageSave": null,
+      "bypass": "",
+      "awareness": null,
+      "opposedBy": "",
+      "attack": null,
+      "saveDC": null,
+      "damage": "(PR)d6 bang",
+      "repeats": false,
+      "targetArea": "(PR × 5) ft. radius",
+      "autoHit": true,
+      "delayRounds": null,
+      "rangeIncrementFromPR": false,
+      "summary": "Area/range: (PR × 5) ft. radius. Hits automatically. Damage: (PR)d6 bang. Detect DC 10 + (PR × 2); Disable DC 10 + (PR × 3).",
+      "raw": {
+        "Trap": "Ultrasonic siren",
+        "Target Area/Range*": "(PR × 5) ft. radius",
+        "Attack Bonus/Save DC*": "Automatic hit",
+        "Damage*": "(PR)d6 bang",
+        "Detect DC*∆": "10 + (PR × 2)",
+        "Disable DC*": "10 + (PR × 3)",
+        "XP Reward*": "PR × 8"
+      }
+    }
+  ],
+  "reputation": {
+    "page": 440,
+    "textPage": 439,
+    "startingReputation": 2,
+    "startingNetWorth": 100000,
+    "byCaliber": [
+      {
+        "caliber": 1,
+        "caliberPrinted": "I",
+        "reputation": 2,
+        "netWorth": 100000
+      },
+      {
+        "caliber": 2,
+        "caliberPrinted": "II",
+        "reputation": 5,
+        "netWorth": 250000
+      },
+      {
+        "caliber": 3,
+        "caliberPrinted": "III",
+        "reputation": 10,
+        "netWorth": 500000
+      },
+      {
+        "caliber": 4,
+        "caliberPrinted": "IV",
+        "reputation": 15,
+        "netWorth": 750000
+      },
+      {
+        "caliber": 5,
+        "caliberPrinted": "V",
+        "reputation": 20,
+        "netWorth": 1000000
+      }
+    ],
+    "burnedBelow": {
+      "reputation": 0,
+      "netWorth": 0
+    },
+    "liquidationBelow": {
+      "reputation": -20,
+      "netWorth": -1000000,
+      "roll": "1d20",
+      "targetBase": 4,
+      "targetPerConsecutiveMission": 1,
+      "event": "marked-for-death"
+    },
+    "summary": "Faction characters track Reputation, Freelance ones Net Worth (Hybrid: one or the other). Start at 2 or $100,000 at any level. Each completed mission pays the Caliber reward per character regardless of success (unless critical objectives apply), and a Profession/Accomplishment check can raise it. Spent on extra gear and favors; spending does not refresh. Lost through exposure. Below 0/$0 the character is burned: no mission gear or resources until back above 0. Below -20/-$1,000,000 he is also targeted for liquidation: each mission start the GC rolls 1d20, and on a result of 4 + 1 per consecutive targeted mission (counting the first) or less, a Marked for Death event hits him. GC may rescale Net Worth (e.g. 1/100 or 1/1,000)."
+  },
+  "timeLimit": {
+    "xp": 50,
+    "page": 439
+  },
+  "anomalies": [
+    {
+      "where": "Table 7.2 Hazards / Table 7.3 Nature's Fury (schema)",
+      "printed": "Rows are keyed by \"Action Die Cost\" (1-4, contagion 1-8*), with no dice ranges",
+      "comment": "Neither table is rolled; both are placed under lookups (hazards, naturesFury) instead of rollTables. Only Table 7.16 is a rolled table."
+    },
+    {
+      "where": "Table 7.2 Hazards, Contagion cost 3",
+      "printed": "any disease with a Complexity DC up to 65–70",
+      "comment": "\"up to\" combined with a range; other rows say \"of 55–60\" etc. Transcribed as 65-70."
+    },
+    {
+      "where": "Table 7.2 Hazards, Contagion costs 5*-8*",
+      "printed": "5*, 6*, 7*, 8*",
+      "comment": "Costs above the general 1-4 dice event cap, allowed by footnote. Event costMax left at 4; rows flagged exceedsLimit."
+    },
+    {
+      "where": "Table 7.3 Nature's Fury, Volcanic Eruption cost 3 (Moderate), p.402",
+      "printed": "Fort save (DC 20) or become deafened until 3d6 hours after inflicting 1d10 fire and stress damage per action die spent",
+      "comment": "Text lines swapped with the cost 4 row in the source. \"after end of eruption; GC may spend 3 action dice to hit 1 character with 1 volcanic bomb\" is presumably intended but the bomb cost is not printed here; bombDice left null."
+    },
+    {
+      "where": "Table 7.3 Nature's Fury, Volcanic Eruption cost 4 (Major), p.402",
+      "printed": "vision and hearing ranges end of eruption; GC may spend 4 action dice ...",
+      "comment": "Range multiplier, Fort save DC and deafness duration are missing from the source (pattern would suggest DC 25 and 4d6 hours, but not printed). Fields left null."
+    },
+    {
+      "where": "Table 7.3 Nature's Fury footnotes",
+      "printed": "† Some natural conditions prompt additional effects, as shown on Table 5.14",
+      "comment": "The single-dagger footnote has no visible reference mark in the table header or rows."
+    },
+    {
+      "where": "Table 7.3 Nature's Fury, Fog",
+      "printed": "Only costs 1-3 listed",
+      "comment": "Fog has no 4-dice row; other types have 4."
+    },
+    {
+      "where": "Table 7.16 Random Possessions, Minion",
+      "printed": "19–20 Real name ID; 20 Clue leading to a henchman",
+      "comment": "Overlap on 20 (two rows claim it). Kept as printed; likely intended 19 = Real name ID, 20 = Clue (matching the Henchman sub-table pattern)."
+    },
+    {
+      "where": "Table 7.7 Exposure, Complete Critical Objective, Grade III",
+      "printed": "–3/–$100,000",
+      "comment": "Breaks the $50,000-per-point pattern (expected -$150,000). Kept as printed."
+    },
+    {
+      "where": "Table 7.7 Exposure, Avoid \"Noise\" and Maintain Anonymity crowd bands",
+      "printed": "11–100 people, then 100–500 people",
+      "comment": "Bands overlap at exactly 100 (probably 101-500). Kept as printed."
+    },
+    {
+      "where": "Table 7.7 Exposure, Avoid \"Noise\"",
+      "printed": "Character attacks with a 1-handed melee weapon ... –0/–$0",
+      "comment": "Zero penalty row; stored as reputation 0, netWorth 0."
+    },
+    {
+      "where": "Table 7.7 Exposure, Avoid \"Noise\"",
+      "printed": "draws a Small or smaller weapon ... –1; draws a Medium or smaller weapon ... –2",
+      "comment": "\"Medium or smaller\" overlaps \"Small or smaller\"; probably means Medium. Kept as printed."
+    },
+    {
+      "where": "Table 7.7 Exposure, Maintain Anonymity",
+      "printed": "–10/–$500,000t",
+      "comment": "Stray \"t\" after the Net Worth value (OCR/typo); stored as -500000."
+    },
+    {
+      "where": "Table 7.7 Exposure, objective header",
+      "printed": "Complete Critical Objective (Complicaton)**  +25 per add. objective",
+      "comment": "Typo \"Complicaton\" corrected in the name. XP is per additional critical objective, stored as xp 25 with xpPrinted and note. Footnote ** cites page 437 for critical objectives but the rule is on p.435."
+    },
+    {
+      "where": "Table 7.7 Exposure, column header",
+      "printed": "XP Reward Worth | Reputation/Net Penalty*",
+      "comment": "Header words appear shuffled (should read \"XP Reward\" and \"Reputation/Net Worth Penalty\")."
+    },
+    {
+      "where": "Table 7.9 Security Options, sensor header",
+      "printed": "Target Area* Awareness / Sensor Bonus* Skill** Opposed",
+      "comment": "Header cells garbled by layout; interpreted as Sensor | Target Area* | Awareness Bonus* | Opposed Skill** | Detect DC*∆ | Disable DC* | XP Reward*."
+    },
+    {
+      "where": "Table 7.9 Security Options, all rows",
+      "printed": "Values such as +(PR × 2), 10 + (PR × 3), PR × 8",
+      "comment": "Every numeric cell scales with Power Rating, so xp, DCs, bonuses and damage are stored as the printed formula strings (with the \"×\" sign), not numbers."
+    },
+    {
+      "where": "Table 7.9 Security Options, Tripwire / Tripwire, laser",
+      "printed": "Awareness Bonus \"—\", Opposed Skill \"Special ΩΩ\"",
+      "comment": "Resolved from the footnote to opposedBy \"Reflex save DC 10 + PR\" / \"Reflex save DC 15 + PR\"."
+    },
+    {
+      "where": "Table 7.9 Security Options, Metal detector / X-ray checkpoint",
+      "printed": "Detect DC \"None (automatic)\"",
+      "comment": "detectDC stored as null with autoDetected true."
+    },
+    {
+      "where": "Table 7.9 Security Options, Flooding chamber",
+      "printed": "P er drowning",
+      "comment": "Stray space; stored as \"Per drowning\"."
+    },
+    {
+      "where": "Table 7.9 Security Options, Steam jet",
+      "printed": "Same or adjacent sqaure",
+      "comment": "Typo; stored as \"square\"."
+    },
+    {
+      "where": "Table 7.9 Security Options, Automated weapon, explosive",
+      "printed": "DC per explosive / Per explosive / PR × 8 §§",
+      "comment": "Save DC and damage defer to the explosive used; XP footnote says per die of explosive damage (maximum +10), whose interaction with \"PR × 8\" is unclear."
+    },
+    {
+      "where": "Table 7.9 Security Options, Net gun",
+      "printed": "+(PR × 3) with no § mark",
+      "comment": "Unlike other attack-bonus traps it lacks the repeating-attack footnote; repeats false as printed."
+    },
+    {
+      "where": "Table 7.9 Security Options, traps with \"Automatic hit\" or \"None\"",
+      "printed": "Automatic hit / Automatic hit ∞ / None / None ∞",
+      "comment": "No attack bonus or save DC; attack and saveDC are null, with extra fields autoHit and delayRounds."
+    },
+    {
+      "where": "Table 7.9 Security Options, save-DC traps",
+      "printed": "DC 10 + PR on p.438 traps vs DC 12 + PR on p.439 traps",
+      "comment": "Two different base DCs are printed (acid/fire/steam jets, bear and cage traps use 10; laser mesh, pits, spring traps, strobe use 12). Kept as printed."
+    },
+    {
+      "where": "Table 7.6 Sample Objectives",
+      "printed": "20 categories x grades 1-5; most cells list 2-3 alternative samples separated by semicolons",
+      "comment": "One objectives entry per printed row (category + grade), with the alternatives condensed into one name string. No row has a grade range, so grade is never null."
+    },
+    {
+      "where": "Events: Wanted (p.404) vs Table 7.7",
+      "printed": "Table 7.7 refers to \"becomes wanted (1-4 action dice)\"",
+      "comment": "The Wanted event text gives no per-die scaling, so no intensities are recorded for it."
+    },
+    {
+      "where": "Events: Surprise Combat (p.403)",
+      "printed": "increase the Tier of all NPCs involved in the chase by 1",
+      "comment": "Says \"chase\" in the combat event; apparent copy-paste from Surprise Chase."
+    },
+    {
+      "where": "Events: Endangered Bystanders (p.399)",
+      "printed": "spend and roll any number of d12 action dice",
+      "comment": "Bystander count uses a d12 regardless of the GC action die type; overall limit is still 4 dice."
+    }
+  ]
+}

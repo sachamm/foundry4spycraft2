@@ -16,6 +16,7 @@
       <div class="summary">
         <label>{{localize "SPYCRAFT.ThreatLevel"}} <input name="system.threatLevel" type="number" value="{{system.threatLevel}}" class="w-2" /></label>
         <select name="system.npcType">{{selectOptions npcTypes selected=system.npcType}}</select>
+        <label title="Use the active mission's Threat Level instead of this number (p.423)"><input type="checkbox" name="system.followMission" {{checked system.followMission}} /> Follow mission TL{{#if system.usesMissionThreatLevel}} ({{system.effectiveThreatLevel}}){{/if}}</label>
       </div>
       {{#unless system.npcProfile.enabled}}<div class="resources">
         <label>{{localize "SPYCRAFT.Vitality"}} <input name="system.vitality.value" type="number" value="{{system.vitality.value}}" /> / <input name="system.vitality.max" type="number" value="{{system.vitality.max}}" /></label>
@@ -23,6 +24,15 @@
       </div>{{/unless}}
     </div>
   </header>
+  <div class="npc-play">
+    {{#if gcPlay.special}}{{#unless system.npcProfile.enabled}}<p><label>Villain role (sets the GC's action die, p.452) <select name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label></p>{{/unless}}{{/if}}
+    <p><a data-action="rollNpcSkill">Skill check</a> · <a data-action="manageDisposition">Disposition ({{gcPlay.baseDisposition}}{{#each gcPlay.dispositions}}; {{name}}: {{grade}}{{/each}})</a>{{#if system.promoted}} · <b>Promoted to special for this mission</b> <a data-action="endPromotion">end</a>{{/if}}</p>
+    {{#unless gcPlay.special}}<p>Damage save {{signed gcPlay.damage.bonus}} · accumulated damage {{gcPlay.damage.track.accumulated}} (next DC {{gcPlay.damage.nextDC}}+) · failed saves {{gcPlay.damage.track.failures}}{{#if gcPlay.damage.tough}} · tough {{gcPlay.damage.tough}} (used {{gcPlay.damage.track.ignored}}){{/if}} · <b>{{gcPlay.damage.track.state}}</b>
+      · <a data-action="npcDamageSave">Suffer damage</a> · <a data-action="resetDamageTrack">Reset</a>
+      <label>Save adjustment (vitality/wound effects, p.452) <input name="system.damageSaveAdjust" type="number" value="{{system.damageSaveAdjust}}" class="w-2" /></label>
+      {{#unless system.npcProfile.enabled}}<label>Villain role <select name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label>
+      <label>Damage save bonus <input name="system.manualDamageSave" type="number" value="{{system.manualDamageSave}}" class="w-2" /></label>{{/unless}}</p>{{/unless}}
+  </div>
   {{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}
   <div class="abilities-row">
     {{#each abilities}}

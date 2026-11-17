@@ -1,0 +1,309 @@
+// Drives the Foundry-facing GC tools through minimal stubs. This checks the bookkeeping and wiring;
+// it is not a substitute for a live Foundry world.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {SPYCRAFT} from '../module/config.mjs';
+
+const settings = new Map(), registered = new Map(), messages = [], warnings = [];
+let dialogAnswers = [], diceQueue = [], idCounter = 0;
+const answer = (...list) => { dialogAnswers.push(...list); };
+const dice = (...list) => { diceQueue.push(...list); };
+class Roll {
+  constructor(formula) { this.formula = formula; }
+  async evaluate() {
+    const match = /^(\d+)d(\d+)(?:\s*\+\s*(\d+))?/.exec(this.formula);
+    if (!diceQueue.length) throw new Error(`No queued die for ${this.formula}`);
+    this.total = match && Number(match[1]) > 1 ? diceQueue.splice(0, Number(match[1])).reduce((a, b) => a + b, 0) + Number(match[3] ?? 0) : diceQueue.shift();
+    return this;
+  }
+  async toMessage(data) { messages.push({content: data.flavor, roll: this.total}); return data; }
+}
+const makeActor = (id, type, system, extra = {}) => ({
+  id, uuid: `Actor.${id}`, name: extra.name ?? id, type, system, flags: {}, isOwner: true, hasPlayerOwner: type === 'agent', statuses: new Set(), effects: [], isToken: false,
+  async update(change) { for (const [path, value] of Object.entries(change)) { const keys = path.split('.'); let target = this; for (const key of keys.slice(0, -1)) target = target[key] ??= {}; target[keys.at(-1)] = value; } return this; },
+  async toggleStatusEffect(status, {active}) { if (active) this.statuses.add(status); else this.statuses.delete(status); },
+  async createEmbeddedDocuments(_type, [data]) { for (const status of data.statuses) this.statuses.add(status); const effect = {id: `e${++idCounter}`, ...data}; this.effects.push(effect); return [effect]; },
+  reset() {}, ...extra
+});
+const actors = new Map();
+globalThis.foundry = {
+  utils: {escapeHTML: text => String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'), randomID: () => `id${++idCounter}`},
+  applications: {api: {DialogV2: {input: async () => { if (!dialogAnswers.length) throw new Error('Unexpected dialog'); return dialogAnswers.shift(); }, confirm: async () => true}, ApplicationV2: class { render() { return this; } }, HandlebarsApplicationMixin: Base => Base}}
+};
+globalThis.CONFIG = {SPYCRAFT, statusEffects: [{id: 'flat-footed', name: 'Flat-footed'}, {id: 'reeling', name: 'Reeling'}]};
+globalThis.ui = {notifications: {warn: message => { warnings.push(message); return null; }, info: () => null}, combat: {render() {}}};
+globalThis.Roll = Roll;
+globalThis.ChatMessage = {create: async data => { messages.push(data); return data; }, getSpeaker: () => ({}), getWhisperRecipients: () => [{id: 'gm'}]};
+globalThis.Hooks = {on() {}, once() {}};
+globalThis.fromUuid = async uuid => [...actors.values()].find(actor => actor.uuid === uuid) ?? null;
+globalThis.game = {
+  user: {isGM: true, id: 'gm'}, users: {activeGM: {id: 'gm'}}, ready: false, spycraft2: {gc: {}},
+  i18n: {localize: text => text},
+  settings: {
+    register: (scope, key, config) => registered.set(`${scope}.${key}`, config),
+    get: (scope, key) => { const id = `${scope}.${key}`; if (!registered.has(id)) throw new Error(`${id} is not registered`); return settings.has(id) ? structuredClone(settings.get(id)) : structuredClone(registered.get(id).default); },
+    set: async (scope, key, value) => { settings.set(`${scope}.${key}`, structuredClone(value)); return value; }
+  },
+  actors: {get: id => actors.get(id), [Symbol.iterator]: () => actors.values()},
+  combats: [], combat: null
+};
+for (const key of ['usagePeriods', 'usagePeriodReview', 'gcActionDice']) game.settings.register('spycraft2', key, {default: {}});
+
+const state = await import('../module/apps/gc/state.mjs');
+state.registerGCSettings();
+const mission = await import('../module/apps/gc/mission.mjs');
+const npc = await import('../module/apps/gc/npc-play.mjs');
+const spend = await import('../module/apps/gc/spend.mjs');
+const combat = await import('../module/apps/gc/combat.mjs');
+const conflicts = await import('../module/apps/gc/conflicts.mjs');
+const tables = await import('../module/apps/gc/tables.mjs');
+const {consoleContext} = await import('../module/apps/gc/console.mjs');
+const {initializeGCDice, gcDiceStatus} = await import('../module/rules/gc-dice.mjs');
+const {missionSettlementDefaults} = await import('../module/apps/gc/mission-defaults.mjs');
+
+const agent = (id, level) => makeActor(id, 'agent', {level, reputation: 2, netWorth: 100000, actionDice: {value: 3, max: 3}, actionDieAwardSummary: {count: 1}, abilities: {int: {mod: 2}}, initiative: {total: 4}});
+const npcSystem = (overrides = {}) => ({npcType: 'standard', npcProfile: {enabled: true, qualities: [], grades: {}}, npcBuild: {xp: 37, skills: [{key: 'notice', bonus: 9}]}, competence: 4, damageSave: 6, damageSaveAdjust: 0, damageTrack: null, usagePeriods: {}, disposition: {base: 'neutral', toward: {}}, abilities: Object.fromEntries(['str', 'dex', 'con', 'int', 'wis', 'cha'].map(k => [k, {mod: k === 'wis' ? 2 : 0}])), initiative: {total: 3}, ...overrides});
+for (const [id, level] of [['a1', 5], ['a2', 5], ['a3', 5], ['a4', 5]]) actors.set(id, agent(id, level));
+const guard = makeActor('guard', 'npc', npcSystem(), {name: 'Guard', rollCheck: async (formula, data, options) => ({formula, data, options})});
+const boss = makeActor('boss', 'npc', npcSystem({npcType: 'special', npcProfile: {enabled: true, qualities: [{id: 'mastermind'}], grades: {}}, npcBuild: {xp: 50, skills: []}}), {name: 'Boss'});
+actors.set('guard', guard); actors.set('boss', boss);
+const lastMessage = () => messages.at(-1)?.content ?? '';
+
+test('mission record: Threat Level is fixed at mission start and feeds the XP defaults', async () => {
+  assert.equal(state.missionThreatLevel(), null);
+  assert.deepEqual(missionSettlementDefaults(), {baseXP: 0, threatLevel: null});
+  answer({name: 'Cold Open', caliber: 3, threatAdjust: 2, threatOverride: '', dramaticScenes: 1, timeLimit: true, bundleCommonItems: 0, scenesPlayed: 0, notes: '', 'team-a1': true, 'team-a2': true, 'team-a3': true, 'team-a4': true});
+  await mission.editMission();
+  const tl = await mission.startMission();
+  assert.deepEqual([tl.base, tl.value, tl.bonusDice], [4, 6, 0]);
+  assert.equal(state.missionThreatLevel(), 6);
+  assert.match(lastMessage(), /Threat Level <b>6<\/b>/);
+  answer({sample: '', name: 'Steal the ledger', grade: 3, critical: true});
+  await mission.addObjective();
+  answer({uuid: 'Actor.guard', name: '', xp: 0, type: '', full: false, scenes: 1}, {uuid: 'Actor.boss', name: '', xp: 0, type: '', full: false, scenes: 1});
+  await mission.addAntagonist(); await mission.addAntagonist();
+  let m = state.getMission();
+  assert.deepEqual(m.antagonists.map(a => [a.name, a.xp, a.type]), [['Guard', 37, 'standard'], ['Boss', 50, 'special']]);
+  assert.equal(state.missionXP().total, 50, 'only the time limit so far');
+  assert.equal(state.missionXP({planned: true}).total, 50 + 75 + 37 + 200);
+  await mission.changeEntry('objectives', m.objectives[0].id, 'complete');
+  await mission.changeEntry('antagonists', m.antagonists[1].id, 'encountered');
+  assert.equal(state.missionXP().total, 50 + 75 + 200);
+  assert.deepEqual(missionSettlementDefaults(), {baseXP: 325, threatLevel: 6});
+  await mission.missionReport();
+  assert.match(lastMessage(), /\(325 \+ 25\) × 5 = <b>1750<\/b>/);
+});
+
+test('complications: security device XP by Power Rating, scripted quality, removal', async () => {
+  answer({kind: 'security', security: 'acid-jet', pr: 4, deviceXP: '', count: 1});
+  await mission.addComplication();
+  assert.equal(state.getMission().security[0].xp, 40);
+  answer({kind: 'quality', quality: 'gritty', count: 1});
+  await mission.addComplication();
+  assert.equal(state.missionXP().total, 325 + 40 + 100);
+  answer({kind: 'quality', quality: 'gritty', count: 1});
+  await mission.addComplication();
+  assert.match(warnings.at(-1), /already in force/);
+  await mission.changeEntry('security', state.getMission().security[0].key, 'ignored');
+  assert.equal(state.missionXP().total, 325 + 20 + 100);
+  await mission.changeEntry('qualities', 'gritty', 'remove');
+  await mission.changeEntry('security', state.getMission().security[0].key, 'remove');
+  assert.equal(state.missionXP().total, 325);
+});
+
+test('exposure infractions reduce standing at once; standing award pays the Caliber reward', async () => {
+  answer({actor: 'a1', infraction: 'adhere-to-honor-code|0', currency: 'reputation', preventing: false, honor: false});
+  await mission.recordInfraction();
+  assert.equal(actors.get('a1').system.reputation, 0);
+  answer({actor: 'a1', infraction: 'adhere-to-honor-code|1', currency: 'reputation', preventing: true, honor: false});
+  await mission.recordInfraction();
+  assert.equal(actors.get('a1').system.reputation, -2);
+  assert.match(lastMessage(), /Negative standing/);
+  answer({currency: 'reputation'});
+  assert.equal(await mission.awardStanding(), 12, 'Caliber III is 10, +2 for a Threat Level raised by 2');
+  assert.equal(actors.get('a2').system.reputation, 14);
+});
+
+test('starting-dice adjustments apply once per session', async () => {
+  await state.setCampaign({qualities: ['bleak']});
+  await mission.applySessionDiceAdjustments();
+  assert.equal(actors.get('a1').system.actionDice.value, 1);
+  await mission.applySessionDiceAdjustments();
+  assert.equal(actors.get('a1').system.actionDice.value, 1);
+  await state.setCampaign({qualities: []});
+});
+
+test('NPC skill check uses Competence or the skilled bonus plus the attribute', async () => {
+  answer({key: 'notice', ability: '', modifier: 1, error: 1, secret: false});
+  let roll = await npc.rollNpcSkill(guard);
+  assert.equal(roll.data.total, 9 + 2 + 1); assert.equal(roll.options.cap, 40);
+  answer({key: 'athletics', ability: '', modifier: 0, error: 1, secret: true});
+  roll = await npc.rollNpcSkill(guard);
+  assert.equal(roll.data.total, 4); assert.equal(roll.options.cap, 30); assert.equal(roll.options.rollMode, 'gmroll');
+});
+
+test('standard NPC Damage saves accumulate, kill and reset; special NPCs are refused', async () => {
+  dice(12);
+  let result = await npc.npcDamageSave(guard, {damage: 8, kind: 'lethal'});
+  assert.deepEqual([result.dc, result.failed, guard.system.damageTrack.accumulated], [14, false, 8]);
+  dice(3);
+  result = await npc.npcDamageSave(guard, {damage: 10, kind: 'lethal'});
+  assert.deepEqual([result.dc, result.state], [19, 'dead']);
+  assert.ok(guard.statuses.has('dead'));
+  assert.equal(await npc.npcDamageSave(guard, {damage: 1, kind: 'lethal'}), null);
+  assert.match(warnings.at(-1), /already dead/);
+  await npc.resetDamageTrack(guard);
+  assert.equal(guard.system.damageTrack.state, 'active'); assert.ok(!guard.statuses.has('dead'));
+  await npc.npcDamageSave(boss, {damage: 5, kind: 'lethal'});
+  assert.match(warnings.at(-1), /Special NPCs/);
+});
+
+test('GC action dice: die type, cost, dramatic scene, promotion and healing', async () => {
+  await initializeGCDice({playersPresent: 4, caliber: 3});
+  assert.equal(gcDiceStatus().value, 10);
+  dice(4, 2);
+  let result = await spend.spendGCDice({id: 'boostRoll', actor: guard});
+  assert.deepEqual([result.die.faces, result.die.total], [4, 6]);
+  assert.equal(gcDiceStatus().value, 9);
+  await spend.spendGCDice({id: 'activateThreat', actor: guard, checkKind: 'attack'});
+  assert.match(warnings.at(-1), /treacherous/); assert.equal(gcDiceStatus().value, 9);
+  dice(7);
+  result = await spend.spendGCDice({id: 'boostRoll', actor: boss});
+  assert.equal(result.die.faces, 10);
+  await spend.spendGCDice({id: 'promote', actor: guard});
+  assert.equal(gcDiceStatus().value, 6);
+  assert.ok(npc.npcIsSpecial(guard), 'promoted for the current mission');
+  await guard.update({'system.promotion': null});
+  await npc.npcDamageSave(guard, {damage: 9, kind: 'lethal'}).catch(() => {});
+  await spend.spendGCDice({id: 'dramaticScene'});
+  assert.equal(state.isDramaticScene(), true); assert.equal(gcDiceStatus().value, 2);
+  await spend.spendGCDice({id: 'saveNpc', actor: boss});
+  assert.match(warnings.at(-1), /dramatic scene cannot be saved/);
+  dice(1, 12, 5);
+  result = await spend.spendGCDice({id: 'boostDC'});
+  assert.equal(result.die.total, 18, 'dramatic scene: a natural 1 explodes too');
+  await spend.spendGCDice({id: 'saveNpc', actor: boss, fromCapture: true});
+  assert.match(warnings.at(-1), /costs 2 action dice; the GC has 1/);
+  await spend.setDramaticScene(false);
+  assert.equal(state.isDramaticScene(), false);
+});
+
+const makeCombat = list => {
+  const combatants = new Map();
+  const fight = {id: 'c1', round: 1, started: true, turn: 0, flags: {}, combatants: {get: id => combatants.get(id), find: fn => [...combatants.values()].find(fn), filter: fn => [...combatants.values()].filter(fn), [Symbol.iterator]: () => combatants.values()},
+    get turns() { return [...combatants.values()].sort((a, b) => (b.initiative ?? -99) - (a.initiative ?? -99)); }, get combatant() { return this.turns[0]; },
+    async update(change) { for (const [path, value] of Object.entries(change)) { const keys = path.split('.'); let target = this; for (const key of keys.slice(0, -1)) target = target[key] ??= {}; target[keys.at(-1)] = value; } }, setupTurns() {}};
+  for (const [id, actor, initiative, playerOwned] of list) {
+    const c = makeActor(id, 'combatant', null, {name: actor.name, actor, initiative, parent: fight, hasPlayerOwner: playerOwned, actorId: actor.id});
+    delete c.system; combatants.set(id, c);
+  }
+  return fight;
+};
+
+test('fluid initiative: record events, immediate actions, end-of-round application', async () => {
+  const fight = makeCombat([['c-a1', actors.get('a1'), 22, true], ['c-guard', guard, 4, false], ['c-boss', boss, 45, false]]);
+  const [hero, mook, villain] = ['c-a1', 'c-guard', 'c-boss'].map(id => fight.combatants.get(id));
+  await combat.recordFluidEvent(hero, 'aim');
+  await combat.recordFluidEvent(hero, 'finalAttack', {times: 2});
+  assert.equal(hero.initiative, 22, 'recorded modifiers wait for the end of the round');
+  assert.equal((await combat.recordFluidEvent(hero, 'delay', {times: 3})).count, 19);
+  await assert.rejects(() => combat.recordFluidEvent(hero, 'press'), /25 or higher/);
+  assert.equal((await combat.recordFluidEvent(villain, 'press')).count, 25);
+  await assert.rejects(() => combat.recordFluidEvent(villain, 'press'), /once per round/);
+  await combat.recordFluidEvent(villain, 'triumph');
+  await combat.recordFluidEvent(mook, 'failedStressSave');
+  await combat.recordFluidEvent(hero, 'regroup');
+  assert.equal(hero.flags.spycraft2.fluid.modifiers.at(-1).amount, 7, '5 + Int bonus 2');
+  const lines = await combat.applyEndOfRound(fight, 1);
+  assert.equal(lines.length, 3);
+  assert.equal(hero.initiative, 19 + 1 - 4 + 7);
+  assert.equal(villain.initiative, 35);
+  assert.equal(mook.initiative, 19, '4 − 5 = −1: reeling, +20');
+  assert.ok(guard.statuses.has('reeling') && guard.statuses.has('flat-footed'));
+  assert.match(lastMessage(), /reeling and flat-footed/);
+  assert.deepEqual(hero.flags.spycraft2.fluid.modifiers, []);
+  assert.equal((await combat.applyEndOfRound(fight, 1)).length, 0, 'nothing is applied twice');
+});
+
+test('group initiative makes one roll per NPC type; tie-breaks are stored', async () => {
+  const twin = makeActor('guard2', 'npc', npcSystem(), {name: 'Guard'});
+  const fight = makeCombat([['g1', guard, null, false], ['g2', guard, null, false], ['b', boss, null, false], ['h', actors.get('a1'), null, true]]);
+  dice(10, 15);
+  assert.equal(await combat.rollGroupInitiative(fight), 2);
+  assert.deepEqual(['g1', 'g2', 'b', 'h'].map(id => fight.combatants.get(id).initiative), [13, 13, 18, null]);
+  dice(4, 17);
+  assert.equal(await combat.rollTiebreaks(fight), 2);
+  const sorted = [fight.combatants.get('g1'), fight.combatants.get('g2')].sort((a, b) => b.flags.spycraft2.tiebreak - a.flags.spycraft2.tiebreak);
+  assert.equal(sorted[0].id, 'g2');
+  const Sorted = combat.fluidCombatClass(class {});
+  const order = [{id: 'x', initiative: 12, actor: {system: {initiative: {total: 1}}}, flags: {}}, {id: 'y', initiative: 12, actor: {system: {initiative: {total: 6}}}, flags: {}}].sort(new Sorted()._sortCombatants);
+  assert.equal(order[0].id, 'y', 'equal Counts: higher Initiative bonus first');
+  void twin;
+});
+
+test('surprise round dialog flags the winners', async () => {
+  const fight = makeCombat([['h', actors.get('a1'), 10, true]]);
+  answer({aware: 'some', players: 14, opponents: 19, actingGroup: 'opponents'});
+  const result = await combat.surpriseRoundDialog(fight);
+  assert.equal(result.occurs, true);
+  assert.deepEqual(fight.flags.spycraft2.surprise.winners, ['opponents']);
+});
+
+test('a Dramatic Conflict runs start to finish through the tracker', async () => {
+  answer({type: 'chase', name: 'Docks', predator: 'Agents', prey: 'Courier'}, {lead: 2, p0: 6, q0: 4, p1: 3, q1: 6});
+  const id = await conflicts.startConflictDialog();
+  assert.equal(conflicts.conflictRows()[0].lead, 2);
+  answer({strategy: 'redline', confirmOther: false}, {strategy: 'outfox', confirmOther: false});
+  await conflicts.advanceConflict(id); await conflicts.advanceConflict(id);
+  assert.match(lastMessage(), /Strategies revealed/);
+  answer({predator: 24, predatorCritical: '', prey: 15, preyCritical: '', tieWinner: ''});
+  await conflicts.advanceConflict(id);
+  answer({'pick-lead': 3, leadShift: ''});
+  await conflicts.advanceConflict(id);
+  const row = conflicts.conflictRows()[0];
+  assert.deepEqual([row.lead, row.winner], [0, 'predator']);
+  assert.match(lastMessage(), /Agents \(predator\) wins/);
+  answer({action: 'remove', lead: 0});
+  await conflicts.manageConflict(id);
+  assert.equal(conflicts.conflictRows().length, 0);
+});
+
+test('reference tools: security device, hazards, events, possessions', async () => {
+  dice(11);
+  answer({id: 'acid-jet', pr: 5, action: 'trap', target: 10, save: 20});
+  dice(3, 3, 3, 3, 3);
+  diceQueue.shift();
+  await tables.securityDeviceDialog();
+  assert.match(lastMessage(), /Reflex save DC 15: saved/); assert.match(lastMessage(), /= 15 → <b>7<\/b>/);
+  answer({hazard: '', fury: 'Earthquake', cost: 1});
+  await tables.hazardLookupDialog();
+  assert.match(lastMessage(), /Tremor/);
+  answer({id: 'wanted'});
+  await tables.eventReferenceDialog();
+  assert.match(lastMessage(), /Wanted/);
+  dice(20);
+  answer({id: 'random-possessions-minion', count: 1});
+  await tables.randomPossessionsDialog();
+  assert.equal((lastMessage().match(/20: /g) ?? []).length, 2, 'the printed overlap at 20 yields both rows');
+});
+
+test('console context summarises everything without throwing', async () => {
+  const context = consoleContext();
+  assert.equal(context.mission.threatLevel, 6);
+  assert.equal(context.mission.caliberLabel, 'III');
+  assert.equal(context.xp.earned, 325);
+  assert.equal(context.dice.expected, 10);
+  assert.equal(context.scene.dramatic, false);
+  assert.ok(Array.isArray(context.conflicts));
+  if (process.env.GC_CONTEXT_OUT) (await import('node:fs')).writeFileSync(process.env.GC_CONTEXT_OUT, JSON.stringify(context));
+});
+
+test('a new scene returns to standard; players cannot change GC state', async () => {
+  await spend.setDramaticScene(true);
+  assert.equal(state.isDramaticScene(), true);
+  await game.settings.set('spycraft2', 'usagePeriods', {scene: 'scene-2'});
+  assert.equal(state.isDramaticScene(), false);
+  game.user.isGM = false;
+  await assert.rejects(() => state.setMission({}), /Only the GC/);
+  game.user.isGM = true;
+});

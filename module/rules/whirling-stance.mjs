@@ -1,6 +1,6 @@
 import {combatStanceState} from './combat-stance.mjs';
 /** p.452: an ordinary NPC's career level is current TL, not its Tier-adjusted statistic row. */
-export function characterCareerLevel(type,system){const level=type==='npc'?system.threatLevel:type==='agent'?system.level:null;return Number.isSafeInteger(level)&&level>=1&&level<=20?level:null;}
+export function characterCareerLevel(type,system){const level=type==='npc'?(system.effectiveThreatLevel??system.threatLevel):type==='agent'?system.level:null;return Number.isSafeInteger(level)&&level>=1&&level<=20?level:null;}
 /** p.179: a lower-level character cannot flank this defender; peers/higher levels retain ordinary rules. */
 export function whirlingStancePlan(system,{flanked=false,attackerLevel=null}={}){
  if(typeof flanked!=='boolean')throw Error('Confirm whether the actual attacker otherwise flanks this character.');

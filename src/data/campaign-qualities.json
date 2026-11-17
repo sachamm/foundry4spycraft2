@@ -1,0 +1,689 @@
+[
+  {
+    "id": "big-budget",
+    "name": "Big Budget",
+    "page": 406,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Every gear pick for any character, NPCs included, rises 1 Caliber; a pick pushed past Caliber V also yields 1 extra Caliber I item of that type. Player and special characters start with +4 Wealth.",
+    "effects": {
+      "gearCaliberShift": 1
+    }
+  },
+  {
+    "id": "black-and-white",
+    "name": "Black & White",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Every character and NPC is labelled Good or Evil. At GC discretion, actions or attacks meant to harm or hinder the opposite side gain +2, and an exemplary act fitting one's nature earns 1 action die.",
+    "effects": {}
+  },
+  {
+    "id": "bleak",
+    "name": "Bleak",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": 75,
+    "gcDice": null,
+    "summary": "Player characters start each session with 2 fewer action dice (minimum 0) and their action dice never explode. Class abilities with uses tied to starting action dice are not reduced.",
+    "effects": {
+      "startingActionDice": -2,
+      "actionDiceExplode": false
+    }
+  },
+  {
+    "id": "blockbuster",
+    "name": "Blockbuster",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": 0,
+    "gcDice": 2,
+    "summary": "Explosion blast increments are tripled. A player character whose successful save would halve damage or an effect ignores it completely instead. Interrupted range increments no longer raise explosion damage.",
+    "effects": {
+      "blastIncrementMultiplier": 3
+    }
+  },
+  {
+    "id": "bloodbath",
+    "name": "Bloodbath",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": 0,
+    "gcDice": 2,
+    "summary": "Any threat scored on a successful attack by a player or special character becomes a critical hit automatically unless the attacker pays 1 action die to prevent it.",
+    "effects": {
+      "autoActivateThreats": true
+    }
+  },
+  {
+    "id": "bottomless-clip",
+    "name": "Bottomless Clip",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": -25,
+    "gcDice": 1,
+    "summary": "Weapons that normally hold 5 or more shots never run out of ammunition.",
+    "effects": {}
+  },
+  {
+    "id": "bulletproof",
+    "name": "Bulletproof",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": -75,
+    "gcDice": 1,
+    "summary": "Activating a critical injury on a player or special character costs 1 more action die. Critical injury saves apply at 36-60 damage and the drop to -9 wounds at 61+. Medicine DCs fall by 5 and error ranges by 2.",
+    "effects": {
+      "criticalInjuryActivationCost": 1,
+      "criticalInjuryRange": [
+        36,
+        60
+      ],
+      "massiveDamageThreshold": 61,
+      "medicineDC": -5,
+      "medicineError": -2
+    }
+  },
+  {
+    "id": "cakewalk",
+    "name": "Cakewalk",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": -75,
+    "gcDice": 1,
+    "summary": "All skill DCs drop by 5 (minimum 10). In the Intel Phase each player character picks skills up to his Intelligence modifier; for the mission those get error range -2 (minimum 1) and taking 10 needs no doubled time.",
+    "effects": {
+      "skillDC": -5,
+      "skillDCMinimum": 10
+    }
+  },
+  {
+    "id": "catch-phrase",
+    "name": "Catch Phrase",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": -25,
+    "gcDice": 1,
+    "summary": "Once per session, on a threat with an attack or skill check, a player or special character may use a free action to voice a signature line: morale bonus to Defense and Resist checks of 2x Charisma bonus (minimum +1) for half career level rounds, rounded up.",
+    "effects": {}
+  },
+  {
+    "id": "the-circuit",
+    "name": "The Circuit",
+    "page": 406,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Chase tree, a Chase feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Chase"
+    }
+  },
+  {
+    "id": "clandestine",
+    "name": "Clandestine",
+    "page": 406,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Covert tree, a Covert feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Covert"
+    }
+  },
+  {
+    "id": "comedy-of-errors",
+    "name": "Comedy of Errors",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": 75,
+    "gcDice": 3,
+    "summary": "For everyone, NPCs included: skill DCs rise by 5; error range +2 on skills keyed to a character's lowest attribute; at most 2 action dice may be spent activating a skill error; taking 10 takes 4x standard time instead of 2x.",
+    "effects": {
+      "skillDC": 5
+    }
+  },
+  {
+    "id": "common-spectacle",
+    "name": "Common Spectacle",
+    "page": 406,
+    "seasonOnly": true,
+    "xp": -25,
+    "gcDice": null,
+    "summary": "A Triumph happens on any skill check result of 60 or more, but the XP bonus for a Triumph falls to 5%.",
+    "effects": {
+      "triumphResult": 60,
+      "triumphXPPercent": 5
+    }
+  },
+  {
+    "id": "corrupt",
+    "name": "Corrupt",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": -25,
+    "gcDice": 1,
+    "summary": "The GC cannot spend action dice to mark characters as honorable during bribes. Reputation and Net Worth exposure penalties for breaking an honor code are halved, rounded down.",
+    "effects": {}
+  },
+  {
+    "id": "diplomatic",
+    "name": "Diplomatic",
+    "page": 406,
+    "seasonOnly": false,
+    "xp": -25,
+    "gcDice": 1,
+    "summary": "Skill check bonuses a player or special character receives from a target's positive disposition are 1 higher.",
+    "effects": {}
+  },
+  {
+    "id": "elite-ops",
+    "name": "Elite Ops",
+    "page": 406,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Skill tree, a Basic Skill feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Basic Skill"
+    }
+  },
+  {
+    "id": "faction",
+    "name": "Faction",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "All player characters serve one large organization and use the Faction gear rules. They earn only Reputation, never Net Worth. Cannot be combined with Freelance.",
+    "effects": {
+      "gearRules": "faction"
+    }
+  },
+  {
+    "id": "fast-attributes",
+    "name": "Fast Attributes",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": -75,
+    "gcDice": null,
+    "summary": "Player characters gain 1 attribute point every 3 career levels instead of every 4.",
+    "effects": {
+      "attributeInterval": 3
+    }
+  },
+  {
+    "id": "fast-feats",
+    "name": "Fast Feats",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": -50,
+    "gcDice": null,
+    "summary": "Player characters gain 1 feat every 2 career levels instead of every 3.",
+    "effects": {
+      "featInterval": 2
+    }
+  },
+  {
+    "id": "fast-growth",
+    "name": "Fast Growth",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "XP needed for each level is halved (rounded down), and up to 2 levels may be gained between missions.",
+    "effects": {
+      "xpToLevelFraction": 0.5
+    }
+  },
+  {
+    "id": "fast-interests",
+    "name": "Fast Interests",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": -25,
+    "gcDice": null,
+    "summary": "Player characters gain 1 Interest every 3 career levels instead of every 4.",
+    "effects": {
+      "interestInterval": 3
+    }
+  },
+  {
+    "id": "fast-proficiencies",
+    "name": "Fast Proficiencies",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": -25,
+    "gcDice": null,
+    "summary": "Player characters gain 1 proficiency every career level instead of every 2.",
+    "effects": {
+      "proficiencyInterval": 1
+    }
+  },
+  {
+    "id": "feat-purchase",
+    "name": "Feat Purchase",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "After each mission a player character may trade 1,000 XP x career level for 1 extra feat, but cannot drop below the XP minimum for his current career level.",
+    "effects": {}
+  },
+  {
+    "id": "fragile",
+    "name": "Fragile",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "After Level 1, player and special characters gain fixed vitality per career level: 2 with a d8 vitality die, 3 with a d10, 4 with a d12.",
+    "effects": {}
+  },
+  {
+    "id": "freelance",
+    "name": "Freelance",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "All player characters work through a network of supporters and use the Freelance gear rules. They earn only Net Worth, never Reputation. Cannot be combined with Faction.",
+    "effects": {
+      "gearRules": "freelance"
+    }
+  },
+  {
+    "id": "gladiators",
+    "name": "Gladiators",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "CQB range runs from Melee Range out to 20 ft. Every character, NPCs included, gets a Defense bonus against ranged attacks equal to his count of Melee and Unarmed Combat feats. Nobody may interrupt or join a Stand Off.",
+    "effects": {}
+  },
+  {
+    "id": "the-great-game",
+    "name": "The Great Game",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Tradecraft tree, a Tradecraft feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Tradecraft"
+    }
+  },
+  {
+    "id": "gritty",
+    "name": "Gritty",
+    "page": 407,
+    "seasonOnly": false,
+    "xp": 100,
+    "gcDice": 4,
+    "summary": "Activating a critical injury on a player or special character costs 1 fewer action die (minimum 0). Critical injury saves apply at 16-25 damage and the drop to -9 wounds at 26+. Medicine DCs rise by 5 and error ranges by 2.",
+    "effects": {
+      "criticalInjuryActivationCost": -1,
+      "criticalInjuryRange": [
+        16,
+        25
+      ],
+      "massiveDamageThreshold": 26,
+      "medicineDC": 5,
+      "medicineError": 2
+    }
+  },
+  {
+    "id": "guerilla-warfare",
+    "name": "Guerilla Warfare",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Terrain tree, a Terrain feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Terrain"
+    }
+  },
+  {
+    "id": "gunmen",
+    "name": "Gunmen",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "For everyone, NPCs included: CQB range runs from Melee Range out to 60 ft.; range increments are doubled; Aim and Brace benefits survive movement by shooter or target unless either Runs or the target leaves line of sight.",
+    "effects": {
+      "rangeIncrementMultiplier": 2
+    }
+  },
+  {
+    "id": "historical",
+    "name": "Historical",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "The season is set in a chosen year. Items not yet introduced count as gadget Housings or effects at +1 Caliber (maximum V). Money values and actual costs are multiplied per Table 7.4, from x0.01 (1875-1900) up to x1 (1990 onward).",
+    "effects": {}
+  },
+  {
+    "id": "hybrid",
+    "name": "Hybrid",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Each player character is either a Faction character (Faction gear rules, Reputation only) or a Freelancer (Freelance gear rules, Net Worth only).",
+    "effects": {
+      "gearRules": "hybrid"
+    }
+  },
+  {
+    "id": "jack-of-all-trades",
+    "name": "Jack-of-All-Trades",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Every skill counts as a class skill for every class. Skill points gained do not change.",
+    "effects": {}
+  },
+  {
+    "id": "the-market",
+    "name": "The Market",
+    "page": 407,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Gear tree, a Gear feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Gear"
+    }
+  },
+  {
+    "id": "mellow",
+    "name": "Mellow",
+    "page": 407,
+    "seasonOnly": false,
+    "xp": -75,
+    "gcDice": null,
+    "summary": "All stress damage is halved (rounded down, minimum 1).",
+    "effects": {}
+  },
+  {
+    "id": "mercenary",
+    "name": "Mercenary",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Combat tree, a Basic Combat feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Basic Combat"
+    }
+  },
+  {
+    "id": "modular",
+    "name": "Modular",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "At character creation a player may buy extra feats for 2 attribute-purchase points each, or surrender feat choices to gain 2 extra attribute-purchase points per feat given up.",
+    "effects": {}
+  },
+  {
+    "id": "omni-competent",
+    "name": "Omni-Competent",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": -100,
+    "gcDice": 1,
+    "summary": "Skill check result caps are removed, all checks count as active, and every skill check penalty is halved (rounded down, minimum -1).",
+    "effects": {}
+  },
+  {
+    "id": "paranoid",
+    "name": "Paranoid",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": 0,
+    "gcDice": 2,
+    "summary": "Player and special characters get +4 morale on Blend/Stealth and Sneak/Hide checks that decide surprise rounds. All characters take -4 morale on skill checks to shift disposition or persuade a target into an action.",
+    "effects": {}
+  },
+  {
+    "id": "rare-spectacle",
+    "name": "Rare Spectacle",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": 25,
+    "gcDice": 4,
+    "summary": "A Triumph happens only on a skill check result of 90 or more.",
+    "effects": {
+      "triumphResult": 90
+    }
+  },
+  {
+    "id": "revolving-door",
+    "name": "Revolving Door",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "A player character who dies in a standard scene with his body intact may come back at the start of the next mission, at a cost of 200 Reputation or $10,000,000.",
+    "effects": {}
+  },
+  {
+    "id": "routine",
+    "name": "Routine",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Characters can never take on Crossroads Subplots.",
+    "effects": {}
+  },
+  {
+    "id": "shoe-string-budget",
+    "name": "Shoe String Budget",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Every gear pick for any character, NPCs included, drops 1 Caliber; a pick pushed below Caliber I is lost. Each PC starts with a Debt Subplot.",
+    "effects": {
+      "gearCaliberShift": -1
+    }
+  },
+  {
+    "id": "slow-attributes",
+    "name": "Slow Attributes",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 75,
+    "gcDice": null,
+    "summary": "Player characters gain 1 attribute point every 5 career levels instead of every 4.",
+    "effects": {
+      "attributeInterval": 5
+    }
+  },
+  {
+    "id": "slow-feats",
+    "name": "Slow Feats",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 50,
+    "gcDice": null,
+    "summary": "Player characters gain 1 feat every 4 career levels instead of every 3.",
+    "effects": {
+      "featInterval": 4
+    }
+  },
+  {
+    "id": "slow-growth",
+    "name": "Slow Growth",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "XP needed for each level is doubled.",
+    "effects": {
+      "xpToLevelFraction": 2
+    }
+  },
+  {
+    "id": "slow-interests",
+    "name": "Slow Interests",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 25,
+    "gcDice": null,
+    "summary": "Player characters gain 1 Interest every 5 career levels instead of every 4.",
+    "effects": {
+      "interestInterval": 5
+    }
+  },
+  {
+    "id": "slow-proficiencies",
+    "name": "Slow Proficiencies",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 25,
+    "gcDice": null,
+    "summary": "Player characters gain 1 proficiency every 4 career levels instead of every 2.",
+    "effects": {
+      "proficiencyInterval": 4
+    }
+  },
+  {
+    "id": "small-screen",
+    "name": "Small Screen",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 25,
+    "gcDice": null,
+    "summary": "Player characters get 32 points for starting attributes instead of 36, and no starting attribute may exceed 18, Origin benefits included.",
+    "effects": {}
+  },
+  {
+    "id": "soap",
+    "name": "Soap",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Each character may be involved in 1 more Subplot at a time than normal.",
+    "effects": {}
+  },
+  {
+    "id": "speed-frame",
+    "name": "Speed-Frame",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": -25,
+    "gcDice": 1,
+    "summary": "Complex Tasks need 1 fewer Challenge (minimum 1). In Dramatic Conflicts, every Lead Advantage has its effect raised by 1.",
+    "effects": {}
+  },
+  {
+    "id": "spirited",
+    "name": "Spirited",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": -50,
+    "gcDice": null,
+    "summary": "Player characters start each session with 2 extra action dice (class ability uses tied to starting dice unchanged). Their action dice also explode on a natural 1, and every action die type steps up 1 size (d4 to d6, d6 to d8, and so on).",
+    "effects": {
+      "startingActionDice": 2
+    }
+  },
+  {
+    "id": "strange-providence",
+    "name": "Strange Providence",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Chance tree, a Chance feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Chance"
+    }
+  },
+  {
+    "id": "style-over-substance",
+    "name": "Style Over Substance",
+    "page": 408,
+    "seasonOnly": true,
+    "xp": 0,
+    "gcDice": null,
+    "summary": "Whenever a player character earns a feat choice outside the Style tree, a Style feat may be taken in its place.",
+    "effects": {
+      "bonusFeatTree": "Style"
+    }
+  },
+  {
+    "id": "subtle",
+    "name": "Subtle",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": -50,
+    "gcDice": 2,
+    "summary": "Every attack check by any character, NPCs included, takes a -1 penalty.",
+    "effects": {}
+  },
+  {
+    "id": "tense",
+    "name": "Tense",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": 75,
+    "gcDice": 3,
+    "summary": "All stress damage is doubled, and no character of any type may take 10 on a skill check.",
+    "effects": {}
+  },
+  {
+    "id": "thriller",
+    "name": "Thriller",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": 25,
+    "gcDice": null,
+    "summary": "Complex Tasks need 1 more Challenge (may exceed 10). In Dramatic Conflicts, every Lead result has its effect lowered by 1 (minimum 0).",
+    "effects": {}
+  },
+  {
+    "id": "violent",
+    "name": "Violent",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": 50,
+    "gcDice": 2,
+    "summary": "Threat ranges of all attack checks by any character, NPCs included, widen by 2.",
+    "effects": {}
+  },
+  {
+    "id": "virtuous",
+    "name": "Virtuous",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": 25,
+    "gcDice": 1,
+    "summary": "Reputation and Net Worth exposure penalties for breaking an honor code are doubled.",
+    "effects": {}
+  },
+  {
+    "id": "wire-fu",
+    "name": "Wire Fu",
+    "page": 408,
+    "seasonOnly": false,
+    "xp": -25,
+    "gcDice": 1,
+    "summary": "Player and special characters may move in any direction, including straight up or along walls. Ending movement off a stable surface triggers the falling rules, but falling damage is halved (rounded down).",
+    "effects": {}
+  }
+]
