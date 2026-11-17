@@ -1074,7 +1074,7 @@ export const GC_DATA = {
        20,
        20
       ],
-      "text": "Clue to a henchman in the same organization",
+      "text": "Clue: one of this organization's henchmen",
       "data": {
        "clue": "henchman"
       }
@@ -1228,7 +1228,7 @@ export const GC_DATA = {
        18,
        18
       ],
-      "text": "Clue to another henchman in the same organization",
+      "text": "Clue: a different henchman of this organization",
       "data": {
        "clue": "henchman"
       }
