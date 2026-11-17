@@ -1,16 +1,19 @@
 <section class="tab bio {{tab.cssClass}}" data-tab="bio" data-group="primary">
-  <div class="details-grid">
+  <div class="details-grid edit-only">
     <label>Affiliation <select name="system.affiliationType"><option value="faction" {{#if (sc2eq system.affiliationType "faction")}}selected{{/if}}>Faction</option><option value="freelance" {{#if (sc2eq system.affiliationType "freelance")}}selected{{/if}}>Freelance</option></select></label>
     {{#each system.details as |v k|}}{{#unless (sc2eq k "level")}}
       <label>{{k}} <input type="text" name="system.details.{{k}}" value="{{v}}" /></label>
     {{/unless}}{{/each}}
   </div>
+  <details class="bio-setup edit-only" data-key="bioSetup"><summary>Age, starting resources and import tools</summary>
   <p>Age category: {{system.aging.category}}. Age modifiers apply automatically to the six attributes; enter creation scores before aging on Main.</p>
   {{#unless system.resourcesInitialized}}<div><button type="button" data-action="initializeResources">Apply starting resources (new character)</button><button type="button" data-action="keepResources">Keep current resources</button></div>{{/unless}}
   <p>At the start of play, Faction characters have 2 Reputation; Freelance characters have $100,000 Net Worth (p.217). Set the appropriate current resource on Gear. Changing affiliation does not reset earned resources.</p>
   <p>Height, weight, gender, eyes, hair, background and goals are descriptive. Body weight is separate from carried equipment. Native language is represented by the starting Cultures focus on Training.</p>
   {{#if editable}}<details><summary>Existing character rules</summary><button type="button" data-action="reviewRules">Review catalog updates</button><button type="button" data-action="restoreRules">Review previous refresh rollback</button><p>Review creation scores, aging and historical INT snapshots separately when importing an older character.</p></details>
   {{/if}}
+  </details>
+  <p class="play-only bio-description">{{#each system.details as |v k|}}{{#if v}}<span><b>{{k}}:</b> {{v}}</span> {{/if}}{{/each}}</p>
   {{#if editable}}
     <prose-mirror name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>
   {{else}}{{{enrichedBiography}}}{{/if}}

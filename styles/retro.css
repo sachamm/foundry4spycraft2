@@ -130,3 +130,60 @@
   .spycraft2.application .window-content { background: white; color: black; }
   .spycraft2 .dossier-band { background: #123436; }
 }
+
+/* Character sheets prioritize the current turn, with build controls in Edit. */
+.spycraft2.sheet.agent.play-mode .edit-only,
+.spycraft2.sheet.agent.edit-mode .play-only { display: none !important; }
+.spycraft2 .sheet-mode-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.spycraft2 .mode-label { font:bold 11px/1.4 'Courier New',monospace; text-transform:uppercase; letter-spacing:.12em; }
+.spycraft2 .sheet-mode-bar button { width:auto; min-height:30px; padding:4px 10px; margin:0; }
+.spycraft2.sheet.agent.play-mode .sheet-header .portrait { width:62px; height:62px; }
+.spycraft2 .agent-name { font:bold 20px/1.25 'Courier New',monospace; }
+.spycraft2 .agent-codename { margin-left:auto; font-style:italic; }
+.spycraft2.sheet.agent .resources { gap:5px 12px; }
+.spycraft2.sheet.agent .res.action-dice { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+.spycraft2.sheet.agent .res.action-dice input { width:3em; }
+.spycraft2.sheet.agent .sheet-tabs { padding:5px 0; margin:5px 0; gap:4px; border-top-width:3px; }
+.spycraft2.sheet.agent .sheet-tabs a { flex:1; text-align:center; padding:5px 8px; }
+.spycraft2.sheet.agent .sc2-action {
+  display:inline-flex; align-items:center; justify-content:center; gap:4px;
+  width:auto; height:auto; min-height:26px; margin:2px 0; padding:3px 7px;
+  font:inherit; line-height:1.25; white-space:normal; vertical-align:middle;
+  color:#24595b; background:#fffcf0; border:1px solid #b7ac92;
+}
+.spycraft2.sheet.agent .sc2-action:hover { background:#e7dec4; color:#142f30; border-color:#24595b; }
+.spycraft2.sheet.agent .controls .sc2-action { min-width:28px; }
+.spycraft2.sheet.agent .stat .sc2-action { border:0; background:transparent; margin:0; }
+.spycraft2.sheet.agent .stat .sc2-action:hover { text-decoration:underline; }
+.spycraft2.sheet.agent .defense-summary .stat-grid { grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; }
+.spycraft2.sheet.agent .defense-summary .stat { min-height:70px; padding:5px 3px; }
+.spycraft2.sheet.agent .stat b { font-size:1.5em; }
+.spycraft2.sheet.agent .play-dashboard { border-bottom:2px solid #a39065; padding-bottom:8px; }
+.spycraft2.sheet.agent .dashboard-weapons .item-list li { padding:5px 0; flex-wrap:wrap; }
+.spycraft2.sheet.agent .dashboard-weapons .name { justify-content:flex-start; font-weight:bold; }
+.spycraft2.sheet.agent .condition-summary { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
+.spycraft2.sheet.agent .reference-panel { margin:10px 0; padding:6px 8px; border:1px solid #b7ac92; background:#fff9e74d; }
+.spycraft2.sheet.agent details > summary { cursor:pointer; font-weight:600; padding:3px 0; }
+.spycraft2.sheet.agent .reference-panel p { margin:8px 0; line-height:1.45; }
+.spycraft2.sheet.agent.play-mode .abilities :is(th,td) { padding:5px; }
+.spycraft2.sheet.agent.play-mode .stat small { display:none; }
+.spycraft2.sheet.agent .skills-table thead { position:sticky; top:0; z-index:1; }
+.spycraft2.sheet.agent .skill-filters { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin:8px 0; }
+.spycraft2.sheet.agent .skill-filters label { display:flex; align-items:center; gap:6px; }
+.spycraft2.sheet.agent .skill-search { width:15em; }
+.spycraft2.sheet.agent .skill-count { margin-left:auto; font-size:.9em; }
+.spycraft2.sheet.agent .skills-table tr[hidden] { display:none; }
+.spycraft2.sheet.agent .skills-table :is(th,td) { padding:5px 4px; }
+.spycraft2.sheet.agent .class-block > label { display:block; margin:10px 0; }
+.spycraft2.sheet.agent .class-choices > label { display:flex; flex-direction:column; align-items:flex-start; gap:5px; margin:12px 0; }
+.spycraft2.sheet.agent .class-choices > label select { width:100%; }
+.spycraft2.sheet.agent .bio-description { display:flex; flex-wrap:wrap; gap:5px 16px; text-transform:capitalize; }
+.spycraft2.sheet.agent .bio-setup { padding:4px 0; }
+.spycraft2.sheet.agent .tab.bio > prose-mirror { flex:1 0 240px; min-height:240px; }
+.spycraft2.sheet.agent .tab.bio > prose-mirror .editor-content { min-height:180px; }
+.spycraft2.sheet.agent .training-summary .tag { display:inline-block; padding:4px 8px; margin:3px; font-size:1em; opacity:1; }
+@container (max-width:640px) {
+  .spycraft2.sheet.agent .defense-summary .stat-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .spycraft2.sheet.agent .main-reference { flex-direction:column; }
+}
+.spycraft2.sheet.agent { container-type:inline-size; }

@@ -100,3 +100,23 @@ https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.jso
 ## NPC creation
 
 NPC actors now offer opt-in graded creation, source-backed core tables, equipment allowances, quality cost controls, Tier resolution and an XP breakdown. Existing NPC stat blocks keep manual mode. See [NPC creation and implementation boundaries](docs/npc-creation.md).
+
+## Character sheet views
+
+Agent sheets open in **Play** with saves, Defense, Initiative, weapon attacks and
+common actions at the top of Main. **Edit character** exposes attribute creation,
+skill purchases, class choices, training and other build controls; **Done editing**
+returns to Play. This view switch changes no character data. Vitality, wounds,
+action dice and biography remain available during play.
+
+Skills supports a name/attribute search and a **Trained skills only** filter.
+Build reminders group repeated choices and open the relevant tab in Edit.
+The Main tab keeps current condition labels visible while detailed condition
+and combat tools are collapsed. Gear shows inventory before wealth and mission
+planning; Classes keeps ability use ahead of the collapsed GC tools.
+
+Skill dialogs show circumstances for the selected named check and put general
+modifiers under **Advanced options**. Changing the check disables inputs specific
+to the previous check so they cannot accidentally apply to the next roll. Required
+gear controls stay visible for checks with a Gear tag. The roll button names the
+selected check or taking-10/20 method; existing validation still applies.

@@ -1,4 +1,5 @@
 <section class="tab classes {{tab.cssClass}}" data-tab="classes" data-group="primary">
+  <div class="edit-only">
   <h3>{{localize "SPYCRAFT.Progression"}}
     <span class="controls">
       <a data-action="addLevel"><i class="fa-solid fa-plus"></i> {{localize "SPYCRAFT.Class.AddLevel"}}</a>
@@ -20,6 +21,7 @@
     {{/each}}
     </tbody>
   </table>
+  </div>
 
   {{#if coreAbilities.length}}
   <h3>{{localize "SPYCRAFT.CoreAbilities"}}</h3>
@@ -29,7 +31,7 @@
   {{#if professor}}<p><a data-action="shareTemporaryFeats" data-ability="professor">Professor: share Basic Skill feats for this session</a></p>{{/if}}
   {{#if trailblazer}}<p><a data-action="shareTemporaryFeats" data-ability="trailblazer">Trailblazer: share Terrain feats for this session</a></p>{{/if}}
   {{#if isGM}}{{#if usagePeriodReview.needsReview}}<p class="bad"><a data-action="reviewUsagePeriod">Review interrupted {{usagePeriodReview.period}} start</a></p>{{/if}}{{/if}}
-  {{#if isGM}}<p><a data-action="manageGCDice">GC action dice</a> · <a data-action="awardActionDice">Award roleplay action dice</a> · <a data-action="settleMissionXP">Settle mission XP</a> · <a data-action="recoverResourceTransaction">Recover interrupted resource transaction</a> · <a data-action="resetUsagePeriod" data-period="scene">Start scene</a> · <a data-action="resetUsagePeriod" data-period="session">Start session</a> · <a data-action="resetUsagePeriod" data-period="mission">Start mission</a> · <a data-action="resetUsagePeriod" data-period="round">Start round outside combat</a></p>{{/if}}
+  {{#if isGM}}<details class="reference-panel" data-key="gcTools"><summary>GC session and resource tools</summary><p><a data-action="manageGCDice">GC action dice</a> · <a data-action="awardActionDice">Award roleplay action dice</a> · <a data-action="settleMissionXP">Settle mission XP</a> · <a data-action="recoverResourceTransaction">Recover interrupted resource transaction</a> · <a data-action="resetUsagePeriod" data-period="scene">Start scene</a> · <a data-action="resetUsagePeriod" data-period="session">Start session</a> · <a data-action="resetUsagePeriod" data-period="mission">Start mission</a> · <a data-action="resetUsagePeriod" data-period="round">Start round outside combat</a></p></details>{{/if}}
   {{#if brightIdeaLegacy}}<p class="bad">Past combined Bright Idea uses need source allocation. {{#if isGM}}{{#if brightIdeaLegacyMalformed}}<a data-action="reviewLimitedUseCounter" data-resource="brightIdea">Review combined count before allocation</a>{{else}}<a data-action="migrateBrightIdeaUses">Review past uses</a>{{/if}}{{else}}Ask the GC to review on Classes.{{/if}}</p>{{/if}}
   {{#if limitedUses.length}}
   <h3>Limited-use abilities</h3>
@@ -44,6 +46,7 @@
   <div class="class-block" data-item-id="{{item.id}}">
     <h3><a data-action="itemEdit">{{item.name}}</a> {{levels}}
       <span class="controls"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a></span></h3>
+    <div class="edit-only class-choices">
     {{#each specialistFields}}<div class="choices"><b>Weapon Specialist (Soldier {{level}})</b>
       {{#unless first}}<label>Gain <select name="specialistChoice.{{../item.id}}.{{level}}.mode">{{selectOptions ../specialistModes selected=mode}}</select></label>{{/unless}}
       {{#if needsProficiency}}<label>Possessed weapon proficiency <select name="specialistChoice.{{../item.id}}.{{level}}.proficiency">{{selectOptions ../specialistProficiencies selected=proficiency blank="—"}}</select></label>{{/if}}
@@ -76,6 +79,7 @@
       {{/each}}
     </div>
     {{/if}}
+    </div>
     <ol class="abilities-list">
       {{#each abilities}}<li><b>{{level}}. {{name}}</b> — {{text}}</li>{{/each}}
     </ol>

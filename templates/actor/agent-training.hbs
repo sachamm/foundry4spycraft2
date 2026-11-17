@@ -1,4 +1,18 @@
 <section class="tab training {{tab.cssClass}}" data-tab="training" data-group="primary">
+  <div class="play-only training-summary">
+    <h3>Weapon proficiencies</h3>
+    {{#each proficiencies}}{{#if proficient}}<span class="tag">{{label}}{{#if forte}} · Forte{{/if}}</span>{{/if}}{{/each}}
+    <h3>Focuses</h3>
+    {{#each focusGroups}}<p><b>{{label}}:</b> {{#each options}}{{#if checked}}<span class="tag">{{name}}</span>{{/if}}{{/each}}</p>{{/each}}
+    <p><b>Profession:</b> {{professionText}}</p>
+    <h3>Skill fortes</h3><ul class="plain">{{#each system.skillFortes}}<li>{{skill}} · {{focus}} · {{forte}}</li>{{/each}}</ul>
+    <h3>Interests</h3><p>{{system.interests}}</p>
+    <h3>Contacts</h3><ul class="plain">{{#each system.contacts}}<li><b>{{name}}</b> · {{lookup ../contactGrades rank}} {{notes}}</li>{{else}}<li>No contacts recorded.</li>{{/each}}</ul>
+    <h3>Subplots</h3><ul class="plain">{{#each system.subplots}}<li><b>{{name}}</b>{{#if complete}} · Complete{{/if}} {{notes}}</li>{{else}}<li>No subplots recorded.</li>{{/each}}</ul>
+    {{#each system.temporaryFocusGrants}}<p>{{name}} <a data-action="chooseTemporaryFocuses" data-item-id="{{itemId}}">Choose temporary focuses</a></p>{{/each}}
+  </div>
+  <div class="edit-only">
+
   <div class="cols">
     <div class="col">
       <h3>{{localize "SPYCRAFT.Proficiencies"}} <span class="points {{#if (sc2lt system.proficiencyPicks.remaining 0)}}bad{{/if}}">{{system.proficiencyPicks.used}} / {{system.proficiencyPicks.available}}</span></h3>
@@ -68,5 +82,6 @@
         {{/each}}
       </ul>
     </div>
+  </div>
   </div>
 </section>
