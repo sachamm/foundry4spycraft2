@@ -1,6 +1,8 @@
 /** Dramatic Conflict tracker (pp.363–388): the GC runs each Conflict round through a short series of dialogs. */
 import {CONFLICT_TYPES, startConflict, availableStrategies, chooseStrategy, strategyModifier, resolveCheck, advantageOptions, chooseAdvantages, nextRound, concede, adjustLead, conflictSummary} from '../../rules/gc/conflict.mjs';
 import {requireGC, getConflicts, saveConflict} from './state.mjs';
+import {MANEUVERING_ROOM, chaseScale, leadDistance, participantRatings, startingLead} from '../../rules/chase.mjs';
+import {spendFuel} from '../vehicle-play.mjs';
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ''));
 const ask = (title, content) => foundry.applications.api.DialogV2.input({window: {title}, rejectClose: false, content: `<div class="spycraft2-roll-options">${content}</div>`});
@@ -10,6 +12,25 @@ const say = (content, whisper = false) => ChatMessage.create({speaker: {alias: '
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 const sideName = (conflict, side) => conflict[side].name || (side === 'predator' ? 'Predator' : 'Prey');
 const strategy = (conflict, side) => CONFLICT_TYPES[conflict.type].strategies.find(entry => entry.id === conflict[side].strategy);
+
+/** Chase participant from an actor: a vehicle supplies its ratings; a character runs on foot. */
+const chaseSource = uuid => { const actor = uuid ? fromUuidSync(uuid) : null; return actor ? {actor, kind: actor.type === 'vehicle' ? 'vehicle' : 'foot', system: actor.system} : null; };
+const chaseActorOptions = () => [['', '— type ratings by hand —'], ...[...game.actors].filter(a => ['vehicle', 'agent', 'npc'].includes(a.type))
+  .sort((a, b) => (a.type === 'vehicle' ? 0 : 1) - (b.type === 'vehicle' ? 0 : 1) || a.name.localeCompare(b.name)).map(a => [a.uuid, `${a.name}${a.type === 'vehicle' ? '' : ' (on foot)'}`])];
+const roomRows = () => Object.entries(MANEUVERING_ROOM).map(([key, r]) => [key, `${r.label} (×${r.speedFactor} speed, +${r.topMphBonus} fastest, Crisis DC ${r.crisisDC})`]);
+
+/** Current chase ratings and scale for a stored chase. */
+function chaseState(conflict) {
+  const chase = conflict.chase; if (!chase) return null;
+  const predator = chaseSource(chase.predator), prey = chaseSource(chase.prey);
+  const ratings = {predator: predator ? participantRatings(predator) : null, prey: prey ? participantRatings(prey) : null};
+  const scale = chaseScale(chase.room, ratings.predator ?? {}, ratings.prey ?? {});
+  return {predator, prey, ratings, scale};
+}
+const chaseLine = (conflict, state) => {
+  const r = state.scale, distance = leadDistance(conflict.lead, r.leadFeet);
+  return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${distance !== null ? ` · ${distance.toLocaleString('en-US')} ft. apart (${r.leadFeet} ft. per Lead)` : ''}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ''}${r.fastest ? ` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ''}${r.mismatched ? ' · <b>mismatched scales: settle with one opposed check</b>' : ''}`;
+};
 
 export function conflictRows() {
   return Object.entries(getConflicts()).map(([id, conflict]) => ({id, ...conflictSummary(conflict), name: conflict.name, predator: sideName(conflict, 'predator'), prey: sideName(conflict, 'prey'), strategiesChosen: ['predator', 'prey'].filter(side => conflict[side].strategy).length}));
@@ -22,22 +43,40 @@ export async function startConflictDialog() {
     <label>Type <select name="type">${options(typeRows)}</select></label>
     <label>Name <input name="name" placeholder="e.g. Rooftop pursuit" /></label>
     <label>Predator <input name="predator" /></label>
-    <label>Prey <input name="prey" /></label>`);
+    <label>Prey <input name="prey" /></label>
+    <fieldset><legend>Chase only</legend>
+      <label>Predator vehicle or character <select name="predatorActor">${options(chaseActorOptions(), '')}</select></label>
+      <label>Prey vehicle or character <select name="preyActor">${options(chaseActorOptions(), '')}</select></label>
+      <label>Maneuvering Room <select name="room">${options(roomRows(), 'close')}</select></label>
+    </fieldset>`);
   if (!first) return null;
   const rules = CONFLICT_TYPES[first.type];
+  // A chase reads Acceleration, Turning and top MPH from the vehicles involved (pp.364–365).
+  let chase = null, chaseNote = '', suggested = {};
+  if (first.type === 'chase' && (first.predatorActor || first.preyActor)) {
+    chase = {room: first.room || 'close', predator: first.predatorActor || '', prey: first.preyActor || ''};
+    const state = chaseState({chase, lead: 5}), start = startingLead(chase.room, state.ratings.predator ?? {}, state.ratings.prey ?? {});
+    suggested = {lead: start.lead, p: state.ratings.predator, q: state.ratings.prey};
+    first.predator ||= state.predator?.actor.name ?? '';
+    first.prey ||= state.prey?.actor.name ?? '';
+    chaseNote = `<p><b>From the vehicles:</b> starting Lead ${start.lead} (${start.rating} difference ${signed(start.difference)}). ${chaseLine({...{lead: start.lead}, predator: {name: first.predator}, prey: {name: first.prey}}, state)}.</p>`;
+  }
   const leadRows = (rules.startingLead?.rules ?? []).map(rule => `<li>${esc(rule.when)}: ${rule.lead ?? esc(rule.formula ?? rule.result ?? '')}</li>`).join('');
-  const ratingInputs = (rules.powerRatings ?? []).map((rating, i) => `<label>${esc(rating)} — Predator <input type="number" name="p${i}" value="0" /> Prey <input type="number" name="q${i}" value="0" /></label>`).join('');
+  const ratingInputs = (rules.powerRatings ?? []).map((rating, i) => `<label>${esc(rating)} — Predator <input type="number" name="p${i}" value="${suggested.p?.[rating] ?? 0}" /> Prey <input type="number" name="q${i}" value="${suggested.q?.[rating] ?? 0}" /></label>`).join('');
   const second = await ask(`${rules.name}: starting Lead and ratings`, `
     <p>${esc(rules.startingLead?.summary ?? '')}</p><ul>${leadRows}</ul>
     <p>Predator skill: ${esc(rules.predatorSkills.join('; '))}<br>Prey skill: ${esc(rules.preySkills.join('; '))}<br>Each round: ${esc(rules.roundTime)}</p>
-    <label>Starting Lead (1–9) <input type="number" name="lead" min="1" max="9" value="${rules.startingLead?.default ?? 5}" required /></label>
+    ${chaseNote}
+    <label>Starting Lead (1–9) <input type="number" name="lead" min="1" max="9" value="${suggested.lead ?? rules.startingLead?.default ?? 5}" required /></label>
     ${ratingInputs}`);
   if (!second) return null;
   const ratings = side => Object.fromEntries((rules.powerRatings ?? []).map((rating, i) => [rating, Number(second[`${side}${i}`]) || 0]));
   try {
-    const conflict = startConflict(first.type, {lead: Number(second.lead), name: first.name, predator: {name: first.predator, ratings: ratings('p')}, prey: {name: first.prey, ratings: ratings('q')}});
+    const conflict = startConflict(first.type, {lead: Number(second.lead), name: first.name, predator: {name: first.predator, actorUuid: chase?.predator || null, ratings: ratings('p')}, prey: {name: first.prey, actorUuid: chase?.prey || null, ratings: ratings('q')}});
+    if (chase) conflict.chase = chase;
     const id = foundry.utils.randomID();
     await saveConflict(id, conflict);
+    if (chase) await say(`<b>${esc(conflict.name)}</b>: ${chaseLine(conflict, chaseState(conflict))}.`);
     await say(`<b>${esc(conflict.name)}</b> begins — ${esc(rules.name)}. Lead ${conflict.lead}. ${esc(sideName(conflict, 'predator'))} (Predator) wins at 0; ${esc(sideName(conflict, 'prey'))} (Prey) wins at 10.`);
     return id;
   } catch (error) { return ui.notifications.warn(error.message); }
@@ -94,7 +133,19 @@ export async function advanceConflict(id) {
       if (rules.outsideActions) await say(`Outside actions: ${esc(rules.outsideActions)}`, true);
       return next;
     }
-    if (conflict.step === 'outside') { const next = nextRound(conflict); await saveConflict(id, next); await say(`<b>${esc(conflict.name)}</b> — round ${next.round} (${esc(rules.roundTime)}). Lead ${next.lead}. Choose Strategies.`); return next; }
+    if (conflict.step === 'outside') {
+      const next = nextRound(conflict), state = chaseState(next);
+      if (state) {
+        for (const side of ['predator', 'prey']) {
+          const r = state.ratings[side];
+          if (r) next[side].ratings = {...next[side].ratings, Acceleration: r.Acceleration, Turning: r.Turning};
+          if (state[side]?.kind === 'vehicle' && state[side].actor.system.fuel) await spendFuel(state[side].actor, {hours: 0, rounds: 1});
+        }
+      }
+      await saveConflict(id, next);
+      await say(`<b>${esc(conflict.name)}</b> — round ${next.round} (${esc(rules.roundTime)}). Lead ${next.lead}.${state ? ` ${chaseLine(next, state)}.` : ''} Choose Strategies.`);
+      return next;
+    }
     return ui.notifications.info('This conflict is over. Remove it when you no longer need the record.');
   } catch (error) { return ui.notifications.warn(error.message); }
 }
@@ -114,11 +165,18 @@ export async function manageConflict(id) {
   const tables = Object.values(rules.tables ?? {}).map(table => `<details><summary>${esc(table.title)}</summary><table><tr>${table.columns.map(column => `<th>${esc(column)}</th>`).join('')}</tr>${table.rows.map(row => `<tr>${row.map(cell => `<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</table></details>`).join('');
   const input = await ask(`${conflict.name}: manage`, `
     <p>Round ${conflict.round}, Lead ${conflict.lead}. ${esc((rules.notes ?? []).join(' '))}</p>${tables}
-    <label>Action <select name="action">${options([['lead', 'Set the Lead (outside effect or correction)'], ['concedePredator', `${sideName(conflict, 'predator')} concedes`], ['concedePrey', `${sideName(conflict, 'prey')} concedes`], ['remove', 'Remove this conflict']], 'lead')}</select></label>
-    <label>Lead <input type="number" name="lead" value="${conflict.lead}" /></label>`);
+    ${conflict.chase ? `<p>${chaseLine(conflict, chaseState(conflict))}.</p>` : ''}
+    <label>Action <select name="action">${options([['lead', 'Set the Lead (outside effect or correction)'], ...(conflict.chase ? [['room', 'Change the Maneuvering Room']] : []), ['concedePredator', `${sideName(conflict, 'predator')} concedes`], ['concedePrey', `${sideName(conflict, 'prey')} concedes`], ['remove', 'Remove this conflict']], 'lead')}</select></label>
+    <label>Lead <input type="number" name="lead" value="${conflict.lead}" /></label>
+    ${conflict.chase ? `<label>Maneuvering Room <select name="room">${options(roomRows(), conflict.chase.room)}</select></label>` : ''}`);
   if (!input) return null;
   try {
     if (input.action === 'remove') return saveConflict(id, null);
+    if (input.action === 'room') {
+      const next = structuredClone(conflict); next.chase.room = input.room;
+      await saveConflict(id, next);
+      return say(`<b>${esc(conflict.name)}</b>: ${chaseLine(next, chaseState(next))}.`);
+    }
     const next = input.action === 'lead' ? adjustLead(conflict, Number(input.lead)) : concede(conflict, input.action === 'concedePredator' ? 'predator' : 'prey');
     await saveConflict(id, next);
     if (next.winner) await announceEnd(id, next); else await say(`<b>${esc(conflict.name)}</b>: Lead set to ${next.lead}.`);

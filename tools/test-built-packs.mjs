@@ -40,7 +40,7 @@ test('rebuilt gear, vehicle and vehicle-upgrade packs hold every source row unde
     contagions: contagions.contagions.length,
     gear: gear.electronics.length + gear.gadgets.length + gear.resources.length + gear.security.length + gear.tradecraft.length + gear.housings.length,
     vehicles: vehicles.vehicles.length,
-    'vehicle-upgrades': vehicles.upgrades.length + vehicles.weapons.length
+    'vehicle-upgrades': vehicles.upgrades.length + vehicles.weapons.filter(w => w.optionOf || !vehicles.weapons.some(o => o.optionOf === w.name)).length
   };
   for (const [pack, count] of Object.entries(expected)) {
     const docs = await items(pack);
@@ -48,12 +48,19 @@ test('rebuilt gear, vehicle and vehicle-upgrade packs hold every source row unde
     assert.equal(new Set(docs.map(d => d._id)).size, count, `${pack}: ids`);
     assert.equal(new Set(docs.map(d => d.name)).size, count, `${pack}: names`);
     for (const doc of docs) {
-      assert.equal(doc.type, pack === 'vehicles' ? 'vehicle' : 'gear', doc.name);
+      assert.equal(doc.type, pack === 'vehicles' ? 'vehicle' : pack === 'vehicle-upgrades' && doc.system.sourceTable === 'Table 4.29' ? 'weapon' : 'gear', doc.name);
       assert.match(doc.system.source, /^Spycraft 2\.0 p\.\d+$/, doc.name);
       assert.match(doc.system.sourceTable, /^Table 4\.\d+$/, doc.name);
       assert.ok(doc.folder, doc.name);
     }
   }
+  // Vehicle weapons are rollable: a proficiency, damage and error/threat on every row.
+  for (const doc of (await items('vehicle-upgrades')).filter(d => d.type === 'weapon')) {
+    assert.ok(['vehicleWeapon', 'guided', 'indirectFire'].includes(doc.system.proficiency), doc.name);
+    assert.ok(doc.system.untrainedPenalty <= -6, doc.name);
+  }
+  const he = (await items('vehicle-upgrades')).find(d => d.name === 'Artillery, 105mm (High explosive ammo)');
+  assert.deepEqual([he.system.damage, he.system.errorThreat, he.system.threat, he.system.range], ['5d8 (AP 25)', '1–2/20', 20, 2000]);
   const gearDocs = await items('gear');
   assert.deepEqual([...new Set(gearDocs.map(d => d.system.gearCategory))].sort(), ['E', 'G', 'R', 'S', 'T']);
   const bug = gearDocs.find(d => d.name === 'Bug, audio (Caliber I)');

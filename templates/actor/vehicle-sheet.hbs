@@ -25,20 +25,20 @@
     {{#if system.condition.immobilized}}· <strong class="bad">immobilized</strong>{{/if}}
   </p>
   <p>
-    Defense <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>
-    · Damage save <strong>{{#if (sc2eq system.damageSave null)}}—{{else}}{{signed system.damageSave}}{{/if}}</strong>
+    Defense <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>{{#if system.defenseNow.rows.length}} <span class="muted">({{#each system.defenseNow.rows}}{{label}} {{signed value}}{{#unless @last}}, {{/unless}}{{/each}})</span>{{/if}}
+    · Damage save <strong>{{#if (sc2eq system.damageSaveNow null)}}—{{else}}{{signed system.damageSaveNow}}{{/if}}</strong>
     · Acceleration <strong>{{#if (sc2eq system.condition.acceleration null)}}{{system.accelerationTurning}}{{else}}{{system.condition.acceleration}}{{/if}}</strong>
     · Turning <strong>{{#if (sc2eq system.condition.turning null)}}—{{else}}{{system.condition.turning}}{{/if}}</strong>
     · MPH <strong>{{#if (sc2eq system.condition.cruiseMph null)}}{{system.mph}}{{else}}{{system.condition.cruiseMph}}/{{system.condition.topMph}}{{/if}}</strong>
     {{#if system.condition.maneuverErrorIncrease}}· Maneuver error +{{system.condition.maneuverErrorIncrease}}{{/if}}
-    {{#if system.condition.fuelHoursLost}}· fuel −{{system.condition.fuelHoursLost}} hr{{/if}}
   </p>
   <p>
     <label><input type="checkbox" name="system.moving" {{checked system.moving}} /> In motion</label>
-    · Driver: {{#if system.driverName}}<strong>{{system.driverName}}</strong> <a data-action="clearDriver" data-tooltip="Remove driver"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">drop a character here</span>{{/if}}
+    · <label>Defense against <select name="system.attacker">{{selectOptions attackerOptions selected=system.attacker}}</select></label>
   </p>
   <p class="controls">
-    <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
+    <a data-action="controlCheck"><i class="fa-solid fa-car-side"></i> Control check</a>
+    · <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
     · <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> Vehicle Damage result</a>
     · <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> Tyre save</a>
     · <a data-action="repair"><i class="fa-solid fa-wrench"></i> Repaired</a>
@@ -46,6 +46,42 @@
   <div class="form-fields-grid">
     {{#each counters}}<label>{{label}} <input name="system.damage.{{key}}" type="number" min="0" value="{{value}}" class="w-2" /></label>{{/each}}
   </div>
+
+  <h3>Aboard</h3>
+  <p>
+    Driver: {{#if system.driverName}}<strong>{{system.driverName}}</strong> <a data-action="clearDriver" data-tooltip="Remove driver"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">drop a character here</span>{{/if}}
+    {{#if (sc2eq system.vehicleClass 'M/AD')}} · Mount: {{#if system.mountName}}<strong>{{system.mountName}}</strong> <a data-action="clearMount" data-tooltip="Unlink the animal"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">drop an NPC to use its statistics</span>{{/if}}{{/if}}
+    · enter or leave: {{system.entryFeet}} ft. of movement
+  </p>
+  {{#if system.occupantList.length}}<table class="items"><tbody>
+    {{#each system.occupantList}}<tr><td>{{name}}</td><td><a data-action="toggleRole" data-index="{{index}}" data-tooltip="Switch crew/passenger">{{role}}</a></td>
+      <td><a data-action="bailOut" data-uuid="{{uuid}}"><i class="fa-solid fa-person-falling"></i> Bail out</a></td>
+      <td><a data-action="leave" data-index="{{index}}" data-tooltip="Leave the vehicle"><i class="fa-solid fa-xmark"></i></a></td></tr>{{/each}}
+  </tbody></table>{{/if}}
+  {{#if system.driverName}}<p><a data-action="bailOut" data-uuid="{{system.driver}}"><i class="fa-solid fa-person-falling"></i> Driver bails out</a></p>{{/if}}
+  <p>
+    <label>Acquired as <select name="system.acquiredAs">{{selectOptions acquiredOptions selected=system.acquiredAs}}</select></label>
+    {{#if skeletonCrew}}· skeleton crew: <strong>{{skeletonCrew.count}}</strong> Tier I vehicle crew <span class="muted">({{skeletonCrew.source}})</span>{{/if}}
+  </p>
+
+  <h3>Fuel</h3>
+  {{#if fuel}}<p>
+    <strong class="{{#if fuel.empty}}bad{{/if}}">{{fuel.remainingLabel}}</strong> of {{fuel.capacityLabel}} hours left · {{fuel.fuelName}}
+    · <a data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> Record use</a> · <a data-action="refuel"><i class="fa-solid fa-rotate"></i> Refuel</a>
+    · used <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> hr
+  </p>{{else}}<p class="muted">No fuel range to track ({{system.rangeFuel}}).</p>{{/if}}
+
+  <h3>Qualities</h3>
+  {{#if system.qualityList.length}}<ul class="vehicle-qualities">{{#each system.qualityList}}<li><strong data-tooltip="{{summary}}">{{label}}</strong> — {{name}}{{#if summary}}: {{summary}}{{/if}}</li>{{/each}}</ul>
+  <p class="muted">Vehicle qualities, pp.292–295.</p>{{else}}<p class="muted">None.</p>{{/if}}
+
+  <h3>Upgrades and weapons</h3>
+  <p>Upgrades used <strong class="{{#if upgradesOver}}bad{{/if}}">{{system.upgraded.used}}</strong> of {{system.upgraded.free}} free · weapon spaces {{weapons.length}} of {{system.weaponSpaces}}{{#if weaponsOver}} <strong class="bad">over</strong>{{/if}} <span class="muted">· drop upgrades and vehicle weapons here</span></p>
+  {{#if upgrades.length}}<table class="items"><tbody>{{#each upgrades}}<tr><td><a data-action="openItem" data-item-id="{{id}}">{{name}}</a></td><td>{{cost}}</td><td><a data-action="removeItem" data-item-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
+  {{#if system.upgraded.addedQualities.length}}<p class="muted">Added by upgrades: {{#each system.upgraded.addedQualities}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+  {{#if weapons.length}}<table class="items"><tbody>{{#each weapons}}<tr><td><a data-action="openItem" data-item-id="{{id}}">{{name}}</a></td><td>{{damage}}</td><td>{{errorThreat}}</td>
+    <td><a data-action="fireWeapon" data-item-id="{{id}}"><i class="fa-solid fa-crosshairs"></i> Fire</a></td><td><a data-action="removeItem" data-item-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
+  {{#if otherItems.length}}<p class="muted">Also aboard: {{#each otherItems}}<a data-action="openItem" data-item-id="{{id}}">{{name}}</a>{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
 
   <h3>Statistics</h3>
   <div class="form-fields-grid">

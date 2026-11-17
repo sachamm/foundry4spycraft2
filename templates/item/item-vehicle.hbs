@@ -37,6 +37,7 @@
     <label><input type="checkbox" name="system.restricted" {{checked system.restricted}} /> Restricted sale</label>
   </div>
   <label>Qualities <input name="system.qualities" value="{{system.qualities}}" /></label>
+  {{#if vehicleQualities.length}}<ul class="vehicle-qualities">{{#each vehicleQualities}}<li><strong>{{label}}</strong> — {{name}}{{#if summary}}: {{summary}}{{/if}}</li>{{/each}}</ul>{{/if}}
   <p class="controls">
     {{#if hasDamageSave}}<a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
     · failed saves <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />

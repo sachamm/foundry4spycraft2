@@ -12,8 +12,10 @@ import { humanizeTemplate, renderTemplate } from "../rules/formula.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { breakState, vehicleClass } from "../rules/vehicles.mjs";
 import { deployVehicle, objectSize, rollObjectDamageSave } from "../apps/vehicle-play.mjs";
-import { issueToTeam, chargeStandingCost, refundStandingCost } from "../apps/gear-play.mjs";
+import { issueToTeam, chargeStandingCost, refundStandingCost, useBattery, rechargeItem, addMechanism, removeMechanism, rollGadgetSkillCheck, repairItem, signalCheck } from "../apps/gear-play.mjs";
+import { batteryState, gadgetState, repairPlan } from "../rules/gear-play-rules.mjs";
 import { parseStandingCost } from "../rules/standing.mjs";
+import { qualityReference } from "../rules/vehicle-play-rules.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
@@ -35,7 +37,13 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       deployVehicle() { return deployVehicle(this.item); },
       issueToTeam() { return issueToTeam(this.item); },
       chargeStanding() { return chargeStandingCost(this.item); },
-      refundStanding() { return refundStandingCost(this.item); }
+      refundStanding() { return refundStandingCost(this.item); },
+      useBattery() { return useBattery(this.item); },
+      recharge() { return rechargeItem(this.item); },
+      repair() { return repairItem(this.item); },
+      signal() { return signalCheck(this.item); },
+      removeMechanism(event, target) { return removeMechanism(this.item, Number(target.dataset.index)); },
+      gadgetSkill(event, target) { return rollGadgetSkillCheck(this.item, Number(target.dataset.index)); }
     }
   };
 
@@ -48,6 +56,20 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     const parts = super._configureRenderParts(options);
     parts.details = { ...parts.details, template: `${TPL}/item-${this.item.type}.hbs` };
     return parts;
+  }
+
+  _onRender(context, options) {
+    super._onRender?.(context, options);
+    const zone = this.element.querySelector(".gadget-drop");
+    if (!zone || !this.isEditable) return;
+    zone.addEventListener("dragover", event => event.preventDefault());
+    zone.addEventListener("drop", async event => {
+      event.preventDefault();
+      const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+      if (data?.type !== "Item") return;
+      const mechanism = await fromUuid(data.uuid);
+      if (mechanism) await addMechanism(this.item, mechanism);
+    });
   }
 
   async _prepareContext(options) {
@@ -136,11 +158,22 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       context.breakState = breakState(size, sys.failedSaves ?? 0);
       const standingCost = parseStandingCost(sys.standingCost), standingCharge = item.getFlag("spycraft2", "standingCharge");
       context.standing = standingCost && item.parent ? { cost: standingCost, netWorthLabel: `$${standingCost.netWorth.toLocaleString("en-US")}`, charge: standingCharge, canCharge: item.parent.isOwner && !standingCharge, canRefund: game.user.isGM && !!standingCharge } : null;
+      // Battery life, gadget housing, repairs and signals (pp.223–224, 276–281).
+      const battery = batteryState(sys.battery, sys.charge);
+      context.battery = battery ? { ...battery, remainingLabel: Math.round(battery.remaining * 100) / 100, unit: battery.kind === "time" ? "hours" : "uses" } : null;
+      context.gadget = item.type === "gear" ? { ...gadgetState({ housingSize: sys.gadget?.housingSize || "", mechanisms: sys.gadget?.mechanisms ?? [] }, { itemDamageSave: sys.damageSave }),
+        mechanisms: (sys.gadget?.mechanisms ?? []).map((m, index) => ({ ...m, index, skillCheck: /^Skill check/.test(m.name) })),
+        canHouse: !(sys.gearCategory === "G" && !/^Gadget housing/.test(item.name)) } : null;
+      context.housingOptions = { "": "—", N: "Nuisance", F: "Fine", D: "Diminutive", T: "Tiny", S: "Small", M: "Medium", L: "Large", H: "Huge", G: "Gargantuan", C: "Colossal", E: "Enormous", V: "Vast" };
+      const repair = repairPlan(item);
+      context.repair = repair.possible && item.parent ? repair : null;
+      context.hasSignal = Number(sys.powerRating) > 0 && !!sys.effectRange && sys.gearCategory === "E";
       context.canIssueTeam = game.user.isGM && !!item.parent && sys.perTeamMember && !item.getFlag("spycraft2", "issuedFrom");
     }
     if (item.type === "vehicle") {
       context.vehicleClassOptions = { "": "—", ...Object.fromEntries(VEHICLE_RULES.classes.map(c => [c.code, c.label])) };
       context.vehicleClassInfo = vehicleClass(sys.vehicleClass);
+      context.vehicleQualities = qualityReference(sys.qualities);
       context.pickOptions = Object.fromEntries(Object.entries(context.pickOptions).filter(([key]) => !key || key === "V" || key === "CHA"));
     }
     return context;

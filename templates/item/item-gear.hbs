@@ -43,8 +43,23 @@
       <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
       · failed saves <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
       · <strong class="{{#unless (sc2eq breakState.state 'intact')}}bad{{/unless}}">{{breakState.state}}</strong>
+      {{#if repair}}· <a data-action="repair"><i class="fa-solid fa-screwdriver-wrench"></i> Repair</a> <span class="muted">({{repair.skillKey}} vs DC {{repair.dc}})</span>{{/if}}
     </p>{{/if}}
+    {{#if battery}}<p>
+      Battery: <strong class="{{#if battery.dry}}bad{{/if}}">{{#if battery.dry}}dry{{else}}{{battery.remainingLabel}} of {{battery.capacity}} {{battery.unit}} left{{/if}}</strong>{{#if battery.depleted}}{{#unless battery.dry}} <span class="bad">past battery life ({{battery.depletedUses}} uses since)</span>{{/unless}}{{/if}}
+      · <a data-action="useBattery"><i class="fa-solid fa-battery-half"></i> Use</a> · <a data-action="recharge"><i class="fa-solid fa-plug"></i> Recharge</a>
+    </p>{{/if}}
+    {{#if hasSignal}}<p><a data-action="signal"><i class="fa-solid fa-tower-broadcast"></i> Signal reception DC</a> <span class="muted">(PR {{system.powerRating}}, {{system.effectRange}} increments)</span></p>{{/if}}
   </details>
+  {{#if gadget.canHouse}}<details class="reference-panel gadget-drop" {{#if gadget.mechanisms.length}}open{{/if}}>
+    <summary>Gadget{{#if gadget.mechanisms.length}} — {{gadget.count}} of {{gadget.max}} mechanisms{{/if}}</summary>
+    <p><label>Housing Size <select name="system.gadget.housingSize">{{selectOptions housingOptions selected=system.gadget.housingSize}}</select></label>
+      {{#if gadget.valid}}· up to {{gadget.max}} mechanism{{#unless (sc2eq gadget.max 1)}}s{{/unless}} · Knowledge DC {{gadget.knowledgeDC}} · Damage save {{signed gadget.damageSave}}{{#if gadget.complexity}} · Complexity {{gadget.complexity}}{{/if}}{{/if}}</p>
+    {{#if gadget.mechanisms.length}}<table class="items"><tbody>{{#each gadget.mechanisms}}<tr><td>{{name}}{{#if skill}} ({{skill}}){{/if}}</td><td>PR {{powerRating}}</td><td>{{complexity}}</td>
+      <td>{{#if skillCheck}}<a data-action="gadgetSkill" data-index="{{index}}"><i class="fa-solid fa-dice-d20"></i> Roll</a>{{/if}}</td>
+      <td><a data-action="removeMechanism" data-index="{{index}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
+    <p class="muted">Drop gadget mechanisms (Gear pack, Gadgets) here; each costs one Gadget pick. The GC approves every gadget.</p>
+  </details>{{/if}}
   <h3>{{localize "SPYCRAFT.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
 </section>

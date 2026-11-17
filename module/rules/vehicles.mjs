@@ -81,7 +81,7 @@ export const VEHICLE_DAMAGE_COUNTERS = Object.freeze(['controls', 'engine', 'flo
  *  - Controls: Turning −1 each.
  *  - Engine: Acceleration −1 each, and each speed loses a quarter (rounded down) once per result.
  *  - Flotation: Acceleration and Turning −1 each.
- *  - Traction: Turning −2 each.
+ *  - Traction: Turning −2 each (−1 with run-flat tyres).
  *  - Lift: Maneuver error range +1 each.
  * A rating reduced to 0 by damage immobilizes the vehicle. Ratings the vehicle never had stay null.
  */
@@ -93,7 +93,8 @@ export function vehicleCondition(stats = {}, damage = {}) {
   const rating = value => Number.isSafeInteger(value) ? value : null;
   const baseAcceleration = rating(stats.acceleration), baseTurning = rating(stats.turning);
   const accelerationLoss = count('engine') + count('flotation');
-  const turningLoss = count('controls') + count('flotation') + 2 * count('traction');
+  // Run-flat tyres limit each Traction result to Turning −1 (p.297).
+  const turningLoss = count('controls') + count('flotation') + (stats.runFlat ? 1 : 2) * count('traction');
   const reduce = (base, loss) => base === null ? null : Math.max(0, base - loss);
   const acceleration = reduce(baseAcceleration, accelerationLoss), turning = reduce(baseTurning, turningLoss);
   const slow = speed => {

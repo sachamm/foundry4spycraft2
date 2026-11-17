@@ -9670,7 +9670,70 @@ export const GEAR_RULES = {
    "damageSave": 22,
    "sourcePage": 278
   }
- ]
+ ],
+ "skillUses": {
+  "Bomb sniffer, commercial": {
+   "checks": [
+    "search/perception"
+   ],
+   "note": "explosives only; no Vision tag"
+  },
+  "Bomb sniffer, military": {
+   "checks": [
+    "search/perception"
+   ],
+   "note": "explosives only; no Vision tag"
+  },
+  "Bug sweeper, commercial": {
+   "checks": [
+    "search/perception"
+   ],
+   "note": "bugs only; no Vision tag"
+  },
+  "Bug sweeper, military": {
+   "checks": [
+    "search/perception"
+   ],
+   "note": "bugs only; no Vision tag"
+  },
+  "Chemical analyzer": {
+   "checks": [
+    "analysis/forensics"
+   ],
+   "gearBonus": 1
+  },
+  "Computer, desktop": {
+   "checks": [
+    "computers/*"
+   ],
+   "note": "checks made with the computer, not against it"
+  },
+  "Computer, laptop": {
+   "checks": [
+    "computers/*"
+   ],
+   "note": "checks made with the computer, not against it"
+  },
+  "Stress analyzer, voice": {
+   "checks": [
+    "senseMotive/detect-lie"
+   ],
+   "gearBonus": 1
+  },
+  "Stress analyzer, retina": {
+   "checks": [
+    "senseMotive/detect-lie"
+   ],
+   "gearBonus": 3
+  },
+  "Fiberscope": {
+   "checks": [
+    "notice/awareness",
+    "search/perception"
+   ],
+   "note": "also adds range penalties"
+  }
+ }
 };
 export const CONTAGIONS = [
  {
@@ -11107,7 +11170,8 @@ export const VEHICLE_RULES = {
     "Tract",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 40
   },
   {
    "code": "SGV",
@@ -11137,7 +11201,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 50
   },
   {
    "code": "HGV",
@@ -11167,7 +11232,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 30
   },
   {
    "code": "M/AD",
@@ -11197,7 +11263,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 30
   },
   {
    "code": "PSA",
@@ -11227,7 +11294,8 @@ export const VEHICLE_RULES = {
     "Occ",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 40
   },
   {
    "code": "PFA",
@@ -11257,7 +11325,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 1000
   },
   {
    "code": "SVA",
@@ -11287,7 +11356,8 @@ export const VEHICLE_RULES = {
     "Occ",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 100
   },
   {
    "code": "RWA",
@@ -11317,7 +11387,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 100
   },
   {
    "code": "PSW",
@@ -11347,7 +11418,8 @@ export const VEHICLE_RULES = {
     "Occ",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 40
   },
   {
    "code": "STW",
@@ -11377,7 +11449,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 50
   },
   {
    "code": "SHP",
@@ -11407,7 +11480,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 5280
   },
   {
    "code": "SUB",
@@ -11437,7 +11511,8 @@ export const VEHICLE_RULES = {
     "W/G",
     "W/G",
     "W/G"
-   ]
+   ],
+   "chaseLeadFeet": 30
   }
  ],
  "damageLocations": {
@@ -11472,5 +11547,188 @@ export const VEHICLE_RULES = {
  "tractionSaveBonusHouseRule": {
   "G": "House rule: +5, between Huge (+4) and Colossal (+6); none printed."
  },
+ "qualities": {
+  "APP": [
+   "Advanced passenger protection",
+   "Occupants get the listed DR/— in a crash, not against attacks."
+  ],
+  "CAP": [
+   "Capital scale",
+   "Maneuvers use Tactics; loses opposed Maneuvers to smaller craft."
+  ],
+  "CHF": [
+   "Chaff and flares",
+   "Half action: guided missiles at it get error +2 this round."
+  ],
+  "CMF": [
+   "Camouflaged",
+   "Driver +2 to Blend/Stealth and Sneak/Hide in its terrain."
+  ],
+  "COM": [
+   "Comfortable",
+   "Occupants recover vitality as if resting on long trips."
+  ],
+  "CRW": [
+   "Crew",
+   "Needs a large crew; Maneuver checks use Tactics."
+  ],
+  "DEP": [
+   "Dependable",
+   "Activating an error with it costs 1 more action die."
+  ],
+  "DRN": [
+   "Drone",
+   "Remote controlled: weapons −4, Maneuver error +1; stops if cut off."
+  ],
+  "DUC": [
+   "Dual controls",
+   "Two drivers may cooperate, or contest control."
+  ],
+  "EJS": [
+   "Ejection seats",
+   "Crew +6 to Reflex saves to escape; ejecting hurts."
+  ],
+  "ENV": [
+   "Environmental tolerance",
+   "Ignores one vehicle hazard penalty."
+  ],
+  "FSS": [
+   "Fire suppression system",
+   "Fire damage to it drops by 1d6 each round."
+  ],
+  "FMP": [
+   "Firmpoints",
+   "Mounts for personal heavy weapons; the gunner has 1/2 cover."
+  ],
+  "FLM": [
+   "Flammable",
+   "−5 to Damage saves against fire; fire damage doubled."
+  ],
+  "FOR": [
+   "Forgiving",
+   "Errors cost 1 more die to activate; untrained penalty 2 less."
+  ],
+  "GEV": [
+   "Ground effect vehicle",
+   "Crosses flat land as if water; flotation results doubled."
+  ],
+  "HDP": [
+   "Hardpoints",
+   "Extra mounts for hardpoint weapons."
+  ],
+  "HAR": [
+   "Heavy armor",
+   "Critical hits against it cost extra action dice."
+  ],
+  "HOB": [
+   "High-observable",
+   "Larger signature on the listed sensors."
+  ],
+  "HOT": [
+   "Hot",
+   "Crew +1 to Impress while it is in view; lost on a critical hit."
+  ],
+  "JAM": [
+   "Jamming gear",
+   "Jams signals at the listed PR, 5-mile increments."
+  ],
+  "LSP": [
+   "Life support",
+   "Sealed air for the listed number of man-days."
+  ],
+  "LVQ": [
+   "Living quarters",
+   "Sleeping, cooking and washing facilities aboard."
+  ],
+  "LOB": [
+   "Low-observable",
+   "Smaller signature on the listed sensors."
+  ],
+  "LUX": [
+   "Luxury",
+   "Owner +2 to Impress inside; lost after 2 critical hits."
+  ],
+  "MUS": [
+   "Muscle powered",
+   "Ratings and speed come from the crew's Strength and Constitution."
+  ],
+  "ORD": [
+   "Off-road",
+   "Smaller penalties in rough terrain."
+  ],
+  "OPN": [
+   "Open",
+   "Occupants can be attacked directly, with the listed cover."
+  ],
+  "PTP": [
+   "Passenger trap",
+   "Occupants take +1 damage per die in a crash."
+  ],
+  "PDC": [
+   "Point defense cluster",
+   "Each cluster may destroy an incoming missile on 18–20."
+  ],
+  "PVI": [
+   "Poor visibility",
+   "Occupants take the listed vision penalty."
+  ],
+  "RAR": [
+   "Reactive armor",
+   "+2d10 DR/— against HE or HEAT tactical weapons."
+  ],
+  "RDD": [
+   "Redundant systems",
+   "Ignores the first damage result in each listed location."
+  ],
+  "RGD": [
+   "Rugged",
+   "Damage saves +2, and +2 more per Size above Medium."
+  ],
+  "SEN": [
+   "Sensors",
+   "Radar, sonar or thermal sensors at the listed PR, 10-mile increments."
+  ],
+  "STB": [
+   "Stabilized",
+   "Weather penalties reduced by 2."
+  ],
+  "TRK": [
+   "Tracked",
+   "Better in rough terrain; tyre saves are against half damage."
+  ],
+  "TRO": [
+   "Trained only",
+   "No untrained Maneuver checks."
+  ],
+  "UNC": [
+   "Uncomfortable",
+   "1 subdual damage per hour of travel after the first."
+  ],
+  "UNF": [
+   "Unforgiving",
+   "Untrained Maneuver penalty 4 worse."
+  ],
+  "UNP": [
+   "Unpowered",
+   "No engine: towed or launched, then glides."
+  ],
+  "UNR": [
+   "Unreliable",
+   "Activating an error with it costs 1 fewer action die."
+  ],
+  "VTL": [
+   "Vertical takeoff and landing",
+   "Takes off vertically; may trade Acceleration for Turning."
+  ],
+  "WPN": [
+   "Weapons",
+   "Permanently mounted weapons, listed in parentheses."
+  ],
+  "WND": [
+   "Wind-powered",
+   "Speed and Acceleration come from the wind."
+  ]
+ },
+ "qualitiesPage": 292,
  "bailOutDC": 15
 };

@@ -181,6 +181,13 @@ export class GearData extends BaseItemData {
       bundled: str(),
       /** One pick issues a copy to every team member. */
       perTeamMember: new BooleanField(),
+      /** Battery use since the last recharge (p.223): hours or uses, uses past depletion, and whether it ran dry. */
+      charge: new SchemaField({ used: num(0, { min: 0 }), depletedUses: int(0, { min: 0 }), dry: new BooleanField() }),
+      /** A gadget built in this item: its housing Size and installed mechanisms (pp.278–281). */
+      gadget: new SchemaField({
+        housingSize: str(),
+        mechanisms: new ArrayField(new SchemaField({ name: str(), caliber: int(0, { min: 0, max: 5 }), powerRating: str(), complexity: str(), skill: str() }))
+      }),
       /** Columns particular to one table, as label/value pairs. */
       stats: new ArrayField(new SchemaField({ label: str(), value: str() }))
     };

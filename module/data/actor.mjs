@@ -12,12 +12,14 @@ const missionThreatLevelSetting=()=>{try{const m=globalThis.game?.settings?.get(
 import { computeAgent } from "../rules/engine.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
 import { VEHICLE_DAMAGE_COUNTERS, breakState, vehicleClass, vehicleCondition, vehicleDefense } from "../rules/vehicles.mjs";
+import { entryMovement, fuelState, hasQuality, qualityReference, ruggedBonus, upgradedStats, weaponSpaces } from "../rules/vehicle-play-rules.mjs";
 import { SKILLS } from "../rules/tables.mjs";
 
 const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
 
 const int = (initial = 0, opts = {}) => new NumberField({ required: true, nullable: false, integer: true, initial, ...opts });
 const str = (initial = "", opts = {}) => new StringField({ required: true, blank: true, initial, ...opts });
+const num = (initial = 0, opts = {}) => new NumberField({ required: true, nullable: false, initial, ...opts });
 const resource = (initial = 0) => new SchemaField({ value: int(initial, { min: 0 }), max: int(initial, { min: 0 }) });
 const ABILITY_KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 const PROF_KEYS = ["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged", "explosives", "guided", "handgun", "hurled",
@@ -321,21 +323,65 @@ export class VehicleActorData extends foundry.abstract.TypeDataModel {
       failedSaves: int(0, { min: 0 }),
       /** Vehicle Damage results recorded so far (Table 4.72, p.290). */
       damage: new SchemaField(Object.fromEntries(VEHICLE_DAMAGE_COUNTERS.map(key => [key, int(0, { min: 0 })]))),
+      /** Everyone aboard besides the driver (p.289). */
+      occupants: new ArrayField(new SchemaField({ uuid: str(), role: str("passenger", { choices: ["crew", "passenger"] }) })),
+      /** How the vehicle was acquired, which sets the size of its skeleton crew (p.289). */
+      acquiredAs: str("", { choices: ["", "possession", "mission"] }),
+      /** Hours of fuel used since the last refuel (p.225); combat and chase rounds use a minute each. */
+      fuelUsed: num(0, { min: 0 }),
+      /** UUID of the NPC whose statistics a mount uses where its table entry says "NPC" (p.236). */
+      mountNpc: str(),
+      /** UUID of an attacking vehicle, to show this vehicle's Defense against it (p.289). */
+      attacker: str(),
       biography: new HTMLField()
     };
   }
 
-  prepareDerivedData() {
-    this.classInfo = vehicleClass(this.vehicleClass);
-    this.condition = vehicleCondition(this, this.damage);
-    this.breakState = breakState(this.size || this.sizeLabel, this.failedSaves);
-    const driver = this.driver ? globalThis.fromUuidSync?.(this.driver) ?? null : null;
-    this.driverName = driver?.name ?? "";
-    this.defenseNow = vehicleDefense({ defense: this.defense, moving: this.moving, driverDexMod: driver?.system?.abilities?.dex?.mod ?? 0 });
+  /** A vehicle on a scene is one particular vehicle: its tokens share its fuel, damage and occupants. */
+  async _preCreate(data, options, user) {
+    const allowed = await super._preCreate?.(data, options, user);
+    if (allowed === false) return false;
+    if (data.prototypeToken?.actorLink === undefined) this.parent.updateSource({ "prototypeToken.actorLink": true });
   }
 
-  /** Vehicles have no Initiative of their own; they act on their driver's count. */
+  prepareDerivedData() {
+    this.classInfo = vehicleClass(this.vehicleClass);
+    // Installed upgrades (Tables 4.28–4.29) are embedded items with an upgrade cost.
+    const upgrades = [...(this.parent?.items ?? [])].filter(item => /^Table 4\.2[89]/.test(item.system?.sourceTable ?? ""))
+      .map(item => ({ id: item.id, name: item.name, cost: Number(item.system.stats?.find(s => s.label === "Upgrade cost")?.value) || 0, weapon: item.system.sourceTable === "Table 4.29" }));
+    this.upgradeList = upgrades;
+    this.upgraded = upgradedStats(this, upgrades);
+    const stats = { ...this, acceleration: this.upgraded.acceleration, turning: this.upgraded.turning, topMph: this.upgraded.topMph, runFlat: !!this.upgraded.runFlat };
+    this.condition = vehicleCondition(stats, this.damage);
+    this.qualitiesNow = this.upgraded.qualities;
+    this.qualityList = qualityReference(this.qualitiesNow);
+    this.breakState = breakState(this.size || this.sizeLabel, this.failedSaves);
+    const resolve = uuid => (uuid ? globalThis.fromUuidSync?.(uuid) ?? null : null);
+    const driver = resolve(this.driver), mount = resolve(this.mountNpc), attacker = resolve(this.attacker);
+    this.driverName = driver?.name ?? "";
+    this.mountName = mount?.name ?? "";
+    this.attackerName = attacker?.name ?? "";
+    // A mount whose table entry says "NPC" takes its Defense and Damage save from the linked NPC.
+    const baseDefense = Number.isSafeInteger(this.defense) ? this.defense : mount?.system?.defense?.total ?? null;
+    const baseSave = Number.isSafeInteger(this.upgraded.damageSave) ? this.upgraded.damageSave : mount?.system?.damageSave ?? null;
+    const attackerNow = attacker?.type === "vehicle" ? attacker.system.condition : null;
+    this.defenseNow = vehicleDefense({ defense: baseDefense, moving: this.moving, driverDexMod: driver?.system?.abilities?.dex?.mod ?? 0,
+      acceleration: this.condition.acceleration, turning: this.condition.turning, attacker: attackerNow });
+    // Rugged adds to every Damage save the vehicle makes (p.294).
+    this.damageSaveNow = Number.isSafeInteger(baseSave) ? baseSave + (hasQuality(this.qualitiesNow, "RGD") ? ruggedBonus(this.size || this.sizeLabel) : 0) : null;
+    this.fuel = fuelState(this.rangeFuel, { used: this.fuelUsed, lost: this.damage.fuelHours, extraHours: this.upgraded.fuelHours });
+    this.occupantList = this.occupants.map((o, index) => ({ index, ...o, name: resolve(o.uuid)?.name ?? "(missing)" }));
+    this.crewCount = this.crew ?? 0;
+    this.entryFeet = entryMovement(this);
+    this.weaponSpaces = weaponSpaces(this.size || this.sizeLabel);
+  }
+
+  /**
+   * Vehicles act on their driver's Initiative Count (p.289). Rolled on its own, a vehicle uses its driver's
+   * Initiative bonus; a combat hook then copies the driver's actual result when the driver is in the fight.
+   */
   getRollData() {
-    return { initiative: { total: 0 }, defense: this.defenseNow?.total ?? this.defense ?? 0, damageSave: this.damageSave ?? 0 };
+    const driver = this.driver ? globalThis.fromUuidSync?.(this.driver) ?? null : null;
+    return { initiative: { total: driver?.system?.initiative?.total ?? 0 }, defense: this.defenseNow?.total ?? this.defense ?? 0, damageSave: this.damageSaveNow ?? this.damageSave ?? 0 };
   }
 }

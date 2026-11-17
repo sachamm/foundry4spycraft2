@@ -304,7 +304,7 @@ test('a gear item records the Damage saves it fails and reports when it breaks',
 });
 
 test('a critical hit on a vehicle rolls a Vehicle Damage result once per failed save', async () => {
-  const car = document('Actor', 'vehicle', {vehicleClass: 'SGV', size: 'L', damageSave: 8, failedSaves: 0, damage: {}});
+  const car = document('Actor', 'vehicle', {vehicleClass: 'SGV', size: 'L', damageSave: 8, failedSaves: 0, damage: {}, crew: 1, passengers: 3, occupants: [], driver: 'Actor.ada'});
   nextRoll = 6; posts.length = 0;                            // save 14 vs DC 30: fails 1, blast +1, critical ×2 = 4; then location 6 = Controls
   await rollObjectDamageSave(car, {damage: 40, blast: true, critical: true});
   assert.equal(car.system.failedSaves, 4);
@@ -314,16 +314,21 @@ test('a critical hit on a vehicle rolls a Vehicle Damage result once per failed 
 
   nextRoll = 16; posts.length = 0;                           // location 16 on SGV = Traction: no counter until the tyre fails its own save
   await rollVehicleDamageResult(car, {failed: 1, damage: 40});
-  assert.match(posts[0].flavor, /tyre must now make its own Damage save against 40 damage \(bonus \+2\)/);
+  assert.match(posts[0].flavor, /tyre must make its own Damage save against 40 damage \(bonus \+2\)/);
   assert.equal(car.system.damage.traction, undefined);
   nextRoll = 3;
   await rollTyreSave(car, {damage: 40});                     // 5 vs DC 30
   assert.equal(car.system.damage.traction, 1);
 
-  nextRoll = 12; posts.length = 0;                           // location 12 on SGV = Occupant: reported, not recorded
-  await rollVehicleDamageResult(car, {failed: 2});
+  nextRoll = 12; posts.length = 0;                           // location 12 on SGV = Occupant: the driver takes damage − save bonus
+  globalThis.fromUuidSync = uuid => (uuid === 'Actor.ada' ? {name: 'Ada', uuid} : null);
+  await rollVehicleDamageResult(car, {failed: 2, damage: 20, armorPiercing: 3});
   assert.match(posts[0].flavor, /Occupant<\/strong> ×2/);
-  assert.match(posts[0].flavor, /nothing is recorded automatically/);
+  assert.match(posts[0].flavor, /<strong>Ada<\/strong> takes 15 damage/);   // 20 − (8 − 3)
+  nextRoll = 1; posts.length = 0;                            // location 1 on SGV = Cargo: at least 1
+  await rollVehicleDamageResult(car, {failed: 1, damage: 4});
+  assert.match(posts[0].flavor, /cargo item takes 1 damage/);
+  delete globalThis.fromUuidSync;
 
   await repairVehicle(car);
   assert.equal(car.system.failedSaves, 0);
@@ -350,4 +355,113 @@ test('a vehicle pick can be placed on a scene and can refresh an existing vehicl
   assert.equal(onScene.system.failedSaves, 2);
   assert.equal(onScene.system.damage.engine, 1);
   assert.equal(await deployVehicle(document('Item', 'gear', {})), null);
+});
+
+/* ---------------------------------------------------------------------- */
+/*  Vehicle play rules: qualities, fuel, crew, control checks, upgrades    */
+/* ---------------------------------------------------------------------- */
+
+const rules = await import('../module/rules/vehicle-play-rules.mjs');
+
+test('qualities parse into codes with parameters and carry our reference labels', () => {
+  const list = rules.qualityReference('OPN (1/4 cover), ORD, HAR (2), LOB (radar S, thermal F)');
+  assert.deepEqual(list.map(q => [q.code, q.param]), [['OPN', '1/4 cover'], ['ORD', ''], ['HAR', '2'], ['LOB', 'radar S, thermal F']]);
+  assert.equal(list[0].name, 'Open');
+  assert.ok(list.every(q => q.summary));
+  assert.equal(rules.heavyArmorDice('HAR (2), TRK'), 2);
+  assert.equal(rules.qualityNumber('PVI (–6)', 'PVI'), -6);
+  for (const v of vehicles.vehicles) for (const q of rules.parseQualities(v.qualities)) assert.ok(VEHICLE_RULES.qualities[q.code], `${v.name}: ${q.code}`);
+  assert.deepEqual([rules.ruggedBonus('S'), rules.ruggedBonus('M'), rules.ruggedBonus('L'), rules.ruggedBonus('G')], [2, 2, 4, 8]);
+});
+
+test('secondary damage from a Vehicle Damage result subtracts the save bonus, reduced by armor-piercing', () => {
+  assert.equal(rules.secondaryDamage({damage: 20, saveBonus: 8}), 12);
+  assert.equal(rules.secondaryDamage({damage: 20, saveBonus: 8, armorPiercing: 10}), 20);
+  assert.equal(rules.secondaryDamage({damage: 3, saveBonus: 8}), 1);
+  assert.equal(rules.secondaryDamage({damage: 3, saveBonus: 8, minimum: 0}), 0);
+});
+
+test('fuel range parses every printed format and tracks use, losses and upgrades', () => {
+  assert.deepEqual(rules.parseRangeFuel('7/G'), {hours: 7, fuel: 'G', fuelName: 'Gas'});
+  assert.equal(rules.parseRangeFuel('60 days/F').hours, 1440);
+  assert.equal(rules.parseRangeFuel('20 years/N').hours, 175200);
+  assert.equal(rules.parseRangeFuel('15//D').hours, 15);
+  assert.ok(Math.abs(rules.parseRangeFuel('2r/A').hours - 2 / 600) < 1e-9);
+  for (const label of ['N/A', 'PD', '', '–10/D']) assert.equal(rules.parseRangeFuel(label), null, label);
+  const state = rules.fuelState('7/G', {used: 2, lost: 1});
+  assert.deepEqual([state.capacity, state.remaining, state.empty], [7, 4, false]);
+  assert.equal(rules.fuelState('7/G', {used: 9}).remaining, 0);
+  assert.equal(rules.fuelState('7/G', {extraHours: -2}).capacity, 5);
+  assert.equal(rules.travelFuel(2, {aboveCruising: true}), 4);
+  for (const v of vehicles.vehicles) if (/^\d/.test(v.rangeFuel)) assert.ok(rules.parseRangeFuel(v.rangeFuel), `${v.name}: ${v.rangeFuel}`);
+});
+
+test('crew, entry movement and bailing out follow the vehicle', () => {
+  assert.equal(rules.skeletonCrew(4, {source: 'possession'}), 3);
+  assert.equal(rules.skeletonCrew(4, {source: 'mission', teamSize: 3}), 1);
+  assert.equal(rules.skeletonCrew(1, {source: 'mission', teamSize: 4}), 0);
+  assert.equal(rules.entryMovement({vehicleClass: 'PGV', qualities: ''}), 5);
+  assert.equal(rules.entryMovement({vehicleClass: 'SHP', qualities: 'CAP, CRW'}), 60);
+  assert.equal(rules.entryMovement({vehicleClass: 'SGV', qualities: ''}), 10);
+  assert.deepEqual(rules.bailOut({qualities: 'EJS'}, {role: 'crew'}), {dc: 15, bonus: 6, ejection: true});
+  assert.equal(rules.bailOut({qualities: 'EJS'}, {role: 'passenger'}).bonus, 0);
+});
+
+test('a control check uses the category skill and focus, with the untrained penalty adjusted by qualities', () => {
+  const driver = (ranks, focuses = []) => ({skills: {drive: {ranks}, acrobatics: {ranks}, tactics: {ranks}}, focuses: {drive: focuses}});
+  const car = {vehicleClass: 'SGV', qualities: '', damage: {}};
+  assert.deepEqual(rules.controlCheckPlan(car, driver(2, ['Standard Ground Vehicles'])), {...rules.controlCheckPlan(car, driver(2, ['Standard Ground Vehicles'])), trained: true, penalty: 0, skillKey: 'drive'});
+  const noFocus = rules.controlCheckPlan(car, driver(2));
+  assert.deepEqual([noFocus.trained, noFocus.penalty], [false, -4]);
+  assert.equal(rules.controlCheckPlan({...car, qualities: 'FOR'}, driver(0)).penalty, -2);
+  assert.equal(rules.controlCheckPlan({...car, qualities: 'UNF'}, driver(0)).penalty, -8);
+  assert.match(rules.controlCheckPlan({...car, qualities: 'TRO'}, driver(0)).blocked, /Trained only/);
+  const bike = rules.controlCheckPlan({vehicleClass: 'PGV', qualities: 'DRN (radio 4)', damage: {lift: 2}}, driver(1, ['Personal Ground Vehicles']));
+  assert.deepEqual([bike.skillKey, bike.trained, bike.errorIncrease], ['acrobatics', true, 3]);
+  assert.equal(rules.controlCheckPlan({vehicleClass: 'SHP', qualities: 'CAP, CRW', damage: {}}, driver(1)).skillKey, 'tactics');
+});
+
+test('installed upgrades change ratings, speed, saves and qualities, and count against free upgrades', () => {
+  const base = {vehicleClass: 'SGV', acceleration: 5, turning: 3, topMph: 110, cruiseMph: 65, damageSave: 8, qualities: 'HOT', upgrades: 2};
+  const up = rules.upgradedStats(base, [
+    {name: 'Acceleration increase (stage I), kit', cost: 1}, {name: 'Control increase (stage II), kit', cost: 2},
+    {name: 'Top speed increase (stage I), kit', cost: 1}, {name: 'Security package (stage I), kit', cost: 1}, {name: 'Emergency service package (basic), kit', cost: 1}
+  ]);
+  assert.deepEqual([up.acceleration, up.turning, up.topMph, up.damageSave], [5, 5, 110, 12]);   // +1 −1 accel; +1 +1 turn; +10% −10% speed
+  assert.equal(up.qualities, 'HOT, UNC, RDD (crew)');
+  assert.deepEqual([up.used, up.free], [6, 2]);
+  assert.equal(rules.upgradedStats({...base, damageSave: 10}, [{name: 'Convertible roof, kit', cost: 1}]).damageSave, 8);
+  assert.equal(rules.upgradedStats(base, [{name: 'Run-flat tires', cost: 1}]).runFlat, true);
+  assert.deepEqual([rules.weaponSpaces('S'), rules.weaponSpaces('M'), rules.weaponSpaces('L'), rules.weaponSpaces('H')], [0, 1, 3, 6]);
+});
+
+/* ---------------------------------------------------------------------- */
+/*  Chases                                                                 */
+/* ---------------------------------------------------------------------- */
+
+const chase = await import('../module/rules/chase.mjs');
+
+test('chase ratings come from the vehicles, after damage, or from a character on foot', () => {
+  const car = {kind: 'vehicle', system: {vehicleClass: 'SGV', acceleration: 5, turning: 3, topMph: 110, damage: {engine: 1}}};
+  assert.deepEqual(chase.participantRatings(car), {kind: 'vehicle', Acceleration: 4, Turning: 3, topMph: 83, leadFeet: 50, immobilized: false});
+  const runner = {kind: 'foot', system: {abilities: {str: {mod: 2}, dex: {mod: -1}}}};
+  assert.deepEqual(chase.participantRatings(runner), {kind: 'foot', Acceleration: 2, Turning: 0, topMph: null, leadFeet: 20});
+  assert.equal(chase.participantRatings({kind: 'vehicle', system: {vehicleClass: 'SVA', size: 'L'}}).leadFeet, 200);
+  assert.equal(chase.participantRatings({kind: 'vehicle', system: {vehicleClass: 'SVA', size: 'G'}}).leadFeet, 100);
+});
+
+test('starting Lead compares Acceleration in open room and Turning in tight room', () => {
+  const fast = {Acceleration: 8, Turning: 2}, nimble = {Acceleration: 4, Turning: 7};
+  assert.equal(chase.startingLead('open', fast, nimble).lead, 4);
+  assert.equal(chase.startingLead('tight', fast, nimble).lead, 6);
+  assert.equal(chase.startingLead('close', {Acceleration: 5}, {Acceleration: 6}).lead, 5);
+  assert.throws(() => chase.startingLead('wide', fast, nimble), /Maneuvering Room/);
+});
+
+test('chase scale uses the shortest Lead distance, flags mismatches and finds the fastest vehicle', () => {
+  const car = {Acceleration: 5, Turning: 3, topMph: 110, leadFeet: 50}, bike = {Acceleration: 6, Turning: 9, topMph: 125, leadFeet: 40}, runner = {Acceleration: 2, Turning: 1, topMph: null, leadFeet: 20};
+  const s = chase.chaseScale('crowded', car, bike);
+  assert.deepEqual([s.leadFeet, s.mismatched, s.speedMph, s.fastest, s.topMphBonus, s.crisisDC], [40, false, 55, 'prey', 2, 30]);
+  assert.equal(chase.chaseScale('open', car, runner).mismatched, true);
+  assert.equal(chase.leadDistance(5, 40), 200);
 });

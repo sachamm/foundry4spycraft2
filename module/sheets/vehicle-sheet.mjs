@@ -1,6 +1,10 @@
 import {VEHICLE_RULES} from '../rules/tables.mjs';
 import {VEHICLE_DAMAGE_COUNTERS} from '../rules/vehicles.mjs';
-import {loadVehicleStats, repairVehicle, rollObjectDamageSave, rollTyreSave, rollVehicleDamageResult} from '../apps/vehicle-play.mjs';
+import {
+  bailOutOf, boardVehicle, fireMountedWeapon, leaveVehicle, loadVehicleStats, refuel, repairVehicle, rollControlCheck,
+  rollObjectDamageSave, rollTyreSave, rollVehicleDamageResult, setOccupantRole, skeletonCrewFor, spendFuel
+} from '../apps/vehicle-play.mjs';
+import {getMission, teamActors} from '../apps/gc/state.mjs';
 
 const {HandlebarsApplicationMixin} = foundry.applications.api;
 const {ActorSheetV2} = foundry.applications.sheets;
@@ -8,12 +12,13 @@ const {ActorSheetV2} = foundry.applications.sheets;
 const COUNTER_LABELS = {
   controls: 'Controls', engine: 'Engine', flotation: 'Flotation', fuelHours: 'Fuel lost (hours)', lift: 'Lift', traction: 'Punctured tyres'
 };
+const hours = n => (Math.round(n * 10) / 10).toLocaleString('en-US');
 
-/** Sheet for a vehicle placed on a scene: its table statistics, current condition and damage rolls. */
+/** Sheet for a vehicle placed on a scene: its table statistics, current condition, people aboard and play actions. */
 export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ['spycraft2', 'sheet', 'actor', 'vehicle'],
-    position: {width: 640, height: 720},
+    position: {width: 680, height: 780},
     window: {resizable: true},
     form: {submitOnChange: true},
     actions: {
@@ -29,6 +34,19 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
         return confirmed ? repairVehicle(this.actor) : null;
       },
       clearDriver() { return this.actor.update({'system.driver': ''}); },
+      clearMount() { return this.actor.update({'system.mountNpc': ''}); },
+      controlCheck() { return rollControlCheck(this.actor); },
+      spendFuel() { return spendFuel(this.actor); },
+      refuel() { return refuel(this.actor); },
+      leave(event, target) { return leaveVehicle(this.actor, Number(target.dataset.index)); },
+      toggleRole(event, target) {
+        const index = Number(target.dataset.index), current = this.actor.system.occupants[index]?.role;
+        return setOccupantRole(this.actor, index, current === 'crew' ? 'passenger' : 'crew');
+      },
+      bailOut(event, target) { return bailOutOf(this.actor, target.dataset.uuid); },
+      fireWeapon(event, target) { return fireMountedWeapon(this.actor, target.dataset.itemId); },
+      removeItem(event, target) { return this.actor.items.get(target.dataset.itemId)?.delete(); },
+      openItem(event, target) { return this.actor.items.get(target.dataset.itemId)?.sheet.render(true); },
       openSource: SpycraftVehicleSheet.#onOpenSource
     }
   };
@@ -38,30 +56,42 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const actor = this.actor, system = actor.system;
+    const team = (() => { try { return teamActors(getMission()).length; } catch { return 0; } })();
+    const crew = skeletonCrewFor(actor, team);
+    const items = [...actor.items];
     Object.assign(context, {
       actor, system, editable: this.isEditable,
       classOptions: {'': '—', ...Object.fromEntries(VEHICLE_RULES.classes.map(c => [c.code, c.label]))},
       calibers: CONFIG.SPYCRAFT.calibers,
+      acquiredOptions: {'': '—', possession: 'Possession', mission: 'Mission gear'},
+      attackerOptions: {'': '— none —', ...Object.fromEntries([...game.actors].filter(a => a.type === 'vehicle' && a !== actor).map(a => [a.uuid, a.name]))},
       counters: VEHICLE_DAMAGE_COUNTERS.map(key => ({key, label: COUNTER_LABELS[key], value: system.damage?.[key] ?? 0})),
       control: system.classInfo ? {
         skill: system.classInfo.skill, focus: system.classInfo.focus, untrainedPenalty: system.classInfo.untrainedPenalty
       } : null,
+      skeletonCrew: crew === null ? null : {count: crew, source: system.acquiredAs === 'mission' ? `crew ${system.crew ?? 0} − team of ${Math.max(1, team)}` : `crew ${system.crew ?? 0} − 1`},
+      fuel: system.fuel ? {...system.fuel, remainingLabel: hours(system.fuel.remaining), capacityLabel: hours(system.fuel.capacity)} : null,
+      upgrades: items.filter(i => i.system.sourceTable === 'Table 4.28').map(i => ({id: i.id, name: i.name, cost: system.upgradeList.find(u => u.id === i.id)?.cost ?? 0})),
+      weapons: items.filter(i => i.type === 'weapon').map(i => ({id: i.id, name: i.name, damage: i.system.damage, errorThreat: i.system.errorThreat})),
+      otherItems: items.filter(i => i.type !== 'weapon' && i.system.sourceTable !== 'Table 4.28'),
+      upgradesOver: system.upgraded.used > system.upgraded.free,
+      weaponsOver: items.filter(i => i.type === 'weapon').length > system.weaponSpaces,
       enrichedBiography: await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.biography, {secrets: actor.isOwner})
     });
     return context;
   }
 
-  /** A vehicle pick dropped here supplies the statistics. */
+  /** A vehicle pick dropped here supplies the statistics; upgrades and weapons are installed. */
   async _onDropItem(event, item) {
     if (!this.actor.isOwner) return null;
     if (item.type === 'vehicle') return loadVehicleStats(this.actor, item);
     return super._onDropItem(event, item);
   }
 
-  /** A character dropped here takes the controls. */
+  /** A character dropped here comes aboard: at the controls if nobody drives, otherwise as crew or passenger. */
   async _onDropActor(event, actor) {
     if (!this.actor.isOwner || !actor?.uuid || actor.type === 'vehicle') return null;
-    return this.actor.update({'system.driver': actor.uuid});
+    return boardVehicle(this.actor, actor);
   }
 
   static async #onOpenSource() {
