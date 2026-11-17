@@ -1,3 +1,4 @@
+import {enhanceSkillDialog} from "../apps/skill-dialog-ux.mjs";
 import {validateReachWeaponProof} from '../rules/reach-weapon.mjs';
 import {reachIncreaseFeet} from '../rules/reach.mjs';
 import {reachContextContent,reachContextInput} from '../apps/reach.mjs';
@@ -556,6 +557,8 @@ export class SpycraftActor extends Actor {
       const abilities = skill.totals.map(t => `<option value="${t.ability}"${t.ability === (ability ?? skill.ability) ? " selected" : ""}>${t.ability.toUpperCase()}</option>`).join("");
       input = await foundry.applications.api.DialogV2.input({
         window: { title: skill.name }, rejectClose: false,
+        ok: {label: "Roll check"},
+        render: (event, dialog) => enhanceSkillDialog(event, dialog, checks),
         content: `<div class="spycraft2-roll-options">${key==='athletics'&&(this.system.conditionContext?.held||this.system.conditionContext?.pinned)?'<fieldset><legend>Opposed Grapple escape</legend><label>Applicable proficiency <select name="grappleProficient"><option value="">Choose for this Grapple</option><option value="true">Proficient</option><option value="false">Not proficient: two full actions, error +2</option></select></label><label>My Size categories minus opponent Size categories <input name="grappleSizeDifference" type="number" step="1" min="-20" max="20" value="0" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> The GC confirms the participants, applicable proficiency and Size difference</label><p>Each larger participant gains +4 per Size category on their own check. This check uses Grasp and Armor Check Penalty; static-restraint Escape has separate rules.</p></fieldset>':''}${key==='athletics'&&restraintRollSource.sources.length?`<p>Current restraint sources: ${restraintRollSource.sources.map(s=>esc(s.name??s.id)).join(', ')}.</p>`:''}${key==='athletics'&&restraintRollSource.sources.length>1?'<label><input name="grappleAllSourcesConfirmed" type="checkbox" /> The GC confirms all current Held/Pinned sources belong to this same grapple; unrelated sources require separate adjudication</label>':''}<label>Skill check <select name="check">${choices}</select></label>
           <label>Attribute (when permitted) <select name="ability">${abilities}</select></label>
           ${(key==='analysis'||key==='resolve'&&Object.values(this.system.analysisTasks??{}).some(t=>t.pressured&&t.status==='active'))?'<details><summary>Complex Analysis Task</summary>':''}

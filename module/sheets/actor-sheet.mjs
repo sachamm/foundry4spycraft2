@@ -1,3 +1,4 @@
+import {groupBuildTasks, activeConditionLabels, enhanceAgentSheet} from "./agent-ux.mjs";
 import {manageThreadNeedle} from '../apps/thread-needle.mjs';
 import {takeStrikingAttack,reviewStrikingAttack} from '../apps/striking-stance.mjs';
 import {recordFendMovement} from '../apps/fend.mjs';
@@ -70,7 +71,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   _skillLevel = null;
 
   /** Which collapsible header panels (to-do, warnings) are open, so re-renders keep them that way. */
-  _open = { todo: true, warnings: false };
+  _open = { todo: false, warnings: false };
+
+  /** A local view preference, never stored on the character. */
+  _editMode = false;
+  _skillSearch = "";
+  _trainedOnly = false;
 
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "agent"],
@@ -78,6 +84,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      toggleEditMode(){
+        if (!this.isEditable) return;
+        this._editMode = !this._editMode;
+        this._open.todo = this._editMode;
+        return this.render();
+      },
       applyShaken(){return this.actor.applyShaken();},
       reviewShakenApplication(){return this.actor.reviewShakenApplication();},
       editShakenSource(event,target){return this.actor.editShakenSource(target.dataset.sourceUuid);},
@@ -292,7 +304,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     Object.assign(context, {
       actor, system: sys, shakenInitiativeReviews:actor.shakenInitiativeReviews, usagePeriodReview:game.spycraft2?.getUsagePeriodReview?.()??{}, startingDiceEntry:actor.startingDiceEntry, source: actor.system._source, config: cfg, editable: this.isEditable,
       tabs: this._prepareTabs("primary"),
-      warnings: sys.warnings ?? [], todo: sys.todo ?? [], open: this._open
+      warnings: sys.warnings ?? [], todo: groupBuildTasks(sys.todo), todoCount: sys.todo?.length ?? 0, open: this._open,
+      editMode: this.isEditable && this._editMode, activeConditions: activeConditionLabels(sys)
     });
 
     // Hover breakdowns: fixed parts first, then every origin/feat/class bonus the engine recorded.
@@ -502,6 +515,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   /** Remember which header panels the player has opened or closed. */
   _onRender(context, options) {
     super._onRender(context, options);
+    enhanceAgentSheet(this.element, context, this, text => game.i18n.localize(text));
     for (const d of this.element.querySelectorAll("details[data-key]")) {
       if(Object.hasOwn(this._open,d.dataset.key))d.open=this._open[d.dataset.key];
       d.addEventListener("toggle", () => { this._open[d.dataset.key] = d.open; });
@@ -642,11 +656,19 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   static #onRollInitiative() { return this.actor.rollInitiative({ createCombatants: true }); }
   static #onRollVitality(event,target) {return this.actor.rollVitality(Number(target.dataset.index));}
   /** Jump from a to-do entry to the tab where it gets resolved. */
-  static #onTodo(event, target) {
+  static async #onTodo(event, target) {
     const { tab, skillLevel } = target.dataset;
     if (skillLevel) this._skillLevel = Number(skillLevel);
     this.changeTab(tab, "primary");
-    if (skillLevel) return this.render({ parts: ["skills"] });
+    this._editMode = this.isEditable;
+    this._open.todo = false;
+    if (tab === "main") this._open.origins = true;
+    await this.render();
+    const section = this.element.querySelector(`section[data-tab="${tab}"]`);
+    const missing = [...(section?.querySelectorAll("select:not([disabled])") ?? [])].find(select => !select.value);
+    const field = missing ?? section?.querySelector("input:not([disabled])");
+    field?.scrollIntoView({block: "nearest"});
+    field?.focus();
   }
   static #onSpendActionDie() { return this.actor.rollActionDie(); }
   static #onAddLevel() { return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true); }

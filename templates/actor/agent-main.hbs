@@ -1,27 +1,51 @@
 <section class="tab main {{tab.cssClass}}" data-tab="main" data-group="primary">
 {{#each shakenInitiativeReviews}}<p class="bad">{{name}}: Initiative Count {{count}} needs Shaken review. {{reason}} {{#if @root.isGM}}<a data-action="reviewShakenInitiative" data-combat-id="{{combatId}}" data-combatant-id="{{id}}">Review included penalty</a>{{/if}}</p>{{/each}}
-  <div class="cols">
+  <div class="play-dashboard">
+    <div class="defense-summary">      <h3>{{localize "SPYCRAFT.Defenses"}}</h3>
+      <div class="stat-grid">
+        {{#each saves}}
+          <div class="stat"><a data-action="rollSave" data-save="{{key}}">{{label}}</a><b {{sc2tip tip}}>{{signed total}}</b><small>{{localize "SPYCRAFT.Base"}} {{base}}{{#if bonus}}, {{signed bonus}}{{/if}}</small></div>
+        {{/each}}
+        <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><b {{sc2tip tips.defense}}>{{system.defense.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.defense.base}}{{#if system.defense.armor}}, {{localize "SPYCRAFT.Armor"}} {{signed system.defense.armor}}{{/if}}</small></div>
+        <div class="stat"><a data-action="rollInitiative">{{localize "SPYCRAFT.Initiative"}}</a><b {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.initiative.base}}</small></div>
+        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b {{sc2tip tips.speed}}>{{#if system.conditionSpeedReview}}GC ruling needed{{else}}{{system.speed}} ft{{/if}}</b></div>
+      </div></div>
+    <div class="dashboard-weapons">      <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
+      <ul class="item-list compact">
+        {{#each weapons}}
+          <li data-item-id="{{item.id}}">
+            <a data-action="rollAttack" class="name">Attack: {{item.name}}</a>
+            <span class="{{#unless attack.trained}}bad{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</span>
+            <a data-action="rollDamage">Damage: {{item.system.damage}}</a>
+          </li>
+        {{else}}<li class="muted">{{localize "SPYCRAFT.NoWeapons"}}</li>{{/each}}
+      </ul>
+</div>
+    <div class="quick-actions" aria-label="Common actions">      <p><a data-action="checkNumericalAdvantage">Check numerical advantage</a> · <a data-action="checkCombatMovement">Check combat movement</a> · <a data-action="takeTotalDefense">Take Total Defense</a>{{#if system.totalDefenseState.active}} · Dodge +{{system.totalDefenseState.bonus}}{{#if system.totalDefenseState.equilibrium}} (Equilibrium Basics +{{system.totalDefenseState.equilibrium.bonus}} included){{/if}} until own Count in round {{system.totalDefenseState.dueRound}}{{/if}}</p></div>
+    {{#if activeConditions.length}}<div class="condition-summary"><b>Current conditions</b>{{#each activeConditions}}<span class="tag bad">{{this}}</span>{{/each}}</div>{{/if}}
+  </div>
+  <div class="cols main-reference">
     <div class="col">
       <h3>{{localize "SPYCRAFT.Attributes"}}
-        <span class="points {{#if (sc2lt system.pointBuy.remaining 0)}}bad{{/if}}">{{localize "SPYCRAFT.PointBuy"}}: {{system.pointBuy.spent}} / <input type="number" name="system.pointBuyBudget" value="{{system.pointBuyBudget}}" class="w-2" /></span></h3>
+        <span class="points edit-only {{#if (sc2lt system.pointBuy.remaining 0)}}bad{{/if}}">{{localize "SPYCRAFT.PointBuy"}}: {{system.pointBuy.spent}} / <input type="number" name="system.pointBuyBudget" value="{{system.pointBuyBudget}}" class="w-2" /></span></h3>
       <table class="abilities">
-        <thead><tr><th></th><th>{{localize "SPYCRAFT.Base"}}</th><th>{{localize "SPYCRAFT.Cost"}}</th><th>{{localize "SPYCRAFT.Origin.Label"}}</th><th>{{localize "SPYCRAFT.Increase"}}</th><th>{{localize "SPYCRAFT.Misc"}}</th><th>{{localize "SPYCRAFT.Score"}}</th><th>{{localize "SPYCRAFT.Mod"}}</th></tr></thead>
+        <thead><tr><th></th><th class="edit-only">{{localize "SPYCRAFT.Base"}}</th><th class="edit-only">{{localize "SPYCRAFT.Cost"}}</th><th class="edit-only">{{localize "SPYCRAFT.Origin.Label"}}</th><th class="edit-only">{{localize "SPYCRAFT.Increase"}}</th><th class="edit-only">{{localize "SPYCRAFT.Misc"}}</th><th>{{localize "SPYCRAFT.Score"}}</th><th>{{localize "SPYCRAFT.Mod"}}</th></tr></thead>
         <tbody>
         {{#each abilities}}
           <tr>
             <th>{{label}}</th>
-            <td><input type="number" name="system.abilities.{{key}}.base" value="{{base}}" min="8" max="18" class="w-2" /></td>
-            <td class="muted">{{cost}}</td>
-            <td>{{#if bonus}}{{signed bonus}}{{/if}}</td>
-            <td>{{#if increase}}+{{increase}}{{/if}}</td>
-            <td><input type="number" name="system.abilities.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
+            <td class="edit-only"><input type="number" name="system.abilities.{{key}}.base" value="{{base}}" min="8" max="18" class="w-2" /></td>
+            <td class="muted edit-only">{{cost}}</td>
+            <td class="edit-only">{{#if bonus}}{{signed bonus}}{{/if}}</td>
+            <td class="edit-only">{{#if increase}}+{{increase}}{{/if}}</td>
+            <td class="edit-only"><input type="number" name="system.abilities.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
             <td class="score"{{#if temporaryBonus}} data-tooltip="Includes {{signed temporaryBonus}} temporary adjustment"{{/if}}>{{value}}</td>
-            <td class="mod">{{signed mod}}</td>
+            <td class="mod"><a data-action="rollAbility" data-ability="{{key}}" aria-label="Roll {{label}}">{{signed mod}}</a></td>
           </tr>
         {{/each}}
         </tbody>
       </table>
-      <div class="increases">
+      <div class="increases edit-only">
         <span>{{localize "SPYCRAFT.AttributeIncreases"}}:</span>
         {{#each increaseLevels}}
           <label class="{{#unless reached}}muted{{/unless}}">{{level}}
@@ -29,12 +53,13 @@
         {{/each}}
       </div>
 
+      <details class="reference-panel" data-key="origins"><summary>Origin and field reference</summary>
       <h3>{{localize "SPYCRAFT.Origin.Label"}}</h3>
       {{#each originSelections}}
-        <details><summary>{{name}}</summary>
-          {{#each fields}}
+        <details {{#if @root.editMode}}open{{/if}}><summary>{{name}}</summary>
+          <div class="edit-only">{{#each fields}}
             <label>{{label}} {{#if text}}<input type="text" name="originChoice.{{../id}}.{{key}}" value="{{value}}" />{{else}}<select name="originChoice.{{../id}}.{{key}}">{{selectOptions options selected=value blank="—"}}</select>{{/if}}</label>
-          {{/each}}
+          {{/each}}</div>
           <div>{{{description}}}</div>
         </details>
       {{/each}}
@@ -60,7 +85,9 @@
       {{#if attributeDamageHistory}}{{#if attributeMissionRecovered}}<p>Current mission’s temporary attribute recovery recorded.</p>{{else}}{{#if isGM}}<p><a data-action="recoverSilverTongueAtMissionEnd">GC: recover Silver Tongue Wisdom damage at mission end</a></p>{{/if}}{{/if}}{{/if}}
       {{#if system.attributeCollapse.wisdomEpisode}}<p><a data-action="rollWisdomCollapse">Roll Wisdom-collapse episode for GC adjudication</a></p>{{/if}}
       {{#if system.cqbReadiedRules.initiativeBonus}}<p>CQB Supremacy: Initiative checks +5 while holding a ranged weapon marked readied and carried on Gear.</p>{{/if}}
-      <p><a data-action="checkNumericalAdvantage">Check numerical advantage</a> · <a data-action="checkCombatMovement">Check combat movement</a> · <a data-action="takeTotalDefense">Take Total Defense</a>{{#if system.totalDefenseState.active}} · Dodge +{{system.totalDefenseState.bonus}}{{#if system.totalDefenseState.equilibrium}} (Equilibrium Basics +{{system.totalDefenseState.equilibrium.bonus}} included){{/if}} until own Count in round {{system.totalDefenseState.dueRound}}{{/if}}</p>
+
+      </details>
+      <details class="reference-panel" data-key="combatTools"><summary>Combat actions and conditions</summary>
       <p><a data-action="manageTripOutcomes">Trip outcomes</a> · <a data-action="takeCounterTrip">Counter-Trip</a>{{#if isGM}} · <a data-action="reviewCounterTrip">Review interrupted counter-Trip</a>{{/if}} · <a data-action="takeTripFinalAttack">Trip final attack</a>{{#if isGM}} · <a data-action="reviewTripFinalAttack">Review interrupted Trip final attack</a>{{/if}} · <a data-action="manageFeintOutcomes">Feint outcomes</a>{{#if isGM}} · <a data-action="reviewFeintBonuses">Review interrupted Feint benefit</a>{{/if}} · <a data-action="declareCombatStance">Combat stance</a>{{#if isGM}} · <a data-action="reviewPowerStanceInitiative">Review Power Count</a>{{/if}}{{#if system.combatStance}} ({{system.combatStance.key}}){{/if}} · <a data-action="reviewStanceMovement">Record round movement</a> · <a data-action="recordFendMovement">Fend movement</a> · <a data-action="manageThreadNeedle">Thread the Needle outcome</a> · <a data-action="takeStrikingAttack">Striking reaction</a>{{#if isGM}} · <a data-action="reviewStrikingAttack">Review Striking reaction</a>{{/if}} · <a data-action="manageStanceDamage">Stance damage</a> · <a data-action="manageDrivingStance">Driving Stance outcome</a> · <a data-action="takeMissTrick">Double Twirl / Remiss</a> · <a data-action="rollCheapShot">Cheap Shot</a> · <a data-action="manageCheapShots">Cheap Shot outcomes/recovery</a> · <a data-action="rollDisarm">Disarm opposed check</a> · <a data-action="declareTwoWeapon">Declare two-weapon combat</a>{{#if system.twoWeaponStyleState.active}} · Declared {{system.twoWeaponStyleState.extraAttacks}} final Standard Attacks; attack penalty −{{system.twoWeaponStyleState.penalty}}; skill penalty {{#if system.twoWeaponStyleState.skillPenalty}}−{{system.twoWeaponStyleState.skillPenalty}}{{else}}0{{/if}}{{#if system.twoWeaponStyleState.handgunSkillWaiver}} (Both Guns Blazing also waives this penalty on handgun attacks){{/if}} until own Count in round {{system.twoWeaponStyleState.dueRound}}{{/if}}{{#if system.twoWeaponStyleState.needsReview}} <span class="bad">{{system.twoWeaponStyleState.reason}}</span>{{/if}}{{#if system.twoWeaponStyle}}{{#if isGM}} · <a data-action="reviewTwoWeapon">GC review remaining tradeoff</a>{{/if}}{{/if}}</p>
       {{#with mobileOffense}}<p>{{#if @root.startedCharacterCombat}}Mobile Offense: {{remaining}} /{{limit}} this round. {{#if counterReview}}<span class="bad">Saved count needs GC review.</span>{{else}}{{#if remaining}}<a data-action="takeMobileOffense">Final attack during Standard Move</a>{{/if}}{{/if}}{{#if @root.isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="mobileOffense">GC review uses already resolved</a>{{/if}}{{else}}Mobile Offense: start a combat containing this character to track its current allowance.{{/if}}</p>{{/with}}
       {{#with contempt}}<p>{{#if @root.startedCharacterCombat}}Contempt: {{remaining}} / {{limit}} this combat; {{@root.contemptRound.remaining}} /1 this round. {{#if counterReview}}<span class="bad">Saved combat count needs GC review.</span>{{else}}{{#if @root.contemptRound.counterReview}}<span class="bad">Saved round count needs GC review.</span>{{else}}{{#if remaining}}{{#if @root.contemptRound.remaining}}<a data-action="takeContempt">Final attack against standard character</a>{{/if}}{{/if}}{{/if}}{{/if}}{{#if @root.isGM}} · <a data-action="reviewLimitedUseCounter" data-resource="contempt">GC review combat uses</a> · <a data-action="reviewLimitedUseCounter" data-resource="contemptRound">GC review round uses</a>{{/if}}{{else}}Contempt: start a combat containing this character to track its current allowance.{{/if}}</p>{{/with}}
@@ -105,15 +132,8 @@
       <p><a data-action="beginFatigueRest">Begin ordinary fatigue recovery</a>{{#if system.fatigueRestState.pending}} · {{system.fatigueRestState.requiredLabel}}; {{system.fatigueRestState.remainingLabel}} · <a data-action="completeFatigueRest">Confirm completed recovery</a>{{/if}}</p>
       <p>Death threshold: {{system.deathThreshold}} wounds (size adjusted; pp.331,349).</p>
       {{#if system.actionDieDefense}}<p>Action die: +2 Defense through round {{system.actionDieDefense.lastRound}}.</p>{{/if}}
-      <h3>{{localize "SPYCRAFT.Defenses"}}</h3>
-      <div class="stat-grid">
-        {{#each saves}}
-          <div class="stat"><a data-action="rollSave" data-save="{{key}}">{{label}}</a><b {{sc2tip tip}}>{{signed total}}</b><small>{{localize "SPYCRAFT.Base"}} {{base}}{{#if bonus}}, {{signed bonus}}{{/if}}</small></div>
-        {{/each}}
-        <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><b {{sc2tip tips.defense}}>{{system.defense.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.defense.base}}{{#if system.defense.armor}}, {{localize "SPYCRAFT.Armor"}} {{signed system.defense.armor}}{{/if}}</small></div>
-        <div class="stat"><a data-action="rollInitiative">{{localize "SPYCRAFT.Initiative"}}</a><b {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.initiative.base}}</small></div>
-        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b {{sc2tip tips.speed}}>{{#if system.conditionSpeedReview}}GC ruling needed{{else}}{{system.speed}} ft{{/if}}</b></div>
-      </div>
+
+      </details>
     </div>
 
     <div class="col">
@@ -138,16 +158,6 @@
       </div>
       {{#if system.actionDieAwardSummary.count}}<p>GC action dice awarded this mission: {{system.actionDieAwardSummary.count}} · {{#if system.actionDieAwardSummary.settled}}Mission reward settled: {{system.actionDieAwardSummary.totalXP}} XP.{{else}}+{{system.actionDieAwardSummary.baseXP}} base mission XP before the Career/Threat multiplier; settlement pending.{{/if}}</p>{{/if}}
       <p><a data-action="configureFortuneTeammates">Improved Fortune teammates</a>{{#if system.improvedFortune.value}} · +{{system.improvedFortune.value}} starting action dice (team cap +3){{/if}}</p>
-      <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
-      <ul class="item-list compact">
-        {{#each weapons}}
-          <li data-item-id="{{item.id}}">
-            <a data-action="rollAttack" class="name">{{item.name}}</a>
-            <span class="{{#unless attack.trained}}bad{{/unless}}">{{signed attack.total}}{{#unless attack.trained}}*{{/unless}}</span>
-            <a data-action="rollDamage">{{item.system.damage}}</a>
-          </li>
-        {{else}}<li class="muted">{{localize "SPYCRAFT.NoWeapons"}}</li>{{/each}}
-      </ul>
       <h3>{{localize "SPYCRAFT.Carrying"}}</h3>
       <div class="carry muted">
         {{localize "SPYCRAFT.Carry.Light"}} {{system.carry.light}} · {{localize "SPYCRAFT.Carry.Medium"}} {{system.carry.medium}} · {{localize "SPYCRAFT.Carry.Heavy"}} {{system.carry.heavy}} ·
@@ -157,7 +167,7 @@
     </div>
   </div>
 
-  <details class="misc-mods">
+  <details class="misc-mods edit-only">
     <summary>{{localize "SPYCRAFT.MiscModifiers"}}</summary>
     <div class="misc-grid">
       {{#each system.misc as |v k|}}
