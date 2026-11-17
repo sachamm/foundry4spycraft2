@@ -1,0 +1,44 @@
+/* Scoped chat controls use Foundry theme colors in both the sidebar and its popout. */
+.sc2-chat-search, .sc2-chat-search-results { pointer-events: auto; }
+.sc2-chat-search {
+  flex: 0 0 auto;
+  padding: 8px;
+  margin: 0 0 6px;
+  border: 1px solid var(--color-border-light-primary, #777);
+  border-radius: 4px;
+  background: var(--color-bg-option, #222);
+  color: var(--color-text-primary, #eee);
+}
+.sc2-chat-search-heading, .sc2-chat-filter-row, .sc2-chat-result-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.sc2-chat-search-heading { margin-bottom: 6px; }
+.sc2-chat-search-heading button { flex: 0 0 auto; width: auto; min-height: 24px; }
+.sc2-chat-search label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; }
+.sc2-chat-text { margin-bottom: 6px; }
+.sc2-chat-filter-row label { flex: 1; min-width: 0; }
+.sc2-chat-search :is(input, select) { width: 100%; min-width: 0; height: 30px; }
+.sc2-chat-search-status { margin: 6px 0 0; font-size: 11px; }
+.sc2-chat-search-results { flex: 1; min-height: 0; overflow-y: auto; padding: 0 3px 8px; }
+.sc2-chat-search-result {
+  padding: 8px;
+  margin-bottom: 6px;
+  border: 1px solid #b7ac92;
+  border-radius: 3px;
+  background: #f5eedb;
+  color: #253737;
+  overflow-wrap: anywhere;
+}
+.sc2-chat-result-title { align-items: start; }
+.sc2-chat-result-title strong { flex: 1; }
+.sc2-chat-result-title span { font-size: 11px; text-align: right; }
+.sc2-chat-search-result time { display: block; font-size: 10px; margin-top: 3px; }
+.sc2-chat-search-result p { font-size: 12px; line-height: 1.4; white-space: pre-wrap; }
+.sc2-chat-search-result button {
+  width: 100%; background: #24595b; color: #fff9e9; border: 1px solid #142f30;
+}
+.sc2-chat-search-empty { text-align: center; padding: 12px; }
+.sc2-chat-search-results[hidden], .chat-scroll[hidden] { display: none !important; }

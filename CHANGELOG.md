@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.3.2 — 2026-11-17
+
+- Chat history search with combined character, roll-type and text filters, newest-first results, pagination and original-message popouts. Searches respect message and secret visibility.
+- Revised Play/Edit character sheets, setup guidance, skill search and grouped combat controls.
+- Game Control tools for missions, initiative, NPC play and Dramatic Conflicts.
+- Expanded character rules workflows and regression coverage since 0.3.1.
 
 - Roll pipeline: rules register reservations, validators, modifiers, record fields, named skill checks and chat buttons
   in `module/rolls/` instead of being wired into the Actor document. Existing behaviour is unchanged.

@@ -60,6 +60,10 @@ Classes also provides ordinary GC action-die awards and once-per-mission XP sett
 
 Implemented resource controls coordinate multiple Foundry clients. Classes provides GC recovery controls for interrupted actions; check the recorded result and current resources before retrying an interrupted transaction. Complete character exports omit temporary transaction bookkeeping.
 
+## Chat search
+
+The Chat Messages sidebar has a text search and Character / Roll type filters. Filters combine and search the full readable history, including older messages that are not currently rendered. Text search ignores case and accents and matches every entered word. Results show newest first; use **Open message** to view the original card, **Show more matches** for additional results, or **Clear** (Escape in a filter) to return to ordinary chat. Private messages and hidden roll results remain subject to Foundry's visibility rules. Older untyped rolls are classified from their displayed labels where possible.
+
 ## Layout
 
 | Path | Purpose |
