@@ -5984,6 +5984,7 @@
    "RequestRapidCommunicationIsAvailable_15nuptl": "Request: rapid communication is available",
    "RequestRecipientAttempt_1dhgtas": "; Request recipient {0}, attempt {1}",
    "RequestSpendOneFullMinuteCommunicating_0gd9cp1": "Request: spend one full minute communicating",
+   "RequestTake10OfficeGossip_0qe8kyc": "Request: take 10 (Office Gossip)",
    "RequestTheDeliveryTimeHasElapsed_1871on6": "Request: the delivery time has elapsed and the item is available",
    "RequestTheGCConfirmsCategoryAnd_14dtpdc": "Request: the GC confirms category and Faction availability",
    "RequestWithoutActionDieCost_10pyv1u": "{0}: Request without action-die cost",

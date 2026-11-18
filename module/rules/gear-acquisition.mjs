@@ -410,3 +410,7 @@ export function requestFeatBonus(system, item, quantity) {
   if (powerRating !== null) sources.push("Superior Documentation");
   return { extra, powerRating, sources };
 }
+
+/** Office Gossip (p.209): the character may take 10 with Request checks. */
+export const officeGossipTake10 = (system, kind, input = {}) =>
+  kind === "request" && input?.requestTake10 === true && system?.activeFeatNames?.includes("Office Gossip") === true;

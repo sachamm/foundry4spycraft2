@@ -89,3 +89,11 @@ test("Request feats add to the claimed bundle", async () => {
   );
   assert.equal(requestFeatBonus(sys([]), { type: "gear", name: "Audio bug", system: {} }, 3).extra, 0);
 });
+
+test("Office Gossip: take 10 on a Request", async () => {
+  const { officeGossipTake10 } = await import("../module/rules/gear-acquisition.mjs");
+  const sys = { activeFeatNames: ["Office Gossip"] };
+  assert.ok(officeGossipTake10(sys, "request", { requestTake10: true }));
+  assert.equal(officeGossipTake10(sys, "common", { requestTake10: true }), false);
+  assert.equal(officeGossipTake10({ activeFeatNames: [] }, "request", { requestTake10: true }), false);
+});
