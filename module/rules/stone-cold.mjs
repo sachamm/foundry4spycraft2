@@ -3,14 +3,19 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Stone Cold p.205: being considered armed satisfies Intimidate's exact weapon gear requirement. */
 export function stoneColdSkillPlan(system, key, check) {
-  if (key !== "intimidate" || !system.activeFeatNames?.includes("Stone Cold"))
-    return { evidence: null, check, notes: [] };
+  // Stone Cold (p.205) and Martial Arts (p.186) both count the character as armed for Intimidate.
+  const source = system.activeFeatNames?.includes("Stone Cold")
+    ? "Stone Cold"
+    : system.activeFeatNames?.includes("Martial Arts")
+      ? "Martial Arts"
+      : "";
+  if (key !== "intimidate" || !source) return { evidence: null, check, notes: [] };
   const tagsBefore = String(check.tags ?? ""),
     tags = tagsBefore.replace(/\bGear \(weapon\)/gi, "");
   return {
     evidence: {
       version: 1,
-      source: "Stone Cold",
+      source,
       kind: "skill",
       skillKey: key,
       checkId: check.id,
@@ -21,7 +26,9 @@ export function stoneColdSkillPlan(system, key, check) {
     },
     check: { ...check, tags },
     notes: [
-      loc`Stone Cold: considered armed for this Intimidate check; an exact Gear (weapon) requirement is satisfied without creating a weapon (p.205).`
+      source === "Stone Cold"
+        ? loc`Stone Cold: considered armed for this Intimidate check; an exact Gear (weapon) requirement is satisfied without creating a weapon (p.205).`
+        : loc`Martial Arts: considered armed with a deadly weapon for this Intimidate check; an exact Gear (weapon) requirement is satisfied (p.186).`
     ]
   };
 }

@@ -51,7 +51,7 @@ import { terrainSkillPlan, localHeroOppositionPlan } from "./terrain.mjs";
 import { trackingSkillPlan, trackingFeatEvidence } from "./tracking.mjs";
 import { ambushCheckPlan } from "./ambush.mjs";
 import { fogSmokePlan, ambientLightPlan, sensorySkillEffects, sensorySkillConditionPlan } from "./senses.mjs";
-import { skillTimingPlan } from "./timing.mjs";
+import { falseStartRestart, skillTimingPlan } from "./timing.mjs";
 import {
   classCheckEffects,
   tenSecondSolutionEligible,
@@ -948,6 +948,12 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [580, `${tracking.notes.join(" ")} `],
     [590, `${ambush.notes.join(" ")} `],
     [600, `${ambush.applicable ? loc`Required Ambush preparation: ${requiredPreparationSeconds} seconds. ` : ""} `],
+    [
+      605,
+      hasFeat("False Start") && unopposed === true && method === "roll" && falseStartRestart(listedTime)
+        ? loc`False Start: if this check fails you may stop and begin again from the next ${falseStartRestart(listedTime)}, spending only half the money or materials (p.200). `
+        : ""
+    ],
     [610, `${light.notes.join(" ")} `],
     [
       620,

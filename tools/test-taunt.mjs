@@ -148,3 +148,29 @@ test("a planned Taunt check carries its evidence and Cha key attribute", async (
   assert.equal(r.taunt?.role, "attacker");
   assert.equal(r.ability, "cha");
 });
+
+test("Martial Arts counts as armed for Intimidate; Fortune Favors the Bold improves session dice", async () => {
+  const { stoneColdSkillPlan } = await import("../module/rules/stone-cold.mjs");
+  const plan = stoneColdSkillPlan({ activeFeatNames: ["Martial Arts"] }, "intimidate", {
+    id: "coercion",
+    tags: "Gear (weapon), Hearing"
+  });
+  assert.equal(plan.evidence.source, "Martial Arts");
+  assert.doesNotMatch(plan.check.tags, /Gear \(weapon\)/);
+  const { sessionGain } = await import("../module/rules/periods.mjs");
+  assert.deepEqual(sessionGain({ activeFeatNames: ["Fortune Favors the Bold"], actionDice: { die: 12 } }, 3), {
+    die: 6,
+    units: 6
+  });
+  assert.equal(sessionGain({ activeFeatNames: [], actionDice: { die: 8 } }, 3).units, 3);
+});
+
+test("False Start: the restart step follows Table 3.1", async () => {
+  const { falseStartRestart } = await import("../module/rules/timing.mjs");
+  assert.deepEqual(
+    ["1 Half Action", "1 Round", "5 Minutes", "1 Hour", "2 Hours", "3 Days", "2 Weeks", "Varies"].map(
+      falseStartRestart
+    ),
+    ["", "round", "minute", "10 minutes", "hour", "day", "week", ""]
+  );
+});
