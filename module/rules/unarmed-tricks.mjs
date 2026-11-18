@@ -69,7 +69,18 @@ export const UNARMED_TRICKS = Object.freeze({
   roll: { feat: "Rolling Basics", name: "Roll", action: "either", damage: 1, page: 187 },
   palmStrike: { feat: "Spirit Basics", name: "Palm Strike", action: "standard", page: 187 },
   oneTwo: { feat: "Brawling Supremacy", name: "One-Two", action: "standard", doubleMargin: 4, page: 185 },
-  vitalize: { feat: "Spirit Moves", name: "Vitalize", action: "standard", page: 187 }
+  vitalize: { feat: "Spirit Moves", name: "Vitalize", action: "standard", page: 187 },
+  drivingPunch: {
+    feat: "Boxing Supremacy",
+    name: "Driving Punch",
+    action: "standard",
+    threat: 2,
+    missFlatFooted: true,
+    page: 184
+  },
+  turningPunch: { feat: "Boxing Supremacy", name: "Turning Punch", action: "standard", damageMultiplier: 3, page: 184 },
+  hurricaneKick: { feat: "Kicking Supremacy", name: "Hurricane Kick", action: "kick", damage: -2, page: 186 },
+  thrustKick: { feat: "Kicking Supremacy", name: "Thrust Kick", action: "kick", page: 186 }
 });
 
 const NOTES = {
@@ -84,6 +95,13 @@ const NOTES = {
   palmStrike: () =>
     loc`Palm Strike: on a hit, push the opponent 5 ft. away; if that square is occupied or blocked, they take 1d4 subdual instead`,
   oneTwo: () => loc`One-Two: if the result beats the target’s Defense by 4 or more, the damage is doubled`,
+  drivingPunch: () =>
+    loc`Driving Punch: a full action; move up to your Speed, at least 10 ft. toward the target, first; threat range +2; a miss leaves you flat-footed`,
+  turningPunch: () =>
+    loc`Turning Punch: a full action; the target’s dodge bonus to Defense counts twice against it; a hit deals triple damage`,
+  hurricaneKick: () =>
+    loc`Hurricane Kick: one of the 5 Kicks of a full action (once per round), split among adjacent opponents; damage −2 (minimum 1); afterwards each opponent hit is pushed 5 ft., or takes 1d4 subdual if that square is occupied or blocked`,
+  thrustKick: () => loc`Thrust Kick: on a hit you may take a Bull Rush against the same opponent as a free action`,
   vitalize: () =>
     loc`Vitalize: aimed at a teammate (once per teammate per scene); on a hit they recover 1 wound point and 1d6 vitality points`
 };
@@ -99,14 +117,20 @@ export function unarmedTrickPlan(
     return { blocked: true, reason: loc`That trick needs its feat.` };
   if (!unarmedWeapon(weapon)) return { blocked: true, reason: loc`${d.name} is an unarmed attack.` };
   const legal =
-    d.action === "either" ? kick === true || attackAction === "standard" : kick !== true && attackAction === "standard";
+    d.action === "kick"
+      ? kick === true
+      : d.action === "either"
+        ? kick === true || attackAction === "standard"
+        : kick !== true && attackAction === "standard";
   if (!legal)
     return {
       blocked: true,
       reason:
-        d.action === "either"
-          ? loc`${d.name} is made with a Kick or an unarmed Standard Attack.`
-          : loc`${d.name} is made with an unarmed Standard Attack.`
+        d.action === "kick"
+          ? loc`${d.name} is made with a Kick.`
+          : d.action === "either"
+            ? loc`${d.name} is made with a Kick or an unarmed Standard Attack.`
+            : loc`${d.name} is made with an unarmed Standard Attack.`
     };
   if (d.flatFooted && flatFootedTarget !== true)
     return { blocked: true, reason: loc`${d.name} is made against a flat-footed opponent.` };
@@ -146,6 +170,8 @@ export function unarmedTrickNote(plan) {
 /** The damage card’s line for a trick with a save on a hit. */
 export function unarmedTrickDamageNote(trick, damage) {
   const d = UNARMED_TRICKS[trick];
+  if (d?.damageMultiplier)
+    return loc`${d.name}: the hit deals triple damage, ${d.damageMultiplier * damage} in all (p.${d.page}).`;
   if (d?.doubleMargin)
     return loc`${d.name}: if the attack beat Defense by ${d.doubleMargin} or more, the damage is doubled to ${2 * damage} (p.${d.page}).`;
   return d?.hitSave
@@ -159,13 +185,22 @@ export const halvesSneakDamage = targetSystem =>
 
 export const inReadyStance = system => combatStanceState(system ?? {})?.key === "ready";
 
+/** Coiled Stance (Brawling Basics, p.185): +2 on unarmed attacks against an opponent with a lower Reflex save bonus. */
+export const coiledStanceBonus = (system, weapon, { ranged = false, lowerReflex = false } = {}) =>
+  !ranged && unarmedWeapon(weapon) && lowerReflex === true && combatStanceState(system ?? {})?.key === "coiled" ? 2 : 0;
+
 rollPipeline.register({
   id: "unarmedTrickContent:attack",
   dialogs: ["attack"],
   order: 73,
   dialog: ({ item, actor }) => {
     const owned = Object.entries(UNARMED_TRICKS).filter(([, d]) => actor?.system?.activeFeatNames?.includes(d.feat));
+    const coiled =
+      unarmedWeapon(item?.system) && combatStanceState(actor?.system ?? {})?.key === "coiled"
+        ? `<label><input type="checkbox" name="coiledLowerReflex" /> ${loc`Coiled Stance: the target’s Reflex save bonus is lower than mine (+2)`}</label>`
+        : "";
     return [
+      { at: 62, html: coiled },
       {
         at: 63,
         html:
@@ -179,10 +214,12 @@ rollPipeline.register({
       }
     ];
   },
-  read: ({ entered }) =>
-    entered?.unarmedTrick
+  read: ({ entered }) => ({
+    ...(entered?.unarmedTrick
       ? { unarmedTrick: String(entered.unarmedTrick), unarmedTrickFlatFooted: entered.unarmedTrickFlatFooted === true }
-      : null
+      : {}),
+    ...(entered?.coiledLowerReflex === true ? { coiledLowerReflex: true } : {})
+  })
 });
 
 rollPipeline.register({
@@ -196,12 +233,16 @@ rollPipeline.register({
         attackAction: options.attackAction ?? "standard",
         flatFootedTarget: options.unarmedTrickFlatFooted === true
       }),
-      ready = !ranged && unarmedWeapon(weapon) && inReadyStance(system);
+      ready = !ranged && unarmedWeapon(weapon) && inReadyStance(system),
+      coiled = coiledStanceBonus(system, weapon, { ranged, lowerReflex: options.coiledLowerReflex === true });
     return {
       key: "unarmedTrick",
       plan: plan && !plan.blocked ? plan : null,
       rowAt: 288,
-      rows: plan?.attackBonus ? [[plan.name, plan.attackBonus]] : [],
+      rows: [
+        ...(plan?.attackBonus ? [[plan.name, plan.attackBonus]] : []),
+        ...(coiled ? [[loc`Coiled Stance`, coiled]] : [])
+      ],
       threat: plan && !plan.blocked ? plan.threatIncrease : 0,
       grantedQuality: plan && !plan.blocked && plan.qualities === "TKD" ? "TKD" : undefined,
       blockAt: 199,
@@ -211,6 +252,11 @@ rollPipeline.register({
         ...(plan && !plan.blocked ? [unarmedTrickNote(plan)] : []),
         ...(ready
           ? [loc`Ready Stance: on a hit, the target suffers −2 to attack checks until the end of the round (p.185).`]
+          : []),
+        ...(coiled
+          ? [
+              loc`Coiled Stance: +2 against an opponent with a lower Reflex save bonus; you may take a second bonus 5-ft. step this round (p.185).`
+            ]
           : [])
       ]
     };

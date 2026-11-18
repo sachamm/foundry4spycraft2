@@ -72,6 +72,12 @@ export const GRAPPLE_TRICKS = Object.freeze([
       loc`Breathtaking Hold: free action; an opponent you pin suffocates until released, out of the pin or dead.`
   },
   {
+    id: "backBreaker",
+    feat: "Wrestling Supremacy",
+    page: 189,
+    text: () => loc`Back Breaker: free action; Coup de Grace against an opponent you pin.`
+  },
+  {
     id: "fling",
     feat: "Wrestling Moves",
     page: 189,

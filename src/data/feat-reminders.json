@@ -7,10 +7,6 @@
     "Berserker Supremacy": [
       "save"
     ],
-    "Brawling Moves": [
-      "skill:acrobatics",
-      "skill:sleightOfHand"
-    ],
     "Brawling Supremacy": [
       "attack",
       "damage"
@@ -20,9 +16,6 @@
     ],
     "Cryptographer": [
       "skill:analysis"
-    ],
-    "Dirty Fighting Moves": [
-      "skill:sleightOfHand"
     ],
     "Executioner": [
       "attack"
@@ -45,23 +38,11 @@
     "Kicking Basics": [
       "attack"
     ],
-    "Lane Dancer": [
-      "skill:drive"
-    ],
-    "Living Cipher": [
-      "skill:analysis"
-    ],
-    "Mingling Basics": [
-      "skill:blend"
-    ],
     "Mingling Mastery": [
       "skill:blend"
     ],
     "Mingling Supremacy": [
       "skill:blend"
-    ],
-    "Need for Speed": [
-      "skill:drive"
     ],
     "Rock and Roll": [
       "attack"
@@ -93,20 +74,12 @@
     "This… is my Boomstick": [
       "attack"
     ],
-    "Trick Shot": [
-      "attack",
-      "damage"
-    ],
     "Two-hit Combo": [
       "attack"
     ],
     "Wind Rider": [
       "skill:notice",
       "skill:drive"
-    ],
-    "Wrestling Moves": [
-      "skill:acrobatics",
-      "skill:athletics"
     ]
   }
 }

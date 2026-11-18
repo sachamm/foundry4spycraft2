@@ -160,3 +160,14 @@ test("Death Ride: DR equal to the Chase feats only while operating a vehicle", (
   assert.equal(on.dr.melee, off.dr.melee + 3);
   assert.equal(on.armorDRByAttack.rangedWeapon, off.armorDRByAttack.rangedWeapon + 3);
 });
+
+test("Sticky Fingers: DR 5 against an adjacent opponent during Total Defense", async () => {
+  const { incomingDefensePlan } = await import("../module/rules/defense.mjs");
+  const s = calculate({ feats: ["Rolling Supremacy"] });
+  s.totalDefenseState = { active: true };
+  const near = incomingDefensePlan(s, { adjacent: true }),
+    far = incomingDefensePlan(s, {});
+  assert.equal(near.stickyFingersDR, 5);
+  assert.equal(near.listedDR.meleeWeapon, far.listedDR.meleeWeapon + 5);
+  assert.equal(far.stickyFingersDR, 0);
+});

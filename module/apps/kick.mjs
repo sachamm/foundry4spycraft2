@@ -28,6 +28,7 @@ rollPipeline.register({
       (UNARMED_TRICKS[unarmed.key]?.hitSave ||
         UNARMED_TRICKS[unarmed.key]?.damage ||
         UNARMED_TRICKS[unarmed.key]?.doubleMargin ||
+        UNARMED_TRICKS[unarmed.key]?.damageMultiplier ||
         unarmed.key === "clothesline")
     )
       controls.push({
@@ -56,6 +57,15 @@ rollPipeline.register({
         label: loc`Back Flip miss: become flat-footed`,
         run: async () => {
           await message.update({ "flags.spycraft2.backFlipMiss": true });
+          return setConditionStatus(actor, "flat-footed", true, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
+        }
+      });
+    // Driving Punch: a miss leaves the character flat-footed.
+    if (UNARMED_TRICKS[unarmed?.key]?.missFlatFooted && check.successConfirmed === false && !check.unarmedTrickMiss)
+      controls.push({
+        label: loc`${unarmed.name} miss: become flat-footed`,
+        run: async () => {
+          await message.update({ "flags.spycraft2.unarmedTrickMiss": true });
           return setConditionStatus(actor, "flat-footed", true, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
         }
       });
@@ -91,8 +101,9 @@ rollPipeline.register({
         label: loc`Kick: Initiative Count −2`,
         run: () => shiftCount(message, actor, -kick.countCost, "kickCount", "Kick")
       });
-    const weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null;
-    if (check.successConfirmed === true && weapon)
+    const weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null,
+      trickRollsDamage = controls.some(c => unarmed && c.label === loc`Roll ${unarmed.name} damage`);
+    if (check.successConfirmed === true && weapon && !trickRollsDamage)
       controls.push({
         label: loc`Roll Kick damage`,
         run: () => actor.rollDamage(weapon, { kick: true, kickTrick: trick?.key ?? null, includeSneakAttack: false })

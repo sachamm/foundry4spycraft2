@@ -17,6 +17,7 @@ const CHECK_SECTIONS = {
   feintOpponentName: ["feint", "resist-feint"],
   threatenOpponentName: ["threaten", "resist-threaten"],
   tauntOpponentUuid: ["taunt", "resist-taunt"],
+  skillTrick: ["trip", "bull-rush", "feint"],
   trackingSurface: ["tracking"],
   nest: ["hide"],
   hideMovement: ["hide"],

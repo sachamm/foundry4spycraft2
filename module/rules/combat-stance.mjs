@@ -23,7 +23,8 @@ export const COMBAT_STANCES = {
   ready: { name: "Ready Stance", feat: "Dirty Fighting Basics", page: 185 },
   forward: { name: "Forward Stance", feat: "Rolling Basics", page: 187 },
   rooted: { name: "Rooted Stance", feat: "Spirit Basics", page: 187 },
-  prone: { name: "Prone Stance", feat: "Submission Basics", page: 188 }
+  prone: { name: "Prone Stance", feat: "Submission Basics", page: 188 },
+  coiled: { name: "Coiled Stance", feat: "Brawling Basics", page: 185 }
 };
 export function stanceForcedExit(system) {
   const c = conditionRollPenalties(system);

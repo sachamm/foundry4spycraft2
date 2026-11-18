@@ -11332,10 +11332,6 @@ export const FEAT_REMINDERS = {
   "rolls": "save",
   "text": "End rage freely; rages last 4d4+4 rounds, +4 to resist frenzy, and you're only fatigued afterwards."
  },
- "Brawling Moves": {
-  "rolls": "skill:acrobatics, skill:sleightOfHand",
-  "text": "Gain brawling tricks such as body slams and feints that boost your Defense."
- },
  "Brawling Supremacy": {
   "rolls": "attack, damage",
   "text": "Two unarmed hits on one foe in a round earn a free final attack; gain tricks such as double-damage combos."
@@ -11347,10 +11343,6 @@ export const FEAT_REMINDERS = {
  "Cryptographer": {
   "rolls": "skill:analysis",
   "text": "Treat codes as 2 Power Rating lower when breaking, writing or requesting them."
- },
- "Dirty Fighting Moves": {
-  "rolls": "skill:sleightOfHand",
-  "text": "Gain underhanded tricks such as blinding eye gouges and improved feints."
  },
  "Executioner": {
   "rolls": "attack",
@@ -11380,18 +11372,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "Kicks don't lower your Initiative Count; gain a kicking stance and trick."
  },
- "Lane Dancer": {
-  "rolls": "skill:drive",
-  "text": "Ground vehicles treat maneuvering room as one step wider, and +2 on Crisis Advantage checks in ground chases."
- },
- "Living Cipher": {
-  "rolls": "skill:analysis",
-  "text": "Work codes in your head as if using a computer, and computers you use count as 1 Power Rating higher."
- },
- "Mingling Basics": {
-  "rolls": "skill:blend",
-  "text": "Blend/Stealth can always use Dex, crowds give synergy, and failing doesn't leave you flat-footed."
- },
  "Mingling Mastery": {
   "rolls": "skill:blend",
   "text": "Halved Stealth penalties for moving or speaking, no Disposition tag, and you're invisible in crowds of 500+."
@@ -11399,10 +11379,6 @@ export const FEAT_REMINDERS = {
  "Mingling Supremacy": {
   "rolls": "skill:blend",
   "text": "No Stealth penalties for moving or speaking, smaller team/terrain penalties, and invisible in crowds of 50+."
- },
- "Need for Speed": {
-  "rolls": "skill:drive",
-  "text": "No Maneuver penalty for going faster than half your vehicle or mount's top speed."
  },
  "Rock and Roll": {
   "rolls": "attack",
@@ -11444,10 +11420,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "Club foes with a readied shotgun, fire it one-handed at –2, raise its save DCs by 4, and knock targets back 5 ft. on a hit."
  },
- "Trick Shot": {
-  "rolls": "attack, damage",
-  "text": "A lethal hit with a non-grenade hurled weapon can hold the target instead of damaging them."
- },
  "Two-hit Combo": {
   "rolls": "attack",
   "text": "When your Initiative Count begins, take an extra unarmed final attack at –2 to all checks for the round."
@@ -11455,10 +11427,6 @@ export const FEAT_REMINDERS = {
  "Wind Rider": {
   "rolls": "skill:notice, skill:drive",
   "text": "Halved visual-range Notice penalty, better gliding, and air vehicles treat maneuvering room as wider with +2 on Crisis Advantage checks."
- },
- "Wrestling Moves": {
-  "rolls": "skill:acrobatics, skill:athletics",
-  "text": "Gain takedown tricks like clotheslines and hip tosses."
  }
 };
 export const VEHICLE_RULES = {

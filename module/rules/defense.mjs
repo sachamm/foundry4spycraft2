@@ -139,6 +139,10 @@ export function incomingDefensePlan(system, options = {}) {
     manual.unconscious ||
     system.mentalLeapState?.unconscious ||
     collapse.conditions.some(c => ["Paralyzed", "Unconscious"].includes(c));
+  const stickyFingers =
+    adjacent === true &&
+    system.activeFeatNames?.includes("Rolling Supremacy") === true &&
+    system.totalDefenseState?.active === true;
   const pinnedAttackerBonus = manual.pinned === true && adjacent && !ranged ? 4 : 0;
   const crouchedAttackerPenalty = manual.crouched === true && ranged && !adjacent ? -1 : 0,
     proneAttackerPenalty = manual.prone === true && ranged && !adjacent ? -2 : 0;
@@ -151,7 +155,12 @@ export function incomingDefensePlan(system, options = {}) {
     cover,
     armorMasteryRequiresHelpless: system.armorFeatRules?.coupDeGraceRequiresHelpless === true,
     sneakAttackImmune: knownSneakAttackImmunity(system).immune,
-    listedDR: system.armorDRByAttack ?? null,
+    // Sticky Fingers (Rolling Supremacy, p.187): DR 5/— against adjacent opponents during Total Defense.
+    stickyFingersDR: stickyFingers ? 5 : 0,
+    listedDR:
+      stickyFingers && system.armorDRByAttack
+        ? Object.fromEntries(Object.entries(system.armorDRByAttack).map(([k, v]) => [k, v + 5]))
+        : (system.armorDRByAttack ?? null),
     coupDeGraceException,
     coupDeGraceExceptionSource: coupDeGraceException ? coupDeGraceExceptionSource.trim() : "",
     pinnedAttackerBonus,
