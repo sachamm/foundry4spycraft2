@@ -2,6 +2,7 @@
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
   COVER_FIRE,
+  FIRE_ACTIONS,
   GRAPPLE_BENEFITS,
   SUPPRESSIVE_FIRE,
   autofireHits,
@@ -40,7 +41,7 @@ export function fireActionContent(preview, item) {
   const modes = preview.modes ?? [],
     capacity = parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "";
   const option = (value, label, show = true) => (show ? `<option value="${value}">${label}</option>` : "");
-  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="10" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}" /></label><p class="hint">${loc`Choose the matching fire mode above. Shots are not deducted for you.`}</p></fieldset>`;
+  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="10" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}" /></label><p class="hint">${loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
 }
 
 /** What the section's fields mean for the roll. */
@@ -48,8 +49,11 @@ export function fireActionInput(input = {}) {
   const action = input.fireAction ?? "";
   if (!action) return null;
   const countEntered = whole(input.fireCount);
+  // Burst needs Burst mode and Autofire or Strafe Full Auto, so the action sets the mode.
+  const mode = FIRE_ACTIONS[action]?.mode;
   return {
     fireAction: action,
+    ...(mode ? { fireMode: mode } : {}),
     fireVolleys: action === "autofire" ? countEntered : null,
     fireSquares: action === "strafe" ? countEntered : null,
     shotsRemaining: whole(input.shotsRemaining),
@@ -88,6 +92,13 @@ rollPipeline.register({
 /*  Cover Fire and Suppressive Fire              */
 /* -------------------------------------------- */
 
+/** An opponent's name in the Cover Fire list; an unlinked token is marked so it is not confused with its sheet. */
+export function coverFireTargetLabel(target) {
+  if (!target?.isToken) return target?.name ?? "";
+  const scene = target.token?.parent?.name;
+  return scene ? loc`${target.name} (token on ${scene})` : loc`${target.name} (token)`;
+}
+
 /** Cover Fire: no attack check; the chosen opponent makes a Will save. */
 export async function coverFire(actor, item, input = {}) {
   const preview = actor.weaponAttack(item, input),
@@ -99,11 +110,13 @@ export async function coverFire(actor, item, input = {}) {
     );
   const shots = whole(input.shotsRemaining);
   if (shots !== null && shots < COVER_FIRE.shots) return ui.notifications.warn(loc`Cover Fire takes 5 shots.`);
-  const targets = attackCharacterTargetChoices().filter(a => a.uuid !== actor.uuid);
+  const targets = attackCharacterTargetChoices().filter(a => a.uuid !== actor.uuid),
+    targeted = [...(game.user?.targets ?? [])],
+    selected = targeted.length === 1 ? (targeted[0].actor?.uuid ?? "") : "";
   const chosen = await systemDialog.input({
     window: { title: loc`Cover Fire` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`A full action and 5 shots. The opponent must not be in melee. Will save DC ${dc}.`}</p><label>${loc`Opponent`} <select name="targetUuid"><option value="">${loc`Not listed — the GC rolls the save`}</option>${targets.map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`).join("")}</select></label></div>`
+    content: `<div class="spycraft2-roll-options"><p>${loc`A full action and 5 shots. The opponent must not be in melee. Will save DC ${dc}.`}</p><label>${loc`Opponent`} <select name="targetUuid"><option value="">${loc`Not listed — the GC rolls the save`}</option>${targets.map(a => `<option value="${esc(a.uuid)}"${a.uuid === selected ? " selected" : ""}>${esc(coverFireTargetLabel(a))}</option>`).join("")}</select></label></div>`
   });
   if (!chosen) return null;
   const target = chosen.targetUuid ? await fromUuid(chosen.targetUuid) : null;
@@ -151,8 +164,8 @@ export async function countFireActionHits(message) {
       .split(/[,\s]+/)
       .filter(Boolean)
       .map(Number);
-    if (!defenses.length || defenses.some(d => !Number.isFinite(d)) || defenses.length > action.squares)
-      return ui.notifications.warn(loc`Enter up to ${action.squares} Defense values.`);
+    if (!defenses.length || defenses.some(d => !Number.isFinite(d) || d < 0) || defenses.length > action.squares)
+      return ui.notifications.warn(loc`Enter up to ${action.squares} Defense values, each 0 or more.`);
     const results = strafeHits(total, defenses);
     return post(fromUuidSync(check.actorUuid), [
       loc`Strafe, result ${total}:`,
@@ -167,11 +180,12 @@ export async function countFireActionHits(message) {
   const input = await systemDialog.input({
     window: { title: action.action === "burst" ? loc`Burst: shots that hit` : loc`Autofire: shots that hit` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`Attack result ${total}.`}</p><label>${loc`Target's Defense`} <input type="number" name="defense" step="1" required /></label></div>`
+    content: `<div class="spycraft2-roll-options"><p>${loc`Attack result ${total}.`}</p><label>${loc`Target's Defense`} <input type="number" name="defense" min="0" step="1" required /></label></div>`
   });
   if (!input) return null;
   const defense = Number(input.defense);
   if (!Number.isFinite(defense)) return null;
+  if (defense < 0) return ui.notifications.warn(loc`Defense cannot be negative.`);
   const hits = action.action === "burst" ? burstHits(total, defense) : autofireHits(total, defense, action.volleys);
   return post(fromUuidSync(check.actorUuid), [
     hits

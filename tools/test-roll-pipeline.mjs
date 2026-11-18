@@ -398,6 +398,7 @@ const EXPECTED_ORDER = [
   "meleeTrickInput",
   "cqbRangeInput",
   "pummelContent:attack",
+  "attackDistanceInput",
   "attackDialogInput",
   "recordFields",
   "sneakAttackTarget",

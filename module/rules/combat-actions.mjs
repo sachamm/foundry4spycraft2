@@ -110,17 +110,18 @@ export function fireActionPlan(
         loc`Autofire: ${chosen} volley(s), ${chosen * rule.shotsEach} shots, attack –${chosen}, error range +2. One shot hits, plus one more for each 4 points the result is over Defense, up to ${chosen}. A critical hit applies only the first shot to wounds (p.353).`
       ]
     };
+  // The check's recoil penalty counts twice.
+  const recoil = Math.min(0, Number(facts.recoilPenalty) || 0);
   return {
     action,
     blocked: false,
     squares: chosen,
     attack: 0,
-    // The check's recoil penalty counts twice.
-    extraRecoil: Math.min(0, Number(facts.recoilPenalty) || 0),
+    extraRecoil: recoil,
     error: rule.error,
     shots: chosen * rule.shotsEach,
     notes: [
-      loc`Strafe: ${chosen} adjacent square(s), ${chosen * rule.shotsEach} shots, recoil penalty doubled, error range +2. One result against each target in turn, whose Defense rises by 2 for each target so far. A critical hit applies to one opponent's wounds (p.359).`
+      loc`Strafe: ${chosen} adjacent square(s), ${chosen * rule.shotsEach} shots, recoil penalty doubled (${2 * recoil} in all), error range +2. One result against each target in turn, whose Defense rises by 2 for each target so far. A critical hit applies to one opponent's wounds (p.359).`
     ]
   };
 }

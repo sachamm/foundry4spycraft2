@@ -194,7 +194,7 @@ Status after the live checks of 2026-11-17 on Foundry 14.370 (two clients: the G
 
 ## Game areas added (2026-11-17, second pass)
 
-None of these has been tried in Foundry yet: no server was running. See "To check in Foundry" below.
+Checked in Foundry 14.370 on 2026-11-17; see "To check in Foundry" below.
 
 - [x] Map integration (`module/rules/map.mjs`, `module/apps/map.mjs`). With a token for the character and one token
       targeted, the attack dialogs open with the measured distance, the flanking box set from tokens on opposite
@@ -225,14 +225,30 @@ None of these has been tried in Foundry yet: no server was running. See "To chec
 
 ## To check in Foundry
 
-Everything in the two sections above is covered by unit tests only (3,307 pass; layout, pack and schema checks pass).
-Restart Foundry first: there are new modules, a new setting, schema version 2 and rebuilt packs.
+Run on 2026-11-17 in Foundry 14.370 (world "spycraft test"), with a throwaway agent, NPC and scene that were deleted
+afterwards. Unit tests: 3,313 of 3,314 pass; the one failure is the sample-scenes pack check, which cannot open the
+pack while Foundry holds it (LEVEL_LOCKED), so it needs Foundry closed.
 
-- [ ] The world migrates to schema version 2 and owned feats gain reminders.
-- [ ] A skill, save, attack and damage dialog each list the feats to keep in mind; ticked ones show on the card.
-- [ ] Attack dialogs fill in distance, flanking and target from the scene; the blast button lists tokens.
-- [ ] Burst, Autofire and Strafe from the ranged attack dialog; the hit counter; Cover Fire's Will save.
-- [ ] Expose an agent to a contagion and to fire; roll and apply the saves; check attribute damage and stress.
-- [ ] A cooperative check with a leader and two helpers; the leader's result rises.
-- [ ] An NPC with qualities shows them in play; its skill check takes the modifiers.
-- [ ] A save roll, an attack and a skill check still read as before (the roll code was reorganised).
+- [x] The world migrates to schema version 2 and owned feats gain reminders. The world is at 2; none of its 14 owned
+      feats has a reminder in the data, so nothing changed there. A feat with its reminder cleared regained it.
+- [x] A skill, save, attack and damage dialog each list the feats to keep in mind; ticked ones show on the card.
+      Fixed: in the skill dialog the reminder box overlapped the "Situational modifier" and "Secret" rows, because
+      the dialog body let its blocks shrink (`styles/retro.css`).
+- [x] Attack dialogs fill in distance, flanking and target from the scene; the blast button lists tokens.
+- [x] Burst, Autofire and Strafe from the ranged attack dialog; the hit counter; Cover Fire's Will save.
+- [x] Expose an agent to a contagion and to fire; roll and apply the saves; check attribute damage and stress.
+      Fixed: every hazard write (exposure, save, fire, antidote) reset the whole character to default values,
+      because the update was non-recursive (`module/apps/hazards.mjs`). `tools/test-update-shapes.mjs` now guards
+      against non-recursive document updates.
+- [x] A cooperative check with a leader and two helpers; the leader's result rises.
+- [x] An NPC with qualities shows them in play; its skill check takes the modifiers.
+- [x] A save roll, an attack and a skill check still read as before (the roll code was reorganised).
+
+Small things seen while checking, since fixed and checked in Foundry:
+- The quick "Attack circumstances" dialog has an optional distance field for ranged weapons, filled from the map,
+  so its card gives the range modifier. Left empty, it stays a quick roll with no range modifier.
+- Choosing Burst, Autofire or Strafe sets the fire mode the action needs.
+- The Strafe note gives the doubled recoil penalty in all (the recoil line still shows the single value).
+- Cover Fire's opponent list preselects the targeted token and marks an unlinked token as "(token on <scene>)", so
+  it is not confused with its sheet.
+- The hit counter refuses a negative Defense.
