@@ -11340,6 +11340,10 @@ export const FEAT_REMINDERS = {
   "rolls": "damage",
   "text": "Grants a grapple trick that lets you strike a held foe with both your unarmed and your weapon damage."
  },
+ "Berserker Supremacy": {
+  "rolls": "save",
+  "text": "End rage freely; rages last 4d4+4 rounds, +4 to resist frenzy, and you're only fatigued afterwards."
+ },
  "Boxing Moves": {
   "rolls": "attack",
   "text": "Gain boxing tricks that can knock out or daze standard characters."

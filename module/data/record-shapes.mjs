@@ -308,6 +308,16 @@ export const RECORD_SHAPES = {
     penalty: "number",
     startRound: "number"
   },
+  berserkerRage: {
+    $also: "null",
+    bonus: "number",
+    combatId: "string",
+    id: "string",
+    rounds: "number",
+    startRound: "number",
+    tier: "string",
+    version: "number"
+  },
   combatStance: {
     $also: "null",
     enteredAt: "number",

@@ -94,6 +94,7 @@ Hooks.once("init", () => {
     ["sickened", "Sickened"],
     ["fatigued", "Fatigued"],
     ["exhausted", "Exhausted"],
+    ["enraged", "Enraged"],
     ["unconscious", "Unconscious"],
     ["flat-footed", "Flat-footed"]
   ])

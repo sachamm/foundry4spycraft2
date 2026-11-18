@@ -346,9 +346,9 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Style Over Caliber | 183 | No | Covered (batch 385): a pistol’s damage roll may replace its standard damage with 1d10+2, keeping other damage, qualities and effects | Native Foundry QA not claimed |
 | This… is my Boomstick | 183 | No | Manual/descriptive | — |
 | Trick Shot | 183 | No | Manual/descriptive | — |
-| Berserker Basics | 183 | No | Manual/descriptive | — |
-| Berserker Mastery | 183 | No | Manual/descriptive | — |
-| Berserker Supremacy | 184 | No | Manual/descriptive | — |
+| Berserker Basics | 183 | No | Covered (batch 386): a rage for 2d4+2 combat rounds, Strength and Constitution +3 and the Enraged status, entered with a full action and ended early with a half action; afterwards exhausted; uses per session equal starting action dice. The enraged condition’s restrictions are left to the table | Native Foundry QA not claimed |
+| Berserker Mastery | 183 | No | Covered (batch 386): free entry, 3d4+3 rounds, Strength and Constitution +5 | Native Foundry QA not claimed |
+| Berserker Supremacy | 184 | No | Partial (batch 386): free ending, 4d4+4 rounds, fatigued instead of exhausted; the +4 to resist becoming frenzied is a save reminder, since saves do not record what they resist | Native Foundry QA not claimed |
 | Boxing Basics | 184 | No | Partial: static numerical effects | — |
 | Boxing Moves | 185 | No | Manual/descriptive | — |
 | Boxing Supremacy | 185 | No | Partial: static numerical effects | — |
@@ -1651,3 +1651,14 @@ Source: rules reference pp.178 and 183 (local markdown edition; original PDF pag
 - **Feat reminders:** the 13 feats the system now carries out (All or Nothing, Better Luck Next Time, Cleave Basics, Club Basics, Daredevil, Defensive and Offensive Driving, Dueling Supremacy, Opportunist, Photo Finish, Simulator Jockey, Snap Shot, Style Over Caliber) are removed from `src/data/feat-reminders.json`, and `module/rules/tables.mjs` is regenerated. Feat items already in a world keep the reminder version 2 gave them until edited. The real packs pick this up at the deferred rebuild.
 
 Verification: 513 legacy assertions, 3382 of 3383 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 91 manual / 54 partial / 169 other; at least 145 of 314 explicitly unfinished; 51 whole-feat closures.
+
+## Residual implementation batch 386 — Berserker Basics, Mastery and Supremacy
+
+Source: rules reference pp.183–184 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/berserker.mjs` and `module/apps/berserker.mjs`. A rage is counted in combat rounds, so it starts in a started combat. The duration is rolled on entry (2d4+2, 3d4+3 or 4d4+4 by the best tier held) and stored in `system.berserkerRage` with its combat and start round (new field and record shape). Uses per session: starting action dice.
+- While the rage runs in its combat, the engine adds the tier’s bonus (+3, or +5 with Mastery) to Strength and Constitution as a temporary bonus, reading the round from the prepared combat list. Entering applies a new Enraged status. Its restrictions (nearest opponent, no Tumble, no Concentration or Language skills, no penalising options) are left to the table.
+- Ending early takes a half action (free with Supremacy); a rage that has run out ends without one, and the sheet asks for it. Ending clears Enraged and applies exhausted (fatigued with Supremacy) through the existing fatigue workflow, with the minutes in its source; fatigue duration itself is not timed by the system.
+- Supremacy’s +4 against becoming frenzied is now a save reminder in `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3387 of 3388 Node tests (5 new, including the engine’s ability bonus during and after a rage), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 88 manual / 55 partial / 171 other; at least 143 of 314 explicitly unfinished; 53 whole-feat closures.

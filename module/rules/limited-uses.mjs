@@ -9,6 +9,7 @@ import { DROP_FOLLOW_UPS } from "./drop-follow-up.mjs";
 import { fortunateSpec } from "./fortunate.mjs";
 import { allOrNothingSpec } from "./all-or-nothing.mjs";
 import { blackCatSpec } from "./black-cat.mjs";
+import { berserkerSpec } from "./berserker.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { adrenalineSource } from "./adrenaline.mjs";
@@ -247,6 +248,8 @@ export function limitedUseAbilities(system, items, cfg) {
         manualReviewable: true,
         hidden: true
       });
+  const rage = berserkerSpec(system);
+  if (rage) add(rage);
   const blackCat = blackCatSpec(system);
   if (blackCat) add(blackCat);
   const allOrNothing = allOrNothingSpec(system);

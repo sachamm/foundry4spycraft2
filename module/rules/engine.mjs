@@ -7,6 +7,7 @@ import { readiedGuardWeapons } from "./guard.mjs";
 import { polearmDefensePlan } from "./polearm-defense.mjs";
 import { knifeBasicsPlan } from "./knife-basics.mjs";
 import { swordBasicsPlan } from "./sword-basics.mjs";
+import { berserkerRageState } from "./berserker.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -641,6 +642,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
         if (!s.candidate) nonCandidateBonus.add(key, amount, s.name, b.bonusType);
       }
     }
+  // Berserker rage, pp.183–184: Strength and Constitution rise while it runs.
+  sys.berserkerRageState = berserkerRageState(sys.berserkerRage, sys.bonusPoolCombats?.[sys.berserkerRage?.combatId]);
+  const rageBonus = sys.berserkerRageState.active ? sys.berserkerRage.bonus : 0;
+  if (sys.berserkerRageState.record && !sys.berserkerRageState.active)
+    warnings.push(loc`The berserker rage has run out: end it to apply what follows.`);
   const increases = sys.abilityIncreases ?? {};
   const increaseAt = l => increases[`l${l}`] || "";
   let pointCost = 0;
@@ -648,7 +654,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     const a = sys.abilities[k];
     a.increase = cfg.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
     a.bonus = abilityBonus.get(k);
-    a.temporaryBonus = sys.mentalLeapState.bonuses[k] ?? 0;
+    a.temporaryBonus = (sys.mentalLeapState.bonuses[k] ?? 0) + (["str", "con"].includes(k) ? rageBonus : 0);
     a.damage = sys.attributeDamageState.byAbility[k].total;
     a.undamagedValue = a.base + a.increase + (a.misc ?? 0) + a.bonus + a.temporaryBonus;
     a.value = a.undamagedValue - a.damage;

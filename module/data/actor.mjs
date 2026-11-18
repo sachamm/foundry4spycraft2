@@ -292,6 +292,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       attackDamageUses: recordList("attackDamageUses"),
       stanceRoundMovement: record("stanceRoundMovement", { nullable: true, initial: null }),
       combatStance: record("combatStance", { nullable: true, initial: null }),
+      berserkerRage: record("berserkerRage", { nullable: true, initial: null }),
       twoWeaponStyle: record("twoWeaponStyle", { nullable: true, initial: null }),
       dartingStyle: record("dartingStyle", { nullable: true, initial: null }),
       totalDefense: record("totalDefense", { nullable: true, initial: null }),
