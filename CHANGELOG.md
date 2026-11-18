@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Starter Actors: one mastermind, three henchmen, eight minion profiles and all 16 sample PCs are copied into their Actor folders on the first GM launch after installation or upgrade. Interrupted setup resumes without duplicates; later edits and deletions are preserved.
+- Added the Sample Villains & Minions compendium, with the original Glass Meridian cast and eight reusable minion profiles. Renamed the default sample character folder to Sample PCs.
+
 Fixes from a live test of 0.5.0:
 
 - A failed subdual save on an agent now settles: the agent is knocked unconscious for the band's time × half the

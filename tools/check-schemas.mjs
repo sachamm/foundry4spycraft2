@@ -63,7 +63,7 @@ for (const [roleId, role] of Object.entries(packageData.roles)) {
     });
 }
 const samplePack = built.packs["sample-agents"];
-const sampleActors = [...samplePack.docs, ...samplePack.companions];
+const sampleActors = [...samplePack.docs, ...samplePack.companions, ...built.packs["sample-npcs"].docs];
 for (const doc of [...npcTemplates, ...sampleActors]) {
   for (const [kind, type, data, label] of [
     ["Actor", doc.type, doc.system, doc.name],
@@ -81,7 +81,7 @@ for (const doc of [...npcTemplates, ...sampleActors]) {
   }
 }
 console.log(
-  `Validated ${npcTemplates.length} NPC template/package systems and ${sampleActors.length} sample agent/companion systems, with all embedded item systems.`
+  `Validated ${npcTemplates.length} NPC template/package systems and ${sampleActors.length} sample actor/companion systems, with all embedded item systems.`
 );
 // Exercise v14's actual embedded collection replacement, including deletion and schema-cleaned inputs.
 try {

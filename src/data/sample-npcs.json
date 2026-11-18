@@ -1,0 +1,43 @@
+{
+  "label": "Sample Villains & Minions",
+  "description": "The original Glass Meridian network: a private intelligence broker, three lieutenants and eight reusable minion profiles.",
+  "defaultThreatLevel": 1,
+  "defaultTier": 3,
+  "cast": [
+    {
+      "id": "vera-kestrel", "base": "executive", "name": "Vera Kestrel — The Glass Broker", "role": "mastermind", "category": "Masterminds",
+      "description": "Vera runs Glass Meridian, a shipping consultancy that sells stolen identities and routes sensitive cargo through legitimate contracts. She wants a ledger recovered before it connects her clients to a vanished courier.",
+      "behavior": "Offers useful intelligence to split the team, lets her lieutenants negotiate first, and retreats through a service exit when her cover collapses.",
+      "customization": "Choose the courier's secret, the client Vera fears and the evidence that could turn her staff against her.",
+      "grades": { "initiative": 6, "attack": 4, "defense": 6, "resilience": 7, "health": 6, "competence": 8, "wealth": 8 },
+      "abilities": { "int": 16, "wis": 14, "cha": 16 },
+      "skills": [{ "key": "bluff", "grade": 8 }, { "key": "networking", "grade": 8 }, { "key": "senseMotive", "grade": 7 }]
+    },
+    {
+      "id": "anton-rusk", "base": "bodyguard", "name": "Anton Rusk — Security Chief", "role": "henchman", "category": "Henchmen",
+      "description": "Anton protects Vera and maintains the network's safehouses. He believes the consultancy shields witnesses from dangerous clients, and has not seen the full ledger.",
+      "behavior": "Keeps a route open for his principal, uses cover and demands that intruders put their weapons down before he negotiates.",
+      "customization": "Decide which innocent employee Anton protects and what evidence would convince him to stand aside."
+    },
+    {
+      "id": "leila-sayegh", "base": "hacker", "name": "Leila Sayegh — Signal Keeper", "role": "henchman", "category": "Henchmen",
+      "description": "Leila controls Glass Meridian's access logs and remote cameras. She has hidden a private copy of the courier's last transmission as insurance against Vera.",
+      "behavior": "Locks doors, redirects guards with false alerts and bargains for a safe exit once the agents reach her workstation.",
+      "customization": "Choose where her backup lives and who she needs extracted before she will surrender it."
+    },
+    {
+      "id": "milo-vale", "base": "commando", "name": "Milo Vale — Retrieval Leader", "role": "henchman", "category": "Henchmen",
+      "description": "Milo retrieves missing shipments and silences loose ends. Recovering the courier's ledger would let him buy control of the operation from Vera's rivals.",
+      "behavior": "Sends scouts ahead, isolates the ledger's carrier and withdraws once he has the objective rather than fighting to the last person.",
+      "customization": "Choose his rival buyer, extraction route and price for abandoning Vera."
+    },
+    { "id": "meridian-guard", "base": "security-guard", "role": "minion", "category": "Minions" },
+    { "id": "meridian-soldier", "base": "soldier", "role": "minion", "category": "Minions" },
+    { "id": "meridian-mercenary", "base": "mercenary", "role": "minion", "category": "Minions" },
+    { "id": "meridian-enforcer", "base": "criminal-enforcer", "role": "minion", "category": "Minions" },
+    { "id": "meridian-burglar", "base": "burglar", "role": "minion", "category": "Minions" },
+    { "id": "meridian-agent", "base": "enemy-agent", "role": "minion", "category": "Minions" },
+    { "id": "meridian-driver", "base": "driver", "role": "minion", "category": "Minions" },
+    { "id": "meridian-medic", "base": "medic", "role": "minion", "category": "Minions" }
+  ]
+}

@@ -1,6 +1,6 @@
 # Sample level-1 agents
 
-The **Sample Level-1 Agents** Actor compendium includes 16 ready-to-import characters, covering all 12 base classes. Faceman, Scout, Soldier and Wheelman each have two different builds. The compendium is included in the standard install ZIP and is visible to players for browsing; the GC imports and assigns the chosen character.
+The **Sample Level-1 Agents** Actor compendium includes 16 ready-to-import characters, covering all 12 base classes. Faceman, Scout, Soldier and Wheelman each have two different builds. The compendium is included in the standard install ZIP and is visible to players for browsing. On the first GM launch, all 16 PCs are copied into the **Sample PCs** Actor folder, with the Scout's linked animal partner. The GC assigns the chosen characters to players; additional copies can still be imported from the compendium.
 
 | Character / codename | Class | Talent / Specialty | Role |
 | --- | --- | --- | --- |
