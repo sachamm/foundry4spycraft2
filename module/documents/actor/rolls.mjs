@@ -705,6 +705,7 @@ export const ActorRolls = Base =>
         conveyanceBullRushCombat: this.mentalLeapCombatContext(),
         bullRushAttackCombat: this.mentalLeapCombatContext(),
         threatenCombat: this.mentalLeapCombatContext(),
+        tauntCombat: this.mentalLeapCombatContext(),
         taskWorldTime: game.time?.worldTime ?? null,
         maneuverCombat: this.mentalLeapCombatContext(),
         inCombat: options.inCombat === true || !!this.participatingCombat,
@@ -720,6 +721,13 @@ export const ActorRolls = Base =>
         ...this.sensoryContext(options),
         whirlingFlankingProof: whirlingAttackProof(this, options),
         ...(options.meleeTrick === "fend" ? { fendTiming: fendTiming(this) } : {}),
+        // Taunt: a bonus this character won against the attack's target is found from the posted attacks.
+        ...(this.system.tauntBonuses?.length
+          ? {
+              tauntBonusActorUuid: this.uuid,
+              tauntBonusCombat: this.participatingCombat ? { id: this.participatingCombat.id } : null
+            }
+          : {}),
         ammunition: ammunition ? { ...ammunition.system, name: ammunition.name } : null
       };
     }

@@ -40,6 +40,7 @@ import {
   weaponSpaces
 } from "../rules/vehicle-play-rules.mjs";
 import { SKILLS } from "../rules/tables.mjs";
+import { underminedState } from "../rules/taunt.mjs";
 import {
   HAZARD_GROUPS,
   accelerationSchedule,
@@ -96,6 +97,8 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
         will: new SchemaField({ base: int(0) })
       }),
       feintBonuses: recordList("feintBonuses"),
+      tauntBonuses: recordList("tauntBonuses"),
+      undermined: record("undermined", { nullable: true, initial: null }),
       feintHistory: recordList("feintHistory"),
       cheapShots: recordList("cheapShots"),
       biography: new HTMLField()
@@ -115,7 +118,10 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
         save.base + this.abilities[ability].mod + (["ref", "will"].includes(key) ? shaken.reflexWillPenalty : 0);
     }
     this.defense.total = 10 + this.defense.bonus + this.abilities.dex.mod;
-    this.initiative.total = this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty;
+    this.underminedCombatContext = underminedCombatContext(this);
+    this.underminedState = underminedState(this);
+    this.initiative.total =
+      this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty - this.underminedState.penalty;
     this.attack = {
       melee: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
       unarmed: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
@@ -124,6 +130,13 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
     this.skillTotals = {};
     this.warnings = [];
   }
+}
+
+/** The combat an Undermine record is timed in, as the rule reads it. */
+function underminedCombatContext(system) {
+  const id = system.undermined?.combatId,
+    combat = id ? globalThis.game?.combats?.get?.(id) : null;
+  return combat ? { id: combat.id, round: combat.round, turn: combat.turn } : null;
 }
 
 export class NpcData extends BaseActorData {
@@ -371,6 +384,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       }),
       misc: new SchemaField(misc),
       feintBonuses: recordList("feintBonuses"),
+      tauntBonuses: recordList("tauntBonuses"),
+      undermined: record("undermined", { nullable: true, initial: null }),
       feintHistory: recordList("feintHistory"),
       cheapShots: recordList("cheapShots"),
       biography: new HTMLField()
@@ -454,6 +469,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           ownTurnIndex: duelingCombat.turns?.findIndex(c => c.id === duelingOwn?.id) ?? -1
         }
       : null;
+    this.underminedCombatContext = underminedCombatContext(this);
     // Death Ride: whether this character is driving a vehicle or riding a mount (its recorded driver).
     this.operatingVehicle = [...(globalThis.game?.actors ?? [])].some(
       a => a.type === "vehicle" && a.system?.driver === this.parent.uuid

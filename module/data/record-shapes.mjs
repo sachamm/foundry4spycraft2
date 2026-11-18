@@ -480,6 +480,26 @@ export const RECORD_SHAPES = {
     sourceIds: ["string"],
     startedAt: "number"
   },
+  tauntBonuses: [
+    {
+      bonus: "number",
+      combatId: "string",
+      sourceMessage: "string",
+      targetUuid: "string",
+      version: "number"
+    }
+  ],
+  undermined: {
+    $also: "null",
+    combatId: "string",
+    penalty: "number",
+    rounds: "number",
+    sourceMessage: "string",
+    sourceUuid: "string",
+    startRound: "number",
+    startTurn: "number",
+    version: "number"
+  },
   feintBonuses: [
     {
       combatId: "string",

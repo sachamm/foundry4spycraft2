@@ -1,4 +1,5 @@
 import test from "node:test";
+import { tauntSkillChecks } from "../module/rules/taunt.mjs";
 import assert from "node:assert/strict";
 import {
   RollPipeline,
@@ -364,6 +365,7 @@ const EXPECTED_ORDER = [
   "detectionObserverContent:skill",
   "feintContent:skill",
   "targetSkillEffectContent:skill",
+  "tauntContent:skill",
   "tripAttackContent:skill",
   "tripDefenseContent:skill",
   "spiderContent:skill",
@@ -475,6 +477,7 @@ const EXPECTED_ORDER = [
   "rankSynergyFeat",
   "stoneCold",
   "threaten",
+  "taunt",
   "bugConcealment",
   "documentation",
   "trackingFeat",
@@ -494,6 +497,7 @@ const EXPECTED_ORDER = [
   "restraintChecks",
   "taskPressureChecks",
   "threatenChecks",
+  "tauntChecks",
   "feintChecks",
   "tripDefenseChecks",
   "tripAttackChecks",
@@ -536,6 +540,7 @@ const EXPECTED_ORDER = [
   "duelingReachAttackTerm",
   "noQuarterAttackTerm",
   "explosiveBasicsAttackTerm",
+  "tauntAttackTerm",
   "stalkingStanceSkillTerm",
   "feintSkillTerm",
   "meleeSkillFeatsSkillTerm",
@@ -551,6 +556,7 @@ const EXPECTED_ORDER = [
   "tripDefenseSkillTerm",
   "rankSynergyFeatsSkillTerm",
   "threatenSkillTerm",
+  "tauntSkillTerm",
   "bugConcealmentSkillTerm",
   "documentationSkillTerm",
   "polyglotSkillTerm",
@@ -598,6 +604,7 @@ const EXPECTED_ORDER = [
   "polyglotRecord",
   "pursuitFeatsRecord",
   "cooperativeControl",
+  "tauntControl",
   "qualityChecksRecord",
   "requestsRecord",
   "hazardSaveControl",
@@ -730,9 +737,12 @@ test("named skill checks match the original fixed composition for every skill", 
               key,
               feintSkillChecks(
                 key,
-                threatenSkillChecks(
+                tauntSkillChecks(
                   key,
-                  taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
+                  threatenSkillChecks(
+                    key,
+                    taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
+                  )
                 )
               )
             )

@@ -2,6 +2,7 @@ import { attributeDamageState } from "./attribute-damage.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { superiorCoverState } from "./superior-cover.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
+import { underminedState } from "./taunt.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { combatExpertiseState } from "./combat-expertise.mjs";
 import { shakenRules, shakenSkillPenalty } from "./shaken.mjs";
@@ -229,6 +230,7 @@ export function conditionSkillPenalty(system, ability) {
     combatExpertiseState(system).penalty -
     superiorCoverState(system).penalty -
     fightDefensivelyState(system).penalty -
+    underminedState(system).penalty -
     dartingStyleState(system).penalty +
     (ability === "dex" ? conditionRollPenalties(system).dexSkill : 0) +
     conditionAbilityPenalty(system, ability) +

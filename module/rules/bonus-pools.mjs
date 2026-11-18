@@ -1,3 +1,4 @@
+import { underminedSpendBlock } from "./taunt.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { actionDiceGain, actionDieBoostPlan } from "./action-dice.mjs";
 import { validFortunatePool } from "./fortunate.mjs";
@@ -357,6 +358,7 @@ export function actionDicePaymentPlan(system, { count, bonusPoolId = "", periods
         ? loc`Review the current Shaken sources before spending action dice.`
         : loc`Shaken IV: no action dice may be spent at all (p.342).`
     };
+  if (underminedSpendBlock(system)) return { blocked: true, reason: underminedSpendBlock(system) };
   if (!Number.isSafeInteger(count) || count < 1) throw new Error(loc`Spend a positive whole number of action dice.`);
   const funding = actionDiceFundingContext(system, { bonusPoolId, periods });
   if (funding.blocked) return funding;

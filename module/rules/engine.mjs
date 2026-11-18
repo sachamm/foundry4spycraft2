@@ -12,6 +12,7 @@ import { favoredGearState } from "./favored-gear.mjs";
 import { duelingAllDodge } from "./dueling-basics.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
 import { notTheFaceDR } from "./not-the-face.mjs";
+import { underminedState } from "./taunt.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -1295,6 +1296,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
     initiativeBonus: sys.activeFeatNames.includes("CQB Supremacy") && sys.readiedRangedWeapons.length ? 5 : 0,
     weaponIds: sys.readiedRangedWeapons.map(w => w.id)
   };
+  // Undermine (p.205): a morale penalty on Initiative while it lasts.
+  sys.underminedState = underminedState(sys);
+  if (sys.underminedState.penalty) B.add("initiative", -sys.underminedState.penalty, "Undermined", "morale");
   if (sys.cqbReadiedRules.initiativeBonus) {
     B.add("initiative", 5, "CQB Supremacy (readied ranged weapon)");
     sys.bonusSources.initiative = B.sources.get("initiative") ?? [];

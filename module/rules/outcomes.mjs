@@ -326,6 +326,7 @@ export function rollEvidence(check) {
     ...(check.rankSynergyFeats ? [check.rankSynergyFeats] : []),
     ...(check.stoneCold ? [check.stoneCold] : []),
     ...(check.threaten ? [check.threaten] : []),
+    ...(check.taunt ? [check.taunt] : []),
     ...(check.bugConcealment ? [check.bugConcealment] : []),
     ...(check.documentation ? [check.documentation] : []),
     ...(check.trackingFeat ? [check.trackingFeat] : []),
@@ -437,6 +438,7 @@ export function rollEvidenceMatches(evidence, check) {
     check.terrainSaveSource ||
     check.oldSchool ||
     check.threaten ||
+    check.taunt ||
     check.bugConcealment ||
     check.documentation ||
     check.analysisTask ||

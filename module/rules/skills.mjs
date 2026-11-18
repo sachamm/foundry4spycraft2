@@ -18,6 +18,7 @@ import { targetSkillEffectPlan, targetSkillTimingPlan } from "./target-skill-eff
 import "./rank-synergy-feats.mjs";
 import { stoneColdSkillPlan } from "./stone-cold.mjs";
 import "./threaten.mjs";
+import "./taunt.mjs";
 import "./bug-basics.mjs";
 import "./documentation.mjs";
 import { oneHandManeuverPlan } from "./maneuver-actions.mjs";

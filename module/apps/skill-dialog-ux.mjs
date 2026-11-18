@@ -16,6 +16,7 @@ const CHECK_SECTIONS = {
   conveyanceBullRushName: ["conveyance-bull-rush"],
   feintOpponentName: ["feint", "resist-feint"],
   threatenOpponentName: ["threaten", "resist-threaten"],
+  tauntOpponentUuid: ["taunt", "resist-taunt"],
   trackingSurface: ["tracking"],
   nest: ["hide"],
   hideMovement: ["hide"],
