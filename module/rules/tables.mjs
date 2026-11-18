@@ -11384,10 +11384,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:drive",
   "text": "Stunts are easier (–5 DC, –1 error), vehicle jumps go 50% farther, and your vehicle takes half falling damage."
  },
- "Hail of Fire": {
-  "rolls": "attack",
-  "text": "With Follow-up Shot, accept –4 instead to gain a second extra final attack."
- },
  "Horde Mastery": {
   "rolls": "skill:athletics",
   "text": "With a 2-to-1 advantage, you and teammates can Pummel as a half action and gain +1 to Grapple skill checks."

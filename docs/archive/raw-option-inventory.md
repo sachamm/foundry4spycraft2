@@ -328,8 +328,8 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | CQB Mastery | 180 | No | Within-CQB opponent ranged threat, into-melee waiver and held/readied ranged-weapon Threaten uninjured-target permission execute | Batch277 adds exact Threaten action/response checks and source/Count/evidence guards; failure/critical-failure next-attack bonus suppression and shared Threaten outcome settlement remain open |
 | CQB Supremacy | 181 | No | +5 Initiative from actual readied/carried available ranged weapons executes once with Size/grip/source checks; incoming Defense preview reduces partial cover one quarter for an actual available ranged Supremacy attack against an opponent within CQB Range; penetration and failed-Threaten reaction remain open | — |
 | Flamethrower Basics | 181 | No | Manual/descriptive | — |
-| Follow-up Shot | 181 | No | Manual/descriptive | — |
-| Hail of Fire | 182 | No | Manual/descriptive | — |
+| Follow-up Shot | 181 | No | Covered (batch 398): a start-of-Count declaration grants 1 final attack with a firearm or heavy weapon and −2 to attack and skill checks for 1 full round (shared Darting Weapon tradeoff; one such declaration per round) | Native Foundry QA not claimed |
+| Hail of Fire | 182 | No | Covered (batch 398): the Follow-Up Shot declaration may grant 2 final attacks at −4 | Native Foundry QA not claimed |
 | Grenade Basics | 181 | No | Partial: thrown range/error and field-request extra grenade; Intel acquisition remains open | — |
 | Guided Weapon Basics | 181 | No | Partial: guided range/error; remaining guided attack effects manual | — |
 | Gunslinger's Eye | 182 | No | Manual/descriptive | — |
@@ -1779,3 +1779,14 @@ Source: rules reference p.180 (local markdown edition; original PDF page not vis
 - The three feats leave `feat-reminders.json` (tables regenerated).
 
 Verification: 513 legacy assertions, 3421 of 3422 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 58 manual / 60 partial / 196 other; at least 118 of 314 explicitly unfinished; 78 whole-feat closures.
+
+## Residual implementation batch 398 — Follow-Up Shot and Hail of Fire
+
+Source: rules reference pp.181–182 (local markdown edition; original PDF pages not visually re-checked).
+
+- Follow-Up Shot’s benefit reads like Darting Weapon’s, with firearms and heavy weapons in place of melee and hurled ones. So the Darting Weapon tradeoff is generalised (`FINAL_ATTACK_TRADEOFFS` in `module/rules/darting.mjs`): a declaration records `kind: "followUp"`, and Hail of Fire plays Flashing Weapon’s part (2 final attacks at −4). The full-round penalty to attack and skill checks, the final-attack counter, GC review and the shared final-attack allowance all come from the existing tradeoff; its final attacks accept firearms and heavy weapons only. Darting records keep their old shape.
+- Interpretation: both feats use the one declaration slot, so a character with Darting Weapon and Follow-Up Shot declares one of them per round.
+- The Main tab offers “Follow-Up Shot / Hail of Fire” to owners of the feat. Hail of Fire leaves `feat-reminders.json` (tables regenerated).
+- This… is my Boomstick (p.183) does not appear in the local text edition under that heading, so it was not checked and stays manual.
+
+Verification: 513 legacy assertions, 3424 of 3425 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 56 manual / 60 partial / 198 other; at least 116 of 314 explicitly unfinished; 80 whole-feat closures.

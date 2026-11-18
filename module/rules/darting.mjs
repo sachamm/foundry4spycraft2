@@ -6,6 +6,13 @@ import { restraintActionBlock } from "./restraints.mjs";
 import { loc } from "../i18n.mjs";
 export const dartingWeaponEligible = w =>
   ["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged", "hurled", "exoticHurled"].includes(w?.proficiency);
+/** Follow-Up Shot / Hail of Fire (pp.181–182) use the same tradeoff with a firearm or heavy weapon. */
+export const followUpWeaponEligible = w =>
+  ["handgun", "rifle", "shotgun", "submachineGun", "tactical", "guided", "indirectFire"].includes(w?.proficiency);
+export const FINAL_ATTACK_TRADEOFFS = Object.freeze({
+  darting: { feat: "Darting Weapon", double: "Flashing Weapon", eligible: dartingWeaponEligible },
+  followUp: { feat: "Follow-Up Shot", double: "Hail of Fire", eligible: followUpWeaponEligible }
+});
 function canAct(system, combat) {
   const block = restraintActionBlock(system, { free: true }) || attributeActionBlock(system, { kind: "attack" });
   if (block || system.conditionContext?.sleeping || system.wounds?.value < 0 || system.mentalLeapState?.unconscious)
@@ -20,11 +27,13 @@ function canAct(system, combat) {
 export function dartingDeclarationPlan(
   system,
   combat,
-  { extraAttacks = 1, atStartOfInitiative = false, confirmed = false } = {}
+  { extraAttacks = 1, atStartOfInitiative = false, confirmed = false, kind = "darting" } = {}
 ) {
-  if (!system.activeFeatNames?.includes("Darting Weapon")) throw new Error(loc`Darting Weapon has not been earned.`);
-  if (![1, 2].includes(extraAttacks) || (extraAttacks === 2 && !system.activeFeatNames.includes("Flashing Weapon")))
-    throw new Error(loc`Choose one final attack with Darting Weapon, or two with earned Flashing Weapon.`);
+  const t = FINAL_ATTACK_TRADEOFFS[kind];
+  if (!t) throw new Error(loc`Choose Darting Weapon or Follow-Up Shot.`);
+  if (!system.activeFeatNames?.includes(t.feat)) throw new Error(loc`${t.feat} has not been earned.`);
+  if (![1, 2].includes(extraAttacks) || (extraAttacks === 2 && !system.activeFeatNames.includes(t.double)))
+    throw new Error(loc`Choose one final attack with ${t.feat}, or two with earned ${t.double}.`);
   if (
     !validOwnCountClock(combat) ||
     !Number.isSafeInteger(combat.round + 1) ||
@@ -45,7 +54,8 @@ export function dartingDeclarationPlan(
     penalty: 2 * extraAttacks,
     extraAttacks,
     atStartOfInitiative: true,
-    confirmed: true
+    confirmed: true,
+    ...(kind === "followUp" ? { kind } : {})
   };
 }
 export function dartingFinalAttackPlan(system, combat, items, { weaponId, confirmed = false } = {}) {
@@ -61,7 +71,7 @@ export function dartingFinalAttackPlan(system, combat, items, { weaponId, confir
     w = item?.system;
   if (
     item?.type !== "weapon" ||
-    !dartingWeaponEligible(w) ||
+    !FINAL_ATTACK_TRADEOFFS[state.kind].eligible(w) ||
     w.equipped !== true ||
     w.carried === false ||
     w.reserve ||
@@ -70,7 +80,11 @@ export function dartingFinalAttackPlan(system, combat, items, { weaponId, confir
     (w.quantity ?? 1) < 1 ||
     possessionUnavailable(w)
   )
-    throw new Error(loc`Choose an owned, readied and usable melee or hurled weapon.`);
+    throw new Error(
+      state.kind === "followUp"
+        ? loc`Choose an owned, readied and usable firearm or heavy weapon.`
+        : loc`Choose an owned, readied and usable melee or hurled weapon.`
+    );
   const grip = weaponGrip(system, w);
   if (grip.blocked) throw new Error(grip.reason || loc`The current weapon grip is unavailable.`);
   return {

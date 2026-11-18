@@ -62,6 +62,7 @@ export function combatToolVisibility(system = {}, stances = {}) {
     striking: feats.has("Polearm Basics") || system.combatStance?.key === "striking",
     missTrick: feats.has("Flail Basics") || feats.has("Fencing Basics"),
     darting: feats.has("Darting Weapon") || !!system.dartingStyle,
+    followUp: feats.has("Follow-Up Shot"),
     twoWeapon: feats.has("Two-Weapon Basics") || !!system.twoWeaponStyle,
     expertise: feats.has("Combat Expertise") || !!system.combatExpertise,
     cover: feats.has("Superior Cover") || !!system.superiorCover
