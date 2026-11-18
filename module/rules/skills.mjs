@@ -225,7 +225,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     key === "acrobatics" && check?.id === "counter-trip"
       ? tripCounterSkillCheck()
       : (tripAttackSkillChecks(key, []).find(c => c.id === check?.id) ??
-        feintSkillChecks(key, []).find(c => c.id === check?.id) ??
+        feintSkillChecks(key, [], system).find(c => c.id === check?.id) ??
         check);
   inDramaticConflict =
     inDramaticConflict === true ||

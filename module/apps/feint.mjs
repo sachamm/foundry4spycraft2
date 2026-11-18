@@ -1,11 +1,12 @@
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { feintActingSkill } from "../rules/feint.mjs";
 import { loc } from "../i18n.mjs";
 export function feintContent(key, actor) {
-  if (!["sleightOfHand", "notice"].includes(key)) return "";
-  const acting = key === "sleightOfHand",
-    esc = foundry.utils.escapeHTML;
-  return `<details><summary>${acting ? loc`Feint action` : loc`Resist Feint`}</summary><p>${loc`Choose ${acting ? loc`Feint Action (Sleight of Hand/DEX, Hands-On and Vision)` : loc`Resist Feint (Notice/WIS, Vision)`} above. Both checks add action error+1. ${acting ? loc`The ordinary action requires one half action during your Initiative Count.` : loc`This rolls only your opposed response.`} Fencing Basics with a readied one-handed FIN sword or Flail Basics with a readied flail supplies +2 gear; these bonuses do not stack.`}</p><label>${loc`Actual opposing character`} <select name="feintOpponentUuid"><option value="">${loc`Unrecorded opponent (manual outcomes)`}</option>${attackCharacterTargetChoices()
+  const acting = feintActingSkill(key, actor?.system);
+  if (!acting && key !== "notice") return "";
+  const esc = foundry.utils.escapeHTML;
+  return `<details><summary>${acting ? loc`Feint action` : loc`Resist Feint`}</summary><p>${loc`Choose ${acting ? (key === "impress" ? loc`Feint Action (Impress/CHA through Fan Service, Vision)` : loc`Feint Action (Sleight of Hand/DEX, Hands-On and Vision)`) : loc`Resist Feint (Notice/WIS, Vision)`} above. Both checks add action error+1. ${acting ? loc`The ordinary action requires one half action during your Initiative Count.` : loc`This rolls only your opposed response.`} Fencing Basics with a readied one-handed FIN sword or Flail Basics with a readied flail supplies +2 gear; these bonuses do not stack.`}</p><label>${loc`Actual opposing character`} <select name="feintOpponentUuid"><option value="">${loc`Unrecorded opponent (manual outcomes)`}</option>${attackCharacterTargetChoices()
     .filter(a => a.uuid !== actor?.uuid)
     .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
     .join(
