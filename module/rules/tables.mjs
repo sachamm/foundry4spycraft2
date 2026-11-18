@@ -11336,10 +11336,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "Once per round, Coup de Grace a helpless character as a half action."
  },
- "Fan Service": {
-  "rolls": "skill:impress",
-  "text": "Use Impress for Diversion and Feint, and as a full action affect every opponent in range."
- },
  "Follow-up Shot": {
   "rolls": "attack",
   "text": "When your Initiative Count begins, take an extra firearm or heavy-weapon final attack at –2 to all checks for the round."

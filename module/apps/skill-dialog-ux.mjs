@@ -17,6 +17,7 @@ const CHECK_SECTIONS = {
   feintOpponentName: ["feint", "resist-feint"],
   threatenOpponentName: ["threaten", "resist-threaten"],
   tauntOpponentUuid: ["taunt", "resist-taunt"],
+  diversionOpponentUuid: ["diversion", "resist-diversion"],
   skillTrick: ["trip", "bull-rush", "feint", "grapple"],
   grappleAdvantageConfirmed: ["grapple", "restraint-escape"],
   grappleJointLock: ["restraint-escape"],

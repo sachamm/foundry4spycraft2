@@ -327,6 +327,7 @@ export function rollEvidence(check) {
     ...(check.stoneCold ? [check.stoneCold] : []),
     ...(check.threaten ? [check.threaten] : []),
     ...(check.taunt ? [check.taunt] : []),
+    ...(check.diversion ? [check.diversion] : []),
     ...(check.bugConcealment ? [check.bugConcealment] : []),
     ...(check.documentation ? [check.documentation] : []),
     ...(check.trackingFeat ? [check.trackingFeat] : []),
@@ -439,6 +440,7 @@ export function rollEvidenceMatches(evidence, check) {
     check.oldSchool ||
     check.threaten ||
     check.taunt ||
+    check.diversion ||
     check.bugConcealment ||
     check.documentation ||
     check.analysisTask ||

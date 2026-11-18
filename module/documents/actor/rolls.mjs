@@ -706,6 +706,7 @@ export const ActorRolls = Base =>
         bullRushAttackCombat: this.mentalLeapCombatContext(),
         threatenCombat: this.mentalLeapCombatContext(),
         tauntCombat: this.mentalLeapCombatContext(),
+        diversionCombat: this.mentalLeapCombatContext(),
         taskWorldTime: game.time?.worldTime ?? null,
         maneuverCombat: this.mentalLeapCombatContext(),
         inCombat: options.inCombat === true || !!this.participatingCombat,
@@ -725,7 +726,9 @@ export const ActorRolls = Base =>
         ...(this.system.tauntBonuses?.length
           ? {
               tauntBonusActorUuid: this.uuid,
-              tauntBonusCombat: this.participatingCombat ? { id: this.participatingCombat.id } : null
+              tauntBonusCombat: this.participatingCombat
+                ? { id: this.participatingCombat.id, round: this.participatingCombat.round }
+                : null
             }
           : {}),
         ammunition: ammunition ? { ...ammunition.system, name: ammunition.name } : null

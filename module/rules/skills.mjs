@@ -19,6 +19,7 @@ import "./rank-synergy-feats.mjs";
 import { stoneColdSkillPlan } from "./stone-cold.mjs";
 import "./threaten.mjs";
 import "./taunt.mjs";
+import "./diversion.mjs";
 import "./grapple-check.mjs";
 import "./bug-basics.mjs";
 import "./documentation.mjs";

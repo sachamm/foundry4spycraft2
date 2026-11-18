@@ -1,5 +1,6 @@
 import test from "node:test";
 import { tauntSkillChecks } from "../module/rules/taunt.mjs";
+import { diversionSkillChecks } from "../module/rules/diversion.mjs";
 import { grappleSkillChecks } from "../module/rules/grapple-check.mjs";
 import assert from "node:assert/strict";
 import {
@@ -365,6 +366,7 @@ const EXPECTED_ORDER = [
   "grappleContent:skill",
   "meleeFireContextContent:rangedAttack",
   "detectionObserverContent:skill",
+  "diversionContent:skill",
   "feintContent:skill",
   "targetSkillEffectContent:skill",
   "tauntContent:skill",
@@ -486,6 +488,7 @@ const EXPECTED_ORDER = [
   "stoneCold",
   "threaten",
   "taunt",
+  "diversion",
   "bugConcealment",
   "documentation",
   "trackingFeat",
@@ -506,6 +509,7 @@ const EXPECTED_ORDER = [
   "taskPressureChecks",
   "threatenChecks",
   "tauntChecks",
+  "diversionChecks",
   "grappleChecks",
   "feintChecks",
   "tripDefenseChecks",
@@ -573,6 +577,7 @@ const EXPECTED_ORDER = [
   "rankSynergyFeatsSkillTerm",
   "threatenSkillTerm",
   "tauntSkillTerm",
+  "diversionSkillTerm",
   "bugConcealmentSkillTerm",
   "documentationSkillTerm",
   "polyglotSkillTerm",
@@ -623,6 +628,7 @@ const EXPECTED_ORDER = [
   "pursuitFeatsRecord",
   "cooperativeControl",
   "tauntControl",
+  "diversionControl",
   "qualityChecksRecord",
   "requestsRecord",
   "hazardSaveControl",
@@ -761,12 +767,16 @@ test("named skill checks match the original fixed composition for every skill", 
                 key,
                 grappleSkillChecks(
                   key,
-                  tauntSkillChecks(
+                  diversionSkillChecks(
                     key,
-                    threatenSkillChecks(
+                    tauntSkillChecks(
                       key,
-                      taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
-                    )
+                      threatenSkillChecks(
+                        key,
+                        taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
+                      )
+                    ),
+                    actor.system
                   )
                 )
               )

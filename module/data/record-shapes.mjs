@@ -512,6 +512,7 @@ export const RECORD_SHAPES = {
       combatId: "string",
       sourceMessage: "string",
       targetUuid: "string",
+      untilRound: "number",
       version: "number"
     }
   ],

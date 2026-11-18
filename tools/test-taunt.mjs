@@ -186,3 +186,41 @@ test("Cleave Mastery: one cleave per drop, any number per round", async () => {
   assert.equal(limit(["Cleave Basics"]), 1);
   assert.equal(limit(["Cleave Basics", "Cleave Mastery"]), 20);
 });
+
+test("Diversion: Bluff (or Fan Service Impress) against Sense Motive; a win costs the opponent Initiative", async () => {
+  const { diversionSkillChecks, diversionCheckPlan, diversionOutcome } = await import("../module/rules/diversion.mjs");
+  const [bluff] = diversionSkillChecks("bluff", []);
+  assert.deepEqual([bluff.id, bluff.attributes, bluff.tags, bluff.error], ["diversion", ["dex"], "Vision", 2]);
+  assert.deepEqual(diversionSkillChecks("impress", []), []);
+  assert.deepEqual(diversionSkillChecks("impress", [], { activeFeatNames: ["Fan Service"] })[0].attributes, ["cha"]);
+  const plan = diversionCheckPlan({}, "bluff", bluff, {
+    diversionOpponentUuid: "Actor.t",
+    diversionOpponentName: "Vex",
+    diversionSightConfirmed: true,
+    diversionCombat: combat()
+  });
+  assert.equal(plan.evidence.role, "attacker");
+  const a = {
+      actorUuid: "Actor.a",
+      resolved: true,
+      effectiveTotal: 15,
+      diversion: { role: "attacker", opponentUuid: "Actor.t" }
+    },
+    d = {
+      actorUuid: "Actor.t",
+      resolved: true,
+      effectiveTotal: 12,
+      diversion: { role: "defender", opponentUuid: "Actor.a" }
+    };
+  assert.deepEqual(diversionOutcome(a, d), { attackerWon: true, critical: false, countLoss: "1d4+1" });
+  assert.equal(diversionOutcome({ ...a, criticalSuccess: true }, d).countLoss, "2d4+2");
+  assert.equal(diversionOutcome({ ...a, effectiveTotal: 10 }, d).attackerWon, false);
+  const rows = {
+    tauntBonuses: [{ sourceMessage: "D1", targetUuid: "Actor.a", combatId: "c", untilRound: 3, bonus: 2 }]
+  };
+  assert.equal(
+    tauntAttackBonus(rows, { actorUuid: "Actor.t", targetUuid: "Actor.a", combatId: "c", round: 3 }).bonus,
+    2
+  );
+  assert.equal(tauntAttackBonus(rows, { actorUuid: "Actor.t", targetUuid: "Actor.a", combatId: "c", round: 4 }), null);
+});

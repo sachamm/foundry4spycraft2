@@ -203,7 +203,7 @@ export const underminedSpendBlock = system =>
 /* -------------------------------------------- */
 
 /** An unused Taunt bonus this character holds against the target in this combat. `posted` are message flags. */
-export function tauntAttackBonus(system, { actorUuid, targetUuid, combatId, posted = [] } = {}) {
+export function tauntAttackBonus(system, { actorUuid, targetUuid, combatId, round = null, posted = [] } = {}) {
   if (!targetUuid || !combatId) return null;
   const used = new Set(
     posted
@@ -212,7 +212,12 @@ export function tauntAttackBonus(system, { actorUuid, targetUuid, combatId, post
       .filter(Boolean)
   );
   const row = (system?.tauntBonuses ?? []).find(
-    r => r?.targetUuid === targetUuid && r.combatId === combatId && !used.has(r.sourceMessage)
+    r =>
+      r?.targetUuid === targetUuid &&
+      r.combatId === combatId &&
+      !used.has(r.sourceMessage) &&
+      // A Diversion's bonus lasts only until the end of the following round.
+      !(Number.isSafeInteger(r.untilRound) && Number.isSafeInteger(round) && round > r.untilRound)
   );
   return row ? { version: 1, sourceMessage: row.sourceMessage, targetUuid, bonus: row.bonus } : null;
 }
@@ -266,6 +271,7 @@ rollPipeline.register({
         actorUuid: options.tauntBonusActorUuid,
         targetUuid: options.characterTarget?.actorUuid || options.targetActorUuid || "",
         combatId: combat?.id,
+        round: combat?.round ?? null,
         posted: [...(globalThis.game?.messages ?? [])].map(m => m.flags?.spycraft2).filter(Boolean)
       });
     if (!plan) return null;
@@ -273,9 +279,11 @@ rollPipeline.register({
       key: "tauntBonus",
       plan,
       rowAt: 289,
-      rows: [[loc`Won a Taunt against this target`, plan.bonus]],
+      rows: [[loc`Won a Taunt or Diversion against this target`, plan.bonus]],
       noteAt: 501,
-      notes: [loc`Taunt: +${plan.bonus} on this attack for winning the opposed Taunt; it is now used (p.361).`]
+      notes: [
+        loc`+${plan.bonus} on this attack for winning an opposed Taunt or Diversion against this character; it is now used (pp.357,361).`
+      ]
     };
   }
 });
