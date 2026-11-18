@@ -49,6 +49,15 @@ export class SpycraftActor extends ActorRolls(
         };
       data.flags = flags;
       updates.flags = flags;
+      // A character entering the world (new, or imported from a compendium) has taken no stress or subdual
+      // damage yet, so its ledger starts at zero instead of waiting for a GC review.
+      if (!(data.system?.accumulatedDamage ?? this.system?.accumulatedDamage)) {
+        // The update below is not recursive, so it carries the whole system source with the ledger set.
+        updates.system = {
+          ...(this._source?.system ?? {}),
+          accumulatedDamage: { version: 1, revision: 1, stress: 0, subdual: 0, pending: [], lastReview: null }
+        };
+      }
     }
     if (Object.keys(updates).length) this.updateSource(updates, { recursive: false });
   }

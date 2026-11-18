@@ -156,8 +156,10 @@ export function drForAttack(system = {}, attackKind = "other") {
 }
 
 /** The DR category of a weapon, from its proficiency and whether the attack was ranged. */
-export function attackKindOf({ proficiency = "", ranged = false, unarmed = false } = {}) {
+export function attackKindOf({ proficiency = "", ranged = false, unarmed = false, blast = false } = {}) {
   if (unarmed || proficiency === "unarmed") return "unarmed";
+  // A grenade or other blast is not a "non-grenade hurled weapon": it takes the "other damage" column.
+  if (blast) return "other";
   if (["hurled", "exoticHurled"].includes(proficiency)) return "hurledWeapon";
   if (ranged) return "rangedWeapon";
   if (["blunt", "exoticBlunt", "edged", "exoticEdged"].includes(proficiency)) return "meleeWeapon";

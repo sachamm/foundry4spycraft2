@@ -16,7 +16,6 @@ import {
   fireDamagePlan,
   hazardState,
   ignitePlan,
-  lethalDamagePlan,
   parseOnset,
   reduceFire,
   rollOnGround,
@@ -27,6 +26,8 @@ import { DAMAGE_TYPE_LABELS, SURVIVAL_LABELS } from "../rules/damage-types.mjs";
 import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
+import { setCondition, woundConditions } from "./wound-conditions.mjs";
+import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
@@ -107,9 +108,18 @@ export async function writeHazards(actor, hazards) {
 /** Take lethal damage off vitality, then wounds, where the character tracks them. Returns what was lost. */
 export async function sufferLethal(actor, amount) {
   if (!Number.isFinite(actor.system.vitality?.max) || !actor.system.vitality.max) return null;
-  const plan = lethalDamagePlan(actor.system, amount);
+  const system = actor.system,
+    plan = lethalHitPlan(
+      { vitality: system.vitality?.value, wounds: system.wounds?.value, woundsMax: system.wounds?.max },
+      { damage: amount }
+    );
   await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
-  return plan;
+  // The same fatigue and wound conditions as any other lethal hit (p.331); notes report what was set.
+  // Only the condition lines: callers already report the vitality and wounds lost.
+  const notes = lethalHitLines("", { ...plan, vitalityLoss: 0, woundLoss: 0, critical: false, massive: null }).slice(1);
+  if (plan.fatigued) notes.push(await setCondition(actor, "fatigued", loc`Fatigued`));
+  if (plan.stateChanged) notes.push(...(await woundConditions(actor, plan.state)));
+  return { ...plan, notes: notes.filter(Boolean) };
 }
 
 /** Record stress through the damage ledger, so resistances and thresholds apply. Returns a note on failure. */
@@ -282,7 +292,8 @@ async function resolveContagionSave(actor, message, save, succeeded) {
       lines.push(
         loss
           ? loc`${amount.total} lethal damage: vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-          : loc`${amount.total} lethal damage: the GC applies it.`
+          : loc`${amount.total} lethal damage: the GC applies it.`,
+        ...(loss?.notes ?? [])
       );
     } else if (effect.kind === "condition") {
       const status = CONFIG.statusEffects?.find(s => s.id === effect.condition);
@@ -313,7 +324,8 @@ async function sufferFire(actor, state, damage, reduction, label) {
   const lines = [
     loss
       ? loc`${label}: ${taken} fire damage, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-      : loc`${label}: ${taken} fire damage; the GC applies it (a standard character saves against it).`
+      : loc`${label}: ${taken} fire damage; the GC applies it (a standard character saves against it).`,
+    ...(loss?.notes ?? [])
   ];
   const lost = loss ? loss.vitalityLoss + loss.woundLoss : taken;
   lines.push(await sufferStress(actor, lost, loc`Fire`, "fireStressBeforeDefenses"));

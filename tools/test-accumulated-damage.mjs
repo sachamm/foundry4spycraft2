@@ -254,7 +254,7 @@ const review = { stress: 0, subdual: 0, note: "GC checked actual totals", confir
   damage = { source: "attack-one", kind: "stress", newDamage: 13, confirmed: true };
 test("legacy damage is never assumed zero; an explicit owning-GC baseline has an auditable revision and can be corrected without pending saves", async () => {
   const a = ledgerActor();
-  await assert.rejects(applyAccumulatedDamage(a, damage), /initialize or review/);
+  await assert.rejects(applyAccumulatedDamage(a, damage), /stress and subdual ledger first/);
   assert.equal(a.system.accumulatedDamage, null);
   let r = await reviewDamageLedger(a, review);
   assert.equal(r.before, null);
@@ -359,7 +359,7 @@ test("pending saves block total corrections and missing receipts or malformed le
     { version: 1, revision: 1, stress: 0, subdual: 0, pending: ["constructor"] },
     { version: 1, revision: 1, stress: 0, subdual: 0, pending: ["a", "a"] }
   ])
-    assert.throws(() => validateDamageLedger(ledger), /initialize or review/);
+    assert.throws(() => validateDamageLedger(ledger), /stress and subdual ledger first/);
 });
 test("zero and below-threshold events have receipts without a save, while below-threshold critical events retain their unresolved outcome", async () => {
   const a = ledgerActor();

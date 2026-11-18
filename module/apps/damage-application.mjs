@@ -32,6 +32,7 @@ import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
+import { setCondition as condition, woundConditions } from "./wound-conditions.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
 import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
@@ -214,34 +215,6 @@ export const nonLethalTotals = actor => ({
 /** Damage types with rules of their own that an agent's hazards track; fire is kept with the other hazards. */
 const TYPED = [...Object.keys(DAMAGE_TYPES), "fire"];
 const typeLabel = type => (type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type));
-
-async function condition(target, id, label) {
-  if (target.statuses?.has(id)) return "";
-  try {
-    await setConditionStatus(target, id, true, { label });
-    return "";
-  } catch (error) {
-    return loc`${label} could not be set (${esc(error.message)}); set it by hand.`;
-  }
-}
-
-async function defeat(target) {
-  for (const combat of values(game.combats))
-    for (const combatant of combat.combatants ?? [])
-      if (combatant.actor === target && !combatant.defeated) await combatant.update({ defeated: true });
-}
-
-/** Set the conditions a wound total brings. Returns lines for anything that could not be set. */
-async function woundConditions(target, state) {
-  const lines = [];
-  if (["unconscious", "dying"].includes(state)) lines.push(await condition(target, "unconscious", loc`Unconscious`));
-  if (state === "dying") lines.push(await condition(target, "dying", loc`Dying`));
-  if (["dead", "destroyed"].includes(state)) {
-    lines.push(await condition(target, "dead", loc`Dead`));
-    await defeat(target);
-  }
-  return lines;
-}
 
 /**
  * Stress or subdual damage. An agent's goes to the ledger, which works out its own save. A special NPC keeps two
@@ -433,17 +406,19 @@ hazardSaveResolvers.set("thresholdSave", async (actor, message, save, succeeded,
 const damageFacts = message => {
   const check = message.flags?.spycraft2 ?? {};
   const weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null,
-    attack = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid)?.flags?.spycraft2 : null;
+    attack = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid)?.flags?.spycraft2 : null,
+    profile = damageProfile(weapon?.system?.damage, check.weaponQualities ?? weapon?.system?.qualities);
   return {
     check,
     weapon,
     attack,
     rolled: Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : message.rolls?.[0]?.total,
-    profile: damageProfile(weapon?.system?.damage, check.weaponQualities ?? weapon?.system?.qualities),
+    profile,
     attackKind: attackKindOf({
       proficiency: weapon?.system?.proficiency ?? check.weaponProficiency,
       ranged: check.sourceAttack?.ranged === true,
-      unarmed: check.unarmed === true
+      unarmed: check.unarmed === true,
+      blast: profile.blast === true
     }),
     applied: Array.isArray(check.damageApplied) ? check.damageApplied : []
   };

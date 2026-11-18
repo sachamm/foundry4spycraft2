@@ -296,7 +296,13 @@ async function grappleConditions(actor, input, outcome) {
       return loc`${esc(who.name)}: ${label} could not be set (${esc(error.message)}).`;
     }
   };
-  if (outcome.winner === "actor") return [await set(opponent, "held", loc`Held`)];
+  // Both wrestlers are vulnerable while the hold lasts: the held opponent through Held, the grappler directly (p.356).
+  if (outcome.winner === "actor")
+    return [
+      await set(opponent, "held", loc`Held`),
+      await set(actor, "vulnerable", loc`Vulnerable`),
+      loc`Clear Vulnerable from ${esc(actor.name)} when the grapple ends.`
+    ];
   const decisive = input.opponentCritical === true || input.criticalFailure === true;
   return [decisive ? await set(actor, "sprawled", loc`Sprawled`) : await set(actor, "flat-footed", loc`Flat-footed`)];
 }
