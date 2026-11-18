@@ -383,9 +383,9 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | All or Nothing | 189 | No | Covered (batch 381): once per session, a rolled skill, Knowledge or attack check declared on its dialog widens error and threat ranges by 5; its error stays open to activation on a success, which then becomes a failure | Native Foundry QA not claimed |
 | Better Luck Next Time | 189 | No | Covered (batch 380): a single boosting die on a skill check or save that rolls a natural 1 is returned once when the check is resolved (ordinary dice, or a still-live unrestricted bonus pool) | Native Foundry QA not claimed |
 | Fortune's Fool | 189 | No | Manual/descriptive | — |
-| Black Cat | 189 | No | Manual/descriptive | — |
+| Black Cat | 189 | No | Covered (batch 382): once per scene the GC marks up to one opponent per Chance feat (GC confirms line of sight); a marked character’s checks carry +2 error range until the scene changes; no character carries two | Native Foundry QA not claimed |
 | Jinx | 190 | No | Implemented: selected paying-opponent critical-failure discount, Chance-based session allowance and combined payment recovery | Batches269–270; Shaken-after-waiver fees, concurrent/source/counter guards, actual GC review and native persistence verified |
-| Tough Luck | 191 | No | Manual/descriptive | — |
+| Tough Luck | 191 | No | Covered (batch 382): recorded with the Black Cat mark; each threat a marked opponent activates costs 1 more action die | Native Foundry QA not claimed |
 | The Dice are Hot | 189 | No | Implemented: Gambling cap removal/current-owned-dice synergy and Lifestyle +1 | Batch228; paid class/Hail Mary recalculation, source checks, expiry/bound pools and cached native combination verified |
 | Fortunate | 189 | No | Covered (batch 379): the GC grants the requested d4 as a scene-long unrestricted bonus die (Fortune Favors the Bold applies); the matching d4 goes to the GC pool or is noted for a chosen opponent; uses per session equal the Chance feats held | Native Foundry QA not claimed |
 | Fortune Favors the Bold | 189 | No | Partial: chosen/roll effects | — |
@@ -1605,3 +1605,13 @@ Source: rules reference p.189 (local markdown edition; original PDF page not vis
 - **Error on a success.** For an All or Nothing roll, an error in range is confirmed and awaits the opponent’s decision even when the result succeeds (`errorDecisionPending`, `adjudicateCheck`). If an opponent activates it as a critical failure, a success becomes a failure (`successConfirmed: false`, `allOrNothingOverturned`).
 
 Verification: 513 legacy assertions, 3362 of 3363 Node tests (5 new, including a real declared attack and a refused second use), 127 browser layout fixtures; the captured-dialog comparison is unchanged for characters without the feat. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 105 manual / 53 partial / 156 other; at least 158 of 314 explicitly unfinished; 38 whole-feat closures.
+
+## Residual implementation batch 382 — Black Cat and Tough Luck
+
+Source: rules reference pp.189 and 191 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Marking.** Black Cat is a once-per-scene free action against opponents in line of sight, and only the GC can write to other characters, so the GC applies it from the user’s Main tab (`module/apps/black-cat.mjs`). The GC ticks the opponents the player chose and confirms the sight lines. The plan (`module/rules/black-cat.mjs`) allows at most one target per Chance feat, never the user or a repeated target, and refuses anyone already carrying a live Black Cat. Each target gets `flags.spycraft2.blackCat` holding the source, the world scene it was made in and whether the source has Tough Luck. A chat receipt lists the targets.
+- **Effect.** While the world scene is unchanged, a marked character’s rolls widen their error range by 2 (never above 19); rolls with no error range, such as saves, are unchanged. The check records `blackCat` and the card notes it. A replacement roll keeps it without adding it again. A changed scene lapses the mark without cleanup.
+- **Tough Luck.** Activating a threat on a check with a Tough Luck mark costs 1 more action die, listed among the activation’s cost sources.
+
+Verification: 513 legacy assertions, 3368 of 3369 Node tests (6 new, including a real marked attack and the replacement-roll guard through `rollCheck`), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 103 manual / 53 partial / 158 other; at least 156 of 314 explicitly unfinished; 40 whole-feat closures.

@@ -193,6 +193,10 @@ export function criticalPlan(
       sources.push("Driven +1");
     }
   }
+  if (kind === "success" && check.blackCat?.toughLuck === true) {
+    adjustment++;
+    sources.push(loc`Tough Luck (Black Cat target) +1`);
+  }
   const cost = Math.max(minimum, baseCost + adjustment);
   if (cost > available) return reject(loc`Not enough action dice remain in the paying character’s pool.`);
   return {

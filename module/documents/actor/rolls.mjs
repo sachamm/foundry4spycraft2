@@ -1,4 +1,5 @@
 /** Checks a character rolls: the shared roll itself, attribute checks, saves and action dice. */
+import { blackCatRollEffect } from "../../rules/black-cat.mjs";
 import { allOrNothingEligible, allOrNothingRanges } from "../../rules/all-or-nothing.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
@@ -255,6 +256,11 @@ export const ActorRolls = Base =>
       }
       if (allOrNothing && !options.allOrNothingRangesApplied)
         ({ threat, error } = allOrNothingRanges({ threat, error }));
+      // Black Cat, p.189: a marked character's checks carry +2 error range this scene. A replacement roll already has it.
+      const blackCat = options.blackCatApplied
+        ? (options.blackCat ?? null)
+        : blackCatRollEffect(this.flags?.spycraft2?.blackCat, this.usagePeriods, error);
+      if (blackCat?.error !== undefined) error = blackCat.error;
       // Reservations, validation, modifiers and extra record fields come from the roll pipeline (module/rolls).
       const rollContext = {
         actor: this,
@@ -398,6 +404,7 @@ export const ActorRolls = Base =>
         oneInAMillion: million,
         tenSecondSolution: solution,
         ...(allOrNothing ? { allOrNothing: true } : {}),
+        ...(blackCat ? { blackCat: blackCat.record ?? blackCat } : {}),
         standaloneCheckConfirmed: !!options.standaloneCheckConfirmed,
         forcedThreat: twenty,
         noForcedReroll: twenty,

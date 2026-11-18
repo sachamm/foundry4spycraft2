@@ -1353,6 +1353,7 @@ export const ActorOutcomes = Base =>
               // A replacement keeps All or Nothing: its ranges are already in the check's threat and error.
               allOrNothingCommitted: check.allOrNothing === true,
               allOrNothingRangesApplied: check.allOrNothing === true,
+              blackCatApplied: !!check.blackCat,
               noForcedReroll: false,
               forcedThreat: false,
               cannotError: check.manualAdjustment ? (check.cannotErrorBeforeManual ?? false) : check.cannotError,
