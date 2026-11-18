@@ -387,7 +387,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Jinx | 190 | No | Implemented: selected paying-opponent critical-failure discount, Chance-based session allowance and combined payment recovery | Batches269–270; Shaken-after-waiver fees, concurrent/source/counter guards, actual GC review and native persistence verified |
 | Tough Luck | 191 | No | Manual/descriptive | — |
 | The Dice are Hot | 189 | No | Implemented: Gambling cap removal/current-owned-dice synergy and Lifestyle +1 | Batch228; paid class/Hail Mary recalculation, source checks, expiry/bound pools and cached native combination verified |
-| Fortunate | 189 | No | Manual/descriptive | — |
+| Fortunate | 189 | No | Covered (batch 379): the GC grants the requested d4 as a scene-long unrestricted bonus die (Fortune Favors the Bold applies); the matching d4 goes to the GC pool or is noted for a chosen opponent; uses per session equal the Chance feats held | Native Foundry QA not claimed |
 | Fortune Favors the Bold | 189 | No | Partial: chosen/roll effects | — |
 | Lady Luck's Smile | 190 | No | Verified complete: action dice explode on their highest two natural faces | Batch231; ordinary/bonus die types, boost/Generous/healing/Defense, prerequisites and persisted native formula verified |
 | Lucky Break | 190 | No | Manual/descriptive | — |
@@ -1574,3 +1574,13 @@ Source: rules reference p.175 (local markdown edition; original PDF page not vis
 - Test support: `tools/fixtures/final-attack-actor.mjs` is a shared actor for posting real final attacks and damage; the Cleave/Snap Shot test now uses it.
 
 Verification: 513 legacy assertions, 3347 of 3348 Node tests (5 new, including a real halved damage roll and a refused second roll), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 108 manual / 53 partial / 153 other; at least 161 of 314 explicitly unfinished; 35 whole-feat closures.
+
+## Residual implementation batch 379 — Fortunate
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- **Die.** `module/rules/fortunate.mjs` grants an unrestricted bonus pool (`source: "fortunate"`): one d4, improved to d6 under Fortune Favors the Bold like every gained die, lost at scene or session end. It spends through the existing bonus-pool payments, and The Dice are Hot counts it. `UNRESTRICTED_POOL_SOURCES` in `module/rules/bonus-pools.mjs` now lists these pool kinds in one place, replacing three copies.
+- **Uses.** One per Chance feat the character has each session (counted from the prepared feat selections’ tree), with GC counter review.
+- **Grant.** The feat is a request to the GC, so the control on the Main tab is the GC’s. The GC chooses who gains the matching d4: the GC pool (`adjustGCDice`, after checking the session’s pool is initialized) or a named opponent, which the chat receipt notes. If the GC pool write fails after the character’s die is saved, the character keeps the die and the receipt and a warning ask the GC to add the match by hand.
+
+Verification: 513 legacy assertions, 3353 of 3354 Node tests (6 new, including a real grant, a refused second use and the GC-only check), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 107 manual / 53 partial / 154 other; at least 160 of 314 explicitly unfinished; 36 whole-feat closures.
