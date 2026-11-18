@@ -1,32 +1,242 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {manualAdjustmentSource,manualAdjustmentPlan} from '../module/rules/class-checks.mjs';import {limitedUseAbilities} from '../module/rules/limited-uses.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {adjudicateCheck,checkCandidates} from '../module/rules/outcomes.mjs';
-const state=()=>({classLevels:{wheelman:2},actionDice:{value:0,max:3},resourceUses:{}});const check=()=>({actorUuid:'Actor.wheelman',checkKind:'skill',skillKey:'mechanics',successConfirmed:false,errorConfirmed:true,rawTotal:-3,effectiveTotal:-3,naturalDie:1,cap:15,threat:20,error:1,checkMethod:'roll',formula:'1d20 + @total',rollData:{total:-4},boostTotal:0,boostSpent:0});const input={difficultyClass:22,device:'Jammed generator',retryConfirmed:true,halfActionConfirmed:true,whackConfirmed:true};
-test('Manual Adjustment tests every native milestone, skill and threshold; borrowed grade I uses assumed levels without actual-level stacking',()=>{
- for(let level=0;level<=20;level++)for(const skillKey of Object.keys(cfg.skills)){const s={...state(),classLevels:{wheelman:level}},source=manualAdjustmentSource(s),eligible=level>=2&&['mechanics',...(level>=11?['electronics']:[]),...(level>=19?['security']:[])].includes(skillKey);if(eligible){assert.equal(manualAdjustmentPlan(s,{...check(),skillKey},{...input,difficultyClass:level+20}).threshold,level+20);assert.throws(()=>manualAdjustmentPlan(s,{...check(),skillKey},{...input,difficultyClass:level+21}),/must not exceed/);}else assert.throws(()=>manualAdjustmentPlan(s,{...check(),skillKey},input));if(level>=2)assert.equal(source.limit,3);}
- const inheritedClassChoices=[{name:'Wheelman: Manual adjustment I',ownerClass:'pointman',assumedLevel:2},{name:'Wheelman: Manual adjustment I',ownerClass:'pointman',assumedLevel:2},{name:'Wheelman: Manual adjustment I',ownerClass:'other',assumedLevel:2}];const s={...state(),classLevels:{wheelman:1},inheritedClassChoices};assert.equal(manualAdjustmentSource(s).level,4);assert.deepEqual(manualAdjustmentSource(s).skills,['mechanics']);s.classLevels.wheelman=3;assert.equal(manualAdjustmentSource(s).level,3);
+import test from "node:test";
+import assert from "node:assert/strict";
+import { manualAdjustmentSource, manualAdjustmentPlan } from "../module/rules/class-checks.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { adjudicateCheck, checkCandidates } from "../module/rules/outcomes.mjs";
+const state = () => ({ classLevels: { wheelman: 2 }, actionDice: { value: 0, max: 3 }, resourceUses: {} });
+const check = () => ({
+  actorUuid: "Actor.wheelman",
+  checkKind: "skill",
+  skillKey: "mechanics",
+  successConfirmed: false,
+  errorConfirmed: true,
+  rawTotal: -3,
+  effectiveTotal: -3,
+  naturalDie: 1,
+  cap: 15,
+  threat: 20,
+  error: 1,
+  checkMethod: "roll",
+  formula: "1d20 + @total",
+  rollData: { total: -4 },
+  boostTotal: 0,
+  boostSpent: 0
 });
-test('only retryable confirmed failures before activation qualify; errors and negative results are explicitly eligible',()=>{
- assert.equal(manualAdjustmentPlan(state(),check(),input).lowestPositiveGrade,true);for(const patch of [{successConfirmed:true},{successConfirmed:null},{resolved:true},{superseded:'new'},{criticalFailure:true},{criticalSuccess:true},{manualAdjustment:{}}])assert.throws(()=>manualAdjustmentPlan(state(),{...check(),...patch},input));
- for(const patch of [{difficultyClass:''},{difficultyClass:null},{difficultyClass:22.5},{difficultyClass:Infinity},{retryConfirmed:false},{halfActionConfirmed:false},{whackConfirmed:false},{device:''}])assert.throws(()=>manualAdjustmentPlan(state(),check(),{...input,...patch}));
- const spec=limitedUseAbilities(state(),[],cfg).find(s=>s.id==='manualAdjustment');assert.equal(spec.period,'session');assert.equal(spec.limit,3);assert.equal(spec.cost,0);assert.equal(spec.workflow,'manualAdjustment');
+const input = {
+  difficultyClass: 22,
+  device: "Jammed generator",
+  retryConfirmed: true,
+  halfActionConfirmed: true,
+  whackConfirmed: true
+};
+test("Manual Adjustment tests every native milestone, skill and threshold; borrowed grade I uses assumed levels without actual-level stacking", () => {
+  for (let level = 0; level <= 20; level++)
+    for (const skillKey of Object.keys(cfg.skills)) {
+      const s = { ...state(), classLevels: { wheelman: level } },
+        source = manualAdjustmentSource(s),
+        eligible =
+          level >= 2 &&
+          ["mechanics", ...(level >= 11 ? ["electronics"] : []), ...(level >= 19 ? ["security"] : [])].includes(
+            skillKey
+          );
+      if (eligible) {
+        assert.equal(
+          manualAdjustmentPlan(s, { ...check(), skillKey }, { ...input, difficultyClass: level + 20 }).threshold,
+          level + 20
+        );
+        assert.throws(
+          () => manualAdjustmentPlan(s, { ...check(), skillKey }, { ...input, difficultyClass: level + 21 }),
+          /must not exceed/
+        );
+      } else assert.throws(() => manualAdjustmentPlan(s, { ...check(), skillKey }, input));
+      if (level >= 2) assert.equal(source.limit, 3);
+    }
+  const inheritedClassChoices = [
+    { name: "Wheelman: Manual adjustment I", ownerClass: "pointman", assumedLevel: 2 },
+    { name: "Wheelman: Manual adjustment I", ownerClass: "pointman", assumedLevel: 2 },
+    { name: "Wheelman: Manual adjustment I", ownerClass: "other", assumedLevel: 2 }
+  ];
+  const s = { ...state(), classLevels: { wheelman: 1 }, inheritedClassChoices };
+  assert.equal(manualAdjustmentSource(s).level, 4);
+  assert.deepEqual(manualAdjustmentSource(s).skills, ["mechanics"]);
+  s.classLevels.wheelman = 3;
+  assert.equal(manualAdjustmentSource(s).level, 3);
 });
-let session='s1',failUpdate=false,dialog=null;
-globalThis.Actor=class{constructor(){this.uuid='Actor.wheelman';this.isOwner=true;this.type='agent';this.system=state();this.system.limitedUses=limitedUseAbilities(this.system,[],cfg);}async update(data){for(const [path,value] of Object.entries(data)){const keys=path.replace(/^system\./,'').split('.');let o=this.system;for(const k of keys.slice(0,-1))o=o[k]??={};const k=keys.at(-1);if(k.startsWith('-='))delete o[k.slice(2)];else o[k]=structuredClone(value);}}};globalThis.game={user:{isGM:true},settings:{get:()=>({session})}};globalThis.ui={notifications:{warn:()=>null}};globalThis.foundry={utils:{escapeHTML:s=>String(s)},applications:{api:{DialogV2:{input:async opts=>dialog?.(opts)}}}};
-const {SpycraftActor}=await import('../module/documents/actor.mjs');function message(patch={}){return {uuid:'ChatMessage.manual',id:'manual',flags:{spycraft2:{...check(),...patch}},async update(data){if(failUpdate)throw Error('message write failed');for(const [key,value] of Object.entries(data)){if(key==='flags.spycraft2')this.flags.spycraft2=structuredClone(value);else if(key.startsWith('flags.spycraft2.'))this.flags.spycraft2[key.slice(16)]=structuredClone(value);else this[key]=value;}return this;}};}
-test('document whack converts an error/negative result to the lowest positive success, preserves the original roll and consumes only one session use',async()=>{
- session='s1';const a=new SpycraftActor(),m=message(),r=await a.useManualAdjustment(m,input);assert.equal(r.successConfirmed,true);assert.equal(r.errorConfirmed,false);assert.equal(r.rawTotal,-3);assert.equal(r.effectiveTotal,-3);assert.equal(r.naturalDie,1);assert.equal(r.manualAdjustment.threshold,22);assert.equal(r.cannotError,true);assert.equal(checkCandidates(r).error,false);assert.equal(a.system.resourceUses.manualAdjustment.used,1);assert.equal(a.system.actionDice.value,0);assert.match(m.flavor,/failure reversed/);assert.throws(()=>adjudicateCheck(r,false),/already reversed/);await assert.rejects(a.useManualAdjustment(m,input),/confirmed failed/);
+test("only retryable confirmed failures before activation qualify; errors and negative results are explicitly eligible", () => {
+  assert.equal(manualAdjustmentPlan(state(), check(), input).lowestPositiveGrade, true);
+  for (const patch of [
+    { successConfirmed: true },
+    { successConfirmed: null },
+    { resolved: true },
+    { superseded: "new" },
+    { criticalFailure: true },
+    { criticalSuccess: true },
+    { manualAdjustment: {} }
+  ])
+    assert.throws(() => manualAdjustmentPlan(state(), { ...check(), ...patch }, input));
+  for (const patch of [
+    { difficultyClass: "" },
+    { difficultyClass: null },
+    { difficultyClass: 22.5 },
+    { difficultyClass: Infinity },
+    { retryConfirmed: false },
+    { halfActionConfirmed: false },
+    { whackConfirmed: false },
+    { device: "" }
+  ])
+    assert.throws(() => manualAdjustmentPlan(state(), check(), { ...input, ...patch }));
+  const spec = limitedUseAbilities(state(), [], cfg).find(s => s.id === "manualAdjustment");
+  assert.equal(spec.period, "session");
+  assert.equal(spec.limit, 3);
+  assert.equal(spec.cost, 0);
+  assert.equal(spec.workflow, "manualAdjustment");
 });
-test('failed writes restore the use and error side effect; concurrent declarations execute once and uses reset only with session',async()=>{
- session='s1';const a=new SpycraftActor(),m=message();let restored=0;a.syncRollErrorEffect=async()=>()=>{restored++;};failUpdate=true;await assert.rejects(a.useManualAdjustment(m,input),/message write failed/);failUpdate=false;assert.equal(restored,1);assert.equal(a.system.resourceUses.manualAdjustment,undefined);assert.equal(m.flags.spycraft2.successConfirmed,false);
- const results=await Promise.allSettled([a.useManualAdjustment(m,input),a.useManualAdjustment(m,input)]);assert.equal(results.filter(r=>r.status==='fulfilled'&&r.value?.manualAdjustment).length,1);assert.equal(a.system.resourceUses.manualAdjustment.used,1);
- await a.useManualAdjustment(message(),input);await a.useManualAdjustment(message(),input);assert.equal(a.system.resourceUses.manualAdjustment.used,3);assert.equal(await a.useManualAdjustment(message(),input),null);session='s2';assert.ok(await a.useManualAdjustment(message(),input));assert.equal(a.system.resourceUses.manualAdjustment.used,1);
+let session = "s1",
+  failUpdate = false,
+  dialog = null;
+globalThis.Actor = class {
+  constructor() {
+    this.uuid = "Actor.wheelman";
+    this.isOwner = true;
+    this.type = "agent";
+    this.system = state();
+    this.system.limitedUses = limitedUseAbilities(this.system, [], cfg);
+  }
+  async update(data) {
+    for (const [path, value] of Object.entries(data)) {
+      const keys = path.replace(/^system\./, "").split(".");
+      let o = this.system;
+      for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+      const k = keys.at(-1);
+      if (k.startsWith("-=")) delete o[k.slice(2)];
+      else o[k] = structuredClone(value);
+    }
+  }
+};
+globalThis.game = { user: { isGM: true }, settings: { get: () => ({ session }) } };
+globalThis.ui = { notifications: { warn: () => null } };
+globalThis.foundry = {
+  utils: { escapeHTML: s => String(s) },
+  applications: { api: { DialogV2: { input: async opts => dialog?.(opts) } } }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+function message(patch = {}) {
+  return {
+    uuid: "ChatMessage.manual",
+    id: "manual",
+    flags: { spycraft2: { ...check(), ...patch } },
+    async update(data) {
+      if (failUpdate) throw Error("message write failed");
+      for (const [key, value] of Object.entries(data)) {
+        if (key === "flags.spycraft2") this.flags.spycraft2 = structuredClone(value);
+        else if (key.startsWith("flags.spycraft2.")) this.flags.spycraft2[key.slice(16)] = structuredClone(value);
+        else this[key] = value;
+      }
+      return this;
+    }
+  };
+}
+test("document whack converts an error/negative result to the lowest positive success, preserves the original roll and consumes only one session use", async () => {
+  session = "s1";
+  const a = new SpycraftActor(),
+    m = message(),
+    r = await a.useManualAdjustment(m, input);
+  assert.equal(r.successConfirmed, true);
+  assert.equal(r.errorConfirmed, false);
+  assert.equal(r.rawTotal, -3);
+  assert.equal(r.effectiveTotal, -3);
+  assert.equal(r.naturalDie, 1);
+  assert.equal(r.manualAdjustment.threshold, 22);
+  assert.equal(r.cannotError, true);
+  assert.equal(checkCandidates(r).error, false);
+  assert.equal(a.system.resourceUses.manualAdjustment.used, 1);
+  assert.equal(a.system.actionDice.value, 0);
+  assert.match(m.flavor, /failure reversed/);
+  assert.throws(() => adjudicateCheck(r, false), /already reversed/);
+  await assert.rejects(a.useManualAdjustment(m, input), /confirmed failed/);
 });
-test('secret checks stay GC-only and source/DC/physical confirmations are validated before charging',async()=>{
- session='s1';const a=new SpycraftActor(),m=message();m.blind=true;game.user.isGM=false;await assert.rejects(a.useManualAdjustment(m,input),/GC resolves/);game.user.isGM=true;assert.equal(a.system.resourceUses.manualAdjustment,undefined);for(const patch of [{difficultyClass:23},{retryConfirmed:false},{halfActionConfirmed:false}])await assert.rejects(a.useManualAdjustment(m,{...input,...patch}));assert.equal(a.system.resourceUses.manualAdjustment,undefined);
- dialog=()=>null;assert.equal(await a.useManualAdjustment(m),null);assert.equal(a.system.resourceUses.manualAdjustment,undefined);
+test("failed writes restore the use and error side effect; concurrent declarations execute once and uses reset only with session", async () => {
+  session = "s1";
+  const a = new SpycraftActor(),
+    m = message();
+  let restored = 0;
+  a.syncRollErrorEffect = async () => () => {
+    restored++;
+  };
+  failUpdate = true;
+  await assert.rejects(a.useManualAdjustment(m, input), /message write failed/);
+  failUpdate = false;
+  assert.equal(restored, 1);
+  assert.equal(a.system.resourceUses.manualAdjustment, undefined);
+  assert.equal(m.flags.spycraft2.successConfirmed, false);
+  const results = await Promise.allSettled([a.useManualAdjustment(m, input), a.useManualAdjustment(m, input)]);
+  assert.equal(results.filter(r => r.status === "fulfilled" && r.value?.manualAdjustment).length, 1);
+  assert.equal(a.system.resourceUses.manualAdjustment.used, 1);
+  await a.useManualAdjustment(message(), input);
+  await a.useManualAdjustment(message(), input);
+  assert.equal(a.system.resourceUses.manualAdjustment.used, 3);
+  assert.equal(await a.useManualAdjustment(message(), input), null);
+  session = "s2";
+  assert.ok(await a.useManualAdjustment(message(), input));
+  assert.equal(a.system.resourceUses.manualAdjustment.used, 1);
+});
+test("secret checks stay GC-only and source/DC/physical confirmations are validated before charging", async () => {
+  session = "s1";
+  const a = new SpycraftActor(),
+    m = message();
+  m.blind = true;
+  game.user.isGM = false;
+  await assert.rejects(a.useManualAdjustment(m, input), /GC resolves/);
+  game.user.isGM = true;
+  assert.equal(a.system.resourceUses.manualAdjustment, undefined);
+  for (const patch of [{ difficultyClass: 23 }, { retryConfirmed: false }, { halfActionConfirmed: false }])
+    await assert.rejects(a.useManualAdjustment(m, { ...input, ...patch }));
+  assert.equal(a.system.resourceUses.manualAdjustment, undefined);
+  dialog = () => null;
+  assert.equal(await a.useManualAdjustment(m), null);
+  assert.equal(a.system.resourceUses.manualAdjustment, undefined);
 });
 
-test('an eligible voluntary reroll spends its own cost, keeps the whack use spent and restores normal error eligibility on the replacement',async()=>{
- session='s1';globalThis.ChatMessage={getSpeaker:()=>({})};globalThis.Roll=class{constructor(_formula,data){this.total=1+data.total;this.dice=[{total:1}];}async evaluate(){return this;}async toMessage(data){const m=message(data.flags.spycraft2);m.uuid='ChatMessage.rerolled';m.id='rerolled';m.flavor=data.flavor;return m;}};
- const a=new SpycraftActor(),m=message();await a.useManualAdjustment(m,input);a.system.actionDice.value=1;a.system.limitedUses.push({id:'meticulous',name:'Meticulous',workflow:'reroll',skill:'mechanics',period:'scene',limit:1,cost:1});
- const next=await a.rerollCheck(m,{resource:'meticulous'}),c=next.flags.spycraft2;assert.equal(c.naturalDie,1);assert.equal(c.cannotError,false);assert.equal(c.manualAdjustment,undefined);assert.equal(checkCandidates(c).error,true);assert.equal(a.system.resourceUses.manualAdjustment.used,1);assert.equal(a.system.actionDice.value,0);assert.equal(m.flags.spycraft2.resolved,true);
+test("an eligible voluntary reroll spends its own cost, keeps the whack use spent and restores normal error eligibility on the replacement", async () => {
+  session = "s1";
+  globalThis.ChatMessage = { getSpeaker: () => ({}) };
+  globalThis.Roll = class {
+    constructor(_formula, data) {
+      this.total = 1 + data.total;
+      this.dice = [{ total: 1 }];
+    }
+    async evaluate() {
+      return this;
+    }
+    async toMessage(data) {
+      const m = message(data.flags.spycraft2);
+      m.uuid = "ChatMessage.rerolled";
+      m.id = "rerolled";
+      m.flavor = data.flavor;
+      return m;
+    }
+  };
+  const a = new SpycraftActor(),
+    m = message();
+  await a.useManualAdjustment(m, input);
+  a.system.actionDice.value = 1;
+  a.system.limitedUses.push({
+    id: "meticulous",
+    name: "Meticulous",
+    workflow: "reroll",
+    skill: "mechanics",
+    period: "scene",
+    limit: 1,
+    cost: 1
+  });
+  const next = await a.rerollCheck(m, { resource: "meticulous" }),
+    c = next.flags.spycraft2;
+  assert.equal(c.naturalDie, 1);
+  assert.equal(c.cannotError, false);
+  assert.equal(c.manualAdjustment, undefined);
+  assert.equal(checkCandidates(c).error, true);
+  assert.equal(a.system.resourceUses.manualAdjustment.used, 1);
+  assert.equal(a.system.actionDice.value, 0);
+  assert.equal(m.flags.spycraft2.resolved, true);
 });

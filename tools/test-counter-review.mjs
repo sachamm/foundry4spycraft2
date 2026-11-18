@@ -1,31 +1,257 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {resourceCounterReviewPlan,resourceStatus,limitedUseAbilities} from '../module/rules/limited-uses.mjs';import {brightIdeaPoolStatus,brightIdeaMigrationPlan,brightIdeaLegacyReviewSpec} from '../module/rules/bright-idea.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const spec={id:'cunningPlan',name:'Cunning Plan',period:'scene',limit:2,cost:0};const record=()=>({epoch:'a',used:'1'});
-test('review requires an explicit confirmed count/reason, preserves over-allowance use history and never invents an unused count',()=>{
- const uses={cunningPlan:record()},periods={scene:'a'};for(const input of [{used:-1},{used:0.5},{used:NaN},{used:Infinity},{used:'1'},{used:1,reason:''},{used:1,confirmed:false}])assert.throws(()=>resourceCounterReviewPlan(spec,uses,periods,{reason:'Known history',confirmed:true,...input}));const plan=resourceCounterReviewPlan(spec,uses,periods,{used:5,reason:'Class allowance fell after the uses were spent',confirmed:true});assert.deepEqual(plan.record,{epoch:'a',used:5});assert.deepEqual(plan.previous,record());assert.equal(resourceStatus(spec,{cunningPlan:plan.record},periods).remaining,0);assert.deepEqual(uses.cunningPlan,record());assert.throws(()=>resourceCounterReviewPlan(spec,{cunningPlan:{epoch:'a',used:1}},periods,{used:0,reason:'Unneeded',confirmed:true}));
+import test from "node:test";
+import assert from "node:assert/strict";
+import { resourceCounterReviewPlan, resourceStatus, limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+import {
+  brightIdeaPoolStatus,
+  brightIdeaMigrationPlan,
+  brightIdeaLegacyReviewSpec
+} from "../module/rules/bright-idea.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const spec = { id: "cunningPlan", name: "Cunning Plan", period: "scene", limit: 2, cost: 0 };
+const record = () => ({ epoch: "a", used: "1" });
+test("review requires an explicit confirmed count/reason, preserves over-allowance use history and never invents an unused count", () => {
+  const uses = { cunningPlan: record() },
+    periods = { scene: "a" };
+  for (const input of [
+    { used: -1 },
+    { used: 0.5 },
+    { used: NaN },
+    { used: Infinity },
+    { used: "1" },
+    { used: 1, reason: "" },
+    { used: 1, confirmed: false }
+  ])
+    assert.throws(() =>
+      resourceCounterReviewPlan(spec, uses, periods, { reason: "Known history", confirmed: true, ...input })
+    );
+  const plan = resourceCounterReviewPlan(spec, uses, periods, {
+    used: 5,
+    reason: "Class allowance fell after the uses were spent",
+    confirmed: true
+  });
+  assert.deepEqual(plan.record, { epoch: "a", used: 5 });
+  assert.deepEqual(plan.previous, record());
+  assert.equal(resourceStatus(spec, { cunningPlan: plan.record }, periods).remaining, 0);
+  assert.deepEqual(uses.cunningPlan, record());
+  assert.throws(() =>
+    resourceCounterReviewPlan(spec, { cunningPlan: { epoch: "a", used: 1 } }, periods, {
+      used: 0,
+      reason: "Unneeded",
+      confirmed: true
+    })
+  );
 });
-test('unknown legacy Bright Idea epochs and malformed source records cannot disappear through an automatic migration',()=>{
- for(const old of [{used:2},{epoch:42,used:2},'bad',[]]){const s={classLevels:{scientist:3},resourceUses:{brightIdea:old}};assert.equal(brightIdeaPoolStatus(s,{session:'s'}).needsReview,true);assert.equal(brightIdeaPoolStatus(s,{session:'s'}).legacyUsed,null);assert.ok(brightIdeaLegacyReviewSpec(s,{session:'s'}));assert.throws(()=>brightIdeaMigrationPlan(s,{session:'s'}),/malformed/);}
- const s={classLevels:{scientist:3},resourceUses:{brightIdea:{epoch:'s',used:1},brightIdeaScientist:{used:1}}};const status=brightIdeaPoolStatus(s,{session:'s'});assert.equal(status.automatic,false);assert.equal(status.sources[0].used,null);assert.throws(()=>brightIdeaMigrationPlan(s,{session:'s'}),/allocate/);assert.deepEqual(s.resourceUses.brightIdeaScientist,{used:1});
- assert.equal(brightIdeaPoolStatus({classLevels:{scientist:3},resourceUses:{brightIdea:{epoch:'old',used:'bad'}}},{session:'s'}).needsReview,false);
+test("unknown legacy Bright Idea epochs and malformed source records cannot disappear through an automatic migration", () => {
+  for (const old of [{ used: 2 }, { epoch: 42, used: 2 }, "bad", []]) {
+    const s = { classLevels: { scientist: 3 }, resourceUses: { brightIdea: old } };
+    assert.equal(brightIdeaPoolStatus(s, { session: "s" }).needsReview, true);
+    assert.equal(brightIdeaPoolStatus(s, { session: "s" }).legacyUsed, null);
+    assert.ok(brightIdeaLegacyReviewSpec(s, { session: "s" }));
+    assert.throws(() => brightIdeaMigrationPlan(s, { session: "s" }), /malformed/);
+  }
+  const s = {
+    classLevels: { scientist: 3 },
+    resourceUses: { brightIdea: { epoch: "s", used: 1 }, brightIdeaScientist: { used: 1 } }
+  };
+  const status = brightIdeaPoolStatus(s, { session: "s" });
+  assert.equal(status.automatic, false);
+  assert.equal(status.sources[0].used, null);
+  assert.throws(() => brightIdeaMigrationPlan(s, { session: "s" }), /allocate/);
+  assert.deepEqual(s.resourceUses.brightIdeaScientist, { used: 1 });
+  assert.equal(
+    brightIdeaPoolStatus(
+      { classLevels: { scientist: 3 }, resourceUses: { brightIdea: { epoch: "old", used: "bad" } } },
+      { session: "s" }
+    ).needsReview,
+    false
+  );
 });
-let periods={scene:'a',session:'s'},posts=[],failPost=false,failRestore=false,warnings=[];globalThis.Actor=class{constructor(){this.uuid='Actor.review';this.type='agent';this.isOwner=true;this.items=[];this.system={classLevels:{schemer:7},actionDice:{value:0,max:3},resourceUses:{cunningPlan:record()}};this.system.limitedUses=limitedUseAbilities(this.system,[],cfg);}async update(patch){if(failRestore&&patch['system.resourceUses.cunningPlan']?.used==='1')throw Error('restore failed');for(const [path,value] of Object.entries(patch)){const keys=path.replace(/^system\./,'').split('.');let o=this.system;for(const k of keys.slice(0,-1))o=o[k]??={};const k=keys.at(-1);if(k.startsWith('-='))delete o[k.slice(2)];else o[k]=value&&typeof value==='object'&&!Array.isArray(value)&&o[k]&&typeof o[k]==='object'&&!Array.isArray(o[k])?{...o[k],...structuredClone(value)}:structuredClone(value);}}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'gm',isGM:true},settings:{get:()=>periods},i18n:{localize:s=>s}};globalThis.foundry={utils:{escapeHTML:s=>String(s)},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.ui={notifications:{warn:s=>{warnings.push(s);return null;}}};globalThis.ChatMessage={getSpeaker:()=>({}),getWhisperRecipients:()=>[{id:'gm'},{id:'gm2'}],async create(data){if(failPost)throw Error('receipt failed');posts.push(data);return data;}};const {SpycraftActor}=await import('../module/documents/actor.mjs');const input={used:1,reason:'Checked the current scene chat history',confirmed:true};function reset(){periods={scene:'a',session:'s'};posts=[];failPost=false;failRestore=false;warnings=[];game.user.isGM=true;}
-test('the owning GC can repair a registered source with a private audit receipt; cancellation and invalid values change nothing',async()=>{
- reset();const a=new SpycraftActor();assert.equal(await a.reviewLimitedUseCounter('cunningPlan'),null);for(const used of [null,false,undefined,'',' ',0.5,-1])await assert.rejects(a.reviewLimitedUseCounter('cunningPlan',{...input,used}),/GC-confirmed/);assert.deepEqual(a.system.resourceUses.cunningPlan,record());await a.reviewLimitedUseCounter('cunningPlan',{...input,used:'1'});assert.deepEqual(a.system.resourceUses.cunningPlan,{epoch:'a',used:1});assert.deepEqual(posts[0].whisper,['gm','gm2']);assert.deepEqual(posts[0].flags.spycraft2.previousUseRecord,record());assert.equal(posts[0].flags.spycraft2.reviewedBy,'gm');assert.equal(posts[0].flags.spycraft2.actionDiceAllowed,false);assert.equal(a.system.actionDice.value,0);assert.equal(await a.reviewLimitedUseCounter('cunningPlan',input),null);assert.equal(posts.length,1);
+let periods = { scene: "a", session: "s" },
+  posts = [],
+  failPost = false,
+  failRestore = false,
+  warnings = [];
+globalThis.Actor = class {
+  constructor() {
+    this.uuid = "Actor.review";
+    this.type = "agent";
+    this.isOwner = true;
+    this.items = [];
+    this.system = {
+      classLevels: { schemer: 7 },
+      actionDice: { value: 0, max: 3 },
+      resourceUses: { cunningPlan: record() }
+    };
+    this.system.limitedUses = limitedUseAbilities(this.system, [], cfg);
+  }
+  async update(patch) {
+    if (failRestore && patch["system.resourceUses.cunningPlan"]?.used === "1") throw Error("restore failed");
+    for (const [path, value] of Object.entries(patch)) {
+      const keys = path.replace(/^system\./, "").split(".");
+      let o = this.system;
+      for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+      const k = keys.at(-1);
+      if (k.startsWith("-=")) delete o[k.slice(2)];
+      else
+        o[k] =
+          value &&
+          typeof value === "object" &&
+          !Array.isArray(value) &&
+          o[k] &&
+          typeof o[k] === "object" &&
+          !Array.isArray(o[k])
+            ? { ...o[k], ...structuredClone(value) }
+            : structuredClone(value);
+    }
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = { user: { id: "gm", isGM: true }, settings: { get: () => periods }, i18n: { localize: s => s } };
+globalThis.foundry = {
+  utils: { escapeHTML: s => String(s) },
+  applications: { api: { DialogV2: { input: async () => null } } }
+};
+globalThis.ui = {
+  notifications: {
+    warn: s => {
+      warnings.push(s);
+      return null;
+    }
+  }
+};
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  getWhisperRecipients: () => [{ id: "gm" }, { id: "gm2" }],
+  async create(data) {
+    if (failPost) throw Error("receipt failed");
+    posts.push(data);
+    return data;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+const input = { used: 1, reason: "Checked the current scene chat history", confirmed: true };
+function reset() {
+  periods = { scene: "a", session: "s" };
+  posts = [];
+  failPost = false;
+  failRestore = false;
+  warnings = [];
+  game.user.isGM = true;
+}
+test("the owning GC can repair a registered source with a private audit receipt; cancellation and invalid values change nothing", async () => {
+  reset();
+  const a = new SpycraftActor();
+  assert.equal(await a.reviewLimitedUseCounter("cunningPlan"), null);
+  for (const used of [null, false, undefined, "", " ", 0.5, -1])
+    await assert.rejects(a.reviewLimitedUseCounter("cunningPlan", { ...input, used }), /GC-confirmed/);
+  assert.deepEqual(a.system.resourceUses.cunningPlan, record());
+  await a.reviewLimitedUseCounter("cunningPlan", { ...input, used: "1" });
+  assert.deepEqual(a.system.resourceUses.cunningPlan, { epoch: "a", used: 1 });
+  assert.deepEqual(posts[0].whisper, ["gm", "gm2"]);
+  assert.deepEqual(posts[0].flags.spycraft2.previousUseRecord, record());
+  assert.equal(posts[0].flags.spycraft2.reviewedBy, "gm");
+  assert.equal(posts[0].flags.spycraft2.actionDiceAllowed, false);
+  assert.equal(a.system.actionDice.value, 0);
+  assert.equal(await a.reviewLimitedUseCounter("cunningPlan", input), null);
+  assert.equal(posts.length, 1);
 });
-test('non-GCs and non-owners cannot correct counters; a changed source, period or record invalidates an in-flight review',async()=>{
- reset();const a=new SpycraftActor();game.user.isGM=false;await assert.rejects(a.reviewLimitedUseCounter('cunningPlan',input),/owning GC/);game.user.isGM=true;a.isOwner=false;await assert.rejects(a.reviewLimitedUseCounter('cunningPlan',input),/owning GC/);a.isOwner=true;
- for(const change of [b=>{periods.scene='b';},b=>{b.system.resourceUses.cunningPlan.used='changed';},b=>{b.system.limitedUses.find(s=>s.id==='cunningPlan').limit=1;}]){periods.scene='a';const b=new SpycraftActor();let release;b._actionDieQueue=new Promise(r=>release=r);const pending=b.reviewLimitedUseCounter('cunningPlan',input);change(b);release();await assert.rejects(pending,/changed during review/);assert.equal(posts.length,0);}
+test("non-GCs and non-owners cannot correct counters; a changed source, period or record invalidates an in-flight review", async () => {
+  reset();
+  const a = new SpycraftActor();
+  game.user.isGM = false;
+  await assert.rejects(a.reviewLimitedUseCounter("cunningPlan", input), /owning GC/);
+  game.user.isGM = true;
+  a.isOwner = false;
+  await assert.rejects(a.reviewLimitedUseCounter("cunningPlan", input), /owning GC/);
+  a.isOwner = true;
+  for (const change of [
+    b => {
+      periods.scene = "b";
+    },
+    b => {
+      b.system.resourceUses.cunningPlan.used = "changed";
+    },
+    b => {
+      b.system.limitedUses.find(s => s.id === "cunningPlan").limit = 1;
+    }
+  ]) {
+    periods.scene = "a";
+    const b = new SpycraftActor();
+    let release;
+    b._actionDieQueue = new Promise(r => (release = r));
+    const pending = b.reviewLimitedUseCounter("cunningPlan", input);
+    change(b);
+    release();
+    await assert.rejects(pending, /changed during review/);
+    assert.equal(posts.length, 0);
+  }
 });
-test('receipt failure restores malformed history; a failed restore leaves a review warning, and competing corrections cannot overwrite one another',async()=>{
- reset();const a=new SpycraftActor();failPost=true;await assert.rejects(a.reviewLimitedUseCounter('cunningPlan',input),/receipt failed/);assert.deepEqual(a.system.resourceUses.cunningPlan,record());failRestore=true;assert.deepEqual(await a.reviewLimitedUseCounter('cunningPlan',input),{epoch:'a',used:1});assert.equal(a.system.resourceUses.cunningPlan.used,1);assert.match(warnings.at(-1),/may remain/);failRestore=false;failPost=false;const b=new SpycraftActor(),outcomes=await Promise.allSettled([b.reviewLimitedUseCounter('cunningPlan',input),b.reviewLimitedUseCounter('cunningPlan',{...input,used:2})]);assert.equal(outcomes.filter(r=>r.status==='fulfilled').length,1);assert.equal(b.system.resourceUses.cunningPlan.used,1);assert.equal(posts.length,1);
+test("receipt failure restores malformed history; a failed restore leaves a review warning, and competing corrections cannot overwrite one another", async () => {
+  reset();
+  const a = new SpycraftActor();
+  failPost = true;
+  await assert.rejects(a.reviewLimitedUseCounter("cunningPlan", input), /receipt failed/);
+  assert.deepEqual(a.system.resourceUses.cunningPlan, record());
+  failRestore = true;
+  assert.deepEqual(await a.reviewLimitedUseCounter("cunningPlan", input), { epoch: "a", used: 1 });
+  assert.equal(a.system.resourceUses.cunningPlan.used, 1);
+  assert.match(warnings.at(-1), /may remain/);
+  failRestore = false;
+  failPost = false;
+  const b = new SpycraftActor(),
+    outcomes = await Promise.allSettled([
+      b.reviewLimitedUseCounter("cunningPlan", input),
+      b.reviewLimitedUseCounter("cunningPlan", { ...input, used: 2 })
+    ]);
+  assert.equal(outcomes.filter(r => r.status === "fulfilled").length, 1);
+  assert.equal(b.system.resourceUses.cunningPlan.used, 1);
+  assert.equal(posts.length, 1);
 });
-test('correcting a malformed old combined count does not bypass the required class-source allocation or grant extra credits',async()=>{
- reset();const a=new SpycraftActor();a.system.classLevels={scientist:7,fieldAnalyst:4};a.system.resourceUses={brightIdea:{used:'3'}};a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);await a.reviewLimitedUseCounter('brightIdea',{...input,used:3,reason:'Verified three old uses in this session'});assert.deepEqual(a.system.resourceUses.brightIdea,{epoch:'s',used:3});assert.equal(brightIdeaPoolStatus(a.system,periods).needsReview,true);assert.equal(a.resolveBrightIdeaSource(),null);await a.migrateBrightIdeaUses({allocations:{brightIdeaScientist:2,brightIdeaFieldAnalyst:1}});assert.equal(a.system.resourceUses.brightIdea,undefined);assert.equal(a.system.resourceUses.brightIdeaScientist.used,2);assert.equal(a.system.resourceUses.brightIdeaFieldAnalyst.used,1);assert.equal(a.system.resourceUses.brightIdeaLegacyMigration.history[0].used,3);assert.deepEqual(posts[0].flags.spycraft2.previousUseRecord,{used:'3'});
+test("correcting a malformed old combined count does not bypass the required class-source allocation or grant extra credits", async () => {
+  reset();
+  const a = new SpycraftActor();
+  a.system.classLevels = { scientist: 7, fieldAnalyst: 4 };
+  a.system.resourceUses = { brightIdea: { used: "3" } };
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  await a.reviewLimitedUseCounter("brightIdea", {
+    ...input,
+    used: 3,
+    reason: "Verified three old uses in this session"
+  });
+  assert.deepEqual(a.system.resourceUses.brightIdea, { epoch: "s", used: 3 });
+  assert.equal(brightIdeaPoolStatus(a.system, periods).needsReview, true);
+  assert.equal(a.resolveBrightIdeaSource(), null);
+  await a.migrateBrightIdeaUses({ allocations: { brightIdeaScientist: 2, brightIdeaFieldAnalyst: 1 } });
+  assert.equal(a.system.resourceUses.brightIdea, undefined);
+  assert.equal(a.system.resourceUses.brightIdeaScientist.used, 2);
+  assert.equal(a.system.resourceUses.brightIdeaFieldAnalyst.used, 1);
+  assert.equal(a.system.resourceUses.brightIdeaLegacyMigration.history[0].used, 3);
+  assert.deepEqual(posts[0].flags.spycraft2.previousUseRecord, { used: "3" });
 });
-test('a malformed single source must be reviewed before the legacy combined count can migrate into it',async()=>{
- reset();const a=new SpycraftActor();a.system.classLevels={scientist:3};a.system.resourceUses={brightIdea:{epoch:'s',used:1},brightIdeaScientist:{used:'1'}};a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);assert.equal(brightIdeaPoolStatus(a.system,periods).automatic,false);await a.reviewLimitedUseCounter('brightIdeaScientist',input);assert.equal(brightIdeaPoolStatus(a.system,periods).automatic,true);await a.migrateBrightIdeaUses();assert.equal(a.system.resourceUses.brightIdeaScientist.used,2);assert.equal(a.limitedUseStatus.find(s=>s.id==='brightIdeaScientist').remaining,0);
+test("a malformed single source must be reviewed before the legacy combined count can migrate into it", async () => {
+  reset();
+  const a = new SpycraftActor();
+  a.system.classLevels = { scientist: 3 };
+  a.system.resourceUses = { brightIdea: { epoch: "s", used: 1 }, brightIdeaScientist: { used: "1" } };
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  assert.equal(brightIdeaPoolStatus(a.system, periods).automatic, false);
+  await a.reviewLimitedUseCounter("brightIdeaScientist", input);
+  assert.equal(brightIdeaPoolStatus(a.system, periods).automatic, true);
+  await a.migrateBrightIdeaUses();
+  assert.equal(a.system.resourceUses.brightIdeaScientist.used, 2);
+  assert.equal(a.limitedUseStatus.find(s => s.id === "brightIdeaScientist").remaining, 0);
 });
 
-test('failed review receipts restore an unknown epoch exactly under Foundry ObjectField merge semantics',async()=>{
- reset();const a=new SpycraftActor();a.system.classLevels={scientist:3};a.system.resourceUses={brightIdea:{used:'2'}};a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);failPost=true;await assert.rejects(a.reviewLimitedUseCounter('brightIdea',{...input,used:2}),/receipt failed/);assert.deepEqual(a.system.resourceUses.brightIdea,{used:'2'});assert.equal(Object.hasOwn(a.system.resourceUses.brightIdea,'epoch'),false);assert.equal(brightIdeaPoolStatus(a.system,periods).legacyUsed,null);assert.equal(posts.length,0);
+test("failed review receipts restore an unknown epoch exactly under Foundry ObjectField merge semantics", async () => {
+  reset();
+  const a = new SpycraftActor();
+  a.system.classLevels = { scientist: 3 };
+  a.system.resourceUses = { brightIdea: { used: "2" } };
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  failPost = true;
+  await assert.rejects(a.reviewLimitedUseCounter("brightIdea", { ...input, used: 2 }), /receipt failed/);
+  assert.deepEqual(a.system.resourceUses.brightIdea, { used: "2" });
+  assert.equal(Object.hasOwn(a.system.resourceUses.brightIdea, "epoch"), false);
+  assert.equal(brightIdeaPoolStatus(a.system, periods).legacyUsed, null);
+  assert.equal(posts.length, 0);
 });

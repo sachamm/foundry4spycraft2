@@ -1,11 +1,228 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SPYCRAFT as cfg} from '../module/config.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-const state=(feats=[])=>({activeFeatNames:feats,speed:30,conditionContext:{},postureMovement:{standardMove:true},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:12,mod:1}])),skillTotals:Object.fromEntries(Object.entries(cfg.skills).map(([key,s])=>[key,{name:s.name,ranks:4,cap:50,threat:20,totals:s.abilities.map(ability=>({ability,total:10})),bonusEntries:[]}])),focusTotals:{},knowledge:3});
-const tumble=cfg.skills.acrobatics.checks.find(c=>c.id==='tumble'),ordinary={gearStatus:'available',synergySkill:'none'},input=(patch={})=>({...ordinary,tumbleCircumstances:true,tumbleDistanceFeet:20,tumbleAdjacentEnemySquares:1,tumbleOccupiedSquares:0,tumbleRouteConfirmed:true,...patch});
-test('every named use confines path/error evidence to Tumble without converting DC to a skill bonus or changing Knowledge',()=>{for(const[key,skill]of Object.entries(cfg.skills))for(const check of skill.checks){const s=state(['Equilibrium Mastery']),b=resolveSkillCheck(s,key,check,ordinary),r=resolveSkillCheck(s,key,check,input({tumbleOccupiedSquares:1})),eligible=key==='acrobatics'&&check.id==='tumble';assert.equal(!!r.tumblePath,eligible,key+'/'+check.id);assert.equal(r.total,b.total);assert.equal(r.error-b.error,eligible?1:0);for(const k of ['cap','threat','timeMultiplier','ability'])assert.equal(r[k],b[k]);if(eligible)assert.equal(r.tumblePath.dc,25);else assert.ok(r.blockedReason);}for(const skill of Object.keys(cfg.skills))assert.equal(resolveKnowledgeCheck(state(),{skill,...input()}).total,resolveKnowledgeCheck(state(),{skill}).total);});
-test('Mastery changes only the ordinary movement allowance, keeping Vision/armor, named error reductions and condition scaling intact',()=>{for(const conditionContext of [{},{baffled:true},{incompetent:true}]){const s=state(['Equilibrium Mastery']);s.conditionContext=conditionContext;const b=resolveSkillCheck(s,'acrobatics',tumble,ordinary),r=resolveSkillCheck(s,'acrobatics',tumble,input({tumbleDistanceFeet:30,tumbleAdjacentEnemySquares:2,tumbleOccupiedSquares:3}));assert.equal(r.total,b.total);assert.equal(r.error-b.error,3);assert.equal(r.tumblePath.dc,40);assert.equal(r.tumblePath.normalMaximumFeet,30);}const s=state(['Equilibrium Mastery']);s.conditionContext={blinded:true};s.armor={check:-2,visionCheck:-3};const b=resolveSkillCheck(s,'acrobatics',tumble,ordinary),r=resolveSkillCheck(s,'acrobatics',tumble,input({tumbleDistanceFeet:0}));assert.equal(r.total,b.total);assert.equal(r.total,-3);assert.equal(r.cap,30);const ordinaryActor=state();assert.ok(resolveSkillCheck(ordinaryActor,'acrobatics',tumble,input({tumbleDistanceFeet:30})).blocked);s.conditionContext={};s.armor={};s.skillTotals.acrobatics.errorReduction=1;assert.equal(resolveSkillCheck(s,'acrobatics',tumble,input({tumbleOccupiedSquares:10})).error,5);});
-test('disabling path ignores retained fields while confirmed routes cannot preclaim threat/critical movement or fixed results',()=>{const s=state();const r=resolveSkillCheck(s,'acrobatics',tumble,input({tumbleCircumstances:false,tumbleDistanceFeet:'old',tumbleOccupiedSquares:'old'}));assert.equal(r.tumblePath,null);assert.equal(r.blocked,false);for(const patch of [{tumbleDistanceFeet:25},{tumbleDistanceFeet:30},{method:'take10',safeToTake:true},{method:'take20',safeToTake:true},{tumbleRouteConfirmed:false},{tumbleAdjacentEnemySquares:0,tumbleOccupiedSquares:0}])assert.ok(resolveSkillCheck(s,'acrobatics',tumble,input(patch)).blocked);});
-test('immutable path evidence refuses late additions, removals and changes while preserving ordinary legacy rolls',()=>{const proof=resolveSkillCheck(state(),'acrobatics',tumble,input()).tumblePath,c={checkKind:'skill',skillKey:'acrobatics',checkId:'tumble',tumblePath:proof},e=rollEvidence(c);assert.equal(rollEvidenceMatches(e,c),true);assert.equal(rollEvidenceMatches(rollEvidence({...c,tumblePath:null}),c),false);assert.equal(rollEvidenceMatches(e,{...c,tumblePath:null}),false);for(const k of Object.keys(proof)){const n=structuredClone(c);n.tumblePath[k]='changed';assert.equal(rollEvidenceMatches(e,n),false,k);}});
-globalThis.Actor=class{constructor(){this.type='agent';this.isOwner=true;this.uuid='Actor.tumble';this.items=[];this.flags={};this.system=state(['Equilibrium Mastery']);}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'GC',isGM:true},settings:{get:()=>false},time:{worldTime:126},combats:[],actors:[],i18n:{localize:String}};globalThis.foundry={utils:{escapeHTML:String}};globalThis.ui={notifications:{warn:()=>null}};globalThis.ChatMessage={getSpeaker:()=>({})};let hook=async()=>{},posts=[],rolls=0;globalThis.Roll=class{constructor(_f,data){this.total=12+(data.total??0);this.dice=[{total:12}];}async evaluate(){rolls++;await hook();return this;}async toMessage(d){posts.push(d);return d;}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('actual Actor parses route counts and movement and records authoritative allowance/DC rather than caller payloads',async()=>{const a=new SpycraftActor();hook=async()=>{};posts=[];const m=await a.rollSkill('acrobatics',null,{check:'tumble',...input({tumbleDistanceFeet:'30',tumbleAdjacentEnemySquares:'2',tumbleOccupiedSquares:'3',maximumFeet:999,dc:1,errorIncrease:0})}),c=m.flags.spycraft2;assert.equal(c.tumblePath.normalMaximumFeet,30);assert.equal(c.tumblePath.distanceFeet,30);assert.equal(c.tumblePath.dc,40);assert.equal(c.tumblePath.errorIncrease,3);assert.equal(c.error,4);assert.equal(c.rollData.total,10);for(const patch of [{tumbleDistanceFeet:''},{tumbleAdjacentEnemySquares:'1.5'},{tumbleOccupiedSquares:''},{tumbleRouteConfirmed:false}]){const n=posts.length;await a.rollSkill('acrobatics',null,{check:'tumble',...input(patch)});assert.equal(posts.length,n);}});
-test('actual RNG source, Speed, condition or path count drift rejects without posting a stale receipt',async()=>{for(const change of ['source','speed','entangled','count']){const a=new SpycraftActor(),request={check:'tumble',...input({tumbleDistanceFeet:30})};posts=[];hook=async()=>{if(change==='source')a.system.activeFeatNames=[];if(change==='speed')a.system.speed=15;if(change==='entangled')a.system.conditionContext.entangled=true;if(change==='count')request.tumbleOccupiedSquares=1;};await assert.rejects(a.rollSkill('acrobatics',null,request),/changed/);assert.equal(posts.length,0,change);}hook=async()=>{};});
-test('replacement rechecks current source, Speed and movement conditions before RNG',async()=>{const a=new SpycraftActor(),proof=resolveSkillCheck(a.system,'acrobatics',tumble,input({tumbleDistanceFeet:30})).tumblePath,scope={checkKind:'skill',skillKey:'acrobatics',checkId:'tumble',tumblePath:proof};rolls=0;a.system.activeFeatNames=[];await assert.rejects(a.rollCheck('1d20',{},scope),/changed/);a.system.activeFeatNames=['Equilibrium Mastery'];a.system.speed=15;await assert.rejects(a.rollCheck('1d20',{},scope),/changed/);a.system.speed=30;a.system.conditionContext.entangled=true;await assert.rejects(a.rollCheck('1d20',{},scope),/changed/);assert.equal(rolls,0);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+const state = (feats = []) => ({
+  activeFeatNames: feats,
+  speed: 30,
+  conditionContext: {},
+  postureMovement: { standardMove: true },
+  abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 12, mod: 1 }])),
+  skillTotals: Object.fromEntries(
+    Object.entries(cfg.skills).map(([key, s]) => [
+      key,
+      {
+        name: s.name,
+        ranks: 4,
+        cap: 50,
+        threat: 20,
+        totals: s.abilities.map(ability => ({ ability, total: 10 })),
+        bonusEntries: []
+      }
+    ])
+  ),
+  focusTotals: {},
+  knowledge: 3
+});
+const tumble = cfg.skills.acrobatics.checks.find(c => c.id === "tumble"),
+  ordinary = { gearStatus: "available", synergySkill: "none" },
+  input = (patch = {}) => ({
+    ...ordinary,
+    tumbleCircumstances: true,
+    tumbleDistanceFeet: 20,
+    tumbleAdjacentEnemySquares: 1,
+    tumbleOccupiedSquares: 0,
+    tumbleRouteConfirmed: true,
+    ...patch
+  });
+test("every named use confines path/error evidence to Tumble without converting DC to a skill bonus or changing Knowledge", () => {
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const check of skill.checks) {
+      const s = state(["Equilibrium Mastery"]),
+        b = resolveSkillCheck(s, key, check, ordinary),
+        r = resolveSkillCheck(s, key, check, input({ tumbleOccupiedSquares: 1 })),
+        eligible = key === "acrobatics" && check.id === "tumble";
+      assert.equal(!!r.tumblePath, eligible, key + "/" + check.id);
+      assert.equal(r.total, b.total);
+      assert.equal(r.error - b.error, eligible ? 1 : 0);
+      for (const k of ["cap", "threat", "timeMultiplier", "ability"]) assert.equal(r[k], b[k]);
+      if (eligible) assert.equal(r.tumblePath.dc, 25);
+      else assert.ok(r.blockedReason);
+    }
+  for (const skill of Object.keys(cfg.skills))
+    assert.equal(
+      resolveKnowledgeCheck(state(), { skill, ...input() }).total,
+      resolveKnowledgeCheck(state(), { skill }).total
+    );
+});
+test("Mastery changes only the ordinary movement allowance, keeping Vision/armor, named error reductions and condition scaling intact", () => {
+  for (const conditionContext of [{}, { baffled: true }, { incompetent: true }]) {
+    const s = state(["Equilibrium Mastery"]);
+    s.conditionContext = conditionContext;
+    const b = resolveSkillCheck(s, "acrobatics", tumble, ordinary),
+      r = resolveSkillCheck(
+        s,
+        "acrobatics",
+        tumble,
+        input({ tumbleDistanceFeet: 30, tumbleAdjacentEnemySquares: 2, tumbleOccupiedSquares: 3 })
+      );
+    assert.equal(r.total, b.total);
+    assert.equal(r.error - b.error, 3);
+    assert.equal(r.tumblePath.dc, 40);
+    assert.equal(r.tumblePath.normalMaximumFeet, 30);
+  }
+  const s = state(["Equilibrium Mastery"]);
+  s.conditionContext = { blinded: true };
+  s.armor = { check: -2, visionCheck: -3 };
+  const b = resolveSkillCheck(s, "acrobatics", tumble, ordinary),
+    r = resolveSkillCheck(s, "acrobatics", tumble, input({ tumbleDistanceFeet: 0 }));
+  assert.equal(r.total, b.total);
+  assert.equal(r.total, -3);
+  assert.equal(r.cap, 30);
+  const ordinaryActor = state();
+  assert.ok(resolveSkillCheck(ordinaryActor, "acrobatics", tumble, input({ tumbleDistanceFeet: 30 })).blocked);
+  s.conditionContext = {};
+  s.armor = {};
+  s.skillTotals.acrobatics.errorReduction = 1;
+  assert.equal(resolveSkillCheck(s, "acrobatics", tumble, input({ tumbleOccupiedSquares: 10 })).error, 5);
+});
+test("disabling path ignores retained fields while confirmed routes cannot preclaim threat/critical movement or fixed results", () => {
+  const s = state();
+  const r = resolveSkillCheck(
+    s,
+    "acrobatics",
+    tumble,
+    input({ tumbleCircumstances: false, tumbleDistanceFeet: "old", tumbleOccupiedSquares: "old" })
+  );
+  assert.equal(r.tumblePath, null);
+  assert.equal(r.blocked, false);
+  for (const patch of [
+    { tumbleDistanceFeet: 25 },
+    { tumbleDistanceFeet: 30 },
+    { method: "take10", safeToTake: true },
+    { method: "take20", safeToTake: true },
+    { tumbleRouteConfirmed: false },
+    { tumbleAdjacentEnemySquares: 0, tumbleOccupiedSquares: 0 }
+  ])
+    assert.ok(resolveSkillCheck(s, "acrobatics", tumble, input(patch)).blocked);
+});
+test("immutable path evidence refuses late additions, removals and changes while preserving ordinary legacy rolls", () => {
+  const proof = resolveSkillCheck(state(), "acrobatics", tumble, input()).tumblePath,
+    c = { checkKind: "skill", skillKey: "acrobatics", checkId: "tumble", tumblePath: proof },
+    e = rollEvidence(c);
+  assert.equal(rollEvidenceMatches(e, c), true);
+  assert.equal(rollEvidenceMatches(rollEvidence({ ...c, tumblePath: null }), c), false);
+  assert.equal(rollEvidenceMatches(e, { ...c, tumblePath: null }), false);
+  for (const k of Object.keys(proof)) {
+    const n = structuredClone(c);
+    n.tumblePath[k] = "changed";
+    assert.equal(rollEvidenceMatches(e, n), false, k);
+  }
+});
+globalThis.Actor = class {
+  constructor() {
+    this.type = "agent";
+    this.isOwner = true;
+    this.uuid = "Actor.tumble";
+    this.items = [];
+    this.flags = {};
+    this.system = state(["Equilibrium Mastery"]);
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { id: "GC", isGM: true },
+  settings: { get: () => false },
+  time: { worldTime: 126 },
+  combats: [],
+  actors: [],
+  i18n: { localize: String }
+};
+globalThis.foundry = { utils: { escapeHTML: String } };
+globalThis.ui = { notifications: { warn: () => null } };
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+let hook = async () => {},
+  posts = [],
+  rolls = 0;
+globalThis.Roll = class {
+  constructor(_f, data) {
+    this.total = 12 + (data.total ?? 0);
+    this.dice = [{ total: 12 }];
+  }
+  async evaluate() {
+    rolls++;
+    await hook();
+    return this;
+  }
+  async toMessage(d) {
+    posts.push(d);
+    return d;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("actual Actor parses route counts and movement and records authoritative allowance/DC rather than caller payloads", async () => {
+  const a = new SpycraftActor();
+  hook = async () => {};
+  posts = [];
+  const m = await a.rollSkill("acrobatics", null, {
+      check: "tumble",
+      ...input({
+        tumbleDistanceFeet: "30",
+        tumbleAdjacentEnemySquares: "2",
+        tumbleOccupiedSquares: "3",
+        maximumFeet: 999,
+        dc: 1,
+        errorIncrease: 0
+      })
+    }),
+    c = m.flags.spycraft2;
+  assert.equal(c.tumblePath.normalMaximumFeet, 30);
+  assert.equal(c.tumblePath.distanceFeet, 30);
+  assert.equal(c.tumblePath.dc, 40);
+  assert.equal(c.tumblePath.errorIncrease, 3);
+  assert.equal(c.error, 4);
+  assert.equal(c.rollData.total, 10);
+  for (const patch of [
+    { tumbleDistanceFeet: "" },
+    { tumbleAdjacentEnemySquares: "1.5" },
+    { tumbleOccupiedSquares: "" },
+    { tumbleRouteConfirmed: false }
+  ]) {
+    const n = posts.length;
+    await a.rollSkill("acrobatics", null, { check: "tumble", ...input(patch) });
+    assert.equal(posts.length, n);
+  }
+});
+test("actual RNG source, Speed, condition or path count drift rejects without posting a stale receipt", async () => {
+  for (const change of ["source", "speed", "entangled", "count"]) {
+    const a = new SpycraftActor(),
+      request = { check: "tumble", ...input({ tumbleDistanceFeet: 30 }) };
+    posts = [];
+    hook = async () => {
+      if (change === "source") a.system.activeFeatNames = [];
+      if (change === "speed") a.system.speed = 15;
+      if (change === "entangled") a.system.conditionContext.entangled = true;
+      if (change === "count") request.tumbleOccupiedSquares = 1;
+    };
+    await assert.rejects(a.rollSkill("acrobatics", null, request), /changed/);
+    assert.equal(posts.length, 0, change);
+  }
+  hook = async () => {};
+});
+test("replacement rechecks current source, Speed and movement conditions before RNG", async () => {
+  const a = new SpycraftActor(),
+    proof = resolveSkillCheck(a.system, "acrobatics", tumble, input({ tumbleDistanceFeet: 30 })).tumblePath,
+    scope = { checkKind: "skill", skillKey: "acrobatics", checkId: "tumble", tumblePath: proof };
+  rolls = 0;
+  a.system.activeFeatNames = [];
+  await assert.rejects(a.rollCheck("1d20", {}, scope), /changed/);
+  a.system.activeFeatNames = ["Equilibrium Mastery"];
+  a.system.speed = 15;
+  await assert.rejects(a.rollCheck("1d20", {}, scope), /changed/);
+  a.system.speed = 30;
+  a.system.conditionContext.entangled = true;
+  await assert.rejects(a.rollCheck("1d20", {}, scope), /changed/);
+  assert.equal(rolls, 0);
+});

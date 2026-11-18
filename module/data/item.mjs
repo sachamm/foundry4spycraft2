@@ -1,8 +1,9 @@
-import {weaponDamageExpression} from '../rules/weapon-damage-expression.mjs';
-import {vehicleStatFields} from './vehicle-fields.mjs';
+import { weaponDamageExpression } from "../rules/weapon-damage-expression.mjs";
+import { vehicleStatFields } from "./vehicle-fields.mjs";
 const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
 
-const int = (initial = 0, opts = {}) => new NumberField({ required: true, nullable: false, integer: true, initial, ...opts });
+const int = (initial = 0, opts = {}) =>
+  new NumberField({ required: true, nullable: false, integer: true, initial, ...opts });
 const num = (initial = 0, opts = {}) => new NumberField({ required: true, nullable: false, initial, ...opts });
 const str = (initial = "", opts = {}) => new StringField({ required: true, blank: true, initial, ...opts });
 
@@ -12,12 +13,15 @@ const str = (initial = "", opts = {}) => new StringField({ required: true, blank
  * value:  formula string, e.g. "2", "@tb.t1", "max(1, @abilities.cha.mod)".
  * level:  for class bonuses, the class level at which it applies (0 = always).
  */
-export const bonusField = () => new ArrayField(new SchemaField({
-  target: str(),
-  value: str("0"),
-  bonusType: str(),
-  level: int(0, { min: 0 })
-}));
+export const bonusField = () =>
+  new ArrayField(
+    new SchemaField({
+      target: str(),
+      value: str("0"),
+      bonusType: str(),
+      level: int(0, { min: 0 })
+    })
+  );
 
 class BaseItemData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
@@ -100,20 +104,27 @@ export class FeatData extends BaseItemData {
       ranks: int(1, { min: 1 }),
       repeatable: new BooleanField(),
       maxSelections: int(0, { min: 0 }),
-      temporaryGrant: new ObjectField({nullable:true,initial:null}),
+      temporaryGrant: new ObjectField({ nullable: true, initial: null }),
       featKind: str("permanent", { choices: ["permanent", "temporary", "virtual"] }),
-      candidateBasis: new ObjectField({nullable:true,initial:null}),
+      candidateBasis: new ObjectField({ nullable: true, initial: null }),
       choice: str(),
-      contactGrantMode: str("associate",{choices:["associate","improve"]}),
+      contactGrantMode: str("associate", { choices: ["associate", "improve"] }),
       contactTheme: str(),
       contactThemeConfirmed: new BooleanField(),
       restrictions: str(),
       trainingSkills: new ObjectField(),
-      focusChoices: new ArrayField(new SchemaField({kind:str("focus",{choices:["focus","forte"]}),skill:str(),focus:str(),forte:str()})),
+      focusChoices: new ArrayField(
+        new SchemaField({
+          kind: str("focus", { choices: ["focus", "forte"] }),
+          skill: str(),
+          focus: str(),
+          forte: str()
+        })
+      ),
       manualPrerequisitesConfirmed: new BooleanField(),
       /** Career level when feat was acquired; 0 means legacy/unknown. */
       acquisitionSource: str(),
-      acquisitionCheck: new ObjectField({nullable:true,initial:null}),
+      acquisitionCheck: new ObjectField({ nullable: true, initial: null }),
       historicalPrerequisitesConfirmed: new BooleanField(),
       acquiredAtLevel: int(0, { min: 0, max: 20 }),
       /** Granted by an origin or class (does not use a feat slot). */
@@ -132,26 +143,26 @@ export class GearData extends BaseItemData {
       caliber: int(0, { min: 0, max: 5 }),
       weight: num(0, { min: 0 }),
       equipped: new BooleanField(),
-      carried: new BooleanField({initial:true}),
+      carried: new BooleanField({ initial: true }),
       /** Mission gear pick category (R/T/V/S/G/W/E/CHA) — blank for personal gear. */
       pick: str(""),
-      pickCount: int(1,{min:1}),
-      possessionSource: str("",{choices:["","wealth","gcGrant"]}),
+      pickCount: int(1, { min: 1 }),
+      possessionSource: str("", { choices: ["", "wealth", "gcGrant"] }),
       possessionApproved: new BooleanField(),
       cleanAndPolishedReady: new BooleanField(),
-      bundleSize: int(1,{min:1}),
+      bundleSize: int(1, { min: 1 }),
       gearCategory: str(),
       kitType: str(),
-      kitGrade: int(0,{min:0,max:3}),
+      kitGrade: int(0, { min: 0, max: 3 }),
       kitSize: str(),
       kitNonPortable: new BooleanField(),
       kitLocation: str(),
       reserve: new BooleanField(),
-      reserveAcquisition: new ObjectField({nullable:true,initial:null}),
-      armorMissionGrant: new ObjectField({nullable:true,initial:null}),
-      bigStickMissionPick: new ObjectField({nullable:true,initial:null}),
-      missionCaliberGrant: new ObjectField({nullable:true,initial:null}),
-      classGearGrant: new ObjectField({nullable:true,initial:null}),
+      reserveAcquisition: new ObjectField({ nullable: true, initial: null }),
+      armorMissionGrant: new ObjectField({ nullable: true, initial: null }),
+      bigStickMissionPick: new ObjectField({ nullable: true, initial: null }),
+      missionCaliberGrant: new ObjectField({ nullable: true, initial: null }),
+      classGearGrant: new ObjectField({ nullable: true, initial: null }),
       common: new BooleanField(),
       /** Gear table columns (pp.226–235), kept as the printed labels. */
       powerRating: str(),
@@ -186,7 +197,15 @@ export class GearData extends BaseItemData {
       /** A gadget built in this item: its housing Size and installed mechanisms (pp.278–281). */
       gadget: new SchemaField({
         housingSize: str(),
-        mechanisms: new ArrayField(new SchemaField({ name: str(), caliber: int(0, { min: 0, max: 5 }), powerRating: str(), complexity: str(), skill: str() }))
+        mechanisms: new ArrayField(
+          new SchemaField({
+            name: str(),
+            caliber: int(0, { min: 0, max: 5 }),
+            powerRating: str(),
+            complexity: str(),
+            skill: str()
+          })
+        )
       }),
       /** Columns particular to one table, as label/value pairs. */
       stats: new ArrayField(new SchemaField({ label: str(), value: str() }))
@@ -217,13 +236,13 @@ export class WeaponData extends GearData {
       ammunitionKind: str(),
       explosiveAmmunition: new BooleanField(),
       loadedAmmoId: str(),
-      stockpileSize: int(0,{min:0}),
-      shotWeight: num(0,{min:0}),
-      upgradeCost: int(0,{min:0}),
-      upgradeAllowance: int(null,{nullable:true,min:0}),
-      commonItemCost: int(0,{min:0}),
+      stockpileSize: int(0, { min: 0 }),
+      shotWeight: num(0, { min: 0 }),
+      upgradeCost: int(0, { min: 0 }),
+      upgradeAllowance: int(null, { nullable: true, min: 0 }),
+      commonItemCost: int(0, { min: 0 }),
       noStrengthDamage: new BooleanField(),
-      useHands: int(0,{min:0,max:2}),
+      useHands: int(0, { min: 0, max: 2 }),
       useFinesse: new BooleanField(),
       grantFinesse: new BooleanField(),
       destroyed: new BooleanField(),
@@ -237,16 +256,30 @@ export class WeaponData extends GearData {
       ammoCodeChoice: str(),
       ammoCodeOptions: new ArrayField(new StringField()),
       recoil: int(0),
-      meleeFamily: str("",{choices:["","axe","spear","whip","staff","hammer","twoHandedSword","oneHandedSword","polearm","flail","knife"]}),
+      meleeFamily: str("", {
+        choices: [
+          "",
+          "axe",
+          "spear",
+          "whip",
+          "staff",
+          "hammer",
+          "twoHandedSword",
+          "oneHandedSword",
+          "polearm",
+          "flail",
+          "knife"
+        ]
+      }),
       weaponCategory: str(),
       disassembled: new BooleanField(),
-      assemblyHalfActions: int(0,{min:0}),
-      mountRequirement: str("",{choices:["","underbarrel","optionalUnderbarrel","tripodOrVehicle"]}),
+      assemblyHalfActions: int(0, { min: 0 }),
+      mountRequirement: str("", { choices: ["", "underbarrel", "optionalUnderbarrel", "tripodOrVehicle"] }),
       fireModes: new ArrayField(new StringField()),
       fireMode: str(),
       stockExtended: new BooleanField(),
       range: num(0, { min: 0 }),
-      maxRangeIncrements: int(0,{min:0}),
+      maxRangeIncrements: int(0, { min: 0 }),
       sizeHands: str(),
       qualities: str(),
       untrainedPenalty: int(-4)
@@ -255,8 +288,8 @@ export class WeaponData extends GearData {
 
   /** Rollable numeric expression; separately labelled components need their own resolution. */
   get damageFormula() {
-    const parsed=weaponDamageExpression(this.damage);
-    return parsed&&!parsed.componentReview?parsed.expression:"";
+    const parsed = weaponDamageExpression(this.damage);
+    return parsed && !parsed.componentReview ? parsed.expression : "";
   }
 
   get isMelee() {

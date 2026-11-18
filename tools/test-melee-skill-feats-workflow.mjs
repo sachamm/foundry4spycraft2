@@ -1,12 +1,284 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {computeAgent} from '../module/rules/engine.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {tripDefenseSkillChecks} from '../module/rules/trip.mjs';import {bullRushDefenseSkillChecks} from '../module/rules/bull-rush.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-const ready=(family='spear')=>({id:family,name:'Reviewed weapon',uuid:'Item.'+family,family,proficiency:['whip','staff'].includes(family)?'exoticBlunt':family==='hammer'?'blunt':'exoticEdged',hands:2,requiredHands:2}),state=(names=['Spear Basics'])=>({size:'Medium',classLevels:{},activeFeatNames:names,readiedMeleeWeapons:[ready()],conditionContext:{},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:12,mod:1}])),skillTotals:Object.fromEntries(Object.entries(cfg.skills).map(([key,s])=>[key,{name:s.name,ranks:4,cap:50,threat:20,totals:s.abilities.map(ability=>({ability,total:10})),bonusEntries:[]}])),focusTotals:{},knowledge:3});
-const trip=tripDefenseSkillChecks('acrobatics',[])[0],bull=bullRushDefenseSkillChecks('athletics',[])[0],ordinary={gearStatus:'available',synergySkill:'none'},input={...ordinary,tripOpponentName:'Opponent',tripAdjacent:true,tripSizeDifference:0,tripIncomingConfirmed:true},bullInput={...ordinary,bullRushOpponentName:'Rusher',bullRushSizeDifference:0,bullRushIncomingConfirmed:true,bullRushOnFootConfirmed:true,bullRushContactConfirmed:true},jump=cfg.skills.acrobatics.checks.find(c=>c.id==='jump');
-test('live skill arithmetic applies all six exact gear bonuses once and combines competing gear sources by maximum',()=>{for(const[family,name,bonus]of [['axe','Axe Basics',1],['spear','Spear Basics',2],['whip','Whip Basics',2],['twoHandedSword','Great Sword Basics',2]]){const s=state([name]);s.readiedMeleeWeapons=[ready(family)];const p=resolveSkillCheck(s,'acrobatics',trip,input);assert.equal(p.total,10+bonus,name);assert.equal(p.meleeSkillFeats.sources[0].feat,name);}for(const[f,n,b]of [['staff','Staff Basics',3],['whip','Whip Basics',2]]){const s=state([n]);s.readiedMeleeWeapons=[ready(f)];assert.equal(resolveSkillCheck(s,'acrobatics',jump,ordinary).total,10+b);}const h=state(['Hammer Basics']);h.readiedMeleeWeapons=[ready('hammer')];for(const check of cfg.skills.intimidate.checks)assert.equal(resolveSkillCheck(h,'intimidate',check,ordinary).total,12);const s=state(['Axe Basics','Spear Basics','Whip Basics','Great Sword Basics']);s.readiedMeleeWeapons=['axe','spear'].map(f=>({...ready(f),hands:1}));assert.equal(resolveSkillCheck(s,'acrobatics',trip,input).total,12);s.skillTotals.acrobatics.bonusEntries=[{type:'gear',value:5,source:'Existing gear'}];s.skillTotals.acrobatics.totals.forEach(r=>r.total=15);assert.equal(resolveSkillCheck(s,'acrobatics',trip,input).total,15);});
-test('gear enters the conditioned skill bonus once while Size stays outside and Still Standing retains its own stacking',()=>{for(const[condition,total]of [[{},16],[{baffled:true},10],[{incompetent:true},4],[{vulnerable:true},16]]){const s=state();s.conditionContext=condition;const p=resolveSkillCheck(s,'acrobatics',trip,{...input,tripSizeDifference:1});assert.equal(p.total,total);assert.equal(p.skillBonusCondition.normal,12);assert.equal(p.checkAdjustment,4);}const s=state();s.classLevels={brawler:3};s.classOptionSelections=[{classId:'brawler',name:'Still Standing',level:3}];assert.equal(resolveSkillCheck(s,'athletics',bull,bullInput).total,16);});
-test('unrelated ordinary named checks and Knowledge receive no melee source or arithmetic even with all feats and weapons',()=>{const s=state(['Axe Basics','Spear Basics','Whip Basics','Staff Basics','Hammer Basics','Great Sword Basics']);s.readiedMeleeWeapons=['axe','spear','whip','staff','hammer','twoHandedSword'].map(ready);for(const[key,skill]of Object.entries(cfg.skills))for(const c of skill.checks){if(key==='intimidate'||key==='acrobatics'&&c.id==='jump')continue;const a=resolveSkillCheck(s,key,c,ordinary),b=resolveSkillCheck({...s,activeFeatNames:[]},key,c,ordinary);assert.equal(a.total,b.total,key+'/'+c.id);assert.equal(a.meleeSkillFeats,null);}for(const skill of Object.keys(cfg.skills))assert.equal(resolveKnowledgeCheck(s,{skill}).total,resolveKnowledgeCheck({...s,activeFeatNames:[]},{skill}).total);});
-const feats=JSON.parse(readFileSync(new URL('../src/data/feats.json',import.meta.url))),classes=JSON.parse(readFileSync(new URL('../src/data/classes.json',import.meta.url))),cls=classes.find(c=>c.key==='soldier');
-test('real engine prepares current Item family/readiness and grants only an actually qualified feat, without healing or spending dice',()=>{for(const[family,name,prof]of [['axe','Axe Basics','edged'],['spear','Spear Basics','exoticEdged'],['whip','Whip Basics','exoticBlunt'],['staff','Staff Basics','exoticBlunt'],['hammer','Hammer Basics','blunt'],['twoHandedSword','Great Sword Basics','exoticEdged']]){const def=feats.find(f=>f.name===name),items=[{id:'soldier',name:cls.name,type:'class',system:{...structuredClone(cls),identifier:'soldier',vitalityDie:cls.vitality}},{id:'feat',name,type:'feat',system:{...structuredClone(def),tree:'meleeCombat',acquiredAtLevel:1}},{id:'weapon',name:'Renamed source',type:'weapon',system:{meleeFamily:family,proficiency:prof,equipped:true,carried:true,quantity:1,sizeHands:'M/2h'}}],raw={abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:12}])),progression:[{classId:'soldier',vitality:6,skills:{}}],skills:{},focuses:{},proficiencies:{[prof]:{proficient:true}},misc:{},actionDice:{value:0},vitality:{value:4},wounds:{value:4}};const s=computeAgent(raw,items,cfg);assert.equal(s.featStatus.feat.ok,true,name);assert.equal(s.readiedMeleeWeapons[0].family,family);assert.equal(s.vitality.value,4);assert.equal(s.actionDice.value,0);items[2].system.equipped=false;assert.equal(computeAgent(raw,items,cfg).readiedMeleeWeapons.length,0);}});
-test('optional source evidence protects additions/removals/changes while legacy receipts without the context remain valid',()=>{const proof=resolveSkillCheck(state(),'acrobatics',trip,input).meleeSkillFeats,c={checkKind:'skill',skillKey:'acrobatics',checkId:'resist-trip',meleeSkillFeats:proof},e=rollEvidence(c);assert.equal(rollEvidenceMatches(e,c),true);assert.equal(rollEvidenceMatches(rollEvidence({...c,meleeSkillFeats:null}),c),false);assert.equal(rollEvidenceMatches(e,{...c,meleeSkillFeats:null}),false);const n=structuredClone(c);n.meleeSkillFeats.sources[0].weapons[0].id='different';assert.equal(rollEvidenceMatches(e,n),false);});
-globalThis.Actor=class{constructor(){this.type='agent';this.isOwner=true;this.uuid='Actor.melee';this.items=[];this.flags={};this.system=state();}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'GC',isGM:true},settings:{get:()=>false},time:{worldTime:126},combats:[],actors:[],i18n:{localize:String}};globalThis.foundry={utils:{escapeHTML:String}};globalThis.ui={notifications:{warn:()=>null}};globalThis.ChatMessage={getSpeaker:()=>({})};let hook=async()=>{},posts=[],rolls=0;globalThis.Roll=class{constructor(_f,data){this.total=12+(data.total??0);this.dice=[{total:12}];}async evaluate(){rolls++;await hook();return this;}async toMessage(d){posts.push(d);return d;}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('actual Actor records authoritative prepared weapon sources, ignoring fabricated caller bonuses and proofs',async()=>{const a=new SpycraftActor();posts=[];hook=async()=>{};const m=await a.rollSkill('acrobatics',null,{check:'resist-trip',...input,meleeSkillFeats:{bonus:999},bonus:999});assert.equal(m.flags.spycraft2.rollData.total,12);assert.equal(m.flags.spycraft2.meleeSkillFeats.sources[0].weapons[0].id,'spear');});
-test('actual RNG source gain/loss, grip/readiness/identity changes reject posting and replacement checks reject stale proof before RNG',async()=>{for(const change of ['gain','loss','weapon','grip','identity']){const a=new SpycraftActor();if(change==='gain')a.system.activeFeatNames=[];posts=[];hook=async()=>{if(change==='gain')a.system.activeFeatNames=['Spear Basics'];if(change==='loss')a.system.activeFeatNames=[];if(change==='weapon')a.system.readiedMeleeWeapons=[];if(change==='grip')a.system.readiedMeleeWeapons[0].hands=1;if(change==='identity')a.system.readiedMeleeWeapons[0].id='new';};await assert.rejects(a.rollSkill('acrobatics',null,{check:'resist-trip',...input}),/changed/);assert.equal(posts.length,0,change);}hook=async()=>{};const a=new SpycraftActor(),proof=resolveSkillCheck(a.system,'acrobatics',trip,input).meleeSkillFeats;a.system.readiedMeleeWeapons=[];rolls=0;await assert.rejects(a.rollCheck('1d20',{}, {checkKind:'skill',skillKey:'acrobatics',checkId:'resist-trip',ability:'dex',meleeSkillFeats:proof}),/changed/);assert.equal(rolls,0);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { tripDefenseSkillChecks } from "../module/rules/trip.mjs";
+import { bullRushDefenseSkillChecks } from "../module/rules/bull-rush.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+const ready = (family = "spear") => ({
+    id: family,
+    name: "Reviewed weapon",
+    uuid: "Item." + family,
+    family,
+    proficiency: ["whip", "staff"].includes(family) ? "exoticBlunt" : family === "hammer" ? "blunt" : "exoticEdged",
+    hands: 2,
+    requiredHands: 2
+  }),
+  state = (names = ["Spear Basics"]) => ({
+    size: "Medium",
+    classLevels: {},
+    activeFeatNames: names,
+    readiedMeleeWeapons: [ready()],
+    conditionContext: {},
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 12, mod: 1 }])),
+    skillTotals: Object.fromEntries(
+      Object.entries(cfg.skills).map(([key, s]) => [
+        key,
+        {
+          name: s.name,
+          ranks: 4,
+          cap: 50,
+          threat: 20,
+          totals: s.abilities.map(ability => ({ ability, total: 10 })),
+          bonusEntries: []
+        }
+      ])
+    ),
+    focusTotals: {},
+    knowledge: 3
+  });
+const trip = tripDefenseSkillChecks("acrobatics", [])[0],
+  bull = bullRushDefenseSkillChecks("athletics", [])[0],
+  ordinary = { gearStatus: "available", synergySkill: "none" },
+  input = {
+    ...ordinary,
+    tripOpponentName: "Opponent",
+    tripAdjacent: true,
+    tripSizeDifference: 0,
+    tripIncomingConfirmed: true
+  },
+  bullInput = {
+    ...ordinary,
+    bullRushOpponentName: "Rusher",
+    bullRushSizeDifference: 0,
+    bullRushIncomingConfirmed: true,
+    bullRushOnFootConfirmed: true,
+    bullRushContactConfirmed: true
+  },
+  jump = cfg.skills.acrobatics.checks.find(c => c.id === "jump");
+test("live skill arithmetic applies all six exact gear bonuses once and combines competing gear sources by maximum", () => {
+  for (const [family, name, bonus] of [
+    ["axe", "Axe Basics", 1],
+    ["spear", "Spear Basics", 2],
+    ["whip", "Whip Basics", 2],
+    ["twoHandedSword", "Great Sword Basics", 2]
+  ]) {
+    const s = state([name]);
+    s.readiedMeleeWeapons = [ready(family)];
+    const p = resolveSkillCheck(s, "acrobatics", trip, input);
+    assert.equal(p.total, 10 + bonus, name);
+    assert.equal(p.meleeSkillFeats.sources[0].feat, name);
+  }
+  for (const [f, n, b] of [
+    ["staff", "Staff Basics", 3],
+    ["whip", "Whip Basics", 2]
+  ]) {
+    const s = state([n]);
+    s.readiedMeleeWeapons = [ready(f)];
+    assert.equal(resolveSkillCheck(s, "acrobatics", jump, ordinary).total, 10 + b);
+  }
+  const h = state(["Hammer Basics"]);
+  h.readiedMeleeWeapons = [ready("hammer")];
+  for (const check of cfg.skills.intimidate.checks)
+    assert.equal(resolveSkillCheck(h, "intimidate", check, ordinary).total, 12);
+  const s = state(["Axe Basics", "Spear Basics", "Whip Basics", "Great Sword Basics"]);
+  s.readiedMeleeWeapons = ["axe", "spear"].map(f => ({ ...ready(f), hands: 1 }));
+  assert.equal(resolveSkillCheck(s, "acrobatics", trip, input).total, 12);
+  s.skillTotals.acrobatics.bonusEntries = [{ type: "gear", value: 5, source: "Existing gear" }];
+  s.skillTotals.acrobatics.totals.forEach(r => (r.total = 15));
+  assert.equal(resolveSkillCheck(s, "acrobatics", trip, input).total, 15);
+});
+test("gear enters the conditioned skill bonus once while Size stays outside and Still Standing retains its own stacking", () => {
+  for (const [condition, total] of [
+    [{}, 16],
+    [{ baffled: true }, 10],
+    [{ incompetent: true }, 4],
+    [{ vulnerable: true }, 16]
+  ]) {
+    const s = state();
+    s.conditionContext = condition;
+    const p = resolveSkillCheck(s, "acrobatics", trip, { ...input, tripSizeDifference: 1 });
+    assert.equal(p.total, total);
+    assert.equal(p.skillBonusCondition.normal, 12);
+    assert.equal(p.checkAdjustment, 4);
+  }
+  const s = state();
+  s.classLevels = { brawler: 3 };
+  s.classOptionSelections = [{ classId: "brawler", name: "Still Standing", level: 3 }];
+  assert.equal(resolveSkillCheck(s, "athletics", bull, bullInput).total, 16);
+});
+test("unrelated ordinary named checks and Knowledge receive no melee source or arithmetic even with all feats and weapons", () => {
+  const s = state(["Axe Basics", "Spear Basics", "Whip Basics", "Staff Basics", "Hammer Basics", "Great Sword Basics"]);
+  s.readiedMeleeWeapons = ["axe", "spear", "whip", "staff", "hammer", "twoHandedSword"].map(ready);
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const c of skill.checks) {
+      if (key === "intimidate" || (key === "acrobatics" && c.id === "jump")) continue;
+      const a = resolveSkillCheck(s, key, c, ordinary),
+        b = resolveSkillCheck({ ...s, activeFeatNames: [] }, key, c, ordinary);
+      assert.equal(a.total, b.total, key + "/" + c.id);
+      assert.equal(a.meleeSkillFeats, null);
+    }
+  for (const skill of Object.keys(cfg.skills))
+    assert.equal(
+      resolveKnowledgeCheck(s, { skill }).total,
+      resolveKnowledgeCheck({ ...s, activeFeatNames: [] }, { skill }).total
+    );
+});
+const feats = JSON.parse(readFileSync(new URL("../src/data/feats.json", import.meta.url))),
+  classes = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))),
+  cls = classes.find(c => c.key === "soldier");
+test("real engine prepares current Item family/readiness and grants only an actually qualified feat, without healing or spending dice", () => {
+  for (const [family, name, prof] of [
+    ["axe", "Axe Basics", "edged"],
+    ["spear", "Spear Basics", "exoticEdged"],
+    ["whip", "Whip Basics", "exoticBlunt"],
+    ["staff", "Staff Basics", "exoticBlunt"],
+    ["hammer", "Hammer Basics", "blunt"],
+    ["twoHandedSword", "Great Sword Basics", "exoticEdged"]
+  ]) {
+    const def = feats.find(f => f.name === name),
+      items = [
+        {
+          id: "soldier",
+          name: cls.name,
+          type: "class",
+          system: { ...structuredClone(cls), identifier: "soldier", vitalityDie: cls.vitality }
+        },
+        {
+          id: "feat",
+          name,
+          type: "feat",
+          system: { ...structuredClone(def), tree: "meleeCombat", acquiredAtLevel: 1 }
+        },
+        {
+          id: "weapon",
+          name: "Renamed source",
+          type: "weapon",
+          system: {
+            meleeFamily: family,
+            proficiency: prof,
+            equipped: true,
+            carried: true,
+            quantity: 1,
+            sizeHands: "M/2h"
+          }
+        }
+      ],
+      raw = {
+        abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+        progression: [{ classId: "soldier", vitality: 6, skills: {} }],
+        skills: {},
+        focuses: {},
+        proficiencies: { [prof]: { proficient: true } },
+        misc: {},
+        actionDice: { value: 0 },
+        vitality: { value: 4 },
+        wounds: { value: 4 }
+      };
+    const s = computeAgent(raw, items, cfg);
+    assert.equal(s.featStatus.feat.ok, true, name);
+    assert.equal(s.readiedMeleeWeapons[0].family, family);
+    assert.equal(s.vitality.value, 4);
+    assert.equal(s.actionDice.value, 0);
+    items[2].system.equipped = false;
+    assert.equal(computeAgent(raw, items, cfg).readiedMeleeWeapons.length, 0);
+  }
+});
+test("optional source evidence protects additions/removals/changes while legacy receipts without the context remain valid", () => {
+  const proof = resolveSkillCheck(state(), "acrobatics", trip, input).meleeSkillFeats,
+    c = { checkKind: "skill", skillKey: "acrobatics", checkId: "resist-trip", meleeSkillFeats: proof },
+    e = rollEvidence(c);
+  assert.equal(rollEvidenceMatches(e, c), true);
+  assert.equal(rollEvidenceMatches(rollEvidence({ ...c, meleeSkillFeats: null }), c), false);
+  assert.equal(rollEvidenceMatches(e, { ...c, meleeSkillFeats: null }), false);
+  const n = structuredClone(c);
+  n.meleeSkillFeats.sources[0].weapons[0].id = "different";
+  assert.equal(rollEvidenceMatches(e, n), false);
+});
+globalThis.Actor = class {
+  constructor() {
+    this.type = "agent";
+    this.isOwner = true;
+    this.uuid = "Actor.melee";
+    this.items = [];
+    this.flags = {};
+    this.system = state();
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { id: "GC", isGM: true },
+  settings: { get: () => false },
+  time: { worldTime: 126 },
+  combats: [],
+  actors: [],
+  i18n: { localize: String }
+};
+globalThis.foundry = { utils: { escapeHTML: String } };
+globalThis.ui = { notifications: { warn: () => null } };
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+let hook = async () => {},
+  posts = [],
+  rolls = 0;
+globalThis.Roll = class {
+  constructor(_f, data) {
+    this.total = 12 + (data.total ?? 0);
+    this.dice = [{ total: 12 }];
+  }
+  async evaluate() {
+    rolls++;
+    await hook();
+    return this;
+  }
+  async toMessage(d) {
+    posts.push(d);
+    return d;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("actual Actor records authoritative prepared weapon sources, ignoring fabricated caller bonuses and proofs", async () => {
+  const a = new SpycraftActor();
+  posts = [];
+  hook = async () => {};
+  const m = await a.rollSkill("acrobatics", null, {
+    check: "resist-trip",
+    ...input,
+    meleeSkillFeats: { bonus: 999 },
+    bonus: 999
+  });
+  assert.equal(m.flags.spycraft2.rollData.total, 12);
+  assert.equal(m.flags.spycraft2.meleeSkillFeats.sources[0].weapons[0].id, "spear");
+});
+test("actual RNG source gain/loss, grip/readiness/identity changes reject posting and replacement checks reject stale proof before RNG", async () => {
+  for (const change of ["gain", "loss", "weapon", "grip", "identity"]) {
+    const a = new SpycraftActor();
+    if (change === "gain") a.system.activeFeatNames = [];
+    posts = [];
+    hook = async () => {
+      if (change === "gain") a.system.activeFeatNames = ["Spear Basics"];
+      if (change === "loss") a.system.activeFeatNames = [];
+      if (change === "weapon") a.system.readiedMeleeWeapons = [];
+      if (change === "grip") a.system.readiedMeleeWeapons[0].hands = 1;
+      if (change === "identity") a.system.readiedMeleeWeapons[0].id = "new";
+    };
+    await assert.rejects(a.rollSkill("acrobatics", null, { check: "resist-trip", ...input }), /changed/);
+    assert.equal(posts.length, 0, change);
+  }
+  hook = async () => {};
+  const a = new SpycraftActor(),
+    proof = resolveSkillCheck(a.system, "acrobatics", trip, input).meleeSkillFeats;
+  a.system.readiedMeleeWeapons = [];
+  rolls = 0;
+  await assert.rejects(
+    a.rollCheck(
+      "1d20",
+      {},
+      { checkKind: "skill", skillKey: "acrobatics", checkId: "resist-trip", ability: "dex", meleeSkillFeats: proof }
+    ),
+    /changed/
+  );
+  assert.equal(rolls, 0);
+});

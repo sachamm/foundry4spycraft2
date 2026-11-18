@@ -1,12 +1,164 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SPYCRAFT as cfg} from '../module/config.mjs';import {limitedUseAbilities} from '../module/rules/limited-uses.mjs';
-const state=()=>({level:18,actorUuid:'Actor.gambling-payment',worldTime:0,usagePeriods:{session:'s',scene:'scene',mission:'mission'},classLevels:{scientist:14,schemer:4},coreClassIds:['schemer'],activeFeatNames:['The Dice are Hot'],abilities:{int:{value:15,mod:2},wis:{value:16,mod:3},cha:{value:11,mod:0}},conditionContext:{},actionDice:{value:6,max:6,die:10,explodeAt:10,bonus:0},bonusActionDice:{},resourceUses:{},skillTotals:{streetwise:{name:'Streetwise',ranks:0,cap:15,threat:20,totals:[{ability:'wis',total:3},{ability:'cha',total:0}]}},skillFeatRules:[]});
-let serial=0,posts=[],failPost=false,evaluateHook=null;
-globalThis.Actor=class{constructor(){this.type='agent';this.isOwner=true;this.id='gambling-payment';this.uuid='Actor.gambling-payment';this.name='QA';this.flags={};this.items=new Map();this.system=state();this.system.limitedUses=limitedUseAbilities(this.system,[],cfg);}async update(patch){for(const[path,value]of Object.entries(patch)){const keys=path.split('.');let o=this;for(const key of keys.slice(0,-1))o=o[key]??={};const key=keys.at(-1);if(key.startsWith('-='))delete o[key.slice(2)];else o[key]=structuredClone(value);}}};
-globalThis.game={ready:false,user:{id:'gc',isGM:true},combats:[],time:{worldTime:0},settings:{get:(_s,key)=>key==='linguistics'?false:{session:'s',scene:'scene',mission:'mission'}},i18n:{localize:String,format:String}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.ui={notifications:{warn:()=>null}};globalThis.foundry={utils:{escapeHTML:String,randomID:()=>`receipt${++serial}`,deepClone:structuredClone}};globalThis.ChatMessage={getSpeaker:()=>({})};
-globalThis.Roll=class{constructor(formula,data){this.formula=formula;const die=formula.startsWith('20')?20:7;this.total=die+data.total;this.dice=formula.startsWith('20')?[]:[{total:die}];}async evaluate(){await evaluateHook?.();return this;}async toMessage(data){if(failPost)throw Error('post failed');const id='message'+(++serial),m={...data,id,uuid:'ChatMessage.'+id,async update(patch){for(const[k,v]of Object.entries(patch)){if(k==='flags.spycraft2')this.flags.spycraft2=structuredClone(v);else this[k]=v;}return this;}};posts.push(m);return m;}};
-const {SpycraftActor}=await import('../module/documents/actor.mjs');const direct={check:'gambling',synergySkill:'none',hailMaryUntrained:true},solution={...direct,allAccordingToPlan:true,tenSecondSolution:true,standaloneCheckConfirmed:true};function actor(){posts=[];failPost=false;evaluateHook=null;return new SpycraftActor();}
-test('ordinary Hail Mary already computes Gambling synergy from the post-payment wallet',async()=>{const a=actor(),m=await a.rollSkill('streetwise','wis',direct),c=m.flags.spycraft2;assert.equal(a.system.actionDice.value,5);assert.equal(c.gamblingDice.total,5);assert.equal(c.rollData.total,8);assert.equal(c.cap,null);});
-test('the natural-20 class workflow must also compute Gambling from the paid wallet, charging its two class uses and Hail Mary exactly once',async()=>{const a=actor(),m=await a.rollSkill('streetwise','wis',solution),c=m.flags.spycraft2;assert.equal(a.system.actionDice.value,5);assert.equal(c.gamblingDice.total,5);assert.equal(c.rollData.total,7);assert.equal(c.rawTotal,27);assert.equal(c.naturalDie,20);assert.equal(c.hailMary.cost,1);assert.equal(a.system.resourceUses.tenSecondSolution.used,1);assert.equal(a.system.resourceUses.allAccordingToPlan.used,1);assert.equal(posts.length,1);});
-test('failed posts refund the paid die and both class counters',async()=>{const a=actor();failPost=true;await assert.rejects(a.rollSkill('streetwise','wis',solution),/post failed/);assert.equal(a.system.actionDice.value,6);assert.equal(a.system.resourceUses.tenSecondSolution?.used??0,0);assert.equal(a.system.resourceUses.allAccordingToPlan?.used??0,0);assert.equal(posts.length,0);});
-test('losing the Gambling feat during evaluation prevents posting and refunds the combined class/payment reservation',async()=>{const a=actor();evaluateHook=()=>{a.system.activeFeatNames=[];};await assert.rejects(a.rollSkill('streetwise','wis',solution),/changed/);assert.equal(posts.length,0);assert.equal(a.system.actionDice.value,6);assert.equal(a.system.resourceUses.tenSecondSolution?.used??0,0);assert.equal(a.system.resourceUses.allAccordingToPlan?.used??0,0);});
-test('concurrent natural-20 requests reserve one class use and one paid die with the correct post-payment result',async()=>{const a=actor();await Promise.all([a.rollSkill('streetwise','wis',solution),a.rollSkill('streetwise','wis',solution)]);assert.equal(posts.length,1);assert.equal(a.system.actionDice.value,5);assert.equal(posts[0].flags.spycraft2.gamblingDice.total,5);assert.equal(a.system.resourceUses.tenSecondSolution.used,1);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+const state = () => ({
+  level: 18,
+  actorUuid: "Actor.gambling-payment",
+  worldTime: 0,
+  usagePeriods: { session: "s", scene: "scene", mission: "mission" },
+  classLevels: { scientist: 14, schemer: 4 },
+  coreClassIds: ["schemer"],
+  activeFeatNames: ["The Dice are Hot"],
+  abilities: { int: { value: 15, mod: 2 }, wis: { value: 16, mod: 3 }, cha: { value: 11, mod: 0 } },
+  conditionContext: {},
+  actionDice: { value: 6, max: 6, die: 10, explodeAt: 10, bonus: 0 },
+  bonusActionDice: {},
+  resourceUses: {},
+  skillTotals: {
+    streetwise: {
+      name: "Streetwise",
+      ranks: 0,
+      cap: 15,
+      threat: 20,
+      totals: [
+        { ability: "wis", total: 3 },
+        { ability: "cha", total: 0 }
+      ]
+    }
+  },
+  skillFeatRules: []
+});
+let serial = 0,
+  posts = [],
+  failPost = false,
+  evaluateHook = null;
+globalThis.Actor = class {
+  constructor() {
+    this.type = "agent";
+    this.isOwner = true;
+    this.id = "gambling-payment";
+    this.uuid = "Actor.gambling-payment";
+    this.name = "QA";
+    this.flags = {};
+    this.items = new Map();
+    this.system = state();
+    this.system.limitedUses = limitedUseAbilities(this.system, [], cfg);
+  }
+  async update(patch) {
+    for (const [path, value] of Object.entries(patch)) {
+      const keys = path.split(".");
+      let o = this;
+      for (const key of keys.slice(0, -1)) o = o[key] ??= {};
+      const key = keys.at(-1);
+      if (key.startsWith("-=")) delete o[key.slice(2)];
+      else o[key] = structuredClone(value);
+    }
+  }
+};
+globalThis.game = {
+  ready: false,
+  user: { id: "gc", isGM: true },
+  combats: [],
+  time: { worldTime: 0 },
+  settings: {
+    get: (_s, key) => (key === "linguistics" ? false : { session: "s", scene: "scene", mission: "mission" })
+  },
+  i18n: { localize: String, format: String }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.ui = { notifications: { warn: () => null } };
+globalThis.foundry = {
+  utils: { escapeHTML: String, randomID: () => `receipt${++serial}`, deepClone: structuredClone }
+};
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.Roll = class {
+  constructor(formula, data) {
+    this.formula = formula;
+    const die = formula.startsWith("20") ? 20 : 7;
+    this.total = die + data.total;
+    this.dice = formula.startsWith("20") ? [] : [{ total: die }];
+  }
+  async evaluate() {
+    await evaluateHook?.();
+    return this;
+  }
+  async toMessage(data) {
+    if (failPost) throw Error("post failed");
+    const id = "message" + ++serial,
+      m = {
+        ...data,
+        id,
+        uuid: "ChatMessage." + id,
+        async update(patch) {
+          for (const [k, v] of Object.entries(patch)) {
+            if (k === "flags.spycraft2") this.flags.spycraft2 = structuredClone(v);
+            else this[k] = v;
+          }
+          return this;
+        }
+      };
+    posts.push(m);
+    return m;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+const direct = { check: "gambling", synergySkill: "none", hailMaryUntrained: true },
+  solution = { ...direct, allAccordingToPlan: true, tenSecondSolution: true, standaloneCheckConfirmed: true };
+function actor() {
+  posts = [];
+  failPost = false;
+  evaluateHook = null;
+  return new SpycraftActor();
+}
+test("ordinary Hail Mary already computes Gambling synergy from the post-payment wallet", async () => {
+  const a = actor(),
+    m = await a.rollSkill("streetwise", "wis", direct),
+    c = m.flags.spycraft2;
+  assert.equal(a.system.actionDice.value, 5);
+  assert.equal(c.gamblingDice.total, 5);
+  assert.equal(c.rollData.total, 8);
+  assert.equal(c.cap, null);
+});
+test("the natural-20 class workflow must also compute Gambling from the paid wallet, charging its two class uses and Hail Mary exactly once", async () => {
+  const a = actor(),
+    m = await a.rollSkill("streetwise", "wis", solution),
+    c = m.flags.spycraft2;
+  assert.equal(a.system.actionDice.value, 5);
+  assert.equal(c.gamblingDice.total, 5);
+  assert.equal(c.rollData.total, 7);
+  assert.equal(c.rawTotal, 27);
+  assert.equal(c.naturalDie, 20);
+  assert.equal(c.hailMary.cost, 1);
+  assert.equal(a.system.resourceUses.tenSecondSolution.used, 1);
+  assert.equal(a.system.resourceUses.allAccordingToPlan.used, 1);
+  assert.equal(posts.length, 1);
+});
+test("failed posts refund the paid die and both class counters", async () => {
+  const a = actor();
+  failPost = true;
+  await assert.rejects(a.rollSkill("streetwise", "wis", solution), /post failed/);
+  assert.equal(a.system.actionDice.value, 6);
+  assert.equal(a.system.resourceUses.tenSecondSolution?.used ?? 0, 0);
+  assert.equal(a.system.resourceUses.allAccordingToPlan?.used ?? 0, 0);
+  assert.equal(posts.length, 0);
+});
+test("losing the Gambling feat during evaluation prevents posting and refunds the combined class/payment reservation", async () => {
+  const a = actor();
+  evaluateHook = () => {
+    a.system.activeFeatNames = [];
+  };
+  await assert.rejects(a.rollSkill("streetwise", "wis", solution), /changed/);
+  assert.equal(posts.length, 0);
+  assert.equal(a.system.actionDice.value, 6);
+  assert.equal(a.system.resourceUses.tenSecondSolution?.used ?? 0, 0);
+  assert.equal(a.system.resourceUses.allAccordingToPlan?.used ?? 0, 0);
+});
+test("concurrent natural-20 requests reserve one class use and one paid die with the correct post-payment result", async () => {
+  const a = actor();
+  await Promise.all([a.rollSkill("streetwise", "wis", solution), a.rollSkill("streetwise", "wis", solution)]);
+  assert.equal(posts.length, 1);
+  assert.equal(a.system.actionDice.value, 5);
+  assert.equal(posts[0].flags.spycraft2.gamblingDice.total, 5);
+  assert.equal(a.system.resourceUses.tenSecondSolution.used, 1);
+});

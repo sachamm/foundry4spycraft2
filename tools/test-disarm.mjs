@@ -1,13 +1,171 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {DISARM_SIZES,disarmWeaponSize,disarmAttackPlan} from '../module/rules/disarm.mjs';import {weaponAttack} from '../module/rules/gear.mjs';import {criticalPlan} from '../module/rules/criticals.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const context=()=>({confirmed:true,lineOfSightConfirmed:true,rangeConfirmed:true,opponentArmedConfirmed:true,opponentWeaponSize:'Tiny',opponentLabel:'Guard’s knife'}),weapon=(proficiency='edged',sizeHands='M/2h')=>({proficiency,sizeHands,errorThreat:'1/20',maxRangeIncrements:10,weaponCategory:proficiency==='edged'?'melee':'serviceRevolver',fireMode:'single',fireModes:['single'],range:proficiency==='edged'?0:50,recoil:0,damage:'1d6'}),system=()=>({size:'Medium',bab:4,abilities:{str:{mod:2,value:14},dex:{mod:1,value:12}},conditionContext:{},activeFeatNames:[],proficiencyTotals:{edged:{proficient:true},handgun:{proficient:true}}});
-test('Disarm grip, actual weapon Size differences and Expert Disarm bonuses are independent and use a Standard Attack',()=>{for(const expert of [false,true]){const s=system();if(expert)s.activeFeatNames=['Expert Disarm'];const base=weaponAttack(s,weapon(),cfg,'agent',{attackAction:'standard'}),attack=weaponAttack(s,weapon(),cfg,'agent',{attackAction:'standard',disarm:context()});assert.equal(attack.total-base.total,4+8+(expert?2:0));assert.equal(attack.error,base.error+2);assert.equal(attack.disarm.twoHandBonus,4);assert.equal(attack.disarm.sizeBonus,8);assert.equal(attack.disarm.loseFlatFooted,!expert);assert.equal(attack.disarm.loseBonusDisarm,!expert);assert.equal(attack.disarm.loseFinalAttackStillPossible,true);assert.equal(attack.stance.attackAction,'standard');}const p=disarmAttackPlan(system(),weapon(),{context:context(),grip:{hands:1}});assert.equal(p.twoHandBonus,0);assert.equal(p.attackBonus,8);});
-test('all twelve weapon Size categories compare by categories, never object-hardness modifiers; ranged attempts never gain the Size bonus',()=>{for(const a of DISARM_SIZES)for(const b of DISARM_SIZES){const code=a[0];const p=disarmAttackPlan({...system(),size:a},weapon('unarmed'),{context:{...context(),opponentWeaponSize:b},grip:{hands:2}});assert.equal(p.sizeBonus,4*Math.max(0,DISARM_SIZES.indexOf(a)-2-DISARM_SIZES.indexOf(b)));assert.equal(p.twoHandBonus,0);}const ranged=disarmAttackPlan(system(),weapon('handgun','V/1h'),{context:context(),ranged:true,grip:{hands:1}});assert.equal(ranged.sizeBonus,0);assert.equal(disarmWeaponSize(system(),weapon('edged','???')),null);});
-test('missing GC circumstances, unarmed opponent or unresolved Sizes block before granting modifiers; untrained Proficiency doubles time and adds its own two error points',()=>{for(const key of ['confirmed','lineOfSightConfirmed','rangeConfirmed','opponentArmedConfirmed'])assert.equal(disarmAttackPlan(system(),weapon(),{context:{...context(),[key]:false}}).blocked,true);for(const size of ['','unarmed','Unknown'])assert.equal(disarmAttackPlan(system(),weapon(),{context:{...context(),opponentWeaponSize:size}}).blocked,true);assert.equal(disarmAttackPlan(system(),weapon(),{context:context(),action:'other'}).blocked,true);const s=system();s.proficiencyTotals={};const p=weaponAttack(s,weapon(),cfg,'agent',{attackAction:'standard',disarm:context()});assert.equal(p.disarm.errorIncrease,4);assert.equal(p.error,7);assert.match(p.disarm.actionCost,/1 full action/);});
-test('Expert Disarm critical reduction applies only to actual Disarm attack successes and floors at zero, retaining all ordinary activation requirements',()=>{const s={...system(),activeFeatNames:['Expert Disarm']},check={checkKind:'attack',threatConfirmed:true,attackContext:{disarm:{active:true}}},input={baseCost:1,effect:'Take target weapon with a free hand',effectConfirmed:true,beforeDamage:true,available:4};assert.equal(criticalPlan(s,check,input).cost,0);assert.equal(criticalPlan(system(),check,input).cost,1);assert.equal(criticalPlan(s,{...check,attackContext:{}},input).cost,1);assert.equal(criticalPlan(s,{...check,checkKind:'skill'},input).cost,1);assert.equal(criticalPlan(s,check,{...input,beforeDamage:false}).blocked,true);assert.equal(criticalPlan(s,{...check,threatConfirmed:false},input).blocked,true);const failed=criticalPlan(s,{...check,threatConfirmed:false,errorConfirmed:true},{...input,kind:'failure',samePayer:false,opponent:true,lineOfSight:true});assert.equal(failed.cost,1);});
-test('Disarm evidence freezes every declared bonus and loss protection; absent legacy contexts keep existing evidence compatibility',()=>{const c={formula:'1d20',rollData:{},attackContext:{disarm:{active:true,expert:true,sizeBonus:8}}},e=rollEvidence(c);c.attackContext.disarm.sizeBonus=4;assert.notEqual(rollEvidence(c),e);assert.equal(rollEvidenceMatches(e,c),false);delete c.attackContext.disarm;assert.equal(rollEvidenceMatches(rollEvidence(c),c),true);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { DISARM_SIZES, disarmWeaponSize, disarmAttackPlan } from "../module/rules/disarm.mjs";
+import { weaponAttack } from "../module/rules/gear.mjs";
+import { criticalPlan } from "../module/rules/criticals.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const context = () => ({
+    confirmed: true,
+    lineOfSightConfirmed: true,
+    rangeConfirmed: true,
+    opponentArmedConfirmed: true,
+    opponentWeaponSize: "Tiny",
+    opponentLabel: "Guard’s knife"
+  }),
+  weapon = (proficiency = "edged", sizeHands = "M/2h") => ({
+    proficiency,
+    sizeHands,
+    errorThreat: "1/20",
+    maxRangeIncrements: 10,
+    weaponCategory: proficiency === "edged" ? "melee" : "serviceRevolver",
+    fireMode: "single",
+    fireModes: ["single"],
+    range: proficiency === "edged" ? 0 : 50,
+    recoil: 0,
+    damage: "1d6"
+  }),
+  system = () => ({
+    size: "Medium",
+    bab: 4,
+    abilities: { str: { mod: 2, value: 14 }, dex: { mod: 1, value: 12 } },
+    conditionContext: {},
+    activeFeatNames: [],
+    proficiencyTotals: { edged: { proficient: true }, handgun: { proficient: true } }
+  });
+test("Disarm grip, actual weapon Size differences and Expert Disarm bonuses are independent and use a Standard Attack", () => {
+  for (const expert of [false, true]) {
+    const s = system();
+    if (expert) s.activeFeatNames = ["Expert Disarm"];
+    const base = weaponAttack(s, weapon(), cfg, "agent", { attackAction: "standard" }),
+      attack = weaponAttack(s, weapon(), cfg, "agent", { attackAction: "standard", disarm: context() });
+    assert.equal(attack.total - base.total, 4 + 8 + (expert ? 2 : 0));
+    assert.equal(attack.error, base.error + 2);
+    assert.equal(attack.disarm.twoHandBonus, 4);
+    assert.equal(attack.disarm.sizeBonus, 8);
+    assert.equal(attack.disarm.loseFlatFooted, !expert);
+    assert.equal(attack.disarm.loseBonusDisarm, !expert);
+    assert.equal(attack.disarm.loseFinalAttackStillPossible, true);
+    assert.equal(attack.stance.attackAction, "standard");
+  }
+  const p = disarmAttackPlan(system(), weapon(), { context: context(), grip: { hands: 1 } });
+  assert.equal(p.twoHandBonus, 0);
+  assert.equal(p.attackBonus, 8);
+});
+test("all twelve weapon Size categories compare by categories, never object-hardness modifiers; ranged attempts never gain the Size bonus", () => {
+  for (const a of DISARM_SIZES)
+    for (const b of DISARM_SIZES) {
+      const code = a[0];
+      const p = disarmAttackPlan({ ...system(), size: a }, weapon("unarmed"), {
+        context: { ...context(), opponentWeaponSize: b },
+        grip: { hands: 2 }
+      });
+      assert.equal(p.sizeBonus, 4 * Math.max(0, DISARM_SIZES.indexOf(a) - 2 - DISARM_SIZES.indexOf(b)));
+      assert.equal(p.twoHandBonus, 0);
+    }
+  const ranged = disarmAttackPlan(system(), weapon("handgun", "V/1h"), {
+    context: context(),
+    ranged: true,
+    grip: { hands: 1 }
+  });
+  assert.equal(ranged.sizeBonus, 0);
+  assert.equal(disarmWeaponSize(system(), weapon("edged", "???")), null);
+});
+test("missing GC circumstances, unarmed opponent or unresolved Sizes block before granting modifiers; untrained Proficiency doubles time and adds its own two error points", () => {
+  for (const key of ["confirmed", "lineOfSightConfirmed", "rangeConfirmed", "opponentArmedConfirmed"])
+    assert.equal(disarmAttackPlan(system(), weapon(), { context: { ...context(), [key]: false } }).blocked, true);
+  for (const size of ["", "unarmed", "Unknown"])
+    assert.equal(
+      disarmAttackPlan(system(), weapon(), { context: { ...context(), opponentWeaponSize: size } }).blocked,
+      true
+    );
+  assert.equal(disarmAttackPlan(system(), weapon(), { context: context(), action: "other" }).blocked, true);
+  const s = system();
+  s.proficiencyTotals = {};
+  const p = weaponAttack(s, weapon(), cfg, "agent", { attackAction: "standard", disarm: context() });
+  assert.equal(p.disarm.errorIncrease, 4);
+  assert.equal(p.error, 7);
+  assert.match(p.disarm.actionCost, /1 full action/);
+});
+test("Expert Disarm critical reduction applies only to actual Disarm attack successes and floors at zero, retaining all ordinary activation requirements", () => {
+  const s = { ...system(), activeFeatNames: ["Expert Disarm"] },
+    check = { checkKind: "attack", threatConfirmed: true, attackContext: { disarm: { active: true } } },
+    input = {
+      baseCost: 1,
+      effect: "Take target weapon with a free hand",
+      effectConfirmed: true,
+      beforeDamage: true,
+      available: 4
+    };
+  assert.equal(criticalPlan(s, check, input).cost, 0);
+  assert.equal(criticalPlan(system(), check, input).cost, 1);
+  assert.equal(criticalPlan(s, { ...check, attackContext: {} }, input).cost, 1);
+  assert.equal(criticalPlan(s, { ...check, checkKind: "skill" }, input).cost, 1);
+  assert.equal(criticalPlan(s, check, { ...input, beforeDamage: false }).blocked, true);
+  assert.equal(criticalPlan(s, { ...check, threatConfirmed: false }, input).blocked, true);
+  const failed = criticalPlan(
+    s,
+    { ...check, threatConfirmed: false, errorConfirmed: true },
+    { ...input, kind: "failure", samePayer: false, opponent: true, lineOfSight: true }
+  );
+  assert.equal(failed.cost, 1);
+});
+test("Disarm evidence freezes every declared bonus and loss protection; absent legacy contexts keep existing evidence compatibility", () => {
+  const c = { formula: "1d20", rollData: {}, attackContext: { disarm: { active: true, expert: true, sizeBonus: 8 } } },
+    e = rollEvidence(c);
+  c.attackContext.disarm.sizeBonus = 4;
+  assert.notEqual(rollEvidence(c), e);
+  assert.equal(rollEvidenceMatches(e, c), false);
+  delete c.attackContext.disarm;
+  assert.equal(rollEvidenceMatches(rollEvidence(c), c), true);
+});
 // The real controller is exercised without UI in Node; native dialog checks are recorded in the ledger.
-const {makeFatigueActor}=await import('./fixtures/fatigue-actor.mjs');const {rollDisarm}=await import('../module/apps/disarm.mjs');foundry.utils.escapeHTML=String;
-function actor(){const a=makeFatigueActor();a.items=[{id:'blade',name:'Sword',type:'weapon',system:{...weapon(),equipped:true,carried:true}}];a.items.get=id=>a.items.find(i=>i.id===id);a.system=system();Object.defineProperty(a,'participatingCombat',{value:null});a.weaponAttack=(item,opts)=>weaponAttack(a.system,item.system,cfg,'agent',opts);a.rollAttack=async(item,opts)=>{await opts.validateAttackContext();await a.onDraw?.();await opts.validateAttackContext();return opts;};return a;}
-test('the controller rejects unavailable weapons and stale ownership/source/grip; ranged checks require actual measured CQB distance and Single-Shot mode',async()=>{const input={...context(),weaponId:'blade'};let a=actor();assert.equal((await rollDisarm(a,input)).attackAction,'standard');for(const change of [a=>a.items[0].system.equipped=false,a=>a.isOwner=false,a=>a.system.activeFeatNames=['Expert Disarm'],a=>a.items[0].system.useHands=1]){a=actor();a.onDraw=()=>change(a);await assert.rejects(rollDisarm(a,input),/changed/);}a=actor();a.items[0].system= {...weapon('handgun','T/1h'),equipped:true};for(const distanceFeet of ['',undefined,-1,31,Infinity])await assert.rejects(rollDisarm(a,{...input,distanceFeet}),/distance/);assert.equal((await rollDisarm(a,{...input,distanceFeet:30})).distanceFeet,30);a.items[0].system.fireModes=['single','burst'];a.items[0].system.fireMode='burst';await assert.rejects(rollDisarm(a,{...input,distanceFeet:5}),/Single-Shot/);});
+const { makeFatigueActor } = await import("./fixtures/fatigue-actor.mjs");
+const { rollDisarm } = await import("../module/apps/disarm.mjs");
+foundry.utils.escapeHTML = String;
+function actor() {
+  const a = makeFatigueActor();
+  a.items = [{ id: "blade", name: "Sword", type: "weapon", system: { ...weapon(), equipped: true, carried: true } }];
+  a.items.get = id => a.items.find(i => i.id === id);
+  a.system = system();
+  Object.defineProperty(a, "participatingCombat", { value: null });
+  a.weaponAttack = (item, opts) => weaponAttack(a.system, item.system, cfg, "agent", opts);
+  a.rollAttack = async (item, opts) => {
+    await opts.validateAttackContext();
+    await a.onDraw?.();
+    await opts.validateAttackContext();
+    return opts;
+  };
+  return a;
+}
+test("the controller rejects unavailable weapons and stale ownership/source/grip; ranged checks require actual measured CQB distance and Single-Shot mode", async () => {
+  const input = { ...context(), weaponId: "blade" };
+  let a = actor();
+  assert.equal((await rollDisarm(a, input)).attackAction, "standard");
+  for (const change of [
+    a => (a.items[0].system.equipped = false),
+    a => (a.isOwner = false),
+    a => (a.system.activeFeatNames = ["Expert Disarm"]),
+    a => (a.items[0].system.useHands = 1)
+  ]) {
+    a = actor();
+    a.onDraw = () => change(a);
+    await assert.rejects(rollDisarm(a, input), /changed/);
+  }
+  a = actor();
+  a.items[0].system = { ...weapon("handgun", "T/1h"), equipped: true };
+  for (const distanceFeet of ["", undefined, -1, 31, Infinity])
+    await assert.rejects(rollDisarm(a, { ...input, distanceFeet }), /distance/);
+  assert.equal((await rollDisarm(a, { ...input, distanceFeet: 30 })).distanceFeet, 30);
+  a.items[0].system.fireModes = ["single", "burst"];
+  a.items[0].system.fireMode = "burst";
+  await assert.rejects(rollDisarm(a, { ...input, distanceFeet: 5 }), /Single-Shot/);
+});
 
-test('action error increases combine before minimum-limited weapon/feat reductions',()=>{const s=system();s.proficiencyTotals.hurled={proficient:true};s.activeFeatNames=['Grenade Basics'];const w={...weapon('hurled','T/1h'),name:'Grenade'};assert.equal(weaponAttack(s,w,cfg,'agent',{attackAction:'standard',disarm:context()}).error,1);});
+test("action error increases combine before minimum-limited weapon/feat reductions", () => {
+  const s = system();
+  s.proficiencyTotals.hurled = { proficient: true };
+  s.activeFeatNames = ["Grenade Basics"];
+  const w = { ...weapon("hurled", "T/1h"), name: "Grenade" };
+  assert.equal(weaponAttack(s, w, cfg, "agent", { attackAction: "standard", disarm: context() }).error, 1);
+});

@@ -1,18 +1,83 @@
-import { checkPrerequisites, describe } from "../rules/prerequisites.mjs";
+import { describe } from "../rules/prerequisites.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 /** Compendium packs searched for each item type; gear is spread over several. */
-const PACKS = { gear: ["spycraft2.gear", "spycraft2.kits", "spycraft2.vehicle-upgrades", "spycraft2.equipment-upgrades", "spycraft2.contagions"], vehicle: "spycraft2.vehicles", class: "spycraft2.classes", origin: "spycraft2.origins", feat: "spycraft2.feats", weapon: "spycraft2.weapons", armor: "spycraft2.armor" };
+const PACKS = {
+  gear: [
+    "spycraft2.gear",
+    "spycraft2.kits",
+    "spycraft2.vehicle-upgrades",
+    "spycraft2.equipment-upgrades",
+    "spycraft2.contagions"
+  ],
+  vehicle: "spycraft2.vehicles",
+  class: "spycraft2.classes",
+  origin: "spycraft2.origins",
+  feat: "spycraft2.feats",
+  weapon: "spycraft2.weapons",
+  armor: "spycraft2.armor"
+};
 const FIELDS = {
-  gear:["system.kitType","system.kitGrade","system.kitSize","system.kitNonPortable","system.weight","system.caliber","system.description","system.gearCategory","system.powerRating","system.streetValue","system.standingOnly","system.standingCost","system.sourceTable"],
-  vehicle: ["system.vehicleClass", "system.caliber", "system.sizeLabel", "system.occupancy", "system.accelerationTurning", "system.mph", "system.defenseSave", "system.standingOnly", "system.standingCost"],
-  class: ["system.identifier", "system.expert", "system.requirements", "system.vitalityDie", "system.skillPoints", "system.description"],
+  gear: [
+    "system.kitType",
+    "system.kitGrade",
+    "system.kitSize",
+    "system.kitNonPortable",
+    "system.weight",
+    "system.caliber",
+    "system.description",
+    "system.gearCategory",
+    "system.powerRating",
+    "system.streetValue",
+    "system.standingOnly",
+    "system.standingCost",
+    "system.sourceTable"
+  ],
+  vehicle: [
+    "system.vehicleClass",
+    "system.caliber",
+    "system.sizeLabel",
+    "system.occupancy",
+    "system.accelerationTurning",
+    "system.mph",
+    "system.defenseSave",
+    "system.standingOnly",
+    "system.standingCost"
+  ],
+  class: [
+    "system.identifier",
+    "system.expert",
+    "system.requirements",
+    "system.vitalityDie",
+    "system.skillPoints",
+    "system.description"
+  ],
   origin: ["system.originType", "system.description"],
-  feat: ["system.tree", "system.prerequisites", "system.prerequisitesNotChecked", "system.repeatable", "system.maxSelections", "system.description"],
-  weapon: ["system.proficiency", "system.caliber", "system.damage", "system.errorThreat", "system.range", "system.qualities"],
-  armor: ["system.caliber", "system.damageReduction", "system.damageReductionSubdual", "system.defensePenalty", "system.armorCheck"]
+  feat: [
+    "system.tree",
+    "system.prerequisites",
+    "system.prerequisitesNotChecked",
+    "system.repeatable",
+    "system.maxSelections",
+    "system.description"
+  ],
+  weapon: [
+    "system.proficiency",
+    "system.caliber",
+    "system.damage",
+    "system.errorThreat",
+    "system.range",
+    "system.qualities"
+  ],
+  armor: [
+    "system.caliber",
+    "system.damageReduction",
+    "system.damageReductionSubdual",
+    "system.defensePenalty",
+    "system.armorCheck"
+  ]
 };
 
 /** Item types an agent can only hold once; the browser won't add a second copy. */
@@ -35,7 +100,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     super(options);
     this.actor = actor;
     this.itemType = itemType;
-    this.filters = { search: "", group: originType ?? "", qualifiedOnly: false, acquisitionSource:"" };
+    this.filters = { search: "", group: originType ?? "", qualifiedOnly: false, acquisitionSource: "" };
   }
 
   static DEFAULT_OPTIONS = {
@@ -57,104 +122,204 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   async _prepareContext(options) {
-    const packs = [PACKS[this.itemType]].flat().map(id => game.packs.get(id)).filter(Boolean);
-    const index = (await Promise.all(packs.map(pack => pack.getIndex({ fields: FIELDS[this.itemType] })))).flatMap(entries => [...entries]);
+    const packs = [PACKS[this.itemType]]
+      .flat()
+      .map(id => game.packs.get(id))
+      .filter(Boolean);
+    const index = (await Promise.all(packs.map(pack => pack.getIndex({ fields: FIELDS[this.itemType] })))).flatMap(
+      entries => [...entries]
+    );
     const cfg = CONFIG.SPYCRAFT;
     const owned = new Set(this.actor?.items.filter(i => i.type === this.itemType).map(i => i.name.toLowerCase()) ?? []);
     const search = this.filters.search.toLowerCase();
 
-    const freeSources=this.itemType==="feat"?(this.actor?.system.featAcquisitionSources??[]).filter(source=>!this.actor.items.some(item=>item.type==="feat"&&!item.system.granted&&item.system.acquisitionSource===source.id)):[];
-    if(this.filters.acquisitionSource&&!freeSources.some(source=>source.id===this.filters.acquisitionSource))this.filters.acquisitionSource="";
-    const acquisitionSources=Object.fromEntries([["","Career/origin/other feat choice"],...freeSources.map(source=>[source.id,source.label])]);
+    const freeSources =
+      this.itemType === "feat"
+        ? (this.actor?.system.featAcquisitionSources ?? []).filter(
+            source =>
+              !this.actor.items.some(
+                item => item.type === "feat" && !item.system.granted && item.system.acquisitionSource === source.id
+              )
+          )
+        : [];
+    if (this.filters.acquisitionSource && !freeSources.some(source => source.id === this.filters.acquisitionSource))
+      this.filters.acquisitionSource = "";
+    const acquisitionSources = Object.fromEntries([
+      ["", "Career/origin/other feat choice"],
+      ...freeSources.map(source => [source.id, source.label])
+    ]);
     let groups = {};
     const rows = [];
     for (const e of index) {
       const s = e.system ?? {};
-      let group = "", groupLabel = "", req = null, extra = "";
+      let group = "",
+        groupLabel = "",
+        req = null,
+        extra = "";
       switch (this.itemType) {
-        case "feat": group = s.tree; groupLabel = cfg.featTrees[s.tree] ?? s.tree; req = s.prerequisites; break;
-        case "class": group = s.expert ? "expert" : "base"; groupLabel = game.i18n.localize(s.expert ? "SPYCRAFT.Class.Expert" : "SPYCRAFT.Class.Base");
-          req = s.requirements; extra = `d${s.vitalityDie} VP · ${s.skillPoints} SP`; break;
-        case "origin": group = s.originType; groupLabel = game.i18n.localize(cfg.originTypes[s.originType]); break;
-        case "weapon": group = s.proficiency; groupLabel = cfg.proficiencies[s.proficiency]?.label ?? s.proficiency;
-          extra = `${cfg.calibers[s.caliber]} · ${s.damage} · ${s.errorThreat}${s.range ? ` · ${s.range} ft` : ""}`; break;
+        case "feat":
+          group = s.tree;
+          groupLabel = cfg.featTrees[s.tree] ?? s.tree;
+          req = s.prerequisites;
+          break;
+        case "class":
+          group = s.expert ? "expert" : "base";
+          groupLabel = game.i18n.localize(s.expert ? "SPYCRAFT.Class.Expert" : "SPYCRAFT.Class.Base");
+          req = s.requirements;
+          extra = `d${s.vitalityDie} VP · ${s.skillPoints} SP`;
+          break;
+        case "origin":
+          group = s.originType;
+          groupLabel = game.i18n.localize(cfg.originTypes[s.originType]);
+          break;
+        case "weapon":
+          group = s.proficiency;
+          groupLabel = cfg.proficiencies[s.proficiency]?.label ?? s.proficiency;
+          extra = `${cfg.calibers[s.caliber]} · ${s.damage} · ${s.errorThreat}${s.range ? ` · ${s.range} ft` : ""}`;
+          break;
         case "gear":
           if (s.kitGrade) {
-            group = `kit:${s.kitType}`; groupLabel = `Kit — ${s.kitType}`;
-            extra = `Grade ${s.kitGrade} · Caliber ${cfg.calibers[s.caliber]} · ${s.kitSize} · ${s.kitNonPortable ? 'Non-portable' : s.weight + ' lbs.'}`;
+            group = `kit:${s.kitType}`;
+            groupLabel = `Kit — ${s.kitType}`;
+            extra = `Grade ${s.kitGrade} · Caliber ${cfg.calibers[s.caliber]} · ${s.kitSize} · ${s.kitNonPortable ? "Non-portable" : s.weight + " lbs."}`;
           } else {
             const upgrade = /^Table 4\.2[89]$/.test(s.sourceTable ?? "");
             group = upgrade ? "vehicleUpgrade" : s.gearCategory || "other";
-            groupLabel = upgrade ? "Vehicle upgrades" : cfg.gearPicks[s.gearCategory] ?? "Other gear";
-            extra = [s.standingOnly ? `Reputation/Net Worth${s.standingCost ? ` ${s.standingCost}` : ""}` : s.caliber ? `Caliber ${cfg.calibers[s.caliber]}` : "",
-              s.powerRating ? `PR ${s.powerRating}` : "", s.streetValue].filter(Boolean).join(" · ");
+            groupLabel = upgrade ? "Vehicle upgrades" : (cfg.gearPicks[s.gearCategory] ?? "Other gear");
+            extra = [
+              s.standingOnly
+                ? `Reputation/Net Worth${s.standingCost ? ` ${s.standingCost}` : ""}`
+                : s.caliber
+                  ? `Caliber ${cfg.calibers[s.caliber]}`
+                  : "",
+              s.powerRating ? `PR ${s.powerRating}` : "",
+              s.streetValue
+            ]
+              .filter(Boolean)
+              .join(" · ");
           }
           break;
         case "vehicle": {
           const cls = VEHICLE_RULES.classes.find(c => c.code === s.vehicleClass);
-          group = s.vehicleClass; groupLabel = cls?.label ?? s.vehicleClass;
-          extra = [s.standingOnly ? `Reputation/Net Worth${s.standingCost ? ` ${s.standingCost}` : ""}` : `Caliber ${cfg.calibers[s.caliber]}`,
-            s.sizeLabel, s.occupancy ? `Occ ${s.occupancy}` : "", s.accelerationTurning ? `A/T ${s.accelerationTurning}` : "",
-            s.mph ? `${s.mph} MPH` : "", s.defenseSave ? `D/S ${s.defenseSave}` : ""].filter(Boolean).join(" · ");
+          group = s.vehicleClass;
+          groupLabel = cls?.label ?? s.vehicleClass;
+          extra = [
+            s.standingOnly
+              ? `Reputation/Net Worth${s.standingCost ? ` ${s.standingCost}` : ""}`
+              : `Caliber ${cfg.calibers[s.caliber]}`,
+            s.sizeLabel,
+            s.occupancy ? `Occ ${s.occupancy}` : "",
+            s.accelerationTurning ? `A/T ${s.accelerationTurning}` : "",
+            s.mph ? `${s.mph} MPH` : "",
+            s.defenseSave ? `D/S ${s.defenseSave}` : ""
+          ]
+            .filter(Boolean)
+            .join(" · ");
           break;
         }
-        case "armor": group = String(s.caliber); groupLabel = `Caliber ${cfg.calibers[s.caliber]}`;
-          extra = `DR ${s.damageReduction}/${s.damageReductionSubdual} · Def ${s.defensePenalty} · ACP ${s.armorCheck}`; break;
+        case "armor":
+          group = String(s.caliber);
+          groupLabel = `Caliber ${cfg.calibers[s.caliber]}`;
+          extra = `DR ${s.damageReduction}/${s.damageReductionSubdual} · Def ${s.defensePenalty} · ACP ${s.armorCheck}`;
+          break;
       }
       groups[group] = groupLabel;
       if (this.filters.group && group !== this.filters.group) continue;
       const summary = plainText(s.description);
       if (search && !e.name.toLowerCase().includes(search) && !summary.toLowerCase().includes(search)) continue;
-      const check = this.actor && (req||this.filters.acquisitionSource) ? this.actor.checkPrerequisites(req, { classEntry: this.itemType === "class", acquisitionSource:this.filters.acquisitionSource,featTree:s.tree }) : { ok: true, unmet: [] };
+      const check =
+        this.actor && (req || this.filters.acquisitionSource)
+          ? this.actor.checkPrerequisites(req, {
+              classEntry: this.itemType === "class",
+              acquisitionSource: this.filters.acquisitionSource,
+              featTree: s.tree
+            })
+          : { ok: true, unmet: [] };
       if (this.filters.qualifiedOnly && !check.ok) continue;
       rows.push({
-        uuid: e.uuid, id: e._id, name: e.name, groupLabel, extra, summary,
+        uuid: e.uuid,
+        id: e._id,
+        name: e.name,
+        groupLabel,
+        extra,
+        summary,
         owned: owned.has(e.name.toLowerCase()),
-        locked: (UNIQUE.has(this.itemType) || (this.itemType === "feat" && !s.repeatable)) && owned.has(e.name.toLowerCase()),
-        qualified: check.ok, unmet: check.unmet.join("; "), prereq: req ? describe(req) : "",
+        locked:
+          (UNIQUE.has(this.itemType) || (this.itemType === "feat" && !s.repeatable)) && owned.has(e.name.toLowerCase()),
+        qualified: check.ok,
+        unmet: check.unmet.join("; "),
+        prereq: req ? describe(req) : "",
         notChecked: s.prerequisitesNotChecked
       });
     }
     rows.sort((a, b) => a.groupLabel.localeCompare(b.groupLabel) || a.name.localeCompare(b.name));
     return {
-      acquisitionSources,showAcquisitionSources:this.itemType==="feat"&&freeSources.length>0,
-      rows, filters: this.filters, hasPrereqs: ["feat", "class"].includes(this.itemType),
+      acquisitionSources,
+      showAcquisitionSources: this.itemType === "feat" && freeSources.length > 0,
+      rows,
+      filters: this.filters,
+      hasPrereqs: ["feat", "class"].includes(this.itemType),
       groups: Object.fromEntries(Object.entries(groups).sort((a, b) => a[1].localeCompare(b[1]))),
-      actor: this.actor, missingPack: !packs.length
+      actor: this.actor,
+      missingPack: !packs.length
     };
   }
 
   _onRender(context, options) {
     super._onRender(context, options);
     const html = this.element;
-    html.querySelector("[name=search]")?.addEventListener("input", foundry.utils.debounce(ev => {
-      this.filters.search = ev.target.value;
-      this.render().then(() => {
-        const input = this.element.querySelector("[name=search]");
-        input?.focus();
-        input?.setSelectionRange(input.value.length, input.value.length);
-      });
-    }, 250));
-    html.querySelector("[name=acquisitionSource]")?.addEventListener("change",ev=>{this.filters.acquisitionSource=ev.target.value;this.render();});
-    html.querySelector("[name=group]")?.addEventListener("change", ev => { this.filters.group = ev.target.value; this.render(); });
-    html.querySelector("[name=qualifiedOnly]")?.addEventListener("change", ev => { this.filters.qualifiedOnly = ev.target.checked; this.render(); });
+    html.querySelector("[name=search]")?.addEventListener(
+      "input",
+      foundry.utils.debounce(ev => {
+        this.filters.search = ev.target.value;
+        this.render().then(() => {
+          const input = this.element.querySelector("[name=search]");
+          input?.focus();
+          input?.setSelectionRange(input.value.length, input.value.length);
+        });
+      }, 250)
+    );
+    html.querySelector("[name=acquisitionSource]")?.addEventListener("change", ev => {
+      this.filters.acquisitionSource = ev.target.value;
+      this.render();
+    });
+    html.querySelector("[name=group]")?.addEventListener("change", ev => {
+      this.filters.group = ev.target.value;
+      this.render();
+    });
+    html.querySelector("[name=qualifiedOnly]")?.addEventListener("change", ev => {
+      this.filters.qualifiedOnly = ev.target.checked;
+      this.render();
+    });
   }
 
   static async #onAdd(event, target) {
     const doc = await fromUuid(target.closest("[data-uuid]").dataset.uuid);
     if (!doc || !this.actor) return;
-    if ((UNIQUE.has(doc.type) || (doc.type === "feat" && !doc.system.repeatable)) && this.actor.items.some(i => i.type === doc.type && i.name.toLowerCase() === doc.name.toLowerCase())) {
-      return ui.notifications.warn(game.i18n.format(`SPYCRAFT.Browser.Owned.${doc.type}`, { name: doc.name, actor: this.actor.name }));
+    if (
+      (UNIQUE.has(doc.type) || (doc.type === "feat" && !doc.system.repeatable)) &&
+      this.actor.items.some(i => i.type === doc.type && i.name.toLowerCase() === doc.name.toLowerCase())
+    ) {
+      return ui.notifications.warn(
+        game.i18n.format(`SPYCRAFT.Browser.Owned.${doc.type}`, { name: doc.name, actor: this.actor.name })
+      );
     }
     if (doc.type === "class") await this.actor.addClassLevel(doc);
     else {
       if (doc.type === "origin") {
         const old = this.actor.items.filter(i => i.type === "origin" && i.system.originType === doc.system.originType);
-        if (old.length) await this.actor.deleteEmbeddedDocuments("Item", old.map(i => i.id));
+        if (old.length)
+          await this.actor.deleteEmbeddedDocuments(
+            "Item",
+            old.map(i => i.id)
+          );
       }
       const data = doc.toObject();
       delete data._id;
-      if (doc.type === "feat") {data.system.acquiredAtLevel = Math.max(1, this.actor.system.level ?? 1);data.system.acquisitionSource=this.filters.acquisitionSource;}
+      if (doc.type === "feat") {
+        data.system.acquiredAtLevel = Math.max(1, this.actor.system.level ?? 1);
+        data.system.acquisitionSource = this.filters.acquisitionSource;
+      }
       await this.actor.createEmbeddedDocuments("Item", [data]);
     }
     ui.notifications.info(game.i18n.format("SPYCRAFT.Browser.Added", { name: doc.name, actor: this.actor.name }));

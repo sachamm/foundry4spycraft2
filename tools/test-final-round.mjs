@@ -1,37 +1,280 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {FINAL_ATTACK_WORKFLOWS,finalAttackRoundSpec,validateFinalRoundReservation} from '../module/rules/final-round.mjs';import {resourceCounterReviewPlan} from '../module/rules/limited-uses.mjs';import {postFinalAttack} from '../module/apps/final-attack.mjs';import {weaponAttack} from '../module/rules/gear.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {skillTagPlan} from '../module/rules/skill-tags.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {makeFatigueActor} from './fixtures/fatigue-actor.mjs';const {SpycraftActor}=await import('../module/documents/actor.mjs');
-let serial=0;foundry.utils.escapeHTML=String;game.user={id:'gc',isGM:true};ui.notifications.warn=()=>undefined;
-function actor({nauseated=false,known=false}={}){
- serial=0;game.messages=[];const a={uuid:'Actor.final',type:'agent',isOwner:true,flags:{},round:2,system:{activeFeatNames:[],abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:14,mod:2}])),proficiencyTotals:{edged:{proficient:true}},conditionContext:{nauseated},actionDice:{value:0},resourceUses:known?{finalAttackRound:{epoch:'combat:2',used:0}}:{},classLevels:{}},items:[{id:'blade',uuid:'Actor.final.Item.blade',name:'Blade',type:'weapon',system:{proficiency:'edged',damage:'1d6',sizeHands:'S/1h',errorThreat:'1/20',equipped:true,carried:true,quantity:1}}],weaponContext:(_w,o)=>o,getRollData:()=>({}),async update(patch){for(const[path,value]of Object.entries(patch)){const keys=path.split('.');let object=this;for(const key of keys.slice(0,-1))object=object[key]??={};const last=keys.at(-1);if(last.startsWith('-='))delete object[last.slice(2)];else object[last]=structuredClone(value);}this.refresh();return this;}};
- a.items.get=id=>a.items.find(i=>i.id===id);Object.defineProperty(a,'usagePeriods',{get:()=>({round:'combat:'+a.round})});a.actionDiceFundingSystem=a.system;a.refresh=()=>a.system.limitedUses=[...FINAL_ATTACK_WORKFLOWS].map(id=>({id,workflow:id,cost:0,period:'round',limit:3})).concat(finalAttackRoundSpec(a.system));a.refresh();a.weaponAttack=(item,o)=>weaponAttack(a.system,item.system,cfg,'agent',o);a.useLimitedAbility=SpycraftActor.prototype.useLimitedAbility;a.rollAttack=(item,o)=>SpycraftActor.prototype.rollAttack.call(a,item,o);
- a.rollCheck=async(_formula,_data,o)=>{await o.validateFinalAttack?.();await o.validateAttackContext?.();await a.hook?.();await o.validateFinalAttack?.();await o.validateAttackContext?.();if(a.cancel)return null;if(a.postError==='before')throw Error('unposted');const m={id:'message'+(++serial),flags:{spycraft2:{actorUuid:a.uuid,finalAttack:o.finalAttack,finalAttackRound:o.finalAttackRound,checkKind:'attack'}}};game.messages.push(m);if(a.postError==='after')throw Error('posted');return m;};
- a.take=workflow=>a.useLimitedAbility(workflow,()=>postFinalAttack(a,'blade',{freeFinalAttack:true,attackAction:'standard',targetAnimal:false},{id:'receipt'+(++serial),source:workflow},()=>{}),{workflow});return a;
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  FINAL_ATTACK_WORKFLOWS,
+  finalAttackRoundSpec,
+  validateFinalRoundReservation
+} from "../module/rules/final-round.mjs";
+import { resourceCounterReviewPlan } from "../module/rules/limited-uses.mjs";
+import { postFinalAttack } from "../module/apps/final-attack.mjs";
+import { weaponAttack } from "../module/rules/gear.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { skillTagPlan } from "../module/rules/skill-tags.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { makeFatigueActor } from "./fixtures/fatigue-actor.mjs";
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+let serial = 0;
+foundry.utils.escapeHTML = String;
+game.user = { id: "gc", isGM: true };
+ui.notifications.warn = () => undefined;
+function actor({ nauseated = false, known = false } = {}) {
+  serial = 0;
+  game.messages = [];
+  const a = {
+    uuid: "Actor.final",
+    type: "agent",
+    isOwner: true,
+    flags: {},
+    round: 2,
+    system: {
+      activeFeatNames: [],
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 14, mod: 2 }])),
+      proficiencyTotals: { edged: { proficient: true } },
+      conditionContext: { nauseated },
+      actionDice: { value: 0 },
+      resourceUses: known ? { finalAttackRound: { epoch: "combat:2", used: 0 } } : {},
+      classLevels: {}
+    },
+    items: [
+      {
+        id: "blade",
+        uuid: "Actor.final.Item.blade",
+        name: "Blade",
+        type: "weapon",
+        system: {
+          proficiency: "edged",
+          damage: "1d6",
+          sizeHands: "S/1h",
+          errorThreat: "1/20",
+          equipped: true,
+          carried: true,
+          quantity: 1
+        }
+      }
+    ],
+    weaponContext: (_w, o) => o,
+    getRollData: () => ({}),
+    async update(patch) {
+      for (const [path, value] of Object.entries(patch)) {
+        const keys = path.split(".");
+        let object = this;
+        for (const key of keys.slice(0, -1)) object = object[key] ??= {};
+        const last = keys.at(-1);
+        if (last.startsWith("-=")) delete object[last.slice(2)];
+        else object[last] = structuredClone(value);
+      }
+      this.refresh();
+      return this;
+    }
+  };
+  a.items.get = id => a.items.find(i => i.id === id);
+  Object.defineProperty(a, "usagePeriods", { get: () => ({ round: "combat:" + a.round }) });
+  a.actionDiceFundingSystem = a.system;
+  a.refresh = () =>
+    (a.system.limitedUses = [...FINAL_ATTACK_WORKFLOWS]
+      .map(id => ({ id, workflow: id, cost: 0, period: "round", limit: 3 }))
+      .concat(finalAttackRoundSpec(a.system)));
+  a.refresh();
+  a.weaponAttack = (item, o) => weaponAttack(a.system, item.system, cfg, "agent", o);
+  a.useLimitedAbility = SpycraftActor.prototype.useLimitedAbility;
+  a.rollAttack = (item, o) => SpycraftActor.prototype.rollAttack.call(a, item, o);
+  a.rollCheck = async (_formula, _data, o) => {
+    await o.validateFinalAttack?.();
+    await o.validateAttackContext?.();
+    await a.hook?.();
+    await o.validateFinalAttack?.();
+    await o.validateAttackContext?.();
+    if (a.cancel) return null;
+    if (a.postError === "before") throw Error("unposted");
+    const m = {
+      id: "message" + ++serial,
+      flags: {
+        spycraft2: {
+          actorUuid: a.uuid,
+          finalAttack: o.finalAttack,
+          finalAttackRound: o.finalAttackRound,
+          checkKind: "attack"
+        }
+      }
+    };
+    game.messages.push(m);
+    if (a.postError === "after") throw Error("posted");
+    return m;
+  };
+  a.take = workflow =>
+    a.useLimitedAbility(
+      workflow,
+      () =>
+        postFinalAttack(
+          a,
+          "blade",
+          { freeFinalAttack: true, attackAction: "standard", targetAnimal: false },
+          { id: "receipt" + ++serial, source: workflow },
+          () => {}
+        ),
+      { workflow }
+    );
+  return a;
 }
-test('shared spec requires actual baseline only for unknown Nauseated history, retains prior healthy counts and supports ordinary new-round resets',()=>{
- assert.equal(finalAttackRoundSpec({conditionContext:{nauseated:true}}).requiresEpochReceipt,true);assert.equal(finalAttackRoundSpec({}).limit,Number.MAX_SAFE_INTEGER);for(const stored of [null,[],3,{epoch:'',used:0},{epoch:'combat:2',used:-1}])assert.equal(finalAttackRoundSpec({conditionContext:{nauseated:true},resourceUses:{finalAttackRound:stored}}).requiresEpochReceipt,true);for(const epoch of ['combat:1','combat:2','oldCombat:9'])assert.equal(finalAttackRoundSpec({conditionContext:{nauseated:true},resourceUses:{finalAttackRound:{epoch,used:2}}}).requiresEpochReceipt,false);
- const spec=finalAttackRoundSpec({conditionContext:{nauseated:true}});assert.equal(resourceCounterReviewPlan(spec,{}, {round:'combat:2'},{used:2,reason:'Two final attacks occurred before Nauseated',confirmed:true}).record.used,2);
+test("shared spec requires actual baseline only for unknown Nauseated history, retains prior healthy counts and supports ordinary new-round resets", () => {
+  assert.equal(finalAttackRoundSpec({ conditionContext: { nauseated: true } }).requiresEpochReceipt, true);
+  assert.equal(finalAttackRoundSpec({}).limit, Number.MAX_SAFE_INTEGER);
+  for (const stored of [null, [], 3, { epoch: "", used: 0 }, { epoch: "combat:2", used: -1 }])
+    assert.equal(
+      finalAttackRoundSpec({ conditionContext: { nauseated: true }, resourceUses: { finalAttackRound: stored } })
+        .requiresEpochReceipt,
+      true
+    );
+  for (const epoch of ["combat:1", "combat:2", "oldCombat:9"])
+    assert.equal(
+      finalAttackRoundSpec({
+        conditionContext: { nauseated: true },
+        resourceUses: { finalAttackRound: { epoch, used: 2 } }
+      }).requiresEpochReceipt,
+      false
+    );
+  const spec = finalAttackRoundSpec({ conditionContext: { nauseated: true } });
+  assert.equal(
+    resourceCounterReviewPlan(
+      spec,
+      {},
+      { round: "combat:2" },
+      { used: 2, reason: "Two final attacks occurred before Nauseated", confirmed: true }
+    ).record.used,
+    2
+  );
 });
-test('first unknown Nauseated use is held without reserving a source or rolling; GC-confirmed actual zero enables one attack',async()=>{
- const a=actor({nauseated:true});assert.equal(await a.take('dartingFinalAttack'),undefined);assert.equal(game.messages.length,0);assert.equal(a.system.resourceUses.dartingFinalAttack,undefined);const spec=a.system.limitedUses.find(s=>s.id==='finalAttackRound'),r=resourceCounterReviewPlan(spec,a.system.resourceUses,a.usagePeriods,{used:0,reason:'GC verified no prior finals this round',confirmed:true});await a.update({'system.resourceUses.finalAttackRound':r.record});assert.ok(await a.take('dartingFinalAttack'));assert.equal(a.system.resourceUses.finalAttackRound.used,1);
+test("first unknown Nauseated use is held without reserving a source or rolling; GC-confirmed actual zero enables one attack", async () => {
+  const a = actor({ nauseated: true });
+  assert.equal(await a.take("dartingFinalAttack"), undefined);
+  assert.equal(game.messages.length, 0);
+  assert.equal(a.system.resourceUses.dartingFinalAttack, undefined);
+  const spec = a.system.limitedUses.find(s => s.id === "finalAttackRound"),
+    r = resourceCounterReviewPlan(spec, a.system.resourceUses, a.usagePeriods, {
+      used: 0,
+      reason: "GC verified no prior finals this round",
+      confirmed: true
+    });
+  await a.update({ "system.resourceUses.finalAttackRound": r.record });
+  assert.ok(await a.take("dartingFinalAttack"));
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
 });
-test('all five implemented final-attack workflows share one Nauseated allowance; changing feat source cannot create a second attack',async()=>{
- for(const first of FINAL_ATTACK_WORKFLOWS){const a=actor({nauseated:true,known:true});assert.ok(await a.take(first));for(const second of FINAL_ATTACK_WORKFLOWS)assert.equal(await a.take(second),undefined);assert.equal(game.messages.length,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.resourceUses[first].used,1);assert.equal(a.system.actionDice.value,0);assert.equal(a._finalAttackReservation,undefined);}
+test("all five implemented final-attack workflows share one Nauseated allowance; changing feat source cannot create a second attack", async () => {
+  for (const first of FINAL_ATTACK_WORKFLOWS) {
+    const a = actor({ nauseated: true, known: true });
+    assert.ok(await a.take(first));
+    for (const second of FINAL_ATTACK_WORKFLOWS) assert.equal(await a.take(second), undefined);
+    assert.equal(game.messages.length, 1);
+    assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+    assert.equal(a.system.resourceUses[first].used, 1);
+    assert.equal(a.system.actionDice.value, 0);
+    assert.equal(a._finalAttackReservation, undefined);
+  }
 });
-test('healthy finals are tracked before the condition arrives; removing Nauseated permits further finals without erasing shared history',async()=>{
- const a=actor();await a.take('contempt');await a.take('mobileOffense');assert.equal(a.system.resourceUses.finalAttackRound.used,2);a.system.conditionContext.nauseated=true;a.refresh();assert.equal(await a.take('dartingFinalAttack'),undefined);assert.equal(game.messages.length,2);a.system.conditionContext.nauseated=false;a.refresh();assert.ok(await a.take('dartingFinalAttack'));assert.equal(a.system.resourceUses.finalAttackRound.used,3);
+test("healthy finals are tracked before the condition arrives; removing Nauseated permits further finals without erasing shared history", async () => {
+  const a = actor();
+  await a.take("contempt");
+  await a.take("mobileOffense");
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 2);
+  a.system.conditionContext.nauseated = true;
+  a.refresh();
+  assert.equal(await a.take("dartingFinalAttack"), undefined);
+  assert.equal(game.messages.length, 2);
+  a.system.conditionContext.nauseated = false;
+  a.refresh();
+  assert.ok(await a.take("dartingFinalAttack"));
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 3);
 });
-test('concurrent requests across different sources can post only one final while Nauseated, and the next round gets a separate allowance',async()=>{
- const a=actor({nauseated:true,known:true});const result=await Promise.all([...FINAL_ATTACK_WORKFLOWS].map(w=>a.take(w)));assert.equal(result.filter(Boolean).length,1);assert.equal(game.messages.length,1);a.round=3;a.refresh();assert.ok(await a.take('twoWeaponFinalAttack'));assert.deepEqual(a.system.resourceUses.finalAttackRound,{epoch:'combat:3',used:1});assert.equal(game.messages.length,2);
+test("concurrent requests across different sources can post only one final while Nauseated, and the next round gets a separate allowance", async () => {
+  const a = actor({ nauseated: true, known: true });
+  const result = await Promise.all([...FINAL_ATTACK_WORKFLOWS].map(w => a.take(w)));
+  assert.equal(result.filter(Boolean).length, 1);
+  assert.equal(game.messages.length, 1);
+  a.round = 3;
+  a.refresh();
+  assert.ok(await a.take("twoWeaponFinalAttack"));
+  assert.deepEqual(a.system.resourceUses.finalAttackRound, { epoch: "combat:3", used: 1 });
+  assert.equal(game.messages.length, 2);
 });
-test('cancelled/unposted attacks refund both counters; committed chat responses retain both, without spending dice',async()=>{
- for(const failure of ['cancel','before','after']){const a=actor({nauseated:true,known:true});a.cancel=failure==='cancel';a.postError=failure;if(failure==='after'){assert.ok(await a.take('combatInstincts'));assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.resourceUses.combatInstincts.used,1);}else{await assert.rejects(a.take('combatInstincts'));assert.equal(a.system.resourceUses.finalAttackRound.used,0);assert.equal(a.system.resourceUses.combatInstincts,undefined);}assert.equal(a._finalAttackReservation,undefined);assert.equal(a.system.actionDice.value,0);}
+test("cancelled/unposted attacks refund both counters; committed chat responses retain both, without spending dice", async () => {
+  for (const failure of ["cancel", "before", "after"]) {
+    const a = actor({ nauseated: true, known: true });
+    a.cancel = failure === "cancel";
+    a.postError = failure;
+    if (failure === "after") {
+      assert.ok(await a.take("combatInstincts"));
+      assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+      assert.equal(a.system.resourceUses.combatInstincts.used, 1);
+    } else {
+      await assert.rejects(a.take("combatInstincts"));
+      assert.equal(a.system.resourceUses.finalAttackRound.used, 0);
+      assert.equal(a.system.resourceUses.combatInstincts, undefined);
+    }
+    assert.equal(a._finalAttackReservation, undefined);
+    assert.equal(a.system.actionDice.value, 0);
+  }
 });
-test('condition/round/count/ownership changes during RNG invalidate the shared reservation and preserve independent counts',async()=>{
- for(const change of [a=>{a.system.conditionContext.nauseated=false;a.refresh();},a=>a.round++,a=>a.isOwner=false,a=>a.system.resourceUses.finalAttackRound.used++]){const a=actor({nauseated:true,known:true});a.hook=()=>change(a);await assert.rejects(a.take('dartingFinalAttack'),/shared final-attack|shared round allowance/);assert.equal(game.messages.length,0);assert.equal(a.system.resourceUses.dartingFinalAttack,undefined);assert.equal(a._finalAttackReservation,undefined);}
+test("condition/round/count/ownership changes during RNG invalidate the shared reservation and preserve independent counts", async () => {
+  for (const change of [
+    a => {
+      a.system.conditionContext.nauseated = false;
+      a.refresh();
+    },
+    a => a.round++,
+    a => (a.isOwner = false),
+    a => a.system.resourceUses.finalAttackRound.used++
+  ]) {
+    const a = actor({ nauseated: true, known: true });
+    a.hook = () => change(a);
+    await assert.rejects(a.take("dartingFinalAttack"), /shared final-attack|shared round allowance/);
+    assert.equal(game.messages.length, 0);
+    assert.equal(a.system.resourceUses.dartingFinalAttack, undefined);
+    assert.equal(a._finalAttackReservation, undefined);
+  }
 });
-test('actual attack roots cannot bypass the reserved shared counter, and outcome evidence freezes its period/count/condition',async()=>{
- const a=actor({nauseated:true,known:true});await assert.rejects(a.rollAttack(a.items[0],{freeFinalAttack:true,finalAttack:{id:'fake'},validateFinalAttack:()=>{},targetAnimal:false}),/shared round allowance/);const m=await a.take('twoWeaponFinalAttack'),check=m.flags.spycraft2;assert.deepEqual(check.finalAttackRound,{epoch:'combat:2',used:1,nauseated:true});const evidence=rollEvidence(check);check.finalAttackRound.used=0;assert.equal(rollEvidenceMatches(evidence,check),false);assert.throws(()=>validateFinalRoundReservation(a,{record:{epoch:'combat:2',used:2},nauseated:true}),/shared final-attack/);
+test("actual attack roots cannot bypass the reserved shared counter, and outcome evidence freezes its period/count/condition", async () => {
+  const a = actor({ nauseated: true, known: true });
+  await assert.rejects(
+    a.rollAttack(a.items[0], {
+      freeFinalAttack: true,
+      finalAttack: { id: "fake" },
+      validateFinalAttack: () => {},
+      targetAnimal: false
+    }),
+    /shared round allowance/
+  );
+  const m = await a.take("twoWeaponFinalAttack"),
+    check = m.flags.spycraft2;
+  assert.deepEqual(check.finalAttackRound, { epoch: "combat:2", used: 1, nauseated: true });
+  const evidence = rollEvidence(check);
+  check.finalAttackRound.used = 0;
+  assert.equal(rollEvidenceMatches(evidence, check), false);
+  assert.throws(
+    () => validateFinalRoundReservation(a, { record: { epoch: "combat:2", used: 2 }, nauseated: true }),
+    /shared final-attack/
+  );
 });
-test('all named Concentration skill uses are blocked while Nauseated; other tagged uses keep their normal calculation',()=>{
- const a=makeFatigueActor(),normal=a.system;a.raw.conditionContext={nauseated:true};a.derive();const nauseated={...a.system,conditionContext:{...a.system.conditionContext,nauseated:true}};let blocked=0;for(const[key,s]of Object.entries(cfg.skills))for(const check of s.checks??[]){const p=skillTagPlan(nauseated,key,check,{}),r=resolveSkillCheck(nauseated,key,check,{});if(check.tags.includes('Concentration')){assert.match(p.blockedReason,/Nauseated/);assert.equal(r.blocked,true);blocked++;}else assert.equal(p.blockedReason.includes('Nauseated'),false);}assert.ok(blocked>0);assert.equal(resolveSkillCheck(normal,'notice',cfg.skills.notice.checks[0],{}).blocked,resolveSkillCheck(nauseated,'notice',cfg.skills.notice.checks[0],{}).blocked);
+test("all named Concentration skill uses are blocked while Nauseated; other tagged uses keep their normal calculation", () => {
+  const a = makeFatigueActor(),
+    normal = a.system;
+  a.raw.conditionContext = { nauseated: true };
+  a.derive();
+  const nauseated = { ...a.system, conditionContext: { ...a.system.conditionContext, nauseated: true } };
+  let blocked = 0;
+  for (const [key, s] of Object.entries(cfg.skills))
+    for (const check of s.checks ?? []) {
+      const p = skillTagPlan(nauseated, key, check, {}),
+        r = resolveSkillCheck(nauseated, key, check, {});
+      if (check.tags.includes("Concentration")) {
+        assert.match(p.blockedReason, /Nauseated/);
+        assert.equal(r.blocked, true);
+        blocked++;
+      } else assert.equal(p.blockedReason.includes("Nauseated"), false);
+    }
+  assert.ok(blocked > 0);
+  assert.equal(
+    resolveSkillCheck(normal, "notice", cfg.skills.notice.checks[0], {}).blocked,
+    resolveSkillCheck(nauseated, "notice", cfg.skills.notice.checks[0], {}).blocked
+  );
 });

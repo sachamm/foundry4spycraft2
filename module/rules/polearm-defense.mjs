@@ -1,6 +1,10 @@
-import {readiedMeleeFeatSource} from './readied-weapons.mjs';
+import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
 /** Polearm Basics p.179: +1 gear Defense while holding a readied polearm. */
-export function polearmDefensePlan(system){
- try{const source=readiedMeleeFeatSource(system,{name:'Polearm Basics',family:'polearm',bonus:1});return {version:1,source,gearBonus:source?1:0};}
- catch(error){return {version:1,source:null,gearBonus:0,blockedReason:error.message};}
+export function polearmDefensePlan(system) {
+  try {
+    const source = readiedMeleeFeatSource(system, { name: "Polearm Basics", family: "polearm", bonus: 1 });
+    return { version: 1, source, gearBonus: source ? 1 : 0 };
+  } catch (error) {
+    return { version: 1, source: null, gearBonus: 0, blockedReason: error.message };
+  }
 }

@@ -1,30 +1,420 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {actor,attack,hit,controls} from './fixtures/thread-needle.mjs';import {threadNeedleSource,applyThreadNeedle as apply,endThreadNeedle as end,reviewThreadNeedle as review,manageThreadNeedle} from '../module/apps/thread-needle.mjs';import {restraintActionBlock} from '../module/rules/restraints.mjs';
-const opt={confirmed:true},release={confirmed:true,reason:'release'};
-test('actual finished staff hit applies one independent Held source, target restrictions and no invented holder grapple effects or resource/damage change',async()=>{const {a,m,target}=await hit(),before=structuredClone(a.system),r=await apply(a,m,opt);assert.equal(r.state,'active');assert.equal(target.effects.length,1);assert.equal(target.statuses.has('held'),true);assert.match(restraintActionBlock(target.system),/Held/);assert.equal(target.effects[0].origin,m.uuid);assert.equal(Object.hasOwn(target.effects[0].flags.spycraft2.threadNeedleHold,'sourceEvidence'),false);assert.equal(a.effects.length,0);assert.deepEqual(a.system,before);assert.equal(a.system.actionDice.value,0);assert.equal(target.system.actionDice.value,0);});
-test('concurrent/repeated application reuses the original condition; ending and replay never reapply a recovered hold',async()=>{const {a,m,target}=await hit(),rs=await Promise.all([apply(a,m,opt),apply(a,m,opt)]);assert.equal(rs[0].operationId,rs[1].operationId);assert.equal(target.effects.length,1);const r=await end(a,m,release);assert.equal(r.state,'ended');assert.equal(target.statuses.has('held'),false);assert.equal((await apply(a,m,opt)).state,'ended');assert.equal(target.effects.length,0);assert.equal((await end(a,m,{reason:'movedBeyond',separationFeet:0})).end.reason,'release');});
-test('release preserves other Held and Pinned effects, and movement ending needs actual holder movement and resulting separation over5ft',async()=>{const {a,m,target}=await hit();await target.createEmbeddedDocuments('ActiveEffect',[{_id:'otherHold',name:'Independent hold',statuses:['held'],flags:{spycraft2:{conditionOperation:'other'}}},{_id:'otherPin',name:'Independent pin',statuses:['pinned']}]);await apply(a,m,opt);for(const x of [{reason:'movedBeyond',confirmed:true,holderMovedConfirmed:false,separationFeet:20},{reason:'movedBeyond',confirmed:true,holderMovedConfirmed:true,separationFeet:5}])await assert.rejects(end(a,m,x));assert.equal(target.effects.length,3);const r=await end(a,m,{reason:'movedBeyond',confirmed:true,holderMovedConfirmed:true,separationFeet:10});assert.equal(r.end.separationFeet,10);assert.equal(target.effects.length,2);assert.equal(target.statuses.has('held'),true);assert.equal(target.statuses.has('pinned'),true);assert.deepEqual(target.effects.map(e=>e.id),['otherHold','otherPin']);});
-test('a posted effect with failed final stamp or lost creation response reattaches the same original operation without another condition',async()=>{for(const mode of ['stamp','creationResponse']){const {a,m,target}=await hit(),update=m.update,create=target.createEmbeddedDocuments;let once=true;if(mode==='stamp')m.update=async p=>{if(p['flags.spycraft2.threadNeedleHold']?.state==='active'&&once){once=false;throw Error('Final hold stamp failed');}return update(p);};else target.createEmbeddedDocuments=async(...args)=>{const out=await create(...args);if(once){once=false;throw Error('Effect creation response lost');}return out;};await assert.rejects(apply(a,m,opt));assert.equal(target.effects.length,1);assert.equal(m.flags.spycraft2.threadNeedleHold.state,'prepared');const op=m.flags.spycraft2.threadNeedleHold.operationId,r=await apply(a,m,opt);assert.equal(r.state,'active');assert.equal(r.operationId,op);assert.equal(target.effects.length,1);}});
-test('an uncertain missing prepared effect needs explicit owning-GC review; already-ended review preserves recovery without a fresh hold',async()=>{for(const resolution of ['applyPending','alreadyEnded']){const {a,m,target}=await hit(),create=target.createEmbeddedDocuments;target.createEmbeddedDocuments=async()=>{throw Error('Creation interrupted');};await assert.rejects(apply(a,m,opt));target.createEmbeddedDocuments=create;await assert.rejects(apply(a,m,opt),/already ended/);const r=await review(a,m,{confirmed:true,resolution});assert.equal(r.state,resolution==='applyPending'?'active':'ended');assert.equal(target.effects.length,resolution==='applyPending'?1:0);assert.equal(r.gcReviewed,true);}});
-test('an applied effect that was cleared never refreshes through apply or pending review, and its original history can close explicitly',async()=>{const {a,m,target}=await hit(),r=await apply(a,m,opt);await target.deleteEmbeddedDocuments('ActiveEffect',[r.effectId]);assert.equal((await apply(a,m,opt)).operationId,r.operationId);assert.equal(target.effects.length,0);await assert.rejects(review(a,m,{confirmed:true,resolution:'applyPending'}),/cannot be refreshed/);const closed=await review(a,m,{confirmed:true,resolution:'alreadyEnded'});assert.equal(closed.state,'ended');assert.equal(target.effects.length,0);});
-test('failed release stamp preserves completed removal; retry records the original ending without affecting an independent hold',async()=>{const {a,m,target}=await hit();await apply(a,m,opt);await target.createEmbeddedDocuments('ActiveEffect',[{_id:'separate',statuses:['held']}]);const update=m.update;let once=true;m.update=async p=>{if(p['flags.spycraft2.threadNeedleHold']?.state==='ended'&&once){once=false;throw Error('End stamp failed');}return update(p);};await assert.rejects(end(a,m,release));assert.deepEqual(target.effects.map(e=>e.id),['separate']);assert.equal(m.flags.spycraft2.threadNeedleHold.state,'active');assert.equal((await end(a,m,release)).state,'ended');assert.deepEqual(target.effects.map(e=>e.id),['separate']);});
-test('historical hit keeps its hold entitlement after weapon/feat loss; target identity recreation, forged cards and altered evidence require review',async()=>{let {a,m,target}=await hit();a.items.splice(0,1);a.system.activeFeatNames=[];await apply(a,m,opt);assert.equal(target.statuses.has('held'),true);const clone={...m};assert.throws(()=>threadNeedleSource(a,clone),/source/);target._stats={createdTime:999};await assert.rejects(end(a,m,release),/saved/);({a,m,target}=await hit());await apply(a,m,opt);m.flags.spycraft2.attackContext.meleeTrick.damageBonus=1;await assert.rejects(end(a,m,release),/finished successful/);assert.equal(target.effects.length,1);});
-test('only an actually adopted original replacement can apply one root-scoped hold',async()=>{const a=actor(),m=await attack(a),c=m.flags.spycraft2,r=await a.rollCheck(c.formula,c.rollData,{...c,rerollOf:m.uuid});r.update=async p=>{for(const[k,v]of Object.entries(p))r.flags.spycraft2[k.split('.').at(-1)]=structuredClone(v);return r;};Object.assign(r.flags.spycraft2,{resolved:true,successConfirmed:true});assert.throws(()=>threadNeedleSource(a,r),/adopted/);Object.assign(c,{resolved:true,superseded:r.uuid});const applied=await apply(a,r,opt);assert.equal(applied.proof.rootAttackUuid,m.uuid);assert.equal(m.flags.spycraft2.threadNeedleHold.effectId,applied.effectId);assert.equal(game.actors[1].effects.length,1);await assert.rejects(apply(a,m,opt),/finished successful/);});
-test('owning-GC review refuses active local effect creation without a nested resource deadlock, and non-GC review cannot alter history',async()=>{const {a,m,target}=await hit(),create=target.createEmbeddedDocuments,update=m.update;let checked=false,stampChecked=false;m.update=async p=>{if(p['flags.spycraft2.threadNeedleHold']?.state==='active'){await assert.rejects(review(a,m,{confirmed:true,resolution:'alreadyEnded'}),/still applying/);stampChecked=true;}return update(p);};target.createEmbeddedDocuments=async(...args)=>{await assert.rejects(review(a,m,{confirmed:true,resolution:'alreadyEnded'}),/still applying/);checked=true;return create(...args);};await apply(a,m,opt);assert.equal(checked,true);assert.equal(stampChecked,true);const old=game.user;game.user={isGM:false};try{await assert.rejects(review(a,m,{confirmed:true,resolution:'alreadyEnded'}),/owning GC/);}finally{game.user=old;}});
-test('UI uses recorded hit/hold labels, excludes private and wrong-target sources, and cancellation performs no work',async()=>{const {a,m,target}=await hit(),old=foundry.applications.api.DialogV2.input;let captured='';foundry.applications.api.DialogV2.input=async o=>{captured=o.content;return null;};try{assert.equal(await manageThreadNeedle(a),null);assert.match(captured,/finished hit/);assert.match(captured,/usual opposed Athletics/);assert.equal(target.effects.length,0);m.visible=false;assert.equal(await manageThreadNeedle(a),undefined);}finally{foundry.applications.api.DialogV2.input=old;}});
-
-test('unowned, unreadable and replaced target sources cannot apply an effect or write an outcome',async()=>{for(const kind of ['targetOwner','actorOwner','hidden','deletedTarget']){const {a,m,target}=await hit();if(kind==='targetOwner')target.isOwner=false;if(kind==='actorOwner')a.isOwner=false;if(kind==='hidden')m.visible=false;if(kind==='deletedTarget')game.actors.splice(1,1);await assert.rejects(apply(a,m,opt),/owner|source|participants/);assert.equal(target.effects.length,0);assert.equal(m.flags.spycraft2.threadNeedleHold,undefined);}});
-test('history drift while an effect is being created is preserved for review and cannot overwrite another reservation or silently apply again',async()=>{const {a,m,target}=await hit(),create=target.createEmbeddedDocuments;target.createEmbeddedDocuments=async(...args)=>{const out=await create(...args);m.flags.spycraft2.threadNeedleHold.operationId='changed-operation';return out;};await assert.rejects(apply(a,m,opt),/history changed/);assert.equal(target.effects.length,1);assert.equal(m.flags.spycraft2.threadNeedleHold.operationId,'changed-operation');await assert.rejects(apply(a,m,opt),/already ended/);assert.equal(target.effects.length,1);});
-test('a duplicated or modified hold effect requires review and never deletes an independent modifier or status',async()=>{for(const kind of ['duplicate','changed']){const {a,m,target}=await hit();await apply(a,m,opt);const e=target.effects[0];if(kind==='duplicate')await target.createEmbeddedDocuments('ActiveEffect',[{...e.toObject(),_id:'duplicateHold'}]);else e.changes=[{key:'system.misc.defense',mode:2,value:'2'}];await assert.rejects(end(a,m,release),/Review/);assert.equal(target.statuses.has('held'),true);assert.equal(target.effects.length,kind==='duplicate'?2:1);}});
-
-test('accepted Thread escape allows the ordinary Athletics workflow while retaining its actual source snapshot',async()=>{const {restraintSourceSnapshot}=await import('../module/rules/restraints.mjs'),{a,m,target}=await hit();await apply(a,m,opt);const source=restraintSourceSnapshot(target);assert.equal(source.sources[0].threadNeedleHold.rootAttackUuid,m.uuid);assert.equal(source.sources[0].threadNeedleHold.actorUuid,a.uuid);assert.equal(source.sources[0].operation,m.flags.spycraft2.threadNeedleHold.operationId);});
-
-test('actual Thread source escapes through the ordinary release receipt and required move, then closes its original hit exactly once',async()=>{const {applyRestraintEscape,confirmRestraintEscapeMove}=await import('../module/apps/restraint-release.mjs'),{restraintSourceSnapshot,getPendingRestraintMoves}=await import('../module/rules/restraints.mjs'),{rollEvidence}=await import('../module/rules/outcomes.mjs'),{a,m,target}=await hit();await apply(a,m,opt);target.flags={};const derive=target.derive;target.derive=()=>{derive();target.system.speed=target.statuses.has('held')?0:30;target.system.pendingRestraintMoves=getPendingRestraintMoves(target);};target.update=async patch=>{for(const [key,value]of Object.entries(patch)){let o=target;const keys=key.split('.');for(const k of keys.slice(0,-1))o=o[k]??={};o[keys.at(-1)]=structuredClone(value);}target.derive();return target;};target.derive();
- const escape={id:'actualEscape',uuid:'ChatMessage.actualEscape',visible:true,flags:{spycraft2:{actorUuid:target.uuid,checkKind:'skill',skillKey:'athletics',checkId:'restraint-escape',ability:'str',rawTotal:18,effectiveTotal:18,resolved:true,successConfirmed:true,restraintEscape:{condition:'held',kind:'opposedGrapple',sourceSnapshot:restraintSourceSnapshot(target),sourceScopeConfirmed:true}}},update:async()=>null};game.messages.push(escape);
- const ending={reason:'escape',escapeMessage:escape.uuid,confirmed:true};await assert.rejects(end(a,m,ending),/required move/);assert.equal(target.statuses.has('held'),true);
- const released=await applyRestraintEscape(target,escape,{benefit:'escapeHold',confirmed:true});assert.equal(released.movement.state,'required');assert.equal(target.effects.length,0);assert.match(restraintActionBlock(target.system,{free:true}),/immediate/);await assert.rejects(end(a,m,ending),/required move/);assert.equal((await apply(a,m,opt)).state,'active');assert.equal(target.effects.length,0);
- await confirmRestraintEscapeMove(target,escape,{distance:5,confirmed:true});
- const receipt=target.flags.spycraft2.restraintReleases[escape.id];for(const mutate of [()=>{receipt.source.sources[0].operation='unrelated';},()=>{receipt.state='cancelled';},()=>{receipt.movement.state='required';},()=>{escape.flags.spycraft2.superseded='other';},()=>{escape.visible=false;},()=>{escape.flags.spycraft2.restraintEscape.sourceSnapshot.sources[0].threadNeedleHold.actorUuid='Actor.other';}]){const prior=structuredClone(receipt),priorFlags=structuredClone(escape.flags.spycraft2);mutate();await assert.rejects(end(a,m,ending),/required move/);target.flags.spycraft2.restraintReleases[escape.id]=receipt;for(const key of Object.keys(receipt))delete receipt[key];Object.assign(receipt,prior);escape.flags.spycraft2=priorFlags;escape.visible=true;assert.equal(m.flags.spycraft2.threadNeedleHold.state,'active');assert.equal(target.effects.length,0);}
- const original=m.update;let once=true;m.update=async p=>{if(p['flags.spycraft2.threadNeedleHold']?.end?.reason==='escape'&&once){once=false;throw Error('Escape close failed');}return original(p);};await assert.rejects(end(a,m,ending),/Escape close failed/);assert.equal(target.effects.length,0);const closed=await end(a,m,ending);assert.equal(closed.state,'ended');assert.equal(closed.end.escapeEvidence,rollEvidence(escape.flags.spycraft2));assert.equal((await apply(a,m,opt)).state,'ended');assert.deepEqual(await end(a,m,ending),closed);assert.equal(target.system.actionDice.value,0);
+import test from "node:test";
+import assert from "node:assert/strict";
+import { actor, attack, hit } from "./fixtures/thread-needle.mjs";
+import {
+  threadNeedleSource,
+  applyThreadNeedle as apply,
+  endThreadNeedle as end,
+  reviewThreadNeedle as review,
+  manageThreadNeedle
+} from "../module/apps/thread-needle.mjs";
+import { restraintActionBlock } from "../module/rules/restraints.mjs";
+const opt = { confirmed: true },
+  release = { confirmed: true, reason: "release" };
+test("actual finished staff hit applies one independent Held source, target restrictions and no invented holder grapple effects or resource/damage change", async () => {
+  const { a, m, target } = await hit(),
+    before = structuredClone(a.system),
+    r = await apply(a, m, opt);
+  assert.equal(r.state, "active");
+  assert.equal(target.effects.length, 1);
+  assert.equal(target.statuses.has("held"), true);
+  assert.match(restraintActionBlock(target.system), /Held/);
+  assert.equal(target.effects[0].origin, m.uuid);
+  assert.equal(Object.hasOwn(target.effects[0].flags.spycraft2.threadNeedleHold, "sourceEvidence"), false);
+  assert.equal(a.effects.length, 0);
+  assert.deepEqual(a.system, before);
+  assert.equal(a.system.actionDice.value, 0);
+  assert.equal(target.system.actionDice.value, 0);
+});
+test("concurrent/repeated application reuses the original condition; ending and replay never reapply a recovered hold", async () => {
+  const { a, m, target } = await hit(),
+    rs = await Promise.all([apply(a, m, opt), apply(a, m, opt)]);
+  assert.equal(rs[0].operationId, rs[1].operationId);
+  assert.equal(target.effects.length, 1);
+  const r = await end(a, m, release);
+  assert.equal(r.state, "ended");
+  assert.equal(target.statuses.has("held"), false);
+  assert.equal((await apply(a, m, opt)).state, "ended");
+  assert.equal(target.effects.length, 0);
+  assert.equal((await end(a, m, { reason: "movedBeyond", separationFeet: 0 })).end.reason, "release");
+});
+test("release preserves other Held and Pinned effects, and movement ending needs actual holder movement and resulting separation over5ft", async () => {
+  const { a, m, target } = await hit();
+  await target.createEmbeddedDocuments("ActiveEffect", [
+    {
+      _id: "otherHold",
+      name: "Independent hold",
+      statuses: ["held"],
+      flags: { spycraft2: { conditionOperation: "other" } }
+    },
+    { _id: "otherPin", name: "Independent pin", statuses: ["pinned"] }
+  ]);
+  await apply(a, m, opt);
+  for (const x of [
+    { reason: "movedBeyond", confirmed: true, holderMovedConfirmed: false, separationFeet: 20 },
+    { reason: "movedBeyond", confirmed: true, holderMovedConfirmed: true, separationFeet: 5 }
+  ])
+    await assert.rejects(end(a, m, x));
+  assert.equal(target.effects.length, 3);
+  const r = await end(a, m, { reason: "movedBeyond", confirmed: true, holderMovedConfirmed: true, separationFeet: 10 });
+  assert.equal(r.end.separationFeet, 10);
+  assert.equal(target.effects.length, 2);
+  assert.equal(target.statuses.has("held"), true);
+  assert.equal(target.statuses.has("pinned"), true);
+  assert.deepEqual(
+    target.effects.map(e => e.id),
+    ["otherHold", "otherPin"]
+  );
+});
+test("a posted effect with failed final stamp or lost creation response reattaches the same original operation without another condition", async () => {
+  for (const mode of ["stamp", "creationResponse"]) {
+    const { a, m, target } = await hit(),
+      update = m.update,
+      create = target.createEmbeddedDocuments;
+    let once = true;
+    if (mode === "stamp")
+      m.update = async p => {
+        if (p["flags.spycraft2.threadNeedleHold"]?.state === "active" && once) {
+          once = false;
+          throw Error("Final hold stamp failed");
+        }
+        return update(p);
+      };
+    else
+      target.createEmbeddedDocuments = async (...args) => {
+        const out = await create(...args);
+        if (once) {
+          once = false;
+          throw Error("Effect creation response lost");
+        }
+        return out;
+      };
+    await assert.rejects(apply(a, m, opt));
+    assert.equal(target.effects.length, 1);
+    assert.equal(m.flags.spycraft2.threadNeedleHold.state, "prepared");
+    const op = m.flags.spycraft2.threadNeedleHold.operationId,
+      r = await apply(a, m, opt);
+    assert.equal(r.state, "active");
+    assert.equal(r.operationId, op);
+    assert.equal(target.effects.length, 1);
+  }
+});
+test("an uncertain missing prepared effect needs explicit owning-GC review; already-ended review preserves recovery without a fresh hold", async () => {
+  for (const resolution of ["applyPending", "alreadyEnded"]) {
+    const { a, m, target } = await hit(),
+      create = target.createEmbeddedDocuments;
+    target.createEmbeddedDocuments = async () => {
+      throw Error("Creation interrupted");
+    };
+    await assert.rejects(apply(a, m, opt));
+    target.createEmbeddedDocuments = create;
+    await assert.rejects(apply(a, m, opt), /already ended/);
+    const r = await review(a, m, { confirmed: true, resolution });
+    assert.equal(r.state, resolution === "applyPending" ? "active" : "ended");
+    assert.equal(target.effects.length, resolution === "applyPending" ? 1 : 0);
+    assert.equal(r.gcReviewed, true);
+  }
+});
+test("an applied effect that was cleared never refreshes through apply or pending review, and its original history can close explicitly", async () => {
+  const { a, m, target } = await hit(),
+    r = await apply(a, m, opt);
+  await target.deleteEmbeddedDocuments("ActiveEffect", [r.effectId]);
+  assert.equal((await apply(a, m, opt)).operationId, r.operationId);
+  assert.equal(target.effects.length, 0);
+  await assert.rejects(review(a, m, { confirmed: true, resolution: "applyPending" }), /cannot be refreshed/);
+  const closed = await review(a, m, { confirmed: true, resolution: "alreadyEnded" });
+  assert.equal(closed.state, "ended");
+  assert.equal(target.effects.length, 0);
+});
+test("failed release stamp preserves completed removal; retry records the original ending without affecting an independent hold", async () => {
+  const { a, m, target } = await hit();
+  await apply(a, m, opt);
+  await target.createEmbeddedDocuments("ActiveEffect", [{ _id: "separate", statuses: ["held"] }]);
+  const update = m.update;
+  let once = true;
+  m.update = async p => {
+    if (p["flags.spycraft2.threadNeedleHold"]?.state === "ended" && once) {
+      once = false;
+      throw Error("End stamp failed");
+    }
+    return update(p);
+  };
+  await assert.rejects(end(a, m, release));
+  assert.deepEqual(
+    target.effects.map(e => e.id),
+    ["separate"]
+  );
+  assert.equal(m.flags.spycraft2.threadNeedleHold.state, "active");
+  assert.equal((await end(a, m, release)).state, "ended");
+  assert.deepEqual(
+    target.effects.map(e => e.id),
+    ["separate"]
+  );
+});
+test("historical hit keeps its hold entitlement after weapon/feat loss; target identity recreation, forged cards and altered evidence require review", async () => {
+  let { a, m, target } = await hit();
+  a.items.splice(0, 1);
+  a.system.activeFeatNames = [];
+  await apply(a, m, opt);
+  assert.equal(target.statuses.has("held"), true);
+  const clone = { ...m };
+  assert.throws(() => threadNeedleSource(a, clone), /source/);
+  target._stats = { createdTime: 999 };
+  await assert.rejects(end(a, m, release), /saved/);
+  ({ a, m, target } = await hit());
+  await apply(a, m, opt);
+  m.flags.spycraft2.attackContext.meleeTrick.damageBonus = 1;
+  await assert.rejects(end(a, m, release), /finished successful/);
+  assert.equal(target.effects.length, 1);
+});
+test("only an actually adopted original replacement can apply one root-scoped hold", async () => {
+  const a = actor(),
+    m = await attack(a),
+    c = m.flags.spycraft2,
+    r = await a.rollCheck(c.formula, c.rollData, { ...c, rerollOf: m.uuid });
+  r.update = async p => {
+    for (const [k, v] of Object.entries(p)) r.flags.spycraft2[k.split(".").at(-1)] = structuredClone(v);
+    return r;
+  };
+  Object.assign(r.flags.spycraft2, { resolved: true, successConfirmed: true });
+  assert.throws(() => threadNeedleSource(a, r), /adopted/);
+  Object.assign(c, { resolved: true, superseded: r.uuid });
+  const applied = await apply(a, r, opt);
+  assert.equal(applied.proof.rootAttackUuid, m.uuid);
+  assert.equal(m.flags.spycraft2.threadNeedleHold.effectId, applied.effectId);
+  assert.equal(game.actors[1].effects.length, 1);
+  await assert.rejects(apply(a, m, opt), /finished successful/);
+});
+test("owning-GC review refuses active local effect creation without a nested resource deadlock, and non-GC review cannot alter history", async () => {
+  const { a, m, target } = await hit(),
+    create = target.createEmbeddedDocuments,
+    update = m.update;
+  let checked = false,
+    stampChecked = false;
+  m.update = async p => {
+    if (p["flags.spycraft2.threadNeedleHold"]?.state === "active") {
+      await assert.rejects(review(a, m, { confirmed: true, resolution: "alreadyEnded" }), /still applying/);
+      stampChecked = true;
+    }
+    return update(p);
+  };
+  target.createEmbeddedDocuments = async (...args) => {
+    await assert.rejects(review(a, m, { confirmed: true, resolution: "alreadyEnded" }), /still applying/);
+    checked = true;
+    return create(...args);
+  };
+  await apply(a, m, opt);
+  assert.equal(checked, true);
+  assert.equal(stampChecked, true);
+  const old = game.user;
+  game.user = { isGM: false };
+  try {
+    await assert.rejects(review(a, m, { confirmed: true, resolution: "alreadyEnded" }), /owning GC/);
+  } finally {
+    game.user = old;
+  }
+});
+test("UI uses recorded hit/hold labels, excludes private and wrong-target sources, and cancellation performs no work", async () => {
+  const { a, m, target } = await hit(),
+    old = foundry.applications.api.DialogV2.input;
+  let captured = "";
+  foundry.applications.api.DialogV2.input = async o => {
+    captured = o.content;
+    return null;
+  };
+  try {
+    assert.equal(await manageThreadNeedle(a), null);
+    assert.match(captured, /finished hit/);
+    assert.match(captured, /usual opposed Athletics/);
+    assert.equal(target.effects.length, 0);
+    m.visible = false;
+    assert.equal(await manageThreadNeedle(a), undefined);
+  } finally {
+    foundry.applications.api.DialogV2.input = old;
+  }
 });
 
-test('Thread target can roll actual opposed Athletics STR without inventing a DC or making the holder Held',async()=>{const {a,m,target}=await hit();await apply(a,m,opt);const result=await target.rollSkill('athletics',null,{check:'restraint-escape',ability:'str',gearStatus:'available',synergySkill:'none',grappleProficient:true,grappleSizeDifference:0,grappleContextConfirmed:true});assert.ok(result?.uuid);const c=result.flags.spycraft2;assert.equal(c.restraintEscape.kind,'opposedGrapple');assert.equal(c.restraintEscape.fullActions,1);assert.equal(c.ability,'str');assert.equal(c.restraintEscape.sourceSnapshot.sources[0].threadNeedleHold.rootAttackUuid,m.uuid);assert.equal(a.effects.length,0);assert.equal(target.statuses.has('held'),true);});
+test("unowned, unreadable and replaced target sources cannot apply an effect or write an outcome", async () => {
+  for (const kind of ["targetOwner", "actorOwner", "hidden", "deletedTarget"]) {
+    const { a, m, target } = await hit();
+    if (kind === "targetOwner") target.isOwner = false;
+    if (kind === "actorOwner") a.isOwner = false;
+    if (kind === "hidden") m.visible = false;
+    if (kind === "deletedTarget") game.actors.splice(1, 1);
+    await assert.rejects(apply(a, m, opt), /owner|source|participants/);
+    assert.equal(target.effects.length, 0);
+    assert.equal(m.flags.spycraft2.threadNeedleHold, undefined);
+  }
+});
+test("history drift while an effect is being created is preserved for review and cannot overwrite another reservation or silently apply again", async () => {
+  const { a, m, target } = await hit(),
+    create = target.createEmbeddedDocuments;
+  target.createEmbeddedDocuments = async (...args) => {
+    const out = await create(...args);
+    m.flags.spycraft2.threadNeedleHold.operationId = "changed-operation";
+    return out;
+  };
+  await assert.rejects(apply(a, m, opt), /history changed/);
+  assert.equal(target.effects.length, 1);
+  assert.equal(m.flags.spycraft2.threadNeedleHold.operationId, "changed-operation");
+  await assert.rejects(apply(a, m, opt), /already ended/);
+  assert.equal(target.effects.length, 1);
+});
+test("a duplicated or modified hold effect requires review and never deletes an independent modifier or status", async () => {
+  for (const kind of ["duplicate", "changed"]) {
+    const { a, m, target } = await hit();
+    await apply(a, m, opt);
+    const e = target.effects[0];
+    if (kind === "duplicate")
+      await target.createEmbeddedDocuments("ActiveEffect", [{ ...e.toObject(), _id: "duplicateHold" }]);
+    else e.changes = [{ key: "system.misc.defense", mode: 2, value: "2" }];
+    await assert.rejects(end(a, m, release), /Review/);
+    assert.equal(target.statuses.has("held"), true);
+    assert.equal(target.effects.length, kind === "duplicate" ? 2 : 1);
+  }
+});
+
+test("accepted Thread escape allows the ordinary Athletics workflow while retaining its actual source snapshot", async () => {
+  const { restraintSourceSnapshot } = await import("../module/rules/restraints.mjs"),
+    { a, m, target } = await hit();
+  await apply(a, m, opt);
+  const source = restraintSourceSnapshot(target);
+  assert.equal(source.sources[0].threadNeedleHold.rootAttackUuid, m.uuid);
+  assert.equal(source.sources[0].threadNeedleHold.actorUuid, a.uuid);
+  assert.equal(source.sources[0].operation, m.flags.spycraft2.threadNeedleHold.operationId);
+});
+
+test("actual Thread source escapes through the ordinary release receipt and required move, then closes its original hit exactly once", async () => {
+  const { applyRestraintEscape, confirmRestraintEscapeMove } = await import("../module/apps/restraint-release.mjs"),
+    { restraintSourceSnapshot, getPendingRestraintMoves } = await import("../module/rules/restraints.mjs"),
+    { rollEvidence } = await import("../module/rules/outcomes.mjs"),
+    { a, m, target } = await hit();
+  await apply(a, m, opt);
+  target.flags = {};
+  const derive = target.derive;
+  target.derive = () => {
+    derive();
+    target.system.speed = target.statuses.has("held") ? 0 : 30;
+    target.system.pendingRestraintMoves = getPendingRestraintMoves(target);
+  };
+  target.update = async patch => {
+    for (const [key, value] of Object.entries(patch)) {
+      let o = target;
+      const keys = key.split(".");
+      for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+      o[keys.at(-1)] = structuredClone(value);
+    }
+    target.derive();
+    return target;
+  };
+  target.derive();
+  const escape = {
+    id: "actualEscape",
+    uuid: "ChatMessage.actualEscape",
+    visible: true,
+    flags: {
+      spycraft2: {
+        actorUuid: target.uuid,
+        checkKind: "skill",
+        skillKey: "athletics",
+        checkId: "restraint-escape",
+        ability: "str",
+        rawTotal: 18,
+        effectiveTotal: 18,
+        resolved: true,
+        successConfirmed: true,
+        restraintEscape: {
+          condition: "held",
+          kind: "opposedGrapple",
+          sourceSnapshot: restraintSourceSnapshot(target),
+          sourceScopeConfirmed: true
+        }
+      }
+    },
+    update: async () => null
+  };
+  game.messages.push(escape);
+  const ending = { reason: "escape", escapeMessage: escape.uuid, confirmed: true };
+  await assert.rejects(end(a, m, ending), /required move/);
+  assert.equal(target.statuses.has("held"), true);
+  const released = await applyRestraintEscape(target, escape, { benefit: "escapeHold", confirmed: true });
+  assert.equal(released.movement.state, "required");
+  assert.equal(target.effects.length, 0);
+  assert.match(restraintActionBlock(target.system, { free: true }), /immediate/);
+  await assert.rejects(end(a, m, ending), /required move/);
+  assert.equal((await apply(a, m, opt)).state, "active");
+  assert.equal(target.effects.length, 0);
+  await confirmRestraintEscapeMove(target, escape, { distance: 5, confirmed: true });
+  const receipt = target.flags.spycraft2.restraintReleases[escape.id];
+  for (const mutate of [
+    () => {
+      receipt.source.sources[0].operation = "unrelated";
+    },
+    () => {
+      receipt.state = "cancelled";
+    },
+    () => {
+      receipt.movement.state = "required";
+    },
+    () => {
+      escape.flags.spycraft2.superseded = "other";
+    },
+    () => {
+      escape.visible = false;
+    },
+    () => {
+      escape.flags.spycraft2.restraintEscape.sourceSnapshot.sources[0].threadNeedleHold.actorUuid = "Actor.other";
+    }
+  ]) {
+    const prior = structuredClone(receipt),
+      priorFlags = structuredClone(escape.flags.spycraft2);
+    mutate();
+    await assert.rejects(end(a, m, ending), /required move/);
+    target.flags.spycraft2.restraintReleases[escape.id] = receipt;
+    for (const key of Object.keys(receipt)) delete receipt[key];
+    Object.assign(receipt, prior);
+    escape.flags.spycraft2 = priorFlags;
+    escape.visible = true;
+    assert.equal(m.flags.spycraft2.threadNeedleHold.state, "active");
+    assert.equal(target.effects.length, 0);
+  }
+  const original = m.update;
+  let once = true;
+  m.update = async p => {
+    if (p["flags.spycraft2.threadNeedleHold"]?.end?.reason === "escape" && once) {
+      once = false;
+      throw Error("Escape close failed");
+    }
+    return original(p);
+  };
+  await assert.rejects(end(a, m, ending), /Escape close failed/);
+  assert.equal(target.effects.length, 0);
+  const closed = await end(a, m, ending);
+  assert.equal(closed.state, "ended");
+  assert.equal(closed.end.escapeEvidence, rollEvidence(escape.flags.spycraft2));
+  assert.equal((await apply(a, m, opt)).state, "ended");
+  assert.deepEqual(await end(a, m, ending), closed);
+  assert.equal(target.system.actionDice.value, 0);
+});
+
+test("Thread target can roll actual opposed Athletics STR without inventing a DC or making the holder Held", async () => {
+  const { a, m, target } = await hit();
+  await apply(a, m, opt);
+  const result = await target.rollSkill("athletics", null, {
+    check: "restraint-escape",
+    ability: "str",
+    gearStatus: "available",
+    synergySkill: "none",
+    grappleProficient: true,
+    grappleSizeDifference: 0,
+    grappleContextConfirmed: true
+  });
+  assert.ok(result?.uuid);
+  const c = result.flags.spycraft2;
+  assert.equal(c.restraintEscape.kind, "opposedGrapple");
+  assert.equal(c.restraintEscape.fullActions, 1);
+  assert.equal(c.ability, "str");
+  assert.equal(c.restraintEscape.sourceSnapshot.sources[0].threadNeedleHold.rootAttackUuid, m.uuid);
+  assert.equal(a.effects.length, 0);
+  assert.equal(target.statuses.has("held"), true);
+});

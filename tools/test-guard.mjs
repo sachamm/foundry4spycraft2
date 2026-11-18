@@ -1,8 +1,160 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {readiedGuardWeapons as ready,guardDefensePlan as plan,validateGuardDefenseProof as validate} from '../module/rules/guard.mjs';
-const system=()=>({size:'Medium',proficiencyTotals:{blunt:{proficient:true},edged:{proficient:true},exoticBlunt:{proficient:true},exoticEdged:{proficient:true}}}),weapon=(id='tonfa',patch={})=>({id,name:'Renamed actual weapon',type:'weapon',system:{proficiency:'blunt',sizeHands:'T/1h',equipped:true,carried:true,quantity:1,qualities:'FIN, GAR (+2), QKY',...patch}}),calculate=(s=system(),items=[weapon()],options={})=>plan({...s,guardWeapons:ready(s,items)},options);
-test('Guard requires actual appropriate proficiency, usable/readied equipment and legal grip, without feat or family-name substitutions',()=>{assert.equal(calculate().bonus,2);for(const patch of [{equipped:false},{carried:false},{reserve:true},{destroyed:true},{quantity:0},{quantity:-1},{quantity:1.5},{ammunitionOnly:true},{sizeHands:''},{qualities:''},{qualities:'HOK (+2)'},{possessionSource:'wealth',possessionApproved:false}])assert.equal(calculate(system(),[weapon('test',patch)]).bonus,0,JSON.stringify(patch));assert.equal(calculate({...system(),proficiencyTotals:{}}).bonus,0);assert.equal(calculate({...system(),proficiencyTotals:{blunt:{proficient:1}}}).bonus,0);assert.equal(calculate(system(),[{...weapon(),type:'gear'}]).bonus,0);assert.equal(calculate(system(),[{...weapon(),id:undefined}]).bonus,0);const s=system();Object.defineProperty(s,'activeFeatNames',{get(){throw Error('Unused feats');}});assert.equal(calculate(s).bonus,2);});
-test('all eleven original catalog GAR weapons parse their own quality and use the proper proficiency, rather than an assigned family',()=>{const catalog=JSON.parse(readFileSync(new URL('../src/data/equipment.json',import.meta.url))).weapons.filter(w=>/\bGAR\b/.test(w.qualities)),keys={Blunt:'blunt',Edged:'edged','Exotic (Blunt)':'exoticBlunt','Exotic (Edged)':'exoticEdged'};assert.equal(catalog.length,11);for(const w of catalog){const item={id:w.name,name:w.name,type:'weapon',system:{...w,proficiency:keys[w.proficiency],equipped:true,carried:true,quantity:1}},p=calculate(system(),[item]);assert.equal(p.bonus,Number(w.qualities.match(/GAR \(\+(\d+)\)/)[1]),w.name);assert.equal(p.weapons[0].proficiency,keys[w.proficiency]);}});
-test('two actually held weapons stack their listed bonuses, quantity does not multiply them, and excessive or duplicate held equipment requires review',()=>{assert.equal(calculate(system(),[weapon('a'),weapon('b')]).bonus,4);assert.equal(calculate(system(),[weapon('a',{quantity:10})]).bonus,2);const staff=weapon('staff',{proficiency:'exoticBlunt',sizeHands:'M/2h',qualities:'GAR (+1)'});assert.equal(calculate(system(),[staff]).bonus,1);assert.ok(ready(system(),[staff,weapon()]).blockedReason);assert.equal(calculate(system(),[{...staff,system:{...staff.system,useHands:1}},weapon()]).bonus,3);assert.ok(ready(system(),[weapon('a'),weapon('b'),weapon('c',{qualities:''})]).blockedReason);assert.ok(ready(system(),[weapon('a'),weapon('a')]).blockedReason);assert.equal(calculate({...system(),size:'Small'},[staff]).bonus,0);});
-test('only melee/unarmed incoming Defense receives Guard, ranged scope reads no Guard state and malformed source qualities cannot invent a bonus',()=>{const s={get guardWeapons(){throw Error('Unused source');}};assert.equal(plan(s,{ranged:true}).bonus,0);assert.throws(()=>plan(system(),{ranged:'false'}));for(const qualities of ['GAR','GAR (+1.5)','GAR (-1)','GAR (NaN)','GAR (+1), GAR (+2)','GAR (+9007199254740992)']){const state=ready(system(),[weapon('test',{qualities})]);assert.ok(state.blockedReason,qualities);assert.throws(()=>plan({...system(),guardWeapons:state}),/Review/);}assert.equal(calculate(system(),[weapon('test',{qualities:'GAR (0)'})]).bonus,0);});
-test('source snapshots are deterministic, retain identity/grip/proficiency/quality bonus, preserve immutable inputs and support native key order',()=>{const s=system(),items=[weapon('z'),weapon('a')],before=structuredClone({s,items}),state=ready(s,items),p=plan({...s,guardWeapons:state});assert.deepEqual(p.weapons.map(w=>w.id),['a','z']);assert.deepEqual({s,items},before);assert.equal(p.weapons.every(w=>w.trained===true&&w.hands===1&&w.requiredHands===1),true);const reverse=v=>Array.isArray(v)?v.map(reverse):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).reverse().map(([k,x])=>[k,reverse(x)])):v;validate({...s,guardWeapons:state},reverse(p));p.weapons[0].bonus=99;assert.equal(state.weapons[0].bonus,2);});
-test('current proof rejects source/proficiency/quality/grip/identity gains and losses and changed incoming type, while absent legacy evidence stays compatible',()=>{const s=system(),base={...s,guardWeapons:ready(s,[weapon()])},p=plan(base);validate(base,p);for(const patch of [{equipped:false},{qualities:'GAR (+1)'},{useHands:2},{proficiency:'edged'}]){const changed={...s,guardWeapons:ready(s,[weapon('tonfa',patch)])};assert.throws(()=>validate(changed,p),/changed/);}assert.throws(()=>validate({...s,guardWeapons:ready({...s,proficiencyTotals:{}},[weapon()])},p),/changed/);assert.throws(()=>validate({...s,guardWeapons:ready(s,[weapon('different')])},p),/changed/);assert.throws(()=>validate(base,plan(system())),/changed/);assert.throws(()=>validate(base,p,{ranged:true}),/changed/);validate(base,null);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import {
+  readiedGuardWeapons as ready,
+  guardDefensePlan as plan,
+  validateGuardDefenseProof as validate
+} from "../module/rules/guard.mjs";
+const system = () => ({
+    size: "Medium",
+    proficiencyTotals: {
+      blunt: { proficient: true },
+      edged: { proficient: true },
+      exoticBlunt: { proficient: true },
+      exoticEdged: { proficient: true }
+    }
+  }),
+  weapon = (id = "tonfa", patch = {}) => ({
+    id,
+    name: "Renamed actual weapon",
+    type: "weapon",
+    system: {
+      proficiency: "blunt",
+      sizeHands: "T/1h",
+      equipped: true,
+      carried: true,
+      quantity: 1,
+      qualities: "FIN, GAR (+2), QKY",
+      ...patch
+    }
+  }),
+  calculate = (s = system(), items = [weapon()], options = {}) =>
+    plan({ ...s, guardWeapons: ready(s, items) }, options);
+test("Guard requires actual appropriate proficiency, usable/readied equipment and legal grip, without feat or family-name substitutions", () => {
+  assert.equal(calculate().bonus, 2);
+  for (const patch of [
+    { equipped: false },
+    { carried: false },
+    { reserve: true },
+    { destroyed: true },
+    { quantity: 0 },
+    { quantity: -1 },
+    { quantity: 1.5 },
+    { ammunitionOnly: true },
+    { sizeHands: "" },
+    { qualities: "" },
+    { qualities: "HOK (+2)" },
+    { possessionSource: "wealth", possessionApproved: false }
+  ])
+    assert.equal(calculate(system(), [weapon("test", patch)]).bonus, 0, JSON.stringify(patch));
+  assert.equal(calculate({ ...system(), proficiencyTotals: {} }).bonus, 0);
+  assert.equal(calculate({ ...system(), proficiencyTotals: { blunt: { proficient: 1 } } }).bonus, 0);
+  assert.equal(calculate(system(), [{ ...weapon(), type: "gear" }]).bonus, 0);
+  assert.equal(calculate(system(), [{ ...weapon(), id: undefined }]).bonus, 0);
+  const s = system();
+  Object.defineProperty(s, "activeFeatNames", {
+    get() {
+      throw Error("Unused feats");
+    }
+  });
+  assert.equal(calculate(s).bonus, 2);
+});
+test("all eleven original catalog GAR weapons parse their own quality and use the proper proficiency, rather than an assigned family", () => {
+  const catalog = JSON.parse(readFileSync(new URL("../src/data/equipment.json", import.meta.url))).weapons.filter(w =>
+      /\bGAR\b/.test(w.qualities)
+    ),
+    keys = { Blunt: "blunt", Edged: "edged", "Exotic (Blunt)": "exoticBlunt", "Exotic (Edged)": "exoticEdged" };
+  assert.equal(catalog.length, 11);
+  for (const w of catalog) {
+    const item = {
+        id: w.name,
+        name: w.name,
+        type: "weapon",
+        system: { ...w, proficiency: keys[w.proficiency], equipped: true, carried: true, quantity: 1 }
+      },
+      p = calculate(system(), [item]);
+    assert.equal(p.bonus, Number(w.qualities.match(/GAR \(\+(\d+)\)/)[1]), w.name);
+    assert.equal(p.weapons[0].proficiency, keys[w.proficiency]);
+  }
+});
+test("two actually held weapons stack their listed bonuses, quantity does not multiply them, and excessive or duplicate held equipment requires review", () => {
+  assert.equal(calculate(system(), [weapon("a"), weapon("b")]).bonus, 4);
+  assert.equal(calculate(system(), [weapon("a", { quantity: 10 })]).bonus, 2);
+  const staff = weapon("staff", { proficiency: "exoticBlunt", sizeHands: "M/2h", qualities: "GAR (+1)" });
+  assert.equal(calculate(system(), [staff]).bonus, 1);
+  assert.ok(ready(system(), [staff, weapon()]).blockedReason);
+  assert.equal(calculate(system(), [{ ...staff, system: { ...staff.system, useHands: 1 } }, weapon()]).bonus, 3);
+  assert.ok(ready(system(), [weapon("a"), weapon("b"), weapon("c", { qualities: "" })]).blockedReason);
+  assert.ok(ready(system(), [weapon("a"), weapon("a")]).blockedReason);
+  assert.equal(calculate({ ...system(), size: "Small" }, [staff]).bonus, 0);
+});
+test("only melee/unarmed incoming Defense receives Guard, ranged scope reads no Guard state and malformed source qualities cannot invent a bonus", () => {
+  const s = {
+    get guardWeapons() {
+      throw Error("Unused source");
+    }
+  };
+  assert.equal(plan(s, { ranged: true }).bonus, 0);
+  assert.throws(() => plan(system(), { ranged: "false" }));
+  for (const qualities of [
+    "GAR",
+    "GAR (+1.5)",
+    "GAR (-1)",
+    "GAR (NaN)",
+    "GAR (+1), GAR (+2)",
+    "GAR (+9007199254740992)"
+  ]) {
+    const state = ready(system(), [weapon("test", { qualities })]);
+    assert.ok(state.blockedReason, qualities);
+    assert.throws(() => plan({ ...system(), guardWeapons: state }), /Review/);
+  }
+  assert.equal(calculate(system(), [weapon("test", { qualities: "GAR (0)" })]).bonus, 0);
+});
+test("source snapshots are deterministic, retain identity/grip/proficiency/quality bonus, preserve immutable inputs and support native key order", () => {
+  const s = system(),
+    items = [weapon("z"), weapon("a")],
+    before = structuredClone({ s, items }),
+    state = ready(s, items),
+    p = plan({ ...s, guardWeapons: state });
+  assert.deepEqual(
+    p.weapons.map(w => w.id),
+    ["a", "z"]
+  );
+  assert.deepEqual({ s, items }, before);
+  assert.equal(
+    p.weapons.every(w => w.trained === true && w.hands === 1 && w.requiredHands === 1),
+    true
+  );
+  const reverse = v =>
+    Array.isArray(v)
+      ? v.map(reverse)
+      : v && typeof v === "object"
+        ? Object.fromEntries(
+            Object.entries(v)
+              .reverse()
+              .map(([k, x]) => [k, reverse(x)])
+          )
+        : v;
+  validate({ ...s, guardWeapons: state }, reverse(p));
+  p.weapons[0].bonus = 99;
+  assert.equal(state.weapons[0].bonus, 2);
+});
+test("current proof rejects source/proficiency/quality/grip/identity gains and losses and changed incoming type, while absent legacy evidence stays compatible", () => {
+  const s = system(),
+    base = { ...s, guardWeapons: ready(s, [weapon()]) },
+    p = plan(base);
+  validate(base, p);
+  for (const patch of [{ equipped: false }, { qualities: "GAR (+1)" }, { useHands: 2 }, { proficiency: "edged" }]) {
+    const changed = { ...s, guardWeapons: ready(s, [weapon("tonfa", patch)]) };
+    assert.throws(() => validate(changed, p), /changed/);
+  }
+  assert.throws(
+    () => validate({ ...s, guardWeapons: ready({ ...s, proficiencyTotals: {} }, [weapon()]) }, p),
+    /changed/
+  );
+  assert.throws(() => validate({ ...s, guardWeapons: ready(s, [weapon("different")]) }, p), /changed/);
+  assert.throws(() => validate(base, plan(system())), /changed/);
+  assert.throws(() => validate(base, p, { ranged: true }), /changed/);
+  validate(base, null);
+});

@@ -1,10 +1,164 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {polearmDefensePlan as plan} from '../module/rules/polearm-defense.mjs';import {readiedMeleeWeapons as ready} from '../module/rules/readied-weapons.mjs';import {computeAgent} from '../module/rules/engine.mjs';import {incomingDefensePlan} from '../module/rules/defense.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const weapon=(id='polearm',patch={})=>({id,name:'Reviewed polearm',type:'weapon',system:{meleeFamily:'polearm',proficiency:'exoticEdged',sizeHands:'M/2h',equipped:true,carried:true,quantity:1,...patch}}),state=()=>({size:'Medium',activeFeatNames:['Polearm Basics']});
-test('actual reviewed available polearm and legal grip gate one gear Defense bonus, never a renamed or incompatible weapon',()=>{const s=state(),w=weapon();s.readiedMeleeWeapons=ready(s,[w]);assert.equal(plan(s).gearBonus,1);for(const patch of [{meleeFamily:''},{meleeFamily:'spear'},{proficiency:'handgun'},{proficiency:'edged'},{equipped:false},{carried:false},{reserve:true},{destroyed:true},{quantity:0},{sizeHands:''}]){s.readiedMeleeWeapons=ready(s,[weapon('polearm',patch)]);assert.equal(plan(s).gearBonus,0,JSON.stringify(patch));}s.readiedMeleeWeapons=ready({...s,size:'Small'},[w]);assert.equal(plan(s).gearBonus,0);s.readiedMeleeWeapons=ready(s,[weapon('polearm',{useHands:1}),weapon('second',{useHands:1})]);assert.equal(plan(s).gearBonus,1);assert.equal(plan(s).source.weapons.length,2);s.activeFeatNames=[];assert.equal(plan(s).gearBonus,0);});
-const feats=JSON.parse(readFileSync(new URL('../src/data/feats.json',import.meta.url))),classes=JSON.parse(readFileSync(new URL('../src/data/classes.json',import.meta.url))),cls=classes.find(c=>c.key==='soldier');
-function calculate({active=true,gear=0,equipped=true,conditions={},great=false,grip=0}={}){const names=[...(active?[['Polearm Basics',1]]:[]),...(great?[['Great Sword Basics',3]]:[])],items=[{id:'soldier',name:cls.name,type:'class',system:{...structuredClone(cls),identifier:'soldier',vitalityDie:cls.vitality}},...names.map(([name,level])=>({id:name,name,type:'feat',system:{...structuredClone(feats.find(f=>f.name===name)),tree:'meleeCombat',acquiredAtLevel:level}})),weapon('polearm',{equipped,useHands:grip}),...(great?[{...weapon('sword',{meleeFamily:'twoHandedSword',useHands:1}),name:'Reviewed great sword'}]:[]),{id:'other',name:'Existing typed defense',type:'origin',system:{bonuses:[{target:'defense',value:String(gear),bonusType:'gear'},{target:'defense',value:'2',bonusType:'dodge'}]}}];return computeAgent({abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:k==='dex'?14:12}])),progression:Array.from({length:3},()=>({classId:'soldier',vitality:6,skills:{}})),skills:{},focuses:{},proficiencies:{exoticEdged:{proficient:true}},misc:{},conditionContext:conditions,actionDice:{value:0},vitality:{value:4},wounds:{value:4}},items,cfg);}
-test('real engine adds one global gear bonus once before all Defense calculations, including ranged, using the actual qualified source',()=>{const s=calculate(),b=calculate({active:false});assert.equal(s.featStatus['Polearm Basics'].ok,true);assert.equal(s.defense.total-b.defense.total,1);assert.equal(s.defenseBonusEntries.find(e=>e.source==='Polearm Basics (readied polearm)').type,'gear');assert.equal(s.bonusSources.defense.find(e=>e.source==='Polearm Basics (readied polearm)').value,1);for(const ranged of [false,true])assert.equal(incomingDefensePlan(s,{ranged}).total-incomingDefensePlan(b,{ranged}).total,1);assert.equal(calculate({equipped:false}).defense.total,b.defense.total);});
-test('normal gear stacking keeps the strongest positive gear bonus and retains separate negative gear and dodge',()=>{for(const gear of [-3,0,1,2,5]){const s=calculate({gear}),b=calculate({active:false,gear});assert.equal(s.defense.total-b.defense.total,Math.max(0,1-Math.max(0,gear)));assert.equal(s.defense.dodgeBonuses,b.defense.dodgeBonuses);assert.equal(s.polearmDefense.gearBonus,1);}});
-test('vulnerability and flat-footedness remove dodge/DEX normally but preserve readied-polearm gear, without healing or changing saves/skills/initiative',()=>{for(const conditions of [{},{vulnerable:true},{flatFooted:true},{blinded:true},{held:true}]){const s=calculate({conditions}),b=calculate({active:false,conditions});assert.equal(s.defense.total-b.defense.total,1);assert.deepEqual(s.saves,b.saves);assert.deepEqual(s.skillTotals,b.skillTotals);assert.deepEqual(s.initiative,b.initiative);assert.equal(s.actionDice.value,0);assert.equal(s.vitality.value,4);assert.equal(s.wounds.value,4);}});
-test('Great Sword conditional Defense sees the actual Polearm gear entry and adds only one further melee point; ranged stays at the Polearm bonus',()=>{for(const gear of [0,1,2,5]){const s=calculate({great:true,grip:1,gear}),b=calculate({great:false,gear});assert.equal(s.featStatus['Great Sword Basics'].ok,true);const m=incomingDefensePlan(s),r=incomingDefensePlan(s,{ranged:true});assert.equal(m.greatSword.existingGearBonus,Math.max(1,gear));assert.equal(m.greatSword.increment,Math.max(0,2-Math.max(1,gear)));assert.equal(m.total-s.defense.total,Math.max(0,2-Math.max(1,gear)));assert.equal(r.total,s.defense.total);assert.equal(r.total,incomingDefensePlan(b,{ranged:true}).total);}});
-test('shared source output remains immutable and rejects malformed identity/grip before granting a global bonus',()=>{const s=state();s.readiedMeleeWeapons=ready(s,[weapon()]);const before=structuredClone(s);plan(s);assert.deepEqual(s,before);for(const patch of [{id:''},{hands:0},{requiredHands:0},{proficiency:'rifle'}]){const n=structuredClone(s);Object.assign(n.readiedMeleeWeapons[0],patch);assert.equal(plan(n).gearBonus,0);assert.match(plan(n).blockedReason,/Review/);}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { polearmDefensePlan as plan } from "../module/rules/polearm-defense.mjs";
+import { readiedMeleeWeapons as ready } from "../module/rules/readied-weapons.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { incomingDefensePlan } from "../module/rules/defense.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const weapon = (id = "polearm", patch = {}) => ({
+    id,
+    name: "Reviewed polearm",
+    type: "weapon",
+    system: {
+      meleeFamily: "polearm",
+      proficiency: "exoticEdged",
+      sizeHands: "M/2h",
+      equipped: true,
+      carried: true,
+      quantity: 1,
+      ...patch
+    }
+  }),
+  state = () => ({ size: "Medium", activeFeatNames: ["Polearm Basics"] });
+test("actual reviewed available polearm and legal grip gate one gear Defense bonus, never a renamed or incompatible weapon", () => {
+  const s = state(),
+    w = weapon();
+  s.readiedMeleeWeapons = ready(s, [w]);
+  assert.equal(plan(s).gearBonus, 1);
+  for (const patch of [
+    { meleeFamily: "" },
+    { meleeFamily: "spear" },
+    { proficiency: "handgun" },
+    { proficiency: "edged" },
+    { equipped: false },
+    { carried: false },
+    { reserve: true },
+    { destroyed: true },
+    { quantity: 0 },
+    { sizeHands: "" }
+  ]) {
+    s.readiedMeleeWeapons = ready(s, [weapon("polearm", patch)]);
+    assert.equal(plan(s).gearBonus, 0, JSON.stringify(patch));
+  }
+  s.readiedMeleeWeapons = ready({ ...s, size: "Small" }, [w]);
+  assert.equal(plan(s).gearBonus, 0);
+  s.readiedMeleeWeapons = ready(s, [weapon("polearm", { useHands: 1 }), weapon("second", { useHands: 1 })]);
+  assert.equal(plan(s).gearBonus, 1);
+  assert.equal(plan(s).source.weapons.length, 2);
+  s.activeFeatNames = [];
+  assert.equal(plan(s).gearBonus, 0);
+});
+const feats = JSON.parse(readFileSync(new URL("../src/data/feats.json", import.meta.url))),
+  classes = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))),
+  cls = classes.find(c => c.key === "soldier");
+function calculate({ active = true, gear = 0, equipped = true, conditions = {}, great = false, grip = 0 } = {}) {
+  const names = [...(active ? [["Polearm Basics", 1]] : []), ...(great ? [["Great Sword Basics", 3]] : [])],
+    items = [
+      {
+        id: "soldier",
+        name: cls.name,
+        type: "class",
+        system: { ...structuredClone(cls), identifier: "soldier", vitalityDie: cls.vitality }
+      },
+      ...names.map(([name, level]) => ({
+        id: name,
+        name,
+        type: "feat",
+        system: { ...structuredClone(feats.find(f => f.name === name)), tree: "meleeCombat", acquiredAtLevel: level }
+      })),
+      weapon("polearm", { equipped, useHands: grip }),
+      ...(great
+        ? [{ ...weapon("sword", { meleeFamily: "twoHandedSword", useHands: 1 }), name: "Reviewed great sword" }]
+        : []),
+      {
+        id: "other",
+        name: "Existing typed defense",
+        type: "origin",
+        system: {
+          bonuses: [
+            { target: "defense", value: String(gear), bonusType: "gear" },
+            { target: "defense", value: "2", bonusType: "dodge" }
+          ]
+        }
+      }
+    ];
+  return computeAgent(
+    {
+      abilities: Object.fromEntries(
+        ["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: k === "dex" ? 14 : 12 }])
+      ),
+      progression: Array.from({ length: 3 }, () => ({ classId: "soldier", vitality: 6, skills: {} })),
+      skills: {},
+      focuses: {},
+      proficiencies: { exoticEdged: { proficient: true } },
+      misc: {},
+      conditionContext: conditions,
+      actionDice: { value: 0 },
+      vitality: { value: 4 },
+      wounds: { value: 4 }
+    },
+    items,
+    cfg
+  );
+}
+test("real engine adds one global gear bonus once before all Defense calculations, including ranged, using the actual qualified source", () => {
+  const s = calculate(),
+    b = calculate({ active: false });
+  assert.equal(s.featStatus["Polearm Basics"].ok, true);
+  assert.equal(s.defense.total - b.defense.total, 1);
+  assert.equal(s.defenseBonusEntries.find(e => e.source === "Polearm Basics (readied polearm)").type, "gear");
+  assert.equal(s.bonusSources.defense.find(e => e.source === "Polearm Basics (readied polearm)").value, 1);
+  for (const ranged of [false, true])
+    assert.equal(incomingDefensePlan(s, { ranged }).total - incomingDefensePlan(b, { ranged }).total, 1);
+  assert.equal(calculate({ equipped: false }).defense.total, b.defense.total);
+});
+test("normal gear stacking keeps the strongest positive gear bonus and retains separate negative gear and dodge", () => {
+  for (const gear of [-3, 0, 1, 2, 5]) {
+    const s = calculate({ gear }),
+      b = calculate({ active: false, gear });
+    assert.equal(s.defense.total - b.defense.total, Math.max(0, 1 - Math.max(0, gear)));
+    assert.equal(s.defense.dodgeBonuses, b.defense.dodgeBonuses);
+    assert.equal(s.polearmDefense.gearBonus, 1);
+  }
+});
+test("vulnerability and flat-footedness remove dodge/DEX normally but preserve readied-polearm gear, without healing or changing saves/skills/initiative", () => {
+  for (const conditions of [{}, { vulnerable: true }, { flatFooted: true }, { blinded: true }, { held: true }]) {
+    const s = calculate({ conditions }),
+      b = calculate({ active: false, conditions });
+    assert.equal(s.defense.total - b.defense.total, 1);
+    assert.deepEqual(s.saves, b.saves);
+    assert.deepEqual(s.skillTotals, b.skillTotals);
+    assert.deepEqual(s.initiative, b.initiative);
+    assert.equal(s.actionDice.value, 0);
+    assert.equal(s.vitality.value, 4);
+    assert.equal(s.wounds.value, 4);
+  }
+});
+test("Great Sword conditional Defense sees the actual Polearm gear entry and adds only one further melee point; ranged stays at the Polearm bonus", () => {
+  for (const gear of [0, 1, 2, 5]) {
+    const s = calculate({ great: true, grip: 1, gear }),
+      b = calculate({ great: false, gear });
+    assert.equal(s.featStatus["Great Sword Basics"].ok, true);
+    const m = incomingDefensePlan(s),
+      r = incomingDefensePlan(s, { ranged: true });
+    assert.equal(m.greatSword.existingGearBonus, Math.max(1, gear));
+    assert.equal(m.greatSword.increment, Math.max(0, 2 - Math.max(1, gear)));
+    assert.equal(m.total - s.defense.total, Math.max(0, 2 - Math.max(1, gear)));
+    assert.equal(r.total, s.defense.total);
+    assert.equal(r.total, incomingDefensePlan(b, { ranged: true }).total);
+  }
+});
+test("shared source output remains immutable and rejects malformed identity/grip before granting a global bonus", () => {
+  const s = state();
+  s.readiedMeleeWeapons = ready(s, [weapon()]);
+  const before = structuredClone(s);
+  plan(s);
+  assert.deepEqual(s, before);
+  for (const patch of [{ id: "" }, { hands: 0 }, { requiredHands: 0 }, { proficiency: "rifle" }]) {
+    const n = structuredClone(s);
+    Object.assign(n.readiedMeleeWeapons[0], patch);
+    assert.equal(plan(n).gearBonus, 0);
+    assert.match(plan(n).blockedReason, /Review/);
+  }
+});

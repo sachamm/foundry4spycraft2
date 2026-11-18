@@ -1,12 +1,260 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {combatInstinctsPlan as plan} from '../module/rules/combat-instincts.mjs';import {takeCombatInstincts as take} from '../module/apps/combat-instincts.mjs';import {limitedUseAbilities} from '../module/rules/limited-uses.mjs';import {weaponAttack} from '../module/rules/gear.mjs';import {checkFlavor,rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {makeFatigueActor} from './fixtures/fatigue-actor.mjs';const {SpycraftActor}=await import('../module/documents/actor.mjs');
-const clock=()=>({id:'combat',started:true,round:2,turn:0,combatantId:'own',ownTurnIndex:1}),system=()=>({size:'Medium',activeFeatNames:['Combat Instincts'],classLevels:{},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:14,mod:2}])),bab:4,conditionContext:{},proficiencyTotals:{handgun:{proficient:true}},resourceUses:{},actionDice:{value:0},wounds:{value:4}}),check=()=>({actorUuid:'Actor.opponent',checkKind:'attack',checkMethod:'roll',successConfirmed:false,resolved:true,effectiveTotal:6,rollCombat:{id:'combat',round:2,combatantId:'other'}}),input=()=>({messageId:'miss',weaponId:'gun',defenseTotal:11,triggerConfirmed:true,adjacentConfirmed:true,notFlatFootedConfirmed:true,immediateConfirmed:true,distanceFeet:5});
-test('Combat Instincts uses an immediate off-Count reaction at exactly a five-point miss, requiring every source and trigger condition',()=>{assert.equal(plan(system(),clock(),check(),input()).missMargin,5);for(const patch of [{effectiveTotal:7},{resolved:false},{successConfirmed:true},{superseded:true},{criticalSuccess:true},{checkKind:'skill'},{checkMethod:'take10'},{attackContext:{disarm:{active:true}}},{rollCombat:{id:'other',round:2}},{rollCombat:{id:'combat',round:1}}])assert.throws(()=>plan(system(),clock(),{...check(),...patch},input()));for(const key of ['triggerConfirmed','adjacentConfirmed','notFlatFootedConfirmed','immediateConfirmed'])assert.throws(()=>plan(system(),clock(),check(),{...input(),[key]:false}));for(const defenseTotal of [NaN,Infinity,'11'])assert.throws(()=>plan(system(),clock(),check(),{...input(),defenseTotal}));assert.throws(()=>plan({...system(),activeFeatNames:[]},clock(),check(),input()));assert.throws(()=>plan(system(),{...clock(),started:false},check(),input()));});
-test('known flat-footed sources require actual GC timing review unless Uncanny Dodge V prevents the condition; free-action prohibitions remain authoritative',()=>{const s=system();s.conditionContext.flatFooted=true;assert.throws(()=>plan(s,clock(),check(),input()),/timing/);assert.equal(plan(s,clock(),check(),{...input(),gcTimingResolution:'The source began after the recorded miss.'}).gcTimingResolution,'The source began after the recorded miss.');s.classLevels.intruder=20;assert.ok(plan(s,clock(),check(),input()));for(const c of ['pinned','stunned','sleeping','dead','dazed','paralyzed'])assert.throws(()=>plan({...system(),conditionContext:{[c]:true}},clock(),check(),input()),c);assert.ok(plan({...system(),conditionContext:{held:true}},clock(),check(),input()));assert.throws(()=>plan({...system(),refreshAction:{state:'waiting',combatId:'combat',startRound:2}},clock(),check(),input()),/Refresh/);});
-let seq=0;foundry.utils.escapeHTML=String;foundry.utils.randomID=()=> 'reaction'+(++seq);ui.notifications.warn=()=>null;globalThis.ChatMessage={getSpeaker:()=>({})};
-function actor(){game.user={id:'gc',isGM:true};const a={uuid:'Actor.self',type:'agent',isOwner:true,flags:{},system:system(),items:[{id:'gun',uuid:'Actor.self.Item.gun',name:'Handgun',type:'weapon',system:{proficiency:'handgun',weaponCategory:'servicePistol',sizeHands:'D/1h',fireMode:'single',fireModes:['single'],equipped:true,carried:true,quantity:1,damage:'1d6',range:50,recoil:0,errorThreat:'1/20'}}],usagePeriods:{round:'combat:2'},async update(p){for(const [path,value]of Object.entries(p)){const keys=path.split('.');let o=this;for(const key of keys.slice(0,-1))o=o[key]??={};const key=keys.at(-1);if(key.startsWith('-='))delete o[key.slice(2)];else o[key]=structuredClone(value);}}};a.items.get=id=>a.items.find(i=>i.id===id);a.participatingCombat={id:'combat',started:true,round:2,turn:0,turns:[{id:'other',actor:{uuid:'Actor.opponent'}},{id:'own',actor:a}]};a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);a.actionDiceFundingSystem=a.system;a.weaponAttack=(w,opts)=>weaponAttack(a.system,w.system,cfg,'agent',opts);a.useLimitedAbility=SpycraftActor.prototype.useLimitedAbility;a.rollAttack=(w,opts)=>SpycraftActor.prototype.rollAttack.call(a,w,opts);a.rollCheck=async(formula,data,opts)=>{await opts.validateFinalAttack?.();await a.drawHook?.();await opts.validateFinalAttack?.();if(a.cancel)return null;if(a.postError==='before')throw Error('unposted');const m={id:'posted'+(++seq),flags:{spycraft2:{...opts,actorUuid:a.uuid,rollData:data}}};game.messages.push(m);if(a.postError==='after')throw Error('posted');return m;};game.messages=[{id:'miss',uuid:'ChatMessage.miss',visible:true,isContentVisible:true,flags:{spycraft2:check()}}];game.messages.get=id=>game.messages.find(m=>m.id===id);return a;}
-test('the real Actor/resource path posts exactly one final Standard Attack across duplicate clicks, retains source-removal history and spends no dice even under Shaken IV',async()=>{const a=actor();a.system.conditionContext={shakenGrade:4};const out=await Promise.allSettled([take(a,input()),take(a,input())]);assert.equal(game.messages.length,2);assert.equal(out.filter(r=>r.status==='fulfilled'&&r.value?.id).length,1);assert.deepEqual(a.system.resourceUses.combatInstincts,{epoch:'combat:2',used:1});const c=game.messages.at(-1).flags.spycraft2;assert.equal(c.finalAttack.source,'combatInstincts');assert.equal(c.finalAttack.weaponUuid,'Actor.self.Item.gun');assert.match(checkFlavor(c),/Combat Instincts: immediate final Standard Attack/);assert.equal(c.attackContext.attackAction,'standard');assert.equal(c.rollData.total,2);assert.equal(a.system.actionDice.value,0);a.system.activeFeatNames=[];a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);a.system.activeFeatNames=['Combat Instincts'];a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);await take(a,input());assert.equal(game.messages.length,2);});
-test('the next round never reuses an old miss; a new actual miss gets only that round’s single reaction',async()=>{const a=actor();await take(a,input());a.participatingCombat.round=3;a.usagePeriods.round='combat:3';await assert.rejects(take(a,input()));game.messages.get('miss').flags.spycraft2.rollCombat.round=3;await take(a,input());assert.deepEqual(a.system.resourceUses.combatInstincts,{epoch:'combat:3',used:1});assert.equal(game.messages.length,3);});
-test('hidden, blind, self, removed-opponent and unresolved incoming events cannot fund a reaction; a player cannot supply a GC timing override',async()=>{for(const change of [m=>m.visible=false,m=>m.isContentVisible=false,m=>{m.blind=true;game.user.isGM=false;},m=>m.flags.spycraft2.actorUuid='Actor.self',m=>m.flags.spycraft2.rollCombat.combatantId='gone']){const a=actor();change(game.messages[0]);await assert.rejects(take(a,input()));assert.equal(a.system.resourceUses.combatInstincts,undefined);}const a=actor();game.user.isGM=false;a.system.conditionContext.flatFooted=true;await assert.rejects(take(a,{...input(),gcTimingResolution:'Invented override'}),/timing/);});
-test('source, result, weapon, Count and ownership changes during RNG reject stale benefits and refund only the reserved reaction',async()=>{for(const change of [a=>a.system.activeFeatNames=[],a=>game.messages[0].flags.spycraft2.effectiveTotal=7,a=>a.items[0].system.equipped=false,a=>a.participatingCombat.turn=1,a=>a.isOwner=false]){const a=actor();a.drawHook=()=>change(a);await assert.rejects(take(a,input()));assert.equal(a.system.resourceUses.combatInstincts,undefined);assert.equal(game.messages.length,1);}});
-test('cancelled/unposted checks restore the round counter, while a committed response failure keeps the recorded opportunity spent',async()=>{for(const mode of ['cancel','before','after']){const a=actor();if(mode==='cancel')a.cancel=true;else a.postError=mode;const result=await Promise.allSettled([take(a,input())]);assert.equal(result[0].status,mode==='after'?'fulfilled':'rejected');assert.equal(a.system.resourceUses.combatInstincts?.used??0,mode==='after'?1:0);}});
-test('final-attack trigger evidence cannot be changed after posting, and incompatible nested declarations reject before reservation',async()=>{const a=actor(),m=await take(a,input()),e=rollEvidence(m.flags.spycraft2);m.flags.spycraft2.finalAttack.missMargin=10;assert.equal(rollEvidenceMatches(e,m.flags.spycraft2),false);for(const key of ['disarm','oneInAMillion','millionDollarSkill','cunningPlan']){const b=actor();await assert.rejects(take(b,{...input(),[key]:true}),/control/);assert.equal(b.system.resourceUses.combatInstincts,undefined);}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { combatInstinctsPlan as plan } from "../module/rules/combat-instincts.mjs";
+import { takeCombatInstincts as take } from "../module/apps/combat-instincts.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+import { weaponAttack } from "../module/rules/gear.mjs";
+import { checkFlavor, rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import "./fixtures/fatigue-actor.mjs"; // sets up the Foundry stand-ins this file relies on
+
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+const clock = () => ({ id: "combat", started: true, round: 2, turn: 0, combatantId: "own", ownTurnIndex: 1 }),
+  system = () => ({
+    size: "Medium",
+    activeFeatNames: ["Combat Instincts"],
+    classLevels: {},
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 14, mod: 2 }])),
+    bab: 4,
+    conditionContext: {},
+    proficiencyTotals: { handgun: { proficient: true } },
+    resourceUses: {},
+    actionDice: { value: 0 },
+    wounds: { value: 4 }
+  }),
+  check = () => ({
+    actorUuid: "Actor.opponent",
+    checkKind: "attack",
+    checkMethod: "roll",
+    successConfirmed: false,
+    resolved: true,
+    effectiveTotal: 6,
+    rollCombat: { id: "combat", round: 2, combatantId: "other" }
+  }),
+  input = () => ({
+    messageId: "miss",
+    weaponId: "gun",
+    defenseTotal: 11,
+    triggerConfirmed: true,
+    adjacentConfirmed: true,
+    notFlatFootedConfirmed: true,
+    immediateConfirmed: true,
+    distanceFeet: 5
+  });
+test("Combat Instincts uses an immediate off-Count reaction at exactly a five-point miss, requiring every source and trigger condition", () => {
+  assert.equal(plan(system(), clock(), check(), input()).missMargin, 5);
+  for (const patch of [
+    { effectiveTotal: 7 },
+    { resolved: false },
+    { successConfirmed: true },
+    { superseded: true },
+    { criticalSuccess: true },
+    { checkKind: "skill" },
+    { checkMethod: "take10" },
+    { attackContext: { disarm: { active: true } } },
+    { rollCombat: { id: "other", round: 2 } },
+    { rollCombat: { id: "combat", round: 1 } }
+  ])
+    assert.throws(() => plan(system(), clock(), { ...check(), ...patch }, input()));
+  for (const key of ["triggerConfirmed", "adjacentConfirmed", "notFlatFootedConfirmed", "immediateConfirmed"])
+    assert.throws(() => plan(system(), clock(), check(), { ...input(), [key]: false }));
+  for (const defenseTotal of [NaN, Infinity, "11"])
+    assert.throws(() => plan(system(), clock(), check(), { ...input(), defenseTotal }));
+  assert.throws(() => plan({ ...system(), activeFeatNames: [] }, clock(), check(), input()));
+  assert.throws(() => plan(system(), { ...clock(), started: false }, check(), input()));
+});
+test("known flat-footed sources require actual GC timing review unless Uncanny Dodge V prevents the condition; free-action prohibitions remain authoritative", () => {
+  const s = system();
+  s.conditionContext.flatFooted = true;
+  assert.throws(() => plan(s, clock(), check(), input()), /timing/);
+  assert.equal(
+    plan(s, clock(), check(), { ...input(), gcTimingResolution: "The source began after the recorded miss." })
+      .gcTimingResolution,
+    "The source began after the recorded miss."
+  );
+  s.classLevels.intruder = 20;
+  assert.ok(plan(s, clock(), check(), input()));
+  for (const c of ["pinned", "stunned", "sleeping", "dead", "dazed", "paralyzed"])
+    assert.throws(() => plan({ ...system(), conditionContext: { [c]: true } }, clock(), check(), input()), c);
+  assert.ok(plan({ ...system(), conditionContext: { held: true } }, clock(), check(), input()));
+  assert.throws(
+    () =>
+      plan(
+        { ...system(), refreshAction: { state: "waiting", combatId: "combat", startRound: 2 } },
+        clock(),
+        check(),
+        input()
+      ),
+    /Refresh/
+  );
+});
+let seq = 0;
+foundry.utils.escapeHTML = String;
+foundry.utils.randomID = () => "reaction" + ++seq;
+ui.notifications.warn = () => null;
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+function actor() {
+  game.user = { id: "gc", isGM: true };
+  const a = {
+    uuid: "Actor.self",
+    type: "agent",
+    isOwner: true,
+    flags: {},
+    system: system(),
+    items: [
+      {
+        id: "gun",
+        uuid: "Actor.self.Item.gun",
+        name: "Handgun",
+        type: "weapon",
+        system: {
+          proficiency: "handgun",
+          weaponCategory: "servicePistol",
+          sizeHands: "D/1h",
+          fireMode: "single",
+          fireModes: ["single"],
+          equipped: true,
+          carried: true,
+          quantity: 1,
+          damage: "1d6",
+          range: 50,
+          recoil: 0,
+          errorThreat: "1/20"
+        }
+      }
+    ],
+    usagePeriods: { round: "combat:2" },
+    async update(p) {
+      for (const [path, value] of Object.entries(p)) {
+        const keys = path.split(".");
+        let o = this;
+        for (const key of keys.slice(0, -1)) o = o[key] ??= {};
+        const key = keys.at(-1);
+        if (key.startsWith("-=")) delete o[key.slice(2)];
+        else o[key] = structuredClone(value);
+      }
+    }
+  };
+  a.items.get = id => a.items.find(i => i.id === id);
+  a.participatingCombat = {
+    id: "combat",
+    started: true,
+    round: 2,
+    turn: 0,
+    turns: [
+      { id: "other", actor: { uuid: "Actor.opponent" } },
+      { id: "own", actor: a }
+    ]
+  };
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  a.actionDiceFundingSystem = a.system;
+  a.weaponAttack = (w, opts) => weaponAttack(a.system, w.system, cfg, "agent", opts);
+  a.useLimitedAbility = SpycraftActor.prototype.useLimitedAbility;
+  a.rollAttack = (w, opts) => SpycraftActor.prototype.rollAttack.call(a, w, opts);
+  a.rollCheck = async (formula, data, opts) => {
+    await opts.validateFinalAttack?.();
+    await a.drawHook?.();
+    await opts.validateFinalAttack?.();
+    if (a.cancel) return null;
+    if (a.postError === "before") throw Error("unposted");
+    const m = { id: "posted" + ++seq, flags: { spycraft2: { ...opts, actorUuid: a.uuid, rollData: data } } };
+    game.messages.push(m);
+    if (a.postError === "after") throw Error("posted");
+    return m;
+  };
+  game.messages = [
+    { id: "miss", uuid: "ChatMessage.miss", visible: true, isContentVisible: true, flags: { spycraft2: check() } }
+  ];
+  game.messages.get = id => game.messages.find(m => m.id === id);
+  return a;
+}
+test("the real Actor/resource path posts exactly one final Standard Attack across duplicate clicks, retains source-removal history and spends no dice even under Shaken IV", async () => {
+  const a = actor();
+  a.system.conditionContext = { shakenGrade: 4 };
+  const out = await Promise.allSettled([take(a, input()), take(a, input())]);
+  assert.equal(game.messages.length, 2);
+  assert.equal(out.filter(r => r.status === "fulfilled" && r.value?.id).length, 1);
+  assert.deepEqual(a.system.resourceUses.combatInstincts, { epoch: "combat:2", used: 1 });
+  const c = game.messages.at(-1).flags.spycraft2;
+  assert.equal(c.finalAttack.source, "combatInstincts");
+  assert.equal(c.finalAttack.weaponUuid, "Actor.self.Item.gun");
+  assert.match(checkFlavor(c), /Combat Instincts: immediate final Standard Attack/);
+  assert.equal(c.attackContext.attackAction, "standard");
+  assert.equal(c.rollData.total, 2);
+  assert.equal(a.system.actionDice.value, 0);
+  a.system.activeFeatNames = [];
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  a.system.activeFeatNames = ["Combat Instincts"];
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  await take(a, input());
+  assert.equal(game.messages.length, 2);
+});
+test("the next round never reuses an old miss; a new actual miss gets only that round’s single reaction", async () => {
+  const a = actor();
+  await take(a, input());
+  a.participatingCombat.round = 3;
+  a.usagePeriods.round = "combat:3";
+  await assert.rejects(take(a, input()));
+  game.messages.get("miss").flags.spycraft2.rollCombat.round = 3;
+  await take(a, input());
+  assert.deepEqual(a.system.resourceUses.combatInstincts, { epoch: "combat:3", used: 1 });
+  assert.equal(game.messages.length, 3);
+});
+test("hidden, blind, self, removed-opponent and unresolved incoming events cannot fund a reaction; a player cannot supply a GC timing override", async () => {
+  for (const change of [
+    m => (m.visible = false),
+    m => (m.isContentVisible = false),
+    m => {
+      m.blind = true;
+      game.user.isGM = false;
+    },
+    m => (m.flags.spycraft2.actorUuid = "Actor.self"),
+    m => (m.flags.spycraft2.rollCombat.combatantId = "gone")
+  ]) {
+    const a = actor();
+    change(game.messages[0]);
+    await assert.rejects(take(a, input()));
+    assert.equal(a.system.resourceUses.combatInstincts, undefined);
+  }
+  const a = actor();
+  game.user.isGM = false;
+  a.system.conditionContext.flatFooted = true;
+  await assert.rejects(take(a, { ...input(), gcTimingResolution: "Invented override" }), /timing/);
+});
+test("source, result, weapon, Count and ownership changes during RNG reject stale benefits and refund only the reserved reaction", async () => {
+  for (const change of [
+    a => (a.system.activeFeatNames = []),
+    a => (game.messages[0].flags.spycraft2.effectiveTotal = 7),
+    a => (a.items[0].system.equipped = false),
+    a => (a.participatingCombat.turn = 1),
+    a => (a.isOwner = false)
+  ]) {
+    const a = actor();
+    a.drawHook = () => change(a);
+    await assert.rejects(take(a, input()));
+    assert.equal(a.system.resourceUses.combatInstincts, undefined);
+    assert.equal(game.messages.length, 1);
+  }
+});
+test("cancelled/unposted checks restore the round counter, while a committed response failure keeps the recorded opportunity spent", async () => {
+  for (const mode of ["cancel", "before", "after"]) {
+    const a = actor();
+    if (mode === "cancel") a.cancel = true;
+    else a.postError = mode;
+    const result = await Promise.allSettled([take(a, input())]);
+    assert.equal(result[0].status, mode === "after" ? "fulfilled" : "rejected");
+    assert.equal(a.system.resourceUses.combatInstincts?.used ?? 0, mode === "after" ? 1 : 0);
+  }
+});
+test("final-attack trigger evidence cannot be changed after posting, and incompatible nested declarations reject before reservation", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    e = rollEvidence(m.flags.spycraft2);
+  m.flags.spycraft2.finalAttack.missMargin = 10;
+  assert.equal(rollEvidenceMatches(e, m.flags.spycraft2), false);
+  for (const key of ["disarm", "oneInAMillion", "millionDollarSkill", "cunningPlan"]) {
+    const b = actor();
+    await assert.rejects(take(b, { ...input(), [key]: true }), /control/);
+    assert.equal(b.system.resourceUses.combatInstincts, undefined);
+  }
+});

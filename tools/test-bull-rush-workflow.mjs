@@ -1,11 +1,237 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SPYCRAFT as cfg} from '../module/config.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {bullRushDefenseSkillChecks} from '../module/rules/bull-rush.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-const state=(feats=[])=>({size:'Medium',classLevels:{brawler:3},classOptionSelections:[{classId:'brawler',name:'Still Standing',level:3}],activeFeatNames:feats,speed:30,conditionContext:{},postureMovement:{standardMove:true},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:12,mod:1}])),skillTotals:Object.fromEntries(Object.entries(cfg.skills).map(([key,s])=>[key,{name:s.name,ranks:4,cap:50,threat:20,totals:s.abilities.map(ability=>({ability,total:10})),bonusEntries:[]}])),focusTotals:{},knowledge:3});
-const response=bullRushDefenseSkillChecks('athletics',[])[0],ordinary={gearStatus:'available',synergySkill:'none'},input=(patch={})=>({...ordinary,bullRushOpponentName:'Rushing opponent',bullRushSizeDifference:0,bullRushIncomingConfirmed:true,bullRushOnFootConfirmed:true,bullRushContactConfirmed:true,...patch});
-test('all ordinary named uses and Knowledge ignore retained Bull Rush fields and receive no source bonus or marker',()=>{for(const[key,skill]of Object.entries(cfg.skills))for(const check of skill.checks){const s=state(),b=resolveSkillCheck(s,key,check,ordinary),r=resolveSkillCheck(s,key,check,input());assert.equal(r.bullRushDefense,null,key+'/'+check.id);for(const k of ['total','error','cap','threat','timeMultiplier'])assert.equal(r[k],b[k]);}for(const skill of Object.keys(cfg.skills))assert.equal(resolveKnowledgeCheck(state(),{skill,...input()}).total,resolveKnowledgeCheck(state(),{skill}).total);});
-test('Still Standing is an unnamed skill bonus while larger Size remains a separate adjustment under Baffled/Incompetent and vulnerability',()=>{for(const[conditionContext,total,normal]of [[{},18,14],[{baffled:true},11,14],[{incompetent:true},4,14],[{vulnerable:true},18,14]]){const s=state();s.conditionContext=conditionContext;const r=resolveSkillCheck(s,'athletics',response,input({bullRushSizeDifference:1}));assert.equal(r.total,total);assert.equal(r.skillBonusCondition.normal,normal);assert.equal(r.checkAdjustment,4);assert.equal(r.bullRushDefense.stillStanding.bonus,4);assert.equal(r.error,1);}const s=state();s.classOptionSelections=[];assert.equal(resolveSkillCheck(s,'athletics',response,input()).total,10);});
-test('ordinary response forces STR before real All According to Plan, keeps Armor but gains no Vision/Hearing penalties or error change',()=>{const s=state();s.conditionContext={blinded:true,deafened:true};s.armor={check:-2,visionCheck:-3};const r=resolveSkillCheck(s,'athletics',response,input({ability:'con'}));assert.equal(r.ability,'str');assert.equal(r.total,12);assert.equal(r.cap,50);assert.equal(r.error,1);s.conditionContext={};s.armor={};s.classLevels.schemer=4;s.abilities.int.mod=5;const int=resolveSkillCheck(s,'athletics',response,input({allAccordingToPlan:true}));assert.equal(int.ability,'int');assert.equal(int.attributeSubstitution.originalAbility,'str');assert.equal(int.total,18);s.skillTotals.athletics.ranks=0;assert.equal(resolveSkillCheck(s,'athletics',response,input()).error,3);for(const patch of [{method:'take10',safeToTake:true},{method:'take20',safeToTake:true},{bullRushContactConfirmed:false},{bullRushOnFootConfirmed:false},{bullRushSizeDifference:2}])assert.ok(resolveSkillCheck(s,'athletics',response,input(patch)).blocked);});
-test('optional Bull Rush evidence prevents late additions, removals and changed source/Size/participant facts',()=>{const proof=resolveSkillCheck(state(),'athletics',response,input()).bullRushDefense,c={checkKind:'skill',skillKey:'athletics',checkId:'resist-bull-rush',bullRushDefense:proof},e=rollEvidence(c);assert.equal(rollEvidenceMatches(e,c),true);assert.equal(rollEvidenceMatches(rollEvidence({...c,bullRushDefense:null}),c),false);assert.equal(rollEvidenceMatches(e,{...c,bullRushDefense:null}),false);for(const k of Object.keys(proof)){const n=structuredClone(c);n.bullRushDefense[k]='changed';assert.equal(rollEvidenceMatches(e,n),false,k);}});
-globalThis.Actor=class{constructor(){this.type='agent';this.isOwner=true;this.uuid='Actor.bull';this.items=[];this.flags={};this.system=state();}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'GC',isGM:true},settings:{get:()=>false},time:{worldTime:126},combats:[],actors:[],i18n:{localize:String}};globalThis.foundry={utils:{escapeHTML:String}};globalThis.ui={notifications:{warn:()=>null}};globalThis.ChatMessage={getSpeaker:()=>({})};let hook=async()=>{},posts=[],rolls=0;globalThis.Roll=class{constructor(_f,data){this.total=12+(data.total??0);this.dice=[{total:12}];}async evaluate(){rolls++;await hook();return this;}async toMessage(d){posts.push(d);return d;}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('actual Actor exposes the on-foot response, parses Size and records actual class/Size rather than fabricated bonus payloads',async()=>{const a=new SpycraftActor();hook=async()=>{};posts=[];const m=await a.rollSkill('athletics','con',{check:'resist-bull-rush',...input({bullRushSizeDifference:'1',sizeBonus:999,bonus:999})}),c=m.flags.spycraft2;assert.equal(c.ability,'str');assert.equal(c.bullRushDefense.ownSize,'Medium');assert.equal(c.bullRushDefense.sizeDifference,1);assert.equal(c.bullRushDefense.sizeBonus,4);assert.equal(c.bullRushDefense.stillStanding.bonus,4);assert.equal(c.rollData.total,18);assert.equal(c.error,1);for(const patch of [{bullRushSizeDifference:''},{bullRushSizeDifference:'1.5'},{bullRushOnFootConfirmed:false},{bullRushContactConfirmed:'true'}]){const n=posts.length;await a.rollSkill('athletics',null,{check:'resist-bull-rush',...input(patch)});assert.equal(posts.length,n);}});
-test('actual RNG source gain/loss, own Size, declared Size difference or contact drift rejects without posting',async()=>{for(const change of ['gain','loss','size','difference','contact']){const a=new SpycraftActor(),request={check:'resist-bull-rush',...input()};if(change==='gain')a.system.classOptionSelections=[];posts=[];hook=async()=>{if(change==='gain')a.system.classOptionSelections=[{classId:'brawler',name:'Still Standing',level:3}];if(change==='loss')a.system.classOptionSelections=[];if(change==='size')a.system.size='Small';if(change==='difference')request.bullRushSizeDifference=1;if(change==='contact')request.bullRushContactConfirmed=false;};await assert.rejects(a.rollSkill('athletics',null,request),/changed/);assert.equal(posts.length,0,change);}hook=async()=>{};});
-test('replacement validates current class selection, own Size and actual STR/substitution before RNG',async()=>{const a=new SpycraftActor(),proof=resolveSkillCheck(a.system,'athletics',response,input()).bullRushDefense,scope={checkKind:'skill',skillKey:'athletics',checkId:'resist-bull-rush',ability:'str',bullRushDefense:proof};rolls=0;await assert.rejects(a.rollCheck('1d20',{}, {...scope,ability:'con'}),/attribute/);await assert.rejects(a.rollCheck('1d20',{}, {...scope,ability:'int',attributeSubstitution:{source:'All According to Plan',originalAbility:'str',ability:'int'}}),/attribute/);a.system.size='Small';await assert.rejects(a.rollCheck('1d20',{},scope),/changed/);a.system.size='Medium';a.system.classOptionSelections=[];await assert.rejects(a.rollCheck('1d20',{},scope),/changed/);assert.equal(rolls,0);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { bullRushDefenseSkillChecks } from "../module/rules/bull-rush.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+const state = (feats = []) => ({
+  size: "Medium",
+  classLevels: { brawler: 3 },
+  classOptionSelections: [{ classId: "brawler", name: "Still Standing", level: 3 }],
+  activeFeatNames: feats,
+  speed: 30,
+  conditionContext: {},
+  postureMovement: { standardMove: true },
+  abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 12, mod: 1 }])),
+  skillTotals: Object.fromEntries(
+    Object.entries(cfg.skills).map(([key, s]) => [
+      key,
+      {
+        name: s.name,
+        ranks: 4,
+        cap: 50,
+        threat: 20,
+        totals: s.abilities.map(ability => ({ ability, total: 10 })),
+        bonusEntries: []
+      }
+    ])
+  ),
+  focusTotals: {},
+  knowledge: 3
+});
+const response = bullRushDefenseSkillChecks("athletics", [])[0],
+  ordinary = { gearStatus: "available", synergySkill: "none" },
+  input = (patch = {}) => ({
+    ...ordinary,
+    bullRushOpponentName: "Rushing opponent",
+    bullRushSizeDifference: 0,
+    bullRushIncomingConfirmed: true,
+    bullRushOnFootConfirmed: true,
+    bullRushContactConfirmed: true,
+    ...patch
+  });
+test("all ordinary named uses and Knowledge ignore retained Bull Rush fields and receive no source bonus or marker", () => {
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const check of skill.checks) {
+      const s = state(),
+        b = resolveSkillCheck(s, key, check, ordinary),
+        r = resolveSkillCheck(s, key, check, input());
+      assert.equal(r.bullRushDefense, null, key + "/" + check.id);
+      for (const k of ["total", "error", "cap", "threat", "timeMultiplier"]) assert.equal(r[k], b[k]);
+    }
+  for (const skill of Object.keys(cfg.skills))
+    assert.equal(
+      resolveKnowledgeCheck(state(), { skill, ...input() }).total,
+      resolveKnowledgeCheck(state(), { skill }).total
+    );
+});
+test("Still Standing is an unnamed skill bonus while larger Size remains a separate adjustment under Baffled/Incompetent and vulnerability", () => {
+  for (const [conditionContext, total, normal] of [
+    [{}, 18, 14],
+    [{ baffled: true }, 11, 14],
+    [{ incompetent: true }, 4, 14],
+    [{ vulnerable: true }, 18, 14]
+  ]) {
+    const s = state();
+    s.conditionContext = conditionContext;
+    const r = resolveSkillCheck(s, "athletics", response, input({ bullRushSizeDifference: 1 }));
+    assert.equal(r.total, total);
+    assert.equal(r.skillBonusCondition.normal, normal);
+    assert.equal(r.checkAdjustment, 4);
+    assert.equal(r.bullRushDefense.stillStanding.bonus, 4);
+    assert.equal(r.error, 1);
+  }
+  const s = state();
+  s.classOptionSelections = [];
+  assert.equal(resolveSkillCheck(s, "athletics", response, input()).total, 10);
+});
+test("ordinary response forces STR before real All According to Plan, keeps Armor but gains no Vision/Hearing penalties or error change", () => {
+  const s = state();
+  s.conditionContext = { blinded: true, deafened: true };
+  s.armor = { check: -2, visionCheck: -3 };
+  const r = resolveSkillCheck(s, "athletics", response, input({ ability: "con" }));
+  assert.equal(r.ability, "str");
+  assert.equal(r.total, 12);
+  assert.equal(r.cap, 50);
+  assert.equal(r.error, 1);
+  s.conditionContext = {};
+  s.armor = {};
+  s.classLevels.schemer = 4;
+  s.abilities.int.mod = 5;
+  const int = resolveSkillCheck(s, "athletics", response, input({ allAccordingToPlan: true }));
+  assert.equal(int.ability, "int");
+  assert.equal(int.attributeSubstitution.originalAbility, "str");
+  assert.equal(int.total, 18);
+  s.skillTotals.athletics.ranks = 0;
+  assert.equal(resolveSkillCheck(s, "athletics", response, input()).error, 3);
+  for (const patch of [
+    { method: "take10", safeToTake: true },
+    { method: "take20", safeToTake: true },
+    { bullRushContactConfirmed: false },
+    { bullRushOnFootConfirmed: false },
+    { bullRushSizeDifference: 2 }
+  ])
+    assert.ok(resolveSkillCheck(s, "athletics", response, input(patch)).blocked);
+});
+test("optional Bull Rush evidence prevents late additions, removals and changed source/Size/participant facts", () => {
+  const proof = resolveSkillCheck(state(), "athletics", response, input()).bullRushDefense,
+    c = { checkKind: "skill", skillKey: "athletics", checkId: "resist-bull-rush", bullRushDefense: proof },
+    e = rollEvidence(c);
+  assert.equal(rollEvidenceMatches(e, c), true);
+  assert.equal(rollEvidenceMatches(rollEvidence({ ...c, bullRushDefense: null }), c), false);
+  assert.equal(rollEvidenceMatches(e, { ...c, bullRushDefense: null }), false);
+  for (const k of Object.keys(proof)) {
+    const n = structuredClone(c);
+    n.bullRushDefense[k] = "changed";
+    assert.equal(rollEvidenceMatches(e, n), false, k);
+  }
+});
+globalThis.Actor = class {
+  constructor() {
+    this.type = "agent";
+    this.isOwner = true;
+    this.uuid = "Actor.bull";
+    this.items = [];
+    this.flags = {};
+    this.system = state();
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { id: "GC", isGM: true },
+  settings: { get: () => false },
+  time: { worldTime: 126 },
+  combats: [],
+  actors: [],
+  i18n: { localize: String }
+};
+globalThis.foundry = { utils: { escapeHTML: String } };
+globalThis.ui = { notifications: { warn: () => null } };
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+let hook = async () => {},
+  posts = [],
+  rolls = 0;
+globalThis.Roll = class {
+  constructor(_f, data) {
+    this.total = 12 + (data.total ?? 0);
+    this.dice = [{ total: 12 }];
+  }
+  async evaluate() {
+    rolls++;
+    await hook();
+    return this;
+  }
+  async toMessage(d) {
+    posts.push(d);
+    return d;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("actual Actor exposes the on-foot response, parses Size and records actual class/Size rather than fabricated bonus payloads", async () => {
+  const a = new SpycraftActor();
+  hook = async () => {};
+  posts = [];
+  const m = await a.rollSkill("athletics", "con", {
+      check: "resist-bull-rush",
+      ...input({ bullRushSizeDifference: "1", sizeBonus: 999, bonus: 999 })
+    }),
+    c = m.flags.spycraft2;
+  assert.equal(c.ability, "str");
+  assert.equal(c.bullRushDefense.ownSize, "Medium");
+  assert.equal(c.bullRushDefense.sizeDifference, 1);
+  assert.equal(c.bullRushDefense.sizeBonus, 4);
+  assert.equal(c.bullRushDefense.stillStanding.bonus, 4);
+  assert.equal(c.rollData.total, 18);
+  assert.equal(c.error, 1);
+  for (const patch of [
+    { bullRushSizeDifference: "" },
+    { bullRushSizeDifference: "1.5" },
+    { bullRushOnFootConfirmed: false },
+    { bullRushContactConfirmed: "true" }
+  ]) {
+    const n = posts.length;
+    await a.rollSkill("athletics", null, { check: "resist-bull-rush", ...input(patch) });
+    assert.equal(posts.length, n);
+  }
+});
+test("actual RNG source gain/loss, own Size, declared Size difference or contact drift rejects without posting", async () => {
+  for (const change of ["gain", "loss", "size", "difference", "contact"]) {
+    const a = new SpycraftActor(),
+      request = { check: "resist-bull-rush", ...input() };
+    if (change === "gain") a.system.classOptionSelections = [];
+    posts = [];
+    hook = async () => {
+      if (change === "gain")
+        a.system.classOptionSelections = [{ classId: "brawler", name: "Still Standing", level: 3 }];
+      if (change === "loss") a.system.classOptionSelections = [];
+      if (change === "size") a.system.size = "Small";
+      if (change === "difference") request.bullRushSizeDifference = 1;
+      if (change === "contact") request.bullRushContactConfirmed = false;
+    };
+    await assert.rejects(a.rollSkill("athletics", null, request), /changed/);
+    assert.equal(posts.length, 0, change);
+  }
+  hook = async () => {};
+});
+test("replacement validates current class selection, own Size and actual STR/substitution before RNG", async () => {
+  const a = new SpycraftActor(),
+    proof = resolveSkillCheck(a.system, "athletics", response, input()).bullRushDefense,
+    scope = {
+      checkKind: "skill",
+      skillKey: "athletics",
+      checkId: "resist-bull-rush",
+      ability: "str",
+      bullRushDefense: proof
+    };
+  rolls = 0;
+  await assert.rejects(a.rollCheck("1d20", {}, { ...scope, ability: "con" }), /attribute/);
+  await assert.rejects(
+    a.rollCheck(
+      "1d20",
+      {},
+      {
+        ...scope,
+        ability: "int",
+        attributeSubstitution: { source: "All According to Plan", originalAbility: "str", ability: "int" }
+      }
+    ),
+    /attribute/
+  );
+  a.system.size = "Small";
+  await assert.rejects(a.rollCheck("1d20", {}, scope), /changed/);
+  a.system.size = "Medium";
+  a.system.classOptionSelections = [];
+  await assert.rejects(a.rollCheck("1d20", {}, scope), /changed/);
+  assert.equal(rolls, 0);
+});

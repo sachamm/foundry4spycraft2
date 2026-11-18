@@ -1,11 +1,242 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SPYCRAFT as cfg} from '../module/config.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';import {clock,input,sword,prep,acting,defending} from './fixtures/feint.mjs';
-const state=(names=['Fencing Basics'])=>({activeFeatNames:names,size:'Medium',classLevels:{},conditionContext:{},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:12,mod:1}])),skillTotals:Object.fromEntries(Object.entries(cfg.skills).map(([key,s])=>[key,{name:s.name,ranks:4,cap:50,threat:20,totals:s.abilities.map(ability=>({ability,total:10})),bonusEntries:[]}])),focusTotals:{},knowledge:3}),opts=patch=>({...input(),gearStatus:'available',synergySkill:'none',...patch});
-test('both actual skills apply Fencing gear once; stronger gear wins and condition reductions affect the skill bonus before hand/vision adjustments',()=>{for(const [key,c]of [['sleightOfHand',acting],['notice',defending]]){const s=prep(state(),[sword()]);assert.equal(resolveSkillCheck(s,key,c,opts()).total,12);s.skillTotals[key].bonusEntries=[{source:'Other gear',type:'gear',value:5}];s.skillTotals[key].totals.forEach(r=>r.total=15);assert.equal(resolveSkillCheck(s,key,c,opts()).total,15);}for(const [condition,total]of [[{},12],[{baffled:true},6],[{incompetent:true},0]]){const s=prep(state(),[sword()]);s.conditionContext=condition;const p=resolveSkillCheck(s,'sleightOfHand',acting,opts());assert.equal(p.total,total);assert.equal(p.skillBonusCondition.normal,12);}const s=prep(state(),[sword()]);s.armor={check:-5,visionCheck:-3};assert.equal(resolveSkillCheck(s,'sleightOfHand',acting,opts({oneHanded:true})).total,5);assert.equal(resolveSkillCheck(s,'notice',defending,opts({oneHanded:true})).total,9);s.activeFeatNames.push('Two-Weapon Basics');assert.equal(resolveSkillCheck(s,'sleightOfHand',acting,opts({oneHanded:true})).total,7);});
-test('actual action tags drive light/blind/Bound behavior, untrained error and attribute selection; fabricated action metadata cannot remove tags',()=>{const s=prep(state([]),[]);for(const [key,c,base]of [['sleightOfHand',acting,'dex'],['notice',defending,'wis']]){let p=resolveSkillCheck(s,key,c,opts({ability:'cha'}));assert.equal(p.ability,base);assert.equal(p.error,2);assert.equal(p.skillTags.handsOn,key==='sleightOfHand');const b=resolveSkillCheck(s,key,{...c,tags:'',attributes:['cha'],error:0},opts({blinded:true}));assert.equal(b.sensoryConditions.blinded,true);assert.equal(b.ability,base);assert.equal(b.error,2);s.skillTotals[key].ranks=0;p=resolveSkillCheck(s,key,c,opts());assert.equal(p.error,4);s.skillTotals[key].ranks=4;}s.conditionContext.bound=true;assert.equal(resolveSkillCheck(s,'sleightOfHand',acting,opts()).blocked,true);});
-test('retained Feint controls never alter ordinary named skills, Deception or Knowledge and optional proof binds source gains/losses',()=>{const s=prep(state(),[sword()]);for(const [key,skill]of Object.entries(cfg.skills))for(const c of skill.checks){const a=resolveSkillCheck(s,key,c,opts()),b=resolveSkillCheck(s,key,c,{gearStatus:'available',synergySkill:'none'});assert.equal(a.feint,null);for(const field of ['total','error','cap','threat','timeMultiplier'])assert.equal(a[field],b[field],key+'/'+c.id+'/'+field);}assert.equal(resolveKnowledgeCheck(s,opts()).total,resolveKnowledgeCheck(s).total);const c={checkKind:'skill',skillKey:'sleightOfHand',checkId:'feint',feint:resolveSkillCheck(s,'sleightOfHand',acting,opts()).feint},e=rollEvidence(c);assert.equal(rollEvidenceMatches(e,c),true);assert.equal(rollEvidenceMatches(e,{...c,feint:null}),false);assert.equal(rollEvidenceMatches(rollEvidence({...c,feint:null}),c),false);});
-globalThis.Actor=class{};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'GC',isGM:true},settings:{get:()=>false},time:{worldTime:126},combats:[],actors:[],i18n:{localize:String}};globalThis.foundry={utils:{escapeHTML:String},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.ui={notifications:{warn:()=>null}};globalThis.ChatMessage={getSpeaker:()=>({})};let hook=async()=>{},posts=[],rolls=0;globalThis.Roll=class{constructor(_f,data){this.total=12+(data.total??0);this.dice=[{total:12}];}async evaluate(){rolls++;await hook();return this;}async toMessage(d){posts.push(d);return d;}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-function actor(names=['Fencing Basics']){const a=new SpycraftActor();a.type='agent';a.isOwner=true;a.uuid='Actor.feint';a.flags={};a.items=[sword()];a.items.get=id=>a.items.find(i=>i.id===id);a.system=prep(state(names),a.items);a.clock=clock();a.mentalLeapCombatContext=()=>a.clock;return a;}
-test('actual Actor records both roles with authoritative bonus/attribute, ignores caller proofs and guards strict invalid declarations before RNG',async()=>{hook=async()=>{};for(const [key,id,attr]of [['sleightOfHand','feint','dex'],['notice','resist-feint','wis']]){const a=actor(),m=await a.rollSkill(key,'cha',{check:id,...opts(),bonus:999,feint:{fencingBasics:{gearBonus:999}}});const c=m.flags.spycraft2;assert.equal(c.ability,attr);assert.equal(c.rollData.total,12);assert.equal(c.error,2);assert.equal(c.feint.fencingBasics.gearBonus,2);assert.equal(c.feint.role,key==='notice'?'defender':'attacker');for(const patch of [{method:'take10',safeToTake:true},{feintAdjacent:'true'},{feintTargetEligibleConfirmed:false},{feintLegalConfirmed:false}]){rolls=0;posts=[];await a.rollSkill(key,null,{check:id,...opts(patch)});assert.equal(rolls,0);assert.equal(posts.length,0);}}});
-test('live RNG source gain/loss, effective FIN, family, readiness, capacity, declaration and clock changes block without posting',async()=>{for(const change of ['gain','loss','fin','family','readiness','capacity','declaration','round']){const a=actor(change==='gain'?[]:['Fencing Basics']),request={check:'feint',...opts()};posts=[];hook=async()=>{if(change==='gain')a.system.activeFeatNames=['Fencing Basics'];if(change==='loss')a.system.activeFeatNames=[];if(change==='fin')a.items[0].system.qualities='';if(change==='family')a.items[0].system.meleeFamily='axe';if(change==='readiness')a.items[0].system.equipped=false;if(change==='capacity')a.items.push({...sword({useHands:2}),id:'second'});if(change==='declaration')request.feintOpponentName='Other opponent';if(change==='round')a.clock.round++;a.system=prep(a.system,a.items);};await assert.rejects(a.rollSkill('sleightOfHand',null,request),/changed|two hands/);assert.equal(posts.length,0,change);}hook=async()=>{};});
-test('replacement checks validate current owned sources before RNG, preserve local null UUID proofs and reject forged attributes/UUIDs',async()=>{const a=actor();a.system.readiedMeleeWeapons.forEach(w=>w.uuid=null);a.system.disarmWeapons.weapons.forEach(w=>w.uuid=null);hook=async()=>{};const m=await a.rollSkill('sleightOfHand',null,{check:'feint',...opts()}),c=m.flags.spycraft2;assert.equal(c.feint.fencingBasics.weapons[0].uuid,null);for(const change of ['fin','foreign','attribute','method']){const proof=structuredClone(c);if(change==='fin')a.items[0].system.qualities='';if(change==='foreign')proof.feint.fencingBasics.weapons[0].uuid='Actor.other.Item.sword';if(change==='attribute')proof.ability='wis';if(change==='method')proof.checkMethod='take10';rolls=0;await assert.rejects(a.rollCheck('1d20',{},proof),/changed|attribute/);assert.equal(rolls,0);a.items[0].system.qualities='FIN';}});
-test('actual dialog exposes unique Feint eligibility controls only on the two skills, and cancellation posts/spends nothing',async()=>{const a=actor(),{feintContent}=await import('../module/apps/feint.mjs');for(const key of ['sleightOfHand','notice']){let html='';foundry.applications.api.DialogV2.input=async o=>{html=o.content;return null;};const before=posts.length;assert.equal(await a.rollSkill(key),null);assert.equal(posts.length,before);for(const name of ['feintOpponentName','feintAdjacent','feintTargetEligibleConfirmed','feintLegalConfirmed'])assert.equal(html.split('name="'+name+'"').length-1,1);}assert.equal(feintContent('bluff'),'');});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { clock, input, sword, prep, acting, defending } from "./fixtures/feint.mjs";
+const state = (names = ["Fencing Basics"]) => ({
+    activeFeatNames: names,
+    size: "Medium",
+    classLevels: {},
+    conditionContext: {},
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 12, mod: 1 }])),
+    skillTotals: Object.fromEntries(
+      Object.entries(cfg.skills).map(([key, s]) => [
+        key,
+        {
+          name: s.name,
+          ranks: 4,
+          cap: 50,
+          threat: 20,
+          totals: s.abilities.map(ability => ({ ability, total: 10 })),
+          bonusEntries: []
+        }
+      ])
+    ),
+    focusTotals: {},
+    knowledge: 3
+  }),
+  opts = patch => ({ ...input(), gearStatus: "available", synergySkill: "none", ...patch });
+test("both actual skills apply Fencing gear once; stronger gear wins and condition reductions affect the skill bonus before hand/vision adjustments", () => {
+  for (const [key, c] of [
+    ["sleightOfHand", acting],
+    ["notice", defending]
+  ]) {
+    const s = prep(state(), [sword()]);
+    assert.equal(resolveSkillCheck(s, key, c, opts()).total, 12);
+    s.skillTotals[key].bonusEntries = [{ source: "Other gear", type: "gear", value: 5 }];
+    s.skillTotals[key].totals.forEach(r => (r.total = 15));
+    assert.equal(resolveSkillCheck(s, key, c, opts()).total, 15);
+  }
+  for (const [condition, total] of [
+    [{}, 12],
+    [{ baffled: true }, 6],
+    [{ incompetent: true }, 0]
+  ]) {
+    const s = prep(state(), [sword()]);
+    s.conditionContext = condition;
+    const p = resolveSkillCheck(s, "sleightOfHand", acting, opts());
+    assert.equal(p.total, total);
+    assert.equal(p.skillBonusCondition.normal, 12);
+  }
+  const s = prep(state(), [sword()]);
+  s.armor = { check: -5, visionCheck: -3 };
+  assert.equal(resolveSkillCheck(s, "sleightOfHand", acting, opts({ oneHanded: true })).total, 5);
+  assert.equal(resolveSkillCheck(s, "notice", defending, opts({ oneHanded: true })).total, 9);
+  s.activeFeatNames.push("Two-Weapon Basics");
+  assert.equal(resolveSkillCheck(s, "sleightOfHand", acting, opts({ oneHanded: true })).total, 7);
+});
+test("actual action tags drive light/blind/Bound behavior, untrained error and attribute selection; fabricated action metadata cannot remove tags", () => {
+  const s = prep(state([]), []);
+  for (const [key, c, base] of [
+    ["sleightOfHand", acting, "dex"],
+    ["notice", defending, "wis"]
+  ]) {
+    let p = resolveSkillCheck(s, key, c, opts({ ability: "cha" }));
+    assert.equal(p.ability, base);
+    assert.equal(p.error, 2);
+    assert.equal(p.skillTags.handsOn, key === "sleightOfHand");
+    const b = resolveSkillCheck(s, key, { ...c, tags: "", attributes: ["cha"], error: 0 }, opts({ blinded: true }));
+    assert.equal(b.sensoryConditions.blinded, true);
+    assert.equal(b.ability, base);
+    assert.equal(b.error, 2);
+    s.skillTotals[key].ranks = 0;
+    p = resolveSkillCheck(s, key, c, opts());
+    assert.equal(p.error, 4);
+    s.skillTotals[key].ranks = 4;
+  }
+  s.conditionContext.bound = true;
+  assert.equal(resolveSkillCheck(s, "sleightOfHand", acting, opts()).blocked, true);
+});
+test("retained Feint controls never alter ordinary named skills, Deception or Knowledge and optional proof binds source gains/losses", () => {
+  const s = prep(state(), [sword()]);
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const c of skill.checks) {
+      const a = resolveSkillCheck(s, key, c, opts()),
+        b = resolveSkillCheck(s, key, c, { gearStatus: "available", synergySkill: "none" });
+      assert.equal(a.feint, null);
+      for (const field of ["total", "error", "cap", "threat", "timeMultiplier"])
+        assert.equal(a[field], b[field], key + "/" + c.id + "/" + field);
+    }
+  assert.equal(resolveKnowledgeCheck(s, opts()).total, resolveKnowledgeCheck(s).total);
+  const c = {
+      checkKind: "skill",
+      skillKey: "sleightOfHand",
+      checkId: "feint",
+      feint: resolveSkillCheck(s, "sleightOfHand", acting, opts()).feint
+    },
+    e = rollEvidence(c);
+  assert.equal(rollEvidenceMatches(e, c), true);
+  assert.equal(rollEvidenceMatches(e, { ...c, feint: null }), false);
+  assert.equal(rollEvidenceMatches(rollEvidence({ ...c, feint: null }), c), false);
+});
+globalThis.Actor = class {};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { id: "GC", isGM: true },
+  settings: { get: () => false },
+  time: { worldTime: 126 },
+  combats: [],
+  actors: [],
+  i18n: { localize: String }
+};
+globalThis.foundry = {
+  utils: { escapeHTML: String },
+  applications: { api: { DialogV2: { input: async () => null } } }
+};
+globalThis.ui = { notifications: { warn: () => null } };
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+let hook = async () => {},
+  posts = [],
+  rolls = 0;
+globalThis.Roll = class {
+  constructor(_f, data) {
+    this.total = 12 + (data.total ?? 0);
+    this.dice = [{ total: 12 }];
+  }
+  async evaluate() {
+    rolls++;
+    await hook();
+    return this;
+  }
+  async toMessage(d) {
+    posts.push(d);
+    return d;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+function actor(names = ["Fencing Basics"]) {
+  const a = new SpycraftActor();
+  a.type = "agent";
+  a.isOwner = true;
+  a.uuid = "Actor.feint";
+  a.flags = {};
+  a.items = [sword()];
+  a.items.get = id => a.items.find(i => i.id === id);
+  a.system = prep(state(names), a.items);
+  a.clock = clock();
+  a.mentalLeapCombatContext = () => a.clock;
+  return a;
+}
+test("actual Actor records both roles with authoritative bonus/attribute, ignores caller proofs and guards strict invalid declarations before RNG", async () => {
+  hook = async () => {};
+  for (const [key, id, attr] of [
+    ["sleightOfHand", "feint", "dex"],
+    ["notice", "resist-feint", "wis"]
+  ]) {
+    const a = actor(),
+      m = await a.rollSkill(key, "cha", {
+        check: id,
+        ...opts(),
+        bonus: 999,
+        feint: { fencingBasics: { gearBonus: 999 } }
+      });
+    const c = m.flags.spycraft2;
+    assert.equal(c.ability, attr);
+    assert.equal(c.rollData.total, 12);
+    assert.equal(c.error, 2);
+    assert.equal(c.feint.fencingBasics.gearBonus, 2);
+    assert.equal(c.feint.role, key === "notice" ? "defender" : "attacker");
+    for (const patch of [
+      { method: "take10", safeToTake: true },
+      { feintAdjacent: "true" },
+      { feintTargetEligibleConfirmed: false },
+      { feintLegalConfirmed: false }
+    ]) {
+      rolls = 0;
+      posts = [];
+      await a.rollSkill(key, null, { check: id, ...opts(patch) });
+      assert.equal(rolls, 0);
+      assert.equal(posts.length, 0);
+    }
+  }
+});
+test("live RNG source gain/loss, effective FIN, family, readiness, capacity, declaration and clock changes block without posting", async () => {
+  for (const change of ["gain", "loss", "fin", "family", "readiness", "capacity", "declaration", "round"]) {
+    const a = actor(change === "gain" ? [] : ["Fencing Basics"]),
+      request = { check: "feint", ...opts() };
+    posts = [];
+    hook = async () => {
+      if (change === "gain") a.system.activeFeatNames = ["Fencing Basics"];
+      if (change === "loss") a.system.activeFeatNames = [];
+      if (change === "fin") a.items[0].system.qualities = "";
+      if (change === "family") a.items[0].system.meleeFamily = "axe";
+      if (change === "readiness") a.items[0].system.equipped = false;
+      if (change === "capacity") a.items.push({ ...sword({ useHands: 2 }), id: "second" });
+      if (change === "declaration") request.feintOpponentName = "Other opponent";
+      if (change === "round") a.clock.round++;
+      a.system = prep(a.system, a.items);
+    };
+    await assert.rejects(a.rollSkill("sleightOfHand", null, request), /changed|two hands/);
+    assert.equal(posts.length, 0, change);
+  }
+  hook = async () => {};
+});
+test("replacement checks validate current owned sources before RNG, preserve local null UUID proofs and reject forged attributes/UUIDs", async () => {
+  const a = actor();
+  a.system.readiedMeleeWeapons.forEach(w => (w.uuid = null));
+  a.system.disarmWeapons.weapons.forEach(w => (w.uuid = null));
+  hook = async () => {};
+  const m = await a.rollSkill("sleightOfHand", null, { check: "feint", ...opts() }),
+    c = m.flags.spycraft2;
+  assert.equal(c.feint.fencingBasics.weapons[0].uuid, null);
+  for (const change of ["fin", "foreign", "attribute", "method"]) {
+    const proof = structuredClone(c);
+    if (change === "fin") a.items[0].system.qualities = "";
+    if (change === "foreign") proof.feint.fencingBasics.weapons[0].uuid = "Actor.other.Item.sword";
+    if (change === "attribute") proof.ability = "wis";
+    if (change === "method") proof.checkMethod = "take10";
+    rolls = 0;
+    await assert.rejects(a.rollCheck("1d20", {}, proof), /changed|attribute/);
+    assert.equal(rolls, 0);
+    a.items[0].system.qualities = "FIN";
+  }
+});
+test("actual dialog exposes unique Feint eligibility controls only on the two skills, and cancellation posts/spends nothing", async () => {
+  const a = actor(),
+    { feintContent } = await import("../module/apps/feint.mjs");
+  for (const key of ["sleightOfHand", "notice"]) {
+    let html = "";
+    foundry.applications.api.DialogV2.input = async o => {
+      html = o.content;
+      return null;
+    };
+    const before = posts.length;
+    assert.equal(await a.rollSkill(key), null);
+    assert.equal(posts.length, before);
+    for (const name of ["feintOpponentName", "feintAdjacent", "feintTargetEligibleConfirmed", "feintLegalConfirmed"])
+      assert.equal(html.split('name="' + name + '"').length - 1, 1);
+  }
+  assert.equal(feintContent("bluff"), "");
+});

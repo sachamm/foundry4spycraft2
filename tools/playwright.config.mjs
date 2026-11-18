@@ -2,7 +2,12 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
-  testMatch: ["agent-ux.spec.mjs", "sheet-scrolling.spec.mjs", "skill-dialog-scrolling.spec.mjs", "vehicle-sheets.spec.mjs"],
+  testMatch: [
+    "agent-ux.spec.mjs",
+    "sheet-scrolling.spec.mjs",
+    "skill-dialog-scrolling.spec.mjs",
+    "vehicle-sheets.spec.mjs"
+  ],
   fullyParallel: true,
   workers: 2,
   reporter: "list",

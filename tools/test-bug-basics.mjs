@@ -1,8 +1,148 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SPYCRAFT as cfg} from '../module/config.mjs';import {bugConcealmentPlan,validateBugConcealmentProof} from '../module/rules/bug-basics.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-const state=()=>({activeFeatNames:['Bug Basics'],abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:12,mod:1}])),skillTotals:Object.fromEntries(Object.entries(cfg.skills).map(([key,s])=>[key,{name:s.name,ranks:4,cap:50,threat:20,totals:s.abilities.map(ability=>({ability,total:5})),bonusEntries:[]}])),focusTotals:{},knowledge:3,conditionContext:{}}),input={concealingBug:true,bugName:'Button microphone',bugConcealmentConfirmed:true,gearStatus:'available',synergySkill:'none'},eligible=(key,c)=>['sleightOfHand','sneak'].includes(key)&&c.id==='stash-item';
-test('Bug Basics affects exactly Sleight of Hand and Sneak Stash Item among all named uses, excluding every Knowledge check',()=>{const s=state();let applied=0;for(const[key,skill]of Object.entries(cfg.skills))for(const c of skill.checks){const b=resolveSkillCheck(s,key,c,{...input,concealingBug:false}),r=resolveSkillCheck(s,key,c,input);assert.equal(r.total-b.total,eligible(key,c)?2:0,key+'/'+c.id);assert.equal(r.error,b.error);assert.equal(r.cap,b.cap);assert.equal(r.threat,b.threat);assert.equal(!!r.bugConcealment,eligible(key,c));if(r.bugConcealment)applied++;}assert.equal(applied,2);for(const skill of Object.keys(cfg.skills)){const a=resolveKnowledgeCheck(s,{skill,...input}),b=resolveKnowledgeCheck({...s,activeFeatNames:[]},{skill,...input});assert.equal(a.total,b.total);}});
-test('Bug Basics uses normal positive gear stacking for both checks and preserves other bonus types, penalties and fixed-result permissions',()=>{for(const key of ['sleightOfHand','sneak'])for(const gear of [-3,0,1,2,4,6])for(const method of ['roll','take10','take20']){const s=state();s.skillTotals[key].bonusEntries=[{source:'Other gear',type:'gear',value:gear},{type:'insight',value:3},{type:'',value:-2}];const c=cfg.skills[key].checks.find(c=>c.id==='stash-item'),opts={...input,method,safeToTake:true},b=resolveSkillCheck(s,key,c,{...opts,concealingBug:false}),r=resolveSkillCheck(s,key,c,opts);assert.equal(r.total-b.total,Math.max(2,gear)-Math.max(0,gear));assert.equal(r.blocked,b.blocked);assert.equal(r.actionDiceAllowed,b.actionDiceAllowed);assert.equal(r.cap,b.cap);s.activeFeatNames.push('Bug Basics');assert.equal(resolveSkillCheck(s,key,c,opts).total,r.total);}});
-test('bug concealment requires active qualification, an explicitly confirmed named bug and strict boolean declaration',()=>{const s=state(),c={id:'stash-item'};for(const patch of [{bugName:''},{bugName:' '},{bugName:3},{bugName:'x'.repeat(201)},{bugConcealmentConfirmed:false},{bugConcealmentConfirmed:'true'}])assert.ok(bugConcealmentPlan(s,'sneak',c,{...input,...patch}).blockedReason);assert.ok(bugConcealmentPlan({...s,activeFeatNames:[]},'sneak',c,input).blockedReason);for(const concealingBug of [false,'true',1])assert.equal(bugConcealmentPlan(s,'sneak',c,{...input,concealingBug}).evidence,null);assert.equal(bugConcealmentPlan(s,'sneak',c,{...input,bugName:' Button microphone '}).evidence.bugName,input.bugName);});
-test('recorded bug concealment is bound to the exact named check, active source and immutable evidence, preserving legacy checks without it',()=>{const s=state();for(const key of ['sleightOfHand','sneak']){const proof=bugConcealmentPlan(s,key,{id:'stash-item'},input).evidence,c={checkKind:'skill',skillKey:key,checkId:'stash-item',bugConcealment:proof},e=rollEvidence(c);validateBugConcealmentProof(s,proof,c);for(const patch of [{checkKind:'knowledge'},{skillKey:'search'},{checkId:'hide'}])assert.throws(()=>validateBugConcealmentProof(s,proof,{...c,...patch}),/changed/);for(const field of ['source','checkId','bugName','bugConcealmentConfirmed','bonus']){const changed=structuredClone(c);changed.bugConcealment[field]='changed';assert.equal(rollEvidenceMatches(e,changed),false);}assert.equal(rollEvidenceMatches(e,{checkKind:'skill',skillKey:key,checkId:'stash-item'}),false);s.activeFeatNames=[];assert.throws(()=>validateBugConcealmentProof(s,proof,c),/changed/);s.activeFeatNames=['Bug Basics'];validateBugConcealmentProof(s,null,c);}});
-globalThis.Actor=class{constructor(){this.system=state();this.items=[];this.type='agent';this.uuid='Actor.bug';this.isOwner=true;}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{isGM:true},settings:{get:()=>false},i18n:{localize:String}};globalThis.foundry={utils:{escapeHTML:String}};globalThis.ui={notifications:{warn:()=>null}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('actual Actor dispatch retains both concealment contexts and rejects source/declaration changes before posting',async()=>{for(const key of ['sleightOfHand','sneak']){const a=new SpycraftActor();a.rollCheck=async(f,data,options)=>({data,options});const request={...input,check:'stash-item'},r=await a.rollSkill(key,null,request);assert.equal(r.options.bugConcealment.bugName,input.bugName);r.options.validateSkillContext();a.system.activeFeatNames=[];assert.throws(()=>r.options.validateSkillContext(),/changed/);a.system=state();request.bugName='Changed bug';assert.throws(()=>r.options.validateSkillContext(),/changed/);}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { bugConcealmentPlan, validateBugConcealmentProof } from "../module/rules/bug-basics.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+const state = () => ({
+    activeFeatNames: ["Bug Basics"],
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 12, mod: 1 }])),
+    skillTotals: Object.fromEntries(
+      Object.entries(cfg.skills).map(([key, s]) => [
+        key,
+        {
+          name: s.name,
+          ranks: 4,
+          cap: 50,
+          threat: 20,
+          totals: s.abilities.map(ability => ({ ability, total: 5 })),
+          bonusEntries: []
+        }
+      ])
+    ),
+    focusTotals: {},
+    knowledge: 3,
+    conditionContext: {}
+  }),
+  input = {
+    concealingBug: true,
+    bugName: "Button microphone",
+    bugConcealmentConfirmed: true,
+    gearStatus: "available",
+    synergySkill: "none"
+  },
+  eligible = (key, c) => ["sleightOfHand", "sneak"].includes(key) && c.id === "stash-item";
+test("Bug Basics affects exactly Sleight of Hand and Sneak Stash Item among all named uses, excluding every Knowledge check", () => {
+  const s = state();
+  let applied = 0;
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const c of skill.checks) {
+      const b = resolveSkillCheck(s, key, c, { ...input, concealingBug: false }),
+        r = resolveSkillCheck(s, key, c, input);
+      assert.equal(r.total - b.total, eligible(key, c) ? 2 : 0, key + "/" + c.id);
+      assert.equal(r.error, b.error);
+      assert.equal(r.cap, b.cap);
+      assert.equal(r.threat, b.threat);
+      assert.equal(!!r.bugConcealment, eligible(key, c));
+      if (r.bugConcealment) applied++;
+    }
+  assert.equal(applied, 2);
+  for (const skill of Object.keys(cfg.skills)) {
+    const a = resolveKnowledgeCheck(s, { skill, ...input }),
+      b = resolveKnowledgeCheck({ ...s, activeFeatNames: [] }, { skill, ...input });
+    assert.equal(a.total, b.total);
+  }
+});
+test("Bug Basics uses normal positive gear stacking for both checks and preserves other bonus types, penalties and fixed-result permissions", () => {
+  for (const key of ["sleightOfHand", "sneak"])
+    for (const gear of [-3, 0, 1, 2, 4, 6])
+      for (const method of ["roll", "take10", "take20"]) {
+        const s = state();
+        s.skillTotals[key].bonusEntries = [
+          { source: "Other gear", type: "gear", value: gear },
+          { type: "insight", value: 3 },
+          { type: "", value: -2 }
+        ];
+        const c = cfg.skills[key].checks.find(c => c.id === "stash-item"),
+          opts = { ...input, method, safeToTake: true },
+          b = resolveSkillCheck(s, key, c, { ...opts, concealingBug: false }),
+          r = resolveSkillCheck(s, key, c, opts);
+        assert.equal(r.total - b.total, Math.max(2, gear) - Math.max(0, gear));
+        assert.equal(r.blocked, b.blocked);
+        assert.equal(r.actionDiceAllowed, b.actionDiceAllowed);
+        assert.equal(r.cap, b.cap);
+        s.activeFeatNames.push("Bug Basics");
+        assert.equal(resolveSkillCheck(s, key, c, opts).total, r.total);
+      }
+});
+test("bug concealment requires active qualification, an explicitly confirmed named bug and strict boolean declaration", () => {
+  const s = state(),
+    c = { id: "stash-item" };
+  for (const patch of [
+    { bugName: "" },
+    { bugName: " " },
+    { bugName: 3 },
+    { bugName: "x".repeat(201) },
+    { bugConcealmentConfirmed: false },
+    { bugConcealmentConfirmed: "true" }
+  ])
+    assert.ok(bugConcealmentPlan(s, "sneak", c, { ...input, ...patch }).blockedReason);
+  assert.ok(bugConcealmentPlan({ ...s, activeFeatNames: [] }, "sneak", c, input).blockedReason);
+  for (const concealingBug of [false, "true", 1])
+    assert.equal(bugConcealmentPlan(s, "sneak", c, { ...input, concealingBug }).evidence, null);
+  assert.equal(
+    bugConcealmentPlan(s, "sneak", c, { ...input, bugName: " Button microphone " }).evidence.bugName,
+    input.bugName
+  );
+});
+test("recorded bug concealment is bound to the exact named check, active source and immutable evidence, preserving legacy checks without it", () => {
+  const s = state();
+  for (const key of ["sleightOfHand", "sneak"]) {
+    const proof = bugConcealmentPlan(s, key, { id: "stash-item" }, input).evidence,
+      c = { checkKind: "skill", skillKey: key, checkId: "stash-item", bugConcealment: proof },
+      e = rollEvidence(c);
+    validateBugConcealmentProof(s, proof, c);
+    for (const patch of [{ checkKind: "knowledge" }, { skillKey: "search" }, { checkId: "hide" }])
+      assert.throws(() => validateBugConcealmentProof(s, proof, { ...c, ...patch }), /changed/);
+    for (const field of ["source", "checkId", "bugName", "bugConcealmentConfirmed", "bonus"]) {
+      const changed = structuredClone(c);
+      changed.bugConcealment[field] = "changed";
+      assert.equal(rollEvidenceMatches(e, changed), false);
+    }
+    assert.equal(rollEvidenceMatches(e, { checkKind: "skill", skillKey: key, checkId: "stash-item" }), false);
+    s.activeFeatNames = [];
+    assert.throws(() => validateBugConcealmentProof(s, proof, c), /changed/);
+    s.activeFeatNames = ["Bug Basics"];
+    validateBugConcealmentProof(s, null, c);
+  }
+});
+globalThis.Actor = class {
+  constructor() {
+    this.system = state();
+    this.items = [];
+    this.type = "agent";
+    this.uuid = "Actor.bug";
+    this.isOwner = true;
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = { user: { isGM: true }, settings: { get: () => false }, i18n: { localize: String } };
+globalThis.foundry = { utils: { escapeHTML: String } };
+globalThis.ui = { notifications: { warn: () => null } };
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("actual Actor dispatch retains both concealment contexts and rejects source/declaration changes before posting", async () => {
+  for (const key of ["sleightOfHand", "sneak"]) {
+    const a = new SpycraftActor();
+    a.rollCheck = async (f, data, options) => ({ data, options });
+    const request = { ...input, check: "stash-item" },
+      r = await a.rollSkill(key, null, request);
+    assert.equal(r.options.bugConcealment.bugName, input.bugName);
+    r.options.validateSkillContext();
+    a.system.activeFeatNames = [];
+    assert.throws(() => r.options.validateSkillContext(), /changed/);
+    a.system = state();
+    request.bugName = "Changed bug";
+    assert.throws(() => r.options.validateSkillContext(), /changed/);
+  }
+});

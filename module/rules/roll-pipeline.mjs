@@ -18,7 +18,7 @@
  * This module is pure: it knows nothing about Foundry, so it runs under Node tests.
  */
 
-const PHASES = ['skillChecks', 'acquire', 'validate', 'modifiers', 'flags', 'chatControls'];
+const PHASES = ["skillChecks", "acquire", "validate", "modifiers", "flags", "chatControls"];
 
 export class RollPipeline {
   #contributors = [];
@@ -26,25 +26,25 @@ export class RollPipeline {
 
   /** Add a contributor. Returns the pipeline so registrations can be chained. */
   register(spec) {
-    if (!spec || typeof spec !== 'object') throw new TypeError('A roll contributor must be an object.');
-    const {id} = spec;
-    if (typeof id !== 'string' || !id) throw new TypeError('A roll contributor needs a non-empty string id.');
+    if (!spec || typeof spec !== "object") throw new TypeError("A roll contributor must be an object.");
+    const { id } = spec;
+    if (typeof id !== "string" || !id) throw new TypeError("A roll contributor needs a non-empty string id.");
     if (this.#contributors.some(c => c.id === id)) throw new Error(`Roll contributor "${id}" is already registered.`);
-    if (spec.kinds !== undefined && !(Array.isArray(spec.kinds) && spec.kinds.every(k => typeof k === 'string'))) {
+    if (spec.kinds !== undefined && !(Array.isArray(spec.kinds) && spec.kinds.every(k => typeof k === "string"))) {
       throw new TypeError(`Roll contributor "${id}": kinds must be an array of check kinds.`);
     }
     if (spec.order !== undefined && !Number.isFinite(spec.order)) {
       throw new TypeError(`Roll contributor "${id}": order must be a finite number.`);
     }
     for (const phase of PHASES) {
-      if (spec[phase] !== undefined && typeof spec[phase] !== 'function') {
+      if (spec[phase] !== undefined && typeof spec[phase] !== "function") {
         throw new TypeError(`Roll contributor "${id}": ${phase} must be a function.`);
       }
     }
-    if (!PHASES.some(phase => typeof spec[phase] === 'function')) {
+    if (!PHASES.some(phase => typeof spec[phase] === "function")) {
       throw new TypeError(`Roll contributor "${id}" implements no phase.`);
     }
-    this.#contributors.push({...spec, order: spec.order ?? 0, sequence: this.#sequence++});
+    this.#contributors.push({ ...spec, order: spec.order ?? 0, sequence: this.#sequence++ });
     this.#contributors.sort((a, b) => a.order - b.order || a.sequence - b.sequence);
     return this;
   }
@@ -68,13 +68,13 @@ export class RollPipeline {
 
   #active(phase, ctx) {
     const kind = ctx?.checkKind;
-    return this.#contributors.filter(c => typeof c[phase] === 'function' && (!c.kinds || c.kinds.includes(kind)));
+    return this.#contributors.filter(c => typeof c[phase] === "function" && (!c.kinds || c.kinds.includes(kind)));
   }
 
   /** Named checks offered for a skill: each contributor receives the list so far and returns the next one. */
   skillChecks(ctx, checks = []) {
     let list = checks;
-    for (const c of this.#active('skillChecks', ctx)) {
+    for (const c of this.#active("skillChecks", ctx)) {
       list = c.skillChecks(ctx, list);
       if (!Array.isArray(list)) throw new TypeError(`Roll contributor "${c.id}": skillChecks must return an array.`);
     }
@@ -86,10 +86,11 @@ export class RollPipeline {
    * The returned function receives `next(extraOptions)`, which must re-enter the roll with those options added.
    */
   acquire(ctx) {
-    for (const c of this.#active('acquire', ctx)) {
+    for (const c of this.#active("acquire", ctx)) {
       const pending = c.acquire(ctx);
       if (pending === undefined || pending === null || pending === false) continue;
-      if (typeof pending !== 'function') throw new TypeError(`Roll contributor "${c.id}": acquire must return a function.`);
+      if (typeof pending !== "function")
+        throw new TypeError(`Roll contributor "${c.id}": acquire must return a function.`);
       return pending;
     }
     return null;
@@ -100,36 +101,36 @@ export class RollPipeline {
    * Synchronous validators are not awaited, so nothing else can run between two of them.
    */
   async validate(ctx) {
-    for (const c of this.#active('validate', ctx)) {
+    for (const c of this.#active("validate", ctx)) {
       const result = c.validate(ctx);
-      if (result && typeof result.then === 'function') await result;
+      if (result && typeof result.then === "function") await result;
     }
   }
 
   /** Numeric adjustments to the roll: {total, rows: [{id, label, value}]}. Zero-value rows are dropped. */
   modifiers(ctx) {
     const rows = [];
-    for (const c of this.#active('modifiers', ctx)) {
+    for (const c of this.#active("modifiers", ctx)) {
       const result = c.modifiers(ctx);
       if (result === undefined || result === null) continue;
       if (!Array.isArray(result)) throw new TypeError(`Roll contributor "${c.id}": modifiers must return an array.`);
       for (const row of result) {
-        if (!row || typeof row.label !== 'string' || !row.label || !Number.isSafeInteger(row.value)) {
+        if (!row || typeof row.label !== "string" || !row.label || !Number.isSafeInteger(row.value)) {
           throw new TypeError(`Roll contributor "${c.id}": each modifier needs a label and a whole-number value.`);
         }
-        if (row.value !== 0) rows.push({id: c.id, label: row.label, value: row.value});
+        if (row.value !== 0) rows.push({ id: c.id, label: row.label, value: row.value });
       }
     }
-    return {total: rows.reduce((sum, row) => sum + row.value, 0), rows};
+    return { total: rows.reduce((sum, row) => sum + row.value, 0), rows };
   }
 
   /** Extra fields for the posted check record. Later contributors win on a shared key. */
   flags(ctx) {
     const merged = {};
-    for (const c of this.#active('flags', ctx)) {
+    for (const c of this.#active("flags", ctx)) {
       const result = c.flags(ctx);
       if (result === undefined || result === null) continue;
-      if (typeof result !== 'object' || Array.isArray(result)) {
+      if (typeof result !== "object" || Array.isArray(result)) {
         throw new TypeError(`Roll contributor "${c.id}": flags must return an object.`);
       }
       Object.assign(merged, result);
@@ -140,15 +141,15 @@ export class RollPipeline {
   /** Buttons to show under a posted check: [{id, label, run}]. */
   chatControls(ctx) {
     const controls = [];
-    for (const c of this.#active('chatControls', ctx)) {
+    for (const c of this.#active("chatControls", ctx)) {
       const result = c.chatControls(ctx);
       if (result === undefined || result === null) continue;
       if (!Array.isArray(result)) throw new TypeError(`Roll contributor "${c.id}": chatControls must return an array.`);
       for (const control of result) {
-        if (!control || typeof control.label !== 'string' || !control.label || typeof control.run !== 'function') {
+        if (!control || typeof control.label !== "string" || !control.label || typeof control.run !== "function") {
           throw new TypeError(`Roll contributor "${c.id}": each chat control needs a label and a run function.`);
         }
-        controls.push({id: c.id, label: control.label, run: control.run});
+        controls.push({ id: c.id, label: control.label, run: control.run });
       }
     }
     return controls;
@@ -157,14 +158,14 @@ export class RollPipeline {
 
 /** Apply a pipeline modifier total to a roll formula without disturbing the formula recorded for rerolls. */
 export function formulaWithModifiers(formula, total) {
-  if (!Number.isSafeInteger(total)) throw new TypeError('A roll modifier total must be a whole number.');
+  if (!Number.isSafeInteger(total)) throw new TypeError("A roll modifier total must be a whole number.");
   if (total === 0) return formula;
-  return `${formula} ${total < 0 ? '-' : '+'} ${Math.abs(total)}`;
+  return `${formula} ${total < 0 ? "-" : "+"} ${Math.abs(total)}`;
 }
 
 /** One line of chat text for the modifiers a roll received, or an empty string. */
 export function describeModifiers(rows = []) {
-  return rows.map(row => `${row.label} ${row.value >= 0 ? '+' : '−'}${Math.abs(row.value)}`).join('; ');
+  return rows.map(row => `${row.label} ${row.value >= 0 ? "+" : "−"}${Math.abs(row.value)}`).join("; ");
 }
 
 /** The pipeline every roll on this system goes through. */

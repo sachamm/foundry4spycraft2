@@ -1,187 +1,1154 @@
 // These fixtures supply required gear unless a case explicitly overrides gearStatus; absence/kit boundaries are tested in test-skill-gear.mjs.
-import test from 'node:test';import assert from 'node:assert/strict';import {terrainSkillPlan,TERRAIN_TYPES} from '../module/rules/terrain.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const mapping={'Aquatic Training':['aquatic'],'Arctic Training':['arctic'],'Desert Training':['desert','plains'],'Forest Training':['forest'],'Jungle Training':['jungle'],'Mountain Training':['mountain'],'Swamp Training':['swamp'],'Urban Training':['urban']},state=(names=Object.keys(mapping))=>({activeFeatNames:names,classOptionSelections:[],skillTotals:Object.fromEntries(Object.values(cfg.skills).map(skill=>[skill.key,{name:skill.name,ranks:10,cap:50,threat:20,totals:skill.abilities.map(ability=>({ability,total:13}))}]))});
-const survival=cfg.skills.survival.checks.find(c=>c.id==='foraging')??cfg.skills.survival.checks.find(c=>c.id!=='tracking'),ambush=cfg.skills.tactics.checks.find(c=>c.id==='ambush');
-test('every terrain training source matches all nine declared terrains without granting an unowned bonus or treating darkness as terrain',()=>{
- for(const [name,allowed] of Object.entries(mapping))for(const terrain of Object.keys(TERRAIN_TYPES)){const p=terrainSkillPlan(state([name]),'survival',survival,{terrain});assert.equal(p.bonuses.length,allowed.includes(terrain)?1:0,name+'/'+terrain);if(p.bonuses.length)assert.equal(p.bonuses[0].value,2);}for(const terrain of ['night','darkness','__proto__','constructor','unknown'])assert.throws(()=>terrainSkillPlan(state(),'survival',survival,{terrain}));assert.equal(terrainSkillPlan(state([]),'survival',survival,{terrain:'forest'}).bonuses.length,0);assert.equal(terrainSkillPlan(state(['Night Training']),'survival',survival,{terrain:'forest',nightAmbush:true}).bonuses.length,0);
+import test from "node:test";
+import assert from "node:assert/strict";
+import { terrainSkillPlan, TERRAIN_TYPES } from "../module/rules/terrain.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const mapping = {
+    "Aquatic Training": ["aquatic"],
+    "Arctic Training": ["arctic"],
+    "Desert Training": ["desert", "plains"],
+    "Forest Training": ["forest"],
+    "Jungle Training": ["jungle"],
+    "Mountain Training": ["mountain"],
+    "Swamp Training": ["swamp"],
+    "Urban Training": ["urban"]
+  },
+  state = (names = Object.keys(mapping)) => ({
+    activeFeatNames: names,
+    classOptionSelections: [],
+    skillTotals: Object.fromEntries(
+      Object.values(cfg.skills).map(skill => [
+        skill.key,
+        {
+          name: skill.name,
+          ranks: 10,
+          cap: 50,
+          threat: 20,
+          totals: skill.abilities.map(ability => ({ ability, total: 13 }))
+        }
+      ])
+    )
+  });
+const survival =
+    cfg.skills.survival.checks.find(c => c.id === "foraging") ??
+    cfg.skills.survival.checks.find(c => c.id !== "tracking"),
+  ambush = cfg.skills.tactics.checks.find(c => c.id === "ambush");
+test("every terrain training source matches all nine declared terrains without granting an unowned bonus or treating darkness as terrain", () => {
+  for (const [name, allowed] of Object.entries(mapping))
+    for (const terrain of Object.keys(TERRAIN_TYPES)) {
+      const p = terrainSkillPlan(state([name]), "survival", survival, { terrain });
+      assert.equal(p.bonuses.length, allowed.includes(terrain) ? 1 : 0, name + "/" + terrain);
+      if (p.bonuses.length) assert.equal(p.bonuses[0].value, 2);
+    }
+  for (const terrain of ["night", "darkness", "__proto__", "constructor", "unknown"])
+    assert.throws(() => terrainSkillPlan(state(), "survival", survival, { terrain }));
+  assert.equal(terrainSkillPlan(state([]), "survival", survival, { terrain: "forest" }).bonuses.length, 0);
+  assert.equal(
+    terrainSkillPlan(state(["Night Training"]), "survival", survival, { terrain: "forest", nightAmbush: true }).bonuses
+      .length,
+    0
+  );
 });
-test('terrain insight applies only to Survival/navigation/surprise and underwater Aquatic support, with normal typed stacking and both insight upgrades',()=>{
- const s=state(['Aquatic Training','Forest Training','Unfair Advantage']);s.classOptionSelections=[{classId:'scout',name:'Woodcraft'}];const key='analysis',check=cfg.skills.analysis.checks[0];for(const navigating of [false,true])for(const surprise of [false,true]){const r=resolveSkillCheck(s,key,check,{gearStatus:'available',terrain:'forest',underwater:true,navigating,surprise,synergySkill:'none'});assert.equal(r.total,11+(navigating||surprise?4:0));}s.skillTotals.analysis.bonusEntries=[{type:'insight',value:6}];s.skillTotals.analysis.totals=s.skillTotals.analysis.totals.map(t=>({...t,total:t.total+6}));assert.equal(resolveSkillCheck(s,key,check,{gearStatus:'available',terrain:'forest',underwater:true,navigating:true,synergySkill:'none'}).total,17);assert.equal(terrainSkillPlan(state(['Aquatic Training']),'survival',survival,{underwater:true}).bonuses[0].value,2);
+test("terrain insight applies only to Survival/navigation/surprise and underwater Aquatic support, with normal typed stacking and both insight upgrades", () => {
+  const s = state(["Aquatic Training", "Forest Training", "Unfair Advantage"]);
+  s.classOptionSelections = [{ classId: "scout", name: "Woodcraft" }];
+  const key = "analysis",
+    check = cfg.skills.analysis.checks[0];
+  for (const navigating of [false, true])
+    for (const surprise of [false, true]) {
+      const r = resolveSkillCheck(s, key, check, {
+        gearStatus: "available",
+        terrain: "forest",
+        underwater: true,
+        navigating,
+        surprise,
+        synergySkill: "none"
+      });
+      assert.equal(r.total, 11 + (navigating || surprise ? 4 : 0));
+    }
+  s.skillTotals.analysis.bonusEntries = [{ type: "insight", value: 6 }];
+  s.skillTotals.analysis.totals = s.skillTotals.analysis.totals.map(t => ({ ...t, total: t.total + 6 }));
+  assert.equal(
+    resolveSkillCheck(s, key, check, {
+      gearStatus: "available",
+      terrain: "forest",
+      underwater: true,
+      navigating: true,
+      synergySkill: "none"
+    }).total,
+    17
+  );
+  assert.equal(
+    terrainSkillPlan(state(["Aquatic Training"]), "survival", survival, { underwater: true }).bonuses[0].value,
+    2
+  );
 });
-test('the Arctic ruling grants Survival synergy only to natural-surface Acrobatics/Balance, without leaking to another use or Knowledge',()=>{
- const s=state(['Arctic Training']),balance=cfg.skills.acrobatics.checks.find(c=>c.id==='balance');assert.equal(resolveSkillCheck(s,'acrobatics',balance,{gearStatus:'available',naturalSurface:true,synergySkill:'survival'}).synergy,2);assert.equal(resolveSkillCheck(s,'acrobatics',balance,{gearStatus:'available',naturalSurface:false,synergySkill:'survival'}).blocked,true);const jump=cfg.skills.acrobatics.checks.find(c=>c.id==='jump');assert.equal(terrainSkillPlan(s,'acrobatics',jump,{naturalSurface:true}).synergies.length,0);const climb=cfg.skills.athletics.checks.find(c=>c.id==='climb');assert.equal(terrainSkillPlan(s,'athletics',climb,{naturalSurface:true}).synergies.length,0);s.knowledge=3;assert.equal(resolveKnowledgeCheck(s,{skill:'acrobatics',naturalSurface:true,terrain:'arctic',surprise:true}).total,5);
+test("the Arctic ruling grants Survival synergy only to natural-surface Acrobatics/Balance, without leaking to another use or Knowledge", () => {
+  const s = state(["Arctic Training"]),
+    balance = cfg.skills.acrobatics.checks.find(c => c.id === "balance");
+  assert.equal(
+    resolveSkillCheck(s, "acrobatics", balance, {
+      gearStatus: "available",
+      naturalSurface: true,
+      synergySkill: "survival"
+    }).synergy,
+    2
+  );
+  assert.equal(
+    resolveSkillCheck(s, "acrobatics", balance, {
+      gearStatus: "available",
+      naturalSurface: false,
+      synergySkill: "survival"
+    }).blocked,
+    true
+  );
+  const jump = cfg.skills.acrobatics.checks.find(c => c.id === "jump");
+  assert.equal(terrainSkillPlan(s, "acrobatics", jump, { naturalSurface: true }).synergies.length, 0);
+  const climb = cfg.skills.athletics.checks.find(c => c.id === "climb");
+  assert.equal(terrainSkillPlan(s, "athletics", climb, { naturalSurface: true }).synergies.length, 0);
+  s.knowledge = 3;
+  assert.equal(
+    resolveKnowledgeCheck(s, { skill: "acrobatics", naturalSurface: true, terrain: "arctic", surprise: true }).total,
+    5
+  );
 });
-test('Forest trap, Mountain natural climb and Jungle non-urban Hide keep their distinct conditions and never double an existing synergy',()=>{
- const s=state(),installation=cfg.skills.security.checks.find(c=>c.id==='installation');for(const terrain of ['forest','urban',''])for(const installingTrap of [true,false])assert.equal(terrainSkillPlan(s,'security',installation,{terrain,installingTrap}).synergies.length,terrain==='forest'&&installingTrap?1:0);const climb=cfg.skills.athletics.checks.find(c=>c.id==='climb');assert.equal(resolveSkillCheck(s,'athletics',climb,{gearStatus:'available',naturalSurface:true,synergySkill:'survival'}).synergy,2);const hide=cfg.skills.sneak.checks.find(c=>c.id==='hide');for(const terrain of Object.keys(TERRAIN_TYPES))assert.equal(terrainSkillPlan(s,'sneak',hide,{terrain}).synergies.some(x=>x.skill==='survival'),terrain!=='urban');assert.equal(resolveSkillCheck(s,'sneak',hide,{gearStatus:'available',terrain:'forest',synergySkill:'survival'}).total,15);
+test("Forest trap, Mountain natural climb and Jungle non-urban Hide keep their distinct conditions and never double an existing synergy", () => {
+  const s = state(),
+    installation = cfg.skills.security.checks.find(c => c.id === "installation");
+  for (const terrain of ["forest", "urban", ""])
+    for (const installingTrap of [true, false])
+      assert.equal(
+        terrainSkillPlan(s, "security", installation, { terrain, installingTrap }).synergies.length,
+        terrain === "forest" && installingTrap ? 1 : 0
+      );
+  const climb = cfg.skills.athletics.checks.find(c => c.id === "climb");
+  assert.equal(
+    resolveSkillCheck(s, "athletics", climb, {
+      gearStatus: "available",
+      naturalSurface: true,
+      synergySkill: "survival"
+    }).synergy,
+    2
+  );
+  const hide = cfg.skills.sneak.checks.find(c => c.id === "hide");
+  for (const terrain of Object.keys(TERRAIN_TYPES))
+    assert.equal(
+      terrainSkillPlan(s, "sneak", hide, { terrain }).synergies.some(x => x.skill === "survival"),
+      terrain !== "urban"
+    );
+  assert.equal(
+    resolveSkillCheck(s, "sneak", hide, { gearStatus: "available", terrain: "forest", synergySkill: "survival" }).total,
+    15
+  );
 });
-test('Swamp hearing synergy respects actual hearing and passive-mode restrictions, and Urban Tracking enforces the 10,000-person city boundary',()=>{
- const s=state(['Swamp Training','Urban Training']),awareness=cfg.skills.notice.checks.find(c=>c.id==='awareness');assert.equal(terrainSkillPlan(s,'notice',awareness,{hearingCheck:true}).synergies.length,1);assert.equal(terrainSkillPlan(s,'notice',awareness,{hearingCheck:true,deafened:true}).synergies.length,0);assert.equal(resolveSkillCheck(s,'notice',awareness,{gearStatus:'available',hearingCheck:true,synergySkill:'survival'}).synergy,0);s.coreClassIds=['guide'];assert.equal(resolveSkillCheck(s,'notice',awareness,{gearStatus:'available',hearingCheck:true,synergySkill:'survival'}).synergy,2);const tracking=cfg.skills.survival.checks.find(c=>c.id==='tracking');for(const cityPopulation of [0,9999,10000,10001])assert.equal(terrainSkillPlan(s,'survival',tracking,{cityPopulation}).synergies.some(x=>x.skill==='streetwise'),cityPopulation>=10000);for(const cityPopulation of [-1,1.5,NaN,'bad',false])assert.throws(()=>terrainSkillPlan(s,'survival',tracking,{cityPopulation}));
+test("Swamp hearing synergy respects actual hearing and passive-mode restrictions, and Urban Tracking enforces the 10,000-person city boundary", () => {
+  const s = state(["Swamp Training", "Urban Training"]),
+    awareness = cfg.skills.notice.checks.find(c => c.id === "awareness");
+  assert.equal(terrainSkillPlan(s, "notice", awareness, { hearingCheck: true }).synergies.length, 1);
+  assert.equal(terrainSkillPlan(s, "notice", awareness, { hearingCheck: true, deafened: true }).synergies.length, 0);
+  assert.equal(
+    resolveSkillCheck(s, "notice", awareness, { gearStatus: "available", hearingCheck: true, synergySkill: "survival" })
+      .synergy,
+    0
+  );
+  s.coreClassIds = ["guide"];
+  assert.equal(
+    resolveSkillCheck(s, "notice", awareness, { gearStatus: "available", hearingCheck: true, synergySkill: "survival" })
+      .synergy,
+    2
+  );
+  const tracking = cfg.skills.survival.checks.find(c => c.id === "tracking");
+  for (const cityPopulation of [0, 9999, 10000, 10001])
+    assert.equal(
+      terrainSkillPlan(s, "survival", tracking, { cityPopulation }).synergies.some(x => x.skill === "streetwise"),
+      cityPopulation >= 10000
+    );
+  for (const cityPopulation of [-1, 1.5, NaN, "bad", false])
+    assert.throws(() => terrainSkillPlan(s, "survival", tracking, { cityPopulation }));
 });
-test('ambush opposition penalties are separate from the preparation roll and include only matching terrain sources plus a declared Night Training effect',()=>{
- for(const [name,allowed] of Object.entries(mapping))for(const terrain of Object.keys(TERRAIN_TYPES)){const p=terrainSkillPlan(state([name]),'tactics',ambush,{terrain});assert.equal(p.opponentSurprisePenalty,allowed.includes(terrain)?-2:0);}const s=state(['Forest Training','Aquatic Training','Night Training']),p=terrainSkillPlan(s,'tactics',ambush,{terrain:'forest',underwater:true,nightAmbush:true});assert.equal(p.opponentSurprisePenalty,-6);assert.equal(p.bonuses.length,0);assert.equal(p.ambushSources.length,3);const noNight=terrainSkillPlan(s,'tactics',ambush,{terrain:'forest'});assert.equal(noNight.opponentSurprisePenalty,-2);assert.equal(terrainSkillPlan(s,'survival',survival,{terrain:'forest',nightAmbush:true}).opponentSurprisePenalty,0);
+test("ambush opposition penalties are separate from the preparation roll and include only matching terrain sources plus a declared Night Training effect", () => {
+  for (const [name, allowed] of Object.entries(mapping))
+    for (const terrain of Object.keys(TERRAIN_TYPES)) {
+      const p = terrainSkillPlan(state([name]), "tactics", ambush, { terrain });
+      assert.equal(p.opponentSurprisePenalty, allowed.includes(terrain) ? -2 : 0);
+    }
+  const s = state(["Forest Training", "Aquatic Training", "Night Training"]),
+    p = terrainSkillPlan(s, "tactics", ambush, { terrain: "forest", underwater: true, nightAmbush: true });
+  assert.equal(p.opponentSurprisePenalty, -6);
+  assert.equal(p.bonuses.length, 0);
+  assert.equal(p.ambushSources.length, 3);
+  const noNight = terrainSkillPlan(s, "tactics", ambush, { terrain: "forest" });
+  assert.equal(noNight.opponentSurprisePenalty, -2);
+  assert.equal(
+    terrainSkillPlan(s, "survival", survival, { terrain: "forest", nightAmbush: true }).opponentSurprisePenalty,
+    0
+  );
 });
-globalThis.Actor=class{constructor(){this.system=state(['Arctic Training','Forest Training','Night Training']);this.items=[];this.uuid='Actor.terrain';this.type='agent';this.isOwner=true;}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{isGM:true},settings:{get:()=>false},i18n:{localize:s=>s}};globalThis.foundry={utils:{escapeHTML:s=>String(s)}};globalThis.ui={notifications:{warn:()=>null}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('the actual skill path freezes terrain conditions and opponent modifiers without adding an opponent penalty to the actor’s own bonus',async()=>{
- const a=new SpycraftActor();a.rollCheck=async(formula,data,options)=>({data,options});const m=await a.rollSkill('tactics','wis',{gearStatus:'available',check:'ambush',terrain:'forest',nightAmbush:true,surprise:true,synergySkill:'none'});assert.equal(m.data.total,15);assert.equal(m.options.terrain.opponentSurprisePenalty,-4);assert.equal(m.options.terrain.terrain,'forest');assert.match(m.options.flavor,/opponents.*-4|opponents.*−4|opponents.*–4/);const balance=await a.rollSkill('acrobatics','dex',{gearStatus:'available',check:'balance',naturalSurface:true,synergySkill:'survival'});assert.equal(balance.data.total,15);assert.equal(balance.options.terrain.synergySources[0].source,'Arctic Training');
-});
-
-test('Home Turf increases only its six named skills, for every named use and an explicit home-area declaration',()=>{
- const covered=['investigation','notice','search','sneak','streetwise','survival'],s=state(['Home Turf']);for(const [key,skill] of Object.entries(cfg.skills))for(const check of skill.checks){const base=resolveSkillCheck(s,key,check,{gearStatus:'available',synergySkill:'none'}),home=resolveSkillCheck(s,key,check,{gearStatus:'available',synergySkill:'none',homeTurf:true});assert.equal(home.cap,base.cap+(covered.includes(key)?5:0),key+'/'+check.id);assert.equal(home.terrain.homeTurfEligible,covered.includes(key));assert.equal(resolveSkillCheck(s,key,check,{gearStatus:'available',homeTurf:'true',synergySkill:'none'}).cap,base.cap);}
- const check=cfg.skills.search.checks[0];s.activeFeatNames=[];assert.equal(resolveSkillCheck(s,'search',check,{gearStatus:'available',homeTurf:true,synergySkill:'none'}).cap,50);
-});
-test('Home Turf stacks above sixty, leaves Knowledge uncapped and cannot reinstate a cap lifted by another valid option',()=>{
- const s=state(['Home Turf']);s.skillTotals.search.cap=65;const check=cfg.skills.search.checks[0];assert.equal(resolveSkillCheck(s,'search',check,{gearStatus:'available',homeTurf:true,synergySkill:'none'}).cap,70);assert.equal(resolveSkillCheck(s,'search',check,{gearStatus:'available',homeTurf:true,hailMaryUncap:true,synergySkill:'none'}).cap,null);assert.equal(resolveKnowledgeCheck(s,{skill:'search',homeTurf:true}).cap,null);
-});
-import {criticalPlan} from '../module/rules/criticals.mjs';
-test('Home Turf critical discount uses recorded home circumstances and current possession, for all six skills only',()=>{
- const options={baseCost:1,effect:'GC-approved skill critical',effectConfirmed:true,available:0},s=state(['Home Turf']);for(const key of Object.keys(cfg.skills)){const check={checkKind:'skill',skillKey:key,threatConfirmed:true,terrain:{homeTurf:true}},eligible=['investigation','notice','search','sneak','streetwise','survival'].includes(key),p=criticalPlan(s,check,options);assert.equal(p.blocked,!eligible,key);if(eligible){assert.equal(p.cost,0);assert.match(p.sources.join(),/Home Turf/);}assert.equal(criticalPlan(s,{...check,terrain:null},options).blocked,true);assert.equal(criticalPlan(state([]),check,options).blocked,true);}
- for(const checkKind of ['knowledge','attack','save'])assert.equal(criticalPlan(s,{checkKind,skillKey:'search',threatConfirmed:true,terrain:{homeTurf:true}},{...options,beforeDamage:true}).blocked,true);
-});
-test('Home Turf discount stacks with applicable mastery, retains the zero floor and never discounts an opponent’s error',()=>{
- const s=state(['Home Turf']);s.skillFeatRules=[{name:'Grand Skill Mastery',choice:'Investigator',skill:'search'}];const check={checkKind:'skill',skillKey:'search',threatConfirmed:true,terrain:{homeTurf:true}},options={baseCost:2,effect:'Approved skill effect',effectConfirmed:true,available:0};assert.equal(criticalPlan(s,check,options).cost,0);assert.equal(criticalPlan(s,check,{...options,baseCost:1}).cost,0);const error={...check,threatConfirmed:false,errorConfirmed:true};assert.equal(criticalPlan(s,error,{...options,kind:'failure',samePayer:false,opponent:true,lineOfSight:true,available:2}).cost,2);
-});
-test('actual skill workflow freezes Home Turf only for the declared check, with no action-die cost',async()=>{
- const a=new SpycraftActor();a.system.activeFeatNames.push('Home Turf');a.system.skillTotals.search.cap=65;a.rollCheck=async(formula,data,options)=>({data,options});const m=await a.rollSkill('search','int',{gearStatus:'available',check:cfg.skills.search.checks[0].id,homeTurf:true,synergySkill:'none'});assert.equal(m.options.cap,70);assert.equal(m.options.terrain.homeTurf,true);assert.equal(m.options.terrain.homeTurfEligible,true);assert.match(m.options.flavor,/five urban blocks/);const ordinary=await a.rollSkill('search','int',{gearStatus:'available',check:cfg.skills.search.checks[0].id,synergySkill:'none'});assert.equal(ordinary.options.cap,65);assert.equal(ordinary.options.terrain.homeTurf,false);
-});
-
-import {terrainSkillChecks,localHeroOppositionPlan,LOCAL_HERO_OPPOSITION_SKILLS} from '../module/rules/terrain.mjs';
-test('Local Hero adds one separate Networking use only while possessed; configuration and all other skill menus remain unchanged',()=>{
- const s=state(['Local Hero']),base=cfg.skills.networking.checks,checks=terrainSkillChecks(s,'networking',base);assert.equal(checks.length,base.length+1);assert.equal(base.length,3);assert.equal(terrainSkillChecks(state([]),'networking',base),base);for(const key of Object.keys(cfg.skills).filter(k=>k!=='networking'))assert.equal(terrainSkillChecks(s,key,cfg.skills[key].checks),cfg.skills[key].checks);assert.equal(checks.at(-1).synergies.length,0);
-});
-test('Local Hero opposition permits exactly five targeting skills in home turf, never Search, unrelated skills, unspecified targeting, taking or a lost feat',()=>{
- const s=state(['Local Hero']),check=terrainSkillChecks(s,'networking',cfg.skills.networking.checks).at(-1);for(const opposingSkill of Object.keys(cfg.skills)){const p=localHeroOppositionPlan(s,'networking',check,{homeTurf:true,targetingYou:true,opposingSkill});assert.equal(!p.blockedReason,LOCAL_HERO_OPPOSITION_SKILLS.includes(opposingSkill));}for(const patch of [{homeTurf:false},{homeTurf:'true'},{targetingYou:false},{targetingYou:'true'},{method:'take10'},{method:'take20'},{opposingSkill:'search'}])assert.ok(localHeroOppositionPlan(s,'networking',check,{homeTurf:true,targetingYou:true,opposingSkill:'notice',...patch}).blockedReason);assert.ok(localHeroOppositionPlan(state([]),'networking',check,{homeTurf:true,targetingYou:true,opposingSkill:'notice'}).blockedReason);
-});
-test('Local Hero opposition uses Networking’s own attribute bonus and cap without Contact or Endorsement synergies',()=>{
- const s=state(['Local Hero','Home Turf']),check=terrainSkillChecks(s,'networking',cfg.skills.networking.checks).at(-1);s.skillTotals.networking.totals=[{ability:'wis',total:12},{ability:'cha',total:15}];for(const ability of ['wis','cha']){const r=resolveSkillCheck(s,'networking',check,{gearStatus:'available',ability,homeTurf:true,targetingYou:true,opposingSkill:'notice',synergySkill:'none'});assert.equal(r.blocked,false);assert.equal(r.total,ability==='wis'?12:15);assert.equal(r.cap,50);assert.equal(r.synergy,0);assert.equal(r.localHeroOpposition.opposingSkill,'notice');}assert.equal(resolveSkillCheck(s,'networking',check,{gearStatus:'available',homeTurf:true,targetingYou:true,opposingSkill:'notice',method:'take10',safeToTake:true}).blocked,true);
-});
-test('actual Local Hero opposition workflow records its target scope and rejects unavailable or invalid use without making a roll',async()=>{
- const a=new SpycraftActor();a.system.activeFeatNames.push('Local Hero');a.rollCheck=async(formula,data,options)=>({data,options});const input={check:'local-hero-opposition',homeTurf:true,targetingYou:true,opposingSkill:'sneak',synergySkill:'none'},m=await a.rollSkill('networking','cha',{gearStatus:'available',...(input)});assert.equal(m.options.checkId,'local-hero-opposition');assert.equal(m.options.localHeroOpposition.opposingSkill,'sneak');assert.equal(m.options.terrain.homeTurfEligible,false);assert.equal(await a.rollSkill('networking','cha',{gearStatus:'available',...input,opposingSkill:'search'}),null);a.system.activeFeatNames=[];assert.equal(await a.rollSkill('networking','cha',{gearStatus:'available',...(input)}),null);
-});
-
-import {terrainSavePlan} from '../module/rules/terrain.mjs';
-test('Swamp poison saves and Firefighter fire/smoke saves apply only to their stated circumstances, independent of current terrain',()=>{
- const s=state(['Swamp Training','Firefighter Training','Unfair Advantage']);for(const key of ['fort','ref','will']){assert.equal(terrainSavePlan(s,key,{poison:true}).adjustment,2);assert.equal(terrainSavePlan(s,key,{avoidCatchingFire:true}).adjustment,key==='ref'?4:0);assert.equal(terrainSavePlan(s,key,{smokeInhalation:true}).adjustment,key==='fort'?4:0);assert.equal(terrainSavePlan(s,key,{poison:'true',avoidCatchingFire:'true',smokeInhalation:'true'}).adjustment,0);assert.equal(terrainSavePlan(state([]),key,{poison:true,avoidCatchingFire:true,smokeInhalation:true}).adjustment,0);}
-});
-test('conditional saving-throw insight competes with existing insight rather than stacking, retaining penalties and other bonus types',()=>{
- const s=state(['Swamp Training','Firefighter Training']);for(const insight of [-3,0,1,2,4,6]){s.saves={fort:{bonusEntries:[{type:'insight',value:insight},{type:'morale',value:2},{type:'',value:1}]}};assert.equal(terrainSavePlan(s,'fort',{poison:true}).adjustment,Math.max(2,insight)-Math.max(0,insight));assert.equal(terrainSavePlan(s,'fort',{poison:true,smokeInhalation:true}).adjustment,Math.max(4,insight)-Math.max(0,insight));}
-});
-test('actual saving-throw entry records conditional sources and keeps Brace independent of typed save bonuses',async()=>{
- const a=new SpycraftActor();a.system.activeFeatNames=['Swamp Training','Firefighter Training'];a.system.saves={fort:{total:10,bonusEntries:[{type:'insight',value:1}]},ref:{total:9,bonusEntries:[{type:'insight',value:5}]},will:{total:8,bonusEntries:[]}};a.rollCheck=async(formula,data,options)=>({data,options});const poison=await a.rollSave('fort',{poison:true});assert.equal(poison.data.total,11);assert.equal(poison.options.terrainSave.adjustment,1);const smoke=await a.rollSave('fort',{smokeInhalation:true,poison:true});assert.equal(smoke.data.total,13);assert.equal(smoke.options.terrainSave.bonuses.length,2);const fire=await a.rollSave('ref',{avoidCatchingFire:true});assert.equal(fire.data.total,9);assert.equal(fire.options.terrainSave.adjustment,0);assert.equal((await a.rollSave('will',{poison:true})).data.total,10);assert.equal(await a.rollSave('invalid'),null);
-});
-
-import {characterSurvivalStats} from '../module/rules/terrain.mjs';
-test('Terrain damage resistance is unconditional by terrain, stacks with equipped armor and preserves total immunity without changing armor data',()=>{
- const s=state(['Arctic Training','Desert Training','Mountain Training']);s.armor={resistances:{CD:4,HT:'all',FA:8,EL:4}};const before=structuredClone(s.armor),p=characterSurvivalStats(s);assert.deepEqual(p.resistances,{CD:9,HT:'all',FA:13,EL:4});assert.deepEqual(s.armor,before);assert.equal(p.resistanceSources.length,3);s.activeFeatNames=[];assert.deepEqual(characterSurvivalStats(s).resistances,s.armor.resistances);assert.deepEqual(characterSurvivalStats(state([])).resistances,{});
-});
-test('breath allowance uses twice actual Constitution, Aquatic Athletics ranks, and twice the active Chase feat count for Wave Runner',()=>{
- const s=state(['Aquatic Training','Wave Runner']);s.abilities={con:{value:16}};s.activeFeatSelections=[{name:'Wave Runner',tree:'chase'},{name:'Daredevil',tree:'chase'},{name:'Aquatic Training',tree:'terrain'}];assert.equal(characterSurvivalStats(s).breathRounds,46);s.activeFeatNames=['Aquatic Training'];assert.equal(characterSurvivalStats(s).breathRounds,42);s.activeFeatNames=['Wave Runner'];assert.equal(characterSurvivalStats(s).breathRounds,36);s.activeFeatNames=[];assert.equal(characterSurvivalStats(s).breathRounds,32);assert.equal(s.abilities.con.value,16);
-});
-
-import {computeAgent} from '../module/rules/engine.mjs';import {readFile} from 'node:fs/promises';
-const classDefs=JSON.parse(await readFile(new URL('../src/data/classes.json',import.meta.url),'utf8')),featDefs=JSON.parse(await readFile(new URL('../src/data/feats.json',import.meta.url),'utf8'));
-test('full engine derives only earned passive Terrain benefits and recalculates them when the character loses a feat',()=>{
- const scout=classDefs.find(c=>c.key==='scout'),items=[{id:'scout',name:'Scout',type:'class',system:{...scout,identifier:'scout',vitalityDie:10}},...['Arctic Training','Desert Training','Mountain Training','Aquatic Training'].map((name,i)=>({id:name,name,type:'feat',system:{...featDefs.find(f=>f.name===name),tree:'terrain',acquiredAtLevel:[1,3,6,9][i]}})),{id:'armor',name:'Synthetic armor',type:'armor',system:{equipped:true,armorType:'M',armorSlot:'body',resistances:'CD4, FA8'}}],source={abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(key=>[key,{base:16}])),progression:Array.from({length:12},(_,i)=>({classId:'scout',vitality:5,skills:{survival:i===0?3:0,athletics:i===0?3:0}}))},s=computeAgent(structuredClone(source),items,cfg);for(const name of ['Arctic Training','Desert Training','Mountain Training','Aquatic Training'])assert.equal(s.featStatus[name].ok,true);assert.deepEqual(s.survivalStats.resistances,{CD:9,FA:13,HT:5});assert.equal(s.survivalStats.breathRounds,2*s.abilities.con.value+3);const lost=computeAgent(structuredClone(source),items.filter(i=>i.type!=='feat'),cfg);assert.deepEqual(lost.survivalStats.resistances,{CD:4,FA:8});assert.equal(lost.survivalStats.breathRounds,2*lost.abilities.con.value);
-});
-
-test('overland as-if Speed adds ten in every covered terrain, uses current encumbrance/armor-adjusted Speed and preserves immobility',()=>{
- const names=['Aquatic Training','Arctic Training','Desert Training','Forest Training','Jungle Training','Mountain Training','Swamp Training','Urban Training','Night Training'],s=state(names);s.speed=20;const p=characterSurvivalStats(s);assert.deepEqual(p.overlandTerrainSpeeds.map(r=>r.terrain).sort(),['arctic','desert','plains','forest','jungle','mountain','swamp'].sort());assert.ok(p.overlandTerrainSpeeds.every(r=>r.speed===30));assert.equal(s.speed,20);s.encumbrance={immobile:true};assert.ok(characterSurvivalStats(s).overlandTerrainSpeeds.every(r=>r.speed===0));s.activeFeatNames=[];assert.equal(characterSurvivalStats(s).overlandTerrainSpeeds.length,0);
-});
-
-const {underwaterCheckPlan}=await import('../module/rules/environment.mjs');
-test('every named skill use takes the exact underwater Athletics threshold penalty except Athletics/Swim, with Aquatic immunity',()=>{
- for(const ranks of [0,4,5,20])for(const aquatic of [false,true]){const s=state([]);s.skillTotals.athletics.ranks=ranks;s.originEffects=aquatic?[{qualityKey:'aquatic'}]:[];let checked=0;for(const [key,skill]of Object.entries(cfg.skills))for(const check of skill.checks){const base=resolveSkillCheck(s,key,check,{gearStatus:'available',synergySkill:'none'}),wet=resolveSkillCheck(s,key,check,{gearStatus:'available',synergySkill:'none',underwater:true}),swim=key==='athletics'&&check.id==='swim';assert.equal(wet.total-base.total,aquatic||swim?0:ranks>=5?-2:-4,key+'/'+check.id+'/'+ranks+'/'+aquatic);assert.equal(wet.underwaterContext.swimExempt,swim);assert.equal(wet.underwaterContext.aquatic,aquatic);checked++;}assert.equal(checked,100);}
-});
-test('underwater declarations are strict and generic Knowledge penalties do not inherit the related skill’s Swim exception',()=>{const s=state([]);s.skillTotals.athletics.ranks=4;for(const underwater of [false,'true',1,null,undefined])assert.equal(underwaterCheckPlan(s,{underwater}).penalty,0);for(const skill of Object.keys(cfg.skills)){const dry=resolveKnowledgeCheck(s,{skill}),wet=resolveKnowledgeCheck(s,{skill,underwater:true});assert.equal(wet.total,dry.total-4,skill);assert.equal(wet.cap,null);assert.equal(wet.rollMode,'blindroll');}s.originEffects=[{qualityKey:'aquatic'}];assert.equal(resolveKnowledgeCheck(s,{skill:'athletics',underwater:true}).underwaterContext.penalty,0);});
-test('only Reflex saves receive the underwater penalty, which adds to Brace and disappears with Aquatic',async()=>{const a=new SpycraftActor();a.system=state([]);a.system.skillTotals.athletics.ranks=4;a.system.saves={ref:{total:10},fort:{total:10},will:{total:10}};a.rollCheck=async(formula,data,options)=>({data,options});for(const key of ['ref','fort','will']){const m=await a.rollSave(key,{underwater:true,braced:true});assert.equal(m.data.total,key==='ref'?2:10);assert.equal(m.options.underwaterContext.penalty,key==='ref'?-4:0);}a.system.skillTotals.athletics.ranks=5;assert.equal((await a.rollSave('ref',{underwater:true})).data.total,8);a.system.originEffects=[{qualityKey:'aquatic'}];assert.equal((await a.rollSave('ref',{underwater:true,braced:true})).data.total,6);});
-const {substituteSkillBonus}=await import('../module/rules/breakthrough.mjs');
-test('underwater check penalties survive class skill-bonus substitution exactly once',()=>{const s=state([]);s.skillTotals.athletics.ranks=4;const dry=resolveSkillCheck(s,'analysis',cfg.skills.analysis.checks[0],{gearStatus:'available',synergySkill:'none',modifier:3}),wet=resolveSkillCheck(s,'analysis',cfg.skills.analysis.checks[0],{gearStatus:'available',synergySkill:'none',modifier:3,underwater:true});assert.equal(substituteSkillBonus({skillBonus:25},wet).total,substituteSkillBonus({skillBonus:25},dry).total-4);const kd=resolveKnowledgeCheck(s,{skill:'analysis',modifier:3}),kw=resolveKnowledgeCheck(s,{skill:'analysis',modifier:3,underwater:true});assert.equal(substituteSkillBonus({skillBonus:25},kw).total,substituteSkillBonus({skillBonus:25},kd).total-4);});
-const originDefs=JSON.parse(await readFile(new URL('../src/data/origins.json',import.meta.url),'utf8'));
-test('Aquatic quality derives current underwater Speed and drowning immunity through origin selection, loss and load',()=>{const soldier=classDefs.find(c=>c.key==='soldier'),subject=originDefs.specialties.find(o=>o.name==='Test Subject'),c={id:'soldier',type:'class',name:'Soldier',system:{...soldier,identifier:'soldier',vitalityDie:12}},o={id:'subject',type:'origin',name:'Test Subject',system:{...subject,originChoices:{up:'con',down:'int',npcQuality0:'aquatic',npcQuality1:'fearless'}}},source={abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:12}])),progression:[{classId:'soldier',vitality:6,skills:{}}]};let s=computeAgent(structuredClone(source),[c,o],cfg);assert.equal(s.survivalStats.aquatic,true);assert.equal(s.survivalStats.canDrown,false);assert.equal(s.survivalStats.underwaterSpeed,s.speed);const heavy={id:'load',name:'Heavy load',type:'gear',system:{quantity:1,carried:true,weight:100000}};s=computeAgent(structuredClone(source),[c,o,heavy],cfg);assert.equal(s.speed,0);assert.equal(s.survivalStats.underwaterSpeed,0);o.system.originChoices.npcQuality0='fearless';s=computeAgent(structuredClone(source),[c,o],cfg);assert.equal(s.survivalStats.aquatic,false);assert.equal(s.survivalStats.canDrown,true);assert.equal(s.survivalStats.underwaterSpeed,null);});
-test('actual Skill and Knowledge workflows record fresh underwater circumstances and current quality immunity',async()=>{const a=new SpycraftActor();a.system=state([]);a.system.skillTotals.athletics.ranks=4;a.rollCheck=async(formula,data,options)=>({data,options});const input={check:cfg.skills.analysis.checks[0].id,gearStatus:'available',underwater:true,synergySkill:'none'};let m=await a.rollSkill('analysis','int',input);assert.equal(m.options.underwaterContext.penalty,-4);assert.equal(m.data.total,9);m=await a.rollKnowledge({skill:'analysis',underwater:true});assert.equal(m.options.underwaterContext.penalty,-4);a.system.originEffects=[{qualityKey:'aquatic'}];m=await a.rollSkill('analysis','int',input);assert.equal(m.options.underwaterContext.penalty,0);assert.equal(m.data.total,13);});
-
-import {pursuitSkillPlan} from '../module/rules/pursuit-feats.mjs';
-import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-function pursuitState(names=['Escape and Evasion Training']){const s=state(names);s.activeFeatSelections=names.map(name=>({name,choice:'',tree:'terrain'}));return s;}
-test('pursuit manhunt roles cover all100 named skill uses with only their printed flat bonuses and Falsify synergy',()=>{
- for(const[source,role,target]of [['Escape and Evasion Training','prey','blend'],['Always Get Your Man','predator','investigation']]){
-  const s=pursuitState([source]);for(const[key,skill]of Object.entries(cfg.skills))for(const check of skill.checks){
-   const opts={gearStatus:'available',synergySkill:'none'},base=resolveSkillCheck(s,key,check,opts),r=resolveSkillCheck(s,key,check,{...opts,manhuntRole:role});assert.equal(r.total-base.total,key===target?3:0,source+'/'+key+'/'+check.id);assert.equal(r.pursuitFeat.maximum,6);
-   const p=pursuitSkillPlan(s,key,check,{manhuntRole:role});assert.equal(p.synergies.some(r=>r.skill==='falsify'),role==='prey');assert.equal(resolveSkillCheck(s,key,check,{...opts,manhuntRole:role==='prey'?'predator':'prey'}).pursuitFeat,null);
+globalThis.Actor = class {
+  constructor() {
+    this.system = state(["Arctic Training", "Forest Training", "Night Training"]);
+    this.items = [];
+    this.uuid = "Actor.terrain";
+    this.type = "agent";
+    this.isOwner = true;
   }
- }
-});
-test('all skill Maneuvers gain only their own chase role’s listed skill synergy, without a manhunt cap increase',()=>{
- let maneuvers=0;for(const[key,skill]of Object.entries(cfg.skills))for(const check of skill.checks){
-  const s=pursuitState(['Always Get Your Man','Escape and Evasion Training']);for(const[role,synergy]of [['predator','investigation'],['prey','bluff']]){const p=pursuitSkillPlan(s,key,check,{chaseRole:role});assert.equal(p.evidence?.chaseSource!==undefined,check.id==='maneuver');if(check.id==='maneuver'){assert.equal(p.synergies[0].skill,synergy);assert.equal(p.maximum,5);maneuvers++;}}
- }assert.equal(maneuvers,10);
-});
-test('Falsify and flat synergy compete rather than add; the manhunt cap follows every active Terrain selection and passive skill-derived synergy stays unavailable',()=>{
- const s=pursuitState(['Escape and Evasion Training','Urban Training','Night Training']),check={...cfg.skills.blend.checks[0],mode:'Active'};s.skillTotals.falsify.ranks=35;
- const opts={gearStatus:'available',manhuntRole:'prey'},r=resolveSkillCheck(s,'blend',check,opts),none=resolveSkillCheck(s,'blend',check,{...opts,synergySkill:'none'});assert.equal(r.synergy,7);assert.equal(r.total-none.total,4);assert.equal(r.pursuitFeat.totalSynergy,7);assert.equal(r.pursuitFeat.maximum,8);
- s.activeFeatSelections=[s.activeFeatSelections[0]];assert.equal(resolveSkillCheck(s,'blend',check,opts).synergy,6);
- const passive=resolveSkillCheck(s,'blend',{...check,mode:'Passive'},opts);assert.equal(passive.synergy,0);assert.equal(passive.pursuitFeat.totalSynergy,3);
- assert.throws(()=>pursuitSkillPlan(s,'blend',check,{manhuntRole:'predator',manhuntPrey:true}),/both/);for(const role of ['true','hunter','constructor'])assert.throws(()=>pursuitSkillPlan(s,'blend',check,{chaseRole:role}),/listed/);
- assert.equal(resolveSkillCheck(s,'blend',check,{gearStatus:'available',manhuntPrey:true}).pursuitFeat.manhuntRole,'prey');assert.equal(resolveSkillCheck(s,'blend',check,{gearStatus:'available',manhuntPrey:'true'}).pursuitFeat,null);
-});
-test('pursuit role, source ranks, Terrain count, selected synergy and applied total stay immutable in outcome evidence',()=>{
- const s=pursuitState(),r=resolveSkillCheck(s,'blend',cfg.skills.blend.checks[0],{gearStatus:'available',manhuntRole:'prey'}),c={checkKind:'skill',pursuitFeat:r.pursuitFeat},e=rollEvidence(c);
- assert.equal(rollEvidenceMatches(e,c),true);for(const key of Object.keys(c.pursuitFeat)){const x=structuredClone(c);x.pursuitFeat[key]='changed';assert.equal(rollEvidenceMatches(e,x),false,key);}assert.equal(rollEvidenceMatches(e,{checkKind:'skill'}),false);
-});
-test('actual skill entry carries pursuit evidence and rejects a lost feat, changed Terrain count or synergy rank before posting',async()=>{
- const a=new SpycraftActor();a.system=pursuitState();a.rollCheck=async(_f,_d,o)=>{await o.validateSkillContext();return o;};const opts={check:cfg.skills.blend.checks[0].id,gearStatus:'available',manhuntRole:'prey'},m=await a.rollSkill('blend','cha',opts);assert.equal(m.pursuitFeat.source,'Escape and Evasion Training');
- a.system.skillTotals.falsify.ranks++;assert.throws(()=>m.validateSkillContext(),/changed/);a.system.skillTotals.falsify.ranks--;a.system.activeFeatSelections.push({name:'Urban Training',tree:'terrain'});assert.throws(()=>m.validateSkillContext(),/changed/);a.system.activeFeatSelections.pop();a.system.activeFeatNames=[];assert.throws(()=>m.validateSkillContext(),/changed/);
-});
-test('declaring either pursuit role establishes a Dramatic Conflict and cannot bypass the standalone-only 10-Second Solution restriction',()=>{
- const s=pursuitState();s.classLevels={scientist:14};for(const context of [{manhuntRole:'prey'},{chaseRole:'predator'},{manhuntPrey:true}]){const r=resolveSkillCheck(s,'analysis',cfg.skills.analysis.checks[0],{gearStatus:'available',tenSecondSolution:true,standaloneCheckConfirmed:true,...context});assert.equal(r.blocked,true);assert.match(r.blockedReason,/outside Complex Tasks and Dramatic Conflicts/);}
-});
-
-import {dailyWaterRequirements} from '../module/rules/terrain.mjs';
-test('Desert Training halves both printed daily fluid requirements everywhere, including exactly ninety versus above ninety Fahrenheit',()=>{
- for(const names of [[],['Desert Training'],['Desert Training','Desert Training'],['Arctic Training','Firefighter Training']]){
-  const s=state(names),before=structuredClone(s),multiplier=names.includes('Desert Training')?0.5:1;
-  for(const temperatureF of [-40,0,89.9,90,90.01,110,140]){const p=dailyWaterRequirements(s,{temperatureF});assert.equal(p.currentQuarts,(temperatureF>90?2:1)*multiplier);assert.equal(p.normalQuarts,multiplier);assert.equal(p.hotQuarts,2*multiplier);}
-  assert.deepEqual(s,before);assert.equal(dailyWaterRequirements(s).currentQuarts,null);
- }for(const temperatureF of ['90',NaN,Infinity,-Infinity,{},true])assert.throws(()=>dailyWaterRequirements(state(),{temperatureF}),/finite/);
-});
-test('the actual agent engine derives water requirements only from an active Desert Training source and removes the benefit when its prerequisite is lost',()=>{
- const soldier=classDefs.find(c=>c.key==='soldier'),featDef=featDefs.find(f=>f.name==='Desert Training'),cls={id:'soldier',type:'class',name:'Soldier',system:{...soldier,identifier:'soldier',vitalityDie:12}},f={id:'desert',type:'feat',name:'Desert Training',system:{...structuredClone(featDef),tree:'terrain',acquiredAtLevel:1}},source={abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:12}])),progression:[{classId:'soldier',vitality:6,skills:{survival:3}}]};
- let s=computeAgent(structuredClone(source),[cls,f],cfg);assert.equal(s.featStatus.desert.ok,true);assert.equal(s.survivalStats.dailyWater.normalQuarts,0.5);assert.equal(s.survivalStats.dailyWater.hotQuarts,1);
- source.progression[0].skills.survival=2;s=computeAgent(structuredClone(source),[cls,f],cfg);assert.equal(s.featStatus.desert.ok,false);assert.equal(s.survivalStats.dailyWater.normalQuarts,1);assert.equal(s.survivalStats.dailyWater.hotQuarts,2);
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = { user: { isGM: true }, settings: { get: () => false }, i18n: { localize: s => s } };
+globalThis.foundry = { utils: { escapeHTML: s => String(s) } };
+globalThis.ui = { notifications: { warn: () => null } };
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("the actual skill path freezes terrain conditions and opponent modifiers without adding an opponent penalty to the actor’s own bonus", async () => {
+  const a = new SpycraftActor();
+  a.rollCheck = async (formula, data, options) => ({ data, options });
+  const m = await a.rollSkill("tactics", "wis", {
+    gearStatus: "available",
+    check: "ambush",
+    terrain: "forest",
+    nightAmbush: true,
+    surprise: true,
+    synergySkill: "none"
+  });
+  assert.equal(m.data.total, 15);
+  assert.equal(m.options.terrain.opponentSurprisePenalty, -4);
+  assert.equal(m.options.terrain.terrain, "forest");
+  assert.match(m.options.flavor, /opponents.*-4|opponents.*−4|opponents.*–4/);
+  const balance = await a.rollSkill("acrobatics", "dex", {
+    gearStatus: "available",
+    check: "balance",
+    naturalSurface: true,
+    synergySkill: "survival"
+  });
+  assert.equal(balance.data.total, 15);
+  assert.equal(balance.options.terrain.synergySources[0].source, "Arctic Training");
 });
 
-test('terrain feat skill evidence freezes declared terrain, granted synergies and ambush opposition for every terrain training source',()=>{
- for(const[name,terrains]of Object.entries(mapping))for(const terrain of terrains){const s=state([name]),check=cfg.skills.survival.checks.find(c=>c.id==='foraging'),r=resolveSkillCheck(s,'survival',check,{gearStatus:'available',terrain});assert.equal(r.terrainFeat.context.terrain,terrain);assert.equal(r.terrainFeat.context.matched[0],name);const c={checkKind:'skill',terrain:r.terrain,terrainFeat:r.terrainFeat},e=rollEvidence(c),changed=structuredClone(c);changed.terrain.terrain=terrain==='urban'?'forest':'urban';assert.equal(rollEvidenceMatches(e,changed),false);changed.terrain=c.terrain;changed.terrainFeat.context.bonuses[0].value++;assert.equal(rollEvidenceMatches(e,changed),false);}
- const s=state(['Home Turf']),check=cfg.skills.search.checks[0],r=resolveSkillCheck(s,'search',check,{gearStatus:'available',homeTurf:true}),c={checkKind:'skill',terrain:r.terrain,terrainFeat:r.terrainFeat},e=rollEvidence(c);c.terrain.homeTurf=false;assert.equal(rollEvidenceMatches(e,c),false);
- const ambush=resolveSkillCheck(state(['Night Training']),'tactics',cfg.skills.tactics.checks.find(c=>c.id==='ambush'),{gearStatus:'available',nightAmbush:true});assert.equal(ambush.terrainFeat.context.opponentSurprisePenalty,-2);
+test("Home Turf increases only its six named skills, for every named use and an explicit home-area declaration", () => {
+  const covered = ["investigation", "notice", "search", "sneak", "streetwise", "survival"],
+    s = state(["Home Turf"]);
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const check of skill.checks) {
+      const base = resolveSkillCheck(s, key, check, { gearStatus: "available", synergySkill: "none" }),
+        home = resolveSkillCheck(s, key, check, { gearStatus: "available", synergySkill: "none", homeTurf: true });
+      assert.equal(home.cap, base.cap + (covered.includes(key) ? 5 : 0), key + "/" + check.id);
+      assert.equal(home.terrain.homeTurfEligible, covered.includes(key));
+      assert.equal(
+        resolveSkillCheck(s, key, check, { gearStatus: "available", homeTurf: "true", synergySkill: "none" }).cap,
+        base.cap
+      );
+    }
+  const check = cfg.skills.search.checks[0];
+  s.activeFeatNames = [];
+  assert.equal(
+    resolveSkillCheck(s, "search", check, { gearStatus: "available", homeTurf: true, synergySkill: "none" }).cap,
+    50
+  );
 });
-test('actual terrain skill entry rechecks insight and synergy sources and dependent skill ranks before posting',async()=>{
- const a=new SpycraftActor();a.system=state(['Arctic Training']);a.rollCheck=async(_f,_d,o)=>o;const opts={check:'balance',gearStatus:'available',naturalSurface:true,synergySkill:'survival'},r=await a.rollSkill('acrobatics','dex',opts);assert.equal(typeof r.validateSkillContext,'function');a.system.skillTotals.survival.ranks++;assert.throws(()=>r.validateSkillContext(),/changed/);a.system.skillTotals.survival.ranks--;a.system.activeFeatNames=[];assert.throws(()=>r.validateSkillContext(),/changed/);
+test("Home Turf stacks above sixty, leaves Knowledge uncapped and cannot reinstate a cap lifted by another valid option", () => {
+  const s = state(["Home Turf"]);
+  s.skillTotals.search.cap = 65;
+  const check = cfg.skills.search.checks[0];
+  assert.equal(
+    resolveSkillCheck(s, "search", check, { gearStatus: "available", homeTurf: true, synergySkill: "none" }).cap,
+    70
+  );
+  assert.equal(
+    resolveSkillCheck(s, "search", check, {
+      gearStatus: "available",
+      homeTurf: true,
+      hailMaryUncap: true,
+      synergySkill: "none"
+    }).cap,
+    null
+  );
+  assert.equal(resolveKnowledgeCheck(s, { skill: "search", homeTurf: true }).cap, null);
 });
-test('a terrain feat lost during actual RNG cannot post the stale bonus or recorded opponent penalty',async()=>{
- const a=new SpycraftActor();a.system=state(['Desert Training']);let posted=0;globalThis.ChatMessage={getSpeaker:()=>({})};globalThis.Roll=class{constructor(){this.total=15;this.dice=[{total:12}];}async evaluate(){a.system.activeFeatNames=[];return this;}async toMessage(){posted++;return this;}};
- await assert.rejects(a.rollSkill('survival','wis',{check:'foraging',gearStatus:'available',terrain:'desert'}),/changed/);assert.equal(posted,0);
+import { criticalPlan } from "../module/rules/criticals.mjs";
+test("Home Turf critical discount uses recorded home circumstances and current possession, for all six skills only", () => {
+  const options = { baseCost: 1, effect: "GC-approved skill critical", effectConfirmed: true, available: 0 },
+    s = state(["Home Turf"]);
+  for (const key of Object.keys(cfg.skills)) {
+    const check = { checkKind: "skill", skillKey: key, threatConfirmed: true, terrain: { homeTurf: true } },
+      eligible = ["investigation", "notice", "search", "sneak", "streetwise", "survival"].includes(key),
+      p = criticalPlan(s, check, options);
+    assert.equal(p.blocked, !eligible, key);
+    if (eligible) {
+      assert.equal(p.cost, 0);
+      assert.match(p.sources.join(), /Home Turf/);
+    }
+    assert.equal(criticalPlan(s, { ...check, terrain: null }, options).blocked, true);
+    assert.equal(criticalPlan(state([]), check, options).blocked, true);
+  }
+  for (const checkKind of ["knowledge", "attack", "save"])
+    assert.equal(
+      criticalPlan(
+        s,
+        { checkKind, skillKey: "search", threatConfirmed: true, terrain: { homeTurf: true } },
+        { ...options, beforeDamage: true }
+      ).blocked,
+      true
+    );
+});
+test("Home Turf discount stacks with applicable mastery, retains the zero floor and never discounts an opponent’s error", () => {
+  const s = state(["Home Turf"]);
+  s.skillFeatRules = [{ name: "Grand Skill Mastery", choice: "Investigator", skill: "search" }];
+  const check = { checkKind: "skill", skillKey: "search", threatConfirmed: true, terrain: { homeTurf: true } },
+    options = { baseCost: 2, effect: "Approved skill effect", effectConfirmed: true, available: 0 };
+  assert.equal(criticalPlan(s, check, options).cost, 0);
+  assert.equal(criticalPlan(s, check, { ...options, baseCost: 1 }).cost, 0);
+  const error = { ...check, threatConfirmed: false, errorConfirmed: true };
+  assert.equal(
+    criticalPlan(s, error, {
+      ...options,
+      kind: "failure",
+      samePayer: false,
+      opponent: true,
+      lineOfSight: true,
+      available: 2
+    }).cost,
+    2
+  );
+});
+test("actual skill workflow freezes Home Turf only for the declared check, with no action-die cost", async () => {
+  const a = new SpycraftActor();
+  a.system.activeFeatNames.push("Home Turf");
+  a.system.skillTotals.search.cap = 65;
+  a.rollCheck = async (formula, data, options) => ({ data, options });
+  const m = await a.rollSkill("search", "int", {
+    gearStatus: "available",
+    check: cfg.skills.search.checks[0].id,
+    homeTurf: true,
+    synergySkill: "none"
+  });
+  assert.equal(m.options.cap, 70);
+  assert.equal(m.options.terrain.homeTurf, true);
+  assert.equal(m.options.terrain.homeTurfEligible, true);
+  assert.match(m.options.flavor, /five urban blocks/);
+  const ordinary = await a.rollSkill("search", "int", {
+    gearStatus: "available",
+    check: cfg.skills.search.checks[0].id,
+    synergySkill: "none"
+  });
+  assert.equal(ordinary.options.cap, 65);
+  assert.equal(ordinary.options.terrain.homeTurf, false);
 });
 
-test('actual Firefighter and Swamp conditional save bonuses freeze their source and reject feat or typed-insight drift before posting',async()=>{for(const [feat,key,facts] of [['Firefighter Training','ref',{avoidCatchingFire:true}],['Firefighter Training','fort',{smokeInhalation:true}],['Swamp Training','will',{poison:true}]]){const a=new SpycraftActor();a.system.activeFeatNames=[feat];a.system.saves={fort:{total:4,bonusEntries:[]},ref:{total:4,bonusEntries:[]},will:{total:4,bonusEntries:[]}};let captured;a.rollCheck=async(f,d,o)=>{captured=o;return o;};await a.rollSave(key,facts);assert.ok(captured.terrainSaveSource);captured.validateSaveContext();a.system.activeFeatNames=[];assert.throws(()=>captured.validateSaveContext(),/changed/);a.system.activeFeatNames=[feat];a.system.saves[key].bonusEntries.push({type:'insight',value:10});assert.throws(()=>captured.validateSaveContext(),/changed/);}});
+import { terrainSkillChecks, localHeroOppositionPlan, LOCAL_HERO_OPPOSITION_SKILLS } from "../module/rules/terrain.mjs";
+test("Local Hero adds one separate Networking use only while possessed; configuration and all other skill menus remain unchanged", () => {
+  const s = state(["Local Hero"]),
+    base = cfg.skills.networking.checks,
+    checks = terrainSkillChecks(s, "networking", base);
+  assert.equal(checks.length, base.length + 1);
+  assert.equal(base.length, 3);
+  assert.equal(terrainSkillChecks(state([]), "networking", base), base);
+  for (const key of Object.keys(cfg.skills).filter(k => k !== "networking"))
+    assert.equal(terrainSkillChecks(s, key, cfg.skills[key].checks), cfg.skills[key].checks);
+  assert.equal(checks.at(-1).synergies.length, 0);
+});
+test("Local Hero opposition permits exactly five targeting skills in home turf, never Search, unrelated skills, unspecified targeting, taking or a lost feat", () => {
+  const s = state(["Local Hero"]),
+    check = terrainSkillChecks(s, "networking", cfg.skills.networking.checks).at(-1);
+  for (const opposingSkill of Object.keys(cfg.skills)) {
+    const p = localHeroOppositionPlan(s, "networking", check, { homeTurf: true, targetingYou: true, opposingSkill });
+    assert.equal(!p.blockedReason, LOCAL_HERO_OPPOSITION_SKILLS.includes(opposingSkill));
+  }
+  for (const patch of [
+    { homeTurf: false },
+    { homeTurf: "true" },
+    { targetingYou: false },
+    { targetingYou: "true" },
+    { method: "take10" },
+    { method: "take20" },
+    { opposingSkill: "search" }
+  ])
+    assert.ok(
+      localHeroOppositionPlan(s, "networking", check, {
+        homeTurf: true,
+        targetingYou: true,
+        opposingSkill: "notice",
+        ...patch
+      }).blockedReason
+    );
+  assert.ok(
+    localHeroOppositionPlan(state([]), "networking", check, {
+      homeTurf: true,
+      targetingYou: true,
+      opposingSkill: "notice"
+    }).blockedReason
+  );
+});
+test("Local Hero opposition uses Networking’s own attribute bonus and cap without Contact or Endorsement synergies", () => {
+  const s = state(["Local Hero", "Home Turf"]),
+    check = terrainSkillChecks(s, "networking", cfg.skills.networking.checks).at(-1);
+  s.skillTotals.networking.totals = [
+    { ability: "wis", total: 12 },
+    { ability: "cha", total: 15 }
+  ];
+  for (const ability of ["wis", "cha"]) {
+    const r = resolveSkillCheck(s, "networking", check, {
+      gearStatus: "available",
+      ability,
+      homeTurf: true,
+      targetingYou: true,
+      opposingSkill: "notice",
+      synergySkill: "none"
+    });
+    assert.equal(r.blocked, false);
+    assert.equal(r.total, ability === "wis" ? 12 : 15);
+    assert.equal(r.cap, 50);
+    assert.equal(r.synergy, 0);
+    assert.equal(r.localHeroOpposition.opposingSkill, "notice");
+  }
+  assert.equal(
+    resolveSkillCheck(s, "networking", check, {
+      gearStatus: "available",
+      homeTurf: true,
+      targetingYou: true,
+      opposingSkill: "notice",
+      method: "take10",
+      safeToTake: true
+    }).blocked,
+    true
+  );
+});
+test("actual Local Hero opposition workflow records its target scope and rejects unavailable or invalid use without making a roll", async () => {
+  const a = new SpycraftActor();
+  a.system.activeFeatNames.push("Local Hero");
+  a.rollCheck = async (formula, data, options) => ({ data, options });
+  const input = {
+      check: "local-hero-opposition",
+      homeTurf: true,
+      targetingYou: true,
+      opposingSkill: "sneak",
+      synergySkill: "none"
+    },
+    m = await a.rollSkill("networking", "cha", { gearStatus: "available", ...input });
+  assert.equal(m.options.checkId, "local-hero-opposition");
+  assert.equal(m.options.localHeroOpposition.opposingSkill, "sneak");
+  assert.equal(m.options.terrain.homeTurfEligible, false);
+  assert.equal(
+    await a.rollSkill("networking", "cha", { gearStatus: "available", ...input, opposingSkill: "search" }),
+    null
+  );
+  a.system.activeFeatNames = [];
+  assert.equal(await a.rollSkill("networking", "cha", { gearStatus: "available", ...input }), null);
+});
 
-test('new conditional-save source proof also validates replacement rolls and immutable outcome evidence without changing legacy receipts',async()=>{const {validateTerrainSaveSource}=await import('../module/rules/terrain.mjs'),{rollEvidence,rollEvidenceMatches}=await import('../module/rules/outcomes.mjs'),s=state(['Firefighter Training']);s.saves={ref:{bonusEntries:[]}};const proof={version:1,checkId:'ref',plan:terrainSavePlan(s,'ref',{avoidCatchingFire:true})},context={checkKind:'save',checkId:'ref'};validateTerrainSaveSource(s,proof,context);assert.throws(()=>validateTerrainSaveSource(s,proof,{...context,checkId:'fort'}));const c={...context,terrainSaveSource:proof},e=rollEvidence(c),changed=structuredClone(c);changed.terrainSaveSource.plan.avoidCatchingFire=false;assert.equal(rollEvidenceMatches(e,changed),false);s.activeFeatNames=[];assert.throws(()=>validateTerrainSaveSource(s,proof,context),/changed/);validateTerrainSaveSource(s,null,context);});
+import { terrainSavePlan } from "../module/rules/terrain.mjs";
+test("Swamp poison saves and Firefighter fire/smoke saves apply only to their stated circumstances, independent of current terrain", () => {
+  const s = state(["Swamp Training", "Firefighter Training", "Unfair Advantage"]);
+  for (const key of ["fort", "ref", "will"]) {
+    assert.equal(terrainSavePlan(s, key, { poison: true }).adjustment, 2);
+    assert.equal(terrainSavePlan(s, key, { avoidCatchingFire: true }).adjustment, key === "ref" ? 4 : 0);
+    assert.equal(terrainSavePlan(s, key, { smokeInhalation: true }).adjustment, key === "fort" ? 4 : 0);
+    assert.equal(
+      terrainSavePlan(s, key, { poison: "true", avoidCatchingFire: "true", smokeInhalation: "true" }).adjustment,
+      0
+    );
+    assert.equal(
+      terrainSavePlan(state([]), key, { poison: true, avoidCatchingFire: true, smokeInhalation: true }).adjustment,
+      0
+    );
+  }
+});
+test("conditional saving-throw insight competes with existing insight rather than stacking, retaining penalties and other bonus types", () => {
+  const s = state(["Swamp Training", "Firefighter Training"]);
+  for (const insight of [-3, 0, 1, 2, 4, 6]) {
+    s.saves = {
+      fort: {
+        bonusEntries: [
+          { type: "insight", value: insight },
+          { type: "morale", value: 2 },
+          { type: "", value: 1 }
+        ]
+      }
+    };
+    assert.equal(terrainSavePlan(s, "fort", { poison: true }).adjustment, Math.max(2, insight) - Math.max(0, insight));
+    assert.equal(
+      terrainSavePlan(s, "fort", { poison: true, smokeInhalation: true }).adjustment,
+      Math.max(4, insight) - Math.max(0, insight)
+    );
+  }
+});
+test("actual saving-throw entry records conditional sources and keeps Brace independent of typed save bonuses", async () => {
+  const a = new SpycraftActor();
+  a.system.activeFeatNames = ["Swamp Training", "Firefighter Training"];
+  a.system.saves = {
+    fort: { total: 10, bonusEntries: [{ type: "insight", value: 1 }] },
+    ref: { total: 9, bonusEntries: [{ type: "insight", value: 5 }] },
+    will: { total: 8, bonusEntries: [] }
+  };
+  a.rollCheck = async (formula, data, options) => ({ data, options });
+  const poison = await a.rollSave("fort", { poison: true });
+  assert.equal(poison.data.total, 11);
+  assert.equal(poison.options.terrainSave.adjustment, 1);
+  const smoke = await a.rollSave("fort", { smokeInhalation: true, poison: true });
+  assert.equal(smoke.data.total, 13);
+  assert.equal(smoke.options.terrainSave.bonuses.length, 2);
+  const fire = await a.rollSave("ref", { avoidCatchingFire: true });
+  assert.equal(fire.data.total, 9);
+  assert.equal(fire.options.terrainSave.adjustment, 0);
+  assert.equal((await a.rollSave("will", { poison: true })).data.total, 10);
+  assert.equal(await a.rollSave("invalid"), null);
+});
 
+import { characterSurvivalStats } from "../module/rules/terrain.mjs";
+test("Terrain damage resistance is unconditional by terrain, stacks with equipped armor and preserves total immunity without changing armor data", () => {
+  const s = state(["Arctic Training", "Desert Training", "Mountain Training"]);
+  s.armor = { resistances: { CD: 4, HT: "all", FA: 8, EL: 4 } };
+  const before = structuredClone(s.armor),
+    p = characterSurvivalStats(s);
+  assert.deepEqual(p.resistances, { CD: 9, HT: "all", FA: 13, EL: 4 });
+  assert.deepEqual(s.armor, before);
+  assert.equal(p.resistanceSources.length, 3);
+  s.activeFeatNames = [];
+  assert.deepEqual(characterSurvivalStats(s).resistances, s.armor.resistances);
+  assert.deepEqual(characterSurvivalStats(state([])).resistances, {});
+});
+test("breath allowance uses twice actual Constitution, Aquatic Athletics ranks, and twice the active Chase feat count for Wave Runner", () => {
+  const s = state(["Aquatic Training", "Wave Runner"]);
+  s.abilities = { con: { value: 16 } };
+  s.activeFeatSelections = [
+    { name: "Wave Runner", tree: "chase" },
+    { name: "Daredevil", tree: "chase" },
+    { name: "Aquatic Training", tree: "terrain" }
+  ];
+  assert.equal(characterSurvivalStats(s).breathRounds, 46);
+  s.activeFeatNames = ["Aquatic Training"];
+  assert.equal(characterSurvivalStats(s).breathRounds, 42);
+  s.activeFeatNames = ["Wave Runner"];
+  assert.equal(characterSurvivalStats(s).breathRounds, 36);
+  s.activeFeatNames = [];
+  assert.equal(characterSurvivalStats(s).breathRounds, 32);
+  assert.equal(s.abilities.con.value, 16);
+});
 
-test('Disease and Poison Basics grant their untyped +2 only for the explicitly declared resistance, across all three saves',()=>{
- for(const key of ['fort','ref','will'])for(const names of [[],['Disease Basics'],['Poison Basics'],['Disease Basics','Poison Basics','Disease Basics','Poison Basics']])for(const disease of [false,true,'true'])for(const poison of [false,true,'true']){
-  const p=terrainSavePlan(state(names),key,{disease,poison}),expected=(names.includes('Disease Basics')&&disease===true?2:0)+(names.includes('Poison Basics')&&poison===true?2:0);assert.equal(p.adjustment,expected);assert.ok(p.bonuses.every(b=>b.type===''));
- }
+import { computeAgent } from "../module/rules/engine.mjs";
+import { readFile } from "node:fs/promises";
+const classDefs = JSON.parse(await readFile(new URL("../src/data/classes.json", import.meta.url), "utf8")),
+  featDefs = JSON.parse(await readFile(new URL("../src/data/feats.json", import.meta.url), "utf8"));
+test("full engine derives only earned passive Terrain benefits and recalculates them when the character loses a feat", () => {
+  const scout = classDefs.find(c => c.key === "scout"),
+    items = [
+      { id: "scout", name: "Scout", type: "class", system: { ...scout, identifier: "scout", vitalityDie: 10 } },
+      ...["Arctic Training", "Desert Training", "Mountain Training", "Aquatic Training"].map((name, i) => ({
+        id: name,
+        name,
+        type: "feat",
+        system: { ...featDefs.find(f => f.name === name), tree: "terrain", acquiredAtLevel: [1, 3, 6, 9][i] }
+      })),
+      {
+        id: "armor",
+        name: "Synthetic armor",
+        type: "armor",
+        system: { equipped: true, armorType: "M", armorSlot: "body", resistances: "CD4, FA8" }
+      }
+    ],
+    source = {
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(key => [key, { base: 16 }])),
+      progression: Array.from({ length: 12 }, (_, i) => ({
+        classId: "scout",
+        vitality: 5,
+        skills: { survival: i === 0 ? 3 : 0, athletics: i === 0 ? 3 : 0 }
+      }))
+    },
+    s = computeAgent(structuredClone(source), items, cfg);
+  for (const name of ["Arctic Training", "Desert Training", "Mountain Training", "Aquatic Training"])
+    assert.equal(s.featStatus[name].ok, true);
+  assert.deepEqual(s.survivalStats.resistances, { CD: 9, FA: 13, HT: 5 });
+  assert.equal(s.survivalStats.breathRounds, 2 * s.abilities.con.value + 3);
+  const lost = computeAgent(
+    structuredClone(source),
+    items.filter(i => i.type !== "feat"),
+    cfg
+  );
+  assert.deepEqual(lost.survivalStats.resistances, { CD: 4, FA: 8 });
+  assert.equal(lost.survivalStats.breathRounds, 2 * lost.abilities.con.value);
 });
-test('Poison Basics stacks with Swamp insight and existing untyped bonuses, without receiving skill-only insight upgrades',()=>{
- for(const insight of [-3,0,1,2,4,6]){const s=state(['Poison Basics','Swamp Training','Unfair Advantage']);s.saves={fort:{bonusEntries:[{type:'insight',value:insight},{type:'',value:3},{type:'morale',value:2}]}};const p=terrainSavePlan(s,'fort',{poison:true});assert.equal(p.adjustment,2+Math.max(2,insight)-Math.max(0,insight));assert.deepEqual(p.bonuses.map(b=>b.value),[2,2]);}
+
+test("overland as-if Speed adds ten in every covered terrain, uses current encumbrance/armor-adjusted Speed and preserves immobility", () => {
+  const names = [
+      "Aquatic Training",
+      "Arctic Training",
+      "Desert Training",
+      "Forest Training",
+      "Jungle Training",
+      "Mountain Training",
+      "Swamp Training",
+      "Urban Training",
+      "Night Training"
+    ],
+    s = state(names);
+  s.speed = 20;
+  const p = characterSurvivalStats(s);
+  assert.deepEqual(
+    p.overlandTerrainSpeeds.map(r => r.terrain).sort(),
+    ["arctic", "desert", "plains", "forest", "jungle", "mountain", "swamp"].sort()
+  );
+  assert.ok(p.overlandTerrainSpeeds.every(r => r.speed === 30));
+  assert.equal(s.speed, 20);
+  s.encumbrance = { immobile: true };
+  assert.ok(characterSurvivalStats(s).overlandTerrainSpeeds.every(r => r.speed === 0));
+  s.activeFeatNames = [];
+  assert.equal(characterSurvivalStats(s).overlandTerrainSpeeds.length, 0);
 });
-test('actual disease/poison saves carry their typed proof and guard lost sources without changing independent typed insight',async()=>{
- for(const [feat,fact]of[['Disease Basics','disease'],['Poison Basics','poison']])for(const key of ['fort','ref','will']){const a=new SpycraftActor();a.system.activeFeatNames=[feat];a.system.saves={[key]:{total:7,bonusEntries:[{type:'insight',value:4}]}};a.rollCheck=async(f,data,options)=>({data,options});const r=await a.rollSave(key,{[fact]:true});assert.equal(r.data.total,9);assert.equal(r.options.terrainSaveSource.plan.bonuses[0].source,feat);r.options.validateSaveContext();a.system.activeFeatNames=[];assert.throws(()=>r.options.validateSaveContext(),/changed/);a.system.activeFeatNames=[feat];a.system.saves[key].bonusEntries.push({type:'insight',value:8});r.options.validateSaveContext();assert.equal((await a.rollSave(key,{[fact]:false})).data.total,7);}
+
+const { underwaterCheckPlan } = await import("../module/rules/environment.mjs");
+test("every named skill use takes the exact underwater Athletics threshold penalty except Athletics/Swim, with Aquatic immunity", () => {
+  for (const ranks of [0, 4, 5, 20])
+    for (const aquatic of [false, true]) {
+      const s = state([]);
+      s.skillTotals.athletics.ranks = ranks;
+      s.originEffects = aquatic ? [{ qualityKey: "aquatic" }] : [];
+      let checked = 0;
+      for (const [key, skill] of Object.entries(cfg.skills))
+        for (const check of skill.checks) {
+          const base = resolveSkillCheck(s, key, check, { gearStatus: "available", synergySkill: "none" }),
+            wet = resolveSkillCheck(s, key, check, { gearStatus: "available", synergySkill: "none", underwater: true }),
+            swim = key === "athletics" && check.id === "swim";
+          assert.equal(
+            wet.total - base.total,
+            aquatic || swim ? 0 : ranks >= 5 ? -2 : -4,
+            key + "/" + check.id + "/" + ranks + "/" + aquatic
+          );
+          assert.equal(wet.underwaterContext.swimExempt, swim);
+          assert.equal(wet.underwaterContext.aquatic, aquatic);
+          checked++;
+        }
+      assert.equal(checked, 100);
+    }
 });
-test('disease and poison context controls appear on actual Fortitude and Will dialogs even without a terrain feat',async()=>{
- const api=foundry.applications;let content='';foundry.applications={api:{DialogV2:{input:async o=>{content=o.content;return null;}}}};
- try{for(const [feat,fact,other]of[['Disease Basics','disease','poison'],['Poison Basics','poison','disease']])for(const key of ['fort','will']){const a=new SpycraftActor();a.system.activeFeatNames=[feat];await a.rollSave(key,{askContext:true});assert.ok(content.includes('name="'+fact+'"'));assert.ok(!content.includes('name="'+other+'"'));}}finally{foundry.applications=api;}
+test("underwater declarations are strict and generic Knowledge penalties do not inherit the related skill’s Swim exception", () => {
+  const s = state([]);
+  s.skillTotals.athletics.ranks = 4;
+  for (const underwater of [false, "true", 1, null, undefined])
+    assert.equal(underwaterCheckPlan(s, { underwater }).penalty, 0);
+  for (const skill of Object.keys(cfg.skills)) {
+    const dry = resolveKnowledgeCheck(s, { skill }),
+      wet = resolveKnowledgeCheck(s, { skill, underwater: true });
+    assert.equal(wet.total, dry.total - 4, skill);
+    assert.equal(wet.cap, null);
+    assert.equal(wet.rollMode, "blindroll");
+  }
+  s.originEffects = [{ qualityKey: "aquatic" }];
+  assert.equal(resolveKnowledgeCheck(s, { skill: "athletics", underwater: true }).underwaterContext.penalty, 0);
 });
-test('new disease evidence is immutable and replacement validated while old terrain proof shapes remain accepted',async()=>{
- const {validateTerrainSaveSource}=await import('../module/rules/terrain.mjs'),{rollEvidence,rollEvidenceMatches}=await import('../module/rules/outcomes.mjs');for(const [feat,facts]of[['Disease Basics',{disease:true}],['Poison Basics',{poison:true}],['Swamp Training',{poison:true}]]){const s=state([feat]),p=terrainSavePlan(s,'fort',facts),proof={version:1,checkId:'fort',plan:p},c={checkKind:'save',checkId:'fort',terrainSaveSource:proof};if(feat==='Swamp Training'){assert.equal(Object.hasOwn(p,'disease'),false);assert.ok(p.notes[0].startsWith('Conditional save insight:'));}validateTerrainSaveSource(s,proof,c);const e=rollEvidence(c),changed=structuredClone(c);changed.terrainSaveSource.plan.bonuses[0].value=3;assert.equal(rollEvidenceMatches(e,changed),false);s.activeFeatNames=[];assert.throws(()=>validateTerrainSaveSource(s,proof,c),/changed/);validateTerrainSaveSource(s,null,c);}
+test("only Reflex saves receive the underwater penalty, which adds to Brace and disappears with Aquatic", async () => {
+  const a = new SpycraftActor();
+  a.system = state([]);
+  a.system.skillTotals.athletics.ranks = 4;
+  a.system.saves = { ref: { total: 10 }, fort: { total: 10 }, will: { total: 10 } };
+  a.rollCheck = async (formula, data, options) => ({ data, options });
+  for (const key of ["ref", "fort", "will"]) {
+    const m = await a.rollSave(key, { underwater: true, braced: true });
+    assert.equal(m.data.total, key === "ref" ? 2 : 10);
+    assert.equal(m.options.underwaterContext.penalty, key === "ref" ? -4 : 0);
+  }
+  a.system.skillTotals.athletics.ranks = 5;
+  assert.equal((await a.rollSave("ref", { underwater: true })).data.total, 8);
+  a.system.originEffects = [{ qualityKey: "aquatic" }];
+  assert.equal((await a.rollSave("ref", { underwater: true, braced: true })).data.total, 6);
+});
+const { substituteSkillBonus } = await import("../module/rules/breakthrough.mjs");
+test("underwater check penalties survive class skill-bonus substitution exactly once", () => {
+  const s = state([]);
+  s.skillTotals.athletics.ranks = 4;
+  const dry = resolveSkillCheck(s, "analysis", cfg.skills.analysis.checks[0], {
+      gearStatus: "available",
+      synergySkill: "none",
+      modifier: 3
+    }),
+    wet = resolveSkillCheck(s, "analysis", cfg.skills.analysis.checks[0], {
+      gearStatus: "available",
+      synergySkill: "none",
+      modifier: 3,
+      underwater: true
+    });
+  assert.equal(
+    substituteSkillBonus({ skillBonus: 25 }, wet).total,
+    substituteSkillBonus({ skillBonus: 25 }, dry).total - 4
+  );
+  const kd = resolveKnowledgeCheck(s, { skill: "analysis", modifier: 3 }),
+    kw = resolveKnowledgeCheck(s, { skill: "analysis", modifier: 3, underwater: true });
+  assert.equal(
+    substituteSkillBonus({ skillBonus: 25 }, kw).total,
+    substituteSkillBonus({ skillBonus: 25 }, kd).total - 4
+  );
+});
+const originDefs = JSON.parse(await readFile(new URL("../src/data/origins.json", import.meta.url), "utf8"));
+test("Aquatic quality derives current underwater Speed and drowning immunity through origin selection, loss and load", () => {
+  const soldier = classDefs.find(c => c.key === "soldier"),
+    subject = originDefs.specialties.find(o => o.name === "Test Subject"),
+    c = {
+      id: "soldier",
+      type: "class",
+      name: "Soldier",
+      system: { ...soldier, identifier: "soldier", vitalityDie: 12 }
+    },
+    o = {
+      id: "subject",
+      type: "origin",
+      name: "Test Subject",
+      system: { ...subject, originChoices: { up: "con", down: "int", npcQuality0: "aquatic", npcQuality1: "fearless" } }
+    },
+    source = {
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+      progression: [{ classId: "soldier", vitality: 6, skills: {} }]
+    };
+  let s = computeAgent(structuredClone(source), [c, o], cfg);
+  assert.equal(s.survivalStats.aquatic, true);
+  assert.equal(s.survivalStats.canDrown, false);
+  assert.equal(s.survivalStats.underwaterSpeed, s.speed);
+  const heavy = {
+    id: "load",
+    name: "Heavy load",
+    type: "gear",
+    system: { quantity: 1, carried: true, weight: 100000 }
+  };
+  s = computeAgent(structuredClone(source), [c, o, heavy], cfg);
+  assert.equal(s.speed, 0);
+  assert.equal(s.survivalStats.underwaterSpeed, 0);
+  o.system.originChoices.npcQuality0 = "fearless";
+  s = computeAgent(structuredClone(source), [c, o], cfg);
+  assert.equal(s.survivalStats.aquatic, false);
+  assert.equal(s.survivalStats.canDrown, true);
+  assert.equal(s.survivalStats.underwaterSpeed, null);
+});
+test("actual Skill and Knowledge workflows record fresh underwater circumstances and current quality immunity", async () => {
+  const a = new SpycraftActor();
+  a.system = state([]);
+  a.system.skillTotals.athletics.ranks = 4;
+  a.rollCheck = async (formula, data, options) => ({ data, options });
+  const input = {
+    check: cfg.skills.analysis.checks[0].id,
+    gearStatus: "available",
+    underwater: true,
+    synergySkill: "none"
+  };
+  let m = await a.rollSkill("analysis", "int", input);
+  assert.equal(m.options.underwaterContext.penalty, -4);
+  assert.equal(m.data.total, 9);
+  m = await a.rollKnowledge({ skill: "analysis", underwater: true });
+  assert.equal(m.options.underwaterContext.penalty, -4);
+  a.system.originEffects = [{ qualityKey: "aquatic" }];
+  m = await a.rollSkill("analysis", "int", input);
+  assert.equal(m.options.underwaterContext.penalty, 0);
+  assert.equal(m.data.total, 13);
+});
+
+import { pursuitSkillPlan } from "../module/rules/pursuit-feats.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+function pursuitState(names = ["Escape and Evasion Training"]) {
+  const s = state(names);
+  s.activeFeatSelections = names.map(name => ({ name, choice: "", tree: "terrain" }));
+  return s;
+}
+test("pursuit manhunt roles cover all100 named skill uses with only their printed flat bonuses and Falsify synergy", () => {
+  for (const [source, role, target] of [
+    ["Escape and Evasion Training", "prey", "blend"],
+    ["Always Get Your Man", "predator", "investigation"]
+  ]) {
+    const s = pursuitState([source]);
+    for (const [key, skill] of Object.entries(cfg.skills))
+      for (const check of skill.checks) {
+        const opts = { gearStatus: "available", synergySkill: "none" },
+          base = resolveSkillCheck(s, key, check, opts),
+          r = resolveSkillCheck(s, key, check, { ...opts, manhuntRole: role });
+        assert.equal(r.total - base.total, key === target ? 3 : 0, source + "/" + key + "/" + check.id);
+        assert.equal(r.pursuitFeat.maximum, 6);
+        const p = pursuitSkillPlan(s, key, check, { manhuntRole: role });
+        assert.equal(
+          p.synergies.some(r => r.skill === "falsify"),
+          role === "prey"
+        );
+        assert.equal(
+          resolveSkillCheck(s, key, check, { ...opts, manhuntRole: role === "prey" ? "predator" : "prey" }).pursuitFeat,
+          null
+        );
+      }
+  }
+});
+test("all skill Maneuvers gain only their own chase role’s listed skill synergy, without a manhunt cap increase", () => {
+  let maneuvers = 0;
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const check of skill.checks) {
+      const s = pursuitState(["Always Get Your Man", "Escape and Evasion Training"]);
+      for (const [role, synergy] of [
+        ["predator", "investigation"],
+        ["prey", "bluff"]
+      ]) {
+        const p = pursuitSkillPlan(s, key, check, { chaseRole: role });
+        assert.equal(p.evidence?.chaseSource !== undefined, check.id === "maneuver");
+        if (check.id === "maneuver") {
+          assert.equal(p.synergies[0].skill, synergy);
+          assert.equal(p.maximum, 5);
+          maneuvers++;
+        }
+      }
+    }
+  assert.equal(maneuvers, 10);
+});
+test("Falsify and flat synergy compete rather than add; the manhunt cap follows every active Terrain selection and passive skill-derived synergy stays unavailable", () => {
+  const s = pursuitState(["Escape and Evasion Training", "Urban Training", "Night Training"]),
+    check = { ...cfg.skills.blend.checks[0], mode: "Active" };
+  s.skillTotals.falsify.ranks = 35;
+  const opts = { gearStatus: "available", manhuntRole: "prey" },
+    r = resolveSkillCheck(s, "blend", check, opts),
+    none = resolveSkillCheck(s, "blend", check, { ...opts, synergySkill: "none" });
+  assert.equal(r.synergy, 7);
+  assert.equal(r.total - none.total, 4);
+  assert.equal(r.pursuitFeat.totalSynergy, 7);
+  assert.equal(r.pursuitFeat.maximum, 8);
+  s.activeFeatSelections = [s.activeFeatSelections[0]];
+  assert.equal(resolveSkillCheck(s, "blend", check, opts).synergy, 6);
+  const passive = resolveSkillCheck(s, "blend", { ...check, mode: "Passive" }, opts);
+  assert.equal(passive.synergy, 0);
+  assert.equal(passive.pursuitFeat.totalSynergy, 3);
+  assert.throws(() => pursuitSkillPlan(s, "blend", check, { manhuntRole: "predator", manhuntPrey: true }), /both/);
+  for (const role of ["true", "hunter", "constructor"])
+    assert.throws(() => pursuitSkillPlan(s, "blend", check, { chaseRole: role }), /listed/);
+  assert.equal(
+    resolveSkillCheck(s, "blend", check, { gearStatus: "available", manhuntPrey: true }).pursuitFeat.manhuntRole,
+    "prey"
+  );
+  assert.equal(
+    resolveSkillCheck(s, "blend", check, { gearStatus: "available", manhuntPrey: "true" }).pursuitFeat,
+    null
+  );
+});
+test("pursuit role, source ranks, Terrain count, selected synergy and applied total stay immutable in outcome evidence", () => {
+  const s = pursuitState(),
+    r = resolveSkillCheck(s, "blend", cfg.skills.blend.checks[0], { gearStatus: "available", manhuntRole: "prey" }),
+    c = { checkKind: "skill", pursuitFeat: r.pursuitFeat },
+    e = rollEvidence(c);
+  assert.equal(rollEvidenceMatches(e, c), true);
+  for (const key of Object.keys(c.pursuitFeat)) {
+    const x = structuredClone(c);
+    x.pursuitFeat[key] = "changed";
+    assert.equal(rollEvidenceMatches(e, x), false, key);
+  }
+  assert.equal(rollEvidenceMatches(e, { checkKind: "skill" }), false);
+});
+test("actual skill entry carries pursuit evidence and rejects a lost feat, changed Terrain count or synergy rank before posting", async () => {
+  const a = new SpycraftActor();
+  a.system = pursuitState();
+  a.rollCheck = async (_f, _d, o) => {
+    await o.validateSkillContext();
+    return o;
+  };
+  const opts = { check: cfg.skills.blend.checks[0].id, gearStatus: "available", manhuntRole: "prey" },
+    m = await a.rollSkill("blend", "cha", opts);
+  assert.equal(m.pursuitFeat.source, "Escape and Evasion Training");
+  a.system.skillTotals.falsify.ranks++;
+  assert.throws(() => m.validateSkillContext(), /changed/);
+  a.system.skillTotals.falsify.ranks--;
+  a.system.activeFeatSelections.push({ name: "Urban Training", tree: "terrain" });
+  assert.throws(() => m.validateSkillContext(), /changed/);
+  a.system.activeFeatSelections.pop();
+  a.system.activeFeatNames = [];
+  assert.throws(() => m.validateSkillContext(), /changed/);
+});
+test("declaring either pursuit role establishes a Dramatic Conflict and cannot bypass the standalone-only 10-Second Solution restriction", () => {
+  const s = pursuitState();
+  s.classLevels = { scientist: 14 };
+  for (const context of [{ manhuntRole: "prey" }, { chaseRole: "predator" }, { manhuntPrey: true }]) {
+    const r = resolveSkillCheck(s, "analysis", cfg.skills.analysis.checks[0], {
+      gearStatus: "available",
+      tenSecondSolution: true,
+      standaloneCheckConfirmed: true,
+      ...context
+    });
+    assert.equal(r.blocked, true);
+    assert.match(r.blockedReason, /outside Complex Tasks and Dramatic Conflicts/);
+  }
+});
+
+import { dailyWaterRequirements } from "../module/rules/terrain.mjs";
+test("Desert Training halves both printed daily fluid requirements everywhere, including exactly ninety versus above ninety Fahrenheit", () => {
+  for (const names of [
+    [],
+    ["Desert Training"],
+    ["Desert Training", "Desert Training"],
+    ["Arctic Training", "Firefighter Training"]
+  ]) {
+    const s = state(names),
+      before = structuredClone(s),
+      multiplier = names.includes("Desert Training") ? 0.5 : 1;
+    for (const temperatureF of [-40, 0, 89.9, 90, 90.01, 110, 140]) {
+      const p = dailyWaterRequirements(s, { temperatureF });
+      assert.equal(p.currentQuarts, (temperatureF > 90 ? 2 : 1) * multiplier);
+      assert.equal(p.normalQuarts, multiplier);
+      assert.equal(p.hotQuarts, 2 * multiplier);
+    }
+    assert.deepEqual(s, before);
+    assert.equal(dailyWaterRequirements(s).currentQuarts, null);
+  }
+  for (const temperatureF of ["90", NaN, Infinity, -Infinity, {}, true])
+    assert.throws(() => dailyWaterRequirements(state(), { temperatureF }), /finite/);
+});
+test("the actual agent engine derives water requirements only from an active Desert Training source and removes the benefit when its prerequisite is lost", () => {
+  const soldier = classDefs.find(c => c.key === "soldier"),
+    featDef = featDefs.find(f => f.name === "Desert Training"),
+    cls = {
+      id: "soldier",
+      type: "class",
+      name: "Soldier",
+      system: { ...soldier, identifier: "soldier", vitalityDie: 12 }
+    },
+    f = {
+      id: "desert",
+      type: "feat",
+      name: "Desert Training",
+      system: { ...structuredClone(featDef), tree: "terrain", acquiredAtLevel: 1 }
+    },
+    source = {
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+      progression: [{ classId: "soldier", vitality: 6, skills: { survival: 3 } }]
+    };
+  let s = computeAgent(structuredClone(source), [cls, f], cfg);
+  assert.equal(s.featStatus.desert.ok, true);
+  assert.equal(s.survivalStats.dailyWater.normalQuarts, 0.5);
+  assert.equal(s.survivalStats.dailyWater.hotQuarts, 1);
+  source.progression[0].skills.survival = 2;
+  s = computeAgent(structuredClone(source), [cls, f], cfg);
+  assert.equal(s.featStatus.desert.ok, false);
+  assert.equal(s.survivalStats.dailyWater.normalQuarts, 1);
+  assert.equal(s.survivalStats.dailyWater.hotQuarts, 2);
+});
+
+test("terrain feat skill evidence freezes declared terrain, granted synergies and ambush opposition for every terrain training source", () => {
+  for (const [name, terrains] of Object.entries(mapping))
+    for (const terrain of terrains) {
+      const s = state([name]),
+        check = cfg.skills.survival.checks.find(c => c.id === "foraging"),
+        r = resolveSkillCheck(s, "survival", check, { gearStatus: "available", terrain });
+      assert.equal(r.terrainFeat.context.terrain, terrain);
+      assert.equal(r.terrainFeat.context.matched[0], name);
+      const c = { checkKind: "skill", terrain: r.terrain, terrainFeat: r.terrainFeat },
+        e = rollEvidence(c),
+        changed = structuredClone(c);
+      changed.terrain.terrain = terrain === "urban" ? "forest" : "urban";
+      assert.equal(rollEvidenceMatches(e, changed), false);
+      changed.terrain = c.terrain;
+      changed.terrainFeat.context.bonuses[0].value++;
+      assert.equal(rollEvidenceMatches(e, changed), false);
+    }
+  const s = state(["Home Turf"]),
+    check = cfg.skills.search.checks[0],
+    r = resolveSkillCheck(s, "search", check, { gearStatus: "available", homeTurf: true }),
+    c = { checkKind: "skill", terrain: r.terrain, terrainFeat: r.terrainFeat },
+    e = rollEvidence(c);
+  c.terrain.homeTurf = false;
+  assert.equal(rollEvidenceMatches(e, c), false);
+  const ambush = resolveSkillCheck(
+    state(["Night Training"]),
+    "tactics",
+    cfg.skills.tactics.checks.find(c => c.id === "ambush"),
+    { gearStatus: "available", nightAmbush: true }
+  );
+  assert.equal(ambush.terrainFeat.context.opponentSurprisePenalty, -2);
+});
+test("actual terrain skill entry rechecks insight and synergy sources and dependent skill ranks before posting", async () => {
+  const a = new SpycraftActor();
+  a.system = state(["Arctic Training"]);
+  a.rollCheck = async (_f, _d, o) => o;
+  const opts = { check: "balance", gearStatus: "available", naturalSurface: true, synergySkill: "survival" },
+    r = await a.rollSkill("acrobatics", "dex", opts);
+  assert.equal(typeof r.validateSkillContext, "function");
+  a.system.skillTotals.survival.ranks++;
+  assert.throws(() => r.validateSkillContext(), /changed/);
+  a.system.skillTotals.survival.ranks--;
+  a.system.activeFeatNames = [];
+  assert.throws(() => r.validateSkillContext(), /changed/);
+});
+test("a terrain feat lost during actual RNG cannot post the stale bonus or recorded opponent penalty", async () => {
+  const a = new SpycraftActor();
+  a.system = state(["Desert Training"]);
+  let posted = 0;
+  globalThis.ChatMessage = { getSpeaker: () => ({}) };
+  globalThis.Roll = class {
+    constructor() {
+      this.total = 15;
+      this.dice = [{ total: 12 }];
+    }
+    async evaluate() {
+      a.system.activeFeatNames = [];
+      return this;
+    }
+    async toMessage() {
+      posted++;
+      return this;
+    }
+  };
+  await assert.rejects(
+    a.rollSkill("survival", "wis", { check: "foraging", gearStatus: "available", terrain: "desert" }),
+    /changed/
+  );
+  assert.equal(posted, 0);
+});
+
+test("actual Firefighter and Swamp conditional save bonuses freeze their source and reject feat or typed-insight drift before posting", async () => {
+  for (const [feat, key, facts] of [
+    ["Firefighter Training", "ref", { avoidCatchingFire: true }],
+    ["Firefighter Training", "fort", { smokeInhalation: true }],
+    ["Swamp Training", "will", { poison: true }]
+  ]) {
+    const a = new SpycraftActor();
+    a.system.activeFeatNames = [feat];
+    a.system.saves = {
+      fort: { total: 4, bonusEntries: [] },
+      ref: { total: 4, bonusEntries: [] },
+      will: { total: 4, bonusEntries: [] }
+    };
+    let captured;
+    a.rollCheck = async (f, d, o) => {
+      captured = o;
+      return o;
+    };
+    await a.rollSave(key, facts);
+    assert.ok(captured.terrainSaveSource);
+    captured.validateSaveContext();
+    a.system.activeFeatNames = [];
+    assert.throws(() => captured.validateSaveContext(), /changed/);
+    a.system.activeFeatNames = [feat];
+    a.system.saves[key].bonusEntries.push({ type: "insight", value: 10 });
+    assert.throws(() => captured.validateSaveContext(), /changed/);
+  }
+});
+
+test("new conditional-save source proof also validates replacement rolls and immutable outcome evidence without changing legacy receipts", async () => {
+  const { validateTerrainSaveSource } = await import("../module/rules/terrain.mjs"),
+    { rollEvidence, rollEvidenceMatches } = await import("../module/rules/outcomes.mjs"),
+    s = state(["Firefighter Training"]);
+  s.saves = { ref: { bonusEntries: [] } };
+  const proof = { version: 1, checkId: "ref", plan: terrainSavePlan(s, "ref", { avoidCatchingFire: true }) },
+    context = { checkKind: "save", checkId: "ref" };
+  validateTerrainSaveSource(s, proof, context);
+  assert.throws(() => validateTerrainSaveSource(s, proof, { ...context, checkId: "fort" }));
+  const c = { ...context, terrainSaveSource: proof },
+    e = rollEvidence(c),
+    changed = structuredClone(c);
+  changed.terrainSaveSource.plan.avoidCatchingFire = false;
+  assert.equal(rollEvidenceMatches(e, changed), false);
+  s.activeFeatNames = [];
+  assert.throws(() => validateTerrainSaveSource(s, proof, context), /changed/);
+  validateTerrainSaveSource(s, null, context);
+});
+
+test("Disease and Poison Basics grant their untyped +2 only for the explicitly declared resistance, across all three saves", () => {
+  for (const key of ["fort", "ref", "will"])
+    for (const names of [
+      [],
+      ["Disease Basics"],
+      ["Poison Basics"],
+      ["Disease Basics", "Poison Basics", "Disease Basics", "Poison Basics"]
+    ])
+      for (const disease of [false, true, "true"])
+        for (const poison of [false, true, "true"]) {
+          const p = terrainSavePlan(state(names), key, { disease, poison }),
+            expected =
+              (names.includes("Disease Basics") && disease === true ? 2 : 0) +
+              (names.includes("Poison Basics") && poison === true ? 2 : 0);
+          assert.equal(p.adjustment, expected);
+          assert.ok(p.bonuses.every(b => b.type === ""));
+        }
+});
+test("Poison Basics stacks with Swamp insight and existing untyped bonuses, without receiving skill-only insight upgrades", () => {
+  for (const insight of [-3, 0, 1, 2, 4, 6]) {
+    const s = state(["Poison Basics", "Swamp Training", "Unfair Advantage"]);
+    s.saves = {
+      fort: {
+        bonusEntries: [
+          { type: "insight", value: insight },
+          { type: "", value: 3 },
+          { type: "morale", value: 2 }
+        ]
+      }
+    };
+    const p = terrainSavePlan(s, "fort", { poison: true });
+    assert.equal(p.adjustment, 2 + Math.max(2, insight) - Math.max(0, insight));
+    assert.deepEqual(
+      p.bonuses.map(b => b.value),
+      [2, 2]
+    );
+  }
+});
+test("actual disease/poison saves carry their typed proof and guard lost sources without changing independent typed insight", async () => {
+  for (const [feat, fact] of [
+    ["Disease Basics", "disease"],
+    ["Poison Basics", "poison"]
+  ])
+    for (const key of ["fort", "ref", "will"]) {
+      const a = new SpycraftActor();
+      a.system.activeFeatNames = [feat];
+      a.system.saves = { [key]: { total: 7, bonusEntries: [{ type: "insight", value: 4 }] } };
+      a.rollCheck = async (f, data, options) => ({ data, options });
+      const r = await a.rollSave(key, { [fact]: true });
+      assert.equal(r.data.total, 9);
+      assert.equal(r.options.terrainSaveSource.plan.bonuses[0].source, feat);
+      r.options.validateSaveContext();
+      a.system.activeFeatNames = [];
+      assert.throws(() => r.options.validateSaveContext(), /changed/);
+      a.system.activeFeatNames = [feat];
+      a.system.saves[key].bonusEntries.push({ type: "insight", value: 8 });
+      r.options.validateSaveContext();
+      assert.equal((await a.rollSave(key, { [fact]: false })).data.total, 7);
+    }
+});
+test("disease and poison context controls appear on actual Fortitude and Will dialogs even without a terrain feat", async () => {
+  const api = foundry.applications;
+  let content = "";
+  foundry.applications = {
+    api: {
+      DialogV2: {
+        input: async o => {
+          content = o.content;
+          return null;
+        }
+      }
+    }
+  };
+  try {
+    for (const [feat, fact, other] of [
+      ["Disease Basics", "disease", "poison"],
+      ["Poison Basics", "poison", "disease"]
+    ])
+      for (const key of ["fort", "will"]) {
+        const a = new SpycraftActor();
+        a.system.activeFeatNames = [feat];
+        await a.rollSave(key, { askContext: true });
+        assert.ok(content.includes('name="' + fact + '"'));
+        assert.ok(!content.includes('name="' + other + '"'));
+      }
+  } finally {
+    foundry.applications = api;
+  }
+});
+test("new disease evidence is immutable and replacement validated while old terrain proof shapes remain accepted", async () => {
+  const { validateTerrainSaveSource } = await import("../module/rules/terrain.mjs"),
+    { rollEvidence, rollEvidenceMatches } = await import("../module/rules/outcomes.mjs");
+  for (const [feat, facts] of [
+    ["Disease Basics", { disease: true }],
+    ["Poison Basics", { poison: true }],
+    ["Swamp Training", { poison: true }]
+  ]) {
+    const s = state([feat]),
+      p = terrainSavePlan(s, "fort", facts),
+      proof = { version: 1, checkId: "fort", plan: p },
+      c = { checkKind: "save", checkId: "fort", terrainSaveSource: proof };
+    if (feat === "Swamp Training") {
+      assert.equal(Object.hasOwn(p, "disease"), false);
+      assert.ok(p.notes[0].startsWith("Conditional save insight:"));
+    }
+    validateTerrainSaveSource(s, proof, c);
+    const e = rollEvidence(c),
+      changed = structuredClone(c);
+    changed.terrainSaveSource.plan.bonuses[0].value = 3;
+    assert.equal(rollEvidenceMatches(e, changed), false);
+    s.activeFeatNames = [];
+    assert.throws(() => validateTerrainSaveSource(s, proof, c), /changed/);
+    validateTerrainSaveSource(s, null, c);
+  }
 });

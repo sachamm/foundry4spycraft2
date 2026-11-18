@@ -1,6 +1,123 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {feintSkillChecks as checks,feintCheckPlan as plan,validateFeintProof as validate} from '../module/rules/feint.mjs';
-import {clock,input,sword,prep,acting,defending,fencingSystem as system} from './fixtures/feint.mjs';
-test('Feint registers distinct opposed DEX/WIS uses, action error1 on both, Vision on both and Hands-On only on acting check',()=>{for(const [key,c,attr,tags]of [['sleightOfHand',acting,'dex','Hands-On, Vision'],['notice',defending,'wis','Vision']]){assert.deepEqual(c.attributes,[attr]);assert.equal(c.error,2);assert.equal(c.tags,tags);assert.equal(c.page,357);assert.equal(c.combatAction,'feint');assert.equal(checks(key,checks(key)).filter(x=>x.id===c.id).length,1);}assert.equal(acting.time,'1 Half Action');assert.equal(defending.time,'Opposed response');assert.deepEqual(checks('bluff'),[]);});
-test('both participants require adjacency, target eligibility this round and a legal named incoming/acting action; taking is always rejected',()=>{for(const [key,c]of [['sleightOfHand',acting],['notice',defending]]){assert.equal(plan(system(),key,c,input()).blockedReason,'');for(const patch of [{method:'take10'},{method:'take20'},{feintOpponentName:''},{feintOpponentName:'x'.repeat(201)},{feintOpponentName:1},{feintAdjacent:false},{feintAdjacent:'true'},{feintTargetEligibleConfirmed:false},{feintTargetEligibleConfirmed:'true'},{feintLegalConfirmed:false},{feintCombat:null},{feintCombat:{...clock(),started:false}}])assert.ok(plan(system(),key,c,input(patch)).blockedReason,JSON.stringify(patch));}const otherTurn={...clock(),turn:1};assert.ok(plan(system(),'sleightOfHand',acting,input({feintCombat:otherTurn})).blockedReason);assert.equal(plan(system(),'notice',defending,input({feintCombat:otherTurn})).blockedReason,'');assert.equal(plan(system(),'bluff',{id:'feint'},input()).evidence,null);});
-test('Fencing Feint gear bonus requires current qualification, actual one-handed FIN sword and legal held capacity in both roles',()=>{for(const names of [[],['Fencing Basics']])for(const family of ['', 'axe','oneHandedSword'])for(const qualities of ['', 'FIN']){const s=prep({...system(),activeFeatNames:names},[sword({meleeFamily:family,qualities})]);for(const [key,c]of [['sleightOfHand',acting],['notice',defending]])assert.equal(plan(s,key,c,input()).bonuses.length,names.length&&family==='oneHandedSword'&&qualities==='FIN'?1:0);}for(const patch of [{sizeHands:'M/2h'},{equipped:false},{carried:false},{reserve:true},{quantity:0},{destroyed:true}])assert.equal(plan(prep(system(),[sword(patch)]),'notice',defending,input()).bonuses.length,0);const two=[sword({useHands:2}),{...sword(),id:'second'}];assert.match(plan(prep(system(),two),'notice',defending,input()).blockedReason,/two hands/);for(const grant of [false,true]){const s=prep({...system(),activeFeatNames:['Fencing Basics','Finesse Basics']},[sword({qualities:'',grantFinesse:grant})]);assert.equal(plan(s,'notice',defending,input()).bonuses.length,Number(grant));}});
-test('immutable Feint proof checks live owned Items, local null UUIDs, explicit UUIDs, current round and actual substituted attribute',()=>{const items=[sword()],a={items,system:system()},proof=plan(a.system,'sleightOfHand',acting,input()).evidence,scope={checkKind:'skill',skillKey:'sleightOfHand',checkId:'feint',ability:'dex',combat:clock()};validate(a,proof,scope);validate(a,Object.fromEntries(Object.entries(proof).reverse()),scope);assert.throws(()=>validate(a,proof,{...scope,ability:'wis'}),/attribute/);assert.throws(()=>validate(a,proof,{...scope,combat:{...clock(),round:4}}),/changed/);for(const field of ['opponentName','adjacent','targetEligibleConfirmed','legalConfirmed','role','version']){const p=structuredClone(proof);p[field]=null;assert.throws(()=>validate(a,p,scope),field);}const local=structuredClone(proof);local.fencingBasics.weapons[0].uuid=null;validate(a,local,scope);const forged=structuredClone(proof);forged.fencingBasics.weapons[0].uuid='Actor.foreign.Item.sword';assert.throws(()=>validate(a,forged,scope));items[0].system.destroyed=true;assert.throws(()=>validate(a,proof,scope),/changed/);items[0].system.destroyed=false;a.system.classLevels={schemer:4};validate(a,proof,{...scope,ability:'int',attributeSubstitution:{source:'All According to Plan',originalAbility:'dex',ability:'int'}});a.system.classLevels={};assert.throws(()=>validate(a,proof,{...scope,ability:'int',attributeSubstitution:{source:'All According to Plan',originalAbility:'dex',ability:'int'}}),/attribute/);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  feintSkillChecks as checks,
+  feintCheckPlan as plan,
+  validateFeintProof as validate
+} from "../module/rules/feint.mjs";
+import { clock, input, sword, prep, acting, defending, fencingSystem as system } from "./fixtures/feint.mjs";
+test("Feint registers distinct opposed DEX/WIS uses, action error1 on both, Vision on both and Hands-On only on acting check", () => {
+  for (const [key, c, attr, tags] of [
+    ["sleightOfHand", acting, "dex", "Hands-On, Vision"],
+    ["notice", defending, "wis", "Vision"]
+  ]) {
+    assert.deepEqual(c.attributes, [attr]);
+    assert.equal(c.error, 2);
+    assert.equal(c.tags, tags);
+    assert.equal(c.page, 357);
+    assert.equal(c.combatAction, "feint");
+    assert.equal(checks(key, checks(key)).filter(x => x.id === c.id).length, 1);
+  }
+  assert.equal(acting.time, "1 Half Action");
+  assert.equal(defending.time, "Opposed response");
+  assert.deepEqual(checks("bluff"), []);
+});
+test("both participants require adjacency, target eligibility this round and a legal named incoming/acting action; taking is always rejected", () => {
+  for (const [key, c] of [
+    ["sleightOfHand", acting],
+    ["notice", defending]
+  ]) {
+    assert.equal(plan(system(), key, c, input()).blockedReason, "");
+    for (const patch of [
+      { method: "take10" },
+      { method: "take20" },
+      { feintOpponentName: "" },
+      { feintOpponentName: "x".repeat(201) },
+      { feintOpponentName: 1 },
+      { feintAdjacent: false },
+      { feintAdjacent: "true" },
+      { feintTargetEligibleConfirmed: false },
+      { feintTargetEligibleConfirmed: "true" },
+      { feintLegalConfirmed: false },
+      { feintCombat: null },
+      { feintCombat: { ...clock(), started: false } }
+    ])
+      assert.ok(plan(system(), key, c, input(patch)).blockedReason, JSON.stringify(patch));
+  }
+  const otherTurn = { ...clock(), turn: 1 };
+  assert.ok(plan(system(), "sleightOfHand", acting, input({ feintCombat: otherTurn })).blockedReason);
+  assert.equal(plan(system(), "notice", defending, input({ feintCombat: otherTurn })).blockedReason, "");
+  assert.equal(plan(system(), "bluff", { id: "feint" }, input()).evidence, null);
+});
+test("Fencing Feint gear bonus requires current qualification, actual one-handed FIN sword and legal held capacity in both roles", () => {
+  for (const names of [[], ["Fencing Basics"]])
+    for (const family of ["", "axe", "oneHandedSword"])
+      for (const qualities of ["", "FIN"]) {
+        const s = prep({ ...system(), activeFeatNames: names }, [sword({ meleeFamily: family, qualities })]);
+        for (const [key, c] of [
+          ["sleightOfHand", acting],
+          ["notice", defending]
+        ])
+          assert.equal(
+            plan(s, key, c, input()).bonuses.length,
+            names.length && family === "oneHandedSword" && qualities === "FIN" ? 1 : 0
+          );
+      }
+  for (const patch of [
+    { sizeHands: "M/2h" },
+    { equipped: false },
+    { carried: false },
+    { reserve: true },
+    { quantity: 0 },
+    { destroyed: true }
+  ])
+    assert.equal(plan(prep(system(), [sword(patch)]), "notice", defending, input()).bonuses.length, 0);
+  const two = [sword({ useHands: 2 }), { ...sword(), id: "second" }];
+  assert.match(plan(prep(system(), two), "notice", defending, input()).blockedReason, /two hands/);
+  for (const grant of [false, true]) {
+    const s = prep({ ...system(), activeFeatNames: ["Fencing Basics", "Finesse Basics"] }, [
+      sword({ qualities: "", grantFinesse: grant })
+    ]);
+    assert.equal(plan(s, "notice", defending, input()).bonuses.length, Number(grant));
+  }
+});
+test("immutable Feint proof checks live owned Items, local null UUIDs, explicit UUIDs, current round and actual substituted attribute", () => {
+  const items = [sword()],
+    a = { items, system: system() },
+    proof = plan(a.system, "sleightOfHand", acting, input()).evidence,
+    scope = { checkKind: "skill", skillKey: "sleightOfHand", checkId: "feint", ability: "dex", combat: clock() };
+  validate(a, proof, scope);
+  validate(a, Object.fromEntries(Object.entries(proof).reverse()), scope);
+  assert.throws(() => validate(a, proof, { ...scope, ability: "wis" }), /attribute/);
+  assert.throws(() => validate(a, proof, { ...scope, combat: { ...clock(), round: 4 } }), /changed/);
+  for (const field of ["opponentName", "adjacent", "targetEligibleConfirmed", "legalConfirmed", "role", "version"]) {
+    const p = structuredClone(proof);
+    p[field] = null;
+    assert.throws(() => validate(a, p, scope), field);
+  }
+  const local = structuredClone(proof);
+  local.fencingBasics.weapons[0].uuid = null;
+  validate(a, local, scope);
+  const forged = structuredClone(proof);
+  forged.fencingBasics.weapons[0].uuid = "Actor.foreign.Item.sword";
+  assert.throws(() => validate(a, forged, scope));
+  items[0].system.destroyed = true;
+  assert.throws(() => validate(a, proof, scope), /changed/);
+  items[0].system.destroyed = false;
+  a.system.classLevels = { schemer: 4 };
+  validate(a, proof, {
+    ...scope,
+    ability: "int",
+    attributeSubstitution: { source: "All According to Plan", originalAbility: "dex", ability: "int" }
+  });
+  a.system.classLevels = {};
+  assert.throws(
+    () =>
+      validate(a, proof, {
+        ...scope,
+        ability: "int",
+        attributeSubstitution: { source: "All According to Plan", originalAbility: "dex", ability: "int" }
+      }),
+    /attribute/
+  );
+});

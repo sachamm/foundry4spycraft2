@@ -1,5 +1,82 @@
-import {actor as baseActor,controls,opts} from './side-stance.mjs';
-import {prep} from './feint.mjs';import {limitedUseAbilities} from '../../module/rules/limited-uses.mjs';import {SPYCRAFT as cfg} from '../../module/config.mjs';
-export {controls};
-export function actor(){const a=baseActor(),d=game.actors[1];Object.assign(a.items[0].system,{proficiency:'exoticEdged',meleeFamily:'polearm',sizeHands:'M/2h',useHands:2,qualities:'',damage:'1d8'});Object.assign(a.system,{activeFeatNames:['Polearm Basics','All-out Attack'],combatStance:{version:1,key:'striking',id:'striking1',enteredAt:0},resourceUses:{},stanceRoundMovement:{version:1,key:a.clock.id+':'+a.clock.round,feet:0}});a.system.proficiencyTotals.exoticEdged={proficient:true};a.system=prep(a.system,a.items);a.clock.turn=1;a.clock.ownTurnIndex=0;const combat={id:a.clock.id,started:true,round:a.clock.round,turn:1,turns:[{id:a.clock.combatantId,get actor(){return game.actors.find(x=>x.uuid===a.uuid);}},{id:'active-opponent',get actor(){return game.actors.find(x=>x.uuid===d.uuid);}}],combatants:[{actor:a},{actor:d}]};Object.defineProperty(a,'participatingCombat',{configurable:true,get:()=>combat});a.mentalLeapCombatContext=()=>({...a.clock,round:combat.round,turn:combat.turn});Object.defineProperty(a,'usagePeriods',{configurable:true,get:()=>({round:combat.id+':'+combat.round,combat:combat.id,scene:'testScene'})});a.flags={};a.update=async patch=>{for(const [path,value]of Object.entries(patch)){const keys=path.split('.');let o=a;for(const k of keys.slice(0,-1))o=o[k]??={};const k=keys.at(-1);if(k.startsWith('-='))delete o[k.slice(2)];else o[k]=structuredClone(value);}return a;};game.combat=combat;game.combats=[combat];game.messages.get=id=>game.messages.find(m=>m.id===id);a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);a.refreshLimited=()=>a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);return a;}
-export const input=patch=>({opponentUuid:'Actor.target',weaponId:'sword',entryConfirmed:true,alreadyInStanceConfirmed:true,immediateConfirmed:true,roundMovementConfirmed:true,attackLegalConfirmed:true,...patch});
+import { actor as baseActor, controls } from "./side-stance.mjs";
+import { prep } from "./feint.mjs";
+import { limitedUseAbilities } from "../../module/rules/limited-uses.mjs";
+import { SPYCRAFT as cfg } from "../../module/config.mjs";
+export { controls };
+export function actor() {
+  const a = baseActor(),
+    d = game.actors[1];
+  Object.assign(a.items[0].system, {
+    proficiency: "exoticEdged",
+    meleeFamily: "polearm",
+    sizeHands: "M/2h",
+    useHands: 2,
+    qualities: "",
+    damage: "1d8"
+  });
+  Object.assign(a.system, {
+    activeFeatNames: ["Polearm Basics", "All-out Attack"],
+    combatStance: { version: 1, key: "striking", id: "striking1", enteredAt: 0 },
+    resourceUses: {},
+    stanceRoundMovement: { version: 1, key: a.clock.id + ":" + a.clock.round, feet: 0 }
+  });
+  a.system.proficiencyTotals.exoticEdged = { proficient: true };
+  a.system = prep(a.system, a.items);
+  a.clock.turn = 1;
+  a.clock.ownTurnIndex = 0;
+  const combat = {
+    id: a.clock.id,
+    started: true,
+    round: a.clock.round,
+    turn: 1,
+    turns: [
+      {
+        id: a.clock.combatantId,
+        get actor() {
+          return game.actors.find(x => x.uuid === a.uuid);
+        }
+      },
+      {
+        id: "active-opponent",
+        get actor() {
+          return game.actors.find(x => x.uuid === d.uuid);
+        }
+      }
+    ],
+    combatants: [{ actor: a }, { actor: d }]
+  };
+  Object.defineProperty(a, "participatingCombat", { configurable: true, get: () => combat });
+  a.mentalLeapCombatContext = () => ({ ...a.clock, round: combat.round, turn: combat.turn });
+  Object.defineProperty(a, "usagePeriods", {
+    configurable: true,
+    get: () => ({ round: combat.id + ":" + combat.round, combat: combat.id, scene: "testScene" })
+  });
+  a.flags = {};
+  a.update = async patch => {
+    for (const [path, value] of Object.entries(patch)) {
+      const keys = path.split(".");
+      let o = a;
+      for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+      const k = keys.at(-1);
+      if (k.startsWith("-=")) delete o[k.slice(2)];
+      else o[k] = structuredClone(value);
+    }
+    return a;
+  };
+  game.combat = combat;
+  game.combats = [combat];
+  game.messages.get = id => game.messages.find(m => m.id === id);
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  a.refreshLimited = () => (a.system.limitedUses = limitedUseAbilities(a.system, [], cfg));
+  return a;
+}
+export const input = patch => ({
+  opponentUuid: "Actor.target",
+  weaponId: "sword",
+  entryConfirmed: true,
+  alreadyInStanceConfirmed: true,
+  immediateConfirmed: true,
+  roundMovementConfirmed: true,
+  attackLegalConfirmed: true,
+  ...patch
+});

@@ -6,11 +6,13 @@ const retroCSS = readFileSync(new URL("../../styles/retro.css", import.meta.url)
 const tabs = ["main", "classes", "skills", "feats", "training", "gear", "bio"];
 // Exercise real part root classes inside a Foundry-style fixed-height flex window.
 // This is a layout regression fixture, not a replacement for live Foundry QA.
-const roots = Object.fromEntries(tabs.map(id => {
-  const source = readFileSync(new URL(`../../templates/actor/agent-${id}.hbs`, import.meta.url), "utf8");
-  const classes = /<section class="([^"]+)"/.exec(source)[1].replace("{{tab.cssClass}}", "");
-  return [id, classes];
-}));
+const roots = Object.fromEntries(
+  tabs.map(id => {
+    const source = readFileSync(new URL(`../../templates/actor/agent-${id}.hbs`, import.meta.url), "utf8");
+    const classes = /<section class="([^"]+)"/.exec(source)[1].replace("{{tab.cssClass}}", "");
+    return [id, classes];
+  })
+);
 
 async function mount(page, { height = 860, header = 180, css = baseCSS } = {}) {
   await page.setContent(`
@@ -31,16 +33,22 @@ async function mount(page, { height = 860, header = 180, css = baseCSS } = {}) {
       <form class="window-content">
         <div class="sheet-top">Dossier, resources and expanded checklist</div>
         <nav class="sheet-tabs">${tabs.map(id => `<button type="button" data-tab="${id}">${id}</button>`).join("")}</nav>
-        ${tabs.map((id, i) => `<section class="${roots[id]} ${i ? "" : "active"}" data-tab="${id}">
+        ${tabs
+          .map(
+            (id, i) => `<section class="${roots[id]} ${i ? "" : "active"}" data-tab="${id}">
           <div style="height:1800px">Long ${id} content</div>
           <button type="button" class="bottom-control">Last ${id} control</button>
-        </section>`).join("")}
+        </section>`
+          )
+          .join("")}
       </form>
     </div>`);
   await page.locator("nav button").evaluateAll(buttons => {
-    for (const button of buttons) button.addEventListener("click", () => {
-      for (const tab of document.querySelectorAll("section.tab")) tab.classList.toggle("active", tab.dataset.tab === button.dataset.tab);
-    });
+    for (const button of buttons)
+      button.addEventListener("click", () => {
+        for (const tab of document.querySelectorAll("section.tab"))
+          tab.classList.toggle("active", tab.dataset.tab === button.dataset.tab);
+      });
   });
 }
 
@@ -52,7 +60,9 @@ for (const height of [520, 860]) {
         await page.locator(`nav button[data-tab="${id}"]`).click();
         const active = page.locator(`section[data-tab="${id}"]`);
         expect(await active.evaluate(el => el.scrollHeight > el.clientHeight && el.clientHeight > 0)).toBe(true);
-        await active.evaluate(el => { el.scrollTop = el.scrollHeight; });
+        await active.evaluate(el => {
+          el.scrollTop = el.scrollHeight;
+        });
         await expect(active.locator(".bottom-control")).toBeInViewport();
         await expect(page.locator(".sheet-top")).toBeInViewport();
         await expect(page.locator("nav")).toBeInViewport();
@@ -64,7 +74,9 @@ for (const height of [520, 860]) {
 }
 
 // The NPC sheet is one part; its root must scroll inside the fixed-height window.
-const npcRoot = /<section class="([^"]+)"/.exec(readFileSync(new URL("../../templates/actor/npc-sheet.hbs", import.meta.url), "utf8"))[1];
+const npcRoot = /<section class="([^"]+)"/.exec(
+  readFileSync(new URL("../../templates/actor/npc-sheet.hbs", import.meta.url), "utf8")
+)[1];
 
 async function mountNpc(page, { height = 800, css = baseCSS } = {}) {
   await page.setContent(`
@@ -92,7 +104,9 @@ for (const height of [520, 800]) {
     await mountNpc(page, { height });
     const root = page.locator(".window-content > section");
     expect(await root.evaluate(el => el.scrollHeight > el.clientHeight && el.clientHeight > 0)).toBe(true);
-    await root.evaluate(el => { el.scrollTop = el.scrollHeight; });
+    await root.evaluate(el => {
+      el.scrollTop = el.scrollHeight;
+    });
     await expect(root.locator(".bottom-control")).toBeInViewport();
   });
 }
@@ -101,18 +115,21 @@ test("NPC fixture reproduces the inaccessible bottom without the viewport fix", 
   const beforeFix = baseCSS.replace(/\/\* NPC sheet viewport\.[\s\S]*?(?=\/\* Biography )/, "");
   await mountNpc(page, { css: beforeFix });
   const root = page.locator(".window-content > section");
-  await root.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await root.evaluate(el => {
+    el.scrollTop = el.scrollHeight;
+  });
   await expect(root.locator(".bottom-control")).not.toBeInViewport();
 });
 
-test("fixture reproduces the inaccessible bottom without the viewport fix",async ({ page }) => {
+test("fixture reproduces the inaccessible bottom without the viewport fix", async ({ page }) => {
   const beforeFix = baseCSS.replace(/\/\* Agent tab viewport\.[\s\S]*?(?=\/\* Header \*\/)/, "");
   await mount(page, { height: 520, css: beforeFix });
   const tab = page.locator("section.tab.active");
-  await tab.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await tab.evaluate(el => {
+    el.scrollTop = el.scrollHeight;
+  });
   await expect(tab.locator(".bottom-control")).not.toBeInViewport();
 });
-
 
 test("an oversized expanded header cannot collapse any tab to zero height", async ({ page }) => {
   const zeroViewport = baseCSS.replace(/min-height: 80px;/, "min-height: 0;");

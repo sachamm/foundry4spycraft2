@@ -1,56 +1,582 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {shakenInitiativeMarker as marker,shakenInitiativePlan as plan,reviewedShakenInitiativePlan as reviewed} from '../module/rules/shaken-initiative.mjs';
-const system=grade=>({conditionContext:{shakenGrade:grade}});
-test('Shaken II changes an existing Count once, higher grades retain the same penalty, and clearing restores only four',()=>{let row={initiative:20,record:marker(system(0),20)};for(const [grade,expected,delta] of [[1,20,0],[2,16,-4],[3,16,0],[4,16,0],[1,20,4],[0,20,0]]){const p=plan(system(grade),row);assert.equal(p.initiative,expected);assert.equal(p.delta,delta);assert.equal(p.needsReview,undefined);row={initiative:p.initiative,record:p.record};assert.equal(plan(system(grade),row).changed,false);}});
-test('freshly rolled or manually entered final Counts already include their current Shaken modifier',()=>{for(const grade of [0,1,2,3,4]){const r=marker(system(grade),16);assert.equal(r.includedPenalty,grade>=2?-4:0);assert.equal(plan(system(grade),{initiative:16,record:r}).delta,0);assert.equal(plan(system(0),{initiative:16,record:r}).initiative,grade>=2?20:16);}});
-test('independent rerolls or manual Count edits replace the known component rather than replaying a condition delta',()=>{const r=marker(system(2),5);assert.equal(plan(system(2),{initiative:5,record:r}).changed,false);assert.equal(plan(system(0),{initiative:5,record:r}).initiative,9);assert.equal(plan(system(2),{initiative:20,record:r}).needsReview,true);});
-test('legacy Counts require review even at grade0; no presumed adjustment overwrites their current value',()=>{for(const grade of [0,2,3])for(const record of [undefined,{}, {version:1,count:20,includedPenalty:null},{version:2,count:20,includedPenalty:-4}]){const p=plan(system(grade),{initiative:20,record});assert.equal(p.needsReview,true);assert.equal(p.initiative,20);assert.equal(p.delta,0);}});
-test('GC inclusion decisions reconcile both present and cleared conditions without guessing the old component',()=>{for(const grade of [0,2])for(const included of [0,-4]){const p=reviewed(system(grade),{initiative:16,record:{needsReview:true}},included);assert.equal(p.initiative,16+(grade===2?-4:0)-included);assert.equal(p.record.includedPenalty,grade===2?-4:0);assert.equal(p.record.needsReview,false);}});
-test('unrolled/reset Counts carry no penalty and receive a new component only when a final Count is entered',()=>{for(const grade of [0,2,4]){const p=plan(system(grade),{initiative:null,record:marker(system(0),20)});assert.equal(p.initiative,null);assert.equal(p.record.includedPenalty,0);assert.equal(plan(system(grade),{initiative:null,record:p.record}).changed,false);}});
-test('invalid sources, nonfinite Counts, unsafe arithmetic and malformed inclusion choices cannot change Count',()=>{for(const grade of [-1,NaN,'2']){assert.throws(()=>marker(system(grade),20));assert.equal(plan(system(grade),{initiative:20,record:marker(system(0),20)}).needsReview,true);}for(const initiative of [undefined,'20',NaN,Infinity,Number.MAX_SAFE_INTEGER+1])assert.equal(plan(system(2),{initiative,record:{}}).needsReview,true);assert.equal(plan(system(0),{initiative:Number.MAX_SAFE_INTEGER,record:marker(system(2),Number.MAX_SAFE_INTEGER)}).needsReview,true);for(const included of [undefined,null,true,4,-3])assert.throws(()=>reviewed(system(2),{initiative:20},included));});
-test('a recorded review remains held when condition grades change, preserving the unresolved inclusion decision',()=>{for(const grade of [0,1,2,4]){const record={version:1,count:16,includedPenalty:-4,needsReview:true,reason:'Uncertain Count write'};const p=plan(system(grade),{initiative:16,record});assert.equal(p.needsReview,true);assert.equal(p.initiative,16);assert.equal(p.record,record);}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  shakenInitiativeMarker as marker,
+  shakenInitiativePlan as plan,
+  reviewedShakenInitiativePlan as reviewed
+} from "../module/rules/shaken-initiative.mjs";
+const system = grade => ({ conditionContext: { shakenGrade: grade } });
+test("Shaken II changes an existing Count once, higher grades retain the same penalty, and clearing restores only four", () => {
+  let row = { initiative: 20, record: marker(system(0), 20) };
+  for (const [grade, expected, delta] of [
+    [1, 20, 0],
+    [2, 16, -4],
+    [3, 16, 0],
+    [4, 16, 0],
+    [1, 20, 4],
+    [0, 20, 0]
+  ]) {
+    const p = plan(system(grade), row);
+    assert.equal(p.initiative, expected);
+    assert.equal(p.delta, delta);
+    assert.equal(p.needsReview, undefined);
+    row = { initiative: p.initiative, record: p.record };
+    assert.equal(plan(system(grade), row).changed, false);
+  }
+});
+test("freshly rolled or manually entered final Counts already include their current Shaken modifier", () => {
+  for (const grade of [0, 1, 2, 3, 4]) {
+    const r = marker(system(grade), 16);
+    assert.equal(r.includedPenalty, grade >= 2 ? -4 : 0);
+    assert.equal(plan(system(grade), { initiative: 16, record: r }).delta, 0);
+    assert.equal(plan(system(0), { initiative: 16, record: r }).initiative, grade >= 2 ? 20 : 16);
+  }
+});
+test("independent rerolls or manual Count edits replace the known component rather than replaying a condition delta", () => {
+  const r = marker(system(2), 5);
+  assert.equal(plan(system(2), { initiative: 5, record: r }).changed, false);
+  assert.equal(plan(system(0), { initiative: 5, record: r }).initiative, 9);
+  assert.equal(plan(system(2), { initiative: 20, record: r }).needsReview, true);
+});
+test("legacy Counts require review even at grade0; no presumed adjustment overwrites their current value", () => {
+  for (const grade of [0, 2, 3])
+    for (const record of [
+      undefined,
+      {},
+      { version: 1, count: 20, includedPenalty: null },
+      { version: 2, count: 20, includedPenalty: -4 }
+    ]) {
+      const p = plan(system(grade), { initiative: 20, record });
+      assert.equal(p.needsReview, true);
+      assert.equal(p.initiative, 20);
+      assert.equal(p.delta, 0);
+    }
+});
+test("GC inclusion decisions reconcile both present and cleared conditions without guessing the old component", () => {
+  for (const grade of [0, 2])
+    for (const included of [0, -4]) {
+      const p = reviewed(system(grade), { initiative: 16, record: { needsReview: true } }, included);
+      assert.equal(p.initiative, 16 + (grade === 2 ? -4 : 0) - included);
+      assert.equal(p.record.includedPenalty, grade === 2 ? -4 : 0);
+      assert.equal(p.record.needsReview, false);
+    }
+});
+test("unrolled/reset Counts carry no penalty and receive a new component only when a final Count is entered", () => {
+  for (const grade of [0, 2, 4]) {
+    const p = plan(system(grade), { initiative: null, record: marker(system(0), 20) });
+    assert.equal(p.initiative, null);
+    assert.equal(p.record.includedPenalty, 0);
+    assert.equal(plan(system(grade), { initiative: null, record: p.record }).changed, false);
+  }
+});
+test("invalid sources, nonfinite Counts, unsafe arithmetic and malformed inclusion choices cannot change Count", () => {
+  for (const grade of [-1, NaN, "2"]) {
+    assert.throws(() => marker(system(grade), 20));
+    assert.equal(plan(system(grade), { initiative: 20, record: marker(system(0), 20) }).needsReview, true);
+  }
+  for (const initiative of [undefined, "20", NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])
+    assert.equal(plan(system(2), { initiative, record: {} }).needsReview, true);
+  assert.equal(
+    plan(system(0), { initiative: Number.MAX_SAFE_INTEGER, record: marker(system(2), Number.MAX_SAFE_INTEGER) })
+      .needsReview,
+    true
+  );
+  for (const included of [undefined, null, true, 4, -3])
+    assert.throws(() => reviewed(system(2), { initiative: 20 }, included));
+});
+test("a recorded review remains held when condition grades change, preserving the unresolved inclusion decision", () => {
+  for (const grade of [0, 1, 2, 4]) {
+    const record = { version: 1, count: 16, includedPenalty: -4, needsReview: true, reason: "Uncertain Count write" };
+    const p = plan(system(grade), { initiative: 16, record });
+    assert.equal(p.needsReview, true);
+    assert.equal(p.initiative, 16);
+    assert.equal(p.record, record);
+  }
+});
 
-import {reconcileShakenInitiative,reviewShakenInitiative,guardShakenInitiativeUpdate,shakenInitiativeEvidence,shakenInitiativeReviews,shakenCombatantClass,installShakenInitiativeHooks} from '../module/apps/shaken-initiative.mjs';
-let sequence=0;
-function fixture({grade=0,count=20,legacy=false}={}){
- globalThis.foundry={utils:{randomID:()=>`op${++sequence}`,escapeHTML:String},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.ui={notifications:{warn:()=>{}}};
- const a={uuid:'Actor.count',type:'agent',isOwner:true,documentName:'Actor',system:{},effects:[],statuses:new Set(),sheet:{render(){}},testUserPermission:()=>true};
- const setGrade=n=>{a.effects=n?[{id:'shaken',uuid:a.uuid+'.ActiveEffect.shaken',name:'Shaken',active:true,statuses:new Set(['shaken-'+n]),flags:{spycraft2:{shakenGrade:n}}}]:[];};setGrade(grade);
- const combat={id:'combat',name:'Test combat'},c={id:'combatant',actor:a,parent:combat,initiative:count,flags:{spycraft2:{}},writes:0,fail:null,async update(patch,opts={}){guardShakenInitiativeUpdate(this,patch,opts);if(this.fail==='before')throw Error('Count write rejected');if(Object.hasOwn(patch,'initiative'))this.initiative=patch.initiative;if(Object.hasOwn(patch,'flags.spycraft2.shakenInitiative'))this.flags.spycraft2.shakenInitiative={...this.flags.spycraft2.shakenInitiative,...structuredClone(patch['flags.spycraft2.shakenInitiative'])};this.writes++;if(this.fail==='after')throw Error('Count write committed then failed');return this;}};
- if(!legacy)c.flags.spycraft2.shakenInitiative=marker(system(grade),count);
- combat.combatants=new Map([[c.id,c]]);const combatants=[c];combat.combatants[Symbol.iterator]=()=>combatants[Symbol.iterator]();const combats=[combat];combats.get=id=>id===combat.id?combat:null;
- globalThis.game={ready:false,user:{isGM:true,id:'gc'},combats,settings:{get:()=>({})},users:[]};game.users.activeGM=game.user;
- return {a,c,combat,setGrade};
+import {
+  reconcileShakenInitiative,
+  reviewShakenInitiative,
+  guardShakenInitiativeUpdate,
+  shakenInitiativeEvidence,
+  shakenInitiativeReviews,
+  shakenCombatantClass,
+  installShakenInitiativeHooks
+} from "../module/apps/shaken-initiative.mjs";
+let sequence = 0;
+function fixture({ grade = 0, count = 20, legacy = false } = {}) {
+  globalThis.foundry = {
+    utils: { randomID: () => `op${++sequence}`, escapeHTML: String },
+    applications: { api: { DialogV2: { input: async () => null } } }
+  };
+  globalThis.ui = { notifications: { warn: () => {} } };
+  const a = {
+    uuid: "Actor.count",
+    type: "agent",
+    isOwner: true,
+    documentName: "Actor",
+    system: {},
+    effects: [],
+    statuses: new Set(),
+    sheet: { render() {} },
+    testUserPermission: () => true
+  };
+  const setGrade = n => {
+    a.effects = n
+      ? [
+          {
+            id: "shaken",
+            uuid: a.uuid + ".ActiveEffect.shaken",
+            name: "Shaken",
+            active: true,
+            statuses: new Set(["shaken-" + n]),
+            flags: { spycraft2: { shakenGrade: n } }
+          }
+        ]
+      : [];
+  };
+  setGrade(grade);
+  const combat = { id: "combat", name: "Test combat" },
+    c = {
+      id: "combatant",
+      actor: a,
+      parent: combat,
+      initiative: count,
+      flags: { spycraft2: {} },
+      writes: 0,
+      fail: null,
+      async update(patch, opts = {}) {
+        guardShakenInitiativeUpdate(this, patch, opts);
+        if (this.fail === "before") throw Error("Count write rejected");
+        if (Object.hasOwn(patch, "initiative")) this.initiative = patch.initiative;
+        if (Object.hasOwn(patch, "flags.spycraft2.shakenInitiative"))
+          this.flags.spycraft2.shakenInitiative = {
+            ...this.flags.spycraft2.shakenInitiative,
+            ...structuredClone(patch["flags.spycraft2.shakenInitiative"])
+          };
+        this.writes++;
+        if (this.fail === "after") throw Error("Count write committed then failed");
+        return this;
+      }
+    };
+  if (!legacy) c.flags.spycraft2.shakenInitiative = marker(system(grade), count);
+  combat.combatants = new Map([[c.id, c]]);
+  const combatants = [c];
+  combat.combatants[Symbol.iterator] = () => combatants[Symbol.iterator]();
+  const combats = [combat];
+  combats.get = id => (id === combat.id ? combat : null);
+  globalThis.game = { ready: false, user: { isGM: true, id: "gc" }, combats, settings: { get: () => ({}) }, users: [] };
+  game.users.activeGM = game.user;
+  return { a, c, combat, setGrade };
 }
-test('the controller applies one source delta atomically and treats a rerolled final Count as already modified',async()=>{const {a,c,setGrade}=fixture();setGrade(2);await reconcileShakenInitiative(a);assert.equal(c.initiative,16);assert.equal(c.flags.spycraft2.shakenInitiative.includedPenalty,-4);const writes=c.writes;await reconcileShakenInitiative(a);assert.equal(c.writes,writes);await c.update({initiative:7});assert.equal(c.initiative,7);setGrade(0);await reconcileShakenInitiative(a);assert.equal(c.initiative,11);});
-test('a committed Count update error is proved by its atomic marker and never subtracts a second penalty',async()=>{const {a,c,setGrade}=fixture();setGrade(2);c.fail='after';await reconcileShakenInitiative(a);assert.equal(c.initiative,16);assert.equal(c.flags.spycraft2.shakenInitiative.needsReview,false);c.fail=null;await reconcileShakenInitiative(a);assert.equal(c.initiative,16);});
-test('legacy Counts remain unchanged until the GC explicitly confirms their included component',async()=>{const {a,c}=fixture({grade:2,legacy:true});await reconcileShakenInitiative(a);assert.equal(c.initiative,20);assert.equal(shakenInitiativeReviews(a).length,1);await reviewShakenInitiative(a,'combat','combatant',{includedPenalty:0,resolution:'Verified that the old Count had no penalty'});assert.equal(c.initiative,16);assert.equal(c.flags.spycraft2.shakenInitiative.review.includedPenalty,0);assert.equal(shakenInitiativeReviews(a).length,0);});
-test('clearing a condition before legacy review still requires its old inclusion decision',async()=>{const {a,c,setGrade}=fixture({grade:2,legacy:true});await reconcileShakenInitiative(a);setGrade(0);await reconcileShakenInitiative(a);assert.equal(c.initiative,20);assert.equal(shakenInitiativeReviews(a).length,1);await reviewShakenInitiative(a,'combat','combatant',{includedPenalty:-4,resolution:'Confirmed the old penalty remains in this current Count'});assert.equal(c.initiative,24);});
-test('Count or source changes while a GC review waits reject its frozen confirmation',async()=>{for(const change of ['count','source','record']){const {a,c,setGrade}=fixture({grade:2,legacy:true});let release;a._actionDieQueue=new Promise(r=>{release=r;});const pending=reviewShakenInitiative(a,'combat','combatant',{includedPenalty:0,resolution:'Reviewed the old Count'});if(change==='count')c.initiative=19;if(change==='source')setGrade(3);if(change==='record')c.flags.spycraft2.shakenInitiative={needsReview:true};release();await assert.rejects(pending,/changed/);assert.equal(c.initiative,change==='count'?19:20);}});
-test('malformed source records block native Initiative rolls before RNG and block final Count entry',()=>{const {a,c}=fixture();a.effects=[{id:'bad',active:true,statuses:new Set(['shaken-3']),flags:{spycraft2:{shakenGrade:2}}}];class Base{getInitiativeRoll(){assert.fail('must not reach native RNG');}}const C=shakenCombatantClass(Base),d=new C();d.actor=a;assert.throws(()=>d.getInitiativeRoll(),/sources/);assert.throws(()=>guardShakenInitiativeUpdate(c,{initiative:12}),/sources/);});
-test('Count updates with stale source evidence cannot apply a previously calculated delta',()=>{const {c,setGrade}=fixture(),expected=shakenInitiativeEvidence(c);setGrade(2);assert.throws(()=>guardShakenInitiativeUpdate(c,{initiative:16},{spycraft2ShakenInitiative:{expected,marker:marker(system(2),16)}}),/changed/);assert.equal(c.initiative,20);});
-test('review requires the GC, the correct Actor combatant, an explicit inclusion choice and a bounded note',async()=>{const {a,c}=fixture({legacy:true});game.user.isGM=false;await assert.rejects(reviewShakenInitiative(a,'combat','combatant',{includedPenalty:0,resolution:'Verified'}),/Only the GC/);game.user.isGM=true;await assert.rejects(reviewShakenInitiative(a,'other','combatant',{includedPenalty:0,resolution:'Verified'}),/tracked combatant/);for(const input of [{includedPenalty:''},{includedPenalty:true},{includedPenalty:0,resolution:''},{includedPenalty:0,resolution:'x'.repeat(501)}])await assert.rejects(reviewShakenInitiative(a,'combat','combatant',input));assert.equal(c.initiative,20);});
-test('shared Initiative groups remain unchanged and require individual adjudication instead of penalizing all members',async()=>{const {a,c}=fixture({grade:2});c.group={initiative:20};await reconcileShakenInitiative(a);assert.equal(c.initiative,20);assert.match(shakenInitiativeReviews(a)[0].reason,/shared/);await assert.rejects(reviewShakenInitiative(a,'combat','combatant',{includedPenalty:0,resolution:'Verified'}),/shared/);});
-test('null Count markers with operation receipts do not trigger repeated writes',async()=>{const {a,c}=fixture({count:null});c.flags.spycraft2.shakenInitiative.operationId='old';await reconcileShakenInitiative(a);assert.equal(c.writes,0);});
+test("the controller applies one source delta atomically and treats a rerolled final Count as already modified", async () => {
+  const { a, c, setGrade } = fixture();
+  setGrade(2);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 16);
+  assert.equal(c.flags.spycraft2.shakenInitiative.includedPenalty, -4);
+  const writes = c.writes;
+  await reconcileShakenInitiative(a);
+  assert.equal(c.writes, writes);
+  await c.update({ initiative: 7 });
+  assert.equal(c.initiative, 7);
+  setGrade(0);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 11);
+});
+test("a committed Count update error is proved by its atomic marker and never subtracts a second penalty", async () => {
+  const { a, c, setGrade } = fixture();
+  setGrade(2);
+  c.fail = "after";
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 16);
+  assert.equal(c.flags.spycraft2.shakenInitiative.needsReview, false);
+  c.fail = null;
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 16);
+});
+test("legacy Counts remain unchanged until the GC explicitly confirms their included component", async () => {
+  const { a, c } = fixture({ grade: 2, legacy: true });
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 20);
+  assert.equal(shakenInitiativeReviews(a).length, 1);
+  await reviewShakenInitiative(a, "combat", "combatant", {
+    includedPenalty: 0,
+    resolution: "Verified that the old Count had no penalty"
+  });
+  assert.equal(c.initiative, 16);
+  assert.equal(c.flags.spycraft2.shakenInitiative.review.includedPenalty, 0);
+  assert.equal(shakenInitiativeReviews(a).length, 0);
+});
+test("clearing a condition before legacy review still requires its old inclusion decision", async () => {
+  const { a, c, setGrade } = fixture({ grade: 2, legacy: true });
+  await reconcileShakenInitiative(a);
+  setGrade(0);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 20);
+  assert.equal(shakenInitiativeReviews(a).length, 1);
+  await reviewShakenInitiative(a, "combat", "combatant", {
+    includedPenalty: -4,
+    resolution: "Confirmed the old penalty remains in this current Count"
+  });
+  assert.equal(c.initiative, 24);
+});
+test("Count or source changes while a GC review waits reject its frozen confirmation", async () => {
+  for (const change of ["count", "source", "record"]) {
+    const { a, c, setGrade } = fixture({ grade: 2, legacy: true });
+    let release;
+    a._actionDieQueue = new Promise(r => {
+      release = r;
+    });
+    const pending = reviewShakenInitiative(a, "combat", "combatant", {
+      includedPenalty: 0,
+      resolution: "Reviewed the old Count"
+    });
+    if (change === "count") c.initiative = 19;
+    if (change === "source") setGrade(3);
+    if (change === "record") c.flags.spycraft2.shakenInitiative = { needsReview: true };
+    release();
+    await assert.rejects(pending, /changed/);
+    assert.equal(c.initiative, change === "count" ? 19 : 20);
+  }
+});
+test("malformed source records block native Initiative rolls before RNG and block final Count entry", () => {
+  const { a, c } = fixture();
+  a.effects = [{ id: "bad", active: true, statuses: new Set(["shaken-3"]), flags: { spycraft2: { shakenGrade: 2 } } }];
+  class Base {
+    getInitiativeRoll() {
+      assert.fail("must not reach native RNG");
+    }
+  }
+  const C = shakenCombatantClass(Base),
+    d = new C();
+  d.actor = a;
+  assert.throws(() => d.getInitiativeRoll(), /sources/);
+  assert.throws(() => guardShakenInitiativeUpdate(c, { initiative: 12 }), /sources/);
+});
+test("Count updates with stale source evidence cannot apply a previously calculated delta", () => {
+  const { c, setGrade } = fixture(),
+    expected = shakenInitiativeEvidence(c);
+  setGrade(2);
+  assert.throws(
+    () =>
+      guardShakenInitiativeUpdate(
+        c,
+        { initiative: 16 },
+        { spycraft2ShakenInitiative: { expected, marker: marker(system(2), 16) } }
+      ),
+    /changed/
+  );
+  assert.equal(c.initiative, 20);
+});
+test("review requires the GC, the correct Actor combatant, an explicit inclusion choice and a bounded note", async () => {
+  const { a, c } = fixture({ legacy: true });
+  game.user.isGM = false;
+  await assert.rejects(
+    reviewShakenInitiative(a, "combat", "combatant", { includedPenalty: 0, resolution: "Verified" }),
+    /Only the GC/
+  );
+  game.user.isGM = true;
+  await assert.rejects(
+    reviewShakenInitiative(a, "other", "combatant", { includedPenalty: 0, resolution: "Verified" }),
+    /tracked combatant/
+  );
+  for (const input of [
+    { includedPenalty: "" },
+    { includedPenalty: true },
+    { includedPenalty: 0, resolution: "" },
+    { includedPenalty: 0, resolution: "x".repeat(501) }
+  ])
+    await assert.rejects(reviewShakenInitiative(a, "combat", "combatant", input));
+  assert.equal(c.initiative, 20);
+});
+test("shared Initiative groups remain unchanged and require individual adjudication instead of penalizing all members", async () => {
+  const { a, c } = fixture({ grade: 2 });
+  c.group = { initiative: 20 };
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 20);
+  assert.match(shakenInitiativeReviews(a)[0].reason, /shared/);
+  await assert.rejects(
+    reviewShakenInitiative(a, "combat", "combatant", { includedPenalty: 0, resolution: "Verified" }),
+    /shared/
+  );
+});
+test("null Count markers with operation receipts do not trigger repeated writes", async () => {
+  const { a, c } = fixture({ count: null });
+  c.flags.spycraft2.shakenInitiative.operationId = "old";
+  await reconcileShakenInitiative(a);
+  assert.equal(c.writes, 0);
+});
 
-test('rejected Count and held-record writes retain a local GC review instead of concealing the unapplied penalty',async()=>{const {a,c,setGrade}=fixture();setGrade(2);c.fail='before';await assert.rejects(reconcileShakenInitiative(a),/rejected/);assert.equal(c.initiative,20);assert.equal(shakenInitiativeReviews(a).length,1);assert.match(shakenInitiativeReviews(a)[0].reason,/could not be verified/);c.fail=null;await reviewShakenInitiative(a,'combat','combatant',{includedPenalty:0,resolution:'Verified that both rejected writes left Count unchanged'});assert.equal(c.initiative,16);assert.equal(shakenInitiativeReviews(a).length,0);});
-test('a newly entered final Count explicitly replaces a local held record',async()=>{const {a,c,setGrade}=fixture();setGrade(2);c.fail='before';await assert.rejects(reconcileShakenInitiative(a));c.fail=null;await c.update({initiative:12});assert.equal(shakenInitiativeReviews(a).length,0);setGrade(0);await reconcileShakenInitiative(a);assert.equal(c.initiative,16);});
-test('registered pre-update hooks return false on stale evidence rather than relying on a thrown hook exception',()=>{const {c,setGrade}=fixture(),callbacks={};globalThis.Hooks={on:(name,fn)=>{(callbacks[name]??=[]).push(fn);},once:(name,fn)=>{(callbacks[name]??=[]).push(fn);}};installShakenInitiativeHooks();const expected=shakenInitiativeEvidence(c);setGrade(2);assert.equal(callbacks.preUpdateCombatant[0](c,{initiative:16},{spycraft2ShakenInitiative:{expected,marker:marker(system(2),16)}}),false);assert.equal(c.initiative,20);});
+test("rejected Count and held-record writes retain a local GC review instead of concealing the unapplied penalty", async () => {
+  const { a, c, setGrade } = fixture();
+  setGrade(2);
+  c.fail = "before";
+  await assert.rejects(reconcileShakenInitiative(a), /rejected/);
+  assert.equal(c.initiative, 20);
+  assert.equal(shakenInitiativeReviews(a).length, 1);
+  assert.match(shakenInitiativeReviews(a)[0].reason, /could not be verified/);
+  c.fail = null;
+  await reviewShakenInitiative(a, "combat", "combatant", {
+    includedPenalty: 0,
+    resolution: "Verified that both rejected writes left Count unchanged"
+  });
+  assert.equal(c.initiative, 16);
+  assert.equal(shakenInitiativeReviews(a).length, 0);
+});
+test("a newly entered final Count explicitly replaces a local held record", async () => {
+  const { a, c, setGrade } = fixture();
+  setGrade(2);
+  c.fail = "before";
+  await assert.rejects(reconcileShakenInitiative(a));
+  c.fail = null;
+  await c.update({ initiative: 12 });
+  assert.equal(shakenInitiativeReviews(a).length, 0);
+  setGrade(0);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 16);
+});
+test("registered pre-update hooks return false on stale evidence rather than relying on a thrown hook exception", () => {
+  const { c, setGrade } = fixture(),
+    callbacks = {};
+  globalThis.Hooks = {
+    on: (name, fn) => {
+      (callbacks[name] ??= []).push(fn);
+    },
+    once: (name, fn) => {
+      (callbacks[name] ??= []).push(fn);
+    }
+  };
+  installShakenInitiativeHooks();
+  const expected = shakenInitiativeEvidence(c);
+  setGrade(2);
+  assert.equal(
+    callbacks.preUpdateCombatant[0](
+      c,
+      { initiative: 16 },
+      { spycraft2ShakenInitiative: { expected, marker: marker(system(2), 16) } }
+    ),
+    false
+  );
+  assert.equal(c.initiative, 20);
+});
 
-test('NPC Counts use the same active-source delta without converting their Competence or Initiative base',async()=>{const {a,c,setGrade}=fixture();a.type='npc';a.system.initiative={base:7,total:7};a.system.competence=10;setGrade(2);await reconcileShakenInitiative(a);assert.equal(c.initiative,16);assert.deepEqual(a.system.initiative,{base:7,total:7});assert.equal(a.system.competence,10);setGrade(0);await reconcileShakenInitiative(a);assert.equal(c.initiative,20);});
-test('GC reconciliation explicitly clears merged review fields and preserves independent marker metadata',async()=>{const {a,c}=fixture({grade:2,legacy:true});c.flags.spycraft2.shakenInitiative={customNote:'Retain this independent note'};await reconcileShakenInitiative(a);assert.equal(c.flags.spycraft2.shakenInitiative.needsReview,true);await reviewShakenInitiative(a,'combat','combatant',{includedPenalty:0,resolution:'Checked the Count before applying the missing penalty'});assert.equal(c.flags.spycraft2.shakenInitiative.needsReview,false);assert.equal(c.flags.spycraft2.shakenInitiative.reason,null);assert.equal(c.flags.spycraft2.shakenInitiative.id,null);assert.equal(c.flags.spycraft2.shakenInitiative.customNote,'Retain this independent note');assert.equal(shakenInitiativeReviews(a).length,0);});
-test('shared groups without any individual Count penalty keep operating without unnecessary review holds',async()=>{for(const grade of [0,1]){const {a,c}=fixture({grade});c.group={initiative:20};await reconcileShakenInitiative(a);assert.equal(c.initiative,20);assert.equal(c.writes,0);assert.equal(shakenInitiativeReviews(a).length,0);}});
+test("NPC Counts use the same active-source delta without converting their Competence or Initiative base", async () => {
+  const { a, c, setGrade } = fixture();
+  a.type = "npc";
+  a.system.initiative = { base: 7, total: 7 };
+  a.system.competence = 10;
+  setGrade(2);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 16);
+  assert.deepEqual(a.system.initiative, { base: 7, total: 7 });
+  assert.equal(a.system.competence, 10);
+  setGrade(0);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 20);
+});
+test("GC reconciliation explicitly clears merged review fields and preserves independent marker metadata", async () => {
+  const { a, c } = fixture({ grade: 2, legacy: true });
+  c.flags.spycraft2.shakenInitiative = { customNote: "Retain this independent note" };
+  await reconcileShakenInitiative(a);
+  assert.equal(c.flags.spycraft2.shakenInitiative.needsReview, true);
+  await reviewShakenInitiative(a, "combat", "combatant", {
+    includedPenalty: 0,
+    resolution: "Checked the Count before applying the missing penalty"
+  });
+  assert.equal(c.flags.spycraft2.shakenInitiative.needsReview, false);
+  assert.equal(c.flags.spycraft2.shakenInitiative.reason, null);
+  assert.equal(c.flags.spycraft2.shakenInitiative.id, null);
+  assert.equal(c.flags.spycraft2.shakenInitiative.customNote, "Retain this independent note");
+  assert.equal(shakenInitiativeReviews(a).length, 0);
+});
+test("shared groups without any individual Count penalty keep operating without unnecessary review holds", async () => {
+  for (const grade of [0, 1]) {
+    const { a, c } = fixture({ grade });
+    c.group = { initiative: 20 };
+    await reconcileShakenInitiative(a);
+    assert.equal(c.initiative, 20);
+    assert.equal(c.writes, 0);
+    assert.equal(shakenInitiativeReviews(a).length, 0);
+  }
+});
 
-const sourced=(grade,sources=[],classLevels={explorer:16})=>({classLevels,shakenState:{sourceKind:'effects',grade,totalGrade:grade,sources:sources.map(([id,g,self])=>({id,uuid:'Effect.'+id,name:id,grade:g,selfInflicted:self})),needsReview:false,warnings:[]}});
-test('Uncanny Dodge IV halves only a newly inflicted incoming Shaken Count loss and clearing restores its actual two points',()=>{const normal=sourced(0),incoming=sourced(2,[['enemy',2,false]]),p=plan(incoming,{initiative:20,record:marker(normal,20)});assert.equal(p.initiative,18);assert.equal(p.record.includedPenalty,-2);assert.equal(plan(incoming,{initiative:18,record:p.record}).delta,0);const clear=plan(normal,{initiative:18,record:p.record});assert.equal(clear.initiative,20);assert.equal(clear.delta,2);});
-test('self-inflicted Shaken Count loss remains four despite Uncanny Dodge IV',()=>{const p=plan(sourced(2,[['own',2,true]]),{initiative:20,record:marker(sourced(0),20)});assert.equal(p.initiative,16);assert.equal(p.record.includedPenalty,-4);});
-test('the source that crosses gradeII determines the protection, rather than an older unrelated ShakenI source',()=>{for(const firstOwn of [false,true]){const initial=sourced(1,[['first',1,firstOwn]]),start=plan(initial,{initiative:20,record:marker(sourced(0),20)});assert.equal(start.initiative,20);const next=plan(sourced(2,[['first',1,firstOwn],['second',1,!firstOwn]]),{initiative:20,record:start.record});assert.equal(next.initiative,firstOwn?18:16);}});
-test('higher grades never repeat the Count loss and gaining or losing protection does not retroactively change its applied amount',()=>{const p=plan(sourced(2,[['enemy',2,false]]),{initiative:20,record:marker(sourced(0),20)});for(const classLevels of [{explorer:16},{explorer:12}]){const next=plan(sourced(3,[['enemy',2,false],['other',1,true]],classLevels),{initiative:18,record:p.record});assert.equal(next.initiative,18);assert.equal(next.record.includedPenalty,-2);}const unprotected=plan(sourced(2,[['enemy',2,false]],{explorer:12}),{initiative:20,record:marker(sourced(0,[],{explorer:12}),20)});assert.equal(plan(sourced(2,[['enemy',2,false]]),{initiative:16,record:unprotected.record}).initiative,16);});
-test('fresh Initiative rolls keep the full check penalty even with protection and clearing restores their recorded four',()=>{const s=sourced(2,[['enemy',2,false]]),r=marker(s,16);assert.equal(r.includedPenalty,-4);assert.equal(plan(s,{initiative:16,record:r}).initiative,16);assert.equal(plan(sourced(0),{initiative:16,record:r}).initiative,20);});
-test('unknown or simultaneously mixed causes require GC review instead of presuming an incoming attack',()=>{for(const sources of [[['unknown',2,null]],[['one',1,false],['two',1,true]],[]]){const p=plan(sourced(2,sources),{initiative:20,record:marker(sourced(0),20)});assert.equal(p.needsReview,true);assert.equal(p.initiative,20);assert.match(p.reason,/Uncanny/);}});
-test('GC review accepts protected components and can explicitly classify or correct a condition-induced loss',()=>{const s=sourced(2,[['unknown',2,null]]),row={initiative:20,record:{needsReview:true}};assert.equal(reviewed(s,row,0,{selfInflicted:false}).initiative,18);assert.equal(reviewed(s,row,0,{selfInflicted:true}).initiative,16);assert.throws(()=>reviewed(s,row,0),/Uncanny/);assert.equal(reviewed(s,{initiative:16,record:{}},-4,{selfInflicted:false}).initiative,18);assert.equal(reviewed(sourced(0),{initiative:18,record:{}},-2).initiative,20);});
-test('older Count markers for protected characters require inclusion review without changing a legitimate full check penalty',()=>{const s=sourced(2,[['enemy',2,false]]),record={version:1,count:16,includedPenalty:-4};assert.equal(plan(s,{initiative:16,record}).needsReview,true);assert.equal(reviewed(s,{initiative:16,record},-4).initiative,16);assert.equal(reviewed(s,{initiative:16,record},-4,{selfInflicted:false}).initiative,18);});
-test('all class grades and combined Uncanny sources use the existing grade cap while Initiative check penalties remain full',()=>{for(const id of ['explorer','intruder','triggerman'])for(let level=0;level<=20;level++){const classes={[id]:level},s=sourced(2,[['enemy',2,false]],classes),p=plan(s,{initiative:20,record:marker(sourced(0,[],classes),20)});assert.equal(p.initiative,id!=='triggerman'&&level>=16?18:16);}for(const classes of [{explorer:8,intruder:8},{explorer:8,triggerman:8}])assert.equal(plan(sourced(2,[['enemy',2,false]],classes),{initiative:20,record:marker(sourced(0,[],classes),20)}).initiative,18);});
-test('native controller records protected loss, keeps it through higher grades and restores two without altering the check modifier',async()=>{const {a,c,setGrade}=fixture();a.system.classLevels={explorer:16};setGrade(2);a.effects[0].flags.spycraft2.shakenSelfInflicted=false;await reconcileShakenInitiative(a);assert.equal(c.initiative,18);assert.equal(c.flags.spycraft2.shakenInitiative.includedPenalty,-2);setGrade(3);a.effects[0].flags.spycraft2.shakenSelfInflicted=true;await reconcileShakenInitiative(a);assert.equal(c.initiative,18);setGrade(0);await reconcileShakenInitiative(a);assert.equal(c.initiative,20);});
-test('unknown cause stays held until the GC classifies it, and class changes invalidate a waiting confirmation',async()=>{const {a,c,setGrade}=fixture();a.system.classLevels={explorer:16};setGrade(2);await reconcileShakenInitiative(a);assert.equal(c.initiative,20);assert.equal(shakenInitiativeReviews(a).length,1);await reviewShakenInitiative(a,'combat','combatant',{includedPenalty:0,incomingSelfInflicted:'false',resolution:'Verified an incoming source with protection'});assert.equal(c.initiative,18);let release;a._actionDieQueue=new Promise(r=>{release=r;});const pending=reviewShakenInitiative(a,'combat','combatant',{includedPenalty:-2,resolution:'Verified current protected component'});a.system.classLevels.explorer=15;release();await assert.rejects(pending,/changed/);assert.equal(c.initiative,18);});
-test('Count commit proof rejects extra source-provenance rows even if the numerical update committed',async()=>{const {a,c,setGrade}=fixture();setGrade(2);const update=c.update;c.update=async function(p,opts){const r=await update.call(this,p,opts);if(opts?.spycraft2ShakenInitiative){this.flags.spycraft2.shakenInitiative.shakenSources.push({id:'unexpected',grade:1,selfInflicted:false});throw Error('Committed marker changed independently');}return r;};await assert.rejects(reconcileShakenInitiative(a));assert.equal(c.initiative,16);assert.equal(shakenInitiativeReviews(a).length,1);});
+const sourced = (grade, sources = [], classLevels = { explorer: 16 }) => ({
+  classLevels,
+  shakenState: {
+    sourceKind: "effects",
+    grade,
+    totalGrade: grade,
+    sources: sources.map(([id, g, self]) => ({ id, uuid: "Effect." + id, name: id, grade: g, selfInflicted: self })),
+    needsReview: false,
+    warnings: []
+  }
+});
+test("Uncanny Dodge IV halves only a newly inflicted incoming Shaken Count loss and clearing restores its actual two points", () => {
+  const normal = sourced(0),
+    incoming = sourced(2, [["enemy", 2, false]]),
+    p = plan(incoming, { initiative: 20, record: marker(normal, 20) });
+  assert.equal(p.initiative, 18);
+  assert.equal(p.record.includedPenalty, -2);
+  assert.equal(plan(incoming, { initiative: 18, record: p.record }).delta, 0);
+  const clear = plan(normal, { initiative: 18, record: p.record });
+  assert.equal(clear.initiative, 20);
+  assert.equal(clear.delta, 2);
+});
+test("self-inflicted Shaken Count loss remains four despite Uncanny Dodge IV", () => {
+  const p = plan(sourced(2, [["own", 2, true]]), { initiative: 20, record: marker(sourced(0), 20) });
+  assert.equal(p.initiative, 16);
+  assert.equal(p.record.includedPenalty, -4);
+});
+test("the source that crosses gradeII determines the protection, rather than an older unrelated ShakenI source", () => {
+  for (const firstOwn of [false, true]) {
+    const initial = sourced(1, [["first", 1, firstOwn]]),
+      start = plan(initial, { initiative: 20, record: marker(sourced(0), 20) });
+    assert.equal(start.initiative, 20);
+    const next = plan(
+      sourced(2, [
+        ["first", 1, firstOwn],
+        ["second", 1, !firstOwn]
+      ]),
+      { initiative: 20, record: start.record }
+    );
+    assert.equal(next.initiative, firstOwn ? 18 : 16);
+  }
+});
+test("higher grades never repeat the Count loss and gaining or losing protection does not retroactively change its applied amount", () => {
+  const p = plan(sourced(2, [["enemy", 2, false]]), { initiative: 20, record: marker(sourced(0), 20) });
+  for (const classLevels of [{ explorer: 16 }, { explorer: 12 }]) {
+    const next = plan(
+      sourced(
+        3,
+        [
+          ["enemy", 2, false],
+          ["other", 1, true]
+        ],
+        classLevels
+      ),
+      { initiative: 18, record: p.record }
+    );
+    assert.equal(next.initiative, 18);
+    assert.equal(next.record.includedPenalty, -2);
+  }
+  const unprotected = plan(sourced(2, [["enemy", 2, false]], { explorer: 12 }), {
+    initiative: 20,
+    record: marker(sourced(0, [], { explorer: 12 }), 20)
+  });
+  assert.equal(plan(sourced(2, [["enemy", 2, false]]), { initiative: 16, record: unprotected.record }).initiative, 16);
+});
+test("fresh Initiative rolls keep the full check penalty even with protection and clearing restores their recorded four", () => {
+  const s = sourced(2, [["enemy", 2, false]]),
+    r = marker(s, 16);
+  assert.equal(r.includedPenalty, -4);
+  assert.equal(plan(s, { initiative: 16, record: r }).initiative, 16);
+  assert.equal(plan(sourced(0), { initiative: 16, record: r }).initiative, 20);
+});
+test("unknown or simultaneously mixed causes require GC review instead of presuming an incoming attack", () => {
+  for (const sources of [
+    [["unknown", 2, null]],
+    [
+      ["one", 1, false],
+      ["two", 1, true]
+    ],
+    []
+  ]) {
+    const p = plan(sourced(2, sources), { initiative: 20, record: marker(sourced(0), 20) });
+    assert.equal(p.needsReview, true);
+    assert.equal(p.initiative, 20);
+    assert.match(p.reason, /Uncanny/);
+  }
+});
+test("GC review accepts protected components and can explicitly classify or correct a condition-induced loss", () => {
+  const s = sourced(2, [["unknown", 2, null]]),
+    row = { initiative: 20, record: { needsReview: true } };
+  assert.equal(reviewed(s, row, 0, { selfInflicted: false }).initiative, 18);
+  assert.equal(reviewed(s, row, 0, { selfInflicted: true }).initiative, 16);
+  assert.throws(() => reviewed(s, row, 0), /Uncanny/);
+  assert.equal(reviewed(s, { initiative: 16, record: {} }, -4, { selfInflicted: false }).initiative, 18);
+  assert.equal(reviewed(sourced(0), { initiative: 18, record: {} }, -2).initiative, 20);
+});
+test("older Count markers for protected characters require inclusion review without changing a legitimate full check penalty", () => {
+  const s = sourced(2, [["enemy", 2, false]]),
+    record = { version: 1, count: 16, includedPenalty: -4 };
+  assert.equal(plan(s, { initiative: 16, record }).needsReview, true);
+  assert.equal(reviewed(s, { initiative: 16, record }, -4).initiative, 16);
+  assert.equal(reviewed(s, { initiative: 16, record }, -4, { selfInflicted: false }).initiative, 18);
+});
+test("all class grades and combined Uncanny sources use the existing grade cap while Initiative check penalties remain full", () => {
+  for (const id of ["explorer", "intruder", "triggerman"])
+    for (let level = 0; level <= 20; level++) {
+      const classes = { [id]: level },
+        s = sourced(2, [["enemy", 2, false]], classes),
+        p = plan(s, { initiative: 20, record: marker(sourced(0, [], classes), 20) });
+      assert.equal(p.initiative, id !== "triggerman" && level >= 16 ? 18 : 16);
+    }
+  for (const classes of [
+    { explorer: 8, intruder: 8 },
+    { explorer: 8, triggerman: 8 }
+  ])
+    assert.equal(
+      plan(sourced(2, [["enemy", 2, false]], classes), { initiative: 20, record: marker(sourced(0, [], classes), 20) })
+        .initiative,
+      18
+    );
+});
+test("native controller records protected loss, keeps it through higher grades and restores two without altering the check modifier", async () => {
+  const { a, c, setGrade } = fixture();
+  a.system.classLevels = { explorer: 16 };
+  setGrade(2);
+  a.effects[0].flags.spycraft2.shakenSelfInflicted = false;
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 18);
+  assert.equal(c.flags.spycraft2.shakenInitiative.includedPenalty, -2);
+  setGrade(3);
+  a.effects[0].flags.spycraft2.shakenSelfInflicted = true;
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 18);
+  setGrade(0);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 20);
+});
+test("unknown cause stays held until the GC classifies it, and class changes invalidate a waiting confirmation", async () => {
+  const { a, c, setGrade } = fixture();
+  a.system.classLevels = { explorer: 16 };
+  setGrade(2);
+  await reconcileShakenInitiative(a);
+  assert.equal(c.initiative, 20);
+  assert.equal(shakenInitiativeReviews(a).length, 1);
+  await reviewShakenInitiative(a, "combat", "combatant", {
+    includedPenalty: 0,
+    incomingSelfInflicted: "false",
+    resolution: "Verified an incoming source with protection"
+  });
+  assert.equal(c.initiative, 18);
+  let release;
+  a._actionDieQueue = new Promise(r => {
+    release = r;
+  });
+  const pending = reviewShakenInitiative(a, "combat", "combatant", {
+    includedPenalty: -2,
+    resolution: "Verified current protected component"
+  });
+  a.system.classLevels.explorer = 15;
+  release();
+  await assert.rejects(pending, /changed/);
+  assert.equal(c.initiative, 18);
+});
+test("Count commit proof rejects extra source-provenance rows even if the numerical update committed", async () => {
+  const { a, c, setGrade } = fixture();
+  setGrade(2);
+  const update = c.update;
+  c.update = async function (p, opts) {
+    const r = await update.call(this, p, opts);
+    if (opts?.spycraft2ShakenInitiative) {
+      this.flags.spycraft2.shakenInitiative.shakenSources.push({ id: "unexpected", grade: 1, selfInflicted: false });
+      throw Error("Committed marker changed independently");
+    }
+    return r;
+  };
+  await assert.rejects(reconcileShakenInitiative(a));
+  assert.equal(c.initiative, 16);
+  assert.equal(shakenInitiativeReviews(a).length, 1);
+});

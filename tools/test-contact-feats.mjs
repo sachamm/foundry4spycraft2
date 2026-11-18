@@ -1,41 +1,671 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {CONTACT_FEATS,contactFeatGrants} from '../module/rules/contact-feats.mjs';import {computeAgent} from '../module/rules/engine.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const defs=JSON.parse(readFileSync(new URL('../src/data/feats.json',import.meta.url))),classes=JSON.parse(readFileSync(new URL('../src/data/classes.json',import.meta.url))),names=['Academic Contacts','Blue Collar Contacts','Criminal Contacts','Government Contacts','Grifter Contacts','High-Tech Contacts','Local Contacts','Media Contacts','Medical Contacts','Military Contacts','Police Contacts','Research Contacts','Street Contacts','White Collar Contacts','Wilderness Contacts'];
-const contacts=()=>[{name:'Ada',rank:2,notes:'Initial associate'},{name:'Bob',rank:1,notes:'A separate contact'}];
-function state(name='Media Contacts',{choice='Ada',theme='GC-approved printed theme',confirmed=true,rows=contacts(),progressionOverride=null,extraFeats=[],acquired=0,mode='associate'}={}){const c=classes.find(c=>c.key==='soldier');return computeAgent({abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:14,misc:0}])),progression:progressionOverride??[{classId:'soldier',vitality:12,skills:{networking:8}},{classId:'soldier',vitality:6,skills:{networking:2}},{classId:'soldier',vitality:6,skills:{networking:2}}],skills:{},focuses:{},contacts:structuredClone(rows),misc:{}},[{id:'soldier',name:'Soldier',type:'class',system:{...c,identifier:'soldier',vitalityDie:12}},...(name?[{id:'contactFeat',name,type:'feat',system:{...structuredClone(defs.find(f=>f.name===name)),granted:true,choice,contactTheme:theme,contactThemeConfirmed:confirmed,contactGrantMode:mode,acquiredAtLevel:acquired}}]:[]),...extraFeats],cfg);}
-const input={gearStatus:'available',synergySkill:'none',contactName:'Ada',contactThreatLevel:3},check=cfg.skills.networking.checks.find(c=>c.id==='contact');
-test('all fifteen printed contact feats grant the same bound associate allowance, including the seven with no old numeric bonus',()=>{assert.deepEqual(Object.keys(CONTACT_FEATS).sort(),[...names].sort());const b=state(null);for(const name of names){const s=state(name);assert.equal(s.contactFeatGrants.length,1,name);assert.equal(s.contactFeatGrants[0].valid,true,name);assert.equal(s.contactPicks.available,b.contactPicks.available+2,name);assert.equal(s.contactPicks.used,b.contactPicks.used,name);assert.equal(s.activeFeatNames.includes(name),true,name);}});
-test('unassigned, unconfirmed, wrong-grade, ambiguous and overlapping initial grants cannot become spare generic contact points',()=>{const base=state(null);for(const patch of [{choice:''},{choice:'Missing'},{confirmed:false},{theme:''},{rows:[{name:'Ada',rank:1}]},{rows:[{name:'Ada',rank:2},{name:'ADA',rank:2}]}]){const s=state('Media Contacts',patch);assert.equal(s.contactFeatGrants[0].valid,false);assert.equal(s.contactPicks.available,base.contactPicks.available);}const s=state();s.contactFeatBindings.push({...s.contactFeatBindings[0],id:'other',name:'Medical Contacts'});assert.equal(contactFeatGrants(s).every(g=>!g.valid),true);});
-test('every named use and Knowledge retains ordinary modifiers; only the selected initial contact receives half time and error reduction',()=>{for(const name of names){const s=state(name),b=state(null);for(const[key,skill]of Object.entries(cfg.skills))for(const c of skill.checks){const a=resolveSkillCheck(b,key,c,input),p=resolveSkillCheck(s,key,c,input),eligible=key==='networking'&&c.id==='contact';assert.equal(p.total,a.total,name+'/'+key+'/'+c.id);assert.equal(p.cap,a.cap);assert.equal(p.threat,a.threat);assert.equal(p.error,eligible?Math.max(0,a.error-2):a.error);assert.equal(p.timeMultiplier,eligible?0.5:a.timeMultiplier);assert.equal(p.contactFeat?.source??null,eligible?name:null);}for(const skill of Object.keys(cfg.skills))assert.equal(resolveKnowledgeCheck(s,{skill}).total,resolveKnowledgeCheck(b,{skill}).total);const ordinary=resolveSkillCheck(s,'networking',check,{...input,contactName:'Bob'});assert.equal(ordinary.error,4);assert.equal(ordinary.timeMultiplier,1);assert.equal(ordinary.contactFeat.source,null);}});
-test('contact error reduction reaches zero, never stacks on other contacts, and its half time competes as one reduction',()=>{for(const name of names){const s=state(name),c={...check,error:5};assert.equal(resolveSkillCheck(s,'networking',c,input).error,5);assert.equal(resolveSkillCheck(s,'networking',check,input).error,1);const p=resolveSkillCheck(s,'networking',check,{...input,timingReduction:'none'});assert.equal(p.timeMultiplier,1);assert.equal(p.error,1);s.activeFeatNames.push('Simply Irresistible');const a=resolveSkillCheck(s,'networking',check,input);assert.equal(a.timeMultiplier,0.5);assert.equal(a.contactFeat.timing.rounding,'down');}});
-test('unknown/duplicate selections and stale grant approvals block before rolling, while unspecified and ordinary contacts preserve ordinary checks',()=>{for(const name of names){for(const patch of [{confirmed:false},{theme:''},{rows:[{name:'Ada',rank:1}]},{rows:[{name:'Ada',rank:2},{name:'Ada',rank:2}]}])assert.equal(resolveSkillCheck(state(name,patch),'networking',check,input).blocked,true);assert.equal(resolveSkillCheck(state(name),'networking',check,{...input,contactName:'Missing'}).blocked,true);const p=resolveSkillCheck(state(name),'networking',check,{...input,contactName:''});assert.equal(p.contactFeat,null);assert.equal(p.timeMultiplier,1);}});
-test('recorded primary contact, feat source, theme, error and timing evidence is immutable',()=>{const p=resolveSkillCheck(state(),'networking',check,input),c={checkKind:'skill',contactFeat:p.contactFeat},e=rollEvidence(c);assert.equal(rollEvidenceMatches(e,c),true);for(const path of [['source'],['theme'],['featId'],['themeConfirmed'],['contact','name'],['contact','rank'],['contact','notes'],['timing','multiplier'],['errorReduction']]){const copy=structuredClone(c);let o=copy.contactFeat;for(const k of path.slice(0,-1))o=o[k];o[path.at(-1)]='changed';assert.equal(rollEvidenceMatches(e,copy),false);}assert.equal(rollEvidenceMatches(e,{checkKind:'skill'}),false);});
-globalThis.Actor=class{constructor(){this.type='agent';this.uuid='Actor.contact';this.isOwner=true;this.system=state();this.items=[];}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.foundry={utils:{escapeHTML:String}};globalThis.game={user:{isGM:true},settings:{get:()=>false},i18n:{localize:String}};globalThis.ui={notifications:{warn:()=>null}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('actual Actor dispatch freezes the chosen associate and rechecks renamed contacts, source loss and revoked GC approval',async()=>{for(const change of [a=>a.system.contacts[0].name='Changed',a=>a.system=state(null),a=>a.system.contactFeatBindings[0].themeConfirmed=false]){const a=new SpycraftActor();a.rollCheck=async(_formula,_data,options)=>options;const p=await a.rollSkill('networking','cha',{check:'contact',...input});assert.equal(p.contactFeat.source,'Media Contacts');p.validateSkillContext();change(a);assert.throws(()=>p.validateSkillContext(),/changed/);}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { CONTACT_FEATS, contactFeatGrants } from "../module/rules/contact-feats.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const defs = JSON.parse(readFileSync(new URL("../src/data/feats.json", import.meta.url))),
+  classes = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))),
+  names = [
+    "Academic Contacts",
+    "Blue Collar Contacts",
+    "Criminal Contacts",
+    "Government Contacts",
+    "Grifter Contacts",
+    "High-Tech Contacts",
+    "Local Contacts",
+    "Media Contacts",
+    "Medical Contacts",
+    "Military Contacts",
+    "Police Contacts",
+    "Research Contacts",
+    "Street Contacts",
+    "White Collar Contacts",
+    "Wilderness Contacts"
+  ];
+const contacts = () => [
+  { name: "Ada", rank: 2, notes: "Initial associate" },
+  { name: "Bob", rank: 1, notes: "A separate contact" }
+];
+function state(
+  name = "Media Contacts",
+  {
+    choice = "Ada",
+    theme = "GC-approved printed theme",
+    confirmed = true,
+    rows = contacts(),
+    progressionOverride = null,
+    extraFeats = [],
+    acquired = 0,
+    mode = "associate"
+  } = {}
+) {
+  const c = classes.find(c => c.key === "soldier");
+  return computeAgent(
+    {
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 14, misc: 0 }])),
+      progression: progressionOverride ?? [
+        { classId: "soldier", vitality: 12, skills: { networking: 8 } },
+        { classId: "soldier", vitality: 6, skills: { networking: 2 } },
+        { classId: "soldier", vitality: 6, skills: { networking: 2 } }
+      ],
+      skills: {},
+      focuses: {},
+      contacts: structuredClone(rows),
+      misc: {}
+    },
+    [
+      { id: "soldier", name: "Soldier", type: "class", system: { ...c, identifier: "soldier", vitalityDie: 12 } },
+      ...(name
+        ? [
+            {
+              id: "contactFeat",
+              name,
+              type: "feat",
+              system: {
+                ...structuredClone(defs.find(f => f.name === name)),
+                granted: true,
+                choice,
+                contactTheme: theme,
+                contactThemeConfirmed: confirmed,
+                contactGrantMode: mode,
+                acquiredAtLevel: acquired
+              }
+            }
+          ]
+        : []),
+      ...extraFeats
+    ],
+    cfg
+  );
+}
+const input = { gearStatus: "available", synergySkill: "none", contactName: "Ada", contactThreatLevel: 3 },
+  check = cfg.skills.networking.checks.find(c => c.id === "contact");
+test("all fifteen printed contact feats grant the same bound associate allowance, including the seven with no old numeric bonus", () => {
+  assert.deepEqual(Object.keys(CONTACT_FEATS).sort(), [...names].sort());
+  const b = state(null);
+  for (const name of names) {
+    const s = state(name);
+    assert.equal(s.contactFeatGrants.length, 1, name);
+    assert.equal(s.contactFeatGrants[0].valid, true, name);
+    assert.equal(s.contactPicks.available, b.contactPicks.available + 2, name);
+    assert.equal(s.contactPicks.used, b.contactPicks.used, name);
+    assert.equal(s.activeFeatNames.includes(name), true, name);
+  }
+});
+test("unassigned, unconfirmed, wrong-grade, ambiguous and overlapping initial grants cannot become spare generic contact points", () => {
+  const base = state(null);
+  for (const patch of [
+    { choice: "" },
+    { choice: "Missing" },
+    { confirmed: false },
+    { theme: "" },
+    { rows: [{ name: "Ada", rank: 1 }] },
+    {
+      rows: [
+        { name: "Ada", rank: 2 },
+        { name: "ADA", rank: 2 }
+      ]
+    }
+  ]) {
+    const s = state("Media Contacts", patch);
+    assert.equal(s.contactFeatGrants[0].valid, false);
+    assert.equal(s.contactPicks.available, base.contactPicks.available);
+  }
+  const s = state();
+  s.contactFeatBindings.push({ ...s.contactFeatBindings[0], id: "other", name: "Medical Contacts" });
+  assert.equal(
+    contactFeatGrants(s).every(g => !g.valid),
+    true
+  );
+});
+test("every named use and Knowledge retains ordinary modifiers; only the selected initial contact receives half time and error reduction", () => {
+  for (const name of names) {
+    const s = state(name),
+      b = state(null);
+    for (const [key, skill] of Object.entries(cfg.skills))
+      for (const c of skill.checks) {
+        const a = resolveSkillCheck(b, key, c, input),
+          p = resolveSkillCheck(s, key, c, input),
+          eligible = key === "networking" && c.id === "contact";
+        assert.equal(p.total, a.total, name + "/" + key + "/" + c.id);
+        assert.equal(p.cap, a.cap);
+        assert.equal(p.threat, a.threat);
+        assert.equal(p.error, eligible ? Math.max(0, a.error - 2) : a.error);
+        assert.equal(p.timeMultiplier, eligible ? 0.5 : a.timeMultiplier);
+        assert.equal(p.contactFeat?.source ?? null, eligible ? name : null);
+      }
+    for (const skill of Object.keys(cfg.skills))
+      assert.equal(resolveKnowledgeCheck(s, { skill }).total, resolveKnowledgeCheck(b, { skill }).total);
+    const ordinary = resolveSkillCheck(s, "networking", check, { ...input, contactName: "Bob" });
+    assert.equal(ordinary.error, 4);
+    assert.equal(ordinary.timeMultiplier, 1);
+    assert.equal(ordinary.contactFeat.source, null);
+  }
+});
+test("contact error reduction reaches zero, never stacks on other contacts, and its half time competes as one reduction", () => {
+  for (const name of names) {
+    const s = state(name),
+      c = { ...check, error: 5 };
+    assert.equal(resolveSkillCheck(s, "networking", c, input).error, 5);
+    assert.equal(resolveSkillCheck(s, "networking", check, input).error, 1);
+    const p = resolveSkillCheck(s, "networking", check, { ...input, timingReduction: "none" });
+    assert.equal(p.timeMultiplier, 1);
+    assert.equal(p.error, 1);
+    s.activeFeatNames.push("Simply Irresistible");
+    const a = resolveSkillCheck(s, "networking", check, input);
+    assert.equal(a.timeMultiplier, 0.5);
+    assert.equal(a.contactFeat.timing.rounding, "down");
+  }
+});
+test("unknown/duplicate selections and stale grant approvals block before rolling, while unspecified and ordinary contacts preserve ordinary checks", () => {
+  for (const name of names) {
+    for (const patch of [
+      { confirmed: false },
+      { theme: "" },
+      { rows: [{ name: "Ada", rank: 1 }] },
+      {
+        rows: [
+          { name: "Ada", rank: 2 },
+          { name: "Ada", rank: 2 }
+        ]
+      }
+    ])
+      assert.equal(resolveSkillCheck(state(name, patch), "networking", check, input).blocked, true);
+    assert.equal(
+      resolveSkillCheck(state(name), "networking", check, { ...input, contactName: "Missing" }).blocked,
+      true
+    );
+    const p = resolveSkillCheck(state(name), "networking", check, { ...input, contactName: "" });
+    assert.equal(p.contactFeat, null);
+    assert.equal(p.timeMultiplier, 1);
+  }
+});
+test("recorded primary contact, feat source, theme, error and timing evidence is immutable", () => {
+  const p = resolveSkillCheck(state(), "networking", check, input),
+    c = { checkKind: "skill", contactFeat: p.contactFeat },
+    e = rollEvidence(c);
+  assert.equal(rollEvidenceMatches(e, c), true);
+  for (const path of [
+    ["source"],
+    ["theme"],
+    ["featId"],
+    ["themeConfirmed"],
+    ["contact", "name"],
+    ["contact", "rank"],
+    ["contact", "notes"],
+    ["timing", "multiplier"],
+    ["errorReduction"]
+  ]) {
+    const copy = structuredClone(c);
+    let o = copy.contactFeat;
+    for (const k of path.slice(0, -1)) o = o[k];
+    o[path.at(-1)] = "changed";
+    assert.equal(rollEvidenceMatches(e, copy), false);
+  }
+  assert.equal(rollEvidenceMatches(e, { checkKind: "skill" }), false);
+});
+globalThis.Actor = class {
+  constructor() {
+    this.type = "agent";
+    this.uuid = "Actor.contact";
+    this.isOwner = true;
+    this.system = state();
+    this.items = [];
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.foundry = { utils: { escapeHTML: String } };
+globalThis.game = { user: { isGM: true }, settings: { get: () => false }, i18n: { localize: String } };
+globalThis.ui = { notifications: { warn: () => null } };
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("actual Actor dispatch freezes the chosen associate and rechecks renamed contacts, source loss and revoked GC approval", async () => {
+  for (const change of [
+    a => (a.system.contacts[0].name = "Changed"),
+    a => (a.system = state(null)),
+    a => (a.system.contactFeatBindings[0].themeConfirmed = false)
+  ]) {
+    const a = new SpycraftActor();
+    a.rollCheck = async (_formula, _data, options) => options;
+    const p = await a.rollSkill("networking", "cha", { check: "contact", ...input });
+    assert.equal(p.contactFeat.source, "Media Contacts");
+    p.validateSkillContext();
+    change(a);
+    assert.throws(() => p.validateSkillContext(), /changed/);
+  }
+});
 
-import {networkingContactFeatGrants} from '../module/rules/contact-feats.mjs';
-const laterProgression=()=>[1,2,3,4].map(level=>({classId:'soldier',vitality:level===1?12:6,skills:level===1?{networking:6}:level===4?{networking:2}:{}}));
-const newContact=()=>({name:'Claire',rank:2,notes:'New Networking associate',networkingMilestone:4,networkingFeat:'Media Contacts',networkingTheme:'media',networkingFeatConfirmed:true});
-function later(name='Media Contacts',patch={}){return state(name,{acquired:3,progressionOverride:laterProgression(),rows:[...contacts(),{...newContact(),networkingFeat:name,...patch}]});}
-test('all fifteen contact feats upgrade a later new Networking contact to associate with exactly one extra bound grade',()=>{for(const name of names){const a=later(name),plain=state(name,{acquired:3,progressionOverride:laterProgression(),rows:[...contacts(),{name:'Claire',rank:2}]});assert.equal(a.skillTotals.networking.purchasedRanks,4);assert.equal(a.networkingContactFeatGrants.length,1);assert.equal(a.networkingContactFeatGrants[0].valid,true,name);assert.equal(a.networkingContactFeatGrants[0].earnedAtLevel,4);assert.equal(a.contactPicks.available,plain.contactPicks.available+1);assert.equal(a.contactPicks.available,5);assert.equal(a.contactPicks.used,5);assert.equal(a.contactPicks.remaining,0);const normal=resolveSkillCheck(a,'networking',check,{...input,contactName:'Claire',contactThreatLevel:4});assert.equal(normal.contactFeat.source,null);assert.equal(normal.error,3);assert.equal(normal.timeMultiplier,1);}});
-test('Networking upgrade rejects missing approvals/themes, old or unearned milestones, source loss, duplicate contacts and primary-contact reuse',()=>{for(const patch of [{networkingFeatConfirmed:false},{networkingTheme:''},{networkingTheme:'x'.repeat(201)},{networkingMilestone:0},{networkingMilestone:3},{networkingMilestone:8},{networkingMilestone:4.5},{networkingMilestone:NaN},{networkingFeat:'Unknown'},{name:'Ada'},{rank:1}]){const s=later('Media Contacts',patch);assert.equal(s.networkingContactFeatGrants.every(g=>!g.valid),true);assert.equal(s.contactPicks.available,patch.name==='Ada'?2:4);}const s=later();s.contactFeatBindings=[];assert.equal(networkingContactFeatGrants(s)[0].valid,false);});
-test('one purchased-rank milestone cannot fund multiple upgraded contacts, even across different themes',()=>{const s=later();s.contacts.push({...newContact(),name:'Dora'});assert.equal(networkingContactFeatGrants(s).every(g=>!g.valid),true);});
-test('known acquisition chronology blocks contacts earned before the feat; same-level order requires explicit GC confirmation',()=>{const s=later();s.contactFeatBindings[0].acquiredAtLevel=5;assert.match(networkingContactFeatGrants(s)[0].reason,/before/);s.contactFeatBindings[0].acquiredAtLevel=4;assert.equal(networkingContactFeatGrants(s)[0].valid,true);s.contacts[2].networkingFeatConfirmed=false;assert.equal(networkingContactFeatGrants(s)[0].valid,false);s.contactFeatBindings[0].acquiredAtLevel=0;s.contacts[2].networkingFeatConfirmed=true;assert.equal(networkingContactFeatGrants(s)[0].valid,true);});
-test('invalid purchased ranks and invalid purchase budgets never validate an extra contact grade',()=>{for(const ranks of [3,3.5,NaN,-1]){const s=later();s.skillTotals.networking.purchasedRanks=ranks;assert.equal(networkingContactFeatGrants(s)[0].valid,false);}for(const issue of [{level:4,skill:'networking',code:'point-cost'},{level:4,code:'career-budget'},{level:4,code:'training-budget'}]){const s=later();s.skillPurchaseIssues.push(issue);assert.equal(networkingContactFeatGrants(s)[0].valid,false);}});
-test('actual free Talented ranks do not earn Networking contacts, while valid Training purchases do',()=>{const talent={id:'talent',type:'feat',name:'Talented',system:{...structuredClone(defs.find(f=>f.name==='Talented')),granted:true,choice:'Diplomat',acquiredAtLevel:1}},training={id:'training',type:'feat',name:'Training',system:{...structuredClone(defs.find(f=>f.name==='Training')),granted:true,acquiredAtLevel:1,trainingSkills:{networking:4,notice:1}}},rows=[...contacts(),newContact()],free=state('Media Contacts',{acquired:1,rows,extraFeats:[talent],progressionOverride:[{classId:'soldier',vitality:12,skills:{senseMotive:8}}]});assert.equal(free.skillTotals.networking.ranks,4);assert.equal(free.skillTotals.networking.purchasedRanks,0);assert.equal(free.networkingContactFeatGrants[0].valid,false);const paid=state('Media Contacts',{acquired:1,rows,extraFeats:[training],progressionOverride:[{classId:'soldier',vitality:12,skills:{}}]});assert.equal(paid.skillTotals.networking.purchasedRanks,4);assert.equal(paid.networkingContactFeatGrants[0].valid,true);assert.equal(paid.contactPicks.available,5);});
-test('primary and later grant credits disappear with their sources without deleting the recorded people or silently upgrading ordinary contacts',()=>{const s=later();assert.equal(s.contacts[2].rank,2);const absent=state(null,{progressionOverride:laterProgression(),rows:s.contacts});assert.equal(absent.contactPicks.available,2);assert.equal(absent.networkingContactFeatGrants[0].valid,false);assert.equal(absent.contacts.length,3);assert.equal(absent.contacts[2].rank,2);});
+import { networkingContactFeatGrants } from "../module/rules/contact-feats.mjs";
+const laterProgression = () =>
+  [1, 2, 3, 4].map(level => ({
+    classId: "soldier",
+    vitality: level === 1 ? 12 : 6,
+    skills: level === 1 ? { networking: 6 } : level === 4 ? { networking: 2 } : {}
+  }));
+const newContact = () => ({
+  name: "Claire",
+  rank: 2,
+  notes: "New Networking associate",
+  networkingMilestone: 4,
+  networkingFeat: "Media Contacts",
+  networkingTheme: "media",
+  networkingFeatConfirmed: true
+});
+function later(name = "Media Contacts", patch = {}) {
+  return state(name, {
+    acquired: 3,
+    progressionOverride: laterProgression(),
+    rows: [...contacts(), { ...newContact(), networkingFeat: name, ...patch }]
+  });
+}
+test("all fifteen contact feats upgrade a later new Networking contact to associate with exactly one extra bound grade", () => {
+  for (const name of names) {
+    const a = later(name),
+      plain = state(name, {
+        acquired: 3,
+        progressionOverride: laterProgression(),
+        rows: [...contacts(), { name: "Claire", rank: 2 }]
+      });
+    assert.equal(a.skillTotals.networking.purchasedRanks, 4);
+    assert.equal(a.networkingContactFeatGrants.length, 1);
+    assert.equal(a.networkingContactFeatGrants[0].valid, true, name);
+    assert.equal(a.networkingContactFeatGrants[0].earnedAtLevel, 4);
+    assert.equal(a.contactPicks.available, plain.contactPicks.available + 1);
+    assert.equal(a.contactPicks.available, 5);
+    assert.equal(a.contactPicks.used, 5);
+    assert.equal(a.contactPicks.remaining, 0);
+    const normal = resolveSkillCheck(a, "networking", check, {
+      ...input,
+      contactName: "Claire",
+      contactThreatLevel: 4
+    });
+    assert.equal(normal.contactFeat.source, null);
+    assert.equal(normal.error, 3);
+    assert.equal(normal.timeMultiplier, 1);
+  }
+});
+test("Networking upgrade rejects missing approvals/themes, old or unearned milestones, source loss, duplicate contacts and primary-contact reuse", () => {
+  for (const patch of [
+    { networkingFeatConfirmed: false },
+    { networkingTheme: "" },
+    { networkingTheme: "x".repeat(201) },
+    { networkingMilestone: 0 },
+    { networkingMilestone: 3 },
+    { networkingMilestone: 8 },
+    { networkingMilestone: 4.5 },
+    { networkingMilestone: NaN },
+    { networkingFeat: "Unknown" },
+    { name: "Ada" },
+    { rank: 1 }
+  ]) {
+    const s = later("Media Contacts", patch);
+    assert.equal(
+      s.networkingContactFeatGrants.every(g => !g.valid),
+      true
+    );
+    assert.equal(s.contactPicks.available, patch.name === "Ada" ? 2 : 4);
+  }
+  const s = later();
+  s.contactFeatBindings = [];
+  assert.equal(networkingContactFeatGrants(s)[0].valid, false);
+});
+test("one purchased-rank milestone cannot fund multiple upgraded contacts, even across different themes", () => {
+  const s = later();
+  s.contacts.push({ ...newContact(), name: "Dora" });
+  assert.equal(
+    networkingContactFeatGrants(s).every(g => !g.valid),
+    true
+  );
+});
+test("known acquisition chronology blocks contacts earned before the feat; same-level order requires explicit GC confirmation", () => {
+  const s = later();
+  s.contactFeatBindings[0].acquiredAtLevel = 5;
+  assert.match(networkingContactFeatGrants(s)[0].reason, /before/);
+  s.contactFeatBindings[0].acquiredAtLevel = 4;
+  assert.equal(networkingContactFeatGrants(s)[0].valid, true);
+  s.contacts[2].networkingFeatConfirmed = false;
+  assert.equal(networkingContactFeatGrants(s)[0].valid, false);
+  s.contactFeatBindings[0].acquiredAtLevel = 0;
+  s.contacts[2].networkingFeatConfirmed = true;
+  assert.equal(networkingContactFeatGrants(s)[0].valid, true);
+});
+test("invalid purchased ranks and invalid purchase budgets never validate an extra contact grade", () => {
+  for (const ranks of [3, 3.5, NaN, -1]) {
+    const s = later();
+    s.skillTotals.networking.purchasedRanks = ranks;
+    assert.equal(networkingContactFeatGrants(s)[0].valid, false);
+  }
+  for (const issue of [
+    { level: 4, skill: "networking", code: "point-cost" },
+    { level: 4, code: "career-budget" },
+    { level: 4, code: "training-budget" }
+  ]) {
+    const s = later();
+    s.skillPurchaseIssues.push(issue);
+    assert.equal(networkingContactFeatGrants(s)[0].valid, false);
+  }
+});
+test("actual free Talented ranks do not earn Networking contacts, while valid Training purchases do", () => {
+  const talent = {
+      id: "talent",
+      type: "feat",
+      name: "Talented",
+      system: {
+        ...structuredClone(defs.find(f => f.name === "Talented")),
+        granted: true,
+        choice: "Diplomat",
+        acquiredAtLevel: 1
+      }
+    },
+    training = {
+      id: "training",
+      type: "feat",
+      name: "Training",
+      system: {
+        ...structuredClone(defs.find(f => f.name === "Training")),
+        granted: true,
+        acquiredAtLevel: 1,
+        trainingSkills: { networking: 4, notice: 1 }
+      }
+    },
+    rows = [...contacts(), newContact()],
+    free = state("Media Contacts", {
+      acquired: 1,
+      rows,
+      extraFeats: [talent],
+      progressionOverride: [{ classId: "soldier", vitality: 12, skills: { senseMotive: 8 } }]
+    });
+  assert.equal(free.skillTotals.networking.ranks, 4);
+  assert.equal(free.skillTotals.networking.purchasedRanks, 0);
+  assert.equal(free.networkingContactFeatGrants[0].valid, false);
+  const paid = state("Media Contacts", {
+    acquired: 1,
+    rows,
+    extraFeats: [training],
+    progressionOverride: [{ classId: "soldier", vitality: 12, skills: {} }]
+  });
+  assert.equal(paid.skillTotals.networking.purchasedRanks, 4);
+  assert.equal(paid.networkingContactFeatGrants[0].valid, true);
+  assert.equal(paid.contactPicks.available, 5);
+});
+test("primary and later grant credits disappear with their sources without deleting the recorded people or silently upgrading ordinary contacts", () => {
+  const s = later();
+  assert.equal(s.contacts[2].rank, 2);
+  const absent = state(null, { progressionOverride: laterProgression(), rows: s.contacts });
+  assert.equal(absent.contactPicks.available, 2);
+  assert.equal(absent.networkingContactFeatGrants[0].valid, false);
+  assert.equal(absent.contacts.length, 3);
+  assert.equal(absent.contacts[2].rank, 2);
+});
 
-test('Table2.35 independently supplies all four contact grades and all three mission comparisons before any feat',()=>{const refs=[[1,3600,30,4,4],[2,1800,25,3,3],[3,600,20,2,2],[4,60,15,1,1]];for(const[rank,seconds,dc,error,dice]of refs)for(const[tl,timeFactor,dcMod,errorMod,responseFactor]of [[2,0.5,-5,-1,0.5],[3,1,0,0,1],[4,2,5,2,2]]){const s=state(null,{rows:[{name:'Ada',rank,notes:'Table reference'}]}),p=resolveSkillCheck(s,'networking',check,{...input,contactThreatLevel:tl});assert.equal(p.blocked,false,p.blockedReason);assert.equal(p.error,Math.max(1,error+errorMod));assert.equal(p.contactFeat.dc,dc+dcMod);assert.equal(p.contactFeat.requiredSeconds,seconds*timeFactor);assert.equal(p.contactFeat.response.formula,`${dice}d6`);assert.equal(p.contactFeat.response.missionMultiplier,responseFactor);assert.equal(p.contactFeat.response.afterSuccessfulCheck,true);assert.equal(p.contactFeat.source,null);}});
-test('every contact feat reduces equal-mission associate error3 to1 and uses exactly one time reduction in lower/equal/higher missions',()=>{for(const name of names)for(const[tl,error,seconds,dc]of [[2,0,900,20],[3,1,900,25],[4,3,1800,30]]){const p=resolveSkillCheck(state(name),'networking',check,{...input,contactThreatLevel:tl});assert.equal(p.blocked,false);assert.equal(p.error,error,name+'/'+tl);assert.equal(p.contactFeat.requiredSeconds,seconds,name+'/'+tl);assert.equal(p.contactFeat.dc,dc);assert.equal(p.contactFeat.response.formula,'3d6');assert.equal(p.contactFeat.response.missionMultiplier,tl===2?0.5:tl===4?2:1);}});
-test('the lower-mission time effect competes with contact feats and Simply Irresistible; higher mission duration still doubles before one reduction',()=>{const s=state();s.activeFeatNames.push('Simply Irresistible');for(const timingReduction of ['auto','contactMission','contactFeat','irresistible']){const p=resolveSkillCheck(s,'networking',check,{...input,contactThreatLevel:2,timingReduction});assert.equal(p.contactFeat.requiredSeconds,900);assert.equal(p.timeMultiplier,0.5);}const p=resolveSkillCheck(s,'networking',check,{...input,contactThreatLevel:4});assert.equal(p.contactFeat.baseSummonSeconds,3600);assert.equal(p.contactFeat.requiredSeconds,1800);});
-test('selected contacts require an explicit valid mission Threat Level, valid grade and career; unspecified generic checks remain available',()=>{for(const tl of [undefined,null,'',0,-1,1.5,21,true,'unknown']){const p=resolveSkillCheck(state(),'networking',check,{...input,contactThreatLevel:tl});assert.equal(p.blocked,true);assert.match(p.blockedReason,/Threat Level/);}for(const rank of [0,5,2.5]){const s=state(null);s.contacts[0].rank=rank;assert.equal(resolveSkillCheck(s,'networking',check,input).blocked,true);}for(const level of [0,21,2.5]){const s=state();s.level=level;assert.equal(resolveSkillCheck(s,'networking',check,input).blocked,true);}assert.equal(resolveSkillCheck(state(),'networking',check,{...input,contactName:''}).blocked,false);});
-test('the lower-mission minimum applies after the untrained increase, before separate feat reductions',()=>{const s=state(null,{rows:[{name:'Ada',rank:4}]});s.skillTotals.networking.ranks=0;const p=resolveSkillCheck(s,'networking',check,{...input,contactThreatLevel:2});assert.equal(p.error,2);const primary=state('Media Contacts',{rows:[{name:'Ada',rank:4}]});primary.skillTotals.networking.ranks=0;assert.equal(resolveSkillCheck(primary,'networking',check,{...input,contactThreatLevel:2}).error,0);});
-test('new DC, mission, response and summon evidence is frozen and actual dispatch rejects a changed grade or career before posting',async()=>{const c={checkKind:'skill',contactFeat:resolveSkillCheck(state(),'networking',check,input).contactFeat},e=rollEvidence(c);for(const path of [['dc'],['threatLevel'],['careerLevel'],['requiredSeconds'],['response','formula'],['response','missionMultiplier']]){const n=structuredClone(c);let o=n.contactFeat;for(const k of path.slice(0,-1))o=o[k];o[path.at(-1)]=999;assert.equal(rollEvidenceMatches(e,n),false);}for(const change of [a=>a.system.contacts[0].rank=3,a=>a.system.level=4]){const a=new SpycraftActor();a.rollCheck=async(_f,_d,o)=>o;const p=await a.rollSkill('networking','cha',{check:'contact',...input});assert.equal(p.contactFeat.dc,25);change(a);assert.throws(()=>p.validateSkillContext(),/changed/);}});
+test("Table2.35 independently supplies all four contact grades and all three mission comparisons before any feat", () => {
+  const refs = [
+    [1, 3600, 30, 4, 4],
+    [2, 1800, 25, 3, 3],
+    [3, 600, 20, 2, 2],
+    [4, 60, 15, 1, 1]
+  ];
+  for (const [rank, seconds, dc, error, dice] of refs)
+    for (const [tl, timeFactor, dcMod, errorMod, responseFactor] of [
+      [2, 0.5, -5, -1, 0.5],
+      [3, 1, 0, 0, 1],
+      [4, 2, 5, 2, 2]
+    ]) {
+      const s = state(null, { rows: [{ name: "Ada", rank, notes: "Table reference" }] }),
+        p = resolveSkillCheck(s, "networking", check, { ...input, contactThreatLevel: tl });
+      assert.equal(p.blocked, false, p.blockedReason);
+      assert.equal(p.error, Math.max(1, error + errorMod));
+      assert.equal(p.contactFeat.dc, dc + dcMod);
+      assert.equal(p.contactFeat.requiredSeconds, seconds * timeFactor);
+      assert.equal(p.contactFeat.response.formula, `${dice}d6`);
+      assert.equal(p.contactFeat.response.missionMultiplier, responseFactor);
+      assert.equal(p.contactFeat.response.afterSuccessfulCheck, true);
+      assert.equal(p.contactFeat.source, null);
+    }
+});
+test("every contact feat reduces equal-mission associate error3 to1 and uses exactly one time reduction in lower/equal/higher missions", () => {
+  for (const name of names)
+    for (const [tl, error, seconds, dc] of [
+      [2, 0, 900, 20],
+      [3, 1, 900, 25],
+      [4, 3, 1800, 30]
+    ]) {
+      const p = resolveSkillCheck(state(name), "networking", check, { ...input, contactThreatLevel: tl });
+      assert.equal(p.blocked, false);
+      assert.equal(p.error, error, name + "/" + tl);
+      assert.equal(p.contactFeat.requiredSeconds, seconds, name + "/" + tl);
+      assert.equal(p.contactFeat.dc, dc);
+      assert.equal(p.contactFeat.response.formula, "3d6");
+      assert.equal(p.contactFeat.response.missionMultiplier, tl === 2 ? 0.5 : tl === 4 ? 2 : 1);
+    }
+});
+test("the lower-mission time effect competes with contact feats and Simply Irresistible; higher mission duration still doubles before one reduction", () => {
+  const s = state();
+  s.activeFeatNames.push("Simply Irresistible");
+  for (const timingReduction of ["auto", "contactMission", "contactFeat", "irresistible"]) {
+    const p = resolveSkillCheck(s, "networking", check, { ...input, contactThreatLevel: 2, timingReduction });
+    assert.equal(p.contactFeat.requiredSeconds, 900);
+    assert.equal(p.timeMultiplier, 0.5);
+  }
+  const p = resolveSkillCheck(s, "networking", check, { ...input, contactThreatLevel: 4 });
+  assert.equal(p.contactFeat.baseSummonSeconds, 3600);
+  assert.equal(p.contactFeat.requiredSeconds, 1800);
+});
+test("selected contacts require an explicit valid mission Threat Level, valid grade and career; unspecified generic checks remain available", () => {
+  for (const tl of [undefined, null, "", 0, -1, 1.5, 21, true, "unknown"]) {
+    const p = resolveSkillCheck(state(), "networking", check, { ...input, contactThreatLevel: tl });
+    assert.equal(p.blocked, true);
+    assert.match(p.blockedReason, /Threat Level/);
+  }
+  for (const rank of [0, 5, 2.5]) {
+    const s = state(null);
+    s.contacts[0].rank = rank;
+    assert.equal(resolveSkillCheck(s, "networking", check, input).blocked, true);
+  }
+  for (const level of [0, 21, 2.5]) {
+    const s = state();
+    s.level = level;
+    assert.equal(resolveSkillCheck(s, "networking", check, input).blocked, true);
+  }
+  assert.equal(resolveSkillCheck(state(), "networking", check, { ...input, contactName: "" }).blocked, false);
+});
+test("the lower-mission minimum applies after the untrained increase, before separate feat reductions", () => {
+  const s = state(null, { rows: [{ name: "Ada", rank: 4 }] });
+  s.skillTotals.networking.ranks = 0;
+  const p = resolveSkillCheck(s, "networking", check, { ...input, contactThreatLevel: 2 });
+  assert.equal(p.error, 2);
+  const primary = state("Media Contacts", { rows: [{ name: "Ada", rank: 4 }] });
+  primary.skillTotals.networking.ranks = 0;
+  assert.equal(resolveSkillCheck(primary, "networking", check, { ...input, contactThreatLevel: 2 }).error, 0);
+});
+test("new DC, mission, response and summon evidence is frozen and actual dispatch rejects a changed grade or career before posting", async () => {
+  const c = { checkKind: "skill", contactFeat: resolveSkillCheck(state(), "networking", check, input).contactFeat },
+    e = rollEvidence(c);
+  for (const path of [
+    ["dc"],
+    ["threatLevel"],
+    ["careerLevel"],
+    ["requiredSeconds"],
+    ["response", "formula"],
+    ["response", "missionMultiplier"]
+  ]) {
+    const n = structuredClone(c);
+    let o = n.contactFeat;
+    for (const k of path.slice(0, -1)) o = o[k];
+    o[path.at(-1)] = 999;
+    assert.equal(rollEvidenceMatches(e, n), false);
+  }
+  for (const change of [a => (a.system.contacts[0].rank = 3), a => (a.system.level = 4)]) {
+    const a = new SpycraftActor();
+    a.rollCheck = async (_f, _d, o) => o;
+    const p = await a.rollSkill("networking", "cha", { check: "contact", ...input });
+    assert.equal(p.contactFeat.dc, 25);
+    change(a);
+    assert.throws(() => p.validateSkillContext(), /changed/);
+  }
+});
 
-const grant=(name,mode,choice='Ada',id=name,at=1)=>({id,name,type:'feat',system:{...structuredClone(defs.find(f=>f.name===name)),granted:true,acquiredAtLevel:at,choice,contactGrantMode:mode,contactTheme:'Matching GC-approved theme',contactThemeConfirmed:true}});
-test('every contact feat can replace its new associate with exactly one existing-contact grade improvement',()=>{for(const name of names){const rows=[{name:'Bob',rank:2}],s=state(name,{choice:'Bob',mode:'improve',rows}),b=state(null,{rows});assert.equal(s.contactFeatGrants[0].valid,true,name);assert.equal(s.contactFeatGrants[0].credit,1);assert.equal(s.contactPicks.available,b.contactPicks.available+1);const p=resolveSkillCheck(s,'networking',check,{...input,contactName:'Bob'});assert.equal(p.contactFeat.grantMode,'improve');assert.equal(p.error,1);assert.equal(p.contactFeat.requiredSeconds,900);}});
-test('Favored Contacts cannot leave an acquaintance unchanged, use an unknown mode, or apply more grade credits than the final grade contains',()=>{for(const mode of ['improve','unknown']){const s=state('Media Contacts',{mode,rows:[{name:'Ada',rank:1}]});assert.equal(s.contactFeatGrants[0].valid,false);assert.equal(s.contactFeatGrants[0].credit,0);}const s=state('Media Contacts',{mode:'improve',rows:[{name:'Ada',rank:4}],extraFeats:['Academic Contacts','Medical Contacts','Military Contacts'].map(n=>grant(n,'improve'))});assert.equal(s.contactFeatGrants.every(g=>!g.valid),true);assert.equal(s.contactFeatGrants.every(g=>g.credit===0),true);});
-test('one new associate and later improvements, or up to three improvements of an existing acquaintance, account for each grade once',()=>{for(const[mode,extras,rank,credit]of [['associate',['improve'],3,3],['associate',['improve','improve'],4,4],['improve',[],2,1],['improve',['improve'],3,2],['improve',['improve','improve'],4,3]]){const s=state('Media Contacts',{mode,rows:[{name:'Ada',rank}],extraFeats:extras.map((m,i)=>grant(['Academic Contacts','Medical Contacts'][i],m))});assert.equal(s.contactFeatGrants.every(g=>g.valid),true);assert.equal(s.contactFeatGrants.reduce((n,g)=>n+g.credit,0),credit);const tooLow=structuredClone(s);tooLow.contacts[0].rank=rank-1;assert.equal(contactFeatGrants(tooLow).every(g=>!g.valid),true);}const duplicate=state('Media Contacts',{rows:[{name:'Ada',rank:4}],extraFeats:[grant('Academic Contacts','associate')]});assert.equal(duplicate.contactFeatGrants.every(g=>!g.valid),true);});
-test('distinct contact feats stack unnamed error reductions but apply only one half-time effect, with stable source-order evidence',()=>{const s=state('Media Contacts',{rows:[{name:'Ada',rank:3}],extraFeats:[grant('Academic Contacts','improve')]}),c={...check,error:5},p=resolveSkillCheck(s,'networking',c,input);assert.equal(p.error,2);assert.equal(p.contactFeat.errorReduction,4);assert.equal(p.contactFeat.requiredSeconds,300);assert.equal(p.timeMultiplier,0.5);assert.equal(p.contactFeat.sources.length,2);const evidence=rollEvidence({checkKind:'skill',contactFeat:p.contactFeat});s.contactFeatBindings.reverse();assert.equal(rollEvidence({checkKind:'skill',contactFeat:resolveSkillCheck(s,'networking',c,input).contactFeat}),evidence);for(const key of ['mode','credit','theme','name']){const copy=structuredClone(p.contactFeat);copy.sources[1][key]='changed';assert.equal(rollEvidenceMatches(evidence,{checkKind:'skill',contactFeat:copy}),false);}});
-test('a new Networking associate can be improved by a different later feat, requiring the actual third grade and valid chronology',()=>{const rows=[...contacts(),{...newContact(),rank:3}],extra=[grant('Academic Contacts','improve','Claire','academic',4)],s=state('Media Contacts',{acquired:3,progressionOverride:laterProgression(),rows,extraFeats:extra});assert.equal(s.networkingContactFeatGrants[0].valid,true);assert.equal(s.contactFeatGrants.every(g=>g.valid),true);assert.equal(s.contactPicks.available,6);assert.equal(s.contactPicks.used,6);const p=resolveSkillCheck(s,'networking',check,{...input,contactName:'Claire',contactThreatLevel:4});assert.equal(p.contactFeat.source,'Academic Contacts');assert.equal(p.error,0);s.contacts[2].rank=2;assert.equal(contactFeatGrants(s).find(g=>g.name==='Academic Contacts').valid,false);s.contacts[2].rank=3;s.contactFeatBindings.find(g=>g.name==='Academic Contacts').acquiredAtLevel=3;assert.match(networkingContactFeatGrants(s)[0].reason,/predates/);s.contactFeatBindings.find(g=>g.name==='Academic Contacts').name='Media Contacts';assert.equal(networkingContactFeatGrants(s)[0].valid,false);});
-test('lost contact feat sources remove only their grade credits and numerical effects, preserving the contact record for review',()=>{const s=state('Media Contacts',{mode:'improve',rows:[{name:'Ada',rank:3}],extraFeats:[grant('Academic Contacts','improve')]});assert.equal(s.contactPicks.available,4);const remaining=state('Media Contacts',{mode:'improve',rows:s.contacts});assert.equal(remaining.contactPicks.available,3);assert.equal(remaining.contacts[0].rank,3);assert.equal(remaining.contactFeatGrants[0].valid,true);});
-test('actual dispatch rejects changed grant modes or removed combined sources while allowing semantically unchanged source reordering',async()=>{const a=new SpycraftActor();a.system=state('Media Contacts',{rows:[{name:'Ada',rank:3}],extraFeats:[grant('Academic Contacts','improve')]});a.rollCheck=async(_f,_d,o)=>o;const p=await a.rollSkill('networking','cha',{check:'contact',...input});a.system.contactFeatBindings.reverse();p.validateSkillContext();a.system.contactFeatBindings.pop();assert.throws(()=>p.validateSkillContext(),/changed/);const b=new SpycraftActor();b.rollCheck=a.rollCheck;const q=await b.rollSkill('networking','cha',{check:'contact',...input});b.system.contactFeatBindings[0].mode='improve';assert.throws(()=>q.validateSkillContext(),/changed/);});
+const grant = (name, mode, choice = "Ada", id = name, at = 1) => ({
+  id,
+  name,
+  type: "feat",
+  system: {
+    ...structuredClone(defs.find(f => f.name === name)),
+    granted: true,
+    acquiredAtLevel: at,
+    choice,
+    contactGrantMode: mode,
+    contactTheme: "Matching GC-approved theme",
+    contactThemeConfirmed: true
+  }
+});
+test("every contact feat can replace its new associate with exactly one existing-contact grade improvement", () => {
+  for (const name of names) {
+    const rows = [{ name: "Bob", rank: 2 }],
+      s = state(name, { choice: "Bob", mode: "improve", rows }),
+      b = state(null, { rows });
+    assert.equal(s.contactFeatGrants[0].valid, true, name);
+    assert.equal(s.contactFeatGrants[0].credit, 1);
+    assert.equal(s.contactPicks.available, b.contactPicks.available + 1);
+    const p = resolveSkillCheck(s, "networking", check, { ...input, contactName: "Bob" });
+    assert.equal(p.contactFeat.grantMode, "improve");
+    assert.equal(p.error, 1);
+    assert.equal(p.contactFeat.requiredSeconds, 900);
+  }
+});
+test("Favored Contacts cannot leave an acquaintance unchanged, use an unknown mode, or apply more grade credits than the final grade contains", () => {
+  for (const mode of ["improve", "unknown"]) {
+    const s = state("Media Contacts", { mode, rows: [{ name: "Ada", rank: 1 }] });
+    assert.equal(s.contactFeatGrants[0].valid, false);
+    assert.equal(s.contactFeatGrants[0].credit, 0);
+  }
+  const s = state("Media Contacts", {
+    mode: "improve",
+    rows: [{ name: "Ada", rank: 4 }],
+    extraFeats: ["Academic Contacts", "Medical Contacts", "Military Contacts"].map(n => grant(n, "improve"))
+  });
+  assert.equal(
+    s.contactFeatGrants.every(g => !g.valid),
+    true
+  );
+  assert.equal(
+    s.contactFeatGrants.every(g => g.credit === 0),
+    true
+  );
+});
+test("one new associate and later improvements, or up to three improvements of an existing acquaintance, account for each grade once", () => {
+  for (const [mode, extras, rank, credit] of [
+    ["associate", ["improve"], 3, 3],
+    ["associate", ["improve", "improve"], 4, 4],
+    ["improve", [], 2, 1],
+    ["improve", ["improve"], 3, 2],
+    ["improve", ["improve", "improve"], 4, 3]
+  ]) {
+    const s = state("Media Contacts", {
+      mode,
+      rows: [{ name: "Ada", rank }],
+      extraFeats: extras.map((m, i) => grant(["Academic Contacts", "Medical Contacts"][i], m))
+    });
+    assert.equal(
+      s.contactFeatGrants.every(g => g.valid),
+      true
+    );
+    assert.equal(
+      s.contactFeatGrants.reduce((n, g) => n + g.credit, 0),
+      credit
+    );
+    const tooLow = structuredClone(s);
+    tooLow.contacts[0].rank = rank - 1;
+    assert.equal(
+      contactFeatGrants(tooLow).every(g => !g.valid),
+      true
+    );
+  }
+  const duplicate = state("Media Contacts", {
+    rows: [{ name: "Ada", rank: 4 }],
+    extraFeats: [grant("Academic Contacts", "associate")]
+  });
+  assert.equal(
+    duplicate.contactFeatGrants.every(g => !g.valid),
+    true
+  );
+});
+test("distinct contact feats stack unnamed error reductions but apply only one half-time effect, with stable source-order evidence", () => {
+  const s = state("Media Contacts", {
+      rows: [{ name: "Ada", rank: 3 }],
+      extraFeats: [grant("Academic Contacts", "improve")]
+    }),
+    c = { ...check, error: 5 },
+    p = resolveSkillCheck(s, "networking", c, input);
+  assert.equal(p.error, 2);
+  assert.equal(p.contactFeat.errorReduction, 4);
+  assert.equal(p.contactFeat.requiredSeconds, 300);
+  assert.equal(p.timeMultiplier, 0.5);
+  assert.equal(p.contactFeat.sources.length, 2);
+  const evidence = rollEvidence({ checkKind: "skill", contactFeat: p.contactFeat });
+  s.contactFeatBindings.reverse();
+  assert.equal(
+    rollEvidence({ checkKind: "skill", contactFeat: resolveSkillCheck(s, "networking", c, input).contactFeat }),
+    evidence
+  );
+  for (const key of ["mode", "credit", "theme", "name"]) {
+    const copy = structuredClone(p.contactFeat);
+    copy.sources[1][key] = "changed";
+    assert.equal(rollEvidenceMatches(evidence, { checkKind: "skill", contactFeat: copy }), false);
+  }
+});
+test("a new Networking associate can be improved by a different later feat, requiring the actual third grade and valid chronology", () => {
+  const rows = [...contacts(), { ...newContact(), rank: 3 }],
+    extra = [grant("Academic Contacts", "improve", "Claire", "academic", 4)],
+    s = state("Media Contacts", { acquired: 3, progressionOverride: laterProgression(), rows, extraFeats: extra });
+  assert.equal(s.networkingContactFeatGrants[0].valid, true);
+  assert.equal(
+    s.contactFeatGrants.every(g => g.valid),
+    true
+  );
+  assert.equal(s.contactPicks.available, 6);
+  assert.equal(s.contactPicks.used, 6);
+  const p = resolveSkillCheck(s, "networking", check, { ...input, contactName: "Claire", contactThreatLevel: 4 });
+  assert.equal(p.contactFeat.source, "Academic Contacts");
+  assert.equal(p.error, 0);
+  s.contacts[2].rank = 2;
+  assert.equal(contactFeatGrants(s).find(g => g.name === "Academic Contacts").valid, false);
+  s.contacts[2].rank = 3;
+  s.contactFeatBindings.find(g => g.name === "Academic Contacts").acquiredAtLevel = 3;
+  assert.match(networkingContactFeatGrants(s)[0].reason, /predates/);
+  s.contactFeatBindings.find(g => g.name === "Academic Contacts").name = "Media Contacts";
+  assert.equal(networkingContactFeatGrants(s)[0].valid, false);
+});
+test("lost contact feat sources remove only their grade credits and numerical effects, preserving the contact record for review", () => {
+  const s = state("Media Contacts", {
+    mode: "improve",
+    rows: [{ name: "Ada", rank: 3 }],
+    extraFeats: [grant("Academic Contacts", "improve")]
+  });
+  assert.equal(s.contactPicks.available, 4);
+  const remaining = state("Media Contacts", { mode: "improve", rows: s.contacts });
+  assert.equal(remaining.contactPicks.available, 3);
+  assert.equal(remaining.contacts[0].rank, 3);
+  assert.equal(remaining.contactFeatGrants[0].valid, true);
+});
+test("actual dispatch rejects changed grant modes or removed combined sources while allowing semantically unchanged source reordering", async () => {
+  const a = new SpycraftActor();
+  a.system = state("Media Contacts", {
+    rows: [{ name: "Ada", rank: 3 }],
+    extraFeats: [grant("Academic Contacts", "improve")]
+  });
+  a.rollCheck = async (_f, _d, o) => o;
+  const p = await a.rollSkill("networking", "cha", { check: "contact", ...input });
+  a.system.contactFeatBindings.reverse();
+  p.validateSkillContext();
+  a.system.contactFeatBindings.pop();
+  assert.throws(() => p.validateSkillContext(), /changed/);
+  const b = new SpycraftActor();
+  b.rollCheck = a.rollCheck;
+  const q = await b.rollSkill("networking", "cha", { check: "contact", ...input });
+  b.system.contactFeatBindings[0].mode = "improve";
+  assert.throws(() => q.validateSkillContext(), /changed/);
+});

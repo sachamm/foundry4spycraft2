@@ -1,11 +1,234 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SPYCRAFT as cfg} from '../module/config.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {validateBalanceSurfaceProof} from '../module/rules/balance.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-const state=(feats=[])=>({activeFeatNames:feats,speed:30,conditionContext:{},postureMovement:{standardMove:true},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:12,mod:1}])),skillTotals:Object.fromEntries(Object.entries(cfg.skills).map(([key,s])=>[key,{name:s.name,ranks:4,cap:50,threat:20,totals:s.abilities.map(ability=>({ability,total:10})),bonusEntries:[]}])),focusTotals:{},knowledge:3});
-const balance=cfg.skills.acrobatics.checks.find(c=>c.id==='balance'),ordinary={gearStatus:'available',synergySkill:'none'},input=(patch={})=>({...ordinary,balanceCircumstances:true,balanceSurface:'narrow3to6',balanceDistanceFeet:30,balanceBuckled:false,balanceSlippery:false,balanceConfirmed:true,...patch});
-test('every named use confines Balance proof/errors/DC to its exact scope without treating a lower DC as a roll bonus',()=>{for(const[key,skill]of Object.entries(cfg.skills))for(const check of skill.checks){const s=state(),b=resolveSkillCheck(s,key,check,ordinary),r=resolveSkillCheck(s,key,check,input()),eligible=key==='acrobatics'&&check.id==='balance';assert.equal(!!r.balanceSurface,eligible,key+'/'+check.id);assert.equal(r.total,b.total);assert.equal(r.error-b.error,eligible?1:0);assert.equal(r.cap,b.cap);assert.equal(r.threat,b.threat);assert.equal(r.timeMultiplier,b.timeMultiplier);if(eligible){assert.equal(r.balanceSurface.dc,25);assert.equal(r.balanceSurface.requiredChecks,2);}else assert.ok(r.blockedReason);}for(const skill of Object.keys(cfg.skills))assert.equal(resolveKnowledgeCheck(state(),{skill,...input()}).total,resolveKnowledgeCheck(state(),{skill}).total);});
-test('qualified Basics changes count only; Mastery reduces DC/error only on the actual surface and grants no roll bonus',()=>{for(const names of [[],['Equilibrium Basics'],['Equilibrium Mastery'],['Equilibrium Basics','Equilibrium Mastery']]){const s=state(names),r=resolveSkillCheck(s,'acrobatics',balance,input()),mastery=names.includes('Equilibrium Mastery');assert.equal(r.total,10);assert.equal(r.balanceSurface.requiredChecks,names.includes('Equilibrium Basics')?1:2);assert.equal(r.balanceSurface.dc,mastery?20:25);assert.equal(r.error,mastery?1:2);}const s=state(['Equilibrium Mastery']);assert.equal(resolveSkillCheck(s,'acrobatics',balance,input({balanceSurface:'narrow7to12',balanceDistanceFeet:0})).error,0);s.skillTotals.acrobatics.errorReduction=1;assert.equal(resolveSkillCheck(s,'acrobatics',balance,input()).error,0);});
-test('Mastery ignores only Vision on narrow/uneven surfaces, preserving Hearing, armor, blind action gates and condition scaling',()=>{for(const conditionContext of [{blinded:true},{deafened:true},{blinded:true,deafened:true}]){const plain=state(),master=state(['Equilibrium Mastery']);for(const s of [plain,master]){s.conditionContext=conditionContext;s.armor={check:-2,visionCheck:-3};}const p=resolveSkillCheck(plain,'acrobatics',balance,input()),m=resolveSkillCheck(master,'acrobatics',balance,input()),blind=conditionContext.blinded===true;assert.equal(m.total-p.total,3+(blind?8:0));assert.equal(m.armor,-2);assert.equal(m.cap,50-(conditionContext.deafened?10:0));assert.equal(p.cap,50-(blind?20:0)-(conditionContext.deafened?10:0));if(conditionContext.deafened)assert.match(m.notes,/Deafened/i);const flat=resolveSkillCheck(master,'acrobatics',balance,input({balanceSurface:'flat'})),flatPlain=resolveSkillCheck(plain,'acrobatics',balance,input({balanceSurface:'flat'}));assert.equal(flat.total,flatPlain.total);assert.equal(flat.cap,flatPlain.cap);}const s=state(['Equilibrium Mastery']);s.conditionContext={blinded:true};assert.ok(resolveSkillCheck(s,'acrobatics',balance,input({requiresEyesight:true})).blocked);});
-test('disabled retained controls preserve ordinary checks and modern evidence prevents adding, removing or changing a Balance declaration',()=>{const s=state(['Equilibrium Mastery']),b=resolveSkillCheck(s,'acrobatics',balance,ordinary),r=resolveSkillCheck(s,'acrobatics',balance,input({balanceCircumstances:false,balanceSurface:'old',balanceDistanceFeet:'bad'}));assert.equal(r.total,b.total);assert.equal(r.error,b.error);assert.equal(r.balanceSurface,null);const proof=resolveSkillCheck(s,'acrobatics',balance,input()).balanceSurface,c={checkKind:'skill',skillKey:'acrobatics',checkId:'balance',balanceSurface:proof},e=rollEvidence(c);assert.equal(rollEvidenceMatches(e,c),true);assert.equal(rollEvidenceMatches(rollEvidence({...c,balanceSurface:null}),c),false);assert.equal(rollEvidenceMatches(e,{...c,balanceSurface:null}),false);for(const k of Object.keys(proof)){const n=structuredClone(c);n.balanceSurface[k]='changed';assert.equal(rollEvidenceMatches(e,n),false,k);}});
-globalThis.Actor=class{constructor(){this.type='agent';this.isOwner=true;this.uuid='Actor.balance';this.items=[];this.flags={};this.system=state(['Equilibrium Basics','Equilibrium Mastery']);}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'GC',isGM:true},settings:{get:()=>false},time:{worldTime:126},combats:[],actors:[],i18n:{localize:String}};globalThis.foundry={utils:{escapeHTML:String}};globalThis.ui={notifications:{warn:()=>null}};globalThis.ChatMessage={getSpeaker:()=>({})};let hook=async()=>{},posts=[],rolls=0;globalThis.Roll=class{constructor(_f,data){this.total=12+(data.total??0);this.dice=[{total:12}];}async evaluate(){rolls++;await hook();return this;}async toMessage(d){posts.push(d);return d;}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('actual Actor parses counted movement and records table DC/check count without accepting fabricated DC or source payloads',async()=>{const a=new SpycraftActor();hook=async()=>{};posts=[];const m=await a.rollSkill('acrobatics',null,{check:'balance',...input({balanceDistanceFeet:'30',dc:1,requiredChecks:0})}),c=m.flags.spycraft2;assert.equal(c.balanceSurface.dc,20);assert.equal(c.balanceSurface.requiredChecks,1);assert.equal(c.balanceSurface.distanceFeet,30);assert.equal(c.rollData.total,10);assert.equal(c.error,1);for(const patch of [{balanceDistanceFeet:''},{balanceDistanceFeet:'61'},{balanceConfirmed:false},{balanceSurface:'climb61plus'}]){const n=posts.length;await a.rollSkill('acrobatics',null,{check:'balance',...input(patch)});assert.equal(posts.length,n);}});
-test('actual RNG source, Speed and selected-surface drift refuse stale Balance receipts without posting',async()=>{for(const change of ['basics','mastery','speed','surface']){const a=new SpycraftActor(),request={check:'balance',...input()};posts=[];hook=async()=>{if(change==='basics')a.system.activeFeatNames=['Equilibrium Mastery'];if(change==='mastery')a.system.activeFeatNames=['Equilibrium Basics'];if(change==='speed')a.system.speed=10;if(change==='surface')request.balanceSurface='flat';};await assert.rejects(a.rollSkill('acrobatics',null,request),/changed/);assert.equal(posts.length,0,change);}hook=async()=>{};});
-test('replacement checks current source, surface and Speed before RNG',async()=>{const a=new SpycraftActor(),p=resolveSkillCheck(a.system,'acrobatics',balance,input()).balanceSurface,scope={checkKind:'skill',skillKey:'acrobatics',checkId:'balance',balanceSurface:p};validateBalanceSurfaceProof(a.system,p,scope);rolls=0;for(const names of [['Equilibrium Basics'],['Equilibrium Mastery']]){a.system.activeFeatNames=names;await assert.rejects(a.rollCheck('1d20',{},scope),/changed/);}a.system.activeFeatNames=['Equilibrium Basics','Equilibrium Mastery'];a.system.speed=10;await assert.rejects(a.rollCheck('1d20',{},scope),/changed/);assert.equal(rolls,0);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { validateBalanceSurfaceProof } from "../module/rules/balance.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+const state = (feats = []) => ({
+  activeFeatNames: feats,
+  speed: 30,
+  conditionContext: {},
+  postureMovement: { standardMove: true },
+  abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 12, mod: 1 }])),
+  skillTotals: Object.fromEntries(
+    Object.entries(cfg.skills).map(([key, s]) => [
+      key,
+      {
+        name: s.name,
+        ranks: 4,
+        cap: 50,
+        threat: 20,
+        totals: s.abilities.map(ability => ({ ability, total: 10 })),
+        bonusEntries: []
+      }
+    ])
+  ),
+  focusTotals: {},
+  knowledge: 3
+});
+const balance = cfg.skills.acrobatics.checks.find(c => c.id === "balance"),
+  ordinary = { gearStatus: "available", synergySkill: "none" },
+  input = (patch = {}) => ({
+    ...ordinary,
+    balanceCircumstances: true,
+    balanceSurface: "narrow3to6",
+    balanceDistanceFeet: 30,
+    balanceBuckled: false,
+    balanceSlippery: false,
+    balanceConfirmed: true,
+    ...patch
+  });
+test("every named use confines Balance proof/errors/DC to its exact scope without treating a lower DC as a roll bonus", () => {
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const check of skill.checks) {
+      const s = state(),
+        b = resolveSkillCheck(s, key, check, ordinary),
+        r = resolveSkillCheck(s, key, check, input()),
+        eligible = key === "acrobatics" && check.id === "balance";
+      assert.equal(!!r.balanceSurface, eligible, key + "/" + check.id);
+      assert.equal(r.total, b.total);
+      assert.equal(r.error - b.error, eligible ? 1 : 0);
+      assert.equal(r.cap, b.cap);
+      assert.equal(r.threat, b.threat);
+      assert.equal(r.timeMultiplier, b.timeMultiplier);
+      if (eligible) {
+        assert.equal(r.balanceSurface.dc, 25);
+        assert.equal(r.balanceSurface.requiredChecks, 2);
+      } else assert.ok(r.blockedReason);
+    }
+  for (const skill of Object.keys(cfg.skills))
+    assert.equal(
+      resolveKnowledgeCheck(state(), { skill, ...input() }).total,
+      resolveKnowledgeCheck(state(), { skill }).total
+    );
+});
+test("qualified Basics changes count only; Mastery reduces DC/error only on the actual surface and grants no roll bonus", () => {
+  for (const names of [
+    [],
+    ["Equilibrium Basics"],
+    ["Equilibrium Mastery"],
+    ["Equilibrium Basics", "Equilibrium Mastery"]
+  ]) {
+    const s = state(names),
+      r = resolveSkillCheck(s, "acrobatics", balance, input()),
+      mastery = names.includes("Equilibrium Mastery");
+    assert.equal(r.total, 10);
+    assert.equal(r.balanceSurface.requiredChecks, names.includes("Equilibrium Basics") ? 1 : 2);
+    assert.equal(r.balanceSurface.dc, mastery ? 20 : 25);
+    assert.equal(r.error, mastery ? 1 : 2);
+  }
+  const s = state(["Equilibrium Mastery"]);
+  assert.equal(
+    resolveSkillCheck(s, "acrobatics", balance, input({ balanceSurface: "narrow7to12", balanceDistanceFeet: 0 })).error,
+    0
+  );
+  s.skillTotals.acrobatics.errorReduction = 1;
+  assert.equal(resolveSkillCheck(s, "acrobatics", balance, input()).error, 0);
+});
+test("Mastery ignores only Vision on narrow/uneven surfaces, preserving Hearing, armor, blind action gates and condition scaling", () => {
+  for (const conditionContext of [{ blinded: true }, { deafened: true }, { blinded: true, deafened: true }]) {
+    const plain = state(),
+      master = state(["Equilibrium Mastery"]);
+    for (const s of [plain, master]) {
+      s.conditionContext = conditionContext;
+      s.armor = { check: -2, visionCheck: -3 };
+    }
+    const p = resolveSkillCheck(plain, "acrobatics", balance, input()),
+      m = resolveSkillCheck(master, "acrobatics", balance, input()),
+      blind = conditionContext.blinded === true;
+    assert.equal(m.total - p.total, 3 + (blind ? 8 : 0));
+    assert.equal(m.armor, -2);
+    assert.equal(m.cap, 50 - (conditionContext.deafened ? 10 : 0));
+    assert.equal(p.cap, 50 - (blind ? 20 : 0) - (conditionContext.deafened ? 10 : 0));
+    if (conditionContext.deafened) assert.match(m.notes, /Deafened/i);
+    const flat = resolveSkillCheck(master, "acrobatics", balance, input({ balanceSurface: "flat" })),
+      flatPlain = resolveSkillCheck(plain, "acrobatics", balance, input({ balanceSurface: "flat" }));
+    assert.equal(flat.total, flatPlain.total);
+    assert.equal(flat.cap, flatPlain.cap);
+  }
+  const s = state(["Equilibrium Mastery"]);
+  s.conditionContext = { blinded: true };
+  assert.ok(resolveSkillCheck(s, "acrobatics", balance, input({ requiresEyesight: true })).blocked);
+});
+test("disabled retained controls preserve ordinary checks and modern evidence prevents adding, removing or changing a Balance declaration", () => {
+  const s = state(["Equilibrium Mastery"]),
+    b = resolveSkillCheck(s, "acrobatics", balance, ordinary),
+    r = resolveSkillCheck(
+      s,
+      "acrobatics",
+      balance,
+      input({ balanceCircumstances: false, balanceSurface: "old", balanceDistanceFeet: "bad" })
+    );
+  assert.equal(r.total, b.total);
+  assert.equal(r.error, b.error);
+  assert.equal(r.balanceSurface, null);
+  const proof = resolveSkillCheck(s, "acrobatics", balance, input()).balanceSurface,
+    c = { checkKind: "skill", skillKey: "acrobatics", checkId: "balance", balanceSurface: proof },
+    e = rollEvidence(c);
+  assert.equal(rollEvidenceMatches(e, c), true);
+  assert.equal(rollEvidenceMatches(rollEvidence({ ...c, balanceSurface: null }), c), false);
+  assert.equal(rollEvidenceMatches(e, { ...c, balanceSurface: null }), false);
+  for (const k of Object.keys(proof)) {
+    const n = structuredClone(c);
+    n.balanceSurface[k] = "changed";
+    assert.equal(rollEvidenceMatches(e, n), false, k);
+  }
+});
+globalThis.Actor = class {
+  constructor() {
+    this.type = "agent";
+    this.isOwner = true;
+    this.uuid = "Actor.balance";
+    this.items = [];
+    this.flags = {};
+    this.system = state(["Equilibrium Basics", "Equilibrium Mastery"]);
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { id: "GC", isGM: true },
+  settings: { get: () => false },
+  time: { worldTime: 126 },
+  combats: [],
+  actors: [],
+  i18n: { localize: String }
+};
+globalThis.foundry = { utils: { escapeHTML: String } };
+globalThis.ui = { notifications: { warn: () => null } };
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+let hook = async () => {},
+  posts = [],
+  rolls = 0;
+globalThis.Roll = class {
+  constructor(_f, data) {
+    this.total = 12 + (data.total ?? 0);
+    this.dice = [{ total: 12 }];
+  }
+  async evaluate() {
+    rolls++;
+    await hook();
+    return this;
+  }
+  async toMessage(d) {
+    posts.push(d);
+    return d;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("actual Actor parses counted movement and records table DC/check count without accepting fabricated DC or source payloads", async () => {
+  const a = new SpycraftActor();
+  hook = async () => {};
+  posts = [];
+  const m = await a.rollSkill("acrobatics", null, {
+      check: "balance",
+      ...input({ balanceDistanceFeet: "30", dc: 1, requiredChecks: 0 })
+    }),
+    c = m.flags.spycraft2;
+  assert.equal(c.balanceSurface.dc, 20);
+  assert.equal(c.balanceSurface.requiredChecks, 1);
+  assert.equal(c.balanceSurface.distanceFeet, 30);
+  assert.equal(c.rollData.total, 10);
+  assert.equal(c.error, 1);
+  for (const patch of [
+    { balanceDistanceFeet: "" },
+    { balanceDistanceFeet: "61" },
+    { balanceConfirmed: false },
+    { balanceSurface: "climb61plus" }
+  ]) {
+    const n = posts.length;
+    await a.rollSkill("acrobatics", null, { check: "balance", ...input(patch) });
+    assert.equal(posts.length, n);
+  }
+});
+test("actual RNG source, Speed and selected-surface drift refuse stale Balance receipts without posting", async () => {
+  for (const change of ["basics", "mastery", "speed", "surface"]) {
+    const a = new SpycraftActor(),
+      request = { check: "balance", ...input() };
+    posts = [];
+    hook = async () => {
+      if (change === "basics") a.system.activeFeatNames = ["Equilibrium Mastery"];
+      if (change === "mastery") a.system.activeFeatNames = ["Equilibrium Basics"];
+      if (change === "speed") a.system.speed = 10;
+      if (change === "surface") request.balanceSurface = "flat";
+    };
+    await assert.rejects(a.rollSkill("acrobatics", null, request), /changed/);
+    assert.equal(posts.length, 0, change);
+  }
+  hook = async () => {};
+});
+test("replacement checks current source, surface and Speed before RNG", async () => {
+  const a = new SpycraftActor(),
+    p = resolveSkillCheck(a.system, "acrobatics", balance, input()).balanceSurface,
+    scope = { checkKind: "skill", skillKey: "acrobatics", checkId: "balance", balanceSurface: p };
+  validateBalanceSurfaceProof(a.system, p, scope);
+  rolls = 0;
+  for (const names of [["Equilibrium Basics"], ["Equilibrium Mastery"]]) {
+    a.system.activeFeatNames = names;
+    await assert.rejects(a.rollCheck("1d20", {}, scope), /changed/);
+  }
+  a.system.activeFeatNames = ["Equilibrium Basics", "Equilibrium Mastery"];
+  a.system.speed = 10;
+  await assert.rejects(a.rollCheck("1d20", {}, scope), /changed/);
+  assert.equal(rolls, 0);
+});

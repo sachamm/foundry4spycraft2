@@ -3,8 +3,8 @@
  */
 export function grantAcquisitionLevel(items, progression, name) {
   const key = String(name).trim().toLowerCase();
-  if (items.some(i => i.type === "origin" && (i.system.grants ?? [])
-    .some(g => String(g).trim().toLowerCase() === key))) return 1;
+  if (items.some(i => i.type === "origin" && (i.system.grants ?? []).some(g => String(g).trim().toLowerCase() === key)))
+    return 1;
   let earliest = Infinity;
   for (const cls of items.filter(i => i.type === "class")) {
     const ident = cls.system.identifier || cls.name;
@@ -14,7 +14,10 @@ export function grantAcquisitionLevel(items, progression, name) {
       for (const [idx, entry] of progression.entries()) {
         if (entry.classId !== ident) continue;
         count++;
-        if (count >= grant.level) { earliest = Math.min(earliest, idx + 1); break; }
+        if (count >= grant.level) {
+          earliest = Math.min(earliest, idx + 1);
+          break;
+        }
       }
     }
   }

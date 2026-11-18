@@ -1,20 +1,371 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {weaponAttack,weaponDamage} from '../module/rules/gear.mjs';import {reachWeaponPlan,validateReachWeaponProof as validate} from '../module/rules/reach-weapon.mjs';import {reachContextContent,reachContextInput} from '../module/apps/reach.mjs';import {standardAttackContextInput} from '../module/apps/standard-attack-context.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-const system=(trained=true)=>({size:'Medium',bab:3,reach:1,classLevels:{},conditionContext:{},abilities:{str:{value:14,mod:2},dex:{value:14,mod:2}},proficiencyTotals:{exoticEdged:{proficient:trained},exoticBlunt:{proficient:true},edged:{proficient:true}},activeFeatNames:[],actionDice:{value:0},vitality:{value:4},wounds:{value:4}}),weapon=(qualities='RCH (+5 ft.)')=>({id:'polearm',proficiency:'exoticEdged',meleeFamily:'polearm',weaponCategory:'other',sizeHands:'M/2h',useHands:2,equipped:true,carried:true,quantity:1,qualities,error:1,threat:20,damage:'1d6',range:0,recoil:0}),opts={attackAction:'standard',reachAdjacent:true,reachGeometryConfirmed:true},attack=(s=system(),w=weapon(),o=opts)=>weaponAttack(s,w,cfg,'agent',o);
-test('real weapon math applies adjacent minus five once and actual qualified Polearm Basics waives only that penalty',()=>{const s=system(),w=weapon(),a=attack(s,w),plain=attack(s,weapon(''));assert.equal(a.total,plain.total-5);assert.equal(a.reach.extraReachFeet,5);assert.equal(s.reach,1);assert.equal(a.reach.attackPenalty,-5);s.activeFeatNames=['Polearm Basics'];const yes=attack(s,w);assert.equal(yes.total,plain.total);assert.equal(yes.reach.polearmWaiver,true);for(const key of ['threat','error','initiativeLoss','range'])assert.equal(yes[key],a[key]);for(const key of ['formula','bonus','blocked'])assert.equal(weaponDamage(s,w)[key],weaponDamage(s,weapon(''))[key]);assert.match(yes.notes,/ignores the adjacent-target/);assert.equal(attack(s,{...w,meleeFamily:'spear'}).total,plain.total-5);assert.equal(attack(s,w,{...opts,reachAdjacent:false}).total,plain.total);});
-test('Polearm waiver follows the attacking weapon family rather than another held polearm, names or forged options; untrained adjacent ambiguity stays held',()=>{const s=system(false);assert.equal(attack(s).blocked,true);assert.match(attack(s).reason,/pending/);assert.equal(attack(s,weapon(),{...opts,reachAdjacent:false}).blocked,false);assert.equal(attack(s,weapon(),{...opts,reachAdjacent:false}).reach.extraReachFeet,0);s.activeFeatNames=['Polearm Basics'];assert.equal(attack(s).blocked,false);assert.equal(attack(s).reach.polearmWaiver,true);assert.equal(attack(system(),{...weapon(),meleeFamily:'spear'},{...opts,polearmBasics:true}).reach.polearmWaiver,false);assert.equal(attack(system(),weapon('RCH')).blocked,true);});
-function sourceActor(w=weapon(),s=system()){const item={id:w.id,uuid:'Actor.reach.Item.'+w.id,type:'weapon',name:'Actual polearm',system:w},items=[item];items.get=id=>items.find(i=>i.id===id);return {uuid:'Actor.reach',type:'agent',system:s,items};}
-function context(a,p=attack(a.system,a.items[0].system).reach){return {checkKind:'attack',weaponUuid:a.items[0].uuid,weaponProficiency:'exoticEdged',attackContext:{reach:p,reachAdjacent:p.adjacent,reachGeometryConfirmed:p.geometryConfirmed,ranged:false,attackAction:'standard'}};}
-test('owned-source proof binds actual training, family, qualities, identity and geometry; zero-quality proof catches late gains',()=>{for(const change of ['quality','training','family','category','identity','adjacency','confirmed','feat']){const a=sourceActor();if(change==='feat')a.system.activeFeatNames=['Polearm Basics'];const p=attack(a.system,a.items[0].system).reach,c=context(a,p);validate(a,p,c);if(change==='quality')a.items[0].system.qualities='RCH (+10 ft.)';if(change==='training')a.system.proficiencyTotals.exoticEdged.proficient=false;if(change==='family')a.items[0].system.meleeFamily='spear';if(change==='category')a.items[0].system.weaponCategory='changed';if(change==='identity')c.weaponUuid='Foreign.Item';if(change==='adjacency')c.attackContext.reachAdjacent=false;if(change==='confirmed')c.attackContext.reachGeometryConfirmed=false;if(change==='feat')a.system.activeFeatNames=[];assert.throws(()=>validate(a,p,c),/changed|pending/);}const a=sourceActor(weapon('')),p=attack(a.system,a.items[0].system).reach,c=context(a,p);validate(a,p,c);a.items[0].system.qualities='RCH (+5 ft.)';assert.throws(()=>validate(a,p,c),/changed/);validate(a,null,c);});
-test('Reach and geometry are immutable optional evidence while absent historical cards remain compatible',()=>{const a=sourceActor(),c=context(a),p=c.attackContext.reach,e=rollEvidence(c),old={checkKind:'attack',attackContext:{}};assert.equal(rollEvidenceMatches(e,c),true);assert.equal(rollEvidenceMatches(rollEvidence(old),old),true);assert.equal(rollEvidenceMatches(e,old),false);assert.equal(rollEvidenceMatches(rollEvidence(old),c),false);for(const key of Object.keys(p)){const n=structuredClone(c);n.attackContext.reach[key]='changed';assert.equal(rollEvidenceMatches(e,n),false,key);}for(const key of ['reachAdjacent','reachGeometryConfirmed']){const n=structuredClone(c);n.attackContext[key]=false;assert.equal(rollEvidenceMatches(e,n),false,key);}});
-test('original owned unresolved replacement retains earned waiver after feat loss without permitting a foreign/resolved source or changing training',()=>{const a=sourceActor();a.system.activeFeatNames=['Polearm Basics'];const p=attack(a.system,a.items[0].system).reach,c=context(a,p),old={uuid:'ChatMessage.original',flags:{spycraft2:{actorUuid:a.uuid,weaponUuid:c.weaponUuid,checkKind:'attack',attackContext:structuredClone(c.attackContext)}}},lookup=globalThis.fromUuidSync;globalThis.fromUuidSync=()=>old;try{a.system.activeFeatNames=[];assert.throws(()=>validate(a,p,c),/changed/);validate(a,p,{...c,rerollOf:old.uuid});old.flags.spycraft2.resolved=true;assert.throws(()=>validate(a,p,{...c,rerollOf:old.uuid}),/original replacement/);old.flags.spycraft2.resolved=false;a.system.proficiencyTotals.exoticEdged.proficient=false;assert.throws(()=>validate(a,p,{...c,rerollOf:old.uuid}),/changed/);}finally{globalThis.fromUuidSync=lookup;}});
-test('shared input retains strict explicit adjacency and GC geometry without accepting caller-created quality or penalty',()=>{assert.deepEqual(reachContextInput({}),{});for(const b of [false,true])assert.deepEqual(reachContextInput({reachAdjacency:b?'adjacent':'nonadjacent',reachGeometryConfirmed:true}),{reachAdjacent:b,reachGeometryConfirmed:true});assert.equal(standardAttackContextInput({reachAdjacency:'adjacent',reachGeometryConfirmed:true,reach:{attackPenalty:99}}).reachAdjacent,true);for(const x of [{reachAdjacent:1},{reachAdjacency:'near'},{reachGeometryConfirmed:1},{reachAdjacent:false,reachAdjacency:'adjacent'}])assert.throws(()=>reachContextInput(x),/Reach/);assert.match(reachContextContent(),/no token measurement/);});
-const {makeFatigueActor}=await import('./fixtures/fatigue-actor.mjs');foundry.utils.escapeHTML=String;globalThis.ChatMessage={getSpeaker:()=>({})};let hook=async()=>{},posts=[],rolls=0;globalThis.Roll=class{constructor(_f,data){this.total=12+(data.total??0);this.dice=[{total:12}];}async evaluate(){rolls++;await hook();return this;}async toMessage(d){posts.push(d);return d;}};
-function actor(trained=true,qualities='RCH (+5 ft.)'){const a=makeFatigueActor();a.uuid='Actor.reach';a.system=system(trained);a.flags={};a.items=[{id:'polearm',uuid:a.uuid+'.Item.polearm',name:'Actual polearm',type:'weapon',system:weapon(qualities)}];a.items.get=id=>a.items.find(i=>i.id===id);a.getRollData=()=>({});Object.defineProperty(a,'participatingCombat',{value:null});return a;}
-test('actual Actor prompts for omitted Reach geometry, cancelled geometry rolls nothing, and explicit reviewed attacks record exact math',async()=>{const old=foundry.applications.api.DialogV2.input;try{posts=[];rolls=0;let dialogs=0;foundry.applications.api.DialogV2.input=async()=>{dialogs++;return null;};assert.equal(await actor().rollAttack(actor().items[0]),null);assert.equal(rolls,0);assert.equal(dialogs,1);const a=actor();foundry.applications.api.DialogV2.input=async()=>({reachAdjacency:'adjacent',reachGeometryConfirmed:true});const m=await a.rollAttack(a.items[0],{attackAction:'standard'});assert.equal(m.flags.spycraft2.rollData.total,attack().total);assert.equal(m.flags.spycraft2.attackContext.reach.attackPenalty,-5);assert.equal(m.flags.spycraft2.attackContext.reachAdjacent,true);a.system.activeFeatNames=['Polearm Basics'];const yes=await a.rollAttack(a.items[0],opts);assert.equal(yes.flags.spycraft2.rollData.total,m.flags.spycraft2.rollData.total+5);assert.equal(yes.flags.spycraft2.attackContext.reach.polearmWaiver,true);}finally{foundry.applications.api.DialogV2.input=old;}});
-test('actual Actor holds untrained adjacent route before RNG while nonadjacent untrained use retains ordinary untrained costs',async()=>{const a=actor(false);posts=[];rolls=0;await a.rollAttack(a.items[0],opts);assert.equal(rolls,0);const m=await a.rollAttack(a.items[0],{...opts,reachAdjacent:false});assert.equal(rolls,1);assert.equal(m.flags.spycraft2.attackContext.reach.extraReachFeet,0);assert.equal(m.flags.spycraft2.attackContext.reach.attackPenalty,0);assert.equal(m.flags.spycraft2.attackContext.trained,false);});
-test('actual before/after RNG guards reject source/feat/geometry changes, including a late quality gain from a zero proof',async()=>{for(const change of ['quality','qualityGain','training','feat','family','adjacency','confirmed','removed']){const a=actor(true,change==='qualityGain'?'':'RCH (+5 ft.)'),o={...opts};if(change==='feat')a.system.activeFeatNames=['Polearm Basics'];posts=[];hook=async()=>{if(change==='quality')a.items[0].system.qualities='RCH (+10 ft.)';if(change==='qualityGain')a.items[0].system.qualities='RCH (+5 ft.)';if(change==='training')a.system.proficiencyTotals.exoticEdged.proficient=false;if(change==='feat')a.system.activeFeatNames=[];if(change==='family')a.items[0].system.meleeFamily='spear';if(change==='adjacency')o.reachAdjacent=false;if(change==='confirmed')o.reachGeometryConfirmed=false;if(change==='removed')a.items.splice(0,1);};await assert.rejects(a.rollAttack(a.items[0],o),/changed|no longer exists/);assert.equal(posts.length,0,change);}hook=async()=>{};});
-test('raw Actor pre/post guards validate public Reach proof without the original controller closure',async()=>{const a=actor(),p=a.weaponAttack(a.items[0],opts).reach,c=context(a,p);rolls=0;posts=[];a.system.proficiencyTotals.exoticEdged.proficient=false;await assert.rejects(a.rollCheck('1d20 + @total',{total:0},c),/changed/);assert.equal(rolls,0);a.system.proficiencyTotals.exoticEdged.proficient=true;hook=async()=>c.attackContext.reachAdjacent=false;await assert.rejects(a.rollCheck('1d20 + @total',{total:0},c),/changed/);assert.equal(posts.length,0);hook=async()=>{};});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { weaponAttack, weaponDamage } from "../module/rules/gear.mjs";
+import { validateReachWeaponProof as validate } from "../module/rules/reach-weapon.mjs";
+import { reachContextContent, reachContextInput } from "../module/apps/reach.mjs";
+import { standardAttackContextInput } from "../module/apps/standard-attack-context.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+const system = (trained = true) => ({
+    size: "Medium",
+    bab: 3,
+    reach: 1,
+    classLevels: {},
+    conditionContext: {},
+    abilities: { str: { value: 14, mod: 2 }, dex: { value: 14, mod: 2 } },
+    proficiencyTotals: {
+      exoticEdged: { proficient: trained },
+      exoticBlunt: { proficient: true },
+      edged: { proficient: true }
+    },
+    activeFeatNames: [],
+    actionDice: { value: 0 },
+    vitality: { value: 4 },
+    wounds: { value: 4 }
+  }),
+  weapon = (qualities = "RCH (+5 ft.)") => ({
+    id: "polearm",
+    proficiency: "exoticEdged",
+    meleeFamily: "polearm",
+    weaponCategory: "other",
+    sizeHands: "M/2h",
+    useHands: 2,
+    equipped: true,
+    carried: true,
+    quantity: 1,
+    qualities,
+    error: 1,
+    threat: 20,
+    damage: "1d6",
+    range: 0,
+    recoil: 0
+  }),
+  opts = { attackAction: "standard", reachAdjacent: true, reachGeometryConfirmed: true },
+  attack = (s = system(), w = weapon(), o = opts) => weaponAttack(s, w, cfg, "agent", o);
+test("real weapon math applies adjacent minus five once and actual qualified Polearm Basics waives only that penalty", () => {
+  const s = system(),
+    w = weapon(),
+    a = attack(s, w),
+    plain = attack(s, weapon(""));
+  assert.equal(a.total, plain.total - 5);
+  assert.equal(a.reach.extraReachFeet, 5);
+  assert.equal(s.reach, 1);
+  assert.equal(a.reach.attackPenalty, -5);
+  s.activeFeatNames = ["Polearm Basics"];
+  const yes = attack(s, w);
+  assert.equal(yes.total, plain.total);
+  assert.equal(yes.reach.polearmWaiver, true);
+  for (const key of ["threat", "error", "initiativeLoss", "range"]) assert.equal(yes[key], a[key]);
+  for (const key of ["formula", "bonus", "blocked"])
+    assert.equal(weaponDamage(s, w)[key], weaponDamage(s, weapon(""))[key]);
+  assert.match(yes.notes, /ignores the adjacent-target/);
+  assert.equal(attack(s, { ...w, meleeFamily: "spear" }).total, plain.total - 5);
+  assert.equal(attack(s, w, { ...opts, reachAdjacent: false }).total, plain.total);
+});
+test("Polearm waiver follows the attacking weapon family rather than another held polearm, names or forged options; untrained adjacent ambiguity stays held", () => {
+  const s = system(false);
+  assert.equal(attack(s).blocked, true);
+  assert.match(attack(s).reason, /pending/);
+  assert.equal(attack(s, weapon(), { ...opts, reachAdjacent: false }).blocked, false);
+  assert.equal(attack(s, weapon(), { ...opts, reachAdjacent: false }).reach.extraReachFeet, 0);
+  s.activeFeatNames = ["Polearm Basics"];
+  assert.equal(attack(s).blocked, false);
+  assert.equal(attack(s).reach.polearmWaiver, true);
+  assert.equal(
+    attack(system(), { ...weapon(), meleeFamily: "spear" }, { ...opts, polearmBasics: true }).reach.polearmWaiver,
+    false
+  );
+  assert.equal(attack(system(), weapon("RCH")).blocked, true);
+});
+function sourceActor(w = weapon(), s = system()) {
+  const item = { id: w.id, uuid: "Actor.reach.Item." + w.id, type: "weapon", name: "Actual polearm", system: w },
+    items = [item];
+  items.get = id => items.find(i => i.id === id);
+  return { uuid: "Actor.reach", type: "agent", system: s, items };
+}
+function context(a, p = attack(a.system, a.items[0].system).reach) {
+  return {
+    checkKind: "attack",
+    weaponUuid: a.items[0].uuid,
+    weaponProficiency: "exoticEdged",
+    attackContext: {
+      reach: p,
+      reachAdjacent: p.adjacent,
+      reachGeometryConfirmed: p.geometryConfirmed,
+      ranged: false,
+      attackAction: "standard"
+    }
+  };
+}
+test("owned-source proof binds actual training, family, qualities, identity and geometry; zero-quality proof catches late gains", () => {
+  for (const change of ["quality", "training", "family", "category", "identity", "adjacency", "confirmed", "feat"]) {
+    const a = sourceActor();
+    if (change === "feat") a.system.activeFeatNames = ["Polearm Basics"];
+    const p = attack(a.system, a.items[0].system).reach,
+      c = context(a, p);
+    validate(a, p, c);
+    if (change === "quality") a.items[0].system.qualities = "RCH (+10 ft.)";
+    if (change === "training") a.system.proficiencyTotals.exoticEdged.proficient = false;
+    if (change === "family") a.items[0].system.meleeFamily = "spear";
+    if (change === "category") a.items[0].system.weaponCategory = "changed";
+    if (change === "identity") c.weaponUuid = "Foreign.Item";
+    if (change === "adjacency") c.attackContext.reachAdjacent = false;
+    if (change === "confirmed") c.attackContext.reachGeometryConfirmed = false;
+    if (change === "feat") a.system.activeFeatNames = [];
+    assert.throws(() => validate(a, p, c), /changed|pending/);
+  }
+  const a = sourceActor(weapon("")),
+    p = attack(a.system, a.items[0].system).reach,
+    c = context(a, p);
+  validate(a, p, c);
+  a.items[0].system.qualities = "RCH (+5 ft.)";
+  assert.throws(() => validate(a, p, c), /changed/);
+  validate(a, null, c);
+});
+test("Reach and geometry are immutable optional evidence while absent historical cards remain compatible", () => {
+  const a = sourceActor(),
+    c = context(a),
+    p = c.attackContext.reach,
+    e = rollEvidence(c),
+    old = { checkKind: "attack", attackContext: {} };
+  assert.equal(rollEvidenceMatches(e, c), true);
+  assert.equal(rollEvidenceMatches(rollEvidence(old), old), true);
+  assert.equal(rollEvidenceMatches(e, old), false);
+  assert.equal(rollEvidenceMatches(rollEvidence(old), c), false);
+  for (const key of Object.keys(p)) {
+    const n = structuredClone(c);
+    n.attackContext.reach[key] = "changed";
+    assert.equal(rollEvidenceMatches(e, n), false, key);
+  }
+  for (const key of ["reachAdjacent", "reachGeometryConfirmed"]) {
+    const n = structuredClone(c);
+    n.attackContext[key] = false;
+    assert.equal(rollEvidenceMatches(e, n), false, key);
+  }
+});
+test("original owned unresolved replacement retains earned waiver after feat loss without permitting a foreign/resolved source or changing training", () => {
+  const a = sourceActor();
+  a.system.activeFeatNames = ["Polearm Basics"];
+  const p = attack(a.system, a.items[0].system).reach,
+    c = context(a, p),
+    old = {
+      uuid: "ChatMessage.original",
+      flags: {
+        spycraft2: {
+          actorUuid: a.uuid,
+          weaponUuid: c.weaponUuid,
+          checkKind: "attack",
+          attackContext: structuredClone(c.attackContext)
+        }
+      }
+    },
+    lookup = globalThis.fromUuidSync;
+  globalThis.fromUuidSync = () => old;
+  try {
+    a.system.activeFeatNames = [];
+    assert.throws(() => validate(a, p, c), /changed/);
+    validate(a, p, { ...c, rerollOf: old.uuid });
+    old.flags.spycraft2.resolved = true;
+    assert.throws(() => validate(a, p, { ...c, rerollOf: old.uuid }), /original replacement/);
+    old.flags.spycraft2.resolved = false;
+    a.system.proficiencyTotals.exoticEdged.proficient = false;
+    assert.throws(() => validate(a, p, { ...c, rerollOf: old.uuid }), /changed/);
+  } finally {
+    globalThis.fromUuidSync = lookup;
+  }
+});
+test("shared input retains strict explicit adjacency and GC geometry without accepting caller-created quality or penalty", () => {
+  assert.deepEqual(reachContextInput({}), {});
+  for (const b of [false, true])
+    assert.deepEqual(
+      reachContextInput({ reachAdjacency: b ? "adjacent" : "nonadjacent", reachGeometryConfirmed: true }),
+      { reachAdjacent: b, reachGeometryConfirmed: true }
+    );
+  assert.equal(
+    standardAttackContextInput({
+      reachAdjacency: "adjacent",
+      reachGeometryConfirmed: true,
+      reach: { attackPenalty: 99 }
+    }).reachAdjacent,
+    true
+  );
+  for (const x of [
+    { reachAdjacent: 1 },
+    { reachAdjacency: "near" },
+    { reachGeometryConfirmed: 1 },
+    { reachAdjacent: false, reachAdjacency: "adjacent" }
+  ])
+    assert.throws(() => reachContextInput(x), /Reach/);
+  assert.match(reachContextContent(), /no token measurement/);
+});
+const { makeFatigueActor } = await import("./fixtures/fatigue-actor.mjs");
+foundry.utils.escapeHTML = String;
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+let hook = async () => {},
+  posts = [],
+  rolls = 0;
+globalThis.Roll = class {
+  constructor(_f, data) {
+    this.total = 12 + (data.total ?? 0);
+    this.dice = [{ total: 12 }];
+  }
+  async evaluate() {
+    rolls++;
+    await hook();
+    return this;
+  }
+  async toMessage(d) {
+    posts.push(d);
+    return d;
+  }
+};
+function actor(trained = true, qualities = "RCH (+5 ft.)") {
+  const a = makeFatigueActor();
+  a.uuid = "Actor.reach";
+  a.system = system(trained);
+  a.flags = {};
+  a.items = [
+    { id: "polearm", uuid: a.uuid + ".Item.polearm", name: "Actual polearm", type: "weapon", system: weapon(qualities) }
+  ];
+  a.items.get = id => a.items.find(i => i.id === id);
+  a.getRollData = () => ({});
+  Object.defineProperty(a, "participatingCombat", { value: null });
+  return a;
+}
+test("actual Actor prompts for omitted Reach geometry, cancelled geometry rolls nothing, and explicit reviewed attacks record exact math", async () => {
+  const old = foundry.applications.api.DialogV2.input;
+  try {
+    posts = [];
+    rolls = 0;
+    let dialogs = 0;
+    foundry.applications.api.DialogV2.input = async () => {
+      dialogs++;
+      return null;
+    };
+    assert.equal(await actor().rollAttack(actor().items[0]), null);
+    assert.equal(rolls, 0);
+    assert.equal(dialogs, 1);
+    const a = actor();
+    foundry.applications.api.DialogV2.input = async () => ({
+      reachAdjacency: "adjacent",
+      reachGeometryConfirmed: true
+    });
+    const m = await a.rollAttack(a.items[0], { attackAction: "standard" });
+    assert.equal(m.flags.spycraft2.rollData.total, attack().total);
+    assert.equal(m.flags.spycraft2.attackContext.reach.attackPenalty, -5);
+    assert.equal(m.flags.spycraft2.attackContext.reachAdjacent, true);
+    a.system.activeFeatNames = ["Polearm Basics"];
+    const yes = await a.rollAttack(a.items[0], opts);
+    assert.equal(yes.flags.spycraft2.rollData.total, m.flags.spycraft2.rollData.total + 5);
+    assert.equal(yes.flags.spycraft2.attackContext.reach.polearmWaiver, true);
+  } finally {
+    foundry.applications.api.DialogV2.input = old;
+  }
+});
+test("actual Actor holds untrained adjacent route before RNG while nonadjacent untrained use retains ordinary untrained costs", async () => {
+  const a = actor(false);
+  posts = [];
+  rolls = 0;
+  await a.rollAttack(a.items[0], opts);
+  assert.equal(rolls, 0);
+  const m = await a.rollAttack(a.items[0], { ...opts, reachAdjacent: false });
+  assert.equal(rolls, 1);
+  assert.equal(m.flags.spycraft2.attackContext.reach.extraReachFeet, 0);
+  assert.equal(m.flags.spycraft2.attackContext.reach.attackPenalty, 0);
+  assert.equal(m.flags.spycraft2.attackContext.trained, false);
+});
+test("actual before/after RNG guards reject source/feat/geometry changes, including a late quality gain from a zero proof", async () => {
+  for (const change of ["quality", "qualityGain", "training", "feat", "family", "adjacency", "confirmed", "removed"]) {
+    const a = actor(true, change === "qualityGain" ? "" : "RCH (+5 ft.)"),
+      o = { ...opts };
+    if (change === "feat") a.system.activeFeatNames = ["Polearm Basics"];
+    posts = [];
+    hook = async () => {
+      if (change === "quality") a.items[0].system.qualities = "RCH (+10 ft.)";
+      if (change === "qualityGain") a.items[0].system.qualities = "RCH (+5 ft.)";
+      if (change === "training") a.system.proficiencyTotals.exoticEdged.proficient = false;
+      if (change === "feat") a.system.activeFeatNames = [];
+      if (change === "family") a.items[0].system.meleeFamily = "spear";
+      if (change === "adjacency") o.reachAdjacent = false;
+      if (change === "confirmed") o.reachGeometryConfirmed = false;
+      if (change === "removed") a.items.splice(0, 1);
+    };
+    await assert.rejects(a.rollAttack(a.items[0], o), /changed|no longer exists/);
+    assert.equal(posts.length, 0, change);
+  }
+  hook = async () => {};
+});
+test("raw Actor pre/post guards validate public Reach proof without the original controller closure", async () => {
+  const a = actor(),
+    p = a.weaponAttack(a.items[0], opts).reach,
+    c = context(a, p);
+  rolls = 0;
+  posts = [];
+  a.system.proficiencyTotals.exoticEdged.proficient = false;
+  await assert.rejects(a.rollCheck("1d20 + @total", { total: 0 }, c), /changed/);
+  assert.equal(rolls, 0);
+  a.system.proficiencyTotals.exoticEdged.proficient = true;
+  hook = async () => (c.attackContext.reachAdjacent = false);
+  await assert.rejects(a.rollCheck("1d20 + @total", { total: 0 }, c), /changed/);
+  assert.equal(posts.length, 0);
+  hook = async () => {};
+});
 
-test('original replacement can resolve its actual registered card when a synchronous UUID lookup is unavailable',()=>{const a=sourceActor(),p=attack(a.system,a.items[0].system).reach,c=context(a,p),oldLookup=globalThis.fromUuidSync,oldMessages=game.messages;delete globalThis.fromUuidSync;const m={uuid:'ChatMessage.registeredReach',flags:{spycraft2:{actorUuid:a.uuid,weaponUuid:c.weaponUuid,checkKind:'attack',attackContext:c.attackContext}}};game.messages=[m];try{validate(a,p,{...c,rerollOf:m.uuid});assert.throws(()=>validate(a,p,{...c,rerollOf:'ChatMessage.missing'}),/original replacement/);}finally{globalThis.fromUuidSync=oldLookup;game.messages=oldMessages;}});
+test("original replacement can resolve its actual registered card when a synchronous UUID lookup is unavailable", () => {
+  const a = sourceActor(),
+    p = attack(a.system, a.items[0].system).reach,
+    c = context(a, p),
+    oldLookup = globalThis.fromUuidSync,
+    oldMessages = game.messages;
+  delete globalThis.fromUuidSync;
+  const m = {
+    uuid: "ChatMessage.registeredReach",
+    flags: {
+      spycraft2: { actorUuid: a.uuid, weaponUuid: c.weaponUuid, checkKind: "attack", attackContext: c.attackContext }
+    }
+  };
+  game.messages = [m];
+  try {
+    validate(a, p, { ...c, rerollOf: m.uuid });
+    assert.throws(() => validate(a, p, { ...c, rerollOf: "ChatMessage.missing" }), /original replacement/);
+  } finally {
+    globalThis.fromUuidSync = oldLookup;
+    game.messages = oldMessages;
+  }
+});
 
-test('actual incoming Disarm controller with a Reach weapon asks no outgoing-target geometry and keeps its ordinary opposed modifiers',async()=>{const {readiedDisarmWeapons}=await import('../module/rules/disarm-response.mjs'),{rollDisarmResponse}=await import('../module/apps/disarm-response.mjs'),a=actor();a.system.disarmWeapons=readiedDisarmWeapons(a.system,a.items);const old=foundry.applications.api.DialogV2.input;let prompts=0;foundry.applications.api.DialogV2.input=async()=>{prompts++;throw Error('Unexpected outgoing Reach geometry');};hook=async()=>{};posts=[];try{const m=await rollDisarmResponse(a,{weaponId:'polearm',opponentLabel:'Actual incoming attacker',opponentWeaponSize:'Medium',incomingRanged:false,incomingProficient:true,lineOfSightConfirmed:true,rangeConfirmed:true,confirmed:true}),c=m.flags.spycraft2;assert.equal(prompts,0);assert.equal(c.attackContext.reach.defensive,true);assert.equal(c.attackContext.reach.attackPenalty,0);assert.equal(c.attackContext.reach.extraReachFeet,0);assert.equal(c.rollData.total,9);assert.equal(c.attackContext.disarm.twoHandBonus,4);}finally{foundry.applications.api.DialogV2.input=old;}});
+test("actual incoming Disarm controller with a Reach weapon asks no outgoing-target geometry and keeps its ordinary opposed modifiers", async () => {
+  const { readiedDisarmWeapons } = await import("../module/rules/disarm-response.mjs"),
+    { rollDisarmResponse } = await import("../module/apps/disarm-response.mjs"),
+    a = actor();
+  a.system.disarmWeapons = readiedDisarmWeapons(a.system, a.items);
+  const old = foundry.applications.api.DialogV2.input;
+  let prompts = 0;
+  foundry.applications.api.DialogV2.input = async () => {
+    prompts++;
+    throw Error("Unexpected outgoing Reach geometry");
+  };
+  hook = async () => {};
+  posts = [];
+  try {
+    const m = await rollDisarmResponse(a, {
+        weaponId: "polearm",
+        opponentLabel: "Actual incoming attacker",
+        opponentWeaponSize: "Medium",
+        incomingRanged: false,
+        incomingProficient: true,
+        lineOfSightConfirmed: true,
+        rangeConfirmed: true,
+        confirmed: true
+      }),
+      c = m.flags.spycraft2;
+    assert.equal(prompts, 0);
+    assert.equal(c.attackContext.reach.defensive, true);
+    assert.equal(c.attackContext.reach.attackPenalty, 0);
+    assert.equal(c.attackContext.reach.extraReachFeet, 0);
+    assert.equal(c.rollData.total, 9);
+    assert.equal(c.attackContext.disarm.twoHandBonus, 4);
+  } finally {
+    foundry.applications.api.DialogV2.input = old;
+  }
+});

@@ -1,13 +1,193 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {actor,source,opts,controls} from './fixtures/side-stance.mjs';import {grantSideStanceFeint} from '../module/apps/side-stance.mjs';import {eligibleSideStanceHits,sideStanceDamageSource,sideDamageUseRows,reviewSideStanceDamage} from '../module/apps/side-stance-damage.mjs';import {sneakAttackDamagePlan,sneakAttackCapacity} from '../module/rules/sneak-attack.mjs';import {rollEvidence} from '../module/rules/outcomes.mjs';
-const options=hit=>({includeSneakAttack:true,sideStanceSourceUuid:hit.uuid,successfulStandardAttack:true,targetCharacter:true,targetVulnerable:true,targetVitalsConfirmed:true,damageType:'lethal',damageConversion:'none'});
-async function hit(){const a=actor(),{s,feint}=source(a);await grantSideStanceFeint(a,s,feint);const m=await a.rollAttack(a.items[0],opts());Object.assign(m.flags.spycraft2,{resolved:true,successConfirmed:true});return {a,m};}
-test('a resolved qualifying hit retains one damage entitlement after leaving stance, and combines it once with base damage',async()=>{const {a,m}=await hit();a.system.combatStance=null;assert.equal(eligibleSideStanceHits(a,a.items[0]).length,1);const damage=await a.rollDamage(a.items[0],options(m)),c=damage.flags.spycraft2;assert.equal(c.sneakAttack.dice,1);assert.deepEqual(c.sneakAttack.sources,[{source:'Side Stance',dice:1}]);assert.equal(c.sneakAttack.stress,1);assert.match(c.formula,/\+ 1d6/);assert.equal(c.sideStanceDamage.attackUuid,m.uuid);assert.equal(c.sideStanceDamage.targetUuid,'Actor.target');assert.equal(c.sneakAttackTarget.actorUuid,'Actor.target');assert.equal(a.system.sideStanceDamageUses[0].receiptUuid,damage.uuid);assert.equal(eligibleSideStanceHits(a,a.items[0]).length,0);let draws=0;controls.draw=async()=>{draws++;};await assert.rejects(a.rollDamage(a.items[0],options(m)),/already has damage/);assert.equal(draws,0);});
-test('pending stance state, caller flags, missing/foreign hits, wrong weapon and wrong target cannot fabricate or transfer damage dice',async()=>{const {a,m}=await hit();for(const request of [{...options(m),sideStanceSourceUuid:'ChatMessage.missing'},{...options(m),targetActorUuid:'Actor.other'},{...options(m),sideStanceSourceUuid:'',sideStanceDie:true}])await assert.rejects(a.rollDamage(a.items[0],request));const fake={...a.items[0],id:'foreign',uuid:'Actor.foreign.Item.weapon'};assert.throws(()=>sideStanceDamageSource(a,m,fake));const unowned={...a.items[0],id:undefined};assert.throws(()=>sideStanceDamageSource(a,m,unowned),/owned/);assert.equal(a.system.sideStanceDamageUses,undefined);});
-test('misses, unresolved, superseded and non-Standard attacks never gain sneak damage from their spent Side die',async()=>{const {a,m}=await hit(),original=structuredClone(m.flags.spycraft2);for(const patch of [{successConfirmed:false},{resolved:false},{superseded:'another'},{attackContext:{...original.attackContext,attackAction:'other'}},{attackContext:{...original.attackContext,ranged:true}}]){m.flags.spycraft2={...structuredClone(original),...patch};assert.throws(()=>sideStanceDamageSource(a,m,a.items[0]));}m.flags.spycraft2=original;const data={...a.items[0].system,proficiency:'blunt'},originalItem=a.items[0].system;a.items[0].system=data;assert.throws(()=>sideStanceDamageSource(a,m,a.items[0]),/proficiency/);a.items[0].system=originalItem;});
-test('Side die adds to permanent sneak dice and per-die bonuses without qualifying permanent prerequisites or duplicating the stress rider',async()=>{const {a,m}=await hit();assert.equal(sneakAttackCapacity(a.system),0);a.system.activeFeatNames.push('Ambush Basics','Deadly Precision');const d=await a.rollDamage(a.items[0],options(m));assert.equal(d.flags.spycraft2.sneakAttack.dice,2);assert.equal(d.flags.spycraft2.sneakAttack.bonus,2);assert.equal(d.flags.spycraft2.sneakAttack.stress,1);const system={...a.system,activeFeatNames:[...a.system.activeFeatNames,'Whack','Bludgeon']},p=sneakAttackDamagePlan(system,a.items[0].system,{...options(m),sideStanceDie:true,damageType:'subdual',damageConversion:'lethalToSubdual'});assert.equal(p.dice,2);assert.equal(p.bonus,4);assert.equal(p.stress,1);});
-test('existing vulnerability, immunity, vitals, conversion and Standard Attack gates remain required for the Side die',async()=>{for(const patch of [{targetVulnerable:false},{targetVitalsConfirmed:false},{successfulStandardAttack:false},{damageType:'subdual',damageConversion:'lethalToSubdual'}]){const {a,m}=await hit();await assert.rejects(a.rollDamage(a.items[0],{...options(m),...patch}));assert.equal(a.system.sideStanceDamageUses,undefined);}const {a,m}=await hit();game.actors[1].system={npcProfile:{enabled:true,qualities:[{id:'construct'}]}};await assert.rejects(a.rollDamage(a.items[0],options(m)),/immune/);assert.equal(a.system.sideStanceDamageUses,undefined);});
-test('concurrent damage claims post exactly one combined result for the root attack',async()=>{const {a,m}=await hit();const results=await Promise.allSettled([a.rollDamage(a.items[0],options(m)),a.rollDamage(a.items[0],options(m))]);assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(game.messages.filter(m=>m.flags.spycraft2.sideStanceDamage).length,1);assert.equal(sideDamageUseRows(a.system).length,1);});
-test('failed posting and source/protection drift release only unused damage, while a committed response retains its one use',async()=>{for(const kind of ['before','after','source','protection']){const {a,m}=await hit();controls.mode=['before','after'].includes(kind)?kind:'normal';if(kind==='source')controls.draw=async()=>{m.flags.spycraft2.successConfirmed=false;};if(kind==='protection')controls.draw=async()=>{game.actors[1].system={npcProfile:{enabled:true,qualities:[{id:'construct'}]}};};const result=await Promise.allSettled([a.rollDamage(a.items[0],options(m))]);assert.equal(result[0].status,kind==='after'?'fulfilled':'rejected',kind);assert.equal(sideDamageUseRows(a.system).length,kind==='after'?1:0,kind);assert.ok(a.system.sideStanceFeints[0].usedBy,'The attack die stays spent regardless of damage posting');}});
-test('GC review finds an actual posted damage receipt without reroll/refill, or releases a confirmed missing damage reservation',async()=>{const {a,m}=await hit(),d=await a.rollDamage(a.items[0],options(m)),use=a.system.sideStanceDamageUses[0];use.receiptUuid=null;const count=game.messages.length,result=await reviewSideStanceDamage(a,{reservationId:use.reservationId,confirmed:true});assert.equal(result.receiptUuid,d.uuid);assert.equal(game.messages.length,count);const {a:b,m:bm}=await hit();b.system.sideStanceDamageUses=[{version:1,rootAttackUuid:bm.uuid,attackUuid:bm.uuid,reservationId:'missing',targetUuid:'Actor.target',weaponUuid:b.items[0].uuid,sourceEvidence:rollEvidence(bm.flags.spycraft2),receiptUuid:null}];assert.equal((await reviewSideStanceDamage(b,{reservationId:'missing',confirmed:true})).released,true);assert.equal(b.system.sideStanceDamageUses.length,0);assert.ok(b.system.sideStanceFeints[0].usedBy);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { actor, source, opts, controls } from "./fixtures/side-stance.mjs";
+import { grantSideStanceFeint } from "../module/apps/side-stance.mjs";
+import {
+  eligibleSideStanceHits,
+  sideStanceDamageSource,
+  sideDamageUseRows,
+  reviewSideStanceDamage
+} from "../module/apps/side-stance-damage.mjs";
+import { sneakAttackDamagePlan, sneakAttackCapacity } from "../module/rules/sneak-attack.mjs";
+import { rollEvidence } from "../module/rules/outcomes.mjs";
+const options = hit => ({
+  includeSneakAttack: true,
+  sideStanceSourceUuid: hit.uuid,
+  successfulStandardAttack: true,
+  targetCharacter: true,
+  targetVulnerable: true,
+  targetVitalsConfirmed: true,
+  damageType: "lethal",
+  damageConversion: "none"
+});
+async function hit() {
+  const a = actor(),
+    { s, feint } = source(a);
+  await grantSideStanceFeint(a, s, feint);
+  const m = await a.rollAttack(a.items[0], opts());
+  Object.assign(m.flags.spycraft2, { resolved: true, successConfirmed: true });
+  return { a, m };
+}
+test("a resolved qualifying hit retains one damage entitlement after leaving stance, and combines it once with base damage", async () => {
+  const { a, m } = await hit();
+  a.system.combatStance = null;
+  assert.equal(eligibleSideStanceHits(a, a.items[0]).length, 1);
+  const damage = await a.rollDamage(a.items[0], options(m)),
+    c = damage.flags.spycraft2;
+  assert.equal(c.sneakAttack.dice, 1);
+  assert.deepEqual(c.sneakAttack.sources, [{ source: "Side Stance", dice: 1 }]);
+  assert.equal(c.sneakAttack.stress, 1);
+  assert.match(c.formula, /\+ 1d6/);
+  assert.equal(c.sideStanceDamage.attackUuid, m.uuid);
+  assert.equal(c.sideStanceDamage.targetUuid, "Actor.target");
+  assert.equal(c.sneakAttackTarget.actorUuid, "Actor.target");
+  assert.equal(a.system.sideStanceDamageUses[0].receiptUuid, damage.uuid);
+  assert.equal(eligibleSideStanceHits(a, a.items[0]).length, 0);
+  let draws = 0;
+  controls.draw = async () => {
+    draws++;
+  };
+  await assert.rejects(a.rollDamage(a.items[0], options(m)), /already has damage/);
+  assert.equal(draws, 0);
+});
+test("pending stance state, caller flags, missing/foreign hits, wrong weapon and wrong target cannot fabricate or transfer damage dice", async () => {
+  const { a, m } = await hit();
+  for (const request of [
+    { ...options(m), sideStanceSourceUuid: "ChatMessage.missing" },
+    { ...options(m), targetActorUuid: "Actor.other" },
+    { ...options(m), sideStanceSourceUuid: "", sideStanceDie: true }
+  ])
+    await assert.rejects(a.rollDamage(a.items[0], request));
+  const fake = { ...a.items[0], id: "foreign", uuid: "Actor.foreign.Item.weapon" };
+  assert.throws(() => sideStanceDamageSource(a, m, fake));
+  const unowned = { ...a.items[0], id: undefined };
+  assert.throws(() => sideStanceDamageSource(a, m, unowned), /owned/);
+  assert.equal(a.system.sideStanceDamageUses, undefined);
+});
+test("misses, unresolved, superseded and non-Standard attacks never gain sneak damage from their spent Side die", async () => {
+  const { a, m } = await hit(),
+    original = structuredClone(m.flags.spycraft2);
+  for (const patch of [
+    { successConfirmed: false },
+    { resolved: false },
+    { superseded: "another" },
+    { attackContext: { ...original.attackContext, attackAction: "other" } },
+    { attackContext: { ...original.attackContext, ranged: true } }
+  ]) {
+    m.flags.spycraft2 = { ...structuredClone(original), ...patch };
+    assert.throws(() => sideStanceDamageSource(a, m, a.items[0]));
+  }
+  m.flags.spycraft2 = original;
+  const data = { ...a.items[0].system, proficiency: "blunt" },
+    originalItem = a.items[0].system;
+  a.items[0].system = data;
+  assert.throws(() => sideStanceDamageSource(a, m, a.items[0]), /proficiency/);
+  a.items[0].system = originalItem;
+});
+test("Side die adds to permanent sneak dice and per-die bonuses without qualifying permanent prerequisites or duplicating the stress rider", async () => {
+  const { a, m } = await hit();
+  assert.equal(sneakAttackCapacity(a.system), 0);
+  a.system.activeFeatNames.push("Ambush Basics", "Deadly Precision");
+  const d = await a.rollDamage(a.items[0], options(m));
+  assert.equal(d.flags.spycraft2.sneakAttack.dice, 2);
+  assert.equal(d.flags.spycraft2.sneakAttack.bonus, 2);
+  assert.equal(d.flags.spycraft2.sneakAttack.stress, 1);
+  const system = { ...a.system, activeFeatNames: [...a.system.activeFeatNames, "Whack", "Bludgeon"] },
+    p = sneakAttackDamagePlan(system, a.items[0].system, {
+      ...options(m),
+      sideStanceDie: true,
+      damageType: "subdual",
+      damageConversion: "lethalToSubdual"
+    });
+  assert.equal(p.dice, 2);
+  assert.equal(p.bonus, 4);
+  assert.equal(p.stress, 1);
+});
+test("existing vulnerability, immunity, vitals, conversion and Standard Attack gates remain required for the Side die", async () => {
+  for (const patch of [
+    { targetVulnerable: false },
+    { targetVitalsConfirmed: false },
+    { successfulStandardAttack: false },
+    { damageType: "subdual", damageConversion: "lethalToSubdual" }
+  ]) {
+    const { a, m } = await hit();
+    await assert.rejects(a.rollDamage(a.items[0], { ...options(m), ...patch }));
+    assert.equal(a.system.sideStanceDamageUses, undefined);
+  }
+  const { a, m } = await hit();
+  game.actors[1].system = { npcProfile: { enabled: true, qualities: [{ id: "construct" }] } };
+  await assert.rejects(a.rollDamage(a.items[0], options(m)), /immune/);
+  assert.equal(a.system.sideStanceDamageUses, undefined);
+});
+test("concurrent damage claims post exactly one combined result for the root attack", async () => {
+  const { a, m } = await hit();
+  const results = await Promise.allSettled([
+    a.rollDamage(a.items[0], options(m)),
+    a.rollDamage(a.items[0], options(m))
+  ]);
+  assert.equal(results.filter(r => r.status === "fulfilled").length, 1);
+  assert.equal(game.messages.filter(m => m.flags.spycraft2.sideStanceDamage).length, 1);
+  assert.equal(sideDamageUseRows(a.system).length, 1);
+});
+test("failed posting and source/protection drift release only unused damage, while a committed response retains its one use", async () => {
+  for (const kind of ["before", "after", "source", "protection"]) {
+    const { a, m } = await hit();
+    controls.mode = ["before", "after"].includes(kind) ? kind : "normal";
+    if (kind === "source")
+      controls.draw = async () => {
+        m.flags.spycraft2.successConfirmed = false;
+      };
+    if (kind === "protection")
+      controls.draw = async () => {
+        game.actors[1].system = { npcProfile: { enabled: true, qualities: [{ id: "construct" }] } };
+      };
+    const result = await Promise.allSettled([a.rollDamage(a.items[0], options(m))]);
+    assert.equal(result[0].status, kind === "after" ? "fulfilled" : "rejected", kind);
+    assert.equal(sideDamageUseRows(a.system).length, kind === "after" ? 1 : 0, kind);
+    assert.ok(a.system.sideStanceFeints[0].usedBy, "The attack die stays spent regardless of damage posting");
+  }
+});
+test("GC review finds an actual posted damage receipt without reroll/refill, or releases a confirmed missing damage reservation", async () => {
+  const { a, m } = await hit(),
+    d = await a.rollDamage(a.items[0], options(m)),
+    use = a.system.sideStanceDamageUses[0];
+  use.receiptUuid = null;
+  const count = game.messages.length,
+    result = await reviewSideStanceDamage(a, { reservationId: use.reservationId, confirmed: true });
+  assert.equal(result.receiptUuid, d.uuid);
+  assert.equal(game.messages.length, count);
+  const { a: b, m: bm } = await hit();
+  b.system.sideStanceDamageUses = [
+    {
+      version: 1,
+      rootAttackUuid: bm.uuid,
+      attackUuid: bm.uuid,
+      reservationId: "missing",
+      targetUuid: "Actor.target",
+      weaponUuid: b.items[0].uuid,
+      sourceEvidence: rollEvidence(bm.flags.spycraft2),
+      receiptUuid: null
+    }
+  ];
+  assert.equal((await reviewSideStanceDamage(b, { reservationId: "missing", confirmed: true })).released, true);
+  assert.equal(b.system.sideStanceDamageUses.length, 0);
+  assert.ok(b.system.sideStanceFeints[0].usedBy);
+});
 
-test('an original damage replacement chain retains its one root use and rejects a new independent claim after replacing the result',async()=>{const {a,m}=await hit(),damage=await a.rollDamage(a.items[0],options(m)),c=damage.flags.spycraft2;a.system.combatStance=null;const replaced=await a.rollCheck(c.formula,c.rollData,{...c,rerollOf:damage.uuid});assert.equal(replaced.flags.spycraft2.sideStanceDamage.rootAttackUuid,m.uuid);assert.equal(a.system.sideStanceDamageUses[0].receiptUuid,damage.uuid);damage.flags.spycraft2.resolved=true;damage.flags.spycraft2.superseded=replaced.uuid;const again=await a.rollCheck(replaced.flags.spycraft2.formula,replaced.flags.spycraft2.rollData,{...replaced.flags.spycraft2,rerollOf:replaced.uuid});assert.equal(again.flags.spycraft2.sneakAttack.dice,1);await assert.rejects(a.rollDamage(a.items[0],options(m)),/already has damage/);});
+test("an original damage replacement chain retains its one root use and rejects a new independent claim after replacing the result", async () => {
+  const { a, m } = await hit(),
+    damage = await a.rollDamage(a.items[0], options(m)),
+    c = damage.flags.spycraft2;
+  a.system.combatStance = null;
+  const replaced = await a.rollCheck(c.formula, c.rollData, { ...c, rerollOf: damage.uuid });
+  assert.equal(replaced.flags.spycraft2.sideStanceDamage.rootAttackUuid, m.uuid);
+  assert.equal(a.system.sideStanceDamageUses[0].receiptUuid, damage.uuid);
+  damage.flags.spycraft2.resolved = true;
+  damage.flags.spycraft2.superseded = replaced.uuid;
+  const again = await a.rollCheck(replaced.flags.spycraft2.formula, replaced.flags.spycraft2.rollData, {
+    ...replaced.flags.spycraft2,
+    rerollOf: replaced.uuid
+  });
+  assert.equal(again.flags.spycraft2.sneakAttack.dice, 1);
+  await assert.rejects(a.rollDamage(a.items[0], options(m)), /already has damage/);
+});

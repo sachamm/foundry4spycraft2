@@ -1,13 +1,277 @@
-import test from 'node:test';import assert from 'node:assert/strict';import{TASK_PRESSURE_CHECK,pressureStressSource,taskPressureState,taskPressureAttemptPlan}from'../module/rules/task-pressure.mjs';
-const task=()=>({id:'task_x',revision:0,completed:0,status:'active',pressured:true,pressureAttempts:[]}),receipt=(t,patch={})=>({actorUuid:'Actor.me',checkKind:'skill',skillKey:'resolve',checkId:'task-pressure',checkMethod:'roll',formula:'1d20 + @total',rollData:{total:4},naturalDie:7,rawTotal:11,effectiveTotal:11,error:1,threat:20,successConfirmed:true,analysisTask:{stage:'pressure',id:t.id,revision:t.revision,pressureRevision:t.pressureAttempts.length,challengeDC:10},...patch}),options={actorUuid:'Actor.me',messageUuid:'ChatMessage.pressure0',sourceEffectsResolved:true,at:0};
-function failure(t,raw=3,critical=false,cost=1){const n=t.pressureAttempts.length,parent='ChatMessage.pressure'+n,c=receipt(t,{successConfirmed:false,resolved:true,taskPressurePreparation:{version:1,id:'prep'+n},...(critical?{criticalFailure:true,criticalActivation:{kind:'failure',cost}}:{})});c.analysisTask.challengeDC=20;const stress={uuid:'ChatMessage.stress'+n,flags:{spycraft2:{actorUuid:'Actor.me',checkKind:'damage',actionDiceAllowed:false,rawTotal:raw,effectiveTotal:raw,taskPressureStress:{version:1,preparationId:'prep'+n,taskId:t.id,challengeRevision:t.revision,pressureRevision:n,parentMessageUuid:parent}}},rolls:[{formula:'1d6',total:raw,dice:[{faces:6,number:1,results:[{result:raw,active:true}]}]}]},damage={version:1,id:'damage'+n,source:pressureStressSource(parent),kind:'stress',newDamage:raw,before:0,total:raw,defenseContext:{version:1,kind:'stress',rawDamage:raw,netDamage:raw,resisted:0,armorPiercing:'all',damageReductionApplied:0},request:{kind:'stress',newDamage:raw,damageMode:'stressBeforeResistance',criticalHit:false},criticalHit:false,state:'recorded'};return {c,stress,damage,o:{...options,messageUuid:parent,stressMessage:stress,damageEvent:damage}};}
-test('the pressure prerequisite is a Resolve (Con) active check and disabled, malformed or ended tasks cannot demand attempts',()=>{assert.deepEqual(TASK_PRESSURE_CHECK.attributes,['con']);assert.equal(TASK_PRESSURE_CHECK.page,100);assert.equal(TASK_PRESSURE_CHECK.mode,'Active');assert.equal(taskPressureState(task()).needsCheck,true);assert.equal(taskPressureState({...task(),pressured:false}).needsCheck,false);for(const status of['complete','failed'])assert.equal(taskPressureState({...task(),status}).needsCheck,false);for(const patch of[{pressured:'true'},{revision:-1},{pressureAttempts:{}},{status:'unknown'}])assert.throws(()=>taskPressureState({...task(),...patch}));});
-test('ordinary success clears pressure for one Challenge without completing a Challenge or changing its progress',()=>{const t=task(),r=taskPressureAttemptPlan(t,receipt(t),options);assert.equal(r.challengeProgress,0);assert.equal(r.task.completed,0);assert.equal(r.task.revision,0);assert.equal(r.state.ready,true);assert.equal(r.state.immune,false);assert.equal(r.stressDamage,0);assert.throws(()=>taskPressureAttemptPlan(r.task,receipt(r.task),{...options,messageUuid:'ChatMessage.other'}),/another pressure/);const next={...r.task,revision:1};assert.equal(taskPressureState(next).needsCheck,true);assert.equal(taskPressureState(next).passed,false);});
-test('an activated critical success grants pressure immunity for the rest of the task at every later Challenge',()=>{for(const cost of[0,1,2]){const t=task(),c=receipt(t,{criticalSuccess:true,criticalActivation:{kind:'success',cost}}),r=taskPressureAttemptPlan(t,c,options);assert.equal(r.state.immune,true);for(let n=0;n<=20;n++){const next={...r.task,revision:n};assert.equal(taskPressureState(next).ready,true);assert.equal(taskPressureState(next).needsCheck,false);}assert.equal(r.challengeProgress,0);}});
-test('all actual1d6faces require the locked roll and applied stress proof; ordinary failures cause no task progress and no error increase',()=>{for(let raw=1;raw<=6;raw++)for(const state of['recorded','settled']){const t=task(),f=failure(t,raw);f.damage.state=state;f.damage.newDamage=0;f.damage.total=0;f.damage.defenseContext.netDamage=0;f.damage.defenseContext.resisted=raw;/* Full resistance may reduce applied damage without changing the actual rolled dose. */const r=taskPressureAttemptPlan(t,f.c,f.o);assert.equal(r.stressDamage,raw);assert.equal(r.challengeProgress,0);assert.equal(r.state.errorIncrease,0);assert.equal(r.state.needsCheck,true);assert.equal(r.event.damageEventId,f.damage.id);}});
-test('a pressure critical failure still causes1d6stress and adds one to subsequent Challenge error ranges regardless of activation cost',()=>{for(const cost of[0,1,2,4])for(let raw=1;raw<=6;raw++){const t=task(),f=failure(t,raw,true,cost),r=taskPressureAttemptPlan(t,f.c,f.o);assert.equal(r.stressDamage,raw);assert.equal(r.errorIncrease,1);assert.equal(r.task.completed,0);assert.equal(r.state.needsCheck,true);}let t=task();for(let i=1;i<=3;i++){const f=failure(t,2,true,1);t=taskPressureAttemptPlan(t,f.c,f.o).task;assert.equal(taskPressureState(t).errorIncrease,i);}});
-test('foreign, boosted, altered, multiple-die or absent stress rolls and unresolved or mismatched damage cannot prove a pressure consequence',()=>{const changes=[f=>f.stress.uuid='',f=>f.c.resolved=false,f=>f.c.taskPressurePreparation.id='other',f=>f.stress.flags.spycraft2.actorUuid='Actor.other',f=>f.stress.flags.spycraft2.boostSpent=1,f=>f.stress.flags.spycraft2.taskPressureStress.parentMessageUuid='ChatMessage.other',f=>f.stress.flags.spycraft2.taskPressureStress.pressureRevision++,f=>f.stress.rolls[0].formula='2d6',f=>f.stress.rolls[0].dice[0].faces=8,f=>f.stress.rolls[0].dice[0].results.push({result:3}),f=>f.stress.flags.spycraft2.effectiveTotal++,f=>f.damage.state='pending',f=>f.damage.request.damageMode='net',f=>f.damage.request.newDamage++,f=>f.damage.source='Different event',f=>f.damage.newDamage=99,f=>f.damage.total++,f=>f.damage.defenseContext.resisted++,f=>f.damage.defenseContext.damageReductionApplied=1];for(const change of changes){const t=task(),f=failure(t);change(f);assert.throws(()=>taskPressureAttemptPlan(t,f.c,f.o));}for(const raw of[0,7,1.5,NaN]){const t=task(),f=failure(t,raw);assert.throws(()=>taskPressureAttemptPlan(t,f.c,f.o));}});
-test('the GC must finalize the actual current pressure result and cannot substitute a Challenge, fixed result, foreign or superseded receipt',()=>{const t=task();for(const patch of[{checkKind:'save'},{skillKey:'analysis'},{checkId:'other'},{checkMethod:'take10'},{actorUuid:'Actor.other'},{superseded:true},{analysisTaskSettlement:{}},{successConfirmed:null},{successConfirmed:false,naturalDie:1},{criticalSuccess:true},{criticalFailure:true,successConfirmed:true},{analysisTask:{...receipt(t).analysisTask,pressureRevision:1}}])assert.throws(()=>taskPressureAttemptPlan(t,receipt(t,patch),options));assert.throws(()=>taskPressureAttemptPlan(t,receipt(t),{...options,sourceEffectsResolved:false}));assert.throws(()=>taskPressureAttemptPlan({...t,pressured:false},receipt(t),options));});
-test('timed pressure checks must finish strictly before the task deadline even when adjudicated later',()=>{const t={...task(),timing:{startedAt:10,deadline:20}},c=receipt(t);for(const completedAt of[10,19.9]){c.analysisTask.completedAt=completedAt;assert.equal(taskPressureAttemptPlan(t,c,{...options,at:30}).state.ready,true);}for(const completedAt of[undefined,null,9,20,21,Infinity]){c.analysisTask.completedAt=completedAt;assert.throws(()=>taskPressureAttemptPlan(t,c,{...options,at:30}));}c.analysisTask.completedAt=15;assert.throws(()=>taskPressureAttemptPlan(t,c,{...options,at:14}));});
-test('history rejects duplicated receipts/damage, out-of-order or future attempts and attempts after clearance or immunity',()=>{let t=task(),f=failure(t);t=taskPressureAttemptPlan(t,f.c,f.o).task;for(const mutate of[x=>x.pressureAttempts.push({...x.pressureAttempts[0],index:1}),x=>x.pressureAttempts[0].challengeRevision=1,x=>x.pressureAttempts[0].stressRaw=0,x=>x.pressured=false]){const bad=structuredClone(t);mutate(bad);assert.throws(()=>taskPressureState(bad));}const success=taskPressureAttemptPlan(task(),receipt(task()),options).task,bad={...success,pressureAttempts:[...success.pressureAttempts,{...success.pressureAttempts[0],index:1,messageUuid:'ChatMessage.second'}]};assert.throws(()=>taskPressureState(bad));});
-test('planning preserves source objects and freezes the exact roll, decline and critical-activation proof in the new attempt',()=>{const t=task(),f=failure(t,4,true,2),before=JSON.stringify({t,c:f.c,o:f.o}),r=taskPressureAttemptPlan(t,f.c,f.o);assert.equal(JSON.stringify({t,c:f.c,o:f.o}),before);const proof=JSON.parse(r.event.evidence);assert.equal(proof.activation.cost,2);assert.equal(proof.criticalFailure,true);assert.equal(r.event.stressRaw,4);assert.equal(r.task.pressureAttempts.length,1);assert.equal(t.pressureAttempts.length,0);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  TASK_PRESSURE_CHECK,
+  pressureStressSource,
+  taskPressureState,
+  taskPressureAttemptPlan
+} from "../module/rules/task-pressure.mjs";
+const task = () => ({
+    id: "task_x",
+    revision: 0,
+    completed: 0,
+    status: "active",
+    pressured: true,
+    pressureAttempts: []
+  }),
+  receipt = (t, patch = {}) => ({
+    actorUuid: "Actor.me",
+    checkKind: "skill",
+    skillKey: "resolve",
+    checkId: "task-pressure",
+    checkMethod: "roll",
+    formula: "1d20 + @total",
+    rollData: { total: 4 },
+    naturalDie: 7,
+    rawTotal: 11,
+    effectiveTotal: 11,
+    error: 1,
+    threat: 20,
+    successConfirmed: true,
+    analysisTask: {
+      stage: "pressure",
+      id: t.id,
+      revision: t.revision,
+      pressureRevision: t.pressureAttempts.length,
+      challengeDC: 10
+    },
+    ...patch
+  }),
+  options = { actorUuid: "Actor.me", messageUuid: "ChatMessage.pressure0", sourceEffectsResolved: true, at: 0 };
+function failure(t, raw = 3, critical = false, cost = 1) {
+  const n = t.pressureAttempts.length,
+    parent = "ChatMessage.pressure" + n,
+    c = receipt(t, {
+      successConfirmed: false,
+      resolved: true,
+      taskPressurePreparation: { version: 1, id: "prep" + n },
+      ...(critical ? { criticalFailure: true, criticalActivation: { kind: "failure", cost } } : {})
+    });
+  c.analysisTask.challengeDC = 20;
+  const stress = {
+      uuid: "ChatMessage.stress" + n,
+      flags: {
+        spycraft2: {
+          actorUuid: "Actor.me",
+          checkKind: "damage",
+          actionDiceAllowed: false,
+          rawTotal: raw,
+          effectiveTotal: raw,
+          taskPressureStress: {
+            version: 1,
+            preparationId: "prep" + n,
+            taskId: t.id,
+            challengeRevision: t.revision,
+            pressureRevision: n,
+            parentMessageUuid: parent
+          }
+        }
+      },
+      rolls: [{ formula: "1d6", total: raw, dice: [{ faces: 6, number: 1, results: [{ result: raw, active: true }] }] }]
+    },
+    damage = {
+      version: 1,
+      id: "damage" + n,
+      source: pressureStressSource(parent),
+      kind: "stress",
+      newDamage: raw,
+      before: 0,
+      total: raw,
+      defenseContext: {
+        version: 1,
+        kind: "stress",
+        rawDamage: raw,
+        netDamage: raw,
+        resisted: 0,
+        armorPiercing: "all",
+        damageReductionApplied: 0
+      },
+      request: { kind: "stress", newDamage: raw, damageMode: "stressBeforeResistance", criticalHit: false },
+      criticalHit: false,
+      state: "recorded"
+    };
+  return { c, stress, damage, o: { ...options, messageUuid: parent, stressMessage: stress, damageEvent: damage } };
+}
+test("the pressure prerequisite is a Resolve (Con) active check and disabled, malformed or ended tasks cannot demand attempts", () => {
+  assert.deepEqual(TASK_PRESSURE_CHECK.attributes, ["con"]);
+  assert.equal(TASK_PRESSURE_CHECK.page, 100);
+  assert.equal(TASK_PRESSURE_CHECK.mode, "Active");
+  assert.equal(taskPressureState(task()).needsCheck, true);
+  assert.equal(taskPressureState({ ...task(), pressured: false }).needsCheck, false);
+  for (const status of ["complete", "failed"]) assert.equal(taskPressureState({ ...task(), status }).needsCheck, false);
+  for (const patch of [{ pressured: "true" }, { revision: -1 }, { pressureAttempts: {} }, { status: "unknown" }])
+    assert.throws(() => taskPressureState({ ...task(), ...patch }));
+});
+test("ordinary success clears pressure for one Challenge without completing a Challenge or changing its progress", () => {
+  const t = task(),
+    r = taskPressureAttemptPlan(t, receipt(t), options);
+  assert.equal(r.challengeProgress, 0);
+  assert.equal(r.task.completed, 0);
+  assert.equal(r.task.revision, 0);
+  assert.equal(r.state.ready, true);
+  assert.equal(r.state.immune, false);
+  assert.equal(r.stressDamage, 0);
+  assert.throws(
+    () => taskPressureAttemptPlan(r.task, receipt(r.task), { ...options, messageUuid: "ChatMessage.other" }),
+    /another pressure/
+  );
+  const next = { ...r.task, revision: 1 };
+  assert.equal(taskPressureState(next).needsCheck, true);
+  assert.equal(taskPressureState(next).passed, false);
+});
+test("an activated critical success grants pressure immunity for the rest of the task at every later Challenge", () => {
+  for (const cost of [0, 1, 2]) {
+    const t = task(),
+      c = receipt(t, { criticalSuccess: true, criticalActivation: { kind: "success", cost } }),
+      r = taskPressureAttemptPlan(t, c, options);
+    assert.equal(r.state.immune, true);
+    for (let n = 0; n <= 20; n++) {
+      const next = { ...r.task, revision: n };
+      assert.equal(taskPressureState(next).ready, true);
+      assert.equal(taskPressureState(next).needsCheck, false);
+    }
+    assert.equal(r.challengeProgress, 0);
+  }
+});
+test("all actual1d6faces require the locked roll and applied stress proof; ordinary failures cause no task progress and no error increase", () => {
+  for (let raw = 1; raw <= 6; raw++)
+    for (const state of ["recorded", "settled"]) {
+      const t = task(),
+        f = failure(t, raw);
+      f.damage.state = state;
+      f.damage.newDamage = 0;
+      f.damage.total = 0;
+      f.damage.defenseContext.netDamage = 0;
+      f.damage.defenseContext.resisted = raw;
+      /* Full resistance may reduce applied damage without changing the actual rolled dose. */ const r =
+        taskPressureAttemptPlan(t, f.c, f.o);
+      assert.equal(r.stressDamage, raw);
+      assert.equal(r.challengeProgress, 0);
+      assert.equal(r.state.errorIncrease, 0);
+      assert.equal(r.state.needsCheck, true);
+      assert.equal(r.event.damageEventId, f.damage.id);
+    }
+});
+test("a pressure critical failure still causes1d6stress and adds one to subsequent Challenge error ranges regardless of activation cost", () => {
+  for (const cost of [0, 1, 2, 4])
+    for (let raw = 1; raw <= 6; raw++) {
+      const t = task(),
+        f = failure(t, raw, true, cost),
+        r = taskPressureAttemptPlan(t, f.c, f.o);
+      assert.equal(r.stressDamage, raw);
+      assert.equal(r.errorIncrease, 1);
+      assert.equal(r.task.completed, 0);
+      assert.equal(r.state.needsCheck, true);
+    }
+  let t = task();
+  for (let i = 1; i <= 3; i++) {
+    const f = failure(t, 2, true, 1);
+    t = taskPressureAttemptPlan(t, f.c, f.o).task;
+    assert.equal(taskPressureState(t).errorIncrease, i);
+  }
+});
+test("foreign, boosted, altered, multiple-die or absent stress rolls and unresolved or mismatched damage cannot prove a pressure consequence", () => {
+  const changes = [
+    f => (f.stress.uuid = ""),
+    f => (f.c.resolved = false),
+    f => (f.c.taskPressurePreparation.id = "other"),
+    f => (f.stress.flags.spycraft2.actorUuid = "Actor.other"),
+    f => (f.stress.flags.spycraft2.boostSpent = 1),
+    f => (f.stress.flags.spycraft2.taskPressureStress.parentMessageUuid = "ChatMessage.other"),
+    f => f.stress.flags.spycraft2.taskPressureStress.pressureRevision++,
+    f => (f.stress.rolls[0].formula = "2d6"),
+    f => (f.stress.rolls[0].dice[0].faces = 8),
+    f => f.stress.rolls[0].dice[0].results.push({ result: 3 }),
+    f => f.stress.flags.spycraft2.effectiveTotal++,
+    f => (f.damage.state = "pending"),
+    f => (f.damage.request.damageMode = "net"),
+    f => f.damage.request.newDamage++,
+    f => (f.damage.source = "Different event"),
+    f => (f.damage.newDamage = 99),
+    f => f.damage.total++,
+    f => f.damage.defenseContext.resisted++,
+    f => (f.damage.defenseContext.damageReductionApplied = 1)
+  ];
+  for (const change of changes) {
+    const t = task(),
+      f = failure(t);
+    change(f);
+    assert.throws(() => taskPressureAttemptPlan(t, f.c, f.o));
+  }
+  for (const raw of [0, 7, 1.5, NaN]) {
+    const t = task(),
+      f = failure(t, raw);
+    assert.throws(() => taskPressureAttemptPlan(t, f.c, f.o));
+  }
+});
+test("the GC must finalize the actual current pressure result and cannot substitute a Challenge, fixed result, foreign or superseded receipt", () => {
+  const t = task();
+  for (const patch of [
+    { checkKind: "save" },
+    { skillKey: "analysis" },
+    { checkId: "other" },
+    { checkMethod: "take10" },
+    { actorUuid: "Actor.other" },
+    { superseded: true },
+    { analysisTaskSettlement: {} },
+    { successConfirmed: null },
+    { successConfirmed: false, naturalDie: 1 },
+    { criticalSuccess: true },
+    { criticalFailure: true, successConfirmed: true },
+    { analysisTask: { ...receipt(t).analysisTask, pressureRevision: 1 } }
+  ])
+    assert.throws(() => taskPressureAttemptPlan(t, receipt(t, patch), options));
+  assert.throws(() => taskPressureAttemptPlan(t, receipt(t), { ...options, sourceEffectsResolved: false }));
+  assert.throws(() => taskPressureAttemptPlan({ ...t, pressured: false }, receipt(t), options));
+});
+test("timed pressure checks must finish strictly before the task deadline even when adjudicated later", () => {
+  const t = { ...task(), timing: { startedAt: 10, deadline: 20 } },
+    c = receipt(t);
+  for (const completedAt of [10, 19.9]) {
+    c.analysisTask.completedAt = completedAt;
+    assert.equal(taskPressureAttemptPlan(t, c, { ...options, at: 30 }).state.ready, true);
+  }
+  for (const completedAt of [undefined, null, 9, 20, 21, Infinity]) {
+    c.analysisTask.completedAt = completedAt;
+    assert.throws(() => taskPressureAttemptPlan(t, c, { ...options, at: 30 }));
+  }
+  c.analysisTask.completedAt = 15;
+  assert.throws(() => taskPressureAttemptPlan(t, c, { ...options, at: 14 }));
+});
+test("history rejects duplicated receipts/damage, out-of-order or future attempts and attempts after clearance or immunity", () => {
+  let t = task(),
+    f = failure(t);
+  t = taskPressureAttemptPlan(t, f.c, f.o).task;
+  for (const mutate of [
+    x => x.pressureAttempts.push({ ...x.pressureAttempts[0], index: 1 }),
+    x => (x.pressureAttempts[0].challengeRevision = 1),
+    x => (x.pressureAttempts[0].stressRaw = 0),
+    x => (x.pressured = false)
+  ]) {
+    const bad = structuredClone(t);
+    mutate(bad);
+    assert.throws(() => taskPressureState(bad));
+  }
+  const success = taskPressureAttemptPlan(task(), receipt(task()), options).task,
+    bad = {
+      ...success,
+      pressureAttempts: [
+        ...success.pressureAttempts,
+        { ...success.pressureAttempts[0], index: 1, messageUuid: "ChatMessage.second" }
+      ]
+    };
+  assert.throws(() => taskPressureState(bad));
+});
+test("planning preserves source objects and freezes the exact roll, decline and critical-activation proof in the new attempt", () => {
+  const t = task(),
+    f = failure(t, 4, true, 2),
+    before = JSON.stringify({ t, c: f.c, o: f.o }),
+    r = taskPressureAttemptPlan(t, f.c, f.o);
+  assert.equal(JSON.stringify({ t, c: f.c, o: f.o }), before);
+  const proof = JSON.parse(r.event.evidence);
+  assert.equal(proof.activation.cost, 2);
+  assert.equal(proof.criticalFailure, true);
+  assert.equal(r.event.stressRaw, 4);
+  assert.equal(r.task.pressureAttempts.length, 1);
+  assert.equal(t.pressureAttempts.length, 0);
+});

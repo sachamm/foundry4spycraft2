@@ -1,3 +1,27 @@
 /** A full round ends at the start of the prompting character's next Initiative Count (p.346). */
-export const validOwnCountClock=c=>c?.started===true&&typeof c.id==='string'&&!!c.id&&typeof c.combatantId==='string'&&!!c.combatantId&&Number.isSafeInteger(c.round)&&c.round>=1&&Number.isSafeInteger(c.turn)&&c.turn>=0&&Number.isSafeInteger(c.ownTurnIndex)&&c.ownTurnIndex>=0;
-export function ownCountDurationActive(record,combat){return !!record&&validOwnCountClock(combat)&&record.combatId===combat.id&&record.combatantId===combat.combatantId&&Number.isSafeInteger(record.startRound)&&record.startRound>=1&&record.dueRound===record.startRound+1&&combat.round>=record.startRound&&combat.round<=record.dueRound&&!(combat.round===record.dueRound&&combat.turn>=combat.ownTurnIndex);}
+export const validOwnCountClock = c =>
+  c?.started === true &&
+  typeof c.id === "string" &&
+  !!c.id &&
+  typeof c.combatantId === "string" &&
+  !!c.combatantId &&
+  Number.isSafeInteger(c.round) &&
+  c.round >= 1 &&
+  Number.isSafeInteger(c.turn) &&
+  c.turn >= 0 &&
+  Number.isSafeInteger(c.ownTurnIndex) &&
+  c.ownTurnIndex >= 0;
+export function ownCountDurationActive(record, combat) {
+  return (
+    !!record &&
+    validOwnCountClock(combat) &&
+    record.combatId === combat.id &&
+    record.combatantId === combat.combatantId &&
+    Number.isSafeInteger(record.startRound) &&
+    record.startRound >= 1 &&
+    record.dueRound === record.startRound + 1 &&
+    combat.round >= record.startRound &&
+    combat.round <= record.dueRound &&
+    !(combat.round === record.dueRound && combat.turn >= combat.ownTurnIndex)
+  );
+}

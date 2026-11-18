@@ -1,19 +1,283 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {actor} from './fixtures/trip-final-attack.mjs';import {takeTripFinalAttack as take,validateTripFinalAttackProof as validate,reviewTripFinalAttack as review} from '../module/apps/trip-final-attack.mjs';import {tripFinalSource} from '../module/apps/trip-outcomes.mjs';import {limitedUseAbilities} from '../module/rules/limited-uses.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {rollEvidence} from '../module/rules/outcomes.mjs';
-const input=patch=>({sourceMessage:'ChatMessage.source',weaponId:'sword',immediateConfirmed:true,attackLegalConfirmed:true,...patch});
-test('actual controller applies exactly minus four with a source-bound final Standard Attack and shared round use',async()=>{const a=actor(),normal=a.weaponAttack(a.items[0],{attackAction:'standard',targetActorUuid:'Actor.opponent'}).total,m=await take(a,input());assert.equal(m.flags.spycraft2.rollData.total,normal-4);assert.match(m.flags.spycraft2.flavor,/Trip final attack −4/);assert.equal(m.flags.spycraft2.finalAttack.opponentUuid,'Actor.opponent');assert.equal(m.flags.spycraft2.finalAttack.penalty,4);assert.equal(a.system.resourceUses.tripFinalAttack.used,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.actionDice.value,0);assert.equal(game.messages.length,3);assert.ok(!JSON.stringify(m.flags.spycraft2.finalAttack).includes('79123'));});
-test('concurrent calls reserve one opportunity and later repeated calls return the original posted card',async()=>{const a=actor(),results=await Promise.allSettled([take(a,input()),take(a,input())]);assert.equal(game.messages.length,3);assert.equal(results.filter(r=>r.status==='fulfilled'&&r.value).length,1);const m=await take(a,input());assert.equal(m.uuid,game.messages[2].uuid);assert.equal(a.system.resourceUses.finalAttackRound.used,1);});
-test('cancelled and unposted failures refund only reserved uses; committed post failures retain their exact attack',async()=>{for(const mode of ['cancel','before','after']){const a=actor();if(mode==='cancel')a.cancel=true;else a.postError=mode;const r=await Promise.allSettled([take(a,input())]);assert.equal(r[0].status,mode==='after'?'fulfilled':'rejected');assert.equal(game.messages.length,mode==='after'?3:2);assert.equal(a.system.resourceUses.tripFinalAttack?.used??0,mode==='after'?1:0);assert.equal(a.system.resourceUses.finalAttackRound?.used??0,mode==='after'?1:0);assert.equal(!!game.messages[0].flags.spycraft2.tripFinalUse,mode==='after');}});
-test('source, opponent, weapon, Count and ownership changes during RNG abort before publication',async()=>{for(const change of [a=>a.items[0].system.equipped=false,a=>a.participatingCombat.turn=1,a=>a.isOwner=false,a=>game.actors=game.actors.filter(x=>x.uuid!=='Actor.opponent'),a=>game.messages[0].flags.spycraft2.effectiveTotal++,a=>game.messages[0].flags.spycraft2.tripSettlement.operationId='changed']){const a=actor();a.drawHook=()=>change(a);await assert.rejects(take(a,input()));assert.equal(game.messages.length,2);assert.equal(a.system.resourceUses.finalAttackRound,undefined);}});
-test('Nauseated includes Trip final attacks in the existing shared allowance without refreshing another source',async()=>{const a=actor();a.system.conditionContext.nauseated=true;a.system.resourceUses.finalAttackRound={epoch:a.usagePeriods.round,used:1};a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);assert.equal(await take(a,input()),null);assert.equal(game.messages.length,2);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.resourceUses.tripFinalAttack,undefined);});
-test('forged new-roll final proof without a private lease cannot authorize a new roll',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2;assert.throws(()=>validate(a,c.finalAttack,{checkKind:'attack',weaponUuid:c.weaponUuid,attackContext:c.attackContext}),/control/);for(const patch of [{penalty:0},{opponentUuid:'Actor.other'},{weaponUuid:'other'},{operationId:'other'}])assert.throws(()=>validate(a,{...c.finalAttack,...patch},{checkKind:'attack',weaponUuid:c.weaponUuid,attackContext:c.attackContext}));});
-test('owned original unresolved replacements retain the historical opportunity and reject foreign, resolved or unrelated roots',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2,args={checkKind:'attack',weaponUuid:c.weaponUuid,attackContext:c.attackContext,rerollOf:m.uuid};validate(a,c.finalAttack,args);a.participatingCombat.round=4;validate(a,c.finalAttack,args);for(const patch of [{actorUuid:'Actor.other'},{resolved:true},{superseded:'other'}]){const old=JSON.parse(JSON.stringify(m.flags.spycraft2));Object.assign(m.flags.spycraft2,patch);assert.throws(()=>validate(a,c.finalAttack,args));m.flags.spycraft2=old;}assert.throws(()=>validate(a,c.finalAttack,{...args,rerollOf:'ChatMessage.missing'}));});
-test('source final-stamp failure is recovered by the owning GC with no additional RNG or allowance use',async()=>{const a=actor(),source=game.messages[0],update=source.update;source.update=async function(p){if(p['flags.spycraft2.tripFinalUse']?.state==='posted')throw Error('stamp failed');return update.call(this,p);};const m=await take(a,input());assert.equal(source.flags.spycraft2.tripFinalUse.state,'reserved');source.update=update;const r=await review(a,{sourceMessage:source.uuid,confirmed:true});assert.equal(r.messageUuid,m.uuid);assert.equal(source.flags.spycraft2.tripFinalUse.state,'posted');assert.equal(game.messages.length,3);assert.equal(a.system.resourceUses.finalAttackRound.used,1);});
-test('GC can close an unused interrupted opportunity without granting a replacement roll or altering its resources',async()=>{const a=actor(),source=game.messages[0];source.flags.spycraft2.tripFinalUse={id:'interrupted',state:'reserved',proof:{}};await assert.rejects(review(a,{sourceMessage:source.uuid,confirmed:true}),/No posted attack/);assert.equal((await review(a,{sourceMessage:source.uuid,confirmed:true,closeUnused:true})).newRollAuthorized,false);assert.equal(source.flags.spycraft2.tripFinalUse.state,'closed');await assert.rejects(take(a,input()),/reserved or interrupted/);assert.equal(game.messages.length,2);});
-test('cancelled dialogs and invalid timing, legality, weapon or unearned source never reserve a final attack',async()=>{const a=actor();assert.equal(await take(a),null);for(const patch of [{immediateConfirmed:false},{attackLegalConfirmed:false},{weaponId:'missing'},{sourceMessage:'ChatMessage.missing'}])await assert.rejects(take(a,input(patch)));assert.equal(game.messages.length,2);assert.deepEqual(a.system.resourceUses,{});});
-test('the final-attack source marker is immutable roll evidence and reciprocal critical receipts remain required',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2,e=rollEvidence(c);assert.notEqual(rollEvidence({...c,finalAttack:{...c.finalAttack,penalty:0}}),e);const d=game.messages[1];d.flags.spycraft2.tripDefense.opponentUuid='Actor.other';assert.throws(()=>tripFinalSource(a,game.messages[0]));});
-test('corrupted posted attack proof cannot be returned or attached during GC recovery',async()=>{const a=actor(),m=await take(a,input());m.flags.spycraft2.finalAttack={...m.flags.spycraft2.finalAttack,penalty:0};await assert.rejects(take(a,input()),/proof changed/);await assert.rejects(review(a,{sourceMessage:'ChatMessage.source',confirmed:true}),/reserved proof/);assert.equal(game.messages.length,3);});
-test('both winning critical success and losing critical failure supply the same single final opportunity',async()=>{const {tripOutcomePlan}=await import('../module/rules/trip-outcomes.mjs');for(const kind of ['success','failure','both']){const a=actor(),x=game.messages[0].flags.spycraft2,y=game.messages[1].flags.spycraft2;delete x.criticalSuccess;if(kind!=='failure')x.criticalSuccess=true;if(kind!=='success')y.criticalFailure=true;const p=tripOutcomePlan(x,y,{attackerUuid:a.uuid,defenderUuid:y.actorUuid,combat:a.mentalLeapCombatContext(),allowCriticalAttackerWin:true}),s={...x.tripSettlement,...p,sourceEvidence:[x,y].map(c=>JSON.parse(rollEvidence(c)))};x.tripSettlement=structuredClone(s);y.tripSettlement=structuredClone(s);await take(a,input());assert.equal(a.system.resourceUses.finalAttackRound.used,1,kind);assert.equal(game.messages.length,3);}});
-test('the real raw Actor roll entry rejects a fabricated new Trip final-attack proof before RNG',async()=>{const {SpycraftActor}=await import('../module/documents/actor.mjs'),a=actor(),m=await take(a,input()),c=m.flags.spycraft2;await assert.rejects(SpycraftActor.prototype.rollCheck.call(a,c.formula,c.rollData,{...c,tripFinalLease:undefined}),/control/);});
-test('the private replacement guard preserves target and weapon identity and rejects a forged extra root',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2,scope={checkKind:'attack',weaponUuid:c.weaponUuid,attackContext:c.attackContext,rerollOf:m.uuid};for(const patch of [{weaponUuid:'other'},{attackContext:{...c.attackContext,targetActorUuid:'Actor.other'}},{checkKind:'damage'}])assert.throws(()=>validate(a,c.finalAttack,{...scope,...patch}));const fake={id:'extra',uuid:'ChatMessage.extra',flags:{spycraft2:{actorUuid:a.uuid,checkKind:'attack',finalAttack:c.finalAttack}}};game.messages.push(fake);assert.throws(()=>validate(a,c.finalAttack,{...scope,rerollOf:fake.uuid}),/root|descend/);});
-test('legitimate same-actor Count reordering preserves the immediate final opportunity while a changed active participant still rejects',async()=>{const a=actor();a.drawHook=()=>{a.mentalLeapCombatContext=()=>({id:'Combat.feint',combatantId:'participant',started:true,round:3,turn:1,ownTurnIndex:1});};const m=await take(a,input());assert.equal(m.flags.spycraft2.finalAttack.combat.turn,0);assert.equal(a.system.resourceUses.finalAttackRound.used,1);const b=actor();b.drawHook=()=>{b.mentalLeapCombatContext=()=>({id:'Combat.feint',combatantId:'other',started:true,round:3,turn:1,ownTurnIndex:1});};await assert.rejects(take(b,input()),/original Initiative/);assert.equal(game.messages.length,2);});
-test('the final source picker excludes a losing defender’s copied settlement and keeps the actual attacking winner',async()=>{const a=actor(),d=game.actors.find(x=>x.uuid==='Actor.opponent'),inputDialog=foundry.applications.api.DialogV2.input;d.type='agent';d.items=[];d.system.activeFeatNames=[];let html='';foundry.applications.api.DialogV2.input=async x=>{html=x.content;return null;};try{assert.equal(await take(d),null);assert.ok(!html.includes('value="ChatMessage.defense"'));assert.equal(await take(a),null);assert.ok(html.includes('value="ChatMessage.source"'));assert.equal(game.messages.length,2);}finally{foundry.applications.api.DialogV2.input=inputDialog;}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { actor } from "./fixtures/trip-final-attack.mjs";
+import {
+  takeTripFinalAttack as take,
+  validateTripFinalAttackProof as validate,
+  reviewTripFinalAttack as review
+} from "../module/apps/trip-final-attack.mjs";
+import { tripFinalSource } from "../module/apps/trip-outcomes.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { rollEvidence } from "../module/rules/outcomes.mjs";
+const input = patch => ({
+  sourceMessage: "ChatMessage.source",
+  weaponId: "sword",
+  immediateConfirmed: true,
+  attackLegalConfirmed: true,
+  ...patch
+});
+test("actual controller applies exactly minus four with a source-bound final Standard Attack and shared round use", async () => {
+  const a = actor(),
+    normal = a.weaponAttack(a.items[0], { attackAction: "standard", targetActorUuid: "Actor.opponent" }).total,
+    m = await take(a, input());
+  assert.equal(m.flags.spycraft2.rollData.total, normal - 4);
+  assert.match(m.flags.spycraft2.flavor, /Trip final attack −4/);
+  assert.equal(m.flags.spycraft2.finalAttack.opponentUuid, "Actor.opponent");
+  assert.equal(m.flags.spycraft2.finalAttack.penalty, 4);
+  assert.equal(a.system.resourceUses.tripFinalAttack.used, 1);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(a.system.actionDice.value, 0);
+  assert.equal(game.messages.length, 3);
+  assert.ok(!JSON.stringify(m.flags.spycraft2.finalAttack).includes("79123"));
+});
+test("concurrent calls reserve one opportunity and later repeated calls return the original posted card", async () => {
+  const a = actor(),
+    results = await Promise.allSettled([take(a, input()), take(a, input())]);
+  assert.equal(game.messages.length, 3);
+  assert.equal(results.filter(r => r.status === "fulfilled" && r.value).length, 1);
+  const m = await take(a, input());
+  assert.equal(m.uuid, game.messages[2].uuid);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+});
+test("cancelled and unposted failures refund only reserved uses; committed post failures retain their exact attack", async () => {
+  for (const mode of ["cancel", "before", "after"]) {
+    const a = actor();
+    if (mode === "cancel") a.cancel = true;
+    else a.postError = mode;
+    const r = await Promise.allSettled([take(a, input())]);
+    assert.equal(r[0].status, mode === "after" ? "fulfilled" : "rejected");
+    assert.equal(game.messages.length, mode === "after" ? 3 : 2);
+    assert.equal(a.system.resourceUses.tripFinalAttack?.used ?? 0, mode === "after" ? 1 : 0);
+    assert.equal(a.system.resourceUses.finalAttackRound?.used ?? 0, mode === "after" ? 1 : 0);
+    assert.equal(!!game.messages[0].flags.spycraft2.tripFinalUse, mode === "after");
+  }
+});
+test("source, opponent, weapon, Count and ownership changes during RNG abort before publication", async () => {
+  for (const change of [
+    a => (a.items[0].system.equipped = false),
+    a => (a.participatingCombat.turn = 1),
+    a => (a.isOwner = false),
+    a => (game.actors = game.actors.filter(x => x.uuid !== "Actor.opponent")),
+    a => game.messages[0].flags.spycraft2.effectiveTotal++,
+    a => (game.messages[0].flags.spycraft2.tripSettlement.operationId = "changed")
+  ]) {
+    const a = actor();
+    a.drawHook = () => change(a);
+    await assert.rejects(take(a, input()));
+    assert.equal(game.messages.length, 2);
+    assert.equal(a.system.resourceUses.finalAttackRound, undefined);
+  }
+});
+test("Nauseated includes Trip final attacks in the existing shared allowance without refreshing another source", async () => {
+  const a = actor();
+  a.system.conditionContext.nauseated = true;
+  a.system.resourceUses.finalAttackRound = { epoch: a.usagePeriods.round, used: 1 };
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  assert.equal(await take(a, input()), null);
+  assert.equal(game.messages.length, 2);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(a.system.resourceUses.tripFinalAttack, undefined);
+});
+test("forged new-roll final proof without a private lease cannot authorize a new roll", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2;
+  assert.throws(
+    () => validate(a, c.finalAttack, { checkKind: "attack", weaponUuid: c.weaponUuid, attackContext: c.attackContext }),
+    /control/
+  );
+  for (const patch of [
+    { penalty: 0 },
+    { opponentUuid: "Actor.other" },
+    { weaponUuid: "other" },
+    { operationId: "other" }
+  ])
+    assert.throws(() =>
+      validate(
+        a,
+        { ...c.finalAttack, ...patch },
+        { checkKind: "attack", weaponUuid: c.weaponUuid, attackContext: c.attackContext }
+      )
+    );
+});
+test("owned original unresolved replacements retain the historical opportunity and reject foreign, resolved or unrelated roots", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    args = { checkKind: "attack", weaponUuid: c.weaponUuid, attackContext: c.attackContext, rerollOf: m.uuid };
+  validate(a, c.finalAttack, args);
+  a.participatingCombat.round = 4;
+  validate(a, c.finalAttack, args);
+  for (const patch of [{ actorUuid: "Actor.other" }, { resolved: true }, { superseded: "other" }]) {
+    const old = JSON.parse(JSON.stringify(m.flags.spycraft2));
+    Object.assign(m.flags.spycraft2, patch);
+    assert.throws(() => validate(a, c.finalAttack, args));
+    m.flags.spycraft2 = old;
+  }
+  assert.throws(() => validate(a, c.finalAttack, { ...args, rerollOf: "ChatMessage.missing" }));
+});
+test("source final-stamp failure is recovered by the owning GC with no additional RNG or allowance use", async () => {
+  const a = actor(),
+    source = game.messages[0],
+    update = source.update;
+  source.update = async function (p) {
+    if (p["flags.spycraft2.tripFinalUse"]?.state === "posted") throw Error("stamp failed");
+    return update.call(this, p);
+  };
+  const m = await take(a, input());
+  assert.equal(source.flags.spycraft2.tripFinalUse.state, "reserved");
+  source.update = update;
+  const r = await review(a, { sourceMessage: source.uuid, confirmed: true });
+  assert.equal(r.messageUuid, m.uuid);
+  assert.equal(source.flags.spycraft2.tripFinalUse.state, "posted");
+  assert.equal(game.messages.length, 3);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+});
+test("GC can close an unused interrupted opportunity without granting a replacement roll or altering its resources", async () => {
+  const a = actor(),
+    source = game.messages[0];
+  source.flags.spycraft2.tripFinalUse = { id: "interrupted", state: "reserved", proof: {} };
+  await assert.rejects(review(a, { sourceMessage: source.uuid, confirmed: true }), /No posted attack/);
+  assert.equal(
+    (await review(a, { sourceMessage: source.uuid, confirmed: true, closeUnused: true })).newRollAuthorized,
+    false
+  );
+  assert.equal(source.flags.spycraft2.tripFinalUse.state, "closed");
+  await assert.rejects(take(a, input()), /reserved or interrupted/);
+  assert.equal(game.messages.length, 2);
+});
+test("cancelled dialogs and invalid timing, legality, weapon or unearned source never reserve a final attack", async () => {
+  const a = actor();
+  assert.equal(await take(a), null);
+  for (const patch of [
+    { immediateConfirmed: false },
+    { attackLegalConfirmed: false },
+    { weaponId: "missing" },
+    { sourceMessage: "ChatMessage.missing" }
+  ])
+    await assert.rejects(take(a, input(patch)));
+  assert.equal(game.messages.length, 2);
+  assert.deepEqual(a.system.resourceUses, {});
+});
+test("the final-attack source marker is immutable roll evidence and reciprocal critical receipts remain required", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    e = rollEvidence(c);
+  assert.notEqual(rollEvidence({ ...c, finalAttack: { ...c.finalAttack, penalty: 0 } }), e);
+  const d = game.messages[1];
+  d.flags.spycraft2.tripDefense.opponentUuid = "Actor.other";
+  assert.throws(() => tripFinalSource(a, game.messages[0]));
+});
+test("corrupted posted attack proof cannot be returned or attached during GC recovery", async () => {
+  const a = actor(),
+    m = await take(a, input());
+  m.flags.spycraft2.finalAttack = { ...m.flags.spycraft2.finalAttack, penalty: 0 };
+  await assert.rejects(take(a, input()), /proof changed/);
+  await assert.rejects(review(a, { sourceMessage: "ChatMessage.source", confirmed: true }), /reserved proof/);
+  assert.equal(game.messages.length, 3);
+});
+test("both winning critical success and losing critical failure supply the same single final opportunity", async () => {
+  const { tripOutcomePlan } = await import("../module/rules/trip-outcomes.mjs");
+  for (const kind of ["success", "failure", "both"]) {
+    const a = actor(),
+      x = game.messages[0].flags.spycraft2,
+      y = game.messages[1].flags.spycraft2;
+    delete x.criticalSuccess;
+    if (kind !== "failure") x.criticalSuccess = true;
+    if (kind !== "success") y.criticalFailure = true;
+    const p = tripOutcomePlan(x, y, {
+        attackerUuid: a.uuid,
+        defenderUuid: y.actorUuid,
+        combat: a.mentalLeapCombatContext(),
+        allowCriticalAttackerWin: true
+      }),
+      s = { ...x.tripSettlement, ...p, sourceEvidence: [x, y].map(c => JSON.parse(rollEvidence(c))) };
+    x.tripSettlement = structuredClone(s);
+    y.tripSettlement = structuredClone(s);
+    await take(a, input());
+    assert.equal(a.system.resourceUses.finalAttackRound.used, 1, kind);
+    assert.equal(game.messages.length, 3);
+  }
+});
+test("the real raw Actor roll entry rejects a fabricated new Trip final-attack proof before RNG", async () => {
+  const { SpycraftActor } = await import("../module/documents/actor.mjs"),
+    a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2;
+  await assert.rejects(
+    SpycraftActor.prototype.rollCheck.call(a, c.formula, c.rollData, { ...c, tripFinalLease: undefined }),
+    /control/
+  );
+});
+test("the private replacement guard preserves target and weapon identity and rejects a forged extra root", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    scope = { checkKind: "attack", weaponUuid: c.weaponUuid, attackContext: c.attackContext, rerollOf: m.uuid };
+  for (const patch of [
+    { weaponUuid: "other" },
+    { attackContext: { ...c.attackContext, targetActorUuid: "Actor.other" } },
+    { checkKind: "damage" }
+  ])
+    assert.throws(() => validate(a, c.finalAttack, { ...scope, ...patch }));
+  const fake = {
+    id: "extra",
+    uuid: "ChatMessage.extra",
+    flags: { spycraft2: { actorUuid: a.uuid, checkKind: "attack", finalAttack: c.finalAttack } }
+  };
+  game.messages.push(fake);
+  assert.throws(() => validate(a, c.finalAttack, { ...scope, rerollOf: fake.uuid }), /root|descend/);
+});
+test("legitimate same-actor Count reordering preserves the immediate final opportunity while a changed active participant still rejects", async () => {
+  const a = actor();
+  a.drawHook = () => {
+    a.mentalLeapCombatContext = () => ({
+      id: "Combat.feint",
+      combatantId: "participant",
+      started: true,
+      round: 3,
+      turn: 1,
+      ownTurnIndex: 1
+    });
+  };
+  const m = await take(a, input());
+  assert.equal(m.flags.spycraft2.finalAttack.combat.turn, 0);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  const b = actor();
+  b.drawHook = () => {
+    b.mentalLeapCombatContext = () => ({
+      id: "Combat.feint",
+      combatantId: "other",
+      started: true,
+      round: 3,
+      turn: 1,
+      ownTurnIndex: 1
+    });
+  };
+  await assert.rejects(take(b, input()), /original Initiative/);
+  assert.equal(game.messages.length, 2);
+});
+test("the final source picker excludes a losing defender’s copied settlement and keeps the actual attacking winner", async () => {
+  const a = actor(),
+    d = game.actors.find(x => x.uuid === "Actor.opponent"),
+    inputDialog = foundry.applications.api.DialogV2.input;
+  d.type = "agent";
+  d.items = [];
+  d.system.activeFeatNames = [];
+  let html = "";
+  foundry.applications.api.DialogV2.input = async x => {
+    html = x.content;
+    return null;
+  };
+  try {
+    assert.equal(await take(d), null);
+    assert.ok(!html.includes('value="ChatMessage.defense"'));
+    assert.equal(await take(a), null);
+    assert.ok(html.includes('value="ChatMessage.source"'));
+    assert.equal(game.messages.length, 2);
+  } finally {
+    foundry.applications.api.DialogV2.input = inputDialog;
+  }
+});

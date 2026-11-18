@@ -1,20 +1,412 @@
-import test from 'node:test';import assert from 'node:assert/strict';import{SPYCRAFT as cfg}from'../module/config.mjs';import{limitedUseAbilities}from'../module/rules/limited-uses.mjs';import{analysisTaskValid,analysisTaskCheckPlan}from'../module/rules/analysis-tasks.mjs';import{taskPressureState,taskPressureUseSpec}from'../module/rules/task-pressure.mjs';import{analysisTaskReceiptSystem,validateAnalysisTaskReceipt,validateAnalysisTaskRoll}from'../module/rules/analysis-tasks.mjs';
-let serial=0,posts=[],actors=[],natural=7,stressDie=4,evaluations={d20:0,stress:0},failPost='',hook=null;
-function apply(o,p){for(const[path,value]of Object.entries(p)){const keys=path.split('.');let target=o;for(const key of keys.slice(0,-1))target=target[key]??={};const last=keys.at(-1);if(last.startsWith('-='))delete target[last.slice(2)];else target[last]=structuredClone(value);}}
-const state=()=>({activeFeatNames:['Forensic Genius'],activeFeatSelections:[],resourceUses:{},usagePeriods:{scene:'s',session:'t',mission:'m'},actionDice:{value:0,max:3,die:4},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:14,mod:2}])),skillTotals:Object.fromEntries(Object.values(cfg.skills).map(s=>[s.key,{name:s.name,ranks:s.key==='analysis'?6:0,cap:30,threat:20,bonusEntries:[],totals:s.abilities.map(ability=>({ability,total:7}))}])),analysisTasks:{},accumulatedDamage:{version:1,revision:1,stress:0,subdual:0,pending:[]},survivalStats:{resistances:{},resistanceSources:[],noFear:null},stressThreshold:14,subdualThreshold:14,saves:{will:{total:2},fort:{total:2},ref:{total:2}}});
-globalThis.Actor=class{constructor(){this.uuid='Actor.pressure'+(++serial);this.name='Pressure fixture';this.type='agent';this.isOwner=true;this.flags={};this.items=new Map();this.items.filter=fn=>[...this.items.values()].filter(fn);this.items.find=fn=>[...this.items.values()].find(fn);this.extraUses=[];this.system=state();}async update(p){apply(this,p);this.system.limitedUses=[...limitedUseAbilities(this.system,[],cfg),...this.extraUses];return this;}};
-globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'gm',isGM:true},settings:{get:()=>({scene:'s',session:'t',mission:'m'})},time:{worldTime:0},i18n:{localize:String,format:String},messages:{get contents(){return posts;},[Symbol.iterator](){return posts[Symbol.iterator]();}},actors:{get contents(){return actors;},get:id=>actors.find(a=>a.id===id),[Symbol.iterator](){return actors[Symbol.iterator]();}},combats:[]};globalThis.foundry={utils:{randomID:()=>String(++serial),escapeHTML:String},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.ui={notifications:{warn:message=>({native:true,message})}};globalThis.ChatMessage={getSpeaker:()=>({})};globalThis.fromUuid=async uuid=>posts.find(m=>m.uuid===uuid)??actors.find(a=>a.uuid===uuid)??null;
-globalThis.Roll=class{constructor(formula,data={}){this.formula=formula;const stress=formula.replace(/\s/g,'')==='1d6',fixed=/^(10|20)\b/.test(formula);this.total=(stress?stressDie:fixed?parseInt(formula):natural)+(data.total??0);this.dice=fixed?[]:[{number:1,faces:stress?6:20,total:stress?stressDie:natural,results:[{result:stress?stressDie:natural,active:true}]}];this._evaluated=false;}async evaluate(){this._evaluated=true;evaluations[this.formula.replace(/\s/g,'')==='1d6'?'stress':'d20']++;await hook?.('evaluate',this);return this;}toJSON(){return {formula:this.formula,total:this.total,dice:structuredClone(this.dice),_evaluated:this._evaluated};}static fromJSON(json){const data=JSON.parse(json),r=new Roll(data.formula);Object.assign(r,data);return r;}async toMessage(data){await hook?.('post',this,data);if(failPost==='before')throw Error('post failed');const m={...data,id:'r'+(++serial),uuid:'ChatMessage.r'+serial,rolls:[this],async update(p){apply(this,p);return this;}};posts.push(m);if(failPost==='committed')throw Error('post committed then rejected');return m;}};
-const{SpycraftActor}=await import('../module/documents/actor.mjs');function actor(){posts=[];actors=[];natural=7;stressDie=4;evaluations={d20:0,stress:0};failPost='';hook=null;game.time.worldTime=0;game.spycraft2={};game.user.isGM=true;const a=new SpycraftActor();a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);actors.push(a);return a;}
-const opts={sourceEffectsResolved:true,errorActivationDeclinedConfirmed:true},create=(a,patch={})=>a.createAnalysisTask({title:'Historical source timing',baseChallenges:6,unpressuredConfirmed:true,...patch}),skill=(a,t)=>a.rollSkill('analysis',null,{check:t.forensicsOnly?'forensics':'appraise',analysisTaskId:t.id,gearStatus:'available'}),pressure=(a,t)=>a.rollSkill('resolve','con',{check:'task-pressure',analysisTaskId:t.id,taskChallengeDC:50,taskChallengeDCConfirmed:true});
-test('the frozen task source projection preserves other character state and never grants or removes an actual feat',()=>{const a=actor();a.system.activeFeatNames=['Tracking Mastery','Unfair Advantage'];const before=structuredClone(a.system),t={forensicGenius:true,forensicsOnly:true,trackingMastery:false},historical=analysisTaskReceiptSystem(a.system,t);assert.deepEqual(historical.activeFeatNames,['Unfair Advantage','Forensic Genius']);assert.deepEqual(a.system,before);assert.equal(historical.analysisTasks,a.system.analysisTasks);assert.equal(historical.resourceUses,a.system.resourceUses);});
-test('ordinary completed receipts settle their original counts after source loss or gain without admitting a new check under a changed source',async()=>{for(const original of[[],['Forensic Genius'],['Tracking Mastery'],['Forensic Genius','Tracking Mastery']]){const a=actor();a.system.activeFeatNames=original;const t=await create(a,{forensicsOnlyConfirmed:true}),m=await skill(a,t);await a.confirmCheckOutcome(m,{succeeded:true});a.system.activeFeatNames=original.length?[]:['Forensic Genius','Tracking Mastery'];const now=structuredClone(a.system.activeFeatNames),result=await a.settleAnalysisTask(t.id,m,opts);assert.equal(result.completed,1);assert.equal(result.requiredChallenges,t.requiredChallenges);assert.deepEqual(a.system.activeFeatNames,now);const before=posts.length;await skill(a,t);assert.equal(posts.length,before);await assert.rejects(a.settleAnalysisTask(t.id,m,opts));}});
-test('live roll admission remains strict while historical receipt validation accepts its own frozen eligibility and still rejects scope or counter drift',async()=>{const a=actor(),t=await create(a),m=await skill(a,t),c=m.flags.spycraft2;a.system.activeFeatNames=[];assert.throws(()=>validateAnalysisTaskRoll(a.system,c.analysisTask,{now:0,checkKind:'skill',skillKey:'analysis',checkId:c.checkId}),/eligibility/);validateAnalysisTaskReceipt(a.system,c.analysisTask,{now:0,checkKind:'skill',skillKey:'analysis',checkId:c.checkId});const changed=structuredClone(c.analysisTask);changed.requiredChallenges++;assert.throws(()=>validateAnalysisTaskReceipt(a.system,changed,{now:0,checkKind:'skill',skillKey:'analysis',checkId:c.checkId}),/changed/);});
-test('failed pressure recorded before source expiry still freezes and applies its owed stress once and makes no Challenge progress',async()=>{for(const forensicsOnlyConfirmed of[false,true]){const a=actor();a.system.activeFeatNames=['Forensic Genius',...(forensicsOnlyConfirmed?['Tracking Mastery']:[])];const t=await create(a,{unpressuredConfirmed:false,pressuredConfirmed:true,forensicsOnlyConfirmed}),m=await pressure(a,t);await a.confirmCheckOutcome(m,{succeeded:false});a.system.activeFeatNames=[];await a.prepareAnalysisTaskPressure(t.id,m,opts);const hit=await a.applyAnalysisTaskPressureStress(t.id,m,opts),result=await a.settleAnalysisTask(t.id,m,opts);assert.equal(hit.newDamage,4);assert.equal(a.system.accumulatedDamage.stress,4);assert.equal(result.completed,0);assert.equal(result.pressureAttempts.length,1);assert.equal(result.requiredChallenges,t.requiredChallenges);assert.deepEqual(a.system.activeFeatNames,[]);const before=posts.length;await pressure(a,t);assert.equal(posts.length,before);assert.equal((await a.applyAnalysisTaskPressureStress(t.id,m,opts)).id,hit.id);assert.equal(evaluations.stress,1);}});
-test('an actual activated pressure critical failure retains its extra error consequence after source loss, including full resistance and original payment',async()=>{for(const resistance of[0,'all']){const a=actor();a.system.survivalStats.resistances.stress=resistance;const t=await create(a,{unpressuredConfirmed:false,pressuredConfirmed:true});natural=1;const m=await pressure(a,t);await a.confirmCheckOutcome(m,{succeeded:false});const b=new SpycraftActor();b.system.actionDice.value=1;actors.push(b);await a.activateCritical(m,{kind:'failure',payer:b,baseCost:1,effect:'Pressure critical failure',effectConfirmed:true,opponent:true,lineOfSight:true});a.system.activeFeatNames=[];await a.prepareAnalysisTaskPressure(t.id,m,opts);await a.applyAnalysisTaskPressureStress(t.id,m,opts);await a.settleAnalysisTask(t.id,m,opts);assert.equal(taskPressureState(a.system.analysisTasks[t.id]).errorIncrease,1);assert.equal(a.system.accumulatedDamage.stress,resistance==='all'?0:4);assert.equal(b.system.actionDice.value,0);assert.equal(m.flags.spycraft2.criticalActivation.cost,1);}});
-test('historical receipt handling still requires the current reserved attempt, task revision and completed mandatory Health save',async()=>{for(const phase of['counter','history','health']){const a=actor(),t=await create(a,{unpressuredConfirmed:false,pressuredConfirmed:true}),m=await pressure(a,t);await a.confirmCheckOutcome(m,{succeeded:false});a.system.activeFeatNames=[];if(phase==='counter')a.system.resourceUses[m.flags.spycraft2.analysisTask.pressureUseId].used=0;if(phase==='history')a.system.analysisTasks[t.id].revision++;if(phase==='health')a.system.accumulatedDamage.pending=['unresolved'];await assert.rejects(a.prepareAnalysisTaskPressure(t.id,m,opts));assert.equal(evaluations.stress,0);}});
-test('timely historical pressure consequences remain owed after the deadline, but cannot admit a late or missing completion stamp',async()=>{const a=actor(),t=await create(a,{unpressuredConfirmed:false,pressuredConfirmed:true,timeLimitSeconds:2}),m=await pressure(a,t);await a.confirmCheckOutcome(m,{succeeded:false});a.system.activeFeatNames=[];game.time.worldTime=3;await a.prepareAnalysisTaskPressure(t.id,m,opts);await a.applyAnalysisTaskPressureStress(t.id,m,opts);await a.settleAnalysisTask(t.id,m,opts);assert.equal(a.system.analysisTasks[t.id].pressureAttempts.length,1);const b=actor(),u=await create(b,{unpressuredConfirmed:false,pressuredConfirmed:true,timeLimitSeconds:2}),n=await pressure(b,u);await b.confirmCheckOutcome(n,{succeeded:false});b.system.activeFeatNames=[];n.flags.spycraft2.analysisTask.completedAt=2;await assert.rejects(b.prepareAnalysisTaskPressure(u.id,n,opts),/deadline/);assert.equal(evaluations.stress,0);});
-test('an interrupted historical receipt settlement can retain its exact progress through the owning GC review without reinstating an expired feat',async()=>{const a=actor(),t=await create(a),m=await skill(a,t);await a.confirmCheckOutcome(m,{succeeded:true});a.system.activeFeatNames=[];const update=m.update.bind(m);m.update=async p=>{if(p['flags.spycraft2']?.analysisTaskSettlement?.state==='settled')throw Error('Final historical save failed');return update(p);};assert.equal((await a.settleAnalysisTask(t.id,m,opts)).needsReview,true);m.update=update;await a.reviewAnalysisTaskSettlement({keep:true,reason:'The actual successful check preceded source expiry',confirmed:true});assert.equal(a.system.analysisTasks[t.id].completed,1);assert.deepEqual(a.system.activeFeatNames,[]);assert.equal(m.flags.spycraft2.analysisTaskSettlement.state,'settled');});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
 
-test('the actual GC dialog allows source expiry while settling a prior roll but still refuses changed sources for creating a new task',async()=>{const a=actor(),t=await create(a),m=await skill(a,t);await a.confirmCheckOutcome(m,{succeeded:true});const input=foundry.applications.api.DialogV2.input;try{foundry.applications.api.DialogV2.input=async()=>{a.system.activeFeatNames=[];return {action:'settle',taskId:t.id,messageUuid:m.uuid,...opts};};assert.equal((await a.manageAnalysisTasks()).completed,1);const b=actor();foundry.applications.api.DialogV2.input=async()=>{b.system.activeFeatNames=[];return {action:'create',title:'Changed new task',baseChallenges:6,unpressuredConfirmed:true};};await assert.rejects(b.manageAnalysisTasks(),/source.*changed|tasks.*changed/);assert.equal(Object.keys(b.system.analysisTasks??{}).length,0);}finally{foundry.applications.api.DialogV2.input=input;}});
-test('GC pressure actions reject a receipt edited while their dialog was open instead of applying a different consequence',async()=>{const a=actor(),t=await create(a,{unpressuredConfirmed:false,pressuredConfirmed:true}),m=await pressure(a,t);await a.confirmCheckOutcome(m,{succeeded:false});const input=foundry.applications.api.DialogV2.input;try{foundry.applications.api.DialogV2.input=async()=>{m.flags.spycraft2.effectiveTotal++;return {action:'pressureRollStress',taskId:t.id,messageUuid:m.uuid,...opts};};await assert.rejects(a.manageAnalysisTasks(),/receipt changed/);assert.equal(evaluations.stress,0);}finally{foundry.applications.api.DialogV2.input=input;}});
+import { taskPressureState } from "../module/rules/task-pressure.mjs";
+import {
+  analysisTaskReceiptSystem,
+  validateAnalysisTaskReceipt,
+  validateAnalysisTaskRoll
+} from "../module/rules/analysis-tasks.mjs";
+let serial = 0,
+  posts = [],
+  actors = [],
+  natural = 7,
+  stressDie = 4,
+  evaluations = { d20: 0, stress: 0 },
+  failPost = "",
+  hook = null;
+function apply(o, p) {
+  for (const [path, value] of Object.entries(p)) {
+    const keys = path.split(".");
+    let target = o;
+    for (const key of keys.slice(0, -1)) target = target[key] ??= {};
+    const last = keys.at(-1);
+    if (last.startsWith("-=")) delete target[last.slice(2)];
+    else target[last] = structuredClone(value);
+  }
+}
+const state = () => ({
+  activeFeatNames: ["Forensic Genius"],
+  activeFeatSelections: [],
+  resourceUses: {},
+  usagePeriods: { scene: "s", session: "t", mission: "m" },
+  actionDice: { value: 0, max: 3, die: 4 },
+  abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 14, mod: 2 }])),
+  skillTotals: Object.fromEntries(
+    Object.values(cfg.skills).map(s => [
+      s.key,
+      {
+        name: s.name,
+        ranks: s.key === "analysis" ? 6 : 0,
+        cap: 30,
+        threat: 20,
+        bonusEntries: [],
+        totals: s.abilities.map(ability => ({ ability, total: 7 }))
+      }
+    ])
+  ),
+  analysisTasks: {},
+  accumulatedDamage: { version: 1, revision: 1, stress: 0, subdual: 0, pending: [] },
+  survivalStats: { resistances: {}, resistanceSources: [], noFear: null },
+  stressThreshold: 14,
+  subdualThreshold: 14,
+  saves: { will: { total: 2 }, fort: { total: 2 }, ref: { total: 2 } }
+});
+globalThis.Actor = class {
+  constructor() {
+    this.uuid = "Actor.pressure" + ++serial;
+    this.name = "Pressure fixture";
+    this.type = "agent";
+    this.isOwner = true;
+    this.flags = {};
+    this.items = new Map();
+    this.items.filter = fn => [...this.items.values()].filter(fn);
+    this.items.find = fn => [...this.items.values()].find(fn);
+    this.extraUses = [];
+    this.system = state();
+  }
+  async update(p) {
+    apply(this, p);
+    this.system.limitedUses = [...limitedUseAbilities(this.system, [], cfg), ...this.extraUses];
+    return this;
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { id: "gm", isGM: true },
+  settings: { get: () => ({ scene: "s", session: "t", mission: "m" }) },
+  time: { worldTime: 0 },
+  i18n: { localize: String, format: String },
+  messages: {
+    get contents() {
+      return posts;
+    },
+    [Symbol.iterator]() {
+      return posts[Symbol.iterator]();
+    }
+  },
+  actors: {
+    get contents() {
+      return actors;
+    },
+    get: id => actors.find(a => a.id === id),
+    [Symbol.iterator]() {
+      return actors[Symbol.iterator]();
+    }
+  },
+  combats: []
+};
+globalThis.foundry = {
+  utils: { randomID: () => String(++serial), escapeHTML: String },
+  applications: { api: { DialogV2: { input: async () => null } } }
+};
+globalThis.ui = { notifications: { warn: message => ({ native: true, message }) } };
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.fromUuid = async uuid => posts.find(m => m.uuid === uuid) ?? actors.find(a => a.uuid === uuid) ?? null;
+globalThis.Roll = class {
+  constructor(formula, data = {}) {
+    this.formula = formula;
+    const stress = formula.replace(/\s/g, "") === "1d6",
+      fixed = /^(10|20)\b/.test(formula);
+    this.total = (stress ? stressDie : fixed ? parseInt(formula) : natural) + (data.total ?? 0);
+    this.dice = fixed
+      ? []
+      : [
+          {
+            number: 1,
+            faces: stress ? 6 : 20,
+            total: stress ? stressDie : natural,
+            results: [{ result: stress ? stressDie : natural, active: true }]
+          }
+        ];
+    this._evaluated = false;
+  }
+  async evaluate() {
+    this._evaluated = true;
+    evaluations[this.formula.replace(/\s/g, "") === "1d6" ? "stress" : "d20"]++;
+    await hook?.("evaluate", this);
+    return this;
+  }
+  toJSON() {
+    return { formula: this.formula, total: this.total, dice: structuredClone(this.dice), _evaluated: this._evaluated };
+  }
+  static fromJSON(json) {
+    const data = JSON.parse(json),
+      r = new Roll(data.formula);
+    Object.assign(r, data);
+    return r;
+  }
+  async toMessage(data) {
+    await hook?.("post", this, data);
+    if (failPost === "before") throw Error("post failed");
+    const m = {
+      ...data,
+      id: "r" + ++serial,
+      uuid: "ChatMessage.r" + serial,
+      rolls: [this],
+      async update(p) {
+        apply(this, p);
+        return this;
+      }
+    };
+    posts.push(m);
+    if (failPost === "committed") throw Error("post committed then rejected");
+    return m;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+function actor() {
+  posts = [];
+  actors = [];
+  natural = 7;
+  stressDie = 4;
+  evaluations = { d20: 0, stress: 0 };
+  failPost = "";
+  hook = null;
+  game.time.worldTime = 0;
+  game.spycraft2 = {};
+  game.user.isGM = true;
+  const a = new SpycraftActor();
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  actors.push(a);
+  return a;
+}
+const opts = { sourceEffectsResolved: true, errorActivationDeclinedConfirmed: true },
+  create = (a, patch = {}) =>
+    a.createAnalysisTask({
+      title: "Historical source timing",
+      baseChallenges: 6,
+      unpressuredConfirmed: true,
+      ...patch
+    }),
+  skill = (a, t) =>
+    a.rollSkill("analysis", null, {
+      check: t.forensicsOnly ? "forensics" : "appraise",
+      analysisTaskId: t.id,
+      gearStatus: "available"
+    }),
+  pressure = (a, t) =>
+    a.rollSkill("resolve", "con", {
+      check: "task-pressure",
+      analysisTaskId: t.id,
+      taskChallengeDC: 50,
+      taskChallengeDCConfirmed: true
+    });
+test("the frozen task source projection preserves other character state and never grants or removes an actual feat", () => {
+  const a = actor();
+  a.system.activeFeatNames = ["Tracking Mastery", "Unfair Advantage"];
+  const before = structuredClone(a.system),
+    t = { forensicGenius: true, forensicsOnly: true, trackingMastery: false },
+    historical = analysisTaskReceiptSystem(a.system, t);
+  assert.deepEqual(historical.activeFeatNames, ["Unfair Advantage", "Forensic Genius"]);
+  assert.deepEqual(a.system, before);
+  assert.equal(historical.analysisTasks, a.system.analysisTasks);
+  assert.equal(historical.resourceUses, a.system.resourceUses);
+});
+test("ordinary completed receipts settle their original counts after source loss or gain without admitting a new check under a changed source", async () => {
+  for (const original of [[], ["Forensic Genius"], ["Tracking Mastery"], ["Forensic Genius", "Tracking Mastery"]]) {
+    const a = actor();
+    a.system.activeFeatNames = original;
+    const t = await create(a, { forensicsOnlyConfirmed: true }),
+      m = await skill(a, t);
+    await a.confirmCheckOutcome(m, { succeeded: true });
+    a.system.activeFeatNames = original.length ? [] : ["Forensic Genius", "Tracking Mastery"];
+    const now = structuredClone(a.system.activeFeatNames),
+      result = await a.settleAnalysisTask(t.id, m, opts);
+    assert.equal(result.completed, 1);
+    assert.equal(result.requiredChallenges, t.requiredChallenges);
+    assert.deepEqual(a.system.activeFeatNames, now);
+    const before = posts.length;
+    await skill(a, t);
+    assert.equal(posts.length, before);
+    await assert.rejects(a.settleAnalysisTask(t.id, m, opts));
+  }
+});
+test("live roll admission remains strict while historical receipt validation accepts its own frozen eligibility and still rejects scope or counter drift", async () => {
+  const a = actor(),
+    t = await create(a),
+    m = await skill(a, t),
+    c = m.flags.spycraft2;
+  a.system.activeFeatNames = [];
+  assert.throws(
+    () =>
+      validateAnalysisTaskRoll(a.system, c.analysisTask, {
+        now: 0,
+        checkKind: "skill",
+        skillKey: "analysis",
+        checkId: c.checkId
+      }),
+    /eligibility/
+  );
+  validateAnalysisTaskReceipt(a.system, c.analysisTask, {
+    now: 0,
+    checkKind: "skill",
+    skillKey: "analysis",
+    checkId: c.checkId
+  });
+  const changed = structuredClone(c.analysisTask);
+  changed.requiredChallenges++;
+  assert.throws(
+    () =>
+      validateAnalysisTaskReceipt(a.system, changed, {
+        now: 0,
+        checkKind: "skill",
+        skillKey: "analysis",
+        checkId: c.checkId
+      }),
+    /changed/
+  );
+});
+test("failed pressure recorded before source expiry still freezes and applies its owed stress once and makes no Challenge progress", async () => {
+  for (const forensicsOnlyConfirmed of [false, true]) {
+    const a = actor();
+    a.system.activeFeatNames = ["Forensic Genius", ...(forensicsOnlyConfirmed ? ["Tracking Mastery"] : [])];
+    const t = await create(a, { unpressuredConfirmed: false, pressuredConfirmed: true, forensicsOnlyConfirmed }),
+      m = await pressure(a, t);
+    await a.confirmCheckOutcome(m, { succeeded: false });
+    a.system.activeFeatNames = [];
+    await a.prepareAnalysisTaskPressure(t.id, m, opts);
+    const hit = await a.applyAnalysisTaskPressureStress(t.id, m, opts),
+      result = await a.settleAnalysisTask(t.id, m, opts);
+    assert.equal(hit.newDamage, 4);
+    assert.equal(a.system.accumulatedDamage.stress, 4);
+    assert.equal(result.completed, 0);
+    assert.equal(result.pressureAttempts.length, 1);
+    assert.equal(result.requiredChallenges, t.requiredChallenges);
+    assert.deepEqual(a.system.activeFeatNames, []);
+    const before = posts.length;
+    await pressure(a, t);
+    assert.equal(posts.length, before);
+    assert.equal((await a.applyAnalysisTaskPressureStress(t.id, m, opts)).id, hit.id);
+    assert.equal(evaluations.stress, 1);
+  }
+});
+test("an actual activated pressure critical failure retains its extra error consequence after source loss, including full resistance and original payment", async () => {
+  for (const resistance of [0, "all"]) {
+    const a = actor();
+    a.system.survivalStats.resistances.stress = resistance;
+    const t = await create(a, { unpressuredConfirmed: false, pressuredConfirmed: true });
+    natural = 1;
+    const m = await pressure(a, t);
+    await a.confirmCheckOutcome(m, { succeeded: false });
+    const b = new SpycraftActor();
+    b.system.actionDice.value = 1;
+    actors.push(b);
+    await a.activateCritical(m, {
+      kind: "failure",
+      payer: b,
+      baseCost: 1,
+      effect: "Pressure critical failure",
+      effectConfirmed: true,
+      opponent: true,
+      lineOfSight: true
+    });
+    a.system.activeFeatNames = [];
+    await a.prepareAnalysisTaskPressure(t.id, m, opts);
+    await a.applyAnalysisTaskPressureStress(t.id, m, opts);
+    await a.settleAnalysisTask(t.id, m, opts);
+    assert.equal(taskPressureState(a.system.analysisTasks[t.id]).errorIncrease, 1);
+    assert.equal(a.system.accumulatedDamage.stress, resistance === "all" ? 0 : 4);
+    assert.equal(b.system.actionDice.value, 0);
+    assert.equal(m.flags.spycraft2.criticalActivation.cost, 1);
+  }
+});
+test("historical receipt handling still requires the current reserved attempt, task revision and completed mandatory Health save", async () => {
+  for (const phase of ["counter", "history", "health"]) {
+    const a = actor(),
+      t = await create(a, { unpressuredConfirmed: false, pressuredConfirmed: true }),
+      m = await pressure(a, t);
+    await a.confirmCheckOutcome(m, { succeeded: false });
+    a.system.activeFeatNames = [];
+    if (phase === "counter") a.system.resourceUses[m.flags.spycraft2.analysisTask.pressureUseId].used = 0;
+    if (phase === "history") a.system.analysisTasks[t.id].revision++;
+    if (phase === "health") a.system.accumulatedDamage.pending = ["unresolved"];
+    await assert.rejects(a.prepareAnalysisTaskPressure(t.id, m, opts));
+    assert.equal(evaluations.stress, 0);
+  }
+});
+test("timely historical pressure consequences remain owed after the deadline, but cannot admit a late or missing completion stamp", async () => {
+  const a = actor(),
+    t = await create(a, { unpressuredConfirmed: false, pressuredConfirmed: true, timeLimitSeconds: 2 }),
+    m = await pressure(a, t);
+  await a.confirmCheckOutcome(m, { succeeded: false });
+  a.system.activeFeatNames = [];
+  game.time.worldTime = 3;
+  await a.prepareAnalysisTaskPressure(t.id, m, opts);
+  await a.applyAnalysisTaskPressureStress(t.id, m, opts);
+  await a.settleAnalysisTask(t.id, m, opts);
+  assert.equal(a.system.analysisTasks[t.id].pressureAttempts.length, 1);
+  const b = actor(),
+    u = await create(b, { unpressuredConfirmed: false, pressuredConfirmed: true, timeLimitSeconds: 2 }),
+    n = await pressure(b, u);
+  await b.confirmCheckOutcome(n, { succeeded: false });
+  b.system.activeFeatNames = [];
+  n.flags.spycraft2.analysisTask.completedAt = 2;
+  await assert.rejects(b.prepareAnalysisTaskPressure(u.id, n, opts), /deadline/);
+  assert.equal(evaluations.stress, 0);
+});
+test("an interrupted historical receipt settlement can retain its exact progress through the owning GC review without reinstating an expired feat", async () => {
+  const a = actor(),
+    t = await create(a),
+    m = await skill(a, t);
+  await a.confirmCheckOutcome(m, { succeeded: true });
+  a.system.activeFeatNames = [];
+  const update = m.update.bind(m);
+  m.update = async p => {
+    if (p["flags.spycraft2"]?.analysisTaskSettlement?.state === "settled") throw Error("Final historical save failed");
+    return update(p);
+  };
+  assert.equal((await a.settleAnalysisTask(t.id, m, opts)).needsReview, true);
+  m.update = update;
+  await a.reviewAnalysisTaskSettlement({
+    keep: true,
+    reason: "The actual successful check preceded source expiry",
+    confirmed: true
+  });
+  assert.equal(a.system.analysisTasks[t.id].completed, 1);
+  assert.deepEqual(a.system.activeFeatNames, []);
+  assert.equal(m.flags.spycraft2.analysisTaskSettlement.state, "settled");
+});
+
+test("the actual GC dialog allows source expiry while settling a prior roll but still refuses changed sources for creating a new task", async () => {
+  const a = actor(),
+    t = await create(a),
+    m = await skill(a, t);
+  await a.confirmCheckOutcome(m, { succeeded: true });
+  const input = foundry.applications.api.DialogV2.input;
+  try {
+    foundry.applications.api.DialogV2.input = async () => {
+      a.system.activeFeatNames = [];
+      return { action: "settle", taskId: t.id, messageUuid: m.uuid, ...opts };
+    };
+    assert.equal((await a.manageAnalysisTasks()).completed, 1);
+    const b = actor();
+    foundry.applications.api.DialogV2.input = async () => {
+      b.system.activeFeatNames = [];
+      return { action: "create", title: "Changed new task", baseChallenges: 6, unpressuredConfirmed: true };
+    };
+    await assert.rejects(b.manageAnalysisTasks(), /source.*changed|tasks.*changed/);
+    assert.equal(Object.keys(b.system.analysisTasks ?? {}).length, 0);
+  } finally {
+    foundry.applications.api.DialogV2.input = input;
+  }
+});
+test("GC pressure actions reject a receipt edited while their dialog was open instead of applying a different consequence", async () => {
+  const a = actor(),
+    t = await create(a, { unpressuredConfirmed: false, pressuredConfirmed: true }),
+    m = await pressure(a, t);
+  await a.confirmCheckOutcome(m, { succeeded: false });
+  const input = foundry.applications.api.DialogV2.input;
+  try {
+    foundry.applications.api.DialogV2.input = async () => {
+      m.flags.spycraft2.effectiveTotal++;
+      return { action: "pressureRollStress", taskId: t.id, messageUuid: m.uuid, ...opts };
+    };
+    await assert.rejects(a.manageAnalysisTasks(), /receipt changed/);
+    assert.equal(evaluations.stress, 0);
+  } finally {
+    foundry.applications.api.DialogV2.input = input;
+  }
+});

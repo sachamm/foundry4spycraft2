@@ -1,27 +1,414 @@
-import {prep} from './fixtures/feint.mjs';
-import test from 'node:test';import assert from 'node:assert/strict';import {actor,controls,input} from './fixtures/striking-stance.mjs';
-import {takeStrikingAttack as take,reviewStrikingAttack as review,strikingRows,validateStrikingAttackProof as validate} from '../module/apps/striking-stance.mjs';
-import {combatStanceDeclaration} from '../module/rules/combat-stance.mjs';import {strikingTriggerPlan} from '../module/rules/striking-stance.mjs';import {rollEvidence} from '../module/rules/outcomes.mjs';
-test('actual earned Striking reaction rolls one melee Standard Attack off own Count, with its real target and both round counters',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2,p=c.finalAttack;assert.equal(c.checkKind,'attack');assert.equal(c.attackContext.ranged,false);assert.equal(c.attackContext.targetActorUuid,'Actor.target');assert.equal(p.source,'striking');assert.equal(p.trigger.combat.turn,1);assert.equal(p.trigger.combat.ownTurnIndex,0);assert.equal(p.trigger.activeCombatantId,'active-opponent');assert.equal(a.system.resourceUses.strikingStance.used,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.actionDice.value,0);assert.equal(strikingRows(a)[0].state,'posted');assert.equal(strikingRows(a)[0].messageUuid,m.uuid);assert.equal(game.messages.length,1);});
-test('missing entry/stance/timing/movement/legal confirmations, wrong target, inactive stance and ranged weapon reject before RNG',async()=>{for(const patch of [{entryConfirmed:false},{alreadyInStanceConfirmed:false},{immediateConfirmed:false},{roundMovementConfirmed:false},{attackLegalConfirmed:false},{opponentUuid:'Actor.missing'},{targetActorUuid:'Actor.other'}]){const a=actor();let draws=0;controls.draw=async()=>draws++;await assert.rejects(take(a,input(patch)));assert.equal(draws,0);assert.equal(strikingRows(a).length,0);assert.equal(game.messages.length,0);}for(const change of [a=>a.system.combatStance=null,a=>a.system.activeFeatNames=[],a=>a.system.stanceRoundMovement.feet=6,a=>{a.items[0].system.proficiency='rifle';a.items[0].system.range=100;}]){const a=actor();change(a);await assert.rejects(take(a,input()));assert.equal(game.messages.length,0);}});
-test('one use persists through a miss, stance exit/re-entry and additional source attempts; read-only source retry returns the original result',async()=>{const a=actor(),m=await take(a,input());Object.assign(m.flags.spycraft2,{resolved:true,successConfirmed:false});const id=m.flags.spycraft2.finalAttack.id;assert.equal(await take(a,input()),null);a.system.combatStance=null;assert.equal((await take(a,{reactionId:id})).uuid,m.uuid);a.system.combatStance={version:1,key:'striking',id:'newStance',enteredAt:0};assert.equal(await take(a,input()),null);assert.equal(game.messages.length,1);assert.equal(a.system.resourceUses.strikingStance.used,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);});
+import { prep } from "./fixtures/feint.mjs";
+import test from "node:test";
+import assert from "node:assert/strict";
+import { actor, controls, input } from "./fixtures/striking-stance.mjs";
+import {
+  takeStrikingAttack as take,
+  reviewStrikingAttack as review,
+  strikingRows
+} from "../module/apps/striking-stance.mjs";
+import { combatStanceDeclaration } from "../module/rules/combat-stance.mjs";
+import { strikingTriggerPlan } from "../module/rules/striking-stance.mjs";
+import { rollEvidence } from "../module/rules/outcomes.mjs";
+test("actual earned Striking reaction rolls one melee Standard Attack off own Count, with its real target and both round counters", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    p = c.finalAttack;
+  assert.equal(c.checkKind, "attack");
+  assert.equal(c.attackContext.ranged, false);
+  assert.equal(c.attackContext.targetActorUuid, "Actor.target");
+  assert.equal(p.source, "striking");
+  assert.equal(p.trigger.combat.turn, 1);
+  assert.equal(p.trigger.combat.ownTurnIndex, 0);
+  assert.equal(p.trigger.activeCombatantId, "active-opponent");
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(a.system.actionDice.value, 0);
+  assert.equal(strikingRows(a)[0].state, "posted");
+  assert.equal(strikingRows(a)[0].messageUuid, m.uuid);
+  assert.equal(game.messages.length, 1);
+});
+test("missing entry/stance/timing/movement/legal confirmations, wrong target, inactive stance and ranged weapon reject before RNG", async () => {
+  for (const patch of [
+    { entryConfirmed: false },
+    { alreadyInStanceConfirmed: false },
+    { immediateConfirmed: false },
+    { roundMovementConfirmed: false },
+    { attackLegalConfirmed: false },
+    { opponentUuid: "Actor.missing" },
+    { targetActorUuid: "Actor.other" }
+  ]) {
+    const a = actor();
+    let draws = 0;
+    controls.draw = async () => draws++;
+    await assert.rejects(take(a, input(patch)));
+    assert.equal(draws, 0);
+    assert.equal(strikingRows(a).length, 0);
+    assert.equal(game.messages.length, 0);
+  }
+  for (const change of [
+    a => (a.system.combatStance = null),
+    a => (a.system.activeFeatNames = []),
+    a => (a.system.stanceRoundMovement.feet = 6),
+    a => {
+      a.items[0].system.proficiency = "rifle";
+      a.items[0].system.range = 100;
+    }
+  ]) {
+    const a = actor();
+    change(a);
+    await assert.rejects(take(a, input()));
+    assert.equal(game.messages.length, 0);
+  }
+});
+test("one use persists through a miss, stance exit/re-entry and additional source attempts; read-only source retry returns the original result", async () => {
+  const a = actor(),
+    m = await take(a, input());
+  Object.assign(m.flags.spycraft2, { resolved: true, successConfirmed: false });
+  const id = m.flags.spycraft2.finalAttack.id;
+  assert.equal(await take(a, input()), null);
+  a.system.combatStance = null;
+  assert.equal((await take(a, { reactionId: id })).uuid, m.uuid);
+  a.system.combatStance = { version: 1, key: "striking", id: "newStance", enteredAt: 0 };
+  assert.equal(await take(a, input()), null);
+  assert.equal(game.messages.length, 1);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+});
 
-test('Striking stance entry uses the shared5ft cap including earlier movement and does not require a held polearm; a different actual melee weapon can react',async()=>{const a=actor();const own={...a.mentalLeapCombatContext(),turn:0};assert.equal(combatStanceDeclaration({...a.system,readiedMeleeWeapons:[]},'striking',{combat:own,halfActionConfirmed:true,legalConfirmed:true}).key,'striking');a.system.stanceRoundMovement.feet=5;assert.equal(strikingTriggerPlan(a.system,a.mentalLeapCombatContext(),{...input(),activeCombatantId:'active-opponent'}).movementAtTrigger.feet,5);Object.assign(a.items[0].system,{proficiency:'exoticBlunt',meleeFamily:'flail',sizeHands:'T/1h',useHands:1});a.system.proficiencyTotals.exoticBlunt={proficient:true};a.system=prep(a.system,a.items);assert.equal(a.system.readiedMeleeWeapons.some(w=>w.family==='polearm'),false);const m=await take(a,input());assert.equal(m.flags.spycraft2.attackContext.ranged,false);assert.equal(m.flags.spycraft2.finalAttack.trigger.stance.key,'striking');});
-test('the shared Nauseated allowance rejects Striking after another final attack and a legitimate known initial0 permits only its one final attack',async()=>{let a=actor();a.system.conditionContext.nauseated=true;a.system.resourceUses.finalAttackRound={epoch:a.usagePeriods.round,used:1};a.refreshLimited();assert.equal(await take(a,input()),null);assert.equal(game.messages.length,0);assert.equal(strikingRows(a).length,0);assert.equal(a.system.resourceUses.strikingStance,undefined);a=actor();a.system.conditionContext.nauseated=true;a.system.resourceUses.finalAttackRound={epoch:a.usagePeriods.round,used:0};a.refreshLimited();await take(a,input());assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.resourceUses.strikingStance.used,1);assert.equal(await take(a,input()),null);assert.equal(game.messages.length,1);});
-test('copied public final metadata, changed prepared data or target cannot create a raw new roll without the private source lease',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2,n=game.messages.length;let draws=0;controls.draw=async()=>draws++;assert.equal(Object.hasOwn(c,'strikingLease'),false);await assert.rejects(a.rollCheck(c.formula,c.rollData,{...c}),/control|copied/);await assert.rejects(a.rollCheck(c.formula,{...c.rollData,total:c.rollData.total+1},{...c}),/original prepared/);await assert.rejects(a.rollCheck(c.formula,c.rollData,{...c,attackContext:{...c.attackContext,targetActorUuid:'Actor.other'}}),/actual weapon|opponent/);assert.equal(draws,0);assert.equal(game.messages.length,n);});
-test('live stance, actual weapon, opponent identity, acting statistics, movement or active-participant changes reject unpublished rolls',async()=>{for(const change of [a=>a.system.combatStance=null,a=>a.system.combatStance.id='reentered',a=>a.items[0].system.equipped=false,a=>a.system.abilities.str.mod++,a=>a.system.stanceRoundMovement.feet=5,a=>a.participatingCombat.turn=0,a=>game.actors.splice(1,1),a=>{game.actors[1]={...game.actors[1],_stats:{createdTime:3}};}]){const a=actor();controls.draw=async()=>change(a);await assert.rejects(take(a,input()),/changed|Striking|actual|owned/,String(change));assert.equal(game.messages.length,0);assert.ok(strikingRows(a).every(r=>r.state==='closed'));}});
-test('same active participant survives legitimate Count reordering, preserves original indices and can finish a declared Fend within the5ft cap',async()=>{const a=actor();controls.draw=async()=>{a.participatingCombat.turns.reverse();a.participatingCombat.turn=0;a.clock.ownTurnIndex=1;};const m=await take(a,input({meleeTrick:'fend',meleeTrickOnlyConfirmed:true})),p=m.flags.spycraft2.finalAttack;assert.equal(p.trigger.combat.turn,1);assert.equal(p.trigger.combat.ownTurnIndex,0);assert.equal(a.mentalLeapCombatContext().turn,0);assert.equal(a.mentalLeapCombatContext().ownTurnIndex,1);Object.assign(m.flags.spycraft2,{resolved:true,successConfirmed:false});globalThis.ChatMessage.create=async data=>{const m={id:'movement',uuid:'ChatMessage.movement',...data};game.messages.push(m);return m;};const {recordFendMovement}=await import('../module/apps/fend.mjs');await recordFendMovement(a,{sourceMessage:m.uuid,totalFeet:5,immediateConfirmed:true,routeConfirmed:true,movementCompleted:true});assert.equal(a.system.stanceRoundMovement.feet,5);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.resourceUses.strikingStance.used,1);});
-test('concurrent controls reserve only one actual reaction and cancellation or an unpublished error cannot publish another attack',async()=>{let a=actor(),results=await Promise.allSettled([take(a,input()),take(a,input())]);assert.equal(results.filter(r=>r.status==='fulfilled'&&r.value).length,1);assert.equal(game.messages.length,1);assert.equal(a.system.resourceUses.strikingStance.used,1);a=actor();assert.equal(await take(a),null);assert.equal(strikingRows(a).length,0);controls.mode='before';await assert.rejects(take(a,input()),/posting failed/);assert.equal(game.messages.length,0);assert.ok(strikingRows(a).every(r=>r.state==='closed'));});
-test('posted response loss keeps the actual attack and both spent counters; interrupted source stamping is attached by GC without another roll',async()=>{let a=actor();controls.mode='after';const m=await take(a,input());assert.equal(game.messages.length,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(strikingRows(a)[0].messageUuid,m.uuid);a=actor();const update=a.update;a.update=async p=>{if(p['flags.spycraft2.strikingReactions']?.some(r=>r.state==='posted'))throw Error('stamp failed');return update(p);};const posted=await take(a,input()),row=strikingRows(a)[0];assert.equal(row.state,'reserved');a.update=update;const n=game.messages.length;controls.draw=async()=>{throw Error('Unexpected review RNG');};const r=await review(a,{reactionId:row.id,confirmed:true});assert.equal(r.messageUuid,posted.uuid);assert.equal(game.messages.length,n);assert.equal(a.system.resourceUses.strikingStance.used,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);});
-test('GC reattaches an existing original result after weapon deletion without granting a new-roll ownership waiver',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2,row=strikingRows(a)[0];a.items.splice(0,1);const r=await review(a,{reactionId:row.id,confirmed:true});assert.equal(r.messageUuid,m.uuid);await assert.rejects(a.rollCheck(c.formula,c.rollData,{...c,rerollOf:m.uuid}),/owned|weapon/);assert.equal(game.messages.length,1);});
-test('owned unresolved original replacements retain temporal source after stance exit and only an adopted replacement becomes the current spent reaction',async()=>{const a=actor(),m=await take(a,input()),c=m.flags.spycraft2;a.system.combatStance=null;const r=await a.rollCheck(c.formula,c.rollData,{...c,rerollOf:m.uuid});await assert.rejects(a.rollCheck(r.flags.spycraft2.formula,r.flags.spycraft2.rollData,{...r.flags.spycraft2,rerollOf:r.uuid}),/adopted/);Object.assign(c,{resolved:true,superseded:r.uuid});assert.equal((await take(a,{reactionId:c.finalAttack.id})).uuid,r.uuid);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(a.system.resourceUses.strikingStance.used,1);});
-test('missing-result GC closure preserves current resource history, authorizes no new attack and cannot be used as a source retry',async()=>{const a=actor(),m=await take(a,input()),row=strikingRows(a)[0];game.messages.splice(0,1);row.state='reserved';row.messageUuid=null;const before=structuredClone(a.system.resourceUses);await assert.rejects(review(a,{reactionId:row.id,confirmed:true}),/No unique posted/);const closed=await review(a,{reactionId:row.id,confirmed:true,closeUnused:true});assert.equal(closed.state,'closed');assert.deepEqual(a.system.resourceUses,before);await assert.rejects(take(a,{reactionId:row.id}),/reserved|review/);assert.equal(await take(a,input()),null);assert.equal(game.messages.length,0);});
-test('source identity and frozen attack modifiers are immutable evidence; duplicate roots, altered posted proof and damaged saved records require review',async()=>{let a=actor(),m=await take(a,input()),c=m.flags.spycraft2,e=rollEvidence(c);assert.notEqual(rollEvidence({...c,finalAttack:{...c.finalAttack,opponentUuid:'Actor.other'}}),e);const clone={id:'duplicate',uuid:'ChatMessage.duplicate',flags:JSON.parse(JSON.stringify(m.flags))};game.messages.push(clone);await assert.rejects(review(a,{reactionId:c.finalAttack.id,confirmed:true}),/unique original/);a=actor();m=await take(a,input());m.flags.spycraft2.rollData.total++;await assert.rejects(take(a,{reactionId:m.flags.spycraft2.finalAttack.id}),/modifiers changed/);a=actor();await take(a,input());a.flags.spycraft2.strikingReactions[0].proof.trigger.movementAtTrigger.feet=6;assert.throws(()=>strikingRows(a),/Review/);});
-test('a natural new combat round permits its own new reaction without resetting the old source history or restoring a spent old reaction',async()=>{const a=actor(),first=await take(a,input());a.participatingCombat.round++;const second=await take(a,input());assert.notEqual(first.uuid,second.uuid);assert.equal(strikingRows(a).length,2);assert.notEqual(first.flags.spycraft2.finalAttack.strikingUse.epoch,second.flags.spycraft2.finalAttack.strikingUse.epoch);assert.equal((await take(a,{reactionId:first.flags.spycraft2.finalAttack.id})).uuid,first.uuid);assert.equal(a.system.resourceUses.strikingStance.used,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);});
+test("Striking stance entry uses the shared5ft cap including earlier movement and does not require a held polearm; a different actual melee weapon can react", async () => {
+  const a = actor();
+  const own = { ...a.mentalLeapCombatContext(), turn: 0 };
+  assert.equal(
+    combatStanceDeclaration({ ...a.system, readiedMeleeWeapons: [] }, "striking", {
+      combat: own,
+      halfActionConfirmed: true,
+      legalConfirmed: true
+    }).key,
+    "striking"
+  );
+  a.system.stanceRoundMovement.feet = 5;
+  assert.equal(
+    strikingTriggerPlan(a.system, a.mentalLeapCombatContext(), { ...input(), activeCombatantId: "active-opponent" })
+      .movementAtTrigger.feet,
+    5
+  );
+  Object.assign(a.items[0].system, {
+    proficiency: "exoticBlunt",
+    meleeFamily: "flail",
+    sizeHands: "T/1h",
+    useHands: 1
+  });
+  a.system.proficiencyTotals.exoticBlunt = { proficient: true };
+  a.system = prep(a.system, a.items);
+  assert.equal(
+    a.system.readiedMeleeWeapons.some(w => w.family === "polearm"),
+    false
+  );
+  const m = await take(a, input());
+  assert.equal(m.flags.spycraft2.attackContext.ranged, false);
+  assert.equal(m.flags.spycraft2.finalAttack.trigger.stance.key, "striking");
+});
+test("the shared Nauseated allowance rejects Striking after another final attack and a legitimate known initial0 permits only its one final attack", async () => {
+  let a = actor();
+  a.system.conditionContext.nauseated = true;
+  a.system.resourceUses.finalAttackRound = { epoch: a.usagePeriods.round, used: 1 };
+  a.refreshLimited();
+  assert.equal(await take(a, input()), null);
+  assert.equal(game.messages.length, 0);
+  assert.equal(strikingRows(a).length, 0);
+  assert.equal(a.system.resourceUses.strikingStance, undefined);
+  a = actor();
+  a.system.conditionContext.nauseated = true;
+  a.system.resourceUses.finalAttackRound = { epoch: a.usagePeriods.round, used: 0 };
+  a.refreshLimited();
+  await take(a, input());
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  assert.equal(await take(a, input()), null);
+  assert.equal(game.messages.length, 1);
+});
+test("copied public final metadata, changed prepared data or target cannot create a raw new roll without the private source lease", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    n = game.messages.length;
+  let draws = 0;
+  controls.draw = async () => draws++;
+  assert.equal(Object.hasOwn(c, "strikingLease"), false);
+  await assert.rejects(a.rollCheck(c.formula, c.rollData, { ...c }), /control|copied/);
+  await assert.rejects(
+    a.rollCheck(c.formula, { ...c.rollData, total: c.rollData.total + 1 }, { ...c }),
+    /original prepared/
+  );
+  await assert.rejects(
+    a.rollCheck(c.formula, c.rollData, { ...c, attackContext: { ...c.attackContext, targetActorUuid: "Actor.other" } }),
+    /actual weapon|opponent/
+  );
+  assert.equal(draws, 0);
+  assert.equal(game.messages.length, n);
+});
+test("live stance, actual weapon, opponent identity, acting statistics, movement or active-participant changes reject unpublished rolls", async () => {
+  for (const change of [
+    a => (a.system.combatStance = null),
+    a => (a.system.combatStance.id = "reentered"),
+    a => (a.items[0].system.equipped = false),
+    a => a.system.abilities.str.mod++,
+    a => (a.system.stanceRoundMovement.feet = 5),
+    a => (a.participatingCombat.turn = 0),
+    a => game.actors.splice(1, 1),
+    a => {
+      game.actors[1] = { ...game.actors[1], _stats: { createdTime: 3 } };
+    }
+  ]) {
+    const a = actor();
+    controls.draw = async () => change(a);
+    await assert.rejects(take(a, input()), /changed|Striking|actual|owned/, String(change));
+    assert.equal(game.messages.length, 0);
+    assert.ok(strikingRows(a).every(r => r.state === "closed"));
+  }
+});
+test("same active participant survives legitimate Count reordering, preserves original indices and can finish a declared Fend within the5ft cap", async () => {
+  const a = actor();
+  controls.draw = async () => {
+    a.participatingCombat.turns.reverse();
+    a.participatingCombat.turn = 0;
+    a.clock.ownTurnIndex = 1;
+  };
+  const m = await take(a, input({ meleeTrick: "fend", meleeTrickOnlyConfirmed: true })),
+    p = m.flags.spycraft2.finalAttack;
+  assert.equal(p.trigger.combat.turn, 1);
+  assert.equal(p.trigger.combat.ownTurnIndex, 0);
+  assert.equal(a.mentalLeapCombatContext().turn, 0);
+  assert.equal(a.mentalLeapCombatContext().ownTurnIndex, 1);
+  Object.assign(m.flags.spycraft2, { resolved: true, successConfirmed: false });
+  globalThis.ChatMessage.create = async data => {
+    const m = { id: "movement", uuid: "ChatMessage.movement", ...data };
+    game.messages.push(m);
+    return m;
+  };
+  const { recordFendMovement } = await import("../module/apps/fend.mjs");
+  await recordFendMovement(a, {
+    sourceMessage: m.uuid,
+    totalFeet: 5,
+    immediateConfirmed: true,
+    routeConfirmed: true,
+    movementCompleted: true
+  });
+  assert.equal(a.system.stanceRoundMovement.feet, 5);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+});
+test("concurrent controls reserve only one actual reaction and cancellation or an unpublished error cannot publish another attack", async () => {
+  let a = actor(),
+    results = await Promise.allSettled([take(a, input()), take(a, input())]);
+  assert.equal(results.filter(r => r.status === "fulfilled" && r.value).length, 1);
+  assert.equal(game.messages.length, 1);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  a = actor();
+  assert.equal(await take(a), null);
+  assert.equal(strikingRows(a).length, 0);
+  controls.mode = "before";
+  await assert.rejects(take(a, input()), /posting failed/);
+  assert.equal(game.messages.length, 0);
+  assert.ok(strikingRows(a).every(r => r.state === "closed"));
+});
+test("posted response loss keeps the actual attack and both spent counters; interrupted source stamping is attached by GC without another roll", async () => {
+  let a = actor();
+  controls.mode = "after";
+  const m = await take(a, input());
+  assert.equal(game.messages.length, 1);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(strikingRows(a)[0].messageUuid, m.uuid);
+  a = actor();
+  const update = a.update;
+  a.update = async p => {
+    if (p["flags.spycraft2.strikingReactions"]?.some(r => r.state === "posted")) throw Error("stamp failed");
+    return update(p);
+  };
+  const posted = await take(a, input()),
+    row = strikingRows(a)[0];
+  assert.equal(row.state, "reserved");
+  a.update = update;
+  const n = game.messages.length;
+  controls.draw = async () => {
+    throw Error("Unexpected review RNG");
+  };
+  const r = await review(a, { reactionId: row.id, confirmed: true });
+  assert.equal(r.messageUuid, posted.uuid);
+  assert.equal(game.messages.length, n);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+});
+test("GC reattaches an existing original result after weapon deletion without granting a new-roll ownership waiver", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    row = strikingRows(a)[0];
+  a.items.splice(0, 1);
+  const r = await review(a, { reactionId: row.id, confirmed: true });
+  assert.equal(r.messageUuid, m.uuid);
+  await assert.rejects(a.rollCheck(c.formula, c.rollData, { ...c, rerollOf: m.uuid }), /owned|weapon/);
+  assert.equal(game.messages.length, 1);
+});
+test("owned unresolved original replacements retain temporal source after stance exit and only an adopted replacement becomes the current spent reaction", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2;
+  a.system.combatStance = null;
+  const r = await a.rollCheck(c.formula, c.rollData, { ...c, rerollOf: m.uuid });
+  await assert.rejects(
+    a.rollCheck(r.flags.spycraft2.formula, r.flags.spycraft2.rollData, { ...r.flags.spycraft2, rerollOf: r.uuid }),
+    /adopted/
+  );
+  Object.assign(c, { resolved: true, superseded: r.uuid });
+  assert.equal((await take(a, { reactionId: c.finalAttack.id })).uuid, r.uuid);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+});
+test("missing-result GC closure preserves current resource history, authorizes no new attack and cannot be used as a source retry", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    row = strikingRows(a)[0];
+  game.messages.splice(0, 1);
+  row.state = "reserved";
+  row.messageUuid = null;
+  const before = structuredClone(a.system.resourceUses);
+  await assert.rejects(review(a, { reactionId: row.id, confirmed: true }), /No unique posted/);
+  const closed = await review(a, { reactionId: row.id, confirmed: true, closeUnused: true });
+  assert.equal(closed.state, "closed");
+  assert.deepEqual(a.system.resourceUses, before);
+  await assert.rejects(take(a, { reactionId: row.id }), /reserved|review/);
+  assert.equal(await take(a, input()), null);
+  assert.equal(game.messages.length, 0);
+});
+test("source identity and frozen attack modifiers are immutable evidence; duplicate roots, altered posted proof and damaged saved records require review", async () => {
+  let a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    e = rollEvidence(c);
+  assert.notEqual(rollEvidence({ ...c, finalAttack: { ...c.finalAttack, opponentUuid: "Actor.other" } }), e);
+  const clone = { id: "duplicate", uuid: "ChatMessage.duplicate", flags: JSON.parse(JSON.stringify(m.flags)) };
+  game.messages.push(clone);
+  await assert.rejects(review(a, { reactionId: c.finalAttack.id, confirmed: true }), /unique original/);
+  a = actor();
+  m = await take(a, input());
+  m.flags.spycraft2.rollData.total++;
+  await assert.rejects(take(a, { reactionId: m.flags.spycraft2.finalAttack.id }), /modifiers changed/);
+  a = actor();
+  await take(a, input());
+  a.flags.spycraft2.strikingReactions[0].proof.trigger.movementAtTrigger.feet = 6;
+  assert.throws(() => strikingRows(a), /Review/);
+});
+test("a natural new combat round permits its own new reaction without resetting the old source history or restoring a spent old reaction", async () => {
+  const a = actor(),
+    first = await take(a, input());
+  a.participatingCombat.round++;
+  const second = await take(a, input());
+  assert.notEqual(first.uuid, second.uuid);
+  assert.equal(strikingRows(a).length, 2);
+  assert.notEqual(
+    first.flags.spycraft2.finalAttack.strikingUse.epoch,
+    second.flags.spycraft2.finalAttack.strikingUse.epoch
+  );
+  assert.equal((await take(a, { reactionId: first.flags.spycraft2.finalAttack.id })).uuid, first.uuid);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+});
 
-test('owning-GC review cannot close an active in-flight source, and non-GC review cannot alter its history',async()=>{const a=actor();controls.draw=async()=>{const row=strikingRows(a)[0];await assert.rejects(review(a,{reactionId:row.id,confirmed:true,closeUnused:true}),/still executing/);};const m=await take(a,input());assert.equal(strikingRows(a)[0].state,'posted');game.user.isGM=false;await assert.rejects(review(a,{reactionId:m.flags.spycraft2.finalAttack.id,confirmed:true}),/owning GC/);game.user.isGM=true;assert.equal(game.messages.length,1);assert.equal(a.system.resourceUses.strikingStance.used,1);});
-test('actual reaction dialog distinguishes read-only past reactions and can return one without requiring a new entry or another attack',async()=>{const a=actor(),m=await take(a,input()),id=m.flags.spycraft2.finalAttack.id,old=foundry.applications.api.DialogV2.input;let content='';foundry.applications.api.DialogV2.input=async o=>{content=o.content;return {reactionId:id};};try{const r=await take(a);assert.equal(r.uuid,m.uuid);assert.match(content,/Recorded — review only/);assert.equal(game.messages.length,1);assert.equal(a.system.resourceUses.strikingStance.used,1);}finally{foundry.applications.api.DialogV2.input=old;}});
+test("owning-GC review cannot close an active in-flight source, and non-GC review cannot alter its history", async () => {
+  const a = actor();
+  controls.draw = async () => {
+    const row = strikingRows(a)[0];
+    await assert.rejects(review(a, { reactionId: row.id, confirmed: true, closeUnused: true }), /still executing/);
+  };
+  const m = await take(a, input());
+  assert.equal(strikingRows(a)[0].state, "posted");
+  game.user.isGM = false;
+  await assert.rejects(review(a, { reactionId: m.flags.spycraft2.finalAttack.id, confirmed: true }), /owning GC/);
+  game.user.isGM = true;
+  assert.equal(game.messages.length, 1);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+});
+test("actual reaction dialog distinguishes read-only past reactions and can return one without requiring a new entry or another attack", async () => {
+  const a = actor(),
+    m = await take(a, input()),
+    id = m.flags.spycraft2.finalAttack.id,
+    old = foundry.applications.api.DialogV2.input;
+  let content = "";
+  foundry.applications.api.DialogV2.input = async o => {
+    content = o.content;
+    return { reactionId: id };
+  };
+  try {
+    const r = await take(a);
+    assert.equal(r.uuid, m.uuid);
+    assert.match(content, /Recorded — review only/);
+    assert.equal(game.messages.length, 1);
+    assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  } finally {
+    foundry.applications.api.DialogV2.input = old;
+  }
+});
 
-test('actual stance entry rejects prior movement over5ft, preserves a legal prior5ft, and an earned reaction cannot refund itself when Fend exceeds that cap',async()=>{const {declareCombatStance}=await import('../module/apps/combat-stance.mjs'),{recordFendMovement}=await import('../module/apps/fend.mjs');let a=actor();a.participatingCombat.turn=0;a.system.combatStance=null;a.system.stanceRoundMovement.feet=6;await assert.rejects(declareCombatStance(a,{stance:'striking',halfActionConfirmed:true,legalConfirmed:true,roundMovementFeet:6,roundMovementConfirmed:true}),/no more than 5/);assert.equal(a.system.combatStance,null);assert.equal(a.system.stanceRoundMovement.feet,6);a=actor();a.participatingCombat.turn=0;a.system.combatStance=null;a.system.stanceRoundMovement.feet=5;await declareCombatStance(a,{stance:'striking',halfActionConfirmed:true,legalConfirmed:true,roundMovementFeet:5,roundMovementConfirmed:true});assert.equal(a.system.combatStance.key,'striking');assert.equal(a.system.stanceRoundMovement.feet,5);a.participatingCombat.turn=1;const m=await take(a,input({meleeTrick:'fend',meleeTrickOnlyConfirmed:true}));Object.assign(m.flags.spycraft2,{resolved:true,successConfirmed:false});await assert.rejects(recordFendMovement(a,{sourceMessage:m.uuid,totalFeet:10,immediateConfirmed:true,routeConfirmed:true,movementCompleted:true}),/no more than 5/);assert.equal(a.system.stanceRoundMovement.feet,5);assert.equal(a.system.resourceUses.strikingStance.used,1);assert.equal(a.system.resourceUses.finalAttackRound.used,1);assert.equal(game.messages.length,1);});
+test("actual stance entry rejects prior movement over5ft, preserves a legal prior5ft, and an earned reaction cannot refund itself when Fend exceeds that cap", async () => {
+  const { declareCombatStance } = await import("../module/apps/combat-stance.mjs"),
+    { recordFendMovement } = await import("../module/apps/fend.mjs");
+  let a = actor();
+  a.participatingCombat.turn = 0;
+  a.system.combatStance = null;
+  a.system.stanceRoundMovement.feet = 6;
+  await assert.rejects(
+    declareCombatStance(a, {
+      stance: "striking",
+      halfActionConfirmed: true,
+      legalConfirmed: true,
+      roundMovementFeet: 6,
+      roundMovementConfirmed: true
+    }),
+    /no more than 5/
+  );
+  assert.equal(a.system.combatStance, null);
+  assert.equal(a.system.stanceRoundMovement.feet, 6);
+  a = actor();
+  a.participatingCombat.turn = 0;
+  a.system.combatStance = null;
+  a.system.stanceRoundMovement.feet = 5;
+  await declareCombatStance(a, {
+    stance: "striking",
+    halfActionConfirmed: true,
+    legalConfirmed: true,
+    roundMovementFeet: 5,
+    roundMovementConfirmed: true
+  });
+  assert.equal(a.system.combatStance.key, "striking");
+  assert.equal(a.system.stanceRoundMovement.feet, 5);
+  a.participatingCombat.turn = 1;
+  const m = await take(a, input({ meleeTrick: "fend", meleeTrickOnlyConfirmed: true }));
+  Object.assign(m.flags.spycraft2, { resolved: true, successConfirmed: false });
+  await assert.rejects(
+    recordFendMovement(a, {
+      sourceMessage: m.uuid,
+      totalFeet: 10,
+      immediateConfirmed: true,
+      routeConfirmed: true,
+      movementCompleted: true
+    }),
+    /no more than 5/
+  );
+  assert.equal(a.system.stanceRoundMovement.feet, 5);
+  assert.equal(a.system.resourceUses.strikingStance.used, 1);
+  assert.equal(a.system.resourceUses.finalAttackRound.used, 1);
+  assert.equal(game.messages.length, 1);
+});
 
-test('a truthy warning without a published attack cannot stamp a phantom source or retain unused final-attack counters',async()=>{const a=actor();a.rollAttack=async()=>({warning:'current attack became unavailable'});await assert.rejects(take(a,input()),/did not post/);assert.equal(game.messages.length,0);assert.ok(strikingRows(a).every(r=>r.state==='closed'));assert.equal(a.system.resourceUses.strikingStance?.used??0,0);assert.equal(a.system.resourceUses.finalAttackRound?.used??0,0);});
+test("a truthy warning without a published attack cannot stamp a phantom source or retain unused final-attack counters", async () => {
+  const a = actor();
+  a.rollAttack = async () => ({ warning: "current attack became unavailable" });
+  await assert.rejects(take(a, input()), /did not post/);
+  assert.equal(game.messages.length, 0);
+  assert.ok(strikingRows(a).every(r => r.state === "closed"));
+  assert.equal(a.system.resourceUses.strikingStance?.used ?? 0, 0);
+  assert.equal(a.system.resourceUses.finalAttackRound?.used ?? 0, 0);
+});

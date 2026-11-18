@@ -1,6 +1,6 @@
 import { SKILLS, TABLES, CLASS_FEATURES } from "./rules/tables.mjs";
 
-export const SPYCRAFT = {classFeatures:CLASS_FEATURES};
+export const SPYCRAFT = { classFeatures: CLASS_FEATURES };
 
 SPYCRAFT.abilities = {
   str: "SPYCRAFT.Ability.str",
@@ -85,25 +85,57 @@ SPYCRAFT.calibers = { 0: "—", 1: "I", 2: "II", 3: "III", 4: "IV", 5: "V" };
 
 /** Human-readable labels for bonus targets (used on item sheets). */
 SPYCRAFT.bonusTargets = {
-  "abilities.str": "Strength", "abilities.dex": "Dexterity", "abilities.con": "Constitution",
-  "abilities.int": "Intelligence", "abilities.wis": "Wisdom", "abilities.cha": "Charisma",
-  "baseSave.fort": "Base Fortitude", "baseSave.ref": "Base Reflex", "baseSave.will": "Base Will",
-  "saves.fort": "Fortitude save", "saves.ref": "Reflex save", "saves.will": "Will save",
-  defense: "Defense", defenseArmor: "Defense (while armored)", armorCheck: "Armor check penalty",
-  initiative: "Initiative", speed: "Speed", vitality: "Vitality", wounds: "Wounds", stressDamage: "Stress damage",
-  baseDefense: "Base Defense", stressThreshold: "Stress threshold", subdualThreshold: "Subdual threshold",
-  defensePartialArmor:"Partial armor Defense modifier",
-  naturalDR: "Natural damage reduction", largeSize: "Large Size",
-  knowledge: "Knowledge checks", wealth: "Wealth", lifestyle: "Lifestyle", possessions: "Possessions", spendingCash: "Spending cash",
-  contacts: "Contacts", interests: "Interests", subplots: "Subplots", skillPoints: "Skill points / level",
-  discountedSkillRanks:"Cross-class ranks purchased at one point each",untrainedSkillCap:"Untrained result-cap increase",
-  classSkillPicks: "Extra class skills", "actionDice.count": "Action dice", "actionDice.bonus": "Action die bonus",
-  "focus.cultures": "Cultures focuses", "focus.drive": "Drive focuses", "focus.profession": "Profession focuses",
-  "focus.science": "Science focuses", "focus.generic": "Generic focuses", "prof.generic": "Weapon proficiencies",
+  "abilities.str": "Strength",
+  "abilities.dex": "Dexterity",
+  "abilities.con": "Constitution",
+  "abilities.int": "Intelligence",
+  "abilities.wis": "Wisdom",
+  "abilities.cha": "Charisma",
+  "baseSave.fort": "Base Fortitude",
+  "baseSave.ref": "Base Reflex",
+  "baseSave.will": "Base Will",
+  "saves.fort": "Fortitude save",
+  "saves.ref": "Reflex save",
+  "saves.will": "Will save",
+  defense: "Defense",
+  defenseArmor: "Defense (while armored)",
+  armorCheck: "Armor check penalty",
+  initiative: "Initiative",
+  speed: "Speed",
+  vitality: "Vitality",
+  wounds: "Wounds",
+  stressDamage: "Stress damage",
+  baseDefense: "Base Defense",
+  stressThreshold: "Stress threshold",
+  subdualThreshold: "Subdual threshold",
+  defensePartialArmor: "Partial armor Defense modifier",
+  naturalDR: "Natural damage reduction",
+  largeSize: "Large Size",
+  knowledge: "Knowledge checks",
+  wealth: "Wealth",
+  lifestyle: "Lifestyle",
+  possessions: "Possessions",
+  spendingCash: "Spending cash",
+  contacts: "Contacts",
+  interests: "Interests",
+  subplots: "Subplots",
+  skillPoints: "Skill points / level",
+  discountedSkillRanks: "Cross-class ranks purchased at one point each",
+  untrainedSkillCap: "Untrained result-cap increase",
+  classSkillPicks: "Extra class skills",
+  "actionDice.count": "Action dice",
+  "actionDice.bonus": "Action die bonus",
+  "focus.cultures": "Cultures focuses",
+  "focus.drive": "Drive focuses",
+  "focus.profession": "Profession focuses",
+  "focus.science": "Science focuses",
+  "focus.generic": "Generic focuses",
+  "prof.generic": "Weapon proficiencies",
   "featSlots.any": "Feats (any)"
 };
 for (const [k, v] of Object.entries(SPYCRAFT.featTrees)) SPYCRAFT.bonusTargets[`featSlots.${k}`] = `${v} feats`;
-for (const [k, v] of Object.entries(SPYCRAFT.proficiencies)) SPYCRAFT.bonusTargets[`prof.${k}`] = `${v.label} proficiency`;
+for (const [k, v] of Object.entries(SPYCRAFT.proficiencies))
+  SPYCRAFT.bonusTargets[`prof.${k}`] = `${v.label} proficiency`;
 for (const s of SKILLS) {
   SPYCRAFT.bonusTargets[`skills.${s.key}.misc`] = `${s.name} bonus`;
   SPYCRAFT.bonusTargets[`skills.${s.key}.threat`] = `${s.name} threat range`;

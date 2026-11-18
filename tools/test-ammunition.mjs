@@ -1,34 +1,385 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {parseAmmunitionCode,ammunitionConfiguration} from '../module/rules/ammunition.mjs';import {computeAgent} from '../module/rules/engine.mjs';import {rulesRefreshChanges} from '../module/rules/refresh.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {readFile} from 'node:fs/promises';
-const weapons=JSON.parse(await readFile(new URL('../src/data/equipment.json',import.meta.url),'utf8')).weapons;
-test('printed magazine/internal/belt/drum codes preserve supplied reload counts without adding a bonus loaded magazine, including twin supplies',()=>{
- for(const [raw,capacity,loads,shots,parts,type]of [['15M4',15,4,60,[15],'M'],['30m5**',30,5,150,[30],'M'],['1S5',1,5,5,[1],'S'],['200B1',200,1,200,[200],'B'],['50D3',50,3,150,[50],'D'],['6+6S40*',12,40,480,[6,6],'S'],['1S0',1,0,0,[1],'S']]){const p=parseAmmunitionCode(raw);assert.equal(p.capacity,capacity);assert.equal(p.loads,loads);assert.equal(p.shots,shots);assert.deepEqual(p.capacities,parts);assert.equal(p.containerType,type);}
- for(const raw of ['',null,12,'20M','M5','0M5','20X5','20M-5','1.5M2','20M5 trailing','20M5 or 30M4','9007199254740992M1','9007199254740991M2','9007199254740991+1S1'])assert.equal(parseAmmunitionCode(raw),null,String(raw));
+import test from "node:test";
+import assert from "node:assert/strict";
+import { parseAmmunitionCode, ammunitionConfiguration } from "../module/rules/ammunition.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { rulesRefreshChanges } from "../module/rules/refresh.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { readFile } from "node:fs/promises";
+const weapons = JSON.parse(await readFile(new URL("../src/data/equipment.json", import.meta.url), "utf8")).weapons;
+test("printed magazine/internal/belt/drum codes preserve supplied reload counts without adding a bonus loaded magazine, including twin supplies", () => {
+  for (const [raw, capacity, loads, shots, parts, type] of [
+    ["15M4", 15, 4, 60, [15], "M"],
+    ["30m5**", 30, 5, 150, [30], "M"],
+    ["1S5", 1, 5, 5, [1], "S"],
+    ["200B1", 200, 1, 200, [200], "B"],
+    ["50D3", 50, 3, 150, [50], "D"],
+    ["6+6S40*", 12, 40, 480, [6, 6], "S"],
+    ["1S0", 1, 0, 0, [1], "S"]
+  ]) {
+    const p = parseAmmunitionCode(raw);
+    assert.equal(p.capacity, capacity);
+    assert.equal(p.loads, loads);
+    assert.equal(p.shots, shots);
+    assert.deepEqual(p.capacities, parts);
+    assert.equal(p.containerType, type);
+  }
+  for (const raw of [
+    "",
+    null,
+    12,
+    "20M",
+    "M5",
+    "0M5",
+    "20X5",
+    "20M-5",
+    "1.5M2",
+    "20M5 trailing",
+    "20M5 or 30M4",
+    "9007199254740992M1",
+    "9007199254740991M2",
+    "9007199254740991+1S1"
+  ])
+    assert.equal(parseAmmunitionCode(raw), null, String(raw));
 });
-test('every coded catalog weapon has valid nonduplicated choices; the Thompson’s special rule exposes exactly four capacities',()=>{
- let coded=0;for(const w of weapons){const before=structuredClone(w),p=ammunitionConfiguration(w);assert.equal(p.needsReview,false,w.name);if(p.applicable){coded++;assert.ok(p.options.length,w.name);for(const option of p.options){const selected=ammunitionConfiguration({...w,ammoCodeChoice:option.code});assert.equal(selected.selected.shots,option.capacity*option.loads,w.name);assert.equal(selected.requiresChoice,false);}}assert.deepEqual(w,before);}assert.ok(coded>300);const thompson=ammunitionConfiguration(weapons.find(w=>w.name==='Thompson M1928 .45 ACP'));assert.deepEqual(thompson.options.map(p=>p.code),['20M6','30M4','50D3','100D1']);assert.deepEqual(thompson.options.map(p=>p.shots),[120,120,150,100]);assert.equal(thompson.requiresChoice,true);
+test("every coded catalog weapon has valid nonduplicated choices; the Thompson’s special rule exposes exactly four capacities", () => {
+  let coded = 0;
+  for (const w of weapons) {
+    const before = structuredClone(w),
+      p = ammunitionConfiguration(w);
+    assert.equal(p.needsReview, false, w.name);
+    if (p.applicable) {
+      coded++;
+      assert.ok(p.options.length, w.name);
+      for (const option of p.options) {
+        const selected = ammunitionConfiguration({ ...w, ammoCodeChoice: option.code });
+        assert.equal(selected.selected.shots, option.capacity * option.loads, w.name);
+        assert.equal(selected.requiresChoice, false);
+      }
+    }
+    assert.deepEqual(w, before);
+  }
+  assert.ok(coded > 300);
+  const thompson = ammunitionConfiguration(weapons.find(w => w.name === "Thompson M1928 .45 ACP"));
+  assert.deepEqual(
+    thompson.options.map(p => p.code),
+    ["20M6", "30M4", "50D3", "100D1"]
+  );
+  assert.deepEqual(
+    thompson.options.map(p => p.shots),
+    [120, 120, 150, 100]
+  );
+  assert.equal(thompson.requiresChoice, true);
 });
-test('alternatives are exclusive, single codes need no invented choice, and malformed/stale selections remain reviewable without silently choosing another code',()=>{
- const w=weapons.find(w=>w.name==='Colt M16A1 5.56mm NATO');assert.equal(ammunitionConfiguration(w).selected,null);assert.equal(ammunitionConfiguration({...w,ammoCodeChoice:'20M8'}).selected.shots,160);assert.equal(ammunitionConfiguration({...w,ammoCodeChoice:'30m5'}).selected.shots,150);assert.equal(ammunitionConfiguration({ammo:'1S2'}).selected.shots,2);assert.equal(ammunitionConfiguration({...w,ammoCodeChoice:'50D3'}).needsReview,true);assert.equal(ammunitionConfiguration({ammo:'1S2',ammoCodeChoice:'30M5'}).selected,null);for(const patch of [{ammo:'special*'},{ammo:'30M5',ammoCodeOptions:['30M5','030M05']},{ammo:'30M5',ammoCodeOptions:['bad']},{ammo:'—',ammoCodeOptions:true},{ammo:'30M5',ammoCodeChoice:0}])assert.equal(ammunitionConfiguration(patch).needsReview,true);assert.equal(ammunitionConfiguration({ammo:'30',ammunitionOnly:true}).applicable,false);assert.equal(ammunitionConfiguration({ammo:'12'}).applicable,false);
+test("alternatives are exclusive, single codes need no invented choice, and malformed/stale selections remain reviewable without silently choosing another code", () => {
+  const w = weapons.find(w => w.name === "Colt M16A1 5.56mm NATO");
+  assert.equal(ammunitionConfiguration(w).selected, null);
+  assert.equal(ammunitionConfiguration({ ...w, ammoCodeChoice: "20M8" }).selected.shots, 160);
+  assert.equal(ammunitionConfiguration({ ...w, ammoCodeChoice: "30m5" }).selected.shots, 150);
+  assert.equal(ammunitionConfiguration({ ammo: "1S2" }).selected.shots, 2);
+  assert.equal(ammunitionConfiguration({ ...w, ammoCodeChoice: "50D3" }).needsReview, true);
+  assert.equal(ammunitionConfiguration({ ammo: "1S2", ammoCodeChoice: "30M5" }).selected, null);
+  for (const patch of [
+    { ammo: "special*" },
+    { ammo: "30M5", ammoCodeOptions: ["30M5", "030M05"] },
+    { ammo: "30M5", ammoCodeOptions: ["bad"] },
+    { ammo: "—", ammoCodeOptions: true },
+    { ammo: "30M5", ammoCodeChoice: 0 }
+  ])
+    assert.equal(ammunitionConfiguration(patch).needsReview, true);
+  assert.equal(ammunitionConfiguration({ ammo: "30", ammunitionOnly: true }).applicable, false);
+  assert.equal(ammunitionConfiguration({ ammo: "12" }).applicable, false);
 });
-const source=()=>({abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:12}])),progression:[]}),item=()=>({id:'rifle',type:'weapon',name:'Colt M16A1 5.56mm NATO',system:{...weapons.find(w=>w.name==='Colt M16A1 5.56mm NATO'),proficiency:'rifle',quantity:1,carried:true}});
-test('engine choices persist in derived Gear information and remain on the checklist before level one, without granting or consuming ammunition or picks',()=>{
- const rifle=item();let s=computeAgent(source(),[rifle],cfg);assert.ok(s.todo.some(t=>t.always&&t.tab==='gear'&&t.text.includes('Choose one supplied ammunition')));assert.equal(s.ammunitionConfigurations.rifle.selected,null);rifle.system.ammoCodeChoice='30M5';s=computeAgent(source(),[rifle],cfg);assert.equal(s.ammunitionConfigurations.rifle.selected.shots,150);assert.equal(s.todo.some(t=>t.text.includes('Choose one supplied ammunition')),false);assert.equal(rifle.system.quantity,1);assert.equal(s.gearPicks.W.spent,0);assert.equal(rifle.system.loadedAmmoId,undefined);rifle.system.ammo='20M8';s=computeAgent(source(),[rifle],cfg);assert.ok(s.todo.some(t=>t.text.includes('saved ammunition code no longer matches')));assert.equal(rifle.system.ammoCodeChoice,'30M5');
+const source = () => ({
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+    progression: []
+  }),
+  item = () => ({
+    id: "rifle",
+    type: "weapon",
+    name: "Colt M16A1 5.56mm NATO",
+    system: {
+      ...weapons.find(w => w.name === "Colt M16A1 5.56mm NATO"),
+      proficiency: "rifle",
+      quantity: 1,
+      carried: true
+    }
+  });
+test("engine choices persist in derived Gear information and remain on the checklist before level one, without granting or consuming ammunition or picks", () => {
+  const rifle = item();
+  let s = computeAgent(source(), [rifle], cfg);
+  assert.ok(s.todo.some(t => t.always && t.tab === "gear" && t.text.includes("Choose one supplied ammunition")));
+  assert.equal(s.ammunitionConfigurations.rifle.selected, null);
+  rifle.system.ammoCodeChoice = "30M5";
+  s = computeAgent(source(), [rifle], cfg);
+  assert.equal(s.ammunitionConfigurations.rifle.selected.shots, 150);
+  assert.equal(
+    s.todo.some(t => t.text.includes("Choose one supplied ammunition")),
+    false
+  );
+  assert.equal(rifle.system.quantity, 1);
+  assert.equal(s.gearPicks.W.spent, 0);
+  assert.equal(rifle.system.loadedAmmoId, undefined);
+  rifle.system.ammo = "20M8";
+  s = computeAgent(source(), [rifle], cfg);
+  assert.ok(s.todo.some(t => t.text.includes("saved ammunition code no longer matches")));
+  assert.equal(rifle.system.ammoCodeChoice, "30M5");
 });
-test('rules refresh updates authoritative source options while preserving the player’s supplied-code choice and inventory state',()=>{const rifle=item();rifle.system.ammoCodeChoice='30M5';rifle.system.ammoCodeOptions=[];const changes=rulesRefreshChanges(rifle,{name:rifle.name,type:'weapon',system:{ammoCodeChoice:'20M8',ammoCodeOptions:['20M8','30M5'],quantity:99}});assert.deepEqual(changes.map(c=>c.path),['system.ammoCodeOptions']);assert.equal(rifle.system.ammoCodeChoice,'30M5');assert.equal(rifle.system.quantity,1);});
+test("rules refresh updates authoritative source options while preserving the player’s supplied-code choice and inventory state", () => {
+  const rifle = item();
+  rifle.system.ammoCodeChoice = "30M5";
+  rifle.system.ammoCodeOptions = [];
+  const changes = rulesRefreshChanges(rifle, {
+    name: rifle.name,
+    type: "weapon",
+    system: { ammoCodeChoice: "20M8", ammoCodeOptions: ["20M8", "30M5"], quantity: 99 }
+  });
+  assert.deepEqual(
+    changes.map(c => c.path),
+    ["system.ammoCodeOptions"]
+  );
+  assert.equal(rifle.system.ammoCodeChoice, "30M5");
+  assert.equal(rifle.system.quantity, 1);
+});
 
-const catalog=JSON.parse(await readFile(new URL('../src/data/ammunition.json',import.meta.url),'utf8'));
-test('the ammunition reference covers all sixty-three printed rows across all six families and survives generation into runtime tables',()=>{assert.equal(catalog.length,63);assert.deepEqual(catalog,cfg.tables.ammunitionCatalog);assert.equal(new Set(catalog.map(a=>a.id)).size,63);const counts=Object.fromEntries(['arrowBolt','bullet','shell','grenade','mortar','rocket'].map(f=>[f,catalog.filter(a=>a.family===f).length]));assert.deepEqual(counts,{arrowBolt:2,bullet:16,shell:9,grenade:21,mortar:9,rocket:6});assert.equal(catalog.filter(a=>a.firstStockpile).length,31);assert.deepEqual(catalog.filter(a=>a.family==='bullet'&&a.firstStockpile).map(a=>a.name),['Blank','Full metal jacket (FMJ)','Jacketed hollow point (JHP)','Non-lethal']);});
-test('ammunition reference costs are per stockpile, weights are per shot, heavy ammunition has no Common Item price, and the two street-value units remain distinct',()=>{for(const a of catalog){assert.equal(a.streetValueUnit,a.sourcePage===274?'stockpile':'shot');if(['bullet','shell'].includes(a.family))assert.equal(a.unitWeight,.2);if(a.sourcePage===275)assert.equal(a.commonItemCost,null);}const get=(family,name)=>catalog.find(a=>a.family===family&&a.name===name);assert.deepEqual(catalog.filter(a=>a.family==='arrowBolt').map(a=>[a.fixedStockpileSize,a.unitWeight,a.upgradeCost,a.commonItemCost,a.firstStockpile]),[[30,.1,1,3,false],[4,.1,3,9,false]]);assert.equal(get('bullet','Sabot').upgradeCost,5);assert.equal(get('bullet','Sabot').commonItemCost,15);assert.equal(get('bullet','Armor-piercing incendiary').availableFor,'any rifle or machine gun');assert.equal(get('bullet','Match grade').availableFor,'any pistol, revolver, rifle, or machine gun');assert.equal(get('mortar','81mm smoke').unitWeight,10.3);assert.equal(get('mortar','81mm illumination').unitWeight,8.9);assert.equal(get('mortar','81mm chemical').streetValue,'per plot');});
-test('special ammunition modes and footnotes remain distinct from ordinary damage; ambiguous printed illumination text is retained for review',()=>{const get=(family,name)=>catalog.find(a=>a.family===family&&a.name===name);assert.equal(get('grenade','40mm beehive').unitWeight,.3);assert.equal(get('grenade','40mm beehive').explosive,true);assert.equal(get('grenade','40mm flash/bang').damageMode,'flashBang');assert.equal(get('grenade','40mm illumination').damageMode,'illumination');assert.equal(get('grenade','40mm smoke').damageMode,'smoke');assert.equal(get('grenade','40mm tear gas').damageMode,'contagion');assert.equal(get('mortar','81mm chemical').damageMode,'contagion');assert.equal(get('rocket','Carl Gustav HEAT').damage,'2d10 (AP 45)');assert.equal(get('rocket','RPG-7 HEAT').unitWeight,4.9);assert.equal(get('rocket','RPG-7 HEAT').firstStockpile,false);const illumination=get('mortar','81mm illumination');assert.equal(illumination.qualities,'BLS 7550 ft., special)');assert.equal(illumination.reviewNotes.length,1);assert.equal(catalog.filter(a=>a.reviewNotes.length).length,1);});
+const catalog = JSON.parse(await readFile(new URL("../src/data/ammunition.json", import.meta.url), "utf8"));
+test("the ammunition reference covers all sixty-three printed rows across all six families and survives generation into runtime tables", () => {
+  assert.equal(catalog.length, 63);
+  assert.deepEqual(catalog, cfg.tables.ammunitionCatalog);
+  assert.equal(new Set(catalog.map(a => a.id)).size, 63);
+  const counts = Object.fromEntries(
+    ["arrowBolt", "bullet", "shell", "grenade", "mortar", "rocket"].map(f => [
+      f,
+      catalog.filter(a => a.family === f).length
+    ])
+  );
+  assert.deepEqual(counts, { arrowBolt: 2, bullet: 16, shell: 9, grenade: 21, mortar: 9, rocket: 6 });
+  assert.equal(catalog.filter(a => a.firstStockpile).length, 31);
+  assert.deepEqual(
+    catalog.filter(a => a.family === "bullet" && a.firstStockpile).map(a => a.name),
+    ["Blank", "Full metal jacket (FMJ)", "Jacketed hollow point (JHP)", "Non-lethal"]
+  );
+});
+test("ammunition reference costs are per stockpile, weights are per shot, heavy ammunition has no Common Item price, and the two street-value units remain distinct", () => {
+  for (const a of catalog) {
+    assert.equal(a.streetValueUnit, a.sourcePage === 274 ? "stockpile" : "shot");
+    if (["bullet", "shell"].includes(a.family)) assert.equal(a.unitWeight, 0.2);
+    if (a.sourcePage === 275) assert.equal(a.commonItemCost, null);
+  }
+  const get = (family, name) => catalog.find(a => a.family === family && a.name === name);
+  assert.deepEqual(
+    catalog
+      .filter(a => a.family === "arrowBolt")
+      .map(a => [a.fixedStockpileSize, a.unitWeight, a.upgradeCost, a.commonItemCost, a.firstStockpile]),
+    [
+      [30, 0.1, 1, 3, false],
+      [4, 0.1, 3, 9, false]
+    ]
+  );
+  assert.equal(get("bullet", "Sabot").upgradeCost, 5);
+  assert.equal(get("bullet", "Sabot").commonItemCost, 15);
+  assert.equal(get("bullet", "Armor-piercing incendiary").availableFor, "any rifle or machine gun");
+  assert.equal(get("bullet", "Match grade").availableFor, "any pistol, revolver, rifle, or machine gun");
+  assert.equal(get("mortar", "81mm smoke").unitWeight, 10.3);
+  assert.equal(get("mortar", "81mm illumination").unitWeight, 8.9);
+  assert.equal(get("mortar", "81mm chemical").streetValue, "per plot");
+});
+test("special ammunition modes and footnotes remain distinct from ordinary damage; ambiguous printed illumination text is retained for review", () => {
+  const get = (family, name) => catalog.find(a => a.family === family && a.name === name);
+  assert.equal(get("grenade", "40mm beehive").unitWeight, 0.3);
+  assert.equal(get("grenade", "40mm beehive").explosive, true);
+  assert.equal(get("grenade", "40mm flash/bang").damageMode, "flashBang");
+  assert.equal(get("grenade", "40mm illumination").damageMode, "illumination");
+  assert.equal(get("grenade", "40mm smoke").damageMode, "smoke");
+  assert.equal(get("grenade", "40mm tear gas").damageMode, "contagion");
+  assert.equal(get("mortar", "81mm chemical").damageMode, "contagion");
+  assert.equal(get("rocket", "Carl Gustav HEAT").damage, "2d10 (AP 45)");
+  assert.equal(get("rocket", "RPG-7 HEAT").unitWeight, 4.9);
+  assert.equal(get("rocket", "RPG-7 HEAT").firstStockpile, false);
+  const illumination = get("mortar", "81mm illumination");
+  assert.equal(illumination.qualities, "BLS 7550 ft., special)");
+  assert.equal(illumination.reviewNotes.length, 1);
+  assert.equal(catalog.filter(a => a.reviewNotes.length).length, 1);
+});
 
-import {ammunitionProfile,compatibleAmmunition,ammunitionStockpilePlan} from '../module/rules/ammunition.mjs';import {firearmDefaults} from '../module/rules/firearms.mjs';import {planAmmunitionStockpile} from '../module/apps/ammunition-planner.mjs';
-const weapon=name=>{const w=weapons.find(w=>w.name===name);assert.ok(w,name);return {...w,...firearmDefaults(w.sourceTable,w.qualities)};},ammo=(family,name)=>catalog.find(a=>a.family===family&&a.name===name),plan=(w,family,name,options={})=>ammunitionStockpilePlan(w,catalog,{ammunitionId:ammo(family,name).id,...options});
-test('stockpile options respect exact bullet category restrictions, all shell/arrow choices, projectile caliber/model and the BS-1 special round',()=>{for(const [category,count]of [['assaultRifle',16],['saw',16],['gpmg',16],['servicePistol',13],['lightSMG',12],['pumpActionShotgun',9]])assert.equal(compatibleAmmunition({weaponCategory:category},catalog).length,count,category);assert.equal(compatibleAmmunition({damage:'as bolt'},catalog).length,2);assert.equal(ammunitionProfile({damage:'as bolt'}).projectileKind,'bolt');assert.equal(compatibleAmmunition({weaponCategory:'grenadeLauncher',ammoChamber:'37 mm'},catalog).length,6);assert.equal(compatibleAmmunition({weaponCategory:'grenadeLauncher',ammoChamber:'40mm'},catalog).length,9);assert.deepEqual(compatibleAmmunition(weapon('RSA BS-1'),catalog).map(a=>a.name),['30mm HEAT']);assert.equal(compatibleAmmunition(weapon('Watervliet Arsenal M224 60mm'),catalog).length,4);assert.equal(compatibleAmmunition(weapon('Royal Ordnance L-16A2 81mm'),catalog).length,5);assert.equal(compatibleAmmunition(weapon('Bofors Carl Gustav'),catalog).length,4);assert.equal(compatibleAmmunition(weapon('RSA RPG-7'),catalog).length,2);assert.equal(compatibleAmmunition({weaponCategory:'grenadeLauncher'},catalog).length,0);assert.equal(compatibleAmmunition({ammunitionOnly:true,damage:'as arrow'},catalog).length,0);});
-test('fixed arrow/bolt stockpiles and variable weapon codes calculate exact shot counts, per-shot weight and alternative stockpile costs',()=>{const w={...weapon('Colt M16A1 5.56mm NATO'),ammoCodeChoice:'30M5'},before=structuredClone(w),p=plan(w,'bullet','Armor-piercing',{stockpiles:2});assert.equal(p.totalShots,300);assert.equal(p.totalWeight,60);assert.equal(p.upgradeCost,4);assert.equal(p.commonItemCost,12);assert.deepEqual(w,before);const arrow=plan({damage:'as arrow'},'arrowBolt','Standard');assert.equal(arrow.totalShots,30);assert.equal(arrow.totalWeight,3);assert.equal(arrow.upgradeCost,1);assert.equal(arrow.commonItemCost,3);const bolt=plan({damage:'as bolt'},'arrowBolt','Low-explosive',{stockpiles:2});assert.equal(bolt.totalShots,8);assert.equal(bolt.totalWeight,.8);assert.equal(bolt.upgradeCost,6);assert.equal(bolt.commonItemCost,18);assert.equal(bolt.projectileKind,'bolt');const grenade=plan(weapon('CTS TL-1 37mm'),'grenade','37mm high explosive');assert.equal(grenade.totalShots,8);assert.equal(grenade.totalWeight,4);assert.equal(grenade.commonItemCost,null);const mortar=plan(weapon('Watervliet Arsenal M224 60mm'),'mortar','60mm high explosive');assert.equal(mortar.totalShots,5);assert.equal(mortar.totalWeight,18.5);});
-test('included-stockpile and conversion calculations subtract exactly one upgrade or three Common Items; BS-1 extra grenades cost one upgrade each',()=>{const w={...weapon('Colt M16A1 5.56mm NATO'),ammoCodeChoice:'30M5'};const free=plan(w,'bullet','Full metal jacket (FMJ)',{initial:true});assert.equal(free.upgradeCost,0);assert.equal(free.commonItemCost,0);assert.equal(free.convertedInitial,false);const converted=plan(w,'bullet','Armor-piercing',{initial:true});assert.equal(converted.upgradeCost,1);assert.equal(converted.commonItemCost,3);assert.equal(converted.convertedInitial,true);const rpg=plan(weapon('RSA RPG-7'),'rocket','RPG-7 HEAT',{initial:true});assert.equal(rpg.upgradeCost,0);assert.equal(rpg.convertedInitial,true);const bs1=weapon('RSA BS-1'),extra=plan(bs1,'grenade','30mm HEAT',{stockpiles:2});assert.equal(extra.totalShots,10);assert.equal(extra.totalWeight,4);assert.equal(extra.upgradeCost,10);assert.equal(extra.commonItemCost,null);assert.equal(plan(bs1,'grenade','30mm HEAT',{initial:true}).upgradeCost,0);});
-test('unconfigured/unsupported/incompatible ammunition, multiple included stockpiles and unsafe arithmetic do not invent prices or quantities',()=>{const w=weapon('Colt M16A1 5.56mm NATO');assert.throws(()=>plan(w,'bullet','Full metal jacket (FMJ)'),/Choose one supplied/);for(const stockpiles of [0,-1,1.5,NaN,true,'2',Number.MAX_SAFE_INTEGER])assert.throws(()=>plan({...w,ammoCodeChoice:'30M5'},'bullet','Full metal jacket (FMJ)',{stockpiles}));assert.throws(()=>plan({...w,ammoCodeChoice:'30M5'},'bullet','Full metal jacket (FMJ)',{initial:true,stockpiles:2}),/one supplied/);assert.throws(()=>plan({damage:'as arrow'},'arrowBolt','Standard',{initial:true}),/one supplied/);assert.throws(()=>plan({...w,ammoCodeChoice:'30M5'},'grenade','30mm HEAT'),/Choose ammunition/);assert.throws(()=>plan({...w,ammoCodeChoice:'30M5'},'bullet','Full metal jacket (FMJ)',{initial:'true'}),/explicit/);assert.throws(()=>plan({weaponCategory:'grenadeLauncher',ammo:'1S2'},'grenade','37mm high explosive'),/Choose ammunition/);for(const patch of [{unitWeight:-1},{unitWeight:NaN},{upgradeCost:-1},{upgradeCost:1.5},{commonItemCost:-3},{firstStockpile:'yes'}]){const source={...ammo('bullet','Full metal jacket (FMJ)'),...patch};assert.throws(()=>ammunitionStockpilePlan({...w,ammoCodeChoice:'30M5'},[source],{ammunitionId:source.id}),/Review the ammunition source/);}});
-test('every canonical mortar/grenade and variable-ammunition rocket has the correct chamber metadata, without guessing other fixed launcher ammunition',()=>{for(const w of weapons.filter(w=>/^Table 4\.5[67]:/.test(w.sourceTable))){assert.ok(w.ammoChamber,w.name);assert.ok(compatibleAmmunition({...w,...firearmDefaults(w.sourceTable,w.qualities)},catalog).length,w.name);}assert.equal(weapon('Bofors Carl Gustav').ammoChamber,'Carl Gustav');assert.equal(weapon('RSA RPG-7').ammoChamber,'RPG-7');assert.equal(compatibleAmmunition(weapon('Bofors AT4 HE'),catalog).length,0);assert.equal(compatibleAmmunition(weapon('Euromissile Milan'),catalog).length,0);});
-globalThis.CONFIG={SPYCRAFT:cfg};globalThis.foundry={utils:{escapeHTML:s=>String(s)},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.ui={notifications:{warn:()=>null}};
-test('the stockpile calculator returns reference results or cancels without changing a weapon, allocating inventory or spending resources',async()=>{const w={name:'Rifle',system:{...weapon('Colt M16A1 5.56mm NATO'),ammoCodeChoice:'30M5'},async update(){throw Error('Reference calculator must not mutate');}},before=structuredClone(w.system);const p=await planAmmunitionStockpile(w,{ammunitionId:ammo('bullet','Full metal jacket (FMJ)').id,stockpiles:2});assert.equal(p.totalShots,300);assert.equal(p.upgradeCost,2);assert.equal(p.commonItemCost,6);assert.deepEqual(w.system,before);assert.equal(await planAmmunitionStockpile(w),null);assert.deepEqual(w.system,before);});
+import { ammunitionProfile, compatibleAmmunition, ammunitionStockpilePlan } from "../module/rules/ammunition.mjs";
+import { firearmDefaults } from "../module/rules/firearms.mjs";
+import { planAmmunitionStockpile } from "../module/apps/ammunition-planner.mjs";
+const weapon = name => {
+    const w = weapons.find(w => w.name === name);
+    assert.ok(w, name);
+    return { ...w, ...firearmDefaults(w.sourceTable, w.qualities) };
+  },
+  ammo = (family, name) => catalog.find(a => a.family === family && a.name === name),
+  plan = (w, family, name, options = {}) =>
+    ammunitionStockpilePlan(w, catalog, { ammunitionId: ammo(family, name).id, ...options });
+test("stockpile options respect exact bullet category restrictions, all shell/arrow choices, projectile caliber/model and the BS-1 special round", () => {
+  for (const [category, count] of [
+    ["assaultRifle", 16],
+    ["saw", 16],
+    ["gpmg", 16],
+    ["servicePistol", 13],
+    ["lightSMG", 12],
+    ["pumpActionShotgun", 9]
+  ])
+    assert.equal(compatibleAmmunition({ weaponCategory: category }, catalog).length, count, category);
+  assert.equal(compatibleAmmunition({ damage: "as bolt" }, catalog).length, 2);
+  assert.equal(ammunitionProfile({ damage: "as bolt" }).projectileKind, "bolt");
+  assert.equal(compatibleAmmunition({ weaponCategory: "grenadeLauncher", ammoChamber: "37 mm" }, catalog).length, 6);
+  assert.equal(compatibleAmmunition({ weaponCategory: "grenadeLauncher", ammoChamber: "40mm" }, catalog).length, 9);
+  assert.deepEqual(
+    compatibleAmmunition(weapon("RSA BS-1"), catalog).map(a => a.name),
+    ["30mm HEAT"]
+  );
+  assert.equal(compatibleAmmunition(weapon("Watervliet Arsenal M224 60mm"), catalog).length, 4);
+  assert.equal(compatibleAmmunition(weapon("Royal Ordnance L-16A2 81mm"), catalog).length, 5);
+  assert.equal(compatibleAmmunition(weapon("Bofors Carl Gustav"), catalog).length, 4);
+  assert.equal(compatibleAmmunition(weapon("RSA RPG-7"), catalog).length, 2);
+  assert.equal(compatibleAmmunition({ weaponCategory: "grenadeLauncher" }, catalog).length, 0);
+  assert.equal(compatibleAmmunition({ ammunitionOnly: true, damage: "as arrow" }, catalog).length, 0);
+});
+test("fixed arrow/bolt stockpiles and variable weapon codes calculate exact shot counts, per-shot weight and alternative stockpile costs", () => {
+  const w = { ...weapon("Colt M16A1 5.56mm NATO"), ammoCodeChoice: "30M5" },
+    before = structuredClone(w),
+    p = plan(w, "bullet", "Armor-piercing", { stockpiles: 2 });
+  assert.equal(p.totalShots, 300);
+  assert.equal(p.totalWeight, 60);
+  assert.equal(p.upgradeCost, 4);
+  assert.equal(p.commonItemCost, 12);
+  assert.deepEqual(w, before);
+  const arrow = plan({ damage: "as arrow" }, "arrowBolt", "Standard");
+  assert.equal(arrow.totalShots, 30);
+  assert.equal(arrow.totalWeight, 3);
+  assert.equal(arrow.upgradeCost, 1);
+  assert.equal(arrow.commonItemCost, 3);
+  const bolt = plan({ damage: "as bolt" }, "arrowBolt", "Low-explosive", { stockpiles: 2 });
+  assert.equal(bolt.totalShots, 8);
+  assert.equal(bolt.totalWeight, 0.8);
+  assert.equal(bolt.upgradeCost, 6);
+  assert.equal(bolt.commonItemCost, 18);
+  assert.equal(bolt.projectileKind, "bolt");
+  const grenade = plan(weapon("CTS TL-1 37mm"), "grenade", "37mm high explosive");
+  assert.equal(grenade.totalShots, 8);
+  assert.equal(grenade.totalWeight, 4);
+  assert.equal(grenade.commonItemCost, null);
+  const mortar = plan(weapon("Watervliet Arsenal M224 60mm"), "mortar", "60mm high explosive");
+  assert.equal(mortar.totalShots, 5);
+  assert.equal(mortar.totalWeight, 18.5);
+});
+test("included-stockpile and conversion calculations subtract exactly one upgrade or three Common Items; BS-1 extra grenades cost one upgrade each", () => {
+  const w = { ...weapon("Colt M16A1 5.56mm NATO"), ammoCodeChoice: "30M5" };
+  const free = plan(w, "bullet", "Full metal jacket (FMJ)", { initial: true });
+  assert.equal(free.upgradeCost, 0);
+  assert.equal(free.commonItemCost, 0);
+  assert.equal(free.convertedInitial, false);
+  const converted = plan(w, "bullet", "Armor-piercing", { initial: true });
+  assert.equal(converted.upgradeCost, 1);
+  assert.equal(converted.commonItemCost, 3);
+  assert.equal(converted.convertedInitial, true);
+  const rpg = plan(weapon("RSA RPG-7"), "rocket", "RPG-7 HEAT", { initial: true });
+  assert.equal(rpg.upgradeCost, 0);
+  assert.equal(rpg.convertedInitial, true);
+  const bs1 = weapon("RSA BS-1"),
+    extra = plan(bs1, "grenade", "30mm HEAT", { stockpiles: 2 });
+  assert.equal(extra.totalShots, 10);
+  assert.equal(extra.totalWeight, 4);
+  assert.equal(extra.upgradeCost, 10);
+  assert.equal(extra.commonItemCost, null);
+  assert.equal(plan(bs1, "grenade", "30mm HEAT", { initial: true }).upgradeCost, 0);
+});
+test("unconfigured/unsupported/incompatible ammunition, multiple included stockpiles and unsafe arithmetic do not invent prices or quantities", () => {
+  const w = weapon("Colt M16A1 5.56mm NATO");
+  assert.throws(() => plan(w, "bullet", "Full metal jacket (FMJ)"), /Choose one supplied/);
+  for (const stockpiles of [0, -1, 1.5, NaN, true, "2", Number.MAX_SAFE_INTEGER])
+    assert.throws(() => plan({ ...w, ammoCodeChoice: "30M5" }, "bullet", "Full metal jacket (FMJ)", { stockpiles }));
+  assert.throws(
+    () => plan({ ...w, ammoCodeChoice: "30M5" }, "bullet", "Full metal jacket (FMJ)", { initial: true, stockpiles: 2 }),
+    /one supplied/
+  );
+  assert.throws(() => plan({ damage: "as arrow" }, "arrowBolt", "Standard", { initial: true }), /one supplied/);
+  assert.throws(() => plan({ ...w, ammoCodeChoice: "30M5" }, "grenade", "30mm HEAT"), /Choose ammunition/);
+  assert.throws(
+    () => plan({ ...w, ammoCodeChoice: "30M5" }, "bullet", "Full metal jacket (FMJ)", { initial: "true" }),
+    /explicit/
+  );
+  assert.throws(
+    () => plan({ weaponCategory: "grenadeLauncher", ammo: "1S2" }, "grenade", "37mm high explosive"),
+    /Choose ammunition/
+  );
+  for (const patch of [
+    { unitWeight: -1 },
+    { unitWeight: NaN },
+    { upgradeCost: -1 },
+    { upgradeCost: 1.5 },
+    { commonItemCost: -3 },
+    { firstStockpile: "yes" }
+  ]) {
+    const source = { ...ammo("bullet", "Full metal jacket (FMJ)"), ...patch };
+    assert.throws(
+      () => ammunitionStockpilePlan({ ...w, ammoCodeChoice: "30M5" }, [source], { ammunitionId: source.id }),
+      /Review the ammunition source/
+    );
+  }
+});
+test("every canonical mortar/grenade and variable-ammunition rocket has the correct chamber metadata, without guessing other fixed launcher ammunition", () => {
+  for (const w of weapons.filter(w => /^Table 4\.5[67]:/.test(w.sourceTable))) {
+    assert.ok(w.ammoChamber, w.name);
+    assert.ok(compatibleAmmunition({ ...w, ...firearmDefaults(w.sourceTable, w.qualities) }, catalog).length, w.name);
+  }
+  assert.equal(weapon("Bofors Carl Gustav").ammoChamber, "Carl Gustav");
+  assert.equal(weapon("RSA RPG-7").ammoChamber, "RPG-7");
+  assert.equal(compatibleAmmunition(weapon("Bofors AT4 HE"), catalog).length, 0);
+  assert.equal(compatibleAmmunition(weapon("Euromissile Milan"), catalog).length, 0);
+});
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.foundry = {
+  utils: { escapeHTML: s => String(s) },
+  applications: { api: { DialogV2: { input: async () => null } } }
+};
+globalThis.ui = { notifications: { warn: () => null } };
+test("the stockpile calculator returns reference results or cancels without changing a weapon, allocating inventory or spending resources", async () => {
+  const w = {
+      name: "Rifle",
+      system: { ...weapon("Colt M16A1 5.56mm NATO"), ammoCodeChoice: "30M5" },
+      async update() {
+        throw Error("Reference calculator must not mutate");
+      }
+    },
+    before = structuredClone(w.system);
+  const p = await planAmmunitionStockpile(w, {
+    ammunitionId: ammo("bullet", "Full metal jacket (FMJ)").id,
+    stockpiles: 2
+  });
+  assert.equal(p.totalShots, 300);
+  assert.equal(p.upgradeCost, 2);
+  assert.equal(p.commonItemCost, 6);
+  assert.deepEqual(w.system, before);
+  assert.equal(await planAmmunitionStockpile(w), null);
+  assert.deepEqual(w.system, before);
+});
 
-test('calculator reports invalid stockpile input without posting a result, allocating inventory or spending resources',async()=>{let warnings=[],dialogs=0;const oldWarn=ui.notifications.warn,oldInput=foundry.applications.api.DialogV2.input;ui.notifications.warn=message=>warnings.push(message);foundry.applications.api.DialogV2.input=async()=>{dialogs++;return {ammunitionId:ammo('bullet','Full metal jacket (FMJ)').id,stockpiles:'0'};};try{const w={name:'Rifle',system:{...weapon('Colt M16A1 5.56mm NATO'),ammoCodeChoice:'30M5'},update(){throw Error('Must not mutate');}};assert.equal(await planAmmunitionStockpile(w),null);assert.equal(dialogs,1);assert.match(warnings[0],/positive whole/);}finally{ui.notifications.warn=oldWarn;foundry.applications.api.DialogV2.input=oldInput;}});
+test("calculator reports invalid stockpile input without posting a result, allocating inventory or spending resources", async () => {
+  let warnings = [],
+    dialogs = 0;
+  const oldWarn = ui.notifications.warn,
+    oldInput = foundry.applications.api.DialogV2.input;
+  ui.notifications.warn = message => warnings.push(message);
+  foundry.applications.api.DialogV2.input = async () => {
+    dialogs++;
+    return { ammunitionId: ammo("bullet", "Full metal jacket (FMJ)").id, stockpiles: "0" };
+  };
+  try {
+    const w = {
+      name: "Rifle",
+      system: { ...weapon("Colt M16A1 5.56mm NATO"), ammoCodeChoice: "30M5" },
+      update() {
+        throw Error("Must not mutate");
+      }
+    };
+    assert.equal(await planAmmunitionStockpile(w), null);
+    assert.equal(dialogs, 1);
+    assert.match(warnings[0], /positive whole/);
+  } finally {
+    ui.notifications.warn = oldWarn;
+    foundry.applications.api.DialogV2.input = oldInput;
+  }
+});

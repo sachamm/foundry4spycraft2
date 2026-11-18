@@ -1,15 +1,314 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {everydayGeniusSource,everydayGeniusPlan} from '../module/rules/temporary-feats.mjs';import {limitedUseAbilities,resourceStatus} from '../module/rules/limited-uses.mjs';import {computeAgent} from '../module/rules/engine.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const fs=JSON.parse(readFileSync(new URL('../src/data/feats.json',import.meta.url))),cs=JSON.parse(readFileSync(new URL('../src/data/classes.json',import.meta.url))),scientist=cs.find(c=>c.key==='scientist'),cls={id:'s',name:scientist.name,type:'class',system:{...scientist,identifier:'scientist',vitalityDie:scientist.vitality}},tree=s=>s==='Basic Skill'?'basicSkill':s==='Advanced Skill'?'advancedSkill':s,all=fs.map((f,i)=>({id:'f'+i,uuid:'Compendium.spycraft2.feats.f'+i,name:f.name,type:'feat',system:{...f,tree:tree(f.tree)}})),feat=n=>all.find(f=>f.name===n),basic=all.filter(f=>f.system.tree==='basicSkill');
-const permanent=(name,career)=>({...structuredClone(feat(name)),system:{...structuredClone(feat(name).system),acquiredAtLevel:career,featKind:'permanent'}}),source=()=>({actorUuid:'Actor.qa',usagePeriods:{mission:'m',session:'s'},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:12}])),progression:Array.from({length:20},()=>({classId:'scientist',vitality:6,skills:{}})),actionDice:{value:0},resourceUses:{}}),items=()=>[structuredClone(cls),permanent('Scholar',1),permanent('Attention to Detail',3),permanent('Unfair Advantage',6),permanent('Everyday Genius',15)];
-const compute=(is=items(),s=source())=>computeAgent(s,is,cfg);
-test('Everyday Genius is prerequisite-qualified and counts all eligible Advanced Skill selections, including itself and active temporary repeats',()=>{const base=compute();assert.equal(everydayGeniusSource(base).limit,3);const spec=limitedUseAbilities(base,items(),cfg).find(s=>s.id==='everydayGenius');assert.equal(spec.limit,3);assert.equal(spec.period,'mission');assert.equal(spec.cost,0);assert.equal(spec.workflow,'sessionBasicFeat');for(const n of ['Everyday Genius','Unfair Advantage','Scholar'])assert.equal(everydayGeniusSource(compute(items().filter(i=>i.name!==n))),null);const at14=source();at14.progression.length=14;assert.equal(everydayGeniusSource(compute(items(),at14)),null);const ds=[0,1].map(i=>({...permanent('Depth of Study',20),id:'depth'+i,system:{...permanent('Depth of Study',20).system,featKind:'temporary',temporaryGrant:{period:'mission',epoch:'m',ability:'knowItAll',selfGranted:true,sourceActorUuid:'Actor.qa'}}}));assert.equal(everydayGeniusSource(compute([...items(),...ds])).limit,5);const expired=source();expired.usagePeriods.mission='next';assert.equal(everydayGeniusSource(compute([...items(),...ds],expired)).limit,3);});
-test('all fifteen canonical Basic Skill options plan session-scoped self grants, while already owned/virtual/wrong-tree options are rejected',()=>{assert.equal(basic.length,15);const s=compute();for(const f of basic){const p=everydayGeniusPlan(s,[],f,{epoch:'s',sourceActorUuid:'Actor.qa'});assert.equal(p.system.temporaryGrant.period,'session');assert.equal(p.system.temporaryGrant.epoch,'s');assert.equal(p.system.featKind,'temporary');assert.equal(p.system.temporaryGrant.selfGranted,true);assert.equal(p.system.granted,true);assert.equal(p.system.acquisitionSource,'');}assert.throws(()=>everydayGeniusPlan(s,items(),feat('Scholar')),/possessed/);assert.throws(()=>everydayGeniusPlan(s,[],feat('Guts')),/Basic Skill/);assert.throws(()=>everydayGeniusPlan(s,[],{...feat('Techie'),system:{...feat('Techie').system,featKind:'virtual'}}),/non-virtual/);assert.throws(()=>everydayGeniusPlan({...s,virtualFeats:[{name:'Techie'}]},[],feat('Techie')),/possessed/);assert.throws(()=>everydayGeniusPlan({activeFeatSelections:[]},[],feat('Techie')),/eligible/);});
-let mission='m',session='s',seq=0,failCreate=false,failPost=false,failDelete=false,hook=null,posts=[],warnings=[];
-globalThis.Actor=class{constructor(){this.uuid='Actor.qa';this.type='agent';this.isOwner=true;this.items=items();this.system=source();this.derive();}derive(){this.system.usagePeriods={mission,session};computeAgent(this.system,this.items,cfg);}async update(p){for(const [path,value]of Object.entries(p)){const ks=path.replace(/^system\./,'').split('.');let o=this.system;for(const k of ks.slice(0,-1))o=o[k]??={};const k=ks.at(-1);if(k.startsWith('-='))delete o[k.slice(2)];else o[k]=structuredClone(value);}this.derive();}async createEmbeddedDocuments(_type,data){if(failCreate)throw Error('create failed');const out=data.map(d=>({...structuredClone(d),id:'created'+(++seq),uuid:'Actor.qa.Item.created'+seq}));this.items.push(...out);this.derive();hook?.(this);return out;}async deleteEmbeddedDocuments(_type,ids){if(failDelete)throw Error('cleanup failed');this.items=this.items.filter(i=>!ids.includes(i.id));this.derive();}};
-globalThis.CONFIG={SPYCRAFT:cfg};globalThis.foundry={utils:{escapeHTML:s=>String(s),deepClone:structuredClone},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.game={user:{isGM:true},settings:{get:()=>({mission,session})},packs:new Map([['spycraft2.feats',{async getDocument(id){return all.find(f=>f.id===id);},async getIndex(){return all;}}]]),combat:null};globalThis.ui={notifications:{warn:s=>{warnings.push(s);return null;}}};globalThis.ChatMessage={getSpeaker:()=>({}),async create(d){if(failPost)throw Error('post failed');posts.push(d);return d;}};
-const {SpycraftActor}=await import('../module/documents/actor.mjs');const opts=n=>({featId:feat(n).id,fullActionConfirmed:true});function reset(){mission='m';session='s';seq=0;failCreate=false;failPost=false;failDelete=false;hook=null;posts=[];warnings=[];game.combat=null;return new SpycraftActor();}
-test('every canonical Basic Skill feat can be activated and derives the correct temporary eligibility with no permanent slot/die cost',async()=>{for(const f of basic){const a=reset();a.items=a.items.filter(i=>i.name!=='Scholar');a.items.push(permanent(f.name==='Scholar'?'Techie':'Scholar',1));a.derive();const slots=a.system.feats.any.spent,g=await a.useEverydayGenius(opts(f.name));assert.equal(a.system.featStatus[g.id].ok,true,f.name);assert.equal(a.system.resourceUses.everydayGenius.used,1);assert.equal(a.system.feats.any.spent,slots);assert.equal(a.system.actionDice.value,0);assert.equal(a.checkPrerequisites({type:'feat',name:f.name},{temporary:true}).ok,true);assert.equal(a.checkPrerequisites({type:'feat',name:f.name}).ok,false);assert.equal(a.checkPrerequisites({type:'feat',name:f.name},{classEntry:true}).ok,false);}});
-test('mission usage and session benefit expire independently; active duplicates and deletion never refund a claim',async()=>{const a=reset(),before=a.system.skillTotals.computers.totals[0].total;const g=await a.useEverydayGenius(opts('Techie'));assert.equal(a.system.skillTotals.computers.totals[0].total,before+3);session='next';a.derive();assert.equal(a.system.skillTotals.computers.totals[0].total,before);assert.equal(a.system.resourceUses.everydayGenius.used,1);await a.useEverydayGenius(opts('Techie'));assert.equal(a.system.resourceUses.everydayGenius.used,2);mission='next';a.derive();assert.ok(a.system.activeFeatNames.includes('Techie'));await assert.rejects(a.useEverydayGenius(opts('Techie')),/possessed/);assert.equal(a.system.resourceUses.everydayGenius.used,2);await a.useEverydayGenius(opts('Actor'));assert.equal(a.system.resourceUses.everydayGenius.used,1);assert.equal(a.system.resourceUses.everydayGenius.epoch,'next');await a.deleteEmbeddedDocuments('Item',a.items.filter(i=>i.system.featKind==='temporary').map(i=>i.id));assert.equal(a.system.resourceUses.everydayGenius.used,1);assert.equal(posts[0].flags.spycraft2.session,'s');assert.equal(g.system.temporaryGrant.period,'session');});
-test('three mission claims exhaust a three-feat allowance and concurrent final claims produce one result without extra dice',async()=>{const a=reset();await a.useEverydayGenius(opts('Techie'));await a.useEverydayGenius(opts('Actor'));const result=await Promise.all([a.useEverydayGenius(opts('Burglar')),a.useEverydayGenius(opts('Observer'))]);assert.equal(result.filter(Boolean).length,1);assert.equal(a.items.filter(i=>i.system.featKind==='temporary').length,3);assert.equal(a.system.resourceUses.everydayGenius.used,3);assert.equal(await a.useEverydayGenius(opts('Observer')),null);const status=resourceStatus(a.system.limitedUses.find(s=>s.id==='everydayGenius'),a.system.resourceUses,a.usagePeriods);assert.equal(status.remaining,0);assert.equal(a.system.actionDice.value,0);});
-test('cancellation, strict full-action declaration, wrong tree, off-turn, creation/posting and changed-period failures leave no partial grant or spent claim',async()=>{let a=reset();assert.equal(await a.useEverydayGenius(),null);assert.equal(await a.useEverydayGenius({...opts('Techie'),fullActionConfirmed:'true'}),null);await assert.rejects(a.useEverydayGenius(opts('Guts')),/Basic Skill/);failCreate=true;await assert.rejects(a.useEverydayGenius(opts('Techie')),/create failed/);failCreate=false;failPost=true;await assert.rejects(a.useEverydayGenius(opts('Techie')),/post failed/);failPost=false;assert.equal(a.system.resourceUses.everydayGenius,undefined);assert.equal(a.items.filter(i=>i.system.featKind==='temporary').length,0);game.combat={started:true,combatants:[{actor:{uuid:a.uuid}}],combatant:{actor:{uuid:'Actor.other'}}};await assert.rejects(a.useEverydayGenius(opts('Techie')),/initiative/);game.combat=null;hook=actor=>{session='changed';actor.derive();};await assert.rejects(a.useEverydayGenius(opts('Techie')),/period changed/);assert.equal(a.items.filter(i=>i.system.featKind==='temporary').length,0);assert.equal(a.system.resourceUses.everydayGenius,undefined);a=reset();a.isOwner=false;assert.equal(await a.useEverydayGenius(opts('Techie')),null);});
-test('shrinking earned allowance rolls back the new grant, while failed cleanup keeps the remaining grant and spent use for review',async()=>{let a=reset();await a.useEverydayGenius(opts('Techie'));await a.useEverydayGenius(opts('Actor'));hook=actor=>{actor.items=actor.items.filter(i=>i.name!=='Attention to Detail');actor.derive();};await assert.rejects(a.useEverydayGenius(opts('Burglar')),/allowance/);assert.equal(a.items.filter(i=>i.system.featKind==='temporary').length,2);assert.equal(a.system.resourceUses.everydayGenius.used,2);a=reset();failPost=true;failDelete=true;assert.ok(await a.useEverydayGenius(opts('Techie')));assert.equal(a.system.resourceUses.everydayGenius.used,1);assert.match(warnings.at(-1),/use remains spent/);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { everydayGeniusSource, everydayGeniusPlan } from "../module/rules/temporary-feats.mjs";
+import { limitedUseAbilities, resourceStatus } from "../module/rules/limited-uses.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const fs = JSON.parse(readFileSync(new URL("../src/data/feats.json", import.meta.url))),
+  cs = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))),
+  scientist = cs.find(c => c.key === "scientist"),
+  cls = {
+    id: "s",
+    name: scientist.name,
+    type: "class",
+    system: { ...scientist, identifier: "scientist", vitalityDie: scientist.vitality }
+  },
+  tree = s => (s === "Basic Skill" ? "basicSkill" : s === "Advanced Skill" ? "advancedSkill" : s),
+  all = fs.map((f, i) => ({
+    id: "f" + i,
+    uuid: "Compendium.spycraft2.feats.f" + i,
+    name: f.name,
+    type: "feat",
+    system: { ...f, tree: tree(f.tree) }
+  })),
+  feat = n => all.find(f => f.name === n),
+  basic = all.filter(f => f.system.tree === "basicSkill");
+const permanent = (name, career) => ({
+    ...structuredClone(feat(name)),
+    system: { ...structuredClone(feat(name).system), acquiredAtLevel: career, featKind: "permanent" }
+  }),
+  source = () => ({
+    actorUuid: "Actor.qa",
+    usagePeriods: { mission: "m", session: "s" },
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+    progression: Array.from({ length: 20 }, () => ({ classId: "scientist", vitality: 6, skills: {} })),
+    actionDice: { value: 0 },
+    resourceUses: {}
+  }),
+  items = () => [
+    structuredClone(cls),
+    permanent("Scholar", 1),
+    permanent("Attention to Detail", 3),
+    permanent("Unfair Advantage", 6),
+    permanent("Everyday Genius", 15)
+  ];
+const compute = (is = items(), s = source()) => computeAgent(s, is, cfg);
+test("Everyday Genius is prerequisite-qualified and counts all eligible Advanced Skill selections, including itself and active temporary repeats", () => {
+  const base = compute();
+  assert.equal(everydayGeniusSource(base).limit, 3);
+  const spec = limitedUseAbilities(base, items(), cfg).find(s => s.id === "everydayGenius");
+  assert.equal(spec.limit, 3);
+  assert.equal(spec.period, "mission");
+  assert.equal(spec.cost, 0);
+  assert.equal(spec.workflow, "sessionBasicFeat");
+  for (const n of ["Everyday Genius", "Unfair Advantage", "Scholar"])
+    assert.equal(everydayGeniusSource(compute(items().filter(i => i.name !== n))), null);
+  const at14 = source();
+  at14.progression.length = 14;
+  assert.equal(everydayGeniusSource(compute(items(), at14)), null);
+  const ds = [0, 1].map(i => ({
+    ...permanent("Depth of Study", 20),
+    id: "depth" + i,
+    system: {
+      ...permanent("Depth of Study", 20).system,
+      featKind: "temporary",
+      temporaryGrant: {
+        period: "mission",
+        epoch: "m",
+        ability: "knowItAll",
+        selfGranted: true,
+        sourceActorUuid: "Actor.qa"
+      }
+    }
+  }));
+  assert.equal(everydayGeniusSource(compute([...items(), ...ds])).limit, 5);
+  const expired = source();
+  expired.usagePeriods.mission = "next";
+  assert.equal(everydayGeniusSource(compute([...items(), ...ds], expired)).limit, 3);
+});
+test("all fifteen canonical Basic Skill options plan session-scoped self grants, while already owned/virtual/wrong-tree options are rejected", () => {
+  assert.equal(basic.length, 15);
+  const s = compute();
+  for (const f of basic) {
+    const p = everydayGeniusPlan(s, [], f, { epoch: "s", sourceActorUuid: "Actor.qa" });
+    assert.equal(p.system.temporaryGrant.period, "session");
+    assert.equal(p.system.temporaryGrant.epoch, "s");
+    assert.equal(p.system.featKind, "temporary");
+    assert.equal(p.system.temporaryGrant.selfGranted, true);
+    assert.equal(p.system.granted, true);
+    assert.equal(p.system.acquisitionSource, "");
+  }
+  assert.throws(() => everydayGeniusPlan(s, items(), feat("Scholar")), /possessed/);
+  assert.throws(() => everydayGeniusPlan(s, [], feat("Guts")), /Basic Skill/);
+  assert.throws(
+    () => everydayGeniusPlan(s, [], { ...feat("Techie"), system: { ...feat("Techie").system, featKind: "virtual" } }),
+    /non-virtual/
+  );
+  assert.throws(
+    () => everydayGeniusPlan({ ...s, virtualFeats: [{ name: "Techie" }] }, [], feat("Techie")),
+    /possessed/
+  );
+  assert.throws(() => everydayGeniusPlan({ activeFeatSelections: [] }, [], feat("Techie")), /eligible/);
+});
+let mission = "m",
+  session = "s",
+  seq = 0,
+  failCreate = false,
+  failPost = false,
+  failDelete = false,
+  hook = null,
+  posts = [],
+  warnings = [];
+globalThis.Actor = class {
+  constructor() {
+    this.uuid = "Actor.qa";
+    this.type = "agent";
+    this.isOwner = true;
+    this.items = items();
+    this.system = source();
+    this.derive();
+  }
+  derive() {
+    this.system.usagePeriods = { mission, session };
+    computeAgent(this.system, this.items, cfg);
+  }
+  async update(p) {
+    for (const [path, value] of Object.entries(p)) {
+      const ks = path.replace(/^system\./, "").split(".");
+      let o = this.system;
+      for (const k of ks.slice(0, -1)) o = o[k] ??= {};
+      const k = ks.at(-1);
+      if (k.startsWith("-=")) delete o[k.slice(2)];
+      else o[k] = structuredClone(value);
+    }
+    this.derive();
+  }
+  async createEmbeddedDocuments(_type, data) {
+    if (failCreate) throw Error("create failed");
+    const out = data.map(d => ({ ...structuredClone(d), id: "created" + ++seq, uuid: "Actor.qa.Item.created" + seq }));
+    this.items.push(...out);
+    this.derive();
+    hook?.(this);
+    return out;
+  }
+  async deleteEmbeddedDocuments(_type, ids) {
+    if (failDelete) throw Error("cleanup failed");
+    this.items = this.items.filter(i => !ids.includes(i.id));
+    this.derive();
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.foundry = {
+  utils: { escapeHTML: s => String(s), deepClone: structuredClone },
+  applications: { api: { DialogV2: { input: async () => null } } }
+};
+globalThis.game = {
+  user: { isGM: true },
+  settings: { get: () => ({ mission, session }) },
+  packs: new Map([
+    [
+      "spycraft2.feats",
+      {
+        async getDocument(id) {
+          return all.find(f => f.id === id);
+        },
+        async getIndex() {
+          return all;
+        }
+      }
+    ]
+  ]),
+  combat: null
+};
+globalThis.ui = {
+  notifications: {
+    warn: s => {
+      warnings.push(s);
+      return null;
+    }
+  }
+};
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  async create(d) {
+    if (failPost) throw Error("post failed");
+    posts.push(d);
+    return d;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+const opts = n => ({ featId: feat(n).id, fullActionConfirmed: true });
+function reset() {
+  mission = "m";
+  session = "s";
+  seq = 0;
+  failCreate = false;
+  failPost = false;
+  failDelete = false;
+  hook = null;
+  posts = [];
+  warnings = [];
+  game.combat = null;
+  return new SpycraftActor();
+}
+test("every canonical Basic Skill feat can be activated and derives the correct temporary eligibility with no permanent slot/die cost", async () => {
+  for (const f of basic) {
+    const a = reset();
+    a.items = a.items.filter(i => i.name !== "Scholar");
+    a.items.push(permanent(f.name === "Scholar" ? "Techie" : "Scholar", 1));
+    a.derive();
+    const slots = a.system.feats.any.spent,
+      g = await a.useEverydayGenius(opts(f.name));
+    assert.equal(a.system.featStatus[g.id].ok, true, f.name);
+    assert.equal(a.system.resourceUses.everydayGenius.used, 1);
+    assert.equal(a.system.feats.any.spent, slots);
+    assert.equal(a.system.actionDice.value, 0);
+    assert.equal(a.checkPrerequisites({ type: "feat", name: f.name }, { temporary: true }).ok, true);
+    assert.equal(a.checkPrerequisites({ type: "feat", name: f.name }).ok, false);
+    assert.equal(a.checkPrerequisites({ type: "feat", name: f.name }, { classEntry: true }).ok, false);
+  }
+});
+test("mission usage and session benefit expire independently; active duplicates and deletion never refund a claim", async () => {
+  const a = reset(),
+    before = a.system.skillTotals.computers.totals[0].total;
+  const g = await a.useEverydayGenius(opts("Techie"));
+  assert.equal(a.system.skillTotals.computers.totals[0].total, before + 3);
+  session = "next";
+  a.derive();
+  assert.equal(a.system.skillTotals.computers.totals[0].total, before);
+  assert.equal(a.system.resourceUses.everydayGenius.used, 1);
+  await a.useEverydayGenius(opts("Techie"));
+  assert.equal(a.system.resourceUses.everydayGenius.used, 2);
+  mission = "next";
+  a.derive();
+  assert.ok(a.system.activeFeatNames.includes("Techie"));
+  await assert.rejects(a.useEverydayGenius(opts("Techie")), /possessed/);
+  assert.equal(a.system.resourceUses.everydayGenius.used, 2);
+  await a.useEverydayGenius(opts("Actor"));
+  assert.equal(a.system.resourceUses.everydayGenius.used, 1);
+  assert.equal(a.system.resourceUses.everydayGenius.epoch, "next");
+  await a.deleteEmbeddedDocuments(
+    "Item",
+    a.items.filter(i => i.system.featKind === "temporary").map(i => i.id)
+  );
+  assert.equal(a.system.resourceUses.everydayGenius.used, 1);
+  assert.equal(posts[0].flags.spycraft2.session, "s");
+  assert.equal(g.system.temporaryGrant.period, "session");
+});
+test("three mission claims exhaust a three-feat allowance and concurrent final claims produce one result without extra dice", async () => {
+  const a = reset();
+  await a.useEverydayGenius(opts("Techie"));
+  await a.useEverydayGenius(opts("Actor"));
+  const result = await Promise.all([a.useEverydayGenius(opts("Burglar")), a.useEverydayGenius(opts("Observer"))]);
+  assert.equal(result.filter(Boolean).length, 1);
+  assert.equal(a.items.filter(i => i.system.featKind === "temporary").length, 3);
+  assert.equal(a.system.resourceUses.everydayGenius.used, 3);
+  assert.equal(await a.useEverydayGenius(opts("Observer")), null);
+  const status = resourceStatus(
+    a.system.limitedUses.find(s => s.id === "everydayGenius"),
+    a.system.resourceUses,
+    a.usagePeriods
+  );
+  assert.equal(status.remaining, 0);
+  assert.equal(a.system.actionDice.value, 0);
+});
+test("cancellation, strict full-action declaration, wrong tree, off-turn, creation/posting and changed-period failures leave no partial grant or spent claim", async () => {
+  let a = reset();
+  assert.equal(await a.useEverydayGenius(), null);
+  assert.equal(await a.useEverydayGenius({ ...opts("Techie"), fullActionConfirmed: "true" }), null);
+  await assert.rejects(a.useEverydayGenius(opts("Guts")), /Basic Skill/);
+  failCreate = true;
+  await assert.rejects(a.useEverydayGenius(opts("Techie")), /create failed/);
+  failCreate = false;
+  failPost = true;
+  await assert.rejects(a.useEverydayGenius(opts("Techie")), /post failed/);
+  failPost = false;
+  assert.equal(a.system.resourceUses.everydayGenius, undefined);
+  assert.equal(a.items.filter(i => i.system.featKind === "temporary").length, 0);
+  game.combat = {
+    started: true,
+    combatants: [{ actor: { uuid: a.uuid } }],
+    combatant: { actor: { uuid: "Actor.other" } }
+  };
+  await assert.rejects(a.useEverydayGenius(opts("Techie")), /initiative/);
+  game.combat = null;
+  hook = actor => {
+    session = "changed";
+    actor.derive();
+  };
+  await assert.rejects(a.useEverydayGenius(opts("Techie")), /period changed/);
+  assert.equal(a.items.filter(i => i.system.featKind === "temporary").length, 0);
+  assert.equal(a.system.resourceUses.everydayGenius, undefined);
+  a = reset();
+  a.isOwner = false;
+  assert.equal(await a.useEverydayGenius(opts("Techie")), null);
+});
+test("shrinking earned allowance rolls back the new grant, while failed cleanup keeps the remaining grant and spent use for review", async () => {
+  let a = reset();
+  await a.useEverydayGenius(opts("Techie"));
+  await a.useEverydayGenius(opts("Actor"));
+  hook = actor => {
+    actor.items = actor.items.filter(i => i.name !== "Attention to Detail");
+    actor.derive();
+  };
+  await assert.rejects(a.useEverydayGenius(opts("Burglar")), /allowance/);
+  assert.equal(a.items.filter(i => i.system.featKind === "temporary").length, 2);
+  assert.equal(a.system.resourceUses.everydayGenius.used, 2);
+  a = reset();
+  failPost = true;
+  failDelete = true;
+  assert.ok(await a.useEverydayGenius(opts("Techie")));
+  assert.equal(a.system.resourceUses.everydayGenius.used, 1);
+  assert.match(warnings.at(-1), /use remains spent/);
+});

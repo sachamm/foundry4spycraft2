@@ -1,20 +1,354 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {settleSilverTongueVictory,resumeSilverTongueVictory,correctSilverTongueVictory,recoverSilverTongueAtMissionEnd,silverVictoryRows} from '../module/apps/silver-tongue.mjs';import {attributeDamageState,attributeDamagePlan,attributeMissionRecoveryPlan} from '../module/rules/attribute-damage.mjs';
-const reverse=v=>v&&typeof v==='object'?Array.isArray(v)?v.map(reverse):Object.fromEntries(Object.entries(v).reverse().map(([k,x])=>[k,reverse(x)])):v;
-const merge=(a,b)=>{for(const[k,v]of Object.entries(b))a[k]=v&&typeof v==='object'&&!Array.isArray(v)?merge(a[k]&&typeof a[k]==='object'?a[k]:{},v):structuredClone(v);return a;};
-class Actor{constructor(id,{silver=false,wisdom=8}={}){this.id=id;this.uuid='Actor.'+id;this.name=id;this.type='agent';this.isOwner=true;this.flags={};this.system={activeFeatNames:silver?['Silver Tongue']:[],abilities:{wis:{base:wisdom,value:wisdom},con:{base:12,value:12},int:{base:12,value:12}},usagePeriods:{mission:'mission1'},attributeDamage:null,actionDice:{value:0}};this.updates=0;this.beforeUpdate=async()=>{};this.afterUpdate=async()=>{};}get usagePeriods(){return this.system.usagePeriods;}derive(){const s=attributeDamageState(this.system);for(const[k,a]of Object.entries(this.system.abilities))a.value=a.base-s.byAbility[k].total;}async update(patch){const count=++this.updates;await this.beforeUpdate(patch,count);for(const[path,value]of Object.entries(patch)){const parts=path.split('.');let at=this;for(const k of parts.slice(0,-1))at=at[k]??={};const key=parts.at(-1);if(value&&typeof value==='object'&&!Array.isArray(value))at[key]=merge(at[key]&&typeof at[key]==='object'?at[key]:{},value);else at[key]=structuredClone(value);}this.flags=reverse(this.flags);if(this.system.attributeDamage)this.system.attributeDamage=reverse(this.system.attributeDamage);this.derive();await this.afterUpdate(patch,count);return this;}}
-let dialog=null,notices=[];globalThis.game={ready:false,user:{id:'GC',isGM:true},time:{worldTime:126},settings:{get:()=>null},actors:new Map()};globalThis.foundry={utils:{escapeHTML:String},applications:{api:{DialogV2:{input:async()=>dialog}}}};globalThis.ui={notifications:{warn:s=>notices.push(s)}};
-function fixture(){game.user.isGM=true;notices=[];dialog=null;const source=new Actor('source',{silver:true,wisdom:12}),target=new Actor('target');game.actors=new Map([[source.id,source],[target.id,target]]);return {source,target};}
-const input=(patch={})=>({targetActorUuid:'Actor.target',conflictId:'seduction1',victoryConfirmed:true,sourceAtVictoryConfirmed:true,...patch});
-const first=source=>Object.values(source.flags.spycraft2?.silverTongueVictories??{})[0];
-async function otherDamage(target,{id='other',ability='wis',kind='temporary',amount=1,source='Other source'}={}){const p=attributeDamagePlan(target.system,{id,ability,kind,amount,source,confirmed:true,worldTime:126});await target.update({'system.attributeDamage':p.record});return p;}
-test('actual actor lookup, GC/ownership, strict declarations and dialog cancellation prevent fabricated target damage',async()=>{let {source,target}=fixture();assert.equal(await settleSilverTongueVictory(source),null);assert.equal(source.updates,0);for(const patch of [{victoryConfirmed:'true'},{sourceAtVictoryConfirmed:false},{targetActorUuid:'Actor.fake'}])await assert.rejects(settleSilverTongueVictory(source,input(patch)));assert.equal(source.updates,0);game.user.isGM=false;await assert.rejects(settleSilverTongueVictory(source,input()),/owning GC/);game.user.isGM=true;target.isOwner=false;await assert.rejects(settleSilverTongueVictory(source,input()),/owning GC/);target.isOwner=true;const r=await settleSilverTongueVictory(source,input({targetSystem:{abilities:{wis:{value:999}}}}));assert.equal(r.status,'settled');assert.equal(r.event.before,8);assert.equal(target.system.abilities.wis.value,7);assert.equal(target.system.actionDice.value,0);assert.equal(source.system.actionDice.value,0);});
-test('concurrent duplicate victories apply once; distinct victories reach six and retain zero-damage claims without healing below six',async()=>{const {source,target}=fixture();const [a,b]=await Promise.all([settleSilverTongueVictory(source,input()),settleSilverTongueVictory(source,input())]);assert.equal(a.id,b.id);assert.equal(target.system.abilities.wis.value,7);assert.equal(target.system.attributeDamage.events.length,1);for(const conflictId of ['seduction2','seduction3','seduction4'])await settleSilverTongueVictory(source,input({conflictId}));assert.equal(target.system.abilities.wis.value,6);assert.deepEqual(target.system.attributeDamage.events.map(e=>e.amount),[1,1,0,0]);assert.equal(Object.keys(source.flags.spycraft2.silverTongueVictories).length,4);assert.ok(silverVictoryRows(source).every(r=>r.status==='settled'));await assert.rejects(settleSilverTongueVictory(source,input({targetActorUuid:source.uuid})),/opposing character/);});
-test('a pending history save that fails before commit changes no target, while committed-then-rejected writes reconcile exactly',async()=>{let {source,target}=fixture();source.beforeUpdate=async(_p,n)=>{if(n===1)throw Error('Source save rejected');};await assert.rejects(settleSilverTongueVictory(source,input()),/Source save/);assert.equal(target.updates,0);assert.equal(target.system.abilities.wis.value,8);({source,target}=fixture());source.afterUpdate=async(_p,n)=>{if(n===1||n===2)throw Error('Committed source write rejected');};target.afterUpdate=async()=>{throw Error('Committed target write rejected');};const r=await settleSilverTongueVictory(source,input());assert.equal(r.status,'settled');assert.equal(target.system.abilities.wis.value,7);assert.equal(target.system.attributeDamage.events.length,1);assert.equal(first(source).status,'settled');});
-test('failed target saving preserves one durable pending victory, blocks other claims/recovery, and resumes after feat loss without spending or double damage',async()=>{const {source,target}=fixture();target.beforeUpdate=async()=>{throw Error('Target save rejected');};const r=await settleSilverTongueVictory(source,input());assert.equal(r.needsReview,true);assert.equal(first(source).status,'pending');assert.equal(target.system.abilities.wis.value,8);await assert.rejects(settleSilverTongueVictory(source,input({conflictId:'other'})),/interrupted/);await assert.rejects(recoverSilverTongueAtMissionEnd(target,{confirmed:true}),/pending/);source.system.activeFeatNames=[];target.beforeUpdate=async()=>{};const resumed=await resumeSilverTongueVictory(source,r.id);assert.equal(resumed.status,'settled');assert.equal(target.system.abilities.wis.value,7);assert.equal(target.system.attributeDamage.events.length,1);assert.equal((await settleSilverTongueVictory(source,input())).status,'settled');assert.equal(target.system.abilities.wis.value,7);});
-test('target Wisdom/history drift after source preparation remains pending and can be cancelled without guessing or overwriting unrelated changes',async()=>{const {source,target}=fixture();source.afterUpdate=async(_p,n)=>{if(n===1){target.system.abilities.wis.base=9;target.derive();}};const r=await settleSilverTongueVictory(source,input());assert.equal(r.needsReview,true);assert.match(r.reason,/Wisdom, mission or damage history changed/);assert.equal(target.system.attributeDamage,null);assert.equal(target.system.abilities.wis.value,9);const corrected=await correctSilverTongueVictory(source,r.id,{confirmed:true,reason:'Wrong target confirmed'});assert.equal(corrected.status,'cancelled');assert.equal(target.system.abilities.wis.value,9);assert.equal(target.system.attributeDamage,null);assert.equal((await settleSilverTongueVictory(source,input())).status,'cancelled');assert.equal((await settleSilverTongueVictory(source,input({conflictId:'legitimate'}))).status,'settled');assert.equal(target.system.abilities.wis.value,8);});
-test('a failed final source save resumes from the exact existing target event even after healing, new damage or feat loss',async()=>{const {source,target}=fixture();source.beforeUpdate=async(_p,n)=>{if(n===2)throw Error('Final source save failed');};const r=await settleSilverTongueVictory(source,input());assert.equal(r.needsReview,true);assert.equal(target.system.abilities.wis.value,7);assert.equal(first(source).status,'pending');await otherDamage(target,{id:'unrelated',amount:1});const recovery=attributeMissionRecoveryPlan(target.system,{id:'synthetic-end',missionId:'mission1',confirmed:true,worldTime:127});await target.update({'system.attributeDamage':recovery.record});source.system.activeFeatNames=[];source.beforeUpdate=async()=>{};const before=structuredClone(target.system.attributeDamage),resumed=await resumeSilverTongueVictory(source,r.id);assert.equal(resumed.status,'settled');assert.deepEqual(target.system.attributeDamage,before);assert.equal(target.system.abilities.wis.value,8);assert.equal(target.system.attributeDamage.events.length,2);});
-test('correction restores only its own remaining Wisdom point and records cancelling intent before a failed final save',async()=>{const {source,target}=fixture();const r=await settleSilverTongueVictory(source,input());await otherDamage(target,{amount:2});assert.equal(target.system.abilities.wis.value,5);source.beforeUpdate=async(p)=>{if(Object.values(p).some(v=>v?.status==='cancelled'))throw Error('Final cancellation failed');};const c=await correctSilverTongueVictory(source,r.id,{confirmed:true,reason:'Wrong recorded victory'});assert.equal(c.needsReview,true);assert.equal(first(source).status,'cancelling');assert.equal(target.system.abilities.wis.value,6);assert.equal(target.system.attributeDamage.events.length,2);assert.equal(attributeDamageState(target.system).events.find(e=>e.id==='other').remaining,2);assert.equal(target.system.attributeDamage.recoveries.length,1);await assert.rejects(settleSilverTongueVictory(source,input({conflictId:'new'})),/interrupted/);source.beforeUpdate=async()=>{};source.system.activeFeatNames=[];const done=await resumeSilverTongueVictory(source,r.id);assert.equal(done.status,'cancelled');assert.equal(target.system.abilities.wis.value,6);assert.equal(target.system.attributeDamage.recoveries.length,1);assert.equal((await correctSilverTongueVictory(source,r.id,{confirmed:true,reason:'Retry'})).status,'cancelled');assert.equal(target.system.abilities.wis.value,6);});
-test('failed correction target write is resumable and a mismatched target event cannot be silently corrected or reapplied',async()=>{const {source,target}=fixture();const r=await settleSilverTongueVictory(source,input());target.beforeUpdate=async()=>{throw Error('Correction save failed');};const c=await correctSilverTongueVictory(source,r.id,{confirmed:true,reason:'Wrong victory'});assert.equal(c.needsReview,true);assert.equal(first(source).status,'cancelling');assert.equal(target.system.abilities.wis.value,7);target.beforeUpdate=async()=>{};const altered=structuredClone(target.system.attributeDamage);altered.events[0].before=9;await target.update({'system.attributeDamage':altered});const stopped=await resumeSilverTongueVictory(source,r.id);assert.equal(stopped.needsReview,true);assert.match(stopped.reason,/recorded source differs/);assert.equal(target.system.abilities.wis.value,7);assert.equal(target.system.attributeDamage.recoveries.length,0);});
-test('mission-end recovery uses the actual current mission, heals temporary Silver Wisdom once, preserves permanent damage and every source receipt',async()=>{const {source,target}=fixture();await otherDamage(target,{id:'permanent',kind:'permanent',amount:1});await settleSilverTongueVictory(source,input());const raw=structuredClone(target.system.attributeDamage.events);assert.equal(target.system.abilities.wis.value,6);await assert.rejects(recoverSilverTongueAtMissionEnd(target,{confirmed:'true'}),/actual end/);const a=await recoverSilverTongueAtMissionEnd(target,{confirmed:true});assert.equal(a.recovery.kind,'missionEnd');assert.equal(target.system.abilities.wis.value,7);assert.deepEqual(target.system.attributeDamage.events,raw);const b=await recoverSilverTongueAtMissionEnd(target,{confirmed:true});assert.equal(b.alreadyApplied,true);assert.equal(target.system.attributeDamage.recoveries.length,1);await assert.rejects(settleSilverTongueVictory(source,input({conflictId:'after-end'})),/already settled/);});
-test('mission recovery refuses other temporary/hazard/Constitution damage and a changed mission instead of using the Silver-only control',async()=>{for(const ability of ['wis','con','int']){const {source,target}=fixture();await settleSilverTongueVictory(source,input());await otherDamage(target,{ability});const before=structuredClone(target.system.attributeDamage);await assert.rejects(recoverSilverTongueAtMissionEnd(target,{confirmed:true}),/source-specific recovery/);assert.deepEqual(target.system.attributeDamage,before);}const {target}=fixture();target._actionDieQueue=Promise.resolve().then(()=>{target.system.usagePeriods.mission='new';});await assert.rejects(recoverSilverTongueAtMissionEnd(target,{confirmed:true}),/mission changed/);});
-test('ownership loss after preparation retains pending history; completed/cancelled and pending rows survive source loss for GC review',async()=>{const {source,target}=fixture();source.afterUpdate=async(_p,n)=>{if(n===1)target.isOwner=false;};const r=await settleSilverTongueVictory(source,input());assert.equal(r.needsReview,true);assert.equal(target.updates,0);assert.equal(silverVictoryRows(source)[0].pending,true);target.isOwner=true;source.afterUpdate=async()=>{};source.system.activeFeatNames=[];assert.equal((await resumeSilverTongueVictory(source,r.id)).status,'settled');assert.equal(silverVictoryRows(source)[0].pending,false);source.flags.spycraft2.silverTongueVictories.invalid={};assert.ok(silverVictoryRows(source).some(r=>r.needsReview));await assert.rejects(resumeSilverTongueVictory(source,r.id),/history/);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  settleSilverTongueVictory,
+  resumeSilverTongueVictory,
+  correctSilverTongueVictory,
+  recoverSilverTongueAtMissionEnd,
+  silverVictoryRows
+} from "../module/apps/silver-tongue.mjs";
+import {
+  attributeDamageState,
+  attributeDamagePlan,
+  attributeMissionRecoveryPlan
+} from "../module/rules/attribute-damage.mjs";
+const reverse = v =>
+  v && typeof v === "object"
+    ? Array.isArray(v)
+      ? v.map(reverse)
+      : Object.fromEntries(
+          Object.entries(v)
+            .reverse()
+            .map(([k, x]) => [k, reverse(x)])
+        )
+    : v;
+const merge = (a, b) => {
+  for (const [k, v] of Object.entries(b))
+    a[k] =
+      v && typeof v === "object" && !Array.isArray(v)
+        ? merge(a[k] && typeof a[k] === "object" ? a[k] : {}, v)
+        : structuredClone(v);
+  return a;
+};
+class Actor {
+  constructor(id, { silver = false, wisdom = 8 } = {}) {
+    this.id = id;
+    this.uuid = "Actor." + id;
+    this.name = id;
+    this.type = "agent";
+    this.isOwner = true;
+    this.flags = {};
+    this.system = {
+      activeFeatNames: silver ? ["Silver Tongue"] : [],
+      abilities: { wis: { base: wisdom, value: wisdom }, con: { base: 12, value: 12 }, int: { base: 12, value: 12 } },
+      usagePeriods: { mission: "mission1" },
+      attributeDamage: null,
+      actionDice: { value: 0 }
+    };
+    this.updates = 0;
+    this.beforeUpdate = async () => {};
+    this.afterUpdate = async () => {};
+  }
+  get usagePeriods() {
+    return this.system.usagePeriods;
+  }
+  derive() {
+    const s = attributeDamageState(this.system);
+    for (const [k, a] of Object.entries(this.system.abilities)) a.value = a.base - s.byAbility[k].total;
+  }
+  async update(patch) {
+    const count = ++this.updates;
+    await this.beforeUpdate(patch, count);
+    for (const [path, value] of Object.entries(patch)) {
+      const parts = path.split(".");
+      let at = this;
+      for (const k of parts.slice(0, -1)) at = at[k] ??= {};
+      const key = parts.at(-1);
+      if (value && typeof value === "object" && !Array.isArray(value))
+        at[key] = merge(at[key] && typeof at[key] === "object" ? at[key] : {}, value);
+      else at[key] = structuredClone(value);
+    }
+    this.flags = reverse(this.flags);
+    if (this.system.attributeDamage) this.system.attributeDamage = reverse(this.system.attributeDamage);
+    this.derive();
+    await this.afterUpdate(patch, count);
+    return this;
+  }
+}
+let dialog = null,
+  notices = [];
+globalThis.game = {
+  ready: false,
+  user: { id: "GC", isGM: true },
+  time: { worldTime: 126 },
+  settings: { get: () => null },
+  actors: new Map()
+};
+globalThis.foundry = {
+  utils: { escapeHTML: String },
+  applications: { api: { DialogV2: { input: async () => dialog } } }
+};
+globalThis.ui = { notifications: { warn: s => notices.push(s) } };
+function fixture() {
+  game.user.isGM = true;
+  notices = [];
+  dialog = null;
+  const source = new Actor("source", { silver: true, wisdom: 12 }),
+    target = new Actor("target");
+  game.actors = new Map([
+    [source.id, source],
+    [target.id, target]
+  ]);
+  return { source, target };
+}
+const input = (patch = {}) => ({
+  targetActorUuid: "Actor.target",
+  conflictId: "seduction1",
+  victoryConfirmed: true,
+  sourceAtVictoryConfirmed: true,
+  ...patch
+});
+const first = source => Object.values(source.flags.spycraft2?.silverTongueVictories ?? {})[0];
+async function otherDamage(
+  target,
+  { id = "other", ability = "wis", kind = "temporary", amount = 1, source = "Other source" } = {}
+) {
+  const p = attributeDamagePlan(target.system, { id, ability, kind, amount, source, confirmed: true, worldTime: 126 });
+  await target.update({ "system.attributeDamage": p.record });
+  return p;
+}
+test("actual actor lookup, GC/ownership, strict declarations and dialog cancellation prevent fabricated target damage", async () => {
+  let { source, target } = fixture();
+  assert.equal(await settleSilverTongueVictory(source), null);
+  assert.equal(source.updates, 0);
+  for (const patch of [
+    { victoryConfirmed: "true" },
+    { sourceAtVictoryConfirmed: false },
+    { targetActorUuid: "Actor.fake" }
+  ])
+    await assert.rejects(settleSilverTongueVictory(source, input(patch)));
+  assert.equal(source.updates, 0);
+  game.user.isGM = false;
+  await assert.rejects(settleSilverTongueVictory(source, input()), /owning GC/);
+  game.user.isGM = true;
+  target.isOwner = false;
+  await assert.rejects(settleSilverTongueVictory(source, input()), /owning GC/);
+  target.isOwner = true;
+  const r = await settleSilverTongueVictory(source, input({ targetSystem: { abilities: { wis: { value: 999 } } } }));
+  assert.equal(r.status, "settled");
+  assert.equal(r.event.before, 8);
+  assert.equal(target.system.abilities.wis.value, 7);
+  assert.equal(target.system.actionDice.value, 0);
+  assert.equal(source.system.actionDice.value, 0);
+});
+test("concurrent duplicate victories apply once; distinct victories reach six and retain zero-damage claims without healing below six", async () => {
+  const { source, target } = fixture();
+  const [a, b] = await Promise.all([
+    settleSilverTongueVictory(source, input()),
+    settleSilverTongueVictory(source, input())
+  ]);
+  assert.equal(a.id, b.id);
+  assert.equal(target.system.abilities.wis.value, 7);
+  assert.equal(target.system.attributeDamage.events.length, 1);
+  for (const conflictId of ["seduction2", "seduction3", "seduction4"])
+    await settleSilverTongueVictory(source, input({ conflictId }));
+  assert.equal(target.system.abilities.wis.value, 6);
+  assert.deepEqual(
+    target.system.attributeDamage.events.map(e => e.amount),
+    [1, 1, 0, 0]
+  );
+  assert.equal(Object.keys(source.flags.spycraft2.silverTongueVictories).length, 4);
+  assert.ok(silverVictoryRows(source).every(r => r.status === "settled"));
+  await assert.rejects(
+    settleSilverTongueVictory(source, input({ targetActorUuid: source.uuid })),
+    /opposing character/
+  );
+});
+test("a pending history save that fails before commit changes no target, while committed-then-rejected writes reconcile exactly", async () => {
+  let { source, target } = fixture();
+  source.beforeUpdate = async (_p, n) => {
+    if (n === 1) throw Error("Source save rejected");
+  };
+  await assert.rejects(settleSilverTongueVictory(source, input()), /Source save/);
+  assert.equal(target.updates, 0);
+  assert.equal(target.system.abilities.wis.value, 8);
+  ({ source, target } = fixture());
+  source.afterUpdate = async (_p, n) => {
+    if (n === 1 || n === 2) throw Error("Committed source write rejected");
+  };
+  target.afterUpdate = async () => {
+    throw Error("Committed target write rejected");
+  };
+  const r = await settleSilverTongueVictory(source, input());
+  assert.equal(r.status, "settled");
+  assert.equal(target.system.abilities.wis.value, 7);
+  assert.equal(target.system.attributeDamage.events.length, 1);
+  assert.equal(first(source).status, "settled");
+});
+test("failed target saving preserves one durable pending victory, blocks other claims/recovery, and resumes after feat loss without spending or double damage", async () => {
+  const { source, target } = fixture();
+  target.beforeUpdate = async () => {
+    throw Error("Target save rejected");
+  };
+  const r = await settleSilverTongueVictory(source, input());
+  assert.equal(r.needsReview, true);
+  assert.equal(first(source).status, "pending");
+  assert.equal(target.system.abilities.wis.value, 8);
+  await assert.rejects(settleSilverTongueVictory(source, input({ conflictId: "other" })), /interrupted/);
+  await assert.rejects(recoverSilverTongueAtMissionEnd(target, { confirmed: true }), /pending/);
+  source.system.activeFeatNames = [];
+  target.beforeUpdate = async () => {};
+  const resumed = await resumeSilverTongueVictory(source, r.id);
+  assert.equal(resumed.status, "settled");
+  assert.equal(target.system.abilities.wis.value, 7);
+  assert.equal(target.system.attributeDamage.events.length, 1);
+  assert.equal((await settleSilverTongueVictory(source, input())).status, "settled");
+  assert.equal(target.system.abilities.wis.value, 7);
+});
+test("target Wisdom/history drift after source preparation remains pending and can be cancelled without guessing or overwriting unrelated changes", async () => {
+  const { source, target } = fixture();
+  source.afterUpdate = async (_p, n) => {
+    if (n === 1) {
+      target.system.abilities.wis.base = 9;
+      target.derive();
+    }
+  };
+  const r = await settleSilverTongueVictory(source, input());
+  assert.equal(r.needsReview, true);
+  assert.match(r.reason, /Wisdom, mission or damage history changed/);
+  assert.equal(target.system.attributeDamage, null);
+  assert.equal(target.system.abilities.wis.value, 9);
+  const corrected = await correctSilverTongueVictory(source, r.id, {
+    confirmed: true,
+    reason: "Wrong target confirmed"
+  });
+  assert.equal(corrected.status, "cancelled");
+  assert.equal(target.system.abilities.wis.value, 9);
+  assert.equal(target.system.attributeDamage, null);
+  assert.equal((await settleSilverTongueVictory(source, input())).status, "cancelled");
+  assert.equal((await settleSilverTongueVictory(source, input({ conflictId: "legitimate" }))).status, "settled");
+  assert.equal(target.system.abilities.wis.value, 8);
+});
+test("a failed final source save resumes from the exact existing target event even after healing, new damage or feat loss", async () => {
+  const { source, target } = fixture();
+  source.beforeUpdate = async (_p, n) => {
+    if (n === 2) throw Error("Final source save failed");
+  };
+  const r = await settleSilverTongueVictory(source, input());
+  assert.equal(r.needsReview, true);
+  assert.equal(target.system.abilities.wis.value, 7);
+  assert.equal(first(source).status, "pending");
+  await otherDamage(target, { id: "unrelated", amount: 1 });
+  const recovery = attributeMissionRecoveryPlan(target.system, {
+    id: "synthetic-end",
+    missionId: "mission1",
+    confirmed: true,
+    worldTime: 127
+  });
+  await target.update({ "system.attributeDamage": recovery.record });
+  source.system.activeFeatNames = [];
+  source.beforeUpdate = async () => {};
+  const before = structuredClone(target.system.attributeDamage),
+    resumed = await resumeSilverTongueVictory(source, r.id);
+  assert.equal(resumed.status, "settled");
+  assert.deepEqual(target.system.attributeDamage, before);
+  assert.equal(target.system.abilities.wis.value, 8);
+  assert.equal(target.system.attributeDamage.events.length, 2);
+});
+test("correction restores only its own remaining Wisdom point and records cancelling intent before a failed final save", async () => {
+  const { source, target } = fixture();
+  const r = await settleSilverTongueVictory(source, input());
+  await otherDamage(target, { amount: 2 });
+  assert.equal(target.system.abilities.wis.value, 5);
+  source.beforeUpdate = async p => {
+    if (Object.values(p).some(v => v?.status === "cancelled")) throw Error("Final cancellation failed");
+  };
+  const c = await correctSilverTongueVictory(source, r.id, { confirmed: true, reason: "Wrong recorded victory" });
+  assert.equal(c.needsReview, true);
+  assert.equal(first(source).status, "cancelling");
+  assert.equal(target.system.abilities.wis.value, 6);
+  assert.equal(target.system.attributeDamage.events.length, 2);
+  assert.equal(attributeDamageState(target.system).events.find(e => e.id === "other").remaining, 2);
+  assert.equal(target.system.attributeDamage.recoveries.length, 1);
+  await assert.rejects(settleSilverTongueVictory(source, input({ conflictId: "new" })), /interrupted/);
+  source.beforeUpdate = async () => {};
+  source.system.activeFeatNames = [];
+  const done = await resumeSilverTongueVictory(source, r.id);
+  assert.equal(done.status, "cancelled");
+  assert.equal(target.system.abilities.wis.value, 6);
+  assert.equal(target.system.attributeDamage.recoveries.length, 1);
+  assert.equal(
+    (await correctSilverTongueVictory(source, r.id, { confirmed: true, reason: "Retry" })).status,
+    "cancelled"
+  );
+  assert.equal(target.system.abilities.wis.value, 6);
+});
+test("failed correction target write is resumable and a mismatched target event cannot be silently corrected or reapplied", async () => {
+  const { source, target } = fixture();
+  const r = await settleSilverTongueVictory(source, input());
+  target.beforeUpdate = async () => {
+    throw Error("Correction save failed");
+  };
+  const c = await correctSilverTongueVictory(source, r.id, { confirmed: true, reason: "Wrong victory" });
+  assert.equal(c.needsReview, true);
+  assert.equal(first(source).status, "cancelling");
+  assert.equal(target.system.abilities.wis.value, 7);
+  target.beforeUpdate = async () => {};
+  const altered = structuredClone(target.system.attributeDamage);
+  altered.events[0].before = 9;
+  await target.update({ "system.attributeDamage": altered });
+  const stopped = await resumeSilverTongueVictory(source, r.id);
+  assert.equal(stopped.needsReview, true);
+  assert.match(stopped.reason, /recorded source differs/);
+  assert.equal(target.system.abilities.wis.value, 7);
+  assert.equal(target.system.attributeDamage.recoveries.length, 0);
+});
+test("mission-end recovery uses the actual current mission, heals temporary Silver Wisdom once, preserves permanent damage and every source receipt", async () => {
+  const { source, target } = fixture();
+  await otherDamage(target, { id: "permanent", kind: "permanent", amount: 1 });
+  await settleSilverTongueVictory(source, input());
+  const raw = structuredClone(target.system.attributeDamage.events);
+  assert.equal(target.system.abilities.wis.value, 6);
+  await assert.rejects(recoverSilverTongueAtMissionEnd(target, { confirmed: "true" }), /actual end/);
+  const a = await recoverSilverTongueAtMissionEnd(target, { confirmed: true });
+  assert.equal(a.recovery.kind, "missionEnd");
+  assert.equal(target.system.abilities.wis.value, 7);
+  assert.deepEqual(target.system.attributeDamage.events, raw);
+  const b = await recoverSilverTongueAtMissionEnd(target, { confirmed: true });
+  assert.equal(b.alreadyApplied, true);
+  assert.equal(target.system.attributeDamage.recoveries.length, 1);
+  await assert.rejects(settleSilverTongueVictory(source, input({ conflictId: "after-end" })), /already settled/);
+});
+test("mission recovery refuses other temporary/hazard/Constitution damage and a changed mission instead of using the Silver-only control", async () => {
+  for (const ability of ["wis", "con", "int"]) {
+    const { source, target } = fixture();
+    await settleSilverTongueVictory(source, input());
+    await otherDamage(target, { ability });
+    const before = structuredClone(target.system.attributeDamage);
+    await assert.rejects(recoverSilverTongueAtMissionEnd(target, { confirmed: true }), /source-specific recovery/);
+    assert.deepEqual(target.system.attributeDamage, before);
+  }
+  const { target } = fixture();
+  target._actionDieQueue = Promise.resolve().then(() => {
+    target.system.usagePeriods.mission = "new";
+  });
+  await assert.rejects(recoverSilverTongueAtMissionEnd(target, { confirmed: true }), /mission changed/);
+});
+test("ownership loss after preparation retains pending history; completed/cancelled and pending rows survive source loss for GC review", async () => {
+  const { source, target } = fixture();
+  source.afterUpdate = async (_p, n) => {
+    if (n === 1) target.isOwner = false;
+  };
+  const r = await settleSilverTongueVictory(source, input());
+  assert.equal(r.needsReview, true);
+  assert.equal(target.updates, 0);
+  assert.equal(silverVictoryRows(source)[0].pending, true);
+  target.isOwner = true;
+  source.afterUpdate = async () => {};
+  source.system.activeFeatNames = [];
+  assert.equal((await resumeSilverTongueVictory(source, r.id)).status, "settled");
+  assert.equal(silverVictoryRows(source)[0].pending, false);
+  source.flags.spycraft2.silverTongueVictories.invalid = {};
+  assert.ok(silverVictoryRows(source).some(r => r.needsReview));
+  await assert.rejects(resumeSilverTongueVictory(source, r.id), /history/);
+});

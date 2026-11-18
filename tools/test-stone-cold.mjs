@@ -1,10 +1,179 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SPYCRAFT as cfg} from '../module/config.mjs';import {stoneColdSkillPlan,stoneColdSavePlan,validateStoneColdProof} from '../module/rules/stone-cold.mjs';import {resolveSkillCheck} from '../module/rules/skills.mjs';import {resolveKnowledgeCheck} from '../module/rules/knowledge.mjs';import {rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';
-const clock=()=>({id:'combat',started:true,round:1,turn:1,combatantId:'own',ownTurnIndex:0}),state=()=>({activeFeatNames:['Stone Cold'],abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:12,mod:1}])),skillTotals:Object.fromEntries(Object.entries(cfg.skills).map(([key,s])=>[key,{name:s.name,ranks:4,cap:50,threat:20,totals:s.abilities.map(ability=>({ability,total:5})),bonusEntries:[]}])),focusTotals:{},knowledge:3,conditionContext:{},saves:Object.fromEntries(['fort','ref','will'].map(k=>[k,{total:4,bonusEntries:[]}]))}),coercion=cfg.skills.intimidate.checks.find(c=>c.id==='coercion');
-test('Stone Cold is armed for every Intimidate use, waiving the exact missing-weapon penalty without leaking into other named skills or Knowledge',()=>{const s=state();for(const[key,skill]of Object.entries(cfg.skills))for(const c of skill.checks){const i={gearStatus:'missing',synergySkill:'none'},r=resolveSkillCheck(s,key,c,i),b=resolveSkillCheck({...s,activeFeatNames:[]},key,c,i);assert.equal(r.total-b.total,key==='intimidate'&&c.id==='coercion'?4:0,key+'/'+c.id);assert.equal(!!r.stoneCold,key==='intimidate');assert.equal(r.cap,b.cap);assert.equal(r.error,b.error);assert.equal(r.threat,b.threat);}for(const skill of Object.keys(cfg.skills))assert.equal(resolveKnowledgeCheck(s,{skill}).total,resolveKnowledgeCheck({...s,activeFeatNames:[]},{skill}).total);});
-test('the exact weapon requirement is satisfied even when unknown, without waiving another gear requirement or inventing a gear bonus/cap increase',()=>{const s=state();for(const gearStatus of ['missing','unknown','available']){const r=resolveSkillCheck(s,'intimidate',coercion,{gearStatus,synergySkill:'none'});assert.equal(r.blocked,false,r.blockedReason);assert.equal(r.total,5);assert.equal(r.skillGear,null);assert.equal(r.stoneCold.weaponGearWaived,true);}for(const tags of ['Gear (Forensics Kit)','Gear Only (weapon)','Gear (weapon or Forensics Kit)']){const c={...coercion,tags},p=stoneColdSkillPlan(s,'intimidate',c);assert.equal(p.check.tags,tags);assert.equal(p.evidence.weaponGearWaived,false);}const mixed=stoneColdSkillPlan(s,'intimidate',{...coercion,tags:'Gear (weapon), Gear (Forensics Kit)'});assert.ok(mixed.check.tags.includes('Gear (Forensics Kit)'));assert.ok(!mixed.check.tags.includes('Gear (weapon)'));assert.equal(resolveSkillCheck(s,'intimidate',mixed.check,{gearStatus:'unknown'}).blocked,true);});
-test('Stone Cold combat Will +1 is untyped, source-scoped and independent of own Count, rounds or other save types',()=>{for(const key of ['fort','ref','will'])for(const earned of [false,true])for(const started of [false,true]){const p=stoneColdSavePlan({...state(),activeFeatNames:earned?['Stone Cold','Stone Cold']:[]},key,{...clock(),started});assert.equal(!!p,key==='will'&&earned&&started);if(p){assert.equal(p.bonus,1);assert.equal(p.type,'');assert.equal(p.combat.id,'combat');}}for(const patch of [{id:''},{combatantId:''},{round:0},{turn:-1},{ownTurnIndex:-1}])assert.equal(stoneColdSavePlan(state(),'will',{...clock(),...patch}),null);assert.equal(stoneColdSavePlan(state(),'will',null),null);});
-test('new source proof validates direct/replacement skill and save entries, including source loss and ending or changing combat',()=>{const s=state(),skill=stoneColdSkillPlan(s,'intimidate',coercion).evidence,save=stoneColdSavePlan(s,'will',clock());validateStoneColdProof(s,skill,{checkKind:'skill',skillKey:'intimidate',checkId:'coercion'});validateStoneColdProof(s,save,{checkKind:'save',checkId:'will',combat:clock()});validateStoneColdProof(s,save,{checkKind:'save',checkId:'will',combat:{...clock(),round:2,turn:0}});for(const context of [{checkKind:'save',checkId:'will',combat:null},{checkKind:'save',checkId:'will',combat:{...clock(),started:false}},{checkKind:'save',checkId:'will',combat:{...clock(),id:'other'}},{checkKind:'save',checkId:'fort',combat:clock()}])assert.throws(()=>validateStoneColdProof(s,save,context),/changed/);s.activeFeatNames=[];assert.throws(()=>validateStoneColdProof(s,skill,{checkKind:'skill',skillKey:'intimidate',checkId:'coercion'}),/changed/);assert.throws(()=>validateStoneColdProof(s,save,{checkKind:'save',checkId:'will',combat:clock()}),/changed/);validateStoneColdProof(s,null,{});});
-test('Stone Cold evidence cannot be added to an old snapshot, removed or changed without invalidating the receipt',()=>{for(const proof of [stoneColdSkillPlan(state(),'intimidate',coercion).evidence,stoneColdSavePlan(state(),'will',clock())]){const c={checkKind:proof.kind,checkId:proof.checkId,stoneCold:proof},e=rollEvidence(c);assert.equal(rollEvidenceMatches(e,c),true);assert.equal(rollEvidenceMatches(rollEvidence({...c,stoneCold:null}),c),false);assert.equal(rollEvidenceMatches(e,{...c,stoneCold:null}),false);for(const field of Object.keys(proof)){const n=structuredClone(c);n.stoneCold[field]='changed';assert.equal(rollEvidenceMatches(e,n),false);}}});
-globalThis.Actor=class{constructor(){this.system=state();this.items=[];this.type='agent';this.uuid='Actor.stone';this.isOwner=true;}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{isGM:true},settings:{get:()=>false},i18n:{localize:String}};globalThis.foundry={utils:{escapeHTML:String}};globalThis.ui={notifications:{warn:()=>null}};const {SpycraftActor}=await import('../module/documents/actor.mjs');
-test('actual unarmed Coercion dispatch preserves normal skill math, records the source and guards feat loss before posting',async()=>{const a=new SpycraftActor();a.rollCheck=async(f,data,options)=>({data,options});const r=await a.rollSkill('intimidate','wis',{check:'coercion',gearStatus:'missing',synergySkill:'none'});assert.equal(r.data.total,5);assert.equal(r.options.stoneCold.armed,true);assert.equal(r.options.skillGear,null);r.options.validateSkillContext();a.system.activeFeatNames=[];assert.throws(()=>r.options.validateSkillContext(),/changed/);const b=await a.rollSkill('intimidate','wis',{check:'coercion',gearStatus:'missing',synergySkill:'none'});assert.equal(b.data.total,1);assert.equal(b.options.stoneCold,null);});
-test('actual Will entry uses only actual participating combat, adds the unnamed bonus once alongside existing save bonuses and ignores forged options',async()=>{const a=new SpycraftActor();let c=clock();a.mentalLeapCombatContext=()=>c;a.rollCheck=async(f,data,options)=>({data,options});const r=await a.rollSave('will');assert.equal(r.data.total,5);assert.equal(r.options.stoneCold.bonus,1);for(const key of ['fort','ref']){const p=await a.rollSave(key);assert.equal(p.data.total,4);assert.equal(p.options.stoneCold,null);}c=null;const outside=await a.rollSave('will',{inCombat:true,combat:clock(),stoneCold:{bonus:999}});assert.equal(outside.data.total,4);assert.equal(outside.options.stoneCold,null);a.system.activeFeatNames=[];c=clock();assert.equal((await a.rollSave('will')).data.total,4);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { stoneColdSkillPlan, stoneColdSavePlan, validateStoneColdProof } from "../module/rules/stone-cold.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { resolveKnowledgeCheck } from "../module/rules/knowledge.mjs";
+import { rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+const clock = () => ({ id: "combat", started: true, round: 1, turn: 1, combatantId: "own", ownTurnIndex: 0 }),
+  state = () => ({
+    activeFeatNames: ["Stone Cold"],
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 12, mod: 1 }])),
+    skillTotals: Object.fromEntries(
+      Object.entries(cfg.skills).map(([key, s]) => [
+        key,
+        {
+          name: s.name,
+          ranks: 4,
+          cap: 50,
+          threat: 20,
+          totals: s.abilities.map(ability => ({ ability, total: 5 })),
+          bonusEntries: []
+        }
+      ])
+    ),
+    focusTotals: {},
+    knowledge: 3,
+    conditionContext: {},
+    saves: Object.fromEntries(["fort", "ref", "will"].map(k => [k, { total: 4, bonusEntries: [] }]))
+  }),
+  coercion = cfg.skills.intimidate.checks.find(c => c.id === "coercion");
+test("Stone Cold is armed for every Intimidate use, waiving the exact missing-weapon penalty without leaking into other named skills or Knowledge", () => {
+  const s = state();
+  for (const [key, skill] of Object.entries(cfg.skills))
+    for (const c of skill.checks) {
+      const i = { gearStatus: "missing", synergySkill: "none" },
+        r = resolveSkillCheck(s, key, c, i),
+        b = resolveSkillCheck({ ...s, activeFeatNames: [] }, key, c, i);
+      assert.equal(r.total - b.total, key === "intimidate" && c.id === "coercion" ? 4 : 0, key + "/" + c.id);
+      assert.equal(!!r.stoneCold, key === "intimidate");
+      assert.equal(r.cap, b.cap);
+      assert.equal(r.error, b.error);
+      assert.equal(r.threat, b.threat);
+    }
+  for (const skill of Object.keys(cfg.skills))
+    assert.equal(
+      resolveKnowledgeCheck(s, { skill }).total,
+      resolveKnowledgeCheck({ ...s, activeFeatNames: [] }, { skill }).total
+    );
+});
+test("the exact weapon requirement is satisfied even when unknown, without waiving another gear requirement or inventing a gear bonus/cap increase", () => {
+  const s = state();
+  for (const gearStatus of ["missing", "unknown", "available"]) {
+    const r = resolveSkillCheck(s, "intimidate", coercion, { gearStatus, synergySkill: "none" });
+    assert.equal(r.blocked, false, r.blockedReason);
+    assert.equal(r.total, 5);
+    assert.equal(r.skillGear, null);
+    assert.equal(r.stoneCold.weaponGearWaived, true);
+  }
+  for (const tags of ["Gear (Forensics Kit)", "Gear Only (weapon)", "Gear (weapon or Forensics Kit)"]) {
+    const c = { ...coercion, tags },
+      p = stoneColdSkillPlan(s, "intimidate", c);
+    assert.equal(p.check.tags, tags);
+    assert.equal(p.evidence.weaponGearWaived, false);
+  }
+  const mixed = stoneColdSkillPlan(s, "intimidate", { ...coercion, tags: "Gear (weapon), Gear (Forensics Kit)" });
+  assert.ok(mixed.check.tags.includes("Gear (Forensics Kit)"));
+  assert.ok(!mixed.check.tags.includes("Gear (weapon)"));
+  assert.equal(resolveSkillCheck(s, "intimidate", mixed.check, { gearStatus: "unknown" }).blocked, true);
+});
+test("Stone Cold combat Will +1 is untyped, source-scoped and independent of own Count, rounds or other save types", () => {
+  for (const key of ["fort", "ref", "will"])
+    for (const earned of [false, true])
+      for (const started of [false, true]) {
+        const p = stoneColdSavePlan({ ...state(), activeFeatNames: earned ? ["Stone Cold", "Stone Cold"] : [] }, key, {
+          ...clock(),
+          started
+        });
+        assert.equal(!!p, key === "will" && earned && started);
+        if (p) {
+          assert.equal(p.bonus, 1);
+          assert.equal(p.type, "");
+          assert.equal(p.combat.id, "combat");
+        }
+      }
+  for (const patch of [{ id: "" }, { combatantId: "" }, { round: 0 }, { turn: -1 }, { ownTurnIndex: -1 }])
+    assert.equal(stoneColdSavePlan(state(), "will", { ...clock(), ...patch }), null);
+  assert.equal(stoneColdSavePlan(state(), "will", null), null);
+});
+test("new source proof validates direct/replacement skill and save entries, including source loss and ending or changing combat", () => {
+  const s = state(),
+    skill = stoneColdSkillPlan(s, "intimidate", coercion).evidence,
+    save = stoneColdSavePlan(s, "will", clock());
+  validateStoneColdProof(s, skill, { checkKind: "skill", skillKey: "intimidate", checkId: "coercion" });
+  validateStoneColdProof(s, save, { checkKind: "save", checkId: "will", combat: clock() });
+  validateStoneColdProof(s, save, { checkKind: "save", checkId: "will", combat: { ...clock(), round: 2, turn: 0 } });
+  for (const context of [
+    { checkKind: "save", checkId: "will", combat: null },
+    { checkKind: "save", checkId: "will", combat: { ...clock(), started: false } },
+    { checkKind: "save", checkId: "will", combat: { ...clock(), id: "other" } },
+    { checkKind: "save", checkId: "fort", combat: clock() }
+  ])
+    assert.throws(() => validateStoneColdProof(s, save, context), /changed/);
+  s.activeFeatNames = [];
+  assert.throws(
+    () => validateStoneColdProof(s, skill, { checkKind: "skill", skillKey: "intimidate", checkId: "coercion" }),
+    /changed/
+  );
+  assert.throws(
+    () => validateStoneColdProof(s, save, { checkKind: "save", checkId: "will", combat: clock() }),
+    /changed/
+  );
+  validateStoneColdProof(s, null, {});
+});
+test("Stone Cold evidence cannot be added to an old snapshot, removed or changed without invalidating the receipt", () => {
+  for (const proof of [
+    stoneColdSkillPlan(state(), "intimidate", coercion).evidence,
+    stoneColdSavePlan(state(), "will", clock())
+  ]) {
+    const c = { checkKind: proof.kind, checkId: proof.checkId, stoneCold: proof },
+      e = rollEvidence(c);
+    assert.equal(rollEvidenceMatches(e, c), true);
+    assert.equal(rollEvidenceMatches(rollEvidence({ ...c, stoneCold: null }), c), false);
+    assert.equal(rollEvidenceMatches(e, { ...c, stoneCold: null }), false);
+    for (const field of Object.keys(proof)) {
+      const n = structuredClone(c);
+      n.stoneCold[field] = "changed";
+      assert.equal(rollEvidenceMatches(e, n), false);
+    }
+  }
+});
+globalThis.Actor = class {
+  constructor() {
+    this.system = state();
+    this.items = [];
+    this.type = "agent";
+    this.uuid = "Actor.stone";
+    this.isOwner = true;
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = { user: { isGM: true }, settings: { get: () => false }, i18n: { localize: String } };
+globalThis.foundry = { utils: { escapeHTML: String } };
+globalThis.ui = { notifications: { warn: () => null } };
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+test("actual unarmed Coercion dispatch preserves normal skill math, records the source and guards feat loss before posting", async () => {
+  const a = new SpycraftActor();
+  a.rollCheck = async (f, data, options) => ({ data, options });
+  const r = await a.rollSkill("intimidate", "wis", { check: "coercion", gearStatus: "missing", synergySkill: "none" });
+  assert.equal(r.data.total, 5);
+  assert.equal(r.options.stoneCold.armed, true);
+  assert.equal(r.options.skillGear, null);
+  r.options.validateSkillContext();
+  a.system.activeFeatNames = [];
+  assert.throws(() => r.options.validateSkillContext(), /changed/);
+  const b = await a.rollSkill("intimidate", "wis", { check: "coercion", gearStatus: "missing", synergySkill: "none" });
+  assert.equal(b.data.total, 1);
+  assert.equal(b.options.stoneCold, null);
+});
+test("actual Will entry uses only actual participating combat, adds the unnamed bonus once alongside existing save bonuses and ignores forged options", async () => {
+  const a = new SpycraftActor();
+  let c = clock();
+  a.mentalLeapCombatContext = () => c;
+  a.rollCheck = async (f, data, options) => ({ data, options });
+  const r = await a.rollSave("will");
+  assert.equal(r.data.total, 5);
+  assert.equal(r.options.stoneCold.bonus, 1);
+  for (const key of ["fort", "ref"]) {
+    const p = await a.rollSave(key);
+    assert.equal(p.data.total, 4);
+    assert.equal(p.options.stoneCold, null);
+  }
+  c = null;
+  const outside = await a.rollSave("will", { inCombat: true, combat: clock(), stoneCold: { bonus: 999 } });
+  assert.equal(outside.data.total, 4);
+  assert.equal(outside.options.stoneCold, null);
+  a.system.activeFeatNames = [];
+  c = clock();
+  assert.equal((await a.rollSave("will")).data.total, 4);
+});

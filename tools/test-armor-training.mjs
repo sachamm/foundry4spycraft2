@@ -1,21 +1,279 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
-import {armorTrainingRules,armorTrainingAdjustments,armorTrainingDRForAttack,armorTypeChoice} from '../module/rules/armor-training.mjs';
-import {armorTotals} from '../module/rules/gear.mjs';import {resolveFeatChoices} from '../module/rules/feats.mjs';import {computeAgent} from '../module/rules/engine.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const armor=(type='P',patch={})=>({id:'armor',name:'Armor fixture',type:'armor',system:{equipped:true,carried:true,quantity:1,weight:0,armorSlot:'body',armorType:type,damageReduction:4,damageReductionSubdual:2,defensePenalty:-2,armorCheck:-3,speedPenalty:-10,notice:'12',...patch}});
-const feat=(name,choice='')=>({id:name,name,type:'feat',system:{choice,granted:true,bonuses:[]}}),basics=choice=>feat('Armor Basics',choice),mastery=choice=>feat('Armor Mastery',choice),supremacy=()=>feat('Armor Supremacy');
-const training=items=>armorTrainingRules(items,new Set(items.map(i=>i.id)));
-const components={natural:0,class:0,armorMelee:4,armorOther:2};
-function calculate(items){const cls={id:'test',type:'class',name:'Test',system:{identifier:'test',skillPoints:4,vitalityDie:6,classSkills:[],table:[{level:1,bab:1,defense:0,fort:0,ref:0,will:0}]}};return computeAgent({abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:12}])),progression:[{classId:'test',vitality:6,skills:{}}],skills:{},focuses:{},proficiencies:{},misc:{}},[cls,...items],cfg);}
-test('all three Armor Basics choices apply only their specified stat changes and keep DR scopes separate',()=>{for(const type of ['P','M','F']){const item=armor(type),before=structuredClone(item),row=armorTrainingAdjustments(item,training([basics(type)]));assert.deepEqual(item,before);assert.equal(row.system.damageReduction,4);assert.equal(row.system.damageReductionSubdual,2);assert.equal(row.system.defensePenalty,type==='P'?0:-2);assert.equal(row.system.armorCheck,type==='M'?-1:-2);assert.equal(row.system.speedPenalty,type==='M'?-5:-10);assert.equal(row.system.notice,type==='P'?'16':'12');assert.equal(row.benefits.meleeWeaponDR,type==='P'?1:type==='F'?2:0);assert.equal(row.benefits.rangedWeaponDR,type==='M'?1:type==='F'?2:0);assert.equal(row.benefits.defense,0);}});
-test('penalty reductions stop at zero without erasing positive bonuses or creating Speed bonuses',()=>{for(const type of ['P','M','F'])for(const value of [-1,0,2]){const row=armorTrainingAdjustments(armor(type,{defensePenalty:value,armorCheck:value,speedPenalty:value}),training([basics(type)]));if(value>=0){assert.equal(row.system.armorCheck,value);assert.equal(row.system.defensePenalty,value);assert.equal(row.system.speedPenalty,value);}else{assert.equal(row.system.armorCheck,0);if(type==='P')assert.equal(row.system.defensePenalty,0);if(type==='M')assert.equal(row.system.speedPenalty,0);}}});
-test('partial armor concealment raises numeric Notice/Search DCs and preserves disguised-clothing suffixes and descriptive entries',()=>{for(const [notice,expected]of [['20D','24D'],['18D','22D'],['12','16'],['obvious','obvious'],['as clothing','as clothing'],['12 / 14','12 / 14']]){const row=armorTrainingAdjustments(armor('P',{notice}),training([basics('P')]));assert.equal(row.system.notice,expected);assert.equal(row.benefits.noticeDC,4);}});
-test('Mastery extends Basics to a distinct type and adds Defense exactly once for either chosen type',()=>{for(const first of ['P','M','F'])for(const second of ['P','M','F']){const pair=[basics(first),mastery(second)],r=training(pair),choice=resolveFeatChoices(pair[1],{},pair,cfg,new Set(pair.map(i=>i.id)));assert.equal(r.types.length,first===second?1:2);assert.equal(choice.warnings.length,first===second?1:0);for(const worn of ['P','M','F'])assert.equal(armorTrainingAdjustments(armor(worn),r).benefits.defense,r.types.includes(worn)?1:0);}const rules=training([basics('P'),mastery('M')]);assert.deepEqual(rules.types,['P','M']);for(const type of ['P','M','F']){const row=armorTrainingAdjustments(armor(type),rules);assert.equal(row.benefits.defense,type==='F'?0:1);assert.equal(row.benefits.coupDeGraceRequiresHelpless,type!=='F');assert.equal(row.chosen,type!=='F');}const items=[basics('partial'),mastery('P')],choice=resolveFeatChoices(items[1],{},items,cfg,new Set(items.map(i=>i.id)));assert.match(choice.warnings[0],/different/);assert.deepEqual(training(items).types,['P']);});
-test('Supremacy supplies both earlier benefits for every armor type and its own attack protections without double counting',()=>{const rules=training([supremacy()]);assert.deepEqual(rules.types,['P','M','F']);for(const type of ['P','M','F']){const row=armorTrainingAdjustments(armor(type),rules);assert.equal(row.benefits.defense,1);assert.equal(row.benefits.meleeAttackDR,1);assert.equal(row.benefits.rangedAttackDR,1);assert.equal(row.benefits.sneakAttackImmune,true);assert.equal(row.benefits.coupDeGraceRequiresHelpless,true);assert.deepEqual(armorTrainingAdjustments(armor(type),training([basics('P'),mastery('M'),supremacy()])),row);}});
-test('missing and invalid choices produce actionable pending choices; Supremacy makes the old type selections unnecessary',()=>{for(const choice of ['', 'unrecognized']){const b=basics(choice),r=resolveFeatChoices(b,{},[b],cfg,new Set([b.id]));assert.ok(r.pending.length);assert.deepEqual(training([b]).types,[]);}const items=[basics(),mastery(),supremacy()],active=new Set(items.map(i=>i.id));for(const f of items.slice(0,2))assert.deepEqual(resolveFeatChoices(f,{},items,cfg,active).pending,[]);for(const [text,expected]of [['p','P'],['partial','P'],[' Moderate ','M'],['FULL','F'],['helmet',null]])assert.equal(armorTypeChoice(text),expected);});
-test('helmet, shield and miscellaneous protective gear do not acquire body-armor training benefits',()=>{const rules=training([supremacy()]);for(const slot of ['helmet','shield','goggles']){const row=armorTrainingAdjustments(armor('P'),rules,slot);assert.equal(row.applies,false);assert.equal(row.benefits.sneakAttackImmune,false);assert.equal(row.benefits.defense,0);}const helmet=armor('—',{armorSlot:'helmet',visionPenalty:true}),row=armorTotals([helmet],{armorTraining:rules}).armor;assert.equal(row.training.sneakAttackImmune,false);assert.equal(row.visionCheck,-3);});
-test('training adjusts only accepted equipped armor and preserves slot, reserve and helmet Vision rules',()=>{const body=armor('P'),extra={...armor('F'),id:'extra'},helmet={...armor('—',{armorSlot:'helmet',visionPenalty:true,armorCheck:-1}),id:'helmet'},items=[body,extra,helmet],before=structuredClone(items),r=armorTotals(items,{armorTraining:training([basics('P'),mastery('M')])});assert.deepEqual(items,before);assert.deepEqual(r.armor.items,['armor','helmet']);assert.equal(r.armor.check,-2);assert.equal(r.armor.visionCheck,-1);assert.equal(r.armor.defenseBonus,1);assert.equal(r.warnings.length,1);for(const patch of [{reserve:true},{carried:false},{destroyed:true},{quantity:0}])assert.equal(armorTotals([armor('P',patch)],{armorTraining:training([supremacy()])}).armor,null);});
-test('class ACP/Defense modifiers combine after type adjustments while training cannot remove independent load penalties',()=>{const rules=training([basics('P'),mastery('M')]),r=armorTotals([armor('P')],{armorTraining:rules,checkBonus:1,partialDefenseBonus:2,armorDefenseBonus:4}).armor;assert.equal(r.check,-1);assert.equal(r.defensePenalty,0);assert.equal(r.defenseBonus,7);assert.equal(Math.min(0,r.check,-4),-4);assert.equal(Math.min(0,r.defensePenalty,-3)+r.defenseBonus,4);});
-test('conditional armor DR uses the correct melee/unarmed/hurled/ranged axis and never adds a feat bonus after the natural-quality maximum',()=>{for(const type of ['P','M','F']){const row=armorTrainingAdjustments(armor(type),training([supremacy()])),s={damageReductionComponents:components,armorFeatRules:row.benefits};assert.equal(armorTrainingDRForAttack(s,'meleeWeapon'),5+(type==='P'?1:type==='F'?2:0));assert.equal(armorTrainingDRForAttack(s,'unarmed'),5);assert.equal(armorTrainingDRForAttack(s,'hurledWeapon'),5+(type==='M'?1:type==='F'?2:0));assert.equal(armorTrainingDRForAttack(s,'rangedWeapon'),3+(type==='M'?1:type==='F'?2:0));assert.equal(armorTrainingDRForAttack(s,'other'),2);assert.equal(armorTrainingDRForAttack({...s,damageReductionComponents:{...components,natural:10,class:2}},'meleeWeapon'),10);}assert.throws(()=>armorTrainingDRForAttack({},'meleeWeapon'),/components/);assert.throws(()=>armorTrainingDRForAttack({damageReductionComponents:components},'unknown'),/category/);});
-test('the actual engine exposes worn choices and per-attack DR while keeping Base Defense and equipment source values intact',()=>{const items=[armor('P'),basics('P'),mastery('M'),supremacy()],before=structuredClone(items),s=calculate(items),plain=calculate([armor('P')]);assert.deepEqual(items,before);assert.equal(s.defense.base,plain.defense.base);assert.equal(s.defense.total,plain.defense.total+3);assert.equal(s.armor.check,-2);assert.equal(s.armorDRByAttack.meleeWeapon,6);assert.equal(s.armorDRByAttack.unarmed,5);assert.equal(s.armorDRByAttack.rangedWeapon,3);assert.equal(s.armorDRByAttack.other,2);assert.equal(s.armorFeatRules.sneakAttackImmune,true);assert.equal(s.armor.adjustments[0].system.notice,'16');});
-test('dropping active feats or unwearing armor removes its protections without mutating the retained choices',()=>{const b=basics('P'),m=mastery('M'),sup=supremacy(),body=armor('P');assert.equal(armorTrainingRules([b,m,sup],new Set([b.id])).supremacy,false);assert.equal(calculate([body,b]).armorFeatRules.sneakAttackImmune,false);assert.equal(calculate([armor('P',{equipped:false}),b,m,sup]).armor,null);assert.equal(b.system.choice,'P');assert.equal(m.system.choice,'M');});
-test('all 37 source armor entries retain base statistics while every typed body armor gets the correct training branch',()=>{const catalog=JSON.parse(readFileSync(new URL('../src/data/equipment.json',import.meta.url))).armor,rules=training([supremacy()]);assert.equal(catalog.length,37);for(const source of catalog){const item=armor(source.armorType,{armorSlot:source.armorSlot,armorCheck:source.acp,defensePenalty:source.defensePenalty,speedPenalty:source.speed,notice:source.notice,visionPenalty:source.visionPenalty}),before=structuredClone(item),r=armorTrainingAdjustments(item,rules,source.armorSlot);assert.deepEqual(item,before);assert.equal(r.applies,source.armorSlot==='body'&&['P','M','F'].includes(source.armorType),source.name);}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import {
+  armorTrainingRules,
+  armorTrainingAdjustments,
+  armorTrainingDRForAttack,
+  armorTypeChoice
+} from "../module/rules/armor-training.mjs";
+import { armorTotals } from "../module/rules/gear.mjs";
+import { resolveFeatChoices } from "../module/rules/feats.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const armor = (type = "P", patch = {}) => ({
+  id: "armor",
+  name: "Armor fixture",
+  type: "armor",
+  system: {
+    equipped: true,
+    carried: true,
+    quantity: 1,
+    weight: 0,
+    armorSlot: "body",
+    armorType: type,
+    damageReduction: 4,
+    damageReductionSubdual: 2,
+    defensePenalty: -2,
+    armorCheck: -3,
+    speedPenalty: -10,
+    notice: "12",
+    ...patch
+  }
+});
+const feat = (name, choice = "") => ({ id: name, name, type: "feat", system: { choice, granted: true, bonuses: [] } }),
+  basics = choice => feat("Armor Basics", choice),
+  mastery = choice => feat("Armor Mastery", choice),
+  supremacy = () => feat("Armor Supremacy");
+const training = items => armorTrainingRules(items, new Set(items.map(i => i.id)));
+const components = { natural: 0, class: 0, armorMelee: 4, armorOther: 2 };
+function calculate(items) {
+  const cls = {
+    id: "test",
+    type: "class",
+    name: "Test",
+    system: {
+      identifier: "test",
+      skillPoints: 4,
+      vitalityDie: 6,
+      classSkills: [],
+      table: [{ level: 1, bab: 1, defense: 0, fort: 0, ref: 0, will: 0 }]
+    }
+  };
+  return computeAgent(
+    {
+      abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 12 }])),
+      progression: [{ classId: "test", vitality: 6, skills: {} }],
+      skills: {},
+      focuses: {},
+      proficiencies: {},
+      misc: {}
+    },
+    [cls, ...items],
+    cfg
+  );
+}
+test("all three Armor Basics choices apply only their specified stat changes and keep DR scopes separate", () => {
+  for (const type of ["P", "M", "F"]) {
+    const item = armor(type),
+      before = structuredClone(item),
+      row = armorTrainingAdjustments(item, training([basics(type)]));
+    assert.deepEqual(item, before);
+    assert.equal(row.system.damageReduction, 4);
+    assert.equal(row.system.damageReductionSubdual, 2);
+    assert.equal(row.system.defensePenalty, type === "P" ? 0 : -2);
+    assert.equal(row.system.armorCheck, type === "M" ? -1 : -2);
+    assert.equal(row.system.speedPenalty, type === "M" ? -5 : -10);
+    assert.equal(row.system.notice, type === "P" ? "16" : "12");
+    assert.equal(row.benefits.meleeWeaponDR, type === "P" ? 1 : type === "F" ? 2 : 0);
+    assert.equal(row.benefits.rangedWeaponDR, type === "M" ? 1 : type === "F" ? 2 : 0);
+    assert.equal(row.benefits.defense, 0);
+  }
+});
+test("penalty reductions stop at zero without erasing positive bonuses or creating Speed bonuses", () => {
+  for (const type of ["P", "M", "F"])
+    for (const value of [-1, 0, 2]) {
+      const row = armorTrainingAdjustments(
+        armor(type, { defensePenalty: value, armorCheck: value, speedPenalty: value }),
+        training([basics(type)])
+      );
+      if (value >= 0) {
+        assert.equal(row.system.armorCheck, value);
+        assert.equal(row.system.defensePenalty, value);
+        assert.equal(row.system.speedPenalty, value);
+      } else {
+        assert.equal(row.system.armorCheck, 0);
+        if (type === "P") assert.equal(row.system.defensePenalty, 0);
+        if (type === "M") assert.equal(row.system.speedPenalty, 0);
+      }
+    }
+});
+test("partial armor concealment raises numeric Notice/Search DCs and preserves disguised-clothing suffixes and descriptive entries", () => {
+  for (const [notice, expected] of [
+    ["20D", "24D"],
+    ["18D", "22D"],
+    ["12", "16"],
+    ["obvious", "obvious"],
+    ["as clothing", "as clothing"],
+    ["12 / 14", "12 / 14"]
+  ]) {
+    const row = armorTrainingAdjustments(armor("P", { notice }), training([basics("P")]));
+    assert.equal(row.system.notice, expected);
+    assert.equal(row.benefits.noticeDC, 4);
+  }
+});
+test("Mastery extends Basics to a distinct type and adds Defense exactly once for either chosen type", () => {
+  for (const first of ["P", "M", "F"])
+    for (const second of ["P", "M", "F"]) {
+      const pair = [basics(first), mastery(second)],
+        r = training(pair),
+        choice = resolveFeatChoices(pair[1], {}, pair, cfg, new Set(pair.map(i => i.id)));
+      assert.equal(r.types.length, first === second ? 1 : 2);
+      assert.equal(choice.warnings.length, first === second ? 1 : 0);
+      for (const worn of ["P", "M", "F"])
+        assert.equal(armorTrainingAdjustments(armor(worn), r).benefits.defense, r.types.includes(worn) ? 1 : 0);
+    }
+  const rules = training([basics("P"), mastery("M")]);
+  assert.deepEqual(rules.types, ["P", "M"]);
+  for (const type of ["P", "M", "F"]) {
+    const row = armorTrainingAdjustments(armor(type), rules);
+    assert.equal(row.benefits.defense, type === "F" ? 0 : 1);
+    assert.equal(row.benefits.coupDeGraceRequiresHelpless, type !== "F");
+    assert.equal(row.chosen, type !== "F");
+  }
+  const items = [basics("partial"), mastery("P")],
+    choice = resolveFeatChoices(items[1], {}, items, cfg, new Set(items.map(i => i.id)));
+  assert.match(choice.warnings[0], /different/);
+  assert.deepEqual(training(items).types, ["P"]);
+});
+test("Supremacy supplies both earlier benefits for every armor type and its own attack protections without double counting", () => {
+  const rules = training([supremacy()]);
+  assert.deepEqual(rules.types, ["P", "M", "F"]);
+  for (const type of ["P", "M", "F"]) {
+    const row = armorTrainingAdjustments(armor(type), rules);
+    assert.equal(row.benefits.defense, 1);
+    assert.equal(row.benefits.meleeAttackDR, 1);
+    assert.equal(row.benefits.rangedAttackDR, 1);
+    assert.equal(row.benefits.sneakAttackImmune, true);
+    assert.equal(row.benefits.coupDeGraceRequiresHelpless, true);
+    assert.deepEqual(armorTrainingAdjustments(armor(type), training([basics("P"), mastery("M"), supremacy()])), row);
+  }
+});
+test("missing and invalid choices produce actionable pending choices; Supremacy makes the old type selections unnecessary", () => {
+  for (const choice of ["", "unrecognized"]) {
+    const b = basics(choice),
+      r = resolveFeatChoices(b, {}, [b], cfg, new Set([b.id]));
+    assert.ok(r.pending.length);
+    assert.deepEqual(training([b]).types, []);
+  }
+  const items = [basics(), mastery(), supremacy()],
+    active = new Set(items.map(i => i.id));
+  for (const f of items.slice(0, 2)) assert.deepEqual(resolveFeatChoices(f, {}, items, cfg, active).pending, []);
+  for (const [text, expected] of [
+    ["p", "P"],
+    ["partial", "P"],
+    [" Moderate ", "M"],
+    ["FULL", "F"],
+    ["helmet", null]
+  ])
+    assert.equal(armorTypeChoice(text), expected);
+});
+test("helmet, shield and miscellaneous protective gear do not acquire body-armor training benefits", () => {
+  const rules = training([supremacy()]);
+  for (const slot of ["helmet", "shield", "goggles"]) {
+    const row = armorTrainingAdjustments(armor("P"), rules, slot);
+    assert.equal(row.applies, false);
+    assert.equal(row.benefits.sneakAttackImmune, false);
+    assert.equal(row.benefits.defense, 0);
+  }
+  const helmet = armor("—", { armorSlot: "helmet", visionPenalty: true }),
+    row = armorTotals([helmet], { armorTraining: rules }).armor;
+  assert.equal(row.training.sneakAttackImmune, false);
+  assert.equal(row.visionCheck, -3);
+});
+test("training adjusts only accepted equipped armor and preserves slot, reserve and helmet Vision rules", () => {
+  const body = armor("P"),
+    extra = { ...armor("F"), id: "extra" },
+    helmet = { ...armor("—", { armorSlot: "helmet", visionPenalty: true, armorCheck: -1 }), id: "helmet" },
+    items = [body, extra, helmet],
+    before = structuredClone(items),
+    r = armorTotals(items, { armorTraining: training([basics("P"), mastery("M")]) });
+  assert.deepEqual(items, before);
+  assert.deepEqual(r.armor.items, ["armor", "helmet"]);
+  assert.equal(r.armor.check, -2);
+  assert.equal(r.armor.visionCheck, -1);
+  assert.equal(r.armor.defenseBonus, 1);
+  assert.equal(r.warnings.length, 1);
+  for (const patch of [{ reserve: true }, { carried: false }, { destroyed: true }, { quantity: 0 }])
+    assert.equal(armorTotals([armor("P", patch)], { armorTraining: training([supremacy()]) }).armor, null);
+});
+test("class ACP/Defense modifiers combine after type adjustments while training cannot remove independent load penalties", () => {
+  const rules = training([basics("P"), mastery("M")]),
+    r = armorTotals([armor("P")], {
+      armorTraining: rules,
+      checkBonus: 1,
+      partialDefenseBonus: 2,
+      armorDefenseBonus: 4
+    }).armor;
+  assert.equal(r.check, -1);
+  assert.equal(r.defensePenalty, 0);
+  assert.equal(r.defenseBonus, 7);
+  assert.equal(Math.min(0, r.check, -4), -4);
+  assert.equal(Math.min(0, r.defensePenalty, -3) + r.defenseBonus, 4);
+});
+test("conditional armor DR uses the correct melee/unarmed/hurled/ranged axis and never adds a feat bonus after the natural-quality maximum", () => {
+  for (const type of ["P", "M", "F"]) {
+    const row = armorTrainingAdjustments(armor(type), training([supremacy()])),
+      s = { damageReductionComponents: components, armorFeatRules: row.benefits };
+    assert.equal(armorTrainingDRForAttack(s, "meleeWeapon"), 5 + (type === "P" ? 1 : type === "F" ? 2 : 0));
+    assert.equal(armorTrainingDRForAttack(s, "unarmed"), 5);
+    assert.equal(armorTrainingDRForAttack(s, "hurledWeapon"), 5 + (type === "M" ? 1 : type === "F" ? 2 : 0));
+    assert.equal(armorTrainingDRForAttack(s, "rangedWeapon"), 3 + (type === "M" ? 1 : type === "F" ? 2 : 0));
+    assert.equal(armorTrainingDRForAttack(s, "other"), 2);
+    assert.equal(
+      armorTrainingDRForAttack(
+        { ...s, damageReductionComponents: { ...components, natural: 10, class: 2 } },
+        "meleeWeapon"
+      ),
+      10
+    );
+  }
+  assert.throws(() => armorTrainingDRForAttack({}, "meleeWeapon"), /components/);
+  assert.throws(() => armorTrainingDRForAttack({ damageReductionComponents: components }, "unknown"), /category/);
+});
+test("the actual engine exposes worn choices and per-attack DR while keeping Base Defense and equipment source values intact", () => {
+  const items = [armor("P"), basics("P"), mastery("M"), supremacy()],
+    before = structuredClone(items),
+    s = calculate(items),
+    plain = calculate([armor("P")]);
+  assert.deepEqual(items, before);
+  assert.equal(s.defense.base, plain.defense.base);
+  assert.equal(s.defense.total, plain.defense.total + 3);
+  assert.equal(s.armor.check, -2);
+  assert.equal(s.armorDRByAttack.meleeWeapon, 6);
+  assert.equal(s.armorDRByAttack.unarmed, 5);
+  assert.equal(s.armorDRByAttack.rangedWeapon, 3);
+  assert.equal(s.armorDRByAttack.other, 2);
+  assert.equal(s.armorFeatRules.sneakAttackImmune, true);
+  assert.equal(s.armor.adjustments[0].system.notice, "16");
+});
+test("dropping active feats or unwearing armor removes its protections without mutating the retained choices", () => {
+  const b = basics("P"),
+    m = mastery("M"),
+    sup = supremacy(),
+    body = armor("P");
+  assert.equal(armorTrainingRules([b, m, sup], new Set([b.id])).supremacy, false);
+  assert.equal(calculate([body, b]).armorFeatRules.sneakAttackImmune, false);
+  assert.equal(calculate([armor("P", { equipped: false }), b, m, sup]).armor, null);
+  assert.equal(b.system.choice, "P");
+  assert.equal(m.system.choice, "M");
+});
+test("all 37 source armor entries retain base statistics while every typed body armor gets the correct training branch", () => {
+  const catalog = JSON.parse(readFileSync(new URL("../src/data/equipment.json", import.meta.url))).armor,
+    rules = training([supremacy()]);
+  assert.equal(catalog.length, 37);
+  for (const source of catalog) {
+    const item = armor(source.armorType, {
+        armorSlot: source.armorSlot,
+        armorCheck: source.acp,
+        defensePenalty: source.defensePenalty,
+        speedPenalty: source.speed,
+        notice: source.notice,
+        visionPenalty: source.visionPenalty
+      }),
+      before = structuredClone(item),
+      r = armorTrainingAdjustments(item, rules, source.armorSlot);
+    assert.deepEqual(item, before);
+    assert.equal(r.applies, source.armorSlot === "body" && ["P", "M", "F"].includes(source.armorType), source.name);
+  }
+});

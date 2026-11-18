@@ -54,7 +54,7 @@ The agent sheet calculates:
   armor affecting Defense, Reflex and Speed; mission gear picks by category.
 - **Final totals** — vitality, wounds, stress/subdual thresholds, knowledge/request/gear checks, action dice, carrying capacity.
 
-Build problems are shown as warnings. Executable workflows also reject invalid actions, unavailable gear and insufficient resources. The [RAW review and residual implementation ledger](docs/raw-character-review.md) distinguish verified mechanics from remaining manual rules. Personal gear classification, field acquisition, measured attacks and class resource controls are documented there; catalog presence alone does not establish complete automation.
+Build problems are shown as warnings. Executable workflows also reject invalid actions, unavailable gear and insufficient resources. The [RAW review and residual implementation ledger](docs/archive/raw-character-review.md) distinguish verified mechanics from remaining manual rules. Personal gear classification, field acquisition, measured attacks and class resource controls are documented there; catalog presence alone does not establish complete automation.
 
 Classes also provides ordinary GC action-die awards and once-per-mission XP settlement using the user-selected p.440 formula. Gear records Armor Use armor and reviewed higher-Caliber mission picks; Caliber V upgrades remain separate. Soldier 14 can declare One in a Million before an eligible roll. See the ledger for each workflow’s limits.
 

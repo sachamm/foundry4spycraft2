@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * Engine regression test: builds sample agents from the compiled compendium packs and
+ * Engine regression check: builds sample agents from the compendium documents generated from src/data and
  * compares derived values with the saved reference figures in tools/fixtures/*.json.
  *
- *   npm run build && npm test
+ *   npm test
  */
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ClassicLevel } from "classic-level";
+import { buildPacks } from "./lib/pack-docs.mjs";
 import { SKILLS, TABLES } from "../module/rules/tables.mjs";
 import { resolveSkillCheck } from "../module/rules/skills.mjs";
 import { computeAgent } from "../module/rules/engine.mjs";
@@ -21,31 +21,71 @@ const cfg = {
   tables: TABLES,
   pointBuy: 36,
   abilityIncreaseLevels: [4, 8, 12, 16, 20],
-  featTrees: Object.fromEntries(["basicCombat", "meleeCombat", "rangedCombat", "unarmedCombat", "chance", "chase", "covert", "gear",
-    "basicSkill", "advancedSkill", "style", "terrain", "tradecraft"].map(k => [k, k])),
-  proficiencies: Object.fromEntries(["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged", "explosives", "guided", "handgun", "hurled",
-    "exoticHurled", "indirectFire", "rifle", "shotgun", "submachineGun", "tactical", "vehicleWeapon"].map(k => [k, { label: k }]))
+  featTrees: Object.fromEntries(
+    [
+      "basicCombat",
+      "meleeCombat",
+      "rangedCombat",
+      "unarmedCombat",
+      "chance",
+      "chase",
+      "covert",
+      "gear",
+      "basicSkill",
+      "advancedSkill",
+      "style",
+      "terrain",
+      "tradecraft"
+    ].map(k => [k, k])
+  ),
+  proficiencies: Object.fromEntries(
+    [
+      "unarmed",
+      "blunt",
+      "exoticBlunt",
+      "edged",
+      "exoticEdged",
+      "explosives",
+      "guided",
+      "handgun",
+      "hurled",
+      "exoticHurled",
+      "indirectFire",
+      "rifle",
+      "shotgun",
+      "submachineGun",
+      "tactical",
+      "vehicleWeapon"
+    ].map(k => [k, { label: k }])
+  )
 };
 
-async function loadPack(name) {
-  const db = new ClassicLevel(join(process.env.SPYCRAFT_PACKS_DIR || join(ROOT, "packs"), name), { valueEncoding: "json" });
-  const docs = [];
-  for await (const [k, v] of db.iterator()) if (k.startsWith("!items!")) docs.push(v);
-  await db.close();
-  return Object.fromEntries(docs.map(d => [d.name, d]));
-}
+// Documents come straight from src/data through the pack builder, so this runs without built packs.
+const built = buildPacks().packs;
 const packs = {};
-for (const p of ["classes", "origins", "feats", "weapons", "armor"]) packs[p] = await loadPack(p);
+for (const p of ["classes", "origins", "feats", "weapons", "armor"])
+  packs[p] = Object.fromEntries(built[p].docs.map(d => [d.name, d]));
 const clone = o => structuredClone(o);
 
 function blankAgent() {
   const sys = {
     abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 8, misc: 0 }])),
-    pointBuyBudget: 36, abilityIncreases: { l4: "", l8: "", l12: "", l16: "", l20: "" },
-    progression: [], skills: Object.fromEntries(SKILLS.map(s => [s.key, { ability: "", misc: 0, classSkill: false }])),
-    proficiencies: Object.fromEntries(Object.keys(cfg.proficiencies).map(k => [k, { proficient: false, forte: false }])),
-    focuses: { cultures: [], drive: [], profession: [], science: [], fortes: [] }, interests: "", contacts: [], subplots: [],
-    wealthAllocation: { lifestyle: 0, possessions: 0, spendingCash: 0 }, misc: {}, vitality: { value: 0 }, wounds: { value: 0 }, actionDice: { value: 0 }
+    pointBuyBudget: 36,
+    abilityIncreases: { l4: "", l8: "", l12: "", l16: "", l20: "" },
+    progression: [],
+    skills: Object.fromEntries(SKILLS.map(s => [s.key, { ability: "", misc: 0, classSkill: false }])),
+    proficiencies: Object.fromEntries(
+      Object.keys(cfg.proficiencies).map(k => [k, { proficient: false, forte: false }])
+    ),
+    focuses: { cultures: [], drive: [], profession: [], science: [], fortes: [] },
+    interests: "",
+    contacts: [],
+    subplots: [],
+    wealthAllocation: { lifestyle: 0, possessions: 0, spendingCash: 0 },
+    misc: {},
+    vitality: { value: 0 },
+    wounds: { value: 0 },
+    actionDice: { value: 0 }
   };
   return sys;
 }
@@ -55,7 +95,12 @@ function build(spec) {
   const sys = blankAgent();
   const items = [];
   let n = 0;
-  const add = (doc, patch = {}) => { const d = clone(doc); Object.assign(d.system, patch); items.push({ id: `i${n++}`, name: d.name, type: d.type, system: d.system }); return d; };
+  const add = (doc, patch = {}) => {
+    const d = clone(doc);
+    Object.assign(d.system, patch);
+    items.push({ id: `i${n++}`, name: d.name, type: d.type, system: d.system });
+    return d;
+  };
   Object.entries(spec.abilities).forEach(([k, v]) => (sys.abilities[k].base = v));
   Object.assign(sys.abilityIncreases, spec.increases ?? {});
   if (spec.talent) add(packs.origins[spec.talent]);
@@ -63,7 +108,11 @@ function build(spec) {
   const classDocs = {};
   for (const [i, cname] of spec.classes.entries()) {
     if (!classDocs[cname]) classDocs[cname] = add(packs.classes[cname]);
-    sys.progression.push({ classId: classDocs[cname].system.identifier, vitality: spec.vitality?.[i] ?? 0, skills: spec.skillPoints?.[i] ?? {} });
+    sys.progression.push({
+      classId: classDocs[cname].system.identifier,
+      vitality: spec.vitality?.[i] ?? 0,
+      skills: spec.skillPoints?.[i] ?? {}
+    });
   }
   for (const f of spec.feats ?? []) add(packs.feats[f]);
   // Mirror SpycraftActor#syncGrantedFeats: origins and class levels grant feats automatically.
@@ -71,17 +120,23 @@ function build(spec) {
   for (const i of items) if (i.type === "origin") (i.system.grants ?? []).forEach(g => granted.add(g));
   const lv = {};
   for (const c of spec.classes) lv[c] = (lv[c] ?? 0) + 1;
-  for (const [c, l] of Object.entries(lv)) for (const g of packs.classes[c].system.featGrants) if (g.level <= l) granted.add(g.feat);
-  for (const f of granted) if (packs.feats[f] && !(spec.feats ?? []).includes(f)) add(packs.feats[f], { granted: true });
+  for (const [c, l] of Object.entries(lv))
+    for (const g of packs.classes[c].system.featGrants) if (g.level <= l) granted.add(g.feat);
+  for (const f of granted)
+    if (packs.feats[f] && !(spec.feats ?? []).includes(f)) add(packs.feats[f], { granted: true });
   for (const [k, v] of Object.entries(spec.proficiencies ?? {})) sys.proficiencies[k].proficient = v;
   computeAgent(sys, items, cfg);
   return sys;
 }
 
-let failures = 0, checks = 0;
+let failures = 0,
+  checks = 0;
 function expect(label, actual, expected) {
   checks++;
-  if (actual !== expected) { failures++; console.log(`  ✗ ${label}: got ${actual}, expected ${expected}`); }
+  if (actual !== expected) {
+    failures++;
+    console.log(`  ✗ ${label}: got ${actual}, expected ${expected}`);
+  }
 }
 
 const FIX = join(ROOT, "tools", "fixtures");
@@ -91,7 +146,8 @@ for (const file of fixtures) {
   console.log(`• ${fx.name}`);
   const s = build(fx.spec);
   const e = fx.expected;
-  for (const k of ["str", "dex", "con", "int", "wis", "cha"]) expect(`${k} score`, s.abilities[k].value, e.abilities[k]);
+  for (const k of ["str", "dex", "con", "int", "wis", "cha"])
+    expect(`${k} score`, s.abilities[k].value, e.abilities[k]);
   expect("point-buy remaining", s.pointBuy.remaining, e.pointsRemaining);
   expect("career level", s.level, e.level);
   expect("BAB", s.bab, e.bab);
@@ -139,13 +195,16 @@ console.log("• historical expert-class eligibility snapshot");
 {
   const brawler = packs.classes.Brawler;
   const sys = blankAgent();
-  sys.progression = [{ classId: brawler.system.identifier, vitality: 0, skills: {},
-    expertEntry: {ok: true, unmet: []} }];
+  sys.progression = [
+    { classId: brawler.system.identifier, vitality: 0, skills: {}, expertEntry: { ok: true, unmet: [] } }
+  ];
   computeAgent(sys, [{ id: "brawler", name: brawler.name, type: brawler.type, system: clone(brawler.system) }], cfg);
-  expect("entry snapshot prevents retroactive expert warning",
-    sys.warnings.some(w => w.includes("expert class requirements")), false);
+  expect(
+    "entry snapshot prevents retroactive expert warning",
+    sys.warnings.some(w => w.includes("expert class requirements")),
+    false
+  );
 }
-
 
 console.log("• feat prerequisites suppress effects, including self-qualification");
 {
@@ -153,59 +212,88 @@ console.log("• feat prerequisites suppress effects, including self-qualificati
   const sys = blankAgent();
   sys.abilities.dex.base = 10;
   sys.progression = [{ classId: soldier.system.identifier, vitality: 0, skills: {} }];
-  const feat = { id: "invalid", name:"Self-boost", type:"feat", system: {
-    tree:"basicCombat", ranks:1, granted:false, prerequisites: {type:"ability",key:"dex",min:20},
-    bonuses:[{target:"abilities.dex",value:"10",level:0}]
-  }};
-  const items=[{id:"soldier",name:"Soldier",type:"class",system:clone(soldier.system)},feat];
-  computeAgent(sys,items,cfg);
-  expect("self-qualification is disallowed",sys.abilities.dex.value,10);
-  expect("self-boost is unavailable",sys.featStatus.invalid.ok,false);
-  sys.abilities.dex.base=20;
-  computeAgent(sys,items,cfg);
-  expect("eligible feat becomes active",sys.abilities.dex.value,30);
-  expect("eligible feat satisfies prerequisites",sys.featStatus.invalid.ok,true);
+  const feat = {
+    id: "invalid",
+    name: "Self-boost",
+    type: "feat",
+    system: {
+      tree: "basicCombat",
+      ranks: 1,
+      granted: false,
+      prerequisites: { type: "ability", key: "dex", min: 20 },
+      bonuses: [{ target: "abilities.dex", value: "10", level: 0 }]
+    }
+  };
+  const items = [{ id: "soldier", name: "Soldier", type: "class", system: clone(soldier.system) }, feat];
+  computeAgent(sys, items, cfg);
+  expect("self-qualification is disallowed", sys.abilities.dex.value, 10);
+  expect("self-boost is unavailable", sys.featStatus.invalid.ok, false);
+  sys.abilities.dex.base = 20;
+  computeAgent(sys, items, cfg);
+  expect("eligible feat becomes active", sys.abilities.dex.value, 30);
+  expect("eligible feat satisfies prerequisites", sys.featStatus.invalid.ok, true);
 }
-
 
 console.log("• legal and illegal purchase-time skill ranks");
 {
   const soldier = packs.classes.Soldier;
-  const ci = {id:"soldier",name:soldier.name,type:soldier.type,system:clone(soldier.system)};
+  const ci = { id: "soldier", name: soldier.name, type: soldier.type, system: clone(soldier.system) };
   const legal = blankAgent();
-  for (const [k,v] of Object.entries({str:14,dex:14,con:14,int:13,wis:12,cha:10})) legal.abilities[k].base = v;
-  legal.progression = [{classId:ci.system.identifier,vitality:0,skills:{athletics:4}}];
-  computeAgent(legal,[ci],cfg);
-  expect("valid 36-point allocation",legal.pointBuy.remaining,0);
-  expect("legal skill rank allocation has no rank warning",legal.warnings.some(w=>w.includes("ranks")),false);
+  for (const [k, v] of Object.entries({ str: 14, dex: 14, con: 14, int: 13, wis: 12, cha: 10 }))
+    legal.abilities[k].base = v;
+  legal.progression = [{ classId: ci.system.identifier, vitality: 0, skills: { athletics: 4 } }];
+  computeAgent(legal, [ci], cfg);
+  expect("valid 36-point allocation", legal.pointBuy.remaining, 0);
+  expect(
+    "legal skill rank allocation has no rank warning",
+    legal.warnings.some(w => w.includes("ranks")),
+    false
+  );
 
   const over = blankAgent();
-  over.progression = Array.from({length:8},(_,i)=>({classId:ci.system.identifier,vitality:1,skills:i===0?{athletics:6}:{}}));
-  computeAgent(over,[ci],cfg);
-  expect("front-loaded ranks flagged even after the career cap increases",
-    over.warnings.some(w=>w.includes("purchase-time maximum")),true);
+  over.progression = Array.from({ length: 8 }, (_, i) => ({
+    classId: ci.system.identifier,
+    vitality: 1,
+    skills: i === 0 ? { athletics: 6 } : {}
+  }));
+  computeAgent(over, [ci], cfg);
+  expect(
+    "front-loaded ranks flagged even after the career cap increases",
+    over.warnings.some(w => w.includes("purchase-time maximum")),
+    true
+  );
 }
 
 console.log("• result caps follow Table 2.4, untrained error range, vitality floor");
 {
   const soldier = packs.classes.Soldier;
-  const ci = {id:"soldier",name:soldier.name,type:soldier.type,system:clone(soldier.system)};
+  const ci = { id: "soldier", name: soldier.name, type: soldier.type, system: clone(soldier.system) };
   // Class-skill points per level chosen so the running ranks hit each band edge of Table 2.4.
-  const want = {0:15, 1:20, 3:20, 4:30, 6:30, 7:40, 9:40, 10:50, 12:50, 13:60};
+  const want = { 0: 15, 1: 20, 3: 20, 4: 30, 6: 30, 7: 40, 9: 40, 10: 50, 12: 50, 13: 60 };
   for (const [ranks, cap] of Object.entries(want)) {
     const sys = blankAgent();
     const n = Number(ranks);
-    sys.progression = Array.from({length:10},(_,i)=>({classId:ci.system.identifier,vitality:1,
-      skills: i===0 && n ? {athletics:Math.min(n,4)} : (i>0 && n>3+i ? {athletics:1} : {})}));
-    computeAgent(sys,[ci],cfg);
+    sys.progression = Array.from({ length: 10 }, (_, i) => ({
+      classId: ci.system.identifier,
+      vitality: 1,
+      skills: i === 0 && n ? { athletics: Math.min(n, 4) } : i > 0 && n > 3 + i ? { athletics: 1 } : {}
+    }));
+    computeAgent(sys, [ci], cfg);
     expect(`fixture built ${ranks} Athletics ranks`, sys.skillTotals.athletics.ranks, n);
     expect(`${ranks} ranks -> result cap ${cap}`, sys.skillTotals.athletics.cap, cap);
-    expect(`${ranks} ranks -> error range`, resolveSkillCheck(sys,"athletics",cfg.skills.athletics.checks[0],{gearStatus:"available",synergySkill:"none"}).error, cfg.skills.athletics.checks[0].error+(n?0:2));
+    expect(
+      `${ranks} ranks -> error range`,
+      resolveSkillCheck(sys, "athletics", cfg.skills.athletics.checks[0], {
+        gearStatus: "available",
+        synergySkill: "none"
+      }).error,
+      cfg.skills.athletics.checks[0].error + (n ? 0 : 2)
+    );
   }
   const frail = blankAgent();
-  frail.abilities.con.base = 8;   // -1 modifier; creation attributes have a minimum of 8
-  frail.progression = [1,1,5,0].map((v,i)=>({classId:ci.system.identifier,vitality:i?v:0,skills:{}}));
-  computeAgent(frail,[ci],cfg);
+  frail.abilities.con.base = 8; // -1 modifier; creation attributes have a minimum of 8
+  frail.progression = [1, 1, 5, 0].map((v, i) => ({ classId: ci.system.identifier, vitality: i ? v : 0, skills: {} }));
+  computeAgent(frail, [ci], cfg);
   // L1: 12-1 = 11; L2: roll 1-1 -> 1; L3: 5-1 = 4; L4 pending roll retains the minimum 1.
   expect("Con penalty never takes a level's vitality below 1", frail.vitality.max, 17);
 }

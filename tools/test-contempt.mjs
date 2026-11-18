@@ -1,14 +1,303 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {contemptPlan as plan} from '../module/rules/contempt.mjs';import {takeContempt as take} from '../module/apps/contempt.mjs';import {limitedUseAbilities} from '../module/rules/limited-uses.mjs';import {weaponAttack} from '../module/rules/gear.mjs';import {checkFlavor,rollEvidence,rollEvidenceMatches} from '../module/rules/outcomes.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';import {makeFatigueActor} from './fixtures/fatigue-actor.mjs';const {SpycraftActor}=await import('../module/documents/actor.mjs');
-const clock=()=>({id:'combat',started:true,round:1,turn:1,combatantId:'own',ownTurnIndex:1}),sys=()=>({level:6,size:'Medium',activeFeatNames:['Contempt'],classLevels:{},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:14,mod:2}])),bab:6,conditionContext:{},proficiencyTotals:{handgun:{proficient:true}},resourceUses:{},actionDice:{value:0,max:4},wounds:{value:4}}),target=()=>({uuid:'Actor.target',type:'npc',npcType:'standard'}),input=()=>({weaponId:'gun',targetUuid:'Actor.target',targetStandardConfirmed:true,attackLegalConfirmed:true,distanceFeet:5});
-test('Contempt requires Career Level6, the actual standard-character classification and own Count; standard animals qualify only with GC confirmation',()=>{for(const npcType of ['standard','animal'])assert.equal(plan(sys(),clock(),{...target(),npcType},input()).targetType,npcType);for(const patch of [{type:'agent'},{npcType:'special'},{npcType:'villain'},{npcType:'unknown'},{uuid:''}])assert.throws(()=>plan(sys(),clock(),{...target(),...patch},input()));for(const patch of [{targetStandardConfirmed:false},{attackLegalConfirmed:false}])assert.throws(()=>plan(sys(),clock(),target(),{...input(),...patch}));assert.throws(()=>plan({...sys(),level:5},clock(),target(),input()));assert.throws(()=>plan({...sys(),activeFeatNames:[]},clock(),target(),input()));assert.throws(()=>plan(sys(),{...clock(),turn:0},target(),input()));assert.throws(()=>plan(sys(),{...clock(),started:false},target(),input()));});
-test('combat allowance uses starting dice rather than the current wallet; invalid limits and action prohibitions fail before granting a free attack',()=>{for(const max of [0,1,3,4,8]){const s=sys();s.actionDice={value:99,max};assert.equal(plan(s,clock(),target(),input()).combatAllowance,max);const specs=limitedUseAbilities(s,[],cfg);assert.equal(specs.find(s=>s.id==='contempt').limit,max);assert.equal(specs.find(s=>s.id==='contemptRound').limit,1);}for(const max of [undefined,-1,1.5,NaN,'4'])assert.throws(()=>plan({...sys(),actionDice:{max}},clock(),target(),input()));for(const c of ['pinned','stunned','sleeping','dead','dazed','paralyzed'])assert.throws(()=>plan({...sys(),conditionContext:{[c]:true}},clock(),target(),input()));assert.ok(plan({...sys(),conditionContext:{held:true}},clock(),target(),input()));assert.throws(()=>plan({...sys(),refreshAction:{state:'waiting',combatId:'combat',startRound:1}},clock(),target(),input()),/Refresh/);});
-let seq=0;foundry.utils.escapeHTML=String;foundry.utils.randomID=()=> 'contempt'+(++seq);ui.notifications.warn=()=>null;globalThis.ChatMessage={getSpeaker:()=>({})};
-function actor(max=4){game.user={id:'gc',isGM:true,targets:new Set()};const t={id:'target',uuid:'Actor.target',documentName:'Actor',name:'Standard target',type:'npc',system:{npcType:'standard'},visible:true,isOwner:false},a={id:'self',uuid:'Actor.self',type:'agent',isOwner:true,flags:{},system:sys(),items:[{id:'gun',uuid:'Actor.self.Item.gun',name:'Handgun',type:'weapon',system:{proficiency:'handgun',weaponCategory:'servicePistol',sizeHands:'D/1h',fireMode:'single',fireModes:['single'],equipped:true,carried:true,quantity:1,damage:'1d6',range:50,recoil:0,errorThreat:'1/20'}}],usagePeriods:{combat:'combat',round:'combat:1'},async update(p){for(const [path,value]of Object.entries(p)){const keys=path.split('.');let o=this;for(const k of keys.slice(0,-1))o=o[k]??={};const k=keys.at(-1);if(k.startsWith('-='))delete o[k.slice(2)];else o[k]=structuredClone(value);}}};a.system.actionDice.max=max;a.items.get=id=>a.items.find(i=>i.id===id);a.participatingCombat={id:'combat',started:true,round:1,turn:1,turns:[{id:'other',actor:t},{id:'own',actor:a}]};a.specs=()=>a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);a.specs();a.actionDiceFundingSystem=a.system;a.weaponAttack=(w,opts)=>weaponAttack(a.system,w.system,cfg,'agent',opts);a.useLimitedAbility=SpycraftActor.prototype.useLimitedAbility;a.rollAttack=(w,opts)=>SpycraftActor.prototype.rollAttack.call(a,w,opts);a.rollCheck=async(formula,data,opts)=>{await opts.validateFinalAttack?.();await a.drawHook?.();await opts.validateFinalAttack?.();if(a.cancel)return null;if(a.postError==='before')throw Error('unposted');const m={id:'posted'+(++seq),flags:{spycraft2:{...opts,actorUuid:a.uuid,rollData:data}}};game.messages.push(m);if(a.postError==='after')throw Error('posted');return m;};game.actors=[a,t];globalThis.fromUuid=async uuid=>game.actors.find(a=>a.uuid===uuid);game.messages=[];game.messages.get=id=>game.messages.find(m=>m.id===id);a.target=t;a.nextRound=()=>{a.participatingCombat.round++;a.usagePeriods.round=a.participatingCombat.id+':'+a.participatingCombat.round;};return a;}
-test('real dual-counter reservations allow only one per round and only the starting-dice total per combat, with no action-die spend',async()=>{const a=actor(2);await Promise.all([take(a,input()),take(a,input())]);assert.equal(game.messages.length,1);assert.deepEqual(a.system.resourceUses.contempt,{epoch:'combat',used:1});assert.deepEqual(a.system.resourceUses.contemptRound,{epoch:'combat:1',used:1});a.nextRound();await take(a,input());assert.equal(game.messages.length,2);a.nextRound();await take(a,input());assert.equal(game.messages.length,2);assert.deepEqual(a.system.resourceUses.contempt,{epoch:'combat',used:2});assert.deepEqual(a.system.resourceUses.contemptRound,{epoch:'combat:2',used:1});assert.equal(a.system.actionDice.value,0);a.participatingCombat.id='next';a.usagePeriods.combat='next';a.usagePeriods.round='next:3';await take(a,input());assert.equal(game.messages.length,3);assert.deepEqual(a.system.resourceUses.contempt,{epoch:'next',used:1});});
-test('loss/reacquisition and a new round never erase prior combat spending; a genuine larger starting allowance extends only the unspent difference',async()=>{const a=actor(1);await take(a,input());a.system.activeFeatNames=[];a.specs();a.system.activeFeatNames=['Contempt'];a.specs();a.nextRound();await take(a,input());assert.equal(game.messages.length,1);a.system.actionDice.max=2;a.specs();await take(a,input());assert.equal(game.messages.length,2);assert.equal(a.system.resourceUses.contempt.used,2);});
-test('known special targets, missing target access and changing classifications cannot be overridden by a checkbox; standard animals automatically receive animal-specific attack rules',async()=>{for(const kind of ['special','villain']){const a=actor();a.target.system.npcType=kind;await assert.rejects(take(a,input()));assert.deepEqual(a.system.resourceUses,{});}const a=actor();a.target.visible=false;game.user.isGM=false;await assert.rejects(take(a,input()),/available/);const b=actor();b.target.system.npcType='animal';b.system.classLevels.scout=4;b.system.classOptionSelections=[{classId:'scout',name:'Game Hunter'}];const m=await take(b,{...input(),targetAnimal:false});assert.equal(m.flags.spycraft2.attackContext.targetAnimal,true);assert.equal(m.flags.spycraft2.attackContext.gameHunter.threatIncrease,3);assert.equal(m.flags.spycraft2.finalAttack.targetType,'animal');});
-test('target, source, allowance, weapon and Count changes during RNG refund both reserved counters while preserving unrelated history',async()=>{for(const change of [a=>a.target.system.npcType='special',a=>game.actors.splice(1,1),a=>a.system.activeFeatNames=[],a=>a.system.actionDice.max=3,a=>a.items[0].system.equipped=false,a=>a.participatingCombat.turn=0,a=>a.isOwner=false]){const a=actor();a.system.resourceUses.unrelated={epoch:'keep',used:7};a.drawHook=()=>change(a);await assert.rejects(take(a,input()));assert.deepEqual(a.system.resourceUses,{unrelated:{epoch:'keep',used:7}});assert.equal(game.messages.length,0);}});
-test('cancellation and unposted failure refund both allowances, while a committed unique receipt keeps both spent; malformed history never refills silently',async()=>{for(const mode of ['cancel','before','after']){const a=actor();if(mode==='cancel')a.cancel=true;else a.postError=mode;const results=await Promise.allSettled([take(a,input())]);assert.equal(results[0].status,mode==='after'?'fulfilled':'rejected');assert.equal(a.system.resourceUses.contempt?.used??0,mode==='after'?1:0);assert.equal(a.system.resourceUses.contemptRound?.used??0,mode==='after'?1:0);}for(const id of ['contempt','contemptRound']){const a=actor();a.system.resourceUses[id]={epoch:id==='contempt'?'combat':'combat:1',used:'0'};await take(a,input());assert.equal(game.messages.length,0);assert.equal(a.system.resourceUses[id].used,'0');}});
-test('the actual Actor maps combat periods independently of rounds; final evidence binds standard target, weapon and combat sequence',async()=>{const b=new SpycraftActor();b.system={};Object.defineProperty(b,'participatingCombat',{value:{id:'real',round:4,started:true}});assert.equal(b.usagePeriods.combat,'real');assert.equal(b.usagePeriods.round,'real:4');const a=actor(),m=await take(a,input()),c=m.flags.spycraft2,e=rollEvidence(c);assert.equal(c.finalAttack.weaponUuid,'Actor.self.Item.gun');assert.equal(c.finalAttack.targetUuid,'Actor.target');assert.equal(c.finalAttack.combatSequence,1);assert.match(checkFlavor(c),/Contempt: final Standard Attack/);c.finalAttack.targetUuid='Actor.special';assert.equal(rollEvidenceMatches(e,c),false);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { contemptPlan as plan } from "../module/rules/contempt.mjs";
+import { takeContempt as take } from "../module/apps/contempt.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+import { weaponAttack } from "../module/rules/gear.mjs";
+import { checkFlavor, rollEvidence, rollEvidenceMatches } from "../module/rules/outcomes.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import "./fixtures/fatigue-actor.mjs"; // sets up the Foundry stand-ins this file relies on
 
-test('GC counter review cannot overwrite prior combat history using an artificial initial period outside combat',async()=>{const a=actor();await take(a,input());const saved=structuredClone(a.system.resourceUses);a.counterReviewSpec=id=>a.system.limitedUses.find(s=>s.id===id);a.participatingCombat=null;for(const id of ['contempt','contemptRound'])await assert.rejects(SpycraftActor.prototype.reviewLimitedUseCounter.call(a,id,{used:0,confirmed:true,reason:'Not a current combat'}),/combat before reviewing/);assert.deepEqual(a.system.resourceUses,saved);});
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+const clock = () => ({ id: "combat", started: true, round: 1, turn: 1, combatantId: "own", ownTurnIndex: 1 }),
+  sys = () => ({
+    level: 6,
+    size: "Medium",
+    activeFeatNames: ["Contempt"],
+    classLevels: {},
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 14, mod: 2 }])),
+    bab: 6,
+    conditionContext: {},
+    proficiencyTotals: { handgun: { proficient: true } },
+    resourceUses: {},
+    actionDice: { value: 0, max: 4 },
+    wounds: { value: 4 }
+  }),
+  target = () => ({ uuid: "Actor.target", type: "npc", npcType: "standard" }),
+  input = () => ({
+    weaponId: "gun",
+    targetUuid: "Actor.target",
+    targetStandardConfirmed: true,
+    attackLegalConfirmed: true,
+    distanceFeet: 5
+  });
+test("Contempt requires Career Level6, the actual standard-character classification and own Count; standard animals qualify only with GC confirmation", () => {
+  for (const npcType of ["standard", "animal"])
+    assert.equal(plan(sys(), clock(), { ...target(), npcType }, input()).targetType, npcType);
+  for (const patch of [
+    { type: "agent" },
+    { npcType: "special" },
+    { npcType: "villain" },
+    { npcType: "unknown" },
+    { uuid: "" }
+  ])
+    assert.throws(() => plan(sys(), clock(), { ...target(), ...patch }, input()));
+  for (const patch of [{ targetStandardConfirmed: false }, { attackLegalConfirmed: false }])
+    assert.throws(() => plan(sys(), clock(), target(), { ...input(), ...patch }));
+  assert.throws(() => plan({ ...sys(), level: 5 }, clock(), target(), input()));
+  assert.throws(() => plan({ ...sys(), activeFeatNames: [] }, clock(), target(), input()));
+  assert.throws(() => plan(sys(), { ...clock(), turn: 0 }, target(), input()));
+  assert.throws(() => plan(sys(), { ...clock(), started: false }, target(), input()));
+});
+test("combat allowance uses starting dice rather than the current wallet; invalid limits and action prohibitions fail before granting a free attack", () => {
+  for (const max of [0, 1, 3, 4, 8]) {
+    const s = sys();
+    s.actionDice = { value: 99, max };
+    assert.equal(plan(s, clock(), target(), input()).combatAllowance, max);
+    const specs = limitedUseAbilities(s, [], cfg);
+    assert.equal(specs.find(s => s.id === "contempt").limit, max);
+    assert.equal(specs.find(s => s.id === "contemptRound").limit, 1);
+  }
+  for (const max of [undefined, -1, 1.5, NaN, "4"])
+    assert.throws(() => plan({ ...sys(), actionDice: { max } }, clock(), target(), input()));
+  for (const c of ["pinned", "stunned", "sleeping", "dead", "dazed", "paralyzed"])
+    assert.throws(() => plan({ ...sys(), conditionContext: { [c]: true } }, clock(), target(), input()));
+  assert.ok(plan({ ...sys(), conditionContext: { held: true } }, clock(), target(), input()));
+  assert.throws(
+    () =>
+      plan(
+        { ...sys(), refreshAction: { state: "waiting", combatId: "combat", startRound: 1 } },
+        clock(),
+        target(),
+        input()
+      ),
+    /Refresh/
+  );
+});
+let seq = 0;
+foundry.utils.escapeHTML = String;
+foundry.utils.randomID = () => "contempt" + ++seq;
+ui.notifications.warn = () => null;
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+function actor(max = 4) {
+  game.user = { id: "gc", isGM: true, targets: new Set() };
+  const t = {
+      id: "target",
+      uuid: "Actor.target",
+      documentName: "Actor",
+      name: "Standard target",
+      type: "npc",
+      system: { npcType: "standard" },
+      visible: true,
+      isOwner: false
+    },
+    a = {
+      id: "self",
+      uuid: "Actor.self",
+      type: "agent",
+      isOwner: true,
+      flags: {},
+      system: sys(),
+      items: [
+        {
+          id: "gun",
+          uuid: "Actor.self.Item.gun",
+          name: "Handgun",
+          type: "weapon",
+          system: {
+            proficiency: "handgun",
+            weaponCategory: "servicePistol",
+            sizeHands: "D/1h",
+            fireMode: "single",
+            fireModes: ["single"],
+            equipped: true,
+            carried: true,
+            quantity: 1,
+            damage: "1d6",
+            range: 50,
+            recoil: 0,
+            errorThreat: "1/20"
+          }
+        }
+      ],
+      usagePeriods: { combat: "combat", round: "combat:1" },
+      async update(p) {
+        for (const [path, value] of Object.entries(p)) {
+          const keys = path.split(".");
+          let o = this;
+          for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+          const k = keys.at(-1);
+          if (k.startsWith("-=")) delete o[k.slice(2)];
+          else o[k] = structuredClone(value);
+        }
+      }
+    };
+  a.system.actionDice.max = max;
+  a.items.get = id => a.items.find(i => i.id === id);
+  a.participatingCombat = {
+    id: "combat",
+    started: true,
+    round: 1,
+    turn: 1,
+    turns: [
+      { id: "other", actor: t },
+      { id: "own", actor: a }
+    ]
+  };
+  a.specs = () => (a.system.limitedUses = limitedUseAbilities(a.system, [], cfg));
+  a.specs();
+  a.actionDiceFundingSystem = a.system;
+  a.weaponAttack = (w, opts) => weaponAttack(a.system, w.system, cfg, "agent", opts);
+  a.useLimitedAbility = SpycraftActor.prototype.useLimitedAbility;
+  a.rollAttack = (w, opts) => SpycraftActor.prototype.rollAttack.call(a, w, opts);
+  a.rollCheck = async (formula, data, opts) => {
+    await opts.validateFinalAttack?.();
+    await a.drawHook?.();
+    await opts.validateFinalAttack?.();
+    if (a.cancel) return null;
+    if (a.postError === "before") throw Error("unposted");
+    const m = { id: "posted" + ++seq, flags: { spycraft2: { ...opts, actorUuid: a.uuid, rollData: data } } };
+    game.messages.push(m);
+    if (a.postError === "after") throw Error("posted");
+    return m;
+  };
+  game.actors = [a, t];
+  globalThis.fromUuid = async uuid => game.actors.find(a => a.uuid === uuid);
+  game.messages = [];
+  game.messages.get = id => game.messages.find(m => m.id === id);
+  a.target = t;
+  a.nextRound = () => {
+    a.participatingCombat.round++;
+    a.usagePeriods.round = a.participatingCombat.id + ":" + a.participatingCombat.round;
+  };
+  return a;
+}
+test("real dual-counter reservations allow only one per round and only the starting-dice total per combat, with no action-die spend", async () => {
+  const a = actor(2);
+  await Promise.all([take(a, input()), take(a, input())]);
+  assert.equal(game.messages.length, 1);
+  assert.deepEqual(a.system.resourceUses.contempt, { epoch: "combat", used: 1 });
+  assert.deepEqual(a.system.resourceUses.contemptRound, { epoch: "combat:1", used: 1 });
+  a.nextRound();
+  await take(a, input());
+  assert.equal(game.messages.length, 2);
+  a.nextRound();
+  await take(a, input());
+  assert.equal(game.messages.length, 2);
+  assert.deepEqual(a.system.resourceUses.contempt, { epoch: "combat", used: 2 });
+  assert.deepEqual(a.system.resourceUses.contemptRound, { epoch: "combat:2", used: 1 });
+  assert.equal(a.system.actionDice.value, 0);
+  a.participatingCombat.id = "next";
+  a.usagePeriods.combat = "next";
+  a.usagePeriods.round = "next:3";
+  await take(a, input());
+  assert.equal(game.messages.length, 3);
+  assert.deepEqual(a.system.resourceUses.contempt, { epoch: "next", used: 1 });
+});
+test("loss/reacquisition and a new round never erase prior combat spending; a genuine larger starting allowance extends only the unspent difference", async () => {
+  const a = actor(1);
+  await take(a, input());
+  a.system.activeFeatNames = [];
+  a.specs();
+  a.system.activeFeatNames = ["Contempt"];
+  a.specs();
+  a.nextRound();
+  await take(a, input());
+  assert.equal(game.messages.length, 1);
+  a.system.actionDice.max = 2;
+  a.specs();
+  await take(a, input());
+  assert.equal(game.messages.length, 2);
+  assert.equal(a.system.resourceUses.contempt.used, 2);
+});
+test("known special targets, missing target access and changing classifications cannot be overridden by a checkbox; standard animals automatically receive animal-specific attack rules", async () => {
+  for (const kind of ["special", "villain"]) {
+    const a = actor();
+    a.target.system.npcType = kind;
+    await assert.rejects(take(a, input()));
+    assert.deepEqual(a.system.resourceUses, {});
+  }
+  const a = actor();
+  a.target.visible = false;
+  game.user.isGM = false;
+  await assert.rejects(take(a, input()), /available/);
+  const b = actor();
+  b.target.system.npcType = "animal";
+  b.system.classLevels.scout = 4;
+  b.system.classOptionSelections = [{ classId: "scout", name: "Game Hunter" }];
+  const m = await take(b, { ...input(), targetAnimal: false });
+  assert.equal(m.flags.spycraft2.attackContext.targetAnimal, true);
+  assert.equal(m.flags.spycraft2.attackContext.gameHunter.threatIncrease, 3);
+  assert.equal(m.flags.spycraft2.finalAttack.targetType, "animal");
+});
+test("target, source, allowance, weapon and Count changes during RNG refund both reserved counters while preserving unrelated history", async () => {
+  for (const change of [
+    a => (a.target.system.npcType = "special"),
+    a => game.actors.splice(1, 1),
+    a => (a.system.activeFeatNames = []),
+    a => (a.system.actionDice.max = 3),
+    a => (a.items[0].system.equipped = false),
+    a => (a.participatingCombat.turn = 0),
+    a => (a.isOwner = false)
+  ]) {
+    const a = actor();
+    a.system.resourceUses.unrelated = { epoch: "keep", used: 7 };
+    a.drawHook = () => change(a);
+    await assert.rejects(take(a, input()));
+    assert.deepEqual(a.system.resourceUses, { unrelated: { epoch: "keep", used: 7 } });
+    assert.equal(game.messages.length, 0);
+  }
+});
+test("cancellation and unposted failure refund both allowances, while a committed unique receipt keeps both spent; malformed history never refills silently", async () => {
+  for (const mode of ["cancel", "before", "after"]) {
+    const a = actor();
+    if (mode === "cancel") a.cancel = true;
+    else a.postError = mode;
+    const results = await Promise.allSettled([take(a, input())]);
+    assert.equal(results[0].status, mode === "after" ? "fulfilled" : "rejected");
+    assert.equal(a.system.resourceUses.contempt?.used ?? 0, mode === "after" ? 1 : 0);
+    assert.equal(a.system.resourceUses.contemptRound?.used ?? 0, mode === "after" ? 1 : 0);
+  }
+  for (const id of ["contempt", "contemptRound"]) {
+    const a = actor();
+    a.system.resourceUses[id] = { epoch: id === "contempt" ? "combat" : "combat:1", used: "0" };
+    await take(a, input());
+    assert.equal(game.messages.length, 0);
+    assert.equal(a.system.resourceUses[id].used, "0");
+  }
+});
+test("the actual Actor maps combat periods independently of rounds; final evidence binds standard target, weapon and combat sequence", async () => {
+  const b = new SpycraftActor();
+  b.system = {};
+  Object.defineProperty(b, "participatingCombat", { value: { id: "real", round: 4, started: true } });
+  assert.equal(b.usagePeriods.combat, "real");
+  assert.equal(b.usagePeriods.round, "real:4");
+  const a = actor(),
+    m = await take(a, input()),
+    c = m.flags.spycraft2,
+    e = rollEvidence(c);
+  assert.equal(c.finalAttack.weaponUuid, "Actor.self.Item.gun");
+  assert.equal(c.finalAttack.targetUuid, "Actor.target");
+  assert.equal(c.finalAttack.combatSequence, 1);
+  assert.match(checkFlavor(c), /Contempt: final Standard Attack/);
+  c.finalAttack.targetUuid = "Actor.special";
+  assert.equal(rollEvidenceMatches(e, c), false);
+});
+
+test("GC counter review cannot overwrite prior combat history using an artificial initial period outside combat", async () => {
+  const a = actor();
+  await take(a, input());
+  const saved = structuredClone(a.system.resourceUses);
+  a.counterReviewSpec = id => a.system.limitedUses.find(s => s.id === id);
+  a.participatingCombat = null;
+  for (const id of ["contempt", "contemptRound"])
+    await assert.rejects(
+      SpycraftActor.prototype.reviewLimitedUseCounter.call(a, id, {
+        used: 0,
+        confirmed: true,
+        reason: "Not a current combat"
+      }),
+      /combat before reviewing/
+    );
+  assert.deepEqual(a.system.resourceUses, saved);
+});

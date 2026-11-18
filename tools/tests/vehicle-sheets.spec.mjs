@@ -4,22 +4,53 @@ import { test, expect } from "@playwright/test";
 // Layout regression fixtures for the vehicle actor sheet and the gear and vehicle item templates. They mount each
 // template's real root classes and its section headings inside a Foundry-style fixed-height window, then check that
 // the last control can be scrolled into view. They do not replace live Foundry QA.
-const css = ["spycraft2.css", "retro.css"].map(file => readFileSync(new URL(`../../styles/${file}`, import.meta.url), "utf8")).join("\n");
+const css = ["spycraft2.css", "retro.css"]
+  .map(file => readFileSync(new URL(`../../styles/${file}`, import.meta.url), "utf8"))
+  .join("\n");
 const template = name => readFileSync(new URL(`../../templates/${name}`, import.meta.url), "utf8");
 const rootClass = (source, tag) => new RegExp(`<${tag} class="([^"]+)"`).exec(source)[1];
 
 const FIXTURES = {
-  "vehicle actor sheet": { file: "actor/vehicle-sheet.hbs", tag: "section", app: "spycraft2 sheet actor vehicle", width: 680,
-    controls: ["Control check", "Damage save", "Vehicle Damage result", "Tyre save", "Fuel explosion", "Repaired", "Jamming on", "Record use", "Refuel", "Bail out", "Fire"] },
-  "gear item sheet": { file: "item/item-gear.hbs", tag: "section", app: "spycraft2 sheet item", width: 560,
-    controls: ["Damage save", "Repair", "Use", "Recharge", "Signal reception DC", "Pay the cost", "Issue to the team"] },
-  "vehicle item sheet": { file: "item/item-vehicle.hbs", tag: "section", app: "spycraft2 sheet item", width: 560,
-    controls: ["Damage save", "Place on a scene", "Pay the cost"] }
+  "vehicle actor sheet": {
+    file: "actor/vehicle-sheet.hbs",
+    tag: "section",
+    app: "spycraft2 sheet actor vehicle",
+    width: 680,
+    controls: [
+      "Control check",
+      "Damage save",
+      "Vehicle Damage result",
+      "Tyre save",
+      "Fuel explosion",
+      "Repaired",
+      "Jamming on",
+      "Record use",
+      "Refuel",
+      "Bail out",
+      "Fire"
+    ]
+  },
+  "gear item sheet": {
+    file: "item/item-gear.hbs",
+    tag: "section",
+    app: "spycraft2 sheet item",
+    width: 560,
+    controls: ["Damage save", "Repair", "Use", "Recharge", "Signal reception DC", "Pay the cost", "Issue to the team"]
+  },
+  "vehicle item sheet": {
+    file: "item/item-vehicle.hbs",
+    tag: "section",
+    app: "spycraft2 sheet item",
+    width: 560,
+    controls: ["Damage save", "Place on a scene", "Pay the cost"]
+  }
 };
 
 async function mount(page, fixture, height) {
   const source = template(fixture.file);
-  const sections = [...source.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m => m[1].replace(/\{\{[^}]*\}\}/g, "Section").trim());
+  const sections = [...source.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m =>
+    m[1].replace(/\{\{[^}]*\}\}/g, "Section").trim()
+  );
   // Every control the template offers must exist in it; the fixture lists the ones added for vehicles and gear.
   for (const label of fixture.controls) expect(source, `${fixture.file}: ${label}`).toContain(label);
   await page.setContent(`
@@ -49,7 +80,9 @@ for (const [name, fixture] of Object.entries(FIXTURES)) {
       await mount(page, fixture, height);
       const body = page.locator(`form > ${fixture.tag}`);
       expect(await body.evaluate(el => el.scrollHeight > el.clientHeight && el.clientHeight > 0)).toBe(true);
-      await body.evaluate(el => { el.scrollTop = el.scrollHeight; });
+      await body.evaluate(el => {
+        el.scrollTop = el.scrollHeight;
+      });
       await expect(body.locator(".bottom-control")).toBeInViewport();
       await expect(page.locator(".window-header")).toBeInViewport();
     });

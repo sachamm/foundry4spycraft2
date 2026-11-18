@@ -22,7 +22,6 @@ export function evaluate(formula, data = {}) {
   const stripped = expr.replace(new RegExp(`\\b(${ALLOWED_FN.join("|")})\\b`, "g"), "");
   if (!SAFE.test(stripped)) return 0;
   try {
-    // eslint-disable-next-line no-new-func
     const fn = new Function(...ALLOWED_FN, `return (${expr});`);
     const v = fn(...ALLOWED_FN.map(f => Math[f]));
     return Number.isFinite(v) ? v : 0;

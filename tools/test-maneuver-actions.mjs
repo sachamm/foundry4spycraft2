@@ -1,16 +1,345 @@
-import test from 'node:test';import assert from 'node:assert/strict';import{MANEUVER_SKILLS,oneHandManeuverSource,oneHandManeuverPlan}from'../module/rules/maneuver-actions.mjs';import{SPYCRAFT as cfg}from'../module/config.mjs';import{resolveSkillCheck}from'../module/rules/skills.mjs';import{skillTagPlan}from'../module/rules/skill-tags.mjs';import{limitedUseAbilities}from'../module/rules/limited-uses.mjs';
-let scene='s',posts=[],failPost=false,hook=null,serial=0;const free={wheelFreeManeuver:true,wheelFreeActionConfirmed:true,gearStatus:'available'},clock={id:'c',started:true,round:1,turn:0,ownTurnIndex:0,combatantId:'me'},check=key=>cfg.skills[key].checks.find(c=>c.id==='maneuver');const state=(count=2)=>({activeFeatNames:['One Hand on the Wheel'],activeFeatSelections:Array.from({length:count},()=>({name:'Chase selection',tree:'chase'})),resourceUses:{},usagePeriods:{scene,session:'t',mission:'m'},actionDice:{value:0,max:3,die:4},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{value:14,mod:2}])),skillTotals:Object.fromEntries(Object.values(cfg.skills).map(s=>[s.key,{name:s.name,ranks:6,cap:30,threat:20,bonusEntries:[],totals:s.abilities.map(ability=>({ability,total:7}))}]))});
-test('all named uses retain one-handed penalties except actual vehicle Maneuvers; Mount checks and other Hands-On uses are unaffected',()=>{for(const twoWeapon of[false,true]){const s=state();if(twoWeapon)s.activeFeatNames.push('Two-Weapon Basics');for(const skill of Object.values(cfg.skills))for(const use of skill.checks){const base=skillTagPlan({...s,activeFeatNames:twoWeapon?['Two-Weapon Basics']:[]},skill.key,use,{oneHanded:true}),p=skillTagPlan(s,skill.key,use,{oneHanded:true}),waive=base.handPenalty!==0&&use.id==='maneuver'&&/Gear(?: Only)? \(Vehicle\)/.test(use.tags);assert.equal(p.handPenalty,waive?0:base.handPenalty,skill.key+':'+use.id);assert.equal(p.wheelWaiver,waive);}assert.equal(skillTagPlan(s,'survival',check('survival'),{oneHanded:true}).handPenalty,twoWeapon?-2:-4);}});
-test('all five Maneuver checks become free only on selection; fixed methods retain every ordinary permission and safety restriction',()=>{assert.equal(MANEUVER_SKILLS.length,5);for(const key of MANEUVER_SKILLS){const s=state(),use=check(key),normal=resolveSkillCheck(s,key,use,{gearStatus:'available'}),p=resolveSkillCheck(s,key,use,free);assert.equal(normal.timeMultiplier,1);assert.equal(p.blocked,false,key+':'+p.blockedReason);assert.equal(p.timeMultiplier,0);assert.equal(p.minimumTimeSeconds,0);assert.equal(p.wheelFeat.free,true);assert.equal(p.wheelFeat.actionCost,'free');const fixed=resolveSkillCheck(s,key,use,{...free,method:'take10',safeToTake:true,gcTakingPermissionConfirmed:true});assert.equal(fixed.blocked,key==='athletics');if(key!=='athletics'){assert.equal(fixed.timeMultiplier,0);assert.equal(fixed.fixedDie,10);assert.equal(fixed.actionDiceAllowed,false);assert.match(resolveSkillCheck(s,key,use,{...free,method:'take10',safeToTake:true}).blockedReason,/permission/);assert.match(resolveSkillCheck(s,key,use,{...free,method:'take10',gcTakingPermissionConfirmed:true}).blockedReason,/distracted/);}assert.equal(resolveSkillCheck(s,key,use,{...free,method:'take20',safeToTake:true,gcTakingPermissionConfirmed:true}).blocked,true);}});
-test('source counts, explicit legality, own Initiative Count, Refresh and the single time-reduction rule constrain free Maneuvers',()=>{for(let n=1;n<=15;n++){const s=state(n);s.activeFeatSelections.push({name:'Not Chase',tree:'gear'});assert.equal(oneHandManeuverSource(s).limit,n);}for(const patch of[{wheelFreeManeuver:'true'},{wheelFreeActionConfirmed:false},{wheelFreeActionConfirmed:1},{maneuverCombat:{...clock,turn:1}},{maneuverCombat:{...clock,started:false}},{timingReduction:'professional'},{tenSecondSolution:true}])assert.ok(oneHandManeuverPlan(state(),'drive',check('drive'),{...free,...patch}).blockedReason);assert.ok(oneHandManeuverPlan(state(),'notice',{id:'awareness'},free).blockedReason);const s=state();s.refreshAction={state:'waiting',combatId:'c',startRound:1};assert.match(oneHandManeuverPlan(s,'drive',check('drive'),{...free,maneuverCombat:clock}).blockedReason,/Refresh/);assert.equal(oneHandManeuverPlan(state(),'drive',check('drive'),{...free,maneuverCombat:clock}).blockedReason,'');});
-function apply(a,p){for(const[path,value]of Object.entries(p)){const keys=path.split('.');let o=a;for(const k of keys.slice(0,-1))o=o[k]??={};const last=keys.at(-1);if(last.startsWith('-='))delete o[last.slice(2)];else o[last]=structuredClone(value);}}
-globalThis.Actor=class{constructor(){this.uuid='Actor.wheel'+(++serial);this.type='agent';this.isOwner=true;this.flags={};this.items=new Map();this.items.filter=fn=>[...this.items.values()].filter(fn);this.system=state();this.system.limitedUses=limitedUseAbilities(this.system,[],cfg);}async update(p){apply(this,p);}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{isGM:true},settings:{get:()=>({scene,session:'t',mission:'m'})},i18n:{localize:String,format:String}};globalThis.foundry={utils:{randomID:()=>String(++serial),escapeHTML:String},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.ui={notifications:{warn:()=>({native:true})}};globalThis.ChatMessage={getSpeaker:()=>({})};globalThis.Roll=class{constructor(formula,data){const fixed=/^10\b/.test(formula)||/^20\b/.test(formula),die=fixed?parseInt(formula):7;this.total=die+(data.total??0);this.dice=fixed?[]:[{total:die}];}async evaluate(){await hook?.();return this;}async toMessage(data){if(failPost)throw Error('post failed');const m={...data,id:'r'+(++serial),uuid:'ChatMessage.r'+serial,async update(p){apply(this,p);return this;}};posts.push(m);return m;}};const{SpycraftActor}=await import('../module/documents/actor.mjs');function actor(count=2){scene='s';posts=[];failPost=false;hook=null;const a=new SpycraftActor();a.system=state(count);a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);return a;}
-test('actual free checks share the Chase allowance, spend no dice and preserve used counts after source reacquisition while normal Maneuvers remain available',async()=>{const a=actor();for(const key of['acrobatics','drive']){const m=await a.rollSkill(key,null,{...free,check:'maneuver',oneHanded:true});assert.equal(m.flags.spycraft2.wheelFeat.free,true);assert.equal(m.flags.spycraft2.wheelFeat.timing.multiplier,0);assert.equal(m.flags.spycraft2.skillTags.handPenalty,0);}assert.equal(a.system.resourceUses.oneHandManeuver.used,2);assert.equal(a.system.actionDice.value,0);const before=posts.length;await a.rollSkill('drive',null,{...free,check:'maneuver'});assert.equal(posts.length,before);a.system.activeFeatNames=[];a.system.limitedUses=[];a.system.activeFeatNames=['One Hand on the Wheel'];a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);await a.rollSkill('drive',null,{...free,check:'maneuver'});assert.equal(posts.length,before);const normal=await a.rollSkill('drive',null,{check:'maneuver',gearStatus:'available',oneHanded:true});assert.equal(normal.flags.spycraft2.wheelFeat.free,false);assert.equal(a.system.resourceUses.oneHandManeuver.used,2);scene='next';a.system.usagePeriods.scene=scene;await a.rollSkill('drive',null,{...free,check:'maneuver'});assert.equal(a.system.resourceUses.oneHandManeuver.used,1);});
-test('all five real document paths execute the selected free action and an allowed fixed check has no natural die, threat or boost permission',async()=>{const a=actor(5);for(const key of MANEUVER_SKILLS){const m=await a.rollSkill(key,null,{...free,check:'maneuver'});assert.equal(m.flags.spycraft2.checkId,'maneuver');assert.equal(m.flags.spycraft2.wheelFeat.use.used,posts.length);}assert.equal(a.system.resourceUses.oneHandManeuver.used,5);const b=actor();const m=await b.rollSkill('drive',null,{...free,check:'maneuver',method:'take10',safeToTake:true,gcTakingPermissionConfirmed:true});assert.equal(m.flags.spycraft2.naturalDie,null);assert.equal(m.flags.spycraft2.threat,0);assert.equal(m.flags.spycraft2.actionDiceAllowed,false);assert.equal(b.system.resourceUses.oneHandManeuver.used,1);});
-test('unselected checks and cancelled dialogs never consume a free use, and native-style warnings for invalid conditions or depleted counters cannot retain a new use',async()=>{const a=actor();await a.rollSkill('drive',null,{check:'maneuver',gearStatus:'available',oneHanded:true});assert.equal(a.system.resourceUses.oneHandManeuver,undefined);assert.equal(await a.rollSkill('drive'),null);for(const patch of[{wheelFreeActionConfirmed:false},{gearStatus:'missing'},{method:'take20',safeToTake:true}]){const before=posts.length;await a.rollSkill('drive',null,{...free,check:'maneuver',...patch});assert.equal(posts.length,before);assert.equal(a.system.resourceUses.oneHandManeuver,undefined);}a.system.resourceUses.oneHandManeuver={epoch:scene,used:'bad'};const before=posts.length;await a.rollSkill('drive',null,{...free,check:'maneuver'});assert.equal(posts.length,before);assert.equal(a.system.resourceUses.oneHandManeuver.used,'bad');});
-test('failed posts and source/count/scene/counter drift during evaluation prevent a receipt and restore the reserved use',async()=>{for(const phase of['post','source','count','scene','counter']){const a=actor();failPost=phase==='post';hook=()=>{if(phase==='source')a.system.activeFeatNames=[];if(phase==='count')a.system.activeFeatSelections.push({name:'New Chase',tree:'chase'});if(phase==='scene'){scene='later';a.system.usagePeriods.scene=scene;}if(phase==='counter')a.system.resourceUses.oneHandManeuver.used=0;};await assert.rejects(a.rollSkill('drive',null,{...free,check:'maneuver'}),/failed|changed/);assert.equal(posts.length,0);assert.equal(a.system.resourceUses.oneHandManeuver?.used??0,0);}});
-test('actual combat clock overrides a caller’s forged clock and turn changes during evaluation refund the selected free Maneuver',async()=>{const a=actor(),combat={id:'c',started:true,round:1,turn:1,turns:[{id:'me',actor:{uuid:a.uuid}},{id:'them',actor:{uuid:'Actor.other'}}]};Object.defineProperty(a,'participatingCombat',{get:()=>combat});await a.rollSkill('drive',null,{...free,check:'maneuver',maneuverCombat:clock});assert.equal(posts.length,0);combat.turn=0;hook=()=>{combat.turn=1;};await assert.rejects(a.rollSkill('drive',null,{...free,check:'maneuver'}),/changed/);assert.equal(a.system.resourceUses.oneHandManeuver?.used??0,0);});
-test('a permitted replacement roll retains its original free-use receipt after a later Maneuver spent another use',async()=>{const a=actor();a.system.limitedUses.push({id:'perfect',name:'Perfect',workflow:'reroll',mastery:'Perfect Skill Mastery',period:'session',limit:3,cost:0});const first=await a.rollSkill('drive',null,{...free,check:'maneuver'});await a.rollSkill('drive',null,{...free,check:'maneuver'});const replacement=await a.rerollCheck(first,{resource:'perfect',failed:true});assert.equal(a.system.resourceUses.oneHandManeuver.used,2);assert.deepEqual(replacement.flags.spycraft2.wheelFeat.use,first.flags.spycraft2.wheelFeat.use);assert.equal(replacement.flags.spycraft2.wheelFeat.use.used,1);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { MANEUVER_SKILLS, oneHandManeuverSource, oneHandManeuverPlan } from "../module/rules/maneuver-actions.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { resolveSkillCheck } from "../module/rules/skills.mjs";
+import { skillTagPlan } from "../module/rules/skill-tags.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+let scene = "s",
+  posts = [],
+  failPost = false,
+  hook = null,
+  serial = 0;
+const free = { wheelFreeManeuver: true, wheelFreeActionConfirmed: true, gearStatus: "available" },
+  clock = { id: "c", started: true, round: 1, turn: 0, ownTurnIndex: 0, combatantId: "me" },
+  check = key => cfg.skills[key].checks.find(c => c.id === "maneuver");
+const state = (count = 2) => ({
+  activeFeatNames: ["One Hand on the Wheel"],
+  activeFeatSelections: Array.from({ length: count }, () => ({ name: "Chase selection", tree: "chase" })),
+  resourceUses: {},
+  usagePeriods: { scene, session: "t", mission: "m" },
+  actionDice: { value: 0, max: 3, die: 4 },
+  abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { value: 14, mod: 2 }])),
+  skillTotals: Object.fromEntries(
+    Object.values(cfg.skills).map(s => [
+      s.key,
+      {
+        name: s.name,
+        ranks: 6,
+        cap: 30,
+        threat: 20,
+        bonusEntries: [],
+        totals: s.abilities.map(ability => ({ ability, total: 7 }))
+      }
+    ])
+  )
+});
+test("all named uses retain one-handed penalties except actual vehicle Maneuvers; Mount checks and other Hands-On uses are unaffected", () => {
+  for (const twoWeapon of [false, true]) {
+    const s = state();
+    if (twoWeapon) s.activeFeatNames.push("Two-Weapon Basics");
+    for (const skill of Object.values(cfg.skills))
+      for (const use of skill.checks) {
+        const base = skillTagPlan({ ...s, activeFeatNames: twoWeapon ? ["Two-Weapon Basics"] : [] }, skill.key, use, {
+            oneHanded: true
+          }),
+          p = skillTagPlan(s, skill.key, use, { oneHanded: true }),
+          waive = base.handPenalty !== 0 && use.id === "maneuver" && /Gear(?: Only)? \(Vehicle\)/.test(use.tags);
+        assert.equal(p.handPenalty, waive ? 0 : base.handPenalty, skill.key + ":" + use.id);
+        assert.equal(p.wheelWaiver, waive);
+      }
+    assert.equal(skillTagPlan(s, "survival", check("survival"), { oneHanded: true }).handPenalty, twoWeapon ? -2 : -4);
+  }
+});
+test("all five Maneuver checks become free only on selection; fixed methods retain every ordinary permission and safety restriction", () => {
+  assert.equal(MANEUVER_SKILLS.length, 5);
+  for (const key of MANEUVER_SKILLS) {
+    const s = state(),
+      use = check(key),
+      normal = resolveSkillCheck(s, key, use, { gearStatus: "available" }),
+      p = resolveSkillCheck(s, key, use, free);
+    assert.equal(normal.timeMultiplier, 1);
+    assert.equal(p.blocked, false, key + ":" + p.blockedReason);
+    assert.equal(p.timeMultiplier, 0);
+    assert.equal(p.minimumTimeSeconds, 0);
+    assert.equal(p.wheelFeat.free, true);
+    assert.equal(p.wheelFeat.actionCost, "free");
+    const fixed = resolveSkillCheck(s, key, use, {
+      ...free,
+      method: "take10",
+      safeToTake: true,
+      gcTakingPermissionConfirmed: true
+    });
+    assert.equal(fixed.blocked, key === "athletics");
+    if (key !== "athletics") {
+      assert.equal(fixed.timeMultiplier, 0);
+      assert.equal(fixed.fixedDie, 10);
+      assert.equal(fixed.actionDiceAllowed, false);
+      assert.match(
+        resolveSkillCheck(s, key, use, { ...free, method: "take10", safeToTake: true }).blockedReason,
+        /permission/
+      );
+      assert.match(
+        resolveSkillCheck(s, key, use, { ...free, method: "take10", gcTakingPermissionConfirmed: true }).blockedReason,
+        /distracted/
+      );
+    }
+    assert.equal(
+      resolveSkillCheck(s, key, use, { ...free, method: "take20", safeToTake: true, gcTakingPermissionConfirmed: true })
+        .blocked,
+      true
+    );
+  }
+});
+test("source counts, explicit legality, own Initiative Count, Refresh and the single time-reduction rule constrain free Maneuvers", () => {
+  for (let n = 1; n <= 15; n++) {
+    const s = state(n);
+    s.activeFeatSelections.push({ name: "Not Chase", tree: "gear" });
+    assert.equal(oneHandManeuverSource(s).limit, n);
+  }
+  for (const patch of [
+    { wheelFreeManeuver: "true" },
+    { wheelFreeActionConfirmed: false },
+    { wheelFreeActionConfirmed: 1 },
+    { maneuverCombat: { ...clock, turn: 1 } },
+    { maneuverCombat: { ...clock, started: false } },
+    { timingReduction: "professional" },
+    { tenSecondSolution: true }
+  ])
+    assert.ok(oneHandManeuverPlan(state(), "drive", check("drive"), { ...free, ...patch }).blockedReason);
+  assert.ok(oneHandManeuverPlan(state(), "notice", { id: "awareness" }, free).blockedReason);
+  const s = state();
+  s.refreshAction = { state: "waiting", combatId: "c", startRound: 1 };
+  assert.match(
+    oneHandManeuverPlan(s, "drive", check("drive"), { ...free, maneuverCombat: clock }).blockedReason,
+    /Refresh/
+  );
+  assert.equal(
+    oneHandManeuverPlan(state(), "drive", check("drive"), { ...free, maneuverCombat: clock }).blockedReason,
+    ""
+  );
+});
+function apply(a, p) {
+  for (const [path, value] of Object.entries(p)) {
+    const keys = path.split(".");
+    let o = a;
+    for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+    const last = keys.at(-1);
+    if (last.startsWith("-=")) delete o[last.slice(2)];
+    else o[last] = structuredClone(value);
+  }
+}
+globalThis.Actor = class {
+  constructor() {
+    this.uuid = "Actor.wheel" + ++serial;
+    this.type = "agent";
+    this.isOwner = true;
+    this.flags = {};
+    this.items = new Map();
+    this.items.filter = fn => [...this.items.values()].filter(fn);
+    this.system = state();
+    this.system.limitedUses = limitedUseAbilities(this.system, [], cfg);
+  }
+  async update(p) {
+    apply(this, p);
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { isGM: true },
+  settings: { get: () => ({ scene, session: "t", mission: "m" }) },
+  i18n: { localize: String, format: String }
+};
+globalThis.foundry = {
+  utils: { randomID: () => String(++serial), escapeHTML: String },
+  applications: { api: { DialogV2: { input: async () => null } } }
+};
+globalThis.ui = { notifications: { warn: () => ({ native: true }) } };
+globalThis.ChatMessage = { getSpeaker: () => ({}) };
+globalThis.Roll = class {
+  constructor(formula, data) {
+    const fixed = /^10\b/.test(formula) || /^20\b/.test(formula),
+      die = fixed ? parseInt(formula) : 7;
+    this.total = die + (data.total ?? 0);
+    this.dice = fixed ? [] : [{ total: die }];
+  }
+  async evaluate() {
+    await hook?.();
+    return this;
+  }
+  async toMessage(data) {
+    if (failPost) throw Error("post failed");
+    const m = {
+      ...data,
+      id: "r" + ++serial,
+      uuid: "ChatMessage.r" + serial,
+      async update(p) {
+        apply(this, p);
+        return this;
+      }
+    };
+    posts.push(m);
+    return m;
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+function actor(count = 2) {
+  scene = "s";
+  posts = [];
+  failPost = false;
+  hook = null;
+  const a = new SpycraftActor();
+  a.system = state(count);
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  return a;
+}
+test("actual free checks share the Chase allowance, spend no dice and preserve used counts after source reacquisition while normal Maneuvers remain available", async () => {
+  const a = actor();
+  for (const key of ["acrobatics", "drive"]) {
+    const m = await a.rollSkill(key, null, { ...free, check: "maneuver", oneHanded: true });
+    assert.equal(m.flags.spycraft2.wheelFeat.free, true);
+    assert.equal(m.flags.spycraft2.wheelFeat.timing.multiplier, 0);
+    assert.equal(m.flags.spycraft2.skillTags.handPenalty, 0);
+  }
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, 2);
+  assert.equal(a.system.actionDice.value, 0);
+  const before = posts.length;
+  await a.rollSkill("drive", null, { ...free, check: "maneuver" });
+  assert.equal(posts.length, before);
+  a.system.activeFeatNames = [];
+  a.system.limitedUses = [];
+  a.system.activeFeatNames = ["One Hand on the Wheel"];
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  await a.rollSkill("drive", null, { ...free, check: "maneuver" });
+  assert.equal(posts.length, before);
+  const normal = await a.rollSkill("drive", null, { check: "maneuver", gearStatus: "available", oneHanded: true });
+  assert.equal(normal.flags.spycraft2.wheelFeat.free, false);
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, 2);
+  scene = "next";
+  a.system.usagePeriods.scene = scene;
+  await a.rollSkill("drive", null, { ...free, check: "maneuver" });
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, 1);
+});
+test("all five real document paths execute the selected free action and an allowed fixed check has no natural die, threat or boost permission", async () => {
+  const a = actor(5);
+  for (const key of MANEUVER_SKILLS) {
+    const m = await a.rollSkill(key, null, { ...free, check: "maneuver" });
+    assert.equal(m.flags.spycraft2.checkId, "maneuver");
+    assert.equal(m.flags.spycraft2.wheelFeat.use.used, posts.length);
+  }
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, 5);
+  const b = actor();
+  const m = await b.rollSkill("drive", null, {
+    ...free,
+    check: "maneuver",
+    method: "take10",
+    safeToTake: true,
+    gcTakingPermissionConfirmed: true
+  });
+  assert.equal(m.flags.spycraft2.naturalDie, null);
+  assert.equal(m.flags.spycraft2.threat, 0);
+  assert.equal(m.flags.spycraft2.actionDiceAllowed, false);
+  assert.equal(b.system.resourceUses.oneHandManeuver.used, 1);
+});
+test("unselected checks and cancelled dialogs never consume a free use, and native-style warnings for invalid conditions or depleted counters cannot retain a new use", async () => {
+  const a = actor();
+  await a.rollSkill("drive", null, { check: "maneuver", gearStatus: "available", oneHanded: true });
+  assert.equal(a.system.resourceUses.oneHandManeuver, undefined);
+  assert.equal(await a.rollSkill("drive"), null);
+  for (const patch of [
+    { wheelFreeActionConfirmed: false },
+    { gearStatus: "missing" },
+    { method: "take20", safeToTake: true }
+  ]) {
+    const before = posts.length;
+    await a.rollSkill("drive", null, { ...free, check: "maneuver", ...patch });
+    assert.equal(posts.length, before);
+    assert.equal(a.system.resourceUses.oneHandManeuver, undefined);
+  }
+  a.system.resourceUses.oneHandManeuver = { epoch: scene, used: "bad" };
+  const before = posts.length;
+  await a.rollSkill("drive", null, { ...free, check: "maneuver" });
+  assert.equal(posts.length, before);
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, "bad");
+});
+test("failed posts and source/count/scene/counter drift during evaluation prevent a receipt and restore the reserved use", async () => {
+  for (const phase of ["post", "source", "count", "scene", "counter"]) {
+    const a = actor();
+    failPost = phase === "post";
+    hook = () => {
+      if (phase === "source") a.system.activeFeatNames = [];
+      if (phase === "count") a.system.activeFeatSelections.push({ name: "New Chase", tree: "chase" });
+      if (phase === "scene") {
+        scene = "later";
+        a.system.usagePeriods.scene = scene;
+      }
+      if (phase === "counter") a.system.resourceUses.oneHandManeuver.used = 0;
+    };
+    await assert.rejects(a.rollSkill("drive", null, { ...free, check: "maneuver" }), /failed|changed/);
+    assert.equal(posts.length, 0);
+    assert.equal(a.system.resourceUses.oneHandManeuver?.used ?? 0, 0);
+  }
+});
+test("actual combat clock overrides a caller’s forged clock and turn changes during evaluation refund the selected free Maneuver", async () => {
+  const a = actor(),
+    combat = {
+      id: "c",
+      started: true,
+      round: 1,
+      turn: 1,
+      turns: [
+        { id: "me", actor: { uuid: a.uuid } },
+        { id: "them", actor: { uuid: "Actor.other" } }
+      ]
+    };
+  Object.defineProperty(a, "participatingCombat", { get: () => combat });
+  await a.rollSkill("drive", null, { ...free, check: "maneuver", maneuverCombat: clock });
+  assert.equal(posts.length, 0);
+  combat.turn = 0;
+  hook = () => {
+    combat.turn = 1;
+  };
+  await assert.rejects(a.rollSkill("drive", null, { ...free, check: "maneuver" }), /changed/);
+  assert.equal(a.system.resourceUses.oneHandManeuver?.used ?? 0, 0);
+});
+test("a permitted replacement roll retains its original free-use receipt after a later Maneuver spent another use", async () => {
+  const a = actor();
+  a.system.limitedUses.push({
+    id: "perfect",
+    name: "Perfect",
+    workflow: "reroll",
+    mastery: "Perfect Skill Mastery",
+    period: "session",
+    limit: 3,
+    cost: 0
+  });
+  const first = await a.rollSkill("drive", null, { ...free, check: "maneuver" });
+  await a.rollSkill("drive", null, { ...free, check: "maneuver" });
+  const replacement = await a.rerollCheck(first, { resource: "perfect", failed: true });
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, 2);
+  assert.deepEqual(replacement.flags.spycraft2.wheelFeat.use, first.flags.spycraft2.wheelFeat.use);
+  assert.equal(replacement.flags.spycraft2.wheelFeat.use.used, 1);
+});
 
-test('a declared natural20 reserves the free Maneuver with the class source before validating its use receipt',async()=>{const a=actor();a.system.classLevels={soldier:14};a.system.limitedUses=limitedUseAbilities(a.system,[],cfg);const m=await a.rollSkill('athletics','str',{...free,check:'maneuver',oneInAMillion:true});assert.equal(m.flags.spycraft2.naturalDie,20);assert.equal(m.flags.spycraft2.wheelFeat.use.used,1);assert.equal(a.system.resourceUses.oneHandManeuver.used,1);assert.equal(a.system.resourceUses.oneInAMillion.used,1);});
-test('the free action itself spends no action dice while Shaken, and its frozen receipt cannot be changed during outcome decisions',async()=>{const a=actor();a.system.conditionContext={shakenGrade:2};const m=await a.rollSkill('drive',null,{...free,check:'maneuver'});assert.equal(a.system.actionDice.value,0);assert.equal(a.system.resourceUses.oneHandManeuver.used,1);const{rollEvidence,rollEvidenceMatches}=await import('../module/rules/outcomes.mjs');const f=m.flags.spycraft2,changed=structuredClone(f);changed.wheelFeat.use.used=2;assert.equal(rollEvidenceMatches(rollEvidence(f),changed),false);});
+test("a declared natural20 reserves the free Maneuver with the class source before validating its use receipt", async () => {
+  const a = actor();
+  a.system.classLevels = { soldier: 14 };
+  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
+  const m = await a.rollSkill("athletics", "str", { ...free, check: "maneuver", oneInAMillion: true });
+  assert.equal(m.flags.spycraft2.naturalDie, 20);
+  assert.equal(m.flags.spycraft2.wheelFeat.use.used, 1);
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, 1);
+  assert.equal(a.system.resourceUses.oneInAMillion.used, 1);
+});
+test("the free action itself spends no action dice while Shaken, and its frozen receipt cannot be changed during outcome decisions", async () => {
+  const a = actor();
+  a.system.conditionContext = { shakenGrade: 2 };
+  const m = await a.rollSkill("drive", null, { ...free, check: "maneuver" });
+  assert.equal(a.system.actionDice.value, 0);
+  assert.equal(a.system.resourceUses.oneHandManeuver.used, 1);
+  const { rollEvidence, rollEvidenceMatches } = await import("../module/rules/outcomes.mjs");
+  const f = m.flags.spycraft2,
+    changed = structuredClone(f);
+  changed.wheelFeat.use.used = 2;
+  assert.equal(rollEvidenceMatches(rollEvidence(f), changed), false);
+});

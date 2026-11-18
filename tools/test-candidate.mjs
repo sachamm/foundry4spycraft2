@@ -1,12 +1,219 @@
-import test from 'node:test';import assert from 'node:assert/strict';import{CANDIDATE_KEYS as keys,CANDIDATE_CHOICES,candidatePlan,captureCandidateBasis,reviewedCandidateBasis}from'../module/rules/candidate.mjs';
-const system=scores=>({level:1,candidateScores:Object.fromEntries(keys.map(k=>[k,scores?.[k]??14]))}),feat=(sys,choice)=>({name:'Candidate',type:'feat',system:{choice,acquiredAtLevel:1,candidateBasis:captureCandidateBasis(sys,choice)}});
-test('all15 unordered tie choices grant exactly one point to each selected first-level attribute and never mutate creation scores',()=>{assert.equal(Object.keys(CANDIDATE_CHOICES).length,15);for(const choice of Object.keys(CANDIDATE_CHOICES)){const s=system(),f=feat(s,choice),before=structuredClone({s,f}),p=candidatePlan(s,f);assert.deepEqual(p.keys,choice.split(','));assert.equal(p.bonuses.length,2);assert.ok(p.bonuses.every(b=>b.value==='1'));assert.deepEqual({s,f},before);}});
-test('every strict ordering chooses exactly the two lowest; ties at the second-lowest boundary permit only eligible alternatives',()=>{for(const first of keys)for(const second of keys.filter(k=>k!==first)){const s=system({[first]:8,[second]:9});let valid=0;for(const choice of Object.keys(CANDIDATE_CHOICES)){const f=feat(s,choice);if(choice.split(',').includes(first)&&choice.split(',').includes(second)){assert.doesNotThrow(()=>candidatePlan(s,f));valid++;}else assert.throws(()=>candidatePlan(s,f),/two lowest/);}assert.equal(valid,1);}for(const first of keys){const s=system({[first]:8});let valid=0;for(const choice of Object.keys(CANDIDATE_CHOICES)){if(choice.split(',').includes(first)){candidatePlan(s,feat(s,choice));valid++;}else assert.throws(()=>candidatePlan(s,feat(s,choice)),/two lowest/);}assert.equal(valid,5);}});
-test('later level increases and damage never retarget the recorded pair; first-level setup changes require reselection and unproved historical edits do not apply',()=>{const s=system({str:8,dex:9}),f=feat(s,'str,dex');s.level=10;s.candidateScores={str:20,dex:20,con:0,int:0,wis:14,cha:14};assert.deepEqual(candidatePlan(s,f).keys,['str','dex']);s.level=1;assert.throws(()=>candidatePlan(s,f),/changed/);f.system.choice='con,int';assert.throws(()=>candidatePlan({level:10},f),/history correction/);assert.throws(()=>candidatePlan({}, {system:{...f.system,candidateBasis:null}}),/review/);assert.throws(()=>captureCandidateBasis({level:2,candidateScores:s.candidateScores},'con,int'),/first class/);});
-test('legacy corrections require an explicit confirmed original-score history and still enforce the first-level lowest pair',()=>{const scores=system({int:8,wis:9}).candidateScores;for(const confirmed of [false,'true',1])assert.throws(()=>reviewedCandidateBasis(scores,'int,wis',{reason:'Original sheet',confirmed}),/Confirm/);assert.throws(()=>reviewedCandidateBasis(scores,'str,dex',{reason:'Original sheet',confirmed:true}),/two lowest/);const b=reviewedCandidateBasis(scores,'int,wis',{reason:' Original first-level sheet ',confirmed:true});assert.equal(b.reason,'Original first-level sheet');assert.deepEqual(candidatePlan({level:20},{system:{choice:'int,wis',acquiredAtLevel:1,candidateBasis:b}}).keys,['int','wis']);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  CANDIDATE_KEYS as keys,
+  CANDIDATE_CHOICES,
+  candidatePlan,
+  captureCandidateBasis,
+  reviewedCandidateBasis
+} from "../module/rules/candidate.mjs";
+const system = scores => ({ level: 1, candidateScores: Object.fromEntries(keys.map(k => [k, scores?.[k] ?? 14])) }),
+  feat = (sys, choice) => ({
+    name: "Candidate",
+    type: "feat",
+    system: { choice, acquiredAtLevel: 1, candidateBasis: captureCandidateBasis(sys, choice) }
+  });
+test("all15 unordered tie choices grant exactly one point to each selected first-level attribute and never mutate creation scores", () => {
+  assert.equal(Object.keys(CANDIDATE_CHOICES).length, 15);
+  for (const choice of Object.keys(CANDIDATE_CHOICES)) {
+    const s = system(),
+      f = feat(s, choice),
+      before = structuredClone({ s, f }),
+      p = candidatePlan(s, f);
+    assert.deepEqual(p.keys, choice.split(","));
+    assert.equal(p.bonuses.length, 2);
+    assert.ok(p.bonuses.every(b => b.value === "1"));
+    assert.deepEqual({ s, f }, before);
+  }
+});
+test("every strict ordering chooses exactly the two lowest; ties at the second-lowest boundary permit only eligible alternatives", () => {
+  for (const first of keys)
+    for (const second of keys.filter(k => k !== first)) {
+      const s = system({ [first]: 8, [second]: 9 });
+      let valid = 0;
+      for (const choice of Object.keys(CANDIDATE_CHOICES)) {
+        const f = feat(s, choice);
+        if (choice.split(",").includes(first) && choice.split(",").includes(second)) {
+          assert.doesNotThrow(() => candidatePlan(s, f));
+          valid++;
+        } else assert.throws(() => candidatePlan(s, f), /two lowest/);
+      }
+      assert.equal(valid, 1);
+    }
+  for (const first of keys) {
+    const s = system({ [first]: 8 });
+    let valid = 0;
+    for (const choice of Object.keys(CANDIDATE_CHOICES)) {
+      if (choice.split(",").includes(first)) {
+        candidatePlan(s, feat(s, choice));
+        valid++;
+      } else assert.throws(() => candidatePlan(s, feat(s, choice)), /two lowest/);
+    }
+    assert.equal(valid, 5);
+  }
+});
+test("later level increases and damage never retarget the recorded pair; first-level setup changes require reselection and unproved historical edits do not apply", () => {
+  const s = system({ str: 8, dex: 9 }),
+    f = feat(s, "str,dex");
+  s.level = 10;
+  s.candidateScores = { str: 20, dex: 20, con: 0, int: 0, wis: 14, cha: 14 };
+  assert.deepEqual(candidatePlan(s, f).keys, ["str", "dex"]);
+  s.level = 1;
+  assert.throws(() => candidatePlan(s, f), /changed/);
+  f.system.choice = "con,int";
+  assert.throws(() => candidatePlan({ level: 10 }, f), /history correction/);
+  assert.throws(() => candidatePlan({}, { system: { ...f.system, candidateBasis: null } }), /review/);
+  assert.throws(
+    () => captureCandidateBasis({ level: 2, candidateScores: s.candidateScores }, "con,int"),
+    /first class/
+  );
+});
+test("legacy corrections require an explicit confirmed original-score history and still enforce the first-level lowest pair", () => {
+  const scores = system({ int: 8, wis: 9 }).candidateScores;
+  for (const confirmed of [false, "true", 1])
+    assert.throws(() => reviewedCandidateBasis(scores, "int,wis", { reason: "Original sheet", confirmed }), /Confirm/);
+  assert.throws(
+    () => reviewedCandidateBasis(scores, "str,dex", { reason: "Original sheet", confirmed: true }),
+    /two lowest/
+  );
+  const b = reviewedCandidateBasis(scores, "int,wis", { reason: " Original first-level sheet ", confirmed: true });
+  assert.equal(b.reason, "Original first-level sheet");
+  assert.deepEqual(
+    candidatePlan({ level: 20 }, { system: { choice: "int,wis", acquiredAtLevel: 1, candidateBasis: b } }).keys,
+    ["int", "wis"]
+  );
+});
 
-const{computeAgent}=await import('../module/rules/engine.mjs');const{SPYCRAFT:cfg}=await import('../module/config.mjs');const cls={id:'test',name:'Test',type:'class',system:{identifier:'test',classSkills:[],table:[],skillPoints:4,vitalityDie:6}},raw=(scores={})=>({abilities:Object.fromEntries(keys.map(k=>[k,{base:scores[k]??14}])),progression:[{classId:'test',vitality:1,skills:{}}],misc:{}}),owned=(base,choice)=>({id:'candidate',name:'Candidate',type:'feat',system:{tree:'tradecraft',acquiredAtLevel:1,prerequisites:{type:'level',eq:1},bonuses:[],choice,candidateBasis:captureCandidateBasis(base,choice)}});
-test('engine applies all15 pairs once, preserves point-buy bases/cost and uses origins before identifying the lowest attributes',()=>{for(const choice of Object.keys(CANDIDATE_CHOICES)){const initial=computeAgent(raw(),[cls],cfg),f=owned(initial,choice),s=computeAgent(raw(),[cls,f],cfg);assert.equal(s.featStatus.candidate.ok,true);assert.equal(s.pointBuy.spent,initial.pointBuy.spent);for(const k of keys){assert.equal(s.abilities[k].base,14);assert.equal(s.abilities[k].value,choice.split(',').includes(k)?15:14);assert.equal(s.candidateScores[k],14);}const duplicate={...structuredClone(f),id:'duplicate'};const dup=computeAgent(raw(),[cls,f,duplicate],cfg);assert.equal(dup.featStatus.duplicate.ok,false);for(const k of keys)assert.equal(dup.abilities[k].value,s.abilities[k].value);}const origin={id:'origin',name:'Synthetic origin',type:'origin',system:{originType:'talent',bonuses:[{target:'abilities.str',value:'-2'},{target:'abilities.dex',value:'2'}]}},initial=computeAgent(raw(),[cls,origin],cfg),f=owned(initial,'str,con');assert.equal(f.system.candidateBasis.scores.str,12);assert.equal(f.system.candidateBasis.scores.dex,16);const s=computeAgent(raw(),[cls,origin,f],cfg);assert.equal(s.abilities.str.value,13);assert.equal(s.abilities.dex.value,16);assert.equal(s.abilities.con.value,15);});
-test('Candidate INT increases propagate into first-level skill-point budgets and remain acquired through later advancement',()=>{const r=raw({str:8,int:9}),initial=computeAgent(structuredClone(r),[cls],cfg),f=owned(initial,'str,int'),s=computeAgent(structuredClone(r),[cls,f],cfg);assert.equal(s.abilities.int.value,10);assert.equal(s.skillPoints[0].available,initial.skillPoints[0].available+4);r.progression=Array.from({length:8},()=>({classId:'test',vitality:1,skills:{}}));r.abilityIncreases={l4:'str',l8:'int'};const later=computeAgent(r,[cls,f],cfg);assert.equal(later.featStatus.candidate.ok,true);assert.equal(later.abilities.str.value,10);assert.equal(later.abilities.int.value,11);assert.equal(later.skillPoints[0].available,s.skillPoints[0].available);});
-test('changed starting scores and missing or edited acquisition history disable Candidate until the original eligible choice is recorded',()=>{const initial=computeAgent(raw(),[cls],cfg),f=owned(initial,'str,dex'),changed=raw({con:8});const invalid=computeAgent(structuredClone(changed),[cls,f],cfg);assert.equal(invalid.featStatus.candidate.ok,false);assert.equal(invalid.abilities.str.value,14);assert.equal(invalid.abilities.dex.value,14);f.system.choice='str,con';f.system.candidateBasis=captureCandidateBasis(invalid,f.system.choice);const corrected=computeAgent(structuredClone(changed),[cls,f],cfg);assert.equal(corrected.featStatus.candidate.ok,true);assert.equal(corrected.abilities.con.value,9);f.system.candidateBasis=null;assert.equal(computeAgent(raw(),[cls,f],cfg).featStatus.candidate.ok,false);});
-test('GC corrections reject non-owning or non-GC callers, invalid original pairs and changed ownership during the dialog',async()=>{const{reviewCandidate}=await import('../module/apps/candidate.mjs');globalThis.game={user:{isGM:true,id:'gc'},time:{worldTime:126}};globalThis.foundry={utils:{escapeHTML:String},applications:{api:{DialogV2:{input:async()=>null}}}};const item={isOwner:true,type:'feat',name:'Candidate',parent:{type:'agent',system:{level:10}},system:{acquiredAtLevel:1,choice:'str,dex',candidateBasis:null},async update(p){return p;}},input={...system({str:8,dex:9}).candidateScores,choice:'str,dex',reason:'Original first-level sheet',confirmed:true};assert.equal(await reviewCandidate(item),null);game.user.isGM=false;await assert.rejects(reviewCandidate(item,input),/owning GC/);game.user.isGM=true;await assert.rejects(reviewCandidate({...item,isOwner:false},input),/owning GC/);await assert.rejects(reviewCandidate(item,{...input,choice:'int,wis'}),/two lowest/);const p=await reviewCandidate(item,input);assert.equal(p['system.candidateBasis'].reviewedBy,'gc');assert.equal(p['system.candidateBasis'].reviewedAt,126);foundry.applications.api.DialogV2.input=async()=>{game.user.isGM=false;return input;};await assert.rejects(reviewCandidate(item),/ownership changed/);});
+const { computeAgent } = await import("../module/rules/engine.mjs");
+const { SPYCRAFT: cfg } = await import("../module/config.mjs");
+const cls = {
+    id: "test",
+    name: "Test",
+    type: "class",
+    system: { identifier: "test", classSkills: [], table: [], skillPoints: 4, vitalityDie: 6 }
+  },
+  raw = (scores = {}) => ({
+    abilities: Object.fromEntries(keys.map(k => [k, { base: scores[k] ?? 14 }])),
+    progression: [{ classId: "test", vitality: 1, skills: {} }],
+    misc: {}
+  }),
+  owned = (base, choice) => ({
+    id: "candidate",
+    name: "Candidate",
+    type: "feat",
+    system: {
+      tree: "tradecraft",
+      acquiredAtLevel: 1,
+      prerequisites: { type: "level", eq: 1 },
+      bonuses: [],
+      choice,
+      candidateBasis: captureCandidateBasis(base, choice)
+    }
+  });
+test("engine applies all15 pairs once, preserves point-buy bases/cost and uses origins before identifying the lowest attributes", () => {
+  for (const choice of Object.keys(CANDIDATE_CHOICES)) {
+    const initial = computeAgent(raw(), [cls], cfg),
+      f = owned(initial, choice),
+      s = computeAgent(raw(), [cls, f], cfg);
+    assert.equal(s.featStatus.candidate.ok, true);
+    assert.equal(s.pointBuy.spent, initial.pointBuy.spent);
+    for (const k of keys) {
+      assert.equal(s.abilities[k].base, 14);
+      assert.equal(s.abilities[k].value, choice.split(",").includes(k) ? 15 : 14);
+      assert.equal(s.candidateScores[k], 14);
+    }
+    const duplicate = { ...structuredClone(f), id: "duplicate" };
+    const dup = computeAgent(raw(), [cls, f, duplicate], cfg);
+    assert.equal(dup.featStatus.duplicate.ok, false);
+    for (const k of keys) assert.equal(dup.abilities[k].value, s.abilities[k].value);
+  }
+  const origin = {
+      id: "origin",
+      name: "Synthetic origin",
+      type: "origin",
+      system: {
+        originType: "talent",
+        bonuses: [
+          { target: "abilities.str", value: "-2" },
+          { target: "abilities.dex", value: "2" }
+        ]
+      }
+    },
+    initial = computeAgent(raw(), [cls, origin], cfg),
+    f = owned(initial, "str,con");
+  assert.equal(f.system.candidateBasis.scores.str, 12);
+  assert.equal(f.system.candidateBasis.scores.dex, 16);
+  const s = computeAgent(raw(), [cls, origin, f], cfg);
+  assert.equal(s.abilities.str.value, 13);
+  assert.equal(s.abilities.dex.value, 16);
+  assert.equal(s.abilities.con.value, 15);
+});
+test("Candidate INT increases propagate into first-level skill-point budgets and remain acquired through later advancement", () => {
+  const r = raw({ str: 8, int: 9 }),
+    initial = computeAgent(structuredClone(r), [cls], cfg),
+    f = owned(initial, "str,int"),
+    s = computeAgent(structuredClone(r), [cls, f], cfg);
+  assert.equal(s.abilities.int.value, 10);
+  assert.equal(s.skillPoints[0].available, initial.skillPoints[0].available + 4);
+  r.progression = Array.from({ length: 8 }, () => ({ classId: "test", vitality: 1, skills: {} }));
+  r.abilityIncreases = { l4: "str", l8: "int" };
+  const later = computeAgent(r, [cls, f], cfg);
+  assert.equal(later.featStatus.candidate.ok, true);
+  assert.equal(later.abilities.str.value, 10);
+  assert.equal(later.abilities.int.value, 11);
+  assert.equal(later.skillPoints[0].available, s.skillPoints[0].available);
+});
+test("changed starting scores and missing or edited acquisition history disable Candidate until the original eligible choice is recorded", () => {
+  const initial = computeAgent(raw(), [cls], cfg),
+    f = owned(initial, "str,dex"),
+    changed = raw({ con: 8 });
+  const invalid = computeAgent(structuredClone(changed), [cls, f], cfg);
+  assert.equal(invalid.featStatus.candidate.ok, false);
+  assert.equal(invalid.abilities.str.value, 14);
+  assert.equal(invalid.abilities.dex.value, 14);
+  f.system.choice = "str,con";
+  f.system.candidateBasis = captureCandidateBasis(invalid, f.system.choice);
+  const corrected = computeAgent(structuredClone(changed), [cls, f], cfg);
+  assert.equal(corrected.featStatus.candidate.ok, true);
+  assert.equal(corrected.abilities.con.value, 9);
+  f.system.candidateBasis = null;
+  assert.equal(computeAgent(raw(), [cls, f], cfg).featStatus.candidate.ok, false);
+});
+test("GC corrections reject non-owning or non-GC callers, invalid original pairs and changed ownership during the dialog", async () => {
+  const { reviewCandidate } = await import("../module/apps/candidate.mjs");
+  globalThis.game = { user: { isGM: true, id: "gc" }, time: { worldTime: 126 } };
+  globalThis.foundry = {
+    utils: { escapeHTML: String },
+    applications: { api: { DialogV2: { input: async () => null } } }
+  };
+  const item = {
+      isOwner: true,
+      type: "feat",
+      name: "Candidate",
+      parent: { type: "agent", system: { level: 10 } },
+      system: { acquiredAtLevel: 1, choice: "str,dex", candidateBasis: null },
+      async update(p) {
+        return p;
+      }
+    },
+    input = {
+      ...system({ str: 8, dex: 9 }).candidateScores,
+      choice: "str,dex",
+      reason: "Original first-level sheet",
+      confirmed: true
+    };
+  assert.equal(await reviewCandidate(item), null);
+  game.user.isGM = false;
+  await assert.rejects(reviewCandidate(item, input), /owning GC/);
+  game.user.isGM = true;
+  await assert.rejects(reviewCandidate({ ...item, isOwner: false }, input), /owning GC/);
+  await assert.rejects(reviewCandidate(item, { ...input, choice: "int,wis" }), /two lowest/);
+  const p = await reviewCandidate(item, input);
+  assert.equal(p["system.candidateBasis"].reviewedBy, "gc");
+  assert.equal(p["system.candidateBasis"].reviewedAt, 126);
+  foundry.applications.api.DialogV2.input = async () => {
+    game.user.isGM = false;
+    return input;
+  };
+  await assert.rejects(reviewCandidate(item), /ownership changed/);
+});

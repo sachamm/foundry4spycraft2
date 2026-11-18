@@ -1,21 +1,224 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {renaissanceManPlan,temporaryFeatActive} from '../module/rules/temporary-feats.mjs';import {limitedUseAbilities} from '../module/rules/limited-uses.mjs';import {computeAgent} from '../module/rules/engine.mjs';import {SPYCRAFT as cfg} from '../module/config.mjs';
-const feats=JSON.parse(await readFile(new URL('../src/data/feats.json',import.meta.url),'utf8')).filter(f=>f.tree==='Basic Skill').map((f,i)=>({id:'f'+i,uuid:'Compendium.spycraft2.feats.f'+i,name:f.name,type:'feat',system:{...f,tree:'basicSkill'}}));const classDefinition=JSON.parse(await readFile(new URL('../src/data/classes.json',import.meta.url),'utf8')).find(c=>c.key==='schemer');const cls={id:'schemer',name:'Schemer',type:'class',system:{...classDefinition,identifier:'schemer',vitalityDie:8}};
-function base(mission='a'){return {usagePeriods:{mission},abilities:Object.fromEntries(['str','dex','con','int','wis','cha'].map(k=>[k,{base:10}])),actionDice:{value:0},progression:Array.from({length:3},()=>({classId:'schemer',vitality:4,skills:{}})),misc:{}};}
-test('all 15 Basic Skill feats grant their scoped benefits without spending permanent slots, and expire with the mission while retaining their records',()=>{
- assert.equal(feats.length,15);const original=computeAgent(base(),[cls],cfg);
- for(const feat of feats){const copy=renaissanceManPlan(original,[cls],feat,{epoch:'a',sourceActorUuid:'Actor.test'});copy.id='temporary';const active=computeAgent(base(),[cls,copy],cfg),expired=computeAgent(base('b'),[cls,copy],cfg);assert.equal(copy.system.featKind,'temporary');assert.equal(copy.system.temporaryGrant.sourceFeatUuid,feat.uuid);assert.equal(active.featStatus.temporary.ok,true,feat.name);assert.equal(active.feats.any.spent,original.feats.any.spent);assert.equal(expired.featStatus.temporary.ok,false);for(const key of cfg.tables.basicSkillFeats[feat.name]){assert.equal(active.skillTotals[key].total,original.skillTotals[key].total+2);assert.equal(active.skillTotals[key].threat,19);assert.equal(expired.skillTotals[key].total,original.skillTotals[key].total);}assert.equal(copy.system.temporaryGrant.epoch,'a');}
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { renaissanceManPlan } from "../module/rules/temporary-feats.mjs";
+import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
+import { computeAgent } from "../module/rules/engine.mjs";
+import { SPYCRAFT as cfg } from "../module/config.mjs";
+const feats = JSON.parse(await readFile(new URL("../src/data/feats.json", import.meta.url), "utf8"))
+  .filter(f => f.tree === "Basic Skill")
+  .map((f, i) => ({
+    id: "f" + i,
+    uuid: "Compendium.spycraft2.feats.f" + i,
+    name: f.name,
+    type: "feat",
+    system: { ...f, tree: "basicSkill" }
+  }));
+const classDefinition = JSON.parse(await readFile(new URL("../src/data/classes.json", import.meta.url), "utf8")).find(
+  c => c.key === "schemer"
+);
+const cls = {
+  id: "schemer",
+  name: "Schemer",
+  type: "class",
+  system: { ...classDefinition, identifier: "schemer", vitalityDie: 8 }
+};
+function base(mission = "a") {
+  return {
+    usagePeriods: { mission },
+    abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 10 }])),
+    actionDice: { value: 0 },
+    progression: Array.from({ length: 3 }, () => ({ classId: "schemer", vitality: 4, skills: {} })),
+    misc: {}
+  };
+}
+test("all 15 Basic Skill feats grant their scoped benefits without spending permanent slots, and expire with the mission while retaining their records", () => {
+  assert.equal(feats.length, 15);
+  const original = computeAgent(base(), [cls], cfg);
+  for (const feat of feats) {
+    const copy = renaissanceManPlan(original, [cls], feat, { epoch: "a", sourceActorUuid: "Actor.test" });
+    copy.id = "temporary";
+    const active = computeAgent(base(), [cls, copy], cfg),
+      expired = computeAgent(base("b"), [cls, copy], cfg);
+    assert.equal(copy.system.featKind, "temporary");
+    assert.equal(copy.system.temporaryGrant.sourceFeatUuid, feat.uuid);
+    assert.equal(active.featStatus.temporary.ok, true, feat.name);
+    assert.equal(active.feats.any.spent, original.feats.any.spent);
+    assert.equal(expired.featStatus.temporary.ok, false);
+    for (const key of cfg.tables.basicSkillFeats[feat.name]) {
+      assert.equal(active.skillTotals[key].total, original.skillTotals[key].total + 2);
+      assert.equal(active.skillTotals[key].threat, 19);
+      assert.equal(expired.skillTotals[key].total, original.skillTotals[key].total);
+    }
+    assert.equal(copy.system.temporaryGrant.epoch, "a");
+  }
 });
-test('prose mission limits apply at every milestone; wrong trees, duplicate active feats and missing source classes are rejected',()=>{
- for(let n=0;n<=10;n++){const s={classLevels:{schemer:n}};const spec=limitedUseAbilities(s,[],cfg).find(s=>s.id==='renaissanceMan');assert.equal(spec?.limit??0,n>=7?2:n>=3?1:0);if(spec)assert.equal(spec.period,'mission');else assert.throws(()=>renaissanceManPlan(s,[],feats[0]));}
- const s={classLevels:{schemer:7},usagePeriods:{mission:'a'}};assert.throws(()=>renaissanceManPlan(s,[],{...feats[0],system:{tree:'advancedSkill'}}));assert.throws(()=>renaissanceManPlan(s,[feats[0]],feats[0]));const expired={...feats[0],system:{...feats[0].system,featKind:'temporary',temporaryGrant:{period:'mission',epoch:'old'}}};assert.ok(renaissanceManPlan(s,[expired],feats[0],{epoch:'a'}));assert.equal(expired.system.temporaryGrant.epoch,'old');
+test("prose mission limits apply at every milestone; wrong trees, duplicate active feats and missing source classes are rejected", () => {
+  for (let n = 0; n <= 10; n++) {
+    const s = { classLevels: { schemer: n } };
+    const spec = limitedUseAbilities(s, [], cfg).find(s => s.id === "renaissanceMan");
+    assert.equal(spec?.limit ?? 0, n >= 7 ? 2 : n >= 3 ? 1 : 0);
+    if (spec) assert.equal(spec.period, "mission");
+    else assert.throws(() => renaissanceManPlan(s, [], feats[0]));
+  }
+  const s = { classLevels: { schemer: 7 }, usagePeriods: { mission: "a" } };
+  assert.throws(() => renaissanceManPlan(s, [], { ...feats[0], system: { tree: "advancedSkill" } }));
+  assert.throws(() => renaissanceManPlan(s, [feats[0]], feats[0]));
+  const expired = {
+    ...feats[0],
+    system: { ...feats[0].system, featKind: "temporary", temporaryGrant: { period: "mission", epoch: "old" } }
+  };
+  assert.ok(renaissanceManPlan(s, [expired], feats[0], { epoch: "a" }));
+  assert.equal(expired.system.temporaryGrant.epoch, "old");
 });
-let mission='a',posts=[],failPost=false,failCreation=false,failDelete=false,eligible=true,warnings=[];globalThis.Actor=class{constructor(){this.uuid='Actor.schemer';this.type='agent';this.isOwner=true;this.items=[];this.system={level:7,classLevels:{schemer:7},usagePeriods:{mission},actionDice:{value:0,max:3},resourceUses:{}};this.system.limitedUses=limitedUseAbilities(this.system,[],cfg);}async update(patch){for(const [path,value] of Object.entries(patch)){const keys=path.replace(/^system\./,'').split('.');let o=this.system;for(const k of keys.slice(0,-1))o=o[k]??={};const k=keys.at(-1);if(k.startsWith('-='))delete o[k.slice(2)];else o[k]=structuredClone(value);}}async createEmbeddedDocuments(_t,data){if(failCreation)throw Error('creation failed');const out=data.map((d,i)=>({...structuredClone(d),id:'created'+this.items.length+i,uuid:'Actor.schemer.Item.created'+this.items.length+i}));this.items.push(...out);return out;}async deleteEmbeddedDocuments(_t,ids){if(failDelete)throw Error('delete failed');this.items=this.items.filter(i=>!ids.includes(i.id));}};const pack={async getDocument(id){return feats.find(f=>f.id===id);},async getIndex(){return feats.map(f=>({...f,_id:f.id}));}};globalThis.CONFIG={SPYCRAFT:cfg};globalThis.game={user:{id:'gm',isGM:true},packs:new Map([['spycraft2.feats',pack]]),settings:{get:()=>({mission,session:'s'})},i18n:{localize:s=>s}};globalThis.foundry={utils:{escapeHTML:s=>String(s)},applications:{api:{DialogV2:{input:async()=>null}}}};globalThis.ChatMessage={getSpeaker:()=>({}),async create(data){if(failPost)throw Error('post failed');posts.push(data);return data;}};globalThis.ui={notifications:{warn:s=>{warnings.push(s);return null;}}};const {SpycraftActor}=await import('../module/documents/actor.mjs');function actor(){const a=new SpycraftActor();a.checkPrerequisites=()=>({ok:eligible,unmet:eligible?[]:['QA prerequisite']});return a;}function reset(){mission='a';posts=[];failPost=false;failCreation=false;failDelete=false;eligible=true;warnings=[];}
-test('the native grant workflow creates two independent temporary feats, retains deleted-use history and refreshes only with a new mission',async()=>{
- reset();const a=actor();for(const feat of feats.slice(0,2)){const created=await a.useRenaissanceMan({featId:feat.id,freeActionConfirmed:true});assert.equal(created.system.temporaryGrant.period,'mission');assert.equal(created.system.granted,true);}assert.equal(a.system.resourceUses.renaissanceMan.used,2);assert.equal(a.items.length,2);await a.deleteEmbeddedDocuments('Item',[a.items[0].id]);assert.equal(await a.useRenaissanceMan({featId:feats[2].id,freeActionConfirmed:true}),null);assert.equal(a.system.actionDice.value,0);mission='b';a.system.usagePeriods.mission='b';assert.ok(await a.useRenaissanceMan({featId:feats[0].id,freeActionConfirmed:true}));assert.equal(a.system.resourceUses.renaissanceMan.used,1);
+let mission = "a",
+  posts = [],
+  failPost = false,
+  failCreation = false,
+  failDelete = false,
+  eligible = true,
+  warnings = [];
+globalThis.Actor = class {
+  constructor() {
+    this.uuid = "Actor.schemer";
+    this.type = "agent";
+    this.isOwner = true;
+    this.items = [];
+    this.system = {
+      level: 7,
+      classLevels: { schemer: 7 },
+      usagePeriods: { mission },
+      actionDice: { value: 0, max: 3 },
+      resourceUses: {}
+    };
+    this.system.limitedUses = limitedUseAbilities(this.system, [], cfg);
+  }
+  async update(patch) {
+    for (const [path, value] of Object.entries(patch)) {
+      const keys = path.replace(/^system\./, "").split(".");
+      let o = this.system;
+      for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+      const k = keys.at(-1);
+      if (k.startsWith("-=")) delete o[k.slice(2)];
+      else o[k] = structuredClone(value);
+    }
+  }
+  async createEmbeddedDocuments(_t, data) {
+    if (failCreation) throw Error("creation failed");
+    const out = data.map((d, i) => ({
+      ...structuredClone(d),
+      id: "created" + this.items.length + i,
+      uuid: "Actor.schemer.Item.created" + this.items.length + i
+    }));
+    this.items.push(...out);
+    return out;
+  }
+  async deleteEmbeddedDocuments(_t, ids) {
+    if (failDelete) throw Error("delete failed");
+    this.items = this.items.filter(i => !ids.includes(i.id));
+  }
+};
+const pack = {
+  async getDocument(id) {
+    return feats.find(f => f.id === id);
+  },
+  async getIndex() {
+    return feats.map(f => ({ ...f, _id: f.id }));
+  }
+};
+globalThis.CONFIG = { SPYCRAFT: cfg };
+globalThis.game = {
+  user: { id: "gm", isGM: true },
+  packs: new Map([["spycraft2.feats", pack]]),
+  settings: { get: () => ({ mission, session: "s" }) },
+  i18n: { localize: s => s }
+};
+globalThis.foundry = {
+  utils: { escapeHTML: s => String(s) },
+  applications: { api: { DialogV2: { input: async () => null } } }
+};
+globalThis.ChatMessage = {
+  getSpeaker: () => ({}),
+  async create(data) {
+    if (failPost) throw Error("post failed");
+    posts.push(data);
+    return data;
+  }
+};
+globalThis.ui = {
+  notifications: {
+    warn: s => {
+      warnings.push(s);
+      return null;
+    }
+  }
+};
+const { SpycraftActor } = await import("../module/documents/actor.mjs");
+function actor() {
+  const a = new SpycraftActor();
+  a.checkPrerequisites = () => ({ ok: eligible, unmet: eligible ? [] : ["QA prerequisite"] });
+  return a;
+}
+function reset() {
+  mission = "a";
+  posts = [];
+  failPost = false;
+  failCreation = false;
+  failDelete = false;
+  eligible = true;
+  warnings = [];
+}
+test("the native grant workflow creates two independent temporary feats, retains deleted-use history and refreshes only with a new mission", async () => {
+  reset();
+  const a = actor();
+  for (const feat of feats.slice(0, 2)) {
+    const created = await a.useRenaissanceMan({ featId: feat.id, freeActionConfirmed: true });
+    assert.equal(created.system.temporaryGrant.period, "mission");
+    assert.equal(created.system.granted, true);
+  }
+  assert.equal(a.system.resourceUses.renaissanceMan.used, 2);
+  assert.equal(a.items.length, 2);
+  await a.deleteEmbeddedDocuments("Item", [a.items[0].id]);
+  assert.equal(await a.useRenaissanceMan({ featId: feats[2].id, freeActionConfirmed: true }), null);
+  assert.equal(a.system.actionDice.value, 0);
+  mission = "b";
+  a.system.usagePeriods.mission = "b";
+  assert.ok(await a.useRenaissanceMan({ featId: feats[0].id, freeActionConfirmed: true }));
+  assert.equal(a.system.resourceUses.renaissanceMan.used, 1);
 });
-test('cancellation and invalid choices spend nothing; failed creation or posting rolls back items and usage',async()=>{
- reset();const a=actor();assert.equal(await a.useRenaissanceMan(),null);assert.equal(await a.useRenaissanceMan({featId:feats[0].id}),null);await assert.rejects(a.useRenaissanceMan({featId:'missing',freeActionConfirmed:true}),/Basic Skill/);eligible=false;await assert.rejects(a.useRenaissanceMan({featId:feats[0].id,freeActionConfirmed:true}),/prerequisites/);eligible=true;failCreation=true;await assert.rejects(a.useRenaissanceMan({featId:feats[0].id,freeActionConfirmed:true}),/creation failed/);failCreation=false;failPost=true;await assert.rejects(a.useRenaissanceMan({featId:feats[0].id,freeActionConfirmed:true}),/post failed/);assert.equal(a.items.length,0);assert.equal(a.system.resourceUses.renaissanceMan,undefined);assert.equal(a.system.actionDice.value,0);
+test("cancellation and invalid choices spend nothing; failed creation or posting rolls back items and usage", async () => {
+  reset();
+  const a = actor();
+  assert.equal(await a.useRenaissanceMan(), null);
+  assert.equal(await a.useRenaissanceMan({ featId: feats[0].id }), null);
+  await assert.rejects(a.useRenaissanceMan({ featId: "missing", freeActionConfirmed: true }), /Basic Skill/);
+  eligible = false;
+  await assert.rejects(a.useRenaissanceMan({ featId: feats[0].id, freeActionConfirmed: true }), /prerequisites/);
+  eligible = true;
+  failCreation = true;
+  await assert.rejects(a.useRenaissanceMan({ featId: feats[0].id, freeActionConfirmed: true }), /creation failed/);
+  failCreation = false;
+  failPost = true;
+  await assert.rejects(a.useRenaissanceMan({ featId: feats[0].id, freeActionConfirmed: true }), /post failed/);
+  assert.equal(a.items.length, 0);
+  assert.equal(a.system.resourceUses.renaissanceMan, undefined);
+  assert.equal(a.system.actionDice.value, 0);
 });
-test('a cleanup failure keeps the existing feat and its spent use; competing last grants create exactly one item',async()=>{
- reset();const a=actor();failPost=true;failDelete=true;const kept=await a.useRenaissanceMan({featId:feats[0].id,freeActionConfirmed:true});assert.equal(kept.id,a.items[0].id);assert.equal(a.system.resourceUses.renaissanceMan.used,1);assert.match(warnings.at(-1),/use remains spent/);failPost=false;failDelete=false;const b=actor();b.system.resourceUses.renaissanceMan={epoch:'a',used:1};await Promise.all(feats.slice(0,2).map(f=>b.useRenaissanceMan({featId:f.id,freeActionConfirmed:true})));assert.equal(b.items.length,1);assert.equal(b.system.resourceUses.renaissanceMan.used,2);assert.equal(posts.length,1);
+test("a cleanup failure keeps the existing feat and its spent use; competing last grants create exactly one item", async () => {
+  reset();
+  const a = actor();
+  failPost = true;
+  failDelete = true;
+  const kept = await a.useRenaissanceMan({ featId: feats[0].id, freeActionConfirmed: true });
+  assert.equal(kept.id, a.items[0].id);
+  assert.equal(a.system.resourceUses.renaissanceMan.used, 1);
+  assert.match(warnings.at(-1), /use remains spent/);
+  failPost = false;
+  failDelete = false;
+  const b = actor();
+  b.system.resourceUses.renaissanceMan = { epoch: "a", used: 1 };
+  await Promise.all(feats.slice(0, 2).map(f => b.useRenaissanceMan({ featId: f.id, freeActionConfirmed: true })));
+  assert.equal(b.items.length, 1);
+  assert.equal(b.system.resourceUses.renaissanceMan.used, 2);
+  assert.equal(posts.length, 1);
 });

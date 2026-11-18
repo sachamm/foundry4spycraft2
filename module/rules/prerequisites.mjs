@@ -40,21 +40,53 @@ function test(n, ctx, unmet) {
       if (!ok) unmet.push(describe(n));
       return ok;
     }
-    case "feat": ok = ctx.hasFeat(n.name); break;
-    case "featChoice": ok = !!ctx.hasFeatChoice?.(n.name,n.choice); break;
-    case "featTree": ok = (ctx.featTrees[n.tree] ?? 0) >= n.min; break;
-    case "base": ok = (ctx.base[n.key] ?? 0) >= n.min; break;
-    case "level": ok = n.eq !== undefined ? (ctx.acquisitionLevel ?? ctx.level) === n.eq : (ctx.prerequisiteLevel ?? ctx.level) + (ctx.levelBonus ?? 0) >= n.min; break;
-    case "sneakAttack": ok = (ctx.sneakAttackDice ?? 0) >= n.min; break;
-    case "manual": ok = !!ctx.manualConfirmed; break;
-    case "ability": ok = (ctx.abilities[n.key] ?? 0) >= n.min; break;
-    case "skill": ok = (ctx.skills[n.key] ?? 0) >= n.min; break;
-    case "proficiency": ok = !!ctx.proficient(n.key); break;
-    case "focus": ok = (n.any ?? [n.group]).some(g => ctx.focus(n.skill, g)); break;
-    case "lifestyle": ok = (ctx.lifestyle ?? 0) >= n.min; break;
-    case "keySkill": ok = (ctx.keySkillRanks ?? 0) >= n.min; break;
-    case "never": ok = false; break;
-    default: ok = false; // Unsupported requirements must not be reported as satisfied
+    case "feat":
+      ok = ctx.hasFeat(n.name);
+      break;
+    case "featChoice":
+      ok = !!ctx.hasFeatChoice?.(n.name, n.choice);
+      break;
+    case "featTree":
+      ok = (ctx.featTrees[n.tree] ?? 0) >= n.min;
+      break;
+    case "base":
+      ok = (ctx.base[n.key] ?? 0) >= n.min;
+      break;
+    case "level":
+      ok =
+        n.eq !== undefined
+          ? (ctx.acquisitionLevel ?? ctx.level) === n.eq
+          : (ctx.prerequisiteLevel ?? ctx.level) + (ctx.levelBonus ?? 0) >= n.min;
+      break;
+    case "sneakAttack":
+      ok = (ctx.sneakAttackDice ?? 0) >= n.min;
+      break;
+    case "manual":
+      ok = !!ctx.manualConfirmed;
+      break;
+    case "ability":
+      ok = (ctx.abilities[n.key] ?? 0) >= n.min;
+      break;
+    case "skill":
+      ok = (ctx.skills[n.key] ?? 0) >= n.min;
+      break;
+    case "proficiency":
+      ok = !!ctx.proficient(n.key);
+      break;
+    case "focus":
+      ok = (n.any ?? [n.group]).some(g => ctx.focus(n.skill, g));
+      break;
+    case "lifestyle":
+      ok = (ctx.lifestyle ?? 0) >= n.min;
+      break;
+    case "keySkill":
+      ok = (ctx.keySkillRanks ?? 0) >= n.min;
+      break;
+    case "never":
+      ok = false;
+      break;
+    default:
+      ok = false; // Unsupported requirements must not be reported as satisfied
   }
   if (!ok) unmet.push(describe(n));
   return ok;
@@ -70,22 +102,39 @@ export function describe(n) {
   const tree = k => cfg?.featTrees?.[k] ?? k;
   const prof = k => cfg?.proficiencies?.[k]?.label ?? k;
   switch (n.type) {
-    case "all": return n.of.map(describe).join(", ");
-    case "any": return `(${n.of.map(describe).join(" or ")})`;
-    case "feat": return n.name;
-    case "featChoice": return `${n.name} (${n.choice})`;
-    case "featTree": return n.min > 1 ? `${n.min} ${tree(n.tree)} feats` : `any ${tree(n.tree)} feat`;
-    case "base": return n.key === "bab" ? `BAB +${n.min}` : `Base Defense +${n.min}`;
-    case "level": return n.eq !== undefined ? `Career Level ${n.eq}` : `Career Level ${n.min}+`;
-    case "ability": return `${ABIL[n.key]} ${n.min}+`;
-    case "skill": return `${skill(n.key)} ${n.min}+ ranks`;
-    case "proficiency": return `${prof(n.key)} proficiency`;
-    case "focus": return `${skill(n.skill)} focus (any ${n.group})`;
-    case "lifestyle": return `Lifestyle ${n.min}+`;
-    case "keySkill": return `Key skill ${n.min}+ ranks`;
-    case "sneakAttack": return `Sneak attack damage of ${n.min} ${n.min===1?"die":"dice"} or more`;
-    case "manual": return `GC confirmation: ${n.text}`;
-    case "never": return "Not available";
-    default: return "Special";
+    case "all":
+      return n.of.map(describe).join(", ");
+    case "any":
+      return `(${n.of.map(describe).join(" or ")})`;
+    case "feat":
+      return n.name;
+    case "featChoice":
+      return `${n.name} (${n.choice})`;
+    case "featTree":
+      return n.min > 1 ? `${n.min} ${tree(n.tree)} feats` : `any ${tree(n.tree)} feat`;
+    case "base":
+      return n.key === "bab" ? `BAB +${n.min}` : `Base Defense +${n.min}`;
+    case "level":
+      return n.eq !== undefined ? `Career Level ${n.eq}` : `Career Level ${n.min}+`;
+    case "ability":
+      return `${ABIL[n.key]} ${n.min}+`;
+    case "skill":
+      return `${skill(n.key)} ${n.min}+ ranks`;
+    case "proficiency":
+      return `${prof(n.key)} proficiency`;
+    case "focus":
+      return `${skill(n.skill)} focus (any ${n.group})`;
+    case "lifestyle":
+      return `Lifestyle ${n.min}+`;
+    case "keySkill":
+      return `Key skill ${n.min}+ ranks`;
+    case "sneakAttack":
+      return `Sneak attack damage of ${n.min} ${n.min === 1 ? "die" : "dice"} or more`;
+    case "manual":
+      return `GC confirmation: ${n.text}`;
+    case "never":
+      return "Not available";
+    default:
+      return "Special";
   }
 }

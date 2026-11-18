@@ -8,11 +8,14 @@ export const VEHICLE_NET_WORTH_PER_REPUTATION = 50000;
 
 /** {reputation, netWorth} from a printed cost label, or null when the label is not a cost. */
 export function parseStandingCost(label) {
-  const text = String(label ?? '').trim();
+  const text = String(label ?? "").trim();
   const both = /^(\d+)\s*\/\s*\$([\d,]+)$/.exec(text);
-  if (both) return {reputation: Number(both[1]), netWorth: Number(both[2].replaceAll(',', ''))};
+  if (both) return { reputation: Number(both[1]), netWorth: Number(both[2].replaceAll(",", "")) };
   const repOnly = /^(\d+)\s+Reputation$/i.exec(text);
-  if (repOnly) { const reputation = Number(repOnly[1]); return {reputation, netWorth: reputation * VEHICLE_NET_WORTH_PER_REPUTATION}; }
+  if (repOnly) {
+    const reputation = Number(repOnly[1]);
+    return { reputation, netWorth: reputation * VEHICLE_NET_WORTH_PER_REPUTATION };
+  }
   return null;
 }
 
@@ -21,9 +24,16 @@ export function parseStandingCost(label) {
  * Neither Reputation nor Net Worth may be spent below 0.
  */
 export function standingPayment(system, cost, currency) {
-  if (!cost || !['reputation', 'netWorth'].includes(currency)) return {ok: false, reason: 'No cost to pay.'};
-  const balance = Number(system?.[currency] ?? 0), amount = cost[currency];
-  if (!Number.isSafeInteger(amount) || amount <= 0) return {ok: false, reason: 'No cost to pay.'};
-  if (balance < amount) return {ok: false, reason: `Not enough ${currency === 'reputation' ? 'Reputation' : 'Net Worth'}: ${balance} of ${amount}.`, amount, balance};
-  return {ok: true, amount, balance, after: balance - amount};
+  if (!cost || !["reputation", "netWorth"].includes(currency)) return { ok: false, reason: "No cost to pay." };
+  const balance = Number(system?.[currency] ?? 0),
+    amount = cost[currency];
+  if (!Number.isSafeInteger(amount) || amount <= 0) return { ok: false, reason: "No cost to pay." };
+  if (balance < amount)
+    return {
+      ok: false,
+      reason: `Not enough ${currency === "reputation" ? "Reputation" : "Net Worth"}: ${balance} of ${amount}.`,
+      amount,
+      balance
+    };
+  return { ok: true, amount, balance, after: balance - amount };
 }
