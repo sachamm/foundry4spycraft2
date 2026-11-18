@@ -20,7 +20,8 @@ import {
   missionEpoch,
   reserveInitialization,
   gearAcquisitionPlan,
-  acquisitionOutcome
+  acquisitionOutcome,
+  requestFeatBonus
 } from "../rules/gear-acquisition.mjs";
 import { equipmentCategory } from "../rules/gear.mjs";
 import { loc } from "../i18n.mjs";
@@ -721,14 +722,12 @@ export async function claimGearAcquisition(actor, options = {}) {
       throw new Error(
         loc`One acquisition grants one source-listed bundle; its quantity and pick count cannot be increased after the check.`
       );
-    const grenadeBonus =
-      attempt.kind === "request" &&
-      data.type === "weapon" &&
-      ["hurled", "exoticHurled"].includes(data.system.proficiency) &&
-      /grenade/i.test(data.name) &&
-      actor.system.activeFeatNames?.includes("Grenade Basics")
-        ? 1
-        : 0;
+    const featBonus =
+        attempt.kind === "request"
+          ? requestFeatBonus(actor.system, data, quantity)
+          : { extra: 0, powerRating: null, sources: [] },
+      grenadeBonus = featBonus.extra;
+    if (featBonus.powerRating !== null) data.system.powerRating = featBonus.powerRating;
     Object.assign(data.system, {
       quantity: quantity + grenadeBonus,
       pickCount: 1,

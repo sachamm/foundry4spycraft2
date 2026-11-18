@@ -309,6 +309,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       duelingBasics: record("duelingBasics", { nullable: true, initial: null }),
       fightDefensively: record("fightDefensively", { nullable: true, initial: null }),
       intenseStance: record("intenseStance", { nullable: true, initial: null }),
+      woundDrops: record("woundDrops", { nullable: true, initial: null }),
       twoWeaponStyle: record("twoWeaponStyle", { nullable: true, initial: null }),
       dartingStyle: record("dartingStyle", { nullable: true, initial: null }),
       totalDefense: record("totalDefense", { nullable: true, initial: null }),
@@ -471,6 +472,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         }
       : null;
     this.underminedCombatContext = underminedCombatContext(this);
+    this.currentCombatId = this.parent.participatingCombat?.id ?? null;
     // Death Ride: whether this character is driving a vehicle or riding a mount (its recorded driver).
     this.operatingVehicle = [...(globalThis.game?.actors ?? [])].some(
       a => a.type === "vehicle" && a.system?.driver === this.parent.uuid

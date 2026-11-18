@@ -50,6 +50,39 @@ export function favoredGearState(system, items = []) {
   return { version: 1, bonus, trademark, warnings, cap };
 }
 
+/**
+ * Feats that grant one Possession of a set kind, not charged to Wealth (pp.207–210): Bug Basics (a bug), Disease
+ * Basics (a disease sample), Poison Basics (an item with the injector quality) and Superior Documentation (a cover
+ * identity). All but the disease sample have a Caliber cap of one third of career level, rounded up.
+ */
+export const FEAT_POSSESSIONS = Object.freeze({
+  bugBasics: { feat: "Bug Basics", label: "bug", capped: true },
+  diseaseBasics: { feat: "Disease Basics", label: "disease sample", capped: false },
+  poisonBasics: { feat: "Poison Basics", label: "injector item", capped: true },
+  superiorDocumentation: { feat: "Superior Documentation", label: "cover identity", capped: true }
+});
+
+export function featPossessionWarnings(system, items = []) {
+  const warnings = [],
+    cap = Math.ceil((system.level ?? 0) / 3);
+  for (const [source, d] of Object.entries(FEAT_POSSESSIONS)) {
+    const granted = items.filter(
+      i => ["weapon", "armor", "gear"].includes(i.type) && i.system?.possessionSource === source
+    );
+    if (!granted.length) continue;
+    if (!system.activeFeatNames?.includes(d.feat))
+      warnings.push(loc`${granted[0].name}: a ${d.label} Possession needs ${d.feat}.`);
+    if (granted.length > 1) warnings.push(loc`${d.feat}: ${granted.length} items marked, but the feat grants 1.`);
+    if (d.capped)
+      for (const item of granted)
+        if ((item.system.caliber ?? 0) > cap)
+          warnings.push(
+            loc`${item.name}: this Possession’s Caliber may not exceed ${cap} (one third of career level).`
+          );
+  }
+  return warnings;
+}
+
 /** The morale bonus for a skill check or damage roll made with this item. */
 export const signatureBonus = (system, itemId) => system.favoredGear?.bonus?.[itemId] ?? 0;
 

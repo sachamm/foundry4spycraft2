@@ -320,6 +320,12 @@ export const RECORD_SHAPES = {
     tier: "string",
     version: "number"
   },
+  woundDrops: {
+    $also: "null",
+    combatId: "string",
+    count: "number",
+    version: "number"
+  },
   intenseStance: {
     $also: "null",
     combatId: "string",

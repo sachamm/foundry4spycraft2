@@ -128,7 +128,7 @@ export function threatenCheckPlan(
     bonuses: gearBonus ? [{ source: "CQB Basics (Threaten)", type: "gear", value: 2 }] : [],
     blockedReason: "",
     notes: [
-      loc`Threaten: ${role === "attacker" ? loc`Intimidate(Wis), half attack action` : loc`Resolve(Wis), opposed response`}; Hearing/Language, error modifier+0. ${gearBonus ? loc`CQB Basics adds+2gear from the selected held/readied ranged weapon. ` : ""}${target?.injuryWaived ? (glint ? loc`Glint of Madness waives the prior-injury requirement without requiring a weapon. ` : loc`CQB Mastery waives the prior-injury requirement. `) : ""}Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).`
+      loc`Threaten: ${role === "attacker" ? loc`Intimidate(Wis), half attack action` : loc`Resolve(Wis), opposed response`}; Hearing/Language, error modifier+0. ${gearBonus ? loc`CQB Basics adds+2gear from the selected held/readied ranged weapon. ` : ""}${target?.injuryWaived ? (glint ? loc`Glint of Madness waives the prior-injury requirement without requiring a weapon. ` : loc`CQB Mastery waives the prior-injury requirement. `) : ""}${role === "attacker" && glint && (system.abilities?.cha?.mod ?? 0) > 0 ? loc`Glint of Madness: a success adds +${system.abilities.cha.mod} (Charisma) to the stress damage. ` : ""}Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).`
     ]
   };
 }

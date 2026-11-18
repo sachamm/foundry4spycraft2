@@ -90,3 +90,19 @@ test("Submission Basics doubles Cheap Shot penalties; Submission Supremacy allow
   assert.equal(cheapShotSpeedPenalty(both), -10);
   assert.equal(cheapShotPenalty(both, "dex"), -4);
 });
+
+test("Stone Cold stacks +1 Intimidate per confirmed drop this combat, to +4; Glint of Madness states its stress", async () => {
+  const { woundDropRecord, stoneColdIntimidateBonus, woundDropEligible } =
+    await import("../module/rules/wound-drop.mjs");
+  let r = null;
+  for (let i = 0; i < 6; i++) r = woundDropRecord({ woundDrops: r }, "c");
+  assert.equal(r.count, 6);
+  assert.equal(woundDropRecord({ woundDrops: r }, "d").count, 1, "a new combat starts again");
+  const sys = { activeFeatNames: ["Stone Cold"], woundDrops: r, currentCombatId: "c" };
+  assert.equal(stoneColdIntimidateBonus(sys), 4);
+  assert.equal(stoneColdIntimidateBonus({ ...sys, currentCombatId: "d" }), 0);
+  const hit = { checkKind: "attack", resolved: true, successConfirmed: true, rollCombat: { id: "c" } };
+  assert.ok(woundDropEligible({ activeFeatNames: ["Glint of Madness"] }, hit));
+  assert.equal(woundDropEligible({ activeFeatNames: [] }, hit), false);
+  assert.equal(woundDropEligible(sys, { ...hit, woundDrop: true }), false);
+});

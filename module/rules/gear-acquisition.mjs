@@ -357,3 +357,56 @@ export function managedAcquisition(system, item) {
     item.system.pick === (attempt.kind === "request" ? attempt.pick : "")
   );
 }
+
+/**
+ * Feats that change what a Request yields (pp.181–209), as an extra quantity on the claimed bundle:
+ * Grenade Basics +1 grenade; Bug Basics doubles bugs; Poison Basics +1 poison dose; Guided Weapon Basics doubles
+ * guided weapons and their ammunition; Rock and Roll! doubles weapons that fire Full Auto and their ammunition.
+ * Superior Documentation raises a requested cover identity's Power Rating by 1 (maximum 10).
+ */
+export function requestFeatBonus(system, item, quantity) {
+  const feats = system?.activeFeatNames ?? [],
+    s = item?.system ?? {},
+    name = String(item?.name ?? ""),
+    has = f => feats.includes(f),
+    sources = [];
+  let extra = 0;
+  if (
+    item?.type === "weapon" &&
+    ["hurled", "exoticHurled"].includes(s.proficiency) &&
+    /grenade/i.test(name) &&
+    has("Grenade Basics")
+  ) {
+    extra += 1;
+    sources.push("Grenade Basics");
+  }
+  if (/\bbugs?\b/i.test(name) && has("Bug Basics")) {
+    extra += quantity;
+    sources.push("Bug Basics");
+  }
+  if (/poison/i.test(name) && has("Poison Basics")) {
+    extra += 1;
+    sources.push("Poison Basics");
+  }
+  if (
+    (s.proficiency === "guided" || (s.ammunitionOnly && /guided|missile/i.test(name))) &&
+    has("Guided Weapon Basics")
+  ) {
+    extra += quantity;
+    sources.push("Guided Weapon Basics");
+  }
+  if (
+    ((s.fireModes ?? []).includes("auto") || (s.ammunitionOnly && s.autofireAmmunition === true)) &&
+    has("Rock and Roll")
+  ) {
+    extra += quantity;
+    sources.push("Rock and Roll");
+  }
+  const pr = Number(s.powerRating);
+  const powerRating =
+    /cover identity/i.test(name) && has("Superior Documentation") && Number.isFinite(pr)
+      ? String(Math.min(10, pr + 1))
+      : null;
+  if (powerRating !== null) sources.push("Superior Documentation");
+  return { extra, powerRating, sources };
+}

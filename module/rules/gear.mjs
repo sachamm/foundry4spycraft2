@@ -895,7 +895,15 @@ export function possessionUnavailable(gear) {
 export function cleanAndPolishedApplies(system, gear) {
   return (
     !!gear &&
-    ["wealth", "gcGrant", "favoredGear"].includes(gear.possessionSource) &&
+    [
+      "wealth",
+      "gcGrant",
+      "favoredGear",
+      "bugBasics",
+      "diseaseBasics",
+      "poisonBasics",
+      "superiorDocumentation"
+    ].includes(gear.possessionSource) &&
     !possessionUnavailable(gear) &&
     !!gear.cleanAndPolishedReady &&
     system.activeFeatNames?.includes("Clean and Polished") === true

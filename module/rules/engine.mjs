@@ -8,7 +8,7 @@ import { polearmDefensePlan } from "./polearm-defense.mjs";
 import { knifeBasicsPlan } from "./knife-basics.mjs";
 import { swordBasicsPlan } from "./sword-basics.mjs";
 import { berserkerRageState } from "./berserker.mjs";
-import { favoredGearState } from "./favored-gear.mjs";
+import { favoredGearState, featPossessionWarnings } from "./favored-gear.mjs";
 import { duelingAllDodge } from "./dueling-basics.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
 import { notTheFaceDR } from "./not-the-face.mjs";
@@ -1229,7 +1229,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.knifeBasics = knifeBasicsPlan(sys, items);
   sys.swordBasics = swordBasicsPlan(sys, items);
   sys.favoredGear = favoredGearState(sys, items);
-  warnings.push(...sys.favoredGear.warnings);
+  warnings.push(...sys.favoredGear.warnings, ...featPossessionWarnings(sys, items));
   const heldReview = sys.guardWeapons.blockedReason || sys.disarmWeapons.blockedReason;
   if (heldReview) {
     warnings.push(heldReview);

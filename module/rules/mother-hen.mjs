@@ -12,7 +12,15 @@ export const MOTHER_HEN_SAVE = 4;
 export function motherHenItem(item, owner) {
   const gear = item?.system ?? {};
   return (
-    ["wealth", "gcGrant", "favoredGear"].includes(gear.possessionSource) &&
+    [
+      "wealth",
+      "gcGrant",
+      "favoredGear",
+      "bugBasics",
+      "diseaseBasics",
+      "poisonBasics",
+      "superiorDocumentation"
+    ].includes(gear.possessionSource) &&
     !possessionUnavailable(gear) &&
     owner?.system?.activeFeatNames?.includes("Mother Hen") === true
   );
