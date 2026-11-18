@@ -1,0 +1,105 @@
+/** The Cleave Basics and Snap Shot controls on the Main tab (see module/rules/drop-follow-up.mjs). */
+import { postFinalAttack, finalAttackOptions, finalWeaponReady } from "./final-attack.mjs";
+import { DROP_FOLLOW_UPS, dropTriggerEligible, dropFollowUpPlan } from "../rules/drop-follow-up.mjs";
+import { rollEvidence } from "../rules/outcomes.mjs";
+import { expertiseCombatContext } from "./combat-expertise.mjs";
+import { standardAttackContextContent } from "./standard-attack-context.mjs";
+import { loc } from "../i18n.mjs";
+
+const triggerChoices = (actor, combat, ranged) =>
+  [...(game.messages ?? [])].filter(
+    m =>
+      m.visible !== false &&
+      m.isContentVisible !== false &&
+      (!m.blind || game.user.isGM) &&
+      dropTriggerEligible(m.flags?.spycraft2, { actorUuid: actor.uuid, combat, ranged })
+  );
+
+export async function takeDropFollowUp(actor, key, options = {}) {
+  const d = DROP_FOLLOW_UPS[key];
+  if (!d || !["agent", "npc"].includes(actor.type) || !actor.isOwner) return null;
+  const combat = expertiseCombatContext(actor),
+    clock = JSON.stringify(combat);
+  let input = options;
+  if (!Object.hasOwn(input, "droppedConfirmed")) {
+    const esc = foundry.utils.escapeHTML,
+      choices = triggerChoices(actor, combat, d.ranged)
+        .map(m => {
+          const c = m.flags.spycraft2,
+            weapon = actor.items.find(i => i.uuid === c.weaponUuid);
+          return `<option value="${esc(m.id)}">${esc(weapon?.name ?? c.weaponUuid)}: ${c.effectiveTotal} (${esc(m.id)})</option>`;
+        })
+        .join("");
+    input = await foundry.applications.api.DialogV2.input({
+      window: { title: loc`${d.name}: attack another opponent` },
+      rejectClose: false,
+      content: `<div class="spycraft2-roll-options"><p>${
+        d.ranged
+          ? loc`Once per round, when one of your ranged attacks leaves an opponent unconscious or dead, make one more ranged attack with the same weapon against another opponent (p.182).`
+          : loc`Once per round, when one of your melee attacks leaves an opponent unconscious or dead, make one more melee attack with the same weapon against another opponent (p.177).`
+      }</p><label>${loc`Your hit that dropped the opponent`} <select name="messageId"><option value="">${loc`Choose the recorded hit`}</option>${choices}</select></label>${standardAttackContextContent(actor)}<label><input name="droppedConfirmed" type="checkbox" /> ${loc`The GC confirms that hit left its opponent unconscious or dead`}</label><label><input name="anotherOpponentConfirmed" type="checkbox" /> ${loc`This attack targets a different opponent`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This attack follows that hit at once`}</label></div>`
+    });
+    if (!input) return null;
+  }
+  const opts = finalAttackOptions(input);
+  const event = () => {
+    const message = game.messages.get(input.messageId),
+      now = expertiseCombatContext(actor);
+    if (
+      !message ||
+      message.visible === false ||
+      message.isContentVisible === false ||
+      (message.blind && !game.user.isGM)
+    )
+      throw new Error(loc`Choose your visible recorded hit from this combat.`);
+    return {
+      message,
+      plan: dropFollowUpPlan(actor.system, now, message.flags?.spycraft2, {
+        ...input,
+        key,
+        actorUuid: actor.uuid,
+        targetUuid: opts.targetActorUuid ?? ""
+      })
+    };
+  };
+  if (JSON.stringify(expertiseCombatContext(actor)) !== clock)
+    throw new Error(loc`The Initiative Count changed. Review the attack again.`);
+  const original = event(),
+    item = actor.items.find(i => i.uuid === original.plan.weaponUuid);
+  if (!finalWeaponReady(item)) throw new Error(loc`${d.name} uses the same weapon, which must still be readied.`);
+  const preview = actor.weaponAttack(item, opts);
+  if (preview.blocked || preview.ranged !== d.ranged || (preview.ranged && !Number.isFinite(opts.distanceFeet)))
+    throw new Error(preview.reason || loc`Enter the measured distance for the ranged attack.`);
+  const evidence = rollEvidence(original.message.flags.spycraft2),
+    signature = JSON.stringify(preview),
+    receipt = {
+      ...original.plan,
+      weaponId: item.id,
+      id: foundry.utils.randomID(),
+      triggerMessageUuid: original.message.uuid ?? original.message.id,
+      triggerEvidence: evidence
+    };
+  return actor.useLimitedAbility(
+    key,
+    async status => {
+      const validate = () => {
+        if (!actor.isOwner || JSON.stringify(expertiseCombatContext(actor)) !== clock)
+          throw new Error(loc`The Initiative Count or ownership changed.`);
+        const fresh = event(),
+          w = actor.items.get(item.id),
+          counter = actor.system.resourceUses?.[key];
+        if (
+          JSON.stringify(fresh.plan) !== JSON.stringify(original.plan) ||
+          rollEvidence(fresh.message.flags.spycraft2) !== evidence ||
+          !finalWeaponReady(w) ||
+          JSON.stringify(actor.weaponAttack(w, opts)) !== signature ||
+          counter?.epoch !== status.epoch ||
+          counter.used !== status.used + 1
+        )
+          throw new Error(loc`The triggering hit, weapon or reserved use changed. Review it again.`);
+      };
+      return postFinalAttack(actor, item.id, opts, receipt, validate);
+    },
+    { workflow: key }
+  );
+}

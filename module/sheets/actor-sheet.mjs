@@ -56,6 +56,7 @@ import {
 import { takeMobileOffense } from "../apps/mobile-offense.mjs";
 import { takeContempt } from "../apps/contempt.mjs";
 import { takeCombatInstincts } from "../apps/combat-instincts.mjs";
+import { takeDropFollowUp } from "../apps/drop-follow-up.mjs";
 import { rollDisarmResponse } from "../apps/disarm-response.mjs";
 import { takeMissTrick } from "../apps/miss-tricks.mjs";
 import { rollCheapShot } from "../apps/cheap-shot.mjs";
@@ -223,6 +224,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       takeCombatInstincts() {
         return takeCombatInstincts(this.actor);
+      },
+      takeCleaveBasics() {
+        return takeDropFollowUp(this.actor, "cleaveBasics");
+      },
+      takeSnapShot() {
+        return takeDropFollowUp(this.actor, "snapShot");
       },
       manageCheapShots() {
         return this.actor.manageCheapShots();
@@ -1045,6 +1052,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.contempt = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contempt");
     context.contemptRound = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contemptRound");
     context.combatInstincts = (this.actor.limitedUseStatus ?? []).find(s => s.id === "combatInstincts");
+    context.cleaveBasics = (this.actor.limitedUseStatus ?? []).find(s => s.id === "cleaveBasics");
+    context.snapShot = (this.actor.limitedUseStatus ?? []).find(s => s.id === "snapShot");
     context.twoWeaponFinalAttack = (this.actor.limitedUseStatus ?? []).find(s => s.id === "twoWeaponFinalAttack");
     context.jinxUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "jinx");
     context.markUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "mark");

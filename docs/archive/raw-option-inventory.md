@@ -294,7 +294,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | All-out Attack | 176 | No | Implemented: bounded pre-roll melee penalty, twice that recorded-hit damage bonus once, and miss flat-footed outcome | Batch350; actual/named GC targets including objects, private damage leases, combined Side damage, replacements and GC recovery/reload verified |
 | Axe Basics | 176 | No | Partial: readied reviewed axe +1 gear with ordinary attacking/defending Trip skill checks and melee Disarm attacks; Chop! full-action attack/damage/TKD and ordinary recorded TKD save/outcome implemented; Menacing fixed stress and readied-axe AP(2) implemented; mixed TKD grouping remains open | Batches317–318,354–356,358,360; actual family/readiness/grip/source proof, native dialog/reload verified |
 | Battering Blows | 176 | No | Manual/descriptive | — |
-| Cleave Basics | 177 | No | Manual/descriptive | — |
+| Cleave Basics | 177 | No | Covered (batch 377): once per round, after the character’s own resolved melee hit that the GC confirms dropped its opponent, one free extra melee attack with the same weapon against a different opponent | Native Foundry QA not claimed |
 | Cleave Mastery | 177 | No | Partial: +1 melee threat versus confirmed standard characters; reaction attacks remain open | Batch217; typed target/source evidence |
 | Cleave Supremacy | 177 | No | Partial: melee critical cost −1 versus confirmed standard characters; cleave movement remains open | Batch217; frozen target and legacy GC confirmation |
 | Club Basics | 177 | No | Covered (batch 375): readied reviewed club waives the −4 lethal/subdual conversion penalty; improvised clubs take no improvised penalty; Furious Stance raises the Count at round end by the round’s melee attacks; Out of the Park +2 attack/+2 damage/+2 threat | Native Foundry QA not claimed |
@@ -341,7 +341,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Sharpshooter Basics | 182 | No | Implemented: actual-source ranged incoming Defense preview reduces partial cover by one quarter and halves positive Size Defense bonus (round down) | Batch349; cover stacking, total-cover/Reflex preservation, actual attacker/weapon/feat/Size guards and native reload verified |
 | Sharpshooter Mastery | 182 | No | Partial: braced threat; Called Shot reduction open | — |
 | Sharpshooter Supremacy | 182 | No | Partial: aimed threat and ranged critical cost | — |
-| Snap Shot | 182 | No | Manual/descriptive | — |
+| Snap Shot | 182 | No | Covered (batch 377): the ranged counterpart of Cleave Basics, through the same control | Native Foundry QA not claimed |
 | Steel Rain | 182 | No | Manual/descriptive | — |
 | Style Over Caliber | 183 | No | Manual/descriptive | — |
 | This… is my Boomstick | 183 | No | Manual/descriptive | — |
@@ -1552,3 +1552,14 @@ Source: rules reference p.180 (local markdown edition; original PDF page not vis
 - **Impale.** A Standard Attack trick (not a full action) with a held one-handed sword without finesse. `readiedMeleeFeatSource` gains an explicit `finesse: false` option for this; Fencing’s finesse rule is unchanged. Damage from the recorded hit asks for the target’s Defense (a damage-dialog field after the recorded-hit selector). The proof records `impale: { defense, attackResult, bonus }`, with bonus ⌊(result − Defense) / 2⌋ from the attack’s effective total after boosts. Every later check (reservation, replacement roll, GC review) recomputes the bonus from the recorded Defense. A Defense above the result is rejected as not a hit.
 
 Verification: 513 legacy assertions, 3336 of 3337 Node tests (9 new Sword Basics tests). The one failure is the sample-scenes pack test, locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 111 manual / 53 partial / 150 other; at least 164 of 314 explicitly unfinished; 32 whole-feat closures.
+
+## Residual implementation batch 377 — Cleave Basics and Snap Shot
+
+Source: rules reference pp.177 and 182 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/drop-follow-up.mjs` covers both feats: Cleave answers a melee hit, Snap Shot a ranged one.
+- **Trigger.** The character’s own resolved, successful, unsuperseded attack of the right kind from the current combat round, not a Disarm. The GC confirms it left its opponent unconscious or dead (health is applied at the table), that the extra attack follows at once, and that it targets a different opponent. When both targets are known actors, the system rejects the same one.
+- **Attack.** The Main tab has a control for each feat (`module/apps/drop-follow-up.mjs`), modelled on Combat Instincts. It posts one free Standard Attack with the trigger’s weapon, which must still be readied, through the final-attack workflow. The receipt records the trigger message and its evidence; the attack card notes the extra attack. Each feat has its own once-per-round use with GC counter review.
+- **Interpretation.** The rules call these “cleave” and “snap shot” attacks, not final attacks. They are treated as final attacks: they share the Nauseated one-final-attack allowance and cannot carry a full-action trick.
+
+Verification: 513 legacy assertions, 3342 of 3343 Node tests (6 new, including the posted Cleave attack and a refused second use in the same round), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 109 manual / 53 partial / 152 other; at least 162 of 314 explicitly unfinished; 34 whole-feat closures.

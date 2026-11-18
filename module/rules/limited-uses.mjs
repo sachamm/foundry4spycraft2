@@ -5,6 +5,7 @@ import { safeHouseSource } from "./safe-house.mjs";
 import { taskPressureUseSpec } from "./task-pressure.mjs";
 import { toolShedSource } from "./tool-shed.mjs";
 import { finalAttackRoundSpec } from "./final-round.mjs";
+import { DROP_FOLLOW_UPS } from "./drop-follow-up.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { adrenalineSource } from "./adrenaline.mjs";
@@ -231,6 +232,18 @@ export function limitedUseAbilities(system, items, cfg) {
       combatScoped: true,
       hidden: true
     });
+  for (const [key, d] of Object.entries(DROP_FOLLOW_UPS))
+    if (system.activeFeatNames?.includes(d.feat))
+      add({
+        id: key,
+        name: loc`${d.name} (extra attack after a drop)`,
+        period: "round",
+        limit: 1,
+        workflow: key,
+        combatScoped: true,
+        manualReviewable: true,
+        hidden: true
+      });
   if (system.activeFeatNames?.includes("Combat Instincts"))
     add({
       id: "combatInstincts",

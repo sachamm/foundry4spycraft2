@@ -1,3 +1,4 @@
+import { dropFollowUpNote } from "./drop-follow-up.mjs";
 import { reminderNote } from "./feat-reminders.mjs";
 import { cooperativeNotes } from "./cooperative.mjs";
 import { resolveSkillResult } from "./checks.mjs";
@@ -100,6 +101,7 @@ export function checkFlavor(check) {
     notes.push(
       loc`Combat Instincts: immediate final Standard Attack against the adjacent opponent after a miss by ${check.finalAttack.missMargin}; one round use recorded.`
     );
+  if (dropFollowUpNote(check.finalAttack)) notes.push(dropFollowUpNote(check.finalAttack));
   if (check.featReminders?.length) notes.push(esc(reminderNote(check.featReminders)) + ".");
   notes.push(...cooperativeNotes(check).map(esc));
   if ((check.checkMethod ?? "roll") === "roll" && (check.threat > 0 || check.error > 0))
