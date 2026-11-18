@@ -329,7 +329,7 @@ export const ActorGear = Base =>
         bonusPoolId: input.bonusPoolId ?? "",
         ...surchargeFundingInput(input),
         ...unrolledPaymentFundingInput(input),
-        purpose: "Find an improvised weapon",
+        purpose: loc`Find an improvised weapon`,
         benefit: "improvisedSearch",
         expectedShaken
       };

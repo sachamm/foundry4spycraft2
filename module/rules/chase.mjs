@@ -8,10 +8,38 @@ import { loc } from "../i18n.mjs";
 
 /** Table 6.1 (p.364): chase speed factor, top-MPH bonus and Crisis DC for each Maneuvering Room grade. */
 export const MANEUVERING_ROOM = Object.freeze({
-  open: { label: "Open", speedFactor: 1, topMphBonus: 6, crisisDC: 15 },
-  close: { label: "Close", speedFactor: 3 / 4, topMphBonus: 4, crisisDC: 20 },
-  crowded: { label: "Crowded", speedFactor: 1 / 2, topMphBonus: 2, crisisDC: 30 },
-  tight: { label: "Tight", speedFactor: 1 / 4, topMphBonus: 0, crisisDC: 40 }
+  open: {
+    get label() {
+      return loc`Open`;
+    },
+    speedFactor: 1,
+    topMphBonus: 6,
+    crisisDC: 15
+  },
+  close: {
+    get label() {
+      return loc`Close`;
+    },
+    speedFactor: 3 / 4,
+    topMphBonus: 4,
+    crisisDC: 20
+  },
+  crowded: {
+    get label() {
+      return loc`Crowded`;
+    },
+    speedFactor: 1 / 2,
+    topMphBonus: 2,
+    crisisDC: 30
+  },
+  tight: {
+    get label() {
+      return loc`Tight`;
+    },
+    speedFactor: 1 / 4,
+    topMphBonus: 0,
+    crisisDC: 40
+  }
 });
 export const FOOT_LEAD_FEET = 20;
 

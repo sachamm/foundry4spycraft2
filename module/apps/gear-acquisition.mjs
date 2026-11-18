@@ -445,7 +445,7 @@ export async function rollGearAcquisition(actor, options = {}) {
       }
       // A posted roll has consumed its resources even if this optional linkage update fails.
       try {
-        await actor.update({ [`system.missionReserves.attempts.${id}.messageUuid`]: message.uuid ?? message.id });
+        await actor.update({ [loc`system.missionReserves.attempts.${id}.messageUuid`]: message.uuid ?? message.id });
       } catch (error) {
         ui.notifications.warn(
           loc`The acquisition is already recorded and its resources are spent, but its chat link needs GC review. Do not repeat the Request.`
@@ -770,7 +770,7 @@ export async function claimGearAcquisition(actor, options = {}) {
     if (docs.length !== 1 || !docs[0]?.id)
       throw new Error(loc`The acquired item was not uniquely introduced. Review its current inventory.`);
     try {
-      await actor.update({ [`system.missionReserves.attempts.${attempt.id}.claimedItemId`]: docs[0].id });
+      await actor.update({ [loc`system.missionReserves.attempts.${attempt.id}.claimedItemId`]: docs[0].id });
     } catch (error) {
       if (actor.system.missionReserves?.attempts?.[attempt.id]?.claimedItemId === docs[0].id) return docs[0];
       // Keep the uniquely stamped item for a retry of the parent receipt, without introducing it again.

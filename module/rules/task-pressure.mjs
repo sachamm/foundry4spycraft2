@@ -277,7 +277,7 @@ export function taskPressureUseSpec(task) {
   return p.needsCheck
     ? {
         id: `taskPressure_${task.id}_${task.revision}_${p.revision}`,
-        name: `Pressure check: ${task.title ?? task.id}`,
+        name: loc`Pressure check: ${task.title ?? task.id}`,
         period: "task",
         limit: 1,
         cost: 0,

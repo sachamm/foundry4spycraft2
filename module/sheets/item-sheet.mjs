@@ -153,7 +153,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
           .map(i => [i.id, `${i.name} (${i.system.ammunitionKind || "arrow"})`]) ?? [])
       ]),
       meleeFamilies: {
-        "": "Unclassified / no family bonus",
+        "": loc`Unclassified / no family bonus`,
         axe: "Axe",
         spear: "Spear",
         whip: "Whip",
@@ -176,7 +176,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     if (sys.ammunitionOnly) {
       context.calibers = { ...cfg.calibers, 0: loc`Ammunition stockpile (no Caliber pick)` };
       context.pickOptions = { "": loc`— (upgrade/Common Item stockpile)` };
-      if (sys.pick) context.pickOptions[sys.pick] = `${sys.pick} — review legacy ammunition pick`;
+      if (sys.pick) context.pickOptions[sys.pick] = loc`${sys.pick} — review legacy ammunition pick`;
     }
     if (sys.fireMode && !Object.hasOwn(context.fireModeOptions, sys.fireMode))
       context.fireModeOptions[sys.fireMode] = loc`Unavailable mode — review choice`;

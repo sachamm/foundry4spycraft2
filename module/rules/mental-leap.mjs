@@ -194,7 +194,7 @@ export function mentalLeapState(system) {
       addCause(
         "fatigue:" + event.id,
         event.at,
-        source ? `Fatigue/exhaustion: ${source}` : "Another fatigue/exhaustion while already exhausted"
+        source ? `Fatigue/exhaustion: ${source}` : loc`Another fatigue/exhaustion while already exhausted`
       );
     }
   }
@@ -246,7 +246,8 @@ export function mentalLeapFatigueEvent(system, { id, confirmed = false } = {}) {
     !time(system.worldTime)
   )
     throw new Error(loc`Confirm another fatigue/exhaustion application and its game-time clock.`);
-  return { id, at: system.worldTime, reason: loc`Fatigued or exhausted again while already exhausted: unconscious.` };
+  // Stored on the character and compared when the history is reviewed: a fixed value, not translated text.
+  return { id, at: system.worldTime, reason: "Fatigued or exhausted again while already exhausted: unconscious." };
 }
 /** GC verifies the rolled 2d4 hours of sleep; time alone never certifies sleep. */
 export function mentalLeapRecoveryPlan(system, { requiredHours, completedHours, fullSleepConfirmed = false } = {}) {

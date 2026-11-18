@@ -72,3 +72,38 @@ test("lang/en.json holds exactly the strings written in the source", async () =>
     );
   }
 });
+
+test("display names from the rules data are translated in place, and only when a translation exists", async () => {
+  const { configStrings, configText, localizeConfig } = await import("../module/i18n-data.mjs");
+  const cfg = {
+    skills: { sneak: { key: "sneak", name: "Sneak", checks: [{ id: "hide", name: "Hide" }] } },
+    proficiencies: {
+      blunt: {
+        get label() {
+          return "Blunt";
+        }
+      },
+      edged: { label: "Edged" }
+    },
+    featTrees: { chase: "Chase" },
+    gearPicks: { V: "Vehicles" },
+    bonusTargets: { "skills.sneak.misc": "Sneak" }
+  };
+  assert.deepEqual(configStrings(cfg), ["Sneak", "Hide", "Edged", "Chase", "Vehicles"]);
+  assert.equal(configText(cfg).length, 6);
+  assert.equal(localizeConfig(cfg, undefined), 0);
+  const strings = { ["SPYCRAFT.Text." + keyOf("Sneak")]: "Discrétion", ["SPYCRAFT.Text." + keyOf("Chase")]: "Chase" };
+  const i18n = { has: key => key in strings, localize: key => strings[key] };
+  assert.equal(localizeConfig(cfg, i18n), 2);
+  assert.equal(cfg.skills.sneak.name, "Discrétion");
+  assert.equal(cfg.skills.sneak.key, "sneak");
+  assert.equal(cfg.bonusTargets["skills.sneak.misc"], "Discrétion");
+  assert.equal(cfg.skills.sneak.checks[0].name, "Hide");
+  assert.equal(cfg.featTrees.chase, "Chase");
+  // The real configuration lists its names, and every one is in the language file.
+  const { SPYCRAFT } = await import("../module/config.mjs");
+  const names = configStrings(SPYCRAFT);
+  assert.ok(names.length > 150, `only ${names.length} data names`);
+  const lang = JSON.parse(await readFile(new URL("../lang/en.json", import.meta.url), "utf8")).SPYCRAFT.Text;
+  for (const name of names) assert.equal(lang[keyOf(name)], name, name);
+});

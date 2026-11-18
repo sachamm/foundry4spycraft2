@@ -50,7 +50,7 @@ export function featFreeActionPlan(
     version: 1,
     source: name,
     resourceId: source,
-    action: source === "quickDraw" ? QUICK_DRAW_ACTIONS[action] : "Non-attack half action",
+    action: source === "quickDraw" ? QUICK_DRAW_ACTIONS[action] : loc`Non-attack half action`,
     description: description.trim(),
     actionCost: "free",
     combatId: combat.id,

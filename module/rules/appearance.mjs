@@ -53,7 +53,7 @@ export function appearanceCheckPlan(system, key, check, { manhuntPrey = false } 
     evidence,
     timeChoices:
       irresistible && positive
-        ? [{ id: "irresistible", name: "Simply Irresistible", multiplier: 0.5, minimum: 6, rounding: "down" }]
+        ? [{ id: "irresistible", name: loc`Simply Irresistible`, multiplier: 0.5, minimum: 6, rounding: "down" }]
         : [],
     criticalFailureDiscount,
     bonuses: [

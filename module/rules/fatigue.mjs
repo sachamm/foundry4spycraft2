@@ -158,7 +158,7 @@ export function fatigueRestStatus(system, { restKind = "fatigue" } = {}) {
         ? "4 full hours asleep"
         : r.condition === "exhausted"
           ? "1 full hour asleep"
-          : "8 hours of inactive rest"
+          : loc`8 hours of inactive rest`
   };
 }
 export function fatigueRestRecord(

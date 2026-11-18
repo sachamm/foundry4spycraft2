@@ -26,14 +26,14 @@ const canReadSource = actor =>
 export async function checkIncomingDefense(actor) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
   const fields = {
-    coupDeGraceException: "The GC confirms an actual character option permits Coup de Grace without helplessness",
-    ranged: "This is a ranged attack",
-    flatFooted: "The character is flat-footed against this attack",
-    invisibleAttacker: "The attacker is invisible to the character",
-    flanked: "The attackers otherwise meet the flanking requirements",
-    securityDevice: "The attack is made by a security device",
-    adjacent: "The attacker is adjacent",
-    withinMeleeRange: "The attacker is within Melee Range"
+    coupDeGraceException: loc`The GC confirms an actual character option permits Coup de Grace without helplessness`,
+    ranged: loc`This is a ranged attack`,
+    flatFooted: loc`The character is flat-footed against this attack`,
+    invisibleAttacker: loc`The attacker is invisible to the character`,
+    flanked: loc`The attackers otherwise meet the flanking requirements`,
+    securityDevice: loc`The attack is made by a security device`,
+    adjacent: loc`The attacker is adjacent`,
+    withinMeleeRange: loc`The attacker is within Melee Range`
   };
   const esc = foundry.utils.escapeHTML,
     sources = new Map(),

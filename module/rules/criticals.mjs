@@ -100,7 +100,7 @@ export function criticalPlan(
     if (cleave.discount) {
       adjustment--;
       targetStandardDeclared = cleave.declared === true;
-      sources.push("Cleave Supremacy (standard target) –1");
+      sources.push(loc`Cleave Supremacy (standard target) –1`);
     }
     if (system.activeFeatNames?.includes("Finesse Supremacy") && finesseCriticalEligible(check)) {
       adjustment--;
@@ -115,7 +115,7 @@ export function criticalPlan(
       (system.classOptionSelections ?? []).some(e => e.classId === "wheelman" && e.name === "Most Lethal")
     ) {
       adjustment--;
-      sources.push("Most Lethal (vehicle-mounted weapon) –1");
+      sources.push(loc`Most Lethal (vehicle-mounted weapon) –1`);
     }
     if (check.triumphed && check.successConfirmed === true && check.effectiveTotal >= 75) {
       adjustment--;

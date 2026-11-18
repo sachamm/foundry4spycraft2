@@ -78,7 +78,7 @@ export const criticalInjuryReviews = actor =>
         : r?.state === "awaitingRoll"
           ? loc`GC must recover original roll`
           : loc`Saved record needs review`,
-    source: r?.source ?? "Malformed saved injury record"
+    source: r?.source ?? loc`Malformed saved injury record`
   }));
 export async function rollCriticalInjury(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;

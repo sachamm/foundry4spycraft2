@@ -229,7 +229,7 @@ export async function addComplication() {
             {
               key: id,
               id: device.id,
-              name: `${device.name} (PR ${device.powerRating})`,
+              name: loc`${device.name} (PR ${device.powerRating})`,
               pr: device.powerRating,
               xp,
               count

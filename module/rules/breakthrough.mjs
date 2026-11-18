@@ -46,7 +46,7 @@ export function breakthroughPlan(
     key,
     {
       id: "breakthroughSource",
-      name: "Breakthrough source",
+      name: loc`Breakthrough source`,
       attributes: [ability],
       error: 1,
       tags: "",

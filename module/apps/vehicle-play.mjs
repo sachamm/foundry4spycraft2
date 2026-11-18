@@ -207,10 +207,10 @@ export async function rollVehicleDamageResult(
   } else if (["Cargo", "W/G", "Occ", "Animal"].includes(location.code)) {
     const amount = passOn(location.code === "Animal" ? 0 : 1);
     const what = {
-      Cargo: "One random cargo item",
-      "W/G": "One random weapon or piece of vehicle gear",
+      Cargo: loc`One random cargo item`,
+      "W/G": loc`One random weapon or piece of vehicle gear`,
       Occ: "One random occupant",
-      Animal: "One random draft animal"
+      Animal: loc`One random draft animal`
     }[location.code];
     if (location.code === "Occ") {
       const aboard = occupantsOf(actor),

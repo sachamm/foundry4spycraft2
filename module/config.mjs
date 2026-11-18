@@ -1,4 +1,5 @@
 import { SKILLS, TABLES, CLASS_FEATURES } from "./rules/tables.mjs";
+import { loc } from "./i18n.mjs";
 
 export const SPYCRAFT = { classFeatures: CLASS_FEATURES };
 
@@ -46,22 +47,102 @@ SPYCRAFT.featTrees = {
 };
 
 SPYCRAFT.proficiencies = {
-  unarmed: { label: "Unarmed", ability: "str" },
-  blunt: { label: "Blunt", ability: "str" },
-  exoticBlunt: { label: "Exotic (Blunt)", ability: "str" },
-  edged: { label: "Edged", ability: "str" },
-  exoticEdged: { label: "Exotic (Edged)", ability: "str" },
-  explosives: { label: "Explosives", ability: "int" },
-  guided: { label: "Guided", ability: "int" },
-  handgun: { label: "Handgun", ability: "dex" },
-  hurled: { label: "Hurled", ability: "dex" },
-  exoticHurled: { label: "Exotic (Hurled)", ability: "dex" },
-  indirectFire: { label: "Indirect Fire", ability: "int" },
-  rifle: { label: "Rifle", ability: "dex" },
-  shotgun: { label: "Shotgun", ability: "dex" },
-  submachineGun: { label: "Submachine Gun", ability: "dex" },
-  tactical: { label: "Tactical", ability: "dex" },
-  vehicleWeapon: { label: "Vehicle Weapon", ability: "dex" }
+  unarmed: {
+    get label() {
+      return loc`Unarmed`;
+    },
+    ability: "str"
+  },
+  blunt: {
+    get label() {
+      return loc`Blunt`;
+    },
+    ability: "str"
+  },
+  exoticBlunt: {
+    get label() {
+      return loc`Exotic (Blunt)`;
+    },
+    ability: "str"
+  },
+  edged: {
+    get label() {
+      return loc`Edged`;
+    },
+    ability: "str"
+  },
+  exoticEdged: {
+    get label() {
+      return loc`Exotic (Edged)`;
+    },
+    ability: "str"
+  },
+  explosives: {
+    get label() {
+      return loc`Explosives`;
+    },
+    ability: "int"
+  },
+  guided: {
+    get label() {
+      return loc`Guided`;
+    },
+    ability: "int"
+  },
+  handgun: {
+    get label() {
+      return loc`Handgun`;
+    },
+    ability: "dex"
+  },
+  hurled: {
+    get label() {
+      return loc`Hurled`;
+    },
+    ability: "dex"
+  },
+  exoticHurled: {
+    get label() {
+      return loc`Exotic (Hurled)`;
+    },
+    ability: "dex"
+  },
+  indirectFire: {
+    get label() {
+      return loc`Indirect Fire`;
+    },
+    ability: "int"
+  },
+  rifle: {
+    get label() {
+      return loc`Rifle`;
+    },
+    ability: "dex"
+  },
+  shotgun: {
+    get label() {
+      return loc`Shotgun`;
+    },
+    ability: "dex"
+  },
+  submachineGun: {
+    get label() {
+      return loc`Submachine Gun`;
+    },
+    ability: "dex"
+  },
+  tactical: {
+    get label() {
+      return loc`Tactical`;
+    },
+    ability: "dex"
+  },
+  vehicleWeapon: {
+    get label() {
+      return loc`Vehicle Weapon`;
+    },
+    ability: "dex"
+  }
 };
 
 /** Mission-gear pick categories. */

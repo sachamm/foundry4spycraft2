@@ -109,10 +109,10 @@ export function assistantGroupStatus(system, group) {
     sequence < group.sceneSequence ||
     (sequence === group.sceneSequence && String(system.usagePeriods?.scene ?? "initial") !== group.scene)
   )
-    return { ...group, active: false, review: true, state: "Review saved group history" };
+    return { ...group, active: false, review: true, state: loc`Review saved group history` };
   if (group.status === "withdrawn") return { ...group, active: false, state: "Withdrawn" };
   if (sequence >= group.expiresAtSceneSequence)
-    return { ...group, active: false, state: "Expired at end of following scene" };
+    return { ...group, active: false, state: loc`Expired at end of following scene` };
   return {
     ...group,
     ...{ name: source.name, template: source.template, kitGrade: source.kitGrade },

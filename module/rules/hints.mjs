@@ -12,7 +12,7 @@ export function hintSources(system, items = []) {
     if (items.some(item => item.type === "origin" && item.name === name && item.system?.originType === type))
       sources.push({
         id: `hint${name}`,
-        name: `${name}: free hint`,
+        name: loc`${name}: free hint`,
         period: "session",
         limit,
         refusalDice: 1,
@@ -29,7 +29,7 @@ export function hintSources(system, items = []) {
   if (grade)
     sources.push({
       id: "hintIntuition",
-      name: `Intuition ${["", "I", "II", "III"][grade]}: free hint`,
+      name: loc`Intuition ${["", "I", "II", "III"][grade]}: free hint`,
       period: "mission",
       limit: system.actionDice?.max ?? 0,
       refusalDice: grade,

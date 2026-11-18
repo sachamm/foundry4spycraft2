@@ -286,14 +286,14 @@ export async function reviewUsagePeriod(options = {}) {
           "<p><b>" +
           esc(a.name) +
           "</b> — " +
-          (entry ? "before " + entry.before : "added during the interrupted start") +
+          (entry ? "before " + entry.before : loc`added during the interrupted start`) +
           "; starting " +
           a.system.actionDice.max +
           "; now " +
           a.system.actionDice.value +
           `.</p><label>${loc`Confirmed current dice`} <input name="dice_` +
           i +
-          '" type="number" min="0" step="1" value="' +
+          loc`" type="number" min="0" step="1" value="` +
           a.system.actionDice.value +
           '" /></label>' +
           (optional

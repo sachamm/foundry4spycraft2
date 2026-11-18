@@ -152,24 +152,30 @@ Status after the live checks of 2026-11-17 on Foundry 14.370 (two clients: the G
 - [x] Tests are discovered by pattern (`tools/test-*.mjs`), and the engine fixtures build their documents from
       `src/data`, so `npm test` runs with Foundry open.
 - [x] Batch ledgers and QA records moved to `docs/archive/`.
-- [x] Localization. Text is translatable in three ways, all with unchanged English output:
-      templates read `SPYCRAFT.Template.*` (1,131 strings); chat buttons and settings have their own keys; and
-      text written in JavaScript uses the `loc` template tag (`module/i18n.mjs`): the English stays in the source,
-      its pattern is the key, and `npm run strings` collects every pattern into `lang/en.json` (5,952 strings from
-      6,335 places: dialogs, chat notes, notifications and error messages). A test keeps the file in step with the
-      source. Checked in Foundry: all strings load, and a translation supplied at runtime appears in the roll dialog.
-- [ ] Localization leftovers, none of which change English play:
-      - About a hundred label tables built when a module loads (before the language is known) are still English.
-      - `module/apps/gc/console.mjs` and `spycraft2.mjs` were left alone because another session had uncommitted
-        changes in them; run the same pass over them once those land.
-      - Short phrases without sentence punctuation that are not in a recognised place (list entries, `name:`
-        values) were not tagged, to avoid tagging game terms that the rules compare.
-      - Names that come from data (feats, skills, named checks, class abilities, compendium entries) are not in the
-        language file.
-      - Some rules compare English text (a note that starts with a given phrase, a feat name); a translation of
-        those strings would need the comparison changed too.
-      - Strings were extracted mechanically. A sentence built from several pieces is several entries, and markup is
-        kept out of entries only where the text sat between tags.
+- [x] Localization. Text is translatable, with unchanged English output:
+      - Templates read `SPYCRAFT.Template.*` (1,131 strings); chat buttons and settings have their own keys.
+      - Text written in JavaScript uses the `loc` template tag (`module/i18n.mjs`): the English stays in the source,
+        its pattern is the key, and `npm run strings` collects every pattern into `lang/en.json` (6,551 entries from
+        about 6,500 places: dialogs, chat notes, notifications, error messages). A test keeps the file in step.
+      - Labels in tables built when a module loads are read through getters, so they follow the language too.
+      - Display names from the rules data (skills, named checks, feat trees, pick categories, bonus targets) are
+        translated in `CONFIG.SPYCRAFT` when the language loads (`module/i18n-data.mjs`).
+      - Rules no longer recognise text by its English wording: the two class timing notes are matched by identity,
+        a pending focus choice names its tab, and a stored fatigue event keeps a fixed reason.
+      Checked in Foundry 14.370 after the first pass (all strings load; a translation supplied at runtime appears
+      in the roll dialog). The last pass (load-time labels, data names, the GC console and the entry point) is
+      covered by the test suites only: no world was running to check it in.
+- [ ] What a translator will still find in English, by design or for later:
+      - Names the rules compare: feats, class abilities, origins and everything in the compendium packs. Foundry
+        has no built-in translation for compendium content; that needs a module such as Babele and a mapping.
+      - Short labels without a recognised place: entries of plain lists, `name:` values without an id beside them,
+        and maps of labels whose keys are not `label`, `text` and the like (about thirty tables).
+      - The setup checklist rewords a repeated Versatility choice only in English; other languages get the plain
+        "(n choices)" form.
+      - Strings were extracted mechanically. A sentence built from several pieces is several entries; the long
+        skill-check note is one entry with many numbered slots. These want rewriting before a real translation.
+      - If clients use different languages, text stored on a document (a chat card's flavor, a recorded note)
+        stays in the language of the client that wrote it.
 
 ## Game areas still missing or thin
 

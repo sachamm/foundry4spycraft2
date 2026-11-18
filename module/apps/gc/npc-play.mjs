@@ -185,7 +185,7 @@ export async function npcDamageSave(actor, input = null) {
     result.state === "dead"
       ? "fails and dies"
       : result.state === "unconscious"
-        ? "fails and falls unconscious"
+        ? loc`fails and falls unconscious`
         : result.failures
           ? loc`fails ${result.failures} save(s), all ignored by tough`
           : loc`succeeds: no mechanical effect, the damage lingers`;

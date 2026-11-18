@@ -1,18 +1,53 @@
 import { loc } from "../i18n.mjs";
 /** Ambient light, pp.350–351, Table 5.14. Blank means circumstances were not supplied. */
 export const AMBIENT_LIGHT = {
-  none: { label: "None (pitch black)", visual: null, skill: -8, defense: 8 },
-  faint: { label: "Faint (moonlit night)", visual: -60, skill: -4, defense: 4 },
-  dim: { label: "Dim (dawn/dusk)", visual: -30, skill: -2, defense: 2 },
-  moderate: { label: "Moderate (day)", visual: 0, skill: 0, defense: 0 },
-  bright: { label: "Bright (floodlights)", visual: 30, skill: 1, defense: -2 }
+  none: {
+    get label() {
+      return loc`None (pitch black)`;
+    },
+    visual: null,
+    skill: -8,
+    defense: 8
+  },
+  faint: {
+    get label() {
+      return loc`Faint (moonlit night)`;
+    },
+    visual: -60,
+    skill: -4,
+    defense: 4
+  },
+  dim: {
+    get label() {
+      return loc`Dim (dawn/dusk)`;
+    },
+    visual: -30,
+    skill: -2,
+    defense: 2
+  },
+  moderate: {
+    get label() {
+      return loc`Moderate (day)`;
+    },
+    visual: 0,
+    skill: 0,
+    defense: 0
+  },
+  bright: {
+    get label() {
+      return loc`Bright (floodlights)`;
+    },
+    visual: 30,
+    skill: 1,
+    defense: -2
+  }
 };
 export function lowLightVisionSources(system) {
   const sources = (system.classOptionSelections ?? [])
     .filter(s => s.name === "Low-Light Vision" && ["scout", "sniper"].includes(s.classId))
     .map(s => (s.classId === "scout" ? "Scout Huntsman" : "Sniper Perfect Killer"));
   if ((system.originEffects ?? []).some(s => s.name?.toLowerCase() === "low-light vision"))
-    sources.push("Test Subject low-light vision");
+    sources.push(loc`Test Subject low-light vision`);
   return [...new Set(sources)];
 }
 export function ambientLightPlan(system, { ambientLight = "", visionCheck = false } = {}) {
@@ -149,9 +184,30 @@ export function baseSensoryRanges(system) {
 
 /** Fog/smoke, Table 5.14 p.351; Firefighter Training p.206 changes only smoke visual range. */
 export const FOG_SMOKE = {
-  light: { label: "Light", visual: -10, skill: -1, defense: 1 },
-  moderate: { label: "Moderate", visual: -20, skill: -2, defense: 2 },
-  dense: { label: "Dense", visual: -40, skill: -4, defense: 4 }
+  light: {
+    get label() {
+      return loc`Light`;
+    },
+    visual: -10,
+    skill: -1,
+    defense: 1
+  },
+  moderate: {
+    get label() {
+      return loc`Moderate`;
+    },
+    visual: -20,
+    skill: -2,
+    defense: 2
+  },
+  dense: {
+    get label() {
+      return loc`Dense`;
+    },
+    visual: -40,
+    skill: -4,
+    defense: 4
+  }
 };
 export function fogSmokePlan(system, { obscurant = "", obscurantDensity = "", visionCheck = false } = {}) {
   if (!obscurant && !obscurantDensity)

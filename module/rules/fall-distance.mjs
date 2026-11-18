@@ -23,7 +23,7 @@ export function fallDistancePlan(
     throw Error(loc`Review the character’s current qualified falling-distance sources.`);
   const reductions = [
       ...(names.includes("Equilibrium Basics") ? [{ source: "Equilibrium Basics", feet: 20 }] : []),
-      ...(fallSoftSurface ? [{ source: "Soft or yielding landing surface", feet: 10 }] : [])
+      ...(fallSoftSurface ? [{ source: loc`Soft or yielding landing surface`, feet: 10 }] : [])
     ],
     reductionFeet = reductions.reduce((n, r) => n + r.feet, 0),
     damageDistanceFeet = Math.max(0, fallDistanceFeet - reductionFeet);

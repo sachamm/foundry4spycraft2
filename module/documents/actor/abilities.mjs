@@ -392,7 +392,7 @@ export const ActorAbilities = Base =>
             throw new Error(loc`Review this Bright Idea source and its saved use count before rolling.`);
           const migration = brightIdeaMigrationPlan(this.system, this.usagePeriods, undefined, {
             at: Date.now(),
-            reviewedBy: "single-source automatic migration"
+            reviewedBy: loc`single-source automatic migration`
           });
           if (migration) await this.update(migration.updates);
         }

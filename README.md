@@ -167,8 +167,9 @@ ui.notifications.warn(loc`${actor.name}: not enough action dice remain.`);
 The pattern (`{0}: not enough action dice remain.`) is the entry in `lang/en.json` under `SPYCRAFT.Text`; a
 translation may move the numbered values. After adding or changing text, run `npm run strings`; a test fails if the
 file is out of date. Templates use `{{localize "SPYCRAFT.Template.…"}}`. A new language is a copy of `lang/en.json`
-listed in `system.json`. Use `loc` inside functions: text built while a module loads is fixed before the language
-is known.
+listed in `system.json`. Use `loc` inside functions. Text built while a module loads is fixed before the language is known; in a table,
+write a getter instead (`get label() { return loc`Handgun`; }`). Display names held in the rules data (skills,
+named checks, feat trees) are translated when the language loads, by `module/i18n-data.mjs`.
 
 CI runs `lint`, `format:check`, the build, `npm test` and `npm run test:packs`.
 

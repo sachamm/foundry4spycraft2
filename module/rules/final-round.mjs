@@ -23,11 +23,11 @@ export function finalAttackRoundSpec(system) {
       stored.used >= 0;
   return {
     id: "finalAttackRound",
-    name: "All final attacks this round" + (nauseated ? " (Nauseated maximum1)" : ""),
+    name: loc`All final attacks this round` + (nauseated ? " (Nauseated maximum1)" : ""),
     cost: 0,
     period: "round",
     limit: nauseated ? 1 : Number.MAX_SAFE_INTEGER,
-    limitLabel: nauseated ? "1 while Nauseated" : "No Nauseated cap while the condition is absent",
+    limitLabel: nauseated ? "1 while Nauseated" : loc`No Nauseated cap while the condition is absent`,
     workflow: "finalAttackRound",
     combatScoped: true,
     manualReviewable: true,

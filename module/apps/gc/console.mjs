@@ -20,6 +20,7 @@ import * as spend from "./spend.mjs";
 import * as combat from "./combat.mjs";
 import * as conflicts from "./conflicts.mjs";
 import * as tables from "./tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { AbstractSidebarTab } = foundry.applications.sidebar;
@@ -41,7 +42,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "gc-console"],
     position: { width: 720, height: 800 },
-    window: { title: "Game Control console", resizable: true },
+    window: {
+      get title() {
+        return loc`Game Control console`;
+      },
+      resizable: true
+    },
     actions: {
       editMission: guard(() => mission.editMission()),
       startMission: guard(() => mission.startMission()),
@@ -49,8 +55,8 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       clearMission: guard(async () => {
         if (
           await systemDialog.confirm({
-            window: { title: "Clear the mission record" },
-            content: "<p>Remove every objective, complication and antagonist from the mission record?</p>"
+            window: { title: loc`Clear the mission record` },
+            content: `<p>${loc`Remove every objective, complication and antagonist from the mission record?`}</p>`
           })
         )
           await mission.endMission({ clear: true });
@@ -136,7 +142,7 @@ export function consoleContext() {
       threatLevel: tl,
       threatNote: m.threatOverride
         ? "fixed"
-        : `${live.base}${live.adjust ? ` ${signed(live.adjust)}` : ""}${m.active && m.threatLevel && m.threatLevel !== live.value ? `; the team would now be ${live.value}` : ""}`,
+        : `${live.base}${live.adjust ? ` ${signed(live.adjust)}` : ""}${m.active && m.threatLevel && m.threatLevel !== live.value ? loc`; the team would now be ${live.value}` : ""}`,
       bonusDice: threatBonusActionDice(tl, levels),
       team: team.map(actor => ({
         name: actor.name,
@@ -203,12 +209,12 @@ export function registerGCConsoleTab() {
   CONFIG.ui.gc = GCConsole;
   const Sidebar = CONFIG.ui.sidebar;
   const tabs = Object.entries(Sidebar.TABS).filter(([name]) => name !== "gc");
-  tabs.unshift(["gc", { tooltip: "GC Console", icon: "fa-solid fa-user-secret", gmOnly: true }]);
+  tabs.unshift(["gc", { tooltip: loc`GC Console`, icon: "fa-solid fa-user-secret", gmOnly: true }]);
   Sidebar.TABS = Object.fromEntries(tabs);
 }
 
 export async function openGCConsole() {
-  if (!game.user.isGM) return ui.notifications.warn("The GC Console is for the Game Control.");
+  if (!game.user.isGM) return ui.notifications.warn(loc`The GC Console is for the Game Control.`);
   const instance = ui.gc;
   game.spycraft2.gc.console = instance;
   await instance.render({ force: true });

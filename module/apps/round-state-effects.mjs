@@ -148,7 +148,7 @@ const enabled = () => {
   }
 };
 const mine = actor => enabled() && actor?.type === "agent" && game.users?.activeGM?.isSelf === true;
-const report = error => console.error("Spycraft 2.0 | Could not update round-state effects", error);
+const report = error => console.error(loc`Spycraft 2.0 | Could not update round-state effects`, error);
 
 /** Register the setting and the hooks. Call during `init`. */
 export function installRoundStateEffects() {

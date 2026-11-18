@@ -58,6 +58,8 @@ import * as vehiclePlay from "./module/apps/vehicle-play.mjs";
 import { SpycraftBrowser } from "./module/apps/browser.mjs";
 import { evaluate, renderTemplate } from "./module/rules/formula.mjs";
 import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
+import { loc } from "./module/i18n.mjs";
+import { localizeConfig } from "./module/i18n-data.mjs";
 
 Hooks.once("init", () => {
   console.log("Spycraft 2.0 | Initializing system");
@@ -95,12 +97,12 @@ Hooks.once("init", () => {
     if (!CONFIG.statusEffects.some(effect => effect.id === id))
       CONFIG.statusEffects.push({ id, name, img: "icons/svg/downgrade.svg" });
   if (!CONFIG.statusEffects.some(effect => effect.id === "reeling"))
-    CONFIG.statusEffects.push({ id: "reeling", name: "Reeling", img: "icons/svg/daze.svg" });
+    CONFIG.statusEffects.push({ id: "reeling", name: loc`Reeling`, img: "icons/svg/daze.svg" });
   if (!CONFIG.statusEffects.some(effect => effect.id === "bound"))
     CONFIG.statusEffects.push({ id: "bound", name: "SPYCRAFT.Condition.Bound", img: "icons/svg/net.svg" });
   game.settings.register("spycraft2", "linguistics", {
     name: "Optional Linguistics checks",
-    hint: "Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.",
+    hint: loc`Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.`,
     scope: "world",
     config: true,
     type: Boolean,
@@ -222,7 +224,7 @@ Hooks.once("init", () => {
     const esc = Handlebars.escapeExpression;
     const lines = rows.map(([label, value]) => `${label} ${Number(value) >= 0 ? "+" : ""}${Number(value)}`);
     return new Handlebars.SafeString(
-      `data-tooltip="${esc(lines.join(" · "))}" data-tooltip-html="${esc(lines.map(esc).join("<br>"))}"`
+      loc`data-tooltip="${esc(lines.join(" · "))}" data-tooltip-html="${esc(lines.map(esc).join("<br>"))}"`
     );
   });
 
@@ -246,13 +248,15 @@ function refreshCombatActorData() {
       actor.sheet?.render(false);
     }
 }
+// Display names that come from the rules data are translated once the language is known.
+Hooks.once("i18nInit", () => localizeConfig(CONFIG.SPYCRAFT));
 Hooks.once("ready", refreshCombatActorData);
 Hooks.once("ready", setupSampleScenes);
 // Bring stored world data up to this build's schema version (module/migrations/index.mjs).
 Hooks.once("ready", () => {
   runWorldMigrations().catch(error => {
-    console.error("Spycraft 2.0 | World data migration failed", error);
-    ui.notifications?.error("Spycraft 2.0 could not update this world's data. See the console for details.");
+    console.error(loc`Spycraft 2.0 | World data migration failed`, error);
+    ui.notifications?.error(loc`Spycraft 2.0 could not update this world's data. See the console for details.`);
   });
 });
 Hooks.on("updateWorldTime", refreshCombatActorData);
@@ -274,7 +278,7 @@ function detachMentalLeapClocks(combat) {
     if (primary?.id !== game.user.id || !actor.isOwner) continue;
     actor
       .detachMentalLeapCombat(combat)
-      .catch(error => ui.notifications.warn(`Mental Leap clock needs review: ${error.message}`));
+      .catch(error => ui.notifications.warn(loc`Mental Leap clock needs review: ${error.message}`));
   }
 }
 Hooks.on("deleteCombat", detachMentalLeapClocks);

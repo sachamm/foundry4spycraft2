@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /**
  * Prerequisite trees (feats, expert classes).
  *
@@ -129,7 +130,7 @@ export function describe(n) {
     case "keySkill":
       return `Key skill ${n.min}+ ranks`;
     case "sneakAttack":
-      return `Sneak attack damage of ${n.min} ${n.min === 1 ? "die" : "dice"} or more`;
+      return loc`Sneak attack damage of ${n.min} ${n.min === 1 ? "die" : "dice"} or more`;
     case "manual":
       return `GC confirmation: ${n.text}`;
     case "never":

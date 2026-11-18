@@ -114,7 +114,7 @@ function mountChatSearch(app, html) {
   const textLabel = make("label", "sc2-chat-text", "Text");
   const text = make("input");
   text.type = "search";
-  text.placeholder = "Search messages and rolls…";
+  text.placeholder = loc`Search messages and rolls…`;
   text.setAttribute("aria-label", "Search chat text");
   textLabel.append(text);
   const filters = make("div", "sc2-chat-filter-row");

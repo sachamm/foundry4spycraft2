@@ -46,7 +46,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
       skill = rules.choiceSkill;
     if (skill) {
       const selected = String(item.system.originChoices?.grantedFocus ?? "").trim();
-      if (!selected) pending.push(loc`${item.name}: choose its granted ${skill} focus on Main.`);
+      if (!selected) pending.push({ tab: "main", text: loc`${item.name}: choose its granted ${skill} focus on Main.` });
       else if (rules.domain && !rules.domain.includes(canonical(selected)))
         warnings.push(loc`${item.name}: its granted focus must come from the permitted vehicle category.`);
       else {

@@ -69,13 +69,13 @@ export function armorTotals(
   for (const item of items.filter(i => i.type === "armor" && i.system.equipped)) {
     const quantity = Number(item.system.quantity ?? 1),
       unusable = item.system.reserve
-        ? "reserve armor must be acquired before wearing"
+        ? loc`reserve armor must be acquired before wearing`
         : item.system.carried === false
-          ? "armor is not carried"
+          ? loc`armor is not carried`
           : item.system.destroyed
             ? "armor is destroyed"
             : !Number.isSafeInteger(quantity) || quantity < 1
-              ? "no usable armor remains"
+              ? loc`no usable armor remains`
               : "";
     if (unusable) {
       warnings.push(`${item.name}: ${unusable}.`);

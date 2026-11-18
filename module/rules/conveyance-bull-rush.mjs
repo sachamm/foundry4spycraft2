@@ -6,10 +6,35 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** p.354; user-confirmed ruling: borrow only Maneuver's skill/attribute, not its named-check benefits. */
 export const CONVEYANCE_BULL_RUSH_PROFILES = {
-  acrobatics: { kind: "personalVehicle", label: "personal vehicle", ability: "dex" },
-  drive: { kind: "vehicle", label: "non-personal vehicle without crew", ability: "dex", focusRequired: true },
-  survival: { kind: "mount", label: "animal mount", ability: "cha" },
-  tactics: { kind: "crewedVehicle", label: "vehicle with crew", ability: "cha" }
+  acrobatics: {
+    kind: "personalVehicle",
+    get label() {
+      return loc`personal vehicle`;
+    },
+    ability: "dex"
+  },
+  drive: {
+    kind: "vehicle",
+    get label() {
+      return loc`non-personal vehicle without crew`;
+    },
+    ability: "dex",
+    focusRequired: true
+  },
+  survival: {
+    kind: "mount",
+    get label() {
+      return loc`animal mount`;
+    },
+    ability: "cha"
+  },
+  tactics: {
+    kind: "crewedVehicle",
+    get label() {
+      return loc`vehicle with crew`;
+    },
+    ability: "cha"
+  }
 };
 export const CONVEYANCE_BULL_RUSH_SIZES = DISARM_SIZES;
 export function conveyanceBullRushSkillChecks(key, checks = []) {
@@ -19,7 +44,7 @@ export function conveyanceBullRushSkillChecks(key, checks = []) {
     ...checks.filter(c => c.id !== "conveyance-bull-rush"),
     {
       id: "conveyance-bull-rush",
-      name: "Bull Rush (conveyance)",
+      name: loc`Bull Rush (conveyance)`,
       attributes: [profile.ability],
       mode: "Active",
       tags: "",

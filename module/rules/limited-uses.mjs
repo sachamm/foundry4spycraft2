@@ -111,7 +111,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (house) {
     add({
       id: "safeHouseMission",
-      name: "Safe House declarations",
+      name: loc`Safe House declarations`,
       period: "mission",
       limit: house.limit,
       workflow: "safeHouseDeclaration",
@@ -120,7 +120,7 @@ export function limitedUseAbilities(system, items, cfg) {
     });
     add({
       id: "safeHouseScene",
-      name: "Safe House scene-opening declaration",
+      name: loc`Safe House scene-opening declaration`,
       period: "scene",
       limit: 1,
       workflow: "safeHouseScene",
@@ -168,7 +168,7 @@ export function limitedUseAbilities(system, items, cfg) {
     });
     add({
       id: "surgeOfSpeedRound",
-      name: "Surge of Speed round allowance",
+      name: loc`Surge of Speed round allowance`,
       period: "round",
       limit: 1,
       workflow: "featFreeActionRound",
@@ -191,7 +191,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Mobile Offense"))
     add({
       id: "mobileOffense",
-      name: "Mobile Offense during Standard Move",
+      name: loc`Mobile Offense during Standard Move`,
       period: "round",
       limit: 1,
       workflow: "mobileOffense",
@@ -202,7 +202,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Contempt")) {
     add({
       id: "contempt",
-      name: "Contempt combat allowance",
+      name: loc`Contempt combat allowance`,
       period: "combat",
       limit: system.actionDice?.max,
       workflow: "contempt",
@@ -212,7 +212,7 @@ export function limitedUseAbilities(system, items, cfg) {
     });
     add({
       id: "contemptRound",
-      name: "Contempt round allowance",
+      name: loc`Contempt round allowance`,
       period: "round",
       limit: 1,
       workflow: "contemptRound",
@@ -294,7 +294,7 @@ export function limitedUseAbilities(system, items, cfg) {
     });
     add({
       id: "littleDetailsRound",
-      name: "Little Details round allowance",
+      name: loc`Little Details round allowance`,
       period: "round",
       limit: 1,
       workflow: "littleDetailsRound",
@@ -436,14 +436,14 @@ export function limitedUseAbilities(system, items, cfg) {
       workflow: "tenSecondSolution"
     });
   if ((system.classLevels?.soldier ?? 0) >= 14)
-    add({ id: "oneInAMillion", name: "One in a Million", limit: 1, workflow: "oneInAMillion" });
+    add({ id: "oneInAMillion", name: loc`One in a Million`, limit: 1, workflow: "oneInAMillion" });
   out.push(...brightIdeaSources(system));
   if (system.coreClassIds?.includes("virtuoso")) {
     const v = items.find(i => i.type === "class" && i.system.identifier === "virtuoso");
     if (cfg.skills[v?.system.keySkill])
       add({
         id: "meticulous",
-        name: "Meticulous",
+        name: loc`Meticulous`,
         period: "scene",
         limit: 1,
         cost: 1,

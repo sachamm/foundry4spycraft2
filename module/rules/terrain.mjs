@@ -176,7 +176,7 @@ export function terrainSkillChecks(system, key, checks) {
     ...checks,
     {
       id: "local-hero-opposition",
-      name: "Local Hero Opposition Check",
+      name: loc`Local Hero Opposition Check`,
       attributes: ["wis", "cha"],
       mode: "Active/Secret",
       tags: "",
@@ -271,7 +271,7 @@ export function characterSurvivalStats(system) {
     if (resistances.stress !== "all") resistances.stress = (resistances.stress ?? 0) + noFear.resistance;
   }
   for (const [key, value] of Object.entries(quality)) {
-    resistanceSources.push({ source: "Test Subject damage resistance", key, value });
+    resistanceSources.push({ source: loc`Test Subject damage resistance`, key, value });
     if (resistances[key] !== "all") resistances[key] = Math.max(resistances[key] ?? 0, value);
   }
   // The p.446 restriction names gear/class benefits; independent feat benefits remain additive.

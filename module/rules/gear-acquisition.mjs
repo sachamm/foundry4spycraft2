@@ -7,11 +7,41 @@ import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
 export const DELIVERY = {
-  largeCity: { formula: "3d20", unit: "minutes", label: "City, 10,000+ people" },
-  smallCity: { formula: "1d6", unit: "hours", label: "City, fewer than 10,000 people" },
-  nearCity: { formula: "2d6", unit: "hours", label: "Within 100 miles of a city" },
-  remote: { formula: "3d6", unit: "hours", label: "101–500 miles from a city" },
-  isolated: { formula: "4d6", unit: "hours", label: "501+ miles from a city" }
+  largeCity: {
+    formula: "3d20",
+    unit: "minutes",
+    get label() {
+      return loc`City, 10,000+ people`;
+    }
+  },
+  smallCity: {
+    formula: "1d6",
+    unit: "hours",
+    get label() {
+      return loc`City, fewer than 10,000 people`;
+    }
+  },
+  nearCity: {
+    formula: "2d6",
+    unit: "hours",
+    get label() {
+      return loc`Within 100 miles of a city`;
+    }
+  },
+  remote: {
+    formula: "3d6",
+    unit: "hours",
+    get label() {
+      return loc`101–500 miles from a city`;
+    }
+  },
+  isolated: {
+    formula: "4d6",
+    unit: "hours",
+    get label() {
+      return loc`501+ miles from a city`;
+    }
+  }
 };
 export const hasProcure = system =>
   (system.classOptionSelections ?? []).some(e => e.classId === "intruder" && e.name === "Procure");

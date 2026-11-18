@@ -1,3 +1,4 @@
+import { loc } from "./i18n.mjs";
 const SYSTEM = "spycraft2";
 const SETTING = "sampleSceneSetup";
 const PACK = "spycraft2.sample-scenes";
@@ -26,12 +27,12 @@ export async function setupSampleScenes() {
       await game.settings.set(SYSTEM, SETTING, state);
     }
     const pack = game.packs.get(PACK);
-    if (!pack) throw new Error("Sample Scenes compendium is unavailable.");
+    if (!pack) throw new Error(loc`Sample Scenes compendium is unavailable.`);
     const documents = await pack.getDocuments();
-    if (documents.length !== 3) throw new Error("Sample Scenes compendium is incomplete.");
+    if (documents.length !== 3) throw new Error(loc`Sample Scenes compendium is incomplete.`);
     for (const document of documents) {
       const slug = document.getFlag(SYSTEM, "sampleScene");
-      if (!slug) throw new Error("Sample scene identifier is missing.");
+      if (!slug) throw new Error(loc`Sample scene identifier is missing.`);
       if (game.scenes.some(scene => scene.getFlag(SYSTEM, "sampleScene") === slug)) continue;
       const data = document.toObject();
       delete data._id;
@@ -41,11 +42,11 @@ export async function setupSampleScenes() {
       await globalThis.Scene.create(data);
     }
     await game.settings.set(SYSTEM, SETTING, { status: "done" });
-    ui.notifications.info("Three sample scenes are ready in the Scenes tab.");
+    ui.notifications.info(loc`Three sample scenes are ready in the Scenes tab.`);
   } catch (error) {
-    console.error("Spycraft 2.0 | Sample scene setup failed", error);
+    console.error(loc`Spycraft 2.0 | Sample scene setup failed`, error);
     ui.notifications.warn(
-      "Sample scene setup could not finish. It will retry on the next GM launch; you can also import scenes from the Sample Scenes compendium."
+      loc`Sample scene setup could not finish. It will retry on the next GM launch; you can also import scenes from the Sample Scenes compendium.`
     );
   }
 }

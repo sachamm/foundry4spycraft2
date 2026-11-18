@@ -78,7 +78,7 @@ export function resolveOriginChoices(item, system, items, cfg) {
   if (rule.threatSkill) {
     if (cfg.skills[choices.threatSkill])
       bonuses.push({ target: `skills.${choices.threatSkill}.threat`, value: "1 + floor(@level / 5)" });
-    else pending.push("choose the skill with increased threat range");
+    else pending.push(loc`choose the skill with increased threat range`);
   }
   const notes = [];
   if (rule.npcQualities) {
@@ -98,14 +98,14 @@ export function resolveOriginChoices(item, system, items, cfg) {
       }
       selected.add(key);
       const terrain = key === "camouflaged" ? camouflageTerrain(choices[`npcDetails${index}`]) : null;
-      if (key === "camouflaged" && !terrain) pending.push(`choose the terrain for quality ${index + 1}`);
+      if (key === "camouflaged" && !terrain) pending.push(loc`choose the terrain for quality ${index + 1}`);
       if (terrain && camouflageSelections.has(terrain)) {
         warnings.push(loc`${item.name}: Camouflaged must select different terrain types.`);
         continue;
       }
       if (terrain) camouflageSelections.add(terrain);
       const resistance = key === "damageResistance" ? resistanceType(choices[`npcDetails${index}`]) : null;
-      if (key === "damageResistance" && !resistance) pending.push(`choose the damage type for quality ${index + 1}`);
+      if (key === "damageResistance" && !resistance) pending.push(loc`choose the damage type for quality ${index + 1}`);
       if (key !== "fleet") bonuses.push(...quality.bonuses);
       notes.push({
         qualityKey: key,

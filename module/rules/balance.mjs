@@ -2,15 +2,78 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Table2.10 and Balance p.106; Equilibrium Basics/Mastery p.194. */
 export const BALANCE_SURFACES = {
-  flat: { label: "Flat, normal surface", dc: 5, error: 0, mastery: false },
-  uneven10to20: { label: "Uneven floor, 10°–20°", dc: 15, error: 0, mastery: true },
-  uneven21to35: { label: "Uneven floor, 21°–35°", dc: 20, error: 1, mastery: true },
-  uneven36to45: { label: "Uneven floor, 36°–45°", dc: 25, error: 1, mastery: true },
-  uneven46to60: { label: "Uneven floor, 46°–60°", dc: 30, error: 2, mastery: true },
-  narrow7to12: { label: "Narrow walkway, 7–12 in.", dc: 15, error: 0, mastery: true },
-  narrow3to6: { label: "Narrow walkway, 3–6 in.", dc: 20, error: 1, mastery: true },
-  narrow1to3: { label: "Narrow walkway, 1–3 in. (confirm the row at exactly 3 in.)", dc: 25, error: 1, mastery: true },
-  narrowUnder1: { label: "Narrow walkway, under 1 in.", dc: 30, error: 2, mastery: true }
+  flat: {
+    get label() {
+      return loc`Flat, normal surface`;
+    },
+    dc: 5,
+    error: 0,
+    mastery: false
+  },
+  uneven10to20: {
+    get label() {
+      return loc`Uneven floor, 10°–20°`;
+    },
+    dc: 15,
+    error: 0,
+    mastery: true
+  },
+  uneven21to35: {
+    get label() {
+      return loc`Uneven floor, 21°–35°`;
+    },
+    dc: 20,
+    error: 1,
+    mastery: true
+  },
+  uneven36to45: {
+    get label() {
+      return loc`Uneven floor, 36°–45°`;
+    },
+    dc: 25,
+    error: 1,
+    mastery: true
+  },
+  uneven46to60: {
+    get label() {
+      return loc`Uneven floor, 46°–60°`;
+    },
+    dc: 30,
+    error: 2,
+    mastery: true
+  },
+  narrow7to12: {
+    get label() {
+      return loc`Narrow walkway, 7–12 in.`;
+    },
+    dc: 15,
+    error: 0,
+    mastery: true
+  },
+  narrow3to6: {
+    get label() {
+      return loc`Narrow walkway, 3–6 in.`;
+    },
+    dc: 20,
+    error: 1,
+    mastery: true
+  },
+  narrow1to3: {
+    get label() {
+      return loc`Narrow walkway, 1–3 in. (confirm the row at exactly 3 in.)`;
+    },
+    dc: 25,
+    error: 1,
+    mastery: true
+  },
+  narrowUnder1: {
+    get label() {
+      return loc`Narrow walkway, under 1 in.`;
+    },
+    dc: 30,
+    error: 2,
+    mastery: true
+  }
 };
 export function balanceSurfacePlan(
   system,

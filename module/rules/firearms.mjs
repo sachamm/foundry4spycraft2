@@ -4,28 +4,163 @@ import { loc } from "../i18n.mjs";
 /** Weapon Basics Table 4.77, p.299; recoil table key, p.225. */
 export const FIRE_MODES = { single: "Single-Shot", burst: "Burst", auto: "Full Auto" };
 export const FIREARM_CATEGORIES = {
-  backupPistol: { label: "Backup pistol", modes: ["single"], maxIncrements: 10 },
-  holdoutPistol: { label: "Holdout pistol", modes: ["single"], maxIncrements: 5 },
-  servicePistol: { label: "Service pistol", modes: ["single"], maxIncrements: 10 },
-  backupRevolver: { label: "Backup revolver", modes: ["single"], maxIncrements: 5 },
-  huntingRevolver: { label: "Hunting revolver", modes: ["single"], maxIncrements: 10 },
-  serviceRevolver: { label: "Service revolver", modes: ["single"], maxIncrements: 10 },
-  assaultRifle: { label: "Assault rifle", modes: ["single", "burst", "auto"], maxIncrements: 10 },
-  boltActionRifle: { label: "Bolt-action rifle", modes: ["single"], maxIncrements: 10 },
-  semiAutomaticRifle: { label: "Semi-automatic rifle", modes: ["single"], maxIncrements: 10 },
-  breakActionShotgun: { label: "Break-action shotgun", modes: ["single"], maxIncrements: 5 },
-  pumpActionShotgun: { label: "Pump-action shotgun", modes: ["single"], maxIncrements: 5 },
-  semiAutomaticShotgun: { label: "Semi-automatic shotgun", modes: ["single"], maxIncrements: 5 },
-  lightSMG: { label: "Light submachine gun", modes: ["single", "burst", "auto"], maxIncrements: 10 },
-  heavySMG: { label: "Heavy submachine gun", modes: ["single", "burst", "auto"], maxIncrements: 10 },
-  saw: { label: "Squad automatic weapon", modes: ["burst", "auto"], maxIncrements: 10 },
-  gpmg: { label: "General purpose machine gun", modes: ["burst", "auto"], maxIncrements: 10 },
-  hmg: { label: "Heavy machine gun", modes: ["burst", "auto"], maxIncrements: 10 },
-  flamethrower: { label: "Flamethrower", modes: ["single", "burst", "auto"], maxIncrements: 5 },
-  grenadeLauncher: { label: "Grenade launcher", modes: ["single"], maxIncrements: 10 },
-  missileLauncher: { label: "Missile launcher", modes: ["single"], maxIncrements: 10, locked: true },
-  mortar: { label: "Mortar", modes: ["single"], maxIncrements: 10, locked: true },
-  rocketLauncher: { label: "Rocket launcher", modes: ["single"], maxIncrements: 10, locked: true }
+  backupPistol: {
+    get label() {
+      return loc`Backup pistol`;
+    },
+    modes: ["single"],
+    maxIncrements: 10
+  },
+  holdoutPistol: {
+    get label() {
+      return loc`Holdout pistol`;
+    },
+    modes: ["single"],
+    maxIncrements: 5
+  },
+  servicePistol: {
+    get label() {
+      return loc`Service pistol`;
+    },
+    modes: ["single"],
+    maxIncrements: 10
+  },
+  backupRevolver: {
+    get label() {
+      return loc`Backup revolver`;
+    },
+    modes: ["single"],
+    maxIncrements: 5
+  },
+  huntingRevolver: {
+    get label() {
+      return loc`Hunting revolver`;
+    },
+    modes: ["single"],
+    maxIncrements: 10
+  },
+  serviceRevolver: {
+    get label() {
+      return loc`Service revolver`;
+    },
+    modes: ["single"],
+    maxIncrements: 10
+  },
+  assaultRifle: {
+    get label() {
+      return loc`Assault rifle`;
+    },
+    modes: ["single", "burst", "auto"],
+    maxIncrements: 10
+  },
+  boltActionRifle: {
+    get label() {
+      return loc`Bolt-action rifle`;
+    },
+    modes: ["single"],
+    maxIncrements: 10
+  },
+  semiAutomaticRifle: {
+    get label() {
+      return loc`Semi-automatic rifle`;
+    },
+    modes: ["single"],
+    maxIncrements: 10
+  },
+  breakActionShotgun: {
+    get label() {
+      return loc`Break-action shotgun`;
+    },
+    modes: ["single"],
+    maxIncrements: 5
+  },
+  pumpActionShotgun: {
+    get label() {
+      return loc`Pump-action shotgun`;
+    },
+    modes: ["single"],
+    maxIncrements: 5
+  },
+  semiAutomaticShotgun: {
+    get label() {
+      return loc`Semi-automatic shotgun`;
+    },
+    modes: ["single"],
+    maxIncrements: 5
+  },
+  lightSMG: {
+    get label() {
+      return loc`Light submachine gun`;
+    },
+    modes: ["single", "burst", "auto"],
+    maxIncrements: 10
+  },
+  heavySMG: {
+    get label() {
+      return loc`Heavy submachine gun`;
+    },
+    modes: ["single", "burst", "auto"],
+    maxIncrements: 10
+  },
+  saw: {
+    get label() {
+      return loc`Squad automatic weapon`;
+    },
+    modes: ["burst", "auto"],
+    maxIncrements: 10
+  },
+  gpmg: {
+    get label() {
+      return loc`General purpose machine gun`;
+    },
+    modes: ["burst", "auto"],
+    maxIncrements: 10
+  },
+  hmg: {
+    get label() {
+      return loc`Heavy machine gun`;
+    },
+    modes: ["burst", "auto"],
+    maxIncrements: 10
+  },
+  flamethrower: {
+    get label() {
+      return loc`Flamethrower`;
+    },
+    modes: ["single", "burst", "auto"],
+    maxIncrements: 5
+  },
+  grenadeLauncher: {
+    get label() {
+      return loc`Grenade launcher`;
+    },
+    modes: ["single"],
+    maxIncrements: 10
+  },
+  missileLauncher: {
+    get label() {
+      return loc`Missile launcher`;
+    },
+    modes: ["single"],
+    maxIncrements: 10,
+    locked: true
+  },
+  mortar: {
+    get label() {
+      return loc`Mortar`;
+    },
+    modes: ["single"],
+    maxIncrements: 10,
+    locked: true
+  },
+  rocketLauncher: {
+    get label() {
+      return loc`Rocket launcher`;
+    },
+    modes: ["single"],
+    maxIncrements: 10,
+    locked: true
+  }
 };
 const nfm = qualities =>
   String(qualities ?? "")

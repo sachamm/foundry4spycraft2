@@ -189,7 +189,7 @@ export async function advanceConflict(id) {
       const list = availableStrategies(conflict, side);
       const rows = list.map(entry => [
         entry.id,
-        `${entry.name} (${entry.modifier === null ? "see note" : signed(entry.modifier)}${entry.skill ? `; ${entry.skill}` : ""}${entry.roundDuration && !["—", "**"].includes(entry.roundDuration) ? `; ${entry.roundDuration}` : ""}) — ${entry.advantages.join(", ").replace("*", "any but Victory")}${entry.available ? "" : ` — needs ${entry.reasons.join("; ")}`}${entry.confirm ? " — GC confirms other requirement" : ""}`
+        `${entry.name} (${entry.modifier === null ? "see note" : signed(entry.modifier)}${entry.skill ? `; ${entry.skill}` : ""}${entry.roundDuration && !["—", "**"].includes(entry.roundDuration) ? `; ${entry.roundDuration}` : ""}) — ${entry.advantages.join(", ").replace("*", "any but Victory")}${entry.available ? "" : ` — needs ${entry.reasons.join("; ")}`}${entry.confirm ? loc` — GC confirms other requirement` : ""}`
       ]);
       const input = await ask(
         loc`${conflict.name}: ${sideName(conflict, side)} chooses a Strategy (Lead ${conflict.lead})`,
@@ -245,7 +245,7 @@ export async function advanceConflict(id) {
       await saveConflict(id, next);
       if (smashBefore)
         await say(
-          `<b>${esc(conflict.name)}</b>: ${esc(sideName(next, smashBefore.side))} ${next.chase.smash ? `now holds ${next.chase.smash.points} Smash point${next.chase.smash.points === 1 ? "" : "s"}` : "loses the last Smash point and must climb above the opponent again to regain Smash"}.`
+          `<b>${esc(conflict.name)}</b>: ${esc(sideName(next, smashBefore.side))} ${next.chase.smash ? loc`now holds ${next.chase.smash.points} Smash point${next.chase.smash.points === 1 ? "" : "s"}` : loc`loses the last Smash point and must climb above the opponent again to regain Smash`}.`
         );
       if (next.winner) return announceEnd(id, next);
       await say(

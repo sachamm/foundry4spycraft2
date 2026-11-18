@@ -2,10 +2,34 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Survival/Tracking p.167 Table 2.48; Tracking feats p.207; Trail Signs pp.44,47. */
 export const TRACKING_SURFACES = {
-  verySoft: { label: "Very soft (sand, mud, snow)", dc: 15, error: 0 },
-  soft: { label: "Soft (loose dirt, wet grass, gravel)", dc: 20, error: 1 },
-  firm: { label: "Firm (packed earth, woods, thick rugs)", dc: 30, error: 2 },
-  hard: { label: "Hard (rock, concrete, tile)", dc: 40, error: 3 }
+  verySoft: {
+    get label() {
+      return loc`Very soft (sand, mud, snow)`;
+    },
+    dc: 15,
+    error: 0
+  },
+  soft: {
+    get label() {
+      return loc`Soft (loose dirt, wet grass, gravel)`;
+    },
+    dc: 20,
+    error: 1
+  },
+  firm: {
+    get label() {
+      return loc`Firm (packed earth, woods, thick rugs)`;
+    },
+    dc: 30,
+    error: 2
+  },
+  hard: {
+    get label() {
+      return loc`Hard (rock, concrete, tile)`;
+    },
+    dc: 40,
+    error: 3
+  }
 };
 export function trackingSkillPlan(
   system,

@@ -33,7 +33,7 @@ export function tripDefenseSkillChecks(key, checks = []) {
     ...checks.filter(c => c.id !== "resist-trip"),
     {
       id: "resist-trip",
-      name: "Resist Trip",
+      name: loc`Resist Trip`,
       attributes: ["dex"],
       mode: "Active",
       tags: "Armor Check Penalty",

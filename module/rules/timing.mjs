@@ -12,15 +12,15 @@ export function skillTimingPlan({
   minimumRequired = 0
 } = {}) {
   const base = method === "take10" ? 2 : method === "take20" ? 20 : 1;
-  const choices = [{ id: "none", name: "No time reduction", multiplier: base, minimum: 0, rounding: null }];
+  const choices = [{ id: "none", name: loc`No time reduction`, multiplier: base, minimum: 0, rounding: null }];
   if (method === "take10" && take10Normal)
-    choices.push({ id: "take10", name: "Normal-time take 10", multiplier: 1, minimum: 0, rounding: null });
+    choices.push({ id: "take10", name: loc`Normal-time take 10`, multiplier: 1, minimum: 0, rounding: null });
   if (method === "take20" && falseStart)
-    choices.push({ id: "falseStart", name: "False Start", multiplier: 15, minimum: 0, rounding: null });
+    choices.push({ id: "falseStart", name: loc`False Start`, multiplier: 15, minimum: 0, rounding: null });
   if (professional)
     choices.push({
       id: "professional",
-      name: "Mark of a Professional",
+      name: loc`Mark of a Professional`,
       multiplier: base * 0.5,
       minimum: 6,
       rounding: null

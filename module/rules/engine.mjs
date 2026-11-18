@@ -513,7 +513,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
 
   sys.actionDieDefense = activeDefenseBoost(sys);
   if (sys.actionDieDefense)
-    sources.push({ name: "Action die Defense boost", rank: 1, bonuses: [{ target: "defense", value: "2" }] });
+    sources.push({ name: loc`Action die Defense boost`, rank: 1, bonuses: [{ target: "defense", value: "2" }] });
   sources.push(...inherited.sources);
   const inheritedArmor = inherited.entries.filter(entry => entry.name === "Soldier: Armor use I").length;
   const inheritedWar = inherited.entries.filter(entry => entry.name === "Soldier: Fortunes of war I").length;
@@ -1634,7 +1634,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     todo.push({
       order: 50,
       tab: "training",
-      text: `${plural(profAvail - profUsed, "weapon proficiency/forte pick")} left.`
+      text: `${plural(profAvail - profUsed, loc`weapon proficiency/forte pick`)} left.`
     });
   const earnedInt = sys.startingIntelligenceModifier ?? progression[0]?.intelligenceModifier;
   const initialInt = Number.isFinite(earnedInt)
@@ -1651,8 +1651,10 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.forcedFocuses = Object.fromEntries(Object.entries(focuses.forced).map(([key, value]) => [key, [...value]]));
   sys.focusPicks = focuses.picks;
   warnings.push(...focuses.warnings);
-  for (const text of focuses.pending)
-    todo.push({ order: 51, tab: text.includes("on Main") ? "main" : "training", text });
+  for (const entry of focuses.pending) {
+    const pending = typeof entry === "string" ? { tab: "training", text: entry } : entry;
+    todo.push({ order: 51, tab: pending.tab, text: pending.text });
+  }
   const focusLeft = Object.entries(sys.focusPicks)
     .filter(([, value]) => value.remaining > 0)
     .map(([key, value]) => `${key} ${value.remaining}`);

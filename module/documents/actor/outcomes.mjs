@@ -457,7 +457,7 @@ export const ActorOutcomes = Base =>
               if (getActionDieSettlementReview(donor).needsReview)
                 error.actionDiceSettlementReview = {
                   ...error.actionDiceSettlementReview,
-                  purpose: "Generous donor and recipient",
+                  purpose: loc`Generous donor and recipient`,
                   donorActorUuid: donor.uuid,
                   messageUuid: message.uuid ?? message.id
                 };

@@ -12,7 +12,7 @@ export function tripAttackSkillChecks(key, checks = []) {
     ...checks.filter(c => c.id !== "trip"),
     {
       id: "trip",
-      name: "Trip Action",
+      name: loc`Trip Action`,
       attributes: ["dex"],
       mode: "Active",
       tags: "Armor Check Penalty",
@@ -29,7 +29,7 @@ export function tripCounterSkillCheck() {
   return {
     ...tripAttackSkillChecks("acrobatics")[0],
     id: "counter-trip",
-    name: "Earned Counter-Trip",
+    name: loc`Earned Counter-Trip`,
     time: "Free action"
   };
 }

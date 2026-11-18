@@ -13,6 +13,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as espree from "espree";
 import { keyOf, patternOf } from "../module/i18n.mjs";
+import { configStrings } from "../module/i18n-data.mjs";
+import { SPYCRAFT } from "../module/config.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sources = dir =>
@@ -45,6 +47,8 @@ export function collectStrings(root = ROOT) {
       }
     })(ast);
   }
+  // Display names held in the rules data (skills, named checks, feat trees, pick categories, bonus targets).
+  for (const text of configStrings(SPYCRAFT)) found.set(keyOf(text), text);
   return new Map([...found].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 }
 

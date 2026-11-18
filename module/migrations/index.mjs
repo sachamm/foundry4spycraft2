@@ -101,7 +101,7 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
         report.updated += 1;
       } catch (error) {
         report.failed += 1;
-        console.error(`Spycraft 2.0 | Could not migrate ${kind} ${document.name ?? document.id}`, error);
+        console.error(loc`Spycraft 2.0 | Could not migrate ${kind} ${document.name ?? document.id}`, error);
       }
     };
     for (const actor of world.actors ?? []) {

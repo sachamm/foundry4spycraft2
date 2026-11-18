@@ -8,39 +8,63 @@ import { loc } from "../i18n.mjs";
 /** Attribute collapse p.15. Negative scores are legal damage results; do not silently clamp to zero. */
 const COLLAPSE = {
   str: {
-    label: "Strength",
+    get label() {
+      return loc`Strength`;
+    },
     conditions: ["Dazed", "Sprawled", "Helpless"],
-    text: "No actions; dazed, sprawled and helpless. May still speak.",
+    get text() {
+      return loc`No actions; dazed, sprawled and helpless. May still speak.`;
+    },
     immobile: true
   },
   dex: {
-    label: "Dexterity",
+    get label() {
+      return loc`Dexterity`;
+    },
     conditions: ["Paralyzed"],
-    text: "Paralyzed, but may still speak. Only purely mental actions remain available; no Strength- or Dexterity-based checks.",
+    get text() {
+      return loc`Paralyzed, but may still speak. Only purely mental actions remain available; no Strength- or Dexterity-based checks.`;
+    },
     immobile: true
   },
   con: {
-    label: "Constitution",
+    get label() {
+      return loc`Constitution`;
+    },
     conditions: ["Dead"],
-    text: "Immediately dies. Saving the character from death and persistent death-state handling require GC adjudication.",
+    get text() {
+      return loc`Immediately dies. Saving the character from death and persistent death-state handling require GC adjudication.`;
+    },
     immobile: true
   },
   int: {
-    label: "Intelligence",
+    get label() {
+      return loc`Intelligence`;
+    },
     conditions: ["Stunned"],
-    text: "Stunned and incapable of higher thought; no actions.",
+    get text() {
+      return loc`Stunned and incapable of higher thought; no actions.`;
+    },
     immobile: true
   },
   wis: {
-    label: "Wisdom",
+    get label() {
+      return loc`Wisdom`;
+    },
     conditions: [],
-    text: "The GC determines Frenzied or Terrified with equal probability every 2d10 minutes. Sleep, stun or unconsciousness doubles the current episode duration.",
+    get text() {
+      return loc`The GC determines Frenzied or Terrified with equal probability every 2d10 minutes. Sleep, stun or unconsciousness doubles the current episode duration.`;
+    },
     episode: true
   },
   cha: {
-    label: "Charisma",
+    get label() {
+      return loc`Charisma`;
+    },
     conditions: ["Unconscious"],
-    text: "Falls into a coma and becomes unconscious; no actions.",
+    get text() {
+      return loc`Falls into a coma and becomes unconscious; no actions.`;
+    },
     immobile: true
   }
 };

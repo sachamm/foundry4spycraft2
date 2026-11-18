@@ -144,7 +144,7 @@ export function contactFeatCheckPlan(system, key, check, { contactName = "", con
       ? [
           {
             id: "contactMission",
-            name: "Lower-Threat mission Contact time",
+            name: loc`Lower-Threat mission Contact time`,
             multiplier: 0.5,
             minimum: 0,
             rounding: null

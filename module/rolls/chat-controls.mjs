@@ -13,6 +13,7 @@ import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { automaticSkillSuccessSources, cunningPlanCheck, manualAdjustmentSource } from "../rules/class-checks.mjs";
 import { rerollEligibility } from "../rules/limited-uses.mjs";
 import { checkCandidates } from "../rules/outcomes.mjs";
+import { loc } from "../i18n.mjs";
 
 /** The viewer rolled this check (or is the GC) and it carries a result. */
 const ownsResult = ({ message, check, user }) => Number.isFinite(check.rawTotal) && (message.isAuthor || user.isGM);
@@ -33,13 +34,13 @@ core("restraintEscapeControl", 9000, ctx => {
   const receipt = actor.flags?.spycraft2?.restraintReleases?.[message.id];
   const review = actor.system.restraintReleaseReview;
   if (review?.needsReview && review.id === message.id) {
-    return user.isGM ? content("GC review grapple release", () => actor.reviewRestraintRelease()) : null;
+    return user.isGM ? content(loc`GC review grapple release`, () => actor.reviewRestraintRelease()) : null;
   }
   if (receipt?.movement?.state === "required") {
-    return content("Confirm actual escape movement", () => actor.confirmRestraintEscapeMove(message));
+    return content(loc`Confirm actual escape movement`, () => actor.confirmRestraintEscapeMove(message));
   }
   if (!receipt && check.successConfirmed === true && !check.superseded && !check.criticalFailure) {
-    return content("Apply grapple escape benefit", () => actor.applyRestraintEscape(message));
+    return content(loc`Apply grapple escape benefit`, () => actor.applyRestraintEscape(message));
   }
   return null;
 });
@@ -77,7 +78,7 @@ core("manualAdjustmentControl", 9110, ctx => {
 core("requiredBonusControl", 9120, ctx => {
   const { message, check, actor } = ctx;
   if (!open(ctx) || !check.requiredBonusPoolId || check.requiredBonusSpent || check.criticalFailure) return null;
-  return card("Spend required class bonus die", () =>
+  return card(loc`Spend required class bonus die`, () =>
     actor.boostCheck(message, { bonusPoolId: check.requiredBonusPoolId, count: 1, askOptions: true })
   );
 });

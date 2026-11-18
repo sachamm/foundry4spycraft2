@@ -1,4 +1,9 @@
 import { loc } from "../i18n.mjs";
+
+/** Timing notes that the skill check shows through its own timing line; exported so they can be recognised exactly. */
+export const intelligenceAnalysisNote = () =>
+  loc`Intelligence Analysis: half standard time, rounded up, minimum 1 minute.`;
+export const boobyTrapNote = () => loc`Booby Trap: half standard time, rounded down, minimum 1 half action.`;
 /** Reviewed conditional class options, pp.36,38,42,46–48,52. */
 export function classCheckEffects(
   system,
@@ -22,7 +27,7 @@ export function classCheckEffects(
     if (level >= 3)
       result.timeChoices.push({
         id: "questionsI",
-        name: "All the Right Questions I",
+        name: loc`All the Right Questions I`,
         multiplier: 0.5,
         minimum: 6,
         rounding: "down",
@@ -32,7 +37,7 @@ export function classCheckEffects(
     if (level >= 7)
       result.timeChoices.push({
         id: "questionsII",
-        name: "All the Right Questions II",
+        name: loc`All the Right Questions II`,
         multiplier: 0.25,
         minimum: 6,
         rounding: "down",
@@ -65,7 +70,7 @@ export function classCheckEffects(
     result.timeSource = "Intelligence Analysis";
     result.minimumTimeSeconds = 60;
     result.timeRounding = "up";
-    result.notes.push(loc`Intelligence Analysis: half standard time, rounded up, minimum 1 minute.`);
+    result.notes.push(intelligenceAnalysisNote());
   }
   if (
     has("intruder", "Booby Trap") &&
@@ -76,7 +81,7 @@ export function classCheckEffects(
     result.timeSource = "Booby Trap";
     result.minimumTimeSeconds = 3;
     result.timeRounding = "down";
-    result.notes.push(loc`Booby Trap: half standard time, rounded down, minimum 1 half action.`);
+    result.notes.push(boobyTrapNote());
   }
   if (surprise && has("sleuth", "Alertness")) {
     result.bonuses.push({ value: 4, type: "" });
@@ -248,7 +253,7 @@ export function manualAdjustmentSource(system) {
   if (level < 2) return null;
   return {
     id: "manualAdjustment",
-    name: "Manual Adjustment",
+    name: loc`Manual Adjustment`,
     level,
     threshold: level + 20,
     skills: ["mechanics", ...(native >= 11 ? ["electronics"] : []), ...(native >= 19 ? ["security"] : [])],

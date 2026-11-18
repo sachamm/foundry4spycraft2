@@ -1297,7 +1297,7 @@ export const ActorRolls = Base =>
             bonusPoolId: input.bonusPoolId ?? "",
             ...surchargeFundingInput(input),
             ...unrolledPaymentFundingInput(input),
-            purpose: "Hail Mary skill options",
+            purpose: loc`Hail Mary skill options`,
             benefit: "hailMary"
           })
         : perform();
@@ -2305,7 +2305,7 @@ export const ActorRolls = Base =>
         {
           bonusPoolId: input.bonusPoolId ?? "",
           ...surchargeFundingInput(input),
-          purpose: "Manual action-die benefit",
+          purpose: loc`Manual action-die benefit`,
           benefit: "manualDie",
           expectedShaken
         }

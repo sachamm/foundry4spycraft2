@@ -65,7 +65,7 @@ export function oneHandManeuverPlan(
     },
     timeChoice: {
       id: "oneHandManeuver",
-      name: "One Hand on the Wheel",
+      name: loc`One Hand on the Wheel`,
       multiplier: 0,
       minimum: 0,
       rounding: null,

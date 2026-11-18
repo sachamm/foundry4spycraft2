@@ -77,13 +77,13 @@ export function focusSetupTask(element, { tab, order } = {}) {
       ? '[name^="originChoice."]'
       : Number(order) === 11
         ? '[name^="system.abilityIncreases."]'
-        : '[name^="system.abilities."][name$=".base"]',
+        : loc`[name^="system.abilities."][name$=".base"]`,
     classes:
       Number(order) === 15
         ? '[data-action="rollVitality"]'
         : loc`[name^="choice."], [name^="classSkillChoice."], [name^="inheritedChoice."], [name^="specialistChoice."], [name^="classField."]`,
     skills: '[name^="skillpts."]',
-    feats: Number(order) === 42 ? '[data-action="itemEdit"]' : '[data-action="browse"][data-type="feat"]',
+    feats: Number(order) === 42 ? '[data-action="itemEdit"]' : loc`[data-action="browse"][data-type="feat"]`,
     training:
       {
         50: '[name^="system.proficiencies."]',

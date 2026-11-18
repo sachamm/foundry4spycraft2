@@ -32,7 +32,7 @@ export function globalSearchPlan(
     requiredHours,
     hoursCompleted: hours,
     hoursPerLevel: source.hoursPerLevel,
-    locationScope: "City or 20-mile × 20-mile area",
+    locationScope: loc`City or 20-mile × 20-mile area`,
     onlyFreeActionsConfirmed: true
   };
 }

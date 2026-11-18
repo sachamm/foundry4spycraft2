@@ -45,7 +45,7 @@ export function deviceCard(device) {
     ],
     ["Reflex save DC", device.saveDC],
     ["Damage", device.damage || null],
-    ["Repeats", device.repeats ? "attacks each round until disabled" : null],
+    ["Repeats", device.repeats ? loc`attacks each round until disabled` : null],
     ["XP", device.xp ?? device.xpPrinted]
   ].filter(([, value]) => value !== null && value !== undefined && value !== "");
   return `<b>${esc(device.name)}</b> ${loc`— ${esc(device.kind)}, Power Rating ${device.powerRating} (p.${device.page})`}<br>${rows.map(([label, value]) => `${esc(label)}: ${esc(value)}`).join("<br>")}<br><i>${esc(device.summary)}</i>`;

@@ -88,7 +88,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
     name in mastery ||
     ["Talented", "False Start", "Mark of a Professional", "Practice Makes Perfect"].includes(name)
   ) {
-    if (!basic) pending.push("choose a Basic Skill feat in the feat's Choice field");
+    if (!basic) pending.push(loc`choose a Basic Skill feat in the feat's Choice field`);
     else {
       const skills = pairs[basic];
       if (name !== "Talented" && !activeFeat(basic) && !(basic === "Field of Expertise" && virtuoso))
@@ -151,7 +151,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
     else add(`gear.${key}`, 1);
   }
   if (name === "Unlocked Potential") {
-    if (!skill) pending.push("choose the skill for Unlocked Potential");
+    if (!skill) pending.push(loc`choose the skill for Unlocked Potential`);
     else {
       add(`skills.${skill}.classSkill`, 1);
       add(`skills.${skill}.maxRanks`, 3);
@@ -161,7 +161,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
     const key = cfg.proficiencies[choice]
       ? choice
       : Object.keys(cfg.proficiencies).find(k => normal(cfg.proficiencies[k].label) === normal(choice));
-    if (!key || key === "unarmed") pending.push("choose a possessed weapon proficiency other than Unarmed");
+    if (!key || key === "unarmed") pending.push(loc`choose a possessed weapon proficiency other than Unarmed`);
     else if (
       !system.proficiencies?.[key]?.proficient &&
       !items.some(
@@ -193,7 +193,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
   if (name === "Master's Art") {
     const key = activeFeat("Martial Arts")?.system.choice;
     if (!["str", "dex", "con", "int", "wis", "cha"].includes(key))
-      pending.push("choose the Martial Arts attribute first");
+      pending.push(loc`choose the Martial Arts attribute first`);
     else {
       for (const target of ["unarmedAttack", "unarmedDamage", "defense", "initiative"])
         add(target, `@abilities.${key}.mod`);

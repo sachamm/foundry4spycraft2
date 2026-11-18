@@ -29,7 +29,7 @@ export function classSkillSelections(item, classLevel) {
         fields.push({
           key: `versatility${level}_${n}`,
           level,
-          name: "Versatility",
+          name: loc`Versatility`,
           anySkill: true,
           grantsClassSkill: true,
           versatility: true,
@@ -38,7 +38,13 @@ export function classSkillSelections(item, classLevel) {
   if (id === "advocate")
     for (const level of [4, 8, 12, 16, 20])
       if (classLevel >= level)
-        fields.push({ key: `byAnyMeans${level}`, level, name: "By Any Means", anySkill: true, grantsClassSkill: true });
+        fields.push({
+          key: `byAnyMeans${level}`,
+          level,
+          name: loc`By Any Means`,
+          anySkill: true,
+          grantsClassSkill: true
+        });
   const lists = Object.fromEntries((item.system.choiceLists ?? []).map(list => [list.key, list]));
   const used = new Set();
   orderedClassChoices(item).forEach(({ slot, index }) => {
@@ -52,7 +58,7 @@ export function classSkillSelections(item, classLevel) {
     fields.push({
       key: `choice${index}`,
       level: slot.level,
-      name: "Skill Mastery",
+      name: loc`Skill Mastery`,
       anySkill: false,
       grantsClassSkill: false
     });
