@@ -15,6 +15,19 @@ import {
   surpriseRound
 } from "../../rules/gc/fluid-initiative.mjs";
 import { setConditionStatus } from "../../rules/condition-status.mjs";
+import {
+  ENCOUNTER_DISTANCES,
+  ENCOUNTER_LABELS,
+  SURFACES,
+  SURFACE_LABELS,
+  deviationDie,
+  encounterDistance,
+  gasClearing,
+  gasIncrements,
+  ricochetSquares,
+  senseLimit,
+  surfaceMove
+} from "../../rules/gc/combat-reference.mjs";
 import { loc } from "../../i18n.mjs";
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
@@ -324,4 +337,79 @@ export function installFluidInitiativeHooks() {
       }
     });
   });
+}
+
+/* -------------------------------------------- */
+/*  Combat references (Tables 5.1, 5.3, 5.11)   */
+/* -------------------------------------------- */
+
+/** GC dialog: roll a base encounter distance, a deviation or a gas cloud's spread, or look up a surface. */
+export async function combatReferenceDialog() {
+  const input = await ask(
+    loc`Combat references`,
+    `<label>${loc`Look up`} <select name="tool">${options([
+      ["encounter", loc`Base encounter distance (Table 5.1)`],
+      ["deviation", loc`Deviation of a miss (Table 5.11)`],
+      ["gas", loc`Gas cloud spread`],
+      ["surface", loc`Special surface (Table 5.3)`]
+    ])}</select></label>
+    <label>${loc`Location (encounter)`} <select name="location">${options(Object.keys(ENCOUNTER_DISTANCES).map(key => [key, ENCOUNTER_LABELS[key]]))}</select></label>
+    <label>${loc`Range increment to the target (deviation)`} <input type="number" name="increment" min="1" max="10" value="1" /></label>
+    <label>${loc`Rounds since release (gas)`} <input type="number" name="rounds" min="0" value="0" /></label>
+    <label>${loc`Wind (gas)`} <select name="wind">${options([
+      ["none", loc`Still`],
+      ["light", loc`Light`],
+      ["moderate", loc`Moderate`],
+      ["strong", loc`Strong or severe`]
+    ])}</select></label>
+    <label>${loc`Surface`} <select name="surface">${options(Object.keys(SURFACES).map(key => [key, SURFACE_LABELS[key]]))}</select></label>
+    <label>${loc`Speed for the move (surface)`} <input type="number" name="speed" min="0" value="30" /></label>`
+  );
+  if (!input) return null;
+  const roll = async formula => new Roll(formula).evaluate();
+  if (input.tool === "encounter") {
+    const entry = ENCOUNTER_DISTANCES[input.location];
+    if (!entry?.dice) return say(loc`Encounter distance: line of sight.`, { whisper: true });
+    const dice = await roll(entry.dice),
+      limit = Math.max(0, ...[...(game.scenes?.viewed?.tokens ?? [])].map(t => senseLimit(t.actor?.system))),
+      result = encounterDistance(input.location, dice.total, limit || null);
+    return ChatMessage.create({
+      speaker: { alias: loc`Game Control` },
+      whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id),
+      rolls: [dice],
+      content: `<p>${loc`Encounter distance: ${result.feet} ft.`}${result.limited ? ` ${loc`(cut from ${result.rolledFeet} ft. to the farthest anyone on the scene can see or hear)`}` : ""}</p>`
+    });
+  }
+  if (input.tool === "deviation") {
+    const distance = await roll(deviationDie(input.increment)),
+      direction = await roll("1d8");
+    return ChatMessage.create({
+      speaker: { alias: loc`Game Control` },
+      whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id),
+      rolls: [distance, direction],
+      content: `<p>${loc`The miss strays ${distance.total} square(s) in direction ${direction.total} of the Deviation Diagram (p.346). Off something with a Damage save of +10 or better it ricochets, with ${ricochetSquares(distance.total)} square(s) left.`}</p>`
+    });
+  }
+  if (input.tool === "gas") {
+    const increments = gasIncrements(input.rounds, input.wind),
+      linger = await roll("2d4"),
+      clearing = gasClearing(linger.total, input.wind);
+    return ChatMessage.create({
+      speaker: { alias: loc`Game Control` },
+      whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id),
+      rolls: [linger],
+      content: `<p>${loc`The cloud covers ${increments} blast increment(s).`} ${
+        clearing.immediate
+          ? loc`The wind clears it at once.`
+          : loc`Once fully grown it lingers ${clearing.lingerMinutes} minute(s), then loses an increment every ${clearing.minutesPerIncrement} minute(s).`
+      }</p>`
+    });
+  }
+  const move = surfaceMove(input.surface, input.speed);
+  return say(
+    move.squares === null
+      ? loc`${SURFACE_LABELS[input.surface]}: no movement across it without the check.`
+      : loc`${SURFACE_LABELS[input.surface]}: a ${Number(input.speed) || 0} ft. move covers ${move.feet} ft.${move.bonusStep ? "" : loc` No bonus 5-ft. step across it.`}`,
+    { whisper: true }
+  );
 }

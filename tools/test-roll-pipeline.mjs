@@ -18,6 +18,7 @@ import { feintSkillChecks } from "../module/rules/feint.mjs";
 import { restraintSkillChecks } from "../module/rules/restraints.mjs";
 import { taskPressureSkillChecks } from "../module/rules/task-pressure.mjs";
 import { terrainSkillChecks } from "../module/rules/terrain.mjs";
+import { combatOptionChecks } from "../module/rules/combat-options.mjs";
 import { threatenSkillChecks } from "../module/rules/threaten.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "../module/rules/trip-attack.mjs";
 import { tripDefenseSkillChecks } from "../module/rules/trip.mjs";
@@ -429,6 +430,7 @@ const EXPECTED_ORDER = [
   "noQuarterContent:attack",
   "calledShotContent:attack",
   "bounceContent:rangedAttack",
+  "underwaterAttackContent",
   "recordFields",
   "sneakAttackTarget",
   "meleeArmorPiercing",
@@ -506,6 +508,7 @@ const EXPECTED_ORDER = [
   "terrainChecks",
   "optionalRuleChecks",
   "restraintChecks",
+  "combatOptionChecks",
   "taskPressureChecks",
   "threatenChecks",
   "tauntChecks",
@@ -557,6 +560,7 @@ const EXPECTED_ORDER = [
   "calledShotAttackTerm",
   "bounceAttackTerm",
   "intenseStanceAttackTerm",
+  "underwaterAttackTerm",
   "stalkingStanceSkillTerm",
   "feintSkillTerm",
   "meleeSkillFeatsSkillTerm",
@@ -579,6 +583,7 @@ const EXPECTED_ORDER = [
   "tauntSkillTerm",
   "diversionSkillTerm",
   "bugConcealmentSkillTerm",
+  "combatOptionSkillTerm",
   "documentationSkillTerm",
   "polyglotSkillTerm",
   "gutsSkillTerm",
@@ -630,8 +635,8 @@ const EXPECTED_ORDER = [
   "tauntControl",
   "diversionControl",
   "qualityChecksRecord",
-  "requestsRecord",
   "hazardSaveControl",
+  "requestsRecord",
   "restraintsRecord",
   "sensesRecord",
   "fireActionContent:rangedAttack",
@@ -773,7 +778,11 @@ test("named skill checks match the original fixed composition for every skill", 
                       key,
                       threatenSkillChecks(
                         key,
-                        taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
+                        taskPressureSkillChecks(
+                          actor.system,
+                          key,
+                          combatOptionChecks(key, restraintSkillChecks(actor.system, key, base))
+                        )
                       )
                     ),
                     actor.system

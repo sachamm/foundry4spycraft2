@@ -23,6 +23,7 @@ import {
   scarChecked
 } from "../rules/hazards.mjs";
 import { attributeDamagePlan } from "../rules/attribute-damage.mjs";
+import { DAMAGE_TYPE_LABELS, SURVIVAL_LABELS } from "../rules/damage-types.mjs";
 import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
@@ -34,13 +35,13 @@ const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
 
 /** Roll a formula from the tables ("3d4", "1"): a plain number is not rolled. */
-async function rollTotal(formula) {
+export async function rollTotal(formula) {
   if (/^\d+$/.test(String(formula))) return { total: Number(formula), roll: null };
   const roll = await new Roll(String(formula)).evaluate();
   return { total: roll.total, roll };
 }
 
-const post = (actor, lines, rolls = []) =>
+export const post = (actor, lines, rolls = []) =>
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
     content: lines
@@ -84,18 +85,27 @@ export function hazardsView(actor) {
       };
     }),
     fire: state.fire,
-    any: Object.keys(state.contagions).length > 0 || !!state.fire
+    acid: state.acid,
+    exposure: state.exposure
+      ? { ...state.exposure, label: DAMAGE_TYPE_LABELS[state.exposure.type] ?? state.exposure.type }
+      : null,
+    survival: Object.entries(state.survival).map(([kind, entry]) => ({
+      kind,
+      label: SURVIVAL_LABELS[kind] ?? kind,
+      saves: entry.saves
+    })),
+    any: Object.keys(state.contagions).length > 0 || !!state.fire || !!state.acid || !!state.exposure
   };
 }
 
-async function writeHazards(actor, hazards) {
+export async function writeHazards(actor, hazards) {
   // "==" replaces the hazards record whole (so ended contagions drop out) without touching the rest of `system`.
   // A non-recursive update would replace all of `system` and reset the character to defaults.
   await actor.update({ "system.==hazards": hazards });
 }
 
 /** Take lethal damage off vitality, then wounds, where the character tracks them. Returns what was lost. */
-async function sufferLethal(actor, amount) {
+export async function sufferLethal(actor, amount) {
   if (!Number.isFinite(actor.system.vitality?.max) || !actor.system.vitality.max) return null;
   const plan = lethalDamagePlan(actor.system, amount);
   await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
@@ -103,7 +113,7 @@ async function sufferLethal(actor, amount) {
 }
 
 /** Record stress through the damage ledger, so resistances and thresholds apply. Returns a note on failure. */
-async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance") {
+export async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance") {
   if (!amount) return "";
   try {
     await applyAccumulatedDamage(actor, {
@@ -120,7 +130,7 @@ async function sufferStress(actor, amount, source, damageMode = "stressBeforeRes
 }
 
 /** Apply a rolled attribute loss. Returns the line that reports it. */
-async function sufferAttributeLoss(actor, effect, rolled, source) {
+export async function sufferAttributeLoss(actor, effect, rolled, source) {
   const lines = [];
   let total = 0;
   for (const loss of attributeLoss(effect, rolled)) {
@@ -429,6 +439,12 @@ export async function extinguish(actor) {
 /*  Applying a hazard save's result              */
 /* -------------------------------------------- */
 
+/**
+ * Resolvers for hazard save kinds owned by other modules (module/apps/damage-types.mjs, combat-options.mjs):
+ * kind → async (actor, message, save, succeeded, check). Each registers from its own module.
+ */
+export const hazardSaveResolvers = new Map();
+
 /** Apply what a posted hazard save decides. The save's own result is read when the button is pressed. */
 export async function resolveHazardSave(actor, message) {
   const check = message.flags?.spycraft2,
@@ -436,7 +452,9 @@ export async function resolveHazardSave(actor, message) {
   if (!save || save.resolved || !owned(actor)) return null;
   const succeeded =
     typeof check.successConfirmed === "boolean" ? check.successConfirmed : check.effectiveTotal >= save.dc;
-  if (save.kind === "contagion") await resolveContagionSave(actor, message, save, succeeded);
+  if (hazardSaveResolvers.has(save.kind))
+    await hazardSaveResolvers.get(save.kind)(actor, message, save, succeeded, check);
+  else if (save.kind === "contagion") await resolveContagionSave(actor, message, save, succeeded);
   else if (save.kind === "fire") {
     if (succeeded) await post(actor, [loc`The save succeeds: the character does not catch fire.`]);
     else {

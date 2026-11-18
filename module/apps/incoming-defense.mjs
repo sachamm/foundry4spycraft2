@@ -14,6 +14,7 @@ import { weaponUnavailable } from "../rules/gear.mjs";
 import { incomingDefensePlan } from "../rules/defense.mjs";
 import { combatStanceState } from "../rules/combat-stance.mjs";
 import { hordeCoverFloor } from "../rules/team-feats.mjs";
+import { activeAnticipations } from "./combat-options.mjs";
 import { loc } from "../i18n.mjs";
 const rangedSourceFacts = ({ attacker, weapon }) =>
   JSON.stringify({
@@ -67,9 +68,14 @@ export async function checkIncomingDefense(actor) {
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Incoming attack — Defense` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`}</p>${coverInput}${circlingInput}${ghostCoverContent(actor)}${actor.system.duelingBasics?.opponentUuid && actor.system.activeFeatNames?.includes("Dueling Basics") ? `<label><input name="fromDuelingOpponent" type="checkbox" /> ${loc`Dueling Basics: this attack comes from ${esc(actor.system.duelingBasics.opponentName || "the chosen opponent")} (+2 dodge)`}</label>` : ""}${whirlingDefenseContent(actor)}${Object.entries(
-      fields
+    content: `<div class="spycraft2-roll-options"><p>${loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`}</p>${coverInput}${circlingInput}${ghostCoverContent(actor)}${actor.system.duelingBasics?.opponentUuid && actor.system.activeFeatNames?.includes("Dueling Basics") ? `<label><input name="fromDuelingOpponent" type="checkbox" /> ${loc`Dueling Basics: this attack comes from ${esc(actor.system.duelingBasics.opponentName || "the chosen opponent")} (+2 dodge)`}</label>` : ""}${activeAnticipations(
+      actor
     )
+      .map(
+        (record, index) =>
+          `<label><input name="anticipate_${index}" type="checkbox" /> ${loc`Anticipate: this attack comes from ${esc(record.opponentName)} (+${record.dodge} dodge${record.threatReduction ? loc`; their threat range −${record.threatReduction}` : ""})`}</label>`
+      )
+      .join("")}${whirlingDefenseContent(actor)}${Object.entries(fields)
       .map(([key, label]) => `<label><input name="${key}" type="checkbox" /> ${label}</label>`)
       .join(
         ""
@@ -156,6 +162,12 @@ export async function checkIncomingDefense(actor) {
       throw new Error(loc`The Circling Stance and cover-reduction declarations must name the same actual attacker.`);
     plan = incomingDefensePlan(actor.system, {
       fromDuelingOpponent: input.fromDuelingOpponent === true,
+      anticipateDodge: Math.max(
+        0,
+        ...activeAnticipations(actor)
+          .filter((record, index) => input[`anticipate_${index}`] === true)
+          .map(record => record.dodge)
+      ),
       cover,
       circling: circlingSource
         ? {

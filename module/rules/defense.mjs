@@ -116,13 +116,17 @@ export function incomingDefensePlan(system, options = {}) {
     greatSword = greatSwordDefensePlan(system, { ranged }),
     guard = guardDefensePlan(system, { ranged }),
     wrestling = wrestlingDefense(system, { adjacent, ranged }),
-    dueling = vulnerable ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent);
+    dueling = vulnerable ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent),
+    // Anticipate (p.354): the dodge bonus recorded against this attacker, checked by the caller.
+    anticipate =
+      vulnerable || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
   const total =
     -circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
     wrestling +
     dueling +
+    anticipate +
     greatSword.increment +
     cover.defenseBonus +
     system.defense.total +
@@ -155,6 +159,7 @@ export function incomingDefensePlan(system, options = {}) {
     cover,
     armorMasteryRequiresHelpless: system.armorFeatRules?.coupDeGraceRequiresHelpless === true,
     sneakAttackImmune: knownSneakAttackImmunity(system).immune,
+    anticipate,
     // Sticky Fingers (Rolling Supremacy, p.187): DR 5/— against adjacent opponents during Total Defense.
     stickyFingersDR: stickyFingers ? 5 : 0,
     listedDR:
@@ -197,6 +202,7 @@ export function incomingDefensePlan(system, options = {}) {
         : []),
       ...(wrestling ? [loc`Wrestling Basics: +1 to Defense against this adjacent opponent (p.189).`] : []),
       ...(dueling ? [loc`Dueling Basics: +2 dodge against the opponent you chose this round (p.178).`] : []),
+      ...(anticipate ? [loc`Anticipate: +${anticipate} dodge against this opponent (p.354).`] : []),
       ...(circling.shifting
         ? [
             circling.active

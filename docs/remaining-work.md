@@ -252,3 +252,41 @@ Small things seen while checking, since fixed and checked in Foundry:
 - Cover Fire's opponent list preselects the targeted token and marks an unlinked token as "(token on <scene>)", so
   it is not confused with its sheet.
 - The hit counter refuses a negative Defense.
+
+## Combat chapter sweep (2026-11-18)
+
+Chapter 5 was read section by section against the system. What was missing is now in place; each piece joins an
+existing hook rather than adding a new path.
+
+- [x] Critical effects (`module/rules/critical-effects.mjs`): the critical activation dialog offers Table 5.4's
+      critical misses for the attack's family (unarmed, melee, hurled, firearm), filtered by the attack's final error
+      range, and the critical hit choices by target type (wounds, Table of Ouch, extra failed Damage saves). Picking
+      one sets the effect text and base cost; every existing cost adjustment still applies.
+- [x] Other damage types (`module/rules/damage-types.mjs`, `module/apps/damage-types.mjs`): acid (armor roll, Reflex
+      save, lingering and halving, washing, scarring), bang and flash (Fortitude DC, stunned/deafened/blinded, 1d4
+      stress, takedown over 20), explosive (Reflex with movement bonus or forced failure, half damage minimum 1,
+      Fortitude stun, 1d4 + quarter stress), electrical (subdual, nausea and Count loss or unconsciousness, injuries at
+      25 and 50), cold and heat (subdual on the temperature schedule, fatigue and temporary attribute damage, armor
+      penalty against heat, injury at 50), vacuum (5d6, first-round save halves, injury at 25), collision and laser
+      stress. Saves run through the hazard save hook (`hazardSaveResolvers` in `module/apps/hazards.mjs`); stress and
+      subdual go through the damage ledger. "Other damage types" on the agent sheet's Hazards line.
+- [x] Survival saves (p.349): suffocation, smoke, sleep loss, starvation, thirst and water pressure, each DC rising
+      by 1 per save until the hazard ends. "Survival save" on the Hazards line.
+- [x] Underwater attacks (`module/rules/underwater-combat.mjs`): an attack dialog box; melee and explosives take the
+      Athletics-based penalty and error +2, unarmed none, other weapons need underwater gear; Aquatic is immune.
+- [x] Actions (`module/rules/combat-options.mjs`, `module/apps/combat-options.mjs`): Anticipate, Joint Action, Stand
+      Off and Tire are named checks on Sense Motive, Tactics and Resolve. "Anticipate result" records the dodge bonus
+      against one opponent for a full round and the incoming-Defense check offers it; "Stand off" rolls the entry
+      Reflex save or a lost round's stress; "Tire result" applies subdual or flat-footed; "Survive a Coup de Grace"
+      and "Cancel a readied action" roll their saves.
+- [x] GC console "Combat references" (`module/rules/gc/combat-reference.mjs`): base encounter distance (Table 5.1,
+      capped by the farthest sense range on the scene), deviation (Table 5.11 and ricochet), gas cloud growth and
+      clearing with wind, and special surface movement (Table 5.3).
+
+Not done, left to the table: the laser's lower critical cost (the attack record does not know its damage type),
+halving Strength damage underwater (noted on the card), the Joint Action's shared Count in the tracker, Terminal
+Situations, and spreading fire or gas across squares.
+
+To check in Foundry (Foundry was running, so these were covered by unit tests only): the new sheet links and
+dialogs, a hazard save card's "Apply this save's result" for each new kind, the Anticipate box in the incoming
+Defense check, the ready-made effects in the critical activation dialog, and the GC console button.

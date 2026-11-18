@@ -144,6 +144,26 @@ export const RECORD_SHAPES = {
       suffered: "number",
       scarChecked: "boolean",
       startedAt: "null|number"
+    },
+    acid: {
+      $also: "null",
+      damage: "number",
+      suffered: "number",
+      injuryChecked: "boolean",
+      startedAt: "null|number"
+    },
+    exposure: {
+      $also: "null",
+      type: "string",
+      source: "string",
+      suffered: "number",
+      interval: "null|number",
+      startedAt: "null|number",
+      injuriesChecked: ["number"],
+      lastDamage: "number"
+    },
+    survival: {
+      "*": { saves: "number", lastAt: "null|number" }
     }
   },
   attributeDamage: {
