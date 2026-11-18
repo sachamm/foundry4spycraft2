@@ -31,27 +31,55 @@ Verification includes numeric comparison against both supplied PDFs, pure calcul
 
 ## Core NPC Templates
 The **Core NPC Templates** Actor compendium contains twenty original campaign starting points. Import or duplicate one, then change its name, faction and circumstances. Each starts as a standard NPC at Tier III and follows the active mission’s Threat Level; its fallback Threat Level is 1.
-Equipment is embedded from the existing item catalogs. The graded allowance matches each included pick, and a group’s vehicle is shared. One primary weapon is equipped; other carried weapons can be readied when needed. Ammunition entitlements are recorded by the NPC profile; the GC can assign stockpile documents for tracked ammunition.
+Equipment is embedded from the existing item catalogs. The graded allowance matches each included pick, and a group’s vehicle is shared. One primary weapon is equipped; other carried weapons can be readied when needed. Each firearm includes an ordinary ammunition stockpile and a selected supplied ammunition code. Stockpile inventory quantity counts stockpiles; its weight is per stockpile. Weapon and stockpile flags link the records; expenditure still uses the existing inventory and ammunition workflows.
 The pack does not populate a world automatically. A newly added compendium becomes available after the world is relaunched.
-| Template | Category |
-| --- | --- |
-| Security Guard | Security & Law Enforcement |
-| Police Officer | Security & Law Enforcement |
-| Detective | Security & Law Enforcement |
-| Bodyguard | Security & Law Enforcement |
-| Soldier | Military & Field Operations |
-| Commando | Military & Field Operations |
-| Mercenary | Military & Field Operations |
-| Street Tough | Crime & Intrusion |
-| Criminal Enforcer | Crime & Intrusion |
-| Burglar | Crime & Intrusion |
-| Contract Killer | Crime & Intrusion |
-| Enemy Agent | Intelligence & Technical |
-| Analyst | Intelligence & Technical |
-| Hacker | Intelligence & Technical |
-| Scientist | Civilian & Professional |
-| Medic | Civilian & Professional |
-| Driver | Civilian & Professional |
-| Executive | Civilian & Professional |
-| Journalist | Civilian & Professional |
-| Ordinary Civilian | Civilian & Professional |
+## Feat selections
+
+Each template now includes one to five feats. The pack builder creates a Feat quality and an embedded catalog item for each purchase. Every selection costs 2 XP, including prerequisite feats; any special-NPC multiplier is applied afterward by the usual calculator.
+
+The builder checks the prerequisite feat graph and chosen Basic Skill feats, independently of the list order. It waives numeric requirements under the NPC rules (p.447), checks the purchase limit, and rejects duplicate or unknown selections. Embedded items retain their catalog source IDs and their original prerequisite records; the NPC validation does not rewrite the PC feat catalog.
+
+Feat descriptions remain available from the NPC inventory. Benefits outside the NPC workflows still need GC adjudication; adding a feat does not imply that all of its play effects have been automated. These changes do not replace already imported world actors; import a fresh template to use the new selection.
+
+| Template | Feats | Added feat XP | NPC reward |
+| --- | --- | ---: | ---: |
+| Security Guard | Observer, Combat Mobility | +4 | 47 |
+| Police Officer | CQB Basics, Combat Mobility, Officer | +6 | 62 |
+| Detective | Private Eye, Observer, Advanced Skill Mastery (Private Eye) | +6 | 74 |
+| Bodyguard | Combat Mobility, CQB Basics, Iron Will | +6 | 85 |
+| Soldier | Marksmanship Basics, CQB Basics, Survivalist | +6 | 72 |
+| Commando | Marksmanship Basics, Marksmanship Mastery, CQB Basics, Combat Mobility, Ghost Basics | +10 | 112 |
+| Mercenary | Marksmanship Basics, Marksmanship Mastery, CQB Basics | +6 | 84 |
+| Street Tough | Brawling Basics, Dirty Fighting Basics | +4 | 49 |
+| Criminal Enforcer | Brawling Basics, Brawling Moves, Officer | +6 | 77 |
+| Burglar | Burglar, Ghost Basics, Ghost Mastery | +6 | 67 |
+| Contract Killer | Marksmanship Basics, Marksmanship Mastery, Concealed Carry, Ghost Basics | +8 | 85 |
+| Enemy Agent | Actor, Concealed Carry, Ghost Basics, Charmer | +8 | 85 |
+| Analyst | Examiner, Scholar, Advanced Skill Mastery (Examiner) | +6 | 59 |
+| Hacker | Techie, Advanced Skill Mastery (Techie), False Start (Techie) | +6 | 63 |
+| Scientist | Scholar, Advanced Skill Mastery (Scholar), False Start (Scholar) | +6 | 60 |
+| Medic | Bandage, Examiner, Advanced Skill Mastery (Examiner) | +6 | 61 |
+| Driver | Defensive Driving, Driving Instincts, Speed Demon, Need for Speed | +8 | 66 |
+| Executive | Diplomat, Hustler, Charmer | +6 | 58 |
+| Journalist | Private Eye, Diplomat, Charmer | +6 | 59 |
+| Ordinary Civilian | Advisor | +2 | 15 |
+
+## Template loadouts
+
+Role-specific weapons, armor, kits, communications, recording tools and vehicles are embedded from the item catalogs. Each paid item contributes its actual Caliber to the profile; added picks and Caliber upgrades feed the final reward shown above. Wealth does not grant extra equipment. Vehicles marked as group equipment are shared when placing several copies.
+
+Common Items use a separate curated list in `src/data/npc-common-items.json`. Phones, lights, notebooks and other ordinary supplies do not consume full equipment picks or add XP. Their entries grant no automatic bonus, and their unspecified weights require GC review when tracking load. Clothing and personal keys appear as personal effects in the biography. Kits retain their catalog contents without charging for those contents again.
+
+Standard NPC weapons receive one included ammunition stockpile; special NPC weapons receive three. The template builder requires compatible ordinary ammunition and a valid supplied code, and rejects unpriced conversions. Additional stockpiles must be purchased in pairs, adding 1 XP per pair. The twenty current templates use only the standard included allowance. Already imported world actors keep their current inventories; import fresh templates for these loadouts.
+
+## Optional Threat Level packages
+
+Each of the twenty core templates has three authored packages: **Basic** (suggested TL 1–5), **Established** (6–12) and **Veteran** (13–20). These ranges are module conveniences, not a rulebook progression. Established reproduces the fixed template. Basic uses fewer feats and simpler professional equipment; Veteran expands training and role-appropriate tools. Civilian packages retain civilian equipment. Fixed loadouts remain the default, and neither mission changes nor Threat Level changes replace items.
+
+On a core template's graded NPC sheet, the GC can choose **Preview a package**. The selector marks the recommendation using effective TL, including Tier, but initially selects the actor's current package. The preview lists template items to replace, package items to include, other items to retain, and the complete resulting XP breakdown. Apply explicitly to replace the package; select **Fixed loadout** to restore the original selection. Reapplying a package resets its template items, including edited ammunition quantities. Apply between encounters; active effects are retained.
+
+**Edit TL bands** changes suggestions for that actor. Bands must cover TL 1–20 without overlaps or gaps. Saving bands does not alter feats, inventory or reward.
+
+Package application retains grades, listed skills, other qualities and additional purchases. It removes the previous package's feat purchases and equipment allowances, adds the new ones, and validates the resulting inventory. Every feat must have a matching priced Feat quality, prerequisite feats must remain present, and the applicable feat limit is enforced. Each priced inventory item needs a matching Caliber allowance. Ammunition extras use the same stockpile-pair accounting as fixed templates. Unpriced custom items, incompatible extra feats or manually altered prior package allowances prevent application until the GC reconciles the actor. The feature currently supports the twenty standard graded NPC templates; conversion to special/animal or manual creation requires ordinary GC editing.
+
+The preview is checked again before application. A changed NPC or mission TL requires a fresh preview. Item replacement, the graded profile, the generated equipment/feat biography section and the package receipt are submitted in one Foundry v14 document update. New data is compiled from `src/data/npc-packages.json` through the same builders as fixed templates into `module/data/npc-packages.json`; run `npm run build` after editing it. The file is bundled with the system and loaded when opening the package dialog. Import fresh templates if an older copy lacks the matching purchases and allowances.

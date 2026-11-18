@@ -2,6 +2,7 @@
  * Turns src/data/*.json into compendium documents and the generated rules modules, in memory.
  * tools/build-packs.mjs writes the result to disk; the engine fixture check reads the documents directly.
  */
+import { buildNpcPackages } from "./npc-packages.mjs";
 import { buildNpcTemplates } from "./npc-templates.mjs";
 import { firearmDefaults } from "../../module/rules/firearms.mjs";
 import { createHash } from "node:crypto";
@@ -972,11 +973,17 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
     docs: [{ ...soundtrack, sounds: sounds.map(sound => sound._id), _stats: stats, embedded: { sounds } }]
   };
 
-  packs["core-npcs"] = buildNpcTemplates(read("npc-templates.json"), packs, {
+  const npcOptions = {
     id,
     stats,
-    skillKeys: new Set(core.skills.map(skill => skill.key))
-  });
+    skillKeys: new Set(core.skills.map(skill => skill.key)),
+    commonCatalog: read("npc-common-items.json").items,
+    ammoCatalog: ammunition
+  };
+  const npcTemplates = read("npc-templates.json");
+  packs["core-npcs"] = buildNpcTemplates(npcTemplates, packs, npcOptions);
+  const npcPackages = buildNpcPackages(read("npc-packages.json"), npcTemplates, packs, npcOptions);
+  generated["module/data/npc-packages.json"] = JSON.stringify(npcPackages) + "\n";
 
   return { packs, generated, system };
 }

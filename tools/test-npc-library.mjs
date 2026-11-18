@@ -93,7 +93,7 @@ test("included equipment has stable embedded IDs and exactly matches its priced 
         `${doc.name}: ${category}`
       );
     }
-    for (const item of included) {
+    for (const item of included.filter(item => item.flags.spycraft2?.npcEquipment?.kind === "pick")) {
       assert.equal(item.folder, null);
       assert.match(item.flags.core.sourceId, /^Compendium\.spycraft2\.[\w-]+\.Item\.[a-zA-Z0-9]{16}$/);
       assert.equal(item.system.carried, true);

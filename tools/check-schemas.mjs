@@ -49,7 +49,19 @@ for (const [kind, set] of Object.entries({ Actor: models.actor, Item: models.ite
   }
 }
 const { buildPacks } = await import("./lib/pack-docs.mjs");
-const npcTemplates = buildPacks().packs["core-npcs"].docs;
+const built = buildPacks();
+const npcTemplates = built.packs["core-npcs"].docs;
+const packageData = JSON.parse(built.generated["module/data/npc-packages.json"]);
+for (const [roleId, role] of Object.entries(packageData.roles)) {
+  const original = npcTemplates.find(doc => doc.flags.spycraft2.npcTemplate === roleId);
+  for (const variant of role.packages.filter(p => p.id !== "fixed"))
+    npcTemplates.push({
+      ...original,
+      name: `${role.name} / ${variant.label}`,
+      system: { ...original.system, npcProfile: variant.profile },
+      embedded: { items: variant.items }
+    });
+}
 for (const doc of npcTemplates) {
   for (const [kind, type, data, label] of [
     ["Actor", doc.type, doc.system, doc.name],
@@ -66,5 +78,43 @@ for (const doc of npcTemplates) {
     }
   }
 }
-console.log(`Validated ${npcTemplates.length} NPC template systems and their embedded item systems.`);
+console.log(`Validated ${npcTemplates.length} NPC template/package systems and their embedded item systems.`);
+// Exercise v14's actual embedded collection replacement, including deletion and schema-cleaned inputs.
+try {
+  const assert = (await import("node:assert/strict")).default;
+  globalThis.CONST = await load("constants.mjs");
+  foundry.data.operators = await load("data/operators.mjs");
+  foundry.packages = await load("packages/_module.mjs");
+  foundry.documents = await load("documents/_module.mjs");
+  for (const kind of ["Actor", "Item", "ActiveEffect", "Folder", "Token"])
+    CONFIG[kind] = { documentClass: foundry.documents[`Base${kind}`], dataModels: models[kind.toLowerCase()] ?? {} };
+  globalThis.game = {
+    system: { id: "spycraft2", documentTypes: { Actor: ["npc"], Item: Object.keys(models.item) } },
+    modules: new Map(),
+    model: { Actor: { npc: {} }, Item: Object.fromEntries(Object.keys(models.item).map(type => [type, {}])) }
+  };
+  const { planNpcPackage } = await import("../module/rules/npc-packages.mjs");
+  for (const original of npcTemplates.slice(0, 20)) {
+    const { embedded, ...source } = original;
+    const actor = new foundry.documents.BaseActor({ ...source, items: embedded.items });
+    for (const packageId of ["basic", "veteran", "veteran", "fixed"]) {
+      const plan = planNpcPackage(actor.toObject(), packageData, packageId);
+      actor.updateSource({
+        items: foundry.data.operators.ForcedReplacement.create(plan.items),
+        "system.npcProfile": plan.profile,
+        "flags.spycraft2.npcPackage": plan.receipt
+      });
+      assert.deepEqual(actor.items.map(item => item.id).sort(), plan.items.map(item => item._id).sort());
+      assert.equal(
+        actor.system.npcProfile.qualities.filter(q => q.id === "feat").length,
+        plan.profile.qualities.filter(q => q.id === "feat").length
+      );
+      assert.deepEqual(actor.system.npcProfile.equipment, plan.profile.equipment);
+    }
+  }
+  console.log("Validated native Foundry package replacement and fixed-loadout restoration for all 20 templates.");
+} catch (error) {
+  failed += 1;
+  console.error(`Native package replacement: ${error.stack}`);
+}
 process.exitCode = failed ? 1 : 0;

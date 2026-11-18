@@ -1,3 +1,4 @@
+import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { vehicleClass } from "../rules/vehicles.mjs";
 import {
@@ -1537,6 +1538,12 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       async endPromotion() {
         await this.actor.update({ "system.promotion": null });
       },
+      npcPackages() {
+        return manageNpcPackages(this.actor);
+      },
+      npcPackageBands() {
+        return manageNpcPackages(this.actor, { editBands: true });
+      },
       npcEnable: SpycraftNpcSheet.#onEnable,
       npcAddSkill: SpycraftNpcSheet.#onAddSkill,
       npcAddQuality: SpycraftNpcSheet.#onAddQuality,
@@ -1591,6 +1598,15 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         villain: loc`Villain (legacy special)`,
         animal: loc`Animal`
       },
+      npcPackages: this.actor.flags?.spycraft2?.npcTemplate
+        ? {
+            label: this.actor.flags?.spycraft2?.npcPackage?.label ?? loc`Fixed loadout`,
+            current: loc`Current package`,
+            note: loc`TL packages are optional. Changing Threat Level leaves the current feats and equipment in place.`,
+            preview: loc`Preview a package`,
+            bands: loc`Edit TL bands`
+          }
+        : null,
       npc: this._npcContext(),
       manualRoles: { "": loc`None`, minion: loc`Minion`, henchman: loc`Henchman`, mastermind: loc`Mastermind` },
       gcPlay: {

@@ -1,6 +1,12 @@
 <section class="npc-builder">
   <div class="npc-builder-title"><h2>{{localize "SPYCRAFT.Template.ActorNpcBuilder.NPCCreation"}}</h2>{{#if editable}}<button type="button" data-action="npcEnable">{{#if system.npcProfile.enabled}}{{localize "SPYCRAFT.Template.ActorNpcBuilder.UseManualStatBlock"}}{{else}}{{localize "SPYCRAFT.Template.ActorNpcBuilder.UseGradedNPCCreation"}}{{/if}}</button>{{/if}}</div>
   {{#if system.npcProfile.enabled}}
+  {{#if npcPackages}}
+  <fieldset><legend>{{npcPackages.current}}: {{npcPackages.label}}</legend>
+    <p class="npc-note">{{npcPackages.note}}</p>
+    {{#if isGM}}{{#if editable}}<button type="button" data-action="npcPackages">{{npcPackages.preview}}</button><button type="button" data-action="npcPackageBands">{{npcPackages.bands}}</button>{{/if}}{{/if}}
+  </fieldset>
+  {{/if}}
   <p class="npc-note">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ChooseGradesListedSkillsEquipmentPicks"}}</p>
   <fieldset {{#unless editable}}disabled{{/unless}}>
     <div class="npc-controls">

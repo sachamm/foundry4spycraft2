@@ -1,0 +1,1823 @@
+{
+  "roles": [
+    {
+      "templateId": "security-guard",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Observer"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Club, light",
+              "category": "weapons"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "armor",
+              "name": "Corrections vest",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Observer"
+            },
+            {
+              "name": "Combat Mobility"
+            },
+            {
+              "name": "CQB Basics"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Club, light",
+              "category": "weapons"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            },
+            {
+              "pack": "armor",
+              "name": "Corrections vest",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit I",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "police-officer",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "CQB Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Beretta 92 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Club, light",
+              "category": "weapons"
+            },
+            {
+              "pack": "armor",
+              "name": "Duty vest, Class IIA",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, full-size sedan",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit I",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "CQB Basics"
+            },
+            {
+              "name": "Combat Mobility"
+            },
+            {
+              "name": "Officer"
+            },
+            {
+              "name": "Observer"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Beretta 92 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Club, light",
+              "category": "weapons"
+            },
+            {
+              "pack": "armor",
+              "name": "Duty vest, Class IIIA",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, full-size sedan",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit II",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "detective",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Private Eye"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 26 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "kits",
+              "name": "Forensics Kit I",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, mid-size sedan",
+              "category": "vehicles"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Private Eye"
+            },
+            {
+              "name": "Observer"
+            },
+            {
+              "name": "Advanced Skill Mastery",
+              "choice": "Private Eye"
+            },
+            {
+              "name": "Grand Skill Mastery",
+              "choice": "Private Eye"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 26 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "kits",
+              "name": "Forensics Kit II",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber II)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, mid-size sedan",
+              "category": "vehicles"
+            },
+            {
+              "pack": "gear",
+              "name": "Camera, still (commercial-grade)",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Tape recorder (commercial-grade)",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "bodyguard",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Combat Mobility"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 17 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "armor",
+              "name": "Duty vest, Class IIA",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, full-size sedan",
+              "category": "vehicles"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Combat Mobility"
+            },
+            {
+              "name": "CQB Basics"
+            },
+            {
+              "name": "Iron Will"
+            },
+            {
+              "name": "Observer"
+            },
+            {
+              "name": "Mobile Offense"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 17 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "armor",
+              "name": "Duty vest, Class IIIA",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, full-size sedan",
+              "category": "vehicles"
+            },
+            {
+              "pack": "gear",
+              "name": "Bug sweeper, military",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "soldier",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Colt M16A2/A4 5.56mm NATO",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1,
+                "code": "30M5"
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Dagger/survival knife",
+              "category": "weapons"
+            },
+            {
+              "pack": "armor",
+              "name": "Tactical vest",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Jeep",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit I",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            },
+            {
+              "name": "CQB Basics"
+            },
+            {
+              "name": "Survivalist"
+            },
+            {
+              "name": "Marksmanship Mastery"
+            },
+            {
+              "name": "Combat Mobility"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Colt M16A2/A4 5.56mm NATO",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 3,
+                "code": "30M5"
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Dagger/survival knife",
+              "category": "weapons"
+            },
+            {
+              "pack": "armor",
+              "name": "Tactical vest",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Jeep",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit II",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "commando",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "H&K MP5SD6 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Dagger/survival knife",
+              "category": "weapons"
+            },
+            {
+              "pack": "armor",
+              "name": "Tactical jacket",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Jeep",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "Climbing Kit I",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            },
+            {
+              "name": "Marksmanship Mastery"
+            },
+            {
+              "name": "CQB Basics"
+            },
+            {
+              "name": "Combat Mobility"
+            },
+            {
+              "name": "Ghost Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "H&K MP5SD6 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 3
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Dagger/survival knife",
+              "category": "weapons"
+            },
+            {
+              "pack": "armor",
+              "name": "Tactical jacket",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Jeep",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "Climbing Kit III",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Fiberscope",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit II",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "mercenary",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Colt M16A2/A4 5.56mm NATO",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1,
+                "code": "30M5"
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Beretta 92 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "armor",
+              "name": "Flak jacket",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Jeep",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit I",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            },
+            {
+              "name": "Marksmanship Mastery"
+            },
+            {
+              "name": "CQB Basics"
+            },
+            {
+              "name": "Combat Mobility"
+            },
+            {
+              "name": "Survivalist"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Colt M16A2/A4 5.56mm NATO",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 3,
+                "code": "30M5"
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Beretta 92 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 3
+              }
+            },
+            {
+              "pack": "armor",
+              "name": "Flak jacket",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Jeep",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit II",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "street-tough",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Brawling Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Club, light",
+              "category": "weapons"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Brawling Basics"
+            },
+            {
+              "name": "Dirty Fighting Basics"
+            },
+            {
+              "name": "Brawling Moves"
+            },
+            {
+              "name": "Combat Mobility"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Club, light",
+              "category": "weapons"
+            },
+            {
+              "pack": "armor",
+              "name": "Corrections vest",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "criminal-enforcer",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Brawling Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Club, heavy",
+              "category": "weapons"
+            },
+            {
+              "pack": "weapons",
+              "name": "Beretta 92 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "armor",
+              "name": "Corrections vest",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Brawling Basics"
+            },
+            {
+              "name": "Brawling Moves"
+            },
+            {
+              "name": "Officer"
+            },
+            {
+              "name": "Dirty Fighting Basics"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Club, heavy",
+              "category": "weapons"
+            },
+            {
+              "pack": "weapons",
+              "name": "Beretta 92 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "armor",
+              "name": "Corrections vest",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "burglar",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Burglar"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Escape knife",
+              "category": "weapons"
+            },
+            {
+              "pack": "kits",
+              "name": "Lockpicking Kit I",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Climbing Kit I",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Burglar"
+            },
+            {
+              "name": "Ghost Basics"
+            },
+            {
+              "name": "Ghost Mastery"
+            },
+            {
+              "name": "Advanced Skill Mastery",
+              "choice": "Burglar"
+            },
+            {
+              "name": "Observer"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Escape knife",
+              "category": "weapons"
+            },
+            {
+              "pack": "kits",
+              "name": "Lockpicking Kit III",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Climbing Kit II",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Fiberscope",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "contract-killer",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 26 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Remington Model 700 7.62mm NATO",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, compact",
+              "category": "vehicles"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Marksmanship Basics"
+            },
+            {
+              "name": "Marksmanship Mastery"
+            },
+            {
+              "name": "Concealed Carry"
+            },
+            {
+              "name": "Ghost Basics"
+            },
+            {
+              "name": "Ghost Mastery"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 26 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "weapons",
+              "name": "Remington Model 700 7.62mm NATO",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber II)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, compact",
+              "category": "vehicles"
+            },
+            {
+              "pack": "gear",
+              "name": "Camera, still (commercial-grade)",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "enemy-agent",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Actor"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 26 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "kits",
+              "name": "Disguise Kit I",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, mid-size sedan",
+              "category": "vehicles"
+            },
+            {
+              "pack": "gear",
+              "name": "Bug, audio (Caliber II)",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Actor"
+            },
+            {
+              "name": "Concealed Carry"
+            },
+            {
+              "name": "Ghost Basics"
+            },
+            {
+              "name": "Charmer"
+            },
+            {
+              "name": "Ghost Mastery"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "weapons",
+              "name": "Glock 26 9mm",
+              "category": "weapons",
+              "ammunition": {
+                "id": "bullet-full-metal-jacket-fmj",
+                "stockpiles": 1
+              }
+            },
+            {
+              "pack": "kits",
+              "name": "Disguise Kit III",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, mid-size sedan",
+              "category": "vehicles"
+            },
+            {
+              "pack": "gear",
+              "name": "Bug, audio (Caliber II)",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Bug sweeper, military",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "analyst",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Examiner"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Authentication Kit I",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Examiner"
+            },
+            {
+              "name": "Scholar"
+            },
+            {
+              "name": "Advanced Skill Mastery",
+              "choice": "Examiner"
+            },
+            {
+              "name": "Grand Skill Mastery",
+              "choice": "Examiner"
+            },
+            {
+              "name": "False Start",
+              "choice": "Examiner"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber III)",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Authentication Kit II",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "hacker",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Techie"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Electronics Kit I",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Techie"
+            },
+            {
+              "name": "Advanced Skill Mastery",
+              "choice": "Techie"
+            },
+            {
+              "name": "False Start",
+              "choice": "Techie"
+            },
+            {
+              "name": "Grand Skill Mastery",
+              "choice": "Techie"
+            },
+            {
+              "name": "Mark of a Professional",
+              "choice": "Techie"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber III)",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Electronics Kit III",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Bug sweeper, military",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "scientist",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Scholar"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "kits",
+              "name": "Chemistry Kit I",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber I)",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Scholar"
+            },
+            {
+              "name": "Advanced Skill Mastery",
+              "choice": "Scholar"
+            },
+            {
+              "name": "False Start",
+              "choice": "Scholar"
+            },
+            {
+              "name": "Grand Skill Mastery",
+              "choice": "Scholar"
+            },
+            {
+              "name": "Mark of a Professional",
+              "choice": "Scholar"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "kits",
+              "name": "Chemistry Kit III",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber III)",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "medic",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Bandage"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "kits",
+              "name": "First Aid Kit I",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Surgery Kit I",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (Caliber I)",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Bandage"
+            },
+            {
+              "name": "Examiner"
+            },
+            {
+              "name": "Advanced Skill Mastery",
+              "choice": "Examiner"
+            },
+            {
+              "name": "Grand Skill Mastery",
+              "choice": "Examiner"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "kits",
+              "name": "First Aid Kit III",
+              "category": "gear"
+            },
+            {
+              "pack": "kits",
+              "name": "Surgery Kit II",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Radio, tactical or headset (encrypted)",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "driver",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Defensive Driving"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "kits",
+              "name": "Mechanics Kit I",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, mid-size sedan",
+              "category": "vehicles"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Defensive Driving"
+            },
+            {
+              "name": "Driving Instincts"
+            },
+            {
+              "name": "Speed Demon"
+            },
+            {
+              "name": "Need for Speed"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "kits",
+              "name": "Mechanics Kit II",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, mid-size sedan",
+              "category": "vehicles"
+            },
+            {
+              "pack": "kits",
+              "name": "First Aid Kit I",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "executive",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Diplomat"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, full-size sedan",
+              "category": "vehicles"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Diplomat"
+            },
+            {
+              "name": "Hustler"
+            },
+            {
+              "name": "Charmer"
+            },
+            {
+              "name": "Iron Will"
+            },
+            {
+              "name": "Observer"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber III)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, full-size sedan",
+              "category": "vehicles"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "journalist",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Private Eye"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber I)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, compact",
+              "category": "vehicles"
+            },
+            {
+              "pack": "gear",
+              "name": "Camera, still (commercial-grade)",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Tape recorder (consumer-grade)",
+              "category": "gear"
+            }
+          ]
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Private Eye"
+            },
+            {
+              "name": "Diplomat"
+            },
+            {
+              "name": "Charmer"
+            },
+            {
+              "name": "Observer"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": [
+            {
+              "pack": "gear",
+              "name": "Computer, laptop (Caliber II)",
+              "category": "gear"
+            },
+            {
+              "pack": "vehicles",
+              "name": "Car, compact",
+              "category": "vehicles"
+            },
+            {
+              "pack": "gear",
+              "name": "Camera, still (professional-grade)",
+              "category": "gear"
+            },
+            {
+              "pack": "gear",
+              "name": "Tape recorder (commercial-grade)",
+              "category": "gear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "templateId": "ordinary-civilian",
+      "packages": [
+        {
+          "id": "basic",
+          "label": "Basic",
+          "minTL": 1,
+          "maxTL": 5,
+          "feats": [
+            {
+              "name": "Advisor"
+            }
+          ],
+          "loadout": []
+        },
+        {
+          "id": "established",
+          "label": "Established",
+          "minTL": 6,
+          "maxTL": 12
+        },
+        {
+          "id": "veteran",
+          "label": "Veteran",
+          "minTL": 13,
+          "maxTL": 20,
+          "feats": [
+            {
+              "name": "Advisor"
+            },
+            {
+              "name": "Observer"
+            },
+            {
+              "name": "Iron Will"
+            }
+          ],
+          "loadout": []
+        }
+      ]
+    }
+  ]
+}

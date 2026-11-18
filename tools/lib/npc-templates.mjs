@@ -1,4 +1,6 @@
 /** Assemble original campaign templates from the same graded profiles the NPC sheet edits. */
+import { buildNpcLoadout } from "./npc-loadouts.mjs";
+import { validateNpcFeats } from "../../module/rules/npc-feats.mjs";
 import { computeNpcProfile, defaultNpcProfile, NPC_CATEGORIES } from "../../module/rules/npcs.mjs";
 
 const esc = text =>
@@ -7,7 +9,7 @@ const esc = text =>
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-export function buildNpcTemplates(data, packs, { id, stats, skillKeys }) {
+export function buildNpcTemplates(data, packs, { id, stats, skillKeys, commonCatalog = [], ammoCatalog = [] }) {
   const packName = "core-npcs";
   const categories = [...new Set(data.templates.map(template => template.category))];
   const folders = categories.map((name, index) => ({
@@ -40,28 +42,36 @@ export function buildNpcTemplates(data, packs, { id, stats, skillKeys }) {
       qualities: structuredClone(template.qualities),
       equipment: Object.fromEntries(NPC_CATEGORIES.map(category => [category, []]))
     };
-    let weaponIndex = 0;
-    const items = template.loadout.map((entry, itemIndex) => {
-      const source = packs[entry.pack]?.docs.find(item => item.name === entry.name);
-      if (!source) throw new Error(`${template.name}: missing loadout item ${entry.pack}/${entry.name}`);
-      if (!NPC_CATEGORIES.includes(entry.category)) throw new Error(`${template.name}: invalid loadout category`);
-      const caliber = source.system.caliber;
-      if (!Number.isInteger(caliber) || caliber < 1 || caliber > 5)
-        throw new Error(`${template.name}: ${entry.name} has no ordinary NPC Caliber`);
-      profile.equipment[entry.category].push(caliber);
-      const item = structuredClone(source);
-      item._id = id(packName, template.id, entry.pack, source._id, String(itemIndex));
+    if (profile.qualities.some(quality => quality.id === "feat"))
+      throw new Error(`${template.name}: list feats in the feats field; Feat quality pricing is generated.`);
+    const featPurchase = validateNpcFeats(template.feats ?? [], packs.feats.docs, { qualities: profile.qualities });
+    if (!featPurchase.ok) throw new Error(`${template.name}: ${featPurchase.errors.join("; ")}`);
+    profile.qualities.push(
+      ...featPurchase.selections.map(feat => ({
+        id: "feat",
+        units: 1,
+        details: feat.name + (feat.choice ? ` (${feat.choice})` : "")
+      }))
+    );
+    const loadout = buildNpcLoadout(template, packs, { id, stats, commonCatalog, ammoCatalog, type: "standard" });
+    const items = loadout.items;
+    profile.equipment = loadout.equipment;
+    profile.extraAmmoPairs = loadout.extraAmmoPairs;
+    const featItems = featPurchase.selections.map((feat, index) => {
+      const item = structuredClone(feat.source);
+      item._id = id(packName, template.id, "feat", feat.source._id, feat.choice);
       item.folder = null;
-      item.sort = (itemIndex + 1) * 100000;
-      item.system.carried = true;
-      item.system.reserve = false;
-      item.system.equipped = item.type === "armor" || (item.type === "weapon" && weaponIndex++ === 0);
+      item.sort = (items.length + index + 1) * 100000;
+      Object.assign(item.system, { choice: feat.choice, featKind: "permanent", granted: false, acquiredAtLevel: 0 });
       item.flags = {
         ...item.flags,
-        core: { ...item.flags?.core, sourceId: `Compendium.spycraft2.${entry.pack}.Item.${source._id}` }
+        core: { ...item.flags?.core, sourceId: `Compendium.spycraft2.feats.Item.${feat.source._id}` }
       };
       return item;
     });
+    for (const item of [...items, ...featItems]) {
+      item.flags.spycraft2 = { ...item.flags.spycraft2, npcPackageManaged: template.id };
+    }
     const result = computeNpcProfile(profile, "standard", data.defaultThreatLevel, abilities);
     if (!result.complete) throw new Error(`${template.name}: ${result.warnings.join("; ")}`);
     const actorId = id(packName, "npc", template.id);
@@ -71,10 +81,13 @@ export function buildNpcTemplates(data, packs, { id, stats, skillKeys }) {
       `<h3>Campaign choices</h3><p>${esc(template.customization)}</p>`,
       `<p>Import a copy, give it a campaign identity and adjust its graded profile. It follows the active mission's Threat Level; without an active mission it uses its own Threat Level.</p>`,
       `<h3>Included equipment</h3><ul>${items.map(item => `<li>${esc(item.name)}</li>`).join("")}</ul>`,
+      `<h3>Feats</h3><ul>${featPurchase.selections.map(feat => `<li>${esc(feat.name)}${feat.choice ? ` (${esc(feat.choice)})` : ""}</li>`).join("")}</ul>`,
+      `<p>Feat purchases add ${featPurchase.xp} XP before any special-NPC multiplier. Required feats are included; numerical requirements are waived under the NPC rules (p.447). Use the attached feat items for their benefits and any GC adjudication.</p>`,
       ...(template.group && profile.equipment.vehicles.length
         ? ["<p>The vehicle pick serves the whole group. Assign one vehicle when placing multiple copies.</p>"]
         : []),
-      "<p>Weapon ammunition allowances come from the NPC profile. Assign ammunition documents when using tracked ammunition. Unlisted everyday possessions are for the GC to choose.</p>"
+      `<h3>Personal effects</h3><p>${(template.personalEffects ?? []).map(esc).join(", ")}. Clothing and personal accessories are lifestyle details; they do not grant equipment bonuses.</p>`,
+      "<p>Common Items are recorded separately from priced gear picks. Their weights need GC review when tracking load. Weapon ammunition has its own stockpile entries; quantity counts stockpiles, with the selected ammunition code shown on each weapon.</p>"
     ].join("");
     return {
       _id: actorId,
@@ -97,14 +110,14 @@ export function buildNpcTemplates(data, packs, { id, stats, skillKeys }) {
         disposition: 0,
         texture: { src: "icons/svg/mystery-man.svg" }
       },
-      items: items.map(item => item._id),
+      items: [...items, ...featItems].map(item => item._id),
       effects: [],
       folder: folders.find(folder => folder.name === template.category)._id,
       sort: (index + 1) * 100000,
       ownership: { default: 0 },
       flags: { spycraft2: { npcTemplate: template.id, npcTemplateCategory: template.category } },
       _stats: stats,
-      embedded: { items }
+      embedded: { items: [...items, ...featItems] }
     };
   });
   return { label: data.label, type: "Actor", collection: "actors", folders, docs };

@@ -1,0 +1,80 @@
+{
+  "sourcePage": 213,
+  "items": [
+    {
+      "id": "cell-phone",
+      "name": "Cell phone",
+      "description": "An ordinary personal phone for routine calls and messages."
+    },
+    {
+      "id": "flashlight",
+      "name": "Flashlight",
+      "description": "A handheld light. The GC decides illumination and any situational use."
+    },
+    {
+      "id": "notebook",
+      "name": "Notebook and pen",
+      "description": "Paper notes and a writing tool for observations, messages or sketches."
+    },
+    {
+      "id": "binoculars",
+      "name": "Binoculars",
+      "description": "Ordinary binoculars for watching distant activity; use the Common Item rules."
+    },
+    {
+      "id": "handcuffs",
+      "name": "Handcuffs",
+      "description": "A conventional pair of restraints; restraint and escape procedures still apply."
+    },
+    {
+      "id": "backpack",
+      "name": "Backpack",
+      "description": "A simple container for the character’s carried equipment."
+    },
+    {
+      "id": "compass",
+      "name": "Compass",
+      "description": "A basic magnetic compass for orientation."
+    },
+    {
+      "id": "canteen",
+      "name": "Canteen",
+      "description": "A water container for ordinary field use."
+    },
+    {
+      "id": "duct-tape",
+      "name": "Duct tape",
+      "description": "A roll of utility tape; improvised uses are for the GC to assess."
+    },
+    {
+      "id": "multitool",
+      "name": "Multitool",
+      "description": "A pocket collection of simple tools; professional checks still use their required kits."
+    },
+    {
+      "id": "storage-media",
+      "name": "Storage media",
+      "description": "Ordinary removable media for carrying copies of files."
+    },
+    {
+      "id": "stretcher",
+      "name": "Stretcher",
+      "description": "A folding casualty carrier; it does not provide medical treatment."
+    },
+    {
+      "id": "road-flares",
+      "name": "Road flares",
+      "description": "A small roadside signal supply; the GC determines burn time and safe placement."
+    },
+    {
+      "id": "fire-extinguisher",
+      "name": "Fire extinguisher",
+      "description": "An ordinary portable extinguisher for a small fire, subject to the hazard rules."
+    },
+    {
+      "id": "briefcase",
+      "name": "Briefcase",
+      "description": "A conventional document case with no concealed devices or special protection."
+    }
+  ]
+}

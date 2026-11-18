@@ -56,6 +56,23 @@
           "name": "Corrections vest",
           "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Observer"
+        },
+        {
+          "name": "Combat Mobility"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "handcuffs"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -98,7 +115,11 @@
         {
           "pack": "weapons",
           "name": "Beretta 92 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "weapons",
@@ -119,7 +140,33 @@
           "pack": "vehicles",
           "name": "Car, full-size sedan",
           "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Combat Mobility"
+        },
+        {
+          "name": "Officer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "handcuffs",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -168,7 +215,11 @@
         {
           "pack": "weapons",
           "name": "Glock 26 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "kits",
@@ -184,7 +235,38 @@
           "pack": "vehicles",
           "name": "Car, mid-size sedan",
           "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Tape recorder (consumer-grade)",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Private Eye"
+        },
+        {
+          "name": "Observer"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Private Eye"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -240,7 +322,11 @@
         {
           "pack": "weapons",
           "name": "Glock 17 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "armor",
@@ -256,7 +342,32 @@
           "pack": "vehicles",
           "name": "Car, full-size sedan",
           "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug sweeper, commercial",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Combat Mobility"
+        },
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Iron Will"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "binoculars"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -310,7 +421,12 @@
         {
           "pack": "weapons",
           "name": "Colt M16A2/A4 5.56mm NATO",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1,
+            "code": "30M5"
+          }
         },
         {
           "pack": "weapons",
@@ -331,7 +447,33 @@
           "pack": "vehicles",
           "name": "Jeep",
           "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Survivalist"
+        }
+      ],
+      "commonItems": [
+        "backpack",
+        "compass",
+        "canteen",
+        "flashlight"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -391,7 +533,11 @@
         {
           "pack": "weapons",
           "name": "H&K MP5SD6 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "weapons",
@@ -412,7 +558,45 @@
           "pack": "vehicles",
           "name": "Jeep",
           "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "Climbing Kit II",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Fiberscope",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "Marksmanship Mastery"
+        },
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Combat Mobility"
+        },
+        {
+          "name": "Ghost Basics"
+        }
+      ],
+      "commonItems": [
+        "backpack",
+        "compass",
+        "canteen",
+        "flashlight",
+        "duct-tape"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -467,12 +651,21 @@
         {
           "pack": "weapons",
           "name": "Colt M16A2/A4 5.56mm NATO",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1,
+            "code": "30M5"
+          }
         },
         {
           "pack": "weapons",
           "name": "Beretta 92 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "armor",
@@ -488,7 +681,33 @@
           "pack": "vehicles",
           "name": "Jeep",
           "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "Marksmanship Mastery"
+        },
+        {
+          "name": "CQB Basics"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "backpack",
+        "canteen",
+        "binoculars"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -539,6 +758,22 @@
           "name": "Club, light",
           "category": "weapons"
         }
+      ],
+      "feats": [
+        {
+          "name": "Brawling Basics"
+        },
+        {
+          "name": "Dirty Fighting Basics"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "multitool"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -597,13 +832,37 @@
         {
           "pack": "weapons",
           "name": "Beretta 92 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "armor",
           "name": "Corrections vest",
           "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Brawling Basics"
+        },
+        {
+          "name": "Brawling Moves"
+        },
+        {
+          "name": "Officer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "handcuffs",
+        "flashlight"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -662,7 +921,32 @@
           "pack": "kits",
           "name": "Climbing Kit I",
           "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Fiberscope",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Burglar"
+        },
+        {
+          "name": "Ghost Basics"
+        },
+        {
+          "name": "Ghost Mastery"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "duct-tape"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -711,12 +995,20 @@
         {
           "pack": "weapons",
           "name": "Glock 26 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "weapons",
           "name": "Remington Model 700 7.62mm NATO",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "gear",
@@ -727,7 +1019,35 @@
           "pack": "vehicles",
           "name": "Car, compact",
           "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "Marksmanship Mastery"
+        },
+        {
+          "name": "Concealed Carry"
+        },
+        {
+          "name": "Ghost Basics"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "binoculars",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -782,7 +1102,11 @@
         {
           "pack": "weapons",
           "name": "Glock 26 9mm",
-          "category": "weapons"
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
         },
         {
           "pack": "kits",
@@ -798,7 +1122,40 @@
           "pack": "vehicles",
           "name": "Car, mid-size sedan",
           "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug, audio (Caliber II)",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug sweeper, commercial",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Actor"
+        },
+        {
+          "name": "Concealed Carry"
+        },
+        {
+          "name": "Ghost Basics"
+        },
+        {
+          "name": "Charmer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -848,7 +1205,33 @@
           "pack": "gear",
           "name": "Computer, laptop (Caliber II)",
           "category": "gear"
+        },
+        {
+          "pack": "kits",
+          "name": "Authentication Kit I",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Examiner"
+        },
+        {
+          "name": "Scholar"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Examiner"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -902,7 +1285,34 @@
           "pack": "kits",
           "name": "Electronics Kit II",
           "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug sweeper, commercial",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Techie"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Techie"
+        },
+        {
+          "name": "False Start",
+          "choice": "Techie"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "storage-media",
+        "multitool"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -957,6 +1367,28 @@
           "name": "Computer, laptop (Caliber II)",
           "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Scholar"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Scholar"
+        },
+        {
+          "name": "False Start",
+          "choice": "Scholar"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -1011,7 +1443,33 @@
           "pack": "kits",
           "name": "Surgery Kit I",
           "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Bandage"
+        },
+        {
+          "name": "Examiner"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Examiner"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "stretcher"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -1066,6 +1524,30 @@
           "name": "Car, mid-size sedan",
           "category": "vehicles"
         }
+      ],
+      "feats": [
+        {
+          "name": "Defensive Driving"
+        },
+        {
+          "name": "Driving Instincts"
+        },
+        {
+          "name": "Speed Demon"
+        },
+        {
+          "name": "Need for Speed"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "road-flares",
+        "fire-extinguisher"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -1121,6 +1603,26 @@
           "name": "Car, full-size sedan",
           "category": "vehicles"
         }
+      ],
+      "feats": [
+        {
+          "name": "Diplomat"
+        },
+        {
+          "name": "Hustler"
+        },
+        {
+          "name": "Charmer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "briefcase",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -1180,7 +1682,37 @@
           "pack": "vehicles",
           "name": "Car, compact",
           "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Camera, still (commercial-grade)",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Tape recorder (consumer-grade)",
+          "category": "gear"
         }
+      ],
+      "feats": [
+        {
+          "name": "Private Eye"
+        },
+        {
+          "name": "Diplomat"
+        },
+        {
+          "name": "Charmer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
       ]
     },
     {
@@ -1227,7 +1759,20 @@
         }
       ],
       "group": false,
-      "loadout": []
+      "loadout": [],
+      "feats": [
+        {
+          "name": "Advisor"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ]
     }
   ]
 }
