@@ -1,0 +1,601 @@
+{
+  "_id": "254b6945a873ddd2",
+  "name": "Sample | Night Infiltration",
+  "width": 1536,
+  "height": 1024,
+  "padding": 0,
+  "grid": {
+    "type": 1,
+    "size": 64,
+    "distance": 5,
+    "units": "ft",
+    "alpha": 0.12
+  },
+  "navigation": false,
+  "active": false,
+  "tokenVision": true,
+  "fog": {
+    "mode": 0
+  },
+  "environment": {
+    "darknessLevel": 0.8,
+    "globalLight": {
+      "enabled": false
+    }
+  },
+  "levels": [
+    {
+      "_id": "defaultLevel0000",
+      "name": "Ground",
+      "background": {
+        "src": "systems/spycraft2/assets/scenes/night-infiltration.webp",
+        "color": "#20252b"
+      },
+      "elevation": {
+        "bottom": 0,
+        "top": null
+      }
+    }
+  ],
+  "initialLevel": "defaultLevel0000",
+  "walls": [
+    {
+      "_id": "0a11cf492e3b275e",
+      "c": [
+        87,
+        157,
+        1448,
+        157
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "ce551dba1178338d",
+      "c": [
+        1448,
+        157,
+        1448,
+        738
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "6ba99a94c51be9cf",
+      "c": [
+        1448,
+        807,
+        1448,
+        873
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "efbb966ac8642f4e",
+      "c": [
+        1448,
+        873,
+        87,
+        873
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "860f9c45456c476b",
+      "c": [
+        87,
+        873,
+        87,
+        157
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "94f19f8051ce9c40",
+      "c": [
+        510,
+        307,
+        944,
+        307
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "5879ce2655702090",
+      "c": [
+        944,
+        307,
+        944,
+        641
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "9943eae9fe97b918",
+      "c": [
+        944,
+        641,
+        774,
+        641
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "a0d5ed4fdedfb98f",
+      "c": [
+        682,
+        641,
+        510,
+        641
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "47fbca77ddd96d3b",
+      "c": [
+        510,
+        641,
+        510,
+        307
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "cbe2cec1d2c3e124",
+      "c": [
+        1090,
+        245,
+        1360,
+        245
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "87cbe99adb765e65",
+      "c": [
+        1360,
+        245,
+        1360,
+        504
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "305ae1ce59e8ea01",
+      "c": [
+        1360,
+        504,
+        1090,
+        504
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "0f0e37bb83fbd37e",
+      "c": [
+        1090,
+        504,
+        1090,
+        438
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "8dd11c651a700f94",
+      "c": [
+        1090,
+        390,
+        1090,
+        245
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "a4e02385cf8458c6",
+      "c": [
+        682,
+        641,
+        774,
+        641
+      ],
+      "door": 1,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "8addf344b74ab5c4",
+      "c": [
+        1090,
+        390,
+        1090,
+        438
+      ],
+      "door": 1,
+      "ds": 2,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "3b0d4532ddfca9b9",
+      "c": [
+        1448,
+        738,
+        1448,
+        807
+      ],
+      "door": 1,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "12d52f9a825a1366",
+      "c": [
+        214,
+        352,
+        350,
+        352
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "34d1229f7ed040dc",
+      "c": [
+        350,
+        352,
+        350,
+        504
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "4f32f3d958123d9b",
+      "c": [
+        350,
+        504,
+        214,
+        504
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    },
+    {
+      "_id": "36751ccacf960b50",
+      "c": [
+        214,
+        504,
+        214,
+        352
+      ],
+      "door": 0,
+      "ds": 0,
+      "move": 20,
+      "sight": 20,
+      "light": 20,
+      "sound": 20,
+      "dir": 0,
+      "levels": [
+        "defaultLevel0000"
+      ]
+    }
+  ],
+  "lights": [
+    {
+      "_id": "a251c46fe48539cf",
+      "x": 607,
+      "y": 659,
+      "levels": [
+        "defaultLevel0000"
+      ],
+      "walls": true,
+      "vision": false,
+      "config": {
+        "bright": 8,
+        "dim": 22,
+        "color": "#ffe4bc",
+        "alpha": 0.18,
+        "attenuation": 0.5
+      }
+    },
+    {
+      "_id": "4ccb8c0db4212e57",
+      "x": 730,
+      "y": 659,
+      "levels": [
+        "defaultLevel0000"
+      ],
+      "walls": true,
+      "vision": false,
+      "config": {
+        "bright": 8,
+        "dim": 22,
+        "color": "#ffe4bc",
+        "alpha": 0.18,
+        "attenuation": 0.5
+      }
+    },
+    {
+      "_id": "638ebebd50e3454a",
+      "x": 850,
+      "y": 659,
+      "levels": [
+        "defaultLevel0000"
+      ],
+      "walls": true,
+      "vision": false,
+      "config": {
+        "bright": 8,
+        "dim": 22,
+        "color": "#ffe4bc",
+        "alpha": 0.18,
+        "attenuation": 0.5
+      }
+    },
+    {
+      "_id": "adc97fc524ddeb83",
+      "x": 1076,
+      "y": 391,
+      "levels": [
+        "defaultLevel0000"
+      ],
+      "walls": true,
+      "vision": false,
+      "config": {
+        "bright": 8,
+        "dim": 22,
+        "color": "#ffe4bc",
+        "alpha": 0.18,
+        "attenuation": 0.5
+      }
+    },
+    {
+      "_id": "db5c667e75499025",
+      "x": 1468,
+      "y": 726,
+      "levels": [
+        "defaultLevel0000"
+      ],
+      "walls": true,
+      "vision": false,
+      "config": {
+        "bright": 8,
+        "dim": 22,
+        "color": "#ffe4bc",
+        "alpha": 0.18,
+        "attenuation": 0.5
+      }
+    },
+    {
+      "_id": "b194c774b70f6efb",
+      "x": 730,
+      "y": 430,
+      "levels": [
+        "defaultLevel0000"
+      ],
+      "walls": true,
+      "vision": false,
+      "config": {
+        "bright": 12,
+        "dim": 22,
+        "color": "#c7ddff",
+        "alpha": 0.18,
+        "attenuation": 0.5
+      }
+    },
+    {
+      "_id": "2dfd3081a194d636",
+      "x": 1220,
+      "y": 380,
+      "levels": [
+        "defaultLevel0000"
+      ],
+      "walls": true,
+      "vision": false,
+      "config": {
+        "bright": 8,
+        "dim": 16,
+        "color": "#78baff",
+        "alpha": 0.18,
+        "attenuation": 0.5
+      }
+    }
+  ],
+  "tokens": [],
+  "drawings": [],
+  "tiles": [],
+  "notes": [],
+  "sounds": [],
+  "regions": [],
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "spycraft2": {
+      "sampleScene": "night-infiltration"
+    }
+  },
+  "_stats": {
+    "coreVersion": "14.370",
+    "systemId": "spycraft2",
+    "systemVersion": "0.3.2"
+  }
+}

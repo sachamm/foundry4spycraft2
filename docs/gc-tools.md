@@ -1,6 +1,6 @@
 # Game Control tools
 
-Open the **GC Console** from the button at the top of the Actors sidebar (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros. Page references are printed page numbers.
+Open the **GC Console** from the first sidebar tab, marked with a spy icon (GC only), or run `game.spycraft2.gc.open()`. Every function is also available under `game.spycraft2.gc` for macros. Page references are printed page numbers.
 
 Foundry already supplies scenes, tokens, journals, roll tables and the combat tracker. These tools add what is specific to Spycraft 2.0.
 

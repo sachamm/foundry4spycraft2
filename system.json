@@ -227,6 +227,18 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "sample-scenes",
+      "label": "Sample Scenes",
+      "path": "packs/sample-scenes",
+      "type": "Scene",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -256,7 +268,8 @@
         "vehicle-upgrades",
         "equipment-upgrades",
         "contagions",
-        "gc-tables"
+        "gc-tables",
+        "sample-scenes"
       ]
     }
   ]
