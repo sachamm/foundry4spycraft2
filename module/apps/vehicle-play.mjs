@@ -28,6 +28,12 @@ import { gadgetDamage, gadgetState } from "../rules/gear-play-rules.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { explosionPlan } from "../rules/vehicle-environment.mjs";
 import { VEHICLE_STAT_KEYS, vehicleStats } from "../data/vehicle-fields.mjs";
+import {
+  collisionDamagePlan,
+  demolitionDerbyDamage,
+  crashOccupantPlan,
+  crashOccupantNote
+} from "../rules/collision.mjs";
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -588,5 +594,43 @@ export function loadVehicleStats(actor, item) {
     img: item.img,
     "system.sourceItem": item.uuid,
     ...Object.fromEntries(VEHICLE_STAT_KEYS.filter(key => key in stats).map(key => [`system.${key}`, stats[key]]))
+  });
+}
+
+/* ---------------------------------------------------------------------- */
+/*  Crashes                                                                */
+/* ---------------------------------------------------------------------- */
+
+/** Roll a vehicle's crash at a speed: its collision damage, then each occupant's Reflex save and share (p.366). */
+export async function crashVehicle(actor) {
+  const size = sizeCode(objectSize(actor));
+  const input = await ask(
+    loc`${actor.name}: crash`,
+    `<p>${loc`The vehicle takes collision damage at its own Size for its speed; each occupant saves against half of it.`}</p><label>${loc`Speed (MPH)`} <input name="mph" type="number" min="10" step="1" value="${actor.system.topMph ?? 30}" /></label>`
+  );
+  if (!input) return null;
+  const plan = collisionDamagePlan(size, Number(input.mph));
+  if (!plan.dice && !plan.flat)
+    return ui.notifications.warn(loc`At this Size and speed the crash does no collision damage.`);
+  const driver = actor.system.driver ? fromUuidSync(actor.system.driver) : null,
+    roll = plan.dice ? await new Roll(plan.formula).evaluate() : null,
+    faces = roll ? roll.dice.flatMap(d => d.results.map(r => r.result)) : [],
+    raw = roll ? roll.total : plan.flat,
+    damage = roll ? demolitionDerbyDamage(driver?.system, faces) : plan.flat,
+    dice = plan.dice || plan.flat;
+  if (roll)
+    await roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: esc(loc`${actor.name} crashes`) });
+  const people = [actor.system.driver, ...(actor.system.occupants ?? []).map(o => o.uuid)]
+    .filter(Boolean)
+    .map(uuid => fromUuidSync(uuid))
+    .filter(Boolean);
+  const lines = [
+    loc`${actor.name} crashes at ${input.mph} MPH: ${damage} ${plan.type} collision damage, armor-piercing (${plan.ap})${plan.takedown ? loc`, takedown` : ""}${damage !== raw ? loc` (Demolition Derby: 1 less per die from ${raw})` : ""}. Apply it to the vehicle with its Damage save.`,
+    ...people.map(p => crashOccupantNote(p.name, crashOccupantPlan(p.system, damage, dice))),
+    loc`A crashed participant leaves any chase (p.366).`
+  ];
+  return ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor }),
+    content: lines.map(l => `<p>${esc(l)}</p>`).join("")
   });
 }

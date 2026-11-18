@@ -25,7 +25,7 @@
     {{#if system.condition.immobilized}}· <strong class="bad">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Immobilized"}}</strong>{{/if}}
   </p>
   <p>
-    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Defense"}} <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>{{#if system.defenseNow.rows.length}} <span class="muted">({{#each system.defenseNow.rows}}{{label}} {{signed value}}{{#unless @last}}, {{/unless}}{{/each}})</span>{{/if}}
+    {{#if system.mountUp}}<span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.MountUpReflex"}} {{signed system.mountUp.reflex}}</span> {{/if}}    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Defense"}} <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>{{#if system.defenseNow.rows.length}} <span class="muted">({{#each system.defenseNow.rows}}{{label}} {{signed value}}{{#unless @last}}, {{/unless}}{{/each}})</span>{{/if}}
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave"}} <strong>{{#if (sc2eq system.damageSaveNow null)}}—{{else}}{{signed system.damageSaveNow}}{{/if}}</strong>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.Acceleration"}} <strong>{{#if (sc2eq system.condition.acceleration null)}}{{system.accelerationTurning}}{{else}}{{system.condition.acceleration}}{{/if}}</strong>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.Turning"}} <strong>{{#if (sc2eq system.condition.turning null)}}—{{else}}{{system.condition.turning}}{{/if}}</strong>
@@ -40,6 +40,7 @@
   </p>
   <p class="controls">
     <a data-action="controlCheck"><i class="fa-solid fa-car-side"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.ControlCheck"}}</a>
+    <a data-action="crash"><i class="fa-solid fa-car-burst"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Crash"}}</a>
     · <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave2"}}</a>
     · <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleDamageResult"}}</a>
     · <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TyreSave"}}</a>

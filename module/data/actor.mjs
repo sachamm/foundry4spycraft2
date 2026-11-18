@@ -41,6 +41,7 @@ import {
 } from "../rules/vehicle-play-rules.mjs";
 import { SKILLS } from "../rules/tables.mjs";
 import { underminedState } from "../rules/taunt.mjs";
+import { mountUpPlan } from "../rules/driving-feats.mjs";
 import {
   HAZARD_GROUPS,
   accelerationSchedule,
@@ -760,7 +761,10 @@ export class VehicleActorData extends foundry.abstract.TypeDataModel {
     this.mountName = mount?.name ?? "";
     this.attackerName = attacker?.name ?? "";
     // A mount whose table entry says "NPC" takes its Defense and Damage save from the linked NPC.
-    const baseDefense = Number.isSafeInteger(this.defense) ? this.defense : (mount?.system?.defense?.total ?? null);
+    let baseDefense = Number.isSafeInteger(this.defense) ? this.defense : (mount?.system?.defense?.total ?? null);
+    // Mount Up (p.192): a ridden mount uses the rider's Defense and Reflex save bonus when they are higher.
+    this.mountUp = mountUpPlan(this, driver?.system, mount?.system);
+    if (this.mountUp && Number.isSafeInteger(baseDefense)) baseDefense = Math.max(baseDefense, this.mountUp.defense);
     const baseSave = Number.isSafeInteger(this.upgraded.damageSave)
       ? this.upgraded.damageSave
       : (mount?.system?.damageSave ?? null);

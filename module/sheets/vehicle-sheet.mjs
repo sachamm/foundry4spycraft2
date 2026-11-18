@@ -10,6 +10,7 @@ import {
   refuel,
   repairVehicle,
   rollControlCheck,
+  crashVehicle,
   rollFuelExplosion,
   rollObjectDamageSave,
   rollTyreSave,
@@ -110,6 +111,9 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
       },
       controlCheck() {
         return rollControlCheck(this.actor);
+      },
+      crash() {
+        return crashVehicle(this.actor);
       },
       spendFuel() {
         return spendFuel(this.actor);

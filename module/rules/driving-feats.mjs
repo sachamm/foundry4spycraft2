@@ -31,3 +31,21 @@ export function crewDamageSaveBonus(driver, occupants = []) {
 }
 
 export const simulatorJockey = driver => feats(driver).includes("Simulator Jockey");
+
+/**
+ * Mount Up (p.192): a mount the character rides uses the rider's Defense and Reflex save bonus when they are higher.
+ * Returns the values to use, or null when the feat does not apply.
+ */
+export function mountUpPlan(vehicle, riderSystem, mountSystem) {
+  if (vehicle?.vehicleClass !== "M/AD" || !riderSystem?.activeFeatNames?.includes("Mount Up")) return null;
+  const riderDefense = Number(riderSystem.defense?.total),
+    riderReflex = Number(riderSystem.saves?.ref?.total),
+    mountReflex = Number(mountSystem?.saves?.ref?.total);
+  return {
+    defense: Number.isFinite(riderDefense) ? riderDefense : -Infinity,
+    reflex: Math.max(
+      Number.isFinite(riderReflex) ? riderReflex : -Infinity,
+      Number.isFinite(mountReflex) ? mountReflex : -Infinity
+    )
+  };
+}
