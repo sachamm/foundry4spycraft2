@@ -9,6 +9,7 @@ import { knifeBasicsPlan } from "./knife-basics.mjs";
 import { swordBasicsPlan } from "./sword-basics.mjs";
 import { berserkerRageState } from "./berserker.mjs";
 import { favoredGearState } from "./favored-gear.mjs";
+import { duelingAllDodge } from "./dueling-basics.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -351,6 +352,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
       rank: 1,
       bonuses: ["saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "1" }))
     });
+  // Dueling Basics, p.178: +1 dodge against all attacks for the declared round when no opponent was chosen.
+  if (duelingAllDodge(sys))
+    sources.push({ name: "Dueling Basics", rank: 1, bonuses: [{ target: "defense", value: "1", bonusType: "dodge" }] });
   // Dueling Supremacy, p.178: +2 dodge bonus to Defense.
   if (sys.activeFeatNames?.includes("Dueling Supremacy"))
     sources.push({

@@ -300,7 +300,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Club Basics | 177 | No | Covered (batch 375): readied reviewed club waives the −4 lethal/subdual conversion penalty; improvised clubs take no improvised penalty; Furious Stance raises the Count at round end by the round’s melee attacks; Out of the Park +2 attack/+2 damage/+2 threat | Native Foundry QA not claimed |
 | Darting Weapon | 178 | No | Start-of-own-Count −2 timed attack/skill tradeoff and one counted final melee/unarmed/hurled Standard Attack execute; current weapon/Count/receipt validated. Shared Nauseated final-attack allowance now executes across the five implemented final-attack controls | — |
 | Flashing Weapon | 178 | No | Earned two-attack/−4 Darting choice executes with durable declaration-scoped counters and own-next-Count expiry; shared Nauseated final-attack limit executes | — |
-| Dueling Basics | 178 | No | Manual/descriptive | — |
+| Dueling Basics | 178 | No | Covered (batch 403): an own-Count declaration grants +1 dodge against all attacks (prepared with Defense) or +2 dodge against a chosen opponent (Incoming attack preview) for 1 full round; once per round a melee attack may target an opponent 5 ft. beyond Reach, and a miss offers flat-footed on the card | Native Foundry QA not claimed |
 | Dueling Mastery | 178 | No | Covered (batch 385): +1 Defense while a readied melee weapon is held; a GC control on an adjacent attacker’s resolved miss lowers that attacker’s Initiative Count by 2, once per attack; unarmed stances are not modelled, so melee attacks in them are not restricted | Native Foundry QA not claimed |
 | Dueling Supremacy | 178 | No | Covered (batch 385): +2 dodge bonus to Defense; each resolved melee-weapon hit offers +1 Initiative Count, once per hit | Native Foundry QA not claimed |
 | Fencing Basics | 178 | No | Implemented: Disarm/Feint gear benefit, Remiss final attack and Side Stance | Batches333–346: reviewed FIN sword; recorded opponent/attack sources; one pending Side die, Defense−1 and reviewed20ft round movement cap |
@@ -1833,3 +1833,13 @@ Source: rules reference pp.172–175 (local markdown edition; original PDF pages
 - Reminders: Fire-Team Supremacy, Horde Supremacy and Tac-Squad Basics and Supremacy leave the list; Horde Mastery now points at Athletics. The reminder data test’s floor is lowered to 25, as the list shrinks while feats are automated.
 
 Verification: 3435 of 3436 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 43 manual / 63 partial / 208 other; at least 106 of 314 explicitly unfinished; 90 whole-feat closures.
+
+## Residual implementation batch 403 — Dueling Basics
+
+Source: rules reference p.178 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/dueling-basics.mjs`, `module/apps/dueling-basics.mjs`. A Main-tab declaration during the character’s own Count stores `system.duelingBasics` (new field, record shape and combat context), timed like Total Defense until the start of the next own Count.
+- Without a chosen opponent, +1 dodge against all attacks is prepared with Defense. With one, the Incoming attack preview adds +2 dodge (none when vulnerable) when the attack is declared to come from that opponent.
+- The extra Reach: an attack-dialog option for melee attacks, refused if another attack this combat round already used it. A resolved miss offers “Dueling Basics miss: become flat-footed”, once.
+
+Verification: 513 legacy assertions, 3438 of 3439 Node tests (3 new), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 42 manual / 63 partial / 209 other; at least 105 of 314 explicitly unfinished; 91 whole-feat closures.

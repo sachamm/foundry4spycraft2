@@ -67,7 +67,7 @@ export async function checkIncomingDefense(actor) {
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Incoming attack — Defense` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`}</p>${coverInput}${circlingInput}${ghostCoverContent(actor)}${whirlingDefenseContent(actor)}${Object.entries(
+    content: `<div class="spycraft2-roll-options"><p>${loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`}</p>${coverInput}${circlingInput}${ghostCoverContent(actor)}${actor.system.duelingBasics?.opponentUuid && actor.system.activeFeatNames?.includes("Dueling Basics") ? `<label><input name="fromDuelingOpponent" type="checkbox" /> ${loc`Dueling Basics: this attack comes from ${esc(actor.system.duelingBasics.opponentName || "the chosen opponent")} (+2 dodge)`}</label>` : ""}${whirlingDefenseContent(actor)}${Object.entries(
       fields
     )
       .map(([key, label]) => `<label><input name="${key}" type="checkbox" /> ${label}</label>`)
@@ -155,6 +155,7 @@ export async function checkIncomingDefense(actor) {
     if (circlingSource && [source?.attacker, precision].some(a => a && a !== circlingSource))
       throw new Error(loc`The Circling Stance and cover-reduction declarations must name the same actual attacker.`);
     plan = incomingDefensePlan(actor.system, {
+      fromDuelingOpponent: input.fromDuelingOpponent === true,
       cover,
       circling: circlingSource
         ? {

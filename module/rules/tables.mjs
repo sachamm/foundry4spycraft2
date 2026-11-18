@@ -11352,10 +11352,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:sleightOfHand",
   "text": "Gain underhanded tricks such as blinding eye gouges and improved feints."
  },
- "Dueling Basics": {
-  "rolls": "attack",
-  "text": "Choose a foe each round for +2 dodge Defense against them (or +1 vs. everyone), and occasionally strike 5 ft. beyond your Reach."
- },
  "Executioner": {
   "rolls": "attack",
   "text": "Once per round, Coup de Grace a helpless character as a half action."

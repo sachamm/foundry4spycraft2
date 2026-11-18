@@ -7,6 +7,7 @@ import { totalDefenseState } from "./total-defense.mjs";
 import { coverPlan } from "./cover.mjs";
 import { circlingDefensePlan } from "./knife-basics.mjs";
 import { wrestlingDefense } from "./wrestling.mjs";
+import { duelingChosenDodge } from "./dueling-basics.mjs";
 import { knownSneakAttackImmunity } from "./sneak-attack.mjs";
 import { attributeCollapsePlan, attributeDefensePlan } from "./attributes.mjs";
 import { loc } from "../i18n.mjs";
@@ -114,12 +115,14 @@ export function incomingDefensePlan(system, options = {}) {
   const sharpshooter = sharpshooterDefensePlan(system, { ...options.cover, ranged }),
     greatSword = greatSwordDefensePlan(system, { ranged }),
     guard = guardDefensePlan(system, { ranged }),
-    wrestling = wrestlingDefense(system, { adjacent, ranged });
+    wrestling = wrestlingDefense(system, { adjacent, ranged }),
+    dueling = vulnerable ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent);
   const total =
     -circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
     wrestling +
+    dueling +
     greatSword.increment +
     cover.defenseBonus +
     system.defense.total +
@@ -184,6 +187,7 @@ export function incomingDefensePlan(system, options = {}) {
           ]
         : []),
       ...(wrestling ? [loc`Wrestling Basics: +1 to Defense against this adjacent opponent (p.189).`] : []),
+      ...(dueling ? [loc`Dueling Basics: +2 dodge against the opponent you chose this round (p.178).`] : []),
       ...(circling.shifting
         ? [
             circling.active

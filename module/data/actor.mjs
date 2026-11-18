@@ -293,6 +293,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       stanceRoundMovement: record("stanceRoundMovement", { nullable: true, initial: null }),
       combatStance: record("combatStance", { nullable: true, initial: null }),
       berserkerRage: record("berserkerRage", { nullable: true, initial: null }),
+      duelingBasics: record("duelingBasics", { nullable: true, initial: null }),
       twoWeaponStyle: record("twoWeaponStyle", { nullable: true, initial: null }),
       dartingStyle: record("dartingStyle", { nullable: true, initial: null }),
       totalDefense: record("totalDefense", { nullable: true, initial: null }),
@@ -433,6 +434,25 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         c.actor?.uuid === this.parent.uuid &&
         (!this.totalDefense?.combatantId || c.id === this.totalDefense.combatantId)
     );
+    // Dueling Basics' declaration is timed like Total Defense, from the character's own Count.
+    const duelingCombat = this.duelingBasics?.combatId
+      ? globalThis.game?.combats?.get?.(this.duelingBasics.combatId)
+      : this.parent.participatingCombat;
+    const duelingOwn = duelingCombat?.turns?.find(
+      c =>
+        c.actor?.uuid === this.parent.uuid &&
+        (!this.duelingBasics?.combatantId || c.id === this.duelingBasics.combatantId)
+    );
+    this.duelingCombatContext = duelingCombat
+      ? {
+          id: duelingCombat.id,
+          started: duelingCombat.started,
+          round: duelingCombat.round,
+          turn: duelingCombat.turn,
+          combatantId: duelingOwn?.id,
+          ownTurnIndex: duelingCombat.turns?.findIndex(c => c.id === duelingOwn?.id) ?? -1
+        }
+      : null;
     this.totalDefenseCombatContext = totalDefenseCombat
       ? {
           id: totalDefenseCombat.id,
