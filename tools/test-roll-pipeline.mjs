@@ -673,6 +673,7 @@ const EXPECTED_ORDER = [
   "shatterWeaponControl",
   "applyDamageControl",
   "medicalAidControl",
+  "reportedSaveControl",
   "terrainRecord",
   "trackingRecord",
   "twoWeaponStateRecord",

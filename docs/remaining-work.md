@@ -322,12 +322,32 @@ the Foundry side is in `module/apps/damage-application.mjs`, `healing.mjs`, `opp
       (or takes a typed one), settles ties by bonus and then a roll-off, and confirms both checks when you own both.
       The grapple and Dramatic Conflict dialogs show the latest results beside their typed totals.
 
-Not done: the Fortitude save and critical injury for a massive hit are reported, not rolled; a special NPC's stress
-and subdual damage is compared with its thresholds by hand (only agents keep a ledger); special damage types still go
-through "Other damage types"; damage is applied to one target at a time, so a blast is applied target by target; a
-player cannot apply damage to a character they do not own; grapple benefits after the opening check (Pin, Sprawl)
-are still set by hand; stress and subdual recovery over time is not applied by "Rest and recover".
+Finished later on 2026-11-18 (the items first left to the table):
+
+- [x] **Saves a report calls for.** A hit of 25 or more posts its report as a card with "Roll the Fortitude save":
+      the button makes the character's save through the usual save roll (its dialog opens where the character has
+      one), and the save card's "Apply this save's result" rolls the critical injury on a failure and drops wounds
+      to –9 for a hit of 50 or more.
+- [x] **Special NPCs' stress and subdual damage.** Two running totals on the NPC (shown on its sheet, editable).
+      Damage reduction counts twice against subdual damage; when a threshold or a critical hit calls for a save the
+      report carries the Will or Fortitude button, and a failed subdual save sets unconscious with its duration.
+- [x] **Special damage types.** The apply dialog has a "Special damage type" choice, filled in from the weapon. For an
+      agent it hands the damage to that type's own rules (the existing dialog opens with the type, amount and
+      remaining damage reduction filled in); fire goes to the fire hazard.
+- [x] **Blasts.** "Apply the blast to everyone caught" on a blast weapon's damage card lists the characters you own,
+      with distances measured from the targeted token when there is a scene, and settles each at its halved damage.
+- [x] **Grapple benefits.** After a check that earns benefits the winner picks them; Pin, Sprawl, Throw, Mute, Escape
+      Hold and Break Pin change the conditions on both sides.
+- [x] **Stress and subdual recovery.** "Rest and recover" wears both off over the time rested, at the rate the
+      current total sets (faster as it falls), for agents and special NPCs.
+
+Still left to the table: a player cannot apply damage to a character they do not own; a failed stress save on a
+special NPC names the Shaken grade and leaves it to "Apply Shaken"; a special damage type on an NPC is applied as
+ordinary damage with its other effects by hand; blast distances ignore walls and cover; a grapple benefit's damage
+(Injure, Throw, Sprawl) is rolled from the weapon card and applied separately.
 
 To check in Foundry (Foundry was running, so these were covered by unit tests only): each new chat button on a live
-card, the reload line on the agent and NPC sheets, the shot fields on the weapon sheet, the new token statuses, and a
-player without ownership of the target being refused.
+card, the reload line on the agent and NPC sheets, the shot fields on the weapon sheet, the new token statuses, a
+player without ownership of the target being refused, the save buttons on a damage report and the save card that
+follows, the blast dialog with and without a targeted token, the grapple benefit dialog, and the stress and subdual
+fields on a special NPC's sheet.

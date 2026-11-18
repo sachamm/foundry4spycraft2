@@ -14,6 +14,12 @@ Not yet tried in a running Foundry world; see `docs/remaining-work.md` for the c
 - Healing: "Rest and recover", First Aid and Stabilize applied from their checks, and a dying character's roll.
 - Opposed checks: "Compare with an opposing check" on a rolled skill check.
 - More token statuses (stunned, dazed, helpless, dying and others); an opening grapple check sets its conditions.
+- A damage report that calls for a save (a hit of 25 or more, a special NPC's stress or subdual threshold) carries a
+  button that rolls the character's save; the save card applies the critical injury, –9 wounds or knockout.
+- Special NPCs keep stress and subdual totals (`flags.spycraft2.nonLethal`), shown on their sheet.
+- The apply-damage dialog can hand a special damage type to an agent's own rules, and "Apply the blast to everyone
+  caught" settles each character in a blast.
+- Grapple benefits the winner picks change conditions; "Rest and recover" wears off stress and subdual damage.
 - Feat reminders: feats the system does not work out are listed in roll dialogs for the rolls they bear on, and the
   ones ticked are noted on the check. New feat field `system.reminder`; schema version 2 fills it for feats already
   in a world.

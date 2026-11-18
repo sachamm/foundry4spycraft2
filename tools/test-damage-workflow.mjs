@@ -10,6 +10,18 @@ globalThis.foundry = {
   applications: { api: { DialogV2: { input: async () => null } } }
 };
 globalThis.ui = { notifications: { warn: text => (warnings.push(text), null), info: () => null } };
+globalThis.Roll = class {
+  constructor(formula) {
+    this.formula = formula;
+  }
+  async evaluate() {
+    // Every die shows 5: "1d20 + 31" is 36.
+    this.total = String(this.formula)
+      .split("+")
+      .reduce((sum, part) => sum + (/d/.test(part) ? 5 : Number(part)), 0);
+    return this;
+  }
+};
 globalThis.ChatMessage = {
   getSpeaker: ({ actor }) => ({ alias: actor?.name }),
   create: async data => (posted.push(data), data)
@@ -24,10 +36,17 @@ globalThis.game = {
 globalThis.fromUuidSync = uuid => registry.get(uuid) ?? null;
 globalThis.fromUuid = async uuid => registry.get(uuid) ?? null;
 globalThis.CONFIG = {
-  statusEffects: ["fatigued", "unconscious", "dying", "dead", "flat-footed"].map(id => ({ id, name: id, img: "" }))
+  statusEffects: ["fatigued", "unconscious", "dying", "dead", "flat-footed", "held", "pinned", "sprawled", "prone"].map(
+    id => ({ id, name: id, img: "" })
+  )
 };
 
-const { resolveAttack, applyDamage, defenseOf } = await import("../module/apps/damage-application.mjs");
+const { resolveAttack, applyDamage, applyBlast, defenseOf, rollReportedSave, nonLethalTotals } =
+  await import("../module/apps/damage-application.mjs");
+const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
+const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
+const { settleGrapple } = await import("../module/apps/combat-actions.mjs");
+const { restAndRecover } = await import("../module/apps/healing.mjs");
 const { reloadWeapon, spendWeaponShots, weaponAmmunition } = await import("../module/apps/ammunition-use.mjs");
 const { compareOpposed, recentResults } = await import("../module/apps/opposed-checks.mjs");
 
@@ -228,4 +247,186 @@ test("an opposed check is compared with the other side's posted result and both 
     naturalDie: 3
   });
   assert.equal((await compareOpposed(again, { total: 15 })).outcome, "lost");
+});
+
+test("a hit of 25 or more posts a report whose button rolls the character's Fortitude save", async () => {
+  reset();
+  const saves = [];
+  const guard = character("Boss", {
+    vitality: { value: 80, max: 80 },
+    wounds: { value: 14, max: 14 },
+    abilities: { con: { value: 14 } },
+    npcType: "special"
+  });
+  guard.type = "npc";
+  guard.rollSave = async (key, options) => (saves.push([key, options]), { flags: { spycraft2: {} } });
+  const damage = card("d3", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 52 });
+  await applyDamage(damage, { targetUuid: guard.uuid, damage: 52, kind: "lethal" });
+  const report = posted.at(-1);
+  assert.match(report.content, /Fortitude save DC 26/);
+  assert.deepEqual(
+    [report.flags.spycraft2.checkKind, report.flags.spycraft2.pendingSave.kind, report.flags.spycraft2.pendingSave.dc],
+    ["note", "massiveDamage", 26]
+  );
+  // The report is a card of its own: only the save button appears under it.
+  const note = card("n1", report.flags.spycraft2);
+  const buttons = rollPipeline.chatControls({
+    message: note,
+    check: note.flags.spycraft2,
+    actor: guard,
+    user: game.user,
+    checkKind: "note"
+  });
+  assert.deepEqual(
+    buttons.map(b => b.label),
+    ["Roll the Fortitude save (DC 26)"]
+  );
+  await rollReportedSave(note);
+  assert.equal(saves.length, 1);
+  assert.equal(saves[0][0], "fort");
+  assert.equal(saves[0][1].askContext, true, "the usual save dialog is offered");
+  assert.deepEqual(
+    [saves[0][1].hazardSave.kind, saves[0][1].hazardSave.dc, saves[0][1].hazardSave.toMinusNine],
+    ["massiveDamage", 26, true]
+  );
+  assert.equal(note.flags.spycraft2.pendingSave.rolled, true);
+  await rollReportedSave(note);
+  assert.equal(saves.length, 1, "the save is rolled once");
+  // A cancelled save leaves the button for another try.
+  const again = card(
+    "n2",
+    report.flags.spycraft2 && {
+      ...report.flags.spycraft2,
+      pendingSave: { ...report.flags.spycraft2.pendingSave, rolled: false }
+    }
+  );
+  guard.rollSave = async () => null;
+  await rollReportedSave(again);
+  assert.equal(again.flags.spycraft2.pendingSave.rolled, false);
+});
+
+test("a failed massive-damage save rolls a critical injury and drops wounds to –9 for a hit of 50 or more", async () => {
+  reset();
+  const boss = character("Boss2", {
+    vitality: { value: 28, max: 80 },
+    wounds: { value: 14, max: 14 },
+    npcType: "special"
+  });
+  boss.type = "npc";
+  const resolve = hazardSaveResolvers.get("massiveDamage");
+  await resolve(boss, { id: "s9" }, { damage: 31, toMinusNine: false }, true);
+  assert.match(posted.at(-1).content, /no critical injury/);
+  await resolve(boss, { id: "s9" }, { damage: 52, toMinusNine: true }, false);
+  assert.equal(boss.system.wounds.value, -9);
+  assert.equal(boss.statuses.has("dying"), true);
+  assert.match(posted.at(-1).content, /Critical injury \(57\)/);
+  assert.match(posted.at(-1).content, /wounds drop to -9/);
+});
+
+test("a special NPC's stress and subdual damage is totalled and its threshold save offered", async () => {
+  reset();
+  const boss = character("Boss3", { abilities: { con: { value: 10 }, wis: { value: 12 } }, npcType: "special" });
+  boss.type = "npc";
+  const damage = card("d4", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 8 });
+  await applyDamage(damage, { targetUuid: boss.uuid, damage: 8, kind: "subdual" });
+  assert.deepEqual(nonLethalTotals(boss), { stress: 0, subdual: 8 });
+  assert.equal(posted.at(-1).flags, undefined, "below the threshold: no save");
+  await applyDamage(damage, { targetUuid: boss.uuid, damage: 6, kind: "subdual" });
+  assert.equal(nonLethalTotals(boss).subdual, 14);
+  const save = posted.at(-1).flags.spycraft2.pendingSave;
+  assert.deepEqual([save.kind, save.saveKey, save.dc, save.damageKind], ["thresholdSave", "fort", 12, "subdual"]);
+  await hazardSaveResolvers.get("thresholdSave")(boss, {}, save, false, { effectiveTotal: 7 });
+  assert.equal(boss.statuses.has("unconscious"), true);
+  assert.match(posted.at(-1).content, /unconscious for 2 round/);
+});
+
+test("a blast is applied to each character caught, halved by distance", async () => {
+  reset();
+  const near = character("Near", {
+    vitality: { value: 40, max: 40 },
+    wounds: { value: 12, max: 12 },
+    npcType: "special"
+  });
+  const far = character("Far", {
+    vitality: { value: 40, max: 40 },
+    wounds: { value: 12, max: 12 },
+    npcType: "special"
+  });
+  near.type = far.type = "npc";
+  const damage = card("d5", {
+    actorUuid: "Actor.Kevin",
+    checkKind: "damage",
+    effectiveTotal: 20,
+    weaponQualities: "BLS (5 ft.)"
+  });
+  await applyBlast(damage, {
+    kind: "lethal",
+    type: "",
+    targets: [
+      { uuid: near.uuid, distanceFeet: 0 },
+      { uuid: far.uuid, distanceFeet: 10 }
+    ]
+  });
+  assert.deepEqual([near.system.vitality.value, far.system.vitality.value], [20, 35]);
+  assert.equal(damage.flags.spycraft2.damageApplied.length, 2);
+});
+
+test("a special damage type is handed to an agent's own rules, with the dialog offered for review", async () => {
+  reset();
+  const agent = character("Agent", {
+    vitality: { value: 40, max: 40 },
+    wounds: { value: 12, max: 12 },
+    dr: { other: 3 }
+  });
+  const asked = [];
+  agent.rollSave = async (key, options) => (asked.push([key, options.hazardSave]), { flags: {} });
+  const damage = card("d6", { actorUuid: "Actor.Kevin", checkKind: "damage", effectiveTotal: 18 });
+  await applyDamage(damage, { targetUuid: agent.uuid, damage: 18, kind: "lethal", type: "bang", attackKind: "other" });
+  assert.deepEqual(asked, [["fort", { kind: "bang", label: asked[0][1].label, dc: 18 }]]);
+  assert.equal(agent.system.vitality.value, 40, "bang damage is a save, not lost vitality");
+});
+
+test("grapple benefits the winner takes change conditions on both sides", async () => {
+  reset();
+  const kevin = character("Grappler", { activeFeatNames: [] });
+  const foe = character("Foe", {});
+  const remove = who => async () => who.statuses.clear();
+  foe.deleteEmbeddedDocuments = remove(foe);
+  await settleGrapple(kevin, { opening: true, total: 20, opponentTotal: 12, opponentUuid: foe.uuid, benefits: [] });
+  assert.equal(foe.statuses.has("held"), true);
+  await settleGrapple(kevin, {
+    opening: false,
+    total: 22,
+    opponentTotal: 12,
+    opponentUuid: foe.uuid,
+    benefits: ["pin"]
+  });
+  assert.equal(foe.statuses.has("pinned"), true);
+  assert.match(posted.at(-1).content, /Foe is now pinned/);
+  await settleGrapple(kevin, {
+    opening: false,
+    total: 22,
+    opponentTotal: 12,
+    opponentUuid: foe.uuid,
+    benefits: ["sprawl"]
+  });
+  assert.deepEqual([foe.statuses.has("sprawled"), kevin.statuses.has("prone")], [true, true]);
+  assert.match(posted.at(-1).content, /1d4 \+ Strength subdual/);
+});
+
+test("rest wears off a special NPC's stress and subdual damage", async () => {
+  reset();
+  const boss = character("Rester", {
+    vitality: { value: 10, max: 40 },
+    wounds: { value: 12, max: 12 },
+    abilities: { con: { value: 10 }, wis: { value: 12 } },
+    effectiveThreatLevel: 4,
+    npcType: "special"
+  });
+  boss.type = "npc";
+  boss.flags.spycraft2 = { nonLethal: { stress: 6, subdual: 14 } };
+  await restAndRecover(boss, { hours: 1, days: 0 });
+  assert.equal(boss.system.vitality.value, 14);
+  assert.deepEqual(nonLethalTotals(boss), { stress: 0, subdual: 0 });
+  assert.match(posted.at(-1).content, /subdual damage 14 → 0/);
 });

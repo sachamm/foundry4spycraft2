@@ -11,6 +11,7 @@ import {
   blastProfile,
   burstHits,
   coverFireDC,
+  grappleBenefitChanges,
   grappleBenefitText,
   grappleOutcome,
   grappleSizeBonus,
@@ -284,8 +285,7 @@ const grappleTargeted = () => {
 
 /** Set the conditions an opening grapple check brings (p.356) on the characters this user owns. */
 async function grappleConditions(actor, input, outcome) {
-  const manual = loc`Record Held, Pinned, Sprawled or Flat-footed with the token's condition controls.`;
-  if (!input.opening || outcome.winner === "tie") return [manual];
+  if (!input.opening || outcome.winner === "tie") return [];
   const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
   const set = async (who, id, label) => {
     if (!who?.isOwner) return loc`${esc(who?.name ?? loc`The opponent`)}: set ${label} by hand.`;
@@ -299,6 +299,81 @@ async function grappleConditions(actor, input, outcome) {
   if (outcome.winner === "actor") return [await set(opponent, "held", loc`Held`)];
   const decisive = input.opponentCritical === true || input.criticalFailure === true;
   return [decisive ? await set(actor, "sprawled", loc`Sprawled`) : await set(actor, "flat-footed", loc`Flat-footed`)];
+}
+
+const CONDITION_LABELS = () => ({
+  held: loc`Held`,
+  pinned: loc`Pinned`,
+  sprawled: loc`Sprawled`,
+  prone: loc`Prone`,
+  mute: loc`Mute`
+});
+
+/**
+ * Let the winner of a grapple check take the benefits it earned, and change the conditions they bring on the
+ * characters this user owns. `input.benefits` (a list of benefit ids) skips the dialog.
+ */
+async function grappleBenefitsChosen(actor, input, outcome) {
+  if (!outcome.benefits || outcome.winner === "tie") return [];
+  const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+  const winner = outcome.winner === "actor" ? actor : opponent,
+    loser = outcome.winner === "actor" ? opponent : actor;
+  let chosen = input.benefits;
+  if (!Array.isArray(chosen)) {
+    const list = GRAPPLE_BENEFITS.map(benefit => {
+      const [name, summary] = grappleBenefitText(benefit.id);
+      return `<option value="${benefit.id}">${esc(name)} — ${esc(summary)}</option>`;
+    }).join("");
+    const picked = await systemDialog.input({
+      window: {
+        title: loc`${winner?.name ?? loc`The opponent`}: ${outcome.benefits} grapple benefit(s)`
+      },
+      rejectClose: false,
+      ok: { label: loc`Take` },
+      content: `<div class="spycraft2-roll-options">${Array.from(
+        { length: outcome.benefits },
+        (_, index) =>
+          `<label>${loc`Benefit ${index + 1}`} <select name="benefit${index}"><option value="">${loc`Decide later`}</option>${list}</select></label>`
+      ).join(
+        ""
+      )}<p class="hint">${loc`Pin, Sprawl, Throw, Mute, Escape Hold and Break Pin change conditions on the characters you own. The others are carried out at the table.`}</p></div>`
+    });
+    if (!picked) return [];
+    chosen = Array.from({ length: outcome.benefits }, (_, index) => picked[`benefit${index}`]).filter(Boolean);
+  }
+  if (!chosen.length) return [];
+  const labels = CONDITION_LABELS(),
+    lines = [
+      loc`${esc(winner?.name ?? loc`The opponent`)} takes: ${chosen.map(id => esc(grappleBenefitText(id)[0])).join(", ")}.`
+    ];
+  for (const change of grappleBenefitChanges(chosen)) {
+    const who = change.side === "winner" ? winner : loser,
+      label = labels[change.id] ?? change.id;
+    // Removing a condition the character does not have is nothing to report.
+    if (!change.active && who?.isOwner && !who.statuses?.has(change.id)) continue;
+    if (!who?.isOwner) {
+      lines.push(
+        change.active
+          ? loc`${esc(who?.name ?? loc`The other character`)}: set ${label} by hand.`
+          : loc`${esc(who?.name ?? loc`The other character`)}: clear ${label} by hand.`
+      );
+      continue;
+    }
+    try {
+      await setConditionStatus(who, change.id, change.active, { label });
+      lines.push(
+        change.active
+          ? loc`${esc(who.name)} is now ${label.toLowerCase()}.`
+          : loc`${esc(who.name)} is no longer ${label.toLowerCase()}.`
+      );
+    } catch (error) {
+      lines.push(loc`${esc(who.name)}: ${label} could not be changed (${esc(error.message)}).`);
+    }
+  }
+  if (chosen.includes("sprawl")) lines.push(loc`Sprawl Opponent: roll 1d4 + Strength subdual damage and apply it.`);
+  if (chosen.some(id => ["injure", "throw", "useWeapon"].includes(id)))
+    lines.push(loc`Roll the damage from the weapon's card and apply it to the opponent.`);
+  return lines;
 }
 
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */
@@ -352,5 +427,7 @@ export async function settleGrapple(actor, options = {}) {
     ...benefits,
     ...(await grappleConditions(actor, input, outcome))
   ]);
+  const taken = await grappleBenefitsChosen(actor, input, outcome);
+  if (taken.length) await post(actor, taken);
   return outcome;
 }
