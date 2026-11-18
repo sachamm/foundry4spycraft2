@@ -2,6 +2,7 @@
  * Vehicle play rules beyond damage (pp.289–297): qualities, fuel, crew and occupants, control checks and upgrades.
  * Pure functions: no Foundry access. Damage rules live in ./vehicles.mjs.
  */
+import { simulatorJockey } from "./driving-feats.mjs";
 import { VEHICLE_RULES } from "./tables.mjs";
 import { SIZE_CODES, sizeCode, vehicleClass } from "./vehicles.mjs";
 import { loc } from "../i18n.mjs";
@@ -208,8 +209,11 @@ export function controlCheckPlan(vehicle, driver, { hazards = null } = {}) {
     notes.push(loc`Lift damage: error +${lift}.`);
   }
   if (hasQuality(qualities, "DRN")) {
-    errorIncrease += 1;
-    notes.push(loc`Drone: error +1.`);
+    if (simulatorJockey(driver)) notes.push(loc`Drone: Simulator Jockey ignores its penalties.`);
+    else {
+      errorIncrease += 1;
+      notes.push(loc`Drone: error +1.`);
+    }
   }
   if (hazards?.rows?.length) {
     penalty += hazards.modifier;

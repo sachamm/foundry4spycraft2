@@ -115,7 +115,7 @@ export async function rollObjectDamageSave(doc, options = {}) {
   ];
   if (vehicle && bonus !== doc.system.damageSave)
     lines.push(
-      loc`Save bonus +${bonus}${hasQuality(qualities, "RGD") ? loc` (Rugged included)` : ""}${input.fire && flammable ? loc` (Flammable −5)` : ""}.`
+      loc`Save bonus +${bonus}${hasQuality(qualities, "RGD") ? loc` (Rugged included)` : ""}${doc.system?.crewSave?.notes?.length ? ` (${doc.system.crewSave.notes.join(", ")})` : ""}${input.fire && flammable ? loc` (Flammable −5)` : ""}.`
     );
   if (!failed) lines.push(loc`Saved.`);
   else

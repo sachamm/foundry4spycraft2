@@ -1,3 +1,4 @@
+import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "../rules/cheap-shot-effects.mjs";
 import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
@@ -689,9 +690,15 @@ export class VehicleActorData extends foundry.abstract.TypeDataModel {
       turning: this.condition.turning,
       attacker: attackerNow
     });
-    // Rugged adds to every Damage save the vehicle makes (p.294).
+    // Rugged adds to every Damage save the vehicle makes (p.294); so do the crew's Chase feats (pp.192–193).
+    this.crewSave = crewDamageSaveBonus(
+      driver?.system,
+      (this.occupants ?? []).map(o => resolve(o.uuid)?.system).filter(Boolean)
+    );
     this.damageSaveNow = Number.isSafeInteger(baseSave)
-      ? baseSave + (hasQuality(this.qualitiesNow, "RGD") ? ruggedBonus(this.size || this.sizeLabel) : 0)
+      ? baseSave +
+        (hasQuality(this.qualitiesNow, "RGD") ? ruggedBonus(this.size || this.sizeLabel) : 0) +
+        this.crewSave.bonus
       : null;
     this.fuel = fuelState(this.rangeFuel, {
       used: this.fuelUsed,

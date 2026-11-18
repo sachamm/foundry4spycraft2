@@ -398,7 +398,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Mark of Turmoil | 190 | No | Implemented: +1 on every melee weapon damage roll; BAB and career level count 3 higher for Melee Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Melee Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
 | Trouble Magnet | 191 | Yes | Implemented: one extra Subplot per valid selection (twice maximum), plus minimum-one unfinished Subplot check | Batch226; active named/described records, completion/source changes and visible requirement verified |
 | Baby It | 191 | No | Manual/descriptive | — |
-| Demolition Derby | 192 | No | Manual/descriptive | — |
+| Demolition Derby | 192 | No | Partial (batch 384): +2 to Damage saves of a vehicle the character drives; reduced collision damage needs a collision workflow, which does not exist yet | Native Foundry QA not claimed |
 | Death Ride | 192 | No | Manual/descriptive | — |
 | Bail Out! | 191 | No | Manual/descriptive | — |
 | Daredevil | 192 | No | Covered (batch 383): Strategy rating requirements are checked with Acceleration and Turning +2; Stunt needs no GC confirmation | Native Foundry QA not claimed |
@@ -414,13 +414,13 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Jackrabbit Start | 192 | No | Covered (batch 383): chase or manhunt Prey: starting Lead +2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
 | Driving Instincts | 192 | No | Manual/descriptive | — |
 | Professional Driver - Closed Course | 193 | No | Implemented: Impress synergy on all five Maneuvers; Acrobatics or Drive synergy on all Impress uses when the target sees both you and your vehicle | Batch259; all named uses, rank thresholds/cap, typed stacking, source guards, actual dialog and native persistence verified |
-| Duct Tape and Bubblegum | 192 | No | Manual/descriptive | — |
+| Duct Tape and Bubblegum | 192 | No | Covered (batch 384): a vehicle gains the best half-Mechanics-ranks (rounded up) Damage save bonus among its driver and occupants with the feat | Native Foundry QA not claimed |
 | Get Radical! | 192 | No | Manual/descriptive | — |
 | Need for Speed | 192 | No | Manual/descriptive | — |
 | Offensive Driving | 192 | No | Covered (batch 383): Predator Strategy penalties halved (rounded down); once-per-chase ignored Crisis recorded for the GC | Native Foundry QA not claimed |
 | Relentless Pursuit | 193 | No | Covered (batch 383): chase or manhunt Predator: starting Lead −2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
 | One Hand on the Wheel | 193 | No | Vehicle Maneuver one-handed penalty waived; selected free Maneuvers share a scene allowance equal to active Chase feats; legality, own-count timing, reservations, refunds and frozen receipts verified (batch258) | — |
-| Simulator Jockey | 193 | No | Manual/descriptive | — |
+| Simulator Jockey | 193 | No | Covered (batch 384): the driver ignores the Drone quality’s Maneuver error increase; the drone attack penalty and Regroup restriction are not applied by the system to begin with | Native Foundry QA not claimed |
 | Ambush Basics | 193 | No | Sneak die and role-scoped Cross-Check implemented; outcome rewards remain manual | — |
 | Ambush Mastery | 193 | No | Quick-ambush time/error tradeoff and threat implemented; source synergy checked | — |
 | Ambush Supremacy | 193 | No | Sneak die, approved slow-ambush timing and scoped critical discount implemented; rewards remain manual | — |
@@ -1628,3 +1628,15 @@ Source: rules reference pp.192–193 (local markdown edition; original PDF pages
 - Death Ride’s extracted text duplicates Defensive Driving’s; its real benefit (DR while driving, staying up at 0 wounds) belongs with the vehicle damage feats and is not part of this batch.
 
 Verification: 513 legacy assertions, 3375 of 3376 Node tests (7 new), GC rule and app suites unchanged. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 97 manual / 53 partial / 164 other; at least 150 of 314 explicitly unfinished; 46 whole-feat closures.
+
+## Residual implementation batch 384 — vehicle crew feats
+
+Source: rules reference pp.192–193 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/driving-feats.mjs`. The vehicle data model adds its crew’s bonus to its prepared Damage save (`damageSaveNow`) and lists the sources on the Damage save card.
+- **Demolition Derby:** +2 when the character drives. Partial: collisions are not modelled, so the reduced collision damage is not applied.
+- **Duct Tape and Bubblegum:** half Mechanics ranks, rounded up, from the driver or anyone aboard with the feat; only the best one applies.
+- **Simulator Jockey:** `controlCheckPlan` drops the Drone quality’s error +1 for a driver with the feat. The system does not apply the drone attack −4 or a Regroup restriction to anyone, so the rest of the feat holds as is.
+- Need for Speed was examined: the over-half-top-speed Maneuver DC row (p.125) is not modelled, so there is nothing to waive yet. It stays manual.
+
+Verification: 513 legacy assertions, 3378 of 3379 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 94 manual / 54 partial / 166 other; at least 148 of 314 explicitly unfinished; 48 whole-feat closures.
