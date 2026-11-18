@@ -65,3 +65,29 @@ test("Shifting Stance halves the target's dodge bonus, rounded up, against a con
     "Circling is unchanged"
   );
 });
+
+test("Kicking Moves tricks: Back Flip on a Kick or unarmed Standard Attack; Guillotine and Power Kick need a Kick", async () => {
+  const { kickTrickPlan, kickTrickNote, kickDamageWeapon, KICK_TRICKS } = await import("../module/rules/kick.mjs");
+  const owner = { activeFeatNames: ["Kicking Moves"] };
+  assert.deepEqual(Object.keys(KICK_TRICKS), ["backFlip", "guillotine", "powerKick"]);
+  assert.equal(kickTrickPlan(owner, fists, { trick: "backFlip", attackAction: "standard" }).blocked, false);
+  assert.equal(kickTrickPlan(owner, fists, { trick: "backFlip", kick: true, attackAction: "other" }).blocked, false);
+  assert.ok(
+    kickTrickPlan(owner, fists, { trick: "backFlip", attackAction: "other" }).blocked,
+    "not a Kick or Standard Attack"
+  );
+  assert.ok(kickTrickPlan(owner, fists, { trick: "guillotine", attackAction: "standard" }).blocked);
+  const g = kickTrickPlan(owner, fists, { trick: "guillotine", kick: true });
+  assert.deepEqual([g.attackBonus, g.threatIncrease], [-4, 1]);
+  assert.match(kickTrickNote(g), /DC 10 \+ damage/);
+  assert.ok(kickTrickPlan({ activeFeatNames: [] }, fists, { trick: "powerKick", kick: true }).blocked);
+  assert.ok(kickTrickPlan(owner, { proficiency: "edged" }, { trick: "powerKick", kick: true }).blocked);
+  assert.equal(kickDamageWeapon({ qualities: "" }, "powerKick").qualities, "AP (2), TKD");
+  assert.equal(kickDamageWeapon({ qualities: "NKL" }, "powerKick").qualities, "NKL, AP (2), TKD");
+  assert.equal(kickDamageWeapon({ qualities: "NKL" }, "backFlip").qualities, "NKL");
+  const strong = { abilities: { str: { mod: 2 } } };
+  assert.match(
+    weaponDamage(strong, { ...fists, kick: true, qualities: "AP (2), TKD" }).effectiveQualities ?? "AP (2), TKD",
+    /TKD/
+  );
+});

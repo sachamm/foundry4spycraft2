@@ -32,6 +32,7 @@ import { coverFire, suppressiveFire } from "../../apps/combat-actions.mjs";
 import { featReminders } from "../../rules/feat-reminders.mjs";
 import { opportunistDamageSource, halvedFormula } from "../../rules/opportunist.mjs";
 import { styleOverCaliberEligible, styleOverCaliberWeapon } from "../../rules/style-over-caliber.mjs";
+import { kickDamageWeapon } from "../../rules/kick.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorAttackRolls = Base =>
@@ -281,6 +282,7 @@ export const ActorAttackRolls = Base =>
             pummel: atk.pummel ?? null,
             damageConversion: atk.damageConversion ?? null,
             kick: atk.kick ?? null,
+            kickTrick: atk.kickTrick ?? null,
             meleeTradeoff: atk.meleeTradeoff,
             grippingStance: grippingAttackProof(
               this.system,
@@ -541,7 +543,13 @@ export const ActorAttackRolls = Base =>
         ...(options.kick === true ? { kick: true } : {}),
         id: current.id ?? current._id,
         name: current.name,
-        qualities: grantedMeleeQuality(current.system.qualities ?? "", attackDamageBenefit?.grantedQuality)
+        // Power Kick adds armor-piercing (2) and takedown to the Kick's damage.
+        qualities: grantedMeleeQuality(
+          options.kick === true
+            ? kickDamageWeapon({ qualities: current.system.qualities ?? "" }, options.kickTrick).qualities
+            : (current.system.qualities ?? ""),
+          attackDamageBenefit?.grantedQuality
+        )
       });
       const damageWeaponContext = current => {
         const context = this.weaponContext(current, options),
@@ -663,6 +671,7 @@ export const ActorAttackRolls = Base =>
         pummelDamage: pummel,
         styleOverCaliber: options.styleOverCaliber === true,
         kick: options.kick === true,
+        kickTrick: options.kickTrick ?? null,
         opportunistDamage,
         meleeArmorPiercing: damage.meleeArmorPiercing.evidence,
         attackDamageBenefit,
@@ -670,7 +679,7 @@ export const ActorAttackRolls = Base =>
         finesseDamage,
         validateAttackContext: validateFinesseDamage,
         weaponQualities: damage.effectiveQualities,
-        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${options.styleOverCaliber === true ? loc` — Style Over Caliber: 1d10+2 standard damage` : ""}${options.kick === true ? loc` — Kick: Strength modifier added twice` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
+        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${options.styleOverCaliber === true ? loc` — Style Over Caliber: 1d10+2 standard damage` : ""}${options.kick === true ? loc` — Kick: Strength modifier added twice` : ""}${options.kickTrick === "powerKick" ? loc` — Power Kick: armor-piercing (2), takedown` : ""}${options.kickTrick === "guillotine" ? loc` — Guillotine Kick: the target makes a Fortitude save (DC 10 + this damage) or is sent reeling` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
         validateCQBRange,
         cqbRange: damage.cqbRange?.active ? damage.cqbRange : null,
         mortarOperation: damage.mortarOperation?.applicable ? damage.mortarOperation : null,

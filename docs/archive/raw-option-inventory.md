@@ -359,7 +359,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Dirty Fighting Moves | 185 | No | Manual/descriptive | — |
 | Dirty Fighting Supremacy | 185 | No | Unarmed sneak die implemented; tricks remain manual | — |
 | Kicking Basics | 186 | No | Partial (batch 390): a Kick costs no Initiative Count; Shifting Stance halves the target’s dodge bonus against unarmed attacks (Incoming attack preview) and reminds of the far-side move on a threat or critical hit. Sweep (no flat-footed on a lost Trip) is not yet carried out | Native Foundry QA not claimed |
-| Kicking Moves | 186 | No | Manual/descriptive | — |
+| Kicking Moves | 186 | No | Covered (batch 391): Back Flip (Kick or unarmed Standard Attack; hit reminder for the 5 ft. move and +1 dodge, a miss control applies flat-footed), Guillotine Kick (Kick, −4 attack, +1 threat, Fortitude DC 10 + damage or reeling noted on the damage roll) and Power Kick (Kick damage with armor-piercing (2) and takedown) | Native Foundry QA not claimed |
 | Kicking Supremacy | 186 | No | Partial: static numerical effects | — |
 | Martial Arts | 186 | No | Partial: chosen/roll effects | — |
 | Master's Art | 187 | No | Partial: chosen/roll effects | — |
@@ -1703,3 +1703,14 @@ Source: rules reference pp.186 and 358 (local markdown edition; original PDF pag
 - **Partial:** Sweep (a lost Trip does not leave the character flat-footed; a critical failure does, but gives the opponent no free Trip). The Trip outcome receipts are re-validated by recomputing them, so the attacker’s Sweep needs to be recorded on the Trip check itself; that is left for a dedicated change.
 
 Verification: 513 legacy assertions, 3397 of 3398 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 78 manual / 57 partial / 179 other; at least 135 of 314 explicitly unfinished; 61 whole-feat closures.
+
+## Residual implementation batch 391 — Kicking Moves
+
+Source: rules reference p.186 (local markdown edition; original PDF page not visually re-checked).
+
+- The attack dialog offers a Kicking Moves trick to an owner of the feat (`KICK_TRICKS` in `module/rules/kick.mjs`). The attack records it as `kickTrick`, separately from the Kick, since Back Flip may also ride an unarmed Standard Attack.
+- **Back Flip:** a Kick or unarmed Standard Attack. The card reminds of the 5 ft. move and +1 dodge on a hit (movement and the round-long dodge stay at the table). A resolved miss offers “Back Flip miss: become flat-footed”, applied once.
+- **Guillotine Kick:** a Kick at −4 with +1 threat range. Its Kick damage roll states the target’s Fortitude save, DC 10 + that damage, or reeling.
+- **Power Kick:** a Kick whose damage roll carries armor-piercing (2) and takedown, merged into the weapon’s own qualities.
+
+Verification: 513 legacy assertions, 3398 of 3399 Node tests (1 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 77 manual / 57 partial / 180 other; at least 134 of 314 explicitly unfinished; 62 whole-feat closures.
