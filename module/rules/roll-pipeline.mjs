@@ -8,6 +8,9 @@
  *     kinds: ['save'],               // optional: only these check kinds (attack, damage, save, skill, …)
  *     order: 0,                      // optional: lower runs first; ties keep registration order
  *     skillChecks(ctx, checks),      // return the named checks offered for ctx.skillKey
+ *     dialogs: ['skill'],            // which roll dialogs `dialog` and `read` take part in
+ *     dialog(ctx),                   // return [{at, html}] pieces of that dialog's form, placed by `at`
+ *     read(ctx, input),              // return fields to merge into what the player entered (coercion, lookups)
  *     acquire(ctx),                  // return run => … to reserve something before the roll, or nothing
  *     validate(ctx),                 // throw to stop the roll; runs before and after the dice (ctx.phase)
  *     modifiers(ctx),                // return [{label, value}] added to the roll
@@ -22,7 +25,7 @@
  * This module is pure: it knows nothing about Foundry, so it runs under Node tests.
  */
 
-const PHASES = ["skillChecks", "acquire", "validate", "modifiers", "flags", "chatControls"];
+const PHASES = ["skillChecks", "dialog", "read", "acquire", "validate", "modifiers", "flags", "chatControls"];
 
 export class RollPipeline {
   #contributors = [];
@@ -44,6 +47,14 @@ export class RollPipeline {
       if (spec[phase] !== undefined && typeof spec[phase] !== "function") {
         throw new TypeError(`Roll contributor "${id}": ${phase} must be a function.`);
       }
+    }
+    if (
+      (spec.dialog || spec.read) &&
+      !(Array.isArray(spec.dialogs) && spec.dialogs.length && spec.dialogs.every(d => typeof d === "string"))
+    ) {
+      throw new TypeError(
+        `Roll contributor "${id}": dialog and read need a dialogs list naming the dialogs they join.`
+      );
     }
     if (
       spec.record !== undefined &&
@@ -89,6 +100,47 @@ export class RollPipeline {
       if (!Array.isArray(list)) throw new TypeError(`Roll contributor "${c.id}": skillChecks must return an array.`);
     }
     return list;
+  }
+
+  #inDialog(phase, ctx) {
+    if (typeof ctx?.dialog !== "string" || !ctx.dialog) throw new TypeError("A dialog context names its dialog.");
+    return this.#contributors.filter(c => typeof c[phase] === "function" && c.dialogs.includes(ctx.dialog));
+  }
+
+  /**
+   * The HTML of a roll dialog's form: every contributor's pieces for `ctx.dialog`, in `at` order.
+   * Pieces with the same `at` keep contributor order. An empty or missing piece adds nothing.
+   */
+  dialog(ctx) {
+    const pieces = [];
+    for (const c of this.#inDialog("dialog", ctx)) {
+      const result = c.dialog(ctx);
+      if (result === undefined || result === null) continue;
+      if (!Array.isArray(result)) throw new TypeError(`Roll contributor "${c.id}": dialog must return an array.`);
+      for (const piece of result) {
+        if (!piece || !Number.isFinite(piece.at)) {
+          throw new TypeError(`Roll contributor "${c.id}": each dialog piece needs a numeric position.`);
+        }
+        const html = piece.html === undefined || piece.html === null || piece.html === false ? "" : String(piece.html);
+        if (html) pieces.push({ at: piece.at, html, sequence: pieces.length });
+      }
+    }
+    pieces.sort((a, b) => a.at - b.at || a.sequence - b.sequence);
+    return pieces.map(piece => piece.html).join("");
+  }
+
+  /** What the player entered, after every contributor for `ctx.dialog` has added or corrected its fields. */
+  read(ctx, input) {
+    let current = input;
+    for (const c of this.#inDialog("read", ctx)) {
+      const patch = c.read(ctx, current);
+      if (patch === undefined || patch === null) continue;
+      if (typeof patch !== "object" || Array.isArray(patch)) {
+        throw new TypeError(`Roll contributor "${c.id}": read must return an object of fields.`);
+      }
+      if (Object.keys(patch).length) current = { ...current, ...patch };
+    }
+    return current;
   }
 
   /**

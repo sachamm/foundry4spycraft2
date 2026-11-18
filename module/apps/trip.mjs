@@ -49,3 +49,10 @@ rollPipeline.register({
   order: 1500,
   validate: ({ actor, options }) => validateTripDefenseTarget(actor, options.tripDefense)
 });
+
+// Roll pipeline: this rule's section of the "skill" dialog.
+rollPipeline.register({
+  id: "tripDefenseContent:skill",
+  dialogs: ["skill"],
+  dialog: ({ actor, key }) => [{ at: 300, html: tripDefenseContent(key, actor) }]
+});

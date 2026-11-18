@@ -44,3 +44,10 @@ rollPipeline.register({
   record: ["feint"],
   validate: ({ actor, options }) => validateFeintTarget(actor, options.feint)
 });
+
+// Roll pipeline: this rule's section of the "skill" dialog.
+rollPipeline.register({
+  id: "feintContent:skill",
+  dialogs: ["skill"],
+  dialog: ({ actor, key }) => [{ at: 310, html: feintContent(key, actor) }]
+});

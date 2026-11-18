@@ -1,4 +1,5 @@
 import { BALANCE_SURFACES } from "../rules/balance.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 export function balanceSurfaceContent(key) {
   if (key !== "acrobatics") return "";
   const esc = foundry.utils.escapeHTML;
@@ -10,3 +11,10 @@ export function balanceSurfaceContent(key) {
       ""
     )}</select></label><label>Total counted movement for this Balance sequence (ft.) <input name="balanceDistanceFeet" type="number" min="0" step="any" value="0" /></label><label><input name="balanceBuckled" type="checkbox" /> Buckled, rolling or sagging surface</label><label><input name="balanceSlippery" type="checkbox" /> Slippery surface or knee-deep water</label><label><input name="balanceConfirmed" type="checkbox" /> The GC confirms this row, cumulative conditions and otherwise legal movement/actions</label><p>The receipt lists the DC and number of checks required. This rolls one check; resolve remaining checks, movement and outcomes separately. Other DC modifiers remain separate.</p></details>`;
 }
+
+// Roll pipeline: this rule's section of the "skill" dialog.
+rollPipeline.register({
+  id: "balanceSurfaceContent:skill",
+  dialogs: ["skill"],
+  dialog: ({ key }) => [{ at: 330, html: balanceSurfaceContent(key) }]
+});

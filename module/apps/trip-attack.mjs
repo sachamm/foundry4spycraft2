@@ -48,3 +48,10 @@ rollPipeline.register({
   order: 1480,
   validate: ({ actor, options }) => validateTripAttackTarget(actor, options.tripAttack)
 });
+
+// Roll pipeline: this rule's section of the "skill" dialog.
+rollPipeline.register({
+  id: "tripAttackContent:skill",
+  dialogs: ["skill"],
+  dialog: ({ actor, key }) => [{ at: 290, html: tripAttackContent(key, actor) }]
+});

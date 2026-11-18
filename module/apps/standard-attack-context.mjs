@@ -7,6 +7,7 @@ import {
   observedAttackTargetContent
 } from "./character-target.mjs";
 import { AMBIENT_LIGHT, FOG_SMOKE } from "../rules/senses.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const booleanFields = {
   targetOpponentConfirmed: "This attack targets an opponent (CQB Mastery threat benefit)",
   targetAnimal: "The target is an animal (Game Hunter)",
@@ -244,3 +245,10 @@ export function meleeTrickInput(input = {}) {
   }
   return out;
 }
+
+// Roll pipeline: this rule's section of the "rangedAttack" dialog.
+rollPipeline.register({
+  id: "meleeFireContextContent:rangedAttack",
+  dialogs: ["rangedAttack"],
+  dialog: ({ options }) => [{ at: 130, html: meleeFireContextContent(options) }]
+});

@@ -8,56 +8,39 @@ import { reachContextContent, reachContextInput } from "../../apps/reach.mjs";
 import { fendTiming } from "../../rules/fend.mjs";
 import { whirlingAttackProof } from "../../apps/whirling-stance.mjs";
 import { validateTripCounterIntent } from "../../apps/counter-trip.mjs";
-import { tripAttackContent, tripAttackTargetInput } from "../../apps/trip-attack.mjs";
+import { tripAttackTargetInput } from "../../apps/trip-attack.mjs";
 import { grantedMeleeQuality, meleeTrickSourceFacts } from "../../rules/melee-tricks.mjs";
 import { eligibleAttackDamageHits, makeAttackDamageProof } from "../../apps/attack-damage-benefits.mjs";
 import { grippingAttackProof } from "../../rules/gripping-stance.mjs";
 import { eligibleSideStanceHits, makeSideStanceDamageProof } from "../../apps/side-stance-damage.mjs";
-import { combatStanceProof, combatStanceState } from "../../rules/combat-stance.mjs";
+import { combatStanceProof } from "../../rules/combat-stance.mjs";
 import { endCombatStance } from "../../apps/combat-stance.mjs";
 import { missTrickSourceFacts } from "../../rules/miss-tricks.mjs";
 import { validateCheapShotTarget } from "../../apps/cheap-shot.mjs";
-import { conveyanceBullRushContent } from "../../apps/conveyance-bull-rush.mjs";
-import { bullRushAttackContent } from "../../apps/bull-rush-attack.mjs";
-import { bullRushDefenseContent } from "../../apps/bull-rush.mjs";
 import { stillStandingSaveContent } from "../../apps/still-standing.mjs";
 import { stillStandingTakedownPlan } from "../../rules/still-standing.mjs";
-import { tumblePathContent } from "../../apps/tumble.mjs";
-import { feintContent, feintTargetInput } from "../../apps/feint.mjs";
-import { tripDefenseContent, tripDefenseTargetInput } from "../../apps/trip.mjs";
-import { fallDistanceContent } from "../../apps/fall-distance.mjs";
-import { balanceSurfaceContent } from "../../apps/balance.mjs";
-import { hideCircumstanceContent } from "../../apps/hide-circumstances.mjs";
-import { detectionObserverContext, detectionObserverContent } from "../../apps/detection-observer.mjs";
+import { feintTargetInput } from "../../apps/feint.mjs";
+import { tripDefenseTargetInput } from "../../apps/trip.mjs";
+import { detectionObserverContext } from "../../apps/detection-observer.mjs";
 import { attributeDamageEvidence, validateAttributeDamageProof } from "../../rules/attribute-damage.mjs";
-import { targetSkillContext, targetSkillEffectContent } from "../../apps/target-skill-effects.mjs";
+import { targetSkillContext } from "../../apps/target-skill-effects.mjs";
 import { stoneColdSavePlan } from "../../rules/stone-cold.mjs";
 import { oldSchoolContext } from "../../apps/old-school.mjs";
 import { oneHandManeuverUseProof } from "../../rules/maneuver-actions.mjs";
 import {
-  characterTargetContent,
   completeCharacterTarget,
   validateCharacterTarget,
-  cleaveTargetRequired,
-  attackCharacterTargetChoices,
-  observedAttackTargetContent
+  attackCharacterTargetChoices
 } from "../../apps/character-target.mjs";
 import { validateFinalRoundReservation } from "../../rules/final-round.mjs";
 import { dartingStyleState } from "../../rules/darting-state.mjs";
 import { superiorCoverState } from "../../rules/superior-cover.mjs";
 import { saveCoverPlan } from "../../rules/cover.mjs";
-import { saveCoverContent } from "../../apps/save-cover.mjs";
 import {
-  meleeTrickContent,
   meleeTrickInput,
-  bullseyeContent,
   bullseyeInput,
-  allOutAttackContent,
   allOutAttackInput,
-  meleeFireContextContent,
-  quickRangedAimContent,
   quickRangedAimInput,
-  quickAttackActionContent,
   quickAttackActionInput
 } from "../../apps/standard-attack-context.mjs";
 import { cqbRangePlan, cqbRangedWeapon } from "../../rules/cqb.mjs";
@@ -81,8 +64,7 @@ import { unnervingGrade, unnervingEligible, unnervingPlan } from "../../rules/un
 import { hasFinalDeduction, finalDeductionStudy, finalDeductionPlan } from "../../rules/final-deduction.mjs";
 import { globalSearchSource, globalSearchPlan } from "../../rules/global-search.mjs";
 import { littleDetailsSource } from "../../rules/little-details.mjs";
-import { TERRAIN_TYPES, LOCAL_HERO_OPPOSITION_SKILLS, terrainSavePlan } from "../../rules/terrain.mjs";
-import { TRACKING_SURFACES } from "../../rules/tracking.mjs";
+import { terrainSavePlan } from "../../rules/terrain.mjs";
 import { taskPressureUseProof } from "../../rules/task-pressure.mjs";
 import { validateAnalysisTaskRoll } from "../../rules/analysis-tasks.mjs";
 import { hasSneakAttackSource, sneakAttackDamagePlan } from "../../rules/sneak-attack.mjs";
@@ -92,13 +74,12 @@ import {
   tenSecondSolutionEligible,
   cunningPlanEffect
 } from "../../rules/class-checks.mjs";
-import { AMBIENT_LIGHT, FOG_SMOKE } from "../../rules/senses.mjs";
 import { millionDollarSkillPlan } from "../../rules/sniper.mjs";
 import { breakthroughPlan, nestPlan } from "../../rules/breakthrough.mjs";
 import { brightIdeaPoolStatus } from "../../rules/bright-idea.mjs";
 import { unrestrictedBonusPools, difficultSkillBonusPlan, checkBonusPool } from "../../rules/bonus-pools.mjs";
 import { queueResources, isResourceLock } from "../../rules/transactions.mjs";
-import { FIRE_MODES, bracedReflexPenalty } from "../../rules/firearms.mjs";
+import { bracedReflexPenalty } from "../../rules/firearms.mjs";
 import { checkFlavor, rollEvidence } from "../../rules/outcomes.mjs";
 import { specialistApplies } from "../../rules/weapon-specialist.mjs";
 import { resourceStatus, resourceUsePlan } from "../../rules/limited-uses.mjs";
@@ -577,7 +558,7 @@ export const ActorRolls = Base =>
         input = await systemDialog.input({
           window: { title: game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label) },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options">${stillStandingContent}${this.system.conditionContext?.baffled === true ? '<label><input type="checkbox" name="resistingBaffled" /> This save resists becoming Baffled (+8)</label>' : ""}${this.system.mentalLeapState?.fatigueSaveBonus ? '<label>Fatigue-related save <select name="fatigueCondition"><option value="">Other save</option><option value="fatigue">Resists becoming fatigued</option><option value="exhaustion">Resists becoming exhausted</option></select></label>' : ""}${key === "ref" ? saveCoverContent(this.system) : ""}${key === "ref" ? '<label><input type="checkbox" name="reflexReducesDamage" /> The source allows this Reflex save to reduce damage</label><label><input type="checkbox" name="flatFooted" /> I am flat-footed against this attack or event</label>' : ""}${key === "ref" && evasionPlan(this.system).canTake10 ? '<label>Method <select name="checkMethod"><option value="roll">Roll d20</option><option value="take10">Take 10 (Evasion III)</option></select></label>' : ""}${key === "ref" && uncannyDodgePlan(this.system).securityBonus ? '<label><input type="checkbox" name="securityDevice" /> This Reflex save avoids a security device (Uncanny Dodge +4)</label>' : ""}${key === "ref" ? '<label><input type="checkbox" name="braced" /> I am currently braced (apply the Brace Reflex penalty)</label><label><input type="checkbox" name="underwater" /> I am underwater</label>' : ""}${feats.has("Swamp Training") || feats.has("Poison Basics") ? '<label><input type="checkbox" name="poison" /> This save resists poison (owned Poison Basics / Swamp Training)</label>' : ""}${feats.has("Disease Basics") ? '<label><input type="checkbox" name="disease" /> This save resists disease (Disease Basics)</label>' : ""}${feats.has("Firefighter Training") && key === "ref" ? '<label><input type="checkbox" name="avoidCatchingFire" /> This Reflex save avoids catching fire (Firefighter Training)</label>' : ""}${feats.has("Firefighter Training") && key === "fort" ? '<label><input type="checkbox" name="smokeInhalation" /> This Fortitude save resists smoke inhalation (Firefighter Training)</label>' : ""}</div>`
+          content: rollPipeline.dialog({ dialog: "save", actor: this, feats, key, stillStandingContent })
         });
         if (!input) return null;
       }
@@ -719,213 +700,21 @@ export const ActorRolls = Base =>
           rejectClose: false,
           ok: { label: "Roll check" },
           render: (event, dialog) => enhanceSkillDialog(event, dialog, checks),
-          content: `<div class="spycraft2-roll-options">${key === "athletics" && (this.system.conditionContext?.held || this.system.conditionContext?.pinned) ? '<fieldset><legend>Opposed Grapple escape</legend><label>Applicable proficiency <select name="grappleProficient"><option value="">Choose for this Grapple</option><option value="true">Proficient</option><option value="false">Not proficient: two full actions, error +2</option></select></label><label>My Size categories minus opponent Size categories <input name="grappleSizeDifference" type="number" step="1" min="-20" max="20" value="0" /></label><label><input name="grappleContextConfirmed" type="checkbox" /> The GC confirms the participants, applicable proficiency and Size difference</label><p>Each larger participant gains +4 per Size category on their own check. This check uses Grasp and Armor Check Penalty; static-restraint Escape has separate rules.</p></fieldset>' : ""}${key === "athletics" && restraintRollSource.sources.length ? `<p>Current restraint sources: ${restraintRollSource.sources.map(s => esc(s.name ?? s.id)).join(", ")}.</p>` : ""}${key === "athletics" && restraintRollSource.sources.length > 1 ? '<label><input name="grappleAllSourcesConfirmed" type="checkbox" /> The GC confirms all current Held/Pinned sources belong to this same grapple; unrelated sources require separate adjudication</label>' : ""}<label>Skill check <select name="check">${choices}</select></label>
-          <label>Attribute (when permitted) <select name="ability">${abilities}</select></label>
-          ${key === "analysis" || (key === "resolve" && Object.values(this.system.analysisTasks ?? {}).some(t => t.pressured && t.status === "active")) ? "<details><summary>Complex Analysis Task</summary>" : ""}
-            ${key === "analysis" && this.system.activeFeatNames?.some(n => ["Forensic Genius", "Tracking Mastery"].includes(n)) ? `<fieldset><legend>Complex Analysis challenge count</legend><label><input type="checkbox" name="complexAnalysisTask" /> Declare an unrecorded Complex Analysis Task</label><label>GC’s unmodified number of Challenges <input name="analysisBaseChallenges" type="number" min="2" step="1" /></label><p>Forensic Genius reduces the required count by2; Tracking Mastery reduces an Analysis/Forensics task by1(minimum1 after all reductions). A selected recorded task supplies its own count; use this declaration only for an unrecorded task (pp.207,209).</p></fieldset>` : ""}
-            ${
-              key === "analysis" ||
-              (key === "resolve" &&
-                Object.values(this.system.analysisTasks ?? {}).some(t => t.pressured && t.status === "active"))
-                ? `<label>Recorded Complex Analysis Task <select name="analysisTaskId"><option value="">None</option>${Object.entries(
-                    this.system.analysisTasks ?? {}
-                  )
-                    .filter(([, t]) => t.status === "active" && (key === "analysis" || t.pressured))
-                    .map(
-                      ([id, t]) =>
-                        `<option value="${esc(id)}">${esc(t.title)} (${esc(t.completed)}/${esc(t.requiredChallenges)})</option>`
-                    )
-                    .join("")}</select></label>`
-                : ""
-            }
-            ${key === "resolve" && Object.values(this.system.analysisTasks ?? {}).some(t => t.pressured && t.status === "active") ? `<label>Upcoming Challenge DC (Task Pressure only)<input name="taskChallengeDC" type="number" step="1" min="0" /></label><label><input name="taskChallengeDCConfirmed" type="checkbox" /> The GC confirms this is the actual upcoming Challenge DC</label>` : ""}
-          ${key === "analysis" || (key === "resolve" && Object.values(this.system.analysisTasks ?? {}).some(t => t.pressured && t.status === "active")) ? "</details>" : ""}
-          ${["intimidate", "resolve"].includes(key) ? `<details><summary>Threaten action / response (pp.180,361)</summary><p>Choose Threaten (Intimidate/Wis) or Resist Threaten (Resolve/Wis) above. These are opposed checks with Hearing and Language tags; taking10/20 is unavailable. The GC resolves the opposed outcome, stress/fright and next-attack effects.</p><label>Opposing character name <input name="threatenOpponentName" maxlength="200" /></label><label><input name="threatenOpponentConfirmed" type="checkbox" /> The named character is my opponent</label><label><input name="threatenContextConfirmed" type="checkbox" /> The GC confirms these Threaten circumstances and participants</label><label>Held/readied ranged weapon for CQB benefits <select name="threatenWeaponId"><option value="">None</option>${(this.system.readiedRangedWeapons ?? []).map(w => `<option value="${esc(w.id)}">${esc(w.name)}</option>`).join("")}</select></label>${key === "intimidate" ? '<label>Measured target distance (ft.) <input name="threatenDistanceFeet" type="number" min="0" step="any" /></label><label>Vitality lost to my attacks <input name="threatenVitalityLoss" type="number" min="0" step="1" value="0" /></label><label>Wounds lost to my attacks <input name="threatenWoundLoss" type="number" min="0" step="1" value="0" /></label><label><input name="threatenInjuryFromYourAttacksConfirmed" type="checkbox" /> The GC confirms these losses were caused by my attacks</label><p>The target must have lost5vitality or1wound to your attacks. CQB Mastery waives this requirement while you hold a readied ranged weapon. Glint of Madness waives it without requiring a weapon. Use your own Initiative Count.</p>' : '<label><input name="threatenIncomingLegalConfirmed" type="checkbox" /> The GC confirms this responds to a legal incoming Threaten action, including the attacker’s CQB Range and prior-injury requirement or exception</label>'}</details>` : ""}
-          ${targetSkillEffectContent(key)}${detectionObserverContent(key)}
-          ${conveyanceBullRushContent(key)}${bullRushAttackContent(key)}${bullRushDefenseContent(key)}${tumblePathContent(key)}${tripAttackContent(key, this)}${tripDefenseContent(key, this)}${feintContent(key, this)}${fallDistanceContent(key)}${balanceSurfaceContent(key)}${hideCircumstanceContent(key)}
-          ${key === "sneak" && ["side", "stalking"].includes(combatStanceState(this.system)?.key) ? '<label>Combat stance: distance this Hide route adds toward the 20 ft. round limit (ft.; required only for included movement) <input name="stanceDistanceFeet" type="number" min="0" step="any" /></label><p>Check the recorded total on Main; record the completed round total after moving.</p>' : ""}
-          ${key === "sneak" ? '<details><summary>Included Hide ground movement</summary><p>For a rolled Sneak/Hide check. This includes the ground movement check modifier and separate error increase. Ghost Basics doubles the included current-Speed allowance. Resolve other movement modes separately.</p><label><input name="hideMovement" type="checkbox" /> Declare movement included in this Hide action</label><label>Counted movement (ft.) <input name="hideDistanceFeet" type="number" min="0" step="any" value="0" /></label><label><input name="hideAdjacentThreat" type="checkbox" /> Starting adjacent to a threatening opponent</label><label><input name="hidePassesThreat" type="checkbox" /> Continuing after entering threatening adjacency</label><label><input name="hideRouteConfirmed" type="checkbox" /> The GC confirms this ordinary ground route, counted distance and terrain costs; no balancing, climbing, swimming or water entry/exit</label><label><input name="hideActionConfirmed" type="checkbox" /> I take the legal action required for this Hide check (normally one full action)</label></details>' : ""}
-          ${key === "sneak" && this.system.activeFeatNames?.includes("Ghost Basics") ? '<details><summary>Ghost Basics Hide targets</summary><p>Only Sneak/Hide. Normal strongest-positive synergy stacking applies.</p><label>Hide target type <select name="ghostHideTargetKind"><option value="">No Ghost Basics target synergy</option><option value="sensor">Security sensor</option><option value="living">Living opponent</option><option value="both">Both security sensors and living opponents</option></select></label><label>Actual sensor / living opponent <input name="ghostHideTargetName" maxlength="200" /></label><label><input name="ghostHideConfirmed" type="checkbox" /> The GC confirms this Hide check evades the named target types</label></details>' : ""}
-          <details><summary>Focus, forte and synergy</summary>
-            <label>Applicable focus (blank uses the check name) <input name="focus" /></label>
-            <label><input type="checkbox" name="forte" /> An owned forte applies</label>
-            <label>Synergy skill <select name="synergySkill"><option value="auto">Best listed unconditional synergy</option><option value="none">None</option>${Object.entries(
-              CONFIG.SPYCRAFT.skills
-            )
-              .map(([key, skill]) => `<option value="${key}">${esc(skill.name)}</option>`)
-              .join("")}</select></label>
-            ${key === "impress" && this.system.activeFeatNames?.includes("Professional Driver - Closed Course") ? `<fieldset><legend>Professional Driver — Closed Course</legend><label><input type="checkbox" name="closedCourseSeesYou" /> The target has line of sight to you</label><label><input type="checkbox" name="closedCourseSeesVehicle" /> The target has line of sight to your vehicle</label><p>Both are required for Acrobatics or Drive synergy (p.193).</p></fieldset>` : ""}
-            <label>Synergy focus <input name="synergyFocus" /></label>
-            <label><input type="checkbox" name="synergyConditionMet" /> Listed synergy circumstances apply</label>
-            <label><input type="checkbox" name="gcApprovedSynergy" /> GC approved an additional synergy</label>
-          </details>
-          <details><summary>Weapon work — Weapon Focus</summary>
-            <label><input name="weaponWork" type="checkbox" /> Apply Weapon Focus to this weapon Build, Modify or Repair DC</label>
-            <label>Owned target weapon/model <select name="weaponWorkItemId"><option value="">GC-confirmed model or other target below</option>${(this.items?.filter(i => i.type === "weapon") ?? []).map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`).join("")}</select></label>
-            <label>Other target weapon/model <input name="weaponWorkName" /></label>
-            <label>Other target proficiency <select name="weaponWorkProficiency">${Object.entries(
-              CONFIG.SPYCRAFT.proficiencies
-            )
-              .filter(([k]) => k !== "unarmed")
-              .map(([k, n]) => `<option value="${esc(k)}">${esc(n.label ?? n)}</option>`)
-              .join("")}</select></label>
-            <label>DC before Weapon Focus <input name="weaponWorkDC" type="number" min="0" step="1" /></label>
-            <label><input name="weaponWorkConfirmed" type="checkbox" /> The GC confirms the target weapon, proficiency and unmodified DC</label>
-            <p>The selected owned weapon supplies its actual proficiency. For an unowned or not-yet-built model, confirm its specifications with the GC. Weapon Focus changes the DC, not the roll total.</p>
-          </details>
-          <details><summary>Required gear and kits</summary>
-            <label>Required gear <select name="gearStatus"><option value="unknown">Confirm for Gear / Gear Only checks</option><option value="available">All required gear is available</option><option value="missing">Required gear is missing</option></select></label>
-            <label><input type="checkbox" name="kitAtLocation" /> I am at the selected non-portable kit’s recorded location</label>
-            <label>Gear being used <select name="gearItem"><option value="">None</option>${(this.items?.filter(item => ["weapon", "armor", "gear"].includes(item.type) && !isResourceLock(item) && !item.system.reserve && !item.system.destroyed && item.system.quantity !== 0 && !possessionUnavailable(item.system)) ?? []).map(item => `<option value="${item.id}">${esc(item.name)}</option>`).join("")}</select></label>
-          </details>
-          ${
-            key === "networking"
-              ? `<label>Contact being called <select name="contactName"><option value="">Unspecified / not a Contact check</option>${(
-                  this.system.contacts ?? []
-                )
-                  .filter(c => c.name?.trim())
-                  .map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`)
-                  .join(
-                    ""
-                  )}</select></label><label>Current mission Threat Level (for the selected Contact check) <input name="contactThreatLevel" type="number" min="1" max="20" step="1" /></label><p>For a contact feat’s initial associate, select their uniquely named Training record and configure that feat’s primary contact and GC-approved theme.</p>`
-              : ""
-          }
-          <details><summary>Time and class circumstances</summary>
-            <label><input type="checkbox" name="inCombat" /> Additional combat for this Medicine check</label>
-            <label><input type="checkbox" name="combatInSight" /> Surgery: combat occurred within line of sight at any time during the check</label>
-            <label><input type="checkbox" name="complexTaskNearby" /> Therapy: someone is performing a Complex Task in my presence</label>
-            <label><input type="checkbox" name="dramaticConflictNearby" /> Therapy: someone is performing a Dramatic Conflict in my presence</label>
-            ${(this.system.originEffects ?? []).some(effect => effect.qualityKey === "seductive") ? '<label><input type="checkbox" name="shiftingDisposition" /> Seductive: this check actually shifts disposition</label><label><input type="checkbox" name="seductionConflict" /> Seductive: this check is part of a seduction Dramatic Conflict</label>' : ""}
-            <label><input type="checkbox" name="oneHanded" /> Only one hand available for this Hands-On check</label>
-            <label><input type="checkbox" name="noSharedLanguage" /> No shared language or relevant local tongue for this Language check</label>
-            <label><input type="checkbox" name="bound" /> Additional bound condition for this check</label>
-            <label><input type="checkbox" name="conveyingMessage" /> Innuendo: I am conveying a message (adds Hands-On)</label>
-            <label>Ambush preparation (Tactics/Ambush only) <select name="ambushPreparation"><option value="slow">Slow: 10 minutes, no quick-check error increase</option><option value="quick">Quick: 1 minute, error range +2</option></select></label>
-            <label>Ambush role <select name="ambushRole"><option value="">Unspecified</option><option value="leader">Leader</option><option value="helper">Helper</option></select></label>
-            <label>Method <select name="method"><option value="roll">Roll</option><option value="take10">Take 10</option><option value="take20">Take 20</option></select></label>
-            <label><input type="checkbox" name="safeToTake" /> Neither distracted nor endangered</label>
-            <label><input type="checkbox" name="gcTakingPermissionConfirmed" /> GC permits taking 10/20 when this named check requires permission</label>
-            ${key === "blend" && this.system.activeFeatNames?.some(n => ["Gorgeous", "The Look", "Simply Irresistible"].includes(n)) ? '<label><input type="checkbox" name="manhuntPrey" /> This Blend check is made as the Prey during a manhunt (Gorgeous/The Look/Simply Irresistible)</label>' : ""}
-            ${key === "impress" && this.system.activeFeatNames?.includes("Charmer") ? `<fieldset><legend>Charmer — Influence timing (p.202)</legend><label><input type="checkbox" name="charmer" /> Use Charmer</label><label>NPC name <input type="text" name="charmerTarget" maxlength="200" /></label><label>Disposition toward you <select name="charmerDisposition"><option value="">Choose disposition</option><option value="neutral">Neutral</option><option value="intrigued">Intrigued</option><option value="friendly">Friendly</option></select></label><label>Influence duration <select name="charmerDuration"><option value="quick">Quick: scene benefit (normally 1 minute)</option><option value="slow">Slow: mission benefit (normally 10 minutes)</option></select></label><label><input type="checkbox" name="charmerNPCConfirmed" /> GC confirms this named NPC and their disposition toward me</label><p>Select one Influence timing feat. Actions and resulting disposition remain resolved at the table.</p></fieldset>` : ""}
-            ${key === "impress" && this.system.activeFeatNames?.includes("Hard Core") ? `<fieldset><legend>Hard Core — Influence timing (p.203)</legend><label><input type="checkbox" name="hardCore" /> Use Hard Core</label><label>NPC name <input type="text" name="hardCoreTarget" maxlength="200" /></label><label>Disposition toward you <select name="hardCoreDisposition"><option value="">Choose disposition</option><option value="aloof">Aloof</option><option value="unfriendly">Unfriendly</option><option value="hostile">Hostile</option></select></label><label>Influence duration <select name="influenceDuration"><option value="quick">Quick: scene benefit (normally 1 minute)</option><option value="slow">Slow: mission benefit (normally 10 minutes)</option></select></label><label><input type="checkbox" name="hardCoreNPCConfirmed" /> GC confirms this named NPC and their disposition toward me</label><p>The single chosen time reduction applies before taking 10/20 or Cross-Check. Actions and resulting disposition remain resolved at the table.</p></fieldset>` : ""}
-            ${this.system.activeFeatNames?.includes("One Hand on the Wheel") ? `<fieldset><legend>One Hand on the Wheel</legend><label><input type="checkbox" name="wheelFreeManeuver" /> Use a free Maneuver (${this.limitedUseStatus.find(s => s.id === "oneHandManeuver")?.remaining ?? 0} / ${this.limitedUseStatus.find(s => s.id === "oneHandManeuver")?.limit ?? 0} uses this scene; Maneuver checks only)</label><label><input type="checkbox" name="wheelFreeActionConfirmed" /> The GC confirms this legal Maneuver may be a free action now (my Initiative Count in combat)</label></fieldset>` : ""}
-            <label>Time reduction (one source, p.102) <select name="timingReduction"><option value="auto">Choose fastest available (review minima for variable times)</option><option value="none">No reduction</option><option value="take10">Normal-time take 10 (class ability / forte)</option><option value="falseStart">False Start (take 20)</option><option value="professional">Mark of a Professional (unopposed)</option><option value="class">Applicable class time reduction</option><option value="ambushMastery">Ambush Mastery (quick ambush; error +2)</option><option value="ambushSupremacy">Ambush Supremacy (slow ambush; error +2)</option><option value="irresistible">Simply Irresistible (Impress/Networking)</option><option value="contactMission">Lower-Threat mission Contact time</option><option value="contactFeat">Initial contact feat (chosen contact)</option><option value="charmer">Charmer (confirmed Influence NPC)</option><option value="hardCore">Hard Core (confirmed Influence NPC)</option><option value="solution">10-Second Solution (declare below)</option><option value="questionsI">All the Right Questions I (Field Analyst 3; error +1)</option><option value="questionsII">All the Right Questions II (Field Analyst 7; error +2)</option></select></label>
-            <label><input type="checkbox" name="unopposed" /> Unopposed check</label>
-            ${this.system.activeFeatNames?.some(n => ["Always Get Your Man", "Escape and Evasion Training"].includes(n)) ? '<label>Role for this manhunt check <select name="manhuntRole"><option value="">Not a manhunt</option><option value="predator">Predator</option><option value="prey">Prey</option></select></label><label>Role for this chase Maneuver <select name="chaseRole"><option value="">Not a chase Maneuver</option><option value="predator">Predator</option><option value="prey">Prey</option></select></label>' : ""}
-            <label><input type="checkbox" name="crossCheckActive" /> Cross-Check: triple time for an active check</label>
-            ${key === "bluff" && this.system.activeFeatNames?.includes("Superior Documentation") ? '<fieldset><legend>Superior Documentation</legend><label><input name="usingCoverIdentity" type="checkbox" /> Use the +1 gear bonus while using a cover identity</label><label>Cover identity name <input name="coverIdentityName" maxlength="200" /></label><label><input name="coverIdentityConfirmed" type="checkbox" /> The GC confirms I am using this cover identity for this Bluff check</label></fieldset>' : ""}
-            ${["sleightOfHand", "sneak"].includes(key) && this.system.activeFeatNames?.includes("Bug Basics") ? '<fieldset><legend>Bug Basics — Stash Item only</legend><label><input name="concealingBug" type="checkbox" /> Use the +2 gear bonus to conceal a bug</label><label>Bug name <input name="bugName" maxlength="200" /></label><label><input name="bugConcealmentConfirmed" type="checkbox" /> The GC confirms this Stash Item check conceals this bug</label></fieldset>' : ""}
-            <label><input type="checkbox" name="usingComputer" /> Research is being performed using a computer</label>
-            <label><input type="checkbox" name="installingTrap" /> Installation is setting a trap</label>
-            <label><input type="checkbox" name="surprise" /> This check determines surprise</label>
-            <label><input type="checkbox" name="deafened" /> Additional deafness for this check (Improved hearing cannot apply)</label>
-            <label><input type="checkbox" name="blinded" /> Additional blindness for this check</label>
-            <label><input type="checkbox" name="targetDeafened" /> This check targets a deafened character (Language cap −20)</label>
-            <label><input type="checkbox" name="requiresEyesight" /> The GC confirms this check requires eyesight or eye-hand coordination</label>
-            <label><input type="checkbox" name="requiresHearing" /> The GC confirms this check requires hearing</label>
-            <label><input type="checkbox" name="targetCharacter" /> Night Training: this check targets a character</label>
-            <label>Distance to that character (ft., Night Training) <input name="distanceFeet" type="number" min="0" step="any" /></label>
-            <label><input type="checkbox" name="scentUsable" /> I can rely on scent for this Tracking check (Improved scent)</label>
-            <label>Fog/smoke <select name="obscurant"><option value="">Unspecified</option><option value="fog">Fog</option><option value="smoke">Smoke</option></select></label>
-            <label>Fog/smoke density <select name="obscurantDensity"><option value="">Unspecified</option>${Object.entries(
-              FOG_SMOKE
-            )
-              .map(([id, row]) => `<option value="${id}">${row.label}</option>`)
-              .join("")}</select></label>
-            <label>Ambient light <select name="ambientLight"><option value="">Unspecified / resolve at table</option>${Object.entries(
-              AMBIENT_LIGHT
-            )
-              .map(([id, row]) => `<option value="${id}">${row.label}</option>`)
-              .join("")}</select></label>
-          </details>
-          <details><summary>Terrain feat circumstances</summary>
-            <label><input type="checkbox" name="homeTurf" /> Within my home turf: five-block urban radius or one-mile wilderness radius of home</label>
-            <label>Local Hero: opposing skill <select name="opposingSkill"><option value="">Choose only for Local Hero opposition</option>${LOCAL_HERO_OPPOSITION_SKILLS.map(key => `<option value="${key}">${esc(CONFIG.SPYCRAFT.skills[key].name)}</option>`).join("")}</select></label>
-            <label><input type="checkbox" name="targetingYou" /> The opposing check targets me (Local Hero)</label>
-            <label>Terrain <select name="terrain"><option value="">Unspecified</option>${Object.entries(TERRAIN_TYPES)
-              .map(([id, label]) => `<option value="${id}">${label}</option>`)
-              .join("")}</select></label>
-            <label><input type="checkbox" name="underwater" /> I am underwater (general check penalty; Aquatic Training circumstances)</label>
-            <label><input type="checkbox" name="navigating" /> This check is made to navigate</label>
-            <label><input type="checkbox" name="naturalSurface" /> This footing/climbing check uses a natural surface</label>
-            <label><input type="checkbox" name="hearingCheck" /> This Notice check uses hearing (Swamp Training)</label>
-            <label>City population here (0 outside a city) <input type="number" name="cityPopulation" min="0" step="1" value="0" /></label>
-            <label><input type="checkbox" name="nightAmbush" /> This ambush is planned at night or in darkness (Night Training)</label>
-          </details>
-          <details><summary>Tracking circumstances</summary>
-            <label>Surface (required for Survival/Tracking) <select name="trackingSurface"><option value="">Choose the trail surface</option>${Object.entries(
-              TRACKING_SURFACES
-            )
-              .map(([id, row]) => `<option value="${id}">${row.label}</option>`)
-              .join("")}</select></label>
-            <label>Hours since tracks were left <input type="number" name="trackingAgeHours" min="0" step="any" value="0" /></label>
-            <label>Hours of rain/snow since tracks were left <input type="number" name="trackingWeatherHours" min="0" step="any" value="0" /></label>
-            <label><input type="checkbox" name="trackingLargeGroup" /> Target group has more than three characters</label>
-            <label>Tracking pace <select name="trackingPace"><option value="half">Up to half Speed</option><option value="full">Up to full Speed</option><option value="faster">Faster than full Speed</option></select></label>
-            <label><input type="checkbox" name="followingPhysicalTrail" /> I am following a physical trail (Tracking Mastery surprise bonus)</label>
-          </details>
-          <details><summary>Nest — Sniper Perfect Killer</summary>
-            <label><input type="checkbox" name="nest" /> Substitute Tactics skill bonus for Hide to avoid being spotted</label>
-            <label><input type="checkbox" name="nestHalfCoverConfirmed" /> I benefit from at least half cover and this check avoids being spotted</label>
-            <label>Tactics attribute <select name="nestAbility"><option value="">Tactics default</option><option value="wis">WIS</option><option value="cha">CHA</option></select></label>
-          </details>
-          ${this.system.activeFeatNames?.includes("I Can Swim") ? '<label><input type="checkbox" name="iCanSwim" /> I Can Swim: spend saved skill points in this skill as a free action before this check</label>' : ""}
-          <details><summary>Limited abilities and action dice</summary>
-            <label><input type="checkbox" name="cunningPlan" /> Cunning Plan: Schemer 2, free action to reduce this error range by INT modifier (once/scene; twice at 7)</label>
-            <label><input type="checkbox" name="allAccordingToPlan" /> All According to Plan: Schemer 4, use Intelligence for this check (session uses equal starting action dice)</label>
-            <label><input type="checkbox" name="iKnowWhatDoing" /> …I Know What I’m Doing.: Stuntman 8, required bonus d10 for this STR/DEX check (once/scene)</label><label>DC for this bonus <input type="number" name="difficultyClass" step="1" placeholder="Must exceed Career Level +20" /></label>
-            <label><input type="checkbox" name="tenSecondSolution" /> 10-Second Solution: Scientist 14, natural 20 on this Intelligence skill (once/session)</label><label><input type="checkbox" name="standaloneCheckConfirmed" /> This check is outside any Complex Task or Dramatic Conflict</label>
-            <label><input type="checkbox" name="littleDetails" /> Little Details: Athletics/Smash as a free action (shared session and round limits)</label>
-            <label><input type="checkbox" name="oneInAMillion" /> One in a Million: Soldier 14, natural 20 on a STR/CON skill check (once/session)</label>
-            <label><input type="checkbox" name="breakthrough" /> Breakthrough: Virtuoso 10, substitute the key skill’s total bonus (once/scene)</label><label>Key skill attribute <select name="breakthroughAbility"><option value="">Key skill default</option>${["str", "dex", "con", "int", "wis", "cha"].map(a => `<option value="${a}">${a.toUpperCase()}</option>`).join("")}</select></label>
-            <label>Bright Idea source <select name="brightIdeaSource"><option value="">Automatic available source</option>${this.limitedUseStatus
-              .filter(s => s.workflow === "brightIdea")
-              .map(s => `<option value="${esc(s.id)}">${esc(s.name)}: ${s.remaining} remaining</option>`)
-              .join("")}</select></label>
-            <label><input type="checkbox" name="brightIdea" /> Bright Idea: roll twice and choose (INT/WIS skill checks)</label>
-            ${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl({ perBenefit: true, unrolled: true })}<label><input type="checkbox" name="hailMaryUntrained" /> Hail Mary: remove untrained error increase (1 die)</label>
-            <label><input type="checkbox" name="hailMaryUncap" /> Hail Mary: lift the result cap (3 dice)</label>
-            <label><input type="checkbox" name="hailMaryActive" /> Hail Mary: make passive/secret check active (4 dice)</label>
-          </details>
-          ${attributeCollapsePlan(this.system).conditions.includes("Paralyzed") || this.system.conditionContext?.paralyzed ? '<label><input type="checkbox" name="purelyMentalConfirmed" /> The GC confirmed this is a purely mental action (paralysis)</label>' : ""}
-          <label>Situational modifier <input type="number" name="modifier" value="0" /></label>
-          <label><input type="checkbox" name="secret" /> Secret when the check permits either type</label></div>`
+          content: rollPipeline.dialog({
+            dialog: "skill",
+            actor: this,
+            abilities,
+            choices,
+            esc,
+            key,
+            restraintRollSource,
+            skill
+          })
         });
         if (!input) return null;
       }
-      for (const field of [
-        "stanceDistanceFeet",
-        "conveyanceBullRushAllowanceFeet",
-        "conveyanceBullRushDistanceFeet",
-        "bullRushAttackSizeDifference",
-        "bullRushAttackDistanceFeet",
-        "bullRushSizeDifference",
-        "tumbleDistanceFeet",
-        "tumbleAdjacentEnemySquares",
-        "tumbleOccupiedSquares",
-        "tripAttackSizeDifference",
-        "tripSizeDifference",
-        "fallDistanceFeet",
-        "balanceDistanceFeet",
-        "hideAreaPeople",
-        "hideDistanceFeet",
-        "threatenDistanceFeet",
-        "threatenVitalityLoss",
-        "threatenWoundLoss"
-      ])
-        if (typeof input[field] === "string")
-          input = { ...input, [field]: input[field].trim() ? Number(input[field]) : null };
-      if (typeof input.grappleProficient === "string")
-        input = {
-          ...input,
-          grappleProficient:
-            input.grappleProficient === "true" ? true : input.grappleProficient === "false" ? false : null
-        };
-      if (typeof input.grappleSizeDifference === "string")
-        input = {
-          ...input,
-          grappleSizeDifference: input.grappleSizeDifference.trim() ? Number(input.grappleSizeDifference) : null
-        };
+      // Field coercion and lookups registered for this dialog (module/rolls/dialogs/skill.mjs and rule modules).
+      input = rollPipeline.read({ dialog: "skill", actor: this, key }, input);
       const check = checks.find(c => c.id === input.check);
       const gearItem = input.gearItem ? this.items?.get?.(input.gearItem) : null;
       const workTarget = () =>
@@ -1672,26 +1461,7 @@ export const ActorRolls = Base =>
         input = await systemDialog.input({
           window: { title: "Knowledge" },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options">
-        <label>Question or task <input name="topic" /></label><label><input name="underwater" type="checkbox" /> I am underwater (standard skill-check penalty)</label>
-        <label>GC-selected relevant skill <select name="skill">${Object.entries(CONFIG.SPYCRAFT.skills)
-          .map(([key, skill]) => `<option value="${key}">${esc(skill.name)}</option>`)
-          .join("")}</select></label>
-        ${this.system.activeFeatNames?.includes("Card Shark") ? '<label>Card Shark gambling Knowledge <select name="gamblingKnowledge"><option value="">Ordinary Knowledge scope</option><option value="rules">Gambling rules</option><option value="people">Major gamblers, their winnings and debts</option><option value="locations">Casinos and other gaming locations</option></select></label><p>A question in a selected Card Shark category is active. Taking 10/20 still requires Photographic Memory.</p>' : ""}
-        <label>Relevant focus <input name="focus" /></label>
-        <label>Situational modifier <input type="number" name="modifier" value="0" /></label>
-        <label>Method <select name="method"><option value="roll">Roll</option><option value="take10">Take 10 — 1 round (Photographic Memory)</option><option value="take20">Take 20 — 1 minute (Photographic Memory)</option></select></label>
-        <label><input type="checkbox" name="active" /> Active check (Photographic Memory)</label>
-        <label><input type="checkbox" name="safeToTake" /> Neither distracted nor endangered</label>
-        <label><input type="checkbox" name="breakthrough" /> Breakthrough: Virtuoso 10, substitute the key skill’s total bonus (once/scene)</label><label>Key skill attribute <select name="breakthroughAbility"><option value="">Key skill default</option>${["str", "dex", "con", "int", "wis", "cha"].map(a => `<option value="${a}">${a.toUpperCase()}</option>`).join("")}</select></label>
-            <label>Bright Idea source <select name="brightIdeaSource"><option value="">Automatic available source</option>${this.limitedUseStatus
-              .filter(s => s.workflow === "brightIdea")
-              .map(s => `<option value="${esc(s.id)}">${esc(s.name)}: ${s.remaining} remaining</option>`)
-              .join("")}</select></label>
-        <label><input type="checkbox" name="brightIdea" /> Bright Idea: roll twice and choose (uses the same source pool as Skills)</label>
-        <label><input type="checkbox" name="tenSecondSolution" /> 10-Second Solution: Scientist 14, natural 20 (same session use as Skills; minimum 1 full action)</label>
-        <label><input type="checkbox" name="standaloneCheckConfirmed" /> This check is outside any Complex Task or Dramatic Conflict</label>
-        <label><input type="checkbox" name="cunningPlan" /> Cunning Plan: Schemer 2, free action to reduce the error range (shared scene uses)</label><p>The GC resolves class abilities on passive Knowledge checks. Named-skill abilities do not apply merely because that skill supplies Knowledge synergy.</p></div>`
+          content: rollPipeline.dialog({ dialog: "knowledge", actor: this, esc })
         });
         if (!input) return null;
       }
@@ -1825,7 +1595,7 @@ export const ActorRolls = Base =>
         const input = await systemDialog.input({
           window: { title: "Attack circumstances" },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options">${reachIncreaseFeet(item.system.qualities ?? "") ? reachContextContent(options) : ""}${cleaveTargetRequired(this, item.system) ? characterTargetContent(this, options) : observedAttackTargetContent(this, options)}<label><input type="checkbox" name="targetFlanked" /> I am flanking this opponent with this attack, satisfying the applicable position, ready-weapon and Reach/CQB requirements (p.341)</label><label><input type="checkbox" name="targetPinnedAdjacent" /> Target is pinned and I am adjacent (+4 melee/unarmed attack)</label><label><input type="checkbox" name="targetAnimal" /> This attack targets an animal (Scout Game Hunter, p.43)</label>${cqbRangedWeapon(item.system) ? meleeFireContextContent(options) + quickRangedAimContent(options) + bullseyeContent(this, options) : quickAttackActionContent(options) + allOutAttackContent(this, options) + meleeTrickContent(this, options)}${needsCQB ? `<label>CQB target distance (feet) <input name="distanceFeet" type="number" min="0" step="any" required value="${Number.isFinite(options.distanceFeet) ? options.distanceFeet : ""}" /></label><label><input name="targetOpponentConfirmed" type="checkbox" /> This attack targets an opponent (CQB Mastery threat benefit)</label>` : ""}</div>`
+          content: rollPipeline.dialog({ dialog: "attack", actor: this, item, needsCQB, options })
         });
         if (!input) return null;
         const cqbInput = needsCQB
@@ -2156,35 +1926,7 @@ export const ActorRolls = Base =>
         input = await systemDialog.input({
           window: { title: `Ranged attack: ${item.name}` },
           rejectClose: false,
-          content: `
-        <p>Range increment ${preview.range} ft. Recoil uses your current Strength. Confirm Aim/Brace conditions for this roll. Action costs and Initiative Count changes are applied at the table.</p>
-        <label>Target distance (feet) <input type="number" name="distanceFeet" min="0" step="any" required /></label>
-        <div class="spycraft2-roll-options">
-        <label><input type="checkbox" name="oneInAMillion" /> One in a Million (Soldier 14; once/session)</label>
-        <label><input type="checkbox" name="millionDollarSkill" /> Million Dollar Skill: Sniper 10, roll twice and choose (once/round; eligible weapon)</label><label><input type="checkbox" name="targetVulnerable" /> This opponent is vulnerable against this attack</label>
-        <label><input type="checkbox" name="targetFlanked" /> I am flanking this opponent with this attack; applicable position, ready-weapon and Reach/CQB requirements are met (p.341)</label>
-        <label><input type="checkbox" name="targetPinnedAdjacent" /> Target is pinned and I am adjacent (+4 melee/unarmed attack)</label><label><input type="checkbox" name="targetOpponentConfirmed" /> This attack targets an opponent (CQB Mastery threat benefit)</label><label><input type="checkbox" name="targetAnimal" /> This attack targets an animal (Scout Game Hunter)</label><label><input type="checkbox" name="targetCrouchedNonAdjacent" /> Target is crouched and I am not adjacent (−1 ranged attack)</label><label><input type="checkbox" name="targetProneNonAdjacent" /> Target is prone and I am not adjacent (−2 ranged attack)</label>
-        <label><input type="checkbox" name="targetFlatFooted" /> This opponent is flat-footed against this attack (Surprise Shot)</label>
-        <label><input type="checkbox" name="cunningPlan" /> Cunning Plan: Schemer 2, free action to reduce error range (shared scene uses)</label>
-        <label><input type="checkbox" name="vehicleMounted" /> This weapon is mounted on a vehicle for this attack</label>
-        <label>Mounted weapon’s normal firing time <select name="weaponOperationTime"><option value="">Unspecified / use its source</option><option value="half">1 half action</option><option value="full">1 full action</option><option value="twoHalf">2 half actions</option></select></label>
-        <label>Fog/smoke <select name="obscurant"><option value="">Unspecified</option><option value="fog">Fog</option><option value="smoke">Smoke</option></select></label>
-            <label>Fog/smoke density <select name="obscurantDensity"><option value="">Unspecified</option>${Object.entries(
-              FOG_SMOKE
-            )
-              .map(([id, row]) => `<option value="${id}">${row.label}</option>`)
-              .join("")}</select></label>
-            <label>Ambient light <select name="ambientLight"><option value="">Unspecified / resolve at table</option>${Object.entries(
-              AMBIENT_LIGHT
-            )
-              .map(([id, row]) => `<option value="${id}">${row.label}</option>`)
-              .join("")}</select></label>
-        <label><input type="checkbox" name="blinded" /> Additional blindness for this attack</label><label><input type="checkbox" name="deafened" /> Additional deafness for this attack</label><label><input type="checkbox" name="targetCharacter" /> Target is a character (Night Training's nearby hearing exception)</label>
-        ${item.system.weaponCategory === "mortar" ? '<label><input name="mortarSpaceConfirmed" type="checkbox" /> Mortar is outdoors or in a very large indoor area suitable for its high-arc trajectory</label>' : ""}${item.system.weaponCategory === "grenadeLauncher" ? '<label><input type="checkbox" name="indirectFire" /> Grenade launcher: indirect fire at a target outside line of sight (Indirect/INT; otherwise Tactical/DEX)</label>' : ""}${["underbarrel", "optionalUnderbarrel"].includes(item.system.mountRequirement) ? '<label><input type="checkbox" name="underbarrelMountConfirmed" /> Underbarrel version is attached to a compatible rifle’s available underbarrel location</label>' : ""}${item.system.mountRequirement === "tripodOrVehicle" ? '<label><input type="checkbox" name="usingIntegralTripod" /> Automatic grenade launcher: integral tripod is in use (or declare vehicle attachment above)</label>' : ""}
-        ${meleeFireContextContent(options)}<label>Attack action <select name="attackAction"><option value="other">Other attack (resolve its action modifiers at the table)</option><option value="standard">Standard Attack (Single-Shot for firearms)</option></select></label>
-        <label><input type="checkbox" name="aimed" /> Aim remains valid for this target; it has not moved more than 5 ft.</label>
-        ${preview.firearm ? `<label><input type="checkbox" name="braced" /> Brace remains valid: I have not moved and the target is in the chosen 90-degree cone</label><label><input type="checkbox" name="stableSurface" /> I have a stable surface to brace against (unnecessary with Marksmanship Basics)</label>` : ""}
-        ${preview.firearm ? `<label>Fire mode <select name="fireMode">${preview.modes.map(mode => `<option value="${mode}" ${mode === preview.fireMode ? "selected" : ""}>${esc(FIRE_MODES[mode] ?? mode)}</option>`).join("")}</select></label>` : ""}</div>`
+          content: rollPipeline.dialog({ dialog: "rangedAttack", actor: this, esc, item, options, preview })
         });
         if (!input) return null;
       }
@@ -2290,18 +2032,15 @@ export const ActorRolls = Base =>
         const input = await systemDialog.input({
           window: { title: attackBonusHits.length ? "Damage and attack benefits" : "Damage and sneak attack" },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><label>Target sheet <select name="targetActorUuid"><option value="">Manual target: confirm immunities below</option>${targetChoices.actors.map(a => `<option value="${foundry.utils.escapeHTML(a.uuid)}"${(sideHits.length === 1 ? sideHits[0].proof.targetUuid : (automaticAttackBonus?.proof.targetUuid ?? targetChoices.selected)) === a.uuid ? " selected" : ""}>${foundry.utils.escapeHTML(a.name ?? "Character")}</option>`).join("")}</select></label><p>A selected target sheet supplies its known armor protection. Other immunities and reachable vitals still require confirmation.</p>
-        ${attackBonusHits.length ? `<label>Recorded attack damage bonus <select name="attackDamageSourceUuid"><option value="">No recorded attack bonus</option>${attackBonusHits.map(h => `<option value="${foundry.utils.escapeHTML(h.message.uuid)}"${automaticAttackBonus === h ? " selected" : ""}>${foundry.utils.escapeHTML(h.proof.source)} ${h.proof.sneakDice ? `+${h.proof.sneakDice}d6 sneak` : `+${h.proof.bonus}`} — ${foundry.utils.escapeHTML(targetChoices.actors.find(a => a.uuid === h.proof.targetUuid)?.name ?? h.proof.manualTargetName ?? "Recorded target")}</option>`).join("")}</select></label><p>Use this exact recorded successful attack and target. Its damage bonus applies once and combines with ordinary weapon modifiers before minimum damage.</p>` : ""}
-        <label><input type="checkbox" name="includeSneakAttack"${sideHits.length === 1 || trickSneakHit ? " checked" : ""} /> Include earned sneak attack damage</label>${sideHits.length ? `<label>Side Stance hit <select name="sideStanceSourceUuid"><option value="">Other attack / no Side Stance die</option>${sideHits.map(h => `<option value="${foundry.utils.escapeHTML(h.message.uuid)}"${sideHits.length === 1 ? " selected" : ""}>Round ${h.message.flags.spycraft2.rollCombat?.round ?? "?"} — ${foundry.utils.escapeHTML(targetChoices.actors.find(a => a.uuid === h.proof.targetUuid)?.name ?? "Recorded opponent")}</option>`).join("")}</select></label><p>The selected hit supplies one earned die, once. It is combined with this attack’s other sneak damage; leaving the stance after the hit does not remove its recorded entitlement.</p>` : ""}
-        <label><input type="checkbox" name="successfulStandardAttack"${sideHits.length === 1 ? " checked" : ""} /> This was a successful Standard Attack</label>
-        <label><input type="checkbox" name="targetCharacter"${sideHits.length === 1 ? " checked" : ""} /> Target is a character, not an object</label>
-        <label><input type="checkbox" name="targetFlanked" /> I am flanking this target with this attack</label><label><input type="checkbox" name="targetHelpless" /> Target is helpless</label><label><input type="checkbox" name="targetVulnerable" /> Target is vulnerable</label>
-        <label><input type="checkbox" name="targetVitalsConfirmed" /> Target is not immune to critical hits or sneak attack damage, is not hidden to me and has reachable vitals</label>
-        <label>Damage type <select name="damageType"><option value="lethal">Lethal</option><option value="subdual">Subdual</option></select></label>
-        <label>Conversion <select name="damageConversion"><option value="none">None</option><option value="lethalToSubdual">Lethal to subdual (requires Bludgeon)</option><option value="subdualToLethal">Subdual to lethal (no sneak attack)</option></select></label>
-        <label>Ranged target distance (feet) <input type="number" name="distanceFeet" min="0" step="any" /></label>
-        <label><input type="checkbox" name="braced" /> I was bracing this two-handed firearm/hurled weapon for this attack (Sniper dice)</label>
-      </div>`
+          content: rollPipeline.dialog({
+            dialog: "damage",
+            actor: this,
+            attackBonusHits,
+            automaticAttackBonus,
+            sideHits,
+            targetChoices,
+            trickSneakHit
+          })
         });
         if (!input) return null;
         options = { ...options, ...input, includeSneakAttack: !!input.includeSneakAttack };

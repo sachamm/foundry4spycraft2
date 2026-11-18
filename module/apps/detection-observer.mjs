@@ -97,3 +97,10 @@ rollPipeline.register({
   validate: ({ options, checkKind, checkId, checkMethod, skillKey }) =>
     validateDetectionObserverProof(options.detectionObserver, { checkKind, skillKey, checkId, checkMethod })
 });
+
+// Roll pipeline: this rule's section of the "skill" dialog.
+rollPipeline.register({
+  id: "detectionObserverContent:skill",
+  dialogs: ["skill"],
+  dialog: ({ key }) => [{ at: 230, html: detectionObserverContent(key) }]
+});

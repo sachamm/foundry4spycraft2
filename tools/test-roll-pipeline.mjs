@@ -250,6 +250,26 @@ const { rollPipeline } = await import("../module/rolls/index.mjs");
 
 // The order contributors run in, phase by phase. Validation order decides which failure a player is shown first.
 const EXPECTED_ORDER = [
+  "meleeFireContextContent:rangedAttack",
+  "detectionObserverContent:skill",
+  "feintContent:skill",
+  "targetSkillEffectContent:skill",
+  "tripAttackContent:skill",
+  "tripDefenseContent:skill",
+  "conveyanceBullRushContent:skill",
+  "bullRushAttackContent:skill",
+  "bullRushDefenseContent:skill",
+  "tumblePathContent:skill",
+  "fallDistanceContent:skill",
+  "balanceSurfaceContent:skill",
+  "hideCircumstanceContent:skill",
+  "damageDialog",
+  "rangedAttackDialog",
+  "attackDialog",
+  "knowledgeDialog",
+  "saveDialog",
+  "skillDialog",
+  "skillDialogInput",
   "feintBonusLease",
   "attackDamageLease",
   "sideStanceLease",
@@ -356,6 +376,64 @@ const EXPECTED_ORDER = [
 test("every contributor is registered once, in the documented order", () => {
   assert.deepEqual(rollPipeline.ids, EXPECTED_ORDER);
   assert.equal(new Set(EXPECTED_ORDER).size, EXPECTED_ORDER.length);
+});
+
+test("every module that registers a contributor is loaded by the contributor index", async () => {
+  const { readdir, readFile } = await import("node:fs/promises");
+  const root = new URL("../module/", import.meta.url);
+  const index = await readFile(new URL("rolls/index.mjs", root), "utf8");
+  const loaded = new Set(
+    [...index.matchAll(/import "([^"]+)";/g)].map(m => new URL(m[1], new URL("rolls/", root)).href)
+  );
+  const files = (await readdir(root, { recursive: true })).filter(
+    f => f.endsWith(".mjs") && f !== "rules/roll-pipeline.mjs"
+  );
+  for (const file of files) {
+    const source = await readFile(new URL(file, root), "utf8");
+    if (source.includes("rollPipeline.register("))
+      assert.ok(loaded.has(new URL(file, root).href), `${file} is not imported by module/rolls/index.mjs`);
+  }
+});
+
+test("dialog pieces are placed by position and read contributors adjust what was entered", () => {
+  const pipeline = new RollPipeline();
+  assert.throws(() => pipeline.register({ id: "x", dialog: () => [] }), /dialogs list/);
+  pipeline.register({
+    id: "base",
+    dialogs: ["demo"],
+    dialog: () => [
+      { at: 10, html: "<a>" },
+      { at: 30, html: "</a>" }
+    ]
+  });
+  pipeline.register({
+    id: "extra",
+    dialogs: ["demo", "other"],
+    dialog: ({ show }) => [
+      { at: 20, html: show ? "B" : "" },
+      { at: 20, html: null }
+    ]
+  });
+  pipeline.register({ id: "tie", dialogs: ["demo"], dialog: () => [{ at: 20, html: "C" }] });
+  assert.equal(pipeline.dialog({ dialog: "demo", show: true }), "<a>BC</a>");
+  assert.equal(pipeline.dialog({ dialog: "demo", show: false }), "<a>C</a>");
+  assert.equal(pipeline.dialog({ dialog: "other", show: true }), "B");
+  assert.equal(pipeline.dialog({ dialog: "none" }), "");
+  assert.throws(() => pipeline.dialog({}), /names its dialog/);
+  pipeline.register({ id: "bad", dialogs: ["broken"], dialog: () => [{ html: "x" }] });
+  assert.throws(() => pipeline.dialog({ dialog: "broken" }), /numeric position/);
+
+  pipeline.register({
+    id: "numbers",
+    dialogs: ["demo"],
+    read: (ctx, input) => (typeof input.feet === "string" ? { feet: Number(input.feet) } : null)
+  });
+  pipeline.register({ id: "double", dialogs: ["demo"], read: (ctx, input) => ({ doubled: input.feet * 2 }) });
+  const entered = { feet: "15", name: "x" };
+  assert.deepEqual(pipeline.read({ dialog: "demo" }, entered), { feet: 15, name: "x", doubled: 30 });
+  assert.deepEqual(entered, { feet: "15", name: "x" });
+  const untouched = { feet: 5 };
+  assert.equal(pipeline.read({ dialog: "other" }, untouched), untouched);
 });
 
 test("roll options named by `record` are copied onto every posted check, null when absent", async () => {

@@ -88,3 +88,10 @@ rollPipeline.register({
   validate: ({ options, checkKind, checkId, skillKey }) =>
     validateTargetSkillEffectProof(options.targetSkillEffect, { checkKind, skillKey, checkId })
 });
+
+// Roll pipeline: this rule's section of the "skill" dialog.
+rollPipeline.register({
+  id: "targetSkillEffectContent:skill",
+  dialogs: ["skill"],
+  dialog: ({ key }) => [{ at: 220, html: targetSkillEffectContent(key) }]
+});
