@@ -358,7 +358,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Dirty Fighting Basics | 185 | No | Manual/descriptive | — |
 | Dirty Fighting Moves | 185 | No | Manual/descriptive | — |
 | Dirty Fighting Supremacy | 185 | No | Unarmed sneak die implemented; tricks remain manual | — |
-| Kicking Basics | 186 | No | Manual/descriptive | — |
+| Kicking Basics | 186 | No | Partial (batch 390): a Kick costs no Initiative Count; Shifting Stance halves the target’s dodge bonus against unarmed attacks (Incoming attack preview) and reminds of the far-side move on a threat or critical hit. Sweep (no flat-footed on a lost Trip) is not yet carried out | Native Foundry QA not claimed |
 | Kicking Moves | 186 | No | Manual/descriptive | — |
 | Kicking Supremacy | 186 | No | Partial: static numerical effects | — |
 | Martial Arts | 186 | No | Partial: chosen/roll effects | — |
@@ -1693,3 +1693,13 @@ Source: rules reference p.197 (local markdown edition; original PDF page not vis
 - **Signature / Trademark Gear**: a favored item’s sheet sets Signature (1) or Trademark (2). Valid marks (no more than the Signature selections, one Trademark item) add +1 or +2 morale to damage with the item (`weaponDamage`) and to skill checks naming it as gear in use. Trademark boosts on those skill checks and damage rolls roll 2 dice per die (`actionDieBoostPlan`). The system destroys only improvised weapons on errors, so a signature item is never destroyed by a critical failure.
 
 Verification: 513 legacy assertions, 3394 of 3395 Node tests (5 new), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 79 manual / 56 partial / 179 other; at least 135 of 314 explicitly unfinished; 61 whole-feat closures.
+
+## Residual implementation batch 390 — the Kick action and Kicking Basics
+
+Source: rules reference pp.186 and 358 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Kick action (p.358)**, baseline, not previously modelled (`module/rules/kick.mjs`, `module/apps/kick.mjs`). An unarmed weapon’s attack dialog offers “Kick”. It is recorded as a non-Standard Attack (`attackAction: "other"`), so Standard Attack abilities and tricks do not apply. The card offers the voluntary −2 Initiative Count, once, and “Roll Kick damage”, which adds a positive Strength modifier to damage once more.
+- **Kicking Basics:** the Kick costs no Initiative Count. Shifting Stance joins the shared stance lifecycle. Against an attacker in it, the target’s Incoming attack preview halves the dodge bonus, rounded up, once the attack is confirmed unarmed; this reuses and generalises Circling Stance’s plan, which is otherwise unchanged. Unarmed attacks in the stance carry the far-side move reminder.
+- **Partial:** Sweep (a lost Trip does not leave the character flat-footed; a critical failure does, but gives the opponent no free Trip). The Trip outcome receipts are re-validated by recomputing them, so the attacker’s Sweep needs to be recorded on the Trip check itself; that is left for a dedicated change.
+
+Verification: 513 legacy assertions, 3397 of 3398 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 78 manual / 57 partial / 179 other; at least 135 of 314 explicitly unfinished; 61 whole-feat closures.

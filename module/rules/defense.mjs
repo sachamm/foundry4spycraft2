@@ -180,13 +180,19 @@ export function incomingDefensePlan(system, options = {}) {
             loc`Whirling Stance: career level ${whirling.defenderLevel}; ${whirling.declared ? loc`this attacker level ` + whirling.attackerLevel + (whirling.prevented ? loc` cannot flank you.` : loc` retains ordinary flanking eligibility.`) : loc`review the actual attacker’s career level if flanking is declared.`} No unconditional Defense bonus (p.179).`
           ]
         : []),
-      ...(circling.stance
+      ...(circling.shifting
         ? [
             circling.active
-              ? loc`Circling Stance: this melee attacker has an unoccupied adjacent square, so your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up, against this attack (p.179).`
-              : loc`Circling Stance: no reduction (${circling.unoccupiedAdjacentConfirmed ? loc`no positive dodge bonus applies to this attack` : loc`no unoccupied square adjacent to the attacker was confirmed`}) (p.179).`
+              ? loc`Shifting Stance: against this unarmed attack your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up (p.186).`
+              : loc`Shifting Stance: no reduction (${circling.unarmedConfirmed ? loc`no positive dodge bonus applies` : loc`the attack was not confirmed as unarmed`}) (p.186).`
           ]
-        : []),
+        : circling.stance
+          ? [
+              circling.active
+                ? loc`Circling Stance: this melee attacker has an unoccupied adjacent square, so your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up, against this attack (p.179).`
+                : loc`Circling Stance: no reduction (${circling.unoccupiedAdjacentConfirmed ? loc`no positive dodge bonus applies to this attack` : loc`no unoccupied square adjacent to the attacker was confirmed`}) (p.179).`
+            ]
+          : []),
       ...(sharpshooter.active
         ? [
             loc`Sharpshooter Basics: target Size Defense bonus +${sharpshooter.originalSizeBonus} becomes +${sharpshooter.retainedSizeBonus}, rounded down, against this ranged attack (p.182).`

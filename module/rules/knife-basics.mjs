@@ -61,9 +61,28 @@ export function circlingDefensePlan({
   attackerSystem = null,
   ranged = false,
   unoccupiedAdjacentConfirmed = false,
+  unarmedConfirmed = false,
   dodgeBonus = 0
 } = {}) {
   if (!attackerSystem) return { active: false, dodgeReduction: 0 };
+  // Shifting Stance (Kicking Basics, p.186): the same halving against the attacker's unarmed attacks.
+  if (combatStanceState(attackerSystem)?.key === "shifting") {
+    if (ranged) throw Error(loc`Shifting Stance applies only to the attacker’s unarmed attacks.`);
+    if (!Number.isFinite(dodgeBonus))
+      throw Error(loc`Prepare the target’s dodge bonus to Defense before applying Shifting Stance.`);
+    const original = Math.max(0, dodgeBonus),
+      retained = unarmedConfirmed === true ? Math.ceil(original / 2) : original;
+    return {
+      version: 1,
+      shifting: true,
+      active: retained < original,
+      stance: true,
+      unarmedConfirmed: unarmedConfirmed === true,
+      originalDodgeBonus: original,
+      retainedDodgeBonus: retained,
+      dodgeReduction: original - retained
+    };
+  }
   if (typeof ranged !== "boolean" || typeof unoccupiedAdjacentConfirmed !== "boolean")
     throw Error(
       loc`Declare whether this is a ranged attack and whether a square adjacent to the Circling Stance attacker is unoccupied.`

@@ -1,3 +1,4 @@
+import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { markDamagePlan } from "./marks.mjs";
 import { reachWeaponPlan } from "./reach-weapon.mjs";
@@ -756,12 +757,14 @@ export function weaponDamage(
   const markDamage = markDamagePlan(system, weapon);
   const conditionDamagePenalty = conditionRollPenalties(system).damage;
   // Signature / Trademark Gear, p.197: +1 or +2 morale to damage with the item.
-  const signatureDamage = signatureBonus(system, weapon.id);
+  const signatureDamage = signatureBonus(system, weapon.id),
+    kickDamage = weapon.kick === true && unarmedWeapon(weapon) ? kickDamageBonus(system) : 0;
   bonus +=
     conditionDamagePenalty +
     cqbRange.damageBonus +
     markDamage.bonus +
     signatureDamage +
+    kickDamage +
     (options.attackDamageBonus ?? 0);
   const min = parsed.minimum;
   return {

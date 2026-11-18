@@ -16,7 +16,8 @@ export const COMBAT_STANCES = {
   stalking: { name: "Stalking Stance", feat: "Garrote Basics", page: 179, movementLimitFeet: 20 },
   circling: { name: "Circling Stance", feat: "Knife Basics", page: 179 },
   furious: { name: "Furious Stance", feat: "Club Basics", page: 177 },
-  unbeatable: { name: "Unbeatable Stance", feat: "Sword Basics", page: 180 }
+  unbeatable: { name: "Unbeatable Stance", feat: "Sword Basics", page: 180 },
+  shifting: { name: "Shifting Stance", feat: "Kicking Basics", page: 186 }
 };
 export function stanceForcedExit(system) {
   const c = conditionRollPenalties(system);
