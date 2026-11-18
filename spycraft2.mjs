@@ -1,5 +1,6 @@
 import { registerSoundtrackSetup, setupSoundtrack } from "./module/soundtrack.mjs";
 import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-scenes.mjs";
+import { registerActorFolderSetup, setupActorFolders } from "./module/actor-folders.mjs";
 import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
@@ -136,6 +137,7 @@ Hooks.once("init", () => {
   registerGCSettings();
   registerGCConsoleTab();
   registerSampleSceneSetup();
+  registerActorFolderSetup();
   registerSoundtrackSetup();
   registerMigrationSettings();
   registerGmLocks();
@@ -254,6 +256,7 @@ function refreshCombatActorData() {
 Hooks.once("i18nInit", () => localizeConfig(CONFIG.SPYCRAFT));
 Hooks.once("ready", refreshCombatActorData);
 Hooks.once("ready", setupSampleScenes);
+Hooks.once("ready", setupActorFolders);
 // Bring stored world data up to this build's schema version (module/migrations/index.mjs).
 Hooks.once("ready", () => {
   runWorldMigrations().catch(error => {
