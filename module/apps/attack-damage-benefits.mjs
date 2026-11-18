@@ -5,6 +5,7 @@ import { ownedWeaponTraining, weaponSourceIdentity } from "../rules/weapon-train
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { impaleDamageBonus } from "../rules/sword-basics.mjs";
 import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Map(),
@@ -74,12 +75,15 @@ function attackRoot(actor, attack, proof) {
   throw Error(loc`The original attack chain is missing or cyclic.`);
 }
 /** Historical facts authorize bookkeeping, never a new roll or a substitute Item. */
-function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
+function recordedAttackDamageFacts(actor, attack, { targetUuid, impaleDefense } = {}) {
   const c = attack?.flags?.spycraft2,
     trade = attackTradeoffProof(c),
     declaredTrick = c?.attackContext?.meleeTrick,
     trick =
-      declaredTrick?.damageBonus === 0 && !declaredTrick?.grantedQuality && !declaredTrick?.sneakDice
+      declaredTrick?.damageBonus === 0 &&
+      !declaredTrick?.grantedQuality &&
+      !declaredTrick?.sneakDice &&
+      declaredTrick?.key !== "impale"
         ? null
         : declaredTrick,
     p = trade ?? trick,
@@ -154,6 +158,15 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
   if (actualTarget !== p.targetUuid || (targetUuid && targetUuid !== p.targetUuid))
     throw Error(loc`Use the recorded attack’s actual target.`);
   const rootAttackUuid = attackRoot(actor, attack, damageDeclaration(c));
+  // Impale's bonus comes from the GC-confirmed Defense, which is recorded with the damage.
+  const impale =
+    trick?.key === "impale" && impaleDefense !== undefined
+      ? {
+          defense: impaleDefense,
+          attackResult: c.effectiveTotal,
+          bonus: impaleDamageBonus(c.effectiveTotal, impaleDefense)
+        }
+      : null;
   return {
     version: 1,
     rootAttackUuid,
@@ -162,7 +175,8 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
     weaponUuid: c.weaponUuid,
     sourceEvidence: rollEvidence(c),
     source: [trade?.source, trick?.source].filter(Boolean).join(" + "),
-    bonus: (trade?.damageBonus ?? 0) + (trick?.damageBonus ?? 0),
+    bonus: (trade?.damageBonus ?? 0) + (trick?.damageBonus ?? 0) + (impale?.bonus ?? 0),
+    ...(impale ? { impale } : {}),
     ...(trick?.grantedQuality ? { grantedQuality: trick.grantedQuality } : {}),
     ...(trick?.sneakDice ? { sneakDice: trick.sneakDice, sneakSource: trick.source } : {}),
     ...(p.manualTargetName ? { manualTargetName: p.manualTargetName } : {}),
@@ -178,8 +192,8 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
   };
 }
 
-export function attackDamageBenefitSource(actor, attack, item, { targetUuid, historical = false } = {}) {
-  const facts = recordedAttackDamageFacts(actor, attack, { targetUuid }),
+export function attackDamageBenefitSource(actor, attack, item, { targetUuid, historical = false, impaleDefense } = {}) {
+  const facts = recordedAttackDamageFacts(actor, attack, { targetUuid, impaleDefense }),
     c = attack.flags.spycraft2,
     p = attackTradeoffProof(c) ?? c.attackContext.meleeTrick,
     profile = c.attackContext.meleeTrick ?? (p.source === "Bullseye" ? p : null);
@@ -231,9 +245,14 @@ export function eligibleAttackDamageHits(actor, item) {
       }
     });
 }
-export function makeAttackDamageProof(actor, item, attackUuid, { targetUuid } = {}) {
+/** Whether a recorded hit is an Impale attack, whose damage needs the target's Defense. */
+export const impaleHit = attack => attack?.flags?.spycraft2?.attackContext?.meleeTrick?.key === "impale";
+export function makeAttackDamageProof(actor, item, attackUuid, { targetUuid, impaleDefense } = {}) {
+  const attack = message(attackUuid);
+  if (impaleHit(attack) && impaleDefense === undefined)
+    throw Error(loc`Enter the target’s Defense against the Impale attack to roll its damage.`);
   return {
-    ...attackDamageBenefitSource(actor, message(attackUuid), item, { targetUuid }),
+    ...attackDamageBenefitSource(actor, attack, item, { targetUuid, impaleDefense }),
     reservationId: foundry.utils.randomID()
   };
 }
@@ -246,7 +265,11 @@ function validateSource(actor, proof, { historical = false } = {}) {
     item =
       actor.items?.get?.(proof.weaponUuid?.split(".").at(-1)) ??
       values(actor.items).find(i => i.uuid === proof.weaponUuid);
-  const expected = attackDamageBenefitSource(actor, attack, item, { targetUuid: proof.targetUuid, historical }),
+  const expected = attackDamageBenefitSource(actor, attack, item, {
+      targetUuid: proof.targetUuid,
+      historical,
+      impaleDefense: proof.impale?.defense
+    }),
     { reservationId, ...facts } = proof;
   if (typeof reservationId !== "string" || !reservationId || stable(expected) !== stable(facts))
     throw Error(loc`The original recorded attack bonus hit, target or damage source changed.`);
@@ -413,7 +436,10 @@ export async function reviewAttackDamageBenefit(actor, { reservationId, confirme
       throw Error(loc`The posted damage lost its earned takedown quality.`);
     if (receipt) {
       const { reservationId: nonce, ...facts } = receipt.flags.spycraft2.attackDamageBenefit,
-        expected = recordedAttackDamageFacts(actor, message(use.attackUuid), { targetUuid: use.targetUuid });
+        expected = recordedAttackDamageFacts(actor, message(use.attackUuid), {
+          targetUuid: use.targetUuid,
+          impaleDefense: facts.impale?.defense
+        });
       if (nonce !== use.reservationId || stable(expected) !== stable(facts))
         throw Error(loc`The posted damage bonus or original recorded hit changed.`);
     }
@@ -460,5 +486,28 @@ rollPipeline.register({
     const proof = options.attackDamageBenefit;
     if (!proof || options.rerollOf || hasAttackDamageLease(actor, proof, options.attackDamageLease)) return null;
     return next => withAttackDamageBenefit(actor, proof, lease => next({ attackDamageLease: lease }));
+  }
+});
+
+// Impale: the damage dialog asks for the target's Defense when an Impale hit is on offer.
+const wholeNumber = v => {
+  const n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN;
+  return Number.isSafeInteger(n) ? n : undefined;
+};
+rollPipeline.register({
+  id: "impaleDefenseContent:damage",
+  dialogs: ["damage"],
+  order: 31,
+  dialog: ({ attackBonusHits = [] }) => [
+    {
+      at: 45,
+      html: attackBonusHits.some(h => impaleHit(h.message))
+        ? `<label>${loc`Target’s Defense against the Impale hit (GC confirms; +1 damage per 2 points the attack beat it)`} <input type="number" name="impaleDefense" min="0" step="1" /></label>`
+        : ""
+    }
+  ],
+  read: (context, input) => {
+    const n = wholeNumber(input?.impaleDefense);
+    return n === undefined ? null : { impaleDefense: n };
   }
 });

@@ -56,6 +56,18 @@ import {
 import { takeMobileOffense } from "../apps/mobile-offense.mjs";
 import { takeContempt } from "../apps/contempt.mjs";
 import { takeCombatInstincts } from "../apps/combat-instincts.mjs";
+import { takeDropFollowUp } from "../apps/drop-follow-up.mjs";
+import { takeOpportunist } from "../apps/opportunist.mjs";
+import { grantFortunate } from "../apps/fortunate.mjs";
+import { applyBlackCat } from "../apps/black-cat.mjs";
+import { enterBerserkerRage, endBerserkerRage } from "../apps/berserker.mjs";
+import { useGunslingersEye } from "../apps/gunslinger.mjs";
+import { takeFireTeamSupremacy } from "../apps/team-final-attack.mjs";
+import { declareDuelingBasics } from "../apps/dueling-basics.mjs";
+import { declareFightDefensively, declareIntenseStance } from "../apps/fight-defensively.mjs";
+import { declareSnakeStrike } from "../apps/snake-strike.mjs";
+import { companionsContext, createCompanion, recordCompanionDeath } from "../apps/companions.mjs";
+import { editIdentity, removeIdentity, enterIdentity, leaveIdentity } from "../apps/flawless-identity.mjs";
 import { rollDisarmResponse } from "../apps/disarm-response.mjs";
 import { takeMissTrick } from "../apps/miss-tricks.mjs";
 import { rollCheapShot } from "../apps/cheap-shot.mjs";
@@ -224,6 +236,66 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       takeCombatInstincts() {
         return takeCombatInstincts(this.actor);
       },
+      takeCleaveBasics() {
+        return takeDropFollowUp(this.actor, "cleaveBasics");
+      },
+      takeSnapShot() {
+        return takeDropFollowUp(this.actor, "snapShot");
+      },
+      takeOpportunist() {
+        return takeOpportunist(this.actor);
+      },
+      grantFortunate() {
+        return grantFortunate(this.actor);
+      },
+      applyBlackCat() {
+        return applyBlackCat(this.actor);
+      },
+      enterBerserkerRage() {
+        return enterBerserkerRage(this.actor);
+      },
+      useGunslingersEye() {
+        return useGunslingersEye(this.actor);
+      },
+      takeFireTeamSupremacy() {
+        return takeFireTeamSupremacy(this.actor);
+      },
+      declareDuelingBasics() {
+        return declareDuelingBasics(this.actor);
+      },
+      declareFightDefensively() {
+        return declareFightDefensively(this.actor);
+      },
+      declareIntenseStance() {
+        return declareIntenseStance(this.actor);
+      },
+      declareSnakeStrike() {
+        return declareSnakeStrike(this.actor);
+      },
+      createCompanion(event, target) {
+        return createCompanion(this.actor, target.dataset.feat);
+      },
+      openCompanion(event, target) {
+        return fromUuidSync(target.dataset.uuid)?.sheet?.render(true);
+      },
+      companionDied(event, target) {
+        return recordCompanionDeath(this.actor, target.dataset.uuid);
+      },
+      editIdentity(event, target) {
+        return editIdentity(this.actor, target.dataset.id ?? "");
+      },
+      removeIdentity(event, target) {
+        return removeIdentity(this.actor, target.dataset.id);
+      },
+      enterIdentity(event, target) {
+        return enterIdentity(this.actor, target.dataset.id);
+      },
+      leaveIdentity() {
+        return leaveIdentity(this.actor);
+      },
+      endBerserkerRage() {
+        return endBerserkerRage(this.actor);
+      },
       manageCheapShots() {
         return this.actor.manageCheapShots();
       },
@@ -310,6 +382,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       declareDarting() {
         return declareDarting(this.actor);
+      },
+      declareFollowUp() {
+        return declareDarting(this.actor, { kind: "followUp" });
+      },
+      declareTwoHit() {
+        return declareDarting(this.actor, { kind: "twoHit" });
       },
       takeDartingFinalAttack() {
         return takeDartingFinalAttack(this.actor);
@@ -1045,6 +1123,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.contempt = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contempt");
     context.contemptRound = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contemptRound");
     context.combatInstincts = (this.actor.limitedUseStatus ?? []).find(s => s.id === "combatInstincts");
+    context.cleaveBasics = (this.actor.limitedUseStatus ?? []).find(s => s.id === "cleaveBasics");
+    context.snapShot = (this.actor.limitedUseStatus ?? []).find(s => s.id === "snapShot");
+    context.opportunist = (this.actor.limitedUseStatus ?? []).find(s => s.id === "opportunist");
+    context.fortunate = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fortunate");
+    context.blackCat = (this.actor.limitedUseStatus ?? []).find(s => s.id === "blackCat");
+    context.berserker = (this.actor.limitedUseStatus ?? []).find(s => s.id === "berserkerRage");
+    context.gunslinger = (this.actor.limitedUseStatus ?? []).find(s => s.id === "gunslingersEye");
+    context.fireTeamSupremacy = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fireTeamSupremacy");
+    context.companions = this.actor.type === "agent" ? companionsContext(this.actor) : null;
+    context.flawlessIdentity = this.actor.system.activeFeatNames?.includes("Flawless Identity") === true;
     context.twoWeaponFinalAttack = (this.actor.limitedUseStatus ?? []).find(s => s.id === "twoWeaponFinalAttack");
     context.jinxUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "jinx");
     context.markUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "mark");

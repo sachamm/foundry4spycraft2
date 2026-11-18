@@ -2,7 +2,136 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { loc } from "../i18n.mjs";
-export const FREE_ACTION_FEATS = { quickDraw: "Quick Draw", surgeOfSpeed: "Surge of Speed" };
+import { totalDefenseState } from "./total-defense.mjs";
+
+/**
+ * Feats that let an ordinary action be taken as a free (or half) action a set number of times per round. The action
+ * itself is resolved at the table; the receipt records the conversion and spends the round use.
+ * - Containment Mastery (Diversion or Taunt), Fire-Team Basics (Cover Fire), Fire-Team Mastery (Medicine/Stabilize)
+ *   and Tac-Squad Mastery (Suppressive Fire as a half action) need a 2-to-1 or greater advantage (pp.172–175).
+ * - Merciless: a Coup de Grace against a helpless character (p.195).
+ * - Weather the Storm (Boxing Moves, p.185): twice per round while in Total Defense, a Tire action against an
+ *   opponent who attacks, at any Initiative Count.
+ */
+export const ROUND_ACTION_FEATS = Object.freeze({
+  containmentMastery: {
+    feat: "Containment Mastery",
+    actions: ["Diversion", "Taunt"],
+    perRound: 1,
+    cost: "free",
+    advantage: true
+  },
+  fireTeamBasics: { feat: "Fire-Team Basics", actions: ["Cover Fire"], perRound: 1, cost: "free", advantage: true },
+  fireTeamMastery: {
+    feat: "Fire-Team Mastery",
+    actions: ["Medicine/Stabilize check"],
+    perRound: 1,
+    cost: "free",
+    advantage: true
+  },
+  tacSquadMastery: {
+    feat: "Tac-Squad Mastery",
+    actions: ["Suppressive Fire"],
+    perRound: 1,
+    cost: "half",
+    advantage: true
+  },
+  autofireBasics: { feat: "Autofire Basics", actions: ["Cover Fire"], perRound: 1, cost: "half" },
+  // Tac-Squad Basics, p.175: a free Threaten, or an Intimidate/Coercion check as a half action (2-to-1).
+  tacSquadBasics: {
+    feat: "Tac-Squad Basics",
+    actions: ["Threaten", "Intimidate/Coercion check"],
+    costs: { "Intimidate/Coercion check": "half" },
+    perRound: 1,
+    cost: "free",
+    advantage: true
+  },
+  // Horde Mastery, p.174: a Pummel as a half action (2-to-1).
+  hordeMastery: { feat: "Horde Mastery", actions: ["Pummel"], perRound: 1, cost: "half", advantage: true },
+  // Revolver Basics, p.182: once per round, a full reload of a revolver as a free action.
+  revolverBasics: { feat: "Revolver Basics", actions: ["Reload a revolver completely"], perRound: 1, cost: "free" },
+  merciless: { feat: "Merciless", actions: ["Coup de Grace against a helpless character"], perRound: 1, cost: "free" },
+  spiritBasics: {
+    feat: "Spirit Basics",
+    label: "Spirit Basics",
+    actions: ["Reduce the lethal damage from one source by your base attack bonus (minimum 1)"],
+    perRound: 1,
+    period: "combat",
+    cost: "free",
+    anyCount: true
+  },
+  weatherTheStorm: {
+    feat: "Boxing Moves",
+    label: "Weather the Storm",
+    actions: ["Tire against an attacking opponent"],
+    perRound: 2,
+    cost: "free",
+    totalDefense: true,
+    anyCount: true
+  }
+});
+export const FREE_ACTION_FEATS = {
+  quickDraw: "Quick Draw",
+  surgeOfSpeed: "Surge of Speed",
+  ...Object.fromEntries(Object.entries(ROUND_ACTION_FEATS).map(([k, d]) => [k, d.label ?? d.feat]))
+};
+
+/** The per-round uses these feats give. */
+export function roundActionSpecs(system) {
+  return Object.entries(ROUND_ACTION_FEATS)
+    .filter(([, d]) => system.activeFeatNames?.includes(d.feat))
+    .map(([id, d]) => ({
+      id,
+      name: loc`${d.label ?? d.feat}: ${d.actions.join(" / ")} as a ${d.cost} action`,
+      period: d.period ?? "round",
+      limit: d.perRound,
+      workflow: "featFreeAction",
+      combatScoped: true,
+      manualReviewable: true,
+      hidden: true,
+      roundAction: true
+    }));
+}
+
+function roundActionPlan(
+  system,
+  combat,
+  source,
+  { action = "", description = "", confirmed = false, advantageConfirmed = false } = {}
+) {
+  const d = ROUND_ACTION_FEATS[source];
+  if (!system.activeFeatNames?.includes(d.feat)) throw new Error(loc`${d.feat} has not been earned.`);
+  if (!validOwnCountClock(combat) || (!d.anyCount && combat.turn !== combat.ownTurnIndex))
+    throw new Error(
+      d.anyCount
+        ? loc`Use this in a started combat.`
+        : loc`Use this free action during this character’s Initiative Count in a started combat.`
+    );
+  const blocked =
+    restraintActionBlock(system, { free: d.cost === "free" }) || attributeActionBlock(system, { kind: "attack" });
+  if (blocked) throw new Error(blocked);
+  if (!d.actions.includes(action)) throw new Error(loc`Choose one of the actions this feat converts.`);
+  if (d.advantage && advantageConfirmed !== true)
+    throw new Error(loc`The GC must confirm your side has a 2-to-1 or greater advantage.`);
+  if (d.totalDefense && !totalDefenseState(system).active)
+    throw new Error(loc`Weather the Storm works while you benefit from Total Defense.`);
+  if (confirmed !== true || typeof description !== "string" || !description.trim() || description.length > 1000)
+    throw new Error(loc`Describe the actual legal action and confirm its circumstances with the GC.`);
+  return {
+    version: 1,
+    source: d.label ?? d.feat,
+    resourceId: source,
+    action,
+    description: description.trim(),
+    actionCost: d.costs?.[action] ?? d.cost,
+    combatId: combat.id,
+    combatantId: combat.combatantId,
+    round: combat.round,
+    turn: combat.turn,
+    ...(d.advantage ? { advantageConfirmed: true } : {}),
+    confirmed: true
+  };
+}
 export const QUICK_DRAW_ACTIONS = {
   draw: "Draw Weapon",
   holster: "Holster Weapon",
@@ -22,6 +151,13 @@ export function featFreeActionPlan(
     purelyMentalConfirmed = false
   } = {}
 ) {
+  if (Object.hasOwn(ROUND_ACTION_FEATS, source))
+    return roundActionPlan(system, combat, source, {
+      action,
+      description,
+      confirmed,
+      advantageConfirmed: arguments[2]?.advantageConfirmed
+    });
   const name = FREE_ACTION_FEATS[source];
   if (!name || !system.activeFeatNames?.includes(name))
     throw new Error(loc`Choose an earned Quick Draw or Surge of Speed feat.`);

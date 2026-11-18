@@ -5,6 +5,7 @@ import {
   FIRE_ACTIONS,
   GRAPPLE_BENEFITS,
   SUPPRESSIVE_FIRE,
+  steelRainWeapon,
   autofireHits,
   blastIncrementFeet,
   blastProfile,
@@ -16,6 +17,7 @@ import {
   strafeHits
 } from "../rules/combat-actions.mjs";
 import { parseAmmunitionCode } from "../rules/ammunition.mjs";
+import { grappleTrickLines } from "../rules/grapple-tricks.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
@@ -36,12 +38,19 @@ const whole = value => (value === "" || value === null || value === undefined ? 
 /* -------------------------------------------- */
 
 /** The ranged attack dialog's fire action section, for firearms that can fire more than one shot. */
-export function fireActionContent(preview, item) {
+export function fireActionContent(preview, item, actor = null) {
+  if (!preview?.firearm && steelRainWeapon(actor?.system, item?.system)) return steelRainContent();
   if (!preview?.firearm) return "";
   const modes = preview.modes ?? [],
     capacity = parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "";
   const option = (value, label, show = true) => (show ? `<option value="${value}">${label}</option>` : "");
-  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="10" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}" /></label><p class="hint">${loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
+  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("twoShotBurst", loc`Two-Shot Burst — Single-Shot or Burst mode, 2 shots, at most 2 hits (Autofire Basics)`, (modes.includes("single") || modes.includes("burst")) && actor?.system?.activeFeatNames?.includes("Autofire Basics") === true)}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="100" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}" /></label><p class="hint">${loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
+}
+
+/** Steel Rain's hurled-weapon fire actions: the Burst trick, Cover Fire and Suppressive Fire. */
+function steelRainContent() {
+  const option = (value, label) => `<option value="${value}">${label}</option>`;
+  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action (Steel Rain)`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — 3 hurled weapons, error +1 (a Standard Attack)`)}${option("coverFire", loc`Cover Fire — 5 hurled weapons, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 hurled weapons at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 hurled weapon, –4`)}</select></label><label>${loc`Hurled weapons of this kind on you`} <input type="number" name="shotsRemaining" min="0" step="1" /></label><p class="hint">${loc`Each “shot” is one hurled weapon thrown. They are not deducted for you (p.182).`}</p></fieldset>`;
 }
 
 /** What the section's fields mean for the roll. */
@@ -58,7 +67,7 @@ export function fireActionInput(input = {}) {
     fireSquares: action === "strafe" ? countEntered : null,
     shotsRemaining: whole(input.shotsRemaining),
     // Each fire action is its own kind of attack action for Aim and Brace.
-    ...(action === "burst" ? { attackAction: "standard" } : {}),
+    ...(["burst", "twoShotBurst"].includes(action) ? { attackAction: "standard" } : {}),
     ...(action === "autofire" ? { attackAction: "autofire" } : {}),
     ...(["strafe", "suppressiveFinal"].includes(action) ? { attackAction: "other", aimed: false } : {})
   };
@@ -68,7 +77,7 @@ rollPipeline.register({
   id: "fireActionContent:rangedAttack",
   dialogs: ["rangedAttack"],
   order: 9740,
-  dialog: ({ preview, item }) => [{ at: 175, html: fireActionContent(preview, item) }],
+  dialog: ({ preview, item, actor }) => [{ at: 175, html: fireActionContent(preview, item, actor) }],
   read: (context, input) => fireActionInput(input)
 });
 
@@ -152,7 +161,9 @@ export async function countFireActionHits(message) {
   const check = message.flags?.spycraft2,
     action = check?.attackContext?.fireAction;
   if (!action) return null;
-  const total = check.effectiveTotal;
+  const total = check.effectiveTotal,
+    feats = fromUuidSync(check.actorUuid)?.system?.activeFeatNames ?? [],
+    supreme = feats.includes("Autofire Supremacy");
   if (action.action === "strafe") {
     const input = await systemDialog.input({
       window: { title: loc`Strafe: targets in order` },
@@ -166,7 +177,7 @@ export async function countFireActionHits(message) {
       .map(Number);
     if (!defenses.length || defenses.some(d => !Number.isFinite(d) || d < 0) || defenses.length > action.squares)
       return ui.notifications.warn(loc`Enter up to ${action.squares} Defense values, each 0 or more.`);
-    const results = strafeHits(total, defenses);
+    const results = strafeHits(total, defenses, { step: supreme ? 1 : 2 });
     return post(fromUuidSync(check.actorUuid), [
       loc`Strafe, result ${total}:`,
       ...results.map(r =>
@@ -178,7 +189,11 @@ export async function countFireActionHits(message) {
     ]);
   }
   const input = await systemDialog.input({
-    window: { title: action.action === "burst" ? loc`Burst: shots that hit` : loc`Autofire: shots that hit` },
+    window: {
+      title: ["burst", "twoShotBurst"].includes(action.action)
+        ? loc`Burst: shots that hit`
+        : loc`Autofire: shots that hit`
+    },
     rejectClose: false,
     content: `<div class="spycraft2-roll-options"><p>${loc`Attack result ${total}.`}</p><label>${loc`Target's Defense`} <input type="number" name="defense" min="0" step="1" required /></label></div>`
   });
@@ -186,11 +201,16 @@ export async function countFireActionHits(message) {
   const defense = Number(input.defense);
   if (!Number.isFinite(defense)) return null;
   if (defense < 0) return ui.notifications.warn(loc`Defense cannot be negative.`);
-  const hits = action.action === "burst" ? burstHits(total, defense) : autofireHits(total, defense, action.volleys);
+  const hits =
+    action.action === "burst"
+      ? burstHits(total, defense)
+      : action.action === "twoShotBurst"
+        ? burstHits(total, defense, 2)
+        : autofireHits(total, defense, action.volleys, { perPoints: supreme ? 3 : 4 });
   return post(fromUuidSync(check.actorUuid), [
     hits
-      ? loc`${action.action === "burst" ? loc`Burst` : loc`Autofire`}: result ${total} against Defense ${defense} — ${hits} shot(s) hit. Roll damage once for each; a critical hit sends only the first to wounds.`
-      : loc`${action.action === "burst" ? loc`Burst` : loc`Autofire`}: result ${total} against Defense ${defense} — a miss.`
+      ? loc`${action.action === "autofire" ? loc`Autofire` : loc`Burst`}: result ${total} against Defense ${defense} — ${hits} shot(s) hit. Roll damage once for each; a critical hit sends only the first to wounds.`
+      : loc`${action.action === "autofire" ? loc`Autofire` : loc`Burst`}: result ${total} against Defense ${defense} — a miss.`
   ]);
 }
 
@@ -201,7 +221,7 @@ rollPipeline.register({
   chatControls({ message, check, actor }) {
     const controls = [];
     const action = check.attackContext?.fireAction;
-    if (action && ["burst", "autofire", "strafe"].includes(action.action) && !check.superseded)
+    if (action && ["burst", "twoShotBurst", "autofire", "strafe"].includes(action.action) && !check.superseded)
       controls.push({ label: loc`Count the shots that hit`, run: () => countFireActionHits(message) });
     if (check.attackContext?.pummel && !check.superseded) {
       const weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null;
@@ -284,6 +304,9 @@ export async function settleGrapple(actor, options = {}) {
           .join("")}</ul>`
       ]
     : [];
+  const tricks = grappleTrickLines(actor.system);
+  if (tricks.length)
+    benefits.push(loc`Your grapple tricks:`, `<ul>${tricks.map(line => `<li>${esc(line)}</li>`).join("")}</ul>`);
   await post(actor, [
     loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
     ...outcome.effects.map(esc),

@@ -113,3 +113,12 @@ test("proof preserves the source and calculation, supports native key order, and
   r.reductions[0].feet = 999;
   assert.deepEqual(s.activeFeatNames, ["Equilibrium Basics"]);
 });
+
+test("Spider Mastery: each falling damage die is 1 lower", async () => {
+  const { fallDistancePlan } = await import("../module/rules/fall-distance.mjs");
+  const input = { fallDeclared: true, fallDistanceFeet: 30, fallSoftSurface: false, fallConfirmed: true };
+  const plan = fallDistancePlan({ activeFeatNames: ["Spider Mastery"] }, input);
+  assert.equal(plan.perDieReduction, 1);
+  assert.match(plan.notes.join(" "), /Spider Mastery/);
+  assert.equal(fallDistancePlan({ activeFeatNames: [] }, input).perDieReduction, undefined);
+});

@@ -45,6 +45,8 @@ const SKILL_PLAN_FIELDS = [
   "rankSynergyFeats",
   "stoneCold",
   "threaten",
+  "taunt",
+  "diversion",
   "bugConcealment",
   "documentation",
   "analysisTask",
@@ -114,6 +116,8 @@ const GUARDED_SKILL_FIELDS = [
   "rankSynergyFeats",
   "stoneCold",
   "threaten",
+  "taunt",
+  "diversion",
   "bugConcealment",
   "documentation",
   "analysisTask",
@@ -283,7 +287,8 @@ export const ActorSkillRolls = Base =>
           : []),
         ...(input.breakthrough ? [{ id: "breakthrough", workflow: "breakthrough" }] : []),
         ...(input.allAccordingToPlan ? [{ id: "allAccordingToPlan", workflow: "attributeSubstitution" }] : []),
-        ...(input.cunningPlan ? [{ id: "cunningPlan", workflow: "cunningPlan" }] : [])
+        ...(input.cunningPlan ? [{ id: "cunningPlan", workflow: "cunningPlan" }] : []),
+        ...(input.allOrNothing === true ? [{ id: "allOrNothing", workflow: "allOrNothing" }] : [])
       ];
       const esc = foundry.utils.escapeHTML;
       if (
@@ -447,6 +452,7 @@ export const ActorSkillRolls = Base =>
             requiredBonusPoolId,
             oneInAMillion: !!input.oneInAMillion,
             tenSecondSolution: !!input.tenSecondSolution,
+            ...(input.allOrNothing === true ? { allOrNothing: true, allOrNothingCommitted: true } : {}),
             standaloneCheckConfirmed: !!input.standaloneCheckConfirmed,
             inComplexTask:
               !!input.inComplexTask ||
@@ -738,7 +744,8 @@ export const ActorSkillRolls = Base =>
         });
       const additionalUses = [
         ...(input.breakthrough ? [{ id: "breakthrough", workflow: "breakthrough" }] : []),
-        ...(input.cunningPlan ? [{ id: "cunningPlan", workflow: "cunningPlan" }] : [])
+        ...(input.cunningPlan ? [{ id: "cunningPlan", workflow: "cunningPlan" }] : []),
+        ...(input.allOrNothing === true ? [{ id: "allOrNothing", workflow: "allOrNothing" }] : [])
       ];
       if (input.brightIdea && input.tenSecondSolution)
         throw new Error(loc`Choose one pre-roll class ability for Knowledge.`);
@@ -806,6 +813,7 @@ export const ActorSkillRolls = Base =>
             choiceSource: brightSource?.name,
             choiceResourceId: brightSource?.id,
             tenSecondSolution: !!input.tenSecondSolution,
+            ...(input.allOrNothing === true ? { allOrNothing: true, allOrNothingCommitted: true } : {}),
             standaloneCheckConfirmed: !!input.standaloneCheckConfirmed,
             inComplexTask: !!input.inComplexTask,
             inDramaticConflict: !!input.inDramaticConflict

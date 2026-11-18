@@ -4,6 +4,7 @@ import { getReserveReview } from "./reserve-transactions.mjs";
 import { getBaffledReview } from "./baffled.mjs";
 import { queueResources, periodResourceActors } from "./transactions.mjs";
 import { withGCPeriodLock } from "./gc-dice.mjs";
+import { actionDiceGain } from "./action-dice.mjs";
 import { loc } from "../i18n.mjs";
 const clone = structuredClone,
   same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -44,6 +45,12 @@ const individualReview = actor =>
   ["actionDieAwardReview", "actionDiceSettlementReview", "missionXPReview"].some(
     key => actor.flags?.spycraft2?.[key]?.needsReview
   );
+/** The session's starting dice as gained: Fortune Favors the Bold improves their type (a d12 becomes two d6). */
+export function sessionGain(system, starting) {
+  const die = system?.actionDice?.die;
+  if (!starting || ![4, 6, 8, 10, 12].includes(die)) return { units: starting, die };
+  return actionDiceGain(system, die, starting);
+}
 /** p.27: discard old ordinary dice and use starting counts; unentered level-zero creations wait. */
 export function sessionDicePlan(actors) {
   return actors
@@ -58,7 +65,8 @@ export function sessionDicePlan(actors) {
       return {
         actor,
         before,
-        value: deferred ? 0 : starting,
+        // Fortune Favors the Bold (p.189) improves the dice gained at the start of each session.
+        value: deferred ? 0 : sessionGain(actor.system, starting).units,
         starting,
         deferred,
         level: actor.system.level,
@@ -116,9 +124,9 @@ export async function startUsagePeriod(period) {
               id,
               session: id,
               actorUuid: p.actor.uuid,
-              value: p.starting,
+              value: p.value,
               previousSession: String(beforePeriods.session ?? "initial"),
-              die: p.die,
+              die: p.starting > 0 && p.die ? sessionGain(p.actor.system, p.starting).die : p.die,
               level: p.level ?? null,
               at
             };

@@ -261,10 +261,12 @@ export const RECORD_SHAPES = {
         resolution: "string"
       },
       choice: "string",
+      doubled: "boolean",
       lastSaveAt: "null|number",
       madeAt: "number",
       recovered: "boolean",
       recoveryMessage: "string",
+      repeat: "boolean",
       scene: "string",
       sourceMessage: "string",
       version: "number"
@@ -307,6 +309,72 @@ export const RECORD_SHAPES = {
     id: "string",
     penalty: "number",
     startRound: "number"
+  },
+  berserkerRage: {
+    $also: "null",
+    bonus: "number",
+    combatId: "string",
+    id: "string",
+    rounds: "number",
+    startRound: "number",
+    tier: "string",
+    version: "number"
+  },
+  companionOf: {
+    $also: "null",
+    feat: "string",
+    ownerUuid: "string"
+  },
+  identities: [
+    {
+      id: "string",
+      interests: ["string"],
+      name: "string",
+      professionFocus: "string"
+    }
+  ],
+  snakeStrikes: [
+    {
+      combatId: "string",
+      id: "string",
+      round: "number",
+      targetUuid: "string",
+      version: "number",
+      weaponId: "string"
+    }
+  ],
+  woundDrops: {
+    $also: "null",
+    combatId: "string",
+    count: "number",
+    version: "number"
+  },
+  intenseStance: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    id: "string",
+    startRound: "number",
+    version: "number"
+  },
+  fightDefensively: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    dueRound: "number",
+    id: "string",
+    startRound: "number",
+    version: "number"
+  },
+  duelingBasics: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    dueRound: "number",
+    opponentName: "string",
+    opponentUuid: "string",
+    startRound: "number",
+    version: "number"
   },
   combatStance: {
     $also: "null",
@@ -450,6 +518,27 @@ export const RECORD_SHAPES = {
     requiredHours: "number",
     sourceIds: ["string"],
     startedAt: "number"
+  },
+  tauntBonuses: [
+    {
+      bonus: "number",
+      combatId: "string",
+      sourceMessage: "string",
+      targetUuid: "string",
+      untilRound: "number",
+      version: "number"
+    }
+  ],
+  undermined: {
+    $also: "null",
+    combatId: "string",
+    penalty: "number",
+    rounds: "number",
+    sourceMessage: "string",
+    sourceUuid: "string",
+    startRound: "number",
+    startTurn: "number",
+    version: "number"
   },
   feintBonuses: [
     {

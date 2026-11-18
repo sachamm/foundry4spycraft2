@@ -6,6 +6,16 @@ import { readiedDisarmWeapons } from "./disarm-response.mjs";
 import { readiedGuardWeapons } from "./guard.mjs";
 import { polearmDefensePlan } from "./polearm-defense.mjs";
 import { knifeBasicsPlan } from "./knife-basics.mjs";
+import { swordBasicsPlan } from "./sword-basics.mjs";
+import { berserkerRageState } from "./berserker.mjs";
+import { favoredGearState, featPossessionWarnings } from "./favored-gear.mjs";
+import { duelingAllDodge } from "./dueling-basics.mjs";
+import { fightDefensivelyState } from "./fight-defensively.mjs";
+import { notTheFaceDR } from "./not-the-face.mjs";
+import { underminedState } from "./taunt.mjs";
+import { PERSONAL_LIEUTENANT, lieutenantReview } from "./companions.mjs";
+import { activeIdentity, identityReview, professionFocusesWithIdentity } from "./flawless-identity.mjs";
+import { intenseStanceState } from "./intense-stance.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -236,6 +246,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const progression = sys.progression ?? [];
   const level = progression.length;
   sys.level = level;
+  sys.specialtyName = items.find(i => i.type === "origin" && i.system?.originType === "specialty")?.name ?? "";
   sys.activeFeatSelections = items
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id))
     .map(i => ({ name: ruleName(i), choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));
@@ -340,6 +351,23 @@ export function computeAgent(sys, items, cfg, options = {}) {
         ...Object.keys(cfg.skills).map(key => ({ target: `skills.${key}.misc`, value: "-2" })),
         ...["knowledge", "saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "-2" }))
       ]
+    });
+  // Rooted Stance (Spirit Basics, p.187): +1 to all saves while in the stance.
+  if (sys.combatStance?.key === "rooted" && sys.activeFeatNames?.includes("Spirit Basics"))
+    sources.push({
+      name: "Rooted Stance",
+      rank: 1,
+      bonuses: ["saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "1" }))
+    });
+  // Dueling Basics, p.178: +1 dodge against all attacks for the declared round when no opponent was chosen.
+  if (duelingAllDodge(sys))
+    sources.push({ name: "Dueling Basics", rank: 1, bonuses: [{ target: "defense", value: "1", bonusType: "dodge" }] });
+  // Dueling Supremacy, p.178: +2 dodge bonus to Defense.
+  if (sys.activeFeatNames?.includes("Dueling Supremacy"))
+    sources.push({
+      name: "Dueling Supremacy",
+      rank: 1,
+      bonuses: [{ target: "defense", value: "2", bonusType: "dodge" }]
     });
   if ((classLevels.triggerman ?? 0) >= 8)
     sources.push({
@@ -633,6 +661,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
         if (!s.candidate) nonCandidateBonus.add(key, amount, s.name, b.bonusType);
       }
     }
+  // Berserker rage, pp.183–184: Strength and Constitution rise while it runs.
+  sys.berserkerRageState = berserkerRageState(sys.berserkerRage, sys.bonusPoolCombats?.[sys.berserkerRage?.combatId]);
+  const rageBonus = sys.berserkerRageState.active ? sys.berserkerRage.bonus : 0;
+  if (sys.berserkerRageState.record && !sys.berserkerRageState.active)
+    warnings.push(loc`The berserker rage has run out: end it to apply what follows.`);
   const increases = sys.abilityIncreases ?? {};
   const increaseAt = l => increases[`l${l}`] || "";
   let pointCost = 0;
@@ -640,7 +673,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     const a = sys.abilities[k];
     a.increase = cfg.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
     a.bonus = abilityBonus.get(k);
-    a.temporaryBonus = sys.mentalLeapState.bonuses[k] ?? 0;
+    a.temporaryBonus = (sys.mentalLeapState.bonuses[k] ?? 0) + (["str", "con"].includes(k) ? rageBonus : 0);
     a.damage = sys.attributeDamageState.byAbility[k].total;
     a.undamagedValue = a.base + a.increase + (a.misc ?? 0) + a.bonus + a.temporaryBonus;
     a.value = a.undamagedValue - a.damage;
@@ -1144,7 +1177,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.qualityNaturalDR = B.get("qualityNaturalDR");
   const classDR = B.get("naturalDR");
   sys.naturalDR = Math.max(classDR, sys.qualityNaturalDR);
-  const independentFeatDR = sys.superiorCoverState.dr + (sys.activeFeatNames.includes("Too Ugly to Die") ? 2 : 0);
+  // Death Ride, p.192: DR equal to the Chase feats while driving a vehicle or riding a mount.
+  sys.deathRideDR =
+    sys.activeFeatNames.includes("Death Ride") && sys.operatingVehicle === true
+      ? sys.activeFeatSelections.filter(f => f.tree === "chase").length
+      : 0;
+  const independentFeatDR =
+    sys.superiorCoverState.dr + (sys.activeFeatNames.includes("Too Ugly to Die") ? 2 : 0) + sys.deathRideDR;
   sys.dr = {
     melee: Math.max(sys.qualityNaturalDR, (sys.armor?.dr ?? 0) + classDR) + independentFeatDR,
     other: Math.max(sys.qualityNaturalDR, (sys.armor?.drRanged ?? 0) + classDR) + independentFeatDR
@@ -1190,6 +1229,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.guardWeapons = readiedGuardWeapons(sys, items);
   sys.disarmWeapons = readiedDisarmWeapons(sys, items);
   sys.knifeBasics = knifeBasicsPlan(sys, items);
+  sys.swordBasics = swordBasicsPlan(sys, items);
+  sys.favoredGear = favoredGearState(sys, items);
+  warnings.push(...sys.favoredGear.warnings, ...featPossessionWarnings(sys, items));
   const heldReview = sys.guardWeapons.blockedReason || sys.disarmWeapons.blockedReason;
   if (heldReview) {
     warnings.push(heldReview);
@@ -1203,6 +1245,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
     wornArmor: sys.armor?.adjustments ?? []
   });
   if (sys.bloodstainDefense.bonus) B.add("defense", sys.bloodstainDefense.bonus, "Bloodstain Resistant");
+  // Dueling Mastery, p.178: +1 to Defense while holding a readied melee weapon.
+  if (
+    sys.activeFeatNames.includes("Dueling Mastery") &&
+    !sys.disarmWeapons.blockedReason &&
+    sys.disarmWeapons.weapons.some(w => ["blunt", "exoticBlunt", "edged", "exoticEdged"].includes(w.proficiency))
+  )
+    B.add("defense", 1, "Dueling Mastery (readied melee weapon)");
   sys.totalDefenseState = totalDefenseState(sys);
   if (sys.totalDefenseState.needsReview) {
     warnings.push(sys.totalDefenseState.reason);
@@ -1216,6 +1265,21 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.combatExpertiseState = combatExpertiseState(sys);
   if (sys.combatExpertiseState.active)
     B.add("defense", sys.combatExpertiseState.dodgeBonus, "Combat Expertise", "dodge");
+  sys.fightDefensivelyState = fightDefensivelyState(sys);
+  sys.intenseStanceState = intenseStanceState(sys);
+  if (sys.fightDefensivelyState.active) {
+    B.add("defense", sys.fightDefensivelyState.dodgeBonus, "Fight Defensively", "dodge");
+    if (sys.fightDefensivelyState.equilibrium)
+      B.add("defense", sys.fightDefensivelyState.equilibrium, "Equilibrium Supremacy", "dodge");
+    if (sys.fightDefensivelyState.tribesman)
+      B.add("defense", sys.fightDefensivelyState.tribesman, "Tribesman (Fight Defensively)");
+  }
+  // Not the Face: DR against melee and unarmed attacks while either defensive declaration lasts.
+  sys.notTheFaceDR = notTheFaceDR(sys, abil.cha.mod);
+  if (sys.notTheFaceDR) {
+    sys.armorDRByAttack.unarmed += sys.notTheFaceDR;
+    sys.armorDRByAttack.meleeWeapon += sys.notTheFaceDR;
+  }
   const sideStanceDefense = sideStanceDefensePenalty(sys);
   if (sideStanceDefense) B.add("defense", sideStanceDefense, "Side Stance");
   sys.bonusSources.defense = B.sources.get("defense") ?? [];
@@ -1236,6 +1300,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
     initiativeBonus: sys.activeFeatNames.includes("CQB Supremacy") && sys.readiedRangedWeapons.length ? 5 : 0,
     weaponIds: sys.readiedRangedWeapons.map(w => w.id)
   };
+  // Undermine (p.205): a morale penalty on Initiative while it lasts.
+  sys.underminedState = underminedState(sys);
+  if (sys.underminedState.penalty) B.add("initiative", -sys.underminedState.penalty, "Undermined", "morale");
   if (sys.cqbReadiedRules.initiativeBonus) {
     B.add("initiative", 5, "CQB Supremacy (readied ranged weapon)");
     sys.bonusSources.initiative = B.sources.get("initiative") ?? [];
@@ -1434,6 +1501,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
       sys.actionDice.die = 6;
       sys.actionDice.max *= 2;
     } else sys.actionDice.die += 2;
+  }
+  // Personal Lieutenant (p.204): always exactly 1 action die.
+  if (sys.companionOf?.feat === PERSONAL_LIEUTENANT) {
+    sys.actionDice.max = 1;
+    if (sys.lieutenantOwner) warnings.push(...lieutenantReview(sys, sys.lieutenantOwner).warnings);
+    else warnings.push(loc`Personal Lieutenant: the owner could not be found.`);
   }
   sys.adrenalineJunkieSource = adrenalineSource(sys);
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
@@ -1648,6 +1721,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
     activeFeatIds
   });
   sys.focusTotals = focuses.totals;
+  // Flawless Identity (p.209): the identity in use adds its Profession focus.
+  sys.activeIdentityState = activeIdentity(sys);
+  if (sys.activeIdentityState && sys.focusTotals?.profession)
+    sys.focusTotals.profession = professionFocusesWithIdentity(sys, sys.focusTotals.profession);
+  warnings.push(...identityReview(sys));
   sys.temporaryFocusGrants = focuses.temporaryGrants;
   sys.skillForteTotals = focuses.activeFortes;
   sys.forcedFocuses = Object.fromEntries(Object.entries(focuses.forced).map(([key, value]) => [key, [...value]]));

@@ -17,17 +17,34 @@ import { loc } from "../i18n.mjs";
 
 export const FIRE_ACTIONS = {
   burst: { mode: "burst", shots: 3, error: 1 },
+  // Autofire Basics, p.180: a Burst that adds only 1 shot and never hits a third time.
+  twoShotBurst: { modes: ["single", "burst"], shots: 2, error: 1, maxHits: 2, feat: "Autofire Basics" },
   autofire: { mode: "auto", minimumShots: 6, shotsEach: 3, most: 10, error: 2 },
   strafe: { mode: "auto", minimumShots: 9, shotsEach: 3, most: 10, error: 2 },
   suppressiveFinal: { shots: 1, error: 1, attack: -4 }
 };
+/**
+ * Steel Rain, p.182: a hurled weapon (not one with a blast increment, nor firing blast ammunition) may be used for the
+ * Burst trick, Cover Fire and Suppressive Fire. Shots are the hurled weapons thrown.
+ */
+export const steelRainWeapon = (system, weapon) =>
+  system?.activeFeatNames?.includes("Steel Rain") === true &&
+  ["hurled", "exoticHurled"].includes(weapon?.proficiency) &&
+  !/\bBLS\b/.test(weapon?.qualities ?? "");
 export const COVER_FIRE = { shots: 5, base: 10, penalty: -4, finalAttackMargin: 5 };
 export const SUPPRESSIVE_FIRE = { shots: 5, penalty: -4 };
 const count = value => (Number.isSafeInteger(value) ? value : NaN);
 
+/** Rock and Roll!: 2 shots a volley, and as many volleys as half the shots left (rounded down). */
+export const rockAndRollRule = rule => ({
+  ...rule,
+  shotsEach: 2,
+  minimumShots: (rule.minimumShots / rule.shotsEach) * 2,
+  most: Number.MAX_SAFE_INTEGER
+});
+
 /** How many volleys or squares the shots left in a weapon allow. */
-export function fireActionLimit(action, shotsRemaining) {
-  const rule = FIRE_ACTIONS[action];
+export function fireActionLimit(action, shotsRemaining, rule = FIRE_ACTIONS[action]) {
   if (!rule?.shotsEach || !Number.isSafeInteger(shotsRemaining)) return 0;
   return shotsRemaining < rule.minimumShots ? 0 : Math.min(rule.most, Math.floor(shotsRemaining / rule.shotsEach));
 }
@@ -38,15 +55,51 @@ export function fireActionLimit(action, shotsRemaining) {
  * @param {object} declared { action, volleys, squares, shotsRemaining }
  * @returns {object|null} null when no fire action is declared
  */
-export function fireActionPlan(
-  facts = {},
-  { action = "", volleys = null, squares = null, shotsRemaining = null } = {}
-) {
+export function fireActionPlan(facts = {}, declared = {}) {
+  // Flamethrower Basics, p.181: a flamethrower attack uses half the usual shots, rounded up. Each shot left in the
+  // weapon covers two of the action's shots, so the base checks see twice the shots left.
+  const halved = facts.flamethrower === true && (facts.feats ?? []).includes("Flamethrower Basics");
+  if (!halved) return baseFireActionPlan(facts, declared);
+  const left = declared.shotsRemaining,
+    doubled = left === null || left === "" || left === undefined ? left : Number(left) * 2,
+    plan = baseFireActionPlan(facts, { ...declared, shotsRemaining: doubled });
+  if (!plan || plan.blocked) return plan;
+  const shots = Math.ceil(plan.shots / 2);
+  return {
+    ...plan,
+    shots,
+    notes: [...plan.notes, loc`Flamethrower Basics: this uses ${shots} shot(s) instead of ${plan.shots} (p.181).`]
+  };
+}
+function baseFireActionPlan(facts = {}, { action = "", volleys = null, squares = null, shotsRemaining = null } = {}) {
   if (!action) return null;
-  const rule = FIRE_ACTIONS[action];
+  // Rock and Roll!, p.182: Autofire and Strafe volleys take 2 shots each, up to half the shots left.
+  const rock = (facts.feats ?? []).includes("Rock and Roll") && ["autofire", "strafe"].includes(action);
+  const rule = rock ? rockAndRollRule(FIRE_ACTIONS[action]) : FIRE_ACTIONS[action];
   const stop = reason => ({ action, blocked: true, reason, attack: 0, extraRecoil: 0, error: 0, shots: 0, notes: [] });
   if (!rule) return stop(loc`Choose a listed fire action.`);
   if (!facts.firearm) return stop(loc`This action needs a firearm.`);
+  const feats = facts.feats ?? [];
+  // Autofire Mastery, p.180: Burst and Two-Shot Burst add no error range.
+  const burstError = feats.includes("Autofire Mastery") ? 0 : 1;
+  if (action === "twoShotBurst") {
+    if (!feats.includes(rule.feat)) return stop(loc`Two-Shot Burst needs Autofire Basics.`);
+    if (!rule.modes.includes(facts.fireMode)) return stop(loc`A Two-Shot Burst is fired in Single-Shot or Burst mode.`);
+    if (facts.attackAction !== "standard") return stop(loc`A Two-Shot Burst is a trick on a Standard Attack.`);
+    const left = shotsRemaining === null || shotsRemaining === "" ? null : count(Number(shotsRemaining));
+    if (left !== null && left < rule.shots) return stop(loc`A Two-Shot Burst needs 2 shots in the weapon.`);
+    return {
+      action,
+      blocked: false,
+      attack: 0,
+      extraRecoil: 0,
+      error: burstError,
+      shots: rule.shots,
+      notes: [
+        loc`Two-Shot Burst: 2 shots${burstError ? loc`, error range +1` : ""}. One shot hits; two if the result beats Defense by 5; never a third (p.180).`
+      ]
+    };
+  }
   if (rule.mode && facts.fireMode !== rule.mode)
     return stop(
       rule.mode === "burst"
@@ -64,10 +117,10 @@ export function fireActionPlan(
       blocked: false,
       attack: 0,
       extraRecoil: 0,
-      error: rule.error,
+      error: burstError,
       shots: rule.shots,
       notes: [
-        loc`Burst: 3 shots, error range +1. One shot hits; two if the result beats Defense by 5, all three by 10. A critical hit applies only the first shot to wounds (p.354).`
+        loc`Burst: 3 shots, error range +${burstError}. One shot hits; two if the result beats Defense by 5, all three by 10. A critical hit applies only the first shot to wounds (p.354).`
       ]
     };
   }
@@ -83,19 +136,19 @@ export function fireActionPlan(
     };
   }
   if (remaining === null) return stop(loc`Enter the shots left in the weapon.`);
-  const limit = fireActionLimit(action, remaining);
+  const limit = fireActionLimit(action, remaining, rule);
   if (!limit)
     return stop(
       action === "autofire"
-        ? loc`Autofire needs 6 or more shots in the weapon.`
-        : loc`Strafe needs 9 or more shots in the weapon.`
+        ? loc`Autofire needs ${rule.minimumShots} or more shots in the weapon.`
+        : loc`Strafe needs ${rule.minimumShots} or more shots in the weapon.`
     );
   const chosen = count(Number(action === "autofire" ? volleys : squares));
   if (!Number.isSafeInteger(chosen) || chosen < 1 || chosen > limit)
     return stop(
       action === "autofire"
-        ? loc`Choose 1 to ${limit} volleys (3 shots each, 10 at most).`
-        : loc`Choose 1 to ${limit} squares (3 shots each, 10 at most).`
+        ? loc`Choose 1 to ${limit} volleys (${rule.shotsEach} shots each${rock ? "" : loc`, 10 at most`}).`
+        : loc`Choose 1 to ${limit} squares (${rule.shotsEach} shots each${rock ? "" : loc`, 10 at most`}).`
     );
   if (action === "autofire")
     return {
@@ -127,22 +180,22 @@ export function fireActionPlan(
 }
 
 /** Shots of a Burst that hit: 1, 2 at Defense +5, 3 at Defense +10. */
-export function burstHits(attackTotal, defense) {
+export function burstHits(attackTotal, defense, maxHits = 3) {
   const margin = attackTotal - defense;
-  return margin < 0 ? 0 : margin >= 10 ? 3 : margin >= 5 ? 2 : 1;
+  return Math.min(maxHits, margin < 0 ? 0 : margin >= 10 ? 3 : margin >= 5 ? 2 : 1);
 }
 
-/** Shots of an Autofire attack that hit: 1, plus 1 per 4 over Defense, up to the volleys fired. */
-export function autofireHits(attackTotal, defense, volleys) {
+/** Shots of an Autofire attack that hit: 1, plus 1 per 4 over Defense (per 3 with Autofire Supremacy), up to the volleys. */
+export function autofireHits(attackTotal, defense, volleys, { perPoints = 4 } = {}) {
   const margin = attackTotal - defense;
   if (margin < 0 || !Number.isSafeInteger(volleys) || volleys < 1) return 0;
-  return Math.min(volleys, 1 + Math.floor(margin / 4));
+  return Math.min(volleys, 1 + Math.floor(margin / perPoints));
 }
 
 /** A Strafe against each target in order: Defense rises by 2 per target so far, counting the target itself. */
-export function strafeHits(attackTotal, defenses = []) {
+export function strafeHits(attackTotal, defenses = [], { step = 2 } = {}) {
   return defenses.map((defense, index) => {
-    const raised = defense + 2 * (index + 1);
+    const raised = defense + step * (index + 1);
     return { index, defense, raised, hit: attackTotal >= raised };
   });
 }
@@ -341,9 +394,11 @@ rollPipeline.register({
   terms({ system, weapon, options, firing, stance }) {
     const plan = fireActionPlan(
       {
-        firearm: firing.firearm,
-        fireMode: firing.fireMode,
+        firearm: firing.firearm || steelRainWeapon(system, weapon),
+        flamethrower: weapon.weaponCategory === "flamethrower",
+        fireMode: firing.firearm ? firing.fireMode : "burst",
         attackAction: stance.attackAction,
+        feats: system.activeFeatNames ?? [],
         recoilPenalty: firing.recoilPenalty
       },
       {
@@ -376,7 +431,16 @@ rollPipeline.register({
         blockAt: 195,
         blocked: blocked?.reason ?? "",
         noteAt: 495,
-        notes: [...(plan?.notes ?? []), ...(pummel?.notes ?? [])]
+        notes: [
+          ...(plan?.notes ?? []),
+          ...(pummel?.notes ?? []),
+          // Shadow Walk (Spirit Supremacy, p.187).
+          ...(pummel && !pummel.blocked && system.activeFeatNames?.includes("Spirit Supremacy")
+            ? [
+                loc`Shadow Walk: before this Pummel you may move up to your Speed, passing freely through squares adjacent to or occupied by opponents (p.187).`
+              ]
+            : [])
+        ]
       },
       { key: "pummel", plan: pummel && !pummel.blocked ? pummel : null }
     ];

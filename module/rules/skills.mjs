@@ -1,3 +1,4 @@
+import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
 import "./stalking-stance.mjs";
 import "./melee-skill-feats.mjs";
@@ -6,6 +7,7 @@ import "./bull-rush-attack.mjs";
 import "./bull-rush.mjs";
 import { tumblePathPlan } from "./tumble.mjs";
 import { feintSkillChecks } from "./feint.mjs";
+import { spiderClimbCheck } from "./spider.mjs";
 import "./trip.mjs";
 import { fallDistanceSkillPlan } from "./fall-distance.mjs";
 import { balanceSurfacePlan } from "./balance.mjs";
@@ -16,6 +18,9 @@ import { targetSkillEffectPlan, targetSkillTimingPlan } from "./target-skill-eff
 import "./rank-synergy-feats.mjs";
 import { stoneColdSkillPlan } from "./stone-cold.mjs";
 import "./threaten.mjs";
+import "./taunt.mjs";
+import "./diversion.mjs";
+import "./grapple-check.mjs";
 import "./bug-basics.mjs";
 import "./documentation.mjs";
 import { oneHandManeuverPlan } from "./maneuver-actions.mjs";
@@ -48,7 +53,7 @@ import { terrainSkillPlan, localHeroOppositionPlan } from "./terrain.mjs";
 import { trackingSkillPlan, trackingFeatEvidence } from "./tracking.mjs";
 import { ambushCheckPlan } from "./ambush.mjs";
 import { fogSmokePlan, ambientLightPlan, sensorySkillEffects, sensorySkillConditionPlan } from "./senses.mjs";
-import { skillTimingPlan } from "./timing.mjs";
+import { falseStartRestart, skillTimingPlan } from "./timing.mjs";
 import {
   classCheckEffects,
   tenSecondSolutionEligible,
@@ -224,7 +229,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     key === "acrobatics" && check?.id === "counter-trip"
       ? tripCounterSkillCheck()
       : (tripAttackSkillChecks(key, []).find(c => c.id === check?.id) ??
-        feintSkillChecks(key, []).find(c => c.id === check?.id) ??
+        feintSkillChecks(key, [], system).find(c => c.id === check?.id) ??
         check);
   inDramaticConflict =
     inDramaticConflict === true ||
@@ -338,6 +343,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     timingReduction,
     tenSecondSolution
   });
+  // Spider Basics plans a Climb without its Hands-On and Vision tags or the missing-kit penalty (p.196).
+  const spider = spiderClimbCheck(system, key, check);
+  check = spider.check;
   const skillTags = skillTagPlan(system, key, check, { oneHanded, noSharedLanguage, bound, conveyingMessage });
   const stoneCold = stoneColdSkillPlan(system, key, check);
   const skillGear = skillGearPlan(stoneCold.check, { gearStatus, gearItem, kitAtLocation, system });
@@ -460,7 +468,16 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [100, pursuit.bonuses],
     [110, appearancePlan.bonuses],
     [150, qualityChecks.bonuses],
-    [160, [...skillGear.bonuses, ...gearUse.bonuses]],
+    [
+      160,
+      [
+        ...skillGear.bonuses.filter(b => !(spider.waiveMissingGear && b.source === "Missing required gear")),
+        ...gearUse.bonuses,
+        ...(signatureBonus(system, gearItem?.id)
+          ? [{ type: "morale", value: signatureBonus(system, gearItem.id), source: gearItem.name }]
+          : [])
+      ]
+    ],
     [170, terrainPlan.bonuses],
     [180, senses.bonuses],
     [190, tracking.bonuses]
@@ -528,7 +545,8 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     ) - (skill.threatAdjustment ?? 0);
   const reduction =
     (skill.errorReduction ?? 0) +
-    conditional.filter(row => row.kind === "errorReduction").reduce((n, row) => n + row.value, 0);
+    conditional.filter(row => row.kind === "errorReduction").reduce((n, row) => n + row.value, 0) +
+    terms.sum("errorReduction");
   const errorFloor = Math.max(
     skill.errorFloor ?? 0,
     ...conditional.filter(row => row.kind === "errorFloor").map(row => row.value)
@@ -932,6 +950,12 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [580, `${tracking.notes.join(" ")} `],
     [590, `${ambush.notes.join(" ")} `],
     [600, `${ambush.applicable ? loc`Required Ambush preparation: ${requiredPreparationSeconds} seconds. ` : ""} `],
+    [
+      605,
+      hasFeat("False Start") && unopposed === true && method === "roll" && falseStartRestart(listedTime)
+        ? loc`False Start: if this check fails you may stop and begin again from the next ${falseStartRestart(listedTime)}, spending only half the money or materials (p.200). `
+        : ""
+    ],
     [610, `${light.notes.join(" ")} `],
     [
       620,
@@ -1153,7 +1177,11 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     ]),
     armor,
     missingFocus: !!missingFocus,
-    threat: taking ? 0 : conditionalThreat ? Math.max(1, conditionalThreat - ambush.threatIncrease) : 0,
+    threat: taking
+      ? 0
+      : conditionalThreat
+        ? Math.max(1, conditionalThreat - ambush.threatIncrease - terms.sum("threatIncrease"))
+        : 0,
     error: taking ? 0 : error,
     cap: method === "take20" && attention ? null : cap,
     blocked: blockedReasons.length > 0,

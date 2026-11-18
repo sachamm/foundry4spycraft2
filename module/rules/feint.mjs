@@ -7,9 +7,13 @@ import { readiedDisarmWeapons } from "./disarm-response.mjs";
 import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Ordinary Feint p.357. Alternative skills, free actions and outcomes are separate. */
-export function feintSkillChecks(key, checks = []) {
-  const acting = key === "sleightOfHand",
-    defending = key === "notice";
+/** Fan Service, p.203: Feint may use Impress (Cha) instead of Sleight of Hand. */
+export const feintActingSkill = (key, system) =>
+  key === "sleightOfHand" || (key === "impress" && system?.activeFeatNames?.includes("Fan Service") === true);
+export function feintSkillChecks(key, checks = [], system = null) {
+  const acting = feintActingSkill(key, system),
+    defending = key === "notice",
+    impress = key === "impress";
   if (!acting && !defending) return checks;
   const id = acting ? "feint" : "resist-feint";
   return [
@@ -17,9 +21,9 @@ export function feintSkillChecks(key, checks = []) {
     {
       id,
       name: acting ? "Feint Action" : "Resist Feint",
-      attributes: [acting ? "dex" : "wis"],
+      attributes: [impress ? "cha" : acting ? "dex" : "wis"],
       mode: "Active",
-      tags: acting ? "Hands-On, Vision" : "Vision",
+      tags: acting && !impress ? "Hands-On, Vision" : "Vision",
       error: 2,
       time: acting ? "1 Half Action" : "Opposed response",
       page: 357,
@@ -44,7 +48,7 @@ export function feintCheckPlan(
   } = {}
 ) {
   const role =
-      key === "sleightOfHand" && check?.id === "feint"
+      feintActingSkill(key, system) && check?.id === "feint"
         ? "attacker"
         : key === "notice" && check?.id === "resist-feint"
           ? "defender"
@@ -111,7 +115,7 @@ export function feintCheckPlan(
             loc`Flail Basics: +2 gear with this Feint skill check while holding a reviewed readied flail; gear bonuses do not stack (p.178).`
           ]
         : []),
-      loc`Feint: opposed ${role === "attacker" ? loc`Sleight of Hand(DEX), Hands-On and Vision; one half action` : loc`Notice(WIS), Vision; response to the incoming half action`}; base error1 plus action error+1 on both checks (pp.352,357).`,
+      loc`Feint: opposed ${role === "attacker" ? (key === "impress" ? loc`Impress(CHA) through Fan Service, Vision; one half action, or a full action against every opponent in range, each resisting separately (p.203)` : loc`Sleight of Hand(DEX), Hands-On and Vision; one half action`) : loc`Notice(WIS), Vision; response to the incoming half action`}; base error1 plus action error+1 on both checks (pp.352,357).`,
       ...(fencingBasics
         ? [
             loc`Fencing Basics: +2 gear with this Feint skill check while holding a readied one-handed FIN sword; gear bonuses do not stack (p.178).`
@@ -163,7 +167,7 @@ export function validateFeintProof(
         feintCombat: combat
       }
     );
-  const base = skillKey === "sleightOfHand" ? "dex" : "wis",
+  const base = skillKey === "sleightOfHand" ? "dex" : skillKey === "impress" ? "cha" : "wis",
     substituted =
       attributeSubstitution?.source === "All According to Plan" &&
       attributeSubstitution.originalAbility === base &&
@@ -201,7 +205,7 @@ rollPipeline.register({
   id: "feintChecks",
   order: 5060,
   kinds: ["skill"],
-  skillChecks: ({ skillKey }, checks) => feintSkillChecks(skillKey, checks)
+  skillChecks: ({ skillKey, actor }, checks) => feintSkillChecks(skillKey, checks, actor?.system)
 });
 
 // A Feint's part of a skill check plan.

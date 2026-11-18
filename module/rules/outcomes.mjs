@@ -1,3 +1,7 @@
+import { dropFollowUpNote } from "./drop-follow-up.mjs";
+import { opportunistNote } from "./opportunist.mjs";
+import { allOrNothingNote } from "./all-or-nothing.mjs";
+import { blackCatNote } from "./black-cat.mjs";
 import { reminderNote } from "./feat-reminders.mjs";
 import { cooperativeNotes } from "./cooperative.mjs";
 import { resolveSkillResult } from "./checks.mjs";
@@ -31,7 +35,8 @@ export function errorDecisionPending(check) {
   return (
     !(check.boostSpent > 0) &&
     !check.errorActivationDeclined &&
-    (candidates.negative || (candidates.naturalError && check.successConfirmed !== true))
+    (candidates.negative ||
+      (candidates.naturalError && (check.successConfirmed !== true || check.allOrNothing === true)))
   );
 }
 export function adjudicateCheck(check, succeeded) {
@@ -56,7 +61,7 @@ export function adjudicateCheck(check, succeeded) {
   const candidates = checkCandidates({ ...check, effectiveTotal: result.total });
   return {
     successConfirmed: succeeded,
-    errorConfirmed: candidates.negative || (!succeeded && candidates.naturalError),
+    errorConfirmed: candidates.negative || ((!succeeded || check.allOrNothing === true) && candidates.naturalError),
     threatConfirmed:
       succeeded && !candidates.negative && (candidates.threat || (check.checkKind === "attack" && candidates.triumph)),
     triumphed: succeeded && triumphCheck(check) && result.triumph,
@@ -100,6 +105,10 @@ export function checkFlavor(check) {
     notes.push(
       loc`Combat Instincts: immediate final Standard Attack against the adjacent opponent after a miss by ${check.finalAttack.missMargin}; one round use recorded.`
     );
+  if (dropFollowUpNote(check.finalAttack)) notes.push(dropFollowUpNote(check.finalAttack));
+  if (opportunistNote(check.finalAttack)) notes.push(opportunistNote(check.finalAttack));
+  if (allOrNothingNote(check)) notes.push(allOrNothingNote(check));
+  if (blackCatNote(check)) notes.push(esc(blackCatNote(check)));
   if (check.featReminders?.length) notes.push(esc(reminderNote(check.featReminders)) + ".");
   notes.push(...cooperativeNotes(check).map(esc));
   if ((check.checkMethod ?? "roll") === "roll" && (check.threat > 0 || check.error > 0))
@@ -317,6 +326,8 @@ export function rollEvidence(check) {
     ...(check.rankSynergyFeats ? [check.rankSynergyFeats] : []),
     ...(check.stoneCold ? [check.stoneCold] : []),
     ...(check.threaten ? [check.threaten] : []),
+    ...(check.taunt ? [check.taunt] : []),
+    ...(check.diversion ? [check.diversion] : []),
     ...(check.bugConcealment ? [check.bugConcealment] : []),
     ...(check.documentation ? [check.documentation] : []),
     ...(check.trackingFeat ? [check.trackingFeat] : []),
@@ -428,6 +439,8 @@ export function rollEvidenceMatches(evidence, check) {
     check.terrainSaveSource ||
     check.oldSchool ||
     check.threaten ||
+    check.taunt ||
+    check.diversion ||
     check.bugConcealment ||
     check.documentation ||
     check.analysisTask ||

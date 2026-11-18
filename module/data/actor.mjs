@@ -1,3 +1,4 @@
+import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "../rules/cheap-shot-effects.mjs";
 import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
@@ -39,6 +40,15 @@ import {
   weaponSpaces
 } from "../rules/vehicle-play-rules.mjs";
 import { SKILLS } from "../rules/tables.mjs";
+import { underminedState } from "../rules/taunt.mjs";
+import { mountUpPlan } from "../rules/driving-feats.mjs";
+import {
+  ANIMAL_PARTNER,
+  PERSONAL_LIEUTENANT,
+  animalPartnerReview,
+  lieutenantReview,
+  partnerThreatLevel
+} from "../rules/companions.mjs";
 import {
   HAZARD_GROUPS,
   accelerationSchedule,
@@ -95,6 +105,9 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
         will: new SchemaField({ base: int(0) })
       }),
       feintBonuses: recordList("feintBonuses"),
+      companionOf: record("companionOf", { nullable: true, initial: null }),
+      tauntBonuses: recordList("tauntBonuses"),
+      undermined: record("undermined", { nullable: true, initial: null }),
       feintHistory: recordList("feintHistory"),
       cheapShots: recordList("cheapShots"),
       biography: new HTMLField()
@@ -114,7 +127,10 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
         save.base + this.abilities[ability].mod + (["ref", "will"].includes(key) ? shaken.reflexWillPenalty : 0);
     }
     this.defense.total = 10 + this.defense.bonus + this.abilities.dex.mod;
-    this.initiative.total = this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty;
+    this.underminedCombatContext = underminedCombatContext(this);
+    this.underminedState = underminedState(this);
+    this.initiative.total =
+      this.initiative.bonus + this.abilities.dex.mod + shaken.initiativePenalty - this.underminedState.penalty;
     this.attack = {
       melee: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
       unarmed: cheapShotPenalty(this, "str") + this.bab + this.abilities.str.mod + shaken.attackPenalty,
@@ -123,6 +139,13 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
     this.skillTotals = {};
     this.warnings = [];
   }
+}
+
+/** The combat an Undermine record is timed in, as the rule reads it. */
+function underminedCombatContext(system) {
+  const id = system.undermined?.combatId,
+    combat = id ? globalThis.game?.combats?.get?.(id) : null;
+  return combat ? { id: combat.id, round: combat.round, turn: combat.turn } : null;
 }
 
 export class NpcData extends BaseActorData {
@@ -135,6 +158,16 @@ export class NpcData extends BaseActorData {
     const missionTL = this.followMission ? missionThreatLevelSetting() : null;
     this.effectiveThreatLevel = missionTL ?? this.threatLevel;
     this.usesMissionThreatLevel = missionTL !== null;
+    // Animal Partner (p.201): a special character at the owner's career level − 2, one health grade higher.
+    const partnerOwner =
+      this.companionOf?.feat === ANIMAL_PARTNER
+        ? (globalThis.fromUuidSync?.(this.companionOf.ownerUuid) ?? null)
+        : null;
+    this.animalPartner = !!partnerOwner;
+    if (partnerOwner) {
+      this.effectiveThreatLevel = partnerThreatLevel(partnerOwner.system?.level);
+      this.usesMissionThreatLevel = false;
+    }
     // p.398: a promoted standard NPC is special until the mission ends.
     this.promoted = !!this.promotion && this.promotion.mission === String(this.usagePeriods?.mission ?? "initial");
     // What the NPC's qualities do at the table (module/rules/npc-qualities.mjs).
@@ -173,8 +206,19 @@ export class NpcData extends BaseActorData {
         this.damageSave = null;
       }
     }
+    if (partnerOwner) {
+      const grade = Math.min(10, (this.npcProfile.grades?.health ?? 1) + 1),
+        health = npcTableValue("health", grade, result.effectiveLevel);
+      if (Array.isArray(health)) {
+        [this.vitality.max, this.wounds.max] = health;
+        this.damageSave = null;
+      }
+    }
     this.competence = result.competence;
-    this.warnings = result.warnings;
+    this.warnings = [
+      ...(result.warnings ?? []),
+      ...(partnerOwner ? animalPartnerReview(partnerOwner.system, this).warnings : [])
+    ];
   }
 
   static defineSchema() {
@@ -291,6 +335,14 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       attackDamageUses: recordList("attackDamageUses"),
       stanceRoundMovement: record("stanceRoundMovement", { nullable: true, initial: null }),
       combatStance: record("combatStance", { nullable: true, initial: null }),
+      berserkerRage: record("berserkerRage", { nullable: true, initial: null }),
+      duelingBasics: record("duelingBasics", { nullable: true, initial: null }),
+      fightDefensively: record("fightDefensively", { nullable: true, initial: null }),
+      intenseStance: record("intenseStance", { nullable: true, initial: null }),
+      woundDrops: record("woundDrops", { nullable: true, initial: null }),
+      snakeStrikes: recordList("snakeStrikes"),
+      identities: recordList("identities"),
+      activeIdentity: str(),
       twoWeaponStyle: record("twoWeaponStyle", { nullable: true, initial: null }),
       dartingStyle: record("dartingStyle", { nullable: true, initial: null }),
       totalDefense: record("totalDefense", { nullable: true, initial: null }),
@@ -367,6 +419,9 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       }),
       misc: new SchemaField(misc),
       feintBonuses: recordList("feintBonuses"),
+      companionOf: record("companionOf", { nullable: true, initial: null }),
+      tauntBonuses: recordList("tauntBonuses"),
+      undermined: record("undermined", { nullable: true, initial: null }),
       feintHistory: recordList("feintHistory"),
       cheapShots: recordList("cheapShots"),
       biography: new HTMLField()
@@ -431,6 +486,79 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         c.actor?.uuid === this.parent.uuid &&
         (!this.totalDefense?.combatantId || c.id === this.totalDefense.combatantId)
     );
+    // Dueling Basics' declaration is timed like Total Defense, from the character's own Count.
+    const duelingCombat = this.duelingBasics?.combatId
+      ? globalThis.game?.combats?.get?.(this.duelingBasics.combatId)
+      : this.parent.participatingCombat;
+    const duelingOwn = duelingCombat?.turns?.find(
+      c =>
+        c.actor?.uuid === this.parent.uuid &&
+        (!this.duelingBasics?.combatantId || c.id === this.duelingBasics.combatantId)
+    );
+    this.duelingCombatContext = duelingCombat
+      ? {
+          id: duelingCombat.id,
+          started: duelingCombat.started,
+          round: duelingCombat.round,
+          turn: duelingCombat.turn,
+          combatantId: duelingOwn?.id,
+          ownTurnIndex: duelingCombat.turns?.findIndex(c => c.id === duelingOwn?.id) ?? -1
+        }
+      : null;
+    this.underminedCombatContext = underminedCombatContext(this);
+    this.currentCombatId = this.parent.participatingCombat?.id ?? null;
+    // Personal Lieutenant (p.204): the owner's career level and feats, for the lieutenant's limits.
+    const lieutenantOwner =
+      this.companionOf?.feat === PERSONAL_LIEUTENANT
+        ? (globalThis.fromUuidSync?.(this.companionOf.ownerUuid) ?? null)
+        : null;
+    this.lieutenantOwner = lieutenantOwner
+      ? {
+          level: lieutenantOwner.system?.level ?? 0,
+          activeFeatNames: [...(lieutenantOwner.system?.activeFeatNames ?? [])]
+        }
+      : null;
+    // Death Ride: whether this character is driving a vehicle or riding a mount (its recorded driver).
+    this.operatingVehicle = [...(globalThis.game?.actors ?? [])].some(
+      a => a.type === "vehicle" && a.system?.driver === this.parent.uuid
+    );
+    // Fight Defensively lasts 1 full round from the character's own Count.
+    const fightCombat = this.fightDefensively?.combatId
+      ? globalThis.game?.combats?.get?.(this.fightDefensively.combatId)
+      : this.parent.participatingCombat;
+    const fightOwn = fightCombat?.turns?.find(
+      c =>
+        c.actor?.uuid === this.parent.uuid &&
+        (!this.fightDefensively?.combatantId || c.id === this.fightDefensively.combatantId)
+    );
+    const intenseCombat = this.intenseStance?.combatId
+      ? globalThis.game?.combats?.get?.(this.intenseStance.combatId)
+      : this.parent.participatingCombat;
+    const intenseOwn = intenseCombat?.turns?.find(
+      c =>
+        c.actor?.uuid === this.parent.uuid &&
+        (!this.intenseStance?.combatantId || c.id === this.intenseStance.combatantId)
+    );
+    this.intenseCombatContext = intenseCombat
+      ? {
+          id: intenseCombat.id,
+          started: intenseCombat.started,
+          round: intenseCombat.round,
+          turn: intenseCombat.turn,
+          combatantId: intenseOwn?.id,
+          ownTurnIndex: intenseCombat.turns?.findIndex(c => c.id === intenseOwn?.id) ?? -1
+        }
+      : null;
+    this.fightDefensivelyCombatContext = fightCombat
+      ? {
+          id: fightCombat.id,
+          started: fightCombat.started,
+          round: fightCombat.round,
+          turn: fightCombat.turn,
+          combatantId: fightOwn?.id,
+          ownTurnIndex: fightCombat.turns?.findIndex(c => c.id === fightOwn?.id) ?? -1
+        }
+      : null;
     this.totalDefenseCombatContext = totalDefenseCombat
       ? {
           id: totalDefenseCombat.id,
@@ -676,7 +804,10 @@ export class VehicleActorData extends foundry.abstract.TypeDataModel {
     this.mountName = mount?.name ?? "";
     this.attackerName = attacker?.name ?? "";
     // A mount whose table entry says "NPC" takes its Defense and Damage save from the linked NPC.
-    const baseDefense = Number.isSafeInteger(this.defense) ? this.defense : (mount?.system?.defense?.total ?? null);
+    let baseDefense = Number.isSafeInteger(this.defense) ? this.defense : (mount?.system?.defense?.total ?? null);
+    // Mount Up (p.192): a ridden mount uses the rider's Defense and Reflex save bonus when they are higher.
+    this.mountUp = mountUpPlan(this, driver?.system, mount?.system);
+    if (this.mountUp && Number.isSafeInteger(baseDefense)) baseDefense = Math.max(baseDefense, this.mountUp.defense);
     const baseSave = Number.isSafeInteger(this.upgraded.damageSave)
       ? this.upgraded.damageSave
       : (mount?.system?.damageSave ?? null);
@@ -689,9 +820,15 @@ export class VehicleActorData extends foundry.abstract.TypeDataModel {
       turning: this.condition.turning,
       attacker: attackerNow
     });
-    // Rugged adds to every Damage save the vehicle makes (p.294).
+    // Rugged adds to every Damage save the vehicle makes (p.294); so do the crew's Chase feats (pp.192–193).
+    this.crewSave = crewDamageSaveBonus(
+      driver?.system,
+      (this.occupants ?? []).map(o => resolve(o.uuid)?.system).filter(Boolean)
+    );
     this.damageSaveNow = Number.isSafeInteger(baseSave)
-      ? baseSave + (hasQuality(this.qualitiesNow, "RGD") ? ruggedBonus(this.size || this.sizeLabel) : 0)
+      ? baseSave +
+        (hasQuality(this.qualitiesNow, "RGD") ? ruggedBonus(this.size || this.sizeLabel) : 0) +
+        this.crewSave.bonus
       : null;
     this.fuel = fuelState(this.rangeFuel, {
       used: this.fuelUsed,

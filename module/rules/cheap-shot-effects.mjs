@@ -18,21 +18,36 @@ export function cheapShotRecords(system) {
         !Number.isFinite(r.madeAt) ||
         r.madeAt < 0 ||
         typeof r.recovered !== "boolean" ||
-        (r.lastSaveAt !== null && (!Number.isFinite(r.lastSaveAt) || r.lastSaveAt < r.madeAt))
+        (r.lastSaveAt !== null && (!Number.isFinite(r.lastSaveAt) || r.lastSaveAt < r.madeAt)) ||
+        (r.doubled !== undefined && typeof r.doubled !== "boolean") ||
+        (r.repeat !== undefined && typeof r.repeat !== "boolean")
     )
   )
     throw Error(loc`The GC must review malformed Cheap Shot history.`);
   const current = rows.filter(r => r.scene === cheapShotScene(system));
-  if (current.length > 1) throw Error(loc`The GC must review competing successful Cheap Shots in this scene.`);
+  // Submission Supremacy (p.188) allows further Cheap Shots in a scene, each with a different penalty.
+  if (
+    current.length > 1 &&
+    (current.slice(1).some(r => r.repeat !== true) || new Set(current.map(r => r.choice)).size !== current.length)
+  )
+    throw Error(loc`The GC must review competing successful Cheap Shots in this scene.`);
   return current;
 }
+/** Submission Basics (p.188): the penalties of a Cheap Shot on a successful unarmed attack are doubled. */
+const factor = r => (r.doubled === true ? 2 : 1);
 export function cheapShotPenalty(system, ability) {
-  return cheapShotRecords(system).some(r => !r.recovered && r.choice === ability) ? -2 : 0;
+  const r = cheapShotRecords(system).find(r => !r.recovered && r.choice === ability);
+  return r ? -2 * factor(r) : 0;
 }
 export function cheapShotSpeedPenalty(system) {
-  return cheapShotRecords(system).some(r => !r.recovered && r.choice === "speed") ? -10 : 0;
+  const r = cheapShotRecords(system).find(r => !r.recovered && r.choice === "speed");
+  return r ? -10 * factor(r) : 0;
 }
-export function cheapShotApplyPlan(system, check, { sourceMessage, now, scene } = {}) {
+export function cheapShotApplyPlan(
+  system,
+  check,
+  { sourceMessage, now, scene, doubled = false, supremacy = false } = {}
+) {
   const p = check?.attackContext?.cheapShot;
   if (
     check?.checkKind !== "attack" ||
@@ -58,9 +73,11 @@ export function cheapShotApplyPlan(system, check, { sourceMessage, now, scene } 
       throw Error(loc`The applied Cheap Shot receipt changed; review its original target history.`);
     return { record: prior, existing: true };
   }
-  if (rows.length)
+  if (rows.length && !(supremacy === true && !rows.some(r => r.choice === p.choice)))
     throw Error(
-      loc`This combatant already suffered a successful Cheap Shot this scene, even if its penalty has ended.`
+      supremacy === true
+        ? loc`Submission Supremacy: choose a penalty this combatant has not already suffered this scene.`
+        : loc`This combatant already suffered a successful Cheap Shot this scene, even if its penalty has ended.`
     );
   return {
     existing: false,
@@ -73,7 +90,9 @@ export function cheapShotApplyPlan(system, check, { sourceMessage, now, scene } 
       madeAt: p.madeAt,
       recovered: false,
       lastSaveAt: null,
-      attemptId: null
+      attemptId: null,
+      ...(doubled === true ? { doubled: true } : {}),
+      ...(rows.length ? { repeat: true } : {})
     }
   };
 }

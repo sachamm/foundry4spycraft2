@@ -20,7 +20,9 @@ import {
   missionEpoch,
   reserveInitialization,
   gearAcquisitionPlan,
-  acquisitionOutcome
+  acquisitionOutcome,
+  requestFeatBonus,
+  officeGossipTake10
 } from "../rules/gear-acquisition.mjs";
 import { equipmentCategory } from "../rules/gear.mjs";
 import { loc } from "../i18n.mjs";
@@ -114,7 +116,7 @@ export async function rollGearAcquisition(actor, options = {}) {
    <label>${loc`Requested category`} <select name="category">${PICK_CATEGORIES.filter(k => k !== "CHA")
      .map(k => `<option value="${k}">${k}</option>`)
      .join("")}</select></label>
-   <label>${loc`Requested Caliber`} <input type="number" name="caliber" min="1" max="4" value="1" /></label>
+   <label>${loc`Requested Caliber`} <input type="number" name="caliber" min="1" max="${actor.system.activeFeatNames?.includes("Total Control") ? 5 : 4}" value="1" /></label>
    <label>${loc`Location`} <select name="location">${Object.entries(DELIVERY)
      .map(([key, d]) => `<option value="${key}">${esc(d.label)}: ${d.formula} ${d.unit}</option>`)
      .join("")}</select></label>
@@ -124,6 +126,7 @@ export async function rollGearAcquisition(actor, options = {}) {
    <label><input type="checkbox" name="minuteAvailable" /> ${loc`Request: spend one full minute communicating`}</label>
    <label><input type="checkbox" name="useProcure" /> ${loc`Use earned Procure in a qualifying city: Request as mission Caliber +1, maximum IV, and half delivery time`}</label>
    <label><input type="checkbox" name="categoryConfirmed" /> ${loc`Request: the GC confirms category and Faction availability`}</label>
+   ${actor.system.activeFeatNames?.includes("Office Gossip") ? `<label><input type="checkbox" name="requestTake10" /> ${loc`Request: take 10 (Office Gossip)`}</label>` : ""}
    ${actor.system.activeFeatNames?.includes("Personal Stash") ? `<label><input type="checkbox" name="atHome" /> ${loc`This Gear check is made inside my home (Personal Stash; distinct from Home Turf)`}</label><label><input type="checkbox" name="usePersonalStash" /> ${loc`Use Personal Stash: one Gear check per session without spending a Reserve Common Item`}</label>` : ""}
    <label><input type="checkbox" name="commonConfirmed" /> ${loc`Gear check: the GC confirms this is a Common Item`}</label>
    <details><summary>${loc`Shared Request funding (optional)`}</summary><p>${loc`Leave all zero to pay the full cost from your ordinary dice. Otherwise contributions must total the base Request cost after waivers plus the requester’s Shaken surcharge. Teammates may pay any portion of this total.`}</p>${funders
@@ -328,11 +331,12 @@ export async function rollGearAcquisition(actor, options = {}) {
               });
             else
               message = await actor.rollCheck(
-                "1d20 + @total",
+                officeGossipTake10(actor.system, plan.kind, input) ? "10 + @total" : "1d20 + @total",
                 { total: plan.bonus },
                 {
                   flavor: `${plan.kind === "request" ? loc`Request` : loc`Gear check`}: ${esc(plan.name)}<br>${loc`DC ${plan.dc}${plan.outsideFaction ? loc`; ${esc(plan.abilityName)}, class level ${plan.requestLevel} replaces Career Level; outside Faction restrictions; one-hour consultation` : ""}${plan.bonusSources?.length ? `; ${plan.bonusSources.map(s => `${esc(s.name)} +${s.value}`).join("; ")}` : ""}; consumed ${plan.kind === "request" ? loc`one ${plan.pick} Reserve pick and ${plan.cost} action dice` : plan.commonCost === 0 ? loc`no Reserve Common Item (Personal Stash session use)` : loc`one Reserve Common Item`}.`}`,
                   checkKind: plan.kind,
+                  ...(officeGossipTake10(actor.system, plan.kind, input) ? { checkMethod: "take10" } : {}),
                   requestBenefit: plan.requestBenefit ?? null,
                   threat: 0,
                   error: 0,
@@ -721,14 +725,12 @@ export async function claimGearAcquisition(actor, options = {}) {
       throw new Error(
         loc`One acquisition grants one source-listed bundle; its quantity and pick count cannot be increased after the check.`
       );
-    const grenadeBonus =
-      attempt.kind === "request" &&
-      data.type === "weapon" &&
-      ["hurled", "exoticHurled"].includes(data.system.proficiency) &&
-      /grenade/i.test(data.name) &&
-      actor.system.activeFeatNames?.includes("Grenade Basics")
-        ? 1
-        : 0;
+    const featBonus =
+        attempt.kind === "request"
+          ? requestFeatBonus(actor.system, data, quantity)
+          : { extra: 0, powerRating: null, sources: [] },
+      grenadeBonus = featBonus.extra;
+    if (featBonus.powerRating !== null) data.system.powerRating = featBonus.powerRating;
     Object.assign(data.system, {
       quantity: quantity + grenadeBonus,
       pickCount: 1,

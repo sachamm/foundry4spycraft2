@@ -1,5 +1,6 @@
 import { completeCharacterTarget } from "./character-target.mjs";
-import { dartingDeclarationPlan, dartingFinalAttackPlan, dartingWeaponEligible } from "../rules/darting.mjs";
+import { dartingDeclarationPlan, dartingFinalAttackPlan, FINAL_ATTACK_TRADEOFFS } from "../rules/darting.mjs";
+import { dartingStyleState } from "../rules/darting-state.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { queueResources } from "../rules/transactions.mjs";
 import { finalAttackOptions, postFinalAttack } from "./final-attack.mjs";
@@ -11,8 +12,27 @@ const map = v => v !== null && typeof v === "object" && !Array.isArray(v),
   snapshot = a => JSON.stringify({ record: a.system.dartingStyle ?? null, combat: expertiseCombatContext(a) });
 export async function declareDarting(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
-  const before = snapshot(actor);
+  const before = snapshot(actor),
+    kind = ["followUp", "twoHit"].includes(options.kind) ? options.kind : "darting";
   let input = options;
+  if (!Object.hasOwn(input, "extraAttacks") && kind === "twoHit") {
+    input = await foundry.applications.api.DialogV2.input({
+      window: { title: loc`Two-Hit Combo / Warrior’s Grace` },
+      rejectClose: false,
+      content: `<div class="spycraft2-roll-options"><p>${loc`At the start of your Initiative Count, gain final unarmed attacks and accept the attack/skill penalty until the start of your next Initiative Count (p.188). One such declaration per round, shared with Darting Weapon and Follow-Up Shot.`}</p><label>${loc`Choice`} <select name="extraAttacks"><option value="1">${loc`Two-Hit Combo: 1 final unarmed attack; −2 attack/skill checks`}</option><option value="2">${loc`Warrior’s Grace: 2 final unarmed attacks; −4 attack/skill checks`}</option></select></label><label><input name="atStartOfInitiative" type="checkbox" /> ${loc`The GC confirms the start of my Initiative Count`}</label><label><input name="confirmed" type="checkbox" /> ${loc`I accept this penalty for the full round`}</label></div>`
+    });
+    if (!input) return null;
+    input = { ...input, kind };
+  }
+  if (!Object.hasOwn(input, "extraAttacks") && kind === "followUp") {
+    input = await foundry.applications.api.DialogV2.input({
+      window: { title: loc`Follow-Up Shot / Hail of Fire` },
+      rejectClose: false,
+      content: `<div class="spycraft2-roll-options"><p>${loc`At the start of your Initiative Count, gain final attacks with a firearm or heavy weapon and accept the attack/skill penalty until the start of your next Initiative Count (pp.181–182). One such declaration per round, shared with Darting Weapon.`}</p><label>${loc`Choice`} <select name="extraAttacks"><option value="1">${loc`Follow-Up Shot: 1 final attack; −2 attack/skill checks`}</option><option value="2">${loc`Hail of Fire: 2 final attacks; −4 attack/skill checks`}</option></select></label><label><input name="atStartOfInitiative" type="checkbox" /> ${loc`The GC confirms the start of my Initiative Count`}</label><label><input name="confirmed" type="checkbox" /> ${loc`I accept this penalty for the full round`}</label></div>`
+    });
+    if (!input) return null;
+    input = { ...input, kind };
+  }
   if (!Object.hasOwn(input, "extraAttacks")) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Darting / Flashing Weapon` },
@@ -29,7 +49,7 @@ export async function declareDarting(actor, options = {}) {
         typeof input.extraAttacks === "string" && input.extraAttacks.trim()
           ? Number(input.extraAttacks)
           : input.extraAttacks,
-      plan = dartingDeclarationPlan(actor.system, combat, { ...input, extraAttacks }),
+      plan = dartingDeclarationPlan(actor.system, combat, { ...input, extraAttacks, kind }),
       key = roundKey(combat),
       history =
         actor.flags?.spycraft2?.dartingDeclarations === undefined ? {} : actor.flags.spycraft2.dartingDeclarations,
@@ -63,8 +83,10 @@ export async function takeDartingFinalAttack(actor, options = {}) {
   let input = options;
   if (!Object.hasOwn(input, "confirmed")) {
     const esc = foundry.utils.escapeHTML,
+      kind =
+        dartingStyleState({ ...actor.system, dartingCombatContext: expertiseCombatContext(actor) }).kind ?? "darting",
       choices = actor.items
-        .filter(i => i.type === "weapon" && dartingWeaponEligible(i.system))
+        .filter(i => i.type === "weapon" && FINAL_ATTACK_TRADEOFFS[kind].eligible(i.system))
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
     input = await foundry.applications.api.DialogV2.input({
@@ -89,7 +111,11 @@ export async function takeDartingFinalAttack(actor, options = {}) {
     throw new Error(loc`Enter the actual target distance for the final hurled attack.`);
   if (preview.blocked) throw new Error(preview.reason || loc`This final attack is blocked.`);
   const signature = JSON.stringify(preview),
-    receipt = { ...plan, id: foundry.utils.randomID(), source: "dartingWeapon" };
+    receipt = {
+      ...plan,
+      id: foundry.utils.randomID(),
+      source: { followUp: "followUpShot", twoHit: "twoHitCombo" }[actor.system.dartingStyle?.kind] ?? "dartingWeapon"
+    };
   return actor.useLimitedAbility(
     "dartingFinalAttack",
     async status => {

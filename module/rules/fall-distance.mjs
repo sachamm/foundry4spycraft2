@@ -27,15 +27,19 @@ export function fallDistancePlan(
     ],
     reductionFeet = reductions.reduce((n, r) => n + r.feet, 0),
     damageDistanceFeet = Math.max(0, fallDistanceFeet - reductionFeet);
+  // Spider Mastery, p.196: each die of falling damage is 1 lower, never below 1.
+  const spider = names.includes("Spider Mastery");
   return {
     version: 1,
     context: { fallDeclared: true, fallDistanceFeet, fallSoftSurface, fallConfirmed: true },
+    ...(spider ? { perDieReduction: 1 } : {}),
     actualDistanceFeet: fallDistanceFeet,
     reductions,
     reductionFeet,
     damageDistanceFeet,
     notes: [
       loc`Falling damage distance: ${fallDistanceFeet} ft. minus ${reductionFeet} ft. = ${damageDistanceFeet} ft. (minimum0; pp.194,336).`,
+      ...(spider ? [loc`Spider Mastery: each falling damage die is 1 lower (minimum 1 per die) (p.196).`] : []),
       loc`This is the distance used for falling damage. It does not shorten the physical fall, move the character, establish a landing/check outcome or settle damage, armor piercing, stress, diving or fall duration.`
     ]
   };

@@ -1,3 +1,9 @@
+import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
+import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
+import { unarmedTrickDamageBonus } from "./unarmed-tricks.mjs";
+import { hordeSupremacyDamage } from "./team-feats.mjs";
+import { intenseDamage } from "./intense-stance.mjs";
+import { signatureBonus } from "./favored-gear.mjs";
 import { markDamagePlan } from "./marks.mjs";
 import { reachWeaponPlan } from "./reach-weapon.mjs";
 import { meleeArmorPiercingPlan } from "./melee-armor-piercing.mjs";
@@ -432,7 +438,13 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       .replace(/[–−]/g, "-")
       .match(/INA\s*\(([+-]?\d+)\)/)?.[1] ?? 0
   );
-  const improvisedPenalty = weapon.improvised && !system.activeFeatNames?.includes("Improvised Weapon Basics") ? -2 : 0;
+  // Club Basics (p.177): an improvised weapon the GC classed as a club carries no improvised penalty.
+  const improvisedPenalty =
+    weapon.improvised &&
+    !system.activeFeatNames?.includes("Improvised Weapon Basics") &&
+    !(weapon.meleeFamily === "club" && system.activeFeatNames?.includes("Club Basics"))
+      ? -2
+      : 0;
   // Whether the attack can be made, and the first reason it cannot: the weapon's own checks and the terms', in order.
   const blocks = terms
     .merge("blocked", [
@@ -748,7 +760,23 @@ export function weaponDamage(
   const cqbRange = cqbRangePlan(system, weapon, options, "damage");
   const markDamage = markDamagePlan(system, weapon);
   const conditionDamagePenalty = conditionRollPenalties(system).damage;
-  bonus += conditionDamagePenalty + cqbRange.damageBonus + markDamage.bonus + (options.attackDamageBonus ?? 0);
+  // Signature / Trademark Gear, p.197: +1 or +2 morale to damage with the item.
+  const signatureDamage = signatureBonus(system, weapon.id),
+    kickDamage = weapon.kick === true && unarmedWeapon(weapon) ? kickDamageBonus(system) : 0,
+    closedDamage =
+      weapon.closedStanceTarget === true && unarmedWeapon(weapon) && inClosedStance(system) ? CLOSED_STANCE_DAMAGE : 0,
+    trickDamage = unarmedWeapon(weapon) ? unarmedTrickDamageBonus(weapon.unarmedTrick) : 0,
+    hordeDamage = hordeSupremacyDamage(system, weapon) + intenseDamage(system, weapon);
+  bonus +=
+    conditionDamagePenalty +
+    cqbRange.damageBonus +
+    markDamage.bonus +
+    signatureDamage +
+    kickDamage +
+    closedDamage +
+    trickDamage +
+    hordeDamage +
+    (options.attackDamageBonus ?? 0);
   const min = parsed.minimum;
   return {
     markDamage,
@@ -760,7 +788,7 @@ export function weaponDamage(
     conditionDamagePenalty,
     mortarOperation,
     launcherOperation,
-    formula: `max(${min}, ${base} + (${bonus}))`,
+    formula: `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
     damageText: text,
     ammunition: projectile.name ?? "",
     explosive: projectile.explosive,
@@ -867,7 +895,15 @@ export function possessionUnavailable(gear) {
 export function cleanAndPolishedApplies(system, gear) {
   return (
     !!gear &&
-    ["wealth", "gcGrant"].includes(gear.possessionSource) &&
+    [
+      "wealth",
+      "gcGrant",
+      "favoredGear",
+      "bugBasics",
+      "diseaseBasics",
+      "poisonBasics",
+      "superiorDocumentation"
+    ].includes(gear.possessionSource) &&
     !possessionUnavailable(gear) &&
     !!gear.cleanAndPolishedReady &&
     system.activeFeatNames?.includes("Clean and Polished") === true

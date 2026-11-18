@@ -1,77 +1,51 @@
 {
- "_note": "Feats the rules do not carry out, and the rolls each bears on: attack, damage, knowledge, skill, skill:<key>, save, save:<key>. The roll dialog lists a character's matching feats so the player can note the ones that apply for the GC. The reminder shown is the feat's summary from summaries.json.",
- "feats": {
-  "All or Nothing": ["attack", "skill", "knowledge"],
-  "Autofire Basics": ["attack"],
-  "Autofire Mastery": ["attack"],
-  "Autofire Supremacy": ["attack"],
-  "Battering Blows": ["damage"],
-  "Better Luck Next Time": ["skill", "save"],
-  "Boxing Moves": ["attack"],
-  "Brawling Moves": ["attack"],
-  "Brawling Supremacy": ["attack", "damage"],
-  "Cleave Basics": ["attack"],
-  "Club Basics": ["damage"],
-  "Crippling Strike": ["attack"],
-  "Cryptographer": ["skill:analysis"],
-  "Daredevil": ["skill:drive"],
-  "Defensive Driving": ["skill:drive"],
-  "Dirty Fighting Basics": ["attack"],
-  "Dirty Fighting Moves": ["attack"],
-  "Dueling Basics": ["attack"],
-  "Dueling Supremacy": ["attack"],
-  "Executioner": ["attack"],
-  "Fan Service": ["skill:impress"],
-  "Fire-Team Basics": ["attack"],
-  "Fire-Team Supremacy": ["attack"],
-  "Flamethrower Basics": ["attack"],
-  "Follow-up Shot": ["attack"],
-  "Fortune's Fool": ["attack", "skill"],
-  "Get Radical!": ["skill:drive"],
-  "Hail of Fire": ["attack"],
-  "Horde Mastery": ["skill:athletics"],
-  "Horde Supremacy": ["damage"],
-  "Kicking Basics": ["attack"],
-  "Kicking Moves": ["attack"],
-  "Lane Dancer": ["skill:drive"],
-  "Living Cipher": ["skill:analysis"],
-  "Merciless": ["attack"],
-  "Mingling Basics": ["skill:blend"],
-  "Mingling Mastery": ["skill:blend"],
-  "Mingling Supremacy": ["skill:blend"],
-  "Misfortune": ["attack", "skill"],
-  "Need for Speed": ["skill:drive"],
-  "No Quarter": ["attack", "damage"],
-  "Offensive Driving": ["skill:drive"],
-  "Opportunist": ["attack"],
-  "Photo Finish": ["skill:drive"],
-  "Rock and Roll": ["attack"],
-  "Rolling Basics": ["attack"],
-  "Rolling Moves": ["attack"],
-  "Signature Gear": ["attack", "damage", "skill"],
-  "Simulator Jockey": ["attack", "skill"],
-  "Snap Shot": ["attack"],
-  "Spider Basics": ["skill:athletics"],
-  "Spider Mastery": ["skill:athletics"],
-  "Spider Supremacy": ["skill:athletics"],
-  "Spirit Basics": ["attack"],
-  "Spirit Moves": ["attack"],
-  "Steel Rain": ["attack"],
-  "Style Over Caliber": ["damage"],
-  "Submission Basics": ["attack"],
-  "Submission Moves": ["attack"],
-  "Submission Supremacy": ["attack"],
-  "Tac-Squad Basics": ["skill:intimidate"],
-  "Tac-Squad Mastery": ["attack"],
-  "Tac-Squad Supremacy": ["attack"],
-  "This… is my Boomstick": ["attack"],
-  "Trademark Gear": ["attack", "skill"],
-  "Trick Shot": ["attack", "damage"],
-  "Two-hit Combo": ["attack"],
-  "Vital Points Moves": ["attack"],
-  "Warrior's Grace": ["attack"],
-  "Wind Rider": ["skill:notice", "skill:drive"],
-  "Wrestling Basics": ["attack"],
-  "Wrestling Moves": ["attack"]
- }
+  "_note": "Feats the rules do not carry out, and the rolls each bears on: attack, damage, knowledge, skill, skill:<key>, save, save:<key>. The roll dialog lists a character's matching feats so the player can note the ones that apply for the GC. The reminder shown is the feat's summary from summaries.json. Feats the system now carries out are removed from this list.",
+  "feats": {
+    "Crippling Strike": [
+      "attack"
+    ],
+    "Cryptographer": [
+      "skill:analysis"
+    ],
+    "Executioner": [
+      "attack"
+    ],
+    "Follow-up Shot": [
+      "attack"
+    ],
+    "Get Radical!": [
+      "skill:drive"
+    ],
+    "Mingling Mastery": [
+      "skill:blend"
+    ],
+    "Mingling Supremacy": [
+      "skill:blend"
+    ],
+    "Rock and Roll": [
+      "attack"
+    ],
+    "Spider Basics": [
+      "skill:athletics"
+    ],
+    "Spider Mastery": [
+      "skill:athletics"
+    ],
+    "Spider Supremacy": [
+      "skill:athletics"
+    ],
+    "Steel Rain": [
+      "attack"
+    ],
+    "This… is my Boomstick": [
+      "attack"
+    ],
+    "Two-hit Combo": [
+      "attack"
+    ],
+    "Wind Rider": [
+      "skill:notice",
+      "skill:drive"
+    ]
+  }
 }

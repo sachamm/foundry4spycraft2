@@ -322,12 +322,16 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
   if (weapon.proficiency === "indirectFire" && feats.has("Bombard")) {
     factors.push(2);
     errorReduction++;
-    notes.push(loc`Bombard: range increment doubled; error –1, minimum 1.`);
+    notes.push(
+      loc`Bombard: range increment doubled; error –1, minimum 1. The DC to reduce this attack’s damage is 2 higher, and on a miss roll deviation twice and keep the better (p.180).`
+    );
   }
   if (weapon.proficiency === "guided" && feats.has("Guided Weapon Basics")) {
     factors.push(2);
     errorReduction++;
-    notes.push(loc`Guided Weapon Basics: range increment doubled; error –1, minimum 1.`);
+    notes.push(
+      loc`Guided Weapon Basics: range increment doubled; error –1, minimum 1. On a miss roll deviation twice and keep the better (p.181).`
+    );
   }
   const multiplier = factors.length ? 1 + factors.reduce((n, f) => n + f - 1, 0) : 1;
   let increment = ((Number(weapon.range) || 0) + flat) * multiplier;

@@ -14,11 +14,24 @@ export const COMBAT_STANCES = {
   side: { name: "Side Stance", feat: "Fencing Basics", page: 178, movementLimitFeet: 20 },
   gripping: { name: "Gripping Stance", feat: "Spear Basics", page: 179 },
   stalking: { name: "Stalking Stance", feat: "Garrote Basics", page: 179, movementLimitFeet: 20 },
-  circling: { name: "Circling Stance", feat: "Knife Basics", page: 179 }
+  circling: { name: "Circling Stance", feat: "Knife Basics", page: 179 },
+  furious: { name: "Furious Stance", feat: "Club Basics", page: 177 },
+  unbeatable: { name: "Unbeatable Stance", feat: "Sword Basics", page: 180 },
+  shifting: { name: "Shifting Stance", feat: "Kicking Basics", page: 186 },
+  closed: { name: "Closed Stance", feat: "Boxing Basics", page: 184 },
+  open: { name: "Open Stance", feat: "Wrestling Basics", page: 189 },
+  ready: { name: "Ready Stance", feat: "Dirty Fighting Basics", page: 185 },
+  forward: { name: "Forward Stance", feat: "Rolling Basics", page: 187 },
+  rooted: { name: "Rooted Stance", feat: "Spirit Basics", page: 187 },
+  prone: { name: "Prone Stance", feat: "Submission Basics", page: 188 },
+  coiled: { name: "Coiled Stance", feat: "Brawling Basics", page: 185 },
+  intense: { name: "Intense Stance", feat: "Whip Basics", page: 180 }
 };
 export function stanceForcedExit(system) {
   const c = conditionRollPenalties(system);
-  return attributeDefensePlan(system).helpless || c.prone || c.sprawled;
+  // Prone Stance (Submission Basics, p.188): becoming prone does not return the character to normal stance.
+  const proneStance = system.combatStance?.key === "prone" && system.activeFeatNames?.includes("Submission Basics");
+  return attributeDefensePlan(system).helpless || (c.prone && !proneStance) || c.sprawled;
 }
 export function combatStanceState(system) {
   const r = system.combatStance,

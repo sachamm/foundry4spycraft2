@@ -1,3 +1,4 @@
+import { underminedSpendBlock } from "./taunt.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import {
   actionDiceFundingContext,
@@ -67,6 +68,7 @@ export function multipartActionDicePlan(
   if (shaken.needsReview || system.actionDieAwardReview?.needsReview || system.actionDiceSettlementReview?.needsReview)
     throw new Error(loc`Review the interrupted action-die or condition records before spending.`);
   if (shaken.spendingForbidden) throw new Error(loc`Shaken IV: no action dice may be spent at all (p.342).`);
+  if (underminedSpendBlock(system)) throw new Error(underminedSpendBlock(system));
   if (
     !paymentIdValid(id) ||
     typeof actorUuid !== "string" ||

@@ -39,7 +39,8 @@ export function threatenCheckPlan(
     threatenInjuryFromYourAttacksConfirmed = false,
     threatenIncomingLegalConfirmed = false,
     threatenWeaponId = "",
-    threatenCombat = null
+    threatenCombat = null,
+    threatenOneWarning = false
   } = {}
 ) {
   const role =
@@ -90,7 +91,9 @@ export function threatenCheckPlan(
       return reject(loc`Enter nonnegative whole vitality/wound losses caused by your attacks.`);
     const injuryQualified =
         threatenInjuryFromYourAttacksConfirmed === true && (threatenVitalityLoss >= 5 || threatenWoundLoss >= 1),
-      injuryWaived = glint || (mastery && !!weapon);
+      // One Warning (Spirit Moves, p.187): once per opponent per combat, Threaten an uninjured target.
+      oneWarning = threatenOneWarning === true && system.activeFeatNames?.includes("Spirit Moves") === true,
+      injuryWaived = glint || oneWarning || (mastery && !!weapon);
     if (!injuryQualified && !injuryWaived)
       return reject(
         loc`The target must have lost5vitality or1wound to your attacks, or have Glint of Madness, or hold a readied ranged weapon with CQB Mastery.`
@@ -102,7 +105,8 @@ export function threatenCheckPlan(
       woundLoss: threatenWoundLoss,
       injuryFromYourAttacksConfirmed: threatenInjuryFromYourAttacksConfirmed === true,
       injuryQualified,
-      injuryWaived: !injuryQualified && injuryWaived
+      injuryWaived: !injuryQualified && injuryWaived,
+      ...(oneWarning ? { oneWarning: true } : {})
     };
   }
   const gearBonus = basics && weapon ? 2 : 0,
@@ -128,7 +132,7 @@ export function threatenCheckPlan(
     bonuses: gearBonus ? [{ source: "CQB Basics (Threaten)", type: "gear", value: 2 }] : [],
     blockedReason: "",
     notes: [
-      loc`Threaten: ${role === "attacker" ? loc`Intimidate(Wis), half attack action` : loc`Resolve(Wis), opposed response`}; Hearing/Language, error modifier+0. ${gearBonus ? loc`CQB Basics adds+2gear from the selected held/readied ranged weapon. ` : ""}${target?.injuryWaived ? (glint ? loc`Glint of Madness waives the prior-injury requirement without requiring a weapon. ` : loc`CQB Mastery waives the prior-injury requirement. `) : ""}Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).`
+      loc`Threaten: ${role === "attacker" ? loc`Intimidate(Wis), half attack action` : loc`Resolve(Wis), opposed response`}; Hearing/Language, error modifier+0. ${gearBonus ? loc`CQB Basics adds+2gear from the selected held/readied ranged weapon. ` : ""}${target?.oneWarning ? loc`One Warning: once per opponent per combat; a success adds stress equal to your base attack bonus minus the target’s (minimum 0). ` : ""}${target?.injuryWaived && !target?.oneWarning ? (glint ? loc`Glint of Madness waives the prior-injury requirement without requiring a weapon. ` : loc`CQB Mastery waives the prior-injury requirement. `) : ""}${role === "attacker" && glint && (system.abilities?.cha?.mod ?? 0) > 0 ? loc`Glint of Madness: a success adds +${system.abilities.cha.mod} (Charisma) to the stress damage. ` : ""}Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).`
     ]
   };
 }
@@ -156,7 +160,8 @@ export function validateThreatenProof(
         threatenInjuryFromYourAttacksConfirmed: t?.injuryFromYourAttacksConfirmed,
         threatenIncomingLegalConfirmed: proof.incomingLegalConfirmed,
         threatenWeaponId: proof.weapon?.id ?? "",
-        threatenCombat: combat
+        threatenCombat: combat,
+        threatenOneWarning: t?.oneWarning === true
       }
     );
   if (
@@ -208,7 +213,8 @@ rollPipeline.register({
       threatenInjuryFromYourAttacksConfirmed = false,
       threatenIncomingLegalConfirmed = false,
       threatenWeaponId = "",
-      threatenCombat = null
+      threatenCombat = null,
+      threatenOneWarning = false
     } = input;
     const plan = threatenCheckPlan(system, skillKey, check, {
       method,
@@ -221,7 +227,8 @@ rollPipeline.register({
       threatenInjuryFromYourAttacksConfirmed,
       threatenIncomingLegalConfirmed,
       threatenWeaponId,
-      threatenCombat
+      threatenCombat,
+      threatenOneWarning
     });
     return skillPlanTerm("threaten", plan, { noteAt: 190, blockAt: 170, bonusAt: 40 });
   }

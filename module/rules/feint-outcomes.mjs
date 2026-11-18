@@ -15,7 +15,7 @@ export function feintOutcomePlan(
     defending?.actorUuid !== defenderUuid ||
     acting.checkKind !== "skill" ||
     defending.checkKind !== "skill" ||
-    acting.skillKey !== "sleightOfHand" ||
+    !["sleightOfHand", "impress"].includes(acting.skillKey) ||
     acting.checkId !== "feint" ||
     defending.skillKey !== "notice" ||
     defending.checkId !== "resist-feint" ||
@@ -27,7 +27,7 @@ export function feintOutcomePlan(
     q.opponentUuid !== attackerUuid
   )
     throw Error(
-      loc`Pair the actual acting Sleight of Hand and opposing Notice Feint receipts with reciprocal recorded opponents.`
+      loc`Pair the actual acting Sleight of Hand (or Fan Service Impress) and opposing Notice Feint receipts with reciprocal recorded opponents.`
     );
   for (const c of [acting, defending])
     if (

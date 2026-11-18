@@ -1,4 +1,5 @@
 /** Attacks and damage. */
+import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
 import { reachIncreaseFeet } from "../../rules/reach.mjs";
@@ -30,6 +31,11 @@ import { askFollowUp } from "../../rolls/dialogs/follow-ups.mjs";
 import { measureInto } from "../../apps/map.mjs";
 import { coverFire, suppressiveFire } from "../../apps/combat-actions.mjs";
 import { featReminders } from "../../rules/feat-reminders.mjs";
+import { opportunistDamageSource, halvedFormula } from "../../rules/opportunist.mjs";
+import { styleOverCaliberEligible, styleOverCaliberWeapon } from "../../rules/style-over-caliber.mjs";
+import { kickDamageWeapon, unarmedWeapon } from "../../rules/kick.mjs";
+import { inClosedStance } from "../../rules/boxing.mjs";
+import { halvesSneakDamage } from "../../rules/unarmed-tricks.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorAttackRolls = Base =>
@@ -259,6 +265,7 @@ export const ActorAttackRolls = Base =>
           choiceSource: "Million Dollar Skill",
           choiceResourceId: millionDollar ? "millionDollarSkill" : "",
           oneInAMillion: !!options.oneInAMillion,
+          allOrNothing: options.allOrNothing === true,
           checkKind: "attack",
           ability: atk.ability,
           weaponUuid: item.uuid,
@@ -276,6 +283,18 @@ export const ActorAttackRolls = Base =>
             bullseye: atk.bullseye,
             fireAction: atk.fireAction ?? null,
             pummel: atk.pummel ?? null,
+            damageConversion: atk.damageConversion ?? null,
+            kick: atk.kick ?? null,
+            kickTrick: atk.kickTrick ?? null,
+            doubleJab: atk.doubleJab ?? null,
+            boxingTrick: atk.boxingTrick ?? null,
+            brush: atk.brush ?? null,
+            unarmedTrick: atk.unarmedTrick ?? null,
+            duelingReach: atk.duelingReach ?? null,
+            noQuarter: atk.noQuarter ?? null,
+            tauntBonus: atk.tauntBonus ?? null,
+            calledShot: atk.calledShot ?? null,
+            bounce: atk.bounce ?? null,
             meleeTradeoff: atk.meleeTradeoff,
             grippingStance: grippingAttackProof(
               this.system,
@@ -476,7 +495,10 @@ export const ActorAttackRolls = Base =>
         (hasSneakAttackSource(this.system, item.system) ||
           sideHits.length ||
           attackBonusHits.length ||
-          featReminders(this.items, { kind: "damage" }).length)
+          featReminders(this.items, { kind: "damage" }).length ||
+          (inClosedStance(this.system) && unarmedWeapon(item.system)) ||
+          this.system.activeFeatNames?.some(n => ["Horde Supremacy", "Tac-Squad Supremacy"].includes(n)) ||
+          styleOverCaliberEligible(this.system, item.system))
       ) {
         const trickSneakHit = automaticAttackBonus?.proof.sneakDice ? automaticAttackBonus : null;
         const input = await systemDialog.input({
@@ -485,6 +507,7 @@ export const ActorAttackRolls = Base =>
           content: rollPipeline.dialog({
             dialog: "damage",
             actor: this,
+            item,
             attackBonusHits,
             automaticAttackBonus,
             sideHits,
@@ -520,7 +543,8 @@ export const ActorAttackRolls = Base =>
       }
       const attackDamageBenefit = options.attackDamageSourceUuid
         ? makeAttackDamageProof(this, item, options.attackDamageSourceUuid, {
-            targetUuid: options.targetActorUuid || options.targetActor?.uuid
+            targetUuid: options.targetActorUuid || options.targetActor?.uuid,
+            impaleDefense: options.impaleDefense
           })
         : null;
       options = {
@@ -529,10 +553,24 @@ export const ActorAttackRolls = Base =>
         ...(attackDamageBenefit?.hands ? { hands: attackDamageBenefit.hands } : {})
       };
       const damageWeaponSource = current => ({
-        ...current.system,
+        ...styleOverCaliberWeapon(this.system, current.system, options),
+        ...(options.kick === true ? { kick: true } : {}),
+        ...(options.closedStanceTarget === true ? { closedStanceTarget: true } : {}),
+        ...(options.unarmedTrick ? { unarmedTrick: options.unarmedTrick } : {}),
+        ...(options.hordeSupremacy === true ? { hordeSupremacy: true } : {}),
+        ...(options.doubleJab === true ? { doubleJab: true } : {}),
+        ...(options.brush === true && unarmedWeapon(current.system) ? { damage: "1d6", brush: true } : {}),
         id: current.id ?? current._id,
         name: current.name,
-        qualities: grantedMeleeQuality(current.system.qualities ?? "", attackDamageBenefit?.grantedQuality)
+        // Power Kick adds armor-piercing (2) and takedown to the Kick's damage.
+        qualities: grantedMeleeQuality(
+          options.unarmedTrick === "clothesline"
+            ? grantedMeleeQuality(current.system.qualities ?? "", "TKD")
+            : options.kick === true
+              ? kickDamageWeapon({ qualities: current.system.qualities ?? "" }, options.kickTrick).qualities
+              : (current.system.qualities ?? ""),
+          attackDamageBenefit?.grantedQuality
+        )
       });
       const damageWeaponContext = current => {
         const context = this.weaponContext(current, options),
@@ -613,6 +651,21 @@ export const ActorAttackRolls = Base =>
           ? options.targetActorUuid
           : (options.targetActor?.uuid ?? targetChoices.selected),
         targetActor = await resolveDamageTarget(targetUuid);
+      // Snake Strike: the drawn weapon's next hit this round on the Feinted opponent adds 1 sneak attack die.
+      const snakeStrike =
+        options.snakeStrike === true && options.includeSneakAttack === true
+          ? snakeStrikeOpen(this.system, {
+              combatId: this.participatingCombat?.id,
+              round: this.participatingCombat?.round,
+              weaponId: item.id,
+              targetUuid: targetActor?.uuid ?? "",
+              posted: [...(game.messages ?? [])].map(m => m.flags?.spycraft2).filter(Boolean)
+            })
+          : null;
+      if (options.snakeStrike === true && options.includeSneakAttack === true && !snakeStrike)
+        throw new Error(
+          loc`No open Snake Strike for this weapon and target this round. Record it from the Main tab after the Feint.`
+        );
       const sneak = sneakAttackDamagePlan(
           this.system,
           { ...item.system, range: this.weaponAttack(item, options).range },
@@ -622,7 +675,9 @@ export const ActorAttackRolls = Base =>
             trickSneak:
               options.includeSneakAttack === true && attackDamageBenefit?.sneakDice
                 ? { source: attackDamageBenefit.sneakSource, dice: attackDamageBenefit.sneakDice }
-                : null,
+                : snakeStrike
+                  ? { source: "Snake Strike", dice: 1 }
+                  : null,
             whirlingFlankingProof: whirlingAttackProof(this, {
               targetFlanked: options.targetFlanked,
               targetActorUuid: targetActor?.uuid
@@ -631,7 +686,12 @@ export const ActorAttackRolls = Base =>
           }
         ),
         sneakAttackTarget = sneak.active ? sneakAttackTargetSnapshot(targetActor) : null;
-      let formula = damage?.formula && sneak.active ? `${damage.formula} + ${sneak.formula}` : damage?.formula;
+      // Dirty Fighting Basics: sneak attack damage its owner suffers is halved, rounded up (p.185).
+      const sneakHalved = sneak.active && halvesSneakDamage(targetActor?.system);
+      let formula =
+        damage?.formula && sneak.active
+          ? `${damage.formula} + ${sneakHalved ? `ceil((${sneak.formula}) / 2)` : sneak.formula}`
+          : damage?.formula;
       if (!formula) return ui.notifications.warn(game.i18n.format("SPYCRAFT.Weapon.NoDamage", { name: item.name }));
       // Pummel: double the standard subdual damage of an unarmed hit (p.358).
       const pummel =
@@ -639,16 +699,35 @@ export const ActorAttackRolls = Base =>
         (item.system.proficiency === "unarmed" || /\bNKL\b/.test(item.system.qualities ?? ""));
       if (options.pummel === true && !pummel) return ui.notifications.warn(loc`Pummel is an unarmed attack.`);
       if (pummel) formula = `(${formula}) * 2`;
+      // Opportunist: a hit from its final attack deals half standard damage, rounded up (p.175).
+      const opportunistDamage = options.opportunistAttackUuid
+        ? opportunistDamageSource(fromUuidSync(options.opportunistAttackUuid), {
+            actorUuid: this.uuid,
+            weaponUuid: item.uuid,
+            messages: game.messages ?? [],
+            rerollOf: options.rerollOf
+          })
+        : null;
+      if (opportunistDamage) formula = halvedFormula(formula);
       return this.rollCheck(formula, this.getRollData(), {
         featReminders: options.featReminders,
         pummelDamage: pummel,
+        styleOverCaliber: options.styleOverCaliber === true,
+        kick: options.kick === true,
+        hordeSupremacy: options.hordeSupremacy === true,
+        ...(snakeStrike && sneak.active ? { snakeStrike: snakeStrike.id } : {}),
+        kickTrick: options.kickTrick ?? null,
+        doubleJab: options.doubleJab === true,
+        brush: options.brush === true,
+        closedStanceTarget: options.closedStanceTarget === true,
+        opportunistDamage,
         meleeArmorPiercing: damage.meleeArmorPiercing.evidence,
         attackDamageBenefit,
         sideStanceDamage,
         finesseDamage,
         validateAttackContext: validateFinesseDamage,
         weaponQualities: damage.effectiveQualities,
-        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}`,
+        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${options.styleOverCaliber === true ? loc` — Style Over Caliber: 1d10+2 standard damage` : ""}${options.kick === true ? loc` — Kick: Strength modifier added twice` : ""}${options.kickTrick === "powerKick" ? loc` — Power Kick: armor-piercing (2), takedown` : ""}${options.doubleJab === true ? loc` — Double Jab: 2 fewer damage per die (minimum 1)` : ""}${options.brush === true ? loc` — Brush: 1d6 subdual; the target’s Initiative Count drops by this amount` : ""}${sneakHalved ? loc` — Dirty Fighting Basics: the target takes half the sneak attack damage, rounded up` : ""}${options.hordeSupremacy === true ? loc` — Horde Supremacy: +2 morale damage` : ""}${options.closedStanceTarget === true ? loc` — Closed Stance: +2 against the opponent in my square` : ""}${options.kickTrick === "guillotine" ? loc` — Guillotine Kick: the target makes a Fortitude save (DC 10 + this damage) or is sent reeling` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
         validateCQBRange,
         cqbRange: damage.cqbRange?.active ? damage.cqbRange : null,
         mortarOperation: damage.mortarOperation?.applicable ? damage.mortarOperation : null,

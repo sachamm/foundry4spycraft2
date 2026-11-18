@@ -11,7 +11,8 @@ export function tripOutcomePlan(
     tieResolvedConfirmed = false,
     allowCriticalAttackerWin = false,
     allowCriticalCounter = false,
-    activeCombatantId = null
+    activeCombatantId = null,
+    sweep = false
   } = {}
 ) {
   const p = a?.tripAttack,
@@ -62,7 +63,9 @@ export function tripOutcomePlan(
     if ((c.criticalSuccess && c.successConfirmed !== true) || (c.criticalFailure && c.successConfirmed !== false))
       throw Error(loc`The activated critical Trip must agree with its confirmed winner or loser.`);
   const criticalFinal = a.successConfirmed === true && (a.criticalSuccess === true || d.criticalFailure === true),
-    criticalCounter = a.successConfirmed === false && (d.criticalSuccess === true || a.criticalFailure === true);
+    // Sweep (Kicking Basics, p.186): the attacker's own critical failure gives the opponent no free counter-Trip.
+    criticalCounter =
+      a.successConfirmed === false && (d.criticalSuccess === true || (a.criticalFailure === true && !sweep));
   if ((criticalFinal && allowCriticalAttackerWin !== true) || (criticalCounter && allowCriticalCounter !== true))
     throw Error(
       loc`This critical Trip needs its final-attack or counter-Trip sequence adjudicated separately; ordinary settlement is unavailable.`
@@ -118,7 +121,8 @@ export function tripOutcomePlan(
     attackerUuid,
     defenderUuid,
     attackerWon: a.successConfirmed,
-    condition: a.successConfirmed ? "sprawled" : "flat-footed",
+    // Sweep: a lost Trip leaves the attacker flat-footed only on their critical failure.
+    condition: a.successConfirmed ? "sprawled" : sweep && a.criticalFailure !== true ? null : "flat-footed",
     conditionActorUuid: a.successConfirmed ? defenderUuid : attackerUuid,
     combatId: p.combat.id,
     round: p.combat.round,
