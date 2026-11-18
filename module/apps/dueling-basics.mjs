@@ -64,3 +64,23 @@ rollPipeline.register({
     ];
   }
 });
+
+// No Quarter: the hit's damage roll gives up the recorded sneak attack dice.
+rollPipeline.register({
+  id: "noQuarterControl",
+  kinds: ["attack"],
+  order: 9766,
+  chatControls({ check, actor }) {
+    const nq = check.attackContext?.noQuarter;
+    if (!nq || check.successConfirmed !== true || check.superseded) return null;
+    const weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null;
+    return weapon
+      ? [
+          {
+            label: loc`Roll damage (No Quarter: ${nq.dice} fewer sneak dice)`,
+            run: () => actor.rollDamage(weapon, { noQuarterDice: nq.dice })
+          }
+        ]
+      : null;
+  }
+});

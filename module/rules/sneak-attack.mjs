@@ -59,7 +59,8 @@ export function sneakAttackDamagePlan(
     targetSneakAttackImmune = false,
     sideStanceDie = false,
     trickSneak = null,
-    whirlingFlankingProof = null
+    whirlingFlankingProof = null,
+    noQuarterDice = 0
   } = {}
 ) {
   if (
@@ -92,8 +93,12 @@ export function sneakAttackDamagePlan(
   )
     throw new Error(loc`Converted damage cannot include sneak attack damage, except lethal to subdual with Bludgeon.`);
   const sources = sneakAttackSources(system, weapon, { targetFlanked, braced, sideStanceDie, trickSneak }),
-    dice = sources.reduce((n, s) => n + s.dice, 0);
-  if (!dice) throw new Error(loc`This weapon and declared circumstances have no earned sneak attack dice.`);
+    earned = sources.reduce((n, s) => n + s.dice, 0);
+  if (!earned) throw new Error(loc`This weapon and declared circumstances have no earned sneak attack dice.`);
+  // No Quarter (p.195): the dice given up before the attack are not rolled.
+  const given = Number.isSafeInteger(noQuarterDice) && noQuarterDice > 0 ? noQuarterDice : 0,
+    dice = Math.max(0, earned - given);
+  if (!dice) return { active: false, dice: 0, noQuarterDice: given };
   let rangeLimit = null,
     extendedRange = false;
   if (!melee(weapon)) {

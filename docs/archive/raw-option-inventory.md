@@ -428,7 +428,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Whack | 196 | No | Subdual sneak bonus implemented; flat-footed persistence remains manual | — |
 | Concealed Carry | 193 | No | Manual/descriptive | — |
 | Deadly Precision | 194 | No | Sneak damage bonus per die implemented | — |
-| No Quarter | 195 | No | Manual/descriptive | — |
+| No Quarter | 195 | No | Covered (batch 404): an attack-dialog choice gives up 1 or more of the weapon’s earned sneak attack dice for an equal threat range increase; the hit’s damage roll from the card rolls that many fewer | Native Foundry QA not claimed |
 | Crippling Strike | 194 | No | Numeric sneak-dice prerequisite implemented; effects remain manual | — |
 | Equilibrium Basics | 194 | No | Partial: declaration-earned Covert-count dodge bonus with timed Total Defense | Batches290/301/303; timed dodge, declared Balance one-check movement and Falling damage-distance−20 verified, including additive soft landing, source/Speed/evidence guards, Skills UI and native receipts; full movement/landing/damage settlement remains separate |
 | Equilibrium Mastery | 194 | No | Partial: narrow/uneven Balance DC−5, error−1 and Vision tag ignored | Batches301/305/307; all three normal declared benefits verified: Balance surfaces, ordinary Resist Trip dodge and full-Speed Tumble; source/count/Speed/condition/evidence guards, Skills UI and native receipts; broader combinations, physical action sequencing and outcomes remain open |
@@ -1843,3 +1843,12 @@ Source: rules reference p.178 (local markdown edition; original PDF page not vis
 - The extra Reach: an attack-dialog option for melee attacks, refused if another attack this combat round already used it. A resolved miss offers “Dueling Basics miss: become flat-footed”, once.
 
 Verification: 513 legacy assertions, 3438 of 3439 Node tests (3 new), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 42 manual / 63 partial / 209 other; at least 105 of 314 explicitly unfinished; 91 whole-feat closures.
+
+## Residual implementation batch 404 — No Quarter
+
+Source: rules reference p.195 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/no-quarter.mjs`. The attack dialog lets an owner of the feat give up sneak attack dice, up to the most the weapon could earn. The attack plan raises the threat range by that number and records `noQuarter`.
+- The hit’s card offers its damage roll; `sneakAttackDamagePlan` rolls that many fewer sneak dice. If none are left, no sneak damage is rolled.
+
+Verification: 3441 of 3442 Node tests (2 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 41 manual / 63 partial / 210 other; at least 104 of 314 explicitly unfinished; 92 whole-feat closures.

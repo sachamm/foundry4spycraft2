@@ -88,6 +88,7 @@ import "../rules/melee-tradeoff.mjs";
 import "../rules/melee-tricks.mjs";
 import "../rules/mental-leap.mjs";
 import "../rules/miss-tricks.mjs";
+import "../rules/no-quarter.mjs";
 import "../rules/polyglot.mjs";
 import "../rules/pursuit-feats.mjs";
 import "../rules/quality-checks.mjs";

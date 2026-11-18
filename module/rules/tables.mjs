@@ -11404,10 +11404,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:drive",
   "text": "No Maneuver penalty for going faster than half your vehicle or mount's top speed."
  },
- "No Quarter": {
-  "rolls": "attack, damage",
-  "text": "Trade sneak attack dice for an equal increase in threat range on that attack."
- },
  "Rock and Roll": {
   "rolls": "attack",
   "text": "Autofire and Strafe volleys use only 2 shots each; fire rifles and machine guns one-handed at –2; requests for autofire ammo yield double."
