@@ -24,6 +24,7 @@ import {
 } from "../module/rules/combat-actions.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { weaponAttack } from "../module/rules/gear.mjs";
+import { coverFireTargetLabel, fireActionInput } from "../module/apps/combat-actions.mjs";
 
 const auto = { firearm: true, fireMode: "auto", attackAction: "autofire", recoilPenalty: -3 };
 const burstMode = { firearm: true, fireMode: "burst", attackAction: "standard", recoilPenalty: -2 };
@@ -91,6 +92,7 @@ test("Strafe: squares from the shots left, recoil counted twice, error +2, Defen
   const plan = fireActionPlan({ ...auto, attackAction: "other" }, { action: "strafe", squares: 3, shotsRemaining: 30 });
   assert.equal(plan.blocked, false);
   assert.equal(plan.extraRecoil, -3);
+  assert.match(plan.notes[0], /recoil penalty doubled \(-6 in all\)/);
   assert.equal(plan.error, 2);
   assert.equal(plan.shots, 9);
   assert.match(fireActionPlan(auto, { action: "strafe", squares: 4, shotsRemaining: 9 }).reason, /1 to 3 squares/);
@@ -303,4 +305,38 @@ test("Pummel joins an unarmed Standard Attack and is refused with a weapon", () 
     pummel: true
   });
   assert.match(armed.reason, /unarmed attack/);
+});
+
+test("a fire action sets the fire mode it needs", () => {
+  assert.equal(fireActionInput({ fireAction: "burst", fireMode: "single" }).fireMode, "burst");
+  assert.equal(fireActionInput({ fireAction: "autofire", fireMode: "single" }).fireMode, "auto");
+  assert.equal(fireActionInput({ fireAction: "strafe", fireMode: "burst" }).fireMode, "auto");
+  assert.equal(Object.hasOwn(fireActionInput({ fireAction: "coverFire", fireMode: "single" }), "fireMode"), false);
+  assert.equal(fireActionInput({ fireAction: "" }), null);
+});
+
+test("Cover Fire marks an unlinked token apart from its sheet", () => {
+  assert.equal(coverFireTargetLabel({ name: "Guard", isToken: false }), "Guard");
+  assert.equal(
+    coverFireTargetLabel({ name: "Guard", isToken: true, token: { parent: { name: "Docks" } } }),
+    "Guard (token on Docks)"
+  );
+  assert.equal(coverFireTargetLabel({ name: "Guard", isToken: true }), "Guard (token)");
+});
+
+test("the quick attack dialog reads an optional distance for a ranged weapon", async () => {
+  const { rollPipeline } = await import("../module/rolls/index.mjs");
+  const actor = { system: { conditionContext: {}, classLevels: {} }, items: [] };
+  const read = entered =>
+    rollPipeline.read({ dialog: "attack", actor, item: { system: { range: 30 } }, needsCQB: false, entered }, {});
+  assert.equal(read({ distanceFeet: 80 }).distanceFeet, 80);
+  assert.equal(read({ distanceFeet: "45" }).distanceFeet, 45);
+  assert.equal(Object.hasOwn(read({ distanceFeet: "" }), "distanceFeet"), false, "empty stays a quick roll");
+  assert.equal(Object.hasOwn(read({ distanceFeet: null }), "distanceFeet"), false);
+  assert.throws(() => read({ distanceFeet: -5 }), /nonnegative/);
+  const melee = rollPipeline.read(
+    { dialog: "attack", actor, item: { system: { range: 0 } }, needsCQB: false, entered: { distanceFeet: 10 } },
+    {}
+  );
+  assert.equal(Object.hasOwn(melee, "distanceFeet"), false, "a melee weapon has no range modifier");
 });

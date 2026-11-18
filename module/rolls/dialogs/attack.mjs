@@ -22,6 +22,9 @@ import {
 import { cqbRangedWeapon } from "../../rules/cqb.mjs";
 import { loc } from "../../i18n.mjs";
 
+/** A weapon with a range increment, whose attack takes a range modifier when the distance is known. */
+const rangedWeapon = item => Number(item?.system?.range) > 0;
+
 /** [position, render(context)] — context holds the acting character and the values the roll has worked out so far. */
 const parts = [
   [10, () => `<div class="spycraft2-roll-options">`],
@@ -47,10 +50,12 @@ const parts = [
   ],
   [
     60,
-    ({ needsCQB, options }) =>
+    ({ item, needsCQB, options }) =>
       needsCQB
         ? `<label>${loc`CQB target distance (feet)`} <input name="distanceFeet" type="number" min="0" step="any" required value="${Number.isFinite(options.distanceFeet) ? options.distanceFeet : ""}" /></label><label><input name="targetOpponentConfirmed" type="checkbox" /> ${loc`This attack targets an opponent (CQB Mastery threat benefit)`}</label>`
-        : ""
+        : rangedWeapon(item)
+          ? `<label>${loc`Target distance in feet (optional; leave empty for a quick roll without a range modifier)`} <input name="distanceFeet" type="number" min="0" step="any" value="${Number.isFinite(options.distanceFeet) ? options.distanceFeet : ""}" /></label>`
+          : ""
   ],
   [70, () => `</div>`]
 ];
@@ -84,4 +89,20 @@ rollPipeline.register({
     targetAnimal: !!entered.targetAnimal,
     targetFlanked: !!entered.targetFlanked
   })
+});
+
+// The optional distance of a quick ranged attack (the CQB section reads its own, required, distance).
+rollPipeline.register({
+  id: "attackDistanceInput",
+  dialogs: ["attack"],
+  order: 65,
+  read({ item, needsCQB, entered }) {
+    if (needsCQB || !rangedWeapon(item)) return null;
+    const value = entered.distanceFeet;
+    if (value === undefined || value === null || (typeof value === "string" && !value.trim())) return null;
+    const distanceFeet = Number(value);
+    if (!Number.isFinite(distanceFeet) || distanceFeet < 0)
+      throw new Error(loc`Enter a nonnegative target distance, or leave it empty.`);
+    return { distanceFeet };
+  }
 });
