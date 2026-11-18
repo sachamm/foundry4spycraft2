@@ -110,6 +110,7 @@ import "../rules/skill-gear.mjs";
 import "../rules/skill-tags.mjs";
 import "../rules/sneak-attack.mjs";
 import "../rules/sniper.mjs";
+import "../rules/spider.mjs";
 import "../rules/stalking-stance.mjs";
 import "../rules/stash-feats.mjs";
 import "../rules/still-standing.mjs";

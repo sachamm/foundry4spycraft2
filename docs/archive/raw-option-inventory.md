@@ -444,9 +444,9 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Mingling Basics | 195 | No | Covered (batch 410): Blend/Stealth already offers Dexterity; the skill dialog takes the public crowd’s Size Rating and adds it as a synergy bonus; the card states that a failure does not leave the character flat-footed | Native Foundry QA not claimed |
 | Mingling Mastery | 195 | No | Partial (batch 410): the Blend/Stealth card states the halved balancing/moving/speaking penalties, the lost Disposition tag and the 500-person invisibility threshold; those penalties are not itemised by the dialog | Native Foundry QA not claimed |
 | Mingling Supremacy | 195 | No | Partial (batch 410): the Blend/Stealth card states the removed and halved penalties and the 50-person invisibility threshold; those penalties are not itemised by the dialog | Native Foundry QA not claimed |
-| Spider Basics | 196 | No | Manual/descriptive | — |
+| Spider Basics | 196 | No | Partial (batch 415): Athletics/Climb is planned without its Hands-On and Vision tags and without the missing-kit penalty; no attack bonus against a climber and the Covert-feat Initiative bonus stay with the GC | Native Foundry QA not claimed |
 | Spider Mastery | 196 | No | Partial (batch 410): the Acrobatics/Falling declaration records 1 less damage per die (minimum 1); climbing speed and catching yourself on DC 40 surfaces stay with the GC | Native Foundry QA not claimed |
-| Spider Supremacy | 196 | No | Manual/descriptive | — |
+| Spider Supremacy | 196 | No | Partial (batch 415): Climb with a declared climbing kit gets +5 (for DC −5) and error range −1; climbing speeds, no Climb check on damage and the surprise penalty stay with the GC | Native Foundry QA not claimed |
 | Clean and Polished | 197 | No | Conditional personal-gear error cost; maintenance declared | — |
 | Mother Hen | 197 | No | Covered (batch 389): +4 to Damage saves of the owner’s approved Possessions; the item’s Damage save offers the owner’s Reflex save (DC = damage) to take half, rounded up, before the item saves against the rest | Native Foundry QA not claimed |
 | Extra Gear | 197 | Yes | Partial: chosen/roll effects | — |

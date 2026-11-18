@@ -7,6 +7,7 @@ import "./bull-rush-attack.mjs";
 import "./bull-rush.mjs";
 import { tumblePathPlan } from "./tumble.mjs";
 import { feintSkillChecks } from "./feint.mjs";
+import { spiderClimbCheck } from "./spider.mjs";
 import "./trip.mjs";
 import { fallDistanceSkillPlan } from "./fall-distance.mjs";
 import { balanceSurfacePlan } from "./balance.mjs";
@@ -339,6 +340,9 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     timingReduction,
     tenSecondSolution
   });
+  // Spider Basics plans a Climb without its Hands-On and Vision tags or the missing-kit penalty (p.196).
+  const spider = spiderClimbCheck(system, key, check);
+  check = spider.check;
   const skillTags = skillTagPlan(system, key, check, { oneHanded, noSharedLanguage, bound, conveyingMessage });
   const stoneCold = stoneColdSkillPlan(system, key, check);
   const skillGear = skillGearPlan(stoneCold.check, { gearStatus, gearItem, kitAtLocation, system });
@@ -464,7 +468,7 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [
       160,
       [
-        ...skillGear.bonuses,
+        ...skillGear.bonuses.filter(b => !(spider.waiveMissingGear && b.source === "Missing required gear")),
         ...gearUse.bonuses,
         ...(signatureBonus(system, gearItem?.id)
           ? [{ type: "morale", value: signatureBonus(system, gearItem.id), source: gearItem.name }]
@@ -538,7 +542,8 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     ) - (skill.threatAdjustment ?? 0);
   const reduction =
     (skill.errorReduction ?? 0) +
-    conditional.filter(row => row.kind === "errorReduction").reduce((n, row) => n + row.value, 0);
+    conditional.filter(row => row.kind === "errorReduction").reduce((n, row) => n + row.value, 0) +
+    terms.sum("errorReduction");
   const errorFloor = Math.max(
     skill.errorFloor ?? 0,
     ...conditional.filter(row => row.kind === "errorFloor").map(row => row.value)
