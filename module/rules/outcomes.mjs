@@ -1,3 +1,5 @@
+import { reminderNote } from "./feat-reminders.mjs";
+import { cooperativeNotes } from "./cooperative.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { describeModifiers } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
@@ -63,6 +65,16 @@ export function adjudicateCheck(check, succeeded) {
   };
 }
 /** Preserve roll evidence when boosts or adjudication replace the original chat flavor. */
+/**
+ * The card text for a viewer whose language differs from the one the check was posted in: the notes worked out
+ * from the record are written again in the viewer's language. The line the roller's client composed (the check's
+ * name and its own notes) stays as posted. Returns null when the posted text already serves.
+ */
+export function viewerFlavor(check, viewerLanguage) {
+  if (!check?.lang || !viewerLanguage || check.lang === viewerLanguage) return null;
+  return checkFlavor(check);
+}
+
 export function checkFlavor(check) {
   const esc = v => String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   const candidates = checkCandidates(check),
@@ -88,6 +100,8 @@ export function checkFlavor(check) {
     notes.push(
       loc`Combat Instincts: immediate final Standard Attack against the adjacent opponent after a miss by ${check.finalAttack.missMargin}; one round use recorded.`
     );
+  if (check.featReminders?.length) notes.push(esc(reminderNote(check.featReminders)) + ".");
+  notes.push(...cooperativeNotes(check).map(esc));
   if ((check.checkMethod ?? "roll") === "roll" && (check.threat > 0 || check.error > 0))
     notes.push(loc`Error ${check.error ?? 0}; threat ${check.threat ?? 0}.`);
   if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);

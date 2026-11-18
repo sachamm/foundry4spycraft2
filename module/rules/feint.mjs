@@ -4,7 +4,7 @@ import { fencingDisarmPlan as readiedFencingPlan } from "./fencing-disarm.mjs";
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { readiedDisarmWeapons } from "./disarm-response.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Ordinary Feint p.357. Alternative skills, free actions and outcomes are separate. */
 export function feintSkillChecks(key, checks = []) {
@@ -202,4 +202,31 @@ rollPipeline.register({
   order: 5060,
   kinds: ["skill"],
   skillChecks: ({ skillKey }, checks) => feintSkillChecks(skillKey, checks)
+});
+
+// A Feint's part of a skill check plan.
+rollPipeline.register({
+  id: "feintSkillTerm",
+  kinds: ["skill"],
+  order: 9220,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      feintOpponentName = "",
+      feintOpponentUuid = "",
+      feintAdjacent = false,
+      feintTargetEligibleConfirmed = false,
+      feintLegalConfirmed = false,
+      feintCombat = null
+    } = input;
+    const plan = feintCheckPlan(system, skillKey, check, {
+      method,
+      feintOpponentName,
+      feintOpponentUuid,
+      feintAdjacent,
+      feintTargetEligibleConfirmed,
+      feintLegalConfirmed,
+      feintCombat
+    });
+    return skillPlanTerm("feint", plan, { noteAt: 30, blockAt: 10, bonusAt: 20 });
+  }
 });

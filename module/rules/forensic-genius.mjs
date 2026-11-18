@@ -101,3 +101,6 @@ rollPipeline.register({
   validate: ({ actor, options, checkKind, checkId, skillKey }) =>
     validateTrackingTaskProof(actor.system, options.trackingMasteryTask, { checkKind, skillKey, checkId })
 });
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "forensicGeniusRecord", order: 9685, record: ["forensicGenius"] });

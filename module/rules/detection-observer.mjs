@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Table2.25 p.119 observer distraction; Ghost Mastery p.195 adds a separate check penalty. */
 const DISTRACTION = {
@@ -72,3 +73,6 @@ export function detectionObserverPlan(
     ]
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "detectionObserverRecord", order: 9660, record: ["detectionObserver"] });

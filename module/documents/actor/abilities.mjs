@@ -1,4 +1,5 @@
 /** Limited-use class and feat abilities, analysis tasks, temporary feats and assistants. */
+import { ruleName } from "../../rules/rule-name.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { useMark, discloseMark, correctMark } from "../../apps/mark.mjs";
 import { improvisedMasterySpec } from "../../rules/improvised-weapons.mjs";
@@ -819,7 +820,7 @@ export const ActorAbilities = Base =>
       const feat = this.items.get(options.featId);
       if (
         !feat ||
-        feat.name !== "Depth of Study" ||
+        ruleName(feat) !== "Depth of Study" ||
         feat.system.featKind !== "temporary" ||
         !this.system.featStatus?.[feat.id]?.ok
       )

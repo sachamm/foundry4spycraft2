@@ -209,7 +209,7 @@ export async function rollVehicleDamageResult(
     const what = {
       Cargo: loc`One random cargo item`,
       "W/G": loc`One random weapon or piece of vehicle gear`,
-      Occ: "One random occupant",
+      Occ: loc`One random occupant`,
       Animal: loc`One random draft animal`
     }[location.code];
     if (location.code === "Occ") {
@@ -237,8 +237,8 @@ export async function rollVehicleDamageResult(
     }
   } else lines.push(loc`Resolve this result from the page above; nothing is recorded automatically.`);
   for (const [code, label] of [
-    ["HOT", "Hot"],
-    ["LUX", "Luxury"]
+    ["HOT", loc`Hot`],
+    ["LUX", loc`Luxury`]
   ])
     if (hasQuality(actor.system.qualitiesNow, code))
       lines.push(loc`${label} may be lost to this critical hit (p.294); restore it with a Mechanics/Repair check.`);

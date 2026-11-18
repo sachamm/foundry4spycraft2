@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Charmer p.202 / Hard Core p.203; Influence quick/slow checks p.132. */
 function influenceTimingPlan(
@@ -92,3 +93,6 @@ export function charmerInfluencePlan(
     { feat: "Charmer", id: "charmer", page: 202, dispositions: ["neutral", "intrigued", "friendly"] }
   );
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "hardCoreRecord", order: 9695, record: ["charmer", "hardCore"] });

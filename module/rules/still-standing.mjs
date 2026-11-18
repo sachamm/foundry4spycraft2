@@ -88,3 +88,27 @@ rollPipeline.register({
   validate: ({ actor, options, checkKind, checkId }) =>
     validateStillStandingSaveProof(actor.system, options.stillStandingSave, { checkKind, checkId })
 });
+
+// Still Standing's part of a save plan: its bonus against a takedown, guarded until the save is posted.
+rollPipeline.register({
+  id: "stillStandingSaveTerm",
+  kinds: ["save"],
+  order: 9410,
+  terms({ system, saveKey, input }) {
+    let plan;
+    try {
+      plan = stillStandingTakedownPlan(system, { ...input, saveKey });
+    } catch (error) {
+      return { blockAt: 10, blocked: error.message };
+    }
+    return {
+      rowAt: 20,
+      rows: [[loc`Still Standing`, plan?.bonus ?? 0]],
+      flavorAt: 90,
+      flavor: plan?.bonus ? loc` — Still Standing: takedown Fortitude +8` : "",
+      options: { stillStandingSave: plan },
+      guarded: !!plan,
+      facts: () => JSON.stringify(stillStandingTakedownPlan(system, { ...input, saveKey }))
+    };
+  }
+});

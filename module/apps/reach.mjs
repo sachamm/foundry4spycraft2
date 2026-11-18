@@ -1,3 +1,4 @@
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 export function reachContextContent(input = {}) {
   return `<fieldset><legend>${loc`Reach weapon geometry`}</legend><p>${loc`Required when the attacking weapon has RCH. The GC confirms adjacency and a legal target within this attack’s Reach; no token measurement or movement is automated.`}</p><label>${loc`Actual target adjacency`} <select name="reachAdjacency"><option value="">${loc`Choose for a Reach weapon`}</option><option value="adjacent"${input.reachAdjacent === true ? " selected" : ""}>${loc`Adjacent square`}</option><option value="nonadjacent"${input.reachAdjacent === false ? " selected" : ""}>${loc`Nonadjacent square`}</option></select></label><label><input name="reachGeometryConfirmed" type="checkbox"${input.reachGeometryConfirmed === true ? " checked" : ""} /> ${loc`The GC confirms the actual target’s adjacency and legal Reach geometry`}</label></fieldset>`;
@@ -24,3 +25,10 @@ export function reachContextInput(input = {}) {
   }
   return out;
 }
+
+rollPipeline.register({
+  id: "reachGeometryInput",
+  dialogs: ["attack"],
+  order: 20,
+  read: ({ entered }) => reachContextInput(entered)
+});

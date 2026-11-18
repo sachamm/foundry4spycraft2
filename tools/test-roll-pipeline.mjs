@@ -1,6 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RollPipeline, formulaWithModifiers, describeModifiers } from "../module/rules/roll-pipeline.mjs";
+import {
+  RollPipeline,
+  formulaWithModifiers,
+  describeModifiers,
+  planTerms,
+  skillPlanTerm
+} from "../module/rules/roll-pipeline.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { bullRushAttackSkillChecks } from "../module/rules/bull-rush-attack.mjs";
 import { bullRushDefenseSkillChecks } from "../module/rules/bull-rush.mjs";
@@ -146,6 +152,110 @@ test("modifiers are summed, labelled and applied to the dice formula only", () =
   assert.throws(() => pipeline.modifiers({}), /whole-number value/);
 });
 
+test("terms are collected in order, see earlier plans, and fold into rows, notes and the first block reason", () => {
+  const pipeline = new RollPipeline();
+  pipeline.register({
+    id: "late",
+    kinds: ["attack"],
+    order: 2,
+    terms: ctx => ({
+      key: "late",
+      plan: { sawEarly: ctx.plans.early.bonus },
+      at: 50,
+      rows: [["Late", 1]],
+      notes: ["late note"],
+      threat: 1,
+      blocked: "late reason"
+    })
+  });
+  pipeline.register({
+    id: "early",
+    kinds: ["attack"],
+    order: 1,
+    terms: () => ({
+      key: "early",
+      plan: { bonus: 2 },
+      rowAt: 30,
+      rows: [
+        ["Early", 2],
+        ["Early too", 0]
+      ],
+      noteAt: 5,
+      notes: ["early note"],
+      threat: 2,
+      error: 1,
+      blockAt: 90,
+      blocked: { blocked: true, reason: "early reason" }
+    })
+  });
+  pipeline.register({ id: "silent", kinds: ["attack"], terms: () => null });
+  pipeline.register({ id: "skillOnly", kinds: ["skill"], terms: () => ({ key: "skill", plan: 1, threat: 9 }) });
+
+  const terms = planTerms("attack", { system: {} }, pipeline);
+  assert.deepEqual(
+    terms.list.map(term => term.id),
+    ["early", "late"]
+  );
+  assert.deepEqual(terms.plans, { early: { bonus: 2 }, late: { sawEarly: 2 } });
+  assert.equal(terms.sum("threat"), 3);
+  assert.equal(terms.sum("error"), 1);
+  assert.equal(terms.sum("missing"), 0);
+  assert.deepEqual(
+    terms.merge("rows", [
+      [10, ["Own first", 4]],
+      [40, ["Own last", 5]]
+    ]),
+    [
+      ["Own first", 4],
+      ["Early", 2],
+      ["Early too", 0],
+      ["Own last", 5],
+      ["Late", 1]
+    ]
+  );
+  assert.deepEqual(
+    terms.merge("notes", [
+      [10, ["own a", "own b"]],
+      [20, ""],
+      [60, "own tail"]
+    ]),
+    ["early note", "own a", "own b", "late note", "own tail"]
+  );
+  assert.deepEqual(terms.merge("blocked", [[70, ""]]), ["late reason", { blocked: true, reason: "early reason" }]);
+
+  assert.throws(() => {
+    const twice = new RollPipeline();
+    twice.register({ id: "a", terms: () => ({ key: "same" }) }).register({ id: "b", terms: () => ({ key: "same" }) });
+    planTerms("attack", {}, twice);
+  }, /already planned/);
+  assert.throws(() => {
+    const bad = new RollPipeline();
+    bad.register({ id: "a", terms: () => "nope" });
+    planTerms("attack", {}, bad);
+  }, /must be an object/);
+});
+
+test("a skill rule's usual plan becomes a term with its evidence, bonuses, block reason and one note segment", () => {
+  const term = skillPlanTerm(
+    "feint",
+    { evidence: { id: 1 }, bonuses: [{ value: 2 }], notes: ["a", "b"], blockedReason: "no", sizeBonus: 4 },
+    { noteAt: 30, blockAt: 10 }
+  );
+  assert.deepEqual(term, {
+    key: "feint",
+    plan: { id: 1 },
+    bonuses: [{ value: 2 }],
+    segment: "a b ",
+    blocked: "no",
+    adjustment: 4,
+    synergies: [],
+    noteAt: 30,
+    blockAt: 10
+  });
+  assert.equal(skillPlanTerm("empty", {}).segment, " ");
+  assert.equal(skillPlanTerm("empty", {}).plan, null);
+});
+
 test("flags merge, chat controls are collected and named checks are threaded through", () => {
   const pipeline = new RollPipeline();
   pipeline.register({
@@ -265,15 +375,30 @@ const EXPECTED_ORDER = [
   "hideCircumstanceContent:skill",
   "damageDialog",
   "rangedAttackDialog",
+  "rangedAttackDialogInput",
   "attackDialog",
   "knowledgeDialog",
   "saveDialog",
   "skillDialog",
   "skillDialogInput",
+  "reachGeometryDialog",
+  "mortarDamageDialog",
+  "launcherDamageDialog",
+  "cqbDamageDistanceDialog",
+  "killerInstinctDialog",
+  "cqbDamageDistanceInput",
+  "attackActionInput",
   "feintBonusLease",
   "attackDamageLease",
+  "reachGeometryInput",
+  "allOutAttackInput",
   "sideStanceLease",
+  "bullseyeInput",
   "sideStanceDamageLease",
+  "meleeTrickInput",
+  "cqbRangeInput",
+  "pummelContent:attack",
+  "attackDialogInput",
   "recordFields",
   "sneakAttackTarget",
   "meleeArmorPiercing",
@@ -359,18 +484,107 @@ const EXPECTED_ORDER = [
   "conveyanceBullRushChecks",
   "tripCounterCheck",
   "restraintEscapeControl",
+  "meleeTradeoffAttackTerm",
   "gearAcquisitionControl",
+  "bullseyeAttackTerm",
+  "meleeTrickAttackTerm",
+  "cheapShotAttackTerm",
+  "feintBonusAttackTerm",
+  "sideStanceAttackTerm",
+  "cleaveAttackTerm",
+  "finesseAttackTerm",
+  "cqbRangeAttackTerm",
+  "flankingAttackTerm",
   "cunningPlanControl",
+  "gameHunterAttackTerm",
   "manualAdjustmentControl",
+  "sniperAttackTerm",
   "requiredBonusControl",
+  "weaponSpecialistAttackTerm",
   "criticalControl",
+  "fireActionAttackTerm",
   "boostControl",
   "generousControl",
   "rerollControl",
   "confirmControl",
   "finishControl",
+  "stalkingStanceSkillTerm",
+  "feintSkillTerm",
+  "meleeSkillFeatsSkillTerm",
+  "conveyanceBullRushSkillTerm",
+  "bullRushAttackSkillTerm",
+  "bullRushDefenseSkillTerm",
+  "tripAttackSkillTerm",
+  "tripDefenseSkillTerm",
+  "rankSynergyFeatsSkillTerm",
+  "threatenSkillTerm",
+  "bugConcealmentSkillTerm",
+  "documentationSkillTerm",
+  "polyglotSkillTerm",
+  "gutsSkillTerm",
+  "cardSharkSkillTerm",
+  "stillStandingSaveTerm",
+  "stoneColdSaveTerm",
+  "braceSaveTerm",
+  "terrainSaveTerm",
+  "underwaterSaveTerm",
+  "fatigueResistanceSaveTerm",
+  "securityDeviceSaveTerm",
+  "baffledResistanceSaveTerm",
+  "coverSaveTerm",
+  "hazardSaveTerm",
   "unnervingControl",
-  "strutControl"
+  "strutControl",
+  "hazardsRecord",
+  "combatActionsRecord",
+  "actionDiceRecord",
+  "actionDiePaymentsRecord",
+  "ambushRecord",
+  "appearanceRecord",
+  "breakthroughRecord",
+  "cardSharkRecord",
+  "classChecksRecord",
+  "closedCourseRecord",
+  "contactFeatsRecord",
+  "cqbRecord",
+  "defenseRecord",
+  "detectionObserverRecord",
+  "environmentRecord",
+  "finalRoundRecord",
+  "finesseRecord",
+  "firearmsRecord",
+  "forensicGeniusRecord",
+  "gearChecksRecord",
+  "hardCoreRecord",
+  "cooperativeCheck",
+  "improvisedWeaponsRecord",
+  "knowledgeRecord",
+  "medicalRecord",
+  "cooperativeContent:skill",
+  "polyglotRecord",
+  "pursuitFeatsRecord",
+  "cooperativeControl",
+  "qualityChecksRecord",
+  "requestsRecord",
+  "hazardSaveControl",
+  "restraintsRecord",
+  "sensesRecord",
+  "fireActionContent:rangedAttack",
+  "skillConditionsRecord",
+  "skillFeatTermsRecord",
+  "fireActionControl",
+  "skillGearRecord",
+  "skillTagsRecord",
+  "blastControl",
+  "sneakAttackRecord",
+  "targetSkillEffectsRecord",
+  "blastMapControl",
+  "terrainRecord",
+  "trackingRecord",
+  "twoWeaponStateRecord",
+  "unnervingRecord",
+  "weaponWorkRecord",
+  "featReminders"
 ];
 
 test("every contributor is registered once, in the documented order", () => {

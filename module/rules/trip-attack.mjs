@@ -2,7 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { responseOwnSize, tripSizeIndex } from "./trip.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 export { TRIP_SIZES } from "./trip.mjs";
 /** Ordinary half-action Trip p.361. Weapon qualities, free actions and settlement are separate. */
@@ -212,4 +212,37 @@ rollPipeline.register({
   kinds: ["skill"],
   skillChecks: ({ skillKey, options }, checks) =>
     skillKey === "acrobatics" && options?.tripCounter ? [...checks, tripCounterSkillCheck()] : checks
+});
+
+// A Trip attempt, in a skill check's plan.
+rollPipeline.register({
+  id: "tripAttackSkillTerm",
+  kinds: ["skill"],
+  order: 9270,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      tripAttackOpponentName = "",
+      tripAttackOpponentUuid = "",
+      tripAttackOpponentSize = null,
+      tripAttackAdjacent = false,
+      tripAttackSizeDifference = null,
+      tripAttackParticipantsConfirmed = false,
+      tripAttackHalfActionConfirmed = false,
+      tripAttackCombat = null,
+      tripCounter = null
+    } = input;
+    const plan = tripAttackPlan(system, skillKey, check, {
+      method,
+      tripAttackOpponentName,
+      tripAttackOpponentUuid,
+      tripAttackOpponentSize,
+      tripAttackAdjacent,
+      tripAttackSizeDifference,
+      tripAttackParticipantsConfirmed,
+      tripAttackHalfActionConfirmed,
+      tripAttackCombat,
+      tripCounter
+    });
+    return skillPlanTerm("tripAttack", plan, { noteAt: 90, blockAt: 70 });
+  }
 });

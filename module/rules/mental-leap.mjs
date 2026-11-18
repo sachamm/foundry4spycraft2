@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Schemer pp.78–79, round durations p.346, exhaustion/unconsciousness pp.341–342. */
 const time = n => Number.isFinite(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER;
@@ -505,3 +506,25 @@ export function unconsciousSleepCompletionPlan(
   };
   return { record, completedSleep };
 }
+
+// Mental Leap's resistance to fatigue and exhaustion as part of a save plan.
+rollPipeline.register({
+  id: "fatigueResistanceSaveTerm",
+  kinds: ["save"],
+  order: 9460,
+  terms({ system, input }) {
+    const bonus =
+      input.fatigueCondition === "fatigue"
+        ? (system.mentalLeapState?.fatigueSaveBonus ?? 0)
+        : input.fatigueCondition === "exhaustion"
+          ? (system.mentalLeapState?.exhaustionSaveBonus ?? 0)
+          : 0;
+    return {
+      rowAt: 70,
+      rows: [[loc`Fatigue resistance`, bonus]],
+      flavorAt: 80,
+      flavor: bonus ? loc` — Fatigue/exhaustion resistance +${bonus}` : "",
+      options: { fatigueBonus: bonus, fatigueCondition: input.fatigueCondition ?? "" }
+    };
+  }
+});

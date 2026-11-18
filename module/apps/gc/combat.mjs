@@ -47,7 +47,7 @@ const bonusOf = combatant => combatant.actor?.system?.initiative?.total ?? 0;
 const isLeadGM = () => game.users?.activeGM?.id === game.user.id;
 const say = (content, { whisper = false } = {}) =>
   ChatMessage.create({
-    speaker: { alias: "Game Control" },
+    speaker: { alias: loc`Game Control` },
     content,
     ...(whisper ? { whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id) } : {})
   });
@@ -246,8 +246,8 @@ export async function surpriseRoundDialog(combat = game.combat) {
     <p>${loc`Enter each side's opposed team Blend/Stealth or Sneak/Hide result. The winners get a single free, half or full action in Initiative order (no splitting a full action, one free action at most).`}</p>
     <label>${loc`Awareness`} <select name="aware">${options(
       [
-        ["none", "Neither side knows the other is there"],
-        ["some", "One group is concealing itself"],
+        ["none", loc`Neither side knows the other is there`],
+        ["some", loc`One group is concealing itself`],
         ["all", loc`Everyone is aware (no surprise round)`]
       ],
       "none"
@@ -256,8 +256,8 @@ export async function surpriseRoundDialog(combat = game.combat) {
     <label>${loc`Opponents’ result`} <input type="number" name="opponents" value="0" /></label>
     <label>${loc`Concealing group`} <select name="actingGroup">${options(
       [
-        ["players", "Player characters"],
-        ["opponents", "Opponents"]
+        ["players", loc`Player characters`],
+        ["opponents", loc`Opponents`]
       ],
       "opponents"
     )}</select></label>`
@@ -316,7 +316,7 @@ export function installFluidInitiativeHooks() {
   // Combat tracker entries: record an event for one combatant.
   Hooks.on("getCombatantContextOptions", (_app, entries) => {
     entries.push({
-      name: "Fluid initiative event",
+      name: loc`Fluid initiative event`,
       icon: '<i class="fa-solid fa-arrows-up-down"></i>',
       callback: li => {
         const el = li instanceof HTMLElement ? li : li?.[0];

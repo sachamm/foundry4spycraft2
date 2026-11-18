@@ -1,3 +1,4 @@
+import { cqbRangedWeapon } from "../rules/cqb.mjs";
 import { reachContextContent, reachContextInput } from "./reach.mjs";
 import { MELEE_ATTACK_TRICKS } from "../rules/melee-tricks.mjs";
 import { CHEAP_SHOT_CHOICES } from "../rules/cheap-shot.mjs";
@@ -10,21 +11,44 @@ import { AMBIENT_LIGHT, FOG_SMOKE } from "../rules/senses.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 const booleanFields = {
-  targetOpponentConfirmed: "This attack targets an opponent (CQB Mastery threat benefit)",
-  targetAnimal: "The target is an animal (Game Hunter)",
+  get targetOpponentConfirmed() {
+    return loc`This attack targets an opponent (CQB Mastery threat benefit)`;
+  },
+  get targetAnimal() {
+    return loc`The target is an animal (Game Hunter)`;
+  },
   targetFlanked: "I am flanking this opponent; position, ready weapon and Reach/CQB requirements are met",
-  targetPinnedAdjacent: "The target is pinned and I am adjacent",
-  targetCrouchedNonAdjacent: "The target is crouched and I am not adjacent",
-  targetProneNonAdjacent: "The target is prone and I am not adjacent",
-  targetVulnerable: "The target is vulnerable against this attack",
-  targetFlatFooted: "The target is flat-footed against this attack",
-  aimed: "Aim was already taken separately and remains valid for this target; the target has not moved more than 5 ft.",
-  braced:
-    "Brace was already taken separately and remains valid; I have not moved and the target is within the chosen 90° cone",
+  get targetPinnedAdjacent() {
+    return loc`The target is pinned and I am adjacent`;
+  },
+  get targetCrouchedNonAdjacent() {
+    return loc`The target is crouched and I am not adjacent`;
+  },
+  get targetProneNonAdjacent() {
+    return loc`The target is prone and I am not adjacent`;
+  },
+  get targetVulnerable() {
+    return loc`The target is vulnerable against this attack`;
+  },
+  get targetFlatFooted() {
+    return loc`The target is flat-footed against this attack`;
+  },
+  get aimed() {
+    return loc`Aim was already taken separately and remains valid for this target; the target has not moved more than 5 ft.`;
+  },
+  get braced() {
+    return loc`Brace was already taken separately and remains valid; I have not moved and the target is within the chosen 90° cone`;
+  },
   stableSurface: "A stable bracing surface is available (unnecessary with Marksmanship Basics)",
-  blinded: "Additional blindness applies to this attack",
-  deafened: "Additional deafness applies to this attack",
-  targetCharacter: "The target is a character (nearby hearing exceptions)"
+  get blinded() {
+    return loc`Additional blindness applies to this attack`;
+  },
+  get deafened() {
+    return loc`Additional deafness applies to this attack`;
+  },
+  get targetCharacter() {
+    return loc`The target is a character (nearby hearing exceptions)`;
+  }
 };
 export function meleeFireContextContent(input = {}) {
   return `<fieldset><legend>${loc`Ranged fire and melee`}</legend><label><input name="firingOutOfMelee" type="checkbox"${input.firingOutOfMelee === true ? " checked" : ""} /> ${loc`I am engaged in melee while making this ranged attack (out of melee)`}</label><label><input name="firingIntoMelee" type="checkbox"${input.firingIntoMelee === true ? " checked" : ""} /> ${loc`My target is engaged in melee (into melee)`}</label><p>${loc`Check both when shooting the opponent you are engaged with. Each normally applies −4 attack and +2 error; the applicable CQB feat waives its own pair of penalties.`}</p></fieldset>`;
@@ -93,8 +117,7 @@ export function standardAttackContextInput(input = {}) {
   }
   for (const key of [...Object.keys(booleanFields), "firingOutOfMelee", "firingIntoMelee", "vehicleMounted"])
     if (Object.hasOwn(input, key)) {
-      if (typeof input[key] !== "boolean")
-        throw new Error(loc`Declare attack circumstance ` + key + loc` with its checkbox.`);
+      if (typeof input[key] !== "boolean") throw new Error(loc`Declare attack circumstance ${key} with its checkbox.`);
       out[key] = input[key];
     }
   if (
@@ -130,9 +153,9 @@ export function quickRangedAimContent(input = {}) {
 }
 export function quickRangedAimInput(input = {}) {
   const out = {};
-  for (const [key, label] of Object.entries({ aimed: "Aim", braced: "Brace", stableSurface: "bracing surface" }))
+  for (const [key, label] of Object.entries({ aimed: loc`Aim`, braced: loc`Brace`, stableSurface: "bracing surface" }))
     if (Object.hasOwn(input, key)) {
-      if (typeof input[key] !== "boolean") throw Error(loc`Declare valid ` + label + loc` with its checkbox.`);
+      if (typeof input[key] !== "boolean") throw Error(loc`Declare valid ${label} with its checkbox.`);
       out[key] = input[key];
     }
   if (Object.hasOwn(input, "attackAction")) {
@@ -253,4 +276,31 @@ rollPipeline.register({
   id: "meleeFireContextContent:rangedAttack",
   dialogs: ["rangedAttack"],
   dialog: ({ options }) => [{ at: 130, html: meleeFireContextContent(options) }]
+});
+
+// What the attack dialog's fields mean for the roll: each group of fields is read by the rule that owns it.
+rollPipeline.register({
+  id: "attackActionInput",
+  dialogs: ["attack"],
+  order: 10,
+  read: ({ item, entered }) =>
+    cqbRangedWeapon(item.system) ? quickRangedAimInput(entered) : quickAttackActionInput(entered)
+});
+rollPipeline.register({
+  id: "allOutAttackInput",
+  dialogs: ["attack"],
+  order: 30,
+  read: ({ entered }) => allOutAttackInput(entered)
+});
+rollPipeline.register({
+  id: "bullseyeInput",
+  dialogs: ["attack"],
+  order: 40,
+  read: ({ entered }) => bullseyeInput(entered)
+});
+rollPipeline.register({
+  id: "meleeTrickInput",
+  dialogs: ["attack"],
+  order: 50,
+  read: ({ entered }) => meleeTrickInput(entered)
 });

@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { cheapShotPenalty } from "./cheap-shot-effects.mjs";
 import { conditionSkillPenalty, conditionRollPenalties } from "./attributes.mjs";
 import { loc } from "../i18n.mjs";
@@ -22,3 +23,10 @@ export function substituteConditionedBonus(source, result, normal, preservedSkil
     bonus = skillBonusCondition(context, normal).total;
   return { bonus, condition, preservedBonus: condition.total - bonus + preservedCheck };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({
+  id: "skillConditionsRecord",
+  order: 9745,
+  record: ["skillBonusCondition", "skillCheckAdjustment"]
+});

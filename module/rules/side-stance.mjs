@@ -1,5 +1,7 @@
 import { combatStanceState } from "./combat-stance.mjs";
 import { loc } from "../i18n.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
+import { feintAttackTarget } from "./feint-bonus.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -103,3 +105,37 @@ export function assertSideStancePlan(system, proof, context) {
 export function sideStanceDefensePenalty(system) {
   return combatStanceState(system)?.key === "side" ? -1 : 0;
 }
+
+// Side Stance's pending sneak die as part of an attack plan.
+rollPipeline.register({
+  id: "sideStanceAttackTerm",
+  kinds: ["attack"],
+  order: 9060,
+  terms({ system, options, ranged }) {
+    let plan,
+      review = "";
+    try {
+      plan = sideStanceAttackPlan(system, {
+        targetUuid: feintAttackTarget(options),
+        proof: options.sideStanceProof,
+        defensive: options.disarm?.role === "defender",
+        ranged
+      });
+    } catch (error) {
+      review = error.message;
+      plan = { version: 1, stanceId: null, targetUuid: feintAttackTarget(options), sourceMessages: [], dice: 0 };
+    }
+    return {
+      key: "sideStance",
+      plan,
+      blockAt: 70,
+      blocked: review,
+      noteAt: 90,
+      notes: plan.dice
+        ? [
+            loc`Side Stance: the next attack against a successfully Feinted opponent uses the one pending sneak die; it is spent even if this attack misses. Apply it only with a qualifying successful Standard Attack’s damage (pp.178,339).`
+          ]
+        : []
+    };
+  }
+});

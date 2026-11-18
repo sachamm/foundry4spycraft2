@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** User ruling: Supremacy reduces the standard slow ambush from ten minutes to one.
  * Tactics/Ambush p.168, Ambush feats p.193. Outcome rewards remain subject to successful opposition. */
@@ -67,3 +68,6 @@ export function ambushCheckPlan(system, key, check, { ambushPreparation = "slow"
     ]
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "ambushRecord", order: 9615, record: ["ambush"] });

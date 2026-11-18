@@ -26,7 +26,7 @@ export function accumulatedDamagePlan(
   const ability = kind === "stress" ? "wis" : "con",
     threshold = system[kind + "Threshold"] ?? system.abilities?.[ability]?.value;
   if (!Number.isSafeInteger(threshold) || threshold < 0 || !Number.isSafeInteger(threshold * 5))
-    throw new Error(loc`Prepare a valid current ` + kind + loc` threshold before calculating its saves.`);
+    throw new Error(loc`Prepare a valid current ${kind} threshold before calculating its saves.`);
   const total = currentDamage + newDamage,
     rows = bands.map(row => ({ ...row, thresholdValue: threshold * row.tier })),
     band = rows.findLast(row => total > row.thresholdValue) ?? null,

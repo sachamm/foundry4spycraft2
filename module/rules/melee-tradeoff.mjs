@@ -1,6 +1,7 @@
 import { ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { feintAttackTarget } from "./feint-bonus.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -115,4 +116,44 @@ rollPipeline.register({
       attackContext: options.attackContext,
       rerollOf: options.rerollOf
     })
+});
+
+// All-out Attack as part of an attack plan.
+rollPipeline.register({
+  id: "meleeTradeoffAttackTerm",
+  kinds: ["attack"],
+  order: 9010,
+  terms({ system, weapon, options, ranged }) {
+    let plan = null,
+      review = "";
+    try {
+      const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
+      if (manual && options.allOutTargetName?.trim() && manual.name !== options.allOutTargetName.trim())
+        throw Error(loc`Use the same named target for this attack’s classification and All-out Attack.`);
+      plan = meleeTradeoffPlan(system, weapon, {
+        penalty: options.allOutPenalty ?? 0,
+        ranged,
+        defensive: options.disarm?.role === "defender",
+        targetUuid: feintAttackTarget(options),
+        targetName: manual?.name ?? options.allOutTargetName ?? "",
+        targetConfirmed: !!manual || options.allOutTargetConfirmed === true
+      });
+    } catch (error) {
+      review = error.message;
+    }
+    return {
+      key: "meleeTradeoff",
+      plan,
+      rowAt: 40,
+      rows: [[loc`Melee trade-off`, plan?.attackPenalty ?? 0]],
+      blockAt: 60,
+      blocked: review,
+      noteAt: 70,
+      notes: plan
+        ? [
+            loc`All-out Attack: attack −${plan.penalty}, this attack’s damage +${plan.damageBonus}; a miss makes you flat-footed (p.176).`
+          ]
+        : []
+    };
+  }
 });

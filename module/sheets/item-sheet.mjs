@@ -1,3 +1,4 @@
+import { ruleName } from "../rules/rule-name.mjs";
 import { CANDIDATE_CHOICES, candidatePlan } from "../rules/candidate.mjs";
 import { reviewCandidate } from "../apps/candidate.mjs";
 import { historicalFeatEligibility } from "../rules/feat-acquisition.mjs";
@@ -144,7 +145,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       ),
       usesProjectiles: item.type === "weapon" && /as (arrow|bolt)/i.test(sys.damage ?? ""),
       ammunitionOptions: Object.fromEntries([
-        ["", "Choose ammunition…"],
+        ["", loc`Choose ammunition…`],
         ...(item.parent?.items
           ?.filter(
             i =>
@@ -154,18 +155,18 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       ]),
       meleeFamilies: {
         "": loc`Unclassified / no family bonus`,
-        axe: "Axe",
-        spear: "Spear",
-        whip: "Whip",
-        staff: "Staff",
-        hammer: "Hammer",
-        twoHandedSword: "Two-handed sword",
-        oneHandedSword: "One-handed sword",
-        polearm: "Polearm",
-        flail: "Flail",
-        knife: "Knife"
+        axe: loc`Axe`,
+        spear: loc`Spear`,
+        whip: loc`Whip`,
+        staff: loc`Staff`,
+        hammer: loc`Hammer`,
+        twoHandedSword: loc`Two-handed sword`,
+        oneHandedSword: loc`One-handed sword`,
+        polearm: loc`Polearm`,
+        flail: loc`Flail`,
+        knife: loc`Knife`
       },
-      gripOptions: { 0: "Normal required grip", 1: "One hand", 2: "Both hands" },
+      gripOptions: { 0: loc`Normal required grip`, 1: loc`One hand`, 2: loc`Both hands` },
       pickOptions: Object.fromEntries([
         ["", "—"],
         ...Object.entries(cfg.gearPicks).map(([k, v]) => [k, `${k} — ${v}`])
@@ -197,11 +198,11 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
     if (item.type === "feat") {
       context.acquisitionSources = Object.fromEntries([
-        ["", "Career/origin/other feat choice"],
+        ["", loc`Career/origin/other feat choice`],
         ...(item.actor?.system.featAcquisitionSources ?? []).map(source => [source.id, source.label])
       ]);
       context.trainingSkills =
-        item.name === "Training"
+        ruleName(item) === "Training"
           ? Object.entries(cfg.skills).map(([key, value]) => ({
               key,
               name: value.name,
@@ -212,16 +213,16 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       if (item.actor?.system.classLevels?.virtuoso) basicChoices.push("Field of Expertise");
       const choiceLists = {
         Candidate: CANDIDATE_CHOICES,
-        "Armor Basics": { P: "Partial", M: "Moderate", F: "Full" },
-        "Armor Mastery": { P: "Partial", M: "Moderate", F: "Full" },
+        "Armor Basics": { P: loc`Partial`, M: loc`Moderate`, F: loc`Full` },
+        "Armor Mastery": { P: loc`Partial`, M: loc`Moderate`, F: loc`Full` },
         "Extra Gear": {
-          E: "Electronics",
-          G: "Gadgets",
-          R: "Resources",
-          S: "Security",
-          T: "Tradecraft",
-          V: "Vehicles",
-          W: "Weapons"
+          E: loc`Electronics`,
+          G: loc`Gadgets`,
+          R: loc`Resources`,
+          S: loc`Security`,
+          T: loc`Tradecraft`,
+          V: loc`Vehicles`,
+          W: loc`Weapons`
         },
         "Weapon Focus": Object.fromEntries(
           Object.entries(cfg.proficiencies)
@@ -242,7 +243,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       ])
         choiceLists[name] = Object.fromEntries(basicChoices.map(name => [name, name]));
       context.choiceOptions = choiceLists[item.name];
-      if (item.name === "Candidate") {
+      if (ruleName(item) === "Candidate") {
         context.candidateBasis = sys.candidateBasis;
         context.canReviewCandidate = item.isOwner && game.user?.isGM && item.parent?.type === "agent";
         try {
@@ -267,10 +268,10 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       )
         context.choiceOptions = {
           ...context.choiceOptions,
-          [sys.choice]: sys.choice + loc` — existing choice; review its type`
+          [sys.choice]: loc`${sys.choice} — existing choice; review its type`
         };
       context.historicalReview = !!item.actor && (!sys.acquisitionCheck?.ok || !historicalFeatEligibility(sys).ok);
-      context.featKinds = { permanent: "Permanent", temporary: "Temporary", virtual: "Virtual" };
+      context.featKinds = { permanent: loc`Permanent`, temporary: loc`Temporary`, virtual: loc`Virtual` };
       context.prereqText = describePrereq(sys.prerequisites) || "—";
       context.prereqJSON = sys.prerequisites ? JSON.stringify(sys.prerequisites, null, 1) : "";
       if (item.actor?.type === "agent") context.status = item.actor.system.featStatus?.[item.id];
@@ -353,18 +354,18 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
           : null;
       context.housingOptions = {
         "": "—",
-        N: "Nuisance",
-        F: "Fine",
-        D: "Diminutive",
-        T: "Tiny",
-        S: "Small",
-        M: "Medium",
-        L: "Large",
-        H: "Huge",
-        G: "Gargantuan",
-        C: "Colossal",
-        E: "Enormous",
-        V: "Vast"
+        N: loc`Nuisance`,
+        F: loc`Fine`,
+        D: loc`Diminutive`,
+        T: loc`Tiny`,
+        S: loc`Small`,
+        M: loc`Medium`,
+        L: loc`Large`,
+        H: loc`Huge`,
+        G: loc`Gargantuan`,
+        C: loc`Colossal`,
+        E: loc`Enormous`,
+        V: loc`Vast`
       };
       const repair = repairPlan(item);
       context.repair = repair.possible && item.parent ? repair : null;

@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** General underwater checks p.349; Aquatic quality p.446. */
 export function hasAquaticQuality(system) {
@@ -101,3 +102,23 @@ export function burrowMaterialPlan(system, { damageSaveBonus, action = "move", f
       : []
   };
 }
+
+// Being underwater as part of a save plan.
+rollPipeline.register({
+  id: "underwaterSaveTerm",
+  kinds: ["save"],
+  order: 9450,
+  terms({ system, saveKey, input }) {
+    const plan = underwaterCheckPlan(system, { ...input, kind: "save", saveKey });
+    return {
+      rowAt: 60,
+      rows: [[loc`Underwater`, plan.penalty]],
+      flavorAt: 120,
+      flavor: plan.notes.length ? ` — ${plan.notes.join(" ")}` : "",
+      options: { underwaterContext: plan }
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "environmentRecord", order: 9665, record: ["underwaterContext"] });

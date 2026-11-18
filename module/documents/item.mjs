@@ -1,3 +1,4 @@
+import { ruleName } from "../rules/rule-name.mjs";
 import { captureCandidateBasis } from "../rules/candidate.mjs";
 import { CONTACT_FEATS } from "../rules/contact-feats.mjs";
 import {
@@ -41,7 +42,7 @@ export class SpycraftItem extends Item {
     ) {
       const career = this.system.acquiredAtLevel || Math.max(1, this.parent.system.level);
       const changes = { "system.acquiredAtLevel": career };
-      if (this.name === "Candidate" && career === 1 && this.parent.system.level === 1)
+      if (ruleName(this) === "Candidate" && career === 1 && this.parent.system.level === 1)
         changes["system.candidateBasis"] = captureCandidateBasis(this.parent.system, this.system.choice);
       if (this.parent.system.level === career)
         changes["system.acquisitionCheck"] = captureFeatAcquisition(

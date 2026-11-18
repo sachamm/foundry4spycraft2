@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { whirlingStancePlan } from "./whirling-stance.mjs";
 import { sharpshooterDefensePlan } from "./sharpshooter.mjs";
 import { guardDefensePlan } from "./guard.mjs";
@@ -286,3 +287,23 @@ export function reflexDamagePlan(
   const total = evaded ? 0 : halved ? Math.floor(damage / 2) : ordinary;
   return { damage, normalSuccessDamage, succeeded, ordinary, total, evaded, halved, eligible, context: { ...context } };
 }
+
+// Uncanny Dodge against a security device as part of a Reflex save plan.
+rollPipeline.register({
+  id: "securityDeviceSaveTerm",
+  kinds: ["save"],
+  order: 9470,
+  terms({ system, saveKey, input }) {
+    const bonus = saveKey === "ref" && input.securityDevice === true ? uncannyDodgePlan(system).securityBonus : 0;
+    return {
+      rowAt: 80,
+      rows: [[loc`Security device`, bonus]],
+      flavorAt: 60,
+      flavor: bonus ? loc` — Uncanny Dodge/security device +${bonus}` : "",
+      options: { securityBonus: bonus }
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "defenseRecord", order: 9655, record: ["evasionContext"] });

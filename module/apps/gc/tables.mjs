@@ -21,7 +21,7 @@ const options = (rows, selected) =>
     .join("");
 const say = (content, whisper = true) =>
   ChatMessage.create({
-    speaker: { alias: "Game Control" },
+    speaker: { alias: loc`Game Control` },
     content,
     ...(whisper ? { whisper: ChatMessage.getWhisperRecipients("GM").map(user => user.id) } : {})
   });
@@ -29,23 +29,23 @@ const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 
 export function deviceCard(device) {
   const rows = [
-    ["Target", device.targetArea],
+    [loc`Target`, device.targetArea],
     [loc`Detect DC (also its Defense)`, device.detectDC],
-    ["Disable DC", device.disableDC],
-    ["Damage save", device.damageSave === null ? null : signed(device.damageSave)],
-    ["Open", device.openDC === null ? null : `${device.openSkill} DC ${device.openDC}`],
-    ["Awareness", device.awareness === null ? null : signed(device.awareness)],
-    ["Opposed by", device.opposedBy || null],
-    ["Triggers", device.autoTrigger ? "automatically unless disabled" : null],
+    [loc`Disable DC`, device.disableDC],
+    [loc`Damage save`, device.damageSave === null ? null : signed(device.damageSave)],
+    [loc`Open`, device.openDC === null ? null : `${device.openSkill} DC ${device.openDC}`],
+    [loc`Awareness`, device.awareness === null ? null : signed(device.awareness)],
+    [loc`Opposed by`, device.opposedBy || null],
+    [loc`Triggers`, device.autoTrigger ? "automatically unless disabled" : null],
     [
-      "Attack",
+      loc`Attack`,
       device.attack === null
         ? null
         : `${signed(device.attack)} (error 1, threat ${device.threat}${device.threat < 20 ? "–20" : ""})`
     ],
-    ["Reflex save DC", device.saveDC],
-    ["Damage", device.damage || null],
-    ["Repeats", device.repeats ? loc`attacks each round until disabled` : null],
+    [loc`Reflex save DC`, device.saveDC],
+    [loc`Damage`, device.damage || null],
+    [loc`Repeats`, device.repeats ? loc`attacks each round until disabled` : null],
     ["XP", device.xp ?? device.xpPrinted]
   ].filter(([, value]) => value !== null && value !== undefined && value !== "");
   return `<b>${esc(device.name)}</b> ${loc`— ${esc(device.kind)}, Power Rating ${device.powerRating} (p.${device.page})`}<br>${rows.map(([label, value]) => `${esc(label)}: ${esc(value)}`).join("<br>")}<br><i>${esc(device.summary)}</i>`;
@@ -68,7 +68,7 @@ export async function securityDeviceDialog() {
     <label>${loc`Power Rating`} <input type="number" name="pr" min="1" value="${Math.max(1, getMission().threatLevel ?? 1)}" /></label>
     <label>${loc`Action`} <select name="action">${options(
       [
-        ["show", "Show its statistics"],
+        ["show", loc`Show its statistics`],
         ["sensor", loc`Sensor: roll Awareness against an intruder`],
         ["trap", loc`Trap: attack or force a Reflex save`]
       ],

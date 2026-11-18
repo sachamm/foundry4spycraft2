@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Sniper p.80: firearm and hurled categories are narrower than the shared heavy-weapon firing workflow. */
 export function sniperWeapon(weapon) {
   return (
@@ -104,3 +105,23 @@ export function millionDollarSkillPlan(system, weapon, { targetVulnerable = fals
     return { blocked: true, reason: loc`Confirm this opponent is vulnerable against this attack.` };
   return { blocked: false };
 }
+
+// The Sniper's part of an attack plan: Magic Touch, Surprise Shot and One Shot.
+rollPipeline.register({
+  id: "sniperAttackTerm",
+  kinds: ["attack"],
+  order: 9120,
+  terms({ system, weapon, options }) {
+    const plan = sniperAttackEffects(system, weapon, options);
+    return {
+      key: "sniper",
+      plan,
+      rowAt: 290,
+      rows: [[loc`Sniper`, plan.attackBonus]],
+      threat: plan.threatIncrease,
+      errorReduction: plan.errorReduction,
+      noteAt: 420,
+      notes: plan.notes
+    };
+  }
+});

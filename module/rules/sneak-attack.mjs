@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { sniperWeapon } from "./sniper.mjs";
 import { loc } from "../i18n.mjs";
 const has = (system, name) =>
@@ -166,3 +167,6 @@ export function knownSneakAttackImmunity(system = {}) {
     sources.push("Construct");
   return { immune: sources.length > 0, sources };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "sneakAttackRecord", order: 9765, record: ["sneakAttackTarget"] });

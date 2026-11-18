@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Request-check exceptions: Veteran p.21, Geek p.23, Executive Decision p.77, Sources p.45. */
 export function requestSources(system, items = []) {
@@ -133,3 +134,6 @@ export function requestBenefitContext(system, id = "") {
     epoch: String(system.usagePeriods?.[source.period] ?? "initial")
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "requestsRecord", order: 9730, record: ["requestBenefit"] });

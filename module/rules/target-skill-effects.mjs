@@ -1,3 +1,5 @@
+import { ruleName } from "./rule-name.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Opposing target effects: Silver Tongue p.205; Zeroed p.196; Faceless p.195. */
 export function targetSkillEffectApplicable(system, key) {
@@ -43,7 +45,7 @@ export function targetSkillEffectPlan(
       .map(f => ({ name: f.name, choice: f.choice ?? "" }));
     if (
       !covertFeats.length ||
-      !covertFeats.some(f => f.name === "Zeroed") ||
+      !covertFeats.some(f => ruleName(f) === "Zeroed") ||
       covertFeats.some(f => typeof f.name !== "string" || !f.name.trim() || typeof f.choice !== "string")
     )
       return reject(loc`Review the target’s active Covert feat selections, including Zeroed itself.`);
@@ -98,3 +100,6 @@ export function targetSkillTimingPlan(timing, target) {
     blockedReason: ""
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "targetSkillEffectsRecord", order: 9770, record: ["targetSkillEffect"] });

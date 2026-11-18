@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Ambient light, pp.350–351, Table 5.14. Blank means circumstances were not supplied. */
 export const AMBIENT_LIGHT = {
@@ -138,7 +139,10 @@ export function sensoryTargetPlan(
 }
 export function improvedVisionRangePlan(system, penalty, options = {}) {
   const target = sensoryTargetPlan(system, options),
-    applies = hasOriginSense(system, "Improved vision") && !target.blinded,
+    // An origin's sense or an NPC's Improved Vision quality.
+    applies =
+      (hasOriginSense(system, "Improved vision") || (system.qualityEffects?.rangePenaltyReduction ?? 0) > 0) &&
+      !target.blinded,
     reduction = applies ? Math.min(2, Math.max(0, -penalty)) : 0;
   return {
     rangePenalty: penalty + reduction,
@@ -283,3 +287,10 @@ export function sensoryAttackConditionPlan(system, options = {}) {
         : []
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({
+  id: "sensesRecord",
+  order: 9740,
+  record: ["ambientLight", "fogSmoke", "senses", "sensoryConditions"]
+});

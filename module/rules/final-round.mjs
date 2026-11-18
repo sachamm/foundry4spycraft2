@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Nauseated p.342: the one-final-attack allowance is shared across sources. */
 export const FINAL_ATTACK_WORKFLOWS = new Set([
@@ -69,3 +70,6 @@ export async function withFinalRoundReservation(actor, reservation, perform) {
     else actor._finalAttackReservation = previous;
   }
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "finalRoundRecord", order: 9670, record: ["finalAttackRound"] });

@@ -66,3 +66,20 @@ rollPipeline.register({
       combat: actor.mentalLeapCombatContext()
     })
 });
+
+// Stone Cold's part of a save plan.
+rollPipeline.register({
+  id: "stoneColdSaveTerm",
+  kinds: ["save"],
+  order: 9420,
+  terms({ actor, system, saveKey }) {
+    const plan = stoneColdSavePlan(system, saveKey, actor.mentalLeapCombatContext());
+    return {
+      rowAt: 30,
+      rows: [[loc`Stone Cold`, plan?.bonus ?? 0]],
+      flavorAt: 100,
+      flavor: plan ? loc` — Stone Cold: combat Will +1` : "",
+      options: { stoneCold: plan }
+    };
+  }
+});

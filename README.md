@@ -138,13 +138,32 @@ module; `module/rolls/index.mjs` imports every module that does. A contributor m
 - add a section to a roll dialog at a position (`dialog`) and adjust what was entered (`read`);
 - hold a reservation while the roll is made (`acquire`);
 - validate before and after the dice (`validate`);
+- return its part of a planned check (`terms`): a plan, labelled rows, threat and error changes, notes and a block
+  reason, each with a position among the check's own;
 - add a labelled modifier, either to the previewed total (`stage: "plan"`) or at the roll (`modifiers`);
 - copy a roll option onto the posted check (`record`) or add computed fields (`flags`);
 - add a button under the posted check (`chatControls`).
 
-The six main roll dialogs live in `module/rolls/dialogs/` as ordered parts. `game.spycraft2.rollPipeline` exposes
-the registry to macros and modules. The feat-specific arithmetic inside `weaponAttack` and `resolveSkillCheck` is
-still worked out there; see [remaining work](docs/remaining-work.md).
+The six main roll dialogs and the short follow-up dialogs live in `module/rolls/dialogs/` as ordered parts.
+`game.spycraft2.rollPipeline` exposes the registry to macros and modules. Feat and class terms of an attack, a skill
+check and a save are registered from the rule's own module; `weaponAttack`, `resolveSkillCheck` and `rollSave` fold
+them with `planTerms`.
+
+## Rules in play
+
+- **Feat reminders.** A feat the system does not work out can name the rolls it bears on (`system.reminder` on the
+  feat item: for example `attack, skill:sneak, save:will`). Roll dialogs list the character's matching feats; ticked
+  ones are noted on the posted check for the GC. Seventy-two feats ship with reminders.
+- **Cooperative checks.** Choose leader or helper in the skill dialog. Helpers roll against the DC the leader's
+  check sets; a button on the leader's check adds their results. Helper limits come from the skills table.
+- **Hazards.** The agent sheet's Main tab tracks contagions (diseases, poisons, radiation) with their onset times
+  and saves, and a fire burning the character.
+- **Combat actions.** The ranged attack dialog offers Burst, Autofire, Strafe, Cover Fire and Suppressive Fire; an
+  unarmed attack offers Pummel; the sheet settles grapple checks; a blast weapon's damage tapers by distance.
+- **Map measurement.** With a token for the character and one token targeted, attack dialogs open with the distance,
+  flanking and adjacency the scene shows, and say what cover walls give. Client setting, on by default.
+- **NPC qualities.** An NPC's qualities are listed on its sheet with what each does, and apply to its statistics and
+  skill checks where they are plain numbers.
 
 ## Code style and checks
 
@@ -167,7 +186,8 @@ ui.notifications.warn(loc`${actor.name}: not enough action dice remain.`);
 The pattern (`{0}: not enough action dice remain.`) is the entry in `lang/en.json` under `SPYCRAFT.Text`; a
 translation may move the numbered values. After adding or changing text, run `npm run strings`; a test fails if the
 file is out of date. Templates use `{{localize "SPYCRAFT.Template.…"}}`. A new language is a copy of `lang/en.json`
-listed in `system.json`. Use `loc` inside functions. Text built while a module loads is fixed before the language is known; in a table,
+listed in `system.json`. Feats are recognised by a stored rule name, so a feat item may be renamed or translated.
+Use `loc` inside functions. Text built while a module loads is fixed before the language is known; in a table,
 write a getter instead (`get label() { return loc`Handgun`; }`). Display names held in the rules data (skills,
 named checks, feat trees) are translated when the language loads, by `module/i18n-data.mjs`.
 

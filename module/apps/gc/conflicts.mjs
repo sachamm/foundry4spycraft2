@@ -44,7 +44,7 @@ const options = (rows, selected) =>
     .join("");
 const gm = () => ChatMessage.getWhisperRecipients("GM").map(user => user.id);
 const say = (content, whisper = false) =>
-  ChatMessage.create({ speaker: { alias: "Dramatic Conflict" }, content, ...(whisper ? { whisper: gm() } : {}) });
+  ChatMessage.create({ speaker: { alias: loc`Dramatic Conflict` }, content, ...(whisper ? { whisper: gm() } : {}) });
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 const sideName = (conflict, side) => conflict[side].name || (side === "predator" ? "Predator" : "Prey");
 const strategy = (conflict, side) =>
@@ -211,9 +211,9 @@ export async function advanceConflict(id) {
       const critical = side =>
         `<label>${loc`${esc(sideName(conflict, side))} critical`} <select name="${side}Critical">${options(
           [
-            ["", "None"],
-            ["success", "Critical success"],
-            ["failure", "Critical failure"]
+            ["", loc`None`],
+            ["success", loc`Critical success`],
+            ["failure", loc`Critical failure`]
           ],
           ""
         )}</select></label>`;
@@ -354,13 +354,13 @@ export async function manageConflict(id) {
         ["lead", loc`Set the Lead (outside effect or correction)`],
         ...(conflict.chase
           ? [
-              ["room", "Change the Maneuvering Room"],
+              ["room", loc`Change the Maneuvering Room`],
               ["smash", loc`Set Smash points (altitude)`]
             ]
           : []),
         ["concedePredator", `${sideName(conflict, "predator")} concedes`],
         ["concedePrey", `${sideName(conflict, "prey")} concedes`],
-        ["remove", "Remove this conflict"]
+        ["remove", loc`Remove this conflict`]
       ],
       "lead"
     )}</select></label>
@@ -372,7 +372,7 @@ export async function manageConflict(id) {
       <p>${loc`A pilot in a powered aircraft at least 200 ft. above every opponent holds 1 Smash point per Lead point to the next highest opponent; a threat on a Maneuver check gains 1 (or costs the holder 1 when someone else scores it).`}</p>
       <label>${loc`Held by`} <select name="smashSide">${options(
         [
-          ["", "Nobody"],
+          ["", loc`Nobody`],
           ["predator", sideName(conflict, "predator")],
           ["prey", sideName(conflict, "prey")]
         ],

@@ -62,3 +62,26 @@ rollPipeline.register({
   dialogs: ["attack"],
   dialog: context => parts.map(([at, render]) => ({ at, html: render(context) }))
 });
+
+// The dialog's own fields: the chosen target and the plain circumstance boxes.
+rollPipeline.register({
+  id: "attackDialogInput",
+  dialogs: ["attack"],
+  order: 70,
+  read: ({ entered }) => ({
+    ...(Object.hasOwn(entered, "targetActorUuid")
+      ? {
+          targetActorUuid: entered.targetActorUuid,
+          targetCharacterType: entered.targetCharacterType,
+          targetName: entered.targetName,
+          characterTarget: undefined
+        }
+      : {}),
+    firingOutOfMelee: entered.firingOutOfMelee === true,
+    firingIntoMelee: entered.firingIntoMelee === true,
+    askContext: false,
+    targetPinnedAdjacent: entered.targetPinnedAdjacent === true,
+    targetAnimal: !!entered.targetAnimal,
+    targetFlanked: !!entered.targetFlanked
+  })
+});

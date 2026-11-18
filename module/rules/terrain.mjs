@@ -350,3 +350,32 @@ rollPipeline.register({
   kinds: ["skill"],
   skillChecks: ({ actor, skillKey }, checks) => terrainSkillChecks(actor.system, skillKey, checks)
 });
+
+// Terrain feats as part of a save plan, guarded until the save is posted.
+rollPipeline.register({
+  id: "terrainSaveTerm",
+  kinds: ["save"],
+  order: 9440,
+  terms({ system, saveKey, input }) {
+    const plan = terrainSavePlan(system, saveKey, input);
+    return {
+      rowAt: 50,
+      rows: [[loc`Terrain`, plan.adjustment]],
+      flavorAt: 130,
+      flavor: plan.notes.length ? ` — ${plan.notes.join(" ")}` : "",
+      options: {
+        terrainSave: plan,
+        terrainSaveSource: plan.bonuses.length ? { version: 1, checkId: saveKey, plan } : null
+      },
+      guarded: plan.bonuses.length > 0,
+      facts: () => JSON.stringify(terrainSavePlan(system, saveKey, input))
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({
+  id: "terrainRecord",
+  order: 9775,
+  record: ["localHeroOpposition", "terrain", "terrainFeat", "terrainSave"]
+});

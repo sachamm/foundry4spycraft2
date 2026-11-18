@@ -1,20 +1,31 @@
 import { loc } from "../i18n.mjs";
 /** Search documents rather than the paged chat DOM. Never index private roll placeholders. */
+/** Roll kinds the search can filter by: [id, label]. The labels are read when asked for, in the reader's language. */
 export const CHAT_ROLL_TYPES = [
-  ["roll", "All rolls"],
-  ["attack", "Attack"],
-  ["damage", "Damage"],
-  ["skill", "Skill check"],
-  ["save", "Saving throw"],
-  ["ability", "Attribute check"],
-  ["initiative", "Initiative"],
-  ["actionDie", "Action die"],
-  ["knowledge", "Knowledge"],
-  ["gear", "Gear check"],
-  ["request", "Request check"],
-  ["other", "Other roll"],
-  ["message", "Messages & events"]
-];
+  ["roll", () => loc`All rolls`],
+  ["attack", () => loc`Attack`],
+  ["damage", () => loc`Damage`],
+  ["skill", () => loc`Skill check`],
+  ["save", () => loc`Saving throw`],
+  ["ability", () => loc`Attribute check`],
+  ["initiative", () => loc`Initiative`],
+  ["actionDie", () => loc`Action die`],
+  ["knowledge", () => loc`Knowledge`],
+  ["gear", () => loc`Gear check`],
+  ["request", () => loc`Request check`],
+  ["other", () => loc`Other roll`],
+  ["message", () => loc`Messages & events`]
+].map(([id, label]) => ({
+  0: id,
+  get 1() {
+    return label();
+  },
+  length: 2,
+  *[Symbol.iterator]() {
+    yield id;
+    yield label();
+  }
+}));
 const normalize = value =>
   String(value ?? "")
     .normalize("NFD")
@@ -125,7 +136,7 @@ function mountChatSearch(app, html) {
   const typeLabel = make("label", "", "Roll type");
   const type = make("select");
   type.setAttribute("aria-label", "Chat roll type");
-  for (const [value, label] of [["", "All types"], ...CHAT_ROLL_TYPES]) type.append(new Option(label, value));
+  for (const [value, label] of [["", loc`All types`], ...CHAT_ROLL_TYPES]) type.append(new Option(label, value));
   typeLabel.append(type);
   filters.append(characterLabel, typeLabel);
   const status = make("p", "sc2-chat-search-status", loc`Search all readable chat history.`);
@@ -200,7 +211,7 @@ function refreshChatSearch(state) {
     const title = make("div", "sc2-chat-result-title");
     title.append(
       make("strong", "", record.character),
-      make("span", "", CHAT_ROLL_TYPES.find(([id]) => id === record.type)?.[1] ?? "Message")
+      make("span", "", CHAT_ROLL_TYPES.find(([id]) => id === record.type)?.[1] ?? loc`Message`)
     );
     const time = make("time", "", new Date(record.timestamp).toLocaleString());
     time.dateTime = new Date(record.timestamp).toISOString();

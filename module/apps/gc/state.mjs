@@ -21,7 +21,7 @@ export function registerGCSettings() {
   game.settings.register(SYSTEM, "sceneState", hidden({ scene: null, dramatic: false, source: null, dcBoosts: 0 }));
   game.settings.register(SYSTEM, "conflicts", hidden({}));
   game.settings.register(SYSTEM, "fluidInitiative", {
-    name: "Fluid initiative",
+    name: loc`Fluid initiative`,
     hint: loc`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,
     scope: "world",
     config: true,

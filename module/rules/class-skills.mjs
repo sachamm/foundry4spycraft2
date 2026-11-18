@@ -69,6 +69,8 @@ export function classSkillSelections(item, classLevel) {
 export function resolveClassSkillSelections(items, progression, cfg, isClassSkill) {
   const rules = [],
     pending = [],
+    // The same reminders with a wording for several at once, for the setup checklist.
+    pendingTasks = [],
     warnings = [];
   for (const item of items.filter(i => i.type === "class")) {
     const classId = item.system.identifier || item.name;
@@ -78,7 +80,13 @@ export function resolveClassSkillSelections(items, progression, cfg, isClassSkil
       const skill = item.system.skillChoices?.[field.key],
         career = careers[field.level - 1];
       if (!skill) {
-        pending.push(loc`${item.name}: choose a skill for ${field.name} at class level ${field.level}.`);
+        const text = loc`${item.name}: choose a skill for ${field.name} at class level ${field.level}.`;
+        pending.push(text);
+        pendingTasks.push({
+          text,
+          plural: count =>
+            loc`${item.name}: choose ${count} more skills for ${field.name} at class level ${field.level}.`
+        });
         continue;
       }
       if (!cfg.skills[skill]) {
@@ -113,5 +121,5 @@ export function resolveClassSkillSelections(items, progression, cfg, isClassSkil
       });
     }
   }
-  return { rules, pending, warnings };
+  return { rules, pending, pendingTasks, warnings };
 }

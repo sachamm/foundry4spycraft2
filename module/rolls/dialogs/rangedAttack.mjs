@@ -125,3 +125,13 @@ rollPipeline.register({
   dialogs: ["rangedAttack"],
   dialog: context => parts.map(([at, render]) => ({ at, html: render(context) }))
 });
+
+// The measured distance as a number (null when none was entered) and the vehicle mount as a yes or no.
+rollPipeline.register({
+  id: "rangedAttackDialogInput",
+  dialogs: ["rangedAttack"],
+  read: (context, input) => ({
+    vehicleMounted: !!input.vehicleMounted,
+    distanceFeet: input.distanceFeet === "" || input.distanceFeet == null ? null : Number(input.distanceFeet)
+  })
+});

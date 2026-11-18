@@ -118,7 +118,7 @@ export function reconcileShakenInitiative(actor) {
         try {
           await writePlan(c, plan, expected);
         } catch (error) {
-          const held = hold(c, loc`The Shaken Initiative Count update could not be verified: ` + error.message);
+          const held = hold(c, loc`The Shaken Initiative Count update could not be verified: ${error.message}`);
           try {
             await c.update({ "flags.spycraft2.shakenInitiative": held });
           } catch {}
@@ -274,7 +274,7 @@ export function installShakenInitiativeHooks() {
           await reconcileShakenInitiative(actor);
         } while (state.again);
       })
-      .catch(error => ui.notifications.warn(loc`Shaken Initiative Count needs review: ` + error.message))
+      .catch(error => ui.notifications.warn(loc`Shaken Initiative Count needs review: ${error.message}`))
       .finally(() => pending.delete(actor));
   };
   Hooks.on("preCreateCombatant", c => {

@@ -249,7 +249,10 @@ export const SKILLS = [
       "condition": "black-market goods"
      }
     ],
-    "synergyText": "Falsify; Investigation; Streetwise [black-market goods]"
+    "synergyText": "Falsify; Investigation; Streetwise [black-market goods]",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Authenticate Check",
@@ -282,7 +285,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Falsify; Investigation; Science (Chemistry)"
+    "synergyText": "Falsify; Investigation; Science (Chemistry)",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Decipher Check",
@@ -315,7 +321,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers [using a computer]; Investigation; Science (Mathematics)"
+    "synergyText": "Computers [using a computer]; Investigation; Science (Mathematics)",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Examine Media Check",
@@ -348,7 +357,10 @@ export const SKILLS = [
       "condition": "clues about people in the media"
      }
     ],
-    "synergyText": "Computers; Investigation; Sense Motive [clues about people in the media]"
+    "synergyText": "Computers; Investigation; Sense Motive [clues about people in the media]",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Forensics Check",
@@ -399,7 +411,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Investigation; Medicine [biological evidence]; Science (Chemistry) [chemical evidence]; Science (Fabrication) [gear remnants]; Search; Sense Motive"
+    "synergyText": "Investigation; Medicine [biological evidence]; Science (Chemistry) [chemical evidence]; Science (Fabrication) [gear remnants]; Search; Sense Motive",
+    "cooperative": {
+     "max": 5
+    }
    }
   ]
  },
@@ -617,7 +632,11 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve"
+    "synergyText": "Resolve",
+    "cooperative": {
+     "max": 8,
+     "smallItem": true
+    }
    },
    {
     "name": "Speed Push Check",
@@ -672,7 +691,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve; Sense Motive; Tactics"
+    "synergyText": "Resolve; Sense Motive; Tactics",
+    "cooperative": {
+     "max": null
+    }
    },
    {
     "name": "Swim Check",
@@ -786,7 +808,10 @@ export const SKILLS = [
       "condition": "city setting"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government setting]; Cultures [focus area]; Impress [positive approach]; Intimidate [negative approach]; Sense Motive; Streetwise [city setting]"
+    "synergyText": "Bureaucracy [corporate/government setting]; Cultures [focus area]; Impress [positive approach]; Intimidate [negative approach]; Sense Motive; Streetwise [city setting]",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -873,7 +898,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Electronics; Science (Programming); Science (Super-Science)"
+    "synergyText": "Electronics; Science (Programming); Science (Super-Science)",
+    "cooperative": {
+     "max": 1
+    }
    }
   ]
  },
@@ -1024,7 +1052,11 @@ export const SKILLS = [
       "condition": "building a security device"
      }
     ],
-    "synergyText": "Computers; Science (Super-Science); Security [building a security device]"
+    "synergyText": "Computers; Science (Super-Science); Security [building a security device]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Disable Check",
@@ -1057,7 +1089,11 @@ export const SKILLS = [
       "condition": "building a security device"
      }
     ],
-    "synergyText": "Computers; Science (Super-Science); Security [building a security device]"
+    "synergyText": "Computers; Science (Super-Science); Security [building a security device]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Modify Check",
@@ -1096,7 +1132,11 @@ export const SKILLS = [
       "condition": "building a security device"
      }
     ],
-    "synergyText": "Analysis; Computers; Science (Super-Science); Security [building a security device]"
+    "synergyText": "Analysis; Computers; Science (Super-Science); Security [building a security device]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Optimize Check",
@@ -1129,7 +1169,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers; Science (Fabrication); Science (Super-Science)"
+    "synergyText": "Computers; Science (Fabrication); Science (Super-Science)",
+    "cooperative": {
+     "max": 1
+    }
    },
    {
     "name": "Repair Check",
@@ -1162,7 +1205,11 @@ export const SKILLS = [
       "condition": "repairing a security device"
      }
     ],
-    "synergyText": "Computers; Science (Super-Science); Security [repairing a security device]"
+    "synergyText": "Computers; Science (Super-Science); Security [repairing a security device]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Sabotage Check",
@@ -1201,7 +1248,11 @@ export const SKILLS = [
       "condition": "sabotaging a security device"
      }
     ],
-    "synergyText": "Analysis; Computers; Science (Super-Science); Security [sabotaging a security device]"
+    "synergyText": "Analysis; Computers; Science (Super-Science); Security [sabotaging a security device]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    }
   ]
  },
@@ -1245,7 +1296,10 @@ export const SKILLS = [
       "condition": "wilderness setting"
      }
     ],
-    "synergyText": "Bluff; Streetwise [city setting]; Survival [wilderness setting]"
+    "synergyText": "Bluff; Streetwise [city setting]; Survival [wilderness setting]",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Disguise Check",
@@ -1290,7 +1344,10 @@ export const SKILLS = [
       "condition": "city setting"
      }
     ],
-    "synergyText": "Blend; Bluff; Bureaucracy [corporate/government setting]; Sneak; Streetwise [city setting]"
+    "synergyText": "Blend; Bluff; Bureaucracy [corporate/government setting]; Sneak; Streetwise [city setting]",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Forgery Check",
@@ -1347,7 +1404,10 @@ export const SKILLS = [
       "condition": "city-origin document, cover identity or artwork"
      }
     ],
-    "synergyText": "Analysis; Bureaucracy [corporate/government document, cover identity or artwork]; Cultures [focus-area document, cover identity or artwork]; Electronics [fake electronic device]; Mechanics [fake mechanical device]; Science [fake item normally made with a Science focus]; Streetwise [city-origin document, cover identity or artwork]"
+    "synergyText": "Analysis; Bureaucracy [corporate/government document, cover identity or artwork]; Cultures [focus-area document, cover identity or artwork]; Electronics [fake electronic device]; Mechanics [fake mechanical device]; Science [fake item normally made with a Science focus]; Streetwise [city-origin document, cover identity or artwork]",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -1396,7 +1456,10 @@ export const SKILLS = [
       "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Sense Motive; Streetwise [urban target]"
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Sense Motive; Streetwise [urban target]",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Performance Check",
@@ -1429,7 +1492,10 @@ export const SKILLS = [
       "condition": "urban crowd"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government crowd]; Cultures [crowd from a focus area]; Streetwise [urban crowd]"
+    "synergyText": "Bureaucracy [corporate/government crowd]; Cultures [crowd from a focus area]; Streetwise [urban crowd]",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Persuasion Check",
@@ -1468,7 +1534,10 @@ export const SKILLS = [
       "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Resolve; Streetwise [urban target]"
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Resolve; Streetwise [urban target]",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -1525,7 +1594,10 @@ export const SKILLS = [
       "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Manipulate; Resolve; Streetwise [urban target]"
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Manipulate; Resolve; Streetwise [urban target]",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Domination Check",
@@ -1571,7 +1643,10 @@ export const SKILLS = [
       "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Manipulate; Resolve; Streetwise [urban target]"
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Manipulate; Resolve; Streetwise [urban target]",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -1633,7 +1708,10 @@ export const SKILLS = [
       "condition": "city setting"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government setting]; Cultures [focus area]; Impress; Networking; Sense Motive; Streetwise [city setting]"
+    "synergyText": "Bureaucracy [corporate/government setting]; Cultures [focus area]; Impress; Networking; Sense Motive; Streetwise [city setting]",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Detect Search Check",
@@ -1666,7 +1744,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis; Notice; Search"
+    "synergyText": "Analysis; Notice; Search",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Research Check",
@@ -1711,7 +1792,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis; Computers [using a computer]; Investigation; Notice; Search"
+    "synergyText": "Analysis; Computers [using a computer]; Investigation; Notice; Search",
+    "cooperative": {
+     "max": 5
+    }
    }
   ]
  },
@@ -1762,7 +1846,10 @@ export const SKILLS = [
       "condition": "urban target"
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Falsify [physical props used]; Streetwise [urban target]"
+    "synergyText": "Bureaucracy [corporate/government target]; Cultures [target from a focus area]; Falsify [physical props used]; Streetwise [urban target]",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Slander Check",
@@ -1796,7 +1883,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress; Networking; Sense Motive"
+    "synergyText": "Impress; Networking; Sense Motive",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -1840,7 +1930,11 @@ export const SKILLS = [
       "condition": "building a security device"
      }
     ],
-    "synergyText": "Drive [building a vehicle]; Science (Fabrication); Security [building a security device]"
+    "synergyText": "Drive [building a vehicle]; Science (Fabrication); Security [building a security device]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Disable Check",
@@ -1867,7 +1961,11 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Drive [disabling a vehicle]; Science (Fabrication)"
+    "synergyText": "Drive [disabling a vehicle]; Science (Fabrication)",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Modify Check",
@@ -1900,7 +1998,11 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis; Drive [modifying a vehicle]; Science (Fabrication)"
+    "synergyText": "Analysis; Drive [modifying a vehicle]; Science (Fabrication)",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Optimize Check",
@@ -1933,7 +2035,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers; Science (Fabrication); Science (Super-Science)"
+    "synergyText": "Computers; Science (Fabrication); Science (Super-Science)",
+    "cooperative": {
+     "max": 1
+    }
    },
    {
     "name": "Repair Check",
@@ -1966,7 +2071,11 @@ export const SKILLS = [
       "condition": "repairing a security device"
      }
     ],
-    "synergyText": "Drive [repairing a vehicle]; Science (Fabrication); Security [repairing a security device]"
+    "synergyText": "Drive [repairing a vehicle]; Science (Fabrication); Security [repairing a security device]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Sabotage Check",
@@ -1999,7 +2108,11 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis; Drive [sabotaging a vehicle]; Science (Fabrication)"
+    "synergyText": "Analysis; Drive [sabotaging a vehicle]; Science (Fabrication)",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    }
   ]
  },
@@ -2043,7 +2156,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Science (Pharmacology); Search; Survival"
+    "synergyText": "Science (Pharmacology); Search; Survival",
+    "cooperative": {
+     "max": 1
+    }
    },
    {
     "name": "Stabilize Check",
@@ -2082,7 +2198,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Resolve; Science (Pharmacology); Search; Survival"
+    "synergyText": "Resolve; Science (Pharmacology); Search; Survival",
+    "cooperative": {
+     "max": 1
+    }
    },
    {
     "name": "Surgery Check",
@@ -2121,7 +2240,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Notice; Science (Chemistry); Science (Genetics); Search"
+    "synergyText": "Notice; Science (Chemistry); Science (Genetics); Search",
+    "cooperative": {
+     "max": 1
+    }
    },
    {
     "name": "Therapy Check",
@@ -2193,7 +2315,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Notice; Resolve; Science (Pharmacology); Sense Motive"
+    "synergyText": "Notice; Resolve; Science (Pharmacology); Sense Motive",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -2277,7 +2402,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress; Manipulate; Sense Motive"
+    "synergyText": "Impress; Manipulate; Sense Motive",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Mediation Check",
@@ -2323,7 +2451,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Bureaucracy [corporate/government NPCs]; Resolve; Sense Motive; Streetwise [urban NPCs]; Tactics"
+    "synergyText": "Bureaucracy [corporate/government NPCs]; Resolve; Sense Motive; Streetwise [urban NPCs]; Tactics",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -2508,7 +2639,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis; Medicine; Science (Mathematics)"
+    "synergyText": "Analysis; Medicine; Science (Mathematics)",
+    "cooperative": {
+     "special": true
+    }
    },
    {
     "name": "Economy Check",
@@ -2541,7 +2675,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Bureaucracy; Networking; Profession"
+    "synergyText": "Bureaucracy; Networking; Profession",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Engineering Check",
@@ -2574,7 +2711,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Electronics; Mechanics; Science (Fabrication)"
+    "synergyText": "Electronics; Mechanics; Science (Fabrication)",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Fabrication Check",
@@ -2607,7 +2747,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Electronics; Mechanics; Science (Engineering)"
+    "synergyText": "Electronics; Mechanics; Science (Engineering)",
+    "cooperative": {
+     "special": true
+    }
    },
    {
     "name": "Genetics Check",
@@ -2640,7 +2783,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Medicine; Science (Chemistry); Science (Pharmacology)"
+    "synergyText": "Medicine; Science (Chemistry); Science (Pharmacology)",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Mathematics Check",
@@ -2679,7 +2825,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis; Computers; Manipulate; Science (Super-Science)"
+    "synergyText": "Analysis; Computers; Manipulate; Science (Super-Science)",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Pharmacology Check",
@@ -2712,7 +2861,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Medicine; Science (Chemistry); Science (Genetics)"
+    "synergyText": "Medicine; Science (Chemistry); Science (Genetics)",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Programming Check",
@@ -2751,7 +2903,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Analysis; Computers; Science (Mathematics); Science (Super-Science)"
+    "synergyText": "Analysis; Computers; Science (Mathematics); Science (Super-Science)",
+    "cooperative": {
+     "special": true
+    }
    },
    {
     "name": "Super-Science Check",
@@ -2796,7 +2951,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Computers; Electronics; Mechanics; Science (Fabrication); Science (Mathematics)"
+    "synergyText": "Computers; Electronics; Mechanics; Science (Fabrication); Science (Mathematics)",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -2875,7 +3033,11 @@ export const SKILLS = [
       "condition": "security weapon"
      }
     ],
-    "synergyText": "Computers [computerized security device]; Electronics [electronic security device]; Mechanics [mechanical security device]; Science (Chemistry) [explosive security device]; Science (Fabrication) [security weapon]"
+    "synergyText": "Computers [computerized security device]; Electronics [electronic security device]; Mechanics [mechanical security device]; Science (Chemistry) [explosive security device]; Science (Fabrication) [security weapon]",
+    "cooperative": {
+     "max": "cha",
+     "smallItem": true
+    }
    },
    {
     "name": "Hotwire Check",
@@ -2953,7 +3115,10 @@ export const SKILLS = [
       "condition": "security weapon"
      }
     ],
-    "synergyText": "Computers [computerized security device]; Electronics [electronic security device]; Mechanics [mechanical security device]; Science (Fabrication) [security weapon]"
+    "synergyText": "Computers [computerized security device]; Electronics [electronic security device]; Mechanics [mechanical security device]; Science (Fabrication) [security weapon]",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -3068,7 +3233,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Blend; Bluff; Impress"
+    "synergyText": "Blend; Bluff; Impress",
+    "cooperative": {
+     "max": "cha"
+    }
    },
    {
     "name": "Stash Item Check",
@@ -3204,7 +3372,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Cultures [focus area]; Investigation; Networking"
+    "synergyText": "Cultures [focus area]; Investigation; Networking",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Bribe Check",
@@ -3354,7 +3525,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Impress; Resolve; Sense Motive"
+    "synergyText": "Impress; Resolve; Sense Motive",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Foraging Check",
@@ -3387,7 +3561,10 @@ export const SKILLS = [
       "condition": ""
      }
     ],
-    "synergyText": "Cultures [focus area]; Notice; Search"
+    "synergyText": "Cultures [focus area]; Notice; Search",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Forecast Weather Check",
@@ -3504,7 +3681,10 @@ export const SKILLS = [
       "condition": "city setting"
      }
     ],
-    "synergyText": "Athletics; Bureaucracy [corporate/government setting]; Cultures [focus area]; Falsify; Notice; Search; Streetwise [city setting]"
+    "synergyText": "Athletics; Bureaucracy [corporate/government setting]; Cultures [focus area]; Falsify; Notice; Search; Streetwise [city setting]",
+    "cooperative": {
+     "max": "cha"
+    }
    }
   ]
  },
@@ -3566,7 +3746,10 @@ export const SKILLS = [
       "condition": "wilderness ambush"
      }
     ],
-    "synergyText": "Blend; Falsify; Sense Motive; Sneak; Streetwise [city ambush]; Survival [wilderness ambush]"
+    "synergyText": "Blend; Falsify; Sense Motive; Sneak; Streetwise [city ambush]; Survival [wilderness ambush]",
+    "cooperative": {
+     "max": 5
+    }
    },
    {
     "name": "Maneuver Check",
@@ -11140,6 +11323,296 @@ export const CONTAGIONS = [
   "sourceTable": "4.70"
  }
 ];
+export const FEAT_REMINDERS = {
+ "All or Nothing": {
+  "rolls": "attack, skill, knowledge",
+  "text": "Once per session, widen a roll's threat and error ranges by 5 each."
+ },
+ "Autofire Basics": {
+  "rolls": "attack",
+  "text": "Use a Two-Shot Burst with Single-Shot or Burst weapons, and take Cover Fire as a half action once per round."
+ },
+ "Autofire Mastery": {
+  "rolls": "attack",
+  "text": "When you hit a foe with a ranged attack, teammates get +2 to hit them for a round; Bursts don't raise your error range."
+ },
+ "Autofire Supremacy": {
+  "rolls": "attack",
+  "text": "Autofire scores an extra hit per 3 points over Defense, and Strafe targets gain less Defense."
+ },
+ "Battering Blows": {
+  "rolls": "damage",
+  "text": "Grants a grapple trick that lets you strike a held foe with both your unarmed and your weapon damage."
+ },
+ "Better Luck Next Time": {
+  "rolls": "skill, save",
+  "text": "If an action die spent on a skill check or save rolls a natural 1, you get it back."
+ },
+ "Boxing Moves": {
+  "rolls": "attack",
+  "text": "Gain boxing tricks that can knock out or daze standard characters."
+ },
+ "Brawling Moves": {
+  "rolls": "attack",
+  "text": "Gain brawling tricks such as body slams and feints that boost your Defense."
+ },
+ "Brawling Supremacy": {
+  "rolls": "attack, damage",
+  "text": "Two unarmed hits on one foe in a round earn a free final attack; gain tricks such as double-damage combos."
+ },
+ "Cleave Basics": {
+  "rolls": "attack",
+  "text": "Once per round, when a melee attack drops a foe, make one more melee attack on another opponent."
+ },
+ "Club Basics": {
+  "rolls": "damage",
+  "text": "Swap lethal/subdual damage freely with clubs, use improvised clubs without penalty, and gain a club stance and trick."
+ },
+ "Crippling Strike": {
+  "rolls": "attack",
+  "text": "Your Cheap Shots on vulnerable foes impose an extra –1 penalty or –5 ft. Speed."
+ },
+ "Cryptographer": {
+  "rolls": "skill:analysis",
+  "text": "Treat codes as 2 Power Rating lower when breaking, writing or requesting them."
+ },
+ "Daredevil": {
+  "rolls": "skill:drive",
+  "text": "Choose chase Strategies as if Acceleration and Turning were 2 higher, and gain access to the Stunt Strategy."
+ },
+ "Defensive Driving": {
+  "rolls": "skill:drive",
+  "text": "Halved Maneuver penalties from Prey Strategies, and once per chase force a foe to suffer a Crisis Advantage."
+ },
+ "Dirty Fighting Basics": {
+  "rolls": "attack",
+  "text": "Sneak attack damage against you is halved; gain a dirty-fighting stance and trick."
+ },
+ "Dirty Fighting Moves": {
+  "rolls": "attack",
+  "text": "Gain underhanded tricks such as blinding eye gouges and improved feints."
+ },
+ "Dueling Basics": {
+  "rolls": "attack",
+  "text": "Choose a foe each round for +2 dodge Defense against them (or +1 vs. everyone), and occasionally strike 5 ft. beyond your Reach."
+ },
+ "Dueling Supremacy": {
+  "rolls": "attack",
+  "text": "+2 dodge Defense, and each melee hit raises your Initiative Count by 1."
+ },
+ "Executioner": {
+  "rolls": "attack",
+  "text": "Once per round, Coup de Grace a helpless character as a half action."
+ },
+ "Fan Service": {
+  "rolls": "skill:impress",
+  "text": "Use Impress for Diversion and Feint, and as a full action affect every opponent in range."
+ },
+ "Fire-Team Basics": {
+  "rolls": "attack",
+  "text": "With a 2-to-1 advantage, take Cover Fire as a free action once per round."
+ },
+ "Fire-Team Supremacy": {
+  "rolls": "attack",
+  "text": "With a 2-to-1 advantage, make one free final attack each round."
+ },
+ "Flamethrower Basics": {
+  "rolls": "attack",
+  "text": "Flamethrowers ignore imprecise, use half the shots, and can use the Bounce trick."
+ },
+ "Follow-up Shot": {
+  "rolls": "attack",
+  "text": "When your Initiative Count begins, take an extra firearm or heavy-weapon final attack at –2 to all checks for the round."
+ },
+ "Fortune's Fool": {
+  "rolls": "attack, skill",
+  "text": "When an opponent's action die would turn your error into a critical failure, you may swap one of your dice for theirs."
+ },
+ "Get Radical!": {
+  "rolls": "skill:drive",
+  "text": "Stunts are easier (–5 DC, –1 error), vehicle jumps go 50% farther, and your vehicle takes half falling damage."
+ },
+ "Hail of Fire": {
+  "rolls": "attack",
+  "text": "With Follow-up Shot, accept –4 instead to gain a second extra final attack."
+ },
+ "Horde Mastery": {
+  "rolls": "skill:athletics",
+  "text": "With a 2-to-1 advantage, you and teammates can Pummel as a half action and gain +1 to Grapple skill checks."
+ },
+ "Horde Supremacy": {
+  "rolls": "damage",
+  "text": "With a 2-to-1 advantage, your team gets +2 damage within CQB Range and enemy Initiative Count gains are halved."
+ },
+ "Kicking Basics": {
+  "rolls": "attack",
+  "text": "Kicks don't lower your Initiative Count; gain a kicking stance and trick."
+ },
+ "Kicking Moves": {
+  "rolls": "attack",
+  "text": "Gain mobile and high-threat kicking tricks."
+ },
+ "Lane Dancer": {
+  "rolls": "skill:drive",
+  "text": "Ground vehicles treat maneuvering room as one step wider, and +2 on Crisis Advantage checks in ground chases."
+ },
+ "Living Cipher": {
+  "rolls": "skill:analysis",
+  "text": "Work codes in your head as if using a computer, and computers you use count as 1 Power Rating higher."
+ },
+ "Merciless": {
+  "rolls": "attack",
+  "text": "Once per round, Coup de Grace a helpless character as a free action."
+ },
+ "Mingling Basics": {
+  "rolls": "skill:blend",
+  "text": "Blend/Stealth can always use Dex, crowds give synergy, and failing doesn't leave you flat-footed."
+ },
+ "Mingling Mastery": {
+  "rolls": "skill:blend",
+  "text": "Halved Stealth penalties for moving or speaking, no Disposition tag, and you're invisible in crowds of 500+."
+ },
+ "Mingling Supremacy": {
+  "rolls": "skill:blend",
+  "text": "No Stealth penalties for moving or speaking, smaller team/terrain penalties, and invisible in crowds of 50+."
+ },
+ "Misfortune": {
+  "rolls": "attack, skill",
+  "text": "When you score an unused threat against a special character, pay 1 action die to force them to discard one."
+ },
+ "Need for Speed": {
+  "rolls": "skill:drive",
+  "text": "No Maneuver penalty for going faster than half your vehicle or mount's top speed."
+ },
+ "No Quarter": {
+  "rolls": "attack, damage",
+  "text": "Trade sneak attack dice for an equal increase in threat range on that attack."
+ },
+ "Offensive Driving": {
+  "rolls": "skill:drive",
+  "text": "Halved Maneuver penalties from Predator Strategies, and once per chase ignore a Crisis without a check."
+ },
+ "Opportunist": {
+  "rolls": "attack",
+  "text": "Once per round, when a second foe you both can see is stunned or drops below 0 wounds, make a free half-damage final attack on your opponent."
+ },
+ "Photo Finish": {
+  "rolls": "skill:drive",
+  "text": "In a chase, lower your own Acceleration and Turning by 2 to lower everyone else's by 2 too."
+ },
+ "Rock and Roll": {
+  "rolls": "attack",
+  "text": "Autofire and Strafe volleys use only 2 shots each; fire rifles and machine guns one-handed at –2; requests for autofire ammo yield double."
+ },
+ "Rolling Basics": {
+  "rolls": "attack",
+  "text": "Stand Up is free and safe; gain a rolling stance and trick."
+ },
+ "Rolling Moves": {
+  "rolls": "attack",
+  "text": "Gain acrobatic tricks to reposition around and through enemies when attacking."
+ },
+ "Signature Gear": {
+  "rolls": "attack, damage, skill",
+  "text": "One Favored Gear item grants +1 to checks and damage and can't be destroyed by a critical failure."
+ },
+ "Simulator Jockey": {
+  "rolls": "attack, skill",
+  "text": "No penalty for attacks and checks made through a drone, and you can Regroup while operating one."
+ },
+ "Snap Shot": {
+  "rolls": "attack",
+  "text": "Once per round, when a ranged attack drops a foe, immediately take another shot at a different opponent."
+ },
+ "Spider Basics": {
+  "rolls": "skill:athletics",
+  "text": "No penalties while climbing (including without a kit), foes get no bonus against climbing you, and Initiative bonus when combat starts on a wall."
+ },
+ "Spider Mastery": {
+  "rolls": "skill:athletics",
+  "text": "Climb faster, catch yourself on most surfaces when falling, and take less falling damage."
+ },
+ "Spider Supremacy": {
+  "rolls": "skill:athletics",
+  "text": "Climb at full Speed, don't need extra checks when hurt while climbing, and climbing with a kit is easier."
+ },
+ "Spirit Basics": {
+  "rolls": "attack",
+  "text": "Once per combat reduce lethal damage from one source by your BAB; gain a spirit stance and trick."
+ },
+ "Spirit Moves": {
+  "rolls": "attack",
+  "text": "Gain tricks such as intimidating warnings and shattering weapons."
+ },
+ "Steel Rain": {
+  "rolls": "attack",
+  "text": "Hurled weapons are drawn freely and always readied, can Burst, Cover Fire and Suppressive Fire, and are easier to stash."
+ },
+ "Style Over Caliber": {
+  "rolls": "damage",
+  "text": "Pistols can deal a flat 1d10+2 base damage instead of their normal damage, and Cheap Shots with pistols are easier."
+ },
+ "Submission Basics": {
+  "rolls": "attack",
+  "text": "Cheap Shot penalties from your unarmed hits are doubled; gain a ground-fighting stance and trick."
+ },
+ "Submission Moves": {
+  "rolls": "attack",
+  "text": "Gain grapple tricks that sap attributes and lock joints."
+ },
+ "Submission Supremacy": {
+  "rolls": "attack",
+  "text": "Cheap Shot a foe repeatedly (different penalty each time) and gain lethal grapple tricks."
+ },
+ "Tac-Squad Basics": {
+  "rolls": "skill:intimidate",
+  "text": "With a 2-to-1 advantage, once per round Threaten for free or roll Intimidate/Coercion with a half action."
+ },
+ "Tac-Squad Mastery": {
+  "rolls": "attack",
+  "text": "With a 2-to-1 advantage, take Suppressive Fire as a half action once per round."
+ },
+ "Tac-Squad Supremacy": {
+  "rolls": "attack",
+  "text": "With a 2-to-1 advantage, every opponent you can see within CQB Range counts as flanked."
+ },
+ "This… is my Boomstick": {
+  "rolls": "attack",
+  "text": "Club foes with a readied shotgun, fire it one-handed at –2, raise its save DCs by 4, and knock targets back 5 ft. on a hit."
+ },
+ "Trademark Gear": {
+  "rolls": "attack, skill",
+  "text": "Your Signature Gear item's bonus rises to +2, and action dice spent on it roll twice."
+ },
+ "Trick Shot": {
+  "rolls": "attack, damage",
+  "text": "A lethal hit with a non-grenade hurled weapon can hold the target instead of damaging them."
+ },
+ "Two-hit Combo": {
+  "rolls": "attack",
+  "text": "When your Initiative Count begins, take an extra unarmed final attack at –2 to all checks for the round."
+ },
+ "Vital Points Moves": {
+  "rolls": "attack",
+  "text": "Gain pressure-point tricks that can stun or exploit flat-footed foes."
+ },
+ "Warrior's Grace": {
+  "rolls": "attack",
+  "text": "With Two-hit Combo, accept –4 instead to gain a second extra unarmed final attack."
+ },
+ "Wind Rider": {
+  "rolls": "skill:notice, skill:drive",
+  "text": "Halved visual-range Notice penalty, better gliding, and air vehicles treat maneuvering room as wider with +2 on Crisis Advantage checks."
+ },
+ "Wrestling Basics": {
+  "rolls": "attack",
+  "text": "+1 Defense against adjacent foes; gain a wrestling stance and trick."
+ },
+ "Wrestling Moves": {
+  "rolls": "attack",
+  "text": "Gain takedown tricks like clotheslines and hip tosses."
+ }
+};
 export const VEHICLE_RULES = {
  "classes": [
   {

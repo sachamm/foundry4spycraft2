@@ -87,7 +87,7 @@ export async function rollCareerVitality(actor, index) {
         try {
           await postStoredRoll(actor, record);
         } catch (error) {
-          globalThis.ui?.notifications?.warn?.(loc`Vitality remains recorded. ` + error.message);
+          globalThis.ui?.notifications?.warn?.(loc`Vitality remains recorded. ${error.message}`);
         }
       return { total: source.value, recorded: true, legacy: !record, levelId: source.levelId };
     }
@@ -128,7 +128,7 @@ export async function rollCareerVitality(actor, index) {
     try {
       await postStoredRoll(actor, record, roll);
     } catch (error) {
-      globalThis.ui?.notifications?.warn?.(loc`Vitality remains recorded. ` + error.message);
+      globalThis.ui?.notifications?.warn?.(loc`Vitality remains recorded. ${error.message}`);
     }
     return roll;
   });

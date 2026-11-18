@@ -7,6 +7,7 @@ import { ownedWeaponTraining, weaponSourceIdentity } from "./weapon-training.mjs
 import { bullseyeDamageSourceFacts } from "./bullseye.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { feintAttackTarget } from "./feint-bonus.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -123,8 +124,7 @@ export function meleeTrickPlan(
   )
     throw Error(
       d?.fullAction === false
-        ? d.source +
-            loc` requires a melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied.`
+        ? loc`${d.source} requires a melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied.`
         : loc`This melee feat trick requires a full-action melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied.`
     );
   const source = readiedMeleeFeatSource(system, { name: d.feat, family: d.family, bonus: d.attackBonus }),
@@ -290,4 +290,70 @@ rollPipeline.register({
       finalAttack: options.finalAttack,
       weaponQualities
     })
+});
+
+// The Melee and Unarmed Combat feat tricks as part of an attack plan. Planned after All-out Attack, whose target a
+// trick has to share.
+rollPipeline.register({
+  id: "meleeTrickAttackTerm",
+  kinds: ["attack"],
+  order: 9030,
+  terms({ system, sourceWeapon, options, ranged, stance, grip, plans }) {
+    let plan = null,
+      review = "";
+    try {
+      if (options.meleeTrick && options.meleeFeatTrick && options.meleeFeatTrick !== options.meleeTrick)
+        throw Error(loc`Only one Melee/Unarmed Combat feat trick may apply to this action.`);
+      const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
+      if (manual && options.meleeTrickTargetName?.trim() && manual.name !== options.meleeTrickTargetName.trim())
+        throw Error(loc`Use the same named target for this attack and melee trick.`);
+      plan = meleeTrickPlan(system, sourceWeapon, {
+        trick: options.meleeTrick,
+        ranged,
+        action: stance.attackAction,
+        fullActionConfirmed: options.meleeTrickFullActionConfirmed,
+        onlyFeatTrickConfirmed: options.meleeTrickOnlyConfirmed,
+        freeFinalAttack: options.freeFinalAttack === true,
+        disarm: !!options.disarm,
+        targetUuid: feintAttackTarget(options),
+        targetName: manual?.name ?? options.meleeTrickTargetName ?? "",
+        targetConfirmed: !!manual || options.meleeTrickTargetConfirmed === true,
+        grip,
+        spearChargeMovement: {
+          distanceFeet: options.spearChargeDistanceFeet,
+          towardFeet: options.spearChargeTowardFeet,
+          routeConfirmed: options.spearChargeRouteConfirmed,
+          movementCompleted: options.spearChargeMovementCompleted,
+          combat: options.spearChargeCombat
+        },
+        fendTiming: options.fendTiming
+      });
+      if (plan && plans.meleeTradeoff && plan.targetUuid !== plans.meleeTradeoff.targetUuid)
+        throw Error(loc`Use the same actual target for this melee feat trick and All-out Attack.`);
+    } catch (error) {
+      review = error.message;
+    }
+    return {
+      key: "meleeTrick",
+      plan,
+      rowAt: 20,
+      rows: [[loc`Melee trick`, plan?.attackBonus ?? 0]],
+      threat: plan?.threatIncrease ?? 0,
+      grantedQuality: plan?.grantedQuality,
+      blockAt: 40,
+      blocked: review,
+      noteAt: 50,
+      notes: plan
+        ? [
+            plan.key === "betweenRibs"
+              ? loc`Between the Ribs: full-action Standard Attack with this readied knife. A hit inflicts 1 die of sneak attack damage: roll damage from this recorded hit and include its sneak attack die. The general sneak attack conditions still apply (p.179).`
+              : plan.key === "threadNeedle"
+                ? loc`Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond5ft ends this hold (p.180).`
+                : plan.key === "fend"
+                  ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
+                  : loc` ${plan.source}: full-action Standard Attack; ${plan.attackBonus >= 0 ? "+" : ""}${plan.attackBonus} attack, +${plan.damageBonus} recorded-hit damage${plan.threatIncrease ? `, +${plan.threatIncrease} threat range` : ""}${plan.grantedQuality ? ", takedown quality" : ""} (pp.176,179).`
+          ]
+        : []
+    };
+  }
 });

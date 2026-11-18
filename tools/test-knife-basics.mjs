@@ -102,7 +102,10 @@ test("knife is a GC-reviewed family limited to Edged and Hurled proficiencies an
     );
   const { readFile } = await import("node:fs/promises");
   assert.match(await readFile(new URL("../module/data/item.mjs", import.meta.url), "utf8"), /"flail",\s*"knife"\s*\]/);
-  assert.match(await readFile(new URL("../module/sheets/item-sheet.mjs", import.meta.url), "utf8"), /knife:\s*"Knife"/);
+  assert.match(
+    await readFile(new URL("../module/sheets/item-sheet.mjs", import.meta.url), "utf8"),
+    /knife:\s*(?:"Knife"|loc`Knife`)/
+  );
 });
 test("every carried reviewed knife is considered readied; holding stays a separate fact and non-knives, dropped, destroyed or empty stacks are excluded", () => {
   const items = [

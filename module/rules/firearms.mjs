@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { improvedVisionRangePlan } from "./senses.mjs";
 import { sniperWeapon, eagleEyeState } from "./sniper.mjs";
 import { loc } from "../i18n.mjs";
@@ -490,3 +491,22 @@ export function mortarOperationPlan(weapon, { mortarSpaceConfirmed = false } = {
     notes: [loc`Mortar: indirect fire; outdoor or very large indoor firing space confirmed (p.315).`]
   };
 }
+
+// Bracing a weapon as part of a Reflex save plan.
+rollPipeline.register({
+  id: "braceSaveTerm",
+  kinds: ["save"],
+  order: 9430,
+  terms({ system, saveKey, input }) {
+    const penalty = saveKey === "ref" && input.braced ? bracedReflexPenalty(system) : 0;
+    return {
+      rowAt: 40,
+      rows: [[loc`Brace`, penalty]],
+      flavorAt: 110,
+      flavor: penalty ? loc` — Brace ${penalty}` : ""
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "firearmsRecord", order: 9680, record: ["launcherOperation", "mortarOperation"] });

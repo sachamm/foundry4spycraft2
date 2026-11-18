@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Soldier Weapon Specialist, pp.49–50. At 6 gain both; later gain one or the other. */
 export function weaponSpecialist(system, items, cfg) {
   const result = { fields: [], proficiencies: [], abilities: [], pending: [], warnings: [] };
@@ -61,3 +62,13 @@ export function specialistDefense(system, proficiency) {
     ? { dodge: 1, damageReduction: 1 }
     : { dodge: 0, damageReduction: 0 };
 }
+
+// Weapon Specialist "No Worries" as part of an attack plan.
+rollPipeline.register({
+  id: "weaponSpecialistAttackTerm",
+  kinds: ["attack"],
+  order: 9130,
+  terms({ system, weapon }) {
+    return { errorReduction: specialistApplies(system, weapon, "No Worries") ? 2 : 0 };
+  }
+});

@@ -3,6 +3,7 @@ import { cqbRangedWeapon } from "./cqb.mjs";
 import { ownedWeaponTraining, weaponSourceIdentity } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { feintAttackTarget } from "./feint-bonus.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -165,4 +166,53 @@ rollPipeline.register({
       attackContext: options.attackContext,
       rerollOf: options.rerollOf
     })
+});
+
+// Bullseye as part of an attack plan.
+rollPipeline.register({
+  id: "bullseyeAttackTerm",
+  kinds: ["attack"],
+  order: 9020,
+  terms({ system, weapon, sourceWeapon, options, ranged, trained, stance, firing, grip, stableSurface }) {
+    let plan = null,
+      review = "";
+    try {
+      const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
+      if (manual && options.bullseyeTargetName?.trim() && manual.name !== options.bullseyeTargetName.trim())
+        throw Error(loc`Use the same named target for this attack’s classification and Bullseye.`);
+      plan = bullseyePlan(system, weapon, {
+        sourceWeapon,
+        penalty: options.bullseyePenalty ?? 0,
+        ranged,
+        trained,
+        action: stance.attackAction,
+        firing,
+        grip,
+        aimBrace: stance,
+        stableSurface,
+        singleShotConfirmed: options.bullseyeSingleShotConfirmed,
+        targetUuid: feintAttackTarget(options),
+        targetName: manual?.name ?? options.bullseyeTargetName ?? "",
+        targetConfirmed: !!manual || options.bullseyeTargetConfirmed === true,
+        ammunition: options.ammunition ?? null,
+        disarm: !!options.disarm
+      });
+    } catch (error) {
+      review = error.message;
+    }
+    return {
+      key: "bullseye",
+      plan,
+      rowAt: 30,
+      rows: [[loc`Bullseye`, plan?.attackPenalty ?? 0]],
+      blockAt: 50,
+      blocked: review,
+      noteAt: 60,
+      notes: plan
+        ? [
+            loc`Bullseye: single-shot ranged Standard Attack −${plan.penalty}, this attack’s damage +${plan.damageBonus}; a miss makes you flat-footed (p.180).`
+          ]
+        : []
+    };
+  }
 });

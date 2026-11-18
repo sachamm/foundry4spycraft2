@@ -1,4 +1,4 @@
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Faceless p.195, Traceless p.196, Silver Tongue p.205; Ghost Basics p.195: automatic named-rank synergy. */
 const SOURCES = [
@@ -112,4 +112,26 @@ rollPipeline.register({
   record: ["rankSynergyFeats"],
   validate: ({ actor, options, checkKind, checkId, skillKey }) =>
     validateRankSynergyFeatProof(actor.system, options.rankSynergyFeats, { checkKind, skillKey, checkId })
+});
+
+// The feats that grant synergy from ranks, in a skill check's plan.
+rollPipeline.register({
+  id: "rankSynergyFeatsSkillTerm",
+  kinds: ["skill"],
+  order: 9290,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      noSharedLanguage = false,
+      ghostHideTargetKind = "",
+      ghostHideTargetName = "",
+      ghostHideConfirmed = false
+    } = input;
+    const plan = rankSynergyFeatPlan(system, skillKey, check, {
+      noSharedLanguage,
+      ghostHideTargetKind,
+      ghostHideTargetName,
+      ghostHideConfirmed
+    });
+    return skillPlanTerm("rankSynergyFeats", plan, { noteAt: 170, blockAt: 160, bonusAt: 70 });
+  }
 });

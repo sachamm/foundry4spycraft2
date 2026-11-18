@@ -1,3 +1,4 @@
+import { ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "./cheap-shot-effects.mjs";
@@ -181,13 +182,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
         other =>
           other.type === "feat" &&
           other.id !== feat.id &&
-          norm(other.name) === norm(feat.name) &&
+          norm(ruleName(other)) === norm(ruleName(feat)) &&
           (!selfTemporary || sameFeatSelection(feat, other, cfg)) &&
           other.system.featKind !== "temporary"
       )
     )
       continue;
-    const key = norm(feat.name),
+    const key = norm(ruleName(feat)),
       count = featCounts.get(key) ?? 0;
     const definition = cfg.tables.featRules?.[feat.name];
     const repeatable = feat.system.repeatable || definition?.repeatable;
@@ -237,7 +238,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.level = level;
   sys.activeFeatSelections = items
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id))
-    .map(i => ({ name: i.name, choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));
+    .map(i => ({ name: ruleName(i), choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));
   sys.activeFeatNames = sys.activeFeatSelections.map(i => i.name);
 
   sys.details ??= {};
@@ -379,13 +380,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
           ...selected.bonuses,
           ...(["Gorgeous", "Simply Irresistible"].includes(i.name)
             ? [{ target: "abilities.cha", value: "1" }]
-            : i.name === "The Look"
+            : ruleName(i) === "The Look"
               ? [{ target: "appearance", value: "1" }]
               : [])
         ],
         rank: 1,
         acquiredAtLevel: i.system.acquiredAtLevel || 1,
-        candidate: i.name === "Candidate",
+        candidate: ruleName(i) === "Candidate",
         fieldOfExpertise: i.system.choice === "Field of Expertise"
       });
     } else if (i.type === "class") {
@@ -598,7 +599,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   warnings.push(...sys.drunkRepositionState.warnings);
   sys.drunkPendingRepositions = sys.drunkRepositionState.rows.filter(r => ["pending", "moving"].includes(r.state));
   sys.drunkSleepState = fatigueRestStatus({ ...sys, fatigueRest: sys.drunkSleep }, { restKind: "drunk" });
-  if (sys.drunkSleepState?.needsReview) warnings.push(loc`Drunk sleep: ` + sys.drunkSleepState.warning);
+  if (sys.drunkSleepState?.needsReview) warnings.push(loc`Drunk sleep: ${sys.drunkSleepState.warning}`);
   sys.fatigueRestState = fatigueRestStatus(sys);
   if (sys.fatigueRestState?.needsReview) warnings.push(sys.fatigueRestState.warning);
   sys.fatigueApplicationHistory = fatigueApplicationHistory(sys);
@@ -752,7 +753,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
   targeted.rules.push(...inherited.skillRules);
   sys.classSkillRules = targeted.rules;
   warnings.push(...targeted.warnings);
-  for (const text of targeted.pending) todo.push({ order: 21, tab: "classes", text });
+  for (const task of targeted.pendingTasks ?? targeted.pending.map(text => ({ text })))
+    todo.push({ order: 21, tab: "classes", ...task });
   for (const rule of targeted.rules.filter(rule => rule.errorReduction))
     sources.push({
       name: rule.source,
@@ -766,7 +768,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     });
 
   const unlocked = items
-    .filter(item => item.type === "feat" && item.name === "Unlocked Potential" && activeFeatIds.has(item.id))
+    .filter(item => item.type === "feat" && ruleName(item) === "Unlocked Potential" && activeFeatIds.has(item.id))
     .map(item => ({
       skill: cfg.skills[item.system.choice]
         ? item.system.choice
@@ -886,7 +888,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     for (const feat of items.filter(
       i =>
         i.type === "feat" &&
-        i.name === "Training" &&
+        ruleName(i) === "Training" &&
         activeFeatIds.has(i.id) &&
         (i.system.acquiredAtLevel || 1) === idx + 1
     )) {
@@ -956,7 +958,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
 
   /* ---------------- Feats ---------------- */
   const featItems = items.filter(i => i.type === "feat");
-  const featNames = new Set(featItems.filter(i => activeFeatIds.has(i.id)).map(i => norm(i.name)));
+  const featNames = new Set(featItems.filter(i => activeFeatIds.has(i.id)).map(i => norm(ruleName(i))));
   const featTrees = {};
   const activeFeatTrees = {};
   sys.virtualFeats = [];
@@ -1008,7 +1010,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     actionDice: { max: lr?.actionDice ?? 0 }
   };
   const fortuneBold = items.some(
-    i => i.type === "feat" && i.name === "Fortune Favors the Bold" && activeFeatIds.has(i.id)
+    i => i.type === "feat" && ruleName(i) === "Fortune Favors the Bold" && activeFeatIds.has(i.id)
   );
   rd.actionDice.max +=
     miscActionDice(sys) +
@@ -1045,7 +1047,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         b.bonusType === "insight" &&
         value > 0 &&
         (b.target === "knowledge" || /^skills\.\w+\.misc$/.test(b.target)) &&
-        items.some(i => i.type === "feat" && i.name === "Unfair Advantage" && activeFeatIds.has(i.id))
+        items.some(i => i.type === "feat" && ruleName(i) === "Unfair Advantage" && activeFeatIds.has(i.id))
       )
         value += 1;
       if (
@@ -1273,8 +1275,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
       sys.conditionPenalties.attack +
       conditionAbilityPenalty(sys, "dex")
   };
-  const martialArtsFeat = featItems.find(feat => feat.name === "Martial Arts" && activeFeatIds.has(feat.id));
-  const mastersArt = featItems.some(feat => feat.name === "Master's Art" && activeFeatIds.has(feat.id));
+  const martialArtsFeat = featItems.find(feat => ruleName(feat) === "Martial Arts" && activeFeatIds.has(feat.id));
+  const mastersArt = featItems.some(feat => ruleName(feat) === "Master's Art" && activeFeatIds.has(feat.id));
   sys.unarmed = {
     usesStrength: !martialArtsFeat || martialArtsFeat.system.choice === "str" || mastersArt,
     strengthComponent: !martialArtsFeat || martialArtsFeat.system.choice === "str" || mastersArt ? abil.str.mod : 0,
@@ -1594,7 +1596,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   }
   const replacementGrants = [];
   for (const [name, count] of classGrantCounts) {
-    const owned = featItems.find(f => norm(f.name) === name && f.system.featKind !== "temporary");
+    const owned = featItems.find(f => norm(ruleName(f)) === name && f.system.featKind !== "temporary");
     if (!owned) continue;
     const replacements = !owned.system.granted ? count : Math.max(0, count + (originGrantNames.has(name) ? 1 : 0) - 1);
     if (replacements) {
@@ -1932,8 +1934,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
         activeFeatIds.has(other.id) && (f.system.featKind === "temporary" || other.system.featKind !== "temporary")
     );
     const names = new Set([
-      ...usable.map(other => norm(other.name)),
-      ...sys.virtualFeats.map(other => norm(other.name))
+      ...usable.map(other => norm(ruleName(other))),
+      ...sys.virtualFeats.map(other => norm(ruleName(other)))
     ]);
     const trees = {};
     for (const other of [...usable, ...sys.virtualFeats.map(other => ({ system: other }))])
@@ -1962,7 +1964,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
           : exempt
             ? { ok: true, unmet: [] }
             : checkPrerequisites(f.system.prerequisites, context);
-    if (res.ok && f.name === "Candidate")
+    if (res.ok && ruleName(f) === "Candidate")
       try {
         candidatePlan(sys, f);
       } catch (error) {
@@ -2000,7 +2002,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     for (const f of permanent) permanentTrees[f.system.tree] = (permanentTrees[f.system.tree] ?? 0) + 1;
     const classContext = prerequisiteContext(
       classQualificationSystem,
-      new Set(permanent.map(f => norm(f.name))),
+      new Set(permanent.map(f => norm(ruleName(f)))),
       permanentTrees,
       classQualificationRanks
     );
@@ -2018,7 +2020,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
       .filter(
         f =>
           legalFeatIds.has(f.id) &&
-          (f.name !== "Candidate" || sys.featStatus[f.id]?.ok) &&
+          (ruleName(f) !== "Candidate" || sys.featStatus[f.id]?.ok) &&
           ((f.system.granted && f.system.featKind !== "temporary") || sys.featStatus[f.id]?.ok)
       )
       .map(f => f.id)
@@ -2066,7 +2068,7 @@ export function prerequisiteContext(
       featNames.has(norm(name)) &&
       featChoices.some(
         f =>
-          norm(f.name) === norm(name) &&
+          norm(ruleName(f)) === norm(name) &&
           (norm(name) === "extra gear"
             ? extraGearCategory(f.system?.choice ?? f.choice) !== null &&
               extraGearCategory(f.system?.choice ?? f.choice) === extraGearCategory(choice)

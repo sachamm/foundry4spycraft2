@@ -60,7 +60,11 @@ test("the dialog skin preserves caller options, callbacks, cancellation and reje
 });
 
 test("repeated build choices are counted without merging different destinations or changing engine data", () => {
-  const task = { tab: "classes", text: "Pointman: choose a skill for Versatility at class level 1." };
+  const task = {
+    tab: "classes",
+    text: "Pointman: choose a skill for Versatility at class level 1.",
+    plural: count => `Pointman: choose ${count} more skills for Versatility at class level 1.`
+  };
   const input = [task, { ...task }, { ...task }, { tab: "skills", text: task.text }];
   const grouped = groupBuildTasks(input);
   assert.equal(grouped.length, 2);

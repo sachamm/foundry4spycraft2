@@ -118,6 +118,34 @@ export const RECORD_SHAPES = {
       weaponUuid: "string"
     }
   ],
+  hazards: {
+    contagions: {
+      "*": {
+        id: "string",
+        label: "string",
+        name: "string",
+        grade: "string",
+        kind: "string",
+        notes: ["string"],
+        doses: "number",
+        phase: "string",
+        saves: "number",
+        exposedAt: "number",
+        dueAt: "number",
+        primary: { onset: "string", saveDC: "number", effect: "string" },
+        secondary: { onset: "string", saveDC: "number", effect: "string" }
+      }
+    },
+    recovered: ["string"],
+    fire: {
+      $also: "null",
+      damage: "number",
+      ap: "number",
+      suffered: "number",
+      scarChecked: "boolean",
+      startedAt: "null|number"
+    }
+  },
   attributeDamage: {
     "*": "any",
     events: [

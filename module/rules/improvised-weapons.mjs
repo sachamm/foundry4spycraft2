@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { gearCheckPlan } from "./gear-checks.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
@@ -71,3 +72,6 @@ export function improvisedSearchPlan(
     table: "Table5.12, p.347"
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "improvisedWeaponsRecord", order: 9700, record: ["improvisedSearch"] });

@@ -43,7 +43,7 @@ const options = (rows, selected) =>
     .join("");
 const gm = () => ChatMessage.getWhisperRecipients("GM").map(user => user.id);
 const say = (content, whisper = true) =>
-  ChatMessage.create({ speaker: { alias: "Game Control" }, content, ...(whisper ? { whisper: gm() } : {}) });
+  ChatMessage.create({ speaker: { alias: loc`Game Control` }, content, ...(whisper ? { whisper: gm() } : {}) });
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 const money = value => `$${Math.abs(value).toLocaleString("en-US")}`;
 const warn = error => ui.notifications.warn(error.message);
@@ -153,9 +153,9 @@ export async function addAntagonist() {
     <label>${loc`XP reward if not read from the actor`} <input type="number" name="xp" min="0" value="0" /></label>
     <label>${loc`Type`} <select name="type">${options(
       [
-        ["", "From the actor"],
-        ["standard", "Standard or animal"],
-        ["special", "Special"]
+        ["", loc`From the actor`],
+        ["standard", loc`Standard or animal`],
+        ["special", loc`Special`]
       ],
       ""
     )}</select></label>
@@ -190,12 +190,12 @@ export async function addComplication() {
     <p>${loc`Complications raise the base XP reward only when they actually stand in the team's way; one that is ignored is worth half.`}</p>
     <label>${loc`Kind`} <select name="kind">${options(
       [
-        ["quality", "Campaign quality scripted into the mission"],
-        ["security", "Security device"],
-        ["gear", "Gear restriction"],
-        ["exposure", "Exposure objective"],
-        ["bundle", "Mission bundle gear pick"],
-        ["other", "Other (enter XP)"]
+        ["quality", loc`Campaign quality scripted into the mission`],
+        ["security", loc`Security device`],
+        ["gear", loc`Gear restriction`],
+        ["exposure", loc`Exposure objective`],
+        ["bundle", loc`Mission bundle gear pick`],
+        ["other", loc`Other (enter XP)`]
       ],
       "security"
     )}</select></label>
@@ -303,8 +303,8 @@ export async function recordInfraction() {
     <label>${loc`Infraction`} <select name="infraction">${options(rows)}</select></label>
     <label>${loc`Paid in`} <select name="currency">${options(
       [
-        ["reputation", "Reputation (Faction)"],
-        ["netWorth", "Net Worth (Freelance)"]
+        ["reputation", loc`Reputation (Faction)`],
+        ["netWorth", loc`Net Worth (Freelance)`]
       ],
       rules === "freelance" ? "netWorth" : "reputation"
     )}</select></label>

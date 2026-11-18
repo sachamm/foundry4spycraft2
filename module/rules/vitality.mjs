@@ -82,9 +82,7 @@ export function vitalityReviewRecord(actor, source, { value, note, confirmed } =
     !Number.isFinite(at)
   )
     throw new Error(
-      loc`Confirm the actual raw die result (1–` +
-        source.die +
-        loc`) and a bounded source/review note; Constitution and other bonuses apply separately.`
+      loc`Confirm the actual raw die result (1–${source.die}) and a bounded source/review note; Constitution and other bonuses apply separately.`
     );
   return {
     version: 1,

@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Card Shark pp.201–202; normal rank synergy p.92, active Knowledge exception p.99. */
 export function cardSharkProfessionPlan(system, key) {
@@ -25,3 +26,24 @@ export function cardSharkKnowledgePlan(system, { gamblingKnowledge = "", topic =
     evidence: { version: 1, source: "Card Shark", category: gamblingKnowledge, question: topic.trim() }
   };
 }
+
+// Card Shark's Streetwise synergy with Profession, in a skill check's plan.
+rollPipeline.register({
+  id: "cardSharkSkillTerm",
+  kinds: ["skill"],
+  order: 9350,
+  terms({ system, skillKey }) {
+    const plan = cardSharkProfessionPlan(system, skillKey);
+    return {
+      key: "cardSharkProfession",
+      plan,
+      bonusAt: 90,
+      bonuses: plan ? [{ source: "Card Shark", type: "synergy", value: plan.synergy }] : [],
+      noteAt: 420,
+      segment: plan ? loc`Card Shark: Streetwise rank synergy +${plan.synergy} (pp.201–202). ` : ""
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "cardSharkRecord", order: 9630, record: ["cardSharkKnowledge", "cardSharkProfession"] });

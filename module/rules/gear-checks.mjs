@@ -1,3 +1,5 @@
+import { ruleName } from "./rule-name.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Personal Stash, p.197: the character must be inside their home, rather than the wider Home Turf area. */
 export function gearCheckPlan(system, { atHome = false } = {}) {
@@ -10,10 +12,13 @@ export function gearCheckPlan(system, { atHome = false } = {}) {
           .map(f => ({ name: f.name, choice: f.choice ?? "" }))
           .sort((a, b) => a.name.localeCompare(b.name) || a.choice.localeCompare(b.choice))
       : [];
-  if (personalStash && !gearFeats.some(f => f.name === "Personal Stash"))
+  if (personalStash && !gearFeats.some(f => ruleName(f) === "Personal Stash"))
     throw new Error(loc`Review the active Gear feat selections for Personal Stash.`);
   const personalStashBonus = personalStash && atHome === true ? gearFeats.length : 0,
     bonus = baseGearBonus + personalStashBonus;
   if (!Number.isSafeInteger(bonus)) throw new Error(loc`Review the modified Gear check bonus.`);
   return { version: 1, atHome: atHome === true, personalStash, gearFeats, baseGearBonus, personalStashBonus, bonus };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "gearChecksRecord", order: 9690, record: ["gearAllowance", "gearCheckContext"] });

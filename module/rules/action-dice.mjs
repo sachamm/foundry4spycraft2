@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { errorDecisionPending } from "./outcomes.mjs";
 import { resolveSkillResult } from "./checks.mjs";
@@ -288,3 +289,6 @@ export function missionXPPlan(
     }
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "actionDiceRecord", order: 9605, record: ["hailMary"] });

@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Terrain feats, p.206. The declared role describes this check, not a persistent combat stance. */
 export function pursuitSkillPlan(system, key, check, { manhuntRole = "", chaseRole = "", manhuntPrey = false } = {}) {
@@ -63,3 +64,6 @@ export function pursuitSkillPlan(system, key, check, { manhuntRole = "", chaseRo
     ]
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "pursuitFeatsRecord", order: 9720, record: ["pursuitFeat"] });

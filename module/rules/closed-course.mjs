@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { MANEUVER_SKILLS } from "./maneuver-actions.mjs";
 import { loc } from "../i18n.mjs";
 /** p.193. The target must see both the driver and vehicle for the Impress benefit. */
@@ -30,3 +31,6 @@ export function closedCoursePlan(
     ]
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "closedCourseRecord", order: 9640, record: ["closedCourseFeat"] });

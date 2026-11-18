@@ -1,6 +1,6 @@
 import { combatStanceState } from "./combat-stance.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** The p.179 bonus applies to Sneak checks, not the underlying skill bonus. */
 export function stalkingStancePlan(system, key, check, { combat = null } = {}) {
@@ -79,4 +79,16 @@ rollPipeline.register({
       checkId,
       rerollOf: options.rerollOf
     })
+});
+
+// Stalking Stance's part of a skill check plan.
+rollPipeline.register({
+  id: "stalkingStanceSkillTerm",
+  kinds: ["skill"],
+  order: 9210,
+  terms({ system, skillKey, check, method, input }) {
+    const { stalkingCombat = null } = input;
+    const plan = stalkingStancePlan(system, skillKey, check, { combat: stalkingCombat });
+    return skillPlanTerm("stalkingStance", plan, { noteAt: 20, bonusAt: 130 });
+  }
 });

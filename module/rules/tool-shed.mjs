@@ -1,7 +1,8 @@
+import { ruleName } from "./rule-name.mjs";
 import { loc } from "../i18n.mjs";
 const epoch = system => String(system.usagePeriods?.mission ?? "initial");
 export function toolShedSource(system) {
-  const feats = (system.activeFeatSelections ?? []).filter(f => f.name === "Tool Shed" && f.tree === "gear");
+  const feats = (system.activeFeatSelections ?? []).filter(f => ruleName(f) === "Tool Shed" && f.tree === "gear");
   return system.activeFeatNames?.includes("Home Sweet Home") && feats.length
     ? { limit: feats.length, epoch: epoch(system) }
     : null;

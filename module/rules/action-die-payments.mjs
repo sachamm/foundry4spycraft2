@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import {
   actionDiceFundingContext,
   actionDicePoolFingerprint,
@@ -205,3 +206,10 @@ export function multipartRefundPatch(system, record) {
 export function paymentRecordMatches(actor, record) {
   return same(actor.flags?.spycraft2?.actionDiePayments?.[record.id], record);
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({
+  id: "actionDiePaymentsRecord",
+  order: 9610,
+  record: ["preRollFunding", "rerollFunding", "rerollReceiptId"]
+});

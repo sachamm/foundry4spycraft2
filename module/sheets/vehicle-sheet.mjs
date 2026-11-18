@@ -27,16 +27,51 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
 const COUNTER_LABELS = {
-  controls: "Controls",
-  engine: "Engine",
-  flotation: "Flotation",
-  fuelHours: "Fuel lost (hours)",
-  lift: "Lift",
-  traction: "Punctured tyres"
+  get controls() {
+    return loc`Controls`;
+  },
+  get engine() {
+    return loc`Engine`;
+  },
+  get flotation() {
+    return loc`Flotation`;
+  },
+  get fuelHours() {
+    return loc`Fuel lost (hours)`;
+  },
+  get lift() {
+    return loc`Lift`;
+  },
+  get traction() {
+    return loc`Punctured tyres`;
+  }
 };
 const hours = n => (Math.round(n * 10) / 10).toLocaleString("en-US");
-const HAZARD_LABELS = { terrain: "Terrain", surface: "Surface", weather: "Weather", wind: "Wind" };
-const SENSOR_LABELS = { radar: "Radar", sonar: "Sonar", thermal: "Thermal" };
+const HAZARD_LABELS = {
+  get terrain() {
+    return loc`Terrain`;
+  },
+  get surface() {
+    return loc`Surface`;
+  },
+  get weather() {
+    return loc`Weather`;
+  },
+  get wind() {
+    return loc`Wind`;
+  }
+};
+const SENSOR_LABELS = {
+  get radar() {
+    return loc`Radar`;
+  },
+  get sonar() {
+    return loc`Sonar`;
+  },
+  get thermal() {
+    return loc`Thermal`;
+  }
+};
 const share = ([n, d]) => `${n}/${d}`;
 
 /** Sheet for a vehicle placed on a scene: its table statistics, current condition, people aboard and play actions. */
@@ -127,7 +162,7 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
       editable: this.isEditable,
       classOptions: { "": "—", ...Object.fromEntries(VEHICLE_RULES.classes.map(c => [c.code, c.label])) },
       calibers: CONFIG.SPYCRAFT.calibers,
-      acquiredOptions: { "": "—", possession: "Possession", mission: "Mission gear" },
+      acquiredOptions: { "": "—", possession: loc`Possession`, mission: loc`Mission gear` },
       attackerOptions: {
         "": "— none —",
         ...Object.fromEntries(

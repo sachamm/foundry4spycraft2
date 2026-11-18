@@ -52,7 +52,7 @@ export function sessionDicePlan(actors) {
       const starting = actor.system.actionDice?.max,
         before = actor.system.actionDice?.value;
       if (!Number.isSafeInteger(starting) || starting < 0 || !Number.isSafeInteger(before) || before < 0)
-        throw new Error(actor.name + loc`: review the starting/current action-die count before starting a session.`);
+        throw new Error(loc`${actor.name}: review the starting/current action-die count before starting a session.`);
       const deferred =
         actor.system.level === 0 && before === 0 && actor.flags?.spycraft2?.startingDiceCreation?.claimed === false;
       return {
@@ -148,7 +148,7 @@ export async function startUsagePeriod(period) {
             p.actor.system.level !== p.level ||
             !same(snapshot(p.actor, p.field), p.beforeRecord)
           )
-            throw new Error(p.actor.name + loc`: starting dice changed during preparation.`);
+            throw new Error(loc`${p.actor.name}: starting dice changed during preparation.`);
           attempted.push(p);
           try {
             await p.actor.update({
@@ -179,12 +179,12 @@ export async function startUsagePeriod(period) {
           const current = snapshot(p.actor, p.field);
           if (same(current, p.beforeRecord)) continue;
           if (!same(current, { present: true, value: p.record })) {
-            failures.push(new Error(p.actor.name + loc`: the starting-dice record changed again.`));
+            failures.push(new Error(loc`${p.actor.name}: the starting-dice record changed again.`));
             continue;
           }
           const restored = p.actor.system.actionDice.value + p.before - p.value;
           if (!Number.isSafeInteger(restored) || restored < 0) {
-            failures.push(new Error(p.actor.name + loc`: later dice changes need review.`));
+            failures.push(new Error(loc`${p.actor.name}: later dice changes need review.`));
             continue;
           }
           try {
@@ -354,8 +354,7 @@ export async function reviewUsagePeriod(options = {}) {
           const optional = !r.entry || r.entry.deferred,
             entered = optional ? (input.entered?.[r.actor.uuid] ?? input["entered_" + i] === true) : true,
             patch = { "system.actionDice.value": balance };
-          if (typeof entered !== "boolean")
-            throw new Error(loc`Confirm whether ` + r.actor.name + loc` has entered play.`);
+          if (typeof entered !== "boolean") throw new Error(loc`Confirm whether ${r.actor.name} has entered play.`);
           const knownCreation = r.creation ?? (r.entry?.deferred ? r.entry.beforeRecord.value : null);
           if (optional && !entered) {
             if (
@@ -364,7 +363,7 @@ export async function reviewUsagePeriod(options = {}) {
               !knownCreation ||
               knownCreation.claimed !== false
             )
-              throw new Error(loc`Account for ` + r.actor.name + loc` entering play before retaining a dice balance.`);
+              throw new Error(loc`Account for ${r.actor.name} entering play before retaining a dice balance.`);
             Object.assign(
               patch,
               flagPatch(r.actor, "startingDiceCreation", { present: true, value: { ...knownCreation, session } })

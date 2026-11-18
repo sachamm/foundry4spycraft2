@@ -1,3 +1,4 @@
+import { npcQualityEffects } from "../rules/npc-qualities.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "../rules/cheap-shot-effects.mjs";
 import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
 import { shakenStateFromActor, shakenRules } from "../rules/shaken.mjs";
@@ -136,6 +137,12 @@ export class NpcData extends BaseActorData {
     this.usesMissionThreatLevel = missionTL !== null;
     // p.398: a promoted standard NPC is special until the mission ends.
     this.promoted = !!this.promotion && this.promotion.mission === String(this.usagePeriods?.mission ?? "initial");
+    // What the NPC's qualities do at the table (module/rules/npc-qualities.mjs).
+    this.qualityEffects = npcQualityEffects(this.npcProfile?.enabled ? this.npcProfile : null, {
+      type: this.npcType === "villain" ? "special" : this.npcType,
+      threatLevel: this.effectiveThreatLevel,
+      abilities: this.abilities
+    });
     if (!this.npcProfile?.enabled) {
       super.prepareDerivedData();
       if (!["special", "villain"].includes(this.npcType) && !this.promoted) this.damageSave = this.manualDamageSave;
@@ -305,6 +312,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       temporaryShares: record("temporaryShares"),
       assistantGroups: recordList("assistantGroups"),
       accumulatedDamage: record("accumulatedDamage", { nullable: true, initial: null }),
+      /** Contagions at work and a fire burning the character (module/rules/hazards.mjs). */
+      hazards: record("hazards", { nullable: true, initial: null }),
       resourceUses: record("resourceUses"),
       resourcesInitialized: new BooleanField(),
       affiliationType: str("faction", { choices: ["faction", "freelance"] }),

@@ -63,7 +63,7 @@ export async function manageMeleeTradeoff(actor, input = {}) {
         )
         .map(m => ({
           value: "miss:" + m.uuid,
-          label: loc`Apply flat-footed: ${attackTradeoffProof(m.flags.spycraft2).source} miss${m.flags.spycraft2.rollCombat?.round ? loc` in round ` + m.flags.spycraft2.rollCombat.round : ""}`
+          label: loc`Apply flat-footed: ${attackTradeoffProof(m.flags.spycraft2).source} miss${m.flags.spycraft2.rollCombat?.round ? loc` in round ${m.flags.spycraft2.rollCombat.round}` : ""}`
         }));
     if (game.user.isGM)
       for (const r of attackDamageUseRows(actor.system).filter(r => !r.receiptUuid))

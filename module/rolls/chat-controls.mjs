@@ -12,7 +12,7 @@
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { automaticSkillSuccessSources, cunningPlanCheck, manualAdjustmentSource } from "../rules/class-checks.mjs";
 import { rerollEligibility } from "../rules/limited-uses.mjs";
-import { checkCandidates } from "../rules/outcomes.mjs";
+import { checkCandidates, viewerFlavor } from "../rules/outcomes.mjs";
 import { loc } from "../i18n.mjs";
 
 /** The viewer rolled this check (or is the GC) and it carries a result. */
@@ -162,6 +162,10 @@ function row(controls) {
 export function renderCheckControls(message, html) {
   const check = message.flags?.spycraft2;
   if (!check?.actorUuid || (message.blind && !game.user.isGM)) return;
+  // Posted in another language: show this viewer the record's notes in their own.
+  const translated = viewerFlavor(check, game.i18n?.lang);
+  const flavor = translated ? html.querySelector(".flavor-text") : null;
+  if (flavor) flavor.innerHTML = translated;
   const actor = fromUuidSync(check.actorUuid);
   if (!actor?.isOwner) return;
   const controls = rollPipeline.chatControls({ message, check, actor, user: game.user, checkKind: check.checkKind });

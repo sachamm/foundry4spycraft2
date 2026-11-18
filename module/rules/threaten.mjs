@@ -1,5 +1,5 @@
 import { validOwnCountClock } from "./own-count-duration.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Threaten p.361 is a combat action, separate from Coercion/Domination pp.134–135. */
 export function threatenSkillChecks(key, checks = []) {
@@ -190,4 +190,39 @@ rollPipeline.register({
   order: 5050,
   kinds: ["skill"],
   skillChecks: ({ skillKey }, checks) => threatenSkillChecks(skillKey, checks)
+});
+
+// A Threaten action, in a skill check's plan.
+rollPipeline.register({
+  id: "threatenSkillTerm",
+  kinds: ["skill"],
+  order: 9300,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      threatenOpponentName = "",
+      threatenOpponentConfirmed = false,
+      threatenContextConfirmed = false,
+      threatenDistanceFeet = null,
+      threatenVitalityLoss = 0,
+      threatenWoundLoss = 0,
+      threatenInjuryFromYourAttacksConfirmed = false,
+      threatenIncomingLegalConfirmed = false,
+      threatenWeaponId = "",
+      threatenCombat = null
+    } = input;
+    const plan = threatenCheckPlan(system, skillKey, check, {
+      method,
+      threatenOpponentName,
+      threatenOpponentConfirmed,
+      threatenContextConfirmed,
+      threatenDistanceFeet,
+      threatenVitalityLoss,
+      threatenWoundLoss,
+      threatenInjuryFromYourAttacksConfirmed,
+      threatenIncomingLegalConfirmed,
+      threatenWeaponId,
+      threatenCombat
+    });
+    return skillPlanTerm("threaten", plan, { noteAt: 190, blockAt: 170, bonusAt: 40 });
+  }
 });

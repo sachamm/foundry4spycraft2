@@ -146,7 +146,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     if (this.filters.acquisitionSource && !freeSources.some(source => source.id === this.filters.acquisitionSource))
       this.filters.acquisitionSource = "";
     const acquisitionSources = Object.fromEntries([
-      ["", "Career/origin/other feat choice"],
+      ["", loc`Career/origin/other feat choice`],
       ...freeSources.map(source => [source.id, source.label])
     ]);
     let groups = {};

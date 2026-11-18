@@ -1,15 +1,14 @@
 import { markDamagePlan } from "./marks.mjs";
 import { reachWeaponPlan } from "./reach-weapon.mjs";
 import { meleeArmorPiercingPlan } from "./melee-armor-piercing.mjs";
-import { grantedMeleeQuality, meleeTrickPlan } from "./melee-tricks.mjs";
-import { bullseyePlan } from "./bullseye.mjs";
-import { meleeTradeoffPlan } from "./melee-tradeoff.mjs";
+import { grantedMeleeQuality } from "./melee-tricks.mjs";
+import "./bullseye.mjs";
+import "./melee-tradeoff.mjs";
 import { combatStanceState } from "./combat-stance.mjs";
-import { sideStanceAttackPlan } from "./side-stance.mjs";
-import { feintAttackBonusPlan, feintAttackTarget } from "./feint-bonus.mjs";
+import "./side-stance.mjs";
+import "./feint-bonus.mjs";
 import { missTrickSources } from "./miss-tricks.mjs";
-import { cheapShotPenalty } from "./cheap-shot-effects.mjs";
-import { cheapShotPlan } from "./cheap-shot.mjs";
+import "./cheap-shot.mjs";
 import { disarmResponsePlan } from "./disarm-response.mjs";
 import { quirkyWeaponPlan } from "./quirky-weapon.mjs";
 import { superiorAccuracyWeaponPlan } from "./superior-accuracy-weapon.mjs";
@@ -17,9 +16,9 @@ import { weaponDamageExpression } from "./weapon-damage-expression.mjs";
 import { trainedOnlyWeaponPlan } from "./trained-only-weapon.mjs";
 import { accurizedWeaponPlan } from "./accurized-weapon.mjs";
 import { managedClassGearGrant } from "./class-gear.mjs";
-import { cleaveAttackPlan } from "./cleave.mjs";
+import "./cleave.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
-import { finesseThreatIncrease, finesseWeaponPlan, massiveWeaponPlan } from "./finesse.mjs";
+import { finesseWeaponPlan, massiveWeaponPlan } from "./finesse.mjs";
 import { cqbRangePlan, meleeFirePlan } from "./cqb.mjs";
 import { disarmAttackPlan } from "./disarm.mjs";
 import { twoWeaponStyleState, twoWeaponHandgunWaiver } from "./two-weapon-state.mjs";
@@ -27,9 +26,9 @@ import { armorTrainingAdjustments } from "./armor-training.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { attributeActionBlock, conditionRollPenalties, conditionAbilityPenalty } from "./attributes.mjs";
 import { resistanceType } from "./resistances.mjs";
-import { gameHunterAttack, flankingAttackEffects } from "./class-checks.mjs";
+import "./class-checks.mjs";
 import { ambientLightPlan, fogSmokePlan, sensoryAttackConditionPlan } from "./senses.mjs";
-import { sniperAttackEffects } from "./sniper.mjs";
+import "./sniper.mjs";
 import {
   firearmContext,
   rangedAttackContext,
@@ -39,7 +38,8 @@ import {
   mortarOperationPlan
 } from "./firearms.mjs";
 import { specialistApplies } from "./weapon-specialist.mjs";
-import { planTotal } from "./roll-pipeline.mjs";
+import "./combat-actions.mjs";
+import { planTerms, planTotal } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Actual equipment category, separate from the pick used to acquire it. Legacy typed items have known categories. */
 export function equipmentCategory(item) {
@@ -315,8 +315,6 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     );
   const meleeArmorPiercing = meleeArmorPiercingPlan(system, weapon, { grip });
   const twoWeaponWaiver = twoWeaponHandgunWaiver(system, weapon);
-  const finesseThreat = finesseThreatIncrease(system, weapon);
-  const cleave = cleaveAttackPlan(system, weapon, options.characterTarget);
   const projectile = projectileContext(weapon, options.ammunition),
     unavailable =
       (dartingStyleState(system).needsReview ? dartingStyleState(system).reason : "") ||
@@ -379,10 +377,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     reachReview = error.message;
   }
   const firing = firearmContext(system, weapon, { ...options, recoilStrengthIncrease: stance.recoilStrengthIncrease });
-  const flanking = flankingAttackEffects(system, weapon, options),
-    gameHunter = gameHunterAttack(system, options),
-    sniper = sniperAttackEffects(system, weapon, options),
-    light = ambientLightPlan(system, options),
+  const light = ambientLightPlan(system, options),
     fogSmoke = fogSmokePlan(system, options);
   const rangeEffects = weaponRangeEffects(system, weapon, {
     firearm: firing.firearm,
@@ -393,7 +388,6 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       ? 0
       : rangeEffects.increment;
   const meleeFire = meleeFirePlan(system, weapon, options);
-  const cqbRange = cqbRangePlan(system, weapon, options);
   const disarm = (options.disarm?.role === "defender" ? disarmResponsePlan : disarmAttackPlan)(system, weapon, {
     grip,
     trained,
@@ -401,127 +395,23 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     action: stance.attackAction,
     context: options.disarm
   });
-  let meleeTradeoff = null,
-    meleeTradeoffReview = "";
-  try {
-    const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
-    if (manual && options.allOutTargetName?.trim() && manual.name !== options.allOutTargetName.trim())
-      throw Error(loc`Use the same named target for this attack’s classification and All-out Attack.`);
-    meleeTradeoff = meleeTradeoffPlan(system, weapon, {
-      penalty: options.allOutPenalty ?? 0,
-      ranged,
-      defensive: options.disarm?.role === "defender",
-      targetUuid: feintAttackTarget(options),
-      targetName: manual?.name ?? options.allOutTargetName ?? "",
-      targetConfirmed: !!manual || options.allOutTargetConfirmed === true
-    });
-  } catch (error) {
-    meleeTradeoffReview = error.message;
-  }
-  let bullseye = null,
-    bullseyeReview = "";
-  try {
-    const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
-    if (manual && options.bullseyeTargetName?.trim() && manual.name !== options.bullseyeTargetName.trim())
-      throw Error(loc`Use the same named target for this attack’s classification and Bullseye.`);
-    bullseye = bullseyePlan(system, weapon, {
-      sourceWeapon,
-      penalty: options.bullseyePenalty ?? 0,
-      ranged,
-      trained,
-      action: stance.attackAction,
-      firing,
-      grip,
-      aimBrace: stance,
-      stableSurface: options.stableSurface === true || launcherOperation.usingIntegralTripod === true,
-      singleShotConfirmed: options.bullseyeSingleShotConfirmed,
-      targetUuid: feintAttackTarget(options),
-      targetName: manual?.name ?? options.bullseyeTargetName ?? "",
-      targetConfirmed: !!manual || options.bullseyeTargetConfirmed === true,
-      ammunition: options.ammunition ?? null,
-      disarm: !!options.disarm
-    });
-  } catch (error) {
-    bullseyeReview = error.message;
-  }
-  let meleeTrick = null,
-    meleeTrickReview = "";
-  try {
-    if (options.meleeTrick && options.meleeFeatTrick && options.meleeFeatTrick !== options.meleeTrick)
-      throw Error(loc`Only one Melee/Unarmed Combat feat trick may apply to this action.`);
-    const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
-    if (manual && options.meleeTrickTargetName?.trim() && manual.name !== options.meleeTrickTargetName.trim())
-      throw Error(loc`Use the same named target for this attack and melee trick.`);
-    meleeTrick = meleeTrickPlan(system, sourceWeapon, {
-      trick: options.meleeTrick,
-      ranged,
-      action: stance.attackAction,
-      fullActionConfirmed: options.meleeTrickFullActionConfirmed,
-      onlyFeatTrickConfirmed: options.meleeTrickOnlyConfirmed,
-      freeFinalAttack: options.freeFinalAttack === true,
-      disarm: !!options.disarm,
-      targetUuid: feintAttackTarget(options),
-      targetName: manual?.name ?? options.meleeTrickTargetName ?? "",
-      targetConfirmed: !!manual || options.meleeTrickTargetConfirmed === true,
-      grip,
-      spearChargeMovement: {
-        distanceFeet: options.spearChargeDistanceFeet,
-        towardFeet: options.spearChargeTowardFeet,
-        routeConfirmed: options.spearChargeRouteConfirmed,
-        movementCompleted: options.spearChargeMovementCompleted,
-        combat: options.spearChargeCombat
-      },
-      fendTiming: options.fendTiming
-    });
-    if (meleeTrick && meleeTradeoff && meleeTrick.targetUuid !== meleeTradeoff.targetUuid)
-      throw Error(loc`Use the same actual target for this melee feat trick and All-out Attack.`);
-  } catch (error) {
-    meleeTrickReview = error.message;
-  }
-  const cheapShot = cheapShotPlan(system, weapon, {
-    action: stance.attackAction,
+  // Feat and class parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
+  const terms = planTerms("attack", {
+    system,
+    weapon,
+    sourceWeapon,
+    options,
+    actorType: type,
+    ability,
+    trained,
     ranged,
-    context: options.cheapShot,
-    combat: options.cheapShotCombat,
-    freeFinalAttack: options.freeFinalAttack === true,
-    disarm: !!options.disarm,
-    fireMode: firing.firearm ? firing.fireMode : null
+    grip,
+    stance,
+    firing,
+    stableSurface: options.stableSurface === true || launcherOperation.usingIntegralTripod === true
   });
-  let feintBonus,
-    feintBonusReview = "";
-  try {
-    feintBonus = feintAttackBonusPlan(system, {
-      targetUuid: feintAttackTarget(options),
-      combat: options.cheapShotCombat,
-      proof: options.feintBonusProof,
-      defensive: options.disarm?.role === "defender"
-    });
-  } catch (error) {
-    feintBonusReview = error.message;
-    feintBonus = {
-      version: 1,
-      targetUuid: feintAttackTarget(options),
-      combatId: options.cheapShotCombat?.id ?? null,
-      attackRound: options.cheapShotCombat?.round ?? null,
-      sourceMessages: [],
-      attackBonus: 0
-    };
-  }
-  let sideStance,
-    sideStanceReview = "";
-  try {
-    sideStance = sideStanceAttackPlan(system, {
-      targetUuid: feintAttackTarget(options),
-      proof: options.sideStanceProof,
-      defensive: options.disarm?.role === "defender",
-      ranged
-    });
-  } catch (error) {
-    sideStanceReview = error.message;
-    sideStance = { version: 1, stanceId: null, targetUuid: feintAttackTarget(options), sourceMessages: [], dice: 0 };
-  }
   const originalError =
-      cheapShot.errorIncrease +
+      terms.sum("error") +
       meleeFire.errorIncrease +
       disarm.errorIncrease +
       range.error +
@@ -543,27 +433,172 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       .match(/INA\s*\(([+-]?\d+)\)/)?.[1] ?? 0
   );
   const improvisedPenalty = weapon.improvised && !system.activeFeatNames?.includes("Improvised Weapon Basics") ? -2 : 0;
+  // Whether the attack can be made, and the first reason it cannot: the weapon's own checks and the terms', in order.
+  const blocks = terms
+    .merge("blocked", [
+      [10, { blocked: !!reachReview, reason: reachReview }],
+      [20, { blocked: !!reach?.blocked, reason: reach?.blockedReason }],
+      [30, { blocked: !!meleeArmorPiercing.blockedReason, reason: meleeArmorPiercing.blockedReason }],
+      [100, { blocked: !!weaponQualityReview, reason: weaponQualityReview }],
+      [110, { blocked: !!trainedOnly?.blocked, reason: trainedOnly?.blockedReason }],
+      [120, { blocked: !!disarm.blocked, reason: disarm.reason }],
+      [130, { blocked: !!mortarOperation.blocked, reason: mortarOperation.reason }],
+      [140, { blocked: !!launcherOperation.blocked, reason: launcherOperation.reason }],
+      [160, { blocked: !!operation.blocked, reason: operation.reason }],
+      [170, { blocked: !!unavailable, reason: unavailable }],
+      [180, { blocked: !!grip.blocked, reason: grip.reason }],
+      [190, { blocked: !!firing.blocked, reason: firing.reason }],
+      [200, { blocked: !!distance.rangeBlocked, reason: distance.rangeReason }],
+      [210, { blocked: !!stance.blocked, reason: stance.reason }]
+    ])
+    .map(item => (typeof item === "string" ? { blocked: true, reason: item } : item));
+  const stanceKey = combatStanceState(system)?.key,
+    attacking = !ranged && options.disarm?.role !== "defender";
+  const notes = terms.merge("notes", [
+    [10, reach?.notes ?? []],
+    [20, meleeArmorPiercing.notes],
+    [
+      30,
+      attacking && stanceKey === "menacing"
+        ? loc`Menacing Stance: on a successful melee hit, record its separate fixed 2 stress component through Stance damage (p.176).`
+        : ""
+    ],
+    [
+      40,
+      attacking && stanceKey === "circling"
+        ? loc`Circling Stance: with an empty square next to you, this target’s dodge bonus to Defense is halved (rounded up) against this melee attack; select yourself in the target’s Incoming attack preview. Following this attack you automatically move into an unoccupied adjacent square of your choice (p.179).`
+        : ""
+    ],
+    [
+      80,
+      stanceKey === "gripping" && !ranged && grip.required === 2 && grip.hands === 1
+        ? loc`Gripping Stance: using this two-handed weapon with one hand; attack penalty −2 (p.179).`
+        : ""
+    ],
+    [
+      120,
+      quirky?.quirky && !quirky.trained
+        ? loc`Quirky (QKY): base untrained attack penalty ${quirky.baseUntrainedPenalty}, additional −4, total ${quirky.attackPenalty} (p.302).`
+        : ""
+    ],
+    [
+      130,
+      superiorAccuracy?.threatIncrease
+        ? loc`Superior Accuracy (SPA): trained, aimed and braced attack, threat range +1 (p.302).`
+        : ""
+    ],
+    [
+      140,
+      trainedOnly?.evidence.trainedOnly
+        ? loc`Trained Only (TRO): this attack requires its actual operating proficiency (p.302).`
+        : ""
+    ],
+    [150, accurized?.threatIncrease ? loc`Accurized (ACC): trained and aimed attack, threat range +1 (p.301).` : ""],
+    [
+      170,
+      dartingStyleState(system).active
+        ? loc`Darting Weapon: attack/skill penalty −${dartingStyleState(system).penalty}.`
+        : ""
+    ],
+    [180, massive.notes],
+    [
+      190,
+      finesseBasic.granted
+        ? loc`Finesse Basics: optional FIN quality granted; trained use may choose Dexterity damage (p.178).`
+        : ""
+    ],
+    [210, meleeFire.notes],
+    [230, disarm.notes],
+    [
+      240,
+      twoWeaponStyleState(system).active
+        ? loc`Two-weapon style: base attack penalty −${twoWeaponStyleState(system).penalty}.`
+        : ""
+    ],
+    [250, twoWeaponWaiver ? loc`Both Guns Blazing: two-weapon handgun penalty −${twoWeaponWaiver} waived (p.84).` : ""],
+    [260, pinnedTargetBonus ? loc`Pinned target: adjacent unarmed/melee attack +4 (p.342).` : ""],
+    [270, conditionRollPenalties(system).sprawled ? "Sprawled: attack checks −2 (p.342)." : ""],
+    [280, !ranged && conditionRollPenalties(system).prone ? "Prone: melee attack −2 (p.342)." : ""],
+    [
+      290,
+      targetPosturePenalty
+        ? loc`Posture target modifier: non-adjacent ranged attack ${targetPosturePenalty} (pp.340,342).`
+        : ""
+    ],
+    [300, conditionAbilityPenalty(system, ability) ? loc`Drunk: Dexterity-/Wisdom-based attack check −2 (p.341).` : ""],
+    [310, sensoryConditions.notes],
+    [320, conditionRollPenalties(system).sickened ? "Sickened: attack checks −2." : ""],
+    [
+      330,
+      distance.rangePenaltyPerIncrement === 3
+        ? loc`Mortar/rocket launcher range penalty: −3 per increment beyond the first (p.315).`
+        : ""
+    ],
+    [
+      340,
+      distance.improvedVisionReduction
+        ? loc`Improved vision: range penalty ${distance.rangePenaltyBase} → ${distance.rangePenalty}, minimum 0 (p.448).`
+        : ""
+    ],
+    [
+      350,
+      distance.sensoryTarget?.nightTrainingException
+        ? loc`Night Training: not considered blinded when targeting this character within 10 ft. while able to hear.`
+        : ""
+    ],
+    [380, mortarOperation.notes],
+    [390, launcherOperation.notes],
+    [400, light.notes],
+    [410, fogSmoke.notes],
+    [430, operation.notes],
+    [440, rangeEffects.notes],
+    [450, stance.notes],
+    [
+      460,
+      /\bCLS\b/.test(weapon.qualities ?? "") && weapon.stockExtended
+        ? loc`Stock extended: recoil –2; observers gain +2 Notice/Search to spot this weapon.`
+        : ""
+    ],
+    [
+      470,
+      distance.rangeKnown
+        ? loc`Distance ${distance.distanceFeet} ft.; increment ${distance.rangeIncrement} ft.; range penalty ${distance.rangePenalty}; maximum ${distance.maximumRange} ft.`
+        : effectiveRange > 0
+          ? loc`Range not measured; this quick roll has no distance modifier.`
+          : ""
+    ],
+    [480, !trained ? loc`Untrained attack: Initiative Count –4; apply in combat.` : ""],
+    [
+      490,
+      firing.firearm
+        ? loc`${firing.fireModeLabel}; recoil ${firing.recoil} vs Strength ${firing.recoilStrength}: ${firing.recoilPenalty} attack.`
+        : ""
+    ],
+    [500, firing.legacyModeReview ? loc`Review this imported weapon’s fire-mode category.` : ""],
+    [
+      510,
+      projectile.name
+        ? `Ammunition: ${projectile.name}; error modifier ${projectile.error >= 0 ? "+" : ""}${projectile.error}.`
+        : ""
+    ],
+    [520, grip.initiativeLoss ? loc`Initiative Count –${grip.initiativeLoss} per attack; apply in combat.` : ""],
+    [530, weapon.improvised ? loc`Any error destroys the improvised weapon.` : ""]
+  ]);
   return {
     reach: reach?.evidence ?? null,
     meleeArmorPiercing,
-    meleeTrick,
-    bullseye,
-    meleeTradeoff,
-    sideStance,
-    feintBonus,
+    ...terms.plans,
     missTrickSources: missTrickSources(system, weapon, { grip, combat: options.cheapShotCombat, ranged }),
-    cheapShot,
     quirky,
     superiorAccuracy,
     trainedOnly: trainedOnly?.evidence ?? null,
     accurized,
-    cleave,
     finesseBasic,
-    effectiveQualities: grantedMeleeQuality(meleeArmorPiercing.effectiveQualities, meleeTrick?.grantedQuality),
+    effectiveQualities: terms
+      .all("grantedQuality")
+      .reduce((qualities, quality) => grantedMeleeQuality(qualities, quality), meleeArmorPiercing.effectiveQualities),
     massive,
-    finesseThreatIncrease: finesseThreat,
     meleeFire,
-    cqbRange,
     disarm,
     twoWeaponWaiver,
     pinnedTargetBonus,
@@ -587,55 +622,10 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     stance,
     ranged,
     operation,
-    sniper,
-    gameHunter,
-    flanking,
     ambientLight: light,
     fogSmoke,
-    blocked:
-      !!reachReview ||
-      reach?.blocked ||
-      !!meleeArmorPiercing.blockedReason ||
-      !!meleeTrickReview ||
-      !!bullseyeReview ||
-      !!meleeTradeoffReview ||
-      !!sideStanceReview ||
-      !!feintBonusReview ||
-      cheapShot.blocked ||
-      !!weaponQualityReview ||
-      trainedOnly?.blocked ||
-      disarm.blocked ||
-      mortarOperation.blocked ||
-      launcherOperation.blocked ||
-      flanking.blocked ||
-      operation.blocked ||
-      !!unavailable ||
-      grip.blocked ||
-      firing.blocked ||
-      distance.rangeBlocked ||
-      stance.blocked,
-    reason:
-      reachReview ||
-      reach?.blockedReason ||
-      meleeArmorPiercing.blockedReason ||
-      meleeTrickReview ||
-      bullseyeReview ||
-      meleeTradeoffReview ||
-      sideStanceReview ||
-      feintBonusReview ||
-      cheapShot.reason ||
-      weaponQualityReview ||
-      trainedOnly?.blockedReason ||
-      disarm.reason ||
-      mortarOperation.reason ||
-      launcherOperation.reason ||
-      flanking.reason ||
-      operation.reason ||
-      unavailable ||
-      grip.reason ||
-      firing.reason ||
-      distance.rangeReason ||
-      stance.reason,
+    blocked: blocks.some(item => item.blocked),
+    reason: blocks.map(item => item.reason).find(Boolean),
     grip,
     improvisedPenalty,
     conditionAttackPenalty:
@@ -643,188 +633,47 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       twoWeaponWaiver +
       (!ranged ? conditionRollPenalties(system).meleeAttack : 0) +
       conditionAbilityPenalty(system, ability),
-    // The attack bonus as labelled parts; plan-stage roll contributors add theirs (module/rules/roll-pipeline.mjs).
-    ...planTotal("attack", { system, weapon, options, actorType: type }, [
-      [loc`Reach weapon`, reach?.evidence.attackPenalty ?? 0],
-      [loc`Melee trick`, meleeTrick?.attackBonus ?? 0],
-      [loc`Bullseye`, bullseye?.attackPenalty ?? 0],
-      [loc`Melee trade-off`, meleeTradeoff?.attackPenalty ?? 0],
-      [loc`Feint`, feintBonus.attackBonus],
-      [loc`Cheap Shot received`, cheapShotPenalty(system, ability)],
-      [loc`Cheap Shot`, cheapShot.attackBonus],
-      [loc`Firing in melee`, meleeFire.attackPenalty],
-      [loc`Close quarters range`, cqbRange.attackBonus],
-      [loc`Disarm`, disarm.attackBonus],
-      [loc`Pinned target`, pinnedTargetBonus],
-      [loc`Target posture`, targetPosturePenalty],
-      [loc`Conditions and two-weapon fighting`, conditionRollPenalties(system).attack + twoWeaponWaiver],
-      [loc`Conditions (melee)`, !ranged ? conditionRollPenalties(system).meleeAttack : 0],
-      [loc`Condition ability penalty`, conditionAbilityPenalty(system, ability)],
-      [loc`Base attack bonus`, system.bab ?? 0],
-      [loc`Attribute`, system.abilities[ability]?.mod ?? 0],
-      [loc`Forte`, forte],
-      [loc`Size`, system.sizeModifier ?? 0],
-      [loc`Quirky weapon`, quirky?.attackPenalty ?? 0],
-      [loc`Inaccurate weapon`, inaccurate],
-      [loc`Grip`, grip.attackPenalty],
-      [loc`Massive weapon`, massive.attackPenalty],
-      [loc`Improvised weapon`, improvisedPenalty],
-      [loc`Recoil`, firing.recoilPenalty],
-      [loc`Range`, distance.rangePenalty],
-      [loc`Aim`, stance.aimBonus],
-      [loc`Brace`, stance.braceBonus],
-      [loc`Sniper`, sniper.attackBonus],
-      [loc`Flanking`, flanking.attackBonus]
-    ]),
-    error: Math.max(
-      0,
-      reducedError - (specialistApplies(system, weapon, "No Worries") ? 2 : 0) - sniper.errorReduction
+    // The attack bonus as labelled parts; the terms' rows sit among the weapon's own, and plan-stage roll
+    // contributors add theirs (module/rules/roll-pipeline.mjs).
+    ...planTotal(
+      "attack",
+      { system, weapon, options, actorType: type },
+      terms.merge("rows", [
+        [10, [loc`Reach weapon`, reach?.evidence.attackPenalty ?? 0]],
+        [80, [loc`Firing in melee`, meleeFire.attackPenalty]],
+        [100, [loc`Disarm`, disarm.attackBonus]],
+        [110, [loc`Pinned target`, pinnedTargetBonus]],
+        [120, [loc`Target posture`, targetPosturePenalty]],
+        [130, [loc`Conditions and two-weapon fighting`, conditionRollPenalties(system).attack + twoWeaponWaiver]],
+        [140, [loc`Conditions (melee)`, !ranged ? conditionRollPenalties(system).meleeAttack : 0]],
+        [150, [loc`Condition ability penalty`, conditionAbilityPenalty(system, ability)]],
+        [160, [loc`Base attack bonus`, system.bab ?? 0]],
+        [170, [loc`Attribute`, system.abilities[ability]?.mod ?? 0]],
+        [180, [loc`Forte`, forte]],
+        [190, [loc`Size`, system.sizeModifier ?? 0]],
+        [200, [loc`Quirky weapon`, quirky?.attackPenalty ?? 0]],
+        [210, [loc`Inaccurate weapon`, inaccurate]],
+        [220, [loc`Grip`, grip.attackPenalty]],
+        [230, [loc`Massive weapon`, massive.attackPenalty]],
+        [240, [loc`Improvised weapon`, improvisedPenalty]],
+        [250, [loc`Recoil`, firing.recoilPenalty]],
+        [260, [loc`Range`, distance.rangePenalty]],
+        [270, [loc`Aim`, stance.aimBonus]],
+        [280, [loc`Brace`, stance.braceBonus]]
+      ])
     ),
+    error: Math.max(0, reducedError - terms.sum("errorReduction")),
     threat: range.threat
       ? Math.max(
           1,
           range.threat -
-            (meleeTrick?.threatIncrease ?? 0) -
             (superiorAccuracy?.threatIncrease ?? 0) -
             (accurized?.threatIncrease ?? 0) -
-            cqbRange.threatIncrease -
             stance.threatIncrease -
-            sniper.threatIncrease -
-            gameHunter.threatIncrease -
-            flanking.threatIncrease -
-            finesseThreat -
-            cleave.threatIncrease
+            terms.sum("threat")
         )
       : 0,
-    notes: [
-      ...(reach?.notes ?? []),
-      ...meleeArmorPiercing.notes,
-      ...(!ranged && options.disarm?.role !== "defender" && combatStanceState(system)?.key === "menacing"
-        ? [
-            loc`Menacing Stance: on a successful melee hit, record its separate fixed 2 stress component through Stance damage (p.176).`
-          ]
-        : []),
-      ...(!ranged && options.disarm?.role !== "defender" && combatStanceState(system)?.key === "circling"
-        ? [
-            loc`Circling Stance: with an empty square next to you, this target’s dodge bonus to Defense is halved (rounded up) against this melee attack; select yourself in the target’s Incoming attack preview. Following this attack you automatically move into an unoccupied adjacent square of your choice (p.179).`
-          ]
-        : []),
-      ...(meleeTrick
-        ? [
-            meleeTrick.key === "betweenRibs"
-              ? loc`Between the Ribs: full-action Standard Attack with this readied knife. A hit inflicts 1 die of sneak attack damage: roll damage from this recorded hit and include its sneak attack die. The general sneak attack conditions still apply (p.179).`
-              : meleeTrick.key === "threadNeedle"
-                ? loc`Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond5ft ends this hold (p.180).`
-                : meleeTrick.key === "fend"
-                  ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
-                  : loc` ${meleeTrick.source}: full-action Standard Attack; ${meleeTrick.attackBonus >= 0 ? "+" : ""}${meleeTrick.attackBonus} attack, +${meleeTrick.damageBonus} recorded-hit damage${meleeTrick.threatIncrease ? `, +${meleeTrick.threatIncrease} threat range` : ""}${meleeTrick.grantedQuality ? ", takedown quality" : ""} (pp.176,179).`
-          ]
-        : []),
-      ...(bullseye
-        ? [
-            loc`Bullseye: single-shot ranged Standard Attack −${bullseye.penalty}, this attack’s damage +${bullseye.damageBonus}; a miss makes you flat-footed (p.180).`
-          ]
-        : []),
-      ...(meleeTradeoff
-        ? [
-            loc`All-out Attack: attack −${meleeTradeoff.penalty}, this attack’s damage +${meleeTradeoff.damageBonus}; a miss makes you flat-footed (p.176).`
-          ]
-        : []),
-      ...(combatStanceState(system)?.key === "gripping" && !ranged && grip.required === 2 && grip.hands === 1
-        ? [loc`Gripping Stance: using this two-handed weapon with one hand; attack penalty −2 (p.179).`]
-        : []),
-      ...(sideStance.dice
-        ? [
-            loc`Side Stance: the next attack against a successfully Feinted opponent uses the one pending sneak die; it is spent even if this attack misses. Apply it only with a qualifying successful Standard Attack’s damage (pp.178,339).`
-          ]
-        : []),
-      ...(feintBonus.attackBonus ? [loc`Feint: +2 with this next attack against the recorded opponent (p.357).`] : []),
-      ...cheapShot.notes,
-      ...(quirky?.quirky && !quirky.trained
-        ? [
-            loc`Quirky (QKY): base untrained attack penalty ${quirky.baseUntrainedPenalty}, additional −4, total ${quirky.attackPenalty} (p.302).`
-          ]
-        : []),
-      ...(superiorAccuracy?.threatIncrease
-        ? [loc`Superior Accuracy (SPA): trained, aimed and braced attack, threat range +1 (p.302).`]
-        : []),
-      ...(trainedOnly?.evidence.trainedOnly
-        ? [loc`Trained Only (TRO): this attack requires its actual operating proficiency (p.302).`]
-        : []),
-      ...(accurized?.threatIncrease ? [loc`Accurized (ACC): trained and aimed attack, threat range +1 (p.301).`] : []),
-      ...(cleave.threatIncrease
-        ? [loc`Cleave Mastery: melee threat range +1 against this confirmed standard character (p.177).`]
-        : []),
-      ...(dartingStyleState(system).active
-        ? [loc`Darting Weapon: attack/skill penalty −${dartingStyleState(system).penalty}.`]
-        : []),
-      ...massive.notes,
-      ...(finesseBasic.granted
-        ? [loc`Finesse Basics: optional FIN quality granted; trained use may choose Dexterity damage (p.178).`]
-        : []),
-      ...(finesseThreat ? [loc`Finesse feats: melee threat range +${finesseThreat} (p.178).`] : []),
-      ...meleeFire.notes,
-      ...cqbRange.notes,
-      ...disarm.notes,
-      ...(twoWeaponStyleState(system).active
-        ? [loc`Two-weapon style: base attack penalty −${twoWeaponStyleState(system).penalty}.`]
-        : []),
-      ...(twoWeaponWaiver
-        ? [loc`Both Guns Blazing: two-weapon handgun penalty −${twoWeaponWaiver} waived (p.84).`]
-        : []),
-      ...(pinnedTargetBonus ? [loc`Pinned target: adjacent unarmed/melee attack +4 (p.342).`] : []),
-      ...(conditionRollPenalties(system).sprawled ? ["Sprawled: attack checks −2 (p.342)."] : []),
-      ...(!ranged && conditionRollPenalties(system).prone ? ["Prone: melee attack −2 (p.342)."] : []),
-      ...(targetPosturePenalty
-        ? [loc`Posture target modifier: non-adjacent ranged attack ${targetPosturePenalty} (pp.340,342).`]
-        : []),
-      ...(conditionAbilityPenalty(system, ability)
-        ? [loc`Drunk: Dexterity-/Wisdom-based attack check −2 (p.341).`]
-        : []),
-      ...sensoryConditions.notes,
-      ...(conditionRollPenalties(system).sickened ? ["Sickened: attack checks −2."] : []),
-      ...(distance.rangePenaltyPerIncrement === 3
-        ? [loc`Mortar/rocket launcher range penalty: −3 per increment beyond the first (p.315).`]
-        : []),
-      ...(distance.improvedVisionReduction
-        ? [
-            loc`Improved vision: range penalty ${distance.rangePenaltyBase} → ${distance.rangePenalty}, minimum 0 (p.448).`
-          ]
-        : []),
-      ...(distance.sensoryTarget?.nightTrainingException
-        ? [loc`Night Training: not considered blinded when targeting this character within 10 ft. while able to hear.`]
-        : []),
-      ...flanking.notes,
-      ...(gameHunter.threatIncrease ? [loc`Game Hunter: threat range +3 against this animal (p.43).`] : []),
-      ...mortarOperation.notes,
-      ...launcherOperation.notes,
-      ...light.notes,
-      ...fogSmoke.notes,
-      ...sniper.notes,
-      ...operation.notes,
-      ...rangeEffects.notes,
-      ...stance.notes,
-      /\bCLS\b/.test(weapon.qualities ?? "") && weapon.stockExtended
-        ? loc`Stock extended: recoil –2; observers gain +2 Notice/Search to spot this weapon.`
-        : "",
-      distance.rangeKnown
-        ? loc`Distance ${distance.distanceFeet} ft.; increment ${distance.rangeIncrement} ft.; range penalty ${distance.rangePenalty}; maximum ${distance.maximumRange} ft.`
-        : effectiveRange > 0
-          ? loc`Range not measured; this quick roll has no distance modifier.`
-          : "",
-      !trained ? loc`Untrained attack: Initiative Count –4; apply in combat.` : "",
-      firing.firearm
-        ? loc`${firing.fireModeLabel}; recoil ${firing.recoil} vs Strength ${firing.recoilStrength}: ${firing.recoilPenalty} attack.`
-        : "",
-      firing.legacyModeReview ? loc`Review this imported weapon’s fire-mode category.` : "",
-      projectile.name
-        ? `Ammunition: ${projectile.name}; error modifier ${projectile.error >= 0 ? "+" : ""}${projectile.error}.`
-        : "",
-      grip.initiativeLoss ? loc`Initiative Count –${grip.initiativeLoss} per attack; apply in combat.` : "",
-      weapon.improvised ? loc`Any error destroys the improvised weapon.` : ""
-    ]
-      .filter(Boolean)
-      .join(" "),
+    notes: notes.join(" "),
     range: effectiveRange
   };
 }

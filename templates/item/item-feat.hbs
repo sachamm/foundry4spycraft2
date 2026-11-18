@@ -22,6 +22,12 @@
     <p>{{localize "SPYCRAFT.Template.ItemItemFeat.RecordThesePointsHereDoNot"}}</p>
     {{#each trainingSkills}}<label>{{name}} <input type="number" min="0" max="5" name="system.trainingSkills.{{key}}" value="{{points}}" class="w-2" /></label>{{/each}}
   </details>{{/if}}
+  <fieldset class="feat-reminder">
+    <legend>{{localize "SPYCRAFT.Template.ItemItemFeat.ReminderLegend"}}</legend>
+    <p class="hint">{{localize "SPYCRAFT.Template.ItemItemFeat.ReminderHint"}}</p>
+    <label>{{localize "SPYCRAFT.Template.ItemItemFeat.ReminderRolls"}} <input type="text" name="system.reminder.rolls" value="{{system.reminder.rolls}}" placeholder="attack, skill:sneak, save:will" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemFeat.ReminderText"}} <input type="text" name="system.reminder.text" value="{{system.reminder.text}}" /></label>
+  </fieldset>
   <h3>{{localize "SPYCRAFT.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
   {{> "systems/spycraft2/templates/item/parts/bonuses.hbs"}}

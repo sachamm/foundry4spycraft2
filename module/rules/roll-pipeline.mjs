@@ -14,6 +14,7 @@ import { loc } from "../i18n.mjs";
  *     read(ctx, input),              // return fields to merge into what the player entered (coercion, lookups)
  *     acquire(ctx),                  // return run => … to reserve something before the roll, or nothing
  *     validate(ctx),                 // throw to stop the roll; runs before and after the dice (ctx.phase)
+ *     terms(ctx),                    // return this rule's part of a planned check (see planTerms), or nothing
  *     modifiers(ctx),                // return [{label, value}] added to the roll
  *     stage: 'plan',                 // when `modifiers` applies: 'plan' (part of the previewed total) or 'roll' (default)
  *     flags(ctx),                    // return an object merged into the chat message's check record
@@ -27,7 +28,7 @@ import { loc } from "../i18n.mjs";
  * This module is pure: it knows nothing about Foundry, so it runs under Node tests.
  */
 
-const PHASES = ["skillChecks", "dialog", "read", "acquire", "validate", "modifiers", "flags", "chatControls"];
+const PHASES = ["skillChecks", "dialog", "read", "acquire", "validate", "terms", "modifiers", "flags", "chatControls"];
 
 export class RollPipeline {
   #contributors = [];
@@ -176,6 +177,36 @@ export class RollPipeline {
   }
 
   /**
+   * The parts of a planned check that rules own, in contributor order: [{id, key?, plan?, …}].
+   * A term with a `key` is also stored on `ctx.plans`, so a later contributor can read an earlier one's plan.
+   * What the other fields mean is up to the check that asks (see planTerms).
+   */
+  terms(ctx) {
+    const list = [];
+    if (ctx && !ctx.plans) ctx.plans = {};
+    for (const c of this.#active("terms", ctx)) {
+      const result = c.terms(ctx);
+      if (result === undefined || result === null) continue;
+      for (const term of Array.isArray(result) ? result : [result]) {
+        if (!term || typeof term !== "object" || Array.isArray(term)) {
+          throw new TypeError(loc`Roll contributor "${c.id}": each term must be an object.`);
+        }
+        if (term.key !== undefined && (typeof term.key !== "string" || !term.key)) {
+          throw new TypeError(loc`Roll contributor "${c.id}": a term key must be a non-empty string.`);
+        }
+        if (term.key) {
+          if (Object.hasOwn(ctx.plans, term.key)) {
+            throw new Error(loc`Roll contributor "${c.id}": the term "${term.key}" is already planned.`);
+          }
+          ctx.plans[term.key] = term.plan ?? null;
+        }
+        list.push({ ...term, id: c.id });
+      }
+    }
+    return list;
+  }
+
+  /**
    * Numeric adjustments from contributors: {total, rows: [{id, label, value}]}. Zero-value rows are dropped.
    * `ctx.stage` selects which contributors answer: "plan" while a total is being worked out (so previews and the
    * roll agree), "roll" when the dice are thrown. A contributor belongs to exactly one stage, so nothing counts twice.
@@ -267,4 +298,80 @@ export function planTotal(kind, context, entries, pipeline = rollPipeline) {
   }
   const added = pipeline.modifiers({ ...context, checkKind: kind, stage: "plan" });
   return { total: total + added.total, modifiers: [...modifiers, ...added.rows], planModifiers: added.rows };
+}
+
+/**
+ * Ask every rule for its part of a planned check and fold the answers.
+ *
+ * A term is a plain object. Every field is optional:
+ *
+ *   {
+ *     key: "sniper", plan: {…},     // returned to the caller under `plans.sniper` (evidence, proofs, …)
+ *     at: 420,                      // where its rows, notes and block reason sit among the check's own
+ *     rows: [[label, value]],       // labelled parts of the bonus       (position: rowAt ?? at)
+ *     notes: ["…"],                 // text for the posted check          (position: noteAt ?? at)
+ *     blocked: "reason",            // stops the check; first by position (position: blockAt ?? at)
+ *     threat: 1, error: 1, …        // any number a check sums with `sum(field)`
+ *   }
+ *
+ * @param {string} kind     check kind ("attack", "skill", "save", …)
+ * @param {object} context  the facts a rule may need (system, weapon, options, …)
+ * @returns {{list: object[], plans: object, sum: Function, merge: Function}}
+ */
+export function planTerms(kind, context, pipeline = rollPipeline) {
+  const ctx = { ...context, checkKind: kind, stage: "plan", plans: {} };
+  const list = pipeline.terms(ctx);
+  const position = { rows: "rowAt", notes: "noteAt", segment: "noteAt", blocked: "blockAt", bonuses: "bonusAt" };
+  return {
+    list,
+    plans: ctx.plans,
+    /** The total of a numeric field over every term. */
+    sum: field => list.reduce((total, term) => total + (Number(term[field]) || 0), 0),
+    /** Every term's values of a field, in contributor order (arrays are flattened once). */
+    all: field => list.flatMap(term => (term[field] === undefined || term[field] === null ? [] : term[field])),
+    /**
+     * The check's own positioned items and the terms' items for one list, in position order.
+     * @param {"rows"|"notes"|"blocked"} field
+     * @param {Array<[number, *]>} own  [position, item or items]; ties keep the check's own items first
+     */
+    merge(field, own = []) {
+      const entries = [];
+      for (const [at, value] of own) entries.push({ at, value, sequence: entries.length });
+      for (const term of list) {
+        const value = term[field];
+        if (value === undefined || value === null || value === "" || value === false) continue;
+        entries.push({ at: term[position[field] ?? `${field}At`] ?? term.at ?? 0, value, sequence: entries.length });
+      }
+      entries.sort((a, b) => a.at - b.at || a.sequence - b.sequence);
+      // Rows are [label, value] pairs: a term's list of rows is flattened, a single own pair is not.
+      if (field === "rows")
+        return entries.flatMap(entry =>
+          Array.isArray(entry.value[0]) || !entry.value.length ? entry.value : [entry.value]
+        );
+      return entries
+        .flatMap(entry => entry.value)
+        .filter(item => item !== "" && item !== null && item !== undefined && item !== false);
+    }
+  };
+}
+
+/**
+ * The term of a skill check plan for a rule that answers in the usual shape:
+ * {evidence, bonuses, notes, blockedReason, sizeBonus, synergies}. Its notes become one segment of the check's
+ * note text, followed by a space.
+ * @param {string} key        the field the evidence is returned under
+ * @param {object} plan       what the rule's plan function returned
+ * @param {object} positions  {noteAt, blockAt, bonusAt}: where its notes, block reason and bonuses sit
+ */
+export function skillPlanTerm(key, plan, positions = {}) {
+  return {
+    key,
+    plan: plan.evidence ?? null,
+    bonuses: plan.bonuses ?? [],
+    segment: `${(plan.notes ?? []).join(" ")} `,
+    blocked: plan.blockedReason ?? "",
+    adjustment: plan.sizeBonus ?? 0,
+    synergies: plan.synergies ?? [],
+    ...positions
+  };
 }

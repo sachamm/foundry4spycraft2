@@ -35,6 +35,9 @@ export function buildPacks() {
   const kits = read("kits.json");
   const ammunition = read("ammunition.json");
   const summaries = read("summaries.json");
+  const featReminders = read("feat-reminders.json").feats;
+  for (const name of Object.keys(featReminders))
+    if (!feats.some(f => f.name === name)) throw new Error(`feat-reminders.json names an unknown feat: ${name}`);
   const gear = read("gear.json");
   const vehicles = read("vehicles.json");
   const upgrades = read("upgrades.json");
@@ -115,6 +118,7 @@ export const TABLES = ${JSON.stringify({ ...core.tables, ammunitionCatalog: ammu
 export const CLASS_FEATURES = ${JSON.stringify(Object.fromEntries(classes.filter(c => !c.expert).map(c => [c.key, { name: c.name, classSkills: c.classSkills, choiceLists: c.choiceLists.map(list => ({ ...list, options: list.options.map(option => ({ ...option, description: option.description ?? summaries.classes[c.name]?.options?.[option.name] ?? "" })) })) }])), null, 1)};
 export const GEAR_RULES = ${JSON.stringify({ categories: gear.categories, damageSaves: gear.damageSaves, housings: gear.housings, skillUses: gear.skillUses }, null, 1)};
 export const CONTAGIONS = ${JSON.stringify(contagions.contagions, null, 1)};
+export const FEAT_REMINDERS = ${JSON.stringify(Object.fromEntries(Object.entries(featReminders).map(([name, rolls]) => [name, { rolls: rolls.join(", "), text: summaries.feats[name] ?? "" }])), null, 1)};
 export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damageLocations: vehicles.damageLocations, damagePage: vehicles.damagePage, damageSavePage: vehicles.damageSavePage, tractionSaveBonus: vehicles.tractionSaveBonus, tractionSaveBonusHouseRule: vehicles.tractionSaveBonusHouseRule, qualities: vehicles.qualities, qualitiesPage: vehicles.qualitiesPage, bailOutDC: vehicles.bailOutDC, explosions: vehicles.explosions, accelerationDistance: vehicles.accelerationDistance, signature: vehicles.signature, hazards: vehicles.hazards, smash: vehicles.smash }, null, 1)};
 `;
   generated["module/rules/tables.mjs"] = tablesSrc;
@@ -134,7 +138,8 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
       folder,
       sort,
       ownership: { default: 0 },
-      flags: {},
+      // Feats are recognised by name: keep the English name where a rename or translation cannot reach it.
+      flags: type === "feat" ? { spycraft2: { ruleName: name } } : {},
       _stats: stats
     };
   }
@@ -304,6 +309,9 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
           grantSource: "",
           repeatable: f.repeatable ?? false,
           maxSelections: f.maxSelections ?? 0,
+          reminder: featReminders[f.name]
+            ? { rolls: featReminders[f.name].join(", "), text: summaries.feats[f.name] ?? "" }
+            : { rolls: "", text: "" },
           bonuses: f.bonuses.map(b => ({ level: 0, ...b }))
         },
         featFolder[f.tree],

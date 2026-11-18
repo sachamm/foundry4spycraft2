@@ -131,6 +131,8 @@ export class FeatData extends BaseItemData {
       /** Granted by an origin or class (does not use a feat slot). */
       granted: new BooleanField(),
       grantSource: str(),
+      /** Rolls this feat bears on and the line the roll dialog shows for it (module/rules/feat-reminders.mjs). */
+      reminder: new SchemaField({ rolls: str(), text: str() }),
       bonuses: bonusField()
     };
   }

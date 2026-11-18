@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+Not yet tried in a running Foundry world; see `docs/remaining-work.md` for the checks to make.
+
+- Feat reminders: feats the system does not work out are listed in roll dialogs for the rolls they bear on, and the
+  ones ticked are noted on the check. New feat field `system.reminder`; schema version 2 fills it for feats already
+  in a world.
+- Cooperative skill checks: leader and helper roles, helper DCs and limits, and a tally on the leader's check.
+- Hazards on agents: contagions (disease, poison, radiation) and fire. New agent field `system.hazards`.
+- Combat actions: Burst, Autofire, Strafe, Cover Fire, Suppressive Fire, Pummel, grapple checks and blast damage by
+  distance.
+- Attack dialogs take distance, flanking, adjacency and the target from the scene (client setting, on by default).
+- NPC qualities say what they do on the sheet and apply to statistics and skill checks.
+- Roll pipeline: a `terms` phase; feat, class and save terms registered from their own modules; follow-up dialogs
+  and attack dialog input moved into the pipeline; the roll code split into three files.
+- Translation: feats keep a stored rule name so items can be renamed or translated; more labels tagged; sentences
+  built from pieces merged; a check's notes follow the viewer's language.
+
 ## 0.4.0 — 2026-11-17
 
 - Bundled starter scenes and moved Game Control to the first sidebar tab.

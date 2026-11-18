@@ -73,7 +73,7 @@ export function combatMovementPlan(
   const maximumFeet =
     action === "run" ? rules.runFeet : action === "totalDefense" ? rules.totalDefenseMoveFeet : rules.standardMoveFeet;
   if (distanceFeet > maximumFeet)
-    throw new Error(loc`The declared counted distance exceeds this action’s ` + maximumFeet + loc` ft. allowance.`);
+    throw new Error(loc`The declared counted distance exceeds this action’s ${maximumFeet} ft. allowance.`);
   const turns = turnDegrees.filter(d => d > 0);
   if (action === "run" && (turns.length > rules.maximumRunTurns || turns.some(d => d > rules.maximumRunTurnDegrees)))
     throw new Error(

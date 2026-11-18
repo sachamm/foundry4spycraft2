@@ -189,3 +189,6 @@ rollPipeline.register({
   kinds: ["skill"],
   skillChecks: ({ actor, skillKey }, checks) => restraintSkillChecks(actor.system, skillKey, checks)
 });
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "restraintsRecord", order: 9735, record: ["restraintEscape"] });

@@ -621,7 +621,7 @@ export const ActorOutcomes = Base =>
             next = { ...next, sleepWake: wake };
             await message.update({ "flags.spycraft2.sleepWake": wake });
           } catch (error) {
-            ui.notifications.warn(loc`Awareness outcome recorded; waking needs review or retry: ` + error.message);
+            ui.notifications.warn(loc`Awareness outcome recorded; waking needs review or retry: ${error.message}`);
           }
         }
         return next;
