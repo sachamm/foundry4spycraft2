@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 — 2026-11-17
+
+- Bundled starter scenes and moved Game Control to the first sidebar tab.
 
 - Roll pipeline completed: dialog sections, input coercion, modifier rows with a plan stage, record fields and every
   chat button are contributors, registered from the module that owns each rule. Dialogs and rolls are unchanged.
