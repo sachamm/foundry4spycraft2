@@ -11,7 +11,8 @@
     "validate": "node tools/validate-data.mjs",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.mjs\"",
-    "format:check": "prettier --check \"**/*.mjs\""
+    "format:check": "prettier --check \"**/*.mjs\"",
+    "check:schemas": "node tools/check-schemas.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

@@ -1,4 +1,5 @@
 import { shakenRules } from "./shaken.mjs";
+import { GM_TOKEN_PREFIX, gmLockingActive, lockTable, requestLock } from "./gm-locks.mjs";
 /** v14 native embedded-document uniqueness serializes resource transactions across clients.
  * Uses the authenticated document API and existing ownership, without a privileged socket relay.
  */
@@ -95,6 +96,20 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
       );
     throw new Error(`${actor.name}: the reserved resource-document ID is already used by another item.`);
   }
+  // When the world asks the GC's client to arbitrate, the lock lives in that client's memory and nothing is written
+  // to the character (module/rules/gm-locks.mjs). An unreachable GC falls back to the document lock below.
+  if (gmLockingActive()) {
+    const gmToken = GM_TOKEN_PREFIX + foundry.utils.randomID();
+    const answer = await requestLock("acquire", [lockKey(actor, scope)], gmToken);
+    if (answer.ok) {
+      held.set(lockKey(actor, scope), gmToken);
+      return gmToken;
+    }
+    if (!answer.unreachable)
+      throw new ResourceBusyError(
+        `${actor.name}: a resource transaction is in progress. Retry after it finishes; the GC can recover an interrupted transaction.`
+      );
+  }
   const token = foundry.utils.randomID(),
     data = {
       _id: scope,
@@ -120,6 +135,14 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
   return token;
 }
 async function release(actor, token, scope = RESOURCE_LOCK_ID) {
+  if (String(token).startsWith(GM_TOKEN_PREFIX)) {
+    try {
+      await requestLock("release", [lockKey(actor, scope)], token);
+    } finally {
+      if (held.get(lockKey(actor, scope)) === token) held.delete(lockKey(actor, scope));
+    }
+    return;
+  }
   try {
     const fresh = await readActor(actor),
       lock = fresh.items.get(scope);
@@ -182,6 +205,21 @@ export async function runNativeResourceTransaction(actors, work, { messages = []
 export async function recoverResourceTransaction(actor, { confirmed = false, scope = RESOURCE_LOCK_ID } = {}) {
   if (!game.user.isGM) throw new Error("Only the GC can recover an interrupted resource transaction.");
   if (held.has(lockKey(actor, scope))) throw new Error("This client is still executing that resource transaction.");
+  // A lock arbitrated by this GC's client is simply dropped; there is no document to remove.
+  const arbitrated = lockTable.holder(lockKey(actor, scope));
+  if (arbitrated) {
+    const holder = game.users.get(arbitrated.userId);
+    const agreed =
+      confirmed ||
+      (await foundry.applications.api.DialogV2.confirm({
+        window: { title: "Recover interrupted resource transaction" },
+        rejectClose: false,
+        content: `<p>Check the recorded result and current resources before retrying. Make sure ${foundry.utils.escapeHTML(holder?.name ?? "the original user")} is no longer carrying out this action.</p>`
+      }));
+    if (!agreed) return null;
+    lockTable.clear(lockKey(actor, scope));
+    return ui.notifications.info("The interrupted resource transaction was cleared.");
+  }
   const fresh = await readActor(actor),
     lock = fresh.items.get(scope);
   if (!isResourceLock(lock)) return ui.notifications.info("There is no interrupted resource transaction to recover.");

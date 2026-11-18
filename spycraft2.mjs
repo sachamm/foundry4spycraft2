@@ -4,6 +4,8 @@ import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mj
 import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
 import { rollPipeline } from "./module/rolls/index.mjs";
+import { registerMigrationSettings, runWorldMigrations } from "./module/migrations/index.mjs";
+import { registerGmLocks } from "./module/rules/gm-locks.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
 import {
   startUsagePeriod,
@@ -127,6 +129,8 @@ Hooks.once("init", () => {
     }
   });
   registerGCSettings();
+  registerMigrationSettings();
+  registerGmLocks();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);
@@ -238,6 +242,13 @@ function refreshCombatActorData() {
     }
 }
 Hooks.once("ready", refreshCombatActorData);
+// Bring stored world data up to this build's schema version (module/migrations/index.mjs).
+Hooks.once("ready", () => {
+  runWorldMigrations().catch(error => {
+    console.error("Spycraft 2.0 | World data migration failed", error);
+    ui.notifications?.error("Spycraft 2.0 could not update this world's data. See the console for details.");
+  });
+});
 Hooks.on("updateWorldTime", refreshCombatActorData);
 Hooks.on("updateCombat", (_combat, changed) => {
   if (Object.hasOwn(changed, "round") || Object.hasOwn(changed, "active") || Object.hasOwn(changed, "turn"))
