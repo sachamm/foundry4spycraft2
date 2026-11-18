@@ -1,4 +1,5 @@
 /** NPC loadouts use equipment picks, Common Items and included ammunition as distinct allowances. */
+import { iconPath } from "./compendium-icons.mjs";
 import {
   ammunitionConfiguration,
   ammunitionProfile,
@@ -16,7 +17,7 @@ const esc = value =>
 export function buildNpcLoadout(
   template,
   packs,
-  { id, stats, commonCatalog = [], ammoCatalog = [], type = "standard" }
+  { id, stats, commonCatalog = [], ammoCatalog = [], iconData = null, type = "standard" }
 ) {
   const packName = "core-npcs",
     items = [],
@@ -80,7 +81,7 @@ export function buildNpcLoadout(
       _id: ammoId,
       name: `${ammo.name} ammunition — ${item.name}`,
       type: "gear",
-      img: "icons/svg/item-bag.svg",
+      img: iconData ? iconPath(iconData, iconData.npcAmmunition) : "icons/svg/item-bag.svg",
       folder: null,
       system: {
         description: `<p>${esc(item.name)}: ${esc(ammo.name)}, ${esc(plan.code)}. Each stockpile contains ${plan.shotsPerStockpile} shots. The listed quantity counts stockpiles, not individual shots.</p><p>${baseAmmo} stockpile(s) come with this NPC weapon. Additional stockpiles use the NPC ammunition allowance. Record expenditure through the existing inventory and ammunition workflows.</p>`,
@@ -123,7 +124,7 @@ export function buildNpcLoadout(
       _id: id(packName, template.id, "common", key),
       name: entry.name,
       type: "gear",
-      img: "icons/svg/item-bag.svg",
+      img: iconData ? iconPath(iconData, iconData.npcCommonItems[key]) : "icons/svg/item-bag.svg",
       folder: null,
       system: {
         description: `<p>${esc(entry.description)}</p><p>Common Item selected for this NPC. The GC adjudicates its use; this inventory entry supplies no automatic bonus. Assign its weight if tracking carried load.</p>`,

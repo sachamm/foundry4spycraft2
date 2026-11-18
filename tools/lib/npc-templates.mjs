@@ -9,7 +9,11 @@ const esc = text =>
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-export function buildNpcTemplates(data, packs, { id, stats, skillKeys, commonCatalog = [], ammoCatalog = [] }) {
+export function buildNpcTemplates(
+  data,
+  packs,
+  { id, stats, skillKeys, commonCatalog = [], ammoCatalog = [], iconData = null }
+) {
   const packName = "core-npcs";
   const categories = [...new Set(data.templates.map(template => template.category))];
   const folders = categories.map((name, index) => ({
@@ -53,7 +57,14 @@ export function buildNpcTemplates(data, packs, { id, stats, skillKeys, commonCat
         details: feat.name + (feat.choice ? ` (${feat.choice})` : "")
       }))
     );
-    const loadout = buildNpcLoadout(template, packs, { id, stats, commonCatalog, ammoCatalog, type: "standard" });
+    const loadout = buildNpcLoadout(template, packs, {
+      id,
+      stats,
+      commonCatalog,
+      ammoCatalog,
+      iconData,
+      type: "standard"
+    });
     const items = loadout.items;
     profile.equipment = loadout.equipment;
     profile.extraAmmoPairs = loadout.extraAmmoPairs;
