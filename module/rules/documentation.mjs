@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Superior Documentation p.209: the Bluff bonus requires actually using a cover identity. */
 export function documentationSkillPlan(
   system,
@@ -50,3 +51,12 @@ export function validateDocumentationProof(system, proof, { checkKind, skillKey,
   )
     throw new Error("The Superior Documentation source or declared cover identity changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "documentation",
+  order: 1590,
+  record: ["documentation"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateDocumentationProof(actor.system, options.documentation, { checkKind, skillKey, checkId })
+});

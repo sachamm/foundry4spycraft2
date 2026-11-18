@@ -1,5 +1,6 @@
 import { responseOwnSize } from "./trip.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Ordinary target's on-foot Bull Rush response, p.354; action modifier+0, p.352. */
 export function bullRushDefenseSkillChecks(key, checks = []) {
   if (key !== "athletics") return checks;
@@ -132,3 +133,25 @@ export function validateBullRushDefenseProof(
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error("The Bull Rush response, actual Size or Still Standing source changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "bullRushDefense",
+  order: 1420,
+  record: ["bullRushDefense"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey, ability }) =>
+    validateBullRushDefenseProof(actor.system, options.bullRushDefense, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      ability,
+      attributeSubstitution: options.attributeSubstitution
+    })
+});
+rollPipeline.register({
+  id: "bullRushDefenseChecks",
+  order: 5090,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey }, checks) => bullRushDefenseSkillChecks(skillKey, checks)
+});

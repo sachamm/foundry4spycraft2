@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Current Hide circumstances, p.161; Ghost Supremacy's hiding-place exception, p.195. */
 export function hideCircumstancePlan(
   system,
@@ -107,3 +108,18 @@ export function validateHideCircumstanceProof(
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error("The Hide circumstances or qualified Ghost Supremacy source changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "hideCircumstance",
+  order: 1530,
+  record: ["hideCircumstances"],
+  validate: ({ actor, options, checkKind, checkId, skillKey, ability }) =>
+    validateHideCircumstanceProof(actor.system, options.hideCircumstances, {
+      checkKind,
+      skillKey,
+      checkId,
+      ability,
+      attributeSubstitution: options.attributeSubstitution
+    })
+});

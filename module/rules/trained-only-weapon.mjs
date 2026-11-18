@@ -1,5 +1,6 @@
 import { trainedOnlyAttackPlan } from "./trained-only.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export function trainedOnlyWeaponPlan(
   weapon,
   { trained = false, operatingProficiency = weapon?.proficiency ?? null } = {}
@@ -26,3 +27,16 @@ export function validateTrainedOnlyWeaponProof(actor, proof, context = {}) {
       "The Trained Only weapon quality or actual operating proficiency changed or no longer permits this attack."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "trainedOnlyWeapon",
+  order: 1260,
+  validate: ({ actor, options, checkKind }) =>
+    validateTrainedOnlyWeaponProof(actor, options.attackContext?.trainedOnly, {
+      checkKind,
+      weaponProficiency: options.weaponProficiency,
+      weaponUuid: options.weaponUuid,
+      attackContext: options.attackContext
+    })
+});

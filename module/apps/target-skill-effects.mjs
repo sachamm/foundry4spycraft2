@@ -1,4 +1,5 @@
 import { targetSkillEffectApplicable, targetSkillEffectPlan } from "../rules/target-skill-effects.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const actors = () =>
     Array.isArray(game.actors?.contents)
       ? game.actors.contents
@@ -79,3 +80,11 @@ export function validateTargetSkillEffectProof(proof, { checkKind, skillKey, che
         "The target character, feat source, Charisma, Covert count or information-gathering purpose changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "targetSkillEffect",
+  order: 1230,
+  validate: ({ options, checkKind, checkId, skillKey }) =>
+    validateTargetSkillEffectProof(options.targetSkillEffect, { checkKind, skillKey, checkId })
+});

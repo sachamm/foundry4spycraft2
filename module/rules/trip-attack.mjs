@@ -2,6 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { responseOwnSize, tripSizeIndex } from "./trip.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export { TRIP_SIZES } from "./trip.mjs";
 /** Ordinary half-action Trip p.361. Weapon qualities, free actions and settlement are separate. */
 export function tripAttackSkillChecks(key, checks = []) {
@@ -181,3 +182,33 @@ export function validateTripAttackProof(
       "The Trip attacker, actual opponent, adjacency, Size or legal Trip action context changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "tripAttack",
+  order: 1460,
+  record: ["tripAttack"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey, ability }) =>
+    validateTripAttackProof(actor.system, options.tripAttack, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      ability,
+      attributeSubstitution: options.attributeSubstitution,
+      combat: actor.mentalLeapCombatContext()
+    })
+});
+rollPipeline.register({
+  id: "tripAttackChecks",
+  order: 5080,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey }, checks) => tripAttackSkillChecks(skillKey, checks)
+});
+rollPipeline.register({
+  id: "tripCounterCheck",
+  order: 5120,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey, options }, checks) =>
+    skillKey === "acrobatics" && options?.tripCounter ? [...checks, tripCounterSkillCheck()] : checks
+});

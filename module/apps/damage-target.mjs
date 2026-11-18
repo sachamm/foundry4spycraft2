@@ -1,4 +1,5 @@
 import { knownSneakAttackImmunity } from "../rules/sneak-attack.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 export function damageTargetChoices() {
   const targets = values(game.user?.targets),
@@ -41,3 +42,10 @@ export async function validateSneakAttackTarget(snapshot) {
     throw new Error("The target’s armor or protection changed. Confirm damage again.");
   if (knownSneakAttackImmunity(actor.system).immune) throw new Error("The target is immune to sneak attack damage.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "sneakAttackTarget",
+  order: 1010,
+  validate: ({ options }) => validateSneakAttackTarget(options.sneakAttackTarget)
+});

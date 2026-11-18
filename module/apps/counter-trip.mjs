@@ -3,6 +3,7 @@ import { queueRuleState } from "./rule-resource-scope.mjs";
 import { validOwnCountClock } from "../rules/own-count-duration.mjs";
 import { responseOwnSize, tripSizeIndex } from "../rules/trip.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Set(),
   stable = v =>
@@ -313,3 +314,17 @@ export async function reviewCounterTrip(actor, input = {}) {
     return { messageUuid: roots[0].uuid };
   });
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "tripCounter",
+  order: 1470,
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateTripCounterProof(actor, options.tripAttack, {
+      checkKind,
+      skillKey,
+      checkId,
+      lease: options.tripCounterLease,
+      rerollOf: options.rerollOf
+    })
+});

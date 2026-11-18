@@ -5,6 +5,7 @@ import { readiedDisarmWeapons } from "./disarm-response.mjs";
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { cheapShotScene } from "./cheap-shot-effects.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export const CHEAP_SHOT_CHOICES = ["str", "dex", "con", "int", "wis", "cha", "speed"];
 /** p.355 Standard Attack plus a free-action trick, not a separate attack action. */
 export function cheapShotPlan(
@@ -141,3 +142,19 @@ export function validateCheapShotProof(
   if (p.blocked || stable(p) !== stable(proof))
     throw Error("The Cheap Shot choice, actual held flail, qualified feat or Initiative Count changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "cheapShot",
+  order: 1300,
+  validate: ({ actor, options, checkKind }) =>
+    validateCheapShotProof(actor, options.attackContext?.cheapShot, {
+      checkKind,
+      weaponUuid: options.weaponUuid,
+      weaponProficiency: options.weaponProficiency,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf,
+      combat: actor.mentalLeapCombatContext(),
+      finalAttack: !!(options.finalAttack || options.twoWeaponFinalAttack)
+    })
+});

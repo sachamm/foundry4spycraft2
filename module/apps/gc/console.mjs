@@ -1,3 +1,4 @@
+import { systemDialog } from "../dialog-theme.mjs";
 /** The GC Console: one window for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
 import { gcDiceStatus, manageGCDice } from "../../rules/gc-dice.mjs";
 import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
@@ -45,7 +46,7 @@ export class GCConsole extends HandlebarsApplicationMixin(ApplicationV2) {
       endMission: guard(() => mission.endMission()),
       clearMission: guard(async () => {
         if (
-          await foundry.applications.api.DialogV2.confirm({
+          await systemDialog.confirm({
             window: { title: "Clear the mission record" },
             content: "<p>Remove every objective, complication and antagonist from the mission record?</p>"
           })

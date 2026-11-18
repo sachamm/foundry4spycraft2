@@ -1,6 +1,7 @@
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { readiedDisarmWeapons } from "./disarm-response.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Fencing Basics p.178: current qualified feat plus a readied 1h FIN sword.
  * Shared ready-source proof for melee Disarm and Feint; stance/trick are separate.
  */
@@ -49,3 +50,15 @@ export function validateFencingDisarmProof(actor, disarm, { checkKind, weaponPro
       "The qualified Fencing Basics, readied one-handed sword or effective FIN quality changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "fencingDisarm",
+  order: 1310,
+  validate: ({ actor, options, checkKind }) =>
+    validateFencingDisarmProof(actor, options.attackContext?.disarm, {
+      checkKind,
+      weaponProficiency: options.weaponProficiency,
+      rerollOf: options.rerollOf
+    })
+});

@@ -9,6 +9,7 @@ import {
   currentDrivingReceipt
 } from "../rules/driving-stance.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   key = (a, id) => a.uuid + ":" + id;
@@ -243,3 +244,21 @@ export async function manageDrivingStance(actor, input = {}) {
   }
   return settleDrivingStance(actor, input.sourceMessage, { ...input, follow: input.follow === true });
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "drivingDamage",
+  order: 1030,
+  record: ["drivingStance"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, formula, data, weaponUuid }) =>
+    validateDrivingDamageProof(actor, options.drivingStance, {
+      checkKind,
+      checkId,
+      checkMethod,
+      formula,
+      data,
+      weaponUuid,
+      lease: options.drivingStanceLease,
+      rerollOf: options.rerollOf
+    })
+});

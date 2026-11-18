@@ -1,6 +1,7 @@
 import { analysisChallengeCount } from "./forensic-genius.mjs";
 import { taskPressureState, taskPressureUseSpec, taskPressureUseProof } from "./task-pressure.mjs";
 import { rollEvidence, errorDecisionPending } from "./outcomes.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   whole = n => Number.isSafeInteger(n) && n >= 0;
 export const forensicTaskSource = s => s.activeFeatNames?.includes("Forensic Genius") === true;
@@ -389,3 +390,17 @@ export function validateAnalysisTaskReceipt(system, context, options = {}) {
     options
   );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "analysisTaskRoll",
+  order: 1210,
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateAnalysisTaskRoll(actor.system, options.analysisTask, {
+      now: game.time?.worldTime ?? null,
+      checkKind,
+      skillKey,
+      checkId,
+      inCombat: !!actor.participatingCombat
+    })
+});

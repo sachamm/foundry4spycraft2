@@ -1,5 +1,6 @@
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { responseOwnSize } from "../rules/trip.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 export function tripDefenseContent(key, actor) {
   if (key !== "acrobatics") return "";
   const esc = foundry.utils.escapeHTML;
@@ -41,3 +42,10 @@ export function validateTripDefenseTarget(actor, proof) {
   if (!target || responseOwnSize(target.system) !== proof.opponentSize)
     throw Error("The actual Trip attacker or current Size changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "tripDefenseTarget",
+  order: 1500,
+  validate: ({ actor, options }) => validateTripDefenseTarget(actor, options.tripDefense)
+});

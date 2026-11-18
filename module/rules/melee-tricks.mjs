@@ -5,6 +5,7 @@ import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
 import { tradeoffTarget } from "./melee-tradeoff.mjs";
 import { ownedWeaponTraining, weaponSourceIdentity } from "./weapon-training.mjs";
 import { bullseyeDamageSourceFacts } from "./bullseye.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -273,3 +274,19 @@ export function meleeTrickSourceFacts(proof) {
   const c = proof.timing.combat;
   return { ...proof, timing: { ...proof.timing, combat: { id: c.id, round: c.round, combatantId: c.combatantId } } };
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "meleeTrick",
+  order: 1120,
+  validate: ({ actor, options, checkKind, weaponUuid, weaponProficiency, weaponQualities }) =>
+    validateMeleeTrickProof(actor, options.attackContext?.meleeTrick, {
+      checkKind,
+      weaponUuid,
+      weaponProficiency,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf,
+      finalAttack: options.finalAttack,
+      weaponQualities
+    })
+});

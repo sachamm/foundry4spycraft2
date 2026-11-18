@@ -4,6 +4,7 @@ import { fencingDisarmPlan as readiedFencingPlan } from "./fencing-disarm.mjs";
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { readiedDisarmWeapons } from "./disarm-response.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Ordinary Feint p.357. Alternative skills, free actions and outcomes are separate. */
 export function feintSkillChecks(key, checks = []) {
   const acting = key === "sleightOfHand",
@@ -179,3 +180,25 @@ export function validateFeintProof(
       "The Feint participants, eligibility declaration, Initiative Count or readied Feint gear source changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "feint",
+  order: 1450,
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey, ability }) =>
+    validateFeintProof(actor, options.feint, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      ability,
+      attributeSubstitution: options.attributeSubstitution,
+      combat: actor.mentalLeapCombatContext()
+    })
+});
+rollPipeline.register({
+  id: "feintChecks",
+  order: 5060,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey }, checks) => feintSkillChecks(skillKey, checks)
+});

@@ -1,13 +1,10 @@
+import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
 import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
 import { rollPipeline } from "./module/rolls/index.mjs";
-import {
-  automaticSkillSuccessSources,
-  manualAdjustmentSource,
-  cunningPlanCheck
-} from "./module/rules/class-checks.mjs";
+import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
 import {
   startUsagePeriod,
   refreshUsagePeriodActors,
@@ -23,8 +20,6 @@ import {
   reviewGCDiceSettlement,
   recordGCHint
 } from "./module/rules/gc-dice.mjs";
-import { rerollEligibility } from "./module/rules/limited-uses.mjs";
-import { checkCandidates } from "./module/rules/outcomes.mjs";
 import { SPYCRAFT } from "./module/config.mjs";
 import {
   registerGCSettings,
@@ -63,6 +58,7 @@ import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
 Hooks.once("init", () => {
   console.log("Spycraft 2.0 | Initializing system");
   installChatSearchHooks();
+  installDialogThemeHooks();
   CONFIG.SPYCRAFT = SPYCRAFT;
   CONFIG.time.roundTime = 6;
   CONFIG.time.turnTime = 0;
@@ -230,202 +226,8 @@ Hooks.once("init", () => {
   ]);
 });
 
-Hooks.on("renderChatMessageHTML", (message, html) => {
-  const check = message.flags?.spycraft2;
-  if (
-    !check?.actorUuid ||
-    !Number.isFinite(check.rawTotal) ||
-    !(message.isAuthor || game.user.isGM) ||
-    (message.blind && !game.user.isGM)
-  )
-    return;
-  const actor = fromUuidSync(check.actorUuid);
-  if (!actor?.isOwner) return;
-  if (check.resolved) {
-    if (check.restraintEscape?.sourceSnapshot) {
-      const receipt = actor.flags?.spycraft2?.restraintReleases?.[message.id],
-        review = actor.system.restraintReleaseReview,
-        controls = document.createElement("div");
-      controls.className = "spycraft2 roll-controls";
-      const add = (label, work) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = label;
-        button.addEventListener("click", async () => {
-          button.disabled = true;
-          try {
-            await work();
-          } finally {
-            button.disabled = false;
-          }
-        });
-        controls.append(button);
-      };
-      if (review?.needsReview && review.id === message.id) {
-        if (game.user.isGM) add("GC review grapple release", () => actor.reviewRestraintRelease());
-      } else if (receipt?.movement?.state === "required")
-        add("Confirm actual escape movement", () => actor.confirmRestraintEscapeMove(message));
-      else if (!receipt && check.successConfirmed === true && !check.superseded && !check.criticalFailure)
-        add("Apply grapple escape benefit", () => actor.applyRestraintEscape(message));
-      if (controls.childElementCount) html.querySelector(".message-content")?.append(controls);
-      return;
-    }
-    const receipt = check.gearAttempt?.settlement,
-      attempt = actor.system.missionReserves?.attempts?.[check.gearAttempt?.id];
-    if (!receipt || check.superseded || attempt?.settlementId === receipt.id) return;
-    const controls = document.createElement("div"),
-      complete = document.createElement("button");
-    controls.className = "spycraft2 roll-controls";
-    complete.type = "button";
-    complete.textContent = "Complete acquisition record";
-    complete.addEventListener("click", async () => {
-      complete.disabled = true;
-      try {
-        await actor.finishCheck(message);
-      } finally {
-        complete.disabled = false;
-      }
-    });
-    controls.append(complete);
-    html.querySelector(".message-content")?.append(controls);
-    return;
-  }
-  const controls = document.createElement("div");
-  controls.className = "spycraft2 roll-controls";
-  const boost = document.createElement("button");
-  boost.type = "button";
-  boost.textContent = "Boost before outcome";
-  boost.addEventListener("click", async () => {
-    boost.disabled = true;
-    try {
-      await actor.boostCheck(message);
-    } finally {
-      boost.disabled = false;
-    }
-  });
-  const requiredBonus = document.createElement("button");
-  requiredBonus.type = "button";
-  requiredBonus.textContent = "Spend required class bonus die";
-  requiredBonus.addEventListener("click", async () => {
-    requiredBonus.disabled = true;
-    try {
-      await actor.boostCheck(message, { bonusPoolId: check.requiredBonusPoolId, count: 1, askOptions: true });
-    } finally {
-      requiredBonus.disabled = false;
-    }
-  });
-  const generous = document.createElement("button");
-  generous.type = "button";
-  generous.textContent = "Generous teammate die";
-  generous.addEventListener("click", async () => {
-    generous.disabled = true;
-    try {
-      await actor.boostWithGenerous(message);
-    } finally {
-      generous.disabled = false;
-    }
-  });
-  const finish = document.createElement("button");
-  finish.type = "button";
-  finish.textContent = "Outcome resolved";
-  finish.addEventListener("click", async () => {
-    finish.disabled = true;
-    try {
-      await actor.finishCheck(message);
-    } finally {
-      finish.disabled = false;
-    }
-  });
-  const reroll = document.createElement("button");
-  reroll.type = "button";
-  reroll.textContent = "Reroll with ability";
-  reroll.addEventListener("click", async () => {
-    reroll.disabled = true;
-    try {
-      await actor.rerollCheck(message);
-    } finally {
-      reroll.disabled = false;
-    }
-  });
-  const confirm = document.createElement("button");
-  confirm.type = "button";
-  confirm.textContent = "Confirm result";
-  confirm.addEventListener("click", async () => {
-    confirm.disabled = true;
-    try {
-      await actor.confirmCheckOutcome(message);
-    } finally {
-      confirm.disabled = false;
-    }
-  });
-  const critical = document.createElement("button");
-  critical.type = "button";
-  critical.textContent = "Activate critical";
-  critical.addEventListener("click", async () => {
-    critical.disabled = true;
-    try {
-      await actor.activateCritical(message);
-    } finally {
-      critical.disabled = false;
-    }
-  });
-  const candidates = checkCandidates(check),
-    adjustment = check.checkKind === "skill" && manualAdjustmentSource(actor.system)?.skills.includes(check.skillKey);
-  let cunningAvailable = false;
-  try {
-    cunningPlanCheck(actor.system, check);
-    cunningAvailable = actor.limitedUseStatus.some(s => s.id === "cunningPlan" && s.remaining > 0);
-  } catch (error) {}
-  const cunning = document.createElement("button");
-  cunning.type = "button";
-  cunning.textContent = "Cunning Plan";
-  cunning.addEventListener("click", async () => {
-    cunning.disabled = true;
-    try {
-      await actor.useCunningPlan(message);
-    } finally {
-      cunning.disabled = false;
-    }
-  });
-  const manual = document.createElement("button");
-  manual.type = "button";
-  manual.textContent = "Manual Adjustment";
-  manual.addEventListener("click", async () => {
-    manual.disabled = true;
-    try {
-      await actor.useManualAdjustment(message);
-    } finally {
-      manual.disabled = false;
-    }
-  });
-  controls.append(
-    ...(cunningAvailable ? [cunning] : []),
-    ...(adjustment && check.successConfirmed === false && !check.criticalFailure && !check.manualAdjustment
-      ? [manual]
-      : []),
-    ...(check.requiredBonusPoolId && !check.requiredBonusSpent && !check.criticalFailure ? [requiredBonus] : []),
-    ...((check.threatConfirmed || check.errorConfirmed) && !check.criticalSuccess && !check.criticalFailure
-      ? [critical]
-      : []),
-    ...(check.actionDiceAllowed !== false ? [boost, ...(!check.generousBoost ? [generous] : [])] : []),
-    ...(check.checkMethod === "roll" &&
-    actor.limitedUseStatus?.some(
-      spec =>
-        spec.remaining && rerollEligibility(spec, check, { failed: true, criticalFailure: !!check.criticalFailure })
-    )
-      ? [reroll]
-      : []),
-    ...(candidates.error ||
-    candidates.threat ||
-    candidates.triumph ||
-    automaticSkillSuccessSources(actor.system, check).length > 0 ||
-    adjustment
-      ? [confirm]
-      : []),
-    finish
-  );
-  html.append(controls);
-});
+// Buttons under posted checks come from roll pipeline contributors (module/rolls/chat-controls.mjs).
+Hooks.on("renderChatMessageHTML", renderCheckControls);
 
 // Recompute round-based bonuses and counters when combat progresses or ends.
 function refreshCombatActorData() {
@@ -487,35 +289,6 @@ for (const event of ["createItem", "updateItem", "deleteItem"])
   Hooks.on(event, item => {
     if (item.type === "class" && item.parent?.documentName === "Actor") refreshFortuneRecipients(item.parent);
   });
-
-// Buttons that roll contributors add under a posted check (module/rolls/chat-controls.mjs).
-Hooks.on("renderChatMessageHTML", (message, html) => {
-  const check = message.flags?.spycraft2;
-  if (!check?.actorUuid || (message.blind && !game.user.isGM)) return;
-  const actor = fromUuidSync(check.actorUuid);
-  if (!actor?.isOwner) return;
-  for (const control of rollPipeline.chatControls({
-    message,
-    check,
-    actor,
-    user: game.user,
-    checkKind: check.checkKind
-  })) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = control.label;
-    button.dataset.rollControl = control.id;
-    button.addEventListener("click", async () => {
-      button.disabled = true;
-      try {
-        await control.run();
-      } finally {
-        button.disabled = false;
-      }
-    });
-    html.append(button);
-  }
-});
 
 // Game Control console: a button at the top of the Actors sidebar for the GC, plus game.spycraft2.gc.open().
 Hooks.on("renderActorDirectory", (app, html) => {

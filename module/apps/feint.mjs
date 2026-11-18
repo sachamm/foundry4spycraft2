@@ -1,4 +1,5 @@
 import { attackCharacterTargetChoices } from "./character-target.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 export function feintContent(key, actor) {
   if (!["sleightOfHand", "notice"].includes(key)) return "";
   const acting = key === "sleightOfHand",
@@ -35,3 +36,11 @@ export function validateFeintTarget(actor, proof) {
       throw Error("This character has already been targeted by a successful Feint this round.");
   }
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "feintTarget",
+  order: 1170,
+  record: ["feint"],
+  validate: ({ actor, options }) => validateFeintTarget(actor, options.feint)
+});

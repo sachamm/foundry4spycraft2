@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 const choices = ["str", "dex", "con", "int", "wis", "cha", "speed"];
 export const cheapShotScene = system => String(system.usagePeriods?.scene ?? "initial");
 export function cheapShotRecords(system) {
@@ -118,3 +119,12 @@ export function validateCheapShotRecoveryProof(
   )
     throw Error("The recorded Cheap Shot recovery source, attempt or Fortitude DC changed.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "cheapShotRecovery",
+  order: 1620,
+  record: ["cheapShotRecovery"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod }) =>
+    validateCheapShotRecoveryProof(actor, options.cheapShotRecovery, { checkKind, checkId, checkMethod })
+});

@@ -1,4 +1,5 @@
 import { ownedWeaponTraining } from "./weapon-training.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -100,3 +101,17 @@ export function tradeoffTarget({ targetUuid = null, targetName = "", targetConfi
   }
   return { targetUuid, ...(manualTargetName ? { manualTargetName, targetConfirmed: true } : {}) };
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "meleeTradeoff",
+  order: 1140,
+  validate: ({ actor, options, checkKind, weaponUuid, weaponProficiency }) =>
+    validateMeleeTradeoffProof(actor, options.attackContext?.meleeTradeoff, {
+      checkKind,
+      weaponUuid,
+      weaponProficiency,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf
+    })
+});

@@ -2,6 +2,7 @@ import { attributeDefensePlan, conditionRollPenalties } from "./attributes.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export const COMBAT_STANCES = {
   striking: { name: "Striking Stance", feat: "Polearm Basics", page: 179, movementLimitFeet: 5 },
   whirling: { name: "Whirling Stance", feat: "Staff Basics", page: 179 },
@@ -119,3 +120,15 @@ export function punishingDamagePlan(check) {
 export function menacingDamagePlan(check) {
   return stanceDamagePlan(check, { expectedKey: "menacing" });
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "combatStance",
+  order: 1160,
+  validate: ({ actor, options, checkKind }) =>
+    validateCombatStanceProof(actor, options.attackContext?.combatStance, {
+      checkKind,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf
+    })
+});

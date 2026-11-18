@@ -7,6 +7,7 @@ import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { ownedWeaponTraining } from "./weapon-training.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export const MISS_TRICKS = {
   doubleTwirl: { name: "Double Twirl", feat: "Flail Basics", family: "flail" },
   remiss: { name: "Remiss", feat: "Fencing Basics", family: "oneHandedSword" }
@@ -221,3 +222,18 @@ export function missTrickSourceFacts(proof) {
   const { combat, ...facts } = proof;
   return facts;
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "missTrickSources",
+  order: 1280,
+  validate: ({ actor, options, checkKind }) =>
+    validateMissTrickSources(actor, options.attackContext?.missTrickSources, {
+      checkKind,
+      weaponUuid: options.weaponUuid,
+      weaponProficiency: options.weaponProficiency,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf,
+      combat: actor.mentalLeapCombatContext()
+    })
+});

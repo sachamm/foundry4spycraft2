@@ -248,20 +248,127 @@ globalThis.Roll = class {
 const { SpycraftActor } = await import("../module/documents/actor.mjs");
 const { rollPipeline } = await import("../module/rolls/index.mjs");
 
-test("the system registers its reservations, validators, named checks and chat controls in a fixed order", () => {
-  const ids = rollPipeline.ids;
-  assert.deepEqual(ids.slice(0, 5), [
-    "feintBonusLease",
-    "attackDamageLease",
-    "sideStanceLease",
-    "sideStanceDamageLease",
-    "sneakAttackTarget"
-  ]);
-  assert.equal(ids.indexOf("callbackSaveContext") - ids.indexOf("sneakAttackTarget") + 1, 71);
-  assert.ok(ids.indexOf("terrainChecks") < ids.indexOf("optionalRuleChecks"));
-  assert.ok(ids.indexOf("conveyanceBullRushChecks") < ids.indexOf("tripCounterCheck"));
-  assert.deepEqual(ids.slice(-2), ["unnervingControl", "strutControl"]);
-  assert.equal(new Set(ids).size, ids.length);
+// The order contributors run in, phase by phase. Validation order decides which failure a player is shown first.
+const EXPECTED_ORDER = [
+  "feintBonusLease",
+  "attackDamageLease",
+  "sideStanceLease",
+  "sideStanceDamageLease",
+  "recordFields",
+  "sneakAttackTarget",
+  "meleeArmorPiercing",
+  "drivingDamage",
+  "takedownSave",
+  "sideStanceDamage",
+  "tripFinalAttack",
+  "strikingAttack",
+  "callbackFinalAttack",
+  "callbackAttackContext",
+  "trickSneakSource",
+  "attackDamage",
+  "meleeTrick",
+  "bullseye",
+  "meleeTradeoff",
+  "grippingAttack",
+  "combatStance",
+  "feintTarget",
+  "sideStanceAttack",
+  "feintAttackBonus",
+  "callbackCQBRange",
+  "analysisTaskRoll",
+  "attributeDamage",
+  "targetSkillEffect",
+  "detectionObserver",
+  "reachWeapon",
+  "trainedOnlyWeapon",
+  "accurizedWeapon",
+  "missTrickSources",
+  "cheapShotTarget",
+  "cheapShot",
+  "fencingDisarm",
+  "disarmResponse",
+  "quirkyWeapon",
+  "superiorAccuracyWeapon",
+  "axeDisarm",
+  "whirlingAttack",
+  "whirlingSneakAttack",
+  "meleeSkillFeat",
+  "stalkingStance",
+  "conveyanceBullRush",
+  "bullRushAttack",
+  "bullRushDefense",
+  "stillStandingSave",
+  "tumblePath",
+  "feint",
+  "tripAttack",
+  "tripCounter",
+  "tripAttackTarget",
+  "tripDefense",
+  "tripDefenseTarget",
+  "fallDistance",
+  "balanceSurface",
+  "hideCircumstance",
+  "hideMovement",
+  "rankSynergyFeat",
+  "stoneCold",
+  "threaten",
+  "bugConcealment",
+  "documentation",
+  "trackingFeat",
+  "trackingTask",
+  "cheapShotRecovery",
+  "callbackCheapShotRecovery",
+  "callbackSkillContext",
+  "callbackRerollContext",
+  "oldSchool",
+  "damageSaveRoll",
+  "callbackDamageSave",
+  "coverSaveSource",
+  "terrainSaveSource",
+  "callbackSaveContext",
+  "terrainChecks",
+  "optionalRuleChecks",
+  "restraintChecks",
+  "taskPressureChecks",
+  "threatenChecks",
+  "feintChecks",
+  "tripDefenseChecks",
+  "tripAttackChecks",
+  "bullRushDefenseChecks",
+  "bullRushAttackChecks",
+  "conveyanceBullRushChecks",
+  "tripCounterCheck",
+  "restraintEscapeControl",
+  "gearAcquisitionControl",
+  "cunningPlanControl",
+  "manualAdjustmentControl",
+  "requiredBonusControl",
+  "criticalControl",
+  "boostControl",
+  "generousControl",
+  "rerollControl",
+  "confirmControl",
+  "finishControl",
+  "unnervingControl",
+  "strutControl"
+];
+
+test("every contributor is registered once, in the documented order", () => {
+  assert.deepEqual(rollPipeline.ids, EXPECTED_ORDER);
+  assert.equal(new Set(EXPECTED_ORDER).size, EXPECTED_ORDER.length);
+});
+
+test("roll options named by `record` are copied onto every posted check, null when absent", async () => {
+  const actor = new SpycraftActor();
+  posts.length = 0;
+  const check = (await actor.rollCheck("1d20", {}, { checkKind: "check", polyglot: { languages: 3 } })).flags.spycraft2;
+  assert.deepEqual(check.polyglot, { languages: 3 });
+  for (const field of ["takedown", "tripAttack", "feint", "sneakAttack", "rerollOf", "breakthrough"]) {
+    assert.equal(check[field], null, field);
+  }
+  // Computed fields still come from the roll itself and are not overwritten by a same-named option.
+  assert.equal(check.checkKind, "check");
+  assert.equal(check.actorUuid, "Actor.pipeline");
 });
 
 test("named skill checks match the original fixed composition for every skill", () => {

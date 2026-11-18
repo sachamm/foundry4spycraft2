@@ -1,4 +1,5 @@
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Threaten p.361 is a combat action, separate from Coercion/Domination pp.134–135. */
 export function threatenSkillChecks(key, checks = []) {
   const role = key === "intimidate" ? "attacker" : key === "resolve" ? "defender" : null;
@@ -167,3 +168,24 @@ export function validateThreatenProof(
       p.blockedReason || "The Threaten participants, CQB source, weapon or Initiative Count changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "threaten",
+  order: 1570,
+  record: ["threaten"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey }) =>
+    validateThreatenProof(actor.system, options.threaten, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      combat: actor.mentalLeapCombatContext()
+    })
+});
+rollPipeline.register({
+  id: "threatenChecks",
+  order: 5050,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey }, checks) => threatenSkillChecks(skillKey, checks)
+});

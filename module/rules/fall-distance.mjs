@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Equilibrium Basics p.194 and soft/ yielding landing p.336: damage-distance calculation only. */
 export function fallDistancePlan(
   system,
@@ -72,3 +73,12 @@ export function fallDistanceSkillPlan(system, key, check, input = {}) {
     return { ...empty, blockedReason: error.message };
   }
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "fallDistance",
+  order: 1510,
+  record: ["fallDistance"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateFallDistanceProof(actor.system, options.fallDistance, { checkKind, skillKey, checkId })
+});

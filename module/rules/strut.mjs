@@ -1,6 +1,7 @@
 import { restraintActionBlock } from "./restraints.mjs";
 import { actionDiceGain } from "./action-dice.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export const hasStrut = system =>
   (system.classLevels?.brawler ?? 0) >= 3 &&
   (system.classOptionSelections ?? []).some(s => s.classId === "brawler" && s.name === "Strut");
@@ -100,3 +101,16 @@ export function strutPool(system, gain, { id, messageUuid, combat, periods = sys
     needsReview: false
   };
 }
+
+// Roll pipeline: Strut can follow a resolved attack, so it has its own button on the card.
+rollPipeline.register({
+  id: "strutControl",
+  order: 9510,
+  kinds: ["attack"],
+  chatControls({ message, check, actor }) {
+    if (!hasStrut(actor.system) || check.superseded || check.strutPoolId) return null;
+    if (!(check.threatConfirmed || check.criticalSuccess) || !check.rollCombat?.id) return null;
+    if (!(check.unarmed || check.weaponProficiency === "unarmed" || check.attackContext?.ranged === false)) return null;
+    return [{ label: "Strut: posture next half action", run: () => actor.useStrut(message) }];
+  }
+});

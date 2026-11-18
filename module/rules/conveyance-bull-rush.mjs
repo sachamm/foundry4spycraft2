@@ -2,6 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { DISARM_SIZES } from "./disarm.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** p.354; user-confirmed ruling: borrow only Maneuver's skill/attribute, not its named-check benefits. */
 export const CONVEYANCE_BULL_RUSH_PROFILES = {
   acrobatics: { kind: "personalVehicle", label: "personal vehicle", ability: "dex" },
@@ -215,3 +216,26 @@ export function validateConveyanceBullRushProof(
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error("The conveyance Bull Rush declaration, operator condition or Initiative Count changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "conveyanceBullRush",
+  order: 1400,
+  record: ["conveyanceBullRush"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey, ability }) =>
+    validateConveyanceBullRushProof(actor.system, options.conveyanceBullRush, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      ability,
+      attributeSubstitution: options.attributeSubstitution,
+      combat: actor.mentalLeapCombatContext()
+    })
+});
+rollPipeline.register({
+  id: "conveyanceBullRushChecks",
+  order: 5110,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey }, checks) => conveyanceBullRushSkillChecks(skillKey, checks)
+});

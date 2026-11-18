@@ -122,6 +122,38 @@ export function activeConditionLabels(system = {}) {
   return [...labels];
 }
 
+function sheetActionLabel(link, context, localize) {
+  const itemId = link.closest("[data-item-id]")?.dataset.itemId;
+  const item =
+    context.actor?.items?.get?.(itemId) ?? context.actor?.items?.contents?.find(entry => entry.id === itemId);
+  const itemName = item?.name ?? "item";
+  const types = {
+    weapon: "weapons",
+    armor: "armor",
+    gear: "gear",
+    vehicle: "vehicles",
+    feat: "feats",
+    class: "classes",
+    origin: "origins"
+  };
+  const rows = { contacts: "contact", subplots: "subplot", skillFortes: "skill forte" };
+  const label = {
+    browse: `Browse ${types[link.dataset.type] ?? "options"}`,
+    createItem: `Add ${link.dataset.type ?? "item"}`,
+    itemEquip: `${item?.system?.equipped ? "Unequip" : "Equip"} ${itemName}`,
+    itemDelete: `Remove ${itemName}`,
+    itemChat: `Share ${itemName} in chat`,
+    syncGrants: "Refresh granted feats",
+    addRow: `Add ${rows[link.dataset.list] ?? "entry"}`,
+    removeRow: `Remove ${rows[link.dataset.list] ?? "entry"}`
+  }[link.dataset.action];
+  const tooltip = link.dataset.tooltip ? localize(link.dataset.tooltip) : "";
+  return (
+    label ??
+    (tooltip && tooltip !== link.dataset.tooltip ? tooltip : link.dataset.action.replace(/([a-z])([A-Z])/g, "$1 $2"))
+  );
+}
+
 /** Apply view behavior after each complete or partial sheet render. */
 export function enhanceAgentSheet(element, context, state, localize = text => text) {
   element.classList.toggle("play-mode", !context.editMode);
@@ -143,13 +175,26 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
     for (const attr of link.attributes) button.setAttribute(attr.name, attr.value);
     button.type = "button";
     button.classList.add("sc2-action");
-    if (!link.textContent.trim() && !link.hasAttribute("aria-label")) {
-      const label = link.dataset.tooltip
-        ? localize(link.dataset.tooltip)
-        : link.dataset.action.replace(/([a-z])([A-Z])/g, "$1 $2");
+    if (!link.textContent.trim()) {
+      const label = link.getAttribute("aria-label") ?? sheetActionLabel(link, context, localize);
       button.setAttribute("aria-label", label);
+      button.dataset.tooltip = label;
+      button.title = label;
+      // Toolbar labels are visible; compact origin controls retain their explicit labels.
+      if (link.closest(".controls")) {
+        const text = element.ownerDocument.createElement("span");
+        text.textContent =
+          {
+            itemChat: "Share",
+            itemDelete: "Remove",
+            itemEquip: "Equip / unequip",
+            syncGrants: "Refresh grants",
+            removeRow: "Remove"
+          }[link.dataset.action] ?? label;
+        button.append(text);
+      }
     }
-    button.replaceChildren(...link.childNodes);
+    button.prepend(...link.childNodes);
     link.replaceWith(button);
   }
   for (const control of element.querySelectorAll(

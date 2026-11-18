@@ -2,6 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { responseOwnSize } from "./trip.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** p.354 on-foot Bull Rush, chosen-target adjacency exception follows the user-confirmed p.326/p.354 ruling. */
 export function bullRushAttackSkillChecks(key, checks = []) {
   if (key !== "athletics") return checks;
@@ -178,3 +179,26 @@ export function validateBullRushAttackProof(
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error("The Bull Rush attack route, current Size/Speed, posture or Initiative Count changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "bullRushAttack",
+  order: 1410,
+  record: ["bullRushAttack"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey, ability }) =>
+    validateBullRushAttackProof(actor.system, options.bullRushAttack, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      ability,
+      attributeSubstitution: options.attributeSubstitution,
+      combat: actor.mentalLeapCombatContext()
+    })
+});
+rollPipeline.register({
+  id: "bullRushAttackChecks",
+  order: 5100,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey }, checks) => bullRushAttackSkillChecks(skillKey, checks)
+});

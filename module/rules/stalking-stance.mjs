@@ -1,5 +1,6 @@
 import { combatStanceState } from "./combat-stance.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** The p.179 bonus applies to Sneak checks, not the underlying skill bonus. */
 export function stalkingStancePlan(system, key, check, { combat = null } = {}) {
   const empty = { evidence: null, bonuses: [], notes: [] };
@@ -62,3 +63,17 @@ export function validateStalkingStanceProof(actor, proof, { checkKind, skillKey,
   if (checkKind !== "skill" || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error("The Stalking Stance, qualified source or actual combat participation changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "stalkingStance",
+  order: 1390,
+  record: ["stalkingStance"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateStalkingStanceProof(actor, options.stalkingStance, {
+      checkKind,
+      skillKey,
+      checkId,
+      rerollOf: options.rerollOf
+    })
+});

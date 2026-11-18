@@ -1,4 +1,5 @@
 import { rollEvidence, errorDecisionPending } from "./outcomes.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const whole = n => Number.isSafeInteger(n) && n >= 0;
 export const TASK_PRESSURE_CHECK = {
   id: "task-pressure",
@@ -310,3 +311,11 @@ export function taskPressureUseProof(system, binding) {
     throw new Error("The reserved pressure-check attempt changed before posting.");
   return structuredClone(use);
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "taskPressureChecks",
+  order: 5040,
+  kinds: ["skill"],
+  skillChecks: ({ actor, skillKey }, checks) => taskPressureSkillChecks(actor.system, skillKey, checks)
+});

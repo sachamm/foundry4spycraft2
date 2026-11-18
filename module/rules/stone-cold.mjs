@@ -1,4 +1,5 @@
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Stone Cold p.205: being considered armed satisfies Intimidate's exact weapon gear requirement. */
 export function stoneColdSkillPlan(system, key, check) {
   if (key !== "intimidate" || !system.activeFeatNames?.includes("Stone Cold"))
@@ -50,3 +51,17 @@ export function validateStoneColdProof(system, proof, { checkKind, skillKey, che
   )
     throw new Error("The Stone Cold source, armed check or combat save context changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "stoneCold",
+  order: 1560,
+  record: ["stoneCold"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateStoneColdProof(actor.system, options.stoneCold, {
+      checkKind,
+      skillKey,
+      checkId,
+      combat: actor.mentalLeapCombatContext()
+    })
+});

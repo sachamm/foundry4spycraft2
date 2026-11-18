@@ -1,10 +1,74 @@
 /**
- * Registers every roll contributor. Importing this module once is enough; the Actor document does so.
- * A new rule joins the pipeline by registering from its own module and being imported here.
+ * Registers every roll contributor by importing the modules that own them. The Actor document imports this once.
+ * A rule joins the pipeline by registering from its own module and being listed here.
  */
-import "./leases.mjs";
-import "./check-validators.mjs";
+import "../apps/attack-damage-benefits.mjs";
+import "../apps/cheap-shot.mjs";
+import "../apps/counter-trip.mjs";
+import "../apps/damage-target.mjs";
+import "../apps/detection-observer.mjs";
+import "../apps/driving-stance.mjs";
+import "../apps/feint-bonus.mjs";
+import "../apps/feint.mjs";
+import "../apps/old-school.mjs";
+import "../apps/side-stance-damage.mjs";
+import "../apps/side-stance.mjs";
+import "../apps/striking-stance.mjs";
+import "../apps/takedown.mjs";
+import "../apps/target-skill-effects.mjs";
+import "../apps/trip-attack.mjs";
+import "../apps/trip-final-attack.mjs";
+import "../apps/trip.mjs";
+import "../apps/whirling-stance.mjs";
+import "../rules/accurized-weapon.mjs";
+import "../rules/analysis-tasks.mjs";
+import "../rules/attribute-damage.mjs";
+import "../rules/balance.mjs";
+import "../rules/bug-basics.mjs";
+import "../rules/bull-rush-attack.mjs";
+import "../rules/bull-rush.mjs";
+import "../rules/bullseye.mjs";
+import "../rules/cheap-shot-effects.mjs";
+import "../rules/cheap-shot.mjs";
+import "../rules/combat-stance.mjs";
+import "../rules/conveyance-bull-rush.mjs";
+import "../rules/cover.mjs";
+import "../rules/damage-saves.mjs";
+import "../rules/disarm-response.mjs";
+import "../rules/documentation.mjs";
+import "../rules/fall-distance.mjs";
+import "../rules/feint.mjs";
+import "../rules/fencing-disarm.mjs";
+import "../rules/forensic-genius.mjs";
+import "../rules/gripping-stance.mjs";
+import "../rules/hide-circumstances.mjs";
+import "../rules/hide-movement.mjs";
+import "../rules/melee-armor-piercing.mjs";
+import "../rules/melee-skill-feats.mjs";
+import "../rules/melee-tradeoff.mjs";
+import "../rules/melee-tricks.mjs";
+import "../rules/miss-tricks.mjs";
+import "../rules/quirky-weapon.mjs";
+import "../rules/rank-synergy-feats.mjs";
+import "../rules/reach-weapon.mjs";
+import "../rules/restraints.mjs";
+import "../rules/stalking-stance.mjs";
+import "../rules/still-standing.mjs";
+import "../rules/stone-cold.mjs";
+import "../rules/superior-accuracy-weapon.mjs";
+import "../rules/task-pressure.mjs";
+import "../rules/terrain.mjs";
+import "../rules/threaten.mjs";
+import "../rules/tracking.mjs";
+import "../rules/trained-only-weapon.mjs";
+import "../rules/trip-attack.mjs";
+import "../rules/trip.mjs";
+import "../rules/tumble.mjs";
+import "../rules/unnerving.mjs";
+import "../rules/strut.mjs";
+import "./shared-checks.mjs";
 import "./skill-checks.mjs";
+import "./record-fields.mjs";
 import "./chat-controls.mjs";
 
 export { rollPipeline } from "../rules/roll-pipeline.mjs";

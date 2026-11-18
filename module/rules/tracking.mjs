@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Survival/Tracking p.167 Table 2.48; Tracking feats p.207; Trail Signs pp.44,47. */
 export const TRACKING_SURFACES = {
   verySoft: { label: "Very soft (sand, mud, snow)", dc: 15, error: 0 },
@@ -149,3 +150,12 @@ export function validateTrackingFeatProof(system, proof, { checkKind, skillKey, 
   )
     throw new Error("The Tracking feat, trail/surprise context or supporting source changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "trackingFeat",
+  order: 1600,
+  record: ["trackingFeat"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey }) =>
+    validateTrackingFeatProof(actor.system, options.trackingFeat, { checkKind, skillKey, checkId, checkMethod })
+});

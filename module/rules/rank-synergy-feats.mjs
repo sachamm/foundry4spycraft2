@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Faceless p.195, Traceless p.196, Silver Tongue p.205; Ghost Basics p.195: automatic named-rank synergy. */
 const SOURCES = [
   { feat: "Faceless", targets: ["blend"], skill: "sneak" },
@@ -100,3 +101,12 @@ export function validateRankSynergyFeatProof(system, proof, { checkKind, skillKe
   )
     throw new Error("The rank-synergy feat, supporting ranks, language or Hide-target context changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "rankSynergyFeat",
+  order: 1550,
+  record: ["rankSynergyFeats"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateRankSynergyFeatProof(actor.system, options.rankSynergyFeats, { checkKind, skillKey, checkId })
+});

@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Brawler Ploy: Still Standing, p.66. Actual derived class selection, not a feat name. */
 export function stillStandingSource(system) {
   const level = system?.classLevels?.brawler ?? 0;
@@ -77,3 +78,12 @@ export function validateStillStandingSaveProof(system, proof, { checkKind, check
   )
     throw Error("The Still Standing Ploy or confirmed takedown Fortitude save changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "stillStandingSave",
+  order: 1430,
+  record: ["stillStandingSave"],
+  validate: ({ actor, options, checkKind, checkId }) =>
+    validateStillStandingSaveProof(actor.system, options.stillStandingSave, { checkKind, checkId })
+});

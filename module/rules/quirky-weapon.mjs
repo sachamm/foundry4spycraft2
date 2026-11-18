@@ -1,5 +1,6 @@
 import { quirkyAttackPlan } from "./quirky.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export function quirkyWeaponPlan(
   weapon,
   {
@@ -35,3 +36,16 @@ export function validateQuirkyWeaponProof(actor, proof, context = {}) {
       "The Quirky weapon source, actual operating proficiency or base untrained penalty changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "quirkyWeapon",
+  order: 1330,
+  validate: ({ actor, options, checkKind }) =>
+    validateQuirkyWeaponProof(actor, options.attackContext?.quirky, {
+      checkKind,
+      weaponProficiency: options.weaponProficiency,
+      weaponUuid: options.weaponUuid,
+      attackContext: options.attackContext
+    })
+});

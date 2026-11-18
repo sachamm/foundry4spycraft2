@@ -2,6 +2,7 @@ import { stanceMovementRoutePlan } from "./stance-movement.mjs";
 import { combatStanceState } from "./combat-stance.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const GHOST = ["Ghost Basics", "Ghost Mastery", "Ghost Supremacy"];
 const same = (a, b) =>
   JSON.stringify(a, (_k, x) =>
@@ -184,3 +185,20 @@ export function validateHideMovementProof(
       p.blockedReason || "The Hide route, current Speed, Ghost source or movement modifiers changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "hideMovement",
+  order: 1540,
+  record: ["hideMovement"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey }) =>
+    validateHideMovementProof(actor.system, options.hideMovement, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      actor,
+      rerollOf: options.rerollOf,
+      stanceCombat: actor.mentalLeapCombatContext()
+    })
+});

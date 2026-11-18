@@ -13,6 +13,7 @@ import { queueRuleState } from "./rule-resource-scope.mjs";
 import { attackCharacterTargetChoices, completeCharacterTarget } from "./character-target.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, finalWeaponReady, postFinalAttack } from "./final-attack.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Set(),
   messages = () => [...(game.messages ?? [])],
@@ -433,3 +434,19 @@ export async function reviewStrikingAttack(actor, input = {}) {
     })
   );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "strikingAttack",
+  order: 1070,
+  validate: ({ actor, options, checkKind, formula, data, weaponUuid }) =>
+    validateStrikingAttackProof(actor, options.finalAttack, {
+      checkKind,
+      weaponUuid,
+      attackContext: options.attackContext,
+      lease: options.strikingLease,
+      rerollOf: options.rerollOf,
+      formula,
+      data
+    })
+});

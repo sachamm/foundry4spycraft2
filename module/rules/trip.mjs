@@ -2,6 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
 import { attributeDefensePlan } from "./attributes.mjs";
 import { uncannyDodgePlan } from "./defense.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export const TRIP_SIZES = Object.freeze([
   "Nuisance",
   "Fine",
@@ -221,3 +222,26 @@ export function validateTripDefenseProof(
       "The Trip-defense circumstances, vulnerability or qualified Covert feat sources changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "tripDefense",
+  order: 1490,
+  record: ["tripDefense"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey, ability }) =>
+    validateTripDefenseProof(actor.system, options.tripDefense, {
+      checkKind,
+      skillKey,
+      checkId,
+      checkMethod,
+      ability,
+      attributeSubstitution: options.attributeSubstitution,
+      combat: actor.mentalLeapCombatContext()
+    })
+});
+rollPipeline.register({
+  id: "tripDefenseChecks",
+  order: 5070,
+  kinds: ["skill"],
+  skillChecks: ({ skillKey }, checks) => tripDefenseSkillChecks(skillKey, checks)
+});

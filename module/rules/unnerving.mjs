@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Unnerving, p.451. Additional stress requires damage actually inflicted by an unarmed/melee attack. */
 export function unnervingGrade(system) {
   return Math.min(3, (system.originEffects ?? []).filter(effect => effect.qualityKey === "unnerving").length);
@@ -25,3 +26,13 @@ export function unnervingPlan(system, check, { target = "", damageInflictedConfi
   const grade = check.unnervingAvailableGrade;
   return { grade, formula: `${grade}d4`, damageType: "stress", target: target.trim(), damageInflictedConfirmed: true };
 }
+
+// Roll pipeline: a damaging attack's added stress may be recorded after its ordinary outcome is resolved.
+rollPipeline.register({
+  id: "unnervingControl",
+  order: 9500,
+  chatControls({ message, check, actor, user }) {
+    if (!(message.isAuthor || user.isGM) || !unnervingEligible(actor.system, check)) return null;
+    return [{ label: "Resolve Unnerving stress", run: () => actor.resolveUnnerving(message) }];
+  }
+});

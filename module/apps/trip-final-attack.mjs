@@ -9,6 +9,7 @@ import {
 } from "./character-target.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, postFinalAttack, finalWeaponReady } from "./final-attack.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Set(),
   stable = v =>
@@ -339,3 +340,18 @@ export async function reviewTripFinalAttack(actor, input = {}) {
     { messages: [row.acting, row.defending] }
   );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "tripFinalAttack",
+  order: 1060,
+  record: ["finalAttack"],
+  validate: ({ actor, options, checkKind, weaponUuid }) =>
+    validateTripFinalAttackProof(actor, options.finalAttack, {
+      checkKind,
+      weaponUuid,
+      attackContext: options.attackContext,
+      lease: options.tripFinalLease,
+      rerollOf: options.rerollOf
+    })
+});

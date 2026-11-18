@@ -1,4 +1,5 @@
 import { validateDamageLedger, accumulatedDamagePlan } from "./accumulated-damage.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function pendingDamageSave(actor, eventId, { allowSettling = false } = {}) {
   const ledger = validateDamageLedger(actor.system.accumulatedDamage),
@@ -118,3 +119,12 @@ export function validateDamageSaveRoll(actor, context, kind, key) {
   )
     throw new Error("The check does not match the next pending damage save.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "damageSaveRoll",
+  order: 1670,
+  record: ["damageSave"],
+  validate: ({ actor, options, checkKind, checkId }) =>
+    validateDamageSaveRoll(actor, options.damageSave, checkKind, checkId)
+});

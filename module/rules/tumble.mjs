@@ -1,5 +1,6 @@
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Tumble and Table2.13 p.109; Equilibrium Mastery p.194. Plans one rolled half action. */
 export function tumblePathPlan(
   system,
@@ -121,3 +122,12 @@ export function validateTumblePathProof(system, proof, { checkKind, skillKey, ch
       "The Tumble path, current Speed, movement condition or qualified Equilibrium source changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "tumblePath",
+  order: 1440,
+  record: ["tumblePath"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey }) =>
+    validateTumblePathProof(actor.system, options.tumblePath, { checkKind, skillKey, checkId, checkMethod })
+});

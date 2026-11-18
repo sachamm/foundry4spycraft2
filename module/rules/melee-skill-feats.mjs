@@ -1,4 +1,5 @@
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Readied melee feat skill benefits, pp.176,179–180. Other benefits remain separate. */
 const definitions = [
   { name: "Axe Basics", family: "axe", scopes: ["trip"], bonus: 1 },
@@ -64,3 +65,12 @@ export function validateMeleeSkillFeatProof(system, proof, { checkKind, skillKey
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error("The readied melee weapon, qualified feat or named skill use changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "meleeSkillFeat",
+  order: 1380,
+  record: ["meleeSkillFeats"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateMeleeSkillFeatProof(actor.system, options.meleeSkillFeats, { checkKind, skillKey, checkId })
+});

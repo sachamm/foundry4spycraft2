@@ -2,6 +2,7 @@ import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { feintBonusRows, feintBonusGrantPlan, assertFeintBonusPlan } from "../rules/feint-bonus.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   activeAttempts = new Map(),
   stable = v =>
@@ -259,3 +260,27 @@ export async function reviewFeintBonuses(actor, input = {}) {
     return { version: 1, attemptId: input.attemptId, receiptUuid: receipt?.uuid ?? null, released: !receipt };
   });
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "feintAttackBonus",
+  order: 1190,
+  validate: ({ actor, options, checkKind }) =>
+    validateFeintAttackBonusProof(actor, options.attackContext?.feintBonus, {
+      checkKind,
+      attackContext: options.attackContext,
+      lease: options.feintBonusLease,
+      rerollOf: options.rerollOf,
+      finalAttack: options.finalAttack
+    })
+});
+rollPipeline.register({
+  order: 10,
+  id: "feintBonusLease",
+  acquire({ actor, options }) {
+    const proof = options.attackContext?.feintBonus;
+    if (proof?.attackBonus !== 2 || options.rerollOf || hasFeintBonusLease(actor, proof, options.feintBonusLease))
+      return null;
+    return next => withFeintAttackBonus(actor, proof, lease => next({ feintBonusLease: lease }));
+  }
+});

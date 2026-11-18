@@ -2,6 +2,7 @@ import { hasAquaticQuality } from "./environment.mjs";
 import { activeNoFear } from "./health.mjs";
 import { RESISTANCE_TYPES, qualityResistances } from "./resistances.mjs";
 import { stackedBonuses } from "./knowledge.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Terrain training, pp.206–207. Darkness is not a terrain type (p.206). */
 /** Active-character daily fluids, p.349; Desert Training halves the requirement everywhere, p.206. */
 export function dailyWaterRequirements(system, { temperatureF = null } = {}) {
@@ -331,3 +332,18 @@ export function validateTerrainSaveSource(system, source, { checkKind, checkId }
   )
     throw new Error("The conditional save feat or insight source changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "terrainSaveSource",
+  order: 1700,
+  record: ["terrainSaveSource"],
+  validate: ({ actor, options, checkKind, checkId }) =>
+    validateTerrainSaveSource(actor.system, options.terrainSaveSource, { checkKind, checkId })
+});
+rollPipeline.register({
+  id: "terrainChecks",
+  order: 5010,
+  kinds: ["skill"],
+  skillChecks: ({ actor, skillKey }, checks) => terrainSkillChecks(actor.system, skillKey, checks)
+});

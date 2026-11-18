@@ -2,6 +2,7 @@ import { weaponGrip } from "./gear.mjs";
 import { grantedMeleeQuality } from "./melee-tricks.mjs";
 import { finesseWeaponPlan } from "./finesse.mjs";
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -170,3 +171,20 @@ export function validateRecordedMeleeArmorPiercing(check) {
   )
     throw Error("The posted result lost or changed its earned armor-piercing quality.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "meleeArmorPiercing",
+  order: 1020,
+  record: ["meleeArmorPiercing"],
+  validate: ({ actor, options, checkKind, weaponUuid, weaponProficiency, weaponQualities }) =>
+    validateMeleeArmorPiercingProof(actor, options.meleeArmorPiercing, {
+      checkKind,
+      weaponUuid,
+      weaponProficiency,
+      weaponQualities,
+      attackContext: options.attackContext,
+      grantedQuality: options.attackDamageBenefit?.grantedQuality,
+      rerollOf: options.rerollOf
+    })
+});

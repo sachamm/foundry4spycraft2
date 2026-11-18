@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Held/Pinned action restrictions and their Athletics escape exception (p.342). */
 export function restraintState(system) {
   return system.conditionContext?.pinned === true ? "pinned" : system.conditionContext?.held === true ? "held" : "";
@@ -177,3 +178,11 @@ export const getPendingRestraintMoves = actor =>
   Object.values(actor.flags?.spycraft2?.restraintReleases ?? {}).filter(
     r => r?.state === "applied" && r.movement?.state === "required"
   );
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "restraintChecks",
+  order: 5030,
+  kinds: ["skill"],
+  skillChecks: ({ actor, skillKey }, checks) => restraintSkillChecks(actor.system, skillKey, checks)
+});

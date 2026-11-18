@@ -1,4 +1,5 @@
 import { oldSchoolEligible, oldSchoolPlan } from "../rules/old-school.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 /** GC facts support unrecorded NPCs without inferring their hidden class/feat sheets. */
 export async function oldSchoolContext(actor, context, options = {}) {
   let input = options.oldSchool;
@@ -54,3 +55,10 @@ export function validateOldSchool(actor, context, evidence) {
   )
     throw new Error("Old School’s target facts or source changed before posting the check.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "oldSchool",
+  order: 1660,
+  validate: ({ actor, oldSchoolScope, oldSchool }) => validateOldSchool(actor, oldSchoolScope, oldSchool)
+});

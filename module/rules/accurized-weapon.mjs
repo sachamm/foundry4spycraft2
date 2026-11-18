@@ -1,5 +1,6 @@
 import { accurizedAttackPlan } from "./accurized.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Source identity stays the actual Item even when an operation substitutes proficiency. */
 export function accurizedWeaponPlan(
   weapon,
@@ -31,3 +32,16 @@ export function validateAccurizedWeaponProof(actor, proof, context = {}) {
   if (stable(current) !== stable(proof))
     throw Error("The Accurized weapon source, actual operating proficiency or valid Aim changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "accurizedWeapon",
+  order: 1270,
+  validate: ({ actor, options, checkKind }) =>
+    validateAccurizedWeaponProof(actor, options.attackContext?.accurized, {
+      checkKind,
+      weaponProficiency: options.weaponProficiency,
+      weaponUuid: options.weaponUuid,
+      attackContext: options.attackContext
+    })
+});

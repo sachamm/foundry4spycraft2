@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Attribute damage and mission-end recovery, p.17. Current scores may be negative. */
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const clean = () => ({ version: 1, events: [], recoveries: [] });
@@ -222,3 +223,11 @@ export function attributeDamageCorrectionPlan(system, { id, eventId, reason, con
   record.recoveries.push(recovery);
   return { record, recovery, alreadyApplied: false, changed: true };
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "attributeDamage",
+  order: 1220,
+  validate: ({ actor, checkKind, attributeDamage }) =>
+    validateAttributeDamageProof(actor.system, attributeDamage, { checkKind })
+});

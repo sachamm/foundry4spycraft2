@@ -1,5 +1,6 @@
 import { superiorAccuracyAttackPlan } from "./superior-accuracy.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export function superiorAccuracyWeaponPlan(
   weapon,
   { trained = false, aimed = false, braced = false, operatingProficiency = weapon?.proficiency ?? null } = {}
@@ -33,3 +34,16 @@ export function validateSuperiorAccuracyWeaponProof(actor, proof, context = {}) 
       "The Superior Accuracy weapon source, actual operating proficiency, valid Aim or valid Brace changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "superiorAccuracyWeapon",
+  order: 1340,
+  validate: ({ actor, options, checkKind }) =>
+    validateSuperiorAccuracyWeaponProof(actor, options.attackContext?.superiorAccuracy, {
+      checkKind,
+      weaponProficiency: options.weaponProficiency,
+      weaponUuid: options.weaponUuid,
+      attackContext: options.attackContext
+    })
+});

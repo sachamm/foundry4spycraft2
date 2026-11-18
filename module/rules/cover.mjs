@@ -1,5 +1,6 @@
 import { terrainCoverPlan } from "./terrain-cover.mjs";
 import { cqbRangedWeapon } from "./cqb.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export const COVER_GRADES = ["None", "One-quarter (1/4)", "One-half (1/2)", "Three-quarters (3/4)", "Total"];
 /** Counter-Terrorist p.69: second grade replaces the first; no weapon or range restriction. */
 export function precisionTakedownGrade(system) {
@@ -197,3 +198,12 @@ export function validateCoverSaveSource(system, proof, { checkKind, checkId } = 
   if (checkKind !== "save" || checkId !== "ref" || JSON.stringify(current) !== JSON.stringify(proof))
     throw new Error("The terrain cover save source, grades or circumstances changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "coverSaveSource",
+  order: 1690,
+  record: ["coverSave"],
+  validate: ({ actor, options, checkKind, checkId }) =>
+    validateCoverSaveSource(actor.system, options.coverSave, { checkKind, checkId })
+});

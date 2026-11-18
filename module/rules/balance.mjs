@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Table2.10 and Balance p.106; Equilibrium Basics/Mastery p.194. */
 export const BALANCE_SURFACES = {
   flat: { label: "Flat, normal surface", dc: 5, error: 0, mastery: false },
@@ -139,3 +140,12 @@ export function validateBalanceSurfaceProof(system, proof, { checkKind, skillKey
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error("The Balance surface, movement, current Speed or qualified Equilibrium source changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "balanceSurface",
+  order: 1520,
+  record: ["balanceSurface"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateBalanceSurfaceProof(actor.system, options.balanceSurface, { checkKind, skillKey, checkId })
+});

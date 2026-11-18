@@ -2,6 +2,7 @@ import { uncannyDodgePlan } from "../rules/defense.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { characterCareerLevel, whirlingStancePlan } from "../rules/whirling-stance.mjs";
 import { combatStanceState } from "../rules/combat-stance.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -106,3 +107,26 @@ export function validateWhirlingIncomingIdentity(proof, otherAttackerUuids = [])
         "Whirling Stance, cover and invisibility must refer to the same actual incoming attacker; select that observed character for its career level."
       );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "whirlingAttack",
+  order: 1360,
+  validate: ({ actor, options, checkKind }) =>
+    validateWhirlingAttackProof(actor, options.attackContext?.flanking?.whirling, {
+      checkKind,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf
+    })
+});
+rollPipeline.register({
+  id: "whirlingSneakAttack",
+  order: 1370,
+  validate: ({ actor, options, checkKind }) =>
+    validateWhirlingAttackProof(actor, options.sneakAttack?.whirling, {
+      checkKind,
+      attackContext: { targetFlanked: true, targetActorUuid: options.sneakAttackTarget?.actorUuid },
+      rerollOf: options.rerollOf,
+      sneakAttack: options.sneakAttack
+    })
+});

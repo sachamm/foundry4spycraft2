@@ -1,6 +1,7 @@
 import { weaponGrip } from "./gear.mjs";
 import { combatStanceState } from "./combat-stance.mjs";
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Record the physical grip only when the new stance affects this melee attack. */
 export function grippingAttackProof(system, weapon, { ranged = false, hands = weapon.useHands ?? 0 } = {}) {
   const stance = combatStanceState(system),
@@ -70,3 +71,16 @@ export function validateGrippingAttackProof(
   if (stable(current) !== stable(proof))
     throw Error("The actual grip, qualified Gripping Stance or weapon changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "grippingAttack",
+  order: 1150,
+  validate: ({ actor, options, checkKind, weaponUuid }) =>
+    validateGrippingAttackProof(actor, options.attackContext?.grippingStance, {
+      checkKind,
+      weaponUuid,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf
+    })
+});

@@ -11,6 +11,7 @@ import { queueRuleState } from "./rule-resource-scope.mjs";
 import { queueResources } from "../rules/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   key = (a, id) => a.uuid + ":" + id;
@@ -405,3 +406,18 @@ export async function manageTakedown(actor, input = {}) {
   }
   throw Error("Choose a listed takedown operation.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "takedownSave",
+  order: 1040,
+  record: ["takedown"],
+  validate: ({ actor, options, checkKind, checkId, checkMethod }) =>
+    validateTakedownSaveProof(actor, options.takedown, {
+      checkKind,
+      checkId,
+      checkMethod,
+      lease: options.takedownLease,
+      rerollOf: options.rerollOf
+    })
+});

@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Bug Basics p.208: only the two named Stash Item checks made to conceal bugs. */
 export function bugConcealmentPlan(
   system,
@@ -42,3 +43,12 @@ export function validateBugConcealmentProof(system, proof, { checkKind, skillKey
   )
     throw new Error("The Bug Basics source or declared bug concealment changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "bugConcealment",
+  order: 1580,
+  record: ["bugConcealment"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateBugConcealmentProof(actor.system, options.bugConcealment, { checkKind, skillKey, checkId })
+});

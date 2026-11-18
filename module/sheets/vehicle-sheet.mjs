@@ -1,3 +1,4 @@
+import { systemDialog } from "../apps/dialog-theme.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { VEHICLE_DAMAGE_COUNTERS } from "../rules/vehicles.mjs";
 import {
@@ -58,7 +59,7 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
         return rollFuelExplosion(this.actor);
       },
       async repair() {
-        const confirmed = await foundry.applications.api.DialogV2.confirm({
+        const confirmed = await systemDialog.confirm({
           window: { title: `${this.actor.name}: repairs` },
           content: "<p>Clear every failed Damage save and Vehicle Damage result recorded on this vehicle?</p>",
           rejectClose: false

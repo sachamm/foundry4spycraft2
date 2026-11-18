@@ -12,8 +12,12 @@
  *     validate(ctx),                 // throw to stop the roll; runs before and after the dice (ctx.phase)
  *     modifiers(ctx),                // return [{label, value}] added to the roll
  *     flags(ctx),                    // return an object merged into the chat message's check record
- *     chatControls(ctx)              // return [{label, run}] buttons for a posted check
+ *     record: ['takedown'],          // roll options copied onto that record as they are (null when absent)
+ *     chatControls(ctx)              // return [{label, run, placement?}] buttons for a posted check
  *   }
+ *
+ * A rule registers from its own module; module/rolls/index.mjs imports every module that does. Phases are
+ * independent: `order` only ranks contributors within the same phase.
  *
  * This module is pure: it knows nothing about Foundry, so it runs under Node tests.
  */
@@ -41,7 +45,13 @@ export class RollPipeline {
         throw new TypeError(`Roll contributor "${id}": ${phase} must be a function.`);
       }
     }
-    if (!PHASES.some(phase => typeof spec[phase] === "function")) {
+    if (
+      spec.record !== undefined &&
+      !(Array.isArray(spec.record) && spec.record.every(k => typeof k === "string" && k))
+    ) {
+      throw new TypeError(`Roll contributor "${id}": record must be an array of option names.`);
+    }
+    if (!PHASES.some(phase => typeof spec[phase] === "function") && !spec.record?.length) {
       throw new TypeError(`Roll contributor "${id}" implements no phase.`);
     }
     this.#contributors.push({ ...spec, order: spec.order ?? 0, sequence: this.#sequence++ });
@@ -124,9 +134,13 @@ export class RollPipeline {
     return { total: rows.reduce((sum, row) => sum + row.value, 0), rows };
   }
 
-  /** Extra fields for the posted check record. Later contributors win on a shared key. */
+  /**
+   * Extra fields for the posted check record: every `record` option first (whatever the check kind, so a record
+   * always has the same fields), then each contributor's own `flags`. Later contributors win on a shared key.
+   */
   flags(ctx) {
     const merged = {};
+    for (const c of this.#contributors) for (const key of c.record ?? []) merged[key] = ctx?.options?.[key] ?? null;
     for (const c of this.#active("flags", ctx)) {
       const result = c.flags(ctx);
       if (result === undefined || result === null) continue;
@@ -138,7 +152,7 @@ export class RollPipeline {
     return merged;
   }
 
-  /** Buttons to show under a posted check: [{id, label, run}]. */
+  /** Buttons to show under a posted check: [{id, label, run, placement}]. */
   chatControls(ctx) {
     const controls = [];
     for (const c of this.#active("chatControls", ctx)) {
@@ -149,7 +163,7 @@ export class RollPipeline {
         if (!control || typeof control.label !== "string" || !control.label || typeof control.run !== "function") {
           throw new TypeError(`Roll contributor "${c.id}": each chat control needs a label and a run function.`);
         }
-        controls.push({ id: c.id, label: control.label, run: control.run });
+        controls.push({ id: c.id, label: control.label, run: control.run, placement: control.placement ?? "plain" });
       }
     }
     return controls;

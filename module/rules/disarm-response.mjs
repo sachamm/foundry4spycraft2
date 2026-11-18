@@ -5,6 +5,7 @@ import { DISARM_SIZES, disarmWeaponSize } from "./disarm.mjs";
 import { axeDisarmPlan } from "./axe-disarm.mjs";
 import { readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { ownedWeaponTraining } from "./weapon-training.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Actual held personal weapons; training is not required for Sure Grip. */
 export function readiedDisarmWeapons(system, items = []) {
   const weapons = [];
@@ -200,3 +201,17 @@ export function validateDisarmResponseProof(actor, proof, context = {}) {
       "The targeted readied weapon, Sure Grip, Disarm response or current attack sources changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "disarmResponse",
+  order: 1320,
+  validate: ({ actor, options, checkKind }) =>
+    validateDisarmResponseProof(actor, options.attackContext?.disarm, {
+      checkKind,
+      weaponProficiency: options.weaponProficiency,
+      weaponUuid: options.weaponUuid,
+      attackContext: options.attackContext,
+      rerollOf: options.rerollOf
+    })
+});

@@ -4,6 +4,7 @@ import { bullseyeDamageSourceFacts } from "../rules/bullseye.mjs";
 import { ownedWeaponTraining, weaponSourceIdentity } from "../rules/weapon-training.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   stable = v =>
@@ -429,3 +430,34 @@ export async function reviewAttackDamageBenefit(actor, { reservationId, confirme
     return { version: 1, reservationId, receiptUuid: receipt?.uuid ?? null, released: !receipt };
   });
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "trickSneakSource",
+  order: 1100,
+  record: ["sneakAttack"],
+  validate: ({ options }) => validateTrickSneakSource(options.attackDamageBenefit, options.sneakAttack)
+});
+rollPipeline.register({
+  id: "attackDamage",
+  order: 1110,
+  record: ["attackDamageBenefit"],
+  validate: ({ actor, options, checkKind, weaponUuid, weaponProficiency, weaponQualities }) =>
+    validateAttackDamageProof(actor, options.attackDamageBenefit, {
+      checkKind,
+      weaponUuid,
+      lease: options.attackDamageLease,
+      weaponProficiency,
+      weaponQualities,
+      rerollOf: options.rerollOf
+    })
+});
+rollPipeline.register({
+  order: 20,
+  id: "attackDamageLease",
+  acquire({ actor, options }) {
+    const proof = options.attackDamageBenefit;
+    if (!proof || options.rerollOf || hasAttackDamageLease(actor, proof, options.attackDamageLease)) return null;
+    return next => withAttackDamageBenefit(actor, proof, lease => next({ attackDamageLease: lease }));
+  }
+});

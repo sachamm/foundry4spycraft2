@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Complex Analysis challenge counts: Forensic Genius p.209 and Tracking Mastery p.207. */
 export function analysisChallengeCount(system, base, { forensics = false } = {}) {
   const raw = typeof base === "string" && base.trim() ? Number(base) : base;
@@ -90,3 +91,12 @@ export function validateTrackingTaskProof(system, proof, { checkKind, skillKey, 
   )
     throw new Error("The Tracking Mastery Forensics task source or challenge count changed before posting.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "trackingTask",
+  order: 1610,
+  record: ["trackingMasteryTask"],
+  validate: ({ actor, options, checkKind, checkId, skillKey }) =>
+    validateTrackingTaskProof(actor.system, options.trackingMasteryTask, { checkKind, skillKey, checkId })
+});

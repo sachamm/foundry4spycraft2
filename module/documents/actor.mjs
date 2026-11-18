@@ -1,3 +1,4 @@
+import { systemDialog } from "../apps/dialog-theme.mjs";
 import { rollPipeline } from "../rolls/index.mjs";
 import { formulaWithModifiers } from "../rules/roll-pipeline.mjs";
 import { missionSettlementDefaults } from "../apps/gc/mission-defaults.mjs";
@@ -590,7 +591,7 @@ export class SpycraftActor extends Actor {
       const second = await new Roll(rollFormula, data).evaluate(),
         rolls = [roll, second];
       alternatives = rolls.map(r => ({ total: r.total, naturalDie: r.dice[0]?.total ?? null }));
-      const selection = await foundry.applications.api.DialogV2.input({
+      const selection = await systemDialog.input({
         window: { title: `${choiceSource}: choose the preferred result` },
         rejectClose: false,
         content: `<label>Result <select name="chosen">${alternatives.map((r, index) => `<option value="${index}">Roll ${index + 1}: ${r.total} (natural ${r.naturalDie})</option>`).join("")}</select></label><p>Closing this dialog keeps the first result.</p>`
@@ -635,37 +636,7 @@ export class SpycraftActor extends Actor {
     const check = {
       ...rollPipeline.flags(rollContext),
       ...(pipelineModifiers.rows.length ? { pipelineModifiers: pipelineModifiers.rows } : {}),
-      tripAttack: options.tripAttack ?? null,
-      meleeArmorPiercing: options.meleeArmorPiercing ?? null,
-      drivingStance: options.drivingStance ?? null,
-      takedown: options.takedown ?? null,
-      attackDamageBenefit: options.attackDamageBenefit ?? null,
-      stalkingStance: options.stalkingStance ?? null,
-      sideStanceDamage: options.sideStanceDamage ?? null,
-      cheapShotRecovery: options.cheapShotRecovery ?? null,
-      feint: options.feint ?? null,
       attributeDamage,
-      meleeSkillFeats: options.meleeSkillFeats ?? null,
-      conveyanceBullRush: options.conveyanceBullRush ?? null,
-      bullRushAttack: options.bullRushAttack ?? null,
-      bullRushDefense: options.bullRushDefense ?? null,
-      stillStandingSave: options.stillStandingSave ?? null,
-      tumblePath: options.tumblePath ?? null,
-      tripDefense: options.tripDefense ?? null,
-      fallDistance: options.fallDistance ?? null,
-      balanceSurface: options.balanceSurface ?? null,
-      hideCircumstances: options.hideCircumstances ?? null,
-      detectionObserver: options.detectionObserver ?? null,
-      hideMovement: options.hideMovement ?? null,
-      targetSkillEffect: options.targetSkillEffect ?? null,
-      rankSynergyFeats: options.rankSynergyFeats ?? null,
-      stoneCold: options.stoneCold ?? null,
-      threaten: options.threaten ?? null,
-      bugConcealment: options.bugConcealment ?? null,
-      documentation: options.documentation ?? null,
-      trackingFeat: options.trackingFeat ?? null,
-      trackingMasteryTask: options.trackingMasteryTask ?? null,
-      terrainSaveSource: options.terrainSaveSource ?? null,
       oldSchool,
       analysisTask: options.analysisTask
         ? {
@@ -679,8 +650,6 @@ export class SpycraftActor extends Actor {
             completedAt: game.time?.worldTime ?? null
           }
         : null,
-      forensicGenius: options.forensicGenius ?? null,
-      closedCourseFeat: options.closedCourseFeat ?? null,
       wheelFeat: options.wheelFeat
         ? {
             ...options.wheelFeat,
@@ -689,84 +658,26 @@ export class SpycraftActor extends Actor {
               : {})
           }
         : null,
-      requestBenefit: options.requestBenefit ?? null,
-      rerollSource: options.rerollSource ?? null,
-      practiceFeat: options.practiceFeat ?? null,
-      fundedTaking: options.fundedTaking ?? null,
-      gearAllowance: options.gearAllowance ?? null,
-      gearCheckContext: options.gearCheckContext ?? null,
-      improvisedSearch: options.improvisedSearch ?? null,
-      terrainFeat: options.terrainFeat ?? null,
-      pursuitFeat: options.pursuitFeat ?? null,
-      professionalFeat: options.professionalFeat ?? null,
-      contactFeat: options.contactFeat ?? null,
-      polyglot: options.polyglot ?? null,
-      photographicMemory: options.photographicMemory ?? null,
-      charmer: options.charmer ?? null,
-      cardSharkKnowledge: options.cardSharkKnowledge ?? null,
-      cardSharkProfession: options.cardSharkProfession ?? null,
-      appearanceModifiers: options.appearanceModifiers ?? null,
-      hardCore: options.hardCore ?? null,
-      finalAttackRound: options.finalAttackRound ?? null,
-      finesseDamage: options.finesseDamage ?? null,
-      damageSave: options.damageSave ?? null,
-      coverSave: options.coverSave ?? null,
-      cqbRange: options.cqbRange ?? null,
-      finalAttack: options.finalAttack ?? null,
-      twoWeaponFinalAttack: options.twoWeaponFinalAttack ?? null,
       shakenContext,
-      restraintEscape: options.restraintEscape ?? null,
-      skillBonusCondition: options.skillBonusCondition ?? null,
-      skillCheckAdjustment: options.skillCheckAdjustment ?? null,
-      weaponFocusWork: options.weaponFocusWork ?? null,
       baffledSaveBonus: options.baffledSaveBonus ?? 0,
-      gamblingDice: options.gamblingDice ?? null,
       rollCombat: recordedCombat
         ? { id: recordedCombat.id, round: recordedCombat.round, combatantId: recordedCombat.combatantId }
         : null,
-      preRollFunding: options.preRollFunding ?? null,
-      hailMary: options.hailMary ?? null,
-      rerollFunding: options.rerollFunding ?? null,
-      rerollReceiptId: options.rerollReceiptId ?? null,
-      rerollOf: options.rerollOf ?? null,
       sleepSnapshot,
       conditionAbilityAdjustment: options.conditionAbilityAdjustment ?? 0,
       conditionDamagePenalty,
-      evasionContext: options.evasionContext ?? null,
       securityBonus: options.securityBonus ?? 0,
       fatigueBonus: options.fatigueBonus ?? 0,
       fatigueCondition: options.fatigueCondition ?? "",
-      underwaterContext: options.underwaterContext ?? null,
-      mortarOperation: options.mortarOperation ?? null,
-      launcherOperation: options.launcherOperation ?? null,
       unnervingAvailableGrade: options.unnervingAvailableGrade ?? 0,
-      unnervingStress: options.unnervingStress ?? null,
-      qualityChecks: options.qualityChecks ?? null,
-      medical: options.medical ?? null,
       littleDetails: options.littleDetails
         ? {
             ...options.littleDetails,
             round: this.system.resourceUses?.littleDetailsRound?.epoch ?? options.littleDetails.round
           }
         : null,
-      sensoryConditions: options.sensoryConditions ?? null,
-      skillTags: options.skillTags ?? null,
-      skillGear: options.skillGear ?? null,
-      fogSmoke: options.fogSmoke ?? null,
-      terrainSave: options.terrainSave ?? null,
-      localHeroOpposition: options.localHeroOpposition ?? null,
       cunningPlan: cunning,
-      attributeSubstitution: options.attributeSubstitution ?? null,
-      terrain: options.terrain ?? null,
-      senses: options.senses ?? null,
-      tracking: options.tracking ?? null,
       gcTakingPermissionConfirmed: options.gcTakingPermissionConfirmed === true,
-      ambush: options.ambush ?? null,
-      sneakAttackTarget: options.sneakAttackTarget ?? null,
-      sneakAttack: options.sneakAttack ?? null,
-      ambientLight: options.ambientLight ?? null,
-      nest: options.nest ?? null,
-      breakthrough: options.breakthrough ?? null,
       requiredBonusPoolId,
       requiredBonusSpent: false,
       cannotError: !!cannotError,
@@ -1005,7 +916,7 @@ export class SpycraftActor extends Actor {
     const rule = rules[condition];
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: rule.label + " condition" },
         rejectClose: false,
         content: `<label>Condition <select name="active"><option value="true"${this.system.conditionContext?.[condition] ? "" : " selected"}>Apply ${rule.label}</option><option value="false"${this.system.conditionContext?.[condition] ? " selected" : ""}>Clear ${rule.label}</option></select></label><label><input name="confirmed" type="checkbox" /> The GC confirms the condition applies or its cause has ended</label><p>${rule.text}</p>`
@@ -1040,7 +951,7 @@ export class SpycraftActor extends Actor {
     if (event.state === "awake") return { state: "awake", changed: false };
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Wake from sleep" },
         rejectClose: false,
         content:
@@ -1062,7 +973,7 @@ export class SpycraftActor extends Actor {
         own = [...(combat?.combatants ?? [])].filter(c => c.actor?.uuid === this.uuid),
         esc = foundry.utils.escapeHTML;
       if (!combat?.started || !own.length) return ui.notifications.warn("Choose this character in a started combat.");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Apply Initiative Count loss" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><label>Combatant <select name="combatantId">${own.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></label><label>Listed loss <input name="loss" type="number" min="0" step="1" value="1" /></label><label><input name="selfInflicted" type="checkbox" /> This penalty is inflicted by my own action (Uncanny Dodge does not halve it)</label><label><input name="confirmed" type="checkbox" /> The GC confirms this loss and its source</label><p>Incoming losses are halved, rounded down, with Uncanny Dodge IV. No action die is spent.</p></div>`
@@ -1152,7 +1063,7 @@ export class SpycraftActor extends Actor {
         this.system.conditionContext?.baffled === true ||
         !!stillStandingContent)
     ) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label) },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">${stillStandingContent}${this.system.conditionContext?.baffled === true ? '<label><input type="checkbox" name="resistingBaffled" /> This save resists becoming Baffled (+8)</label>' : ""}${this.system.mentalLeapState?.fatigueSaveBonus ? '<label>Fatigue-related save <select name="fatigueCondition"><option value="">Other save</option><option value="fatigue">Resists becoming fatigued</option><option value="exhaustion">Resists becoming exhausted</option></select></label>' : ""}${key === "ref" ? saveCoverContent(this.system) : ""}${key === "ref" ? '<label><input type="checkbox" name="reflexReducesDamage" /> The source allows this Reflex save to reduce damage</label><label><input type="checkbox" name="flatFooted" /> I am flat-footed against this attack or event</label>' : ""}${key === "ref" && evasionPlan(this.system).canTake10 ? '<label>Method <select name="checkMethod"><option value="roll">Roll d20</option><option value="take10">Take 10 (Evasion III)</option></select></label>' : ""}${key === "ref" && uncannyDodgePlan(this.system).securityBonus ? '<label><input type="checkbox" name="securityDevice" /> This Reflex save avoids a security device (Uncanny Dodge +4)</label>' : ""}${key === "ref" ? '<label><input type="checkbox" name="braced" /> I am currently braced (apply the Brace Reflex penalty)</label><label><input type="checkbox" name="underwater" /> I am underwater</label>' : ""}${feats.has("Swamp Training") || feats.has("Poison Basics") ? '<label><input type="checkbox" name="poison" /> This save resists poison (owned Poison Basics / Swamp Training)</label>' : ""}${feats.has("Disease Basics") ? '<label><input type="checkbox" name="disease" /> This save resists disease (Disease Basics)</label>' : ""}${feats.has("Firefighter Training") && key === "ref" ? '<label><input type="checkbox" name="avoidCatchingFire" /> This Reflex save avoids catching fire (Firefighter Training)</label>' : ""}${feats.has("Firefighter Training") && key === "fort" ? '<label><input type="checkbox" name="smokeInhalation" /> This Fortitude save resists smoke inhalation (Firefighter Training)</label>' : ""}</div>`
@@ -1322,7 +1233,7 @@ export class SpycraftActor extends Actor {
             `<option value="${t.ability}"${t.ability === (ability ?? skill.ability) ? " selected" : ""}>${t.ability.toUpperCase()}</option>`
         )
         .join("");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: skill.name },
         rejectClose: false,
         ok: { label: "Roll check" },
@@ -2109,7 +2020,7 @@ export class SpycraftActor extends Actor {
       esc = foundry.utils.escapeHTML;
     let input = options;
     if (!Object.hasOwn(input, "expectedRound")) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Final Deduction study" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>${study ? `Continue ${esc(study.target)} after ${study.rounds} completed full rounds. Interruptions within this session preserve progress.` : "Begin one special-character study this session. First observe the target for at least one round in person or by audio/visual recording."} Each confirmation records one additional completed full round. The GC supplies all revelations; ties and final ordering belong to the GC.</p><label>Target special character <input name="target" value="${esc(study?.target ?? "")}" ${study ? "readonly" : ""} required /></label>${study ? "" : '<label><input name="specialCharacterConfirmed" type="checkbox" /> The target is a special character</label><label><input name="observedRoundConfirmed" type="checkbox" /> I previously observed this target for at least one round</label>'}<label><input name="fullRoundConfirmed" type="checkbox" /> I completed another full round studying this target</label>${(study?.rounds ?? 0) >= 4 ? '<label>Next information <select name="stage"><option value="classes">Next class and level</option><option value="skills">Next skill and ranks</option><option value="remaining">Remaining Subplots and proficiencies</option></select></label><label><input name="allClassesKnownConfirmed" type="checkbox" /> All target class names and levels are already known</label><label><input name="allSkillsKnownConfirmed" type="checkbox" /> All target skill names and ranks are already known</label>' : ""}</div>`
@@ -2180,7 +2091,7 @@ export class SpycraftActor extends Actor {
     if (!this.isOwner || !source) return ui.notifications.warn("Global Search is not currently available.");
     let input = options;
     if (!input.target) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Record completed Global Search" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Complete ${source.hoursPerLevel} hours × target level while taking only free actions, then record this use. The GC supplies the city or 20-mile × 20-mile area.</p><label>Target special character <input name="target" required /></label><label>GC-supplied target level <input name="targetLevel" type="number" min="1" step="1" required /></label><label>Hours completed <input name="hoursCompleted" type="number" min="0" step="any" required /></label><label><input name="specialCharacterConfirmed" type="checkbox" /> The target is a special character</label><label><input name="onlyFreeActionsConfirmed" type="checkbox" /> I performed no other non-free actions during the required search time</label></div>`
@@ -2214,7 +2125,7 @@ export class SpycraftActor extends Actor {
       return ui.notifications.warn("Little Details is not currently available.");
     let input = options;
     if (!input.action) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Little Details" },
         rejectClose: false,
         content:
@@ -2269,7 +2180,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     const esc = foundry.utils.escapeHTML;
     if (!input.skill) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Knowledge" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">
@@ -2446,7 +2357,7 @@ export class SpycraftActor extends Actor {
           (initialCQB.mastery && initialCQB.within && typeof options.targetOpponentConfirmed !== "boolean")))
     ) {
       const needsCQB = cqbRangePlan(this.system, item.system, options).active;
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Attack circumstances" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">${reachIncreaseFeet(item.system.qualities ?? "") ? reachContextContent(options) : ""}${cleaveTargetRequired(this, item.system) ? characterTargetContent(this, options) : observedAttackTargetContent(this, options)}<label><input type="checkbox" name="targetFlanked" /> I am flanking this opponent with this attack, satisfying the applicable position, ready-weapon and Reach/CQB requirements (p.341)</label><label><input type="checkbox" name="targetPinnedAdjacent" /> Target is pinned and I am adjacent (+4 melee/unarmed attack)</label><label><input type="checkbox" name="targetAnimal" /> This attack targets an animal (Scout Game Hunter, p.43)</label>${cqbRangedWeapon(item.system) ? meleeFireContextContent(options) + quickRangedAimContent(options) + bullseyeContent(this, options) : quickAttackActionContent(options) + allOutAttackContent(this, options) + meleeTrickContent(this, options)}${needsCQB ? `<label>CQB target distance (feet) <input name="distanceFeet" type="number" min="0" step="any" required value="${Number.isFinite(options.distanceFeet) ? options.distanceFeet : ""}" /></label><label><input name="targetOpponentConfirmed" type="checkbox" /> This attack targets an opponent (CQB Mastery threat benefit)</label>` : ""}</div>`
@@ -2494,7 +2405,7 @@ export class SpycraftActor extends Actor {
       reachIncreaseFeet(item.system.qualities ?? "") &&
       (typeof options.reachAdjacent !== "boolean" || options.reachGeometryConfirmed !== true)
     ) {
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Reach weapon — actual target geometry" },
         rejectClose: false,
         content: '<div class="spycraft2-roll-options">' + reachContextContent(options) + "</div>"
@@ -2752,7 +2663,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     if (!input.kind) {
       const esc = foundry.utils.escapeHTML;
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "One in a Million: declare before rolling" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Once per session, Soldier 14 may declare a natural 20 before an attack, Fortitude save or STR/CON skill check. For skills, choose this ability in the skill dialog instead.</p><label>Check <select name="kind"><option value="attack">Weapon attack</option><option value="fort">Fortitude save</option></select></label><label>Weapon for attack <select name="weaponId">${this.items
@@ -2775,7 +2686,7 @@ export class SpycraftActor extends Actor {
     if (!Object.keys(input).length) {
       const preview = this.weaponAttack(item),
         esc = foundry.utils.escapeHTML;
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: `Ranged attack: ${item.name}` },
         rejectClose: false,
         content: `
@@ -2826,7 +2737,7 @@ export class SpycraftActor extends Actor {
       return ui.notifications.warn("Unnerving is not available for this damage record.");
     let input = options;
     if (!input.target) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Unnerving: additional stress" },
         rejectClose: false,
         content:
@@ -2881,7 +2792,7 @@ export class SpycraftActor extends Actor {
       /\d*d\d+/i.test(item.system.damage) &&
       !Object.hasOwn(options, "mortarSpaceConfirmed")
     ) {
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Mortar damage circumstances" },
         rejectClose: false,
         content:
@@ -2896,7 +2807,7 @@ export class SpycraftActor extends Actor {
       /\d*d\d+/i.test(item.system.damage) &&
       !["underbarrelMountConfirmed", "usingIntegralTripod", "vehicleMounted"].some(key => Object.hasOwn(options, key))
     ) {
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Launcher damage circumstances" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Confirm the mount and firing mode used for the attack producing this damage.</p>${["underbarrel", "optionalUnderbarrel"].includes(item.system.mountRequirement) ? '<label><input type="checkbox" name="underbarrelMountConfirmed" /> Underbarrel version was attached to a compatible rifle’s available underbarrel location</label>' : ""}${item.system.mountRequirement === "tripodOrVehicle" ? '<label><input type="checkbox" name="usingIntegralTripod" /> Integral tripod was in use</label><label><input type="checkbox" name="vehicleMounted" /> Launcher was attached to a vehicle</label>' : ""}<label><input type="checkbox" name="indirectFire" /> Target was outside line of sight (Indirect/INT)</label></div>`
@@ -2909,7 +2820,7 @@ export class SpycraftActor extends Actor {
       (hasSneakAttackSource(this.system, item.system) || sideHits.length || attackBonusHits.length)
     ) {
       const trickSneakHit = automaticAttackBonus?.proof.sneakDice ? automaticAttackBonus : null;
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: attackBonusHits.length ? "Damage and attack benefits" : "Damage and sneak attack" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><label>Target sheet <select name="targetActorUuid"><option value="">Manual target: confirm immunities below</option>${targetChoices.actors.map(a => `<option value="${foundry.utils.escapeHTML(a.uuid)}"${(sideHits.length === 1 ? sideHits[0].proof.targetUuid : (automaticAttackBonus?.proof.targetUuid ?? targetChoices.selected)) === a.uuid ? " selected" : ""}>${foundry.utils.escapeHTML(a.name ?? "Character")}</option>`).join("")}</select></label><p>A selected target sheet supplies its known armor protection. Other immunities and reachable vitals still require confirmation.</p>
@@ -2930,7 +2841,7 @@ export class SpycraftActor extends Actor {
     }
     const cqbPreview = cqbRangePlan(this.system, item.system, options, "damage");
     if (cqbPreview.active && cqbPreview.basics && !cqbPreview.known) {
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "CQB damage target distance" },
         rejectClose: false,
         content:
@@ -2952,7 +2863,7 @@ export class SpycraftActor extends Actor {
       !["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged"].includes(item.system.proficiency) &&
       options.withinCQB === undefined
     ) {
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Killer Instinct range" },
         rejectClose: false,
         content: `<label><input type="checkbox" name="withinCQB" /> The target is beyond Reach and within CQB range (${this.system.cqbRange ?? 30} ft.)</label>`
@@ -3157,7 +3068,7 @@ export class SpycraftActor extends Actor {
       (shakenRules(this.actionDiceFundingSystem).extraDice ||
         unrestrictedBonusPools(this.actionDiceFundingSystem, this.usagePeriods).some(p => p.available))
     ) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Spend an action die" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Roll one benefit die. Surcharge dice are spent without being rolled.</p></div>`
@@ -3246,7 +3157,7 @@ export class SpycraftActor extends Actor {
       if (!Object.keys(input).length || input.askOptions) {
         const pools = availableCheckBonusPools(this.system, message, this.usagePeriods),
           esc = foundry.utils.escapeHTML;
-        input = await foundry.applications.api.DialogV2.input({
+        input = await systemDialog.input({
           window: { title: "Boost result before its outcome is described" },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options">
@@ -3273,7 +3184,7 @@ export class SpycraftActor extends Actor {
       }
       check = message.flags?.spycraft2;
       if (input.bonusPoolId && errorDecisionPending(check) && input.errorDeclined === undefined) {
-        const decision = await foundry.applications.api.DialogV2.input({
+        const decision = await systemDialog.input({
           window: { title: "Decide the error before spending the bonus" },
           rejectClose: false,
           content:
@@ -3453,7 +3364,7 @@ export class SpycraftActor extends Actor {
             )
         )
         .join("");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Generous: one teammate action die" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">
@@ -3670,7 +3581,7 @@ export class SpycraftActor extends Actor {
       return ui.notifications.warn(e.message);
     }
     if (!options.freeActionConfirmed) {
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Cunning Plan" },
         rejectClose: false,
         content:
@@ -3708,7 +3619,7 @@ export class SpycraftActor extends Actor {
     let succeeded = options.succeeded,
       difficultyClass = options.difficultyClass;
     if (typeof succeeded !== "boolean") {
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Confirm the check's outcome" },
         rejectClose: false,
         content: `${message.flags.spycraft2.damageSave ? `<p>Recorded damage-event save DC${Number(message.flags.spycraft2.damageSave.dc)}; final result ${Number(message.flags.spycraft2.effectiveTotal)}.</p>` : ""}<label>GC-confirmed result <select name="outcome" required><option value="">Choose…</option><option value="success">Succeeded</option><option value="failure">Failed</option></select></label>${automaticSkillSuccessSources(this.system, message.flags.spycraft2).length > 0 ? '<label>GC-confirmed DC / final opposing result (required for a class automatic-success fallback) <input type="number" name="difficultyClass" step="1" /></label>' : ""}<p>A natural range is not an automatic success or failure. Negative skill, Knowledge and attack results operate like errors (pp.96–97,330).</p>`
@@ -3807,7 +3718,7 @@ export class SpycraftActor extends Actor {
               )
           )
           .join("");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Activate a confirmed critical result" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">
@@ -4200,7 +4111,7 @@ export class SpycraftActor extends Actor {
       if (status.legacyUsed === null)
         throw new Error("Review the malformed old Bright Idea counter before allocation.");
       const esc = foundry.utils.escapeHTML,
-        input = await foundry.applications.api.DialogV2.input({
+        input = await systemDialog.input({
           window: { title: "Allocate past Bright Idea uses" },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options"><p>The old combined pool records ${status.legacyUsed} uses this session. Confirm which class supplied each use; the allocated total must match. This preserves past use and grants no dice.</p>${status.sources.map((s, index) => `<label>${esc(s.name)} (${s.remaining} allowance remaining) <input type="number" name="source_${index}" value="0" min="0" max="${s.remaining}" /></label>`).join("")}</div>`
@@ -4226,7 +4137,7 @@ export class SpycraftActor extends Actor {
     const expected = rollEvidence(message.flags.spycraft2);
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Manual Adjustment: reverse a failed check" },
         rejectClose: false,
         content:
@@ -4270,7 +4181,7 @@ export class SpycraftActor extends Actor {
     if (!input.outcome) {
       const esc = foundry.utils.escapeHTML,
         sources = hintSources(this.system, [...this.items]);
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Record free-hint response" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Record one request after the GC provides or refuses the hint. No action die is charged and the GC gains no die. A refusal grants the source’s bonus dice, without award XP.</p><label>Source <select name="source">${sources.map(spec => `<option value="${esc(spec.id)}" ${options.source === spec.id ? "selected" : ""}>${esc(spec.name)} (${spec.refusalDice} refusal dice)</option>`).join("")}</select></label><label>GC response <select name="outcome"><option value="provided">Hint provided</option><option value="refused">Hint refused</option></select></label><label>Hint / refusal note <textarea name="text"></textarea></label><label><input type="checkbox" name="minuteConfirmed" /> The agent spends one minute (required for Intuition)</label></div>`
@@ -4391,7 +4302,7 @@ export class SpycraftActor extends Actor {
         skills = CONFIG.SPYCRAFT.classFeatures.intruder.classSkills.filter(
           key => (this.system.skillTotals?.[key]?.ranks ?? 0) >= 4
         );
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Master Thief: replace an opposed skill roll" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Once per session, set one opposed Intruder class-skill result to the opponent’s final result +1. Requires at least four ranks in that skill. No die is rolled, so no action-die boost applies. This result cannot be an error or threat.</p><label>Skill <select name="skillKey">${skills.map(key => `<option value="${key}">${esc(CONFIG.SPYCRAFT.skills[key].name)}</option>`).join("")}</select></label><label>Focus / check, if applicable <input name="focus" /></label><label>Opponent’s final result <input type="number" name="opponentResult" step="1" required /></label><label><input type="checkbox" name="opposedConfirmed" /> This is an opposed skill check</label><label><input type="checkbox" name="opponentFinalConfirmed" /> The GC confirms this opponent’s final result</label><label><input type="checkbox" name="declaredBeforeRolling" /> I declare Master Thief instead of rolling this check</label><label><input type="checkbox" name="secret" /> Secret result (resolved by the GC)</label></div>`
@@ -4450,7 +4361,7 @@ export class SpycraftActor extends Actor {
     if (this.type !== "agent" || !this.isOwner) throw new Error("You must own the agent improvising an item.");
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Improvisation: make one Common Item" },
         rejectClose: false,
         content:
@@ -4529,7 +4440,7 @@ export class SpycraftActor extends Actor {
       const sources = missionCaliberOptions(this.system, [...this.items]).options,
         esc = foundry.utils.escapeHTML;
       if (!sources.length) throw new Error("No reviewed mission-Caliber ability is available.");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Higher-Caliber mission pick" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Record mission Caliber in reserve setup first. Import the item and assign its ordinary paid mission pick. This ability permits one higher-Caliber pick; it does not grant an extra pick. Caliber V grants upgrades instead, with purchasing/effects adjudicated separately.</p><label>Ability <select name="source">${sources.map(s => `<option value="${s.key}" ${input.source === s.key ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label><label>Item <select name="itemId">${this.items
@@ -4561,7 +4472,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     if (!input.itemId) {
       const esc = foundry.utils.escapeHTML;
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Big Stick: mission weapon" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Record mission Caliber in the reserve setup first. Import the weapon and assign its normal paid Weapon pick. Big Stick permits one covered pick at one higher Caliber; it does not grant another pick. At Caliber V it grants extra upgrades instead; upgrade purchasing still requires separate adjudication.</p><label>Weapon <select name="itemId">${this.items
@@ -4594,7 +4505,7 @@ export class SpycraftActor extends Actor {
     if (!input.itemId) {
       const esc = foundry.utils.escapeHTML;
       const armor = this.items.filter(item => item.type === "armor");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Armor Use: mission armor" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Import the desired armor first, leaving its acquisition fields unassigned. Armor Use grants one piece within your earned grade, once per mission, without spending a mission pick. Existing selections cannot be replaced by deleting their item.</p><label>Armor <select name="itemId">${armor.map(item => `<option value="${item.id}">${esc(item.name)} (Caliber ${item.system.caliber})</option>`).join("")}</select></label><label><input type="checkbox" name="intelConfirmed" /> This selection was made during the Intel Phase</label></div>`
@@ -4634,7 +4545,7 @@ export class SpycraftActor extends Actor {
     const expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem));
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Find an improvised weapon" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Spend one action die on a Gear check to turn up an improvised weapon no more than 4 squares away (pp.346–347). Improvised Weapon Basics adds +3. The GC describes the object and its exact location. Choose weapon statistics from your final result's Table 5.12 row or a lower row.</p><label><input name="nonBarrenConfirmed" type="checkbox" /> This location is not barren</label>${this.system.activeFeatNames?.includes("Personal Stash") ? '<label><input name="atHome" type="checkbox" /> I am inside my home (Personal Stash)</label>' : ""}${this.system.activeFeatNames?.includes("Improvised Weapon Mastery") ? `<p>Mastery: the object is adjacent. One search payment may be waived per combat; Shaken surcharges still apply.</p><label><input name="useMastery" type="checkbox" /> Use Mastery's once-per-combat payment waiver (${this.participatingCombat ? (this.limitedUseStatus.find(s => s.id === improvisedMasterySpec(this.system, this.participatingCombat?.id)?.id)?.remaining ?? 0) : 0} remaining)</label>` : ""}${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl({ unrolled: true })}</div>`
@@ -4876,7 +4787,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     const expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem));
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Heal outside combat with action dice" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Choose all healing benefit dice for this use. The Shaken surcharge is paid once for this healing use and restores no health.</p><label>Benefit dice for vitality <input type="number" name="vitalityDice" min="0" value="1" /></label><label>Benefit dice for wounds (2 points each) <input type="number" name="woundDice" min="0" value="0" /></label>${mixedHealingFundingControl(this)}<p>Vitality dice explode normally. Healing cannot exceed the current maximum. Combat healing requires Refresh.</p></div>`
@@ -4926,7 +4837,7 @@ export class SpycraftActor extends Actor {
     const expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem));
     if (!Object.keys(input).length) {
       const waiting = this.system.refreshAction?.state === "waiting";
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Refresh: full round, then wait until next initiative" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Payment occurs only when you complete Refresh.</p>
@@ -5114,7 +5025,7 @@ export class SpycraftActor extends Actor {
       },
       expectedRound = roundSignature();
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Boost Defense for rolled rounds" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Spend one benefit die for +2 Defense. The selected die's result determines duration in rounds.</p><label><input name="atStartOfRound" type="checkbox" /> This is the start of the combat round</label><label><input name="replaceExisting" type="checkbox" /> Replace any existing action-die Defense boost</label>${this.system.coreClassIds?.includes("transporter") ? "<p>Watchful Initiative is resolved by the GC while its roll interpretation is pending.</p>" : ""}</div>`
@@ -5306,7 +5217,7 @@ export class SpycraftActor extends Actor {
     if (input.healthReviewed === undefined) {
       const esc = foundry.utils.escapeHTML,
         current = state();
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Review interrupted action-die use" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>${esc(saved.payment.label)}; current health ${current.vitality} vitality / ${current.wounds} wounds. If health needs correction, close this dialog, correct health on Main, and reopen this review before confirming.</p><p>${esc(saved.reason)}</p><label>Confirmed action-die balance <input name="balance" type="number" min="0" step="1" value="${current.balance ?? 0}" /></label>${saved.limitedUseSettlement?.length ? '<label><input name="restoreLimitedUses" type="checkbox" /> No replacement result or other activation effect remains; restore this activation’s recorded limited uses</label>' : ""}<label>Resolution <input name="resolution" required /></label><label><input name="healthReviewed" type="checkbox" /> The GC reviewed actual health, action state and action-die balances and completed any required corrections</label></div>`
@@ -5507,7 +5418,7 @@ export class SpycraftActor extends Actor {
       throw new Error("Review the interrupted award before adding another award.");
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Award roleplay action dice" },
         rejectClose: false,
         content:
@@ -5670,7 +5581,7 @@ export class SpycraftActor extends Actor {
     if (input.confirmed === undefined) {
       const current = state(),
         esc = foundry.utils.escapeHTML;
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Review interrupted award" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>${esc(saved.reason)}</p><p>Review the actual player dice, recorded award, GC pool and any posted receipt. Initialize this session’s GC pool first if the session changed.</p><label>Award <select name="retainAward"><option value="retain">Retain this award in the mission XP ledger</option><option value="cancel">Cancel this award in the mission XP ledger</option></select></label><label>Confirmed player dice <input name="playerBalance" type="number" min="0" step="1" value="${current.player}" /></label><label>Confirmed GC dice <input name="gcBalance" type="number" min="0" step="1" value="${current.gc?.value ?? 0}" /></label><label>Resolution <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> The GC reviewed the award, actual balances and receipt</label></div>`
@@ -5757,7 +5668,7 @@ export class SpycraftActor extends Actor {
       expectedContext = settlementContext();
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Settle mission XP — p.440" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.</p><label>Base mission XP before action-die awards <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>Team Threat Level <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label>Additional post-multiplier XP <input type="number" name="additionalXP" min="0" value="0" /></label><label>Source of additional XP <input name="modifierReason" placeholder="GC-calculated Crossroads, Triumph or other bonus" /></label><p>Crossroads and Triumph percentages are not calculated by this control. Review their eligibility and rounding, then enter their final XP contribution above. A Crossroads Title first earned this mission starts its benefits next mission.</p><label><input type="checkbox" name="missionCompleteConfirmed" /> The mission has ended; all post-multiplier modifiers were reviewed and included</label></div>`
@@ -5896,7 +5807,7 @@ export class SpycraftActor extends Actor {
       expected = JSON.stringify(state());
     let input = options;
     if (input.confirmed === undefined) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Review interrupted mission XP" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>${foundry.utils.escapeHTML(saved.reason)}</p><label>Mission reward <select name="retainSettlement"><option value="retain">Retain the recorded mission settlement</option><option value="cancel">Cancel this settlement</option></select></label><label>Confirmed total XP <input name="xp" type="number" min="0" step="1" value="${this.system.xp}" /></label><label>Resolution <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> The GC reviewed actual XP, mission reward and any posted receipt</label><p>This sets the confirmed XP balance; it does not add the reward again.</p></div>`
@@ -6047,7 +5958,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     if (!Object.hasOwn(input, "used")) {
       const esc = foundry.utils.escapeHTML;
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: `Review saved uses: ${spec.name}` },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>${resourceStatus(spec, this.system.resourceUses, this.usagePeriods).counterReview ? "This use history needs verification." : "Review the actual uses already resolved, including uses handled at the table or through other controls."} Confirm the actual uses already spent in the current ${esc(spec.period)}. No unused allowance is assumed. Current source allowance: ${esc(spec.limitLabel ?? String(spec.limit))}.</p><details><summary>Saved record for review</summary><pre>${esc(JSON.stringify(this.system.resourceUses?.[id]) ?? "missing")}</pre></details><label>Uses already spent <input name="used" type="number" min="0" step="1" required /></label><label>Reason / source of corrected history <input name="reason" required /></label><label><input name="confirmed" type="checkbox" /> This is the GC-confirmed count for the current period</label></div>`
@@ -6121,7 +6032,7 @@ export class SpycraftActor extends Actor {
     if (!spec) throw new Error("Choose an available manual class ability.");
     let input = options;
     if (spec.cost > 0 && !Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: spec.name },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Use ${foundry.utils.escapeHTML(spec.name)}. Base cost ${spec.cost} action dice. Apply its stated actions, circumstances and effect at the table.</p>${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl({ unrolled: true })}</div>`
@@ -6182,7 +6093,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     const esc = foundry.utils.escapeHTML;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: FREE_ACTION_FEATS[source] },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>${source === "quickDraw" ? "Twice per round, take Draw Weapon, Holster Weapon, Pick Up Weapon or Reload as a free action. Each action retains its ordinary limits (one two-handed weapon or two one-handed weapons for Draw/Holster/Pick Up; normal Reload amount)." + (this.system.knifeBasics?.active ? " Knife Basics already makes drawing a knife a free action: do not spend a Quick Draw use to draw a knife." : "") : "Once per round, take one additional non-attack half action as a free action; session uses equal starting action dice."}</p>${
@@ -6437,7 +6348,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     if (!input.ids) {
       const esc = foundry.utils.escapeHTML;
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Improved Fortune teammates" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Choose actual Pointman teammates. Their Improved Fortune combines with your own, up to +3 starting action dice. Current dice are not refilled by changing this list.</p>${candidates.map(actor => `<label><input type="checkbox" name="ally_${actor.id}" ${this.system.fortuneTeammateIds?.includes(actor.id) ? "checked" : ""} /> ${esc(actor.name)} (Pointman ${pointmanLevel(actor)})</label>`).join("")}<label><input type="checkbox" name="teammatesConfirmed" /> These characters are teammates who provide Improved Fortune</label></div>`
@@ -6463,7 +6374,7 @@ export class SpycraftActor extends Actor {
       (shakenRules(this.actionDiceFundingSystem).extraDice ||
         unrestrictedBonusPools(this.actionDiceFundingSystem, this.usagePeriods).some(p => p.available))
     ) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Eagle Eye" },
         rejectClose: false,
         content:
@@ -6594,7 +6505,7 @@ export class SpycraftActor extends Actor {
         .filter(([key]) => key !== "unarmed")
         .map(([key, row]) => `<option value="${esc(key)}">${esc(row.label)}</option>`)
         .join("");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: source.name },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Choose ${source.count} temporary ${esc(CONFIG.SPYCRAFT.featTrees[source.tree] ?? source.tree)} feat(s) in acquisition order, until this mission ends. All prerequisites apply. A prior temporary selection can qualify a later temporary selection; it cannot qualify permanent feats or expert classes.</p>${Array.from({ length: source.count }, (_, i) => `<label>Feat ${i + 1} <select name="feat${i}"><option value="">Choose a feat</option>${choices.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label>${source.tree === "basicCombat" ? `<label>Choice for selection ${i + 1}: Weapon Focus proficiency or Armor Basics/Mastery type <select name="choice${i}"><option value="">Choose only if required by this feat</option><optgroup label="Armor type"><option value="P">Partial</option><option value="M">Moderate</option><option value="F">Full</option></optgroup><optgroup label="Weapon Focus proficiency">${proficiencies}</optgroup></select></label>` : ""}`).join("")}<label><input name="intelPhaseConfirmed" type="checkbox" /> I choose these during the current mission’s Intel Phase</label></div>`
@@ -6704,7 +6615,7 @@ export class SpycraftActor extends Actor {
       const groups = ["cultures", "drive", "profession", "science"],
         existing = feat.system.focusChoices ?? [];
       const selected = (a, b) => (a === b ? " selected" : "");
-      const input = await foundry.applications.api.DialogV2.input({
+      const input = await systemDialog.input({
         window: { title: "Temporary Depth of Study choices" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Choose two focuses or fortes in order. A forte must name a subdivision of a focus already possessed, including an earlier choice. Profession names and forte subdivisions require the GC’s ordinary approval. These choices expire with this feat.</p>${[
@@ -6798,7 +6709,7 @@ export class SpycraftActor extends Actor {
         feats = index
           .filter(f => f.type === "feat" && f.system.tree === "advancedSkill")
           .sort((a, b) => a.name.localeCompare(b.name));
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Know It All" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Gain two temporary Advanced Skill feats in acquisition order until this mission ends. All prerequisites apply; level-one-only feats remain unavailable at Scientist 10+. Repeatable self-grants follow each feat’s own restrictions.</p>${[0, 1].map(i => `<label>Feat ${i + 1} <select name="feat${i}"><option value="">Choose a feat</option>${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label>`).join("")}<label><input name="freeActionConfirmed" type="checkbox" /> I spend the required free action (during my initiative if in combat)</label></div>`
@@ -6843,7 +6754,7 @@ export class SpycraftActor extends Actor {
               }</fieldset>`
           )
           .join("");
-        const detail = await foundry.applications.api.DialogV2.input({
+        const detail = await systemDialog.input({
           window: { title: "Know It All choices" },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options">${fields}</div>`
@@ -6962,7 +6873,7 @@ export class SpycraftActor extends Actor {
         feats = index
           .filter(i => i.type === "feat" && i.system.tree === "terrain")
           .sort((a, b) => a.name.localeCompare(b.name));
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Any Time, Any Place" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Gain one temporary Terrain feat until this mission ends. All prerequisites apply. One use is earned at Guide 4 and another at Guide 8.</p><label>Feat <select name="featId">${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label><label><input name="freeActionConfirmed" type="checkbox" /> I spend the required free action (during my initiative if in combat)</label></div>`
@@ -7059,7 +6970,7 @@ export class SpycraftActor extends Actor {
     if (!mentalLeapSource(this.system)) return ui.notifications.warn("Mental Leap has not been earned.");
     let input = options;
     if (!input.ability) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Mental Leap" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Add your current starting action-die count (${this.system.actionDice.max}) to one attribute for ten rounds. When it ends, exhaustion lasts twice the active rounds. Ending during the activation initiative counts as one round and two exhausted rounds. Existing unnamed Mental Leap bonuses may overlap; repeated exhaustion causes unconsciousness.</p><label>Attribute <select name="ability"><option value="dex">Dexterity</option><option value="int">Intelligence</option><option value="wis">Wisdom</option></select></label><label><input name="confirmed" type="checkbox" /> I activate Mental Leap now (during my initiative if in combat)</label></div>`
@@ -7133,7 +7044,7 @@ export class SpycraftActor extends Actor {
       esc = foundry.utils.escapeHTML;
     if (!active.length) return ui.notifications.warn("No Mental Leap is currently active.");
     if (input.freeActionConfirmed === undefined) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "End Mental Leap" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><label>Active benefit <select name="id">${active.map(r => `<option value="${esc(r.id)}" ${r.id === options.id ? "selected" : ""}>${r.ability.toUpperCase()} +${r.bonus}; ${Math.ceil(r.remainingSeconds / 6)} round(s) remain</option>`).join("")}</select></label><label><input name="freeActionConfirmed" type="checkbox" /> I end this effect as a free action during my initiative (if in combat)</label><p>At least one active round counts, even if you end it during its activation initiative. Exhaustion follows immediately for twice the active rounds.</p></div>`
@@ -7211,7 +7122,7 @@ export class SpycraftActor extends Actor {
       throw new Error("This character does not have the Adrenaline Junkie core ability.");
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Adrenaline Junkie — record wound loss" },
         rejectClose: false,
         content:
@@ -7308,7 +7219,7 @@ export class SpycraftActor extends Actor {
     plan(true);
     let input = options;
     if (input.nextHalfActionConfirmed === undefined) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Strut — next half action" },
         rejectClose: false,
         content:
@@ -7396,7 +7307,7 @@ export class SpycraftActor extends Actor {
       expected = JSON.stringify(["scene", "session", "mission"].map(k => String(periods[k] ?? "initial")));
     let input = options;
     if (input.freeActionConfirmed === undefined) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Master Plan" },
         rejectClose: false,
         content: `<p>Gain ${initial.units} bonus d${initial.die} action dice as a free action, once per mission. Unused dice expire at the end of this scene. Current Intelligence modifier ${initial.intelligenceModifier} is frozen when granted.</p><label><input name="freeActionConfirmed" type="checkbox" /> The GC confirms this free action may be taken now</label>`
@@ -7511,7 +7422,7 @@ export class SpycraftActor extends Actor {
         "Use this round-start tracker in a started participating combat. The GC resolves rounds outside combat."
       );
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Drunk round-start reposition" },
         rejectClose: false,
         content:
@@ -7598,7 +7509,7 @@ export class SpycraftActor extends Actor {
       positions = new Map(tokens.map(t => [t.uuid, JSON.stringify(this.drunkTokenSnapshot(t))]));
     if (input.routeConfirmed === undefined) {
       const esc = foundry.utils.escapeHTML,
-        answer = await foundry.applications.api.DialogV2.input({
+        answer = await systemDialog.input({
           window: { title: "Apply Drunk five-foot reposition" },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options"><label>Token <select name="tokenUuid">${tokens.map(t => `<option value="${esc(t.uuid)}">${esc(t.name)} (${esc(t.parent.name)})</option>`).join("")}</select></label><label><input name="routeConfirmed" type="checkbox" /> The GC confirms the recorded direction and forced movement path; obstacles and hazards are resolved</label><p>The selected token moves exactly five feet in the frozen direction without spending allowed movement. Other grids and unresolved paths use manual reposition confirmation.</p></div>`
@@ -7657,7 +7568,7 @@ export class SpycraftActor extends Actor {
         ),
       expected = signature(this.system.drunkRepositions?.find(r => r.id === input.id));
     if (input.movementConfirmed === undefined) {
-      const answer = await foundry.applications.api.DialogV2.input({
+      const answer = await systemDialog.input({
         window: { title: "Confirm Drunk reposition" },
         rejectClose: false,
         content: `${this.system.drunkRepositions?.find(r => r.id === input.id)?.state === "moving" ? '<label><input name="interruptedMovementReviewed" type="checkbox" /> The GC reviewed the interrupted token movement and its actual resolution</label>' : ""}<label><input name="movementConfirmed" type="checkbox" /> The GC confirms the recorded five-foot movement actually occurred and did not reduce allowed movement; obstacles and hazards were resolved</label>`
@@ -7727,7 +7638,7 @@ export class SpycraftActor extends Actor {
     );
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: restKind === "drunk" ? "Begin Drunk sleep" : "Begin fatigue recovery" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><label>Recovery <select name="condition">${available.map(c => `<option value="${c}">${c === "drunk" ? "Drunk — 4 full hours asleep" : c === "exhausted" ? "Exhausted — 1 full hour asleep" : "Fatigued — 8 hours of inactive rest"}</option>`).join("")}</select></label><label><input name="ordinaryRuleConfirmed" type="checkbox" /> This condition uses its ordinary recovery rule; any special source restrictions are met</label><label><input name="confirmed" type="checkbox" /> The GC confirms the required sleep/rest begins now</label>${this.system[restKey]?.completedAt === null ? '<label><input name="restart" type="checkbox" /> Restart the tracked rest period from now</label>' : ""}<p>Actual sleep/rest must be confirmed after enough game time has passed. Natural healing is separate.</p></div>`
@@ -7765,7 +7676,7 @@ export class SpycraftActor extends Actor {
     const expectedRest = JSON.stringify(this.system[restKey] ?? null);
     let input = options;
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: restKind === "drunk" ? "Confirm Drunk recovery" : "Confirm fatigue recovery" },
         rejectClose: false,
         content:
@@ -7862,7 +7773,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     const expectedState = fatigueStateSignature({ ...this.system, ...this.attributeRuleContext });
     if (!Object.keys(input).length) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Apply fatigue or exhaustion" },
         rejectClose: false,
         content:
@@ -7990,7 +7901,7 @@ export class SpycraftActor extends Actor {
     if (this.type !== "agent" || !this.isOwner) return null;
     let input = options;
     if (input.confirmed === undefined) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Repeated fatigue / exhaustion" },
         rejectClose: false,
         content:
@@ -8037,7 +7948,7 @@ export class SpycraftActor extends Actor {
       esc = foundry.utils.escapeHTML;
     let input = options;
     if (input.confirmed === undefined) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Unconsciousness sleep requirements" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Each applicable new cause receives a frozen 2d4-hour sleep requirement. The GC decides whether another application can affect an already unconscious character (p.340). Existing rolled requirements remain in force.</p>${newCauses.map((c, i) => `<label><input name="cause${i}" type="checkbox" checked /> ${esc(c.label)} — apply a new sleep duration</label>`).join("")}${beforeInput?.completedAt === null && !Array.isArray(beforeInput.causeKeys) ? '<label><input name="reviewLegacyNoNewCause" type="checkbox" /> The GC confirms all current causes were already covered when the earlier tracked sleep began</label>' : ""}${beforeInput?.completedAt === null ? '<label><input name="restart" type="checkbox" /> Restart the current tracked sleep period from now</label>' : ""}<label><input name="confirmed" type="checkbox" /> The GC confirms these causes and the beginning or continuation of actual sleep</label></div>`
@@ -8111,7 +8022,7 @@ export class SpycraftActor extends Actor {
     if (input.fullSleepConfirmed === undefined) {
       const sleep = this.system.mentalLeapSleep,
         requirements = Array.isArray(sleep?.requirements) ? sleep.requirements : [];
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Confirm full sleep recovery" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">${requirements.map(r => `<p>Retained requirement: ${r.requiredHours} full hours asleep.</p>`).join("")}<label><input name="fullSleepConfirmed" type="checkbox" /> The GC confirms all required actual sleep for every retained requirement was completed</label>${sleep && !Array.isArray(sleep.causeKeys) ? '<label><input name="reviewLegacyNoNewCause" type="checkbox" /> The GC confirms no additional cause was omitted from this earlier sleep record</label>' : ""}${sleep?.legacyReviewRequired || (sleep && !Array.isArray(sleep.requirements) && sleep.previousDueAt > sleep.at + sleep.requiredHours * 3600) ? '<label><input name="earlierRequirementsConfirmed" type="checkbox" /> The GC reviewed and satisfied all earlier retained sleep requirements</label>' : ""}<p>The game clock must also reach every deadline. Other conditions and health remain separate.</p></div>`
@@ -8150,7 +8061,7 @@ export class SpycraftActor extends Actor {
     if (this.type !== "agent" || !this.isOwner || !attributeCollapsePlan(this.system).wisdomEpisode) return null;
     let input = options;
     if (!input.confirmed) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Wisdom-collapse episode" },
         rejectClose: false,
         content:
@@ -8196,7 +8107,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     const esc = foundry.utils.escapeHTML;
     if (!input.city) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: source.name },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Summon ${this.system.actionDice.max} Tier II ${esc(source.template)} assistants until the end of the following scene. This records the group; the GC supplies its NPCs and adjudicates their help. No action die is spent.</p><label>Current city <input name="city" type="text" /></label><label>City population <input name="population" type="number" min="10000" step="1" /></label><label><input name="quickContactConfirmed" type="checkbox" /> A method of quick contact is available</label><label><input name="nonCombatConfirmed" type="checkbox" /> The requested help is non-combat work within their skills/equipment</label><label><input name="gcHelpApproved" type="checkbox" /> The GC approved this assistance</label>${source.kitGrade ? "<p>For required-kit skill checks while helping, these standard NPCs are assumed to possess one appropriate grade I kit.</p>" : ""}</div>`
@@ -8270,7 +8181,7 @@ export class SpycraftActor extends Actor {
     let input = options;
     const police = group.source === "friendsOnForce";
     if (!input.event) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Assistant group withdrawal" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>The entire group leaves when any one member meets a stated withdrawal condition.</p><label>Condition <select name="event"><option value="failedMorale">Failed Morale check</option><option value="criticalInjury">Critical injury</option>${police ? '<option value="vitalityLoss">Lost more than half maximum vitality (rounded down)</option><option value="woundLoss">Lost at least one wound point</option>' : '<option value="failedDamageSave">Failed Damage save</option>'}</select></label>${police ? '<label>Officer maximum vitality <input name="maxVitality" type="number" min="1" step="1" value="1" /></label><label>Total vitality lost by that officer <input name="vitalityLost" type="number" min="0" step="1" value="0" /></label><label>Wounds lost by that officer <input name="woundsLost" type="number" min="0" step="1" value="0" /></label>' : ""}<label><input name="confirmed" type="checkbox" /> The GC confirmed at least one member met this condition</label></div>`
@@ -8326,7 +8237,7 @@ export class SpycraftActor extends Actor {
       esc = foundry.utils.escapeHTML;
     let input = options;
     if (input.points === undefined && input.trainingPoints === undefined) {
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: `I Can Swim — ${CONFIG.SPYCRAFT.skills[key].name}` },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Before this skill check, spend current-level points only in ${esc(CONFIG.SPYCRAFT.skills[key].name)}. Class/cross-class costs, discounts, linked ranks and rank limits apply normally. Training costs one point per rank. Allocated ranks remain purchased even if the following check is cancelled.</p><label>Career-level ${level} points (${pools.careerPoints} available) <input name="points" type="number" min="0" max="${pools.careerPoints}" step="1" value="0" /></label>${pools.training.map(p => `<label>Training ${esc(p.id)} (${p.remaining} available) <input name="training_${esc(p.id)}" type="number" min="0" max="${p.remaining}" step="1" value="0" /></label>`).join("")}<label><input type="checkbox" name="freeActionConfirmed" /> I spend the free action before this skill check (during my initiative if in combat)</label></div>`
@@ -8440,7 +8351,7 @@ export class SpycraftActor extends Actor {
         feats = index
           .filter(f => f.type === "feat" && f.system.tree === "basicSkill")
           .sort((a, b) => a.name.localeCompare(b.name));
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Everyday Genius" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>As a full action, gain one unpossessed non-virtual Basic Skill feat until this session ends. Uses per mission equal your number of eligible Advanced Skill feats; granted Basic Skill feats do not increase this limit.</p><label>Basic Skill feat <select name="featId">${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label><label><input type="checkbox" name="fullActionConfirmed" /> I spend the required full action (during my initiative if in combat)</label></div>`
@@ -8526,7 +8437,7 @@ export class SpycraftActor extends Actor {
       const choices = index
         .filter(i => i.type === "feat" && i.system.tree === "basicSkill")
         .sort((a, b) => a.name.localeCompare(b.name));
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Renaissance Man" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options"><p>Gain one temporary Basic Skill feat until this mission ends. Choose a feat you do not already possess. It supplies no permanent feat slot or permanent prerequisite qualification.</p><label>Feat <select name="featId">${choices.map(i => `<option value="${esc(i._id)}">${esc(i.name)}</option>`).join("")}</select></label><label><input type="checkbox" name="freeActionConfirmed" /> I spend the required free action</label></div>`
@@ -8596,7 +8507,7 @@ export class SpycraftActor extends Actor {
       const recipients = [...game.actors].filter(
         actor => actor.type === "agent" && actor.id !== this.id && actor.isOwner
       );
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: `${definition.name}: share temporary feats` },
         rejectClose: false,
         content: `
@@ -8661,7 +8572,7 @@ export class SpycraftActor extends Actor {
           })
       );
       if (!available.length) return ui.notifications.warn("No available reroll ability applies to this check.");
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: "Reroll check" },
         rejectClose: false,
         content: `<div class="spycraft2-roll-options">
@@ -8901,7 +8812,7 @@ export class SpycraftActor extends Actor {
       return result;
     });
     if (level && promptVitality && level > 1 && cls?.system.vitalityDie) {
-      const roll = await foundry.applications.api.DialogV2.confirm({
+      const roll = await systemDialog.confirm({
         window: { title: game.i18n.localize("SPYCRAFT.VitalityRoll") },
         content: `<p>${game.i18n.format("SPYCRAFT.VitalityPrompt", { level, name: cls.name, die: cls.system.vitalityDie })}</p>`
       });

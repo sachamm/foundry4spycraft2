@@ -2,6 +2,7 @@ import { cheapShotRecords } from "../rules/cheap-shot-effects.mjs";
 import { CHEAP_SHOT_CHOICES } from "../rules/cheap-shot.mjs";
 import { standardAttackContextContent, standardAttackContextInput } from "./standard-attack-context.mjs";
 import { completeCharacterTarget, attackCharacterTargetChoices } from "./character-target.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 export async function rollCheapShot(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   let input = options;
@@ -83,3 +84,16 @@ export async function validateCheapShotTarget(actor, context, { targetUuid } = {
   if (cheapShotRecords({ ...target.system, usagePeriods: target.usagePeriods ?? actor.usagePeriods }).length)
     throw Error("This combatant already suffered a successful Cheap Shot this scene.");
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "cheapShotTarget",
+  order: 1290,
+  validate: ({ actor, options }) =>
+    validateCheapShotTarget(actor, options.attackContext?.cheapShot, {
+      targetUuid:
+        options.attackContext?.characterTarget?.actorUuid ||
+        options.finalAttack?.opponentUuid ||
+        options.finalAttack?.targetUuid
+    })
+});

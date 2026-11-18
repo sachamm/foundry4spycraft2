@@ -1,6 +1,7 @@
 import { sideStanceAttackRoot } from "./side-stance.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   stable = v =>
@@ -282,3 +283,28 @@ export async function reviewSideStanceDamage(actor, { reservationId, confirmed =
     return { version: 1, reservationId, receiptUuid: receipt?.uuid ?? null, released: !receipt };
   });
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "sideStanceDamage",
+  order: 1050,
+  record: ["sideStanceDamage"],
+  validate: ({ actor, options, checkKind, weaponUuid }) =>
+    validateSideStanceDamageProof(actor, options.sideStanceDamage, {
+      checkKind,
+      weaponUuid,
+      sneakAttack: options.sneakAttack,
+      lease: options.sideStanceDamageLease,
+      rerollOf: options.rerollOf
+    })
+});
+rollPipeline.register({
+  order: 40,
+  id: "sideStanceDamageLease",
+  acquire({ actor, options }) {
+    const proof = options.sideStanceDamage;
+    if (!proof || options.rerollOf || hasSideStanceDamageLease(actor, proof, options.sideStanceDamageLease))
+      return null;
+    return next => withSideStanceDamage(actor, proof, lease => next({ sideStanceDamageLease: lease }));
+  }
+});

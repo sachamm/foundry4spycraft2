@@ -1,4 +1,5 @@
 import { detectionObserverPlan } from "../rules/detection-observer.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const actors = () =>
     Array.isArray(game.actors?.contents)
       ? game.actors.contents
@@ -88,3 +89,11 @@ export function validateDetectionObserverProof(proof, { checkKind, skillKey, che
       p.blockedReason || "The detection target, distraction or Ghost Mastery source changed before posting."
     );
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "detectionObserver",
+  order: 1240,
+  validate: ({ options, checkKind, checkId, checkMethod, skillKey }) =>
+    validateDetectionObserverProof(options.detectionObserver, { checkKind, skillKey, checkId, checkMethod })
+});

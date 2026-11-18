@@ -2,6 +2,7 @@ import { sideStanceRows, sideStanceGrantPlan, assertSideStancePlan } from "../ru
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
+import { rollPipeline } from "../rules/roll-pipeline.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   stable = v =>
@@ -232,3 +233,26 @@ export async function reviewSideStanceAttack(actor, { attemptId, confirmed = fal
     return { version: 1, attemptId, receiptUuid: receipt?.uuid ?? null, released: !receipt };
   });
 }
+
+// Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).
+rollPipeline.register({
+  id: "sideStanceAttack",
+  order: 1180,
+  validate: ({ actor, options, checkKind }) =>
+    validateSideStanceAttackProof(actor, options.attackContext?.sideStance, {
+      checkKind,
+      attackContext: options.attackContext,
+      lease: options.sideStanceLease,
+      rerollOf: options.rerollOf,
+      finalAttack: options.finalAttack
+    })
+});
+rollPipeline.register({
+  order: 30,
+  id: "sideStanceLease",
+  acquire({ actor, options }) {
+    const proof = options.attackContext?.sideStance;
+    if (proof?.dice !== 1 || options.rerollOf || hasSideStanceLease(actor, proof, options.sideStanceLease)) return null;
+    return next => withSideStanceAttack(actor, proof, lease => next({ sideStanceLease: lease }));
+  }
+});
