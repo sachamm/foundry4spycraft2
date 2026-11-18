@@ -1716,6 +1716,7 @@
    "ARecordedSelectionOnlyReturnsIts_0qawoaf": "A Recorded selection only returns its original attack; it does not grant another entry or roll.",
    "ARequestBenefitCannotApplyTo_08imlna": "A Request benefit cannot apply to a Common Item Gear check.",
    "ARequestFunderHasAnUnsettled_0b1kgo6": "A Request funder has an unsettled payment. Resolve the funders and this Reserve before retrying.",
+   "ARequestMustBeCaliberI_02vkn71": "A Request must be Caliber I–V and cannot exceed the current mission Caliber.",
    "ARequestMustBeCaliberI_0dn5bqo": "A Request must be Caliber I–IV and cannot exceed the current mission Caliber.",
    "ARequestRequiresOneFullMinute_0kbwsnr": "A Request requires one full minute of rapid communication.",
    "AResolvedStandardAttackMissWithout_04blx45": "A resolved Standard Attack miss without an error permits one immediate final attack with the same actual weapon against the same opponent. This uses the shared final-attack allowance; it does not spend an action die.",

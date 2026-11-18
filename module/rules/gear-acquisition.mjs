@@ -277,13 +277,19 @@ export function gearAcquisitionPlan(
     throw new Error(
       loc`Procure requires the earned Intruder option, a city of at least 10,000 people and quick communication (pp.30,38).`
     );
+  // Total Control (p.209): Requests may be for Caliber V gear.
+  const maxCaliber = system.activeFeatNames?.includes("Total Control") ? 5 : 4;
   if (
     !Number.isSafeInteger(caliber) ||
     caliber < 1 ||
-    caliber > 4 ||
+    caliber > maxCaliber ||
     (!benefit?.ignoreMissionCaliber && caliber > record.caliber + (useProcure ? 1 : 0))
   )
-    throw new Error(loc`A Request must be Caliber I–IV and cannot exceed the current mission Caliber.`);
+    throw new Error(
+      maxCaliber === 5
+        ? loc`A Request must be Caliber I–V and cannot exceed the current mission Caliber.`
+        : loc`A Request must be Caliber I–IV and cannot exceed the current mission Caliber.`
+    );
   if (!PICK_CATEGORIES.includes(pick) || (record.picks?.[pick] ?? 0) < 1)
     throw new Error(loc`Choose an available Reserve gear pick.`);
   if (!PICK_CATEGORIES.includes(category) || category === "CHA" || (!categoryConfirmed && !benefit?.outsideFaction))

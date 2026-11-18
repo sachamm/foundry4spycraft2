@@ -551,7 +551,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Candidate | 208 | No | Implemented: first-level+1to each of the two lowest attributes, with recorded tie choices and original-score history | Batch255; all15pairs/orderings, origins, INT skill budgets, advancement, explicit historical corrections and native persistence verified |
 | Career Agent | 208 | No | Implemented: +1insight to all saves and one additional affiliation-specific reward at mission end | Batch256; Faction+1Reputation/Freelance+$50000Net Worth, duplicate claims, atomic/partial-save recovery and native persistence verified |
 | Office Gossip | 209 | No | Covered (batch 423): Requests without an action die, once per Tradecraft feat per mission; the Request dialog offers take 10 | Native Foundry QA not claimed |
-| Total Control | 209 | No | Manual/descriptive | — |
+| Total Control | 209 | No | Partial (batch 429): Requests may be for Caliber V gear (still within the mission Caliber); a teammate discarding 2 action dice each session to raise the mission Caliber by 1 is set by the GC in the Intel Phase | Native Foundry QA not claimed |
 | Cryptographer | 208 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
 | Disease Basics | 208 | No | Covered (batch 422): a free disease sample Possession; +2 on declared disease resistance saves; no accidental exposure is the GC’s ruling when creating or preparing a disease | Native Foundry QA not claimed |
 | Flawless Identity | 209 | No | Manual/descriptive | — |

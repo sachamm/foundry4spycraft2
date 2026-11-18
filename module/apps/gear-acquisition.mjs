@@ -116,7 +116,7 @@ export async function rollGearAcquisition(actor, options = {}) {
    <label>${loc`Requested category`} <select name="category">${PICK_CATEGORIES.filter(k => k !== "CHA")
      .map(k => `<option value="${k}">${k}</option>`)
      .join("")}</select></label>
-   <label>${loc`Requested Caliber`} <input type="number" name="caliber" min="1" max="4" value="1" /></label>
+   <label>${loc`Requested Caliber`} <input type="number" name="caliber" min="1" max="${actor.system.activeFeatNames?.includes("Total Control") ? 5 : 4}" value="1" /></label>
    <label>${loc`Location`} <select name="location">${Object.entries(DELIVERY)
      .map(([key, d]) => `<option value="${key}">${esc(d.label)}: ${d.formula} ${d.unit}</option>`)
      .join("")}</select></label>
