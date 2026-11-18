@@ -4,6 +4,8 @@
  */
 import { isResourceLock } from "../rules/transactions.mjs";
 import { ActorRolls } from "./actor/rolls.mjs";
+import { ActorSkillRolls } from "./actor/skill-rolls.mjs";
+import { ActorAttackRolls } from "./actor/attack-rolls.mjs";
 import { ActorOutcomes } from "./actor/outcomes.mjs";
 import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
@@ -12,7 +14,11 @@ import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
 
 export class SpycraftActor extends ActorRolls(
-  ActorOutcomes(ActorConditions(ActorActionDice(ActorAbilities(ActorGear(ActorProgression(Actor))))))
+  ActorSkillRolls(
+    ActorAttackRolls(
+      ActorOutcomes(ActorConditions(ActorActionDice(ActorAbilities(ActorGear(ActorProgression(Actor))))))
+    )
+  )
 ) {
   /** @override */
   getRollData() {

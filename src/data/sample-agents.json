@@ -1,0 +1,3160 @@
+{
+  "label": "Sample Level-1 Agents",
+  "missionCaliber": 2,
+  "agents": [
+    {
+      "id": "nadia-rahman",
+      "name": "Nadia Rahman",
+      "codename": "Charter",
+      "classId": "advocate",
+      "talent": "Convincing",
+      "specialty": "Authority",
+      "role": "Institutional negotiator",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "38",
+        "height": "168 cm",
+        "weight": "63 kg",
+        "eyes": "Brown",
+        "hair": "Dark brown",
+        "level": 1
+      },
+      "nationality": "Pakistani British",
+      "visual": "a Pakistani British woman aged 38, warm brown skin, dark brown eyes, shoulder-length dark brown waves, navy tailored suit and cream blouse, composed patient expression",
+      "background": "A tenants-rights barrister who exposed a shell-company eviction scheme and now negotiates access for an investigative task force. She keeps immaculate notes and remembers who paid the price for every compromise.",
+      "portrait": "systems/spycraft2/assets/agents/nadia-rahman/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/nadia-rahman/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 12,
+        "con": 12,
+        "int": 14,
+        "wis": 12,
+        "cha": 16
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Silver Tongue"
+        }
+      ],
+      "originChoices": {
+        "grantedFocus": "Lawyer"
+      },
+      "skills": {
+        "manipulate": 4,
+        "bureaucracy": 4,
+        "impress": 4,
+        "networking": 4,
+        "profession": 4,
+        "resolve": 4,
+        "cultures": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Western Europe",
+          "Southern Asia (including Southeast Asia)"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Lawyer",
+          "Mediator"
+        ],
+        "science": [
+          "Economy"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Lawyer",
+          "forte": "Tenant representation"
+        },
+        {
+          "skill": "profession",
+          "focus": "Lawyer",
+          "forte": "Negotiated settlements"
+        },
+        {
+          "skill": "profession",
+          "focus": "Lawyer",
+          "forte": "Case preparation"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Qasim Holt",
+          "rank": 2,
+          "notes": "Legal-Aid Coordinator; known from Nadia Rahman's earlier work. Introduced consultant options: bureaucracy, profession. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        },
+        {
+          "name": "Jo Morrow",
+          "rank": 1,
+          "notes": "Tenants Organizer; known from Nadia Rahman's earlier work. Introduced consultant options: networking. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Charter still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Pakistani British local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 3,
+        "possessions": 0,
+        "spendingCash": 3,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Tuxedo liner",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "gear",
+          "name": "Tape recorder (consumer-grade)",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "kits",
+          "name": "Forgery Kit I",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Dossier (Caliber I)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Cover identity (Caliber I)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Manchester, United Kingdom"
+    },
+    {
+      "id": "elena-marquez",
+      "name": "Elena Marquez",
+      "codename": "Meridian",
+      "classId": "explorer",
+      "talent": "Brainy",
+      "specialty": "Outdoorsman",
+      "role": "Field researcher",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "32",
+        "height": "173 cm",
+        "weight": "68 kg",
+        "eyes": "Hazel",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "Mexican",
+      "visual": "a Mexican woman aged 32, olive skin, hazel eyes, short black curls, weathered olive expedition jacket over a plain shirt, curious alert expression",
+      "background": "A museum surveyor who discovered that stolen artifacts were financing private detention sites. She joined the team to follow the shipping trail, carrying a field notebook full of careful drawings.",
+      "portrait": "systems/spycraft2/assets/agents/elena-marquez/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/elena-marquez/token.webp",
+      "abilities": {
+        "str": 12,
+        "dex": 12,
+        "con": 14,
+        "int": 16,
+        "wis": 12,
+        "cha": 10
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Fortunate"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "cultures": 4,
+        "athletics": 4,
+        "survival": 4,
+        "science": 4,
+        "notice": 4,
+        "search": 4,
+        "drive": 4,
+        "resolve": 4,
+        "blend": 4,
+        "investigation": 4,
+        "security": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Central America",
+          "South America"
+        ],
+        "drive": [
+          "Mounts and Animal-Drawn Vehicles",
+          "Standard Ground Vehicles",
+          "Personal Ground Vehicles"
+        ],
+        "profession": [
+          "Archaeologist"
+        ],
+        "science": [
+          "Chemistry",
+          "Engineering"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Archaeologist",
+          "forte": "Artifact provenance"
+        },
+        {
+          "skill": "science",
+          "focus": "Chemistry",
+          "forte": "Trace-evidence reagents"
+        },
+        {
+          "skill": "drive",
+          "focus": "Mounts and Animal-Drawn Vehicles",
+          "forte": "Horses"
+        },
+        {
+          "skill": "cultures",
+          "focus": "Central America",
+          "forte": "Mexico"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Rosa Quintero",
+          "rank": 1,
+          "notes": "Museum Registrar; known from Elena Marquez's earlier work. Introduced consultant options: science. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Meridian still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Mexican local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 1,
+        "possessions": 0,
+        "spendingCash": 1,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Duty vest, Class IIA",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Climbing Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "gear",
+          "name": "Field glasses",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "compass",
+        "binoculars",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Oaxaca, Mexico"
+    },
+    {
+      "id": "luc-moreau",
+      "name": "Luc Moreau",
+      "codename": "Velvet",
+      "classId": "faceman",
+      "talent": "Graceful",
+      "specialty": "Grifter",
+      "role": "Social infiltrator",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Man",
+        "age": "30",
+        "height": "183 cm",
+        "weight": "79 kg",
+        "eyes": "Brown",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "French Senegalese",
+      "visual": "a French Senegalese man aged 30, medium brown skin, dark brown eyes, neat short black curls and light stubble, charcoal dinner jacket with open white collar, an easy confident smile",
+      "background": "A former hotel concierge who learned how powerful guests disguise their business. After refusing to erase a missing guest from the register, he began using those same social skills to uncover hidden meetings.",
+      "portrait": "systems/spycraft2/assets/agents/luc-moreau/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/luc-moreau/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 14,
+        "con": 12,
+        "int": 12,
+        "wis": 12,
+        "cha": 16
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Mark"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "senseMotive": 4,
+        "bluff": 4,
+        "manipulate": 4,
+        "impress": 4,
+        "falsify": 4,
+        "networking": 4,
+        "cultures": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Western Europe",
+          "Southern Africa"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Hotel Concierge"
+        ],
+        "science": [
+          "Chemistry"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Hotel Concierge",
+          "forte": "Guest introductions"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Mireille Baptiste",
+          "rank": 2,
+          "notes": "Hotel Manager; known from Luc Moreau's earlier work. Introduced consultant options: impress, falsify. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Velvet still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "French Senegalese local history\nPractical first aid\nPublic transit maps",
+      "wealthAllocation": {
+        "lifestyle": 3,
+        "possessions": 0,
+        "spendingCash": 2,
+        "dressedForLifestyle": true
+      },
+      "identities": [
+        {
+          "id": "luc-moreau-cover-0",
+          "name": "Luc Laurent",
+          "professionFocus": "Conference Interpreter",
+          "interests": [
+            "Chamber music",
+            "Museum openings"
+          ]
+        },
+        {
+          "id": "luc-moreau-cover-1",
+          "name": "Luc Haddow",
+          "professionFocus": "Shipping Administrator",
+          "interests": [
+            "Freight schedules",
+            "Local football"
+          ]
+        },
+        {
+          "id": "luc-moreau-cover-2",
+          "name": "Luc Costa",
+          "professionFocus": "Arts Buyer",
+          "interests": [
+            "Ceramics",
+            "Architecture"
+          ]
+        }
+      ],
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Tuxedo liner",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Disguise Kit I",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "kits",
+          "name": "Forgery Kit I",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Cover identity (Caliber II)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Lyon, France"
+    },
+    {
+      "id": "samira-haddad",
+      "name": "Samira Haddad",
+      "codename": "Ledger",
+      "classId": "faceman",
+      "talent": "Shrewd",
+      "specialty": "Journalist",
+      "role": "Investigative cover specialist",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "36",
+        "height": "170 cm",
+        "weight": "65 kg",
+        "eyes": "Green",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "Lebanese Canadian",
+      "visual": "a Lebanese Canadian woman aged 36, light olive skin, green eyes, straight black bob, small round glasses, charcoal coat over a burgundy blouse, watchful thoughtful expression",
+      "background": "A financial correspondent whose source vanished after revealing an off-books security contract. Her cover identities open doors in offices, conference hotels and shipping firms; her own name stays off the byline.",
+      "portrait": "systems/spycraft2/assets/agents/samira-haddad/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/samira-haddad/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 12,
+        "con": 12,
+        "int": 14,
+        "wis": 12,
+        "cha": 16
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Mark"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "senseMotive": 4,
+        "bluff": 4,
+        "manipulate": 4,
+        "impress": 4,
+        "falsify": 4,
+        "networking": 4,
+        "cultures": 4,
+        "profession": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Northern America (including Greenland)",
+          "Western Asia (including the Middle East)"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Hotel Concierge",
+          "Journalist"
+        ],
+        "science": [
+          "Chemistry"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Hotel Concierge",
+          "forte": "Guest introductions"
+        },
+        {
+          "skill": "science",
+          "focus": "Chemistry",
+          "forte": "Trace-evidence reagents"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Leena Farah",
+          "rank": 3,
+          "notes": "Investigations Editor; known from Samira Haddad's earlier work. Introduced consultant options: investigation, analysis, falsify. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        },
+        {
+          "name": "Anton Reed",
+          "rank": 3,
+          "notes": "Financial Compliance Officer; known from Samira Haddad's earlier work. Introduced consultant options: bureaucracy, computers, science. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Ledger still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Lebanese Canadian local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 3,
+        "possessions": 0,
+        "spendingCash": 2,
+        "dressedForLifestyle": true
+      },
+      "identities": [
+        {
+          "id": "samira-haddad-cover-0",
+          "name": "Samira Laurent",
+          "professionFocus": "Conference Interpreter",
+          "interests": [
+            "Chamber music",
+            "Museum openings"
+          ]
+        },
+        {
+          "id": "samira-haddad-cover-1",
+          "name": "Samira Haddow",
+          "professionFocus": "Shipping Administrator",
+          "interests": [
+            "Freight schedules",
+            "Local football"
+          ]
+        },
+        {
+          "id": "samira-haddad-cover-2",
+          "name": "Samira Costa",
+          "professionFocus": "Arts Buyer",
+          "interests": [
+            "Ceramics",
+            "Architecture"
+          ]
+        }
+      ],
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Tuxedo liner",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Disguise Kit I",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Dossier (Caliber I)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "kits",
+          "name": "Forgery Kit I",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord",
+        "signal-whistle",
+        "spare-batteries"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Montreal, Canada"
+    },
+    {
+      "id": "jun-park",
+      "name": "Jun Park",
+      "codename": "Patch",
+      "classId": "hacker",
+      "talent": "Brainy",
+      "specialty": "Geek",
+      "role": "Network intrusion specialist",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Nonbinary",
+        "age": "27",
+        "height": "175 cm",
+        "weight": "67 kg",
+        "eyes": "Brown",
+        "hair": "Black with silver streak",
+        "level": 1
+      },
+      "nationality": "Korean Canadian",
+      "visual": "a Korean Canadian nonbinary adult aged 27, light warm skin, dark brown eyes, short black undercut with one silver streak, olive hoodie under a plain dark jacket, headphones around the neck, focused friendly expression",
+      "background": "A municipal network engineer who found a surveillance backdoor in an emergency-services upgrade. Jun joined the team to trace its operators and still insists that every borrowed system be left working.",
+      "portrait": "systems/spycraft2/assets/agents/jun-park/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/jun-park/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 14,
+        "con": 12,
+        "int": 16,
+        "wis": 12,
+        "cha": 12
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Depth of Study"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "computers": 4,
+        "electronics": 4,
+        "science": 4,
+        "security": 4,
+        "notice": 4,
+        "investigation": 4,
+        "falsify": 4,
+        "cultures": 4,
+        "profession": 4,
+        "resolve": 4,
+        "bureaucracy": 4,
+        "drive": 4,
+        "sleightOfHand": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Northern America (including Greenland)",
+          "Eastern Asia (including China)"
+        ],
+        "drive": [
+          "Standard Ground Vehicles",
+          "Personal Ground Vehicles"
+        ],
+        "profession": [
+          "Network Engineer",
+          "Systems Auditor"
+        ],
+        "science": [
+          "Programming",
+          "Mathematics"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Network Engineer",
+          "forte": "Incident response"
+        },
+        {
+          "skill": "science",
+          "focus": "Programming",
+          "forte": "Network security software"
+        },
+        {
+          "skill": "drive",
+          "focus": "Standard Ground Vehicles",
+          "forte": "Sports cars"
+        },
+        {
+          "skill": "cultures",
+          "focus": "Northern America (including Greenland)",
+          "forte": "Canada"
+        },
+        {
+          "skill": "profession",
+          "focus": "Network Engineer",
+          "forte": "Security audits"
+        },
+        {
+          "skill": "science",
+          "focus": "Programming",
+          "forte": "Database software"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Morgan Seo",
+          "rank": 1,
+          "notes": "Network Administrator; known from Jun Park's earlier work. Introduced consultant options: computers. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Patch still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Korean Canadian local history\nPractical first aid\nPublic transit maps",
+      "wealthAllocation": {
+        "lifestyle": 2,
+        "possessions": 0,
+        "spendingCash": 1,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber II)",
+          "funding": "wealth",
+          "carried": true,
+          "category": "E",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Electronics Kit I",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "E",
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "funding": "mission",
+          "carried": true,
+          "category": "E",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "kits",
+          "name": "Lockpicking Kit I",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "storage-media",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Vancouver, Canada"
+    },
+    {
+      "id": "mara-voss",
+      "name": "Mara Voss",
+      "codename": "Latch",
+      "classId": "intruder",
+      "talent": "Agile",
+      "specialty": "Criminal",
+      "role": "Covert entry specialist",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "29",
+        "height": "166 cm",
+        "weight": "59 kg",
+        "eyes": "Grey",
+        "hair": "Auburn",
+        "level": 1
+      },
+      "nationality": "German",
+      "visual": "a German woman aged 29, pale freckled skin, grey eyes, short auburn pixie haircut, plain black work jacket and dark shirt, practical restrained expression",
+      "background": "A safe technician who once took illicit entry jobs to cover a family debt. She turned witness when a client asked her to disable a hospital alarm, and now plans entries around leaving everyone inside unharmed.",
+      "portrait": "systems/spycraft2/assets/agents/mara-voss/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/mara-voss/token.webp",
+      "abilities": {
+        "str": 12,
+        "dex": 16,
+        "con": 12,
+        "int": 14,
+        "wis": 12,
+        "cha": 10
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Ghost Basics"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "sneak": 4,
+        "security": 4,
+        "acrobatics": 4,
+        "athletics": 4,
+        "search": 4,
+        "sleightOfHand": 4,
+        "notice": 4,
+        "electronics": 4,
+        "streetwise": 4,
+        "bluff": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Western Europe"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Locksmith"
+        ],
+        "science": [
+          "Engineering"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Locksmith",
+          "forte": "Lock assessment"
+        },
+        {
+          "skill": "science",
+          "focus": "Engineering",
+          "forte": "Electronic sensors"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Rika Brandt",
+          "rank": 2,
+          "notes": "Locksmith; known from Mara Voss's earlier work. Introduced consultant options: security, streetwise. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Latch still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "German local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 1,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Duty vest, Class IIA",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Lockpicking Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "G",
+          "pack": "kits",
+          "name": "Lockpicking Kit II",
+          "funding": "mission",
+          "carried": false,
+          "category": "G",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "duct-tape",
+        "storage-media",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Hamburg, Germany"
+    },
+    {
+      "id": "gabriel-okafor",
+      "name": "Gabriel Okafor",
+      "codename": "Anchor",
+      "classId": "pointman",
+      "talent": "Reliable",
+      "specialty": "Instructor",
+      "role": "Team coordinator",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Man",
+        "age": "39",
+        "height": "188 cm",
+        "weight": "92 kg",
+        "eyes": "Brown",
+        "hair": "Shaved, greying beard",
+        "level": 1
+      },
+      "nationality": "Nigerian British",
+      "visual": "a Nigerian British man aged 39, dark brown skin, brown eyes, shaved head and neatly trimmed salt-and-pepper beard, navy field jacket over a cream collared shirt, calm reassuring expression",
+      "background": "A former crisis-response instructor who kept a fractured evacuation team together during a communications blackout. He now organizes field operations, making sure each specialist has a clear task and a way home.",
+      "portrait": "systems/spycraft2/assets/agents/gabriel-okafor/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/gabriel-okafor/token.webp",
+      "abilities": {
+        "str": 12,
+        "dex": 13,
+        "con": 14,
+        "int": 14,
+        "wis": 10,
+        "cha": 14
+      },
+      "classChoices": {},
+      "skillChoices": {
+        "versatility1_0": "medicine",
+        "versatility1_1": "security",
+        "versatility1_2": "sneak",
+        "versatility1_3": "electronics"
+      },
+      "feats": [
+        {
+          "name": "Fortunate"
+        }
+      ],
+      "originChoices": {},
+      "talentChoices": {
+        "up": "wis",
+        "down": "con",
+        "classSkill0": "survival"
+      },
+      "skills": {
+        "tactics": 4,
+        "notice": 4,
+        "medicine": 4,
+        "security": 4,
+        "sneak": 4,
+        "electronics": 4,
+        "profession": 4,
+        "cultures": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Western Europe",
+          "Southern Africa"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Emergency Coordinator",
+          "Instructor"
+        ],
+        "science": [
+          "Engineering",
+          "Mathematics"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Emergency Coordinator",
+          "forte": "Evacuation planning"
+        },
+        {
+          "skill": "profession",
+          "focus": "Emergency Coordinator",
+          "forte": "Team briefings"
+        },
+        {
+          "skill": "science",
+          "focus": "Engineering",
+          "forte": "Electronic sensors"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Ruth Bello",
+          "rank": 2,
+          "notes": "Response-Team Instructor; known from Gabriel Okafor's earlier work. Introduced consultant options: tactics, profession. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        },
+        {
+          "name": "Isaac Moss",
+          "rank": 1,
+          "notes": "Paramedic Supervisor; known from Gabriel Okafor's earlier work. Introduced consultant options: medicine. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Anchor still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Nigerian British local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 2,
+        "possessions": 0,
+        "spendingCash": 1,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Duty vest, Class IIA",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Beretta 92 9mm",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "15M4",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "R",
+          "pack": "kits",
+          "name": "First Aid Kit II",
+          "funding": "mission",
+          "carried": false,
+          "category": "R",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "S",
+          "pack": "kits",
+          "name": "Lockpicking Kit I",
+          "funding": "mission",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "kits",
+          "name": "Electronics Kit I",
+          "funding": "mission",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Dossier (Caliber I)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "London, United Kingdom"
+    },
+    {
+      "id": "priya-raman",
+      "name": "Dr. Priya Raman",
+      "codename": "Remedy",
+      "classId": "scientist",
+      "talent": "Brainy",
+      "specialty": "Doctor",
+      "role": "Field physician",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "34",
+        "height": "164 cm",
+        "weight": "60 kg",
+        "eyes": "Brown",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "Indian British",
+      "visual": "an Indian British woman aged 34, medium brown skin, brown eyes, long black braid over one shoulder, teal medical scrub top under a simple grey field coat with a stethoscope, steady compassionate expression",
+      "background": "An emergency physician who noticed that several unrelated patients carried the same experimental implant. She follows the medical evidence into the field and treats patients regardless of which side brought them in.",
+      "portrait": "systems/spycraft2/assets/agents/priya-raman/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/priya-raman/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 12,
+        "con": 14,
+        "int": 16,
+        "wis": 12,
+        "cha": 12
+      },
+      "classChoices": {
+        "0": 2
+      },
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Depth of Study"
+        },
+        {
+          "name": "Scholar"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "medicine": 4,
+        "analysis": 4,
+        "science": 4,
+        "computers": 4,
+        "electronics": 4,
+        "notice": 4,
+        "profession": 4,
+        "bureaucracy": 4,
+        "cultures": 4,
+        "mechanics": 4,
+        "resolve": 4,
+        "drive": 4,
+        "falsify": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Southern Asia (including Southeast Asia)",
+          "Western Europe"
+        ],
+        "drive": [
+          "Standard Ground Vehicles",
+          "Personal Ground Vehicles"
+        ],
+        "profession": [
+          "Physician",
+          "Medical Researcher"
+        ],
+        "science": [
+          "Pharmacology",
+          "Genetics"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Physician",
+          "forte": "Emergency triage"
+        },
+        {
+          "skill": "science",
+          "focus": "Pharmacology",
+          "forte": "Emergency pharmaceuticals"
+        },
+        {
+          "skill": "drive",
+          "focus": "Standard Ground Vehicles",
+          "forte": "Sports cars"
+        },
+        {
+          "skill": "cultures",
+          "focus": "Southern Asia (including Southeast Asia)",
+          "forte": "India"
+        },
+        {
+          "skill": "profession",
+          "focus": "Physician",
+          "forte": "Treatment planning"
+        },
+        {
+          "skill": "science",
+          "focus": "Pharmacology",
+          "forte": "Toxicology equipment"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Asha Singh",
+          "rank": 2,
+          "notes": "Hospital Administrator; known from Dr. Priya Raman's earlier work. Introduced consultant options: medicine, analysis. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Remedy still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Indian British local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 2,
+        "possessions": 0,
+        "spendingCash": 1,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "kits",
+          "name": "Surgery Kit II",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "G",
+          "pack": "kits",
+          "name": "First Aid Kit II",
+          "funding": "mission",
+          "carried": false,
+          "category": "G",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "E",
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber II)",
+          "funding": "mission",
+          "carried": true,
+          "category": "E",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "kits",
+          "name": "Forensics Kit I",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "stretcher",
+        "storage-media",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Chennai, India"
+    },
+    {
+      "id": "tomas-aalto",
+      "name": "Tomas Aalto",
+      "codename": "Kestrel",
+      "classId": "scout",
+      "talent": "Vigilant",
+      "specialty": "Outdoorsman",
+      "role": "Tracker and animal handler",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Man",
+        "age": "33",
+        "height": "185 cm",
+        "weight": "85 kg",
+        "eyes": "Blue",
+        "hair": "Blond",
+        "level": 1
+      },
+      "nationality": "Finnish",
+      "visual": "a Finnish man aged 33, fair skin, blue eyes, short blond hair and a close blond beard, forest-green field jacket with a small dog-training whistle on a cord, quiet attentive expression",
+      "background": "A search-and-rescue handler recruited after his dog found a missing witness along a supposedly cleared border road. Tomas reads disturbed ground patiently and never treats Bracken as expendable equipment.",
+      "portrait": "systems/spycraft2/assets/agents/tomas-aalto/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/tomas-aalto/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 14,
+        "con": 12,
+        "int": 12,
+        "wis": 16,
+        "cha": 12
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Animal Partner"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "survival": 4,
+        "notice": 4,
+        "sneak": 4,
+        "athletics": 4,
+        "tactics": 4
+      },
+      "proficiencies": {
+        "rifle": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        },
+        "handgun": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Western Europe"
+        ],
+        "drive": [
+          "Mounts and Animal-Drawn Vehicles",
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Search and Rescue Handler"
+        ],
+        "science": [
+          "Genetics"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Search and Rescue Handler",
+          "forte": "Missing-person searches"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Veera Koski",
+          "rank": 1,
+          "notes": "Rescue Dispatcher; known from Tomas Aalto's earlier work. Introduced consultant options: survival. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Kestrel still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Finnish local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 0,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Ruger 10/22 .22 LR",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "10M10",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit II",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Dagger/survival knife",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "gear",
+          "name": "Field glasses",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "compass",
+        "binoculars",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord",
+        "signal-whistle",
+        "spare-batteries",
+        "waterproof-bags"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Oulu, Finland"
+    },
+    {
+      "id": "amina-diallo",
+      "name": "Amina Diallo",
+      "codename": "Drift",
+      "classId": "scout",
+      "talent": "Fit",
+      "specialty": "Hunter",
+      "role": "Mobile reconnaissance",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "28",
+        "height": "177 cm",
+        "weight": "72 kg",
+        "eyes": "Brown",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "Senegalese French",
+      "visual": "a Senegalese French woman aged 28, dark brown skin, brown eyes, natural black hair tied back neatly, sand-colored field jacket and olive scarf, athletic build and measured observant expression",
+      "background": "A wildlife survey guide who mapped a poaching route and discovered that the same vehicles carried people. She now scouts routes for the team, favoring patience, clear sightlines and quiet departures.",
+      "portrait": "systems/spycraft2/assets/agents/amina-diallo/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/amina-diallo/token.webp",
+      "abilities": {
+        "str": 12,
+        "dex": 14,
+        "con": 12,
+        "int": 12,
+        "wis": 16,
+        "cha": 10
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Bullseye"
+        },
+        {
+          "name": "Forest Training"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "survival": 4,
+        "notice": 4,
+        "sneak": 4,
+        "athletics": 4
+      },
+      "proficiencies": {
+        "rifle": {
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        },
+        "handgun": {
+          "proficient": true
+        },
+        "blunt": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Southern Africa"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Search and Rescue Handler"
+        ],
+        "science": [
+          "Genetics"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [],
+      "contacts": [
+        {
+          "name": "Fatou Sarr",
+          "rank": 1,
+          "notes": "Park Ranger; known from Amina Diallo's earlier work. Introduced consultant options: survival. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Drift still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Senegalese French local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 0,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Ruger Mini-14 5.56mm NATO",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "30M3",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Climbing Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Dagger/survival knife",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "compass",
+        "binoculars",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord",
+        "signal-whistle"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Dakar, Senegal"
+    },
+    {
+      "id": "sofia-rossi",
+      "name": "Sofia Rossi",
+      "codename": "Mosaic",
+      "classId": "sleuth",
+      "talent": "Shrewd",
+      "specialty": "Investigator",
+      "role": "Case-building detective",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "40",
+        "height": "169 cm",
+        "weight": "66 kg",
+        "eyes": "Brown",
+        "hair": "Dark brown with grey streaks",
+        "level": 1
+      },
+      "nationality": "Italian",
+      "visual": "an Italian woman aged 40, olive skin, brown eyes, dark brown shoulder-length hair with grey at the temples, worn brown leather coat over a simple black blouse, thoughtful determined expression",
+      "background": "A missing-persons investigator who links cases through the small facts other people discard. She works with the team because a witness deserves a usable case, not merely a dramatic rescue.",
+      "portrait": "systems/spycraft2/assets/agents/sofia-rossi/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/sofia-rossi/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 12,
+        "con": 12,
+        "int": 14,
+        "wis": 16,
+        "cha": 12
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Mark"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "senseMotive": 4,
+        "investigation": 4,
+        "analysis": 4,
+        "notice": 4,
+        "search": 4,
+        "networking": 4,
+        "bureaucracy": 4,
+        "resolve": 4,
+        "profession": 4,
+        "security": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Western Europe"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Private Investigator",
+          "Case Analyst"
+        ],
+        "science": [
+          "Chemistry"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Private Investigator",
+          "forte": "Witness interviews"
+        },
+        {
+          "skill": "science",
+          "focus": "Chemistry",
+          "forte": "Trace-evidence reagents"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Marco Bassi",
+          "rank": 2,
+          "notes": "Retired Magistrate; known from Sofia Rossi's earlier work. Introduced consultant options: bureaucracy, investigation. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        },
+        {
+          "name": "Elena Costa",
+          "rank": 2,
+          "notes": "Crime-Scene Technician; known from Sofia Rossi's earlier work. Introduced consultant options: analysis, search. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Mosaic still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Italian local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 1,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Duty vest, Class IIA",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Forensics Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "R",
+          "pack": "kits",
+          "name": "Forensics Kit II",
+          "funding": "mission",
+          "carried": false,
+          "category": "R",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord",
+        "signal-whistle",
+        "spare-batteries",
+        "waterproof-bags",
+        "personal-toiletries",
+        "sunglasses",
+        "small-mirror"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Turin, Italy"
+    },
+    {
+      "id": "daniel-chen",
+      "name": "Daniel Chen",
+      "codename": "Relay",
+      "classId": "snoop",
+      "talent": "Clever",
+      "specialty": "Journalist",
+      "role": "Signals and surveillance",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Man",
+        "age": "31",
+        "height": "178 cm",
+        "weight": "74 kg",
+        "eyes": "Brown",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "Chinese American",
+      "visual": "a Chinese American man aged 31, light tan skin, brown eyes, neatly side-parted black hair, square glasses, grey travel jacket with a discreet earpiece, patient analytical expression",
+      "background": "A radio producer who traced a staged news recording to a private intelligence broker. He now builds surveillance plans that capture enough context to distinguish a useful signal from a convincing fabrication.",
+      "portrait": "systems/spycraft2/assets/agents/daniel-chen/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/daniel-chen/token.webp",
+      "abilities": {
+        "str": 10,
+        "dex": 12,
+        "con": 12,
+        "int": 16,
+        "wis": 14,
+        "cha": 12
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Techie"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "electronics": 4,
+        "search": 4,
+        "notice": 4,
+        "analysis": 4,
+        "computers": 4,
+        "investigation": 4,
+        "senseMotive": 4,
+        "networking": 4,
+        "cultures": 4,
+        "science": 4,
+        "bluff": 4,
+        "bureaucracy": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Northern America (including Greenland)",
+          "Eastern Asia (including China)"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Radio Producer"
+        ],
+        "science": [
+          "Engineering",
+          "Mathematics"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Radio Producer",
+          "forte": "Audio editing"
+        },
+        {
+          "skill": "science",
+          "focus": "Engineering",
+          "forte": "Electronic sensors"
+        },
+        {
+          "skill": "drive",
+          "focus": "Standard Ground Vehicles",
+          "forte": "Sports cars"
+        },
+        {
+          "skill": "cultures",
+          "focus": "Northern America (including Greenland)",
+          "forte": "Canada"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Mei Wong",
+          "rank": 2,
+          "notes": "Station Engineer; known from Daniel Chen's earlier work. Introduced consultant options: electronics, computers. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        },
+        {
+          "name": "Alton Price",
+          "rank": 2,
+          "notes": "News Editor; known from Daniel Chen's earlier work. Introduced consultant options: investigation, networking. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Relay still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Chinese American local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 1,
+        "possessions": 0,
+        "spendingCash": 1,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber II)",
+          "funding": "wealth",
+          "carried": true,
+          "category": "E",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Electronics Kit I",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "T",
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "G",
+          "pack": "kits",
+          "name": "Lockpicking Kit I",
+          "funding": "mission",
+          "carried": true,
+          "category": "G",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "CHA",
+          "pack": "gear",
+          "name": "Tape recorder (consumer-grade)",
+          "funding": "mission",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "storage-media",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations",
+        "emergency-blanket",
+        "utility-cord"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Seattle, United States"
+    },
+    {
+      "id": "luka-petrov",
+      "name": "Luka Petrov",
+      "codename": "Breakwater",
+      "classId": "soldier",
+      "talent": "Burly",
+      "specialty": "Warrior",
+      "role": "Close protection",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Man",
+        "age": "35",
+        "height": "191 cm",
+        "weight": "108 kg",
+        "eyes": "Blue",
+        "hair": "Dark brown",
+        "level": 1
+      },
+      "nationality": "Serbian",
+      "visual": "a Serbian man aged 35, fair weathered skin, blue eyes, close-cropped dark brown hair and short beard, broad muscular build, olive work shirt under a plain dark field vest, calm protective expression",
+      "background": "A former venue security supervisor who stopped following orders when an employer tried to abandon injured staff. He specializes in getting people through narrow spaces safely and ending a fight before it spreads.",
+      "portrait": "systems/spycraft2/assets/agents/luka-petrov/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/luka-petrov/token.webp",
+      "abilities": {
+        "str": 16,
+        "dex": 12,
+        "con": 14,
+        "int": 12,
+        "wis": 12,
+        "cha": 10
+      },
+      "classChoices": {
+        "0": 3
+      },
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Armor Basics",
+          "choice": "moderate"
+        },
+        {
+          "name": "Brawling Basics"
+        },
+        {
+          "name": "Iron Will"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "athletics": 4,
+        "notice": 4,
+        "resolve": 4,
+        "tactics": 4,
+        "drive": 4
+      },
+      "proficiencies": {
+        "unarmed": {
+          "forte": true
+        },
+        "edged": {
+          "proficient": true
+        },
+        "handgun": {
+          "proficient": true
+        },
+        "blunt": {
+          "proficient": true,
+          "forte": true
+        },
+        "shotgun": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Eastern Europe (including Russia)"
+        ],
+        "drive": [
+          "Standard Ground Vehicles",
+          "Personal Ground Vehicles"
+        ],
+        "profession": [
+          "Security Supervisor"
+        ],
+        "science": [
+          "Engineering"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "profession",
+          "focus": "Security Supervisor",
+          "forte": "Protective escorts"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Milos Jovan",
+          "rank": 1,
+          "notes": "Paramedic; known from Luka Petrov's earlier work. Introduced consultant options: medicine. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Breakwater still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Serbian local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 0,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Modular tactical armor vest",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Tonfa",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "W",
+          "pack": "weapons",
+          "name": "Stun gun, melee",
+          "funding": "mission",
+          "carried": true,
+          "category": "W",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "handcuffs",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Belgrade, Serbia"
+    },
+    {
+      "id": "inez-duarte",
+      "name": "Inez Duarte",
+      "codename": "Vector",
+      "classId": "soldier",
+      "talent": "Fit",
+      "specialty": "Mercenary",
+      "role": "Ranged security",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "30",
+        "height": "175 cm",
+        "weight": "76 kg",
+        "eyes": "Brown",
+        "hair": "Dark brown",
+        "level": 1
+      },
+      "nationality": "Portuguese",
+      "visual": "a Portuguese woman aged 30, light olive skin, brown eyes, dark brown curls tied back, athletic muscular build, muted grey field jacket over a simple protective vest, focused disciplined expression",
+      "background": "A convoy guard who documented diverted relief shipments rather than accept a quiet payoff. She joined the team with a strict preference for clear fields of fire and a plan for everyone behind the target.",
+      "portrait": "systems/spycraft2/assets/agents/inez-duarte/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/inez-duarte/token.webp",
+      "abilities": {
+        "str": 14,
+        "dex": 16,
+        "con": 12,
+        "int": 12,
+        "wis": 12,
+        "cha": 10
+      },
+      "classChoices": {
+        "0": 3
+      },
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Armor Basics",
+          "choice": "moderate"
+        },
+        {
+          "name": "Bullseye"
+        },
+        {
+          "name": "Quick Draw"
+        }
+      ],
+      "originChoices": {},
+      "skills": {
+        "athletics": 4,
+        "notice": 4,
+        "resolve": 4,
+        "tactics": 4
+      },
+      "proficiencies": {
+        "rifle": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        },
+        "handgun": {
+          "proficient": true
+        },
+        "blunt": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Western Europe"
+        ],
+        "drive": [
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Security Supervisor"
+        ],
+        "science": [
+          "Engineering"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [],
+      "contacts": [
+        {
+          "name": "Diana Pires",
+          "rank": 2,
+          "notes": "Freight Coordinator; known from Inez Duarte's earlier work. Introduced consultant options: streetwise, tactics. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Vector still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Portuguese local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 0,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Modular tactical armor vest",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "funding": "wealth",
+          "carried": true,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Beretta 92 9mm",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "15M4",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "W",
+          "pack": "weapons",
+          "name": "Ruger Mini-14 5.56mm NATO",
+          "funding": "mission",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "30M3",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "handcuffs",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover",
+        "snack-rations"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Porto, Portugal"
+    },
+    {
+      "id": "mateo-silva",
+      "name": "Mateo Silva",
+      "codename": "Apex",
+      "classId": "wheelman",
+      "talent": "Daring",
+      "specialty": "Hot Rodder",
+      "role": "Ground extraction driver",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Man",
+        "age": "26",
+        "height": "180 cm",
+        "weight": "77 kg",
+        "eyes": "Brown",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "Brazilian",
+      "visual": "a Brazilian man aged 26, tan skin, brown eyes, short curly black hair, black driving jacket over a rust-colored shirt with driving gloves tucked into the collar, energetic confident expression",
+      "background": "A rally mechanic who used a service road to evacuate a threatened union organizer. He drives with an exit route in mind and keeps an annotated street map beside the diagnostic tools.",
+      "portrait": "systems/spycraft2/assets/agents/mateo-silva/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/mateo-silva/token.webp",
+      "abilities": {
+        "str": 12,
+        "dex": 16,
+        "con": 12,
+        "int": 14,
+        "wis": 12,
+        "cha": 10
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Fortunate"
+        }
+      ],
+      "originChoices": {
+        "grantedFocus": "Standard Ground Vehicles"
+      },
+      "skills": {
+        "drive": 4,
+        "mechanics": 4,
+        "notice": 4,
+        "acrobatics": 4,
+        "tactics": 4,
+        "electronics": 4,
+        "profession": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        },
+        "rifle": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "South America"
+        ],
+        "drive": [
+          "Standard Ground Vehicles",
+          "Personal Ground Vehicles",
+          "Mounts and Animal-Drawn Vehicles"
+        ],
+        "profession": [
+          "Driver",
+          "Vehicle Mechanic"
+        ],
+        "science": [
+          "Engineering"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "drive",
+          "focus": "Standard Ground Vehicles",
+          "forte": "Sports cars"
+        },
+        {
+          "skill": "profession",
+          "focus": "Driver",
+          "forte": "Passenger extraction"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Renata Lima",
+          "rank": 1,
+          "notes": "Rally Mechanic; known from Mateo Silva's earlier work. Introduced consultant options: mechanics. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Apex still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Brazilian local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 1,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Motorcycle suit",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Mechanics Kit I",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "V",
+          "pack": "vehicles",
+          "name": "Car, sports (modern)",
+          "funding": "mission",
+          "carried": false,
+          "category": "V",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "compass",
+        "road-flares",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Curitiba, Brazil"
+    },
+    {
+      "id": "noor-al-masri",
+      "name": "Noor Al-Masri",
+      "codename": "Skylark",
+      "classId": "wheelman",
+      "talent": "Agile",
+      "specialty": "Pilot",
+      "role": "Air rescue pilot",
+      "details": {
+        "faction": "The Lantern Office",
+        "gender": "Woman",
+        "age": "32",
+        "height": "171 cm",
+        "weight": "65 kg",
+        "eyes": "Brown",
+        "hair": "Black",
+        "level": 1
+      },
+      "nationality": "Egyptian British",
+      "visual": "an Egyptian British woman aged 32, medium olive skin, brown eyes, wavy black hair in a low bun, plain navy flight suit with no insignia and a headset resting around the neck, composed observant expression",
+      "background": "A relief pilot who discovered that her flight schedules were being used to conceal prisoner transfers. She now flies rescue and observation missions, keeping meticulous fuel reserves and alternate landing plans.",
+      "portrait": "systems/spycraft2/assets/agents/noor-al-masri/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/noor-al-masri/token.webp",
+      "abilities": {
+        "str": 12,
+        "dex": 16,
+        "con": 12,
+        "int": 14,
+        "wis": 12,
+        "cha": 10
+      },
+      "classChoices": {},
+      "skillChoices": {},
+      "feats": [
+        {
+          "name": "Fortunate"
+        }
+      ],
+      "originChoices": {
+        "grantedFocus": "Rotary-Wing Aircraft"
+      },
+      "skills": {
+        "drive": 4,
+        "mechanics": 4,
+        "notice": 4,
+        "acrobatics": 4,
+        "tactics": 4,
+        "electronics": 4,
+        "profession": 4,
+        "athletics": 4
+      },
+      "proficiencies": {
+        "handgun": {
+          "proficient": true,
+          "forte": true
+        },
+        "unarmed": {
+          "proficient": true
+        },
+        "edged": {
+          "proficient": true
+        },
+        "rifle": {
+          "proficient": true
+        }
+      },
+      "focuses": {
+        "cultures": [
+          "Northern Africa"
+        ],
+        "drive": [
+          "Rotary-Wing Aircraft",
+          "Service Aircraft",
+          "Standard Ground Vehicles"
+        ],
+        "profession": [
+          "Driver",
+          "Vehicle Mechanic"
+        ],
+        "science": [
+          "Engineering"
+        ],
+        "fortes": []
+      },
+      "skillFortes": [
+        {
+          "skill": "drive",
+          "focus": "Rotary-Wing Aircraft",
+          "forte": "Observation helicopters"
+        },
+        {
+          "skill": "profession",
+          "focus": "Driver",
+          "forte": "Passenger extraction"
+        },
+        {
+          "skill": "science",
+          "focus": "Engineering",
+          "forte": "Electronic sensors"
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Hana Saleh",
+          "rank": 1,
+          "notes": "Air-Operations Dispatcher; known from Noor Al-Masri's earlier work. Introduced consultant options: drive. They expect discretion and an occasional reasonable favor. Grade is purchased with the starting contact choices; these are consultants, not combat followers."
+        }
+      ],
+      "subplots": [
+        {
+          "name": "An unfinished case",
+          "notes": "Skylark still needs to identify who authorized the incident described in their background. A former colleague may know more.",
+          "complete": false
+        }
+      ],
+      "interests": "Egyptian British local history\nPractical first aid",
+      "wealthAllocation": {
+        "lifestyle": 1,
+        "possessions": 0,
+        "spendingCash": 0,
+        "dressedForLifestyle": true
+      },
+      "loadout": [
+        {
+          "pack": "armor",
+          "name": "Military flight suit",
+          "funding": "wealth",
+          "carried": true,
+          "category": "S",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "kits",
+          "name": "Mechanics Kit I",
+          "funding": "wealth",
+          "carried": false,
+          "category": "T",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pack": "weapons",
+          "name": "Walther PPK .32 ACP",
+          "funding": "wealth",
+          "carried": true,
+          "category": "W",
+          "ammunition": {
+            "code": "7M8",
+            "id": "bullet-blank"
+          },
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        },
+        {
+          "pick": "V",
+          "pack": "vehicles",
+          "name": "Helicopter, observation",
+          "funding": "mission",
+          "missionAbility": "customRide",
+          "carried": false,
+          "category": "V",
+          "upgradeDecision": "Use the standard catalog configuration; optional included upgrades are deliberately declined and grant no extra benefit."
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook",
+        "backpack",
+        "canteen",
+        "multitool",
+        "compass",
+        "road-flares",
+        "duct-tape",
+        "pocket-map",
+        "work-gloves",
+        "weather-cover"
+      ],
+      "carryNotes": "Large kits and vehicles stay at the Lantern support vehicle or safe house when marked not carried. Carried equipment is the field loadout.",
+      "birthplace": "Alexandria, Egypt"
+    }
+  ],
+  "companions": [
+    {
+      "id": "bracken",
+      "name": "Bracken",
+      "owner": "tomas-aalto",
+      "feat": "Animal Partner",
+      "size": "Medium",
+      "portrait": "systems/spycraft2/assets/agents/bracken/portrait.webp",
+      "token": "systems/spycraft2/assets/agents/bracken/token.webp",
+      "abilities": {
+        "str": 12,
+        "dex": 12,
+        "con": 12,
+        "int": 2,
+        "wis": 12,
+        "cha": 10
+      },
+      "grades": {
+        "initiative": 3,
+        "attack": 2,
+        "defense": 4,
+        "resilience": 3,
+        "health": 2,
+        "competence": 1,
+        "wealth": 0
+      },
+      "skills": [
+        {
+          "key": "athletics",
+          "grade": 1
+        },
+        {
+          "key": "notice",
+          "grade": 3
+        },
+        {
+          "key": "survival",
+          "grade": 3
+        }
+      ],
+      "qualities": [
+        {
+          "id": "improved-scent",
+          "units": 1
+        },
+        {
+          "id": "natural-attack",
+          "units": 1,
+          "caliber": 2,
+          "details": "Bite"
+        },
+        {
+          "id": "fleet",
+          "units": 1
+        },
+        {
+          "id": "rescue",
+          "units": 1
+        },
+        {
+          "id": "seek-on-command",
+          "units": 1,
+          "details": "Find missing people"
+        }
+      ],
+      "freeTrainedQualities": [
+        "rescue",
+        "seek-on-command"
+      ],
+      "background": "Bracken is a four-year-old working German Shepherd trained for search and rescue. She follows Tomas patiently, alerts quietly to a located person, and waits for a release signal before approaching."
+    }
+  ],
+  "commonSupplies": [
+    {
+      "id": "pocket-map",
+      "name": "Folding regional map",
+      "description": "A paper route reference without an automatic skill bonus.",
+      "icon": "map",
+      "weight": 0.1
+    },
+    {
+      "id": "work-gloves",
+      "name": "Work gloves",
+      "description": "Ordinary gloves for handling rough objects; no armor statistics.",
+      "icon": "hand",
+      "weight": 0.2
+    },
+    {
+      "id": "weather-cover",
+      "name": "Pack rain cover",
+      "description": "A simple waterproof cover for the carried pack.",
+      "icon": "jacket",
+      "weight": 0.1
+    },
+    {
+      "id": "snack-rations",
+      "name": "Trail snacks",
+      "description": "Food for an ordinary day away from the support vehicle.",
+      "icon": "canteen",
+      "weight": 1
+    },
+    {
+      "id": "emergency-blanket",
+      "name": "Emergency blanket",
+      "description": "A compact reflective blanket for shelter or patient comfort.",
+      "icon": "stretcher",
+      "weight": 0.2
+    },
+    {
+      "id": "utility-cord",
+      "name": "Utility cord, 10 m",
+      "description": "Ordinary light cord; professional climbing still requires its normal kit.",
+      "icon": "rope",
+      "weight": 0.5
+    },
+    {
+      "id": "signal-whistle",
+      "name": "Signal whistle",
+      "description": "A basic whistle for signaling the team or the dog.",
+      "icon": "speaker",
+      "weight": 0.05
+    },
+    {
+      "id": "spare-batteries",
+      "name": "Spare batteries",
+      "description": "One spare set for the ordinary flashlight or phone accessories.",
+      "icon": "lightning",
+      "weight": 0.2
+    },
+    {
+      "id": "waterproof-bags",
+      "name": "Waterproof document bags",
+      "description": "Simple bags for keeping notes dry.",
+      "icon": "documents",
+      "weight": 0.1
+    },
+    {
+      "id": "personal-toiletries",
+      "name": "Personal toiletries",
+      "description": "A small pouch of ordinary hygiene supplies.",
+      "icon": "cleaning",
+      "weight": 0.5
+    },
+    {
+      "id": "sunglasses",
+      "name": "Sunglasses",
+      "description": "Ordinary sunglasses without special optics or equipment bonuses.",
+      "icon": "goggles",
+      "weight": 0.1
+    },
+    {
+      "id": "small-mirror",
+      "name": "Pocket mirror",
+      "description": "A small unpowered mirror for everyday use.",
+      "icon": "mirror",
+      "weight": 0.1
+    }
+  ]
+}

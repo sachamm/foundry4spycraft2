@@ -1,7 +1,11 @@
+import { underminedSpendBlock } from "./taunt.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { actionDiceGain, actionDieBoostPlan } from "./action-dice.mjs";
+import { validFortunatePool } from "./fortunate.mjs";
 import { loc } from "../i18n.mjs";
 const epoch = (periods, key) => String(periods?.[key] ?? "initial");
+/** Bonus pools that may pay any action-die cost, each with its own expiry. */
+export const UNRESTRICTED_POOL_SOURCES = Object.freeze(["masterPlan", "strut", "adrenalineJunkie", "fortunate"]);
 /** Stuntman 8, p.81: one compulsory d10, confined to its STR/DEX check, once per scene. */
 export function difficultSkillBonusPlan(system, result, { dc } = {}) {
   if ((system.classLevels?.stuntman ?? 0) < 8) throw new Error(loc`This bonus requires Stuntman level 8.`);
@@ -41,7 +45,7 @@ export function checkBonusPool(
   };
 }
 export function bonusPoolForCheck(system, id, message, { periods = system.usagePeriods } = {}) {
-  if (["masterPlan", "strut", "adrenalineJunkie"].includes(system.bonusActionDice?.[id]?.source))
+  if (UNRESTRICTED_POOL_SOURCES.includes(system.bonusActionDice?.[id]?.source))
     return unrestrictedBonusPoolForCheck(system, id, message, { periods });
   const pool = system.bonusActionDice?.[id],
     check = message?.flags?.spycraft2;
@@ -223,13 +227,14 @@ export function unrestrictedBonusPoolStatus(system, id, { periods = system.usage
     pool.granted === 1 &&
     typeof pool.woundEventKey === "string" &&
     /^[A-Za-z0-9_%:-]+$/.test(pool.woundEventKey);
-  const valid = common && (master || strut || adrenaline);
+  const fortunate = validFortunatePool(pool);
+  const valid = common && (master || strut || adrenaline || fortunate);
   if (!valid || pool.needsReview || system.actionDiceSettlementReview?.needsReview) {
     reason = loc`Review this bonus-die grant before spending it.`;
     needsReview = true;
   } else if (
     pool.session !== epoch(periods, "session") ||
-    ((master || adrenaline) && pool.scene !== epoch(periods, "scene"))
+    ((master || adrenaline || fortunate) && pool.scene !== epoch(periods, "scene"))
   )
     reason = loc`These bonus dice expired at scene or session end.`;
   else if (
@@ -268,7 +273,7 @@ export function unrestrictedBonusPoolForCheck(system, id, message, { periods = s
 }
 export function unrestrictedBonusPools(system, periods = system.usagePeriods) {
   return Object.entries(system.bonusActionDice ?? {})
-    .filter(([, pool]) => ["masterPlan", "strut", "adrenalineJunkie"].includes(pool?.source))
+    .filter(([, pool]) => UNRESTRICTED_POOL_SOURCES.includes(pool?.source))
     .map(([id]) => unrestrictedBonusPoolStatus(system, id, { periods }));
 }
 
@@ -353,6 +358,7 @@ export function actionDicePaymentPlan(system, { count, bonusPoolId = "", periods
         ? loc`Review the current Shaken sources before spending action dice.`
         : loc`Shaken IV: no action dice may be spent at all (p.342).`
     };
+  if (underminedSpendBlock(system)) return { blocked: true, reason: underminedSpendBlock(system) };
   if (!Number.isSafeInteger(count) || count < 1) throw new Error(loc`Spend a positive whole number of action dice.`);
   const funding = actionDiceFundingContext(system, { bonusPoolId, periods });
   if (funding.blocked) return funding;
@@ -397,7 +403,7 @@ export function possessedActionDice(system, { periods = system.usagePeriods } = 
   const sources = [];
   for (const [id, pool] of Object.entries(system.bonusActionDice ?? {})) {
     if (pool?.remaining === 0) continue;
-    if (["masterPlan", "strut", "adrenalineJunkie"].includes(pool?.source)) {
+    if (UNRESTRICTED_POOL_SOURCES.includes(pool?.source)) {
       const status = unrestrictedBonusPoolStatus(system, id, { periods });
       if (status.needsReview) throw new Error(status.reason);
       if (status.available)

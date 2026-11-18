@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 /** Finesse Mastery/Supremacy p.178. Melee scope includes unarmed, never hurled attacks. */
 const meleeProficiencies = new Set(["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged"]);
 export const finesseMeleeWeapon = weapon => meleeProficiencies.has(weapon?.proficiency);
@@ -68,3 +69,23 @@ export function massiveWeaponPlan(system, weapon) {
     ]
   };
 }
+
+// The Finesse feats' threat increase as part of an attack plan.
+rollPipeline.register({
+  id: "finesseAttackTerm",
+  kinds: ["attack"],
+  order: 9080,
+  terms({ system, weapon }) {
+    const increase = finesseThreatIncrease(system, weapon);
+    return {
+      key: "finesseThreatIncrease",
+      plan: increase,
+      threat: increase,
+      noteAt: 200,
+      notes: increase ? [loc`Finesse feats: melee threat range +${increase} (p.178).`] : []
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "finesseRecord", order: 9675, record: ["finesseDamage"] });

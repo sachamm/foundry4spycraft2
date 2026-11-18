@@ -8,7 +8,7 @@ test("soundtrack has eleven ordered, portable OGG assets and sequential playback
   const pack = buildPacks().packs.soundtrack;
   assert.equal(pack.type, "Playlist");
   const album = pack.docs[0];
-  assert.equal(album.mode, 1);
+  assert.equal(album.mode, 0);
   assert.equal(album.sorting, "m");
   const sounds = album.embedded.sounds;
   assert.equal(sounds.length, 11);

@@ -184,3 +184,6 @@ rollPipeline.register({
   validate: ({ actor, options, checkKind, checkId, checkMethod, skillKey }) =>
     validateTrackingFeatProof(actor.system, options.trackingFeat, { checkKind, skillKey, checkId, checkMethod })
 });
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "trackingRecord", order: 9780, record: ["tracking"] });

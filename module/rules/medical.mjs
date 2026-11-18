@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Named Medicine combat restrictions, pp.141–143; Bandage's error-range benefit, p.172. */
 export function medicalSkillPlan(
@@ -50,3 +51,6 @@ export function medicalSkillPlan(
     notes
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "medicalRecord", order: 9710, record: ["medical"] });

@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 
 /** Timing notes that the skill check shows through its own timing line; exported so they can be recognised exactly. */
 export const intelligenceAnalysisNote = () =>
@@ -407,3 +408,42 @@ export function flankingAttackEffects(
     ]
   };
 }
+
+// Flanking (and Wolfpack) and Game Hunter as parts of an attack plan.
+rollPipeline.register({
+  id: "flankingAttackTerm",
+  kinds: ["attack"],
+  order: 9100,
+  terms({ system, weapon, options }) {
+    const plan = flankingAttackEffects(system, weapon, options);
+    return {
+      key: "flanking",
+      plan,
+      rowAt: 300,
+      rows: [[loc`Flanking`, plan.attackBonus]],
+      threat: plan.threatIncrease,
+      blockAt: 150,
+      blocked: { blocked: !!plan.blocked, reason: plan.reason },
+      noteAt: 360,
+      notes: plan.notes
+    };
+  }
+});
+rollPipeline.register({
+  id: "gameHunterAttackTerm",
+  kinds: ["attack"],
+  order: 9110,
+  terms({ system, options }) {
+    const plan = gameHunterAttack(system, options);
+    return {
+      key: "gameHunter",
+      plan,
+      threat: plan.threatIncrease,
+      noteAt: 370,
+      notes: plan.threatIncrease ? [loc`Game Hunter: threat range +3 against this animal (p.43).`] : []
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "classChecksRecord", order: 9635, record: ["attributeSubstitution"] });

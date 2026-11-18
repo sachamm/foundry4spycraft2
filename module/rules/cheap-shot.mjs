@@ -7,6 +7,7 @@ import { cheapShotScene } from "./cheap-shot-effects.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { cheapShotPenalty } from "./cheap-shot-effects.mjs";
 export const CHEAP_SHOT_CHOICES = ["str", "dex", "con", "int", "wis", "cha", "speed"];
 /** p.355 Standard Attack plus a free-action trick, not a separate attack action. */
 export function cheapShotPlan(
@@ -160,4 +161,36 @@ rollPipeline.register({
       combat: actor.mentalLeapCombatContext(),
       finalAttack: !!(options.finalAttack || options.twoWeaponFinalAttack)
     })
+});
+
+// Cheap Shot as part of an attack plan: the declared trick, and the penalty a character suffering one takes.
+rollPipeline.register({
+  id: "cheapShotAttackTerm",
+  kinds: ["attack"],
+  order: 9040,
+  terms({ system, weapon, options, ability, stance, ranged, firing }) {
+    const plan = cheapShotPlan(system, weapon, {
+      action: stance.attackAction,
+      ranged,
+      context: options.cheapShot,
+      combat: options.cheapShotCombat,
+      freeFinalAttack: options.freeFinalAttack === true,
+      disarm: !!options.disarm,
+      fireMode: firing.firearm ? firing.fireMode : null
+    });
+    return {
+      key: "cheapShot",
+      plan,
+      rowAt: 60,
+      rows: [
+        [loc`Cheap Shot received`, cheapShotPenalty(system, ability)],
+        [loc`Cheap Shot`, plan.attackBonus]
+      ],
+      error: plan.errorIncrease,
+      blockAt: 90,
+      blocked: { blocked: !!plan.blocked, reason: plan.reason },
+      noteAt: 110,
+      notes: plan.notes
+    };
+  }
 });

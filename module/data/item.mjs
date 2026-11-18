@@ -131,6 +131,8 @@ export class FeatData extends BaseItemData {
       /** Granted by an origin or class (does not use a feat slot). */
       granted: new BooleanField(),
       grantSource: str(),
+      /** Rolls this feat bears on and the line the roll dialog shows for it (module/rules/feat-reminders.mjs). */
+      reminder: new SchemaField({ rolls: str(), text: str() }),
       bonuses: bonusField()
     };
   }
@@ -148,8 +150,21 @@ export class GearData extends BaseItemData {
       /** Mission gear pick category (R/T/V/S/G/W/E/CHA) — blank for personal gear. */
       pick: str(""),
       pickCount: int(1, { min: 1 }),
-      possessionSource: str("", { choices: ["", "wealth", "gcGrant"] }),
+      possessionSource: str("", {
+        choices: [
+          "",
+          "wealth",
+          "gcGrant",
+          "favoredGear",
+          "bugBasics",
+          "diseaseBasics",
+          "poisonBasics",
+          "superiorDocumentation"
+        ]
+      }),
       possessionApproved: new BooleanField(),
+      /** Signature Gear (1) or Trademark Gear (2) on a Favored Gear item, p.197. */
+      signatureGear: int(0, { min: 0, max: 2 }),
       cleanAndPolishedReady: new BooleanField(),
       bundleSize: int(1, { min: 1 }),
       gearCategory: str(),
@@ -269,7 +284,8 @@ export class WeaponData extends GearData {
           "oneHandedSword",
           "polearm",
           "flail",
-          "knife"
+          "knife",
+          "club"
         ]
       }),
       weaponCategory: str(),

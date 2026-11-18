@@ -118,6 +118,54 @@ export const RECORD_SHAPES = {
       weaponUuid: "string"
     }
   ],
+  hazards: {
+    contagions: {
+      "*": {
+        id: "string",
+        label: "string",
+        name: "string",
+        grade: "string",
+        kind: "string",
+        notes: ["string"],
+        doses: "number",
+        phase: "string",
+        saves: "number",
+        exposedAt: "number",
+        dueAt: "number",
+        primary: { onset: "string", saveDC: "number", effect: "string" },
+        secondary: { onset: "string", saveDC: "number", effect: "string" }
+      }
+    },
+    recovered: ["string"],
+    fire: {
+      $also: "null",
+      damage: "number",
+      ap: "number",
+      suffered: "number",
+      scarChecked: "boolean",
+      startedAt: "null|number"
+    },
+    acid: {
+      $also: "null",
+      damage: "number",
+      suffered: "number",
+      injuryChecked: "boolean",
+      startedAt: "null|number"
+    },
+    exposure: {
+      $also: "null",
+      type: "string",
+      source: "string",
+      suffered: "number",
+      interval: "null|number",
+      startedAt: "null|number",
+      injuriesChecked: ["number"],
+      lastDamage: "number"
+    },
+    survival: {
+      "*": { saves: "number", lastAt: "null|number" }
+    }
+  },
   attributeDamage: {
     "*": "any",
     events: [
@@ -233,10 +281,12 @@ export const RECORD_SHAPES = {
         resolution: "string"
       },
       choice: "string",
+      doubled: "boolean",
       lastSaveAt: "null|number",
       madeAt: "number",
       recovered: "boolean",
       recoveryMessage: "string",
+      repeat: "boolean",
       scene: "string",
       sourceMessage: "string",
       version: "number"
@@ -279,6 +329,72 @@ export const RECORD_SHAPES = {
     id: "string",
     penalty: "number",
     startRound: "number"
+  },
+  berserkerRage: {
+    $also: "null",
+    bonus: "number",
+    combatId: "string",
+    id: "string",
+    rounds: "number",
+    startRound: "number",
+    tier: "string",
+    version: "number"
+  },
+  companionOf: {
+    $also: "null",
+    feat: "string",
+    ownerUuid: "string"
+  },
+  identities: [
+    {
+      id: "string",
+      interests: ["string"],
+      name: "string",
+      professionFocus: "string"
+    }
+  ],
+  snakeStrikes: [
+    {
+      combatId: "string",
+      id: "string",
+      round: "number",
+      targetUuid: "string",
+      version: "number",
+      weaponId: "string"
+    }
+  ],
+  woundDrops: {
+    $also: "null",
+    combatId: "string",
+    count: "number",
+    version: "number"
+  },
+  intenseStance: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    id: "string",
+    startRound: "number",
+    version: "number"
+  },
+  fightDefensively: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    dueRound: "number",
+    id: "string",
+    startRound: "number",
+    version: "number"
+  },
+  duelingBasics: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    dueRound: "number",
+    opponentName: "string",
+    opponentUuid: "string",
+    startRound: "number",
+    version: "number"
   },
   combatStance: {
     $also: "null",
@@ -422,6 +538,27 @@ export const RECORD_SHAPES = {
     requiredHours: "number",
     sourceIds: ["string"],
     startedAt: "number"
+  },
+  tauntBonuses: [
+    {
+      bonus: "number",
+      combatId: "string",
+      sourceMessage: "string",
+      targetUuid: "string",
+      untilRound: "number",
+      version: "number"
+    }
+  ],
+  undermined: {
+    $also: "null",
+    combatId: "string",
+    penalty: "number",
+    rounds: "number",
+    sourceMessage: "string",
+    sourceUuid: "string",
+    startRound: "number",
+    startTurn: "number",
+    version: "number"
   },
   feintBonuses: [
     {

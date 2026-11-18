@@ -1,14 +1,18 @@
+import { installSampleAgentHooks } from "./module/sample-agents.mjs";
+import { registerGCTableSetup, setupGCTables, inputRollTableClass } from "./module/gc-table-setup.mjs";
 import { registerSoundtrackSetup, setupSoundtrack } from "./module/soundtrack.mjs";
 import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-scenes.mjs";
 import { registerActorFolderSetup, setupActorFolders } from "./module/actor-folders.mjs";
 import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
+import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
 import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
 import { rollPipeline } from "./module/rolls/index.mjs";
 import { registerMigrationSettings, runWorldMigrations } from "./module/migrations/index.mjs";
 import { registerGmLocks } from "./module/rules/gm-locks.mjs";
+import { registerMapSettings } from "./module/apps/map.mjs";
 import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
 import {
@@ -93,6 +97,7 @@ Hooks.once("init", () => {
     ["sickened", "Sickened"],
     ["fatigued", "Fatigued"],
     ["exhausted", "Exhausted"],
+    ["enraged", "Enraged"],
     ["unconscious", "Unconscious"],
     ["flat-footed", "Flat-footed"]
   ])
@@ -136,11 +141,15 @@ Hooks.once("init", () => {
   });
   registerGCSettings();
   registerGCConsoleTab();
+  registerGCTableSetup();
+  CONFIG.RollTable.documentClass = inputRollTableClass(CONFIG.RollTable.documentClass);
+  installSampleAgentHooks();
   registerSampleSceneSetup();
   registerActorFolderSetup();
   registerSoundtrackSetup();
   registerMigrationSettings();
   registerGmLocks();
+  registerMapSettings();
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
@@ -148,6 +157,7 @@ Hooks.once("init", () => {
   installShakenInitiativeHooks();
   installCombatStanceHooks();
   installPowerStanceInitiativeHooks();
+  installFuriousStanceHooks();
   CONFIG.Actor.documentClass = SpycraftActor;
   CONFIG.Item.documentClass = SpycraftItem;
   Object.assign(CONFIG.Actor.dataModels, dataModels.actor);
@@ -257,6 +267,7 @@ Hooks.once("i18nInit", () => localizeConfig(CONFIG.SPYCRAFT));
 Hooks.once("ready", refreshCombatActorData);
 Hooks.once("ready", setupSampleScenes);
 Hooks.once("ready", setupActorFolders);
+Hooks.once("ready", setupGCTables);
 // Bring stored world data up to this build's schema version (module/migrations/index.mjs).
 Hooks.once("ready", () => {
   runWorldMigrations().catch(error => {

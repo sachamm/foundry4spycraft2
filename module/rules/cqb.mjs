@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 const rangedProficiencies = new Set([
   "guided",
   "handgun",
@@ -109,3 +110,44 @@ export function meleeFirePlan(system, weapon, { firingOutOfMelee = false, firing
     ]
   };
 }
+
+// The CQB feats' range bonus as part of an attack plan.
+rollPipeline.register({
+  id: "cqbRangeAttackTerm",
+  kinds: ["attack"],
+  order: 9090,
+  terms({ system, weapon, options }) {
+    const plan = cqbRangePlan(system, weapon, options);
+    return {
+      key: "cqbRange",
+      plan,
+      rowAt: 90,
+      rows: [[loc`Close quarters range`, plan.attackBonus]],
+      threat: plan.threatIncrease,
+      noteAt: 220,
+      notes: plan.notes
+    };
+  }
+});
+
+/** A distance typed into a form, as a number; NaN when nothing usable was entered. */
+export function enteredDistance(value) {
+  return typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
+}
+
+// The attack dialog's CQB fields: the measured distance and whether the target is an opponent.
+rollPipeline.register({
+  id: "cqbRangeInput",
+  dialogs: ["attack"],
+  order: 60,
+  read({ needsCQB, entered }) {
+    if (!needsCQB) return null;
+    const distanceFeet = enteredDistance(entered.distanceFeet);
+    if (!Number.isFinite(distanceFeet) || distanceFeet < 0)
+      throw new Error(loc`Enter the actual finite nonnegative CQB attack distance.`);
+    return { distanceFeet, targetOpponentConfirmed: entered.targetOpponentConfirmed === true };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "cqbRecord", order: 9650, record: ["cqbRange"] });

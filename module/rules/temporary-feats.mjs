@@ -1,3 +1,4 @@
+import { ruleName } from "./rule-name.mjs";
 import { armorTypeChoice } from "./armor-training.mjs";
 import { loc } from "../i18n.mjs";
 /** Session-scoped shared feats, pp.41–43,171. No virtual feat may be shared. */
@@ -142,11 +143,11 @@ export function intelTemporaryFeatPlan(
     const armorChoice = ["Armor Basics", "Armor Mastery"].includes(feat.name),
       choice = armorChoice
         ? armorTypeChoice(featChoices[index])
-        : feat.name === "Weapon Focus"
+        : ruleName(feat) === "Weapon Focus"
           ? (featChoices[index] ?? "")
           : "";
     if (armorChoice && !choice) throw new Error(loc`${feat.name}: choose partial, moderate or full armor.`);
-    if (feat.name === "Weapon Focus" && (!Object.hasOwn(cfg.proficiencies, choice) || choice === "unarmed"))
+    if (ruleName(feat) === "Weapon Focus" && (!Object.hasOwn(cfg.proficiencies, choice) || choice === "unarmed"))
       throw new Error(loc`Weapon Focus needs a possessed proficiency other than Unarmed.`);
     const data = {
       name: feat.name,
@@ -272,13 +273,13 @@ export function knowItAllChoiceOptions(system, feat, cfg) {
   ) {
     const names = [
       ...Object.keys(cfg.tables.basicSkillFeats ?? {}),
-      ...((system.virtualFeats ?? []).some(f => f.name === "Field of Expertise") ? ["Field of Expertise"] : [])
+      ...((system.virtualFeats ?? []).some(f => ruleName(f) === "Field of Expertise") ? ["Field of Expertise"] : [])
     ];
     return { kind: "basicSkill", options: Object.fromEntries(names.map(name => [name, name])) };
   }
-  if (feat.name === "Unlocked Potential")
+  if (ruleName(feat) === "Unlocked Potential")
     return { kind: "skill", options: Object.fromEntries(Object.entries(cfg.skills).map(([key, s]) => [key, s.name])) };
-  return { kind: feat.name === "Training" ? "training" : "none", options: {} };
+  return { kind: ruleName(feat) === "Training" ? "training" : "none", options: {} };
 }
 export function knowItAllPlan(
   system,
@@ -315,7 +316,8 @@ export function knowItAllPlan(
           total += points;
         }
       }
-      const canDefer = system.activeFeatNames?.includes("I Can Swim") || planned.some(f => f.name === "I Can Swim");
+      const canDefer =
+        system.activeFeatNames?.includes("I Can Swim") || planned.some(f => ruleName(f) === "I Can Swim");
       if (total > 5 || (total < 5 && !canDefer))
         throw new Error(loc`Allocate exactly five Training rank points, unless I Can Swim permits unspent points.`);
     }
@@ -358,7 +360,7 @@ export function knowItAllPlan(
 /** Everyday Genius p.200: mission allowance, but each chosen feat lasts for the session. */
 export function everydayGeniusSource(system) {
   const active = system.activeFeatSelections ?? [];
-  if (!active.some(f => f.name === "Everyday Genius")) return null;
+  if (!active.some(f => ruleName(f) === "Everyday Genius")) return null;
   const limit = active.filter(f => f.tree === "advancedSkill").length;
   return Number.isSafeInteger(limit) && limit > 0 ? { limit } : null;
 }

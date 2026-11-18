@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { cardSharkKnowledgePlan } from "./card-shark.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { superiorCoverState } from "./superior-cover.mjs";
@@ -167,3 +168,6 @@ export function resolveKnowledgeCheck(
     notes: loc`${cardShark.active ? loc`Card Shark: this confirmed gambling Knowledge question is active (pp.201–202). ` : ""}${dartingStyleState(system).active ? loc`Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? loc`Superior Cover: attack/skill check penalty −2. ` : ""}${twoWeaponSkillNote(system)}${combatExpertiseState(system).active ? loc`Combat Expertise: skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? loc`${condition.state === "baffled" ? loc`Baffled` : loc`Incompetent`}: Knowledge bonus ${condition.normal} → ${condition.total}; synergy/check modifiers remain. ` : ""}${underwaterContext.notes.length ? underwaterContext.notes.join(" ") + " " : ""}${cunning ? loc`Cunning Plan: free action; error range 1 → ${cunning.error}. ` : ""}${tenSecondSolution ? loc`10-Second Solution: half standard time, rounded down, minimum 1 full action` : method === "take10" ? loc`1 round` : method === "take20" ? loc`1 minute` : loc`Free action`}. ${active ? loc`Active` : loc`Passive`}. Related skill: ${related.name ?? skill}; synergy +${synergy}${owned ? "" : loc`; no rank synergy without the applicable focus`}. Rules p.99.`
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "knowledgeRecord", order: 9705, record: ["photographicMemory"] });

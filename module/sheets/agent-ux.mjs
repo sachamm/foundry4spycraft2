@@ -14,9 +14,10 @@ export function groupBuildTasks(tasks = []) {
   }
   return [...groups.values()].map(task => ({
     ...task,
+    // A reminder that knows how to speak for several at once does so; the rest are counted.
     text:
-      task.count > 1 && task.text.includes("choose a skill for Versatility")
-        ? task.text.replace("choose a skill for Versatility", `choose ${task.count} more skills for Versatility`)
+      task.count > 1 && typeof task.plural === "function"
+        ? task.plural(task.count)
         : task.count > 1
           ? loc`${task.text} (${task.count} choices)`
           : task.text
@@ -27,12 +28,12 @@ export function groupBuildTasks(tasks = []) {
 export function buildSetupGuide(tasks = []) {
   const labels = {
     main: "Attributes & origins",
-    classes: "Classes",
-    skills: "Skills",
-    feats: "Feats",
+    classes: loc`Classes`,
+    skills: loc`Skills`,
+    feats: loc`Feats`,
     training: "Training",
-    gear: "Gear",
-    bio: "Biography"
+    gear: loc`Gear`,
+    bio: loc`Biography`
   };
   const ordered = groupBuildTasks(tasks).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const steps = new Map();
@@ -61,6 +62,11 @@ export function combatToolVisibility(system = {}, stances = {}) {
     striking: feats.has("Polearm Basics") || system.combatStance?.key === "striking",
     missTrick: feats.has("Flail Basics") || feats.has("Fencing Basics"),
     darting: feats.has("Darting Weapon") || !!system.dartingStyle,
+    followUp: feats.has("Follow-Up Shot"),
+    twoHit: feats.has("Two-Hit Combo"),
+    duelingBasics: feats.has("Dueling Basics"),
+    intense: feats.has("Whip Basics"),
+    snakeStrike: feats.has("Snake Strike"),
     twoWeapon: feats.has("Two-Weapon Basics") || !!system.twoWeaponStyle,
     expertise: feats.has("Combat Expertise") || !!system.combatExpertise,
     cover: feats.has("Superior Cover") || !!system.superiorCover
@@ -144,7 +150,7 @@ function sheetActionLabel(link, context, localize) {
     itemEquip: `${item?.system?.equipped ? "Unequip" : "Equip"} ${itemName}`,
     itemDelete: `Remove ${itemName}`,
     itemChat: `Share ${itemName} in chat`,
-    syncGrants: "Refresh granted feats",
+    syncGrants: loc`Refresh granted feats`,
     addRow: `Add ${rows[link.dataset.list] ?? "entry"}`,
     removeRow: `Remove ${rows[link.dataset.list] ?? "entry"}`
   }[link.dataset.action];
@@ -186,11 +192,11 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
         const text = element.ownerDocument.createElement("span");
         text.textContent =
           {
-            itemChat: "Share",
-            itemDelete: "Remove",
+            itemChat: loc`Share`,
+            itemDelete: loc`Remove`,
             itemEquip: "Equip / unequip",
-            syncGrants: "Refresh grants",
-            removeRow: "Remove"
+            syncGrants: loc`Refresh grants`,
+            removeRow: loc`Remove`
           }[link.dataset.action] ?? label;
         button.append(text);
       }

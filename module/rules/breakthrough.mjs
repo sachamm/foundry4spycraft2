@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { skillConditionEntries, substituteConditionedBonus } from "./skill-conditions.mjs";
 import { stackedBonuses } from "./knowledge.mjs";
 import { resolveSkillCheck } from "./skills.mjs";
@@ -121,3 +122,6 @@ export function nestPlan(
     notes: loc`${result.notes ?? ""} Nest: at least half cover; Tactics (${ability.toUpperCase()}) skill bonus ${replacement.bonus} replaces Sneak's bonus to avoid being spotted. Hide's attribute, check modifiers, threat, error and cap remain in effect (p.80).`
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "breakthroughRecord", order: 9625, record: ["breakthrough", "nest"] });

@@ -45,7 +45,7 @@ export function preparedResistanceSource(system, kind) {
   if (!Object.hasOwn(RESISTANCE_TYPES, kind)) throw new Error(loc`Choose a known prepared resistance type.`);
   const stats = system.survivalStats;
   if (!stats || !stats.resistances || typeof stats.resistances !== "object" || Array.isArray(stats.resistances))
-    throw new Error(loc`Prepare the character’s current ` + kind + loc` resistance before applying it.`);
+    throw new Error(loc`Prepare the character’s current ${kind} resistance before applying it.`);
   const valid = value => value === "all" || (Number.isSafeInteger(value) && value >= 0),
     value = Object.hasOwn(stats.resistances, kind) ? stats.resistances[kind] : 0,
     armor = system.armor?.resistances?.[kind] ?? 0;

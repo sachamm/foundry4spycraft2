@@ -235,7 +235,7 @@ export function spendGCDice(count, perform, { purpose = "Critical activation", m
       try {
         await writePool(refund);
       } catch (refundError) {
-        await holdPayment(review, loc`Refund could not be confirmed: ` + refundError.message);
+        await holdPayment(review, loc`Refund could not be confirmed: ${refundError.message}`);
         throw new AggregateError([error, refundError], loc`GC payment needs review.`);
       }
       throw error;

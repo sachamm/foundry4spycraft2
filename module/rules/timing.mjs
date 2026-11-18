@@ -81,3 +81,26 @@ export function skillTimingPlan({
         : loc`${selected.name}: the single applied time reduction (p.102); ${selected.multiplier}× listed time${crossCheck ? loc` before Cross-Check` : ""}.${selected.errorIncrease ? loc` Error range +${selected.errorIncrease}.` : ""}${selected.rounding ? loc` Round ${selected.rounding}${crossCheck ? loc` before tripling for Cross-Check` : ""}.` : ""}${seconds === null && reduction === "auto" ? loc` Variable time: automatic selection compares multipliers and minima; choose a source explicitly if its minimum would make another option faster.` : ""}`
   };
 }
+
+/**
+ * False Start, p.200 (Table 3.1): after failing an unopposed check that takes longer than 1 round, the character may
+ * stop and begin again from the next whole step of the standard time, spending only half the materials.
+ * Returns the restart step for a listed time, or "" when the check is too short or its time is not fixed.
+ */
+export function falseStartRestart(time = "") {
+  const m = String(time).match(/^\s*(\d+(?:\.\d+)?)\s+(Round|Minute|Hour|Day|Week|Month|Year)s?\b/i);
+  if (!m) return "";
+  const units = { round: 6, minute: 60, hour: 3600, day: 86400, week: 604800, month: 2592000, year: 31536000 },
+    seconds = Number(m[1]) * units[m[2].toLowerCase()];
+  if (seconds < 6) return "";
+  const steps = [
+    [60, loc`round`],
+    [600, loc`minute`],
+    [3600, loc`10 minutes`],
+    [86400, loc`hour`],
+    [604800, loc`day`],
+    [2592000, loc`week`],
+    [31536000, loc`month`]
+  ];
+  return steps.find(([limit]) => seconds <= limit)?.[1] ?? "";
+}

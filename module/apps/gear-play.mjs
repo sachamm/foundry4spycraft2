@@ -264,8 +264,11 @@ export async function signalCheck(item) {
     <label>${loc`Jamming Power Rating at that point (jammer PR minus its range increments)`} <input name="jamming" type="number" min="0" step="1" value="0" /></label>`
   );
   if (!input) return null;
+  // Bug Basics (p.208): a bug the character plants has double the range increment.
+  const doubled = /\bbugs?\b/i.test(item.name) && item.parent?.system?.activeFeatNames?.includes("Bug Basics") === true,
+    increments = doubled ? Math.ceil(Number(input.increments) / 2) : Number(input.increments);
   const result = signalDC({
-    increments: Number(input.increments),
+    increments,
     powerRating: pr,
     jamming: Number(input.jamming) || 0
   });
@@ -276,7 +279,7 @@ export async function signalCheck(item) {
       : loc`Electronics (Int) check DC ${result.dc} to pick it up (signal PR ${result.effectivePR}; Hearing/Vision tags).`;
   await ChatMessage.create({
     speaker: speaker(item),
-    content: `<strong>${esc(item.name)}</strong> ${loc`signal at ${input.increments} increments: ${esc(text)}`}`
+    content: `<strong>${esc(item.name)}</strong> ${loc`signal at ${input.increments} increments: ${esc(text)}`}${doubled ? ` ${loc`(Bug Basics doubles the bug’s range increment: counted as ${increments}.)`}` : ""}`
   });
   return result;
 }

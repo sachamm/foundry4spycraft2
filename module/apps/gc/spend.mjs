@@ -196,7 +196,7 @@ export async function spendGCDice(input = {}) {
     lines.push(`<span class="bad">${loc`Not applied automatically: ${esc(error.message)}`}</span>`);
   }
   await ChatMessage.create({
-    speaker: { alias: "Game Control" },
+    speaker: { alias: loc`Game Control` },
     content: lines.join("<br>"),
     ...(input.public ? {} : { whisper: gmWhisper() })
   });
@@ -230,7 +230,7 @@ export async function doubleOpponentInitiative(combat = game.combat) {
   }
   if (changed.length)
     await ChatMessage.create({
-      speaker: { alias: "Game Control" },
+      speaker: { alias: loc`Game Control` },
       content: `${loc`Dramatic scene — opponents’ Initiative Counts doubled (maximum 50).`}<br>${changed.map(esc).join("<br>")}`,
       whisper: gmWhisper()
     });

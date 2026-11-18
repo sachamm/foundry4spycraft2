@@ -10,6 +10,7 @@ const stable = v =>
   );
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { loc } from "../i18n.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 export function feintBonusRows(system) {
   const rows = system.feintBonuses ?? [];
   if (!Array.isArray(rows)) throw Error(loc`Review the recorded Feint attack bonuses.`);
@@ -109,3 +110,42 @@ export const feintAttackTarget = options =>
   options.finalAttack?.opponentUuid ||
   options.finalAttack?.targetUuid ||
   null;
+
+// The bonus a successful Feint gives the next attack, as part of an attack plan.
+rollPipeline.register({
+  id: "feintBonusAttackTerm",
+  kinds: ["attack"],
+  order: 9050,
+  terms({ system, options }) {
+    let plan,
+      review = "";
+    try {
+      plan = feintAttackBonusPlan(system, {
+        targetUuid: feintAttackTarget(options),
+        combat: options.cheapShotCombat,
+        proof: options.feintBonusProof,
+        defensive: options.disarm?.role === "defender"
+      });
+    } catch (error) {
+      review = error.message;
+      plan = {
+        version: 1,
+        targetUuid: feintAttackTarget(options),
+        combatId: options.cheapShotCombat?.id ?? null,
+        attackRound: options.cheapShotCombat?.round ?? null,
+        sourceMessages: [],
+        attackBonus: 0
+      };
+    }
+    return {
+      key: "feintBonus",
+      plan,
+      rowAt: 50,
+      rows: [[loc`Feint`, plan.attackBonus]],
+      blockAt: 80,
+      blocked: review,
+      noteAt: 100,
+      notes: plan.attackBonus ? [loc`Feint: +2 with this next attack against the recorded opponent (p.357).`] : []
+    };
+  }
+});

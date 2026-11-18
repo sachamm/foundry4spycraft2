@@ -1,8 +1,9 @@
+import { ruleName } from "./rule-name.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
 import { attributeDefensePlan } from "./attributes.mjs";
 import { uncannyDodgePlan } from "./defense.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 export const TRIP_SIZES = Object.freeze([
   "Nuisance",
@@ -122,7 +123,7 @@ export function tripDefensePlan(
       .map(f => ({ name: f.name, choice: f.choice ?? "" }))
       .sort((a, b) => String(a.name).localeCompare(String(b.name)) || String(a.choice).localeCompare(String(b.choice)));
     if (
-      !covertFeats.some(f => f.name === "Equilibrium Mastery") ||
+      !covertFeats.some(f => ruleName(f) === "Equilibrium Mastery") ||
       covertFeats.some(f => typeof f.name !== "string" || !f.name.trim() || typeof f.choice !== "string")
     )
       return reject(loc`Review the qualified Equilibrium Mastery and Covert feat selections.`);
@@ -245,4 +246,33 @@ rollPipeline.register({
   order: 5070,
   kinds: ["skill"],
   skillChecks: ({ skillKey }, checks) => tripDefenseSkillChecks(skillKey, checks)
+});
+
+// Resisting a Trip, in a skill check's plan.
+rollPipeline.register({
+  id: "tripDefenseSkillTerm",
+  kinds: ["skill"],
+  order: 9280,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      tripOpponentUuid = "",
+      tripOpponentSize = null,
+      tripDefenseCombat = null,
+      tripOpponentName = "",
+      tripAdjacent = false,
+      tripSizeDifference = null,
+      tripIncomingConfirmed = false
+    } = input;
+    const plan = tripDefensePlan(system, skillKey, check, {
+      method,
+      tripOpponentUuid,
+      tripOpponentSize,
+      tripDefenseCombat,
+      tripOpponentName,
+      tripAdjacent,
+      tripSizeDifference,
+      tripIncomingConfirmed
+    });
+    return skillPlanTerm("tripDefense", plan, { noteAt: 100, blockAt: 80, bonusAt: 30 });
+  }
 });

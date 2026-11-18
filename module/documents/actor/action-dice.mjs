@@ -948,7 +948,7 @@ export const ActorActionDice = Base =>
           if (!Number.isSafeInteger(value)) throw new Error(loc`The GC balance exceeds a safe whole number.`);
           const beforeLedger = structuredClone(this.system.actionDieAwards?.[plan.key] ?? null),
             beforeBalance = this.system.actionDice.value,
-            next = { ...pool, value, lastReason: loc`Player action-die award: ` + this.name },
+            next = { ...pool, value, lastReason: loc`Player action-die award: ${this.name}` },
             transaction = {
               id,
               key: plan.key,

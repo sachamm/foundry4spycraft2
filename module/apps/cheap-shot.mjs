@@ -82,8 +82,15 @@ export async function validateCheapShotTarget(actor, context, { targetUuid } = {
     !(target.isOwner || game.user.isGM || target.testUserPermission?.(game.user, "OBSERVER"))
   )
     throw Error(loc`The actual Cheap Shot opponent changed or is no longer observable.`);
-  if (cheapShotRecords({ ...target.system, usagePeriods: target.usagePeriods ?? actor.usagePeriods }).length)
-    throw Error(loc`This combatant already suffered a successful Cheap Shot this scene.`);
+  const prior = cheapShotRecords({ ...target.system, usagePeriods: target.usagePeriods ?? actor.usagePeriods });
+  // Submission Supremacy (p.188): further Cheap Shots in a scene, each with a different penalty.
+  const supremacy = actor.system?.activeFeatNames?.includes("Submission Supremacy") === true;
+  if (prior.length && !(supremacy && !prior.some(r => r.choice === context.choice)))
+    throw Error(
+      supremacy
+        ? loc`Submission Supremacy: choose a penalty this combatant has not already suffered this scene.`
+        : loc`This combatant already suffered a successful Cheap Shot this scene.`
+    );
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

@@ -106,27 +106,35 @@ Done on 2026-11-17. The registry is `module/rules/roll-pipeline.mjs`; a rule reg
       by a test.
 - [x] `module/documents/actor.mjs` is a 65-line class composed from seven workflow files in `module/documents/actor/`.
 
-Still inline, and worth doing as rules are next touched:
+Finished later on 2026-11-17:
 
-- [ ] The individual feat terms inside `weaponAttack` and `resolveSkillCheck` are still worked out there, because each
-      also feeds threat, error and notes. Moving one out means giving it a plan-stage contributor that returns all of
-      those, not just a number.
-- [ ] After a dialog closes, the roll methods still build their own plans from the input. Only field coercion is on
-      the `read` phase.
-- [ ] The small follow-up dialogs (reach geometry, mortar and launcher circumstances, Killer Instinct range) are
-      still inline templates.
-- [ ] `module/documents/actor/rolls.mjs` is still about 2,400 lines; `rollSkill` is the bulk of it.
-- [ ] 58 record fields are in the central list because no contributor owns them yet.
+- [x] Feat and class terms are out of `weaponAttack` and `resolveSkillCheck`. A new `terms` phase lets a rule return
+      its whole part of a planned check: its plan, labelled rows, threat and error changes, notes and block reason,
+      each with a position (`planTerms` in `module/rules/roll-pipeline.mjs`). Thirteen attack terms and fifteen skill
+      terms register from their own modules. The output of 4,460 recorded plans is unchanged.
+      What stays in the two functions changes the check itself rather than adding to it: weapon qualities, grip,
+      range, recoil, and the skill rules that alter timing, the synergy list or the error floor.
+- [x] After a dialog closes, the save roll folds registered save terms (nine rules) instead of building its own plan,
+      and the attack dialogs' fields are read by `read` contributors in the modules that own them.
+- [x] The follow-up dialogs (reach geometry, mortar and launcher circumstances, CQB damage distance, Killer Instinct
+      range) are pipeline dialogs in `module/rolls/dialogs/follow-ups.mjs`.
+- [x] `module/documents/actor/rolls.mjs` is split three ways: `rolls.mjs` (the shared roll, attribute checks, saves,
+      action dice; about 700 lines), `skill-rolls.mjs` (about 820) and `attack-rolls.mjs` (about 660). `rollSkill`
+      lost its repeated field lists and five copies of the plan call.
+- [x] The central record list is down to the roll's own two fields; the other 56 are named by a contributor in the
+      module that owns each rule.
 
 ## Architecture (from the November review)
 
 Status after the live checks of 2026-11-17 on Foundry 14.370 (two clients: the GC and a second GM-role user).
 
-- [ ] **Decision needed: how far feat automation goes.** Recommendation: keep the proof/lease/receipt pattern for the
-      roughly forty workflows that have it, and stop there. For the rest, add a "declare and remind" tier: a feat
-      names the roll kinds it bears on and a one-line reminder; the roll dialog lists the ones that apply, and those
-      ticked are noted on the card for the GC to adjudicate. The dialog, read, record and flavor phases already
-      support this; it needs a field on feat items and the reminder text for each feat.
+- [x] **How far feat automation goes.** The recommendation was adopted: the forty-odd proof/lease/receipt workflows
+      stay, and the rest get a "declare and remind" tier (`module/rules/feat-reminders.mjs`). A feat item has
+      `system.reminder` (the rolls it bears on, and a line of text). Roll dialogs list the character's matching
+      feats; the ones ticked are noted on the posted check for the GC. Seventy-two feats the rules never mention
+      ship with reminders (`src/data/feat-reminders.json`, text from the existing summaries); the fields are on the
+      feat sheet for home-made feats. Schema version 2 gives feats already in a world their reminder.
+      Initiative and plain attribute checks open no dialog, so they cannot remind.
 - [x] Resource locks. A GM-arbitrated lock exists (`module/rules/gm-locks.mjs`, world setting "Resource locking").
       Checked with two clients: a held character is refused with the usual message, the lock is freed afterwards,
       and no lock document is written. **The document lock stays the default on purpose:** the arbitrated table
@@ -165,22 +173,120 @@ Status after the live checks of 2026-11-17 on Foundry 14.370 (two clients: the G
       Checked in Foundry 14.370 after the first pass (all strings load; a translation supplied at runtime appears
       in the roll dialog). The last pass (load-time labels, data names, the GC console and the entry point) is
       covered by the test suites only: no world was running to check it in.
-- [ ] What a translator will still find in English, by design or for later:
-      - Names the rules compare: feats, class abilities, origins and everything in the compendium packs. Foundry
-        has no built-in translation for compendium content; that needs a module such as Babele and a mapping.
-      - Short labels without a recognised place: entries of plain lists, `name:` values without an id beside them,
-        and maps of labels whose keys are not `label`, `text` and the like (about thirty tables).
-      - The setup checklist rewords a repeated Versatility choice only in English; other languages get the plain
-        "(n choices)" form.
-      - Strings were extracted mechanically. A sentence built from several pieces is several entries; the long
-        skill-check note is one entry with many numbered slots. These want rewriting before a real translation.
-      - If clients use different languages, text stored on a document (a chat card's flavor, a recorded note)
-        stays in the language of the client that wrote it.
+- [x] Translator leftovers, worked through in the second pass:
+      - Feats are recognised by a stored rule name (`flags.spycraft2.ruleName`, set when the packs are built), or by
+        the original name the Babele module keeps, so a renamed or translated feat still works
+        (`module/rules/rule-name.mjs`). The system ships no compendium translations and does not need Babele.
+      - 162 more labels in the sheets and apps are tagged: option lists, breakdown rows, tab and tooltip maps, GC
+        tool choices.
+      - The setup checklist's wording for several choices at once comes from the rule that asks, in any language.
+      - Thirty-two sentences that were built by adding pieces together are single entries with their values in
+        place, and the long skill-check note is a run of separate segments.
+      - A check posted by a client in another language has the notes worked out from its record written again in
+        the viewer's language.
+      Still English, on purpose:
+      - Class abilities, origins and gear are matched by name or key from the rules data, not by item name, and are
+        not translated. Names of weapons, gear and other compendium entries are display text only.
+      - Text a client composed and stored (a check's own title line, chat cards the tools post, recorded notes)
+        stays in the language it was written in.
+      - Label tables inside `module/rules` whose strings are also identifiers (sizes, conditions, feat and ability
+        names) were left alone.
 
-## Game areas still missing or thin
+## Game areas added (2026-11-17, second pass)
 
-- [ ] Map integration: range, cover, flanking, adjacency and blast areas are typed into dialogs, not measured.
-- [ ] Baseline combat actions: autofire, burst and strafe, suppressive and cover fire, grapple actions, blast damage.
-- [ ] Hazards applied to a character: poison, disease, radiation, fire.
-- [ ] Cooperative skill checks.
-- [ ] NPC qualities, feats and class abilities are listed for reference and not executed.
+Checked in Foundry 14.370 on 2026-11-17; see "To check in Foundry" below.
+
+- [x] Map integration (`module/rules/map.mjs`, `module/apps/map.mjs`). With a token for the character and one token
+      targeted, the attack dialogs open with the measured distance, the flanking box set from tokens on opposite
+      sides, reach adjacency and the target chosen, and say what cover walls give. A blast lists every token it
+      reaches and the damage each takes. Client setting "Measure attacks from the map", on by default.
+      Not done: cover from other tokens or scenery items, drawing the blast on the scene, and measuring for skill
+      dialogs. Blast listing ignores walls.
+- [x] Baseline combat actions (`module/rules/combat-actions.mjs`). Burst, Autofire and Strafe are fire actions on the
+      ranged attack dialog, with their shot counts, penalties and error ranges, and a button on the posted attack
+      that counts the shots that hit. Cover Fire and Suppressive Fire post their terms (Cover Fire rolls the
+      target's Will save when you own the target). Pummel doubles an unarmed hit's subdual damage. "Settle a grapple
+      check" gives the result of an opposed check and the benefit list. Blast damage tapers by distance from a
+      damage roll. Not done: ammunition is not deducted, and Held, Pinned and the –4 penalties are recorded by hand.
+- [x] Hazards on a character (`module/rules/hazards.mjs`): contagions from Table 4.70 with onset times, phase saves,
+      dose penalties, attribute damage (temporary and permanent), matching stress, conditions and antidotes;
+      radiation poison with the sealed-suit bonus; fire with its armor-piercing value, catching fire, damage each
+      round, stress, fighting the fire and the scarring save. Agents only; NPC sheets have no hazards block.
+      Not done: a fire spreading across squares, contagious diseases passing between characters, other damage
+      types (acid, cold, electrical, vacuum).
+- [x] Cooperative skill checks (`module/rules/cooperative.mjs`): helper limits from Table 2.9 on every named check,
+      leader and helper roles in the skill dialog, the helpers' DC, and a button on the leader's check that adds
+      the helpers' results. Team and directed checks are not modelled.
+- [x] NPC qualities (`module/rules/npc-qualities.mjs`): every quality an NPC holds says what it does on the sheet,
+      with its numbers. Speed, Size, damage reduction, resistances, senses and forced-save DCs are worked out;
+      Fearless, Meek and Strong-Minded apply to the NPC's skill checks, and situational ones are boxes on that
+      dialog; Unnerving and Improved Vision feed the same rules an agent's origin does. NPC feats and class
+      abilities are still names: a feat item on an NPC gets the reminder tier on attack rolls.
+
+## To check in Foundry
+
+Run on 2026-11-17 in Foundry 14.370 (world "spycraft test"), with a throwaway agent, NPC and scene that were deleted
+afterwards. Unit tests: 3,313 of 3,314 pass; the one failure is the sample-scenes pack check, which cannot open the
+pack while Foundry holds it (LEVEL_LOCKED), so it needs Foundry closed.
+
+- [x] The world migrates to schema version 2 and owned feats gain reminders. The world is at 2; none of its 14 owned
+      feats has a reminder in the data, so nothing changed there. A feat with its reminder cleared regained it.
+- [x] A skill, save, attack and damage dialog each list the feats to keep in mind; ticked ones show on the card.
+      Fixed: in the skill dialog the reminder box overlapped the "Situational modifier" and "Secret" rows, because
+      the dialog body let its blocks shrink (`styles/retro.css`).
+- [x] Attack dialogs fill in distance, flanking and target from the scene; the blast button lists tokens.
+- [x] Burst, Autofire and Strafe from the ranged attack dialog; the hit counter; Cover Fire's Will save.
+- [x] Expose an agent to a contagion and to fire; roll and apply the saves; check attribute damage and stress.
+      Fixed: every hazard write (exposure, save, fire, antidote) reset the whole character to default values,
+      because the update was non-recursive (`module/apps/hazards.mjs`). `tools/test-update-shapes.mjs` now guards
+      against non-recursive document updates.
+- [x] A cooperative check with a leader and two helpers; the leader's result rises.
+- [x] An NPC with qualities shows them in play; its skill check takes the modifiers.
+- [x] A save roll, an attack and a skill check still read as before (the roll code was reorganised).
+
+Small things seen while checking, since fixed and checked in Foundry:
+- The quick "Attack circumstances" dialog has an optional distance field for ranged weapons, filled from the map,
+  so its card gives the range modifier. Left empty, it stays a quick roll with no range modifier.
+- Choosing Burst, Autofire or Strafe sets the fire mode the action needs.
+- The Strafe note gives the doubled recoil penalty in all (the recoil line still shows the single value).
+- Cover Fire's opponent list preselects the targeted token and marks an unlinked token as "(token on <scene>)", so
+  it is not confused with its sheet.
+- The hit counter refuses a negative Defense.
+
+## Combat chapter sweep (2026-11-18)
+
+Chapter 5 was read section by section against the system. What was missing is now in place; each piece joins an
+existing hook rather than adding a new path.
+
+- [x] Critical effects (`module/rules/critical-effects.mjs`): the critical activation dialog offers Table 5.4's
+      critical misses for the attack's family (unarmed, melee, hurled, firearm), filtered by the attack's final error
+      range, and the critical hit choices by target type (wounds, Table of Ouch, extra failed Damage saves). Picking
+      one sets the effect text and base cost; every existing cost adjustment still applies.
+- [x] Other damage types (`module/rules/damage-types.mjs`, `module/apps/damage-types.mjs`): acid (armor roll, Reflex
+      save, lingering and halving, washing, scarring), bang and flash (Fortitude DC, stunned/deafened/blinded, 1d4
+      stress, takedown over 20), explosive (Reflex with movement bonus or forced failure, half damage minimum 1,
+      Fortitude stun, 1d4 + quarter stress), electrical (subdual, nausea and Count loss or unconsciousness, injuries at
+      25 and 50), cold and heat (subdual on the temperature schedule, fatigue and temporary attribute damage, armor
+      penalty against heat, injury at 50), vacuum (5d6, first-round save halves, injury at 25), collision and laser
+      stress. Saves run through the hazard save hook (`hazardSaveResolvers` in `module/apps/hazards.mjs`); stress and
+      subdual go through the damage ledger. "Other damage types" on the agent sheet's Hazards line.
+- [x] Survival saves (p.349): suffocation, smoke, sleep loss, starvation, thirst and water pressure, each DC rising
+      by 1 per save until the hazard ends. "Survival save" on the Hazards line.
+- [x] Underwater attacks (`module/rules/underwater-combat.mjs`): an attack dialog box; melee and explosives take the
+      Athletics-based penalty and error +2, unarmed none, other weapons need underwater gear; Aquatic is immune.
+- [x] Actions (`module/rules/combat-options.mjs`, `module/apps/combat-options.mjs`): Anticipate, Joint Action, Stand
+      Off and Tire are named checks on Sense Motive, Tactics and Resolve. "Anticipate result" records the dodge bonus
+      against one opponent for a full round and the incoming-Defense check offers it; "Stand off" rolls the entry
+      Reflex save or a lost round's stress; "Tire result" applies subdual or flat-footed; "Survive a Coup de Grace"
+      and "Cancel a readied action" roll their saves.
+- [x] GC console "Combat references" (`module/rules/gc/combat-reference.mjs`): base encounter distance (Table 5.1,
+      capped by the farthest sense range on the scene), deviation (Table 5.11 and ricochet), gas cloud growth and
+      clearing with wind, and special surface movement (Table 5.3).
+
+Not done, left to the table: the laser's lower critical cost (the attack record does not know its damage type),
+halving Strength damage underwater (noted on the card), the Joint Action's shared Count in the tracker, Terminal
+Situations, and spreading fire or gas across squares.
+
+To check in Foundry (Foundry was running, so these were covered by unit tests only): the new sheet links and
+dialogs, a hazard save card's "Apply this save's result" for each new kind, the Anticipate box in the incoming
+Defense check, the ready-made effects in the critical activation dialog, and the GC console button.

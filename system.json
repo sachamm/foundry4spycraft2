@@ -251,6 +251,30 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "core-npcs",
+      "label": "Core NPC Templates",
+      "path": "packs/core-npcs",
+      "type": "Actor",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "NONE",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "sample-agents",
+      "label": "Sample Level-1 Agents",
+      "path": "packs/sample-agents",
+      "type": "Actor",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -282,7 +306,9 @@
         "contagions",
         "gc-tables",
         "sample-scenes",
-        "soundtrack"
+        "soundtrack",
+        "core-npcs",
+        "sample-agents"
       ]
     }
   ]

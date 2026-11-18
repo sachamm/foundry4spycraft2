@@ -11,7 +11,15 @@ import {
   nextRound,
   concede,
   adjustLead,
-  conflictSummary
+  conflictSummary,
+  CONFLICT_FEATS,
+  photoFinish,
+  useConflictFeat,
+  declarePace,
+  guessStrategy,
+  instinctPenalty,
+  roomFeatFor,
+  easedRoom
 } from "../../rules/gc/conflict.mjs";
 import { requireGC, getConflicts, saveConflict } from "./state.mjs";
 import {
@@ -44,7 +52,7 @@ const options = (rows, selected) =>
     .join("");
 const gm = () => ChatMessage.getWhisperRecipients("GM").map(user => user.id);
 const say = (content, whisper = false) =>
-  ChatMessage.create({ speaker: { alias: "Dramatic Conflict" }, content, ...(whisper ? { whisper: gm() } : {}) });
+  ChatMessage.create({ speaker: { alias: loc`Dramatic Conflict` }, content, ...(whisper ? { whisper: gm() } : {}) });
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 const sideName = (conflict, side) => conflict[side].name || (side === "predator" ? "Predator" : "Prey");
 const strategy = (conflict, side) =>
@@ -62,6 +70,18 @@ const chaseActorOptions = () => [
     .sort((a, b) => (a.type === "vehicle" ? 0 : 1) - (b.type === "vehicle" ? 0 : 1) || a.name.localeCompare(b.name))
     .map(a => [a.uuid, `${a.name}${a.type === "vehicle" ? "" : " (on foot)"}`])
 ];
+/** The tracked chase feats a participant has: a vehicle's driver supplies them, a character their own. */
+const participantFeats = uuid => {
+  const actor = uuid ? fromUuidSync(uuid) : null,
+    person = actor?.type === "vehicle" ? (actor.system.driver ? fromUuidSync(actor.system.driver) : null) : actor;
+  return (person?.system?.activeFeatNames ?? []).filter(feat => CONFLICT_FEATS.includes(feat));
+};
+const featBoxes = (side, ticked) =>
+  `<p>${CONFLICT_FEATS.map(
+    feat =>
+      `<label><input type="checkbox" name="${side}Feat-${esc(feat)}"${ticked.includes(feat) ? " checked" : ""} /> ${esc(feat)}</label>`
+  ).join(" ")}</p>`;
+const tickedFeats = (input, side) => CONFLICT_FEATS.filter(feat => input[`${side}Feat-${feat}`] === true);
 const roomRows = () =>
   Object.entries(MANEUVERING_ROOM).map(([key, r]) => [
     key,
@@ -88,7 +108,21 @@ const chaseLine = (conflict, state) => {
   const smashText = smash
     ? ` ${loc`· ${esc(sideName(conflict, smash.side))} holds`} <b>${loc`${smash.points} Smash`}</b> ${loc`(attacks on them use Lead ${smashRangeLead(conflict.lead, smash)} for range)`}`
     : "";
-  return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${distance !== null ? loc` · ${distance.toLocaleString("en-US")} ft. apart (${r.leadFeet} ft. per Lead)` : ""}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ""}${r.fastest ? loc` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ""}${r.mismatched ? ` · <b>${loc`mismatched scales: settle with one opposed check`}</b>` : ""}${smashText}`;
+  const eased = ["predator", "prey"]
+    .map(side => {
+      const source = state[side],
+        feat = roomFeatFor(
+          conflict[side]?.feats ?? [],
+          source && { kind: source.kind, vehicleClass: source.system?.vehicleClass }
+        ),
+        key = conflict.chase?.room,
+        room = MANEUVERING_ROOM[easedRoom(key)];
+      return feat
+        ? loc` · ${esc(sideName(conflict, side))} (${esc(feat)}) treats it as ${room.label}${easedRoom(key) !== key ? loc` (Crisis DC ${room.crisisDC})` : ""} and has +2 on checks and saves from a Crisis Advantage`
+        : "";
+    })
+    .join("");
+  return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${eased}${distance !== null ? loc` · ${distance.toLocaleString("en-US")} ft. apart (${r.leadFeet} ft. per Lead)` : ""}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ""}${r.fastest ? loc` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ""}${r.mismatched ? ` · <b>${loc`mismatched scales: settle with one opposed check`}</b>` : ""}${smashText}`;
 };
 
 export function conflictRows() {
@@ -152,7 +186,10 @@ export async function startConflictDialog() {
     <p>${loc`Predator skill: ${esc(rules.predatorSkills.join("; "))}`}<br>${loc`Prey skill: ${esc(rules.preySkills.join("; "))}`}<br>${loc`Each round: ${esc(rules.roundTime)}`}</p>
     ${chaseNote}
     <label>${loc`Starting Lead (1–9)`} <input type="number" name="lead" min="1" max="9" value="${suggested.lead ?? rules.startingLead?.default ?? 5}" required /></label>
-    ${ratingInputs}`
+    ${ratingInputs}
+    <fieldset><legend>${loc`Conflict feats (pp.192–193, 208–209): Predator`}</legend>${featBoxes("p", participantFeats(chase?.predator))}</fieldset>
+    <fieldset><legend>${loc`Conflict feats: Prey`}</legend>${featBoxes("q", participantFeats(chase?.prey))}</fieldset>
+    <p>${loc`Jackrabbit Start and Relentless Pursuit move the starting Lead by 2 after the value above.`}</p>`
   );
   if (!second) return null;
   const ratings = side =>
@@ -161,8 +198,13 @@ export async function startConflictDialog() {
     const conflict = startConflict(first.type, {
       lead: Number(second.lead),
       name: first.name,
-      predator: { name: first.predator, actorUuid: chase?.predator || null, ratings: ratings("p") },
-      prey: { name: first.prey, actorUuid: chase?.prey || null, ratings: ratings("q") }
+      predator: {
+        name: first.predator,
+        actorUuid: chase?.predator || null,
+        ratings: ratings("p"),
+        feats: tickedFeats(second, "p")
+      },
+      prey: { name: first.prey, actorUuid: chase?.prey || null, ratings: ratings("q"), feats: tickedFeats(second, "q") }
     });
     if (chase) conflict.chase = chase;
     const id = foundry.utils.randomID();
@@ -205,15 +247,20 @@ export async function advanceConflict(id) {
         await say(
           `<b>${esc(conflict.name)}</b> ${loc`— round ${next.round}, Lead ${next.lead}. Strategies revealed: ${esc(sideName(next, "predator"))}`} <b>${esc(strategy(next, "predator").name)}</b> (${signed(strategyModifier(next, "predator"))}); ${esc(sideName(next, "prey"))} <b>${esc(strategy(next, "prey").name)}</b> ${loc`(${signed(strategyModifier(next, "prey"))}). Make the opposed check.`}`
         );
+      for (const target of ["predator", "prey"])
+        if (instinctPenalty(next, target))
+          await say(
+            `<b>${esc(conflict.name)}</b>: ${loc`Driving Instincts — the guess was right; ${esc(sideName(next, target))} takes −${instinctPenalty(next, target)} on this check (included above).`}`
+          );
       return next;
     }
     if (conflict.step === "check") {
       const critical = side =>
         `<label>${loc`${esc(sideName(conflict, side))} critical`} <select name="${side}Critical">${options(
           [
-            ["", "None"],
-            ["success", "Critical success"],
-            ["failure", "Critical failure"]
+            ["", loc`None`],
+            ["success", loc`Critical success`],
+            ["failure", loc`Critical failure`]
           ],
           ""
         )}</select></label>`;
@@ -332,6 +379,9 @@ async function announceEnd(id, conflict) {
   return conflict;
 }
 
+const SIDES_WITH_INSTINCTS = conflict =>
+  ["predator", "prey"].some(side => (conflict[side].feats ?? []).includes("Driving Instincts"));
+
 /** Concede, correct the Lead, or delete the record. */
 export async function manageConflict(id) {
   requireGC();
@@ -354,17 +404,61 @@ export async function manageConflict(id) {
         ["lead", loc`Set the Lead (outside effect or correction)`],
         ...(conflict.chase
           ? [
-              ["room", "Change the Maneuvering Room"],
+              ["room", loc`Change the Maneuvering Room`],
               ["smash", loc`Set Smash points (altitude)`]
             ]
           : []),
+        ...(conflict.type === "chase"
+          ? ["predator", "prey"].flatMap(side => [
+              ...((conflict[side].feats ?? []).includes("Photo Finish")
+                ? [
+                    [
+                      `photoFinish-${side}`,
+                      loc`${sideName(conflict, side)}: Photo Finish (all Acceleration and Turning −2)`
+                    ]
+                  ]
+                : []),
+              ...((conflict[side].feats ?? []).includes("Driving Instincts") && conflict.step === "strategies"
+                ? [
+                    [
+                      `instinct-${side}`,
+                      loc`${sideName(conflict, side)}: Driving Instincts (guess the opponent’s Strategy)`
+                    ]
+                  ]
+                : []),
+              ...["Defensive Driving", "Offensive Driving"]
+                .filter(
+                  feat => (conflict[side].feats ?? []).includes(feat) && !conflict.featUses?.[side]?.includes(feat)
+                )
+                .map(feat => [`feat-${side}-${feat}`, loc`${sideName(conflict, side)}: ${feat} (once per chase)`])
+            ])
+          : []),
+        ...(["interrogation", "brainwashing"].includes(conflict.type)
+          ? [
+              ["predator", "Breaking Points"],
+              ["prey", "Hold Out"]
+            ]
+              .filter(([side, feat]) => (conflict[side].feats ?? []).includes(feat))
+              .map(([side, feat]) => [
+                `pace-${side}`,
+                loc`${sideName(conflict, side)}: ${feat} (+1 error range, change this round’s duration)`
+              ])
+          : []),
         ["concedePredator", `${sideName(conflict, "predator")} concedes`],
         ["concedePrey", `${sideName(conflict, "prey")} concedes`],
-        ["remove", "Remove this conflict"]
+        ["remove", loc`Remove this conflict`]
       ],
       "lead"
     )}</select></label>
     <label>${loc`Lead`} <input type="number" name="lead" value="${conflict.lead}" /></label>
+    ${
+      conflict.type === "chase" && SIDES_WITH_INSTINCTS(conflict)
+        ? `<fieldset><legend>${loc`Driving Instincts (p.192)`}</legend><label>${loc`Guessed Strategy`} <select name="instinctGuess">${options(
+            CONFLICT_TYPES[conflict.type].strategies.map(entry => [entry.id, entry.name]),
+            ""
+          )}</select></label><label>${loc`Guessing side’s Chase feats`} <input type="number" name="instinctFeats" min="1" step="1" value="1" /></label></fieldset>`
+        : ""
+    }
     ${
       conflict.chase
         ? `<label>${loc`Maneuvering Room`} <select name="room">${options(roomRows(), conflict.chase.room)}</select></label>
@@ -372,7 +466,7 @@ export async function manageConflict(id) {
       <p>${loc`A pilot in a powered aircraft at least 200 ft. above every opponent holds 1 Smash point per Lead point to the next highest opponent; a threat on a Maneuver check gains 1 (or costs the holder 1 when someone else scores it).`}</p>
       <label>${loc`Held by`} <select name="smashSide">${options(
         [
-          ["", "Nobody"],
+          ["", loc`Nobody`],
           ["predator", sideName(conflict, "predator")],
           ["prey", sideName(conflict, "prey")]
         ],
@@ -386,6 +480,34 @@ export async function manageConflict(id) {
   if (!input) return null;
   try {
     if (input.action === "remove") return saveConflict(id, null);
+    if (input.action.startsWith("photoFinish-")) {
+      const side = input.action.slice("photoFinish-".length),
+        next = photoFinish(conflict, side);
+      await saveConflict(id, next);
+      return say(
+        `<b>${esc(conflict.name)}</b>${loc`: ${esc(sideName(conflict, side))} uses Photo Finish — every participant’s Acceleration and Turning drop by 2 (total −${2 * next.photoFinish}).`}`
+      );
+    }
+    if (input.action.startsWith("pace-")) {
+      const side = input.action.slice("pace-".length),
+        { next, note } = declarePace(conflict, side);
+      await saveConflict(id, next);
+      return say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(conflict, side))} — ${esc(note)}`);
+    }
+    if (input.action.startsWith("instinct-")) {
+      const side = input.action.slice("instinct-".length),
+        next = guessStrategy(conflict, side, input.instinctGuess, Number(input.instinctFeats));
+      await saveConflict(id, next);
+      return say(
+        `<b>${esc(conflict.name)}</b>: ${esc(sideName(conflict, side))} ${loc`— Driving Instincts guess recorded; it is checked when the Strategies are revealed.`}`
+      );
+    }
+    if (input.action.startsWith("feat-")) {
+      const [, side, ...rest] = input.action.split("-"),
+        { next, note } = useConflictFeat(conflict, side, rest.join("-"));
+      await saveConflict(id, next);
+      return say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(conflict, side))} — ${esc(note)}`);
+    }
     if (input.action === "smash") {
       const next = structuredClone(conflict),
         side = input.smashSide || "";

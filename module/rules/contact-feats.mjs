@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** pp.201–205: each feat's initial themed associate, not every contact of that theme. */
 export const CONTACT_FEATS = {
@@ -257,3 +258,6 @@ export function networkingContactFeatGrants(system) {
       };
     });
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "contactFeatsRecord", order: 9645, record: ["contactFeat"] });

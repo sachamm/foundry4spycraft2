@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { whirlingStancePlan } from "./whirling-stance.mjs";
 import { sharpshooterDefensePlan } from "./sharpshooter.mjs";
 import { guardDefensePlan } from "./guard.mjs";
@@ -5,6 +6,8 @@ import { greatSwordDefensePlan } from "./great-sword-defense.mjs";
 import { totalDefenseState } from "./total-defense.mjs";
 import { coverPlan } from "./cover.mjs";
 import { circlingDefensePlan } from "./knife-basics.mjs";
+import { wrestlingDefense } from "./wrestling.mjs";
+import { duelingChosenDodge } from "./dueling-basics.mjs";
 import { knownSneakAttackImmunity } from "./sneak-attack.mjs";
 import { attributeCollapsePlan, attributeDefensePlan } from "./attributes.mjs";
 import { loc } from "../i18n.mjs";
@@ -111,11 +114,19 @@ export function incomingDefensePlan(system, options = {}) {
   const cover = coverPlan({ ...options.cover, defenderSystem: system, ranged });
   const sharpshooter = sharpshooterDefensePlan(system, { ...options.cover, ranged }),
     greatSword = greatSwordDefensePlan(system, { ranged }),
-    guard = guardDefensePlan(system, { ranged });
+    guard = guardDefensePlan(system, { ranged }),
+    wrestling = wrestlingDefense(system, { adjacent, ranged }),
+    dueling = vulnerable ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent),
+    // Anticipate (p.354): the dodge bonus recorded against this attacker, checked by the caller.
+    anticipate =
+      vulnerable || !Number.isSafeInteger(options.anticipateDodge) ? 0 : Math.max(0, options.anticipateDodge);
   const total =
     -circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
+    wrestling +
+    dueling +
+    anticipate +
     greatSword.increment +
     cover.defenseBonus +
     system.defense.total +
@@ -132,6 +143,10 @@ export function incomingDefensePlan(system, options = {}) {
     manual.unconscious ||
     system.mentalLeapState?.unconscious ||
     collapse.conditions.some(c => ["Paralyzed", "Unconscious"].includes(c));
+  const stickyFingers =
+    adjacent === true &&
+    system.activeFeatNames?.includes("Rolling Supremacy") === true &&
+    system.totalDefenseState?.active === true;
   const pinnedAttackerBonus = manual.pinned === true && adjacent && !ranged ? 4 : 0;
   const crouchedAttackerPenalty = manual.crouched === true && ranged && !adjacent ? -1 : 0,
     proneAttackerPenalty = manual.prone === true && ranged && !adjacent ? -2 : 0;
@@ -144,7 +159,13 @@ export function incomingDefensePlan(system, options = {}) {
     cover,
     armorMasteryRequiresHelpless: system.armorFeatRules?.coupDeGraceRequiresHelpless === true,
     sneakAttackImmune: knownSneakAttackImmunity(system).immune,
-    listedDR: system.armorDRByAttack ?? null,
+    anticipate,
+    // Sticky Fingers (Rolling Supremacy, p.187): DR 5/— against adjacent opponents during Total Defense.
+    stickyFingersDR: stickyFingers ? 5 : 0,
+    listedDR:
+      stickyFingers && system.armorDRByAttack
+        ? Object.fromEntries(Object.entries(system.armorDRByAttack).map(([k, v]) => [k, v + 5]))
+        : (system.armorDRByAttack ?? null),
     coupDeGraceException,
     coupDeGraceExceptionSource: coupDeGraceException ? coupDeGraceExceptionSource.trim() : "",
     pinnedAttackerBonus,
@@ -179,13 +200,22 @@ export function incomingDefensePlan(system, options = {}) {
             loc`Whirling Stance: career level ${whirling.defenderLevel}; ${whirling.declared ? loc`this attacker level ` + whirling.attackerLevel + (whirling.prevented ? loc` cannot flank you.` : loc` retains ordinary flanking eligibility.`) : loc`review the actual attacker’s career level if flanking is declared.`} No unconditional Defense bonus (p.179).`
           ]
         : []),
-      ...(circling.stance
+      ...(wrestling ? [loc`Wrestling Basics: +1 to Defense against this adjacent opponent (p.189).`] : []),
+      ...(dueling ? [loc`Dueling Basics: +2 dodge against the opponent you chose this round (p.178).`] : []),
+      ...(anticipate ? [loc`Anticipate: +${anticipate} dodge against this opponent (p.354).`] : []),
+      ...(circling.shifting
         ? [
             circling.active
-              ? loc`Circling Stance: this melee attacker has an unoccupied adjacent square, so your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up, against this attack (p.179).`
-              : loc`Circling Stance: no reduction (${circling.unoccupiedAdjacentConfirmed ? loc`no positive dodge bonus applies to this attack` : loc`no unoccupied square adjacent to the attacker was confirmed`}) (p.179).`
+              ? loc`Shifting Stance: against this unarmed attack your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up (p.186).`
+              : loc`Shifting Stance: no reduction (${circling.unarmedConfirmed ? loc`no positive dodge bonus applies` : loc`the attack was not confirmed as unarmed`}) (p.186).`
           ]
-        : []),
+        : circling.stance
+          ? [
+              circling.active
+                ? loc`Circling Stance: this melee attacker has an unoccupied adjacent square, so your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up, against this attack (p.179).`
+                : loc`Circling Stance: no reduction (${circling.unoccupiedAdjacentConfirmed ? loc`no positive dodge bonus applies to this attack` : loc`no unoccupied square adjacent to the attacker was confirmed`}) (p.179).`
+            ]
+          : []),
       ...(sharpshooter.active
         ? [
             loc`Sharpshooter Basics: target Size Defense bonus +${sharpshooter.originalSizeBonus} becomes +${sharpshooter.retainedSizeBonus}, rounded down, against this ranged attack (p.182).`
@@ -286,3 +316,23 @@ export function reflexDamagePlan(
   const total = evaded ? 0 : halved ? Math.floor(damage / 2) : ordinary;
   return { damage, normalSuccessDamage, succeeded, ordinary, total, evaded, halved, eligible, context: { ...context } };
 }
+
+// Uncanny Dodge against a security device as part of a Reflex save plan.
+rollPipeline.register({
+  id: "securityDeviceSaveTerm",
+  kinds: ["save"],
+  order: 9470,
+  terms({ system, saveKey, input }) {
+    const bonus = saveKey === "ref" && input.securityDevice === true ? uncannyDodgePlan(system).securityBonus : 0;
+    return {
+      rowAt: 80,
+      rows: [[loc`Security device`, bonus]],
+      flavorAt: 60,
+      flavor: bonus ? loc` — Uncanny Dodge/security device +${bonus}` : "",
+      options: { securityBonus: bonus }
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "defenseRecord", order: 9655, record: ["evasionContext"] });

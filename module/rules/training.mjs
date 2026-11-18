@@ -1,3 +1,4 @@
+import { ruleName } from "./rule-name.mjs";
 import { loc } from "../i18n.mjs";
 const norm = value =>
   String(value ?? "")
@@ -129,7 +130,10 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
     activeFortes = fortes.map(row => ({ ...row }));
   for (const feat of items.filter(
     i =>
-      i.type === "feat" && i.name === "Depth of Study" && i.system.featKind === "temporary" && activeFeatIds.has(i.id)
+      i.type === "feat" &&
+      ruleName(i) === "Depth of Study" &&
+      i.system.featKind === "temporary" &&
+      activeFeatIds.has(i.id)
   )) {
     const source = { itemId: feat.id, name: feat.name, available: 2, used: 0, choices: [] };
     temporaryGrants.push(source);
@@ -186,7 +190,7 @@ export function temporaryFocusPlan(
 ) {
   if (
     feat?.type !== "feat" ||
-    feat.name !== "Depth of Study" ||
+    ruleName(feat) !== "Depth of Study" ||
     feat.system.featKind !== "temporary" ||
     system.featStatus?.[feat.id]?.ok !== true
   )

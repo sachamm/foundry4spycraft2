@@ -3,6 +3,7 @@
  * control checks, mounted weapons and placing a vehicle pick on a scene. The arithmetic lives in
  * module/rules/vehicles.mjs and module/rules/vehicle-play-rules.mjs.
  */
+import { motherHenItem, motherHenTransfer, MOTHER_HEN_SAVE } from "../rules/mother-hen.mjs";
 import {
   VEHICLE_DAMAGE_COUNTERS,
   breakState,
@@ -16,6 +17,7 @@ import {
 import {
   bailOut,
   controlCheckPlan,
+  maneuverDifficulty,
   hasQuality,
   heavyArmorDice,
   secondaryDamage,
@@ -26,6 +28,12 @@ import { gadgetDamage, gadgetState } from "../rules/gear-play-rules.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { explosionPlan } from "../rules/vehicle-environment.mjs";
 import { VEHICLE_STAT_KEYS, vehicleStats } from "../data/vehicle-fields.mjs";
+import {
+  collisionDamagePlan,
+  demolitionDerbyDamage,
+  crashOccupantPlan,
+  crashOccupantNote
+} from "../rules/collision.mjs";
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -53,12 +61,14 @@ const saveBonusOf = doc => {
   const gadget = doc.system?.gadget;
   if (gadget?.mechanisms?.length) {
     const state = gadgetState(gadget, { itemDamageSave: doc.system.damageSave });
-    if (state.valid) return state.damageSave;
+    if (state.valid) return state.damageSave + (motherHenItem(doc, doc.parent) ? MOTHER_HEN_SAVE : 0);
   }
-  return doc.system?.damageSave;
+  const own = doc.system?.damageSave;
+  // Mother Hen: an owner's Possessions save at +4 (p.197).
+  return Number.isSafeInteger(own) && motherHenItem(doc, doc.parent) ? own + MOTHER_HEN_SAVE : own;
 };
 
-async function damageInput(title, { vehicle = false, flammable = false } = {}) {
+async function damageInput(title, { vehicle = false, flammable = false, motherHen = false } = {}) {
   const input = await ask(
     title,
     `
@@ -66,7 +76,8 @@ async function damageInput(title, { vehicle = false, flammable = false } = {}) {
       <label>${loc`Armor-piercing`} <input name="armorPiercing" type="number" min="0" step="1" value="0" /></label>
       <label><input name="blast" type="checkbox" /> ${loc`The damage has a blast increment`}</label>
       <label><input name="fire" type="checkbox" /> ${loc`Fire damage${flammable ? loc` (Flammable: −5 to the save, damage doubled)` : ""}`}</label>
-      <label><input name="critical" type="checkbox" /> ${loc`An activated critical hit${vehicle ? loc` (also rolls a Vehicle Damage result)` : ""}`}</label>`
+      <label><input name="critical" type="checkbox" /> ${loc`An activated critical hit${vehicle ? loc` (also rolls a Vehicle Damage result)` : ""}`}</label>
+      ${motherHen ? `<label><input name="motherHen" type="checkbox" /> ${loc`Mother Hen: the owner is touching it and makes a Reflex save (DC = the damage) to take half (p.197)`}</label>` : ""}`
   );
   if (!input) return null;
   const damage = Number(input.damage);
@@ -79,7 +90,8 @@ async function damageInput(title, { vehicle = false, flammable = false } = {}) {
     armorPiercing: Math.max(0, Number(input.armorPiercing) || 0),
     blast: input.blast === true,
     fire: input.fire === true,
-    critical: input.critical === true
+    critical: input.critical === true,
+    motherHen: input.motherHen === true
   };
 }
 
@@ -95,8 +107,24 @@ export async function rollObjectDamageSave(doc, options = {}) {
   const flammable = vehicle && hasQuality(qualities, "FLM");
   const input = Number.isSafeInteger(options.damage)
     ? { blast: false, critical: false, fire: false, armorPiercing: 0, ...options }
-    : await damageInput(`${doc.name}: Damage save`, { vehicle, flammable });
+    : await damageInput(`${doc.name}: Damage save`, { vehicle, flammable, motherHen: motherHenItem(doc, doc.parent) });
   if (!input) return null;
+  // Mother Hen: the owner's Reflex save decides how much of the damage the item still takes.
+  if (input.motherHen && motherHenItem(doc, doc.parent)) {
+    const owner = doc.parent,
+      reflex = await new Roll("1d20 + @bonus", { bonus: owner.system.saves?.ref?.total ?? 0 }).evaluate(),
+      split = motherHenTransfer(input.damage, reflex.total);
+    await reflex.toMessage({
+      speaker: ChatMessage.getSpeaker({ actor: owner }),
+      flavor: esc(
+        split.saved
+          ? loc`Mother Hen: Reflex ${reflex.total} vs DC ${input.damage} — ${owner.name} takes ${split.toOwner} of the damage (DR applies unless it is worn armor); ${doc.name} takes ${split.toItem}.`
+          : loc`Mother Hen: Reflex ${reflex.total} vs DC ${input.damage} — failed; ${doc.name} takes all ${input.damage}.`
+      )
+    });
+    if (!split.toItem) return null;
+    input.damage = split.toItem;
+  }
 
   // Flammable vehicles take double fire damage and save at −5 against it (p.293); armor-piercing lowers the bonus (p.224).
   const fireDoubled = input.fire && flammable,
@@ -115,7 +143,7 @@ export async function rollObjectDamageSave(doc, options = {}) {
   ];
   if (vehicle && bonus !== doc.system.damageSave)
     lines.push(
-      loc`Save bonus +${bonus}${hasQuality(qualities, "RGD") ? loc` (Rugged included)` : ""}${input.fire && flammable ? loc` (Flammable −5)` : ""}.`
+      loc`Save bonus +${bonus}${hasQuality(qualities, "RGD") ? loc` (Rugged included)` : ""}${doc.system?.crewSave?.notes?.length ? ` (${doc.system.crewSave.notes.join(", ")})` : ""}${input.fire && flammable ? loc` (Flammable −5)` : ""}.`
     );
   if (!failed) lines.push(loc`Saved.`);
   else
@@ -209,7 +237,7 @@ export async function rollVehicleDamageResult(
     const what = {
       Cargo: loc`One random cargo item`,
       "W/G": loc`One random weapon or piece of vehicle gear`,
-      Occ: "One random occupant",
+      Occ: loc`One random occupant`,
       Animal: loc`One random draft animal`
     }[location.code];
     if (location.code === "Occ") {
@@ -237,8 +265,8 @@ export async function rollVehicleDamageResult(
     }
   } else lines.push(loc`Resolve this result from the page above; nothing is recorded automatically.`);
   for (const [code, label] of [
-    ["HOT", "Hot"],
-    ["LUX", "Luxury"]
+    ["HOT", loc`Hot`],
+    ["LUX", loc`Luxury`]
   ])
     if (hasQuality(actor.system.qualitiesNow, code))
       lines.push(loc`${label} may be lost to this critical hit (p.294); restore it with a Mechanics/Repair check.`);
@@ -405,7 +433,7 @@ export function skeletonCrewFor(actor, teamSize) {
 /* ---------------------------------------------------------------------- */
 
 /** The driver makes a Maneuver check with the vehicle's skill, Drive focus, untrained penalty and error increases. */
-export async function rollControlCheck(actor, { modifier = null, topMphBonus = false } = {}) {
+export async function rollControlCheck(actor, { modifier = null, topMphBonus = false, stunt = "", fast = false } = {}) {
   const driver = actor.system.driver ? fromUuidSync(actor.system.driver) : null;
   if (!driver) return ui.notifications.warn(loc`Drop a character on the vehicle sheet to set the driver first.`);
   if (!driver.isOwner) return ui.notifications.warn(loc`Only ${driver.name}'s owner or the GC can roll this check.`);
@@ -422,22 +450,27 @@ export async function rollControlCheck(actor, { modifier = null, topMphBonus = f
       <p>${esc(plan.note)}</p>${hazardNote ? `<p>${esc(hazardNote)}</p>` : ""}
       <label>${loc`Other modifier (Strategy, situation)`} <input name="modifier" type="number" step="1" value="0" /></label>
       <label><input name="topMphBonus" type="checkbox" /> ${loc`Chase: this vehicle has the fastest top MPH (Maneuvering Room bonus)`}</label>
+      <label>${loc`Stunt`} <select name="stunt"><option value="">${loc`None`}</option><option value="minor">${loc`Minor (DC +5)`}</option><option value="moderate">${loc`Moderate (DC +10, error +1)`}</option><option value="major">${loc`Major (DC +15, error +2)`}</option><option value="deathDefying">${loc`Death-defying (DC +20, error +3)`}</option></select></label>
+      <label><input name="fast" type="checkbox" /> ${loc`Moving faster than half the top MPH (DC +5)`}</label>
       <label>${loc`Chase Maneuvering Room`} <select name="room"><option value="0">—</option><option value="6">${loc`Open +6`}</option><option value="4">${loc`Close +4`}</option><option value="2">${loc`Crowded +2`}</option><option value="0">${loc`Tight +0`}</option></select></label>`
     );
     if (!input) return null;
     modifier = (Number(input.modifier) || 0) + (input.topMphBonus ? Number(input.room) || 0 : 0);
     topMphBonus = !!input.topMphBonus;
+    stunt = input.stunt || "";
+    fast = input.fast === true;
   }
+  const difficulty = maneuverDifficulty(driver.system, { stunt, fast });
   return driver.rollSkill(plan.skillKey, null, {
     check: "maneuver",
     modifier: (plan.penalty || 0) + modifier,
     focus: plan.focus,
     gearStatus: "available",
     synergySkill: "auto",
-    vehicleErrorIncrease: plan.errorIncrease,
+    vehicleErrorIncrease: plan.errorIncrease + difficulty.errorIncrease,
     vehicleControl: {
       vehicleUuid: actor.uuid,
-      note: `${plan.note}${hazardNote ? ` ${hazardNote}` : ""}${topMphBonus ? loc` Fastest vehicle in the chase.` : ""}`
+      note: `${plan.note}${hazardNote ? ` ${hazardNote}` : ""}${topMphBonus ? loc` Fastest vehicle in the chase.` : ""}${difficulty.notes.length ? ` ${difficulty.notes.join(" ")}` : ""}`
     }
   });
 }
@@ -561,5 +594,43 @@ export function loadVehicleStats(actor, item) {
     img: item.img,
     "system.sourceItem": item.uuid,
     ...Object.fromEntries(VEHICLE_STAT_KEYS.filter(key => key in stats).map(key => [`system.${key}`, stats[key]]))
+  });
+}
+
+/* ---------------------------------------------------------------------- */
+/*  Crashes                                                                */
+/* ---------------------------------------------------------------------- */
+
+/** Roll a vehicle's crash at a speed: its collision damage, then each occupant's Reflex save and share (p.366). */
+export async function crashVehicle(actor) {
+  const size = sizeCode(objectSize(actor));
+  const input = await ask(
+    loc`${actor.name}: crash`,
+    `<p>${loc`The vehicle takes collision damage at its own Size for its speed; each occupant saves against half of it.`}</p><label>${loc`Speed (MPH)`} <input name="mph" type="number" min="10" step="1" value="${actor.system.topMph ?? 30}" /></label>`
+  );
+  if (!input) return null;
+  const plan = collisionDamagePlan(size, Number(input.mph));
+  if (!plan.dice && !plan.flat)
+    return ui.notifications.warn(loc`At this Size and speed the crash does no collision damage.`);
+  const driver = actor.system.driver ? fromUuidSync(actor.system.driver) : null,
+    roll = plan.dice ? await new Roll(plan.formula).evaluate() : null,
+    faces = roll ? roll.dice.flatMap(d => d.results.map(r => r.result)) : [],
+    raw = roll ? roll.total : plan.flat,
+    damage = roll ? demolitionDerbyDamage(driver?.system, faces) : plan.flat,
+    dice = plan.dice || plan.flat;
+  if (roll)
+    await roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: esc(loc`${actor.name} crashes`) });
+  const people = [actor.system.driver, ...(actor.system.occupants ?? []).map(o => o.uuid)]
+    .filter(Boolean)
+    .map(uuid => fromUuidSync(uuid))
+    .filter(Boolean);
+  const lines = [
+    loc`${actor.name} crashes at ${input.mph} MPH: ${damage} ${plan.type} collision damage, armor-piercing (${plan.ap})${plan.takedown ? loc`, takedown` : ""}${damage !== raw ? loc` (Demolition Derby: 1 less per die from ${raw})` : ""}. Apply it to the vehicle with its Damage save.`,
+    ...people.map(p => crashOccupantNote(p.name, crashOccupantPlan(p.system, damage, dice))),
+    loc`A crashed participant leaves any chase (p.366).`
+  ];
+  return ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor }),
+    content: lines.map(l => `<p>${esc(l)}</p>`).join("")
   });
 }

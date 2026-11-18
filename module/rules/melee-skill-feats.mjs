@@ -1,5 +1,5 @@
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Readied melee feat skill benefits, pp.176,179–180. Other benefits remain separate. */
 const definitions = [
@@ -74,4 +74,15 @@ rollPipeline.register({
   record: ["meleeSkillFeats"],
   validate: ({ actor, options, checkKind, checkId, skillKey }) =>
     validateMeleeSkillFeatProof(actor.system, options.meleeSkillFeats, { checkKind, skillKey, checkId })
+});
+
+// The melee feats' bonuses to named skill checks.
+rollPipeline.register({
+  id: "meleeSkillFeatsSkillTerm",
+  kinds: ["skill"],
+  order: 9230,
+  terms({ system, skillKey, check }) {
+    const plan = meleeSkillFeatPlan(system, skillKey, check);
+    return skillPlanTerm("meleeSkillFeats", plan, { noteAt: 40, blockAt: 20, bonusAt: 120 });
+  }
 });

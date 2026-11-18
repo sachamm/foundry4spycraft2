@@ -1,0 +1,1818 @@
+{
+  "label": "Core NPC Templates",
+  "description": "Twenty original, nameless starting profiles for campaign NPCs. Grades scale through the system NPC rules; descriptions and loadouts are campaign suggestions.",
+  "defaultThreatLevel": 1,
+  "defaultTier": 3,
+  "templates": [
+    {
+      "id": "security-guard",
+      "name": "Security Guard",
+      "category": "Security & Law Enforcement",
+      "description": "A uniformed watchkeeper trained to spot trouble, restrict access and summon help.",
+      "behavior": "Challenges unfamiliar visitors, protects the alarm point and avoids pursuing intruders alone.",
+      "customization": "Choose an employer, patrol route, alarm procedure and reason the guard might bend a rule.",
+      "grades": {
+        "initiative": 4,
+        "attack": 4,
+        "defense": 4,
+        "resilience": 4,
+        "health": 4,
+        "competence": 4,
+        "wealth": 2
+      },
+      "abilities": {
+        "con": 12,
+        "wis": 12
+      },
+      "skills": [
+        {
+          "key": "notice",
+          "grade": 5
+        },
+        {
+          "key": "search",
+          "grade": 5
+        },
+        {
+          "key": "resolve",
+          "grade": 4
+        }
+      ],
+      "qualities": [],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Club, light",
+          "category": "weapons"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "armor",
+          "name": "Corrections vest",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Observer"
+        },
+        {
+          "name": "Combat Mobility"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "handcuffs"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/security-guard.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/security-guard.png"
+    },
+    {
+      "id": "police-officer",
+      "name": "Police Officer",
+      "category": "Security & Law Enforcement",
+      "description": "A patrol officer who can secure an incident, interview bystanders and make an arrest.",
+      "behavior": "Calls in a location, seeks a clear account of events and escalates when colleagues are threatened.",
+      "customization": "Set the jurisdiction, local priorities, arrest authority and relationship with the agents.",
+      "grades": {
+        "initiative": 5,
+        "attack": 5,
+        "defense": 5,
+        "resilience": 5,
+        "health": 5,
+        "competence": 4,
+        "wealth": 3
+      },
+      "abilities": {
+        "str": 12,
+        "wis": 12
+      },
+      "skills": [
+        {
+          "key": "notice",
+          "grade": 6
+        },
+        {
+          "key": "intimidate",
+          "grade": 5
+        },
+        {
+          "key": "drive",
+          "grade": 5
+        }
+      ],
+      "qualities": [],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Beretta 92 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "weapons",
+          "name": "Club, light",
+          "category": "weapons"
+        },
+        {
+          "pack": "armor",
+          "name": "Duty vest, Class IIA",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, full-size sedan",
+          "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Combat Mobility"
+        },
+        {
+          "name": "Officer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "handcuffs",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/police-officer.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/police-officer.png"
+    },
+    {
+      "id": "detective",
+      "name": "Detective",
+      "category": "Security & Law Enforcement",
+      "description": "An investigator who connects testimony, physical traces and the people behind an incident.",
+      "behavior": "Tests accounts against evidence and quietly follows up on details others dismiss.",
+      "customization": "Choose a specialty, unresolved case, institutional pressure and one trusted source.",
+      "grades": {
+        "initiative": 5,
+        "attack": 4,
+        "defense": 5,
+        "resilience": 5,
+        "health": 4,
+        "competence": 6,
+        "wealth": 3
+      },
+      "abilities": {
+        "int": 12,
+        "wis": 14
+      },
+      "skills": [
+        {
+          "key": "investigation",
+          "grade": 8
+        },
+        {
+          "key": "senseMotive",
+          "grade": 7
+        },
+        {
+          "key": "search",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Glock 26 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "kits",
+          "name": "Forensics Kit I",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, mid-size sedan",
+          "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Tape recorder (consumer-grade)",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Private Eye"
+        },
+        {
+          "name": "Observer"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Private Eye"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/detective.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/detective.png"
+    },
+    {
+      "id": "bodyguard",
+      "name": "Bodyguard",
+      "category": "Security & Law Enforcement",
+      "description": "A close-protection professional focused on moving a client out of danger.",
+      "behavior": "Checks approaches, maintains an exit route and puts the client ahead of a pursuit.",
+      "customization": "Name the protected client, acceptable risks, evacuation plan and limits of the contract.",
+      "grades": {
+        "initiative": 6,
+        "attack": 6,
+        "defense": 6,
+        "resilience": 6,
+        "health": 7,
+        "competence": 5,
+        "wealth": 3
+      },
+      "abilities": {
+        "str": 12,
+        "dex": 12,
+        "con": 14,
+        "wis": 12
+      },
+      "skills": [
+        {
+          "key": "notice",
+          "grade": 7
+        },
+        {
+          "key": "search",
+          "grade": 6
+        },
+        {
+          "key": "tactics",
+          "grade": 5
+        }
+      ],
+      "qualities": [
+        {
+          "id": "tough",
+          "units": 1,
+          "details": ""
+        },
+        {
+          "id": "strong-minded",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Glock 17 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "armor",
+          "name": "Duty vest, Class IIA",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, full-size sedan",
+          "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug sweeper, commercial",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Combat Mobility"
+        },
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Iron Will"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "binoculars"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/bodyguard.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/bodyguard.png"
+    },
+    {
+      "id": "soldier",
+      "name": "Soldier",
+      "category": "Military & Field Operations",
+      "description": "A trained infantry member prepared to hold ground and work within a small unit.",
+      "behavior": "Follows the unit plan, watches adjacent positions and reports changes before advancing.",
+      "customization": "Assign a unit, orders, terrain familiarity and a rule of engagement; the vehicle belongs to the group.",
+      "grades": {
+        "initiative": 5,
+        "attack": 6,
+        "defense": 5,
+        "resilience": 5,
+        "health": 6,
+        "competence": 4,
+        "wealth": 2
+      },
+      "abilities": {
+        "str": 12,
+        "con": 12
+      },
+      "skills": [
+        {
+          "key": "athletics",
+          "grade": 6
+        },
+        {
+          "key": "tactics",
+          "grade": 6
+        },
+        {
+          "key": "survival",
+          "grade": 5
+        }
+      ],
+      "qualities": [
+        {
+          "id": "fearless",
+          "units": 1,
+          "details": ""
+        },
+        {
+          "id": "tough",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": true,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Colt M16A2/A4 5.56mm NATO",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1,
+            "code": "30M5"
+          }
+        },
+        {
+          "pack": "weapons",
+          "name": "Dagger/survival knife",
+          "category": "weapons"
+        },
+        {
+          "pack": "armor",
+          "name": "Tactical vest",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Jeep",
+          "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Survivalist"
+        }
+      ],
+      "commonItems": [
+        "backpack",
+        "compass",
+        "canteen",
+        "flashlight"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/soldier.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/soldier.png"
+    },
+    {
+      "id": "commando",
+      "name": "Commando",
+      "category": "Military & Field Operations",
+      "description": "An elite assault specialist suited to difficult entries and coordinated extraction.",
+      "behavior": "Studies the approach, acts on a shared signal and keeps a fallback route available.",
+      "customization": "Define the mission, insertion method, support team and extraction trigger; share the vehicle across the unit.",
+      "grades": {
+        "initiative": 7,
+        "attack": 8,
+        "defense": 7,
+        "resilience": 7,
+        "health": 7,
+        "competence": 5,
+        "wealth": 3
+      },
+      "abilities": {
+        "str": 14,
+        "dex": 14,
+        "con": 12
+      },
+      "skills": [
+        {
+          "key": "athletics",
+          "grade": 7
+        },
+        {
+          "key": "sneak",
+          "grade": 7
+        },
+        {
+          "key": "tactics",
+          "grade": 7
+        }
+      ],
+      "qualities": [
+        {
+          "id": "tough",
+          "units": 2,
+          "details": ""
+        },
+        {
+          "id": "fearless",
+          "units": 2,
+          "details": ""
+        },
+        {
+          "id": "treacherous",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": true,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "H&K MP5SD6 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "weapons",
+          "name": "Dagger/survival knife",
+          "category": "weapons"
+        },
+        {
+          "pack": "armor",
+          "name": "Tactical jacket",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (encrypted)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Jeep",
+          "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "Climbing Kit II",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Fiberscope",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "Marksmanship Mastery"
+        },
+        {
+          "name": "CQB Basics"
+        },
+        {
+          "name": "Combat Mobility"
+        },
+        {
+          "name": "Ghost Basics"
+        }
+      ],
+      "commonItems": [
+        "backpack",
+        "compass",
+        "canteen",
+        "flashlight",
+        "duct-tape"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/commando.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/commando.png"
+    },
+    {
+      "id": "mercenary",
+      "name": "Mercenary",
+      "category": "Military & Field Operations",
+      "description": "A paid field operator whose experience exceeds any loyalty to the current employer.",
+      "behavior": "Preserves ammunition, checks the terms of an order and looks for a survivable withdrawal.",
+      "customization": "Choose the employer, contract terms, professional boundary and price of switching sides.",
+      "grades": {
+        "initiative": 6,
+        "attack": 7,
+        "defense": 6,
+        "resilience": 6,
+        "health": 6,
+        "competence": 5,
+        "wealth": 3
+      },
+      "abilities": {
+        "str": 12,
+        "dex": 12,
+        "con": 12
+      },
+      "skills": [
+        {
+          "key": "notice",
+          "grade": 6
+        },
+        {
+          "key": "tactics",
+          "grade": 6
+        },
+        {
+          "key": "survival",
+          "grade": 5
+        }
+      ],
+      "qualities": [
+        {
+          "id": "tough",
+          "units": 1,
+          "details": ""
+        },
+        {
+          "id": "treacherous",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": true,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Colt M16A2/A4 5.56mm NATO",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1,
+            "code": "30M5"
+          }
+        },
+        {
+          "pack": "weapons",
+          "name": "Beretta 92 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "armor",
+          "name": "Flak jacket",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Jeep",
+          "category": "vehicles"
+        },
+        {
+          "pack": "kits",
+          "name": "First Aid Kit I",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "Marksmanship Mastery"
+        },
+        {
+          "name": "CQB Basics"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "backpack",
+        "canteen",
+        "binoculars"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/mercenary.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/mercenary.png"
+    },
+    {
+      "id": "street-tough",
+      "name": "Street Tough",
+      "category": "Crime & Intrusion",
+      "description": "A neighborhood bruiser who relies on numbers, confidence and local familiarity.",
+      "behavior": "Makes an intimidating entrance and loses enthusiasm when the opposition takes control.",
+      "customization": "Choose a territory, peer group, immediate grievance and reason to back down.",
+      "grades": {
+        "initiative": 4,
+        "attack": 5,
+        "defense": 3,
+        "resilience": 4,
+        "health": 5,
+        "competence": 3,
+        "wealth": 1
+      },
+      "abilities": {
+        "str": 12,
+        "con": 12
+      },
+      "skills": [
+        {
+          "key": "intimidate",
+          "grade": 5
+        },
+        {
+          "key": "athletics",
+          "grade": 5
+        },
+        {
+          "key": "streetwise",
+          "grade": 5
+        }
+      ],
+      "qualities": [
+        {
+          "id": "tough",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": true,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Club, light",
+          "category": "weapons"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Brawling Basics"
+        },
+        {
+          "name": "Dirty Fighting Basics"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "multitool"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/street-tough.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/street-tough.png"
+    },
+    {
+      "id": "criminal-enforcer",
+      "name": "Criminal Enforcer",
+      "category": "Crime & Intrusion",
+      "description": "A disciplined collector who turns an employer\u2019s demands into credible pressure.",
+      "behavior": "Corners a target, names the demand and demonstrates that consequences are close at hand.",
+      "customization": "Specify the employer, debt or demand, permitted violence and person the enforcer refuses to harm.",
+      "grades": {
+        "initiative": 4,
+        "attack": 6,
+        "defense": 4,
+        "resilience": 6,
+        "health": 7,
+        "competence": 4,
+        "wealth": 2
+      },
+      "abilities": {
+        "str": 14,
+        "con": 14
+      },
+      "skills": [
+        {
+          "key": "intimidate",
+          "grade": 7
+        },
+        {
+          "key": "athletics",
+          "grade": 6
+        },
+        {
+          "key": "resolve",
+          "grade": 5
+        }
+      ],
+      "qualities": [
+        {
+          "id": "tough",
+          "units": 2,
+          "details": ""
+        },
+        {
+          "id": "strong-minded",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Club, heavy",
+          "category": "weapons"
+        },
+        {
+          "pack": "weapons",
+          "name": "Beretta 92 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "armor",
+          "name": "Corrections vest",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Brawling Basics"
+        },
+        {
+          "name": "Brawling Moves"
+        },
+        {
+          "name": "Officer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "handcuffs",
+        "flashlight"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/criminal-enforcer.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/criminal-enforcer.png"
+    },
+    {
+      "id": "burglar",
+      "name": "Burglar",
+      "category": "Crime & Intrusion",
+      "description": "A practical intruder who can bypass barriers and leave with portable valuables.",
+      "behavior": "Looks for service access, checks for observers and abandons a job when a clean exit disappears.",
+      "customization": "Choose a preferred target, buyer, entry method and telltale habit.",
+      "grades": {
+        "initiative": 6,
+        "attack": 3,
+        "defense": 6,
+        "resilience": 4,
+        "health": 4,
+        "competence": 5,
+        "wealth": 3
+      },
+      "abilities": {
+        "dex": 14
+      },
+      "skills": [
+        {
+          "key": "security",
+          "grade": 7
+        },
+        {
+          "key": "sneak",
+          "grade": 7
+        },
+        {
+          "key": "athletics",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Escape knife",
+          "category": "weapons"
+        },
+        {
+          "pack": "kits",
+          "name": "Lockpicking Kit II",
+          "category": "gear"
+        },
+        {
+          "pack": "kits",
+          "name": "Climbing Kit I",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Fiberscope",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Burglar"
+        },
+        {
+          "name": "Ghost Basics"
+        },
+        {
+          "name": "Ghost Mastery"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "duct-tape"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/burglar.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/burglar.png"
+    },
+    {
+      "id": "contract-killer",
+      "name": "Contract Killer",
+      "category": "Crime & Intrusion",
+      "description": "A patient hired attacker who treats preparation and escape as part of the job.",
+      "behavior": "Observes routines, chooses favorable conditions and breaks contact if the assignment is compromised.",
+      "customization": "Set the target, payment channel, evidence trail and circumstances that cancel the contract.",
+      "grades": {
+        "initiative": 7,
+        "attack": 8,
+        "defense": 6,
+        "resilience": 6,
+        "health": 5,
+        "competence": 6,
+        "wealth": 4
+      },
+      "abilities": {
+        "dex": 14,
+        "wis": 12
+      },
+      "skills": [
+        {
+          "key": "sneak",
+          "grade": 7
+        },
+        {
+          "key": "notice",
+          "grade": 6
+        },
+        {
+          "key": "tactics",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "treacherous",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Glock 26 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "weapons",
+          "name": "Remington Model 700 7.62mm NATO",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, compact",
+          "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Camera, still (consumer-grade)",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Marksmanship Basics"
+        },
+        {
+          "name": "Marksmanship Mastery"
+        },
+        {
+          "name": "Concealed Carry"
+        },
+        {
+          "name": "Ghost Basics"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "binoculars",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/contract-killer.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/contract-killer.png"
+    },
+    {
+      "id": "enemy-agent",
+      "name": "Enemy Agent",
+      "category": "Intelligence & Technical",
+      "description": "A rival service\u2019s operative who can maintain cover while pursuing a specific objective.",
+      "behavior": "Keeps a plausible explanation ready and values the intelligence objective above a public confrontation.",
+      "customization": "Choose an agency, cover identity, handler and point where cooperation becomes possible.",
+      "grades": {
+        "initiative": 6,
+        "attack": 6,
+        "defense": 6,
+        "resilience": 6,
+        "health": 5,
+        "competence": 6,
+        "wealth": 3
+      },
+      "abilities": {
+        "dex": 12,
+        "int": 12,
+        "wis": 12
+      },
+      "skills": [
+        {
+          "key": "blend",
+          "grade": 6
+        },
+        {
+          "key": "bluff",
+          "grade": 7
+        },
+        {
+          "key": "sneak",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "treacherous",
+          "units": 1,
+          "details": ""
+        },
+        {
+          "id": "strong-minded",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "weapons",
+          "name": "Glock 26 9mm",
+          "category": "weapons",
+          "ammunition": {
+            "id": "bullet-full-metal-jacket-fmj",
+            "stockpiles": 1
+          }
+        },
+        {
+          "pack": "kits",
+          "name": "Disguise Kit II",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, mid-size sedan",
+          "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug, audio (Caliber II)",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug sweeper, commercial",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Actor"
+        },
+        {
+          "name": "Concealed Carry"
+        },
+        {
+          "name": "Ghost Basics"
+        },
+        {
+          "name": "Charmer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/enemy-agent.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/enemy-agent.png"
+    },
+    {
+      "id": "analyst",
+      "name": "Analyst",
+      "category": "Intelligence & Technical",
+      "description": "An intelligence researcher who turns scattered records into a useful assessment.",
+      "behavior": "Asks where a claim came from, compares sources and separates a finding from an assumption.",
+      "customization": "Choose a subject area, data access, professional blind spot and conclusion someone wants suppressed.",
+      "grades": {
+        "initiative": 3,
+        "attack": 1,
+        "defense": 3,
+        "resilience": 3,
+        "health": 3,
+        "competence": 7,
+        "wealth": 3
+      },
+      "abilities": {
+        "int": 14,
+        "wis": 12
+      },
+      "skills": [
+        {
+          "key": "analysis",
+          "grade": 8
+        },
+        {
+          "key": "investigation",
+          "grade": 7
+        },
+        {
+          "key": "tactics",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber II)",
+          "category": "gear"
+        },
+        {
+          "pack": "kits",
+          "name": "Authentication Kit I",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Examiner"
+        },
+        {
+          "name": "Scholar"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Examiner"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/analyst.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/analyst.png"
+    },
+    {
+      "id": "hacker",
+      "name": "Hacker",
+      "category": "Intelligence & Technical",
+      "description": "A computer intrusion specialist who understands both networks and their supporting hardware.",
+      "behavior": "Checks the environment, prepares a fallback connection and notices signs of monitoring.",
+      "customization": "Choose an access method, favored target, employer and personal limit on stolen information.",
+      "grades": {
+        "initiative": 4,
+        "attack": 2,
+        "defense": 4,
+        "resilience": 3,
+        "health": 3,
+        "competence": 7,
+        "wealth": 3
+      },
+      "abilities": {
+        "int": 14
+      },
+      "skills": [
+        {
+          "key": "computers",
+          "grade": 8
+        },
+        {
+          "key": "electronics",
+          "grade": 6
+        },
+        {
+          "key": "security",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber III)",
+          "category": "gear"
+        },
+        {
+          "pack": "kits",
+          "name": "Electronics Kit II",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Bug sweeper, commercial",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Techie"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Techie"
+        },
+        {
+          "name": "False Start",
+          "choice": "Techie"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "storage-media",
+        "multitool"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/hacker.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/hacker.png"
+    },
+    {
+      "id": "scientist",
+      "name": "Scientist",
+      "category": "Civilian & Professional",
+      "description": "A research professional who can explain unfamiliar findings and design a controlled investigation.",
+      "behavior": "Records observations, asks for repeatable evidence and worries about losing the underlying work.",
+      "customization": "Choose a discipline and replace the chemistry kit if needed; define a sponsor, discovery and research constraint.",
+      "grades": {
+        "initiative": 3,
+        "attack": 1,
+        "defense": 3,
+        "resilience": 4,
+        "health": 3,
+        "competence": 7,
+        "wealth": 4
+      },
+      "abilities": {
+        "int": 14
+      },
+      "skills": [
+        {
+          "key": "science",
+          "grade": 8
+        },
+        {
+          "key": "analysis",
+          "grade": 7
+        },
+        {
+          "key": "profession",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "kits",
+          "name": "Chemistry Kit II",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber II)",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Scholar"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Scholar"
+        },
+        {
+          "name": "False Start",
+          "choice": "Scholar"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/scientist.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/scientist.png"
+    },
+    {
+      "id": "medic",
+      "name": "Medic",
+      "category": "Civilian & Professional",
+      "description": "A medical responder prepared to assess casualties and stabilize people in difficult conditions.",
+      "behavior": "Prioritizes urgent injuries, asks others to clear space and seeks a safer treatment area.",
+      "customization": "Set the workplace, medical specialty, available transport and obligation that could conflict with the mission.",
+      "grades": {
+        "initiative": 4,
+        "attack": 2,
+        "defense": 4,
+        "resilience": 5,
+        "health": 4,
+        "competence": 6,
+        "wealth": 3
+      },
+      "abilities": {
+        "int": 12,
+        "wis": 12
+      },
+      "skills": [
+        {
+          "key": "medicine",
+          "grade": 8
+        },
+        {
+          "key": "notice",
+          "grade": 6
+        },
+        {
+          "key": "resolve",
+          "grade": 5
+        }
+      ],
+      "qualities": [
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "kits",
+          "name": "First Aid Kit II",
+          "category": "gear"
+        },
+        {
+          "pack": "kits",
+          "name": "Surgery Kit I",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Radio, tactical or headset (Caliber I)",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Bandage"
+        },
+        {
+          "name": "Examiner"
+        },
+        {
+          "name": "Advanced Skill Mastery",
+          "choice": "Examiner"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "stretcher"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/medic.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/medic.png"
+    },
+    {
+      "id": "driver",
+      "name": "Driver",
+      "category": "Civilian & Professional",
+      "description": "A professional wheelman who knows routes, vehicle limits and how to keep passengers moving.",
+      "behavior": "Checks traffic and exits, keeps the vehicle serviceable and prefers a planned pickup point.",
+      "customization": "Choose a vehicle focus, usual passengers, local routes and response to a dangerous fare.",
+      "grades": {
+        "initiative": 6,
+        "attack": 3,
+        "defense": 6,
+        "resilience": 5,
+        "health": 5,
+        "competence": 5,
+        "wealth": 3
+      },
+      "abilities": {
+        "dex": 14
+      },
+      "skills": [
+        {
+          "key": "drive",
+          "grade": 8
+        },
+        {
+          "key": "mechanics",
+          "grade": 5
+        },
+        {
+          "key": "notice",
+          "grade": 5
+        }
+      ],
+      "qualities": [
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "kits",
+          "name": "Mechanics Kit I",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, mid-size sedan",
+          "category": "vehicles"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Defensive Driving"
+        },
+        {
+          "name": "Driving Instincts"
+        },
+        {
+          "name": "Speed Demon"
+        },
+        {
+          "name": "Need for Speed"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "flashlight",
+        "road-flares",
+        "fire-extinguisher"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/driver.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/driver.png"
+    },
+    {
+      "id": "executive",
+      "name": "Executive",
+      "category": "Civilian & Professional",
+      "description": "A senior decision-maker with resources, institutional access and competing obligations.",
+      "behavior": "Delegates details, protects valuable relationships and wants a manageable account of the risk.",
+      "customization": "Choose an organization, authority, public priority and private vulnerability.",
+      "grades": {
+        "initiative": 3,
+        "attack": 1,
+        "defense": 3,
+        "resilience": 4,
+        "health": 3,
+        "competence": 6,
+        "wealth": 8
+      },
+      "abilities": {
+        "wis": 12,
+        "cha": 14
+      },
+      "skills": [
+        {
+          "key": "bureaucracy",
+          "grade": 8
+        },
+        {
+          "key": "networking",
+          "grade": 7
+        },
+        {
+          "key": "manipulate",
+          "grade": 7
+        }
+      ],
+      "qualities": [
+        {
+          "id": "non-combatant",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber II)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, full-size sedan",
+          "category": "vehicles"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Diplomat"
+        },
+        {
+          "name": "Hustler"
+        },
+        {
+          "name": "Charmer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "briefcase",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/executive.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/executive.png"
+    },
+    {
+      "id": "journalist",
+      "name": "Journalist",
+      "category": "Civilian & Professional",
+      "description": "A reporter who follows leads, develops sources and recognizes when a story is being managed.",
+      "behavior": "Cross-checks statements, protects a useful source and presses for a verifiable detail.",
+      "customization": "Choose a beat, publication, source network and tradeoff between access and publication.",
+      "grades": {
+        "initiative": 4,
+        "attack": 2,
+        "defense": 4,
+        "resilience": 4,
+        "health": 3,
+        "competence": 6,
+        "wealth": 3
+      },
+      "abilities": {
+        "wis": 12,
+        "cha": 12
+      },
+      "skills": [
+        {
+          "key": "investigation",
+          "grade": 7
+        },
+        {
+          "key": "networking",
+          "grade": 6
+        },
+        {
+          "key": "senseMotive",
+          "grade": 6
+        }
+      ],
+      "qualities": [
+        {
+          "id": "non-combatant",
+          "units": 1,
+          "details": ""
+        },
+        {
+          "id": "prodigy",
+          "units": 1,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [
+        {
+          "pack": "gear",
+          "name": "Computer, laptop (Caliber I)",
+          "category": "gear"
+        },
+        {
+          "pack": "vehicles",
+          "name": "Car, compact",
+          "category": "vehicles"
+        },
+        {
+          "pack": "gear",
+          "name": "Camera, still (commercial-grade)",
+          "category": "gear"
+        },
+        {
+          "pack": "gear",
+          "name": "Tape recorder (consumer-grade)",
+          "category": "gear"
+        }
+      ],
+      "feats": [
+        {
+          "name": "Private Eye"
+        },
+        {
+          "name": "Diplomat"
+        },
+        {
+          "name": "Charmer"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook",
+        "storage-media"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/journalist.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/journalist.png"
+    },
+    {
+      "id": "ordinary-civilian",
+      "name": "Ordinary Civilian",
+      "category": "Civilian & Professional",
+      "description": "An everyday person whose work, home or routine brings them into the operation.",
+      "behavior": "Seeks a clear explanation, avoids immediate danger and looks for someone trustworthy to help.",
+      "customization": "Choose an occupation, local connection, immediate worry and small piece of useful knowledge.",
+      "grades": {
+        "initiative": 2,
+        "attack": 1,
+        "defense": 2,
+        "resilience": 2,
+        "health": 2,
+        "competence": 3,
+        "wealth": 2
+      },
+      "abilities": {},
+      "skills": [
+        {
+          "key": "profession",
+          "grade": 4
+        },
+        {
+          "key": "cultures",
+          "grade": 3
+        },
+        {
+          "key": "senseMotive",
+          "grade": 3
+        }
+      ],
+      "qualities": [
+        {
+          "id": "non-combatant",
+          "units": 1,
+          "details": ""
+        },
+        {
+          "id": "meek",
+          "units": 2,
+          "details": ""
+        }
+      ],
+      "group": false,
+      "loadout": [],
+      "feats": [
+        {
+          "name": "Advisor"
+        }
+      ],
+      "commonItems": [
+        "cell-phone",
+        "notebook"
+      ],
+      "personalEffects": [
+        "Appropriate everyday clothing",
+        "Personal keys"
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/ordinary-civilian.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/ordinary-civilian.png"
+    }
+  ]
+}

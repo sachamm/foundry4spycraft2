@@ -17,7 +17,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
     applied = actor.appliedEffects ?? own.filter(e => e.active ?? (!e.disabled && !e.isSuppressed));
   if (!active && applied.some(e => hasStatus(e) && !own.includes(e)))
     throw new Error(
-      label + loc` is still supplied by an item or another source. Review that source before clearing the condition.`
+      loc`${label} is still supplied by an item or another source. Review that source before clearing the condition.`
     );
   if (active) {
     const status = globalThis.CONFIG?.statusEffects?.find(e => e.id === id);
@@ -52,7 +52,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
   }
   const matching = own.filter(e => (e.active ?? (!e.disabled && !e.isSuppressed)) && hasStatus(e));
   if (!matching.length)
-    throw new Error(label + loc` has no directly editable status source. Review its originating effect.`);
+    throw new Error(loc`${label} has no directly editable status source. Review its originating effect.`);
   const updates = [],
     removed = [];
   for (const effect of matching) {
@@ -73,7 +73,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
       deleted.push(data);
     }
     if ([...ids].some(key => actor.statuses?.has(key)))
-      throw new Error(label + loc` remains supplied by another active source. Review that source.`);
+      throw new Error(loc`${label} remains supplied by another active source. Review that source.`);
     return { active: false, changed: true };
   } catch (error) {
     const failures = [];

@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { FEAT_REMINDERS } from "../rules/tables.mjs";
 /**
  * World data migrations.
  *
@@ -19,10 +20,23 @@ import { loc } from "../i18n.mjs";
  */
 
 /** The data schema version this build of the system writes. */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
-/** Ordered migrations. Version 1 is the first versioned schema, so there is nothing to convert yet. */
-export const MIGRATIONS = [];
+/**
+ * Version 2: feats gained `system.reminder`. A feat already on a character or in the world takes the reminder its
+ * compendium entry has, unless it has been given one of its own.
+ */
+export function featReminderUpdate(source, reminders = FEAT_REMINDERS) {
+  if (source?.type !== "feat") return null;
+  const known = Object.hasOwn(reminders, source.name) ? reminders[source.name] : null;
+  if (!known) return null;
+  const current = source.system?.reminder;
+  if (current?.rolls || current?.text) return null;
+  return { "system.reminder": { rolls: known.rolls, text: known.text } };
+}
+
+/** Ordered migrations. Version 1 is the first versioned schema, so the list starts at 2. */
+export const MIGRATIONS = [{ version: 2, label: loc`feat reminders`, item: source => featReminderUpdate(source) }];
 
 /** Migrations still to run for a world at version `from`, oldest first. */
 export function pendingMigrations(from, migrations = MIGRATIONS, to = SCHEMA_VERSION) {

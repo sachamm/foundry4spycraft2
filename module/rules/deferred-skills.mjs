@@ -1,3 +1,4 @@
+import { ruleName } from "./rule-name.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { computeAgent } from "./engine.mjs";
@@ -16,7 +17,7 @@ export function deferredSkillPools(system, items) {
       .filter(
         f =>
           f.type === "feat" &&
-          f.name === "Training" &&
+          ruleName(f) === "Training" &&
           system.featStatus?.[f.id]?.ok &&
           (f.system.acquiredAtLevel || 1) === system.level
       )
@@ -124,7 +125,9 @@ export function deferredSkillDeadline(system, items) {
   const pending = (system.skillPoints ?? [])
     .filter(p => p.remaining > 0)
     .map(p => `level ${p.level}: ${p.remaining} skill point(s)`);
-  for (const feat of items.filter(f => f.type === "feat" && f.name === "Training" && system.featStatus?.[f.id]?.ok)) {
+  for (const feat of items.filter(
+    f => f.type === "feat" && ruleName(f) === "Training" && system.featStatus?.[f.id]?.ok
+  )) {
     const remaining = 5 - Object.values(feat.system.trainingSkills ?? {}).reduce((n, v) => n + v, 0);
     if (remaining > 0) pending.push(`Training (${feat.id}): ${remaining} skill point(s)`);
   }

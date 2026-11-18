@@ -18,7 +18,8 @@ export function dartingStyleState(system) {
     ![1, 2].includes(r.extraAttacks) ||
     r.penalty !== 2 * r.extraAttacks ||
     r.atStartOfInitiative !== true ||
-    r.confirmed !== true
+    r.confirmed !== true ||
+    ![undefined, "followUp", "twoHit"].includes(r.kind)
   )
     return { ...empty(), needsReview: true, reason: loc`The GC must review the saved Darting Weapon tradeoff.` };
   if (!ownCountDurationActive(r, system.dartingCombatContext)) return empty();
@@ -28,6 +29,7 @@ export function dartingStyleState(system) {
     penalty: r.penalty,
     extraAttacks: r.extraAttacks,
     dueRound: r.dueRound,
-    id: r.id
+    id: r.id,
+    kind: r.kind ?? "darting"
   };
 }

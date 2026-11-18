@@ -34,6 +34,12 @@
       <label>{{localize "SPYCRAFT.Template.ActorNpcSheet.DamageSaveBonus"}} <input name="system.manualDamageSave" type="number" value="{{system.manualDamageSave}}" class="w-2" /></label>{{/unless}}</p>{{/unless}}
   </div>
   {{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}
+  {{#if system.qualityEffects.notes.length}}<div class="npc-qualities-play">
+    <h3>{{localize "SPYCRAFT.Template.ActorNpcSheet.QualitiesInPlay"}}</h3>
+    <p>{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed"}} {{system.qualityEffects.speed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{#if system.qualityEffects.flySpeed}}, {{localize "SPYCRAFT.Template.ActorNpcSheet.Flying"}} {{system.qualityEffects.flySpeed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{/if}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.Size"}} {{system.qualityEffects.size}}{{#if system.qualityEffects.damageReduction}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.DamageReduction"}} {{system.qualityEffects.damageReduction}}{{/if}}</p>
+    <ul>{{#each system.qualityEffects.notes}}<li><b>{{name}}</b> — {{text}} <small>(p.{{page}})</small></li>{{/each}}</ul>
+    {{#each system.qualityEffects.saveCalls}}<p><a data-action="callQualitySave" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorNpcSheet.CallForTheSave"}}: {{name}} ({{localize "SPYCRAFT.Template.ActorNpcSheet.WillDC"}} {{dc}})</a></p>{{/each}}
+  </div>{{/if}}
   <div class="abilities-row">
     {{#each abilities}}
       <div class="ability"><a data-action="rollAbility" data-ability="{{key}}">{{label}}</a>

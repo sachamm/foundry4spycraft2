@@ -20,7 +20,7 @@ function state(totalGrade, sources = [], warnings = [], sourceKind = "context") 
     warnings,
     label: valid
       ? grade
-        ? loc`Shaken ` + ["", "I", "II", "III", "IV"][grade]
+        ? loc`Shaken ${["", "I", "II", "III", "IV"][grade]}`
         : ""
       : loc`Shaken — source review required`
   };

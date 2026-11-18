@@ -1,4 +1,4 @@
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Superior Documentation p.209: the Bluff bonus requires actually using a cover identity. */
 export function documentationSkillPlan(
@@ -60,4 +60,20 @@ rollPipeline.register({
   record: ["documentation"],
   validate: ({ actor, options, checkKind, checkId, skillKey }) =>
     validateDocumentationProof(actor.system, options.documentation, { checkKind, skillKey, checkId })
+});
+
+// A cover identity's documentation, in a skill check's plan.
+rollPipeline.register({
+  id: "documentationSkillTerm",
+  kinds: ["skill"],
+  order: 9320,
+  terms({ system, skillKey, check, input }) {
+    const { usingCoverIdentity = false, coverIdentityName = "", coverIdentityConfirmed = false } = input;
+    const plan = documentationSkillPlan(system, skillKey, check, {
+      usingCoverIdentity,
+      coverIdentityName,
+      coverIdentityConfirmed
+    });
+    return skillPlanTerm("documentation", plan, { noteAt: 210, blockAt: 190, bonusAt: 60 });
+  }
 });

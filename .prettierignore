@@ -2,6 +2,8 @@
 module/rules/tables.mjs
 module/rules/gc-tables.mjs
 module/rules/npc-tables.mjs
+module/data/gc-table-catalog.mjs
+module/data/sample-agent-companions.mjs
 packs/
 # Hand-laid-out data: one record per line
 src/data/

@@ -1,3 +1,4 @@
+import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { vehicleClass } from "../rules/vehicles.mjs";
 import {
@@ -40,9 +41,42 @@ import { settlePendingDamageSave } from "../apps/damage-settlement.mjs";
 import { rollPendingDamageSave } from "../apps/damage-saves.mjs";
 import { reviewDamageLedger, applyAccumulatedDamage } from "../apps/damage-ledger.mjs";
 import { checkAccumulatedDamage } from "../apps/accumulated-damage.mjs";
+import { settleGrapple } from "../apps/combat-actions.mjs";
+import {
+  acidStep,
+  endSurvivalHazard,
+  endTypedExposure,
+  exposureFailedSave,
+  sufferTypedDamage,
+  survivalSave
+} from "../apps/damage-types.mjs";
+import { cancelReady, coupDeGraceSave, recordAnticipate, standOff, tireResult } from "../apps/combat-options.mjs";
+import {
+  burningRound,
+  cureHazard,
+  exposeToContagion,
+  exposeToFire,
+  extinguish,
+  fightFire,
+  hazardsView,
+  rollContagionSave,
+  rollFireSave
+} from "../apps/hazards.mjs";
 import { takeMobileOffense } from "../apps/mobile-offense.mjs";
 import { takeContempt } from "../apps/contempt.mjs";
 import { takeCombatInstincts } from "../apps/combat-instincts.mjs";
+import { takeDropFollowUp } from "../apps/drop-follow-up.mjs";
+import { takeOpportunist } from "../apps/opportunist.mjs";
+import { grantFortunate } from "../apps/fortunate.mjs";
+import { applyBlackCat } from "../apps/black-cat.mjs";
+import { enterBerserkerRage, endBerserkerRage } from "../apps/berserker.mjs";
+import { useGunslingersEye } from "../apps/gunslinger.mjs";
+import { takeFireTeamSupremacy } from "../apps/team-final-attack.mjs";
+import { declareDuelingBasics } from "../apps/dueling-basics.mjs";
+import { declareFightDefensively, declareIntenseStance } from "../apps/fight-defensively.mjs";
+import { declareSnakeStrike } from "../apps/snake-strike.mjs";
+import { companionsContext, createCompanion, recordCompanionDeath } from "../apps/companions.mjs";
+import { editIdentity, removeIdentity, enterIdentity, leaveIdentity } from "../apps/flawless-identity.mjs";
 import { rollDisarmResponse } from "../apps/disarm-response.mjs";
 import { takeMissTrick } from "../apps/miss-tricks.mjs";
 import { rollCheapShot } from "../apps/cheap-shot.mjs";
@@ -74,6 +108,7 @@ import { describe as describePrereq } from "../rules/prerequisites.mjs";
 import { SpycraftBrowser } from "../apps/browser.mjs";
 import {
   rollNpcSkill,
+  callQualitySave,
   npcDamageSave,
   resetDamageTrack,
   manageDisposition,
@@ -210,6 +245,66 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       takeCombatInstincts() {
         return takeCombatInstincts(this.actor);
       },
+      takeCleaveBasics() {
+        return takeDropFollowUp(this.actor, "cleaveBasics");
+      },
+      takeSnapShot() {
+        return takeDropFollowUp(this.actor, "snapShot");
+      },
+      takeOpportunist() {
+        return takeOpportunist(this.actor);
+      },
+      grantFortunate() {
+        return grantFortunate(this.actor);
+      },
+      applyBlackCat() {
+        return applyBlackCat(this.actor);
+      },
+      enterBerserkerRage() {
+        return enterBerserkerRage(this.actor);
+      },
+      useGunslingersEye() {
+        return useGunslingersEye(this.actor);
+      },
+      takeFireTeamSupremacy() {
+        return takeFireTeamSupremacy(this.actor);
+      },
+      declareDuelingBasics() {
+        return declareDuelingBasics(this.actor);
+      },
+      declareFightDefensively() {
+        return declareFightDefensively(this.actor);
+      },
+      declareIntenseStance() {
+        return declareIntenseStance(this.actor);
+      },
+      declareSnakeStrike() {
+        return declareSnakeStrike(this.actor);
+      },
+      createCompanion(event, target) {
+        return createCompanion(this.actor, target.dataset.feat);
+      },
+      openCompanion(event, target) {
+        return fromUuidSync(target.dataset.uuid)?.sheet?.render(true);
+      },
+      companionDied(event, target) {
+        return recordCompanionDeath(this.actor, target.dataset.uuid);
+      },
+      editIdentity(event, target) {
+        return editIdentity(this.actor, target.dataset.id ?? "");
+      },
+      removeIdentity(event, target) {
+        return removeIdentity(this.actor, target.dataset.id);
+      },
+      enterIdentity(event, target) {
+        return enterIdentity(this.actor, target.dataset.id);
+      },
+      leaveIdentity() {
+        return leaveIdentity(this.actor);
+      },
+      endBerserkerRage() {
+        return endBerserkerRage(this.actor);
+      },
       manageCheapShots() {
         return this.actor.manageCheapShots();
       },
@@ -297,6 +392,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       declareDarting() {
         return declareDarting(this.actor);
       },
+      declareFollowUp() {
+        return declareDarting(this.actor, { kind: "followUp" });
+      },
+      declareTwoHit() {
+        return declareDarting(this.actor, { kind: "twoHit" });
+      },
       takeDartingFinalAttack() {
         return takeDartingFinalAttack(this.actor);
       },
@@ -326,6 +427,66 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       checkAccumulatedDamage() {
         return checkAccumulatedDamage(this.actor);
+      },
+      exposeToContagion() {
+        return exposeToContagion(this.actor);
+      },
+      settleGrapple() {
+        return settleGrapple(this.actor);
+      },
+      sufferTypedDamage() {
+        return sufferTypedDamage(this.actor);
+      },
+      survivalSave() {
+        return survivalSave(this.actor);
+      },
+      acidStep(event, target) {
+        return acidStep(this.actor, target.dataset.step);
+      },
+      exposureFailedSave() {
+        return exposureFailedSave(this.actor);
+      },
+      endTypedExposure() {
+        return endTypedExposure(this.actor);
+      },
+      endSurvivalHazard(event, target) {
+        return endSurvivalHazard(this.actor, target.dataset.kind);
+      },
+      recordAnticipate() {
+        return recordAnticipate(this.actor);
+      },
+      standOff() {
+        return standOff(this.actor);
+      },
+      tireResult() {
+        return tireResult(this.actor);
+      },
+      coupDeGraceSave() {
+        return coupDeGraceSave(this.actor);
+      },
+      cancelReady() {
+        return cancelReady(this.actor);
+      },
+      rollContagionSave(event, target) {
+        return rollContagionSave(this.actor, target.dataset.id);
+      },
+      cureHazard(event, target) {
+        return cureHazard(this.actor, target.dataset.id);
+      },
+      exposeToFire() {
+        return exposeToFire(this.actor);
+      },
+      burningRound() {
+        return burningRound(this.actor);
+      },
+      fightFire(event, target) {
+        return fightFire(this.actor, target.dataset.method);
+      },
+      rollFireSave(event, target) {
+        return rollFireSave(this.actor, target.dataset.kind);
+      },
+      extinguishFire() {
+        return extinguish(this.actor);
       },
       manageTakedown() {
         return this.actor.manageTakedown();
@@ -673,7 +834,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
           ["DEX", sys.defense.dexterity],
           [loc`Vulnerable: dodge bonuses lost`, -sys.defense.dodgeLost],
           [armorLabel, sys.defense.armor],
-          ["Size", sys.sizeModifier],
+          [loc`Size`, sys.sizeModifier],
           [miscLabel, misc.defense]
         ],
         "defense"
@@ -692,7 +853,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
           [game.i18n.localize("SPYCRAFT.Level"), sys.level],
           abilTip("int"),
           [miscLabel, misc.knowledge],
-          ["Baffled/Incompetent", sys.knowledgeSkillBonusCondition?.adjustment ?? 0]
+          [loc`Baffled/Incompetent`, sys.knowledgeSkillBonusCondition?.adjustment ?? 0]
         ],
         "knowledge"
       ),
@@ -700,7 +861,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         [
           [game.i18n.localize("SPYCRAFT.VitalityDice"), sys.vitalityBreakdown?.dice ?? 0],
           [`CON × ${sys.level}`, conPart],
-          ["Minimum 1 per level", sys.vitalityBreakdown?.minimumAdjustment],
+          [loc`Minimum 1 per level`, sys.vitalityBreakdown?.minimumAdjustment],
           [miscLabel, misc.vitality]
         ],
         "vitality"
@@ -709,7 +870,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         [
           ["CON", sys.abilities.con.value],
           [
-            "Size",
+            loc`Size`,
             sys.wounds.max -
               sys.abilities.con.value -
               (misc.wounds ?? 0) -
@@ -797,9 +958,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         [
           "classSkill",
           rule.classSkills === "scaling" ? 1 + Math.floor(sys.level / 4) : (rule.classSkills ?? 0),
-          "Class skill"
+          loc`Class skill`
         ],
-        ["maxRank", rule.maxRankSkills === "scaling" ? 1 + Math.floor(sys.level / 4) : 0, "Maximum-rank skill"]
+        ["maxRank", rule.maxRankSkills === "scaling" ? 1 + Math.floor(sys.level / 4) : 0, loc`Maximum-rank skill`]
       ])
         for (let index = 0; index < number; index++)
           fields.push({
@@ -880,7 +1041,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       const lists = Object.fromEntries((ci.system.choiceLists ?? []).map(L => [L.key, L]));
       return {
         specialistFields: (sys.weaponSpecialist?.fields ?? []).filter(field => field.itemId === ci.id),
-        specialistModes: { ability: "Another ability", proficiency: "Another possessed proficiency" },
+        specialistModes: { ability: loc`Another ability`, proficiency: loc`Another possessed proficiency` },
         specialistProficiencies: Object.fromEntries(
           Object.entries(cfg.proficiencies)
             .filter(([key]) => sys.proficiencyTotals?.[key]?.proficient)
@@ -976,8 +1137,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
           [
             [game.i18n.localize("SPYCRAFT.Skill.Ranks"), s.ranks],
             abilTip(t.ability),
-            ["Attribute-based condition penalty", s.abilityPenalties?.[t.ability] ?? 0],
-            ["Baffled/Incompetent", t.conditionBonusAdjustment ?? 0],
+            [loc`Attribute-based condition penalty`, s.abilityPenalties?.[t.ability] ?? 0],
+            [loc`Baffled/Incompetent`, t.conditionBonusAdjustment ?? 0],
             [miscLabel, s.misc]
           ],
           `skills.${s.key}.misc`
@@ -1004,6 +1165,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.contempt = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contempt");
     context.contemptRound = (this.actor.limitedUseStatus ?? []).find(s => s.id === "contemptRound");
     context.combatInstincts = (this.actor.limitedUseStatus ?? []).find(s => s.id === "combatInstincts");
+    context.cleaveBasics = (this.actor.limitedUseStatus ?? []).find(s => s.id === "cleaveBasics");
+    context.snapShot = (this.actor.limitedUseStatus ?? []).find(s => s.id === "snapShot");
+    context.opportunist = (this.actor.limitedUseStatus ?? []).find(s => s.id === "opportunist");
+    context.fortunate = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fortunate");
+    context.blackCat = (this.actor.limitedUseStatus ?? []).find(s => s.id === "blackCat");
+    context.berserker = (this.actor.limitedUseStatus ?? []).find(s => s.id === "berserkerRage");
+    context.gunslinger = (this.actor.limitedUseStatus ?? []).find(s => s.id === "gunslingersEye");
+    context.fireTeamSupremacy = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fireTeamSupremacy");
+    context.companions = this.actor.type === "agent" ? companionsContext(this.actor) : null;
+    context.flawlessIdentity = this.actor.system.activeFeatNames?.includes("Flawless Identity") === true;
     context.twoWeaponFinalAttack = (this.actor.limitedUseStatus ?? []).find(s => s.id === "twoWeaponFinalAttack");
     context.jinxUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "jinx");
     context.markUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "mark");
@@ -1030,6 +1201,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.brightIdeaLegacy = brightStatus.needsReview;
     context.brightIdeaLegacyMalformed = brightStatus.legacyUsed === null;
     context.isGM = game.user.isGM;
+    context.hazards = hazardsView(this.actor);
     context.professor = sys.coreClassIds?.includes("scientist");
     context.trailblazer = sys.coreClassIds?.includes("scout");
 
@@ -1051,7 +1223,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       }))
     }));
     context.professionText = sys.focuses.profession.join("\n");
-    context.forteSkills = { cultures: "Cultures", drive: "Drive", profession: "Profession", science: "Science" };
+    context.forteSkills = {
+      cultures: loc`Cultures`,
+      drive: loc`Drive`,
+      profession: loc`Profession`,
+      science: loc`Science`
+    };
     context.crossroadsTitles = Object.fromEntries(
       Object.entries(cfg.tables.crossroads).map(([key, value]) => [key, value.label])
     );
@@ -1059,7 +1236,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.hasContactFeatUpgrades =
       !!sys.contactFeatBindings?.length || sys.contacts.some(c => c.networkingFeat || c.networkingMilestone);
     context.contactFeatOptions = Object.fromEntries([
-      ["", "No contact feat"],
+      ["", loc`No contact feat`],
       ...(sys.contactFeatBindings ?? []).map(b => [b.name, b.name]),
       ...sys.contacts
         .filter(c => c.networkingFeat && !sys.contactFeatBindings?.some(b => b.name === c.networkingFeat))
@@ -1070,7 +1247,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     );
     for (const c of sys.contacts) if (c.networkingMilestone) contactMilestones.add(c.networkingMilestone);
     context.contactMilestones = Object.fromEntries([
-      ["0", "No Networking feat upgrade"],
+      ["0", loc`No Networking feat upgrade`],
       ...[...contactMilestones].sort((a, b) => a - b).map(n => [n, "Networking " + n + " purchased ranks"])
     ]);
     context.contactGrades = Object.fromEntries(cfg.tables.contacts.map(c => [c.rank, `${c.rank} — ${c.grade}`]));
@@ -1475,6 +1652,9 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       rollNpcSkill() {
         return rollNpcSkill(this.actor);
       },
+      callQualitySave(event, target) {
+        return callQualitySave(this.actor, target.dataset.id);
+      },
       npcDamageSave() {
         return npcDamageSave(this.actor);
       },
@@ -1487,6 +1667,12 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       },
       async endPromotion() {
         await this.actor.update({ "system.promotion": null });
+      },
+      npcPackages() {
+        return manageNpcPackages(this.actor);
+      },
+      npcPackageBands() {
+        return manageNpcPackages(this.actor, { editBands: true });
       },
       npcEnable: SpycraftNpcSheet.#onEnable,
       npcAddSkill: SpycraftNpcSheet.#onAddSkill,
@@ -1536,9 +1722,23 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
           attack: this.actor.weaponAttack(w)
         })),
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),
-      npcTypes: { standard: "Standard", special: "Special", villain: "Villain (legacy special)", animal: "Animal" },
+      npcTypes: {
+        standard: loc`Standard`,
+        special: loc`Special`,
+        villain: loc`Villain (legacy special)`,
+        animal: loc`Animal`
+      },
+      npcPackages: this.actor.flags?.spycraft2?.npcTemplate
+        ? {
+            label: this.actor.flags?.spycraft2?.npcPackage?.label ?? loc`Fixed loadout`,
+            current: loc`Current package`,
+            note: loc`TL packages are optional. Changing Threat Level leaves the current feats and equipment in place.`,
+            preview: loc`Preview a package`,
+            bands: loc`Edit TL bands`
+          }
+        : null,
       npc: this._npcContext(),
-      manualRoles: { "": "None", minion: "Minion", henchman: "Henchman", mastermind: "Mastermind" },
+      manualRoles: { "": loc`None`, minion: loc`Minion`, henchman: loc`Henchman`, mastermind: loc`Mastermind` },
       gcPlay: {
         damage: damageSaveState(this.actor),
         special: npcIsSpecial(this.actor),
@@ -1565,7 +1765,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       profile,
       result,
       gradeOptions,
-      wealthOptions: { 0: "None", ...gradeOptions },
+      wealthOptions: { 0: loc`None`, ...gradeOptions },
       tierOptions: Object.fromEntries(
         NPC_RULES.tiers.map(t => [
           t.tier,
@@ -1580,7 +1780,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
           key,
           label: key === "health" ? (result.type === "special" ? loc`Vitality / wounds` : loc`Damage save`) : label,
           value: profile.grades[key],
-          options: key === "wealth" ? { 0: "None", ...gradeOptions } : gradeOptions
+          options: key === "wealth" ? { 0: loc`None`, ...gradeOptions } : gradeOptions
         })),
       skills: profile.skills.map((s, index) => ({ ...s, index, resolved: result.skills?.[index] })),
       equipment: NPC_CATEGORIES.map(category => ({

@@ -219,3 +219,19 @@ test("button text is translated by contributor id and falls back to the contribu
   );
   for (const [id, label] of Object.entries(shown)) assert.equal(strings[id], label, id);
 });
+
+test("a check posted in another language has its notes written again for the viewer", async () => {
+  const { viewerFlavor, checkFlavor } = await import("../module/rules/outcomes.mjs");
+  const check = {
+    lang: "fr",
+    baseFlavor: "Escalade",
+    checkMethod: "roll",
+    error: 1,
+    threat: 20,
+    successConfirmed: true
+  };
+  assert.equal(viewerFlavor(check, "fr"), null, "the same language: the posted text serves");
+  assert.equal(viewerFlavor({ ...check, lang: undefined }, "en"), null, "older cards carry no language");
+  assert.equal(viewerFlavor(check, "en"), checkFlavor(check));
+  assert.match(viewerFlavor(check, "en"), /^Escalade<br>.*Succeeded\./);
+});

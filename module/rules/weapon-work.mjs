@@ -1,3 +1,5 @@
+import { ruleName } from "./rule-name.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Weapon Focus p.176 changes the DC, not the check result or its cap. */
 const norm = v =>
@@ -39,7 +41,7 @@ export function weaponFocusWorkPlan(
     return { ...inactive, blockedReason: loc`Confirm the actual target weapon/model and its covered proficiency.` };
   const choices = new Set(
     (system.activeFeatSelections ?? [])
-      .filter(f => f.name === "Weapon Focus")
+      .filter(f => ruleName(f) === "Weapon Focus")
       .map(f =>
         Object.keys(cfg.proficiencies).find(
           k => norm(k) === norm(f.choice) || norm(cfg.proficiencies[k].label) === norm(f.choice)
@@ -70,3 +72,6 @@ export function weaponFocusWorkPlan(
     notes: loc`Weapon Focus (${name.trim()}): DC ${baseDC} → ${effectiveDC}, reduction ${baseDC - effectiveDC}; minimum 5 without raising an already lower DC. No bonus is added to the check result (p.176).`
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "weaponWorkRecord", order: 9795, record: ["weaponFocusWork"] });

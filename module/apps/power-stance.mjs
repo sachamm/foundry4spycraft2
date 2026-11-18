@@ -154,7 +154,7 @@ export function reconcilePowerStanceInitiative(actor) {
       try {
         await write(c, p, expected);
       } catch (error) {
-        await saveHeld(c, loc`The Power Stance Count update could not be verified: ` + error.message);
+        await saveHeld(c, loc`The Power Stance Count update could not be verified: ${error.message}`);
         throw error;
       }
     }
@@ -367,7 +367,7 @@ export function installPowerStanceInitiativeHooks() {
           await reconcilePowerStanceInitiative(actor);
         } while (state.again);
       })
-      .catch(error => ui.notifications.warn(loc`Power Stance Count needs review: ` + error.message))
+      .catch(error => ui.notifications.warn(loc`Power Stance Count needs review: ${error.message}`))
       .finally(() => pending.delete(actor));
   };
   Hooks.on("preCreateCombatant", c => {

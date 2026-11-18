@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { improvedVisionRangePlan } from "./senses.mjs";
 import { sniperWeapon, eagleEyeState } from "./sniper.mjs";
 import { loc } from "../i18n.mjs";
@@ -321,12 +322,16 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
   if (weapon.proficiency === "indirectFire" && feats.has("Bombard")) {
     factors.push(2);
     errorReduction++;
-    notes.push(loc`Bombard: range increment doubled; error –1, minimum 1.`);
+    notes.push(
+      loc`Bombard: range increment doubled; error –1, minimum 1. The DC to reduce this attack’s damage is 2 higher, and on a miss roll deviation twice and keep the better (p.180).`
+    );
   }
   if (weapon.proficiency === "guided" && feats.has("Guided Weapon Basics")) {
     factors.push(2);
     errorReduction++;
-    notes.push(loc`Guided Weapon Basics: range increment doubled; error –1, minimum 1.`);
+    notes.push(
+      loc`Guided Weapon Basics: range increment doubled; error –1, minimum 1. On a miss roll deviation twice and keep the better (p.181).`
+    );
   }
   const multiplier = factors.length ? 1 + factors.reduce((n, f) => n + f - 1, 0) : 1;
   let increment = ((Number(weapon.range) || 0) + flat) * multiplier;
@@ -490,3 +495,22 @@ export function mortarOperationPlan(weapon, { mortarSpaceConfirmed = false } = {
     notes: [loc`Mortar: indirect fire; outdoor or very large indoor firing space confirmed (p.315).`]
   };
 }
+
+// Bracing a weapon as part of a Reflex save plan.
+rollPipeline.register({
+  id: "braceSaveTerm",
+  kinds: ["save"],
+  order: 9430,
+  terms({ system, saveKey, input }) {
+    const penalty = saveKey === "ref" && input.braced ? bracedReflexPenalty(system) : 0;
+    return {
+      rowAt: 40,
+      rows: [[loc`Brace`, penalty]],
+      flavorAt: 110,
+      flavor: penalty ? loc` — Brace ${penalty}` : ""
+    };
+  }
+});
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "firearmsRecord", order: 9680, record: ["launcherOperation", "mortarOperation"] });

@@ -1,6 +1,8 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { errorDecisionPending } from "./outcomes.mjs";
 import { resolveSkillResult } from "./checks.mjs";
+import { trademarkBoost } from "./favored-gear.mjs";
 import { loc } from "../i18n.mjs";
 /** Doubled-die abilities never exceed two dice per die spent (pp.29,62), including Card Shark p.202. */
 export function actionDieBoostPlan(
@@ -53,7 +55,10 @@ export function actionDieBoostPlan(
       kind === "skill" &&
       (check.checkId === "maneuver" || (check.skillKey === "mechanics" && check.checkId === "repair"))) ||
     (core.has("brawler") && kind === "damage" && (check.unarmed || check.improvised)) ||
-    (core.has("counterterrorist") && openingRound && ["attack", "skill", "knowledge", "damage", "save"].includes(kind));
+    (core.has("counterterrorist") &&
+      openingRound &&
+      ["attack", "skill", "knowledge", "damage", "save"].includes(kind)) ||
+    trademarkBoost(system, check);
   const rolls = count * (doubled ? 2 : 1),
     die = system.actionDice?.die ?? 4,
     explodeAt = system.actionDice?.explodeAt ?? die;
@@ -76,7 +81,9 @@ export function actionDieBoostPlan(
         kind === "damage"),
     intelligence: system.abilities?.int?.mod ?? 0,
     formula: Array(rolls).fill(`1d${die}x>=${explodeAt}`).join(" + "),
-    wellRounded: system.activeFeatNames?.some(name => name.replaceAll("-", " ") === "Well Rounded") && kind === "skill"
+    wellRounded: system.activeFeatNames?.some(name => name.replaceAll("-", " ") === "Well Rounded") && kind === "skill",
+    // Better Luck Next Time, p.189: a single boosting die on a skill check or save that rolls a natural 1 comes back.
+    betterLuck: system.activeFeatNames?.includes("Better Luck Next Time") === true && ["skill", "save"].includes(kind)
   };
 }
 export function actionDieBoostResult(check, plan, dieResults) {
@@ -100,9 +107,18 @@ export function actionDieBoostResult(check, plan, dieResults) {
     threat: check.threat ?? 0,
     actionDieBonus: boostTotal
   });
+  const naturalOne = plan.betterLuck === true && plan.count === 1 && plan.rolls === 1 && Number(dieResults[0]) === 1;
   return {
     added,
     boostTotal,
+    ...(naturalOne
+      ? {
+          betterLuckRefunds: [
+            ...(check.betterLuckRefunds ?? []),
+            { bonusPoolId: plan.bonusPoolId ?? "", die: plan.die }
+          ]
+        }
+      : {}),
     boostSpent: (check.boostSpent ?? 0) + plan.count,
     wellRoundedBoosts,
     effectiveTotal: resolved.total,
@@ -288,3 +304,6 @@ export function missionXPPlan(
     }
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "actionDiceRecord", order: 9605, record: ["hailMary"] });

@@ -1,28 +1,34 @@
-import { tripAttackPlan, tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
-import { stalkingStancePlan } from "./stalking-stance.mjs";
-import { meleeSkillFeatPlan } from "./melee-skill-feats.mjs";
-import { conveyanceBullRushPlan } from "./conveyance-bull-rush.mjs";
-import { bullRushAttackPlan } from "./bull-rush-attack.mjs";
-import { bullRushDefensePlan } from "./bull-rush.mjs";
+import { signatureBonus } from "./favored-gear.mjs";
+import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
+import "./stalking-stance.mjs";
+import "./melee-skill-feats.mjs";
+import "./conveyance-bull-rush.mjs";
+import "./bull-rush-attack.mjs";
+import "./bull-rush.mjs";
 import { tumblePathPlan } from "./tumble.mjs";
-import { feintCheckPlan, feintSkillChecks } from "./feint.mjs";
-import { tripDefensePlan } from "./trip.mjs";
+import { feintSkillChecks } from "./feint.mjs";
+import { spiderClimbCheck } from "./spider.mjs";
+import "./trip.mjs";
 import { fallDistanceSkillPlan } from "./fall-distance.mjs";
 import { balanceSurfacePlan } from "./balance.mjs";
 import { hideCircumstancePlan } from "./hide-circumstances.mjs";
 import { detectionObserverPlan } from "./detection-observer.mjs";
 import { hideMovementPlan } from "./hide-movement.mjs";
 import { targetSkillEffectPlan, targetSkillTimingPlan } from "./target-skill-effects.mjs";
-import { rankSynergyFeatPlan } from "./rank-synergy-feats.mjs";
+import "./rank-synergy-feats.mjs";
 import { stoneColdSkillPlan } from "./stone-cold.mjs";
-import { threatenCheckPlan } from "./threaten.mjs";
-import { bugConcealmentPlan } from "./bug-basics.mjs";
-import { documentationSkillPlan } from "./documentation.mjs";
+import "./threaten.mjs";
+import "./taunt.mjs";
+import "./diversion.mjs";
+import "./grapple-check.mjs";
+import "./bug-basics.mjs";
+import "./documentation.mjs";
 import { oneHandManeuverPlan } from "./maneuver-actions.mjs";
 import { pursuitSkillPlan } from "./pursuit-feats.mjs";
 import { contactFeatCheckPlan, contactTimeLabel } from "./contact-feats.mjs";
-import { polyglotSkillPlan } from "./polyglot.mjs";
-import { cardSharkProfessionPlan } from "./card-shark.mjs";
+import "./polyglot.mjs";
+import "./card-shark.mjs";
+import "./skill-feat-terms.mjs";
 import { appearanceCheckPlan } from "./appearance.mjs";
 import { hardCoreInfluencePlan, charmerInfluencePlan } from "./hard-core.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
@@ -47,7 +53,7 @@ import { terrainSkillPlan, localHeroOppositionPlan } from "./terrain.mjs";
 import { trackingSkillPlan, trackingFeatEvidence } from "./tracking.mjs";
 import { ambushCheckPlan } from "./ambush.mjs";
 import { fogSmokePlan, ambientLightPlan, sensorySkillEffects, sensorySkillConditionPlan } from "./senses.mjs";
-import { skillTimingPlan } from "./timing.mjs";
+import { falseStartRestart, skillTimingPlan } from "./timing.mjs";
 import {
   classCheckEffects,
   tenSecondSolutionEligible,
@@ -61,14 +67,11 @@ import { forensicGeniusPlan } from "./forensic-genius.mjs";
 import { closedCoursePlan } from "./closed-course.mjs";
 import { skillSynergy } from "./synergies.mjs";
 import { stackedBonuses as stacked } from "./knowledge.mjs";
-import { planTotal } from "./roll-pipeline.mjs";
+import { planTerms, planTotal } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Rules common to the 100 named checks (pp.87–169). Context tags remain explicit. */
-export function resolveSkillCheck(
-  system,
-  key,
-  check,
-  {
+export function resolveSkillCheck(system, key, check, input = {}) {
+  const {
     ability,
     modifier = 0,
     secret = false,
@@ -93,8 +96,6 @@ export function resolveSkillCheck(
     timingReduction = "auto",
     tenSecondSolution = false,
     standaloneCheckConfirmed = false,
-    inComplexTask = false,
-    inDramaticConflict = false,
     allAccordingToPlan = false,
     cunningPlan = false,
     ambientLight = "",
@@ -109,7 +110,6 @@ export function resolveSkillCheck(
     trackingLargeGroup = false,
     trackingPace = "half",
     followingPhysicalTrail = false,
-    deafened = false,
     scentUsable = false,
     terrain = "",
     underwater = false,
@@ -173,37 +173,15 @@ export function resolveSkillCheck(
     vehicleControl = null,
     closedCourseSeesYou = false,
     closedCourseSeesVehicle = false,
-    complexAnalysisTask = false,
-    analysisBaseChallenges = null,
     analysisTaskId = "",
     taskWorldTime = null,
     taskChallengeDC = null,
     taskChallengeDCConfirmed = false,
-    usingCoverIdentity = false,
-    coverIdentityName = "",
-    coverIdentityConfirmed = false,
-    concealingBug = false,
-    bugName = "",
-    bugConcealmentConfirmed = false,
-    threatenOpponentName = "",
-    threatenOpponentConfirmed = false,
-    threatenContextConfirmed = false,
-    threatenDistanceFeet = null,
-    threatenVitalityLoss = 0,
-    threatenWoundLoss = 0,
-    threatenInjuryFromYourAttacksConfirmed = false,
-    threatenIncomingLegalConfirmed = false,
-    threatenWeaponId = "",
-    threatenCombat = null,
     targetSkillSystem = null,
     targetSkillActorUuid = "",
     targetSkillActorName = "",
     targetSkillConfirmed = false,
     targetSkillPurpose = "",
-    ghostHideTargetKind = "",
-    ghostHideTargetName = "",
-    ghostHideConfirmed = false,
-    stalkingCombat = null,
     stanceDistanceFeet = null,
     hideMovement = false,
     hideDistanceFeet = 0,
@@ -212,64 +190,12 @@ export function resolveSkillCheck(
     hideActionConfirmed = false,
     hideAdjacentThreat = false,
     hidePassesThreat = false,
-    conveyanceBullRushName = "",
-    conveyanceBullRushTargetName = "",
-    conveyanceBullRushSize = "",
-    conveyanceBullRushTargetSize = "",
-    conveyanceBullRushAllowanceFeet = null,
-    conveyanceBullRushDistanceFeet = null,
-    conveyanceBullRushTargetThreatening = false,
-    conveyanceBullRushOtherThreatAdjacency = false,
-    conveyanceBullRushPassesOtherThreat = false,
-    conveyanceBullRushControlConfirmed = false,
-    conveyanceBullRushStatsConfirmed = false,
-    conveyanceBullRushRouteConfirmed = false,
-    conveyanceBullRushContactConfirmed = false,
-    conveyanceBullRushFullActionConfirmed = false,
-    conveyanceBullRushCombat = null,
-    bullRushAttackOpponentName = "",
-    bullRushAttackSizeDifference = null,
-    bullRushAttackDistanceFeet = null,
-    bullRushAttackOnFootConfirmed = false,
-    bullRushAttackRouteConfirmed = false,
-    bullRushAttackContactConfirmed = false,
-    bullRushAttackFullActionConfirmed = false,
-    bullRushAttackTargetThreatening = false,
-    bullRushAttackOtherThreatAdjacency = false,
-    bullRushAttackPassesOtherThreat = false,
-    bullRushAttackCombat = null,
-    bullRushOpponentName = "",
-    bullRushSizeDifference = null,
-    bullRushIncomingConfirmed = false,
-    bullRushOnFootConfirmed = false,
-    bullRushContactConfirmed = false,
     tumbleCircumstances = false,
     tumbleDistanceFeet = 0,
     tumbleAdjacentEnemySquares = 0,
     tumbleOccupiedSquares = 0,
     tumbleRouteConfirmed = false,
-    feintOpponentName = "",
-    feintOpponentUuid = "",
-    feintAdjacent = false,
-    feintTargetEligibleConfirmed = false,
-    feintLegalConfirmed = false,
     feintCombat = null,
-    tripAttackOpponentName = "",
-    tripAttackOpponentUuid = "",
-    tripAttackOpponentSize = null,
-    tripAttackAdjacent = false,
-    tripAttackSizeDifference = null,
-    tripAttackParticipantsConfirmed = false,
-    tripAttackHalfActionConfirmed = false,
-    tripAttackCombat = null,
-    tripCounter = null,
-    tripOpponentUuid = "",
-    tripOpponentSize = null,
-    tripDefenseCombat = null,
-    tripOpponentName = "",
-    tripAdjacent = false,
-    tripSizeDifference = null,
-    tripIncomingConfirmed = false,
     fallDeclared = false,
     fallDistanceFeet = null,
     fallSoftSurface = false,
@@ -291,13 +217,19 @@ export function resolveSkillCheck(
     detectionActorUuid = "",
     detectionActorName = "",
     detectionConfirmed = false
-  } = {}
-) {
+  } = input;
+  let {
+    inComplexTask = false,
+    inDramaticConflict = false,
+    deafened = false,
+    complexAnalysisTask = false,
+    analysisBaseChallenges = null
+  } = input;
   check =
     key === "acrobatics" && check?.id === "counter-trip"
       ? tripCounterSkillCheck()
       : (tripAttackSkillChecks(key, []).find(c => c.id === check?.id) ??
-        feintSkillChecks(key, []).find(c => c.id === check?.id) ??
+        feintSkillChecks(key, [], system).find(c => c.id === check?.id) ??
         check);
   inDramaticConflict =
     inDramaticConflict === true ||
@@ -372,6 +304,8 @@ export function resolveSkillCheck(
     grappleContextConfirmed
   });
   check = restraint.check;
+  // Feat and action parts of the plan come from the rules that own them (module/rules/roll-pipeline.mjs, planTerms).
+  const terms = planTerms("skill", { system, skillKey: key, check, method, input });
   const conditionSystem =
     bound === true ? { ...system, conditionContext: { ...system.conditionContext, bound: true } } : system;
   const originalAbility =
@@ -409,6 +343,9 @@ export function resolveSkillCheck(
     timingReduction,
     tenSecondSolution
   });
+  // Spider Basics plans a Climb without its Hands-On and Vision tags or the missing-kit penalty (p.196).
+  const spider = spiderClimbCheck(system, key, check);
+  check = spider.check;
   const skillTags = skillTagPlan(system, key, check, { oneHanded, noSharedLanguage, bound, conveyingMessage });
   const stoneCold = stoneColdSkillPlan(system, key, check);
   const skillGear = skillGearPlan(stoneCold.check, { gearStatus, gearItem, kitAtLocation, system });
@@ -450,104 +387,6 @@ export function resolveSkillCheck(
   const contactFeat = contactFeatCheckPlan(system, key, check, { contactName, contactThreatLevel });
   classEffects.timeChoices.push(...contactFeat.timeChoices, ...(wheel.timeChoice ? [wheel.timeChoice] : []));
   classEffects.errorReductionZero += contactFeat.errorReduction + balance.errorReduction;
-  const conveyanceBullRush = conveyanceBullRushPlan(system, key, check, {
-    method,
-    focus,
-    purelyMentalConfirmed,
-    conveyanceBullRushName,
-    conveyanceBullRushTargetName,
-    conveyanceBullRushSize,
-    conveyanceBullRushTargetSize,
-    conveyanceBullRushAllowanceFeet,
-    conveyanceBullRushDistanceFeet,
-    conveyanceBullRushTargetThreatening,
-    conveyanceBullRushOtherThreatAdjacency,
-    conveyanceBullRushPassesOtherThreat,
-    conveyanceBullRushControlConfirmed,
-    conveyanceBullRushStatsConfirmed,
-    conveyanceBullRushRouteConfirmed,
-    conveyanceBullRushContactConfirmed,
-    conveyanceBullRushFullActionConfirmed,
-    conveyanceBullRushCombat
-  });
-  const bullRushAttack = bullRushAttackPlan(system, key, check, {
-    method,
-    bullRushAttackOpponentName,
-    bullRushAttackSizeDifference,
-    bullRushAttackDistanceFeet,
-    bullRushAttackOnFootConfirmed,
-    bullRushAttackRouteConfirmed,
-    bullRushAttackContactConfirmed,
-    bullRushAttackFullActionConfirmed,
-    bullRushAttackTargetThreatening,
-    bullRushAttackOtherThreatAdjacency,
-    bullRushAttackPassesOtherThreat,
-    bullRushAttackCombat
-  });
-  const bullRushDefense = bullRushDefensePlan(system, key, check, {
-    method,
-    bullRushOpponentName,
-    bullRushSizeDifference,
-    bullRushIncomingConfirmed,
-    bullRushOnFootConfirmed,
-    bullRushContactConfirmed
-  });
-  classEffects.bonuses.push(...bullRushDefense.bonuses);
-  const feint = feintCheckPlan(system, key, check, {
-    method,
-    feintOpponentName,
-    feintOpponentUuid,
-    feintAdjacent,
-    feintTargetEligibleConfirmed,
-    feintLegalConfirmed,
-    feintCombat
-  });
-  classEffects.bonuses.push(...feint.bonuses);
-  const tripAttack = tripAttackPlan(system, key, check, {
-    method,
-    tripAttackOpponentName,
-    tripAttackOpponentUuid,
-    tripAttackOpponentSize,
-    tripAttackAdjacent,
-    tripAttackSizeDifference,
-    tripAttackParticipantsConfirmed,
-    tripAttackHalfActionConfirmed,
-    tripAttackCombat,
-    tripCounter
-  });
-  const tripDefense = tripDefensePlan(system, key, check, {
-    method,
-    tripOpponentUuid,
-    tripOpponentSize,
-    tripDefenseCombat,
-    tripOpponentName,
-    tripAdjacent,
-    tripSizeDifference,
-    tripIncomingConfirmed
-  });
-  classEffects.bonuses.push(...tripDefense.bonuses);
-  const threaten = threatenCheckPlan(system, key, check, {
-    method,
-    threatenOpponentName,
-    threatenOpponentConfirmed,
-    threatenContextConfirmed,
-    threatenDistanceFeet,
-    threatenVitalityLoss,
-    threatenWoundLoss,
-    threatenInjuryFromYourAttacksConfirmed,
-    threatenIncomingLegalConfirmed,
-    threatenWeaponId,
-    threatenCombat
-  });
-  classEffects.bonuses.push(...threaten.bonuses);
-  const bugConcealment = bugConcealmentPlan(system, key, check, { concealingBug, bugName, bugConcealmentConfirmed });
-  classEffects.bonuses.push(...bugConcealment.bonuses);
-  const documentation = documentationSkillPlan(system, key, check, {
-    usingCoverIdentity,
-    coverIdentityName,
-    coverIdentityConfirmed
-  });
-  classEffects.bonuses.push(...documentation.bonuses);
   const hideMovementPlanResult = hideMovementPlan(system, key, check, {
     method,
     hideMovement,
@@ -560,24 +399,10 @@ export function resolveSkillCheck(
     stanceDistanceFeet,
     stanceCombat: feintCombat
   });
-  const rankSynergyFeats = rankSynergyFeatPlan(system, key, check, {
-    noSharedLanguage,
-    ghostHideTargetKind,
-    ghostHideTargetName,
-    ghostHideConfirmed
-  });
-  classEffects.bonuses.push(...rankSynergyFeats.bonuses);
-  const polyglot = polyglotSkillPlan(system, key);
-  classEffects.bonuses.push(...(polyglot?.bonuses ?? []));
-  const cardSharkProfession = cardSharkProfessionPlan(system, key);
-  if (cardSharkProfession)
-    classEffects.bonuses.push({ source: "Card Shark", type: "synergy", value: cardSharkProfession.synergy });
   const pursuit = pursuitSkillPlan(system, key, check, { manhuntRole, chaseRole, manhuntPrey });
   const appearancePlan = appearanceCheckPlan(system, key, check, {
     manhuntPrey: manhuntPrey === true || manhuntRole === "prey"
   });
-  classEffects.bonuses.push(...pursuit.bonuses);
-  classEffects.bonuses.push(...appearancePlan.bonuses);
   classEffects.timeChoices.push(...(appearancePlan.timeChoices ?? []));
   const hardCorePlan = hardCoreInfluencePlan(system, key, check, {
     hardCore,
@@ -636,22 +461,27 @@ export function resolveSkillCheck(
     method
   });
   const qualityChecks = qualitySkillChecks(system, key, check, { shiftingDisposition, seductionConflict, terrain });
-  const meleeSkillFeats = meleeSkillFeatPlan(system, key, check),
-    stalkingStance = stalkingStancePlan(system, key, check, { combat: stalkingCombat });
-  classEffects.bonuses.push(...meleeSkillFeats.bonuses, ...stalkingStance.bonuses);
-  const guts =
-    key === "athletics" &&
-    ["forced-march", "power-lifting", "speed-push"].includes(check.id) &&
-    system.activeFeatNames?.includes("Guts")
-      ? 4
-      : 0;
-  if (guts) classEffects.bonuses.push({ source: "Guts", value: guts, type: "" });
-  classEffects.bonuses.push(...qualityChecks.bonuses);
-  classEffects.bonuses.push(...skillGear.bonuses, ...gearUse.bonuses);
-  classEffects.bonuses.push(...terrainPlan.bonuses);
-  classEffects.bonuses.push(...senses.bonuses);
   classEffects.timeChoices.push(...ambush.timeChoices);
-  classEffects.bonuses.push(...tracking.bonuses);
+  // Bonuses to this named check: the class abilities' own, the check's circumstances, and each registered term's.
+  classEffects.bonuses = terms.merge("bonuses", [
+    [0, classEffects.bonuses],
+    [100, pursuit.bonuses],
+    [110, appearancePlan.bonuses],
+    [150, qualityChecks.bonuses],
+    [
+      160,
+      [
+        ...skillGear.bonuses.filter(b => !(spider.waiveMissingGear && b.source === "Missing required gear")),
+        ...gearUse.bonuses,
+        ...(signatureBonus(system, gearItem?.id)
+          ? [{ type: "morale", value: signatureBonus(system, gearItem.id), source: gearItem.name }]
+          : [])
+      ]
+    ],
+    [170, terrainPlan.bonuses],
+    [180, senses.bonuses],
+    [190, tracking.bonuses]
+  ]);
   const solutionEligible = tenSecondSolutionEligible(system, {
     checkKind: "skill",
     ability: selected,
@@ -688,8 +518,7 @@ export function resolveSkillCheck(
         ...pursuit.synergies,
         ...closedCourse.synergies,
         ...forensic.synergies,
-        ...rankSynergyFeats.synergies,
-        ...(polyglot?.synergies ?? [])
+        ...terms.all("synergies")
       ],
       mode
     },
@@ -716,7 +545,8 @@ export function resolveSkillCheck(
     ) - (skill.threatAdjustment ?? 0);
   const reduction =
     (skill.errorReduction ?? 0) +
-    conditional.filter(row => row.kind === "errorReduction").reduce((n, row) => n + row.value, 0);
+    conditional.filter(row => row.kind === "errorReduction").reduce((n, row) => n + row.value, 0) +
+    terms.sum("errorReduction");
   const errorFloor = Math.max(
     skill.errorFloor ?? 0,
     ...conditional.filter(row => row.kind === "errorFloor").map(row => row.value)
@@ -767,39 +597,31 @@ export function resolveSkillCheck(
     weaponWorkConfirmed,
     weaponWorkItem
   });
-  const blockedReasons = [];
-  if (feint.blockedReason) blockedReasons.push(feint.blockedReason);
-  if (meleeSkillFeats.blockedReason) blockedReasons.push(meleeSkillFeats.blockedReason);
-  if (conveyanceBullRush.blockedReason) blockedReasons.push(conveyanceBullRush.blockedReason);
-  if (bullRushAttack.blockedReason) blockedReasons.push(bullRushAttack.blockedReason);
-  if (bullRushDefense.blockedReason) blockedReasons.push(bullRushDefense.blockedReason);
-  if (tumblePath.blockedReason) blockedReasons.push(tumblePath.blockedReason);
-  if (tripAttack.blockedReason) blockedReasons.push(tripAttack.blockedReason);
-  if (tripDefense.blockedReason) blockedReasons.push(tripDefense.blockedReason);
-  if (fallDistance.blockedReason) blockedReasons.push(fallDistance.blockedReason);
-  if (balance.blockedReason) blockedReasons.push(balance.blockedReason);
-  if (hideCircumstance.blockedReason) blockedReasons.push(hideCircumstance.blockedReason);
-  if (detectionObserver.blockedReason) blockedReasons.push(detectionObserver.blockedReason);
-  if (hideMovementPlanResult.blockedReason) blockedReasons.push(hideMovementPlanResult.blockedReason);
-  if (
-    targetSkillEffect.timeMultiplier === 3 &&
-    (inComplexTask || inDramaticConflict || check.tags?.includes("Complex"))
-  )
-    blockedReasons.push(
-      loc`Faceless timing for an entire Complex Task or Dramatic Conflict remains a separate workflow; use this entry only for a standalone check.`
-    );
-  if (targetSkillEffect.blockedReason) blockedReasons.push(targetSkillEffect.blockedReason);
-  if (rankSynergyFeats.blockedReason) blockedReasons.push(rankSynergyFeats.blockedReason);
-  if (threaten.blockedReason) blockedReasons.push(threaten.blockedReason);
-  if (bugConcealment.blockedReason) blockedReasons.push(bugConcealment.blockedReason);
-  if (documentation.blockedReason) blockedReasons.push(documentation.blockedReason);
-  if (analysisTask.context?.stage && method !== "roll")
-    blockedReasons.push(loc`Taking10/20 is unavailable while this task is under pressure.`);
-  if (analysisTask.blockedReason) blockedReasons.push(analysisTask.blockedReason);
-  if (forensic.blockedReason) blockedReasons.push(forensic.blockedReason);
-  if (wheel.blockedReason) blockedReasons.push(wheel.blockedReason);
-  if (contactFeat.blockedReason) blockedReasons.push(contactFeat.blockedReason);
-  if (polyglot?.blockedReason) blockedReasons.push(polyglot.blockedReason);
+  const blockedReasons = terms.merge("blocked", [
+    [60, tumblePath.blockedReason],
+    [90, fallDistance.blockedReason],
+    [100, balance.blockedReason],
+    [110, hideCircumstance.blockedReason],
+    [120, detectionObserver.blockedReason],
+    [130, hideMovementPlanResult.blockedReason],
+    [
+      140,
+      targetSkillEffect.timeMultiplier === 3 && (inComplexTask || inDramaticConflict || check.tags?.includes("Complex"))
+        ? loc`Faceless timing for an entire Complex Task or Dramatic Conflict remains a separate workflow; use this entry only for a standalone check.`
+        : ""
+    ],
+    [150, targetSkillEffect.blockedReason],
+    [
+      200,
+      analysisTask.context?.stage && method !== "roll"
+        ? loc`Taking10/20 is unavailable while this task is under pressure.`
+        : ""
+    ],
+    [210, analysisTask.blockedReason],
+    [220, forensic.blockedReason],
+    [230, wheel.blockedReason],
+    [240, contactFeat.blockedReason]
+  ]);
   if (charmerPlan.blockedReason) blockedReasons.push(charmerPlan.blockedReason);
   if (charmer === true && hardCore === true)
     blockedReasons.push(loc`Choose one Influence timing feat and one target for this check.`);
@@ -974,11 +796,7 @@ export function resolveSkillCheck(
     restraint.sizeBonus +
     hideMovementPlanResult.penalty +
     detectionObserver.penalty +
-    tripAttack.sizeBonus +
-    tripDefense.sizeBonus +
-    bullRushDefense.sizeBonus +
-    bullRushAttack.sizeBonus +
-    conveyanceBullRush.sizeBonus;
+    terms.sum("adjustment");
   const terrainFeat =
     terrainPlan.homeTurf ||
     terrainPlan.bonuses.length ||
@@ -1047,27 +865,160 @@ export function resolveSkillCheck(
   const fundedTaking = wellFundedBribe
     ? { version: 1, source: "Well-Funded", skillKey: key, checkId: check.id, method, errorBefore: error }
     : null;
+  // The note text is a run of segments: the check's own, and one from each registered term, in a fixed order.
+  const noteSegments = terms.merge("segment", [
+    [10, vehicleControl?.note ? `${vehicleControl.note} ` : ""],
+    [80, `${tumblePath.notes.join(" ")} `],
+    [110, `${fallDistance.notes.join(" ")} `],
+    [120, `${balance.notes.join(" ")} `],
+    [130, `${hideCircumstance.notes.join(" ")} `],
+    [140, `${detectionObserver.notes.join(" ")} `],
+    [150, `${hideMovementPlanResult.notes.join(" ")} `],
+    [160, `${targetSkillEffect.notes.join(" ")} `],
+    [180, `${stoneCold.notes.join(" ")} `],
+    [220, `${analysisTask.notes.join(" ")} `],
+    [230, `${forensic.notes.join(" ")} `],
+    [240, `${closedCourse.notes.join(" ")} `],
+    [250, `${wheel.notes} `],
+    [260, wellFundedBribe ? loc`Well-Funded: Bribe take 10 ignores the error-range restriction (p.198). ` : ""],
+    [270, `${pursuit.notes.join(" ")} `],
+    [
+      280,
+      contactFeat.evidence
+        ? loc`Contact ${contactFeat.evidence.contact.name}: DC${contactFeat.evidence.dc}, summon ${contactTimeLabel(Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6)}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table2.35, p.144; response/outcomes resolved separately). `
+        : ""
+    ],
+    [
+      290,
+      contactFeat.evidence?.source
+        ? loc`${contactFeat.evidence.source}: primary contact ${contactFeat.evidence.contact.name}; error range −${contactFeat.errorReduction} (minimum0), optional half time rounded down. `
+        : ""
+    ],
+    [
+      310,
+      dartingStyleState(system).active
+        ? loc`Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. `
+        : ""
+    ],
+    [320, superiorCoverState(system).active ? loc`Superior Cover: attack/skill check penalty −2. ` : ""],
+    [330, twoWeaponSkillNote(system)],
+    [340, weaponFocusWork.notes],
+    [350, weaponFocusWork.notes ? " " : ""],
+    [
+      370,
+      combatExpertiseState(system).active
+        ? loc`Combat Expertise: attack/skill check penalty −${combatExpertiseState(system).penalty}. `
+        : ""
+    ],
+    [
+      380,
+      condition.state
+        ? loc`${condition.state === "baffled" ? loc`Baffled` : loc`Incompetent`}: skill bonus ${condition.normal} → ${condition.total}; separate check modifiers remain. `
+        : ""
+    ],
+    [
+      390,
+      gamblingDice
+        ? loc`The Dice are Hot: ${gamblingDice.total} possessed action dice (${gamblingDice.ordinary} ordinary + ${gamblingDice.bonus} bonus); Gambling synergy uses normal named-bonus stacking. `
+        : ""
+    ],
+    [
+      400,
+      conditionRollPenalties(conditionSystem).entangled && selected === "dex"
+        ? loc`Entangled/Bound: Dexterity-based skill penalty −4. `
+        : ""
+    ],
+    [
+      410,
+      conditionAbilityPenalty(conditionSystem, selected) ? loc`Drunk: Dexterity-/Wisdom-based check penalty −2. ` : ""
+    ],
+    [430, `${appearancePlan.notes.join(" ")} `],
+    [440, `${charmerPlan.notes.join(" ")} `],
+    [450, `${hardCorePlan.notes.join(" ")} `],
+    [460, `${underwaterContext.notes.join(" ")} `],
+    [470, `${qualityChecks.notes.join(" ")} `],
+    [480, `${medical.notes.join(" ")} `],
+    [490, `${details.notes.join(" ")} `],
+    [500, `${skillTags.notes.join(" ")} `],
+    [510, `${skillGear.notes.join(" ")} `],
+    [520, `${gearUse.notes.join(" ")} `],
+    [530, `${fogSmoke.notes.join(" ")} `],
+    [540, `${localHeroOpposition.notes.join(" ")} `],
+    [550, `${terrainPlan.notes.join(" ")} `],
+    [560, `${senses.notes.join(" ")} `],
+    [570, `${sensoryConditions.notes.join(" ")} `],
+    [580, `${tracking.notes.join(" ")} `],
+    [590, `${ambush.notes.join(" ")} `],
+    [600, `${ambush.applicable ? loc`Required Ambush preparation: ${requiredPreparationSeconds} seconds. ` : ""} `],
+    [
+      605,
+      hasFeat("False Start") && unopposed === true && method === "roll" && falseStartRestart(listedTime)
+        ? loc`False Start: if this check fails you may stop and begin again from the next ${falseStartRestart(listedTime)}, spending only half the money or materials (p.200). `
+        : ""
+    ],
+    [610, `${light.notes.join(" ")} `],
+    [
+      620,
+      cunning ? loc`Cunning Plan: free action; error range ${cunning.originalError} → ${cunning.error} (p.79). ` : ""
+    ],
+    [630, substituted ? loc`All According to Plan: Intelligence replaces the check’s key attribute (p.79). ` : ""],
+    [
+      640,
+      (system.classLevels?.schemer ?? 0) >= 10 && selected === "int" && method === "take10"
+        ? loc`Hyperconscious: take 10 without doubling time. `
+        : ""
+    ],
+    [
+      650,
+      `${classEffects.notes.filter(note => note !== intelligenceAnalysisNote() && note !== boobyTrapNote()).join(" ")} `
+    ],
+    [660, `${timing.notes} `],
+    [
+      670,
+      charmerPlan.evidence
+        ? loc`Required Influence time: ${Math.round(Math.max(charmerPlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. `
+        : ""
+    ],
+    [
+      680,
+      hardCorePlan.evidence
+        ? loc`Required Influence time: ${Math.round(Math.max(hardCorePlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. `
+        : ""
+    ],
+    [690, armor ? loc`Armor/load check penalty ${armor}. ` : ""],
+    [700, vision ? loc`Vision ${vision}. ` : ""],
+    [710, hasForte ? loc`Forte +1. ` : ""],
+    [720, Number(modifier) ? loc`Situational modifier ${Number(modifier) >= 0 ? "+" : ""}${Number(modifier)}. ` : ""],
+    [730, synergy.value ? loc`Synergy +${synergy.value} (${synergy.skill}). ` : ""],
+    [
+      740,
+      taking && /with permission/i.test(check.time) && gcTakingPermissionConfirmed === true
+        ? loc`GC permission to take this fixed result confirmed. `
+        : ""
+    ],
+    [750, taking ? loc`Taking ${fixedDie}: ${timeMultiplier}× the listed time; no threat or action-die boost. ` : ""],
+    [760, timing.timeReduction === "take10" ? loc`Taking 10 uses normal time. ` : ""],
+    [770, crossCheckActive && crossCheckAvailable ? loc`Cross-Check: triple the required time; active check. ` : ""],
+    [780, minimumTime ? loc`Minimum time ${minimumTime}. ` : ""],
+    [790, attention ? loc`Secret checks have the Cross-Check tag. ` : ""],
+    [800, loc`${listedTime}. ${mode}. ${check.tags || loc`No tags`}. Rules p.${check.page}.`],
+    [
+      840,
+      restraint.escape
+        ? loc` Opposed Grapple: Size bonus +${restraint.sizeBonus}; ${restraint.timeLocked ? loc`untrained Proficiency: error +2, two full actions, no time reduction.` : loc`proficient: one full action.`}`
+        : ""
+    ]
+  ]);
   return {
-    stalkingStance: stalkingStance.evidence,
-    feint: feint.evidence,
-    meleeSkillFeats: meleeSkillFeats.evidence,
-    conveyanceBullRush: conveyanceBullRush.evidence,
-    bullRushAttack: bullRushAttack.evidence,
-    bullRushDefense: bullRushDefense.evidence,
+    ...terms.plans,
     tumblePath: tumblePath.evidence,
-    tripAttack: tripAttack.evidence,
-    tripDefense: tripDefense.evidence,
     fallDistance: fallDistance.evidence,
     balanceSurface: balance.evidence,
     hideCircumstances: hideCircumstance.evidence,
     detectionObserver: detectionObserver.evidence,
     hideMovement: hideMovementPlanResult.evidence,
     targetSkillEffect: targetSkillEffect.evidence,
-    rankSynergyFeats: rankSynergyFeats.evidence,
     stoneCold: stoneCold.evidence,
-    threaten: threaten.evidence,
-    bugConcealment: bugConcealment.evidence,
-    documentation: documentation.evidence,
     analysisTask: analysisTask.context,
     trackingFeat: trackingFeatEvidence(system, key, check, {
       method,
@@ -1133,7 +1084,6 @@ export function resolveSkillCheck(
           }
         }
       : null,
-    polyglot: polyglot?.evidence ?? null,
     charmer: charmerPlan.evidence
       ? {
           ...charmerPlan.evidence,
@@ -1144,7 +1094,6 @@ export function resolveSkillCheck(
             Math.round(Math.max(charmerPlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6
         }
       : null,
-    cardSharkProfession,
     appearanceModifiers: appearancePlan.evidence
       ? {
           ...appearancePlan.evidence,
@@ -1219,6 +1168,8 @@ export function resolveSkillCheck(
     ability: selected,
     synergy: synergy.value,
     synergySkill: synergy.skill,
+    // The synergy bonus actually inside the total, after named-bonus stacking.
+    synergyBonus: synergyExtra,
     ...planTotal("skill", { system, skillKey: key, check, ability: selected, method }, [
       [loc`Skill bonus`, condition.total],
       [loc`Synergy`, synergyExtra],
@@ -1226,13 +1177,17 @@ export function resolveSkillCheck(
     ]),
     armor,
     missingFocus: !!missingFocus,
-    threat: taking ? 0 : conditionalThreat ? Math.max(1, conditionalThreat - ambush.threatIncrease) : 0,
+    threat: taking
+      ? 0
+      : conditionalThreat
+        ? Math.max(1, conditionalThreat - ambush.threatIncrease - terms.sum("threatIncrease"))
+        : 0,
     error: taking ? 0 : error,
     cap: method === "take20" && attention ? null : cap,
     blocked: blockedReasons.length > 0,
     rollMode: mode.includes("Passive") || mode === "Secret" || (!forceActive && secret) ? "blindroll" : undefined,
     take10TimeMultiplier:
       (system.classLevels?.schemer ?? 0) >= 10 && selected === "int" ? 1 : (skill.take10TimeMultiplier ?? 2),
-    notes: loc`${vehicleControl?.note ? `${vehicleControl.note} ` : ""}${stalkingStance.notes.join(" ")} ${feint.notes.join(" ")} ${meleeSkillFeats.notes.join(" ")} ${conveyanceBullRush.notes.join(" ")} ${bullRushAttack.notes.join(" ")} ${bullRushDefense.notes.join(" ")} ${tumblePath.notes.join(" ")} ${tripAttack.notes.join(" ")} ${tripDefense.notes.join(" ")} ${fallDistance.notes.join(" ")} ${balance.notes.join(" ")} ${hideCircumstance.notes.join(" ")} ${detectionObserver.notes.join(" ")} ${hideMovementPlanResult.notes.join(" ")} ${targetSkillEffect.notes.join(" ")} ${rankSynergyFeats.notes.join(" ")} ${stoneCold.notes.join(" ")} ${threaten.notes.join(" ")} ${bugConcealment.notes.join(" ")} ${documentation.notes.join(" ")} ${analysisTask.notes.join(" ")} ${forensic.notes.join(" ")} ${closedCourse.notes.join(" ")} ${wheel.notes} ${wellFundedBribe ? loc`Well-Funded: Bribe take 10 ignores the error-range restriction (p.198). ` : ""}${pursuit.notes.join(" ")} ${contactFeat.evidence ? loc`Contact ${contactFeat.evidence.contact.name}: DC${contactFeat.evidence.dc}, summon ${contactTimeLabel(Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6)}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table2.35, p.144; response/outcomes resolved separately). ` : ""}${contactFeat.evidence?.source ? loc`${contactFeat.evidence.source}: primary contact ${contactFeat.evidence.contact.name}; error range −${contactFeat.errorReduction} (minimum0), optional half time rounded down. ` : ""}${polyglot ? loc`Polyglot: +${polyglot.evidence.synergy} Cultures synergy, including targets outside owned regions. ` : ""}${dartingStyleState(system).active ? loc`Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? loc`Superior Cover: attack/skill check penalty −2. ` : ""}${twoWeaponSkillNote(system)}${weaponFocusWork.notes}${weaponFocusWork.notes ? " " : ""}${guts ? loc`Guts: +4 with this named Athletics check. ` : ""}${combatExpertiseState(system).active ? loc`Combat Expertise: attack/skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? loc`${condition.state === "baffled" ? loc`Baffled` : loc`Incompetent`}: skill bonus ${condition.normal} → ${condition.total}; separate check modifiers remain. ` : ""}${gamblingDice ? loc`The Dice are Hot: ${gamblingDice.total} possessed action dice (${gamblingDice.ordinary} ordinary + ${gamblingDice.bonus} bonus); Gambling synergy uses normal named-bonus stacking. ` : ""}${conditionRollPenalties(conditionSystem).entangled && selected === "dex" ? loc`Entangled/Bound: Dexterity-based skill penalty −4. ` : ""}${conditionAbilityPenalty(conditionSystem, selected) ? loc`Drunk: Dexterity-/Wisdom-based check penalty −2. ` : ""}${cardSharkProfession ? loc`Card Shark: Streetwise rank synergy +${cardSharkProfession.synergy} (pp.201–202). ` : ""}${appearancePlan.notes.join(" ")} ${charmerPlan.notes.join(" ")} ${hardCorePlan.notes.join(" ")} ${underwaterContext.notes.join(" ")} ${qualityChecks.notes.join(" ")} ${medical.notes.join(" ")} ${details.notes.join(" ")} ${skillTags.notes.join(" ")} ${skillGear.notes.join(" ")} ${gearUse.notes.join(" ")} ${fogSmoke.notes.join(" ")} ${localHeroOpposition.notes.join(" ")} ${terrainPlan.notes.join(" ")} ${senses.notes.join(" ")} ${sensoryConditions.notes.join(" ")} ${tracking.notes.join(" ")} ${ambush.notes.join(" ")} ${ambush.applicable ? loc`Required Ambush preparation: ${requiredPreparationSeconds} seconds. ` : ""} ${light.notes.join(" ")} ${cunning ? loc`Cunning Plan: free action; error range ${cunning.originalError} → ${cunning.error} (p.79). ` : ""}${substituted ? loc`All According to Plan: Intelligence replaces the check’s key attribute (p.79). ` : ""}${(system.classLevels?.schemer ?? 0) >= 10 && selected === "int" && method === "take10" ? loc`Hyperconscious: take 10 without doubling time. ` : ""}${classEffects.notes.filter(note => note !== intelligenceAnalysisNote() && note !== boobyTrapNote()).join(" ")} ${timing.notes} ${charmerPlan.evidence ? loc`Required Influence time: ${Math.round(Math.max(charmerPlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. ` : ""}${hardCorePlan.evidence ? loc`Required Influence time: ${Math.round(Math.max(hardCorePlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. ` : ""}${armor ? loc`Armor/load check penalty ${armor}. ` : ""}${vision ? loc`Vision ${vision}. ` : ""}${hasForte ? loc`Forte +1. ` : ""}${Number(modifier) ? loc`Situational modifier ${Number(modifier) >= 0 ? "+" : ""}${Number(modifier)}. ` : ""}${synergy.value ? loc`Synergy +${synergy.value} (${synergy.skill}). ` : ""}${taking && /with permission/i.test(check.time) && gcTakingPermissionConfirmed === true ? loc`GC permission to take this fixed result confirmed. ` : ""}${taking ? loc`Taking ${fixedDie}: ${timeMultiplier}× the listed time; no threat or action-die boost. ` : ""}${timing.timeReduction === "take10" ? loc`Taking 10 uses normal time. ` : ""}${crossCheckActive && crossCheckAvailable ? loc`Cross-Check: triple the required time; active check. ` : ""}${minimumTime ? loc`Minimum time ${minimumTime}. ` : ""}${attention ? loc`Secret checks have the Cross-Check tag. ` : ""}${listedTime}. ${mode}. ${check.tags || loc`No tags`}. Rules p.${check.page}.${restraint.escape ? loc` Opposed Grapple: Size bonus +${restraint.sizeBonus}; ${restraint.timeLocked ? loc`untrained Proficiency: error +2, two full actions, no time reduction.` : loc`proficient: one full action.`}` : ""}`
+    notes: noteSegments.join("")
   };
 }

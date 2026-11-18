@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
 import { loc } from "../i18n.mjs";
 const normalize = value =>
@@ -79,3 +80,6 @@ export function skillGearPlan(
     notes
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "skillGearRecord", order: 9755, record: ["skillGear"] });

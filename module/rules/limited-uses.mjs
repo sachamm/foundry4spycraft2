@@ -5,6 +5,18 @@ import { safeHouseSource } from "./safe-house.mjs";
 import { taskPressureUseSpec } from "./task-pressure.mjs";
 import { toolShedSource } from "./tool-shed.mjs";
 import { finalAttackRoundSpec } from "./final-round.mjs";
+import { DROP_FOLLOW_UPS } from "./drop-follow-up.mjs";
+import { fortunateSpec } from "./fortunate.mjs";
+import { allOrNothingSpec } from "./all-or-nothing.mjs";
+import { blackCatSpec } from "./black-cat.mjs";
+import { berserkerSpec } from "./berserker.mjs";
+import { gunslingerSpec } from "./gunslinger.mjs";
+import { chanceReactionSpecs } from "./chance-reactions.mjs";
+import { fireTeamSupremacySpec } from "./team-feats.mjs";
+import { brawlingSupremacySpec } from "./brawling-supremacy.mjs";
+import { handOfGodSpec } from "./hand-of-god.mjs";
+import { roundActionSpecs } from "./feat-free-actions.mjs";
+import { openStanceSpec } from "./wrestling.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { adrenalineSource } from "./adrenaline.mjs";
@@ -177,6 +189,9 @@ export function limitedUseAbilities(system, items, cfg) {
       hidden: true
     });
   }
+  for (const spec of roundActionSpecs(system)) add(spec);
+  const openStance = openStanceSpec(system);
+  if (openStance) add(openStance);
   if (system.activeFeatNames?.includes("Polearm Basics"))
     add({
       id: "strikingStance",
@@ -229,6 +244,73 @@ export function limitedUseAbilities(system, items, cfg) {
       limit: Number.MAX_SAFE_INTEGER,
       workflow: "missTrick",
       combatScoped: true,
+      hidden: true
+    });
+  for (const [key, d] of Object.entries(DROP_FOLLOW_UPS))
+    if (system.activeFeatNames?.includes(d.feat))
+      add({
+        id: key,
+        name: loc`${d.name} (extra attack after a drop)`,
+        period: "round",
+        // Cleave Mastery (p.177): any number of cleave attacks per round, one for each opponent dropped.
+        limit: key === "cleaveBasics" && system.activeFeatNames?.includes("Cleave Mastery") ? 20 : 1,
+        workflow: key,
+        combatScoped: true,
+        manualReviewable: true,
+        hidden: true
+      });
+  for (const spec of chanceReactionSpecs(system)) add(spec);
+  const brawling = brawlingSupremacySpec(system);
+  const handOfGod = handOfGodSpec(system);
+  if (system.activeFeatNames?.includes("Spirit Moves"))
+    add({
+      id: "shatterWeapon",
+      name: loc`Shatter Weapon (Smash an attacker’s weapon in Total Defense)`,
+      period: "round",
+      limit: 1,
+      workflow: "shatterWeapon",
+      combatScoped: true,
+      manualReviewable: true,
+      hidden: true
+    });
+  if (handOfGod) add(handOfGod);
+  if (brawling) add(brawling);
+  const fireTeam = fireTeamSupremacySpec(system);
+  if (fireTeam) add(fireTeam);
+  const gunslinger = gunslingerSpec(system);
+  if (gunslinger) add(gunslinger);
+  const rage = berserkerSpec(system);
+  if (rage) add(rage);
+  const blackCat = blackCatSpec(system);
+  if (blackCat) add(blackCat);
+  const allOrNothing = allOrNothingSpec(system);
+  if (allOrNothing) add(allOrNothing);
+  const fortunate = fortunateSpec(system);
+  if (fortunate) add(fortunate);
+  // Scene-limited feat uses settled at the table; the sheet's Use button spends them and posts the use.
+  for (const [id, feat, name] of [
+    ["babyIt", "Baby It", loc`Baby It (a vehicle you operate ignores a critical hit until the scene ends, p.191)`],
+    [
+      "crewDog",
+      "Crew Dog",
+      loc`Crew Dog (an extra d6 action die in a crewed vehicle, for vehicle-related results only, p.191)`
+    ],
+    [
+      "venomousDialogue",
+      "Venomous Dialogue",
+      loc`Venomous Dialogue (after a successful Taunt, the target makes no attacks until attacked or the scene ends, p.205)`
+    ]
+  ])
+    if (system.activeFeatNames?.includes(feat)) add({ id, name, period: "scene", limit: 1, workflow: "manual" });
+  if (system.activeFeatNames?.includes("Opportunist"))
+    add({
+      id: "opportunist",
+      name: loc`Opportunist (final attack after another opponent drops)`,
+      period: "round",
+      limit: 1,
+      workflow: "opportunist",
+      combatScoped: true,
+      manualReviewable: true,
       hidden: true
     });
   if (system.activeFeatNames?.includes("Combat Instincts"))

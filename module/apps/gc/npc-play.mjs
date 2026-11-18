@@ -12,6 +12,7 @@ import {
   dispositionCheckModifier
 } from "../../rules/gc/disposition.mjs";
 import { npcSpendProfile } from "../../rules/gc/gc-spend.mjs";
+import { npcSkillQualityPlan } from "../../rules/npc-qualities.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
@@ -64,6 +65,42 @@ export function npcSkillPlan(actor, key) {
   return { key, bonus, listed: !!listed, cap: stepLookup(TABLES.skillCap, bonus) };
 }
 
+/** The part of the NPC skill check dialog that comes from its qualities. */
+export function qualityCheckContent(effects) {
+  if (!effects) return "";
+  const kinds = [
+    ...(effects.moraleModifier
+      ? [["morale", loc`Resolve/Morale (${signed(effects.moraleModifier)} from qualities)`]]
+      : []),
+    ...(effects.resistModifier
+      ? [
+          ["resist-impress", loc`Resolve/Resist Impress (${signed(effects.resistModifier)})`],
+          ["resist-intimidate", loc`Resolve/Resist Intimidate (${signed(effects.resistModifier)})`],
+          ["resist-manipulate", loc`Sense Motive/Resist Manipulate (${signed(effects.resistModifier)})`]
+        ]
+      : [])
+  ];
+  const boxes = effects.skillOptions
+    .map(option => `<label><input type="checkbox" name="quality-${esc(option.id)}" /> ${esc(option.label)}</label>`)
+    .join("");
+  if (!kinds.length && !boxes) return "";
+  return `<fieldset><legend>${loc`Qualities`}</legend>${
+    kinds.length
+      ? `<label>${loc`This check is`} <select name="qualityCheck">${options([["", loc`another check`], ...kinds], "")}</select></label>`
+      : ""
+  }${boxes}</fieldset>`;
+}
+
+/** Ask the characters who meet this NPC for the save one of its qualities forces. */
+export async function callQualitySave(actor, id) {
+  const call = actor.system.qualityEffects?.saveCalls?.find(entry => entry.id === id);
+  if (!call) return null;
+  return ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor }),
+    content: `<p><b>${esc(call.name)}</b> — ${esc(call.text)} (p.${call.page})</p>`
+  });
+}
+
 export async function rollNpcSkill(actor, input = null) {
   if (!actor.isOwner) return null;
   const graded = actor.system.npcProfile?.enabled === true;
@@ -81,10 +118,11 @@ export async function rollNpcSkill(actor, input = null) {
       `
       <p>${loc`An NPC uses the higher of Competence and its skilled bonus, which also sets the result cap (p.452). The key attribute modifier is added.`}</p>
       <label>${loc`Skill`} <select name="key">${options(skillRows)}</select></label>
-      <label>${loc`Attribute`} <select name="ability">${options([["", "First listed for the skill"], ...abilityRows], "")}</select></label>
+      <label>${loc`Attribute`} <select name="ability">${options([["", loc`First listed for the skill`], ...abilityRows], "")}</select></label>
       ${graded ? "" : `<label>${loc`Skill bonus (manual stat block)`} <input type="number" name="manualBonus" value="0" /></label>`}
       <label>${loc`Situational modifier`} <input type="number" name="modifier" value="0" /></label>
       <label>${loc`Error range`} <input type="number" name="error" min="0" max="19" value="1" /></label>
+      ${qualityCheckContent(actor.system.qualityEffects)}
       <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`
     );
     if (!input) return null;
@@ -104,15 +142,28 @@ export async function rollNpcSkill(actor, input = null) {
     skill.abilities.includes(input.ability) || Object.hasOwn(CONFIG.SPYCRAFT.abilities, input.ability)
       ? input.ability
       : skill.abilities[0];
-  const total = plan.bonus + (actor.system.abilities[ability]?.mod ?? 0) + (Number(input.modifier) || 0);
+  // Qualities: Fearless, Meek and Strong-Minded by the kind of check, the rest by the boxes ticked.
+  const quality = npcSkillQualityPlan(actor.system.qualityEffects ?? { skillOptions: [] }, {
+    skillKey: skill.key,
+    checkId: input.qualityCheck ?? "",
+    chosen: Object.keys(input)
+      .filter(key => key.startsWith("quality-") && input[key] === true)
+      .map(key => key.slice("quality-".length))
+  });
+  const total =
+    plan.bonus + (actor.system.abilities[ability]?.mod ?? 0) + (Number(input.modifier) || 0) + quality.modifier;
   return actor.rollCheck(
     "1d20 + @total",
     { total },
     {
-      flavor: loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}`,
+      flavor:
+        loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}` +
+        (quality.rows.length || quality.errorIncrease
+          ? `<br><small>${esc([...quality.rows.map(row => `${row.label} ${signed(row.value)}`), ...(quality.errorIncrease ? [loc`error range +${quality.errorIncrease}`] : [])].join("; "))}</small>`
+          : ""),
       ability,
       cap: plan.cap,
-      error: Math.max(0, Number(input.error) || 0),
+      error: Math.max(0, Number(input.error) || 0) + quality.errorIncrease,
       npcSkill: skill.key,
       ...(input.secret ? { rollMode: "gmroll" } : {})
     }
@@ -153,9 +204,9 @@ export async function npcDamageSave(actor, input = null) {
       <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
       <label>${loc`Type`} <select name="kind">${options(
         [
-          ["lethal", "Lethal"],
-          ["subdual", "Subdual"],
-          ["stress", "Stress"]
+          ["lethal", loc`Lethal`],
+          ["subdual", loc`Subdual`],
+          ["stress", loc`Stress`]
         ],
         "lethal"
       )}</select></label>
@@ -263,11 +314,11 @@ export async function manageDisposition(actor) {
     <label>${loc`Toward`} <select name="target">${options(targets, "")}</select></label>
     <label>${loc`Action`} <select name="action">${options(
       [
-        ["show", "Show check modifiers"],
-        ["shift", "Shift by grades"],
+        ["show", loc`Show check modifiers`],
+        ["shift", loc`Shift by grades`],
         ["set", loc`Set a grade (GC ruling)`],
-        ["loyalty", "Roll a Loyalty decision"],
-        ["combat", "Roll whether the NPC joins a fight"]
+        ["loyalty", loc`Roll a Loyalty decision`],
+        ["combat", loc`Roll whether the NPC joins a fight`]
       ],
       "show"
     )}</select></label>

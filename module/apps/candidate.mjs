@@ -1,3 +1,4 @@
+import { ruleName } from "../rules/rule-name.mjs";
 import { CANDIDATE_KEYS, CANDIDATE_CHOICES, reviewedCandidateBasis } from "../rules/candidate.mjs";
 import { loc } from "../i18n.mjs";
 /** An explicit correction of missing/imported acquisition history, never a later free re-choice. */
@@ -6,7 +7,7 @@ export async function reviewCandidate(item, options = {}) {
     !game.user?.isGM ||
     !item.isOwner ||
     item.type !== "feat" ||
-    item.name !== "Candidate" ||
+    ruleName(item) !== "Candidate" ||
     item.parent?.type !== "agent"
   )
     throw new Error(loc`Only an owning GC can correct Candidate attribute history.`);

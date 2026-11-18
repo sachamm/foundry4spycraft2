@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 export const CAMOUFLAGE_TERRAINS = {
   aquatic: "Aquatic",
@@ -66,3 +67,6 @@ export function qualitySkillChecks(
     seductionConflict: seductionConflict === true
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "qualityChecksRecord", order: 9725, record: ["qualityChecks"] });

@@ -1,3 +1,4 @@
+import { ruleName } from "./rule-name.mjs";
 import { powerStanceBonus } from "./power-stance.mjs";
 import { sideStanceDefensePenalty } from "./side-stance.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "./cheap-shot-effects.mjs";
@@ -5,6 +6,16 @@ import { readiedDisarmWeapons } from "./disarm-response.mjs";
 import { readiedGuardWeapons } from "./guard.mjs";
 import { polearmDefensePlan } from "./polearm-defense.mjs";
 import { knifeBasicsPlan } from "./knife-basics.mjs";
+import { swordBasicsPlan } from "./sword-basics.mjs";
+import { berserkerRageState } from "./berserker.mjs";
+import { favoredGearState, featPossessionWarnings } from "./favored-gear.mjs";
+import { duelingAllDodge } from "./dueling-basics.mjs";
+import { fightDefensivelyState } from "./fight-defensively.mjs";
+import { notTheFaceDR } from "./not-the-face.mjs";
+import { underminedState } from "./taunt.mjs";
+import { PERSONAL_LIEUTENANT, lieutenantReview } from "./companions.mjs";
+import { activeIdentity, identityReview, professionFocusesWithIdentity } from "./flawless-identity.mjs";
+import { intenseStanceState } from "./intense-stance.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -181,13 +192,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
         other =>
           other.type === "feat" &&
           other.id !== feat.id &&
-          norm(other.name) === norm(feat.name) &&
+          norm(ruleName(other)) === norm(ruleName(feat)) &&
           (!selfTemporary || sameFeatSelection(feat, other, cfg)) &&
           other.system.featKind !== "temporary"
       )
     )
       continue;
-    const key = norm(feat.name),
+    const key = norm(ruleName(feat)),
       count = featCounts.get(key) ?? 0;
     const definition = cfg.tables.featRules?.[feat.name];
     const repeatable = feat.system.repeatable || definition?.repeatable;
@@ -235,9 +246,10 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const progression = sys.progression ?? [];
   const level = progression.length;
   sys.level = level;
+  sys.specialtyName = items.find(i => i.type === "origin" && i.system?.originType === "specialty")?.name ?? "";
   sys.activeFeatSelections = items
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id))
-    .map(i => ({ name: i.name, choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));
+    .map(i => ({ name: ruleName(i), choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));
   sys.activeFeatNames = sys.activeFeatSelections.map(i => i.name);
 
   sys.details ??= {};
@@ -340,6 +352,23 @@ export function computeAgent(sys, items, cfg, options = {}) {
         ...["knowledge", "saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "-2" }))
       ]
     });
+  // Rooted Stance (Spirit Basics, p.187): +1 to all saves while in the stance.
+  if (sys.combatStance?.key === "rooted" && sys.activeFeatNames?.includes("Spirit Basics"))
+    sources.push({
+      name: "Rooted Stance",
+      rank: 1,
+      bonuses: ["saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "1" }))
+    });
+  // Dueling Basics, p.178: +1 dodge against all attacks for the declared round when no opponent was chosen.
+  if (duelingAllDodge(sys))
+    sources.push({ name: "Dueling Basics", rank: 1, bonuses: [{ target: "defense", value: "1", bonusType: "dodge" }] });
+  // Dueling Supremacy, p.178: +2 dodge bonus to Defense.
+  if (sys.activeFeatNames?.includes("Dueling Supremacy"))
+    sources.push({
+      name: "Dueling Supremacy",
+      rank: 1,
+      bonuses: [{ target: "defense", value: "2", bonusType: "dodge" }]
+    });
   if ((classLevels.triggerman ?? 0) >= 8)
     sources.push({
       name: loc`Eye of the Storm (all attackers)`,
@@ -379,13 +408,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
           ...selected.bonuses,
           ...(["Gorgeous", "Simply Irresistible"].includes(i.name)
             ? [{ target: "abilities.cha", value: "1" }]
-            : i.name === "The Look"
+            : ruleName(i) === "The Look"
               ? [{ target: "appearance", value: "1" }]
               : [])
         ],
         rank: 1,
         acquiredAtLevel: i.system.acquiredAtLevel || 1,
-        candidate: i.name === "Candidate",
+        candidate: ruleName(i) === "Candidate",
         fieldOfExpertise: i.system.choice === "Field of Expertise"
       });
     } else if (i.type === "class") {
@@ -598,7 +627,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   warnings.push(...sys.drunkRepositionState.warnings);
   sys.drunkPendingRepositions = sys.drunkRepositionState.rows.filter(r => ["pending", "moving"].includes(r.state));
   sys.drunkSleepState = fatigueRestStatus({ ...sys, fatigueRest: sys.drunkSleep }, { restKind: "drunk" });
-  if (sys.drunkSleepState?.needsReview) warnings.push(loc`Drunk sleep: ` + sys.drunkSleepState.warning);
+  if (sys.drunkSleepState?.needsReview) warnings.push(loc`Drunk sleep: ${sys.drunkSleepState.warning}`);
   sys.fatigueRestState = fatigueRestStatus(sys);
   if (sys.fatigueRestState?.needsReview) warnings.push(sys.fatigueRestState.warning);
   sys.fatigueApplicationHistory = fatigueApplicationHistory(sys);
@@ -632,6 +661,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
         if (!s.candidate) nonCandidateBonus.add(key, amount, s.name, b.bonusType);
       }
     }
+  // Berserker rage, pp.183–184: Strength and Constitution rise while it runs.
+  sys.berserkerRageState = berserkerRageState(sys.berserkerRage, sys.bonusPoolCombats?.[sys.berserkerRage?.combatId]);
+  const rageBonus = sys.berserkerRageState.active ? sys.berserkerRage.bonus : 0;
+  if (sys.berserkerRageState.record && !sys.berserkerRageState.active)
+    warnings.push(loc`The berserker rage has run out: end it to apply what follows.`);
   const increases = sys.abilityIncreases ?? {};
   const increaseAt = l => increases[`l${l}`] || "";
   let pointCost = 0;
@@ -639,7 +673,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     const a = sys.abilities[k];
     a.increase = cfg.abilityIncreaseLevels.filter(l => l <= level && increaseAt(l) === k).length;
     a.bonus = abilityBonus.get(k);
-    a.temporaryBonus = sys.mentalLeapState.bonuses[k] ?? 0;
+    a.temporaryBonus = (sys.mentalLeapState.bonuses[k] ?? 0) + (["str", "con"].includes(k) ? rageBonus : 0);
     a.damage = sys.attributeDamageState.byAbility[k].total;
     a.undamagedValue = a.base + a.increase + (a.misc ?? 0) + a.bonus + a.temporaryBonus;
     a.value = a.undamagedValue - a.damage;
@@ -752,7 +786,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
   targeted.rules.push(...inherited.skillRules);
   sys.classSkillRules = targeted.rules;
   warnings.push(...targeted.warnings);
-  for (const text of targeted.pending) todo.push({ order: 21, tab: "classes", text });
+  for (const task of targeted.pendingTasks ?? targeted.pending.map(text => ({ text })))
+    todo.push({ order: 21, tab: "classes", ...task });
   for (const rule of targeted.rules.filter(rule => rule.errorReduction))
     sources.push({
       name: rule.source,
@@ -766,7 +801,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     });
 
   const unlocked = items
-    .filter(item => item.type === "feat" && item.name === "Unlocked Potential" && activeFeatIds.has(item.id))
+    .filter(item => item.type === "feat" && ruleName(item) === "Unlocked Potential" && activeFeatIds.has(item.id))
     .map(item => ({
       skill: cfg.skills[item.system.choice]
         ? item.system.choice
@@ -886,7 +921,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     for (const feat of items.filter(
       i =>
         i.type === "feat" &&
-        i.name === "Training" &&
+        ruleName(i) === "Training" &&
         activeFeatIds.has(i.id) &&
         (i.system.acquiredAtLevel || 1) === idx + 1
     )) {
@@ -956,7 +991,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
 
   /* ---------------- Feats ---------------- */
   const featItems = items.filter(i => i.type === "feat");
-  const featNames = new Set(featItems.filter(i => activeFeatIds.has(i.id)).map(i => norm(i.name)));
+  const featNames = new Set(featItems.filter(i => activeFeatIds.has(i.id)).map(i => norm(ruleName(i))));
   const featTrees = {};
   const activeFeatTrees = {};
   sys.virtualFeats = [];
@@ -1008,7 +1043,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     actionDice: { max: lr?.actionDice ?? 0 }
   };
   const fortuneBold = items.some(
-    i => i.type === "feat" && i.name === "Fortune Favors the Bold" && activeFeatIds.has(i.id)
+    i => i.type === "feat" && ruleName(i) === "Fortune Favors the Bold" && activeFeatIds.has(i.id)
   );
   rd.actionDice.max +=
     miscActionDice(sys) +
@@ -1045,7 +1080,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         b.bonusType === "insight" &&
         value > 0 &&
         (b.target === "knowledge" || /^skills\.\w+\.misc$/.test(b.target)) &&
-        items.some(i => i.type === "feat" && i.name === "Unfair Advantage" && activeFeatIds.has(i.id))
+        items.some(i => i.type === "feat" && ruleName(i) === "Unfair Advantage" && activeFeatIds.has(i.id))
       )
         value += 1;
       if (
@@ -1142,7 +1177,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.qualityNaturalDR = B.get("qualityNaturalDR");
   const classDR = B.get("naturalDR");
   sys.naturalDR = Math.max(classDR, sys.qualityNaturalDR);
-  const independentFeatDR = sys.superiorCoverState.dr + (sys.activeFeatNames.includes("Too Ugly to Die") ? 2 : 0);
+  // Death Ride, p.192: DR equal to the Chase feats while driving a vehicle or riding a mount.
+  sys.deathRideDR =
+    sys.activeFeatNames.includes("Death Ride") && sys.operatingVehicle === true
+      ? sys.activeFeatSelections.filter(f => f.tree === "chase").length
+      : 0;
+  const independentFeatDR =
+    sys.superiorCoverState.dr + (sys.activeFeatNames.includes("Too Ugly to Die") ? 2 : 0) + sys.deathRideDR;
   sys.dr = {
     melee: Math.max(sys.qualityNaturalDR, (sys.armor?.dr ?? 0) + classDR) + independentFeatDR,
     other: Math.max(sys.qualityNaturalDR, (sys.armor?.drRanged ?? 0) + classDR) + independentFeatDR
@@ -1188,6 +1229,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.guardWeapons = readiedGuardWeapons(sys, items);
   sys.disarmWeapons = readiedDisarmWeapons(sys, items);
   sys.knifeBasics = knifeBasicsPlan(sys, items);
+  sys.swordBasics = swordBasicsPlan(sys, items);
+  sys.favoredGear = favoredGearState(sys, items);
+  warnings.push(...sys.favoredGear.warnings, ...featPossessionWarnings(sys, items));
   const heldReview = sys.guardWeapons.blockedReason || sys.disarmWeapons.blockedReason;
   if (heldReview) {
     warnings.push(heldReview);
@@ -1201,6 +1245,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
     wornArmor: sys.armor?.adjustments ?? []
   });
   if (sys.bloodstainDefense.bonus) B.add("defense", sys.bloodstainDefense.bonus, "Bloodstain Resistant");
+  // Dueling Mastery, p.178: +1 to Defense while holding a readied melee weapon.
+  if (
+    sys.activeFeatNames.includes("Dueling Mastery") &&
+    !sys.disarmWeapons.blockedReason &&
+    sys.disarmWeapons.weapons.some(w => ["blunt", "exoticBlunt", "edged", "exoticEdged"].includes(w.proficiency))
+  )
+    B.add("defense", 1, "Dueling Mastery (readied melee weapon)");
   sys.totalDefenseState = totalDefenseState(sys);
   if (sys.totalDefenseState.needsReview) {
     warnings.push(sys.totalDefenseState.reason);
@@ -1214,6 +1265,21 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.combatExpertiseState = combatExpertiseState(sys);
   if (sys.combatExpertiseState.active)
     B.add("defense", sys.combatExpertiseState.dodgeBonus, "Combat Expertise", "dodge");
+  sys.fightDefensivelyState = fightDefensivelyState(sys);
+  sys.intenseStanceState = intenseStanceState(sys);
+  if (sys.fightDefensivelyState.active) {
+    B.add("defense", sys.fightDefensivelyState.dodgeBonus, "Fight Defensively", "dodge");
+    if (sys.fightDefensivelyState.equilibrium)
+      B.add("defense", sys.fightDefensivelyState.equilibrium, "Equilibrium Supremacy", "dodge");
+    if (sys.fightDefensivelyState.tribesman)
+      B.add("defense", sys.fightDefensivelyState.tribesman, "Tribesman (Fight Defensively)");
+  }
+  // Not the Face: DR against melee and unarmed attacks while either defensive declaration lasts.
+  sys.notTheFaceDR = notTheFaceDR(sys, abil.cha.mod);
+  if (sys.notTheFaceDR) {
+    sys.armorDRByAttack.unarmed += sys.notTheFaceDR;
+    sys.armorDRByAttack.meleeWeapon += sys.notTheFaceDR;
+  }
   const sideStanceDefense = sideStanceDefensePenalty(sys);
   if (sideStanceDefense) B.add("defense", sideStanceDefense, "Side Stance");
   sys.bonusSources.defense = B.sources.get("defense") ?? [];
@@ -1234,6 +1300,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
     initiativeBonus: sys.activeFeatNames.includes("CQB Supremacy") && sys.readiedRangedWeapons.length ? 5 : 0,
     weaponIds: sys.readiedRangedWeapons.map(w => w.id)
   };
+  // Undermine (p.205): a morale penalty on Initiative while it lasts.
+  sys.underminedState = underminedState(sys);
+  if (sys.underminedState.penalty) B.add("initiative", -sys.underminedState.penalty, "Undermined", "morale");
   if (sys.cqbReadiedRules.initiativeBonus) {
     B.add("initiative", 5, "CQB Supremacy (readied ranged weapon)");
     sys.bonusSources.initiative = B.sources.get("initiative") ?? [];
@@ -1273,8 +1342,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
       sys.conditionPenalties.attack +
       conditionAbilityPenalty(sys, "dex")
   };
-  const martialArtsFeat = featItems.find(feat => feat.name === "Martial Arts" && activeFeatIds.has(feat.id));
-  const mastersArt = featItems.some(feat => feat.name === "Master's Art" && activeFeatIds.has(feat.id));
+  const martialArtsFeat = featItems.find(feat => ruleName(feat) === "Martial Arts" && activeFeatIds.has(feat.id));
+  const mastersArt = featItems.some(feat => ruleName(feat) === "Master's Art" && activeFeatIds.has(feat.id));
   sys.unarmed = {
     usesStrength: !martialArtsFeat || martialArtsFeat.system.choice === "str" || mastersArt,
     strengthComponent: !martialArtsFeat || martialArtsFeat.system.choice === "str" || mastersArt ? abil.str.mod : 0,
@@ -1432,6 +1501,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
       sys.actionDice.die = 6;
       sys.actionDice.max *= 2;
     } else sys.actionDice.die += 2;
+  }
+  // Personal Lieutenant (p.204): always exactly 1 action die.
+  if (sys.companionOf?.feat === PERSONAL_LIEUTENANT) {
+    sys.actionDice.max = 1;
+    if (sys.lieutenantOwner) warnings.push(...lieutenantReview(sys, sys.lieutenantOwner).warnings);
+    else warnings.push(loc`Personal Lieutenant: the owner could not be found.`);
   }
   sys.adrenalineJunkieSource = adrenalineSource(sys);
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
@@ -1594,7 +1669,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   }
   const replacementGrants = [];
   for (const [name, count] of classGrantCounts) {
-    const owned = featItems.find(f => norm(f.name) === name && f.system.featKind !== "temporary");
+    const owned = featItems.find(f => norm(ruleName(f)) === name && f.system.featKind !== "temporary");
     if (!owned) continue;
     const replacements = !owned.system.granted ? count : Math.max(0, count + (originGrantNames.has(name) ? 1 : 0) - 1);
     if (replacements) {
@@ -1646,6 +1721,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
     activeFeatIds
   });
   sys.focusTotals = focuses.totals;
+  // Flawless Identity (p.209): the identity in use adds its Profession focus.
+  sys.activeIdentityState = activeIdentity(sys);
+  if (sys.activeIdentityState && sys.focusTotals?.profession)
+    sys.focusTotals.profession = professionFocusesWithIdentity(sys, sys.focusTotals.profession);
+  warnings.push(...identityReview(sys));
   sys.temporaryFocusGrants = focuses.temporaryGrants;
   sys.skillForteTotals = focuses.activeFortes;
   sys.forcedFocuses = Object.fromEntries(Object.entries(focuses.forced).map(([key, value]) => [key, [...value]]));
@@ -1932,8 +2012,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
         activeFeatIds.has(other.id) && (f.system.featKind === "temporary" || other.system.featKind !== "temporary")
     );
     const names = new Set([
-      ...usable.map(other => norm(other.name)),
-      ...sys.virtualFeats.map(other => norm(other.name))
+      ...usable.map(other => norm(ruleName(other))),
+      ...sys.virtualFeats.map(other => norm(ruleName(other)))
     ]);
     const trees = {};
     for (const other of [...usable, ...sys.virtualFeats.map(other => ({ system: other }))])
@@ -1962,7 +2042,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
           : exempt
             ? { ok: true, unmet: [] }
             : checkPrerequisites(f.system.prerequisites, context);
-    if (res.ok && f.name === "Candidate")
+    if (res.ok && ruleName(f) === "Candidate")
       try {
         candidatePlan(sys, f);
       } catch (error) {
@@ -2000,7 +2080,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     for (const f of permanent) permanentTrees[f.system.tree] = (permanentTrees[f.system.tree] ?? 0) + 1;
     const classContext = prerequisiteContext(
       classQualificationSystem,
-      new Set(permanent.map(f => norm(f.name))),
+      new Set(permanent.map(f => norm(ruleName(f)))),
       permanentTrees,
       classQualificationRanks
     );
@@ -2018,7 +2098,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
       .filter(
         f =>
           legalFeatIds.has(f.id) &&
-          (f.name !== "Candidate" || sys.featStatus[f.id]?.ok) &&
+          (ruleName(f) !== "Candidate" || sys.featStatus[f.id]?.ok) &&
           ((f.system.granted && f.system.featKind !== "temporary") || sys.featStatus[f.id]?.ok)
       )
       .map(f => f.id)
@@ -2066,7 +2146,7 @@ export function prerequisiteContext(
       featNames.has(norm(name)) &&
       featChoices.some(
         f =>
-          norm(f.name) === norm(name) &&
+          norm(ruleName(f)) === norm(name) &&
           (norm(name) === "extra gear"
             ? extraGearCategory(f.system?.choice ?? f.choice) !== null &&
               extraGearCategory(f.system?.choice ?? f.choice) === extraGearCategory(choice)

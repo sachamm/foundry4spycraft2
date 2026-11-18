@@ -352,7 +352,7 @@ export async function manageTakedown(actor, input = {}) {
     for (const r of takedownRows(actor)) {
       const save = currentTakedownSave(actor, r);
       if (!r.saveUuid && !r.settlement && game.user.isGM)
-        entries.push({ value: "recover|" + r.id, label: loc`GC review interrupted takedown save DC` + r.proof.dc });
+        entries.push({ value: "recover|" + r.id, label: loc`GC review interrupted takedown save DC${r.proof.dc}` });
       if (r.saveUuid && !r.settlement)
         entries.push({
           value: (save?.flags.spycraft2.resolved ? "settle|" : "existing|") + (save?.uuid ?? ""),
@@ -364,7 +364,7 @@ export async function manageTakedown(actor, input = {}) {
       if (r.settlement?.state === "prepared" && game.user.isGM)
         entries.push({
           value: "outcome|" + r.settlement.saveUuid,
-          label: loc`GC review interrupted takedown outcome DC` + r.proof.dc
+          label: loc`GC review interrupted takedown outcome DC${r.proof.dc}`
         });
     }
     if (!attacks.length && !entries.length)

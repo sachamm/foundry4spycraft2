@@ -202,6 +202,10 @@
   overflow-y: auto;
   padding-right: 0.35rem;
 }
+/* Feats the system does not work out, listed for the player to note on the roll. */
+.spycraft2-feat-reminders { margin-top: 0.5rem; max-height: 22vh; overflow-y: auto; }
+.spycraft2-feat-reminders label { display: block; font-weight: normal; }
+.spycraft2-feat-reminders .hint { margin: 0 0 0.25rem; font-size: var(--font-size-12); opacity: 0.8; }
 .spycraft2-roll-options details > label {
   display: block;
   margin: 0.35rem 0;
@@ -247,3 +251,7 @@
 .gc-console-body h2 { font-size: 1.2em; }
 .gc-console-body h3 { flex-wrap: wrap; }
 .gc-console-body .controls { margin: 0.5em 0; }
+
+/* Contagions and fire on the Main tab. */
+.spycraft2 .hazards .hazard { margin: 0.15rem 0; }
+.spycraft2 .hazards .hazard.due { border-left: 3px solid var(--color-level-warning, #b8860b); padding-left: 0.4rem; }

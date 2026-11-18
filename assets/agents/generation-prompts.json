@@ -1,0 +1,451 @@
+{
+  "tool": "OpenAI built-in image_gen.imagegen",
+  "portraits": "512 x 512 WebP",
+  "tokens": "256 x 256 WebP",
+  "tokenMethod": "A separate built-in image-generator edit of each portrait creates a circular token with a transparent exterior, then resizes it to 256 pixels.",
+  "quality": 85,
+  "characters": [
+    {
+      "id": "amina-diallo",
+      "name": "Amina Diallo",
+      "subject": "a Senegalese French woman aged 28, dark brown skin, brown eyes, natural black hair tied back neatly, sand-colored field jacket and olive scarf, athletic build and measured observant expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Senegalese French woman aged 28, dark brown skin, brown eyes, natural black hair tied back neatly, sand-colored field jacket and olive scarf, athletic build and measured observant expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/amina-diallo/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 21576,
+          "sha256": "de5b92ab4ce05bfbcfd8e151f18804efad33b97e5bd7e564f096802c838e28fc"
+        },
+        {
+          "file": "assets/agents/amina-diallo/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 14790,
+          "sha256": "4ac69888855993f201396d9d3bca5435faedc7b42560c8fb7d5b52dacb161fb0",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Amina Diallo. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "3fe3e8b5c57282d9319c772e147f9019c8ed133e474593c449858a3894c69b29",
+      "tokenSourceSha256": "a8535e1f37e65e71457290a7156d0b8ba97bf917d032d7beecc7eb57de750bd9"
+    },
+    {
+      "id": "bracken",
+      "name": "Bracken",
+      "subject": "a four-year-old female sable German Shepherd search-and-rescue dog, warm brown eyes, tan and black fur, upright ears, alert but calm expression, simple olive working collar without text",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a four-year-old female sable German Shepherd search-and-rescue dog, warm brown eyes, tan and black fur, upright ears, alert but calm expression, simple olive working collar without text. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/bracken/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 26182,
+          "sha256": "3220b689d16b716d5b1911e48778da8fe63930c11b7718570ffa69e1b8eb1bc9"
+        },
+        {
+          "file": "assets/agents/bracken/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 15772,
+          "sha256": "1943aa0edc6ce648604000f9edcf383ed76d72df5c95066953798ca9dbb84aef",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Bracken. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "eedc3dba017fb7431b26293146f30b1f7ec68d557aeab2e523c61081cc834be3",
+      "tokenSourceSha256": "0cb03ea784ce7cc97a0659eed2cba73e0dd406e3f840699e46ccc8fc3e653231"
+    },
+    {
+      "id": "daniel-chen",
+      "name": "Daniel Chen",
+      "subject": "a Chinese American man aged 31, light tan skin, brown eyes, neatly side-parted black hair, square glasses, grey travel jacket with a discreet earpiece, patient analytical expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Chinese American man aged 31, light tan skin, brown eyes, neatly side-parted black hair, square glasses, grey travel jacket with a discreet earpiece, patient analytical expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/daniel-chen/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 15198,
+          "sha256": "307a96d7dea829b94da1bd7159d88666523182238b88acff2b33046915d65f8a"
+        },
+        {
+          "file": "assets/agents/daniel-chen/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 13506,
+          "sha256": "0b9246a592dd7a1e7200450c11bd3efe2ba2d2b6c41b0e0c6a8ffc68b7954a44",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Daniel Chen. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "a0e05968fad83167c4897e14bb6f8bc177c42125bf8603b42d6e7843e7466bf3",
+      "tokenSourceSha256": "933be0a03349ecb5dbd535be2aeb1d608727ad771a060a5bb28dc1eac41bd5f1"
+    },
+    {
+      "id": "elena-marquez",
+      "name": "Elena Marquez",
+      "subject": "a Mexican woman aged 32, olive skin, hazel eyes, short black curls, weathered olive expedition jacket over a plain shirt, curious alert expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Mexican woman aged 32, olive skin, hazel eyes, short black curls, weathered olive expedition jacket over a plain shirt, curious alert expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/elena-marquez/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 23790,
+          "sha256": "1d5da5ff71c520e7974875412f4766f3b906acc3178f0b0e1cb290442893a39e"
+        },
+        {
+          "file": "assets/agents/elena-marquez/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 16362,
+          "sha256": "23f63d353e9c0809e74642ae1f2c6a87dbe33ab5e7dc08cdaf3245ae0e63b017",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Elena Marquez. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "15badc4fd11f3fa905eb6eb482769da7b95ba370acfa65f1f5a63b0954e0ede5",
+      "tokenSourceSha256": "9537c6be022546d5d56a426676281ee02024e9a54abb709a05b00c898ec1532e"
+    },
+    {
+      "id": "gabriel-okafor",
+      "name": "Gabriel Okafor",
+      "subject": "a Nigerian British man aged 39, dark brown skin, brown eyes, shaved head and neatly trimmed salt-and-pepper beard, navy field jacket over a cream collared shirt, calm reassuring expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Nigerian British man aged 39, dark brown skin, brown eyes, shaved head and neatly trimmed salt-and-pepper beard, navy field jacket over a cream collared shirt, calm reassuring expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/gabriel-okafor/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 17796,
+          "sha256": "280744d98515d6ceaf38819ffaf981913d39aef4826273d85b22d18dff817e5c"
+        },
+        {
+          "file": "assets/agents/gabriel-okafor/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 13038,
+          "sha256": "265ec342d6febe4bcebeb22392b71dced9b09d4f8f8d52039b920c844dfcc161",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Gabriel Okafor. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "e044ff3943d2eb539c0a365065d35d7ce65c45f6dbc43f424ed7696efdee79e3",
+      "tokenSourceSha256": "916d985543f48b4573d5ff4829f3a3a3b68ea245e11736d507a9da9fcf225dea"
+    },
+    {
+      "id": "inez-duarte",
+      "name": "Inez Duarte",
+      "subject": "a Portuguese woman aged 30, light olive skin, brown eyes, dark brown curls tied back, athletic muscular build, muted grey field jacket over a simple protective vest, focused disciplined expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Portuguese woman aged 30, light olive skin, brown eyes, dark brown curls tied back, athletic muscular build, muted grey field jacket over a simple protective vest, focused disciplined expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/inez-duarte/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 21280,
+          "sha256": "a277dbcf828adbed4ca66fe7a63ee80dcf1263a08aa834d775ef8b5a9b7c60a4"
+        },
+        {
+          "file": "assets/agents/inez-duarte/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 14960,
+          "sha256": "b661d738bb005e44189b8f48dbf4fcc95048849fe5bd91fa83bc25ecc3188f82",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Inez Duarte. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "5dadcf46e924215084847b95b07a18469eb2f41d671b51cfb2800cff32cf89a8",
+      "tokenSourceSha256": "ba8aa13e48d76680ec10c777171695821acfbd280e0478ea502500ecf0b0b55f"
+    },
+    {
+      "id": "jun-park",
+      "name": "Jun Park",
+      "subject": "a Korean Canadian nonbinary adult aged 27, light warm skin, dark brown eyes, short black undercut with one silver streak, olive hoodie under a plain dark jacket, headphones around the neck, focused friendly expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Korean Canadian nonbinary adult aged 27, light warm skin, dark brown eyes, short black undercut with one silver streak, olive hoodie under a plain dark jacket, headphones around the neck, focused friendly expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/jun-park/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 16990,
+          "sha256": "dcec050d7407faf359926bd572168eab47903c2d7dce18b9cc72f08262dcb51b"
+        },
+        {
+          "file": "assets/agents/jun-park/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 14552,
+          "sha256": "8f7bcfd3a7893ba451af7242746e844d40e888a0cc107bc2be1ade6135dde936",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Jun Park. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "d3c35f24db1a7da2fb0c7b36e4873d9d92a16549141b960d9188b48b13a1a2a7",
+      "tokenSourceSha256": "41598175ee3b3ec3ef9adf1f21e08c3931edc901af61c60f3d116e90f347c6d4"
+    },
+    {
+      "id": "luc-moreau",
+      "name": "Luc Moreau",
+      "subject": "a French Senegalese man aged 30, medium brown skin, dark brown eyes, neat short black curls and light stubble, charcoal dinner jacket with open white collar, an easy confident smile",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a French Senegalese man aged 30, medium brown skin, dark brown eyes, neat short black curls and light stubble, charcoal dinner jacket with open white collar, an easy confident smile. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/luc-moreau/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 15310,
+          "sha256": "6db1fc94be1d4380977e57a126ac20e6be33fce1f21df69aac739319eac57cce"
+        },
+        {
+          "file": "assets/agents/luc-moreau/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 12814,
+          "sha256": "70be897eed8d35a5e1a9577db9f23a5fabff621d08b72b184b282e8079fac0eb",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Luc Moreau. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "47bb39aa460b0e717bc7249ca965568ccc8eff34ec0b119be28705ccd43847f3",
+      "tokenSourceSha256": "4b98f492e4826411f93182bb01c90f219f9e3919f02efb97a32a39bfc40f6476"
+    },
+    {
+      "id": "luka-petrov",
+      "name": "Luka Petrov",
+      "subject": "a Serbian man aged 35, fair weathered skin, blue eyes, close-cropped dark brown hair and short beard, broad muscular build, olive work shirt under a plain dark field vest, calm protective expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Serbian man aged 35, fair weathered skin, blue eyes, close-cropped dark brown hair and short beard, broad muscular build, olive work shirt under a plain dark field vest, calm protective expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/luka-petrov/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 17404,
+          "sha256": "11f2c9f84d970af2dbffcb724e55ad921ff4272d76e6779f0c9a4dcaa1e23184"
+        },
+        {
+          "file": "assets/agents/luka-petrov/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 13174,
+          "sha256": "f6f4c1f1b95d22a70724f4699a091564b81587391c7cb0bfb7a1bd5f62ea7f2c",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Luka Petrov. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "09a6d8be34ab910ce84cb04d2166c97d5f269a7ced5263c51ac3123495782a71",
+      "tokenSourceSha256": "740f3f4664aa7556acc2a34a5bb0a189e326ede60c3c7aab15f4e57ffe15c4a6"
+    },
+    {
+      "id": "mara-voss",
+      "name": "Mara Voss",
+      "subject": "a German woman aged 29, pale freckled skin, grey eyes, short auburn pixie haircut, plain black work jacket and dark shirt, practical restrained expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a German woman aged 29, pale freckled skin, grey eyes, short auburn pixie haircut, plain black work jacket and dark shirt, practical restrained expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/mara-voss/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 13774,
+          "sha256": "ac2ac4e748f4f3e15cdb7aef5498bb0c21398ed8edcc85d36a5b74eceb95ca1a"
+        },
+        {
+          "file": "assets/agents/mara-voss/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 12852,
+          "sha256": "8e08543599ec1f49ea9c2b4e9797d5799230f7e82949018117799b257e9ba751",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Mara Voss. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "952c835f02c82375c54096c7857ebdf8b5862235d5e7068763464997640dad6b",
+      "tokenSourceSha256": "9153eb30819994fe83b769a1289d966e5d17969b4d47e33480103923b269a276"
+    },
+    {
+      "id": "mateo-silva",
+      "name": "Mateo Silva",
+      "subject": "a Brazilian man aged 26, tan skin, brown eyes, short curly black hair, black driving jacket over a rust-colored shirt with driving gloves tucked into the collar, energetic confident expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Brazilian man aged 26, tan skin, brown eyes, short curly black hair, black driving jacket over a rust-colored shirt with driving gloves tucked into the collar, energetic confident expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/mateo-silva/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 17544,
+          "sha256": "433d20cdf4a56d62739cd84e9203e179ff5e7087bb5ad2bc13488803bd94f528"
+        },
+        {
+          "file": "assets/agents/mateo-silva/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 14548,
+          "sha256": "7e1be5471f2e4a06e45a17831ad1e7944739985d6bdff115864328182ae8cd6b",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Mateo Silva. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "12a440e33b4e385ad1eeec6df2e83c9015b7d2ed837458b489fcd8ab69866eee",
+      "tokenSourceSha256": "84ae15ebe6e2b00f4485c97f05e30ee5d6b2377f704bec31585b8be753846fca"
+    },
+    {
+      "id": "nadia-rahman",
+      "name": "Nadia Rahman",
+      "subject": "a Pakistani British woman aged 38, warm brown skin, dark brown eyes, shoulder-length dark brown waves, navy tailored suit and cream blouse, composed patient expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Pakistani British woman aged 38, warm brown skin, dark brown eyes, shoulder-length dark brown waves, navy tailored suit and cream blouse, composed patient expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/nadia-rahman/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 18030,
+          "sha256": "2c4358938849d858a282ddbb10399069851f984992c50c9c5ffd22cae8688e37"
+        },
+        {
+          "file": "assets/agents/nadia-rahman/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 14028,
+          "sha256": "0568955df00260a44785104c90f89c8944c86ec1125d036aeae363b3725eaf00",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Nadia Rahman. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "5ae1b0580921c7ae1305072a65f94a915eea26e873edfe0128df190215e967e8",
+      "tokenSourceSha256": "725d73db37beb74df51e586c5e2118c95c044f1b6f658552ed769dcbcf29ab4a"
+    },
+    {
+      "id": "noor-al-masri",
+      "name": "Noor Al-Masri",
+      "subject": "an Egyptian British woman aged 32, medium olive skin, brown eyes, wavy black hair in a low bun, plain navy flight suit with no insignia and a headset resting around the neck, composed observant expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: an Egyptian British woman aged 32, medium olive skin, brown eyes, wavy black hair in a low bun, plain navy flight suit with no insignia and a headset resting around the neck, composed observant expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/noor-al-masri/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 17390,
+          "sha256": "db163f18ac126f0dc4f3fe8a437143a94357139c8fcb6daddf4832eee826ec36"
+        },
+        {
+          "file": "assets/agents/noor-al-masri/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 13876,
+          "sha256": "df97bb562327c465f45be0420053d82c956c36ea5bf64819d0b5b106306b8345",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Noor Al-Masri. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "b75909dd75ab83d22b9ea9c97578d15636f3d8a3a6b02c8a6b21781e38713443",
+      "tokenSourceSha256": "7f9c5ba7344c87d8e3e15f47f83d4d35bd630adf9ec446a96d42f9e19a472be8"
+    },
+    {
+      "id": "priya-raman",
+      "name": "Dr. Priya Raman",
+      "subject": "an Indian British woman aged 34, medium brown skin, brown eyes, long black braid over one shoulder, teal medical scrub top under a simple grey field coat with a stethoscope, steady compassionate expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: an Indian British woman aged 34, medium brown skin, brown eyes, long black braid over one shoulder, teal medical scrub top under a simple grey field coat with a stethoscope, steady compassionate expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/priya-raman/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 20342,
+          "sha256": "1a1f8d38458af7c713d122113639d9d69d9dbd940f9c2c09cf018f9af3506fb6"
+        },
+        {
+          "file": "assets/agents/priya-raman/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 14346,
+          "sha256": "7912e99fb46a176208254e3ae973eff76a1323e322a9d9a367fb89d5b102c49c",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Dr. Priya Raman. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "79241e908df722dcc5f4df01ce61290839af65595a10b43058a071b86b4887f7",
+      "tokenSourceSha256": "720df4471ee8cbb4f0a3bcead4b817ca38151bdef9a2aced2400777fe744796a"
+    },
+    {
+      "id": "samira-haddad",
+      "name": "Samira Haddad",
+      "subject": "a Lebanese Canadian woman aged 36, light olive skin, green eyes, straight black bob, small round glasses, charcoal coat over a burgundy blouse, watchful thoughtful expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Lebanese Canadian woman aged 36, light olive skin, green eyes, straight black bob, small round glasses, charcoal coat over a burgundy blouse, watchful thoughtful expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/samira-haddad/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 14496,
+          "sha256": "38985fe7bd67290eca89a29db62df92374b5c4e117755e627db837b06284192b"
+        },
+        {
+          "file": "assets/agents/samira-haddad/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 13374,
+          "sha256": "618cf5fbcd595a2f2628a5c0ecb1140793d3e807019e09c4897c2676cd7ba528",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Samira Haddad. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "7c602a4a612b28b316ab73b3c357c7df2ae20144b2e7ad2405b378d72b6fc4bc",
+      "tokenSourceSha256": "d05dcbb0efb2ceccfdc278ee81a5907e1ce3939563b224f1ce2fa838538ba628"
+    },
+    {
+      "id": "sofia-rossi",
+      "name": "Sofia Rossi",
+      "subject": "an Italian woman aged 40, olive skin, brown eyes, dark brown shoulder-length hair with grey at the temples, worn brown leather coat over a simple black blouse, thoughtful determined expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: an Italian woman aged 40, olive skin, brown eyes, dark brown shoulder-length hair with grey at the temples, worn brown leather coat over a simple black blouse, thoughtful determined expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/sofia-rossi/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 18066,
+          "sha256": "92a8242cc3cc80026cd0ba115a277c986619fc2701a5b853e21abd3223767117"
+        },
+        {
+          "file": "assets/agents/sofia-rossi/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 14334,
+          "sha256": "30b435a7a9b3e929bb4f0dd3956b10b90173749a3676e91d58c92a7d2a754770",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Sofia Rossi. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "a38ed17878bbb02e5704a7a1f563af07eb7d95b9d6f62faaf55a308203e1c1d0",
+      "tokenSourceSha256": "d8bb4da421c968acef886a2b11973f40cf7994b2f0f5e2acc57554f95d300961"
+    },
+    {
+      "id": "tomas-aalto",
+      "name": "Tomas Aalto",
+      "subject": "a Finnish man aged 33, fair skin, blue eyes, short blond hair and a close blond beard, forest-green field jacket with a small dog-training whistle on a cord, quiet attentive expression",
+      "prompt": "Use case: stylized-concept. Asset type: a square character portrait for a modern espionage tabletop roleplaying game, also used at small size as a Foundry VTT token. Subject: a Finnish man aged 33, fair skin, blue eyes, short blond hair and a close blond beard, forest-green field jacket with a small dog-training whistle on a cord, quiet attentive expression. A single original fictional character, centered head-and-shoulders portrait with the entire head visible and generous space around it. Grounded contemporary spy-thriller digital painting with believable anatomy, readable facial features and restrained cinematic lighting. Muted teal-grey studio backdrop and natural skin or fur colors, subtle warm highlights. Plain practical clothing as described. No text, lettering, logos, flags, insignia, frames, collage, watermark or weapon. Crisp silhouette, no hands or props in front of the face. One square portrait.",
+      "assets": [
+        {
+          "file": "assets/agents/tomas-aalto/portrait.webp",
+          "width": 512,
+          "height": 512,
+          "bytes": 16734,
+          "sha256": "991ab3a7f4267eb060ba7a50139af1edc6ae640d1f2744a7bcba28e761a18e50"
+        },
+        {
+          "file": "assets/agents/tomas-aalto/token.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 13350,
+          "sha256": "fa1b3c92402eea1b615eaaea4571e5f5354d485e6251f45cffbf5a9cd0e1504b",
+          "transparent": true
+        }
+      ],
+      "tokenPrompt": "Use case: precise-object-edit. Asset type: circular Foundry VTT character token. Edit the supplied portrait into a matching circular token for Tomas Aalto. Preserve the exact person's facial identity, age, skin tone, hair, expression and visible clothing (or the exact dog's face, fur, ears and collar). Keep the entire head and shoulders inside a circular muted dark teal disc. Add a simple thin muted brass ring around the disc. Center the face and leave some comfortable space around the top of the head. Everything outside the circle must be genuinely transparent. The circular token should fill most of the square with a small transparent margin. No text, lettering, labels, logos, extra objects or changes to identity. One square token, not a grid.",
+      "sourceSha256": "8adbd43e91fc51be89cd5f869793215f9403ab641f55570ad3a632d9ff2b68d3",
+      "tokenSourceSha256": "88423828ec6cef4031c0ac2e3e6e06a0f376cb9c3795e0fae9a24d5203debe58"
+    }
+  ]
+}

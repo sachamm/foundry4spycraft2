@@ -13,6 +13,8 @@ import { cqbRangedWeapon } from "../rules/cqb.mjs";
 import { weaponUnavailable } from "../rules/gear.mjs";
 import { incomingDefensePlan } from "../rules/defense.mjs";
 import { combatStanceState } from "../rules/combat-stance.mjs";
+import { hordeCoverFloor } from "../rules/team-feats.mjs";
+import { activeAnticipations } from "./combat-options.mjs";
 import { loc } from "../i18n.mjs";
 const rangedSourceFacts = ({ attacker, weapon }) =>
   JSON.stringify({
@@ -53,18 +55,27 @@ export async function checkIncomingDefense(actor) {
       if (precisionTakedownGrade(attacker.system)) precisionSources.set(attacker.id, attacker);
   const circlingSources = new Map();
   for (const attacker of game.actors ?? [])
-    if (attacker !== actor && canReadSource(attacker) && combatStanceState(attacker.system ?? {})?.key === "circling")
+    if (
+      attacker !== actor &&
+      canReadSource(attacker) &&
+      ["circling", "shifting"].includes(combatStanceState(attacker.system ?? {})?.key)
+    )
       circlingSources.set(attacker.id, attacker);
   const circlingInput = circlingSources.size
-    ? `<fieldset><legend>${loc`Circling Stance attacker`}</legend><label>${loc`Melee attacker in Circling Stance (Knife Basics; optional)`} <select name="circlingAttacker"><option value="">${loc`No Circling Stance attacker`}</option>${[...circlingSources].map(([id, a]) => `<option value="${esc(id)}">${esc(a.name)}</option>`).join("")}</select></label><label><input name="circlingUnoccupiedAdjacent" type="checkbox" /> ${loc`The GC confirms at least 1 square adjacent to that attacker is unoccupied`}</label></fieldset>`
+    ? `<fieldset><legend>${loc`Circling or Shifting Stance attacker`}</legend><label>${loc`Attacker in Circling Stance (Knife Basics) or Shifting Stance (Kicking Basics; optional)`} <select name="circlingAttacker"><option value="">${loc`No such attacker`}</option>${[...circlingSources].map(([id, a]) => `<option value="${esc(id)}">${esc(a.name)}</option>`).join("")}</select></label><label><input name="circlingUnoccupiedAdjacent" type="checkbox" /> ${loc`The GC confirms at least 1 square adjacent to that attacker is unoccupied`}</label><label><input name="shiftingUnarmed" type="checkbox" /> ${loc`Shifting Stance: this is an unarmed attack`}</label></fieldset>`
     : "";
-  const coverInput = `<fieldset><legend>${loc`Cover from this attacker`}</legend><p>${loc`Choose the best personal source and best scenery source on the attacker's side of the cover. Enter grades after any other separately adjudicated grade adjustments. Do not preapply the automatically selected Precision Takedown, CQB Supremacy or Sharpshooter Basics reductions. Other options modifying the cover Defense bonus itself remain separate, except Safe Attack below.`}</p>${["personal", "scenery"].map(kind => `<label>${loc`${kind === "personal" ? "Personal" : "Scenery"} cover`} <select name="${kind}Cover">${COVER_GRADES.map((label, i) => `<option value="${i}">${esc(label)}</option>`).join("")}</select></label>`).join("")}${terrainCoverContent(actor.system)}<label>${loc`Ranged attacker and actual weapon (CQB Supremacy / Sharpshooter Basics; optional)`} <select name="coverAttacker"><option value="">${loc`No automatic ranged-feat reduction`}</option>${[...sources].map(([id, { attacker, weapon }]) => `<option value="${esc(id)}">${esc(attacker.name)} — ${esc(weapon.name)}</option>`).join("")}</select></label><label>${loc`Counter-Terrorist attacker (optional; automatic for the CQB attacker selected above)`} <select name="precisionAttacker"><option value="">${loc`No additional attacker selection`}</option>${[...precisionSources].map(([id, a]) => `<option value="${esc(id)}">${loc`${esc(a.name)} — Precision Takedown ${precisionTakedownGrade(a.system) === 2 ? "II" : "I"}`}</option>`).join("")}</select></label><label>${loc`Target distance in feet for CQB Supremacy`} <input name="coverDistance" type="number" min="0" step="any" /></label><label><input name="coverOpponent" type="checkbox" /> ${loc`This character is an opponent of the selected attacker`}</label><label>${loc`Remaining human-shield Defense bonus after cover-grade reductions`} <input name="humanShieldDefense" type="number" value="0" min="0" max="8" step="1" /></label><label><input name="humanShieldConfirmed" type="checkbox" /> ${loc`The GC confirmed this remaining component; it is supplied by a human shield`}</label><p>${loc`Use0 without a human shield. The GC determines which component remains after grade reductions. An actual Counter-Terrorist level4+ halves only this component with Safe Attack; other cover and penetration remain separate.`}</p></fieldset>`;
+  const coverInput = `<fieldset><legend>${loc`Cover from this attacker`}</legend><p>${loc`Choose the best personal source and best scenery source on the attacker's side of the cover. Enter grades after any other separately adjudicated grade adjustments. Do not preapply the automatically selected Precision Takedown, CQB Supremacy or Sharpshooter Basics reductions. Other options modifying the cover Defense bonus itself remain separate, except Safe Attack below.`}</p>${["personal", "scenery"].map(kind => `<label>${loc`${kind === "personal" ? "Personal" : "Scenery"} cover`} <select name="${kind}Cover">${COVER_GRADES.map((label, i) => `<option value="${i}">${esc(label)}</option>`).join("")}</select></label>`).join("")}${terrainCoverContent(actor.system)}${[...(game.actors ?? [])].some(a => a.system?.activeFeatNames?.includes("Horde Basics")) ? `<label>${loc`Horde Basics: this side’s advantage (raises personal cover)`} <select name="hordeAdvantage"><option value="">${loc`None or no Horde Basics on this side`}</option><option value="2">${loc`2-to-1: at least 1/4 personal cover`}</option><option value="3">${loc`3-to-1 or more: at least 1/2 personal cover`}</option></select></label>` : ""}<label>${loc`Ranged attacker and actual weapon (CQB Supremacy / Sharpshooter Basics; optional)`} <select name="coverAttacker"><option value="">${loc`No automatic ranged-feat reduction`}</option>${[...sources].map(([id, { attacker, weapon }]) => `<option value="${esc(id)}">${esc(attacker.name)} — ${esc(weapon.name)}</option>`).join("")}</select></label><label>${loc`Counter-Terrorist attacker (optional; automatic for the CQB attacker selected above)`} <select name="precisionAttacker"><option value="">${loc`No additional attacker selection`}</option>${[...precisionSources].map(([id, a]) => `<option value="${esc(id)}">${loc`${esc(a.name)} — Precision Takedown ${precisionTakedownGrade(a.system) === 2 ? "II" : "I"}`}</option>`).join("")}</select></label><label>${loc`Target distance in feet for CQB Supremacy`} <input name="coverDistance" type="number" min="0" step="any" /></label><label><input name="coverOpponent" type="checkbox" /> ${loc`This character is an opponent of the selected attacker`}</label><label>${loc`Remaining human-shield Defense bonus after cover-grade reductions`} <input name="humanShieldDefense" type="number" value="0" min="0" max="8" step="1" /></label><label><input name="humanShieldConfirmed" type="checkbox" /> ${loc`The GC confirmed this remaining component; it is supplied by a human shield`}</label><p>${loc`Use0 without a human shield. The GC determines which component remains after grade reductions. An actual Counter-Terrorist level4+ halves only this component with Safe Attack; other cover and penetration remain separate.`}</p></fieldset>`;
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Incoming attack — Defense` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`}</p>${coverInput}${circlingInput}${ghostCoverContent(actor)}${whirlingDefenseContent(actor)}${Object.entries(
-      fields
+    content: `<div class="spycraft2-roll-options"><p>${loc`Check Defense for one incoming attack. Current conditions and class benefits apply.`}</p>${coverInput}${circlingInput}${ghostCoverContent(actor)}${actor.system.duelingBasics?.opponentUuid && actor.system.activeFeatNames?.includes("Dueling Basics") ? `<label><input name="fromDuelingOpponent" type="checkbox" /> ${loc`Dueling Basics: this attack comes from ${esc(actor.system.duelingBasics.opponentName || "the chosen opponent")} (+2 dodge)`}</label>` : ""}${activeAnticipations(
+      actor
     )
+      .map(
+        (record, index) =>
+          `<label><input name="anticipate_${index}" type="checkbox" /> ${loc`Anticipate: this attack comes from ${esc(record.opponentName)} (+${record.dodge} dodge${record.threatReduction ? loc`; their threat range −${record.threatReduction}` : ""})`}</label>`
+      )
+      .join("")}${whirlingDefenseContent(actor)}${Object.entries(fields)
       .map(([key, label]) => `<label><input name="${key}" type="checkbox" /> ${label}</label>`)
       .join(
         ""
@@ -139,7 +150,7 @@ export async function checkIncomingDefense(actor) {
       terrainCoverConfirmed: input.terrainCoverConfirmed ?? false,
       humanShieldDefense: shield,
       humanShieldConfirmed: input.humanShieldConfirmed ?? false,
-      personalCover: grade(input.personalCover),
+      personalCover: Math.max(grade(input.personalCover), hordeCoverFloor(input.hordeAdvantage)),
       sceneryCover: grade(input.sceneryCover),
       attackerSystem: source?.attacker.system,
       attackerWeapon: source?.weapon.system,
@@ -150,11 +161,19 @@ export async function checkIncomingDefense(actor) {
     if (circlingSource && [source?.attacker, precision].some(a => a && a !== circlingSource))
       throw new Error(loc`The Circling Stance and cover-reduction declarations must name the same actual attacker.`);
     plan = incomingDefensePlan(actor.system, {
+      fromDuelingOpponent: input.fromDuelingOpponent === true,
+      anticipateDodge: Math.max(
+        0,
+        ...activeAnticipations(actor)
+          .filter((record, index) => input[`anticipate_${index}`] === true)
+          .map(record => record.dodge)
+      ),
       cover,
       circling: circlingSource
         ? {
             attackerSystem: circlingSource.system,
-            unoccupiedAdjacentConfirmed: input.circlingUnoccupiedAdjacent === true
+            unoccupiedAdjacentConfirmed: input.circlingUnoccupiedAdjacent === true,
+            unarmedConfirmed: input.shiftingUnarmed === true
           }
         : undefined,
       whirlingAttackerLevel: whirling.plan.attackerLevel,
@@ -169,7 +188,7 @@ export async function checkIncomingDefense(actor) {
   await foundry.applications.api.DialogV2.input({
     window: { title: loc`Incoming attack — result` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p><b>${loc`Defense ${plan.total}`}</b></p>${ghostCover ? `<p>${loc`Ghost attacker: ${esc(ghostCover.context.actorName)}; invisible to ${esc(ghostCover.context.opponentName)}: ${ghostCover.invisible ? "yes" : "no"}.`}</p>${ghostCover.notes.map(n => `<p>${esc(n)}</p>`).join("")}` : ""}<p>${loc`Cover: ${esc(plan.cover.label)}, Defense +${plan.cover.defenseBonus}; ordinary Reflex bonus +${plan.cover.reflexBonus} against effects beyond the cover (apply separately to the save).${plan.cover.precisionReduction ? loc` Precision Takedown reduced attack cover by ${plan.cover.precisionReduction} grade(s).` : ""}${plan.cover.supremacyReduction ? loc` CQB Supremacy reduced the attack cover by one quarter.` : ""}`}</p>${plan.cover.notes.map(n => `<p>${esc(n)}</p>`).join("")}<p>${loc`DEX ${plan.dexterity}; dodge bonuses removed ${plan.dodgeLost + plan.circling.dodgeReduction}; security-device bonus +${plan.securityBonus}; adjacent Eye of the Storm bonus +${plan.eyeOfStorm}.`}</p><p>${loc`Uncanny Dodge grade ${plan.uncanny.grade}; vulnerable ${plan.vulnerable ? "yes" : "no"}; flat-footed ${plan.flatFooted ? "yes" : "no"}; flanked ${plan.flanked ? "yes" : "no"}; helpless ${plan.helpless ? "yes" : "no"}.`}</p><p>${loc`Attacker modifier ${plan.attackerBonus >= 0 ? "+" : ""}${plan.attackerBonus} (pinned target, adjacent melee/unarmed +${plan.pinnedAttackerBonus}; prone target ${plan.proneAttackerPenalty}; crouched target ${plan.crouchedAttackerPenalty}; blinded target +${plan.blindedAttackerBonus}; helpless target within Melee Range +${plan.helplessAttackerBonus}). Coup de Grace target eligible: ${plan.coupDeGraceEligible ? loc`yes, subject to normal action requirements` : "no"}.`}</p><p>${loc`Known sneak attack immunity: ${plan.sneakAttackImmune ? "yes" : "no"}. ${plan.armorMasteryRequiresHelpless ? loc`Armor Mastery requires helplessness even when another option permits Coup de Grace.` : ""}`}</p>${plan.listedDR ? `<p>${loc`Listed DR before armor piercing/type exceptions: melee weapons ${plan.listedDR.meleeWeapon}, unarmed ${plan.listedDR.unarmed}, non-grenade hurled weapons ${plan.listedDR.hurledWeapon}, other ranged weapons ${plan.listedDR.rangedWeapon}, other ${plan.listedDR.other}.`}</p>` : ""}${plan.coupDeGraceException ? `<p>${loc`Declared exception: ${esc(plan.coupDeGraceExceptionSource)}.`}</p>` : ""}${plan.notes.map(n => `<p>${esc(n)}</p>`).join("")}</div>`
+    content: `<div class="spycraft2-roll-options"><p><b>${loc`Defense ${plan.total}`}</b></p>${ghostCover ? `<p>${loc`Ghost attacker: ${esc(ghostCover.context.actorName)}; invisible to ${esc(ghostCover.context.opponentName)}: ${ghostCover.invisible ? "yes" : "no"}.`}</p>${ghostCover.notes.map(n => `<p>${esc(n)}</p>`).join("")}` : ""}<p>${loc`Cover: ${esc(plan.cover.label)}, Defense +${plan.cover.defenseBonus}; ordinary Reflex bonus +${plan.cover.reflexBonus} against effects beyond the cover (apply separately to the save).${plan.cover.precisionReduction ? loc` Precision Takedown reduced attack cover by ${plan.cover.precisionReduction} grade(s).` : ""}${plan.cover.supremacyReduction ? loc` CQB Supremacy reduced the attack cover by one quarter.` : ""}`}</p>${plan.cover.notes.map(n => `<p>${esc(n)}</p>`).join("")}<p>${loc`DEX ${plan.dexterity}; dodge bonuses removed ${plan.dodgeLost + plan.circling.dodgeReduction}; security-device bonus +${plan.securityBonus}; adjacent Eye of the Storm bonus +${plan.eyeOfStorm}.`}</p><p>${loc`Uncanny Dodge grade ${plan.uncanny.grade}; vulnerable ${plan.vulnerable ? "yes" : "no"}; flat-footed ${plan.flatFooted ? "yes" : "no"}; flanked ${plan.flanked ? "yes" : "no"}; helpless ${plan.helpless ? "yes" : "no"}.`}</p><p>${loc`Attacker modifier ${plan.attackerBonus >= 0 ? "+" : ""}${plan.attackerBonus} (pinned target, adjacent melee/unarmed +${plan.pinnedAttackerBonus}; prone target ${plan.proneAttackerPenalty}; crouched target ${plan.crouchedAttackerPenalty}; blinded target +${plan.blindedAttackerBonus}; helpless target within Melee Range +${plan.helplessAttackerBonus}). Coup de Grace target eligible: ${plan.coupDeGraceEligible ? loc`yes, subject to normal action requirements` : "no"}.`}</p><p>${loc`Known sneak attack immunity: ${plan.sneakAttackImmune ? "yes" : "no"}. ${plan.armorMasteryRequiresHelpless ? loc`Armor Mastery requires helplessness even when another option permits Coup de Grace.` : ""}`}</p>${plan.listedDR ? `<p>${loc`Listed DR before armor piercing/type exceptions: melee weapons ${plan.listedDR.meleeWeapon}, unarmed ${plan.listedDR.unarmed}, non-grenade hurled weapons ${plan.listedDR.hurledWeapon}, other ranged weapons ${plan.listedDR.rangedWeapon}, other ${plan.listedDR.other}.`}</p>` : ""}${plan.stickyFingersDR ? `<p>${loc`Sticky Fingers: the listed DR includes DR 5 against this adjacent opponent during Total Defense (p.187).`}</p>` : ""}${plan.coupDeGraceException ? `<p>${loc`Declared exception: ${esc(plan.coupDeGraceExceptionSource)}.`}</p>` : ""}${plan.notes.map(n => `<p>${esc(n)}</p>`).join("")}</div>`
   });
   try {
     if (
@@ -188,7 +207,7 @@ export async function checkIncomingDefense(actor) {
       circlingSource &&
       (!canReadSource(circlingSource) ||
         game.actors.get(circlingSource.id) !== circlingSource ||
-        combatStanceState(circlingSource.system)?.key !== "circling")
+        !["circling", "shifting"].includes(combatStanceState(circlingSource.system)?.key))
     )
       throw Error(loc`The Circling Stance attacker changed or left the stance. Reopen the incoming attack preview.`);
     validateWhirlingDefensePreview(actor, input, whirling);

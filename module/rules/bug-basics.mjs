@@ -1,4 +1,4 @@
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Bug Basics p.208: only the two named Stash Item checks made to conceal bugs. */
 export function bugConcealmentPlan(
@@ -55,4 +55,16 @@ rollPipeline.register({
   record: ["bugConcealment"],
   validate: ({ actor, options, checkKind, checkId, skillKey }) =>
     validateBugConcealmentProof(actor.system, options.bugConcealment, { checkKind, skillKey, checkId })
+});
+
+// Concealing a bug, in a skill check's plan.
+rollPipeline.register({
+  id: "bugConcealmentSkillTerm",
+  kinds: ["skill"],
+  order: 9310,
+  terms({ system, skillKey, check, input }) {
+    const { concealingBug = false, bugName = "", bugConcealmentConfirmed = false } = input;
+    const plan = bugConcealmentPlan(system, skillKey, check, { concealingBug, bugName, bugConcealmentConfirmed });
+    return skillPlanTerm("bugConcealment", plan, { noteAt: 200, blockAt: 180, bonusAt: 50 });
+  }
 });

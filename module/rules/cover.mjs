@@ -210,3 +210,20 @@ rollPipeline.register({
   validate: ({ actor, options, checkKind, checkId }) =>
     validateCoverSaveSource(actor.system, options.coverSave, { checkKind, checkId })
 });
+
+// Cover as part of a save plan.
+rollPipeline.register({
+  id: "coverSaveTerm",
+  kinds: ["save"],
+  order: 9490,
+  terms({ system, saveKey, input }) {
+    const plan = saveCoverPlan(saveKey, input, system);
+    return {
+      rowAt: 100,
+      rows: [[loc`Cover`, plan?.bonus ?? 0]],
+      flavorAt: 50,
+      flavor: plan?.bonus ? loc` — Cover/Reflex +${plan.bonus}` : "",
+      options: { coverSave: plan }
+    };
+  }
+});

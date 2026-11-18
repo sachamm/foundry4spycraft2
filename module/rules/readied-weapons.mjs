@@ -5,6 +5,11 @@ import { loc } from "../i18n.mjs";
 /** Gear represents a physically held/readied personal weapon with equipped+carried flags.
  * Ammunition and proficiency are not prerequisites for merely holding the weapon.
  */
+const steelRainReadied = (system, w) =>
+  system?.activeFeatNames?.includes("Steel Rain") === true &&
+  ["hurled", "exoticHurled"].includes(w.proficiency) &&
+  !/\bBLS\b/.test(w.qualities ?? "") &&
+  w.carried !== false;
 export function readiedRangedWeapons(system, items = []) {
   const ready = [];
   for (const item of items) {
@@ -14,7 +19,8 @@ export function readiedRangedWeapons(system, items = []) {
       item.type !== "weapon" ||
       typeof id !== "string" ||
       !id ||
-      w.equipped !== true ||
+      // Steel Rain (p.182): any hurled weapon on the character's person counts as readied.
+      (w.equipped !== true && !steelRainReadied(system, w)) ||
       w.carried === false ||
       !Number.isSafeInteger(w.quantity ?? 1) ||
       (w.quantity ?? 1) < 1 ||
@@ -50,9 +56,11 @@ export const MELEE_SKILL_FAMILIES = [
   "oneHandedSword",
   "polearm",
   "flail",
-  "knife"
+  "knife",
+  "club"
 ];
 const familyProficiencies = {
+  club: ["blunt", "exoticBlunt"],
   knife: ["edged", "exoticEdged", "hurled", "exoticHurled"],
   flail: ["exoticBlunt"],
   polearm: ["exoticEdged"],
@@ -109,14 +117,18 @@ export function readiedMeleeWeapons(system, items = []) {
   return ready.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
-/** Shared immutable source for a qualified feat requiring a physically readied family. */
-export function readiedMeleeFeatSource(system, { name, family, bonus }) {
+/** Shared immutable source for a qualified feat requiring a physically readied family.
+ * One-handed swords default to Fencing's rule (finesse required; a held non-finesse sword needs review).
+ * `finesse: false` asks instead for the held swords without finesse (Sword Basics), ignoring finesse ones.
+ */
+export function readiedMeleeFeatSource(system, { name, family, bonus, finesse = true }) {
   const names = system.activeFeatNames ?? [],
     weapons = system.readiedMeleeWeapons ?? [];
   if (!Array.isArray(names) || names.some(n => typeof n !== "string") || !Array.isArray(weapons))
     throw Error(loc`Review the current qualified melee feats and readied weapon families.`);
   if (!names.includes(name)) return null;
-  const held = weapons.filter(w => w?.family === family);
+  const nonFinesseSword = family === "oneHandedSword" && finesse === false,
+    held = weapons.filter(w => w?.family === family && (!nonFinesseSword || w.finesse !== true));
   if (
     held.some(
       w =>
@@ -127,7 +139,7 @@ export function readiedMeleeFeatSource(system, { name, family, bonus }) {
         ![1, 2].includes(w.hands) ||
         ![1, 2].includes(w.requiredHands) ||
         (family === "twoHandedSword" && w.requiredHands !== 2) ||
-        (family === "oneHandedSword" && (w.requiredHands !== 1 || w.finesse !== true))
+        (family === "oneHandedSword" && (w.requiredHands !== 1 || w.finesse !== !nonFinesseSword))
     ) ||
     new Set(held.map(w => w.id)).size !== held.length
   )

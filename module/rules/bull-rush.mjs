@@ -1,6 +1,6 @@
 import { responseOwnSize } from "./trip.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Ordinary target's on-foot Bull Rush response, p.354; action modifier+0, p.352. */
 export function bullRushDefenseSkillChecks(key, checks = []) {
@@ -155,4 +155,29 @@ rollPipeline.register({
   order: 5090,
   kinds: ["skill"],
   skillChecks: ({ skillKey }, checks) => bullRushDefenseSkillChecks(skillKey, checks)
+});
+
+// Resisting a Bull Rush, in a skill check's plan.
+rollPipeline.register({
+  id: "bullRushDefenseSkillTerm",
+  kinds: ["skill"],
+  order: 9260,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      bullRushOpponentName = "",
+      bullRushSizeDifference = null,
+      bullRushIncomingConfirmed = false,
+      bullRushOnFootConfirmed = false,
+      bullRushContactConfirmed = false
+    } = input;
+    const plan = bullRushDefensePlan(system, skillKey, check, {
+      method,
+      bullRushOpponentName,
+      bullRushSizeDifference,
+      bullRushIncomingConfirmed,
+      bullRushOnFootConfirmed,
+      bullRushContactConfirmed
+    });
+    return skillPlanTerm("bullRushDefense", plan, { noteAt: 70, blockAt: 50, bonusAt: 10 });
+  }
 });

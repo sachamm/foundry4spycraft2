@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { ownCountDurationActive } from "./own-count-duration.mjs";
 import { loc } from "../i18n.mjs";
 const empty = () => ({
@@ -71,3 +72,6 @@ export function twoWeaponSkillNote(system) {
       : loc`Both Guns Blazing: two-weapon skill penalty waived. `
     : "";
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "twoWeaponStateRecord", order: 9785, record: ["twoWeaponFinalAttack"] });

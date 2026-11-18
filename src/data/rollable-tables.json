@@ -1,0 +1,4377 @@
+{
+  "source": "Spycraft 2.0, second printing. Numerical ranges and short labels; descriptions are original.",
+  "tables": [
+    {
+      "id": "age-standard",
+      "name": "Random Age: Standard",
+      "formula": "2d6 + 22",
+      "page": 60,
+      "source": "Character description",
+      "notes": "Optional character detail; check the campaign premise with the GC.",
+      "results": [
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Age 24 years."
+        },
+        {
+          "range": [
+            25,
+            25
+          ],
+          "text": "Age 25 years."
+        },
+        {
+          "range": [
+            26,
+            26
+          ],
+          "text": "Age 26 years."
+        },
+        {
+          "range": [
+            27,
+            27
+          ],
+          "text": "Age 27 years."
+        },
+        {
+          "range": [
+            28,
+            28
+          ],
+          "text": "Age 28 years."
+        },
+        {
+          "range": [
+            29,
+            29
+          ],
+          "text": "Age 29 years."
+        },
+        {
+          "range": [
+            30,
+            30
+          ],
+          "text": "Age 30 years."
+        },
+        {
+          "range": [
+            31,
+            31
+          ],
+          "text": "Age 31 years."
+        },
+        {
+          "range": [
+            32,
+            32
+          ],
+          "text": "Age 32 years."
+        },
+        {
+          "range": [
+            33,
+            33
+          ],
+          "text": "Age 33 years."
+        },
+        {
+          "range": [
+            34,
+            34
+          ],
+          "text": "Age 34 years."
+        }
+      ],
+      "icon": "dossier"
+    },
+    {
+      "id": "age-broad",
+      "name": "Random Age: Broad",
+      "formula": "4d6 + 16",
+      "page": 60,
+      "source": "Character description",
+      "notes": "Optional character detail; check the campaign premise with the GC.",
+      "results": [
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Age 20 years."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Age 21 years."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Age 22 years."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Age 23 years."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Age 24 years."
+        },
+        {
+          "range": [
+            25,
+            25
+          ],
+          "text": "Age 25 years."
+        },
+        {
+          "range": [
+            26,
+            26
+          ],
+          "text": "Age 26 years."
+        },
+        {
+          "range": [
+            27,
+            27
+          ],
+          "text": "Age 27 years."
+        },
+        {
+          "range": [
+            28,
+            28
+          ],
+          "text": "Age 28 years."
+        },
+        {
+          "range": [
+            29,
+            29
+          ],
+          "text": "Age 29 years."
+        },
+        {
+          "range": [
+            30,
+            30
+          ],
+          "text": "Age 30 years."
+        },
+        {
+          "range": [
+            31,
+            31
+          ],
+          "text": "Age 31 years."
+        },
+        {
+          "range": [
+            32,
+            32
+          ],
+          "text": "Age 32 years."
+        },
+        {
+          "range": [
+            33,
+            33
+          ],
+          "text": "Age 33 years."
+        },
+        {
+          "range": [
+            34,
+            34
+          ],
+          "text": "Age 34 years."
+        },
+        {
+          "range": [
+            35,
+            35
+          ],
+          "text": "Age 35 years."
+        },
+        {
+          "range": [
+            36,
+            36
+          ],
+          "text": "Age 36 years."
+        },
+        {
+          "range": [
+            37,
+            37
+          ],
+          "text": "Age 37 years."
+        },
+        {
+          "range": [
+            38,
+            38
+          ],
+          "text": "Age 38 years."
+        },
+        {
+          "range": [
+            39,
+            39
+          ],
+          "text": "Age 39 years."
+        },
+        {
+          "range": [
+            40,
+            40
+          ],
+          "text": "Age 40 years."
+        }
+      ],
+      "icon": "dossier"
+    },
+    {
+      "id": "height-weight-male",
+      "name": "Random Height and Weight: Male",
+      "formula": "2d12",
+      "page": 61,
+      "source": "Table 1.18",
+      "notes": "Roll once for height; resolve the inline weight roll using that height increase. The weight multiplier is an independent 2d4 roll.",
+      "results": [
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Height 5 ft. 0 in. (60 in.). Weight: [[120 + 2 * 2d4]] lb. The weight calculation uses this same height increase of 2 inches."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Height 5 ft. 1 in. (61 in.). Weight: [[120 + 3 * 2d4]] lb. The weight calculation uses this same height increase of 3 inches."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Height 5 ft. 2 in. (62 in.). Weight: [[120 + 4 * 2d4]] lb. The weight calculation uses this same height increase of 4 inches."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Height 5 ft. 3 in. (63 in.). Weight: [[120 + 5 * 2d4]] lb. The weight calculation uses this same height increase of 5 inches."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Height 5 ft. 4 in. (64 in.). Weight: [[120 + 6 * 2d4]] lb. The weight calculation uses this same height increase of 6 inches."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Height 5 ft. 5 in. (65 in.). Weight: [[120 + 7 * 2d4]] lb. The weight calculation uses this same height increase of 7 inches."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Height 5 ft. 6 in. (66 in.). Weight: [[120 + 8 * 2d4]] lb. The weight calculation uses this same height increase of 8 inches."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Height 5 ft. 7 in. (67 in.). Weight: [[120 + 9 * 2d4]] lb. The weight calculation uses this same height increase of 9 inches."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Height 5 ft. 8 in. (68 in.). Weight: [[120 + 10 * 2d4]] lb. The weight calculation uses this same height increase of 10 inches."
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Height 5 ft. 9 in. (69 in.). Weight: [[120 + 11 * 2d4]] lb. The weight calculation uses this same height increase of 11 inches."
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Height 5 ft. 10 in. (70 in.). Weight: [[120 + 12 * 2d4]] lb. The weight calculation uses this same height increase of 12 inches."
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Height 5 ft. 11 in. (71 in.). Weight: [[120 + 13 * 2d4]] lb. The weight calculation uses this same height increase of 13 inches."
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Height 6 ft. 0 in. (72 in.). Weight: [[120 + 14 * 2d4]] lb. The weight calculation uses this same height increase of 14 inches."
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Height 6 ft. 1 in. (73 in.). Weight: [[120 + 15 * 2d4]] lb. The weight calculation uses this same height increase of 15 inches."
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Height 6 ft. 2 in. (74 in.). Weight: [[120 + 16 * 2d4]] lb. The weight calculation uses this same height increase of 16 inches."
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Height 6 ft. 3 in. (75 in.). Weight: [[120 + 17 * 2d4]] lb. The weight calculation uses this same height increase of 17 inches."
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Height 6 ft. 4 in. (76 in.). Weight: [[120 + 18 * 2d4]] lb. The weight calculation uses this same height increase of 18 inches."
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Height 6 ft. 5 in. (77 in.). Weight: [[120 + 19 * 2d4]] lb. The weight calculation uses this same height increase of 19 inches."
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Height 6 ft. 6 in. (78 in.). Weight: [[120 + 20 * 2d4]] lb. The weight calculation uses this same height increase of 20 inches."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Height 6 ft. 7 in. (79 in.). Weight: [[120 + 21 * 2d4]] lb. The weight calculation uses this same height increase of 21 inches."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Height 6 ft. 8 in. (80 in.). Weight: [[120 + 22 * 2d4]] lb. The weight calculation uses this same height increase of 22 inches."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Height 6 ft. 9 in. (81 in.). Weight: [[120 + 23 * 2d4]] lb. The weight calculation uses this same height increase of 23 inches."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Height 6 ft. 10 in. (82 in.). Weight: [[120 + 24 * 2d4]] lb. The weight calculation uses this same height increase of 24 inches."
+        }
+      ],
+      "icon": "crowd"
+    },
+    {
+      "id": "height-weight-female",
+      "name": "Random Height and Weight: Female",
+      "formula": "2d12",
+      "page": 61,
+      "source": "Table 1.18",
+      "notes": "Roll once for height; resolve the inline weight roll using that height increase. The weight multiplier is an independent 2d4 roll.",
+      "results": [
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Height 4 ft. 7 in. (55 in.). Weight: [[85 + 2 * 2d4]] lb. The weight calculation uses this same height increase of 2 inches."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Height 4 ft. 8 in. (56 in.). Weight: [[85 + 3 * 2d4]] lb. The weight calculation uses this same height increase of 3 inches."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Height 4 ft. 9 in. (57 in.). Weight: [[85 + 4 * 2d4]] lb. The weight calculation uses this same height increase of 4 inches."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Height 4 ft. 10 in. (58 in.). Weight: [[85 + 5 * 2d4]] lb. The weight calculation uses this same height increase of 5 inches."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Height 4 ft. 11 in. (59 in.). Weight: [[85 + 6 * 2d4]] lb. The weight calculation uses this same height increase of 6 inches."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Height 5 ft. 0 in. (60 in.). Weight: [[85 + 7 * 2d4]] lb. The weight calculation uses this same height increase of 7 inches."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Height 5 ft. 1 in. (61 in.). Weight: [[85 + 8 * 2d4]] lb. The weight calculation uses this same height increase of 8 inches."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Height 5 ft. 2 in. (62 in.). Weight: [[85 + 9 * 2d4]] lb. The weight calculation uses this same height increase of 9 inches."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Height 5 ft. 3 in. (63 in.). Weight: [[85 + 10 * 2d4]] lb. The weight calculation uses this same height increase of 10 inches."
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Height 5 ft. 4 in. (64 in.). Weight: [[85 + 11 * 2d4]] lb. The weight calculation uses this same height increase of 11 inches."
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Height 5 ft. 5 in. (65 in.). Weight: [[85 + 12 * 2d4]] lb. The weight calculation uses this same height increase of 12 inches."
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Height 5 ft. 6 in. (66 in.). Weight: [[85 + 13 * 2d4]] lb. The weight calculation uses this same height increase of 13 inches."
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Height 5 ft. 7 in. (67 in.). Weight: [[85 + 14 * 2d4]] lb. The weight calculation uses this same height increase of 14 inches."
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Height 5 ft. 8 in. (68 in.). Weight: [[85 + 15 * 2d4]] lb. The weight calculation uses this same height increase of 15 inches."
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Height 5 ft. 9 in. (69 in.). Weight: [[85 + 16 * 2d4]] lb. The weight calculation uses this same height increase of 16 inches."
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Height 5 ft. 10 in. (70 in.). Weight: [[85 + 17 * 2d4]] lb. The weight calculation uses this same height increase of 17 inches."
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Height 5 ft. 11 in. (71 in.). Weight: [[85 + 18 * 2d4]] lb. The weight calculation uses this same height increase of 18 inches."
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Height 6 ft. 0 in. (72 in.). Weight: [[85 + 19 * 2d4]] lb. The weight calculation uses this same height increase of 19 inches."
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Height 6 ft. 1 in. (73 in.). Weight: [[85 + 20 * 2d4]] lb. The weight calculation uses this same height increase of 20 inches."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Height 6 ft. 2 in. (74 in.). Weight: [[85 + 21 * 2d4]] lb. The weight calculation uses this same height increase of 21 inches."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Height 6 ft. 3 in. (75 in.). Weight: [[85 + 22 * 2d4]] lb. The weight calculation uses this same height increase of 22 inches."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Height 6 ft. 4 in. (76 in.). Weight: [[85 + 23 * 2d4]] lb. The weight calculation uses this same height increase of 23 inches."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Height 6 ft. 5 in. (77 in.). Weight: [[85 + 24 * 2d4]] lb. The weight calculation uses this same height increase of 24 inches."
+        }
+      ],
+      "icon": "crowd"
+    },
+    {
+      "id": "bag-guns-i",
+      "name": "Bag Full of Guns: Caliber I",
+      "formula": "2d4 + 8",
+      "page": 281,
+      "source": "Table 4.67",
+      "notes": "Each character rolls once when this resource is received. Add 1 to the weapon error range. This result does not grant an additional equipment pick.",
+      "results": [
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Barrett M82A1 semi-automatic rifle. Error range +1."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Ruger Super Redhawk hunting revolver (.44 Magnum). Error range +1."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Taurus Model 608 service revolver. Error range +1."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "H&K Mk. 23 service pistol. Error range +1."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Benelli M1 Tactical semi-automatic shotgun; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "H&K P7 backup pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Colt Detective Special backup revolver; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Walther PPK backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Saiga 12K semi-automatic shotgun (20 gauge). Error range +1."
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "MAC M11 light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Beretta 92 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Glock 17 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Walther PP backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Colt M1911A1 service pistol; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "MAC M10 light SMG (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "H&K MP5K light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Colt M16A3 assault rifle; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "IMI Uzi heavy SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "SiG-Sauer P239 backup pistol (.40 S&W). Error range +1."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Smith & Wesson Model 500 hunting revolver. Error range +1."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Enfield L85A2 assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Steyr AUG Para assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Thompson M1928 heavy SMG; GC selects ammunition caliber. Error range +1."
+        }
+      ],
+      "icon": "assault-rifle"
+    },
+    {
+      "id": "bag-guns-ii",
+      "name": "Bag Full of Guns: Caliber II",
+      "formula": "2d6 + 6",
+      "page": 281,
+      "source": "Table 4.67",
+      "notes": "Each character rolls once when this resource is received. Add 1 to the weapon error range. This result does not grant an additional equipment pick.",
+      "results": [
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Barrett M82A1 semi-automatic rifle. Error range +1."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Ruger Super Redhawk hunting revolver (.44 Magnum). Error range +1."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Taurus Model 608 service revolver. Error range +1."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "H&K Mk. 23 service pistol. Error range +1."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Benelli M1 Tactical semi-automatic shotgun; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "H&K P7 backup pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Colt Detective Special backup revolver; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Walther PPK backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Saiga 12K semi-automatic shotgun (20 gauge). Error range +1."
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "MAC M11 light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Beretta 92 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Glock 17 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Walther PP backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Colt M1911A1 service pistol; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "MAC M10 light SMG (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "H&K MP5K light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Colt M16A3 assault rifle; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "IMI Uzi heavy SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "SiG-Sauer P239 backup pistol (.40 S&W). Error range +1."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Smith & Wesson Model 500 hunting revolver. Error range +1."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Enfield L85A2 assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Steyr AUG Para assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Thompson M1928 heavy SMG; GC selects ammunition caliber. Error range +1."
+        }
+      ],
+      "icon": "assault-rifle"
+    },
+    {
+      "id": "bag-guns-iii",
+      "name": "Bag Full of Guns: Caliber III",
+      "formula": "2d8 + 4",
+      "page": 281,
+      "source": "Table 4.67",
+      "notes": "Each character rolls once when this resource is received. Add 1 to the weapon error range. This result does not grant an additional equipment pick.",
+      "results": [
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Barrett M82A1 semi-automatic rifle. Error range +1."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Ruger Super Redhawk hunting revolver (.44 Magnum). Error range +1."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Taurus Model 608 service revolver. Error range +1."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "H&K Mk. 23 service pistol. Error range +1."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Benelli M1 Tactical semi-automatic shotgun; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "H&K P7 backup pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Colt Detective Special backup revolver; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Walther PPK backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Saiga 12K semi-automatic shotgun (20 gauge). Error range +1."
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "MAC M11 light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Beretta 92 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Glock 17 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Walther PP backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Colt M1911A1 service pistol; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "MAC M10 light SMG (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "H&K MP5K light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Colt M16A3 assault rifle; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "IMI Uzi heavy SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "SiG-Sauer P239 backup pistol (.40 S&W). Error range +1."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Smith & Wesson Model 500 hunting revolver. Error range +1."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Enfield L85A2 assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Steyr AUG Para assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Thompson M1928 heavy SMG; GC selects ammunition caliber. Error range +1."
+        }
+      ],
+      "icon": "assault-rifle"
+    },
+    {
+      "id": "bag-guns-iv",
+      "name": "Bag Full of Guns: Caliber IV",
+      "formula": "2d10 + 2",
+      "page": 281,
+      "source": "Table 4.67",
+      "notes": "Each character rolls once when this resource is received. Add 1 to the weapon error range. This result does not grant an additional equipment pick.",
+      "results": [
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Barrett M82A1 semi-automatic rifle. Error range +1."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Ruger Super Redhawk hunting revolver (.44 Magnum). Error range +1."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Taurus Model 608 service revolver. Error range +1."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "H&K Mk. 23 service pistol. Error range +1."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Benelli M1 Tactical semi-automatic shotgun; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "H&K P7 backup pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Colt Detective Special backup revolver; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Walther PPK backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Saiga 12K semi-automatic shotgun (20 gauge). Error range +1."
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "MAC M11 light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Beretta 92 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Glock 17 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Walther PP backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Colt M1911A1 service pistol; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "MAC M10 light SMG (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "H&K MP5K light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Colt M16A3 assault rifle; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "IMI Uzi heavy SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "SiG-Sauer P239 backup pistol (.40 S&W). Error range +1."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Smith & Wesson Model 500 hunting revolver. Error range +1."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Enfield L85A2 assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Steyr AUG Para assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Thompson M1928 heavy SMG; GC selects ammunition caliber. Error range +1."
+        }
+      ],
+      "icon": "assault-rifle"
+    },
+    {
+      "id": "bag-guns-v",
+      "name": "Bag Full of Guns: Caliber V",
+      "formula": "2d12",
+      "page": 281,
+      "source": "Table 4.67",
+      "notes": "Each character rolls once when this resource is received. Add 1 to the weapon error range. This result does not grant an additional equipment pick.",
+      "results": [
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Barrett M82A1 semi-automatic rifle. Error range +1."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Ruger Super Redhawk hunting revolver (.44 Magnum). Error range +1."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Taurus Model 608 service revolver. Error range +1."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "H&K Mk. 23 service pistol. Error range +1."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Benelli M1 Tactical semi-automatic shotgun; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "H&K P7 backup pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Colt Detective Special backup revolver; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Walther PPK backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Saiga 12K semi-automatic shotgun (20 gauge). Error range +1."
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "MAC M11 light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Beretta 92 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Glock 17 service pistol (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Walther PP backup pistol (.380 ACP). Error range +1."
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Colt M1911A1 service pistol; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "MAC M10 light SMG (9mm P). Error range +1."
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "H&K MP5K light SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Colt M16A3 assault rifle; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "IMI Uzi heavy SMG; GC selects ammunition caliber. Error range +1."
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "SiG-Sauer P239 backup pistol (.40 S&W). Error range +1."
+        },
+        {
+          "range": [
+            21,
+            21
+          ],
+          "text": "Smith & Wesson Model 500 hunting revolver. Error range +1."
+        },
+        {
+          "range": [
+            22,
+            22
+          ],
+          "text": "Enfield L85A2 assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            23,
+            23
+          ],
+          "text": "Steyr AUG Para assault rifle. Error range +1."
+        },
+        {
+          "range": [
+            24,
+            24
+          ],
+          "text": "Thompson M1928 heavy SMG; GC selects ammunition caliber. Error range +1."
+        }
+      ],
+      "icon": "assault-rifle"
+    },
+    {
+      "id": "vehicle-damage-pgv",
+      "name": "Vehicle Damage: Personal Ground Vehicles",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-sgv",
+      "name": "Vehicle Damage: Standard Ground Vehicles",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-hgv",
+      "name": "Vehicle Damage: Heavy Ground Vehicles",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-m-ad",
+      "name": "Vehicle Damage: Mounts and Animal-Drawn Vehicles",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Animal"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Animal"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Animal"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Animal"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Traction"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-psa",
+      "name": "Vehicle Damage: Personal Aircraft",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-pfa",
+      "name": "Vehicle Damage: Performance Aircraft",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-sva",
+      "name": "Vehicle Damage: Service Aircraft",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Lift"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-rwa",
+      "name": "Vehicle Damage: Rotary-Wing Aircraft",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Rotors"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-psw",
+      "name": "Vehicle Damage: Personal Watercraft",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-stw",
+      "name": "Vehicle Damage: Standard Watercraft",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-shp",
+      "name": "Vehicle Damage: Ships",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "vehicle-damage-sub",
+      "name": "Vehicle Damage: Submarines",
+      "formula": "1d20",
+      "page": 290,
+      "source": "Table 4.72",
+      "notes": "Use after a vehicle critical hit. Re-roll a location that cannot apply. Resolve the location once per failed Damage save, using one location result per attack; see pp.289–291.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Cargo"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Controls"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Engine"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            11,
+            11
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            12,
+            12
+          ],
+          "text": "Flotation"
+        },
+        {
+          "range": [
+            13,
+            13
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            14,
+            14
+          ],
+          "text": "Fuel"
+        },
+        {
+          "range": [
+            15,
+            15
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            16,
+            16
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            17,
+            17
+          ],
+          "text": "Occupant"
+        },
+        {
+          "range": [
+            18,
+            18
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            19,
+            19
+          ],
+          "text": "Weapon or secondary gear"
+        },
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Weapon or secondary gear"
+        }
+      ],
+      "icon": "gears"
+    },
+    {
+      "id": "encounter-distance-open",
+      "name": "Base Encounter Distance: Aquatic, Plains or Desert",
+      "formula": "6d6 * 20",
+      "page": 323,
+      "source": "Table 5.1",
+      "notes": "Reduce the rolled distance when it exceeds the best visual or hearing range among the groups. Indoors, use line of sight instead of rolling.",
+      "results": [
+        {
+          "range": [
+            120,
+            120
+          ],
+          "text": "Base separation 120 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            140,
+            140
+          ],
+          "text": "Base separation 140 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            160,
+            160
+          ],
+          "text": "Base separation 160 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            180,
+            180
+          ],
+          "text": "Base separation 180 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            200,
+            200
+          ],
+          "text": "Base separation 200 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            220,
+            220
+          ],
+          "text": "Base separation 220 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            240,
+            240
+          ],
+          "text": "Base separation 240 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            260,
+            260
+          ],
+          "text": "Base separation 260 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            280,
+            280
+          ],
+          "text": "Base separation 280 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            300,
+            300
+          ],
+          "text": "Base separation 300 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            320,
+            320
+          ],
+          "text": "Base separation 320 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            340,
+            340
+          ],
+          "text": "Base separation 340 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            360,
+            360
+          ],
+          "text": "Base separation 360 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            380,
+            380
+          ],
+          "text": "Base separation 380 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            400,
+            400
+          ],
+          "text": "Base separation 400 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            420,
+            420
+          ],
+          "text": "Base separation 420 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            440,
+            440
+          ],
+          "text": "Base separation 440 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            460,
+            460
+          ],
+          "text": "Base separation 460 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            480,
+            480
+          ],
+          "text": "Base separation 480 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            500,
+            500
+          ],
+          "text": "Base separation 500 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            520,
+            520
+          ],
+          "text": "Base separation 520 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            540,
+            540
+          ],
+          "text": "Base separation 540 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            560,
+            560
+          ],
+          "text": "Base separation 560 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            580,
+            580
+          ],
+          "text": "Base separation 580 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            600,
+            600
+          ],
+          "text": "Base separation 600 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            620,
+            620
+          ],
+          "text": "Base separation 620 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            640,
+            640
+          ],
+          "text": "Base separation 640 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            660,
+            660
+          ],
+          "text": "Base separation 660 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            680,
+            680
+          ],
+          "text": "Base separation 680 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            700,
+            700
+          ],
+          "text": "Base separation 700 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            720,
+            720
+          ],
+          "text": "Base separation 720 ft., subject to the visibility and hearing limit."
+        }
+      ],
+      "icon": "map"
+    },
+    {
+      "id": "encounter-distance-mixed",
+      "name": "Base Encounter Distance: Arctic, Forest or Outdoor Urban",
+      "formula": "4d6 * 10",
+      "page": 323,
+      "source": "Table 5.1",
+      "notes": "Reduce the rolled distance when it exceeds the best visual or hearing range among the groups. Indoors, use line of sight instead of rolling.",
+      "results": [
+        {
+          "range": [
+            40,
+            40
+          ],
+          "text": "Base separation 40 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            50,
+            50
+          ],
+          "text": "Base separation 50 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            60,
+            60
+          ],
+          "text": "Base separation 60 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            70,
+            70
+          ],
+          "text": "Base separation 70 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            80,
+            80
+          ],
+          "text": "Base separation 80 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            90,
+            90
+          ],
+          "text": "Base separation 90 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            100,
+            100
+          ],
+          "text": "Base separation 100 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            110,
+            110
+          ],
+          "text": "Base separation 110 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            120,
+            120
+          ],
+          "text": "Base separation 120 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            130,
+            130
+          ],
+          "text": "Base separation 130 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            140,
+            140
+          ],
+          "text": "Base separation 140 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            150,
+            150
+          ],
+          "text": "Base separation 150 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            160,
+            160
+          ],
+          "text": "Base separation 160 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            170,
+            170
+          ],
+          "text": "Base separation 170 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            180,
+            180
+          ],
+          "text": "Base separation 180 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            190,
+            190
+          ],
+          "text": "Base separation 190 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            200,
+            200
+          ],
+          "text": "Base separation 200 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            210,
+            210
+          ],
+          "text": "Base separation 210 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            220,
+            220
+          ],
+          "text": "Base separation 220 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            230,
+            230
+          ],
+          "text": "Base separation 230 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            240,
+            240
+          ],
+          "text": "Base separation 240 ft., subject to the visibility and hearing limit."
+        }
+      ],
+      "icon": "map"
+    },
+    {
+      "id": "encounter-distance-dense",
+      "name": "Base Encounter Distance: Jungle or Swamp",
+      "formula": "2d6 * 10",
+      "page": 323,
+      "source": "Table 5.1",
+      "notes": "Reduce the rolled distance when it exceeds the best visual or hearing range among the groups. Indoors, use line of sight instead of rolling.",
+      "results": [
+        {
+          "range": [
+            20,
+            20
+          ],
+          "text": "Base separation 20 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            30,
+            30
+          ],
+          "text": "Base separation 30 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            40,
+            40
+          ],
+          "text": "Base separation 40 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            50,
+            50
+          ],
+          "text": "Base separation 50 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            60,
+            60
+          ],
+          "text": "Base separation 60 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            70,
+            70
+          ],
+          "text": "Base separation 70 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            80,
+            80
+          ],
+          "text": "Base separation 80 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            90,
+            90
+          ],
+          "text": "Base separation 90 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            100,
+            100
+          ],
+          "text": "Base separation 100 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            110,
+            110
+          ],
+          "text": "Base separation 110 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            120,
+            120
+          ],
+          "text": "Base separation 120 ft., subject to the visibility and hearing limit."
+        }
+      ],
+      "icon": "map"
+    },
+    {
+      "id": "encounter-distance-vertical",
+      "name": "Base Encounter Distance: Mountains or Underwater",
+      "formula": "6d6 * 5",
+      "page": 323,
+      "source": "Table 5.1",
+      "notes": "Reduce the rolled distance when it exceeds the best visual or hearing range among the groups. Indoors, use line of sight instead of rolling.",
+      "results": [
+        {
+          "range": [
+            30,
+            30
+          ],
+          "text": "Base separation 30 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            35,
+            35
+          ],
+          "text": "Base separation 35 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            40,
+            40
+          ],
+          "text": "Base separation 40 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            45,
+            45
+          ],
+          "text": "Base separation 45 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            50,
+            50
+          ],
+          "text": "Base separation 50 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            55,
+            55
+          ],
+          "text": "Base separation 55 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            60,
+            60
+          ],
+          "text": "Base separation 60 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            65,
+            65
+          ],
+          "text": "Base separation 65 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            70,
+            70
+          ],
+          "text": "Base separation 70 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            75,
+            75
+          ],
+          "text": "Base separation 75 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            80,
+            80
+          ],
+          "text": "Base separation 80 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            85,
+            85
+          ],
+          "text": "Base separation 85 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            90,
+            90
+          ],
+          "text": "Base separation 90 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            95,
+            95
+          ],
+          "text": "Base separation 95 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            100,
+            100
+          ],
+          "text": "Base separation 100 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            105,
+            105
+          ],
+          "text": "Base separation 105 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            110,
+            110
+          ],
+          "text": "Base separation 110 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            115,
+            115
+          ],
+          "text": "Base separation 115 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            120,
+            120
+          ],
+          "text": "Base separation 120 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            125,
+            125
+          ],
+          "text": "Base separation 125 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            130,
+            130
+          ],
+          "text": "Base separation 130 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            135,
+            135
+          ],
+          "text": "Base separation 135 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            140,
+            140
+          ],
+          "text": "Base separation 140 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            145,
+            145
+          ],
+          "text": "Base separation 145 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            150,
+            150
+          ],
+          "text": "Base separation 150 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            155,
+            155
+          ],
+          "text": "Base separation 155 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            160,
+            160
+          ],
+          "text": "Base separation 160 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            165,
+            165
+          ],
+          "text": "Base separation 165 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            170,
+            170
+          ],
+          "text": "Base separation 170 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            175,
+            175
+          ],
+          "text": "Base separation 175 ft., subject to the visibility and hearing limit."
+        },
+        {
+          "range": [
+            180,
+            180
+          ],
+          "text": "Base separation 180 ft., subject to the visibility and hearing limit."
+        }
+      ],
+      "icon": "map"
+    },
+    {
+      "id": "deviation-distance-1-2",
+      "name": "Deviation Distance: 1–2 Range Increments",
+      "formula": "1d2",
+      "page": 346,
+      "source": "Table 5.11",
+      "notes": "Each result counts 5-ft. squares. Roll the separate direction table, orienting it along the attack.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Deviation 1 square(s), 5 ft."
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Deviation 2 square(s), 10 ft."
+        }
+      ],
+      "icon": "arrow"
+    },
+    {
+      "id": "deviation-distance-3-4",
+      "name": "Deviation Distance: 3–4 Range Increments",
+      "formula": "1d4",
+      "page": 346,
+      "source": "Table 5.11",
+      "notes": "Each result counts 5-ft. squares. Roll the separate direction table, orienting it along the attack.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Deviation 1 square(s), 5 ft."
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Deviation 2 square(s), 10 ft."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Deviation 3 square(s), 15 ft."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Deviation 4 square(s), 20 ft."
+        }
+      ],
+      "icon": "arrow"
+    },
+    {
+      "id": "deviation-distance-5-6",
+      "name": "Deviation Distance: 5–6 Range Increments",
+      "formula": "1d6",
+      "page": 346,
+      "source": "Table 5.11",
+      "notes": "Each result counts 5-ft. squares. Roll the separate direction table, orienting it along the attack.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Deviation 1 square(s), 5 ft."
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Deviation 2 square(s), 10 ft."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Deviation 3 square(s), 15 ft."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Deviation 4 square(s), 20 ft."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Deviation 5 square(s), 25 ft."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Deviation 6 square(s), 30 ft."
+        }
+      ],
+      "icon": "arrow"
+    },
+    {
+      "id": "deviation-distance-7-8",
+      "name": "Deviation Distance: 7–8 Range Increments",
+      "formula": "1d8",
+      "page": 346,
+      "source": "Table 5.11",
+      "notes": "Each result counts 5-ft. squares. Roll the separate direction table, orienting it along the attack.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Deviation 1 square(s), 5 ft."
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Deviation 2 square(s), 10 ft."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Deviation 3 square(s), 15 ft."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Deviation 4 square(s), 20 ft."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Deviation 5 square(s), 25 ft."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Deviation 6 square(s), 30 ft."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Deviation 7 square(s), 35 ft."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Deviation 8 square(s), 40 ft."
+        }
+      ],
+      "icon": "arrow"
+    },
+    {
+      "id": "deviation-distance-9-10",
+      "name": "Deviation Distance: 9–10 Range Increments",
+      "formula": "1d10",
+      "page": 346,
+      "source": "Table 5.11",
+      "notes": "Each result counts 5-ft. squares. Roll the separate direction table, orienting it along the attack.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Deviation 1 square(s), 5 ft."
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Deviation 2 square(s), 10 ft."
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Deviation 3 square(s), 15 ft."
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Deviation 4 square(s), 20 ft."
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Deviation 5 square(s), 25 ft."
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Deviation 6 square(s), 30 ft."
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Deviation 7 square(s), 35 ft."
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Deviation 8 square(s), 40 ft."
+        },
+        {
+          "range": [
+            9,
+            9
+          ],
+          "text": "Deviation 9 square(s), 45 ft."
+        },
+        {
+          "range": [
+            10,
+            10
+          ],
+          "text": "Deviation 10 square(s), 50 ft."
+        }
+      ],
+      "icon": "arrow"
+    },
+    {
+      "id": "deviation-direction",
+      "name": "Deviation Direction",
+      "formula": "1d8",
+      "page": 346,
+      "source": "Deviation Diagram",
+      "notes": "Forward follows the attack from the attacker through the target. Rotate the directions with the attack; they are not compass bearings.",
+      "results": [
+        {
+          "range": [
+            1,
+            1
+          ],
+          "text": "Forward, beyond the target"
+        },
+        {
+          "range": [
+            2,
+            2
+          ],
+          "text": "Forward-right"
+        },
+        {
+          "range": [
+            3,
+            3
+          ],
+          "text": "Right"
+        },
+        {
+          "range": [
+            4,
+            4
+          ],
+          "text": "Back-right"
+        },
+        {
+          "range": [
+            5,
+            5
+          ],
+          "text": "Back, toward the attacker"
+        },
+        {
+          "range": [
+            6,
+            6
+          ],
+          "text": "Back-left"
+        },
+        {
+          "range": [
+            7,
+            7
+          ],
+          "text": "Left"
+        },
+        {
+          "range": [
+            8,
+            8
+          ],
+          "text": "Forward-left"
+        }
+      ],
+      "icon": "compass"
+    },
+    {
+      "id": "table-of-ouch",
+      "name": "The Table of Ouch",
+      "formula": "1d20 + @damage",
+      "page": 332,
+      "source": "Table 5.5",
+      "notes": "The roll asks for actual damage suffered and whether Guts supplies a d10. Use only after a valid injury trigger. This table posts a reference result; use the actor injury workflow to record effects. Healing advances at mission starts and after full months of downtime; successful Surgery reduces healing time by 2.",
+      "results": [
+        {
+          "range": [
+            1,
+            35
+          ],
+          "text": "Bleeding; Surgery DC 20; heals at scene end; gain 1d8 stress."
+        },
+        {
+          "range": [
+            36,
+            40
+          ],
+          "text": "Broken limb; Surgery DC 20; healing 1d4 missions. GC chooses arm loss of use or Speed −20 ft."
+        },
+        {
+          "range": [
+            41,
+            45
+          ],
+          "text": "Internal rupture; Surgery DC 25; healing 1d4 missions. Highest physical attribute −2 permanently; resolve ties randomly."
+        },
+        {
+          "range": [
+            46,
+            50
+          ],
+          "text": "Maimed limb; Surgery DC 30; healing 1d6 missions. GC chooses arm loss of use or Speed −20 ft."
+        },
+        {
+          "range": [
+            51,
+            55
+          ],
+          "text": "Brain damage; Surgery DC 35; healing 1d4 missions. Highest mental attribute −2 permanently; resolve ties randomly."
+        },
+        {
+          "range": [
+            56,
+            60
+          ],
+          "text": "Massive system trauma; Surgery DC 40; healing 1d4 missions; permanently sickened."
+        },
+        {
+          "range": [
+            61,
+            65
+          ],
+          "text": "Nerve damage; Surgery DC 45; healing 1d3 missions; permanently nauseated."
+        },
+        {
+          "range": [
+            66,
+            70
+          ],
+          "text": "Spinal injury; Surgery DC 50; healing 1 mission; permanently paralyzed. Surgery is assumed after this mission."
+        },
+        {
+          "range": [
+            71,
+            9007199254740991
+          ],
+          "text": "Unlisted total: the printed table stops at 70. The GC resolves this result; do not cap it or invent another injury.",
+          "weight": 1
+        }
+      ],
+      "icon": "medical",
+      "rollInput": "criticalInjury"
+    }
+  ]
+}

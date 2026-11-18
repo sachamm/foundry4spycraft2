@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Incoming Baffled events, distinct from reviewing the current condition (p.340). */
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -65,3 +66,25 @@ export function baffledApplicationPlan(current, expected, { id, source, confirme
     }
   };
 }
+
+// Resisting the Baffled condition as part of a save plan.
+rollPipeline.register({
+  id: "baffledResistanceSaveTerm",
+  kinds: ["save"],
+  order: 9480,
+  terms({ actor, system, input }) {
+    if (input.resistingBaffled === true && getBaffledReview(actor).needsReview)
+      return {
+        blockAt: 20,
+        blocked: loc`The GC must review the interrupted Baffled event before this resistance save.`
+      };
+    const bonus = system.conditionContext?.baffled === true && input.resistingBaffled === true ? 8 : 0;
+    return {
+      rowAt: 90,
+      rows: [[loc`Baffled resistance`, bonus]],
+      flavorAt: 70,
+      flavor: bonus ? loc` — Baffled resistance +8` : "",
+      options: { baffledSaveBonus: bonus }
+    };
+  }
+});

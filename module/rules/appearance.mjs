@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Gorgeous / The Look p.203. Named check modifiers stay separate from the skill bonus. */
 export function appearanceCheckPlan(system, key, check, { manhuntPrey = false } = {}) {
@@ -106,3 +107,6 @@ export function bloodstainDefensePlan(system, { appearance, wornArmor = [] } = {
     reason: appearance > 0 ? "" : loc`Your Appearance modifier is not positive.`
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "appearanceRecord", order: 9620, record: ["appearanceModifiers"] });

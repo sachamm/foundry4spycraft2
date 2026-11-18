@@ -2,7 +2,14 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Unnerving, p.451. Additional stress requires damage actually inflicted by an unarmed/melee attack. */
 export function unnervingGrade(system) {
-  return Math.min(3, (system.originEffects ?? []).filter(effect => effect.qualityKey === "unnerving").length);
+  // An agent's origin or an NPC's quality, whichever gives more dice.
+  return Math.min(
+    3,
+    Math.max(
+      (system.originEffects ?? []).filter(effect => effect.qualityKey === "unnerving").length,
+      system.qualityEffects?.unnervingDice ?? 0
+    )
+  );
 }
 export function unnervingEligible(system, check) {
   return (
@@ -37,3 +44,6 @@ rollPipeline.register({
     return [{ label: loc`Resolve Unnerving stress`, run: () => actor.resolveUnnerving(message) }];
   }
 });
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "unnervingRecord", order: 9790, record: ["unnervingStress"] });

@@ -1,3 +1,4 @@
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Hands-On/Language p.101; transmitting Innuendo p.158; Two-Weapon Basics p.176; Bound p.340. */
 export function skillTagPlan(
@@ -72,3 +73,6 @@ export function skillTagPlan(
     notes
   };
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({ id: "skillTagsRecord", order: 9760, record: ["skillTags"] });

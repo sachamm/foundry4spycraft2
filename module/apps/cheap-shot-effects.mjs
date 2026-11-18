@@ -1,3 +1,4 @@
+import { unarmedWeapon } from "../rules/kick.mjs";
 import {
   cheapShotApplyPlan,
   cheapShotRecords,
@@ -35,7 +36,11 @@ export async function settleCheapShot(actor, message) {
         const plan = cheapShotApplyPlan({ ...target.system, usagePeriods: target.usagePeriods }, c, {
           sourceMessage: message.uuid,
           now: now(),
-          scene: String(actor.usagePeriods.scene ?? "initial")
+          scene: String(actor.usagePeriods.scene ?? "initial"),
+          doubled:
+            actor.system.activeFeatNames?.includes("Submission Basics") === true &&
+            unarmedWeapon({ proficiency: c.weaponProficiency, qualities: c.weaponQualities }),
+          supremacy: actor.system.activeFeatNames?.includes("Submission Supremacy") === true
         });
         if (!plan.existing)
           await target.update({ "system.cheapShots": [...(target.system.cheapShots ?? []), plan.record] });

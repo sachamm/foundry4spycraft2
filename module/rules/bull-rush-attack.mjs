@@ -2,7 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { responseOwnSize } from "./trip.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** p.354 on-foot Bull Rush, chosen-target adjacency exception follows the user-confirmed p.326/p.354 ruling. */
 export function bullRushAttackSkillChecks(key, checks = []) {
@@ -204,4 +204,41 @@ rollPipeline.register({
   order: 5100,
   kinds: ["skill"],
   skillChecks: ({ skillKey }, checks) => bullRushAttackSkillChecks(skillKey, checks)
+});
+
+// A Bull Rush on foot, in a skill check's plan.
+rollPipeline.register({
+  id: "bullRushAttackSkillTerm",
+  kinds: ["skill"],
+  order: 9250,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      bullRushAttackOpponentName = "",
+      bullRushAttackSizeDifference = null,
+      bullRushAttackDistanceFeet = null,
+      bullRushAttackOnFootConfirmed = false,
+      bullRushAttackRouteConfirmed = false,
+      bullRushAttackContactConfirmed = false,
+      bullRushAttackFullActionConfirmed = false,
+      bullRushAttackTargetThreatening = false,
+      bullRushAttackOtherThreatAdjacency = false,
+      bullRushAttackPassesOtherThreat = false,
+      bullRushAttackCombat = null
+    } = input;
+    const plan = bullRushAttackPlan(system, skillKey, check, {
+      method,
+      bullRushAttackOpponentName,
+      bullRushAttackSizeDifference,
+      bullRushAttackDistanceFeet,
+      bullRushAttackOnFootConfirmed,
+      bullRushAttackRouteConfirmed,
+      bullRushAttackContactConfirmed,
+      bullRushAttackFullActionConfirmed,
+      bullRushAttackTargetThreatening,
+      bullRushAttackOtherThreatAdjacency,
+      bullRushAttackPassesOtherThreat,
+      bullRushAttackCombat
+    });
+    return skillPlanTerm("bullRushAttack", plan, { noteAt: 60, blockAt: 40 });
+  }
 });

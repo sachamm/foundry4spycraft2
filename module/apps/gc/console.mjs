@@ -85,6 +85,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         combat.rollGroupInitiative(game.combat, { single: target.dataset.single === "true" })
       ),
       surprise: guard(() => combat.surpriseRoundDialog()),
+      combatReference: guard(() => combat.combatReferenceDialog()),
       startConflict: guard(() => conflicts.startConflictDialog()),
       advanceConflict: guard((event, target) => conflicts.advanceConflict(target.dataset.id)),
       manageConflict: guard((event, target) => conflicts.manageConflict(target.dataset.id)),

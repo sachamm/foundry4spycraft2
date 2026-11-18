@@ -2291,3 +2291,34 @@ test("settled Request replay rejects newly added modern source markers without r
     assert.equal(a.items.length, 0);
   }
 });
+test("Political Clout, Favors and Immunity: once per mission, automatic, no action dice and immediately available", async () => {
+  const { IMMEDIATE_DELIVERY } = await import("../module/rules/gear-acquisition.mjs");
+  const feats = ["Political Clout", "Political Favors", "Political Immunity"],
+    specs = requestSources({ activeFeatNames: feats }, []);
+  assert.deepEqual(
+    specs.map(s => [s.id, s.category, s.period, s.limit, s.automatic, s.immediate]),
+    [
+      ["requestPoliticalClout", "S", "mission", 1, true, true],
+      ["requestPoliticalFavors", "R", "mission", 1, true, true],
+      ["requestPoliticalImmunity", "R", "mission", 1, true, true]
+    ]
+  );
+  assert.match(specs[1].name, /extradition Resource \(Power Rating 6\)/);
+  assert.equal(requestSources({ activeFeatNames: [] }, []).length, 0);
+  const s = system();
+  s.activeFeatNames = feats;
+  s.resourceUses = {};
+  s.limitedUses = requestSources(s, []);
+  s.missionReserves = reserveInitialization(s, [], initialize);
+  s.actionDice.value = 0;
+  const input = { ...request, requestAbility: "requestPoliticalImmunity", networkConfirmed: true };
+  const p = gearAcquisitionPlan(s, input);
+  assert.equal(p.cost, 0);
+  assert.equal(p.automatic, true);
+  assert.equal(p.delivery, IMMEDIATE_DELIVERY);
+  assert.equal(p.abilityRecord.epoch, "mission1");
+  assert.throws(() => gearAcquisitionPlan(s, { ...input, requestAbility: "requestPoliticalClout" }), /category/);
+  s.resourceUses.requestPoliticalImmunity = { epoch: "mission1", used: 1 };
+  assert.throws(() => gearAcquisitionPlan(s, input), /no uses/);
+  assert.equal(DELIVERY.largeCity.formula, "3d20", "ordinary delivery is unchanged");
+});

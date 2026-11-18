@@ -1,6 +1,15 @@
 import test from "node:test";
+import { tauntSkillChecks } from "../module/rules/taunt.mjs";
+import { diversionSkillChecks } from "../module/rules/diversion.mjs";
+import { grappleSkillChecks } from "../module/rules/grapple-check.mjs";
 import assert from "node:assert/strict";
-import { RollPipeline, formulaWithModifiers, describeModifiers } from "../module/rules/roll-pipeline.mjs";
+import {
+  RollPipeline,
+  formulaWithModifiers,
+  describeModifiers,
+  planTerms,
+  skillPlanTerm
+} from "../module/rules/roll-pipeline.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
 import { bullRushAttackSkillChecks } from "../module/rules/bull-rush-attack.mjs";
 import { bullRushDefenseSkillChecks } from "../module/rules/bull-rush.mjs";
@@ -9,6 +18,7 @@ import { feintSkillChecks } from "../module/rules/feint.mjs";
 import { restraintSkillChecks } from "../module/rules/restraints.mjs";
 import { taskPressureSkillChecks } from "../module/rules/task-pressure.mjs";
 import { terrainSkillChecks } from "../module/rules/terrain.mjs";
+import { combatOptionChecks } from "../module/rules/combat-options.mjs";
 import { threatenSkillChecks } from "../module/rules/threaten.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "../module/rules/trip-attack.mjs";
 import { tripDefenseSkillChecks } from "../module/rules/trip.mjs";
@@ -146,6 +156,110 @@ test("modifiers are summed, labelled and applied to the dice formula only", () =
   assert.throws(() => pipeline.modifiers({}), /whole-number value/);
 });
 
+test("terms are collected in order, see earlier plans, and fold into rows, notes and the first block reason", () => {
+  const pipeline = new RollPipeline();
+  pipeline.register({
+    id: "late",
+    kinds: ["attack"],
+    order: 2,
+    terms: ctx => ({
+      key: "late",
+      plan: { sawEarly: ctx.plans.early.bonus },
+      at: 50,
+      rows: [["Late", 1]],
+      notes: ["late note"],
+      threat: 1,
+      blocked: "late reason"
+    })
+  });
+  pipeline.register({
+    id: "early",
+    kinds: ["attack"],
+    order: 1,
+    terms: () => ({
+      key: "early",
+      plan: { bonus: 2 },
+      rowAt: 30,
+      rows: [
+        ["Early", 2],
+        ["Early too", 0]
+      ],
+      noteAt: 5,
+      notes: ["early note"],
+      threat: 2,
+      error: 1,
+      blockAt: 90,
+      blocked: { blocked: true, reason: "early reason" }
+    })
+  });
+  pipeline.register({ id: "silent", kinds: ["attack"], terms: () => null });
+  pipeline.register({ id: "skillOnly", kinds: ["skill"], terms: () => ({ key: "skill", plan: 1, threat: 9 }) });
+
+  const terms = planTerms("attack", { system: {} }, pipeline);
+  assert.deepEqual(
+    terms.list.map(term => term.id),
+    ["early", "late"]
+  );
+  assert.deepEqual(terms.plans, { early: { bonus: 2 }, late: { sawEarly: 2 } });
+  assert.equal(terms.sum("threat"), 3);
+  assert.equal(terms.sum("error"), 1);
+  assert.equal(terms.sum("missing"), 0);
+  assert.deepEqual(
+    terms.merge("rows", [
+      [10, ["Own first", 4]],
+      [40, ["Own last", 5]]
+    ]),
+    [
+      ["Own first", 4],
+      ["Early", 2],
+      ["Early too", 0],
+      ["Own last", 5],
+      ["Late", 1]
+    ]
+  );
+  assert.deepEqual(
+    terms.merge("notes", [
+      [10, ["own a", "own b"]],
+      [20, ""],
+      [60, "own tail"]
+    ]),
+    ["early note", "own a", "own b", "late note", "own tail"]
+  );
+  assert.deepEqual(terms.merge("blocked", [[70, ""]]), ["late reason", { blocked: true, reason: "early reason" }]);
+
+  assert.throws(() => {
+    const twice = new RollPipeline();
+    twice.register({ id: "a", terms: () => ({ key: "same" }) }).register({ id: "b", terms: () => ({ key: "same" }) });
+    planTerms("attack", {}, twice);
+  }, /already planned/);
+  assert.throws(() => {
+    const bad = new RollPipeline();
+    bad.register({ id: "a", terms: () => "nope" });
+    planTerms("attack", {}, bad);
+  }, /must be an object/);
+});
+
+test("a skill rule's usual plan becomes a term with its evidence, bonuses, block reason and one note segment", () => {
+  const term = skillPlanTerm(
+    "feint",
+    { evidence: { id: 1 }, bonuses: [{ value: 2 }], notes: ["a", "b"], blockedReason: "no", sizeBonus: 4 },
+    { noteAt: 30, blockAt: 10 }
+  );
+  assert.deepEqual(term, {
+    key: "feint",
+    plan: { id: 1 },
+    bonuses: [{ value: 2 }],
+    segment: "a b ",
+    blocked: "no",
+    adjustment: 4,
+    synergies: [],
+    noteAt: 30,
+    blockAt: 10
+  });
+  assert.equal(skillPlanTerm("empty", {}).segment, " ");
+  assert.equal(skillPlanTerm("empty", {}).plan, null);
+});
+
 test("flags merge, chat controls are collected and named checks are threaded through", () => {
   const pipeline = new RollPipeline();
   pipeline.register({
@@ -250,12 +364,21 @@ const { rollPipeline } = await import("../module/rolls/index.mjs");
 
 // The order contributors run in, phase by phase. Validation order decides which failure a player is shown first.
 const EXPECTED_ORDER = [
+  "grappleContent:skill",
   "meleeFireContextContent:rangedAttack",
   "detectionObserverContent:skill",
+  "diversionContent:skill",
   "feintContent:skill",
   "targetSkillEffectContent:skill",
+  "tauntContent:skill",
   "tripAttackContent:skill",
   "tripDefenseContent:skill",
+  "frenzySaveContent:save",
+  "spiderContent:skill",
+  "minglingContent:skill",
+  "revolverIntimidateContent:skill",
+  "skillTrickContent:skill",
+  "stashFeatsContent:skill",
   "conveyanceBullRushContent:skill",
   "bullRushAttackContent:skill",
   "bullRushDefenseContent:skill",
@@ -265,15 +388,49 @@ const EXPECTED_ORDER = [
   "hideCircumstanceContent:skill",
   "damageDialog",
   "rangedAttackDialog",
+  "rangedAttackDialogInput",
   "attackDialog",
   "knowledgeDialog",
   "saveDialog",
   "skillDialog",
   "skillDialogInput",
+  "reachGeometryDialog",
+  "mortarDamageDialog",
+  "launcherDamageDialog",
+  "cqbDamageDistanceDialog",
+  "killerInstinctDialog",
+  "cqbDamageDistanceInput",
+  "attackActionInput",
   "feintBonusLease",
   "attackDamageLease",
+  "reachGeometryInput",
+  "allOutAttackInput",
   "sideStanceLease",
+  "impaleDefenseContent:damage",
+  "styleOverCaliberContent:damage",
+  "closedStanceContent:damage",
+  "teamFeatContent:damage",
+  "snakeStrikeContent:damage",
+  "bullseyeInput",
   "sideStanceDamageLease",
+  "meleeTrickInput",
+  "cqbRangeInput",
+  "pummelContent:attack",
+  "attackDistanceInput",
+  "damageConversionContent:attack",
+  "unbeatableStanceContent:attack",
+  "allOrNothingContent:attack",
+  "kickContent:attack",
+  "doubleJabContent:attack",
+  "attackDialogInput",
+  "boxingMovesContent:attack",
+  "brushContent:attack",
+  "unarmedTrickContent:attack",
+  "duelingReachContent:attack",
+  "noQuarterContent:attack",
+  "calledShotContent:attack",
+  "bounceContent:rangedAttack",
+  "underwaterAttackContent",
   "recordFields",
   "sneakAttackTarget",
   "meleeArmorPiercing",
@@ -332,6 +489,8 @@ const EXPECTED_ORDER = [
   "rankSynergyFeat",
   "stoneCold",
   "threaten",
+  "taunt",
+  "diversion",
   "bugConcealment",
   "documentation",
   "trackingFeat",
@@ -349,8 +508,12 @@ const EXPECTED_ORDER = [
   "terrainChecks",
   "optionalRuleChecks",
   "restraintChecks",
+  "combatOptionChecks",
   "taskPressureChecks",
   "threatenChecks",
+  "tauntChecks",
+  "diversionChecks",
+  "grappleChecks",
   "feintChecks",
   "tripDefenseChecks",
   "tripAttackChecks",
@@ -359,18 +522,158 @@ const EXPECTED_ORDER = [
   "conveyanceBullRushChecks",
   "tripCounterCheck",
   "restraintEscapeControl",
+  "meleeTradeoffAttackTerm",
   "gearAcquisitionControl",
+  "bullseyeAttackTerm",
+  "meleeTrickAttackTerm",
+  "cheapShotAttackTerm",
+  "feintBonusAttackTerm",
+  "sideStanceAttackTerm",
+  "cleaveAttackTerm",
+  "finesseAttackTerm",
+  "cqbRangeAttackTerm",
+  "flankingAttackTerm",
   "cunningPlanControl",
+  "gameHunterAttackTerm",
   "manualAdjustmentControl",
+  "sniperAttackTerm",
   "requiredBonusControl",
+  "weaponSpecialistAttackTerm",
   "criticalControl",
+  "fireActionAttackTerm",
   "boostControl",
+  "damageConversionAttackTerm",
   "generousControl",
+  "swordBasicsAttackTerm",
   "rerollControl",
+  "kickAttackTerm",
   "confirmControl",
+  "boxingAttackTerm",
   "finishControl",
+  "boxingMovesAttackTerm",
+  "wrestlingAttackTerm",
+  "unarmedTrickAttackTerm",
+  "duelingReachAttackTerm",
+  "noQuarterAttackTerm",
+  "explosiveBasicsAttackTerm",
+  "tauntAttackTerm",
+  "calledShotAttackTerm",
+  "bounceAttackTerm",
+  "intenseStanceAttackTerm",
+  "underwaterAttackTerm",
+  "stalkingStanceSkillTerm",
+  "feintSkillTerm",
+  "meleeSkillFeatsSkillTerm",
+  "minglingSkillTerm",
+  "stashFeatsSkillTerm",
+  "livingCipherSkillTerm",
+  "spiderSkillTerm",
+  "containmentSkillTerm",
+  "skillTrickSkillTerm",
+  "grappleSkillTerm",
+  "revolverIntimidateSkillTerm",
+  "stoneColdIntimidateTerm",
+  "conveyanceBullRushSkillTerm",
+  "bullRushAttackSkillTerm",
+  "bullRushDefenseSkillTerm",
+  "tripAttackSkillTerm",
+  "tripDefenseSkillTerm",
+  "rankSynergyFeatsSkillTerm",
+  "threatenSkillTerm",
+  "tauntSkillTerm",
+  "diversionSkillTerm",
+  "bugConcealmentSkillTerm",
+  "combatOptionSkillTerm",
+  "documentationSkillTerm",
+  "polyglotSkillTerm",
+  "gutsSkillTerm",
+  "cardSharkSkillTerm",
+  "stillStandingSaveTerm",
+  "stoneColdSaveTerm",
+  "braceSaveTerm",
+  "terrainSaveTerm",
+  "underwaterSaveTerm",
+  "fatigueResistanceSaveTerm",
+  "securityDeviceSaveTerm",
+  "baffledResistanceSaveTerm",
+  "coverSaveTerm",
+  "frenzySaveTerm",
+  "hazardSaveTerm",
   "unnervingControl",
-  "strutControl"
+  "strutControl",
+  "hazardsRecord",
+  "combatActionsRecord",
+  "styleOverCaliberRecord",
+  "actionDiceRecord",
+  "actionDiePaymentsRecord",
+  "ambushRecord",
+  "appearanceRecord",
+  "breakthroughRecord",
+  "cardSharkRecord",
+  "classChecksRecord",
+  "closedCourseRecord",
+  "snakeStrikeRecord",
+  "contactFeatsRecord",
+  "cqbRecord",
+  "defenseRecord",
+  "detectionObserverRecord",
+  "environmentRecord",
+  "finalRoundRecord",
+  "finesseRecord",
+  "firearmsRecord",
+  "forensicGeniusRecord",
+  "gearChecksRecord",
+  "hardCoreRecord",
+  "cooperativeCheck",
+  "improvisedWeaponsRecord",
+  "knowledgeRecord",
+  "medicalRecord",
+  "cooperativeContent:skill",
+  "polyglotRecord",
+  "pursuitFeatsRecord",
+  "cooperativeControl",
+  "tauntControl",
+  "diversionControl",
+  "qualityChecksRecord",
+  "hazardSaveControl",
+  "requestsRecord",
+  "restraintsRecord",
+  "sensesRecord",
+  "fireActionContent:rangedAttack",
+  "damageConversionContent:rangedAttack",
+  "allOrNothingContent:rangedAttack",
+  "allOrNothingContent:skill",
+  "allOrNothingContent:knowledge",
+  "skillConditionsRecord",
+  "skillFeatTermsRecord",
+  "fireActionControl",
+  "opportunistDamageControl",
+  "opportunistRecord",
+  "skillGearRecord",
+  "duelingControls",
+  "skillTagsRecord",
+  "blastControl",
+  "kickControls",
+  "wrestlingControls",
+  "autofireMasteryControl",
+  "chanceReactionControls",
+  "sneakAttackRecord",
+  "duelingReachControl",
+  "brawlingSupremacyControl",
+  "noQuarterControl",
+  "trickShotControl",
+  "handOfGodControl",
+  "calledShotControl",
+  "targetSkillEffectsRecord",
+  "blastMapControl",
+  "woundDropControl",
+  "shatterWeaponControl",
+  "terrainRecord",
+  "trackingRecord",
+  "twoWeaponStateRecord",
+  "unnervingRecord",
+  "weaponWorkRecord",
+  "featReminders"
 ];
 
 test("every contributor is registered once, in the documented order", () => {
@@ -467,9 +770,23 @@ test("named skill checks match the original fixed composition for every skill", 
               key,
               feintSkillChecks(
                 key,
-                threatenSkillChecks(
+                grappleSkillChecks(
                   key,
-                  taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
+                  diversionSkillChecks(
+                    key,
+                    tauntSkillChecks(
+                      key,
+                      threatenSkillChecks(
+                        key,
+                        taskPressureSkillChecks(
+                          actor.system,
+                          key,
+                          combatOptionChecks(key, restraintSkillChecks(actor.system, key, base))
+                        )
+                      )
+                    ),
+                    actor.system
+                  )
                 )
               )
             )

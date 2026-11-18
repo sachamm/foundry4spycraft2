@@ -2,7 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { DISARM_SIZES } from "./disarm.mjs";
-import { rollPipeline } from "./roll-pipeline.mjs";
+import { rollPipeline, skillPlanTerm } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** p.354; user-confirmed ruling: borrow only Maneuver's skill/attribute, not its named-check benefits. */
 export const CONVEYANCE_BULL_RUSH_PROFILES = {
@@ -266,4 +266,53 @@ rollPipeline.register({
   order: 5110,
   kinds: ["skill"],
   skillChecks: ({ skillKey }, checks) => conveyanceBullRushSkillChecks(skillKey, checks)
+});
+
+// A Bull Rush made with a conveyance, in a skill check's plan.
+rollPipeline.register({
+  id: "conveyanceBullRushSkillTerm",
+  kinds: ["skill"],
+  order: 9240,
+  terms({ system, skillKey, check, method, input }) {
+    const {
+      focus = "",
+      purelyMentalConfirmed = false,
+      conveyanceBullRushName = "",
+      conveyanceBullRushTargetName = "",
+      conveyanceBullRushSize = "",
+      conveyanceBullRushTargetSize = "",
+      conveyanceBullRushAllowanceFeet = null,
+      conveyanceBullRushDistanceFeet = null,
+      conveyanceBullRushTargetThreatening = false,
+      conveyanceBullRushOtherThreatAdjacency = false,
+      conveyanceBullRushPassesOtherThreat = false,
+      conveyanceBullRushControlConfirmed = false,
+      conveyanceBullRushStatsConfirmed = false,
+      conveyanceBullRushRouteConfirmed = false,
+      conveyanceBullRushContactConfirmed = false,
+      conveyanceBullRushFullActionConfirmed = false,
+      conveyanceBullRushCombat = null
+    } = input;
+    const plan = conveyanceBullRushPlan(system, skillKey, check, {
+      method,
+      focus,
+      purelyMentalConfirmed,
+      conveyanceBullRushName,
+      conveyanceBullRushTargetName,
+      conveyanceBullRushSize,
+      conveyanceBullRushTargetSize,
+      conveyanceBullRushAllowanceFeet,
+      conveyanceBullRushDistanceFeet,
+      conveyanceBullRushTargetThreatening,
+      conveyanceBullRushOtherThreatAdjacency,
+      conveyanceBullRushPassesOtherThreat,
+      conveyanceBullRushControlConfirmed,
+      conveyanceBullRushStatsConfirmed,
+      conveyanceBullRushRouteConfirmed,
+      conveyanceBullRushContactConfirmed,
+      conveyanceBullRushFullActionConfirmed,
+      conveyanceBullRushCombat
+    });
+    return skillPlanTerm("conveyanceBullRush", plan, { noteAt: 50, blockAt: 30 });
+  }
 });

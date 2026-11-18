@@ -6,6 +6,14 @@ import { managedClassGearGrant } from "./class-gear.mjs";
 import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
+/** Delivery for a Request that is immediately available (Political Clout, Favors and Immunity). */
+export const IMMEDIATE_DELIVERY = Object.freeze({
+  formula: "0",
+  unit: "minutes",
+  get label() {
+    return loc`Immediately available`;
+  }
+});
 export const DELIVERY = {
   largeCity: {
     formula: "3d20",
@@ -269,13 +277,19 @@ export function gearAcquisitionPlan(
     throw new Error(
       loc`Procure requires the earned Intruder option, a city of at least 10,000 people and quick communication (pp.30,38).`
     );
+  // Total Control (p.209): Requests may be for Caliber V gear.
+  const maxCaliber = system.activeFeatNames?.includes("Total Control") ? 5 : 4;
   if (
     !Number.isSafeInteger(caliber) ||
     caliber < 1 ||
-    caliber > 4 ||
+    caliber > maxCaliber ||
     (!benefit?.ignoreMissionCaliber && caliber > record.caliber + (useProcure ? 1 : 0))
   )
-    throw new Error(loc`A Request must be Caliber I–IV and cannot exceed the current mission Caliber.`);
+    throw new Error(
+      maxCaliber === 5
+        ? loc`A Request must be Caliber I–V and cannot exceed the current mission Caliber.`
+        : loc`A Request must be Caliber I–IV and cannot exceed the current mission Caliber.`
+    );
   if (!PICK_CATEGORIES.includes(pick) || (record.picks?.[pick] ?? 0) < 1)
     throw new Error(loc`Choose an available Reserve gear pick.`);
   if (!PICK_CATEGORIES.includes(category) || category === "CHA" || (!categoryConfirmed && !benefit?.outsideFaction))
@@ -319,7 +333,7 @@ export function gearAcquisitionPlan(
     bonusSources: [...priority.sources, ...local.sources],
     location,
     deliveryMultiplier: useProcure ? 0.5 : 1,
-    delivery: DELIVERY[location],
+    delivery: benefit?.immediate ? IMMEDIATE_DELIVERY : DELIVERY[location],
     record: {
       ...record,
       charismaPicks:
@@ -349,3 +363,60 @@ export function managedAcquisition(system, item) {
     item.system.pick === (attempt.kind === "request" ? attempt.pick : "")
   );
 }
+
+/**
+ * Feats that change what a Request yields (pp.181–209), as an extra quantity on the claimed bundle:
+ * Grenade Basics +1 grenade; Bug Basics doubles bugs; Poison Basics +1 poison dose; Guided Weapon Basics doubles
+ * guided weapons and their ammunition; Rock and Roll! doubles weapons that fire Full Auto and their ammunition.
+ * Superior Documentation raises a requested cover identity's Power Rating by 1 (maximum 10).
+ */
+export function requestFeatBonus(system, item, quantity) {
+  const feats = system?.activeFeatNames ?? [],
+    s = item?.system ?? {},
+    name = String(item?.name ?? ""),
+    has = f => feats.includes(f),
+    sources = [];
+  let extra = 0;
+  if (
+    item?.type === "weapon" &&
+    ["hurled", "exoticHurled"].includes(s.proficiency) &&
+    /grenade/i.test(name) &&
+    has("Grenade Basics")
+  ) {
+    extra += 1;
+    sources.push("Grenade Basics");
+  }
+  if (/\bbugs?\b/i.test(name) && has("Bug Basics")) {
+    extra += quantity;
+    sources.push("Bug Basics");
+  }
+  if (/poison/i.test(name) && has("Poison Basics")) {
+    extra += 1;
+    sources.push("Poison Basics");
+  }
+  if (
+    (s.proficiency === "guided" || (s.ammunitionOnly && /guided|missile/i.test(name))) &&
+    has("Guided Weapon Basics")
+  ) {
+    extra += quantity;
+    sources.push("Guided Weapon Basics");
+  }
+  if (
+    ((s.fireModes ?? []).includes("auto") || (s.ammunitionOnly && s.autofireAmmunition === true)) &&
+    has("Rock and Roll")
+  ) {
+    extra += quantity;
+    sources.push("Rock and Roll");
+  }
+  const pr = Number(s.powerRating);
+  const powerRating =
+    /cover identity/i.test(name) && has("Superior Documentation") && Number.isFinite(pr)
+      ? String(Math.min(10, pr + 1))
+      : null;
+  if (powerRating !== null) sources.push("Superior Documentation");
+  return { extra, powerRating, sources };
+}
+
+/** Office Gossip (p.209): the character may take 10 with Request checks. */
+export const officeGossipTake10 = (system, kind, input = {}) =>
+  kind === "request" && input?.requestTake10 === true && system?.activeFeatNames?.includes("Office Gossip") === true;

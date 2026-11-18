@@ -71,7 +71,7 @@ This is an index into the reference pass, not a certificate of complete automati
 | Test Subject | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 | Thrill Seeker | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 | Tradesman | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
-| Tribesman | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
+| Tribesman | specialties | Permanent numerical effects, choices and milestones; the Fight Defensively Defense bonus (+1, rising at Career Levels 5/10/15/20) applies while the declaration lasts (batch 405); the mission melee weapon remains manual |
 | Wanderer | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 | Warrior | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 
@@ -257,32 +257,32 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Combat Expertise | 172 | No | Own-Count declaration, bounded attack/skill penalty, matching vulnerable-aware dodge bonus and own-next-Count expiry execute | — |
 | Expert Disarm | 174 | No | Opposed Disarm check executes grip/Size/error rules and +2 feat bonus; critical discount executes and loss exceptions are frozen for adjudication; opposition/weapon transfer/conditions remain table-managed | — |
 | Combat Instincts | 172 | No | Recorded current-round miss by5+, GC adjacency/timing/non-flat-footed confirmation and one counted immediate final Standard Attack execute; actual target geometry and other action settlement remain manual | — |
-| Opportunist | 175 | No | Manual/descriptive | — |
+| Opportunist | 175 | No | Covered (batch 378): once per round, a GC-confirmed free final attack against an opponent after a second opponent both can see is stunned or falls below 0 wounds; its hit rolls half damage, rounded up, once from the attack card | Native Foundry QA not claimed |
 | Combat Mobility | 172 | No | Declared route checker enforces adjacency departure, doubled Total Defense movement and Dexterity-bounded Run turns; actual token/action settlement remains manual | — |
 | Mobile Defense | 175 | No | Movement checker suppresses Run flat-footedness; Count-for-dodge option remains open | — |
 | Mobile Offense | 175 | No | One counted final Standard Attack during a GC-confirmed Standard Move executes with route/attack-point/current-Speed checks and an already recorded Total Defense move; actual token movement/action budgets remain manual | — |
-| Containment Basics | 172 | No | Manual/descriptive | — |
-| Containment Mastery | 172 | No | Manual/descriptive | — |
+| Containment Basics | 172 | No | Partial (batch 416): the Tactics/Ambush card states that with a 2-to-1 advantage the Ambush benefits last through the surprise round and the first 3 rounds; the GC confirms the advantage and tracks the rounds | Native Foundry QA not claimed |
+| Containment Mastery | 172 | No | Covered (batch 393): once per round, Diversion or Taunt as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Containment Supremacy | 174 | No | Manual/descriptive | — |
 | Contempt | 174 | No | One counted final Standard Attack per round and starting-dice uses per combat execute with actual standard/animal target checks; geometry, ammunition and damage remain table-managed | — |
-| Explosive Basics | 174 | No | Manual/descriptive | — |
-| Fire-Team Basics | 174 | No | Manual/descriptive | — |
-| Fire-Team Mastery | 174 | No | Manual/descriptive | — |
-| Fire-Team Supremacy | 174 | No | Manual/descriptive | — |
+| Explosive Basics | 174 | No | Partial (batch 407): an Explosives-proficiency attack (setting a charge or mine) has its error range reduced by 2, never below 1; the posted check records the +2 Reflex DC and +4 locate DC for the GC to apply | Native Foundry QA not claimed |
+| Fire-Team Basics | 174 | No | Covered (batch 393): once per round, Cover Fire as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
+| Fire-Team Mastery | 174 | No | Covered (batch 393): once per round, a Medicine/Stabilize check as a free action with a GC-confirmed 2-to-1 advantage; bringing injured and dead teammates along when leaving combat is narrative | Native Foundry QA not claimed |
+| Fire-Team Supremacy | 174 | No | Covered (batch 402): once per round, a free final attack with a GC-confirmed 2-to-1 advantage, through the shared final-attack workflow | Native Foundry QA not claimed |
 | Great Fortitude | 174 | No | Complete: +3 maximum wounds and +3 base Fortitude; the base increase correctly feeds current Toughness | — |
 | Guts | 174 | No | Three named Athletics bonuses and Fatigued penalty exemption execute without negating escalation/recovery; durable Table of Ouch d10 executes; injury application and Revolving Door remain manual | — |
 | Quick Healer | 175 | No | Halves already-modified natural/stress/subdual recovery intervals after rate/rounding calculations, per user ruling; actual time/healing settlement remains manual | — |
-| Horde Basics | 174 | No | Manual/descriptive | — |
-| Horde Mastery | 174 | No | Manual/descriptive | — |
-| Horde Supremacy | 174 | No | Manual/descriptive | — |
+| Horde Basics | 174 | No | Covered (batch 402): the Incoming attack preview’s Horde Basics advantage raises personal cover to at least 1/4 (2-to-1) or 1/2 (3-to-1 or more) | Native Foundry QA not claimed |
+| Horde Mastery | 174 | No | Covered (batch 420): Pummel as a half action once per round and +1 morale on Grapple checks, each with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
+| Horde Supremacy | 174 | No | Partial (batch 402): +2 morale damage within CQB Range as a GC-confirmed damage-roll declaration; the halved Initiative Count increases of opponents in sight are stated for the GC | Native Foundry QA not claimed |
 | Iron Will | 174 | No | Complete: +3 base Will and +3 to Constitution/Wisdom for subdual/stress thresholds only; actual ability scores stay unchanged | — |
 | Lightning Reflexes | 174 | No | +3 base Reflex and native two-roll preferred Initiative choice execute; both original rolls are saved and stale choices rejected | — |
-| Quick Draw | 175 | No | Partial: all four free-action declarations share two uses per round; ordinary weapon handling/ammunition settlement remains manual | Batch232; native UI, limits, counters and persisted action receipts |
-| Snake Strike | 175 | No | Manual/descriptive | — |
-| Surge of Speed | 175 | No | Partial: confirmed non-attack half-action conversion, once per round and starting-dice session allowance; chosen action settlement remains manual | Batch232; concurrent calls, refunds, source loss, visible counters and native persistence |
-| Tac-Squad Basics | 175 | No | Manual/descriptive | — |
-| Tac-Squad Mastery | 175 | No | Manual/descriptive | — |
-| Tac-Squad Supremacy | 175 | No | Manual/descriptive | — |
+| Quick Draw | 175 | No | Covered: Draw, Holster, Pick Up and Reload as free actions twice per round, as recorded declarations | Native Foundry QA not claimed |
+| Snake Strike | 175 | No | Covered (batch 424): a Main-tab record of the free draw and Feint, refused against an opponent already struck this combat or with a weapon already used this combat; the drawn weapon’s next damage roll on that opponent this round adds 1 sneak attack die, once | Native Foundry QA not claimed |
+| Surge of Speed | 175 | No | Covered: once per round a non-attack half action as a free action, as a recorded declaration | Native Foundry QA not claimed |
+| Tac-Squad Basics | 175 | No | Covered (batch 402): once per round, a free Threaten or a half-action Intimidate/Coercion check with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
+| Tac-Squad Mastery | 175 | No | Covered (batch 393): once per round, Suppressive Fire as a half action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
+| Tac-Squad Supremacy | 175 | No | Covered (batch 402): the damage roll reminds that, with a 2-to-1 advantage, opponents within CQB Range and sight count as flanked, alongside the existing GC-confirmed flanking declaration | Native Foundry QA not claimed |
 | Tactical Advantage | 175 | No | GC-confirmed roster counting enforces teammate scope, nonstacking and higher-source precedence; Joint Action DC ruling and half-action leadership remain open | — |
 | Toughness | 176 | Yes | Complete: current base Fortitude adds maximum vitality once per selection, capped at three; Great Fortitude and source changes recalculate it | — |
 | Two-Weapon Basics | 176 | No | One-hand Hands-On rule, paired-weapon declaration, timed −2 tradeoff and one counted final Standard Attack execute; GC confirms least-used weapon and prior/manual uses | — |
@@ -293,169 +293,169 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Wolfpack Supremacy | 176 | No | Flanked-target sneak die and scoped threat implemented; geometry confirmed at table | — |
 | All-out Attack | 176 | No | Implemented: bounded pre-roll melee penalty, twice that recorded-hit damage bonus once, and miss flat-footed outcome | Batch350; actual/named GC targets including objects, private damage leases, combined Side damage, replacements and GC recovery/reload verified |
 | Axe Basics | 176 | No | Partial: readied reviewed axe +1 gear with ordinary attacking/defending Trip skill checks and melee Disarm attacks; Chop! full-action attack/damage/TKD and ordinary recorded TKD save/outcome implemented; Menacing fixed stress and readied-axe AP(2) implemented; mixed TKD grouping remains open | Batches317–318,354–356,358,360; actual family/readiness/grip/source proof, native dialog/reload verified |
-| Battering Blows | 176 | No | Manual/descriptive | — |
-| Cleave Basics | 177 | No | Manual/descriptive | — |
-| Cleave Mastery | 177 | No | Partial: +1 melee threat versus confirmed standard characters; reaction attacks remain open | Batch217; typed target/source evidence |
-| Cleave Supremacy | 177 | No | Partial: melee critical cost −1 versus confirmed standard characters; cleave movement remains open | Batch217; frozen target and legacy GC confirmation |
-| Club Basics | 177 | No | Manual/descriptive | — |
+| Battering Blows | 176 | No | Covered (batch 425): Clobber is a Grapple-check trick at −2 (−4 with a 2-handed weapon) whose card states the unarmed damage, the weapon damage repeated for Darting and Flashing Weapon with takedown, the push and the ended grapple | Native Foundry QA not claimed |
+| Cleave Basics | 177 | No | Covered (batch 377): once per round, after the character’s own resolved melee hit that the GC confirms dropped its opponent, one free extra melee attack with the same weapon against a different opponent | Native Foundry QA not claimed |
+| Cleave Mastery | 177 | No | Covered (batch 420): +1 melee threat against confirmed standard characters; the Cleave control allows any number of cleave attacks per round, one for each recorded hit that dropped an opponent | Native Foundry QA not claimed |
+| Cleave Supremacy | 177 | No | Covered (batch 420): melee critical cost −1 against confirmed standard characters; the Cleave dialog states the 5-ft. move before each cleave within Speed | Native Foundry QA not claimed |
+| Club Basics | 177 | No | Covered (batch 375): readied reviewed club waives the −4 lethal/subdual conversion penalty; improvised clubs take no improvised penalty; Furious Stance raises the Count at round end by the round’s melee attacks; Out of the Park +2 attack/+2 damage/+2 threat | Native Foundry QA not claimed |
 | Darting Weapon | 178 | No | Start-of-own-Count −2 timed attack/skill tradeoff and one counted final melee/unarmed/hurled Standard Attack execute; current weapon/Count/receipt validated. Shared Nauseated final-attack allowance now executes across the five implemented final-attack controls | — |
 | Flashing Weapon | 178 | No | Earned two-attack/−4 Darting choice executes with durable declaration-scoped counters and own-next-Count expiry; shared Nauseated final-attack limit executes | — |
-| Dueling Basics | 178 | No | Manual/descriptive | — |
-| Dueling Mastery | 178 | No | Manual/descriptive | — |
-| Dueling Supremacy | 178 | No | Manual/descriptive | — |
+| Dueling Basics | 178 | No | Covered (batch 403): an own-Count declaration grants +1 dodge against all attacks (prepared with Defense) or +2 dodge against a chosen opponent (Incoming attack preview) for 1 full round; once per round a melee attack may target an opponent 5 ft. beyond Reach, and a miss offers flat-footed on the card | Native Foundry QA not claimed |
+| Dueling Mastery | 178 | No | Covered (batch 385): +1 Defense while a readied melee weapon is held; a GC control on an adjacent attacker’s resolved miss lowers that attacker’s Initiative Count by 2, once per attack; unarmed stances are not modelled, so melee attacks in them are not restricted | Native Foundry QA not claimed |
+| Dueling Supremacy | 178 | No | Covered (batch 385): +2 dodge bonus to Defense; each resolved melee-weapon hit offers +1 Initiative Count, once per hit | Native Foundry QA not claimed |
 | Fencing Basics | 178 | No | Implemented: Disarm/Feint gear benefit, Remiss final attack and Side Stance | Batches333–346: reviewed FIN sword; recorded opponent/attack sources; one pending Side die, Defense−1 and reviewed20ft round movement cap |
 | Finesse Basics | 178 | No | Optional FIN grant on one-handed melee weapons and trained Dexterity damage execute separately; two-handed melee Massive Initiative-loss waiver preserves its Strength attack penalty and other Initiative losses. Initiative-loss settlement remains table-managed | — |
 | Finesse Mastery | 178 | No | +1 threat range on actual melee/unarmed attacks; stacks once with Supremacy and other applicable threat sources, with saved source evidence | — |
 | Finesse Supremacy | 178 | No | Additional +1 melee/unarmed threat and −1 melee critical-hit action-die cost (minimum0) execute; ranged/hurled attacks excluded | — |
 | Flail Basics | 178 | No | Implemented: Feint/Cheap Shot gear benefit, Cheap Shot workflow, Double Twirl and Punishing Stance | Batches336–341: actual qualified sources, shared stance lifecycle, separate fixed2 subdual receipt per resolved melee hit and idempotent settlement; defenses/health follow normal table application |
-| Garrote Basics | 178 | No | Partial: Stalking Stance grants +3Sneak in actual combat and enforces reviewed20ft round movement cap | Batch347; Grapple threat/mute and Tighten the Noose remain manual |
+| Garrote Basics | 178 | No | Covered (batch 420): Stalking Stance +3 Sneak in combat with its 20-ft. cap; the named Athletics Grapple check takes threat +2 with a declared readied garrote and states that a held opponent becomes mute; Tighten the Noose is on the grapple card | Native Foundry QA not claimed |
 | Great Sword Basics | 179 | No | Implemented: readied reviewed two-handed sword +2 gear Trip defense and melee Defense, Hack! full-action attack/damage/threat and Power Stance Strength-based Count/10ft cap | Batches317/319/352/359/364/371; actual family/readiness/total held capacity, typed bonuses, source proofs, native controls/reload and printed-benefit audit verified |
 | Hammer Basics | 179 | No | Implemented: readied reviewed hammer AP(2) and +2 gear with Intimidate; Crush! full-action attack/damage and Driving push/follow or blocked subdual outcome | Batches317,353,357–358; actual family/readiness/grip/source proof, native dialog/reload verified |
 | Improvised Weapon Basics | 179 | No | Implemented: +3 improvised search Gear bonus and attack/damage gear-penalty waivers | Batch244; ordinary paid search, Table5.12, Shaken fees, source/refund guards and native dialog/reload verified; weapon creation/location and error destruction are separate baseline workflows |
-| Improvised Weapon Mastery | 179 | No | Partial: adjacent finds and one selected base-payment waiver per combat execute, with Shaken fees after waiver | Batch245; durable per-combat history, source reacquisition/encounter switching, truthful no-post refund and native persistence; type-choice ruling/weapon settlement remain open |
+| Improvised Weapon Mastery | 179 | No | Covered (batch 428): the found object is adjacent and the dialog states that the character chooses its type; one search payment waived per combat, with Shaken fees after the waiver | Native Foundry QA not claimed |
 | Knife Basics | 179 | No | Implemented: GC-reviewed knife family; every carried knife is considered readied without occupying a hand or spending Quick Draw; Circling Stance halves the target’s dodge bonus (round up) in the Incoming attack preview; Between the Ribs full-action knife attack supplies 1 sneak die inside its recorded hit’s damage | Batch374; automated tests and 112 layout fixtures; automatic adjacent-square move and free-hand check are GC-confirmed; sneak-condition ruling pending; native Foundry QA not run in the cloud session |
 | Polearm Basics | 179 | No | Implemented: readied reviewed polearm +1 gear Defense, adjacent-target penalty waiver, Fend completed5ft movement and Striking Stance adjacent-entry reaction | Batches320/367–369; actual attacking family/source, shared limits, stance caps, adopted source/replay/recovery and native controls/reload verified |
 | Spear Basics | 179 | No | Implemented: readied spear actual Bull Rush/Trip skill+2gear, including supported defense/counter/conveyance scopes, Gripping Stance and Spear Charge | Batches317/348/360/364/365/371; actual source/total held capacity, completed route/current Speed/stance caps, recorded-hit damage/recovery, native controls and printed-benefit audit verified |
-| Staff Basics | 179 | No | Partial: readied reviewed staff +3 gear with Jump, Whirling lower-level flanking protection, Thread the Needle hit/hold/release, holder movement ending and accepted opposed Athletics escape with required move execute | Batches317/366/370/372; actual sources, independent restraint effects, recovery and native reload verified; whole-feat source audit remains |
-| Sword Basics | 180 | No | Manual/descriptive | — |
-| Whip Basics | 180 | No | Partial: readied reviewed whip +2gear with Jump and ordinary attacking/defending Trip skill checks; Intense Stance, Entwine and other Trip variants remain open | Batches317/360; actual family/readiness/grip/source proof; attacking scope automated tests, native response verified in317 |
-| Autofire Basics | 180 | No | Manual/descriptive | — |
-| Autofire Mastery | 180 | No | Manual/descriptive | — |
-| Autofire Supremacy | 180 | No | Manual/descriptive | — |
-| Bombard | 180 | No | Partial: indirect range/error; remaining combat effects manual | — |
+| Staff Basics | 179 | No | Covered: readied reviewed staff +3 gear with Acrobatics/Jump (317), Whirling Stance lower-level flanking protection (366), Thread the Needle hit, hold, release, holder movement ending (370) and opposed Athletics escape (372) | Whole-feat source audit in batch 375; native reload verified in the earlier batches |
+| Sword Basics | 180 | No | Covered (batch 376): lost while any wielded weapon has finesse; post-hit opposite-side move reminder; Unbeatable Stance +1 morale against a GC-confirmed damaged opponent; Impale +1 damage per 2 points over the GC-confirmed Defense | Native Foundry QA not claimed |
+| Whip Basics | 180 | No | Covered (batch 421): readied whip +2 gear on Jump and Trip checks; Intense Stance is a stance with a sheet declaration that refuses attacks for 1 full round and then gives +2 melee attack and damage for the next; Entwine is a whip melee trick that states the hold on a hit | Native Foundry QA not claimed |
+| Autofire Basics | 180 | No | Covered (batch 397): Two-Shot Burst fire action (Single-Shot or Burst mode, 2 shots, at most 2 hits by the hit counter) and Cover Fire as a half action once per round | Native Foundry QA not claimed |
+| Autofire Mastery | 180 | No | Covered (batch 397): Burst and Two-Shot Burst add no error range; a resolved ranged hit offers the teammates’ +2 against that opponent for 1 full round, once per opponent per round | Native Foundry QA not claimed |
+| Autofire Supremacy | 180 | No | Covered (batch 397): the hit counter gives Autofire an extra hit per 3 points over Defense, and raises each strafed target’s Defense by 1 rather than 2 | Native Foundry QA not claimed |
+| Bombard | 180 | No | Covered (batch 421): indirect attacks double the range increment and take error −1 (minimum 1); the card states the +2 damage-reduction DC and the deviation rolled twice on a miss | Native Foundry QA not claimed |
 | Bullseye | 180 | No | Implemented: bounded one-shot ranged Standard Attack penalty, equal recorded-hit damage once, and miss flat-footed outcome | Batch351; actual/named GC targets, spent projectile context, replacements and posted-receipt recovery/reload verified |
 | CQB Basics | 180 | No | Implemented: measured-range ranged attack/damage+1, held/readied ranged-weapon Threaten skill+2gear and out-of-melee penalty/error waiver | Batches195–197,277; ordinary/class/final/damage controls, both opposed Threaten roles, gear stacking, source/Count/evidence guards and native persistence verified |
 | CQB Mastery | 180 | No | Within-CQB opponent ranged threat, into-melee waiver and held/readied ranged-weapon Threaten uninjured-target permission execute | Batch277 adds exact Threaten action/response checks and source/Count/evidence guards; failure/critical-failure next-attack bonus suppression and shared Threaten outcome settlement remain open |
 | CQB Supremacy | 181 | No | +5 Initiative from actual readied/carried available ranged weapons executes once with Size/grip/source checks; incoming Defense preview reduces partial cover one quarter for an actual available ranged Supremacy attack against an opponent within CQB Range; penetration and failed-Threaten reaction remain open | — |
-| Flamethrower Basics | 181 | No | Manual/descriptive | — |
-| Follow-up Shot | 181 | No | Manual/descriptive | — |
-| Hail of Fire | 182 | No | Manual/descriptive | — |
-| Grenade Basics | 181 | No | Partial: thrown range/error and field-request extra grenade; Intel acquisition remains open | — |
-| Guided Weapon Basics | 181 | No | Partial: guided range/error; remaining guided attack effects manual | — |
-| Gunslinger's Eye | 182 | No | Manual/descriptive | — |
-| Marksmanship Basics | 182 | No | Partial: Aim/Brace declarations and braced Reflex; movement/action tracking manual | — |
-| Marksmanship Mastery | 182 | No | Partial: range and Aim bonus; action tracking manual | — |
-| Marksmanship Supremacy | 182 | No | Partial: range replacement and CQB | — |
-| Revolver Basics | 182 | No | Partial: Burst mode; reload and Intimidate effects open | — |
-| Rock and Roll | 182 | No | Partial: one-handed rifle/MG; volleys and ammunition grants open | — |
+| Flamethrower Basics | 181 | No | Covered (batches 407, 421): flamethrower fire actions use half the shots, rounded up; Bounce is offered with a flamethrower; Imprecise has no automated effect to ignore | Native Foundry QA not claimed |
+| Follow-up Shot | 181 | No | Covered (batch 398): a start-of-Count declaration grants 1 final attack with a firearm or heavy weapon and −2 to attack and skill checks for 1 full round (shared Darting Weapon tradeoff; one such declaration per round) | Native Foundry QA not claimed |
+| Hail of Fire | 182 | No | Covered (batch 398): the Follow-Up Shot declaration may grant 2 final attacks at −4 | Native Foundry QA not claimed |
+| Grenade Basics | 181 | No | Covered (batches 421–422): thrown grenade range +5 ft. and error −2; Bounce penalty −2 with a grenade; +1 grenade per request | Native Foundry QA not claimed |
+| Guided Weapon Basics | 181 | No | Covered (batches 421–422): guided range doubled and error −1; deviation rolled twice on a miss is stated; requested guided weapons and ammunition doubled | Native Foundry QA not claimed |
+| Gunslinger's Eye | 182 | No | Covered (batch 399): a Main-tab control sizes up a chosen character, whispering their ranged attack bonus, Initiative bonus and Ranged Combat feat count to the player and GC; uses per session equal Ranged Combat feats; once per character per mission; the target’s option to hide details is stated for the GC | Native Foundry QA not claimed |
+| Marksmanship Basics | 182 | No | Covered: Brace with each Aim, Brace without a surface, and −1 instead of −4 to Reflex while braced | Native Foundry QA not claimed |
+| Marksmanship Mastery | 182 | No | Covered: Aim bonus +1; firearm and heavy weapon range increments +50%, hurled doubled | Native Foundry QA not claimed |
+| Marksmanship Supremacy | 182 | No | Covered: CQB Range 60 ft.; firearm and heavy weapon range increments doubled, hurled tripled, replacing Mastery | Native Foundry QA not claimed |
+| Revolver Basics | 182 | No | Covered (batch 421): a readied revolver fires in Burst mode; Intimidate takes +4 gear with a declared readied revolver holding 1 shot; a full revolver reload is a once-per-round free-action declaration | Native Foundry QA not claimed |
+| Rock and Roll | 182 | No | Covered (batches 421–422): one-handed rifles and machine guns at −2; 2-shot Autofire and Strafe volleys up to half the shots left; requested Full Auto weapons and their ammunition doubled | Native Foundry QA not claimed |
 | Sharpshooter Basics | 182 | No | Implemented: actual-source ranged incoming Defense preview reduces partial cover by one quarter and halves positive Size Defense bonus (round down) | Batch349; cover stacking, total-cover/Reflex preservation, actual attacker/weapon/feat/Size guards and native reload verified |
-| Sharpshooter Mastery | 182 | No | Partial: braced threat; Called Shot reduction open | — |
-| Sharpshooter Supremacy | 182 | No | Partial: aimed threat and ranged critical cost | — |
-| Snap Shot | 182 | No | Manual/descriptive | — |
-| Steel Rain | 182 | No | Manual/descriptive | — |
-| Style Over Caliber | 183 | No | Manual/descriptive | — |
+| Sharpshooter Mastery | 182 | No | Covered (batch 421): braced ranged threat +1; the new Called Shot trick takes 3 off its attack penalty | Native Foundry QA not claimed |
+| Sharpshooter Supremacy | 182 | No | Covered: aimed ranged threat +2 and ranged critical cost −1 | Native Foundry QA not claimed |
+| Snap Shot | 182 | No | Covered (batch 377): the ranged counterpart of Cleave Basics, through the same control | Native Foundry QA not claimed |
+| Steel Rain | 182 | No | Covered (batches 407, 414, 428): hurled weapons without a blast increment take Burst, Cover Fire and Suppressive Fire; carried ones count as readied; +4 gear to stash a hurled weapon; drawing one as a free action is a Quick Draw-style declaration for the player | Native Foundry QA not claimed |
+| Style Over Caliber | 183 | No | Covered (batch 385): a pistol’s damage roll may replace its standard damage with 1d10+2, keeping other damage, qualities and effects | Native Foundry QA not claimed |
 | This… is my Boomstick | 183 | No | Manual/descriptive | — |
-| Trick Shot | 183 | No | Manual/descriptive | — |
-| Berserker Basics | 183 | No | Manual/descriptive | — |
-| Berserker Mastery | 183 | No | Manual/descriptive | — |
-| Berserker Supremacy | 184 | No | Manual/descriptive | — |
-| Boxing Basics | 184 | No | Partial: static numerical effects | — |
-| Boxing Moves | 185 | No | Manual/descriptive | — |
-| Boxing Supremacy | 185 | No | Partial: static numerical effects | — |
-| Brawling Basics | 185 | No | Partial: static numerical effects | — |
-| Brawling Moves | 185 | No | Manual/descriptive | — |
-| Brawling Supremacy | 185 | No | Manual/descriptive | — |
-| Dirty Fighting Basics | 185 | No | Manual/descriptive | — |
-| Dirty Fighting Moves | 185 | No | Manual/descriptive | — |
+| Trick Shot | 183 | No | Covered (batch 412): a hit with a non-grenade hurled weapon offers a control that rolls the damage as the escape DC and states the target is held instead of damaged; the GC records the held condition and combines several Trick Shots in a round | Native Foundry QA not claimed |
+| Berserker Basics | 183 | No | Covered (batch 386): a rage for 2d4+2 combat rounds, Strength and Constitution +3 and the Enraged status, entered with a full action and ended early with a half action; afterwards exhausted; uses per session equal starting action dice. The enraged condition’s restrictions are left to the table | Native Foundry QA not claimed |
+| Berserker Mastery | 183 | No | Covered (batch 386): free entry, 3d4+3 rounds, Strength and Constitution +5 | Native Foundry QA not claimed |
+| Berserker Supremacy | 184 | No | Covered (batch 425): free ending, 4d4+4 rounds and fatigued instead of exhausted; the save dialog declares a save to resist becoming frenzied for +4 | Native Foundry QA not claimed |
+| Boxing Basics | 184 | No | Covered (batch 392): +2 wound points; Closed Stance (+2 unarmed damage against an opponent the damage roll confirms shares the square; DR 2/— against them and their lost bonus 5-ft. steps are card reminders, as DR is applied at the table); Double Jab (unarmed Standard Attacks at −2, damage −2 per die, minimum 1) | Native Foundry QA not claimed |
+| Boxing Moves | 185 | No | Covered (batch 393): Knock Out and Wallop on unarmed Standard Attacks (their damage roll states whether damage beat the known target’s Constitution, or the Reflex DC 10 + damage); Weather the Storm as two free Tire actions per round during Total Defense; one unarmed trick per action | Native Foundry QA not claimed |
+| Boxing Supremacy | 185 | No | Covered (batch 418): Constitution +1; Driving Punch (threat +2, a miss offers flat-footed) and Turning Punch (the card states the doubled dodge; the damage roll states triple damage) are unarmed tricks; the move before Driving Punch is the player’s | Native Foundry QA not claimed |
+| Brawling Basics | 185 | No | Covered (batch 418): Initiative +2; Coiled Stance gives +2 on unarmed attacks declared against a lower Reflex save bonus and states the second 5-ft. step; Head Butt is on the grapple card | Native Foundry QA not claimed |
+| Brawling Moves | 185 | No | Covered (batches 395, 418): Haymaker on unarmed attacks; Body Slam rides a Trip and Fake Out a Feint as declared skill tricks whose card states the effect with the character’s unarmed damage | Native Foundry QA not claimed |
+| Brawling Supremacy | 185 | No | Covered (batch 408): the free final attack after two non-final unarmed hits on one opponent in a round; One-Two’s doubled damage on the damage roll; Sleeper Hold on the grapple card with its DC and duration | Native Foundry QA not claimed |
+| Dirty Fighting Basics | 185 | No | Covered (batch 395): sneak attack damage the owner suffers is halved, rounded up, when an attacker’s damage roll names them as target; Ready Stance (−2 to the hit target’s attacks this round, on the card); Low Blow (Fortitude DC 10 + damage or sickened, from the hit’s damage roll) | Native Foundry QA not claimed |
+| Dirty Fighting Moves | 185 | No | Covered (batches 395, 418): Eye Gouge and Rabbit Punch on unarmed attacks; Mud in Your Eye gives +4 to a Feint, once per opponent per combat as the player confirms | Native Foundry QA not claimed |
 | Dirty Fighting Supremacy | 185 | No | Unarmed sneak die implemented; tricks remain manual | — |
-| Kicking Basics | 186 | No | Manual/descriptive | — |
-| Kicking Moves | 186 | No | Manual/descriptive | — |
-| Kicking Supremacy | 186 | No | Partial: static numerical effects | — |
-| Martial Arts | 186 | No | Partial: chosen/roll effects | — |
-| Master's Art | 187 | No | Partial: chosen/roll effects | — |
-| Rolling Basics | 187 | No | Manual/descriptive | — |
-| Rolling Moves | 187 | No | Manual/descriptive | — |
-| Rolling Supremacy | 187 | No | Partial: static numerical effects | — |
-| Spirit Basics | 187 | No | Manual/descriptive | — |
-| Spirit Moves | 187 | No | Manual/descriptive | — |
-| Spirit Supremacy | 187 | No | Partial: static numerical effects | — |
-| Submission Basics | 188 | No | Manual/descriptive | — |
-| Submission Moves | 188 | No | Manual/descriptive | — |
-| Submission Supremacy | 188 | No | Manual/descriptive | — |
-| Two-hit Combo | 188 | No | Manual/descriptive | — |
-| Warrior's Grace | 189 | No | Manual/descriptive | — |
+| Kicking Basics | 186 | No | Covered (batch 424): a Kick costs no Initiative Count; Shifting Stance halves the target’s dodge against unarmed attacks and states the far-side move; Sweep removes the flat-footed result of a lost Trip (except on a critical failure) and the counter-Trip that critical failure would allow | Native Foundry QA not claimed |
+| Kicking Moves | 186 | No | Covered (batch 391): Back Flip (Kick or unarmed Standard Attack; hit reminder for the 5 ft. move and +1 dodge, a miss control applies flat-footed), Guillotine Kick (Kick, −4 attack, +1 threat, Fortitude DC 10 + damage or reeling noted on the damage roll) and Power Kick (Kick damage with armor-piercing (2) and takedown) | Native Foundry QA not claimed |
+| Kicking Supremacy | 186 | No | Covered (batch 418): Dexterity +1; Hurricane Kick (a Kick trick at −2 damage, with the push stated) and Thrust Kick (a Kick trick stating the free Bull Rush) are unarmed tricks; the five-Kick split is the player’s | Native Foundry QA not claimed |
+| Martial Arts | 186 | No | Covered (batch 419): unarmed threat 19–20 and d6 damage; the chosen attribute replaces Dexterity for Defense and Initiative (Strength) or Strength for unarmed attack and damage (others); always armed with a deadly weapon for Intimidate, waiving a Gear (weapon) requirement | Native Foundry QA not claimed |
+| Master's Art | 187 | No | Covered: unarmed threat 17–20 and +1d6 damage; the Martial Arts attribute also applies to unarmed attack, damage, Defense and Initiative | Native Foundry QA not claimed |
+| Rolling Basics | 187 | No | Covered (batch 396): Forward Stance (a hit’s card offers Initiative Count +1; movement checks refuse anything but Jump checks and the bonus 5-ft. step) and Roll (Kick or unarmed Standard Attack, +1 damage from the hit’s card, the 5-ft. move noted). The system never applies flat-footed or an action cost for standing up, so the free, safe Stand Up holds as is | Native Foundry QA not claimed |
+| Rolling Moves | 187 | No | Covered (batch 395): Circle, Leap and Sway on a Kick or unarmed Standard Attack, with their movement and +1 dodge stated on the card for the table | Native Foundry QA not claimed |
+| Rolling Supremacy | 187 | No | Covered (batch 418): Speed +10; Sticky Fingers adds DR 5 against an adjacent opponent in the Incoming attack preview during Total Defense; Torpedo is a Bull Rush skill trick at +2 stating double unarmed damage | Native Foundry QA not claimed |
+| Spirit Basics | 187 | No | Covered (batch 396): once per combat at any Count, a receipt reducing one source’s lethal damage by base attack bonus (minimum 1); Rooted Stance (+1 to all saves; movement checks refuse leaving the square); Palm Strike (push or 1d4 subdual, on the card) | Native Foundry QA not claimed |
+| Spirit Moves | 187 | No | Covered (batch 424): One Warning lets a Threaten target an uninjured opponent and states the extra stress (base attack bonus difference); Shatter Weapon is a once-per-round control in Total Defense that rolls Athletics/Smash; Vitalize is an unarmed trick stating the healing | Native Foundry QA not claimed |
+| Spirit Supremacy | 187 | No | Covered (batch 418): Wisdom +1; Hand of God is a once-per-round control on a missed melee attack against the owner in Total Defense that rolls the attacker’s damage against them; Shadow Walk is stated on a Pummel | Native Foundry QA not claimed |
+| Submission Basics | 188 | No | Covered (batch 420): Prone Stance gives +1 on Grapple and escape checks, waives the prone attack penalty, survives being prone and turns becoming sprawled into becoming prone; a Cheap Shot on a successful unarmed attack records doubled penalties; Snap! is on the grapple card with its save DC | Native Foundry QA not claimed |
+| Submission Moves | 188 | No | Covered (batch 425): Joint Lock is a −4 declaration on the held character’s escape check; Bone Grind and Reversal are on the grapple card, their attribute damage and condition swap made by the GC | Native Foundry QA not claimed |
+| Submission Supremacy | 188 | No | Covered (batch 420): repeated Cheap Shots in a scene with different penalties; Death Grip and Breathtaking Hold are on the grapple card, their Coup de Grace and suffocation run with the existing actions | Native Foundry QA not claimed |
+| Two-hit Combo | 188 | No | Covered (batch 401): a start-of-Count declaration grants 1 final unarmed attack and −2 to attack and skill checks for 1 full round (the shared final-attack tradeoff; one such declaration per round) | Native Foundry QA not claimed |
+| Warrior's Grace | 189 | No | Covered (batch 401): the Two-Hit Combo declaration may grant 2 final unarmed attacks at −4 | Native Foundry QA not claimed |
 | Vital Points Basics | 188 | No | Sneak-attack resistance 6 executes; stance/trick remain manual | — |
-| Vital Points Moves | 188 | No | Manual/descriptive | — |
+| Vital Points Moves | 188 | No | Covered (batch 395): Nerve Jam (−4, threat +1, stunned on a threat or critical hit), One Finger (−4, threat +4, flat-footed target confirmed) and Spike (threat +1) on unarmed Standard Attacks | Native Foundry QA not claimed |
 | Vital Points Supremacy | 188 | No | Unarmed sneak die implemented; tricks remain manual | — |
-| Wrestling Basics | 189 | No | Manual/descriptive | — |
-| Wrestling Moves | 189 | No | Manual/descriptive | — |
-| Wrestling Supremacy | 189 | No | Partial: static numerical effects | — |
-| All or Nothing | 189 | No | Manual/descriptive | — |
-| Better Luck Next Time | 189 | No | Manual/descriptive | — |
-| Fortune's Fool | 189 | No | Manual/descriptive | — |
-| Black Cat | 189 | No | Manual/descriptive | — |
+| Wrestling Basics | 189 | No | Covered (batch 394): +1 Defense against an adjacent opponent (Incoming attack preview); Open Stance (no Run actions; once per round the GC offers its pull-in and free Grapple or Trip on a resolved miss against the owner); Brush (unarmed Standard Attack for 1d6 subdual whose damage lowers the target’s Initiative Count) | Native Foundry QA not claimed |
+| Wrestling Moves | 189 | No | Covered (batches 395, 408, 418): Clothesline on unarmed attacks; Hip Toss is a Trip skill trick stating the damage and Fatigue save; Fling is on the grapple card | Native Foundry QA not claimed |
+| Wrestling Supremacy | 189 | No | Covered (batch 418): Strength +1; Double Hurl is a Trip skill trick stating double unarmed damage plus equal flash and bang damage; Back Breaker is on the grapple card | Native Foundry QA not claimed |
+| All or Nothing | 189 | No | Covered (batch 381): once per session, a rolled skill, Knowledge or attack check declared on its dialog widens error and threat ranges by 5; its error stays open to activation on a success, which then becomes a failure | Native Foundry QA not claimed |
+| Better Luck Next Time | 189 | No | Covered (batch 380): a single boosting die on a skill check or save that rolls a natural 1 is returned once when the check is resolved (ordinary dice, or a still-live unrestricted bonus pool) | Native Foundry QA not claimed |
+| Fortune's Fool | 189 | No | Covered (batch 400): on the owner’s activated critical failure, a GC control returns 1 action die to the paying opponent (or the GC pool); the owner keeps their count, holding a die of the spent type | Native Foundry QA not claimed |
+| Black Cat | 189 | No | Covered (batch 382): once per scene the GC marks up to one opponent per Chance feat (GC confirms line of sight); a marked character’s checks carry +2 error range until the scene changes; no character carries two | Native Foundry QA not claimed |
 | Jinx | 190 | No | Implemented: selected paying-opponent critical-failure discount, Chance-based session allowance and combined payment recovery | Batches269–270; Shaken-after-waiver fees, concurrent/source/counter guards, actual GC review and native persistence verified |
-| Tough Luck | 191 | No | Manual/descriptive | — |
+| Tough Luck | 191 | No | Covered (batch 382): recorded with the Black Cat mark; each threat a marked opponent activates costs 1 more action die | Native Foundry QA not claimed |
 | The Dice are Hot | 189 | No | Implemented: Gambling cap removal/current-owned-dice synergy and Lifestyle +1 | Batch228; paid class/Hail Mary recalculation, source checks, expiry/bound pools and cached native combination verified |
-| Fortunate | 189 | No | Manual/descriptive | — |
-| Fortune Favors the Bold | 189 | No | Partial: chosen/roll effects | — |
+| Fortunate | 189 | No | Covered (batch 379): the GC grants the requested d4 as a scene-long unrestricted bonus die (Fortune Favors the Bold applies); the matching d4 goes to the GC pool or is noted for a chosen opponent; uses per session equal the Chance feats held | Native Foundry QA not claimed |
+| Fortune Favors the Bold | 189 | No | Covered (batch 419): every gain of action dice improves the die type (a d12 becomes two d6), including the dice given at the start of each session, GC awards and ability grants | Native Foundry QA not claimed |
 | Lady Luck's Smile | 190 | No | Verified complete: action dice explode on their highest two natural faces | Batch231; ordinary/bonus die types, boost/Generous/healing/Defense, prerequisites and persisted native formula verified |
-| Lucky Break | 190 | No | Manual/descriptive | — |
-| Misfortune | 190 | No | Manual/descriptive | — |
-| Peculiar Dodge | 190 | No | Manual/descriptive | — |
+| Lucky Break | 190 | No | Partial (batch 400): a GC control turns a resolved hit on the owner into a miss once per scene after the GC confirms the margin of 1 or less; skill checks targeting the owner are not recorded with a target, so those stay at the table | Native Foundry QA not claimed |
+| Misfortune | 190 | No | Covered (batch 400): a GC control on the owner’s unactivated threat against a recorded character spends 1 of the owner’s action dice and removes 1 from the target (the GC pool for an NPC); uses per session equal Chance feats | Native Foundry QA not claimed |
+| Peculiar Dodge | 190 | No | Covered (batch 400): a GC control on a resolved, unactivated hit against the owner spends 1 action die and rolls it without exploding; an odd face turns the hit into a miss; uses per session equal Chance feats; once per hit | Native Foundry QA not claimed |
 | Mark of Conflict | 190 | No | Implemented: +1 on every ranged weapon damage roll; BAB and career level count 3 higher for Ranged Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Ranged Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
 | Mark of Strife | 190 | No | Implemented: +1 on every unarmed weapon damage roll; BAB and career level count 3 higher for Unarmed Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Unarmed Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
 | Mark of Turmoil | 190 | No | Implemented: +1 on every melee weapon damage roll; BAB and career level count 3 higher for Melee Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Melee Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
 | Trouble Magnet | 191 | Yes | Implemented: one extra Subplot per valid selection (twice maximum), plus minimum-one unfinished Subplot check | Batch226; active named/described records, completion/source changes and visible requirement verified |
-| Baby It | 191 | No | Manual/descriptive | — |
-| Demolition Derby | 192 | No | Manual/descriptive | — |
-| Death Ride | 192 | No | Manual/descriptive | — |
-| Bail Out! | 191 | No | Manual/descriptive | — |
-| Daredevil | 192 | No | Manual/descriptive | — |
-| Crew Dog | 191 | No | Manual/descriptive | — |
-| Lane Dancer | 192 | No | Manual/descriptive | — |
-| Mount Up | 192 | No | Manual/descriptive | — |
-| Photo Finish | 193 | No | Manual/descriptive | — |
+| Baby It | 191 | No | Partial (batch 411): a once-per-scene use on the sheet, spent with its Use button; ignoring and later reapplying the vehicle critical hit stays with the GC | Native Foundry QA not claimed |
+| Demolition Derby | 192 | No | Covered (batch 426): +2 to Damage saves of a vehicle the character drives; the vehicle sheet’s new Crash control takes 1 off each die of the vehicle’s collision damage (minimum 1) when its driver has the feat | Native Foundry QA not claimed |
+| Death Ride | 192 | No | Partial (batch 411): while the character is a vehicle’s recorded driver (including a mount), DR equal to their Chase feats joins the independent feat DR for every attack kind; the agent sheet refreshes it on its next update after the driver changes; staying conscious below 0 wounds stays with the GC | Native Foundry QA not claimed |
+| Bail Out! | 191 | No | Covered (batches 409, 426): the chase tracker opens Long Gone to a Prey with the feat, with the end-of-round crash to confirm; the vehicle Crash control states the occupant’s reduced damage on a successful or failed Reflex save | Native Foundry QA not claimed |
+| Daredevil | 192 | No | Covered (batch 383): Strategy rating requirements are checked with Acceleration and Turning +2; Stunt needs no GC confirmation | Native Foundry QA not claimed |
+| Crew Dog | 191 | No | Partial (batch 411): a once-per-scene use on the sheet; the extra d6 die and its vehicle-only spending stay with the table | Native Foundry QA not claimed |
+| Lane Dancer | 192 | No | Covered: in a ground vehicle the chase tracker shows the side treating Tight room as Close or Close as Open, with its Crisis DC, and the +2 on checks and saves from a Crisis Advantage (batch 409); outside chases the room grade stays with the GC | Native Foundry QA not claimed |
+| Mount Up | 192 | No | Covered (batches 409, 426): a ridden mount uses the rider’s higher Defense, and the vehicle sheet shows the rider-raised Reflex; the chase tracker eases the Maneuvering Room and gives +2 on Crisis Advantage checks and saves | Native Foundry QA not claimed |
+| Photo Finish | 193 | No | Covered (batch 383): every participant’s Acceleration and Turning drop by 2 per use, kept through rating refreshes | Native Foundry QA not claimed |
 | Wave Runner | 193 | No | Breath allowance executes; vehicle maneuvering/Crisis benefits manual | — |
-| Wind Rider | 193 | No | Manual/descriptive | — |
-| Dash | 192 | No | Manual/descriptive | — |
+| Wind Rider | 193 | No | Partial: in an aircraft the chase tracker shows the side treating Tight room as Close or Close as Open, with its Crisis DC, and the +2 on checks and saves from a Crisis Advantage (batch 409); the Notice visual-range halving and gliding distance stay with the GC | Native Foundry QA not claimed |
+| Dash | 192 | No | Partial: a Run covers Speed × 5 (× 3 in full body armor); on foot the chase tracker shows the side treating Tight room as Close or Close as Open, with its Crisis DC, and the +2 on checks and saves from a Crisis Advantage (batch 409); the running-jump increase stays with the GC | Native Foundry QA not claimed |
 | Sprint | 193 | No | Verified complete: +10 ft. Speed with earned Dash prerequisite | Batch229; duplicate/source removal, single halving and independent Fleet/class interaction verified; Dash effects remain separately open |
-| Defensive Driving | 192 | No | Manual/descriptive | — |
-| Jackrabbit Start | 192 | No | Manual/descriptive | — |
-| Driving Instincts | 192 | No | Manual/descriptive | — |
+| Defensive Driving | 192 | No | Covered (batch 383): Prey Strategy penalties halved (rounded down); once-per-chase forced Crisis recorded for the GC | Native Foundry QA not claimed |
+| Jackrabbit Start | 192 | No | Covered (batch 383): chase or manhunt Prey: starting Lead +2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
+| Driving Instincts | 192 | No | Covered (batch 409): the chase tracker records the side’s guess before the reveal; a right guess subtracts the side’s Chase feats from the opponent’s Strategy modifier for that check | Native Foundry QA not claimed |
 | Professional Driver - Closed Course | 193 | No | Implemented: Impress synergy on all five Maneuvers; Acrobatics or Drive synergy on all Impress uses when the target sees both you and your vehicle | Batch259; all named uses, rank thresholds/cap, typed stacking, source guards, actual dialog and native persistence verified |
-| Duct Tape and Bubblegum | 192 | No | Manual/descriptive | — |
-| Get Radical! | 192 | No | Manual/descriptive | — |
-| Need for Speed | 192 | No | Manual/descriptive | — |
-| Offensive Driving | 192 | No | Manual/descriptive | — |
-| Relentless Pursuit | 193 | No | Manual/descriptive | — |
+| Duct Tape and Bubblegum | 192 | No | Covered (batch 384): a vehicle gains the best half-Mechanics-ranks (rounded up) Damage save bonus among its driver and occupants with the feat | Native Foundry QA not claimed |
+| Get Radical! | 192 | No | Partial (batch 412): the vehicle control check now declares a stunt (DC +5/+10/+15/+20, error +0–3) and speed above half top MPH (DC +5); Get Radical! takes 5 off the stunt DC and 1 off its error increase, the DC change stated on the card for the GC; the jump distance and halved falling damage stay with the GC | Native Foundry QA not claimed |
+| Need for Speed | 192 | No | Covered (batch 412): the control check’s speed declaration adds no DC for a driver with the feat, and the card says why | Native Foundry QA not claimed |
+| Offensive Driving | 192 | No | Covered (batch 383): Predator Strategy penalties halved (rounded down); once-per-chase ignored Crisis recorded for the GC | Native Foundry QA not claimed |
+| Relentless Pursuit | 193 | No | Covered (batch 383): chase or manhunt Predator: starting Lead −2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
 | One Hand on the Wheel | 193 | No | Vehicle Maneuver one-handed penalty waived; selected free Maneuvers share a scene allowance equal to active Chase feats; legality, own-count timing, reservations, refunds and frozen receipts verified (batch258) | — |
-| Simulator Jockey | 193 | No | Manual/descriptive | — |
+| Simulator Jockey | 193 | No | Covered (batch 384): the driver ignores the Drone quality’s Maneuver error increase; the drone attack penalty and Regroup restriction are not applied by the system to begin with | Native Foundry QA not claimed |
 | Ambush Basics | 193 | No | Sneak die and role-scoped Cross-Check implemented; outcome rewards remain manual | — |
 | Ambush Mastery | 193 | No | Quick-ambush time/error tradeoff and threat implemented; source synergy checked | — |
 | Ambush Supremacy | 193 | No | Sneak die, approved slow-ambush timing and scoped critical discount implemented; rewards remain manual | — |
-| Bludgeon | 193 | No | Sneak damage conversion exception implemented; attack conversion remains manual | — |
+| Bludgeon | 193 | No | Sneak damage conversion exception implemented; the −4 attack conversion penalty is waived (batch 375) | — |
 | Whack | 196 | No | Subdual sneak bonus implemented; flat-footed persistence remains manual | — |
-| Concealed Carry | 193 | No | Manual/descriptive | — |
+| Concealed Carry | 193 | No | Partial (batch 414): Sleight of Hand/Stash Item states that frisked items count as 2 Size categories smaller; item Size is not itemised by the dialog, so the GC applies it | Native Foundry QA not claimed |
 | Deadly Precision | 194 | No | Sneak damage bonus per die implemented | — |
-| No Quarter | 195 | No | Manual/descriptive | — |
+| No Quarter | 195 | No | Covered (batch 404): an attack-dialog choice gives up 1 or more of the weapon’s earned sneak attack dice for an equal threat range increase; the hit’s damage roll from the card rolls that many fewer | Native Foundry QA not claimed |
 | Crippling Strike | 194 | No | Numeric sneak-dice prerequisite implemented; effects remain manual | — |
-| Equilibrium Basics | 194 | No | Partial: declaration-earned Covert-count dodge bonus with timed Total Defense | Batches290/301/303; timed dodge, declared Balance one-check movement and Falling damage-distance−20 verified, including additive soft landing, source/Speed/evidence guards, Skills UI and native receipts; full movement/landing/damage settlement remains separate |
-| Equilibrium Mastery | 194 | No | Partial: narrow/uneven Balance DC−5, error−1 and Vision tag ignored | Batches301/305/307; all three normal declared benefits verified: Balance surfaces, ordinary Resist Trip dodge and full-Speed Tumble; source/count/Speed/condition/evidence guards, Skills UI and native receipts; broader combinations, physical action sequencing and outcomes remain open |
-| Equilibrium Supremacy | 194 | No | Manual/descriptive | — |
+| Equilibrium Basics | 194 | No | Covered: Covert-count dodge during Total Defense; one Balance check for a full-Speed crossing; falling distance 20 ft. shorter | Native Foundry QA not claimed |
+| Equilibrium Mastery | 194 | No | Covered: Covert-count dodge when resisting a Trip; narrow or uneven Balance DC −5, error −1 and no Vision tag; full-Speed Tumble | Native Foundry QA not claimed |
+| Equilibrium Supremacy | 194 | No | Partial (batch 405): while Fighting Defensively (now a sheet declaration for every character: −4 attack/skill checks, +2 dodge for 1 full round, p.357) the character gains dodge equal to half their Covert feats, rounded up; moving through and ending in opponents’ squares, and the flanking it causes, stay with the GC | Native Foundry QA not claimed |
 | Executioner | 194 | No | Numeric sneak-dice prerequisite implemented; effects remain manual | — |
-| Merciless | 195 | No | Manual/descriptive | — |
-| Faceless | 195 | No | Partial: automatic Sneak rank synergy on all Blend checks and declared standalone information-gathering skill time×3 | Batches283,285; passive/manual distinction, typed stacking, actual target/purpose/source/rank/evidence guards and native persistence verified; timing combinations await p.329 ruling; whole tasks/conflicts, class abilities, Requests and other options remain open |
-| Traceless | 196 | No | Partial: automatic Blend rank synergy on all Falsify checks | Batch283; all named uses, typed stacking, source/rank/evidence guards and native persistence verified; opponent DC/Tracking gate and Analysis task count increase remain open |
-| Zeroed | 196 | No | Partial: active Covert feat count increases opposing Analysis/Investigation error ranges | Batch284; actual readable selected target, all named uses, pre-reduction order, source/count/evidence guards and native persistence verified; physical-evidence threat/critical-success gate remains open |
-| Ghost Basics | 195 | No | Partial: automatic Acrobatics rank synergy for Hide against security sensors and Sense Motive synergy against living opponents | Batch291; named GC-confirmed targets, strongest-positive/manual stacking, exact scope, source/rank/evidence guards and all three actual Skills dialogs/reload verified; batch293 adds counted rolled ground Hide allowance×2and full-Speed check-penalty waiver, retaining+1error per user ruling; current Speed/source/route/evidence guards, ordinary/tier UI and native persistence verified; non-ground modes, alternate paths and broader Hide/detection/outcomes remain separate review scopes |
-| Ghost Mastery | 195 | No | Partial: faster-ground Hide−4instead of−8; distracted Notice/Awareness and Search/Perception observers suffer another−4 against the actual target | Batches293/295/297; ground movement, distracted observer−4 and actual-source scenery invisibility predicate/Defense preview verified; other targeting effects and hidden/invisible lifecycle remain open |
-| Ghost Supremacy | 195 | No | Partial: faster-than-Speed ground Hide check penalty waived; separate+3error retained | Batches293/297/299; ground movement, actual-source half-scenery invisibility predicate/Defense preview and no-apparent-place Hide permission verified; current crowd attribute/known-location opportunity guards and native receipts verified; other targeting effects and hidden/invisible lifecycle remain open |
-| Mingling Basics | 195 | No | Manual/descriptive | — |
-| Mingling Mastery | 195 | No | Manual/descriptive | — |
-| Mingling Supremacy | 195 | No | Manual/descriptive | — |
-| Spider Basics | 196 | No | Manual/descriptive | — |
-| Spider Mastery | 196 | No | Manual/descriptive | — |
-| Spider Supremacy | 196 | No | Manual/descriptive | — |
+| Merciless | 195 | No | Covered (batch 393): once per round, a Coup de Grace against a helpless character as a free action | Native Foundry QA not claimed |
+| Faceless | 195 | No | Covered: Sneak synergy on Blend checks; research into the character takes triple time on declared information-gathering checks | Native Foundry QA not claimed |
+| Traceless | 196 | No | Covered: Blend synergy on Falsify checks | Native Foundry QA not claimed |
+| Zeroed | 196 | No | Covered: Analysis and Investigation checks against the character take error +Covert feats; the dead-on-record cover story is narrative for the GC | Native Foundry QA not claimed |
+| Ghost Basics | 195 | No | Covered: Hide movement allowance doubled with no full-Speed penalty; Acrobatics synergy against sensors and Sense Motive synergy against living observers | Native Foundry QA not claimed |
+| Ghost Mastery | 195 | No | Covered: faster-than-Speed Hide at −4; distracted observers −4; invisibility with 3/4 scenery cover in the Incoming attack preview | Native Foundry QA not claimed |
+| Ghost Supremacy | 195 | No | Covered: Hide without a place to hide; no penalty moving faster than Speed; invisibility with 1/2 scenery cover in the Incoming attack preview | Native Foundry QA not claimed |
+| Mingling Basics | 195 | No | Covered (batch 410): Blend/Stealth already offers Dexterity; the skill dialog takes the public crowd’s Size Rating and adds it as a synergy bonus; the card states that a failure does not leave the character flat-footed | Native Foundry QA not claimed |
+| Mingling Mastery | 195 | No | Partial (batch 410): the Blend/Stealth card states the halved balancing/moving/speaking penalties, the lost Disposition tag and the 500-person invisibility threshold; those penalties are not itemised by the dialog | Native Foundry QA not claimed |
+| Mingling Supremacy | 195 | No | Partial (batch 410): the Blend/Stealth card states the removed and halved penalties and the 50-person invisibility threshold; those penalties are not itemised by the dialog | Native Foundry QA not claimed |
+| Spider Basics | 196 | No | Partial (batch 415): Athletics/Climb is planned without its Hands-On and Vision tags and without the missing-kit penalty; no attack bonus against a climber and the Covert-feat Initiative bonus stay with the GC | Native Foundry QA not claimed |
+| Spider Mastery | 196 | No | Partial (batch 410): the Acrobatics/Falling declaration records 1 less damage per die (minimum 1); climbing speed and catching yourself on DC 40 surfaces stay with the GC | Native Foundry QA not claimed |
+| Spider Supremacy | 196 | No | Partial (batch 415): Climb with a declared climbing kit gets +5 (for DC −5) and error range −1; climbing speeds, no Climb check on damage and the surprise penalty stay with the GC | Native Foundry QA not claimed |
 | Clean and Polished | 197 | No | Conditional personal-gear error cost; maintenance declared | — |
-| Mother Hen | 197 | No | Manual/descriptive | — |
-| Extra Gear | 197 | Yes | Partial: chosen/roll effects | — |
+| Mother Hen | 197 | No | Covered (batch 389): +4 to Damage saves of the owner’s approved Possessions; the item’s Damage save offers the owner’s Reflex save (DC = damage) to take half, rounded up, before the item saves against the rest | Native Foundry QA not claimed |
+| Extra Gear | 197 | Yes | Covered: each selection adds 1 Intel Phase gear pick in a new chosen category | Native Foundry QA not claimed |
 | Electronic Warrior | 197 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
 | Micro-miniaturized | 197 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
 | Trap Master | 198 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
-| Favored Gear | 197 | Yes | Manual/descriptive | — |
-| Signature Gear | 197 | Yes | Manual/descriptive | — |
-| Trademark Gear | 197 | No | Manual/descriptive | — |
+| Favored Gear | 197 | Yes | Partial (batch 389): one extra Possession marked “Favored Gear”, not charged to Wealth, Caliber up to a third of career level (rounded up); the per-session action dice against mission Caliber are left to the GC | Native Foundry QA not claimed |
+| Signature Gear | 197 | Yes | Covered (batch 389): a favored item marked Signature gives +1 morale to skill checks and damage rolls made with it, once per feat selection; non-improvised items are never destroyed by critical failures | Native Foundry QA not claimed |
+| Trademark Gear | 197 | No | Covered (batch 389): the signature item marked Trademark gives +2 morale in all, and boosts on those rolls roll 2 dice per action die | Native Foundry QA not claimed |
 | Home Sweet Home | 197 | No | Verified complete: Lifestyle +2, maximum10 | Batch225; all rank boundaries, allocations, duplicate/source removal and cached native item verified |
 | Tool Shed | 197 | Yes | Implemented: one Grade III kit per selection per mission after one hour at home; mission-end loss | Batch249; all16kit choices, provenance, zero-resource acquisition, source/delete guards, expiry, counter and native persistence verified |
 | Pack Rat | 197 | No | Verified complete: Possessions +2, maximum10 | Batch225; all rank boundaries, allocations, duplicate/source removal and cached native item verified |
@@ -480,7 +480,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Advanced Skill Mastery | 199 | Yes | Implemented: scoped+3insight/base18threat and one failed-check reroll per choice per session | Batch252; all15choices, virtual focus scope, persistent counters, source/period/parent guards and native reroll/persistence verified |
 | Grand Skill Mastery | 200 | Yes | Chosen skill/Knowledge bonuses, threat ranges and scoped critical-success discount implemented | — |
 | Perfect Skill Mastery | 200 | Yes | Implemented: scoped+5insight/base16threat and three general failed-check rerolls per choice per session, each check only once | Batch252; all15choices, prohibition on critical/repeated rerolls, persistent counters, source/period/parent guards and native saves/persistence verified |
-| False Start | 200 | Yes | Partial: chosen/roll effects | — |
+| False Start | 200 | Yes | Covered (batch 419): take 20 at 15 × the time for the chosen Basic Skill feat’s skills; a rolled unopposed check longer than 1 round states the Table 3.1 restart step and the halved materials for a retry after failure | Native Foundry QA not claimed |
 | Mark of a Professional | 200 | Yes | Implemented: scoped error reduction/floor and optional half-time unopposed checks with one-round minimum | Batch240; all15 Basic Skill choices/1500 named uses, virtual focus scope, source loss during RNG and native dialog/persistence verified |
 | Practice Makes Perfect | 200 | No | Implemented: scoped non-error natural rolls below10become10; opponents pay one additional die to activate covered errors | Batch251; all15choices/named uses,420die/error combinations, matching prerequisites, virtual focus scope, source/evidence guards and native persistence verified |
 | Unfair Advantage | 201 | No | Positive insight increases implemented for skill and permitted Knowledge sources; named stacking checked | — |
@@ -494,15 +494,15 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Well Rounded | 201 | No | Initial cross-class rank costs, untrained cap and boosted cap increases | — |
 | Unlocked Potential | 201 | No | Implemented: chosen class skill, exclusive career+6 maximum, required maximum at every level and deferred spending priority | Batch239; all30 targets, historical deficits, advancement/qualification guards and native deferred purchase/reload verified |
 | Academic Contacts | 201 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
-| Animal Partner | 201 | Yes | Manual/descriptive | — |
+| Animal Partner | 201 | Yes | Covered (batch 430): the owner’s Companions section creates a linked animal NPC per selection; it uses Threat Level career level − 2 and special-character health one grade higher, and its sheet warns when its XP reward (less its 2 free trained qualities) exceeds 35 + 5 × Style and Terrain feats or it lacks 2 trained qualities; the GC records its death, deducting Reputation or Net Worth. The book’s Sample Animals are not in the data, so partners are built with the NPC rules; Wolf Pack Mastery or evasion I by Size is stated when it is created | Native Foundry QA not claimed |
 | Bloodstain Resistant | 201 | No | Implemented: declared Lifestyle clothing grants positive Appearance Defense; actual obvious armor removes it | Batch222; default undeclared, worn-armor scope and Appearance verified |
 | Blue Collar Contacts | 201 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
 | Card Shark | 201 | No | Implemented: Streetwise-to-Profession synergy, listed active gambling Knowledge and doubled paid Gambling boost dice | Batch223; two-die cap, Generous exception, unrolled Shaken fee and source evidence verified |
 | Charmer | 202 | No | Implemented: optional quick/slow Influence timing for a named GC-confirmed Neutral/Intrigued/Friendly NPC | Batch224; separate Hard Core scope, one reduction and frozen evidence |
-| Not the Face | 204 | No | Manual/descriptive | — |
+| Not the Face | 204 | No | Partial (batch 406): while Total Defense or Fight Defensively lasts, the Charisma modifier is added to the prepared DR against unarmed and melee weapon attacks (shown on the sheet and used by incoming damage); the same DR against Charisma damage stays with the GC | Native Foundry QA not claimed |
 | Criminal Contacts | 202 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
-| Fan Service | 203 | No | Manual/descriptive | — |
-| Glint of Madness | 203 | No | Partial: Threaten may target an uninjured opponent without a readied weapon | Batch281; independent CQB scope, range/Count/source/evidence guards and native dialog/persistence verified; free-action wound trigger and positive CHA stress addition remain open |
+| Fan Service | 203 | No | Covered (batches 413, 427): Impress offers the Feint Action and the new Diversion Action on Charisma, each stating the all-opponents full-action option; outcomes are settled like the Sleight of Hand and Bluff versions | Native Foundry QA not claimed |
+| Glint of Madness | 203 | No | Covered (batch 422): Threaten without prior injury; a confirmed drop to 0 wounds offers a free Threaten; a successful Threaten states the added Charisma stress | Native Foundry QA not claimed |
 | Gorgeous | 203 | No | Implemented: Charisma increase, named-check synergy bonuses/penalties and manhunt Prey modifier | Batch219; source/evidence and normal synergy stacking |
 | The Look | 203 | No | Implemented: Appearance increase, replaced Gorgeous skill modifiers and penalized-check error increase | Batch219; Lifestyle/Knowledge exclusions verified |
 | Simply Irresistible | 205 | No | Implemented: Charisma, upgraded named-check modifiers, half-time option and opponent error cost | Batch220; previous Appearance retained; one reduction/minima and frozen evidence |
@@ -516,26 +516,26 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Media Contacts | 204 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
 | Medical Contacts | 204 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
 | Military Contacts | 204 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
-| Personal Lieutenant | 204 | No | Manual/descriptive | — |
+| Personal Lieutenant | 204 | No | Covered (batch 430): the owner’s Companions section creates one linked agent at career level 6+, with a 32-point attribute budget and exactly 1 action die; its sheet warns when its career level exceeds half the owner’s, or it takes Animal Partner or Personal Lieutenant, or has contacts, Interests or Subplots; the GC records its death, deducting Reputation or Net Worth | Native Foundry QA not claimed |
 | Police Contacts | 204 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
-| Political Clout | 204 | No | Manual/descriptive | — |
-| Political Favors | 204 | No | Manual/descriptive | — |
-| Political Immunity | 204 | No | Manual/descriptive | — |
+| Political Clout | 204 | No | Covered (batch 388): once per mission, an automatic Security Request for an invitation with no action dice, immediately available | Native Foundry QA not claimed |
+| Political Favors | 204 | No | Covered (batch 388): once per mission, an automatic Resource Request for extradition (Power Rating 6) with no action dice, immediately available | Native Foundry QA not claimed |
+| Political Immunity | 204 | No | Covered (batch 388): once per mission, an automatic Resource Request for legal immunity (Power Rating 6) with no action dice, immediately available | Native Foundry QA not claimed |
 | Polyglot | 204 | No | Implemented: two extra Cultures focuses and automatic rank synergy on all Impress/Networking uses, without regional focus requirement | Batch230; typed stacking, Language exclusion, source guard and persisted native evidence verified |
 | Research Contacts | 205 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
-| Silver Tongue | 205 | No | Partial: all four printed benefits on verified agent/single-target paths, including GC-confirmed seduction Wisdom damage and mission-end recovery | Batches283–284,286–289; actual source/target, signed Charisma error, synergy/language scopes, floor6/zero claims, duplicate/partial-save/correction/source-loss/reload guards and five actual UI paths verified; generic NPC profiles, group/multiple-target checks and Surgery/source-specific recovery remain open |
-| Undermine | 205 | No | Manual/descriptive | — |
-| Venomous Dialogue | 205 | No | Manual/descriptive | — |
-| Stone Cold | 205 | No | Partial: always armed for Intimidate, exact missing-weapon waiver and combat-only Will+1execute | Batch282; all named uses, combat/source/replacement/evidence guards and native controls/persistence verified; accumulating wound-triggered Intimidate bonus remains open |
+| Silver Tongue | 205 | No | Covered: Manipulate synergy on Bluff and Impress; Wisdom damage on a won seduction Conflict; smaller language penalty on Impress/Persuasion; Sense Motive error increase against the character | Native Foundry QA not claimed |
+| Undermine | 205 | No | Covered (batch 417): settling a successful Taunt records on the target a morale penalty equal to the taunter’s Charisma modifier on Initiative and skill checks and a block on spending action dice, for rounds equal to the taunter’s Style feats, timed from the Taunt’s Initiative Count | Native Foundry QA not claimed |
+| Venomous Dialogue | 205 | No | Partial (batches 411, 417): settling a successful Taunt offers it in place of the standard result, spending the once-per-scene use and posting the effect; the no-attacks restriction is enforced by the GC | Native Foundry QA not claimed |
+| Stone Cold | 205 | No | Covered (batch 422): always armed for Intimidate; +1 Intimidate per confirmed opponent dropped to 0 wounds this combat (maximum +4); +1 on Will saves in combat | Native Foundry QA not claimed |
 | Street Contacts | 205 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
 | White Collar Contacts | 205 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
 | Wilderness Contacts | 205 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
-| Always Get Your Man | 206 | No | Partial: Predator Investigation synergy, skill manhunt synergy cap and all five chase Maneuver synergies execute | Batch241; roles, active Terrain count, typed stacking, immutable evidence, source guards and native checks; complete conflict/other-check settlement remains open |
-| Aquatic Training | 206 | No | Partial: terrain insight, breath allowance and partial-submersion quarter-cover increase execute | Batch280; Defense/Reflex/Superior Cover, source expiry, typed source attribution and native persistence verified; ambush penalty recorded but opponent settlement remains open |
+| Always Get Your Man | 206 | No | Covered: Predator Investigation synergy and raised synergy cap in manhunts; Investigation synergy on Predator Maneuver checks | Native Foundry QA not claimed |
+| Aquatic Training | 206 | No | Covered: aquatic insight, breath allowance, ambush surprise penalty and partial-submersion cover increase | Native Foundry QA not claimed |
 | Arctic Training | 206 | No | Terrain insight, natural Balance synergy (user ruling), ambush opposition recorded; other effects manual | — |
 | Desert Training | 206 | No | Terrain insight, travel Speed, heat resistance and daily water requirements execute; ambush opposition recorded | Batch242; active daily fluids0.5qt. normal/1qt. above90°F, unconditional by terrain; consumption/thirst and complete opposition settlement remain separate |
-| Escape and Evasion Training | 206 | No | Partial: Prey Blend synergy, eligible Falsify synergies, skill manhunt cap and all five chase Maneuver synergies execute | Batch241; roles, passive restrictions, Terrain count, source guards and native checks; complete conflict/other-check settlement remains open |
-| Firefighter Training | 206 | No | Partial: fire-stress halving/resistance ledger, smoke visual range and conditional save insight execute | Batch268; exact Science/Engineering source, rounding, typed stacking, source/reroll/evidence guards and native persistence verified; extreme-heat save frequency remains open |
+| Escape and Evasion Training | 206 | No | Covered: Prey Blend and Falsify synergies and raised synergy cap in manhunts; Bluff synergy on Prey Maneuver checks | Native Foundry QA not claimed |
+| Firefighter Training | 206 | No | Partial: fire stress halved before resistance, smoke visual range halved and +4 insight on the fire and smoke saves; the system has no extreme-heat exposure schedule, so making those Fortitude saves half as often stays with the GC | Native Foundry QA not claimed |
 | Forest Training | 207 | No | Terrain insight, trap synergy and travel Speed execute; ambush opposition recorded; Common Items manual | — |
 | Home Turf | 207 | No | Implemented: scoped home-area skill caps/critical costs and quarter-cover increase | Batch280 completes Defense/Reflex/Superior Cover integration, source expiry, raw-grade review, human-shield attribution and native persistence |
 | Jungle Training | 207 | No | Terrain insight, nonurban Hide synergy and travel Speed execute; ambush opposition recorded | — |
@@ -544,24 +544,24 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Night Training | 207 | No | Base scent, low-light range and nearby-character hearing exception implemented; ambush penalty remains open | — |
 | Swamp Training | 207 | No | Terrain insight/hearing synergy/poison saves execute; ambush opposition recorded; movement manual | — |
 | Tracking Basics | 207 | No | Named take-10 timing and Analysis synergy implemented; trail information adjudicated | — |
-| Tracking Mastery | 207 | No | Partial: Tracking take20, physical-trail surprise insight and declared/recorded Forensics task−1execute | Batch271; combined Forensic Genius reduction, scope, pressure/deadline/recovery and source/evidence/reroll guards verified natively; cross-skill/shared tasks and history corrections remain open |
-| Urban Training | 207 | No | Partial: urban insight and city10000+ Tracking synergy execute; ambush opposition recorded | Batch243; city boundary, source loss during RNG, immutable terrain/outcome context and native persistence verified; actual opposition settlement remains open |
-| Breaking Points | 208 | No | Manual/descriptive | — |
-| Bug Basics | 208 | No | Partial: named-bug concealment grants+2gear on Sleight of Hand/Stash Item and Sneak/Stash Item | Batch276; exact scopes, gear stacking, source/evidence guards and native dialogs/persistence verified; personal bug, request quantity and planted range remain open |
+| Tracking Mastery | 207 | No | Covered: take 20 on Tracking; +5 insight to surprise while following a trail; Complex Forensics Task challenges −1 | Native Foundry QA not claimed |
+| Urban Training | 207 | No | Covered: urban insight; Streetwise synergy when tracking in a city of 10,000+; ambush surprise penalty | Native Foundry QA not claimed |
+| Breaking Points | 208 | No | Covered (batch 387): interrogation or brainwashing Predator: starting Lead −1; any Predator Strategy regardless of requirements; a per-round declaration halves the round’s duration for +1 error range on the Predator’s check | Native Foundry QA not claimed |
+| Bug Basics | 208 | No | Covered (batch 422): a free bug Possession (Caliber up to a third of career level); requested bugs doubled; +2 gear on Stash Item to conceal a named bug; a planted bug’s signal check counts its range increment doubled | Native Foundry QA not claimed |
 | Candidate | 208 | No | Implemented: first-level+1to each of the two lowest attributes, with recorded tie choices and original-score history | Batch255; all15pairs/orderings, origins, INT skill budgets, advancement, explicit historical corrections and native persistence verified |
 | Career Agent | 208 | No | Implemented: +1insight to all saves and one additional affiliation-specific reward at mission end | Batch256; Faction+1Reputation/Freelance+$50000Net Worth, duplicate claims, atomic/partial-save recovery and native persistence verified |
-| Office Gossip | 209 | No | Partial: selected Request action-die waiver per active Tradecraft feat per mission executes | Batch253; source/period/counter guards, Shaken fee after waiver, refunds and native persistence verified; take10 permission remains open |
-| Total Control | 209 | No | Manual/descriptive | — |
+| Office Gossip | 209 | No | Covered (batch 423): Requests without an action die, once per Tradecraft feat per mission; the Request dialog offers take 10 | Native Foundry QA not claimed |
+| Total Control | 209 | No | Partial (batch 429): Requests may be for Caliber V gear (still within the mission Caliber); a teammate discarding 2 action dice each session to raise the mission Caliber by 1 is set by the GC in the Intel Phase | Native Foundry QA not claimed |
 | Cryptographer | 208 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
-| Disease Basics | 208 | No | Partial: declared disease resistance saves gain+2untyped | Batch274; all saves, typed stacking, source/evidence guards and native controls/persistence verified; disease sample and accidental exposure prevention remain open |
-| Flawless Identity | 209 | No | Manual/descriptive | — |
-| Forensic Genius | 209 | No | Partial: Analysis synergy on all Search uses and declared Complex Analysis challenge count−2(minimum1) execute | Batches260–271; synergy/counts, normal/critical progress, deadlines, GC error-decline, pressure/stress/save and combined Tracking Mastery Forensics scopes execute with recovery; cross-skill/shared tasks and source/history corrections remain open |
-| Hold Out | 209 | No | Manual/descriptive | — |
-| Living Cipher | 209 | No | Manual/descriptive | — |
+| Disease Basics | 208 | No | Covered (batch 422): a free disease sample Possession; +2 on declared disease resistance saves; no accidental exposure is the GC’s ruling when creating or preparing a disease | Native Foundry QA not claimed |
+| Flawless Identity | 209 | No | Covered (batch 430): identities (name, Profession focus, 2 Interests) up to the starting action dice on the Main tab; getting into character spends 1 action die and adds that identity’s Profession focus until the character returns to themself as a free action; replacement only in an Intel Phase is the GC’s call | Native Foundry QA not claimed |
+| Forensic Genius | 209 | No | Covered: Complex Analysis Task challenges −2 (minimum 1); Analysis synergy on Search | Native Foundry QA not claimed |
+| Hold Out | 209 | No | Covered (batch 387): interrogation or brainwashing Prey: starting Lead +1; any Prey Strategy regardless of requirements; a per-round declaration doubles the round’s duration for +1 error range on the Prey’s check | Native Foundry QA not claimed |
+| Living Cipher | 209 | No | Partial (batch 414): Analysis/Decipher states the counted computer Power Rating (Intelligence modifier without a computer, +1 with one, maximum 10); computer Power Rating is not otherwise modelled on the check | Native Foundry QA not claimed |
 | Old School | 209 | No | Implemented: +4to qualifying Charisma-based checks with named GC-confirmed shared-source and level evidence | Batch266; all final-attribute paths, caps/fixed/rerolls, source/mission guards, actual dialog and native persistence verified |
-| Poison Basics | 209 | No | Partial: declared poison resistance saves gain+2untyped, stacking with Swamp insight | Batch274; all saves, source/evidence guards and native controls/persistence verified; personal injector, extra requested dose and accidental poisoning prevention remain open |
+| Poison Basics | 209 | No | Covered (batch 422): a free injector Possession (Caliber up to a third of career level); +1 dose per poison request; +2 on declared poison resistance saves; no accidental self-poisoning is the GC’s ruling | Native Foundry QA not claimed |
 | Safe House | 209 | No | Implemented: scene-opening declarations, Tradecraft-based mission allowance, city/nearest-city GC placement, Lifestyle−2home quality and mission-end loss | Batch257; all8tiers,10000threshold, dual counters, source/refund/history guards and native persistence verified |
-| Superior Documentation | 209 | No | Partial: declared named cover identity grants+1gear on all Bluff checks | Batch275; all named uses/Knowledge exclusions, gear stacking, fixed-result restrictions, source/evidence guards and native controls/persistence verified; personal identity grant and requested Power Rating increase remain open |
+| Superior Documentation | 209 | No | Covered (batch 422): a free cover identity Possession (Caliber up to a third of career level); a requested cover identity’s Power Rating +1 (maximum 10); +1 gear on Bluff with a declared cover identity | Native Foundry QA not claimed |
 
 ## Equipment — all 458 weapons and 37 armor records
 
@@ -1526,3 +1526,329 @@ Source: rules reference p.179 (extracted text; original PDF page not visually re
 Interpretations to confirm: (1) following the existing Dirty Fighting/Side Stance precedent, the trick die is an earned sneak die still subject to the general p.339 conditions (target flanked, helpless or vulnerable; reachable vitals; characters only) — **new unanswered ruling**; (2) like Chop!/Hack!/Crush!, the trick is limited to melee Standard Attacks, so a thrown knife does not use it; (3) Knife Basics alone does not count as “ability to inflict sneak attack damage” for prerequisites.
 
 Verification: 513 legacy assertions, 3067 Node tests (1412+1655) including 17 new Knife tests, 6 cold pack checks and 112 browser layout fixtures passed (layout run used the container’s Chromium via an explicit executable path). Native Foundry QA is **not claimed**. Inventory: 113 manual / 54 partial / 147 other; at least 167 of 314 explicitly unfinished. Audit: `qa/implementation-374.json`.
+
+## Residual implementation batch 375 — Staff Basics closure and Club Basics
+
+Source: rules reference pp.177, 179, 193 and 345 (text read from the user’s local markdown edition; original PDF pages were not visually re-checked).
+
+- **Staff Basics audit.** Every printed benefit maps to existing work: the +3 gear bonus with Acrobatics/Jump while holding a readied staff (317), Whirling Stance (366), and Thread the Needle’s hit, hold and three endings: escape (372), release and holder movement beyond 5 ft. (370). No code change; the feat is closed on that evidence.
+- **Damage conversion (p.345).** Not implemented before. `module/rules/damage-conversion.mjs` adds an attack declaration for unarmed, melee and hurled weapons that deals subdual instead of lethal damage, or the reverse, at −4 attack. The attack and ranged-attack dialogs offer it (the ranged dialog only for hurled weapons). The attack card records `damageConversion` with its direction and any waiver. Bludgeon waives the penalty for any eligible attack.
+- **Club Basics.** `club` is a GC-reviewed melee family (Blunt, Exotic Blunt).
+  - Conversion: an attack made with the character’s actual readied club takes no conversion penalty. Interpretation: “while holding a readied club” is read as the attacking weapon being that club, not any held club.
+  - Improvised clubs: an improvised weapon the GC classes as a club takes no −2 improvised penalty.
+  - Furious Stance: joins the shared stance lifecycle. When a started combat advances a round, the GC’s client counts the character’s original melee attack records from the round that ended (rerolls and the defender’s side of a Disarm excluded) and raises the Initiative Count by that number. The combatant records the last counted round, so a round is never counted twice and a rewound round is skipped. A GC-only chat note reports each change.
+  - Out of the Park: a full-action club trick, +2 attack, +2 recorded-hit damage, +2 threat range.
+- Trick notes now cite each trick’s own page instead of a shared “pp.176,179”.
+
+Verification: 513 legacy assertions, 3324 Node tests (10 new Club Basics tests), 8 pack checks. Layout fixtures were not re-run (no template change). Native Foundry QA is **not claimed**. Inventory: 112 manual / 53 partial / 149 other; at least 165 of 314 explicitly unfinished; 31 whole-feat closures (Staff Basics, Club Basics).
+
+## Residual implementation batch 376 — Sword Basics
+
+Source: rules reference p.180 (local markdown edition; original PDF page not visually re-checked).
+
+- **Finesse loss.** `module/rules/sword-basics.mjs` prepares `system.swordBasics`: the feat applies only while no equipped, carried, usable weapon has the finesse quality, including finesse granted by Finesse Basics. Every benefit below checks it.
+- **Opposite-side move.** A melee attack with a one-handed sword without finesse carries a reminder that after a hit the character may move to the unoccupied square on the opposite side of the opponent. Movement stays at the table.
+- **Unbeatable Stance.** Joins the shared stance lifecycle. In the stance, the attack dialog offers a GC-confirmed declaration that one of the character’s melee weapons has already damaged this opponent during this combat; it adds a +1 morale row. Interpretation: damage history is not tracked per target, so the GC confirms it.
+- **Impale.** A Standard Attack trick (not a full action) with a held one-handed sword without finesse. `readiedMeleeFeatSource` gains an explicit `finesse: false` option for this; Fencing’s finesse rule is unchanged. Damage from the recorded hit asks for the target’s Defense (a damage-dialog field after the recorded-hit selector). The proof records `impale: { defense, attackResult, bonus }`, with bonus ⌊(result − Defense) / 2⌋ from the attack’s effective total after boosts. Every later check (reservation, replacement roll, GC review) recomputes the bonus from the recorded Defense. A Defense above the result is rejected as not a hit.
+
+Verification: 513 legacy assertions, 3336 of 3337 Node tests (9 new Sword Basics tests). The one failure is the sample-scenes pack test, locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 111 manual / 53 partial / 150 other; at least 164 of 314 explicitly unfinished; 32 whole-feat closures.
+
+## Residual implementation batch 377 — Cleave Basics and Snap Shot
+
+Source: rules reference pp.177 and 182 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/drop-follow-up.mjs` covers both feats: Cleave answers a melee hit, Snap Shot a ranged one.
+- **Trigger.** The character’s own resolved, successful, unsuperseded attack of the right kind from the current combat round, not a Disarm. The GC confirms it left its opponent unconscious or dead (health is applied at the table), that the extra attack follows at once, and that it targets a different opponent. When both targets are known actors, the system rejects the same one.
+- **Attack.** The Main tab has a control for each feat (`module/apps/drop-follow-up.mjs`), modelled on Combat Instincts. It posts one free Standard Attack with the trigger’s weapon, which must still be readied, through the final-attack workflow. The receipt records the trigger message and its evidence; the attack card notes the extra attack. Each feat has its own once-per-round use with GC counter review.
+- **Interpretation.** The rules call these “cleave” and “snap shot” attacks, not final attacks. They are treated as final attacks: they share the Nauseated one-final-attack allowance and cannot carry a full-action trick.
+
+Verification: 513 legacy assertions, 3342 of 3343 Node tests (6 new, including the posted Cleave attack and a refused second use in the same round), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 109 manual / 53 partial / 152 other; at least 162 of 314 explicitly unfinished; 34 whole-feat closures.
+
+## Residual implementation batch 378 — Opportunist
+
+Source: rules reference p.175 (local markdown edition; original PDF page not visually re-checked).
+
+- **Trigger.** Sight lines, stunning and wound totals are settled at the table, so the GC confirms all three: a second opponent just became stunned or fell below 0 wound points, the character and the target opponent can both see them, and the attack follows at once. An optional short description is recorded on the receipt.
+- **Attack.** A Main-tab control (`module/apps/opportunist.mjs`) posts one free final Standard Attack with a chosen readied weapon through the shared final-attack workflow. It counts toward the Nauseated final-attack allowance and has its own once-per-round use with GC counter review.
+- **Half damage.** A resolved Opportunist hit shows “Roll Opportunist damage (half)” on its card. The roll halves the whole damage formula, rounded up (`ceil((formula) / 2)`), and records `opportunistDamage` with the attack. The hit must be the character’s own, resolved, successful, unsuperseded, and made with the same weapon. A second damage roll from the same hit is refused (a replacement roll of the damage is allowed). An ordinary damage roll is not intercepted; the attack card tells the table to use the halved roll.
+- Test support: `tools/fixtures/final-attack-actor.mjs` is a shared actor for posting real final attacks and damage; the Cleave/Snap Shot test now uses it.
+
+Verification: 513 legacy assertions, 3347 of 3348 Node tests (5 new, including a real halved damage roll and a refused second roll), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 108 manual / 53 partial / 153 other; at least 161 of 314 explicitly unfinished; 35 whole-feat closures.
+
+## Residual implementation batch 379 — Fortunate
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- **Die.** `module/rules/fortunate.mjs` grants an unrestricted bonus pool (`source: "fortunate"`): one d4, improved to d6 under Fortune Favors the Bold like every gained die, lost at scene or session end. It spends through the existing bonus-pool payments, and The Dice are Hot counts it. `UNRESTRICTED_POOL_SOURCES` in `module/rules/bonus-pools.mjs` now lists these pool kinds in one place, replacing three copies.
+- **Uses.** One per Chance feat the character has each session (counted from the prepared feat selections’ tree), with GC counter review.
+- **Grant.** The feat is a request to the GC, so the control on the Main tab is the GC’s. The GC chooses who gains the matching d4: the GC pool (`adjustGCDice`, after checking the session’s pool is initialized) or a named opponent, which the chat receipt notes. If the GC pool write fails after the character’s die is saved, the character keeps the die and the receipt and a warning ask the GC to add the match by hand.
+
+Verification: 513 legacy assertions, 3353 of 3354 Node tests (6 new, including a real grant, a refused second use and the GC-only check), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 107 manual / 53 partial / 154 other; at least 160 of 314 explicitly unfinished; 36 whole-feat closures.
+
+## Residual implementation batch 380 — Better Luck Next Time
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- **Qualifying boost.** The boost plan (`actionDieBoostPlan`) marks skill checks and saves boosted by an owner of the feat. Its result (`actionDieBoostResult`, shared by the ordinary and surcharged boost paths) adds a pending entry to the check’s `betterLuckRefunds` when exactly one die was spent and rolled, and it shows a natural 1. Every qualifying boost on the same check adds its own entry. Two dice spent, or a doubled die (Card Shark and the like), does not qualify. Knowledge checks are not skill checks and do not qualify.
+- **Return.** The die comes back “after the action is resolved”, so the refund waits for resolution; an immediate refund would let the same check be boosted again for free. `finishCheck` settles every pending entry in the same update that marks the check resolved, recording `betterLuckRefunded` so it pays out once (`module/rules/better-luck.mjs`). An ordinary die returns to the ordinary count. A bonus-pool die returns only to a still-live unrestricted pool, never above its grant. A check-bound pool belongs to the check just resolved, and an expired pool is gone, so those dice are lost. A notification reports the result; if the balance write fails, a warning asks the GC to add the die by hand.
+- A check that is replaced before resolution passes no pending refund to its replacement.
+
+Verification: 513 legacy assertions, 3357 of 3358 Node tests (4 new, including a real resolution through `finishCheck`). The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Layout fixtures were not re-run (no template change). Native Foundry QA is **not claimed**. Inventory: 106 manual / 53 partial / 155 other; at least 159 of 314 explicitly unfinished; 37 whole-feat closures.
+
+## Residual implementation batch 381 — All or Nothing
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- **Declaration.** The skill, Knowledge, attack and ranged-attack dialogs offer All or Nothing to an owner of the feat (`module/rules/all-or-nothing.mjs`). It applies to rolled checks with both ranges; saves have neither range here, and taking 10 or 20 is not a roll.
+- **Use.** One per session. Skill and Knowledge checks spend it with their other pre-roll uses. For an attack, `rollCheck` spends it itself, or alongside One in a Million, 10-Second Solution or an unspent Cunning Plan when one of those reserves first.
+- **Ranges.** Threat range 20 becomes 15–20 (never below 2); error range 1 becomes 1–6 (never above 19). A roll with no range of a kind keeps none. The check records `allOrNothing`, and the card notes the declaration. A reroll keeps it without spending another use or widening twice.
+- **Error on a success.** For an All or Nothing roll, an error in range is confirmed and awaits the opponent’s decision even when the result succeeds (`errorDecisionPending`, `adjudicateCheck`). If an opponent activates it as a critical failure, a success becomes a failure (`successConfirmed: false`, `allOrNothingOverturned`).
+
+Verification: 513 legacy assertions, 3362 of 3363 Node tests (5 new, including a real declared attack and a refused second use), 127 browser layout fixtures; the captured-dialog comparison is unchanged for characters without the feat. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 105 manual / 53 partial / 156 other; at least 158 of 314 explicitly unfinished; 38 whole-feat closures.
+
+## Residual implementation batch 382 — Black Cat and Tough Luck
+
+Source: rules reference pp.189 and 191 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Marking.** Black Cat is a once-per-scene free action against opponents in line of sight, and only the GC can write to other characters, so the GC applies it from the user’s Main tab (`module/apps/black-cat.mjs`). The GC ticks the opponents the player chose and confirms the sight lines. The plan (`module/rules/black-cat.mjs`) allows at most one target per Chance feat, never the user or a repeated target, and refuses anyone already carrying a live Black Cat. Each target gets `flags.spycraft2.blackCat` holding the source, the world scene it was made in and whether the source has Tough Luck. A chat receipt lists the targets.
+- **Effect.** While the world scene is unchanged, a marked character’s rolls widen their error range by 2 (never above 19); rolls with no error range, such as saves, are unchanged. The check records `blackCat` and the card notes it. A replacement roll keeps it without adding it again. A changed scene lapses the mark without cleanup.
+- **Tough Luck.** Activating a threat on a check with a Tough Luck mark costs 1 more action die, listed among the activation’s cost sources.
+
+Verification: 513 legacy assertions, 3368 of 3369 Node tests (6 new, including a real marked attack and the replacement-roll guard through `rollCheck`), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 103 manual / 53 partial / 158 other; at least 156 of 314 explicitly unfinished; 40 whole-feat closures.
+
+## Residual implementation batch 383 — chase feats in the Conflict tracker
+
+Source: rules reference pp.192–193 (local markdown edition; original PDF pages not visually re-checked).
+
+- Each Conflict side now records which tracked chase feats its participant has (`CONFLICT_FEATS` in `module/rules/gc/conflict.mjs`). The GC’s start dialog pre-ticks them from the chosen character, or from a vehicle’s driver, and the GC can change them (manhunts have no actors).
+- **Jackrabbit Start / Relentless Pursuit** (chase or manhunt): the starting Lead moves 2 in the side’s favour after the GC’s value, staying inside 1–9, and the shift is recorded. The side’s won Strategies always offer the Lead Advantage.
+- **Daredevil** (chase): Strategy availability uses Acceleration and Turning +2; stored ratings are unchanged. Stunt, whose printed requirement is this feat, needs no further GC confirmation.
+- **Defensive / Offensive Driving** (chase): a negative modifier of a Prey (Defensive) or Predator (Offensive) Strategy is halved, rounded down (−12 → −6). General Strategies and bonuses are unchanged. Interpretation: “a Prey chase Strategy” means a Strategy from the Prey list. Each feat’s once-per-chase effect (force a Crisis; ignore a Crisis) is a manage action, recorded once per side and posted for the GC to resolve.
+- **Photo Finish** (chase): a manage action lowers every participant’s Acceleration and Turning by 2 per use (not below 0). It is kept as an offset, so the per-round rating refresh from the vehicles keeps it.
+- Death Ride’s extracted text duplicates Defensive Driving’s; its real benefit (DR while driving, staying up at 0 wounds) belongs with the vehicle damage feats and is not part of this batch.
+
+Verification: 513 legacy assertions, 3375 of 3376 Node tests (7 new), GC rule and app suites unchanged. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 97 manual / 53 partial / 164 other; at least 150 of 314 explicitly unfinished; 46 whole-feat closures.
+
+## Residual implementation batch 384 — vehicle crew feats
+
+Source: rules reference pp.192–193 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/driving-feats.mjs`. The vehicle data model adds its crew’s bonus to its prepared Damage save (`damageSaveNow`) and lists the sources on the Damage save card.
+- **Demolition Derby:** +2 when the character drives. Partial: collisions are not modelled, so the reduced collision damage is not applied.
+- **Duct Tape and Bubblegum:** half Mechanics ranks, rounded up, from the driver or anyone aboard with the feat; only the best one applies.
+- **Simulator Jockey:** `controlCheckPlan` drops the Drone quality’s error +1 for a driver with the feat. The system does not apply the drone attack −4 or a Regroup restriction to anyone, so the rest of the feat holds as is.
+- Need for Speed was examined: the over-half-top-speed Maneuver DC row (p.125) is not modelled, so there is nothing to waive yet. It stays manual.
+
+Verification: 513 legacy assertions, 3378 of 3379 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 94 manual / 54 partial / 166 other; at least 148 of 314 explicitly unfinished; 48 whole-feat closures.
+
+## Residual implementation batch 385 — Dueling Mastery and Supremacy, Style Over Caliber
+
+Source: rules reference pp.178 and 183 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Dueling Supremacy:** +2 dodge to Defense, prepared with the character’s other Defense sources so dodge-loss rules see it. Each resolved melee-weapon hit (not unarmed, not a Disarm) offers its attacker “Initiative Count +1”, once per card (`module/apps/dueling.mjs`).
+- **Dueling Mastery:** +1 to Defense while a readied Blunt or Edged weapon is held. When an attack against the feat’s owner is resolved as a miss, the GC (who confirms the attacker is adjacent) can lower the attacker’s Initiative Count by 2, once per card. Unarmed combat stances are not modelled, so nothing stops melee attacks in them.
+- **Style Over Caliber:** the damage dialog offers 1d10+2 in place of a pistol’s standard damage (`module/rules/style-over-caliber.mjs`). A pistol is a Handgun-proficiency weapon from a pistol or revolver table, or a hand-built Handgun. The roll records `styleOverCaliber`; qualities and other damage are unchanged.
+- **Feat reminders:** the 13 feats the system now carries out (All or Nothing, Better Luck Next Time, Cleave Basics, Club Basics, Daredevil, Defensive and Offensive Driving, Dueling Supremacy, Opportunist, Photo Finish, Simulator Jockey, Snap Shot, Style Over Caliber) are removed from `src/data/feat-reminders.json`, and `module/rules/tables.mjs` is regenerated. Feat items already in a world keep the reminder version 2 gave them until edited. The real packs pick this up at the deferred rebuild.
+
+Verification: 513 legacy assertions, 3382 of 3383 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 91 manual / 54 partial / 169 other; at least 145 of 314 explicitly unfinished; 51 whole-feat closures.
+
+## Residual implementation batch 386 — Berserker Basics, Mastery and Supremacy
+
+Source: rules reference pp.183–184 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/berserker.mjs` and `module/apps/berserker.mjs`. A rage is counted in combat rounds, so it starts in a started combat. The duration is rolled on entry (2d4+2, 3d4+3 or 4d4+4 by the best tier held) and stored in `system.berserkerRage` with its combat and start round (new field and record shape). Uses per session: starting action dice.
+- While the rage runs in its combat, the engine adds the tier’s bonus (+3, or +5 with Mastery) to Strength and Constitution as a temporary bonus, reading the round from the prepared combat list. Entering applies a new Enraged status. Its restrictions (nearest opponent, no Tumble, no Concentration or Language skills, no penalising options) are left to the table.
+- Ending early takes a half action (free with Supremacy); a rage that has run out ends without one, and the sheet asks for it. Ending clears Enraged and applies exhausted (fatigued with Supremacy) through the existing fatigue workflow, with the minutes in its source; fatigue duration itself is not timed by the system.
+- Supremacy’s +4 against becoming frenzied is now a save reminder in `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3387 of 3388 Node tests (5 new, including the engine’s ability bonus during and after a rage), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 88 manual / 55 partial / 171 other; at least 143 of 314 explicitly unfinished; 53 whole-feat closures.
+
+## Residual implementation batch 387 — Breaking Points and Hold Out
+
+Source: rules reference pp.208–209 (local markdown edition; original PDF pages not visually re-checked).
+
+- Both join the Conflict tracker’s feat list (`CONFLICT_FEATS`), for interrogations and brainwashings. The GC ticks them at the start, since those Conflicts have no actors.
+- **Starting Lead:** −1 with Breaking Points (Predator), +1 with Hold Out (Prey), applied with the chase feats’ shifts and kept inside 1–9.
+- **Strategies:** every Strategy on the side’s own list is available whatever its rating, Lead or printed requirement; the other side’s list and the general Strategies are unchanged.
+- **Round pace:** a manage action (`declarePace`) records that the side takes +1 error range on its check this round. The round then takes half (Breaking Points) or twice (Hold Out) its usual time. Once per side per round, before the check is resolved. The GC applies the error range when that check is rolled.
+
+Verification: 3388 of 3389 Node tests (1 new). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 86 manual / 55 partial / 173 other; at least 141 of 314 explicitly unfinished; 55 whole-feat closures.
+
+## Residual implementation batch 388 — Political Clout, Favors and Immunity
+
+Source: rules reference p.204 (local markdown edition; original PDF page not visually re-checked).
+
+- Each feat is a once-per-mission Request benefit in `module/rules/requests.mjs`, used through the existing Request workflow. The Request is automatic (no check, network confirmed by the GC as for Executive Decision) and costs no action dice. It is tied to its category: Security for Clout’s invitation, Resource for Favors’ extradition and Immunity’s legal immunity, which have Power Rating 6.
+- “Immediately available”: these Requests use a new zero-time delivery (`IMMEDIATE_DELIVERY`) instead of the location’s delivery roll.
+- As with every Request, one matching Reserve pick is consumed and the mission Caliber limit applies. Interpretation: the feats waive the check and the action dice, not the pick.
+
+Verification: 3389 of 3390 Node tests (1 new; the Request suite’s 85 pass). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 83 manual / 55 partial / 176 other; at least 138 of 314 explicitly unfinished; 58 whole-feat closures.
+
+## Residual implementation batch 389 — Mother Hen and the Favored Gear chain
+
+Source: rules reference p.197 (local markdown edition; original PDF page not visually re-checked).
+
+- **Mother Hen** (`module/rules/mother-hen.mjs`). An approved Possession (Wealth, GC grant or Favored Gear) of an owner with the feat saves at +4, including a gadget’s housing save. Its Damage save dialog offers “the owner is touching it”. The owner rolls Reflex (their prepared Reflex total, DC = the damage). On a success they take half, rounded up, posted for the GC to apply with DR unless it is worn armor, and the item saves against the rest; if nothing is left, the item makes no save.
+- **Favored Gear** (`module/rules/favored-gear.mjs`): a new Possession source, “Favored Gear”, on gear, weapon and armor sheets. These items are not charged to the Wealth allowance. The engine warns when there are more favored items than Favored Gear selections, or one is above a third of career level (rounded up). Partial: the session-start action dice gained or discarded against mission Caliber need a die pool restricted to one item, so they stay with the GC.
+- **Signature / Trademark Gear**: a favored item’s sheet sets Signature (1) or Trademark (2). Valid marks (no more than the Signature selections, one Trademark item) add +1 or +2 morale to damage with the item (`weaponDamage`) and to skill checks naming it as gear in use. Trademark boosts on those skill checks and damage rolls roll 2 dice per die (`actionDieBoostPlan`). The system destroys only improvised weapons on errors, so a signature item is never destroyed by a critical failure.
+
+Verification: 513 legacy assertions, 3394 of 3395 Node tests (5 new), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 79 manual / 56 partial / 179 other; at least 135 of 314 explicitly unfinished; 61 whole-feat closures.
+
+## Residual implementation batch 390 — the Kick action and Kicking Basics
+
+Source: rules reference pp.186 and 358 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Kick action (p.358)**, baseline, not previously modelled (`module/rules/kick.mjs`, `module/apps/kick.mjs`). An unarmed weapon’s attack dialog offers “Kick”. It is recorded as a non-Standard Attack (`attackAction: "other"`), so Standard Attack abilities and tricks do not apply. The card offers the voluntary −2 Initiative Count, once, and “Roll Kick damage”, which adds a positive Strength modifier to damage once more.
+- **Kicking Basics:** the Kick costs no Initiative Count. Shifting Stance joins the shared stance lifecycle. Against an attacker in it, the target’s Incoming attack preview halves the dodge bonus, rounded up, once the attack is confirmed unarmed; this reuses and generalises Circling Stance’s plan, which is otherwise unchanged. Unarmed attacks in the stance carry the far-side move reminder.
+- **Partial:** Sweep (a lost Trip does not leave the character flat-footed; a critical failure does, but gives the opponent no free Trip). The Trip outcome receipts are re-validated by recomputing them, so the attacker’s Sweep needs to be recorded on the Trip check itself; that is left for a dedicated change.
+
+Verification: 513 legacy assertions, 3397 of 3398 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 78 manual / 57 partial / 179 other; at least 135 of 314 explicitly unfinished; 61 whole-feat closures.
+
+## Residual implementation batch 391 — Kicking Moves
+
+Source: rules reference p.186 (local markdown edition; original PDF page not visually re-checked).
+
+- The attack dialog offers a Kicking Moves trick to an owner of the feat (`KICK_TRICKS` in `module/rules/kick.mjs`). The attack records it as `kickTrick`, separately from the Kick, since Back Flip may also ride an unarmed Standard Attack.
+- **Back Flip:** a Kick or unarmed Standard Attack. The card reminds of the 5 ft. move and +1 dodge on a hit (movement and the round-long dodge stay at the table). A resolved miss offers “Back Flip miss: become flat-footed”, applied once.
+- **Guillotine Kick:** a Kick at −4 with +1 threat range. Its Kick damage roll states the target’s Fortitude save, DC 10 + that damage, or reeling.
+- **Power Kick:** a Kick whose damage roll carries armor-piercing (2) and takedown, merged into the weapon’s own qualities.
+
+Verification: 513 legacy assertions, 3398 of 3399 Node tests (1 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 77 manual / 57 partial / 180 other; at least 134 of 314 explicitly unfinished; 62 whole-feat closures.
+
+## Residual implementation batch 392 — Boxing Basics
+
+Source: rules reference p.184 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/boxing.mjs`. Closed Stance joins the shared stance lifecycle. An unarmed damage roll in it asks whether the target shares the character’s square, and adds +2 if so. The attack card and stance help remind of DR 2/— against that opponent, the shared-square adjacency and the opponent’s lost bonus 5-ft. steps; DR is applied at the table throughout this system.
+- Double Jab: an unarmed Standard Attack option for Boxing Basics owners at −2. Its card offers “Roll Double Jab damage”, which writes each die as `NdXmin3 − 2N` (2 fewer per die, never below 1). The player rolls each of the two attacks.
+- Kicking Moves leaves `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3401 of 3402 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 77 manual / 56 partial / 181 other; at least 133 of 314 explicitly unfinished; 63 whole-feat closures.
+
+## Residual implementation batch 393 — Boxing Moves and the round-action feats
+
+Source: rules reference pp.172–175, 185, 195 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Round actions** (`ROUND_ACTION_FEATS` in `module/rules/feat-free-actions.mjs`). The existing Quick Draw / Surge of Speed free-action workflow now also converts the actions of Containment Mastery (Diversion or Taunt), Fire-Team Basics (Cover Fire), Fire-Team Mastery (Medicine/Stabilize), Tac-Squad Mastery (Suppressive Fire as a half action) and Merciless (Coup de Grace). Each has its own per-round use with GC review and a “Use now” link on the Feats tab. The team feats require the GC to confirm a 2-to-1 or greater advantage; the action itself is resolved at the table.
+- **Boxing Moves:** Weather the Storm is a round action too: two free Tire actions per round, at any Count, only while Total Defense is active. Knock Out and Wallop are unarmed Standard Attack tricks (`BOXING_TRICKS`). A resolved hit’s card offers its damage roll, then posts the effect: Knock Out compares the damage to the target sheet’s Constitution when the target is known, and Wallop gives the Reflex DC (10 + damage). Double Jab, Boxing Moves and Kicking Moves tricks cannot combine on one action.
+- Boxing Moves, Merciless, Fire-Team Basics and Tac-Squad Mastery leave `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3406 of 3407 Node tests (5 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 71 manual / 56 partial / 187 other; at least 127 of 314 explicitly unfinished; 69 whole-feat closures.
+
+## Residual implementation batch 394 — Wrestling Basics
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/wrestling.mjs`, `module/apps/wrestling.mjs`. The Incoming attack preview adds +1 to Defense, with a note, when the attack is declared adjacent and not ranged.
+- **Open Stance:** joins the shared stance lifecycle, and the movement check refuses Run actions while in it. When an attack against the owner is resolved as a miss, the GC (who confirms the attacker is within Reach) can spend the owner’s once-per-round use to post the pull-in and free Grapple or Trip, which is resolved normally.
+- **Brush:** an unarmed Standard Attack option. Its hit’s card rolls 1d6 in place of standard damage, then lowers the target’s Initiative Count by that amount, once. It counts as the action’s one unarmed trick.
+- Wrestling Basics leaves `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3409 of 3410 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 70 manual / 56 partial / 188 other; at least 126 of 314 explicitly unfinished; 70 whole-feat closures.
+
+## Residual implementation batch 395 — the shared unarmed-trick table
+
+Source: rules reference pp.185–189 (local markdown edition; original PDF pages not visually re-checked).
+
+- `UNARMED_TRICKS` in `module/rules/unarmed-tricks.mjs`: Unarmed Combat feat tricks that ride an unarmed Standard Attack or a Kick. The attack dialog lists the ones whose feat the character has. Each trick carries its attack modifier, threat range increase, takedown (Clothesline) and the effect it states on a hit or threat. One Finger needs the target confirmed flat-footed. It is the action’s one unarmed trick (`unarmedTrickClash`).
+- Tricks with a save on a hit (Low Blow, Eye Gouge, Haymaker) and Clothesline offer their damage roll on the hit’s card. Clothesline’s damage keeps takedown; the save tricks post the save at DC 10 + the damage. Conditions are applied by the GC.
+- **Dirty Fighting Basics:** Ready Stance joins the stance lifecycle, with its −2 on the card. When an attacker’s damage roll names a target with the feat, the sneak attack part of the formula is halved, rounded up, and the card says so.
+- Tricks riding a Trip, Feint or grapple (Hip Toss, Fling, Body Slam, Fake Out, Mud in Your Eye) stay as skill reminders. The reminders of Wrestling, Brawling and Dirty Fighting Moves now point at those skills; Rolling Moves, Vital Points Moves and Dirty Fighting Basics leave the list (tables regenerated).
+
+Verification: 513 legacy assertions, 3412 of 3413 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 64 manual / 59 partial / 191 other; at least 123 of 314 explicitly unfinished; 73 whole-feat closures.
+
+## Residual implementation batch 396 — Rolling, Spirit and Submission Basics
+
+Source: rules reference pp.187–188 (local markdown edition; original PDF pages not visually re-checked).
+
+- Three stances join the shared lifecycle. **Forward:** a hit’s card offers Initiative Count +1 (alongside Dueling Supremacy’s control), and movement checks refuse anything but Jump checks or the bonus step. **Rooted:** +1 to all saves, prepared with the character, and movement checks refuse leaving the square. **Prone:** becoming prone no longer forces normal stance, and the prone attack penalty is waived.
+- The unarmed-trick table gains Roll (Kick or Standard Attack, +1 damage through `weaponDamage`) and Palm Strike (the push, or 1d4 subdual into a blocked square, on the card).
+- Spirit Basics’ once-per-combat damage reduction is a round-action receipt (now allowing a per-combat period), usable at any Count.
+- Submission Basics stays partial; its remaining pieces are listed in its row.
+
+Verification: 513 legacy assertions, 3417 of 3418 Node tests (5 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 61 manual / 60 partial / 193 other; at least 121 of 314 explicitly unfinished; 75 whole-feat closures.
+
+## Residual implementation batch 397 — Autofire Basics, Mastery and Supremacy
+
+Source: rules reference p.180 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/combat-actions.mjs`: the fire-action plan reads the attacker’s feats. A new Two-Shot Burst action (Autofire Basics, Single-Shot or Burst mode, a Standard Attack trick) uses 2 shots. The hit counter caps it at 2 hits. Autofire Mastery removes the +1 error range of Burst and Two-Shot Burst.
+- Autofire Supremacy: the hit counter gives Autofire 1 extra hit per 3 points over Defense, instead of 4, and raises each strafed target’s Defense by 1 per target instead of 2.
+- Autofire Basics’ Cover Fire as a half action once per round is a round action.
+- Autofire Mastery’s teammate bonus is a control on a resolved ranged hit against a recorded target (`module/apps/autofire.mjs`); it is refused if already announced against that opponent this combat round.
+- The three feats leave `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3421 of 3422 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 58 manual / 60 partial / 196 other; at least 118 of 314 explicitly unfinished; 78 whole-feat closures.
+
+## Residual implementation batch 398 — Follow-Up Shot and Hail of Fire
+
+Source: rules reference pp.181–182 (local markdown edition; original PDF pages not visually re-checked).
+
+- Follow-Up Shot’s benefit reads like Darting Weapon’s, with firearms and heavy weapons in place of melee and hurled ones. So the Darting Weapon tradeoff is generalised (`FINAL_ATTACK_TRADEOFFS` in `module/rules/darting.mjs`): a declaration records `kind: "followUp"`, and Hail of Fire plays Flashing Weapon’s part (2 final attacks at −4). The full-round penalty to attack and skill checks, the final-attack counter, GC review and the shared final-attack allowance all come from the existing tradeoff; its final attacks accept firearms and heavy weapons only. Darting records keep their old shape.
+- Interpretation: both feats use the one declaration slot, so a character with Darting Weapon and Follow-Up Shot declares one of them per round.
+- The Main tab offers “Follow-Up Shot / Hail of Fire” to owners of the feat. Hail of Fire leaves `feat-reminders.json` (tables regenerated).
+- This… is my Boomstick (p.183) does not appear in the local text edition under that heading, so it was not checked and stays manual.
+
+Verification: 513 legacy assertions, 3424 of 3425 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 56 manual / 60 partial / 198 other; at least 116 of 314 explicitly unfinished; 80 whole-feat closures.
+
+## Residual implementation batch 399 — Gunslinger’s Eye
+
+Source: rules reference p.182 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/gunslinger.mjs`, `module/apps/gunslinger.mjs`. A Main-tab control chooses a character and whispers their prepared ranged attack bonus, Initiative bonus and number of Ranged Combat feats to the player and the GC. It notes that the target may spend 1 action die per detail to keep it hidden, which the GC handles.
+- Uses per session equal the owner’s Ranged Combat feats. The actor keeps a per-mission list of characters already sized up and refuses a second reading of the same one.
+
+Verification: 3426 of 3427 Node tests (2 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 55 manual / 60 partial / 199 other; at least 115 of 314 explicitly unfinished; 81 whole-feat closures.
+
+## Residual implementation batch 400 — Lucky Break, Peculiar Dodge, Misfortune and Fortune’s Fool
+
+Source: rules reference pp.189–191 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/chance-reactions.mjs`, `module/apps/chance-reactions.mjs`. These feats change another character’s attack card or dice, so they are GC controls on resolved attack cards with a recorded target.
+- **Lucky Break:** on a hit against the owner, the GC confirms the margin of 1 or less and spends the owner’s scene use; the card becomes a miss and records `luckyBreak`. Partial: skill checks are not recorded with a target.
+- **Peculiar Dodge:** on a hit before any threat is activated, it spends one of the owner’s action dice through the normal payment and rolls the die without exploding. An odd face turns the card into a miss; the result is recorded either way, once per hit.
+- **Misfortune:** on the owner’s confirmed but unactivated threat, it spends one of the owner’s action dice and makes an agent target lose one die, or takes one from the GC pool for an NPC.
+- **Fortune’s Fool:** on the owner’s activated critical failure, the paying opponent (or the GC pool) gets one die back. The owner keeps their count; the card says they now hold a die of the spent type.
+- Peculiar Dodge’s session uses and Misfortune’s equal the owner’s Chance feats. Misfortune and Fortune’s Fool leave `feat-reminders.json` (tables regenerated).
+
+Verification: 3430 of 3431 Node tests (4 new). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 51 manual / 61 partial / 202 other; at least 112 of 314 explicitly unfinished; 84 whole-feat closures.
+
+## Residual implementation batch 401 — Two-Hit Combo and Warrior’s Grace
+
+Source: rules reference p.188 (local markdown edition; original PDF page not visually re-checked).
+
+- Same benefit as Darting Weapon and Follow-Up Shot, for unarmed attacks: the shared final-attack tradeoff gains `kind: "twoHit"`, with Warrior’s Grace playing Flashing Weapon’s part (2 final unarmed attacks at −4). The Main tab offers the declaration; its final attacks accept unarmed attacks only. One such declaration per round across the three feats.
+- Warrior’s Grace leaves `feat-reminders.json` (tables regenerated).
+
+Verification: 3432 of 3433 Node tests (1 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 49 manual / 61 partial / 204 other; at least 110 of 314 explicitly unfinished; 86 whole-feat closures.
+
+## Residual implementation batch 402 — team-advantage feats
+
+Source: rules reference pp.172–175 (local markdown edition; original PDF pages not visually re-checked).
+
+- Round actions (per-action costs are now allowed): Tac-Squad Basics (free Threaten, or Intimidate/Coercion as a half action) and Horde Mastery (Pummel as a half action), each with a GC-confirmed 2-to-1 advantage.
+- `module/rules/team-feats.mjs`. Horde Basics: the Incoming attack preview offers the side’s advantage and raises the personal cover grade to that floor. Horde Supremacy: a damage-roll declaration adds +2 morale damage within CQB Range; the halved Initiative Count increases of opponents in sight are stated. Tac-Squad Supremacy: the damage roll reminds that opponents within CQB Range and sight count as flanked, next to the existing flanking declaration.
+- Fire-Team Supremacy: a Main-tab free final attack once per round with the advantage confirmed, through the shared final-attack workflow (`module/apps/team-final-attack.mjs`).
+- Containment Basics and Supremacy stay manual: they change Ambush benefit duration and opponents’ Speed, which the system does not track.
+- Reminders: Fire-Team Supremacy, Horde Supremacy and Tac-Squad Basics and Supremacy leave the list; Horde Mastery now points at Athletics. The reminder data test’s floor is lowered to 25, as the list shrinks while feats are automated.
+
+Verification: 3435 of 3436 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 43 manual / 63 partial / 208 other; at least 106 of 314 explicitly unfinished; 90 whole-feat closures.
+
+## Residual implementation batch 403 — Dueling Basics
+
+Source: rules reference p.178 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/dueling-basics.mjs`, `module/apps/dueling-basics.mjs`. A Main-tab declaration during the character’s own Count stores `system.duelingBasics` (new field, record shape and combat context), timed like Total Defense until the start of the next own Count.
+- Without a chosen opponent, +1 dodge against all attacks is prepared with Defense. With one, the Incoming attack preview adds +2 dodge (none when vulnerable) when the attack is declared to come from that opponent.
+- The extra Reach: an attack-dialog option for melee attacks, refused if another attack this combat round already used it. A resolved miss offers “Dueling Basics miss: become flat-footed”, once.
+
+Verification: 513 legacy assertions, 3438 of 3439 Node tests (3 new), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 42 manual / 63 partial / 209 other; at least 105 of 314 explicitly unfinished; 91 whole-feat closures.
+
+## Residual implementation batch 404 — No Quarter
+
+Source: rules reference p.195 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/no-quarter.mjs`. The attack dialog lets an owner of the feat give up sneak attack dice, up to the most the weapon could earn. The attack plan raises the threat range by that number and records `noQuarter`.
+- The hit’s card offers its damage roll; `sneakAttackDamagePlan` rolls that many fewer sneak dice. If none are left, no sneak damage is rolled.
+
+Verification: 3441 of 3442 Node tests (2 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 41 manual / 63 partial / 210 other; at least 104 of 314 explicitly unfinished; 92 whole-feat closures.

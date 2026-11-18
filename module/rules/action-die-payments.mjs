@@ -1,3 +1,5 @@
+import { underminedSpendBlock } from "./taunt.mjs";
+import { rollPipeline } from "./roll-pipeline.mjs";
 import {
   actionDiceFundingContext,
   actionDicePoolFingerprint,
@@ -66,6 +68,7 @@ export function multipartActionDicePlan(
   if (shaken.needsReview || system.actionDieAwardReview?.needsReview || system.actionDiceSettlementReview?.needsReview)
     throw new Error(loc`Review the interrupted action-die or condition records before spending.`);
   if (shaken.spendingForbidden) throw new Error(loc`Shaken IV: no action dice may be spent at all (p.342).`);
+  if (underminedSpendBlock(system)) throw new Error(underminedSpendBlock(system));
   if (
     !paymentIdValid(id) ||
     typeof actorUuid !== "string" ||
@@ -205,3 +208,10 @@ export function multipartRefundPatch(system, record) {
 export function paymentRecordMatches(actor, record) {
   return same(actor.flags?.spycraft2?.actionDiePayments?.[record.id], record);
 }
+
+// Recorded on the posted check as the roll was given them.
+rollPipeline.register({
+  id: "actionDiePaymentsRecord",
+  order: 9610,
+  record: ["preRollFunding", "rerollFunding", "rerollReceiptId"]
+});

@@ -1,6 +1,8 @@
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { superiorCoverState } from "./superior-cover.mjs";
+import { fightDefensivelyState } from "./fight-defensively.mjs";
+import { underminedState } from "./taunt.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { combatExpertiseState } from "./combat-expertise.mjs";
 import { shakenRules, shakenSkillPenalty } from "./shaken.mjs";
@@ -186,14 +188,21 @@ export function conditionRollPenalties(system) {
     bound = system.conditionContext?.bound === true,
     entangled = bound || system.conditionContext?.entangled === true,
     value = sickened ? -2 : 0;
-  const sprawled =
+  // Prone Stance (Submission Basics, p.188): anything that would leave the character sprawled leaves them prone.
+  const proneStance = system.combatStance?.key === "prone" && system.activeFeatNames?.includes("Submission Basics"),
+    sprawledRaw =
       system.conditionContext?.sprawled === true ||
       (system.attributeCollapse ?? attributeCollapsePlan(system)).conditions.includes("Sprawled"),
-    prone = system.conditionContext?.prone === true;
+    sprawled = sprawledRaw && !proneStance,
+    prone = system.conditionContext?.prone === true || (sprawledRaw && proneStance);
   return {
     sprawled,
     prone,
-    meleeAttack: prone ? -2 : 0,
+    // Prone Stance (Submission Basics, p.188): no attack penalty for being prone.
+    meleeAttack:
+      prone && !(system.combatStance?.key === "prone" && system.activeFeatNames?.includes("Submission Basics"))
+        ? -2
+        : 0,
     sickened,
     bound,
     entangled,
@@ -202,6 +211,7 @@ export function conditionRollPenalties(system) {
       twoWeaponStyleState(system).penalty -
       combatExpertiseState(system).penalty -
       superiorCoverState(system).penalty -
+      fightDefensivelyState(system).penalty -
       dartingStyleState(system).penalty +
       shaken.attackPenalty +
       (entangled ? -2 : 0) +
@@ -222,6 +232,8 @@ export function conditionSkillPenalty(system, ability) {
     -twoWeaponStyleState(system).skillPenalty -
     combatExpertiseState(system).penalty -
     superiorCoverState(system).penalty -
+    fightDefensivelyState(system).penalty -
+    underminedState(system).penalty -
     dartingStyleState(system).penalty +
     (ability === "dex" ? conditionRollPenalties(system).dexSkill : 0) +
     conditionAbilityPenalty(system, ability) +

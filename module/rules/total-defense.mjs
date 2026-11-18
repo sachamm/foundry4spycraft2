@@ -1,3 +1,4 @@
+import { ruleName } from "./rule-name.mjs";
 import { ownCountDurationActive, validOwnCountClock } from "./own-count-duration.mjs";
 import { combatMovementPlan } from "./combat-movement.mjs";
 import { loc } from "../i18n.mjs";
@@ -15,7 +16,7 @@ export function equilibriumTotalDefenseBonus(system) {
     .filter(f => f.tree === "covert")
     .map(f => ({ name: f.name, choice: f.choice ?? "" }));
   if (
-    !selections.some(f => f.name === "Equilibrium Basics") ||
+    !selections.some(f => ruleName(f) === "Equilibrium Basics") ||
     selections.some(f => typeof f.name !== "string" || !f.name.trim() || typeof f.choice !== "string")
   )
     return {
@@ -37,7 +38,7 @@ function validEquilibriumDeclaration(p) {
     Array.isArray(p.covertFeats) &&
     p.covertFeats.length > 0 &&
     p.bonus === p.covertFeats.length &&
-    p.covertFeats.some(f => f?.name === "Equilibrium Basics") &&
+    p.covertFeats.some(f => ruleName(f) === "Equilibrium Basics") &&
     p.covertFeats.every(f => typeof f?.name === "string" && f.name.trim() && typeof f.choice === "string")
   );
 }
