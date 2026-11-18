@@ -319,9 +319,9 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Staff Basics | 179 | No | Covered: readied reviewed staff +3 gear with Acrobatics/Jump (317), Whirling Stance lower-level flanking protection (366), Thread the Needle hit, hold, release, holder movement ending (370) and opposed Athletics escape (372) | Whole-feat source audit in batch 375; native reload verified in the earlier batches |
 | Sword Basics | 180 | No | Covered (batch 376): lost while any wielded weapon has finesse; post-hit opposite-side move reminder; Unbeatable Stance +1 morale against a GC-confirmed damaged opponent; Impale +1 damage per 2 points over the GC-confirmed Defense | Native Foundry QA not claimed |
 | Whip Basics | 180 | No | Partial: readied reviewed whip +2gear with Jump and ordinary attacking/defending Trip skill checks; Intense Stance, Entwine and other Trip variants remain open | Batches317/360; actual family/readiness/grip/source proof; attacking scope automated tests, native response verified in317 |
-| Autofire Basics | 180 | No | Manual/descriptive | — |
-| Autofire Mastery | 180 | No | Manual/descriptive | — |
-| Autofire Supremacy | 180 | No | Manual/descriptive | — |
+| Autofire Basics | 180 | No | Covered (batch 397): Two-Shot Burst fire action (Single-Shot or Burst mode, 2 shots, at most 2 hits by the hit counter) and Cover Fire as a half action once per round | Native Foundry QA not claimed |
+| Autofire Mastery | 180 | No | Covered (batch 397): Burst and Two-Shot Burst add no error range; a resolved ranged hit offers the teammates’ +2 against that opponent for 1 full round, once per opponent per round | Native Foundry QA not claimed |
+| Autofire Supremacy | 180 | No | Covered (batch 397): the hit counter gives Autofire an extra hit per 3 points over Defense, and raises each strafed target’s Defense by 1 rather than 2 | Native Foundry QA not claimed |
 | Bombard | 180 | No | Partial: indirect range/error; remaining combat effects manual | — |
 | Bullseye | 180 | No | Implemented: bounded one-shot ranged Standard Attack penalty, equal recorded-hit damage once, and miss flat-footed outcome | Batch351; actual/named GC targets, spent projectile context, replacements and posted-receipt recovery/reload verified |
 | CQB Basics | 180 | No | Implemented: measured-range ranged attack/damage+1, held/readied ranged-weapon Threaten skill+2gear and out-of-melee penalty/error waiver | Batches195–197,277; ordinary/class/final/damage controls, both opposed Threaten roles, gear stacking, source/Count/evidence guards and native persistence verified |
@@ -1767,3 +1767,15 @@ Source: rules reference pp.187–188 (local markdown edition; original PDF pages
 - Submission Basics stays partial; its remaining pieces are listed in its row.
 
 Verification: 513 legacy assertions, 3417 of 3418 Node tests (5 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 61 manual / 60 partial / 193 other; at least 121 of 314 explicitly unfinished; 75 whole-feat closures.
+
+## Residual implementation batch 397 — Autofire Basics, Mastery and Supremacy
+
+Source: rules reference p.180 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/combat-actions.mjs`: the fire-action plan reads the attacker’s feats. A new Two-Shot Burst action (Autofire Basics, Single-Shot or Burst mode, a Standard Attack trick) uses 2 shots. The hit counter caps it at 2 hits. Autofire Mastery removes the +1 error range of Burst and Two-Shot Burst.
+- Autofire Supremacy: the hit counter gives Autofire 1 extra hit per 3 points over Defense, instead of 4, and raises each strafed target’s Defense by 1 per target instead of 2.
+- Autofire Basics’ Cover Fire as a half action once per round is a round action.
+- Autofire Mastery’s teammate bonus is a control on a resolved ranged hit against a recorded target (`module/apps/autofire.mjs`); it is refused if already announced against that opponent this combat round.
+- The three feats leave `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3421 of 3422 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 58 manual / 60 partial / 196 other; at least 118 of 314 explicitly unfinished; 78 whole-feat closures.

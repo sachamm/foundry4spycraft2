@@ -36,6 +36,7 @@ export const ROUND_ACTION_FEATS = Object.freeze({
     cost: "half",
     advantage: true
   },
+  autofireBasics: { feat: "Autofire Basics", actions: ["Cover Fire"], perRound: 1, cost: "half" },
   merciless: { feat: "Merciless", actions: ["Coup de Grace against a helpless character"], perRound: 1, cost: "free" },
   spiritBasics: {
     feat: "Spirit Basics",

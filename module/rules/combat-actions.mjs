@@ -17,6 +17,8 @@ import { loc } from "../i18n.mjs";
 
 export const FIRE_ACTIONS = {
   burst: { mode: "burst", shots: 3, error: 1 },
+  // Autofire Basics, p.180: a Burst that adds only 1 shot and never hits a third time.
+  twoShotBurst: { modes: ["single", "burst"], shots: 2, error: 1, maxHits: 2, feat: "Autofire Basics" },
   autofire: { mode: "auto", minimumShots: 6, shotsEach: 3, most: 10, error: 2 },
   strafe: { mode: "auto", minimumShots: 9, shotsEach: 3, most: 10, error: 2 },
   suppressiveFinal: { shots: 1, error: 1, attack: -4 }
@@ -47,6 +49,27 @@ export function fireActionPlan(
   const stop = reason => ({ action, blocked: true, reason, attack: 0, extraRecoil: 0, error: 0, shots: 0, notes: [] });
   if (!rule) return stop(loc`Choose a listed fire action.`);
   if (!facts.firearm) return stop(loc`This action needs a firearm.`);
+  const feats = facts.feats ?? [];
+  // Autofire Mastery, p.180: Burst and Two-Shot Burst add no error range.
+  const burstError = feats.includes("Autofire Mastery") ? 0 : 1;
+  if (action === "twoShotBurst") {
+    if (!feats.includes(rule.feat)) return stop(loc`Two-Shot Burst needs Autofire Basics.`);
+    if (!rule.modes.includes(facts.fireMode)) return stop(loc`A Two-Shot Burst is fired in Single-Shot or Burst mode.`);
+    if (facts.attackAction !== "standard") return stop(loc`A Two-Shot Burst is a trick on a Standard Attack.`);
+    const left = shotsRemaining === null || shotsRemaining === "" ? null : count(Number(shotsRemaining));
+    if (left !== null && left < rule.shots) return stop(loc`A Two-Shot Burst needs 2 shots in the weapon.`);
+    return {
+      action,
+      blocked: false,
+      attack: 0,
+      extraRecoil: 0,
+      error: burstError,
+      shots: rule.shots,
+      notes: [
+        loc`Two-Shot Burst: 2 shots${burstError ? loc`, error range +1` : ""}. One shot hits; two if the result beats Defense by 5; never a third (p.180).`
+      ]
+    };
+  }
   if (rule.mode && facts.fireMode !== rule.mode)
     return stop(
       rule.mode === "burst"
@@ -64,10 +87,10 @@ export function fireActionPlan(
       blocked: false,
       attack: 0,
       extraRecoil: 0,
-      error: rule.error,
+      error: burstError,
       shots: rule.shots,
       notes: [
-        loc`Burst: 3 shots, error range +1. One shot hits; two if the result beats Defense by 5, all three by 10. A critical hit applies only the first shot to wounds (p.354).`
+        loc`Burst: 3 shots, error range +${burstError}. One shot hits; two if the result beats Defense by 5, all three by 10. A critical hit applies only the first shot to wounds (p.354).`
       ]
     };
   }
@@ -127,22 +150,22 @@ export function fireActionPlan(
 }
 
 /** Shots of a Burst that hit: 1, 2 at Defense +5, 3 at Defense +10. */
-export function burstHits(attackTotal, defense) {
+export function burstHits(attackTotal, defense, maxHits = 3) {
   const margin = attackTotal - defense;
-  return margin < 0 ? 0 : margin >= 10 ? 3 : margin >= 5 ? 2 : 1;
+  return Math.min(maxHits, margin < 0 ? 0 : margin >= 10 ? 3 : margin >= 5 ? 2 : 1);
 }
 
-/** Shots of an Autofire attack that hit: 1, plus 1 per 4 over Defense, up to the volleys fired. */
-export function autofireHits(attackTotal, defense, volleys) {
+/** Shots of an Autofire attack that hit: 1, plus 1 per 4 over Defense (per 3 with Autofire Supremacy), up to the volleys. */
+export function autofireHits(attackTotal, defense, volleys, { perPoints = 4 } = {}) {
   const margin = attackTotal - defense;
   if (margin < 0 || !Number.isSafeInteger(volleys) || volleys < 1) return 0;
-  return Math.min(volleys, 1 + Math.floor(margin / 4));
+  return Math.min(volleys, 1 + Math.floor(margin / perPoints));
 }
 
 /** A Strafe against each target in order: Defense rises by 2 per target so far, counting the target itself. */
-export function strafeHits(attackTotal, defenses = []) {
+export function strafeHits(attackTotal, defenses = [], { step = 2 } = {}) {
   return defenses.map((defense, index) => {
-    const raised = defense + 2 * (index + 1);
+    const raised = defense + step * (index + 1);
     return { index, defense, raised, hit: attackTotal >= raised };
   });
 }
@@ -344,6 +367,7 @@ rollPipeline.register({
         firearm: firing.firearm,
         fireMode: firing.fireMode,
         attackAction: stance.attackAction,
+        feats: system.activeFeatNames ?? [],
         recoilPenalty: firing.recoilPenalty
       },
       {

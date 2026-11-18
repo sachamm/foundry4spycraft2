@@ -11324,18 +11324,6 @@ export const CONTAGIONS = [
  }
 ];
 export const FEAT_REMINDERS = {
- "Autofire Basics": {
-  "rolls": "attack",
-  "text": "Use a Two-Shot Burst with Single-Shot or Burst weapons, and take Cover Fire as a half action once per round."
- },
- "Autofire Mastery": {
-  "rolls": "attack",
-  "text": "When you hit a foe with a ranged attack, teammates get +2 to hit them for a round; Bursts don't raise your error range."
- },
- "Autofire Supremacy": {
-  "rolls": "attack",
-  "text": "Autofire scores an extra hit per 3 points over Defense, and Strafe targets gain less Defense."
- },
  "Battering Blows": {
   "rolls": "damage",
   "text": "Grants a grapple trick that lets you strike a held foe with both your unarmed and your weapon damage."

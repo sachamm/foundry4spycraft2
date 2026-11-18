@@ -1,15 +1,6 @@
 {
   "_note": "Feats the rules do not carry out, and the rolls each bears on: attack, damage, knowledge, skill, skill:<key>, save, save:<key>. The roll dialog lists a character's matching feats so the player can note the ones that apply for the GC. The reminder shown is the feat's summary from summaries.json. Feats the system now carries out are removed from this list.",
   "feats": {
-    "Autofire Basics": [
-      "attack"
-    ],
-    "Autofire Mastery": [
-      "attack"
-    ],
-    "Autofire Supremacy": [
-      "attack"
-    ],
     "Battering Blows": [
       "damage"
     ],

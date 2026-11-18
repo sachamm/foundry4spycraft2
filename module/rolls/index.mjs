@@ -3,6 +3,7 @@
  * A rule joins the pipeline by registering from its own module and being listed here.
  */
 import "../apps/attack-damage-benefits.mjs";
+import "../apps/autofire.mjs";
 import "../apps/cheap-shot.mjs";
 import "../apps/counter-trip.mjs";
 import "../apps/damage-target.mjs";
