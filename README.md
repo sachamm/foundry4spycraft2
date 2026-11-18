@@ -167,7 +167,8 @@ them with `planTerms`.
 - **Hits and damage.** An attack card has "Resolve against Defense": pick the target and the check is settled
   against its Defense. A hit offers "Roll damage", and the damage card has "Apply damage to a target", which changes
   vitality and wounds, rolls a standard NPC's or vehicle's Damage save, and sets the conditions that follow. You can
-  apply damage to characters you own; the GC can apply it to anyone.
+  apply damage to characters you own; the GC can apply it to anyone. A report that calls for a save has a button that
+  rolls it, and a blast weapon's damage card can settle everyone caught in the blast.
 - **Ammunition.** Weapons with an ammunition code count their shots. Attacks spend them and "Reload" refills from the
   reserve. World setting "Count ammunition".
 - **Healing.** "Rest and recover" on the Main tab; a successful First Aid or Stabilize check offers to apply itself

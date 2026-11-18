@@ -194,6 +194,23 @@ export function measureInto(actor) {
 /*  Blast                                        */
 /* -------------------------------------------- */
 
+/**
+ * Everyone a blast of this size reaches around the one targeted token, nearest first, each with its token's actor.
+ * Null when there is no scene to measure on or no single token is targeted.
+ */
+export function blastCaught(total, increment) {
+  if (!mapAvailable() || !Number.isFinite(total)) return null;
+  const zero = targetedToken();
+  if (!zero) return null;
+  const tokens = canvas.tokens.placeables.filter(token => !token.document.hidden);
+  return blastTargets(
+    boxOf(zero),
+    tokens.map(token => ({ id: token.id, name: token.name, box: boxOf(token) })),
+    total,
+    increment
+  ).map(row => ({ ...row, actor: tokens.find(token => token.id === row.id)?.actor ?? null }));
+}
+
 /** List everyone a rolled blast reaches around the targeted token, and outline its reach on the scene. */
 export async function blastOnMap(message) {
   const check = message.flags?.spycraft2,

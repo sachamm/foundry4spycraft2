@@ -135,15 +135,18 @@ function injurySave(actor, type, injury, where) {
 export async function sufferTypedDamage(actor, preset = {}) {
   if (!owned(actor)) return null;
   let input = preset;
-  if (!input.type) {
+  // `review` opens the dialog with what is already known filled in, for the circumstances only the table knows.
+  const known = preset.review === true ? preset : {},
+    mark = (html, value) => (value ? html.replace(`value="${esc(value)}"`, `value="${esc(value)}" selected`) : html);
+  if (!input.type || preset.review === true) {
     input = await systemDialog.input({
       window: { title: loc`Other damage types` },
       rejectClose: false,
       ok: { label: loc`Apply` },
       content: `<div class="spycraft2-roll-options">
-        <label>${loc`Damage type`} <select name="type">${options(Object.keys(DAMAGE_TYPES).map(type => [type, `${DAMAGE_TYPE_LABELS[type]} (p.${DAMAGE_TYPES[type].page})`]))}</select></label>
-        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" required /></label>
-        <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="0" /></label>
+        <label>${loc`Damage type`} <select name="type">${mark(options(Object.keys(DAMAGE_TYPES).map(type => [type, `${DAMAGE_TYPE_LABELS[type]} (p.${DAMAGE_TYPES[type].page})`])), known.type)}</select></label>
+        <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" required /></label>
+        <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="${Number.isFinite(known.reduction) ? known.reduction : 0}" /></label>
         <label>${loc`Armor worn (acid, heat)`} <select name="armor">${options(ARMORS())}</select></label>
         <label>${loc`Acid: half actions given up next Count to shed armor or an item (+1 each)`} <input type="number" name="halfActions" min="0" max="2" step="1" value="0" /></label>
         <label>${loc`Explosive: moved during the last Count`} <select name="moved">${options([
@@ -159,7 +162,7 @@ export async function sufferTypedDamage(actor, preset = {}) {
           ["air", loc`Air`],
           ["liquid", loc`Liquid`]
         ])}</select></label>
-        <label>${loc`Source (a running total is kept per source)`} <input type="text" name="source" /></label>
+        <label>${loc`Source (a running total is kept per source)`} <input type="text" name="source" value="${esc(known.source ?? "")}" /></label>
         <p class="hint">${loc`Bang, flash, acid, explosive and first-round vacuum call for a save; its card applies the result. Cold, heat and electrical damage are subdual.`}</p>
       </div>`
     });

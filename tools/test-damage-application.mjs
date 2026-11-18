@@ -4,6 +4,10 @@ import {
   attackKindOf,
   attackOutcome,
   attackResolutionNote,
+  blastDamageAt,
+  knockoutDuration,
+  nonLethalHitPlan,
+  wearOffPlan,
   damageProfile,
   drForAttack,
   dyingPlan,
@@ -17,6 +21,7 @@ import {
   restPlan,
   woundState
 } from "../module/rules/damage-application.mjs";
+import { grappleBenefitChanges } from "../module/rules/combat-actions.mjs";
 import { ammunitionLabel, ammunitionState, reloadPlan, spendShotsPlan } from "../module/rules/ammunition-use.mjs";
 
 test("an attack hits on a result equal to or above Defense, whatever the die showed", () => {
@@ -218,4 +223,65 @@ test("firing spends shots and Reload refills from the reserve", () => {
   const shotgun = ammunitionState({ ammo: "8S3", shotsLoaded: 1 });
   assert.deepEqual(reloadPlan(shotgun), { shotsLoaded: 4, shotsSpare: 13, moved: 3 });
   assert.equal(spendShotsPlan({ tracked: false }, 1), null);
+});
+
+test("stress and subdual damage on a character without a ledger add up against its thresholds", () => {
+  const system = { abilities: { wis: { value: 12 }, con: { value: 10 } } };
+  const light = nonLethalHitPlan(system, { stress: 0, subdual: 0 }, { kind: "subdual", damage: 8 });
+  assert.deepEqual([light.net, light.total, light.saveRequired, light.totals.subdual], [8, 8, false, 8]);
+  const heavy = nonLethalHitPlan(system, { stress: 0, subdual: 8 }, { kind: "subdual", damage: 10 });
+  assert.deepEqual([heavy.total, heavy.saveRequired, heavy.saveKey, heavy.dc], [18, true, "fort", 12]);
+  // Damage reduction counts twice against subdual damage; armor-piercing lowers it first.
+  assert.equal(nonLethalHitPlan(system, {}, { kind: "subdual", damage: 10, dr: 3 }).net, 4);
+  assert.equal(nonLethalHitPlan(system, {}, { kind: "subdual", damage: 10, dr: 3, armorPiercing: 2 }).net, 8);
+  assert.equal(nonLethalHitPlan(system, {}, { kind: "subdual", damage: 5, dr: 3 }).stopped, true);
+  // Stress ignores damage reduction; a critical hit forces a save below every threshold.
+  const stress = nonLethalHitPlan(system, { stress: 20 }, { kind: "stress", damage: 8, dr: 5 });
+  assert.deepEqual(
+    [stress.net, stress.total, stress.saveKey, stress.dc, stress.failureOutcome],
+    [8, 28, "will", 16, "Shaken II"]
+  );
+  assert.equal(nonLethalHitPlan(system, {}, { kind: "stress", damage: 2, critical: true }).dc, 16);
+  assert.throws(() => nonLethalHitPlan(system, {}, { kind: "lethal", damage: 2 }), /stress or subdual/);
+});
+
+test("a knockout lasts the band's unit times half the margin, at least once", () => {
+  assert.deepEqual(knockoutDuration("1 minute", 16, 11), { count: 2, unit: "minute" });
+  assert.deepEqual(knockoutDuration("1 round", 12, 11), { count: 1, unit: "round" });
+  assert.equal(knockoutDuration(null, 16, 11), null);
+});
+
+test("stress and subdual damage wear off faster as the total falls", () => {
+  const rates = [
+    { thresholdValue: 12, points: 1, seconds: 60 },
+    { thresholdValue: 24, points: 1, seconds: 600 },
+    { thresholdValue: 36, points: 1, seconds: 3600 }
+  ];
+  // 28: four points at 10 minutes each, then a point a minute for the remaining 20 minutes.
+  assert.deepEqual(wearOffPlan(28, rates, 3600), { total: 4, recovered: 24 });
+  assert.deepEqual(wearOffPlan(10, rates, 300), { total: 5, recovered: 5 });
+  assert.deepEqual(wearOffPlan(40, rates, 3599), { total: 40, recovered: 0 });
+  assert.deepEqual(wearOffPlan(5, rates, 86400), { total: 0, recovered: 5 });
+  assert.deepEqual(wearOffPlan(9, [], 86400), { total: 9, recovered: 0 });
+});
+
+test("blast damage halves for each whole increment out from Ground Zero", () => {
+  assert.deepEqual(blastDamageAt(40, 0, 5), { rings: 0, damage: 40 });
+  assert.deepEqual(blastDamageAt(40, 12, 5), { rings: 2, damage: 10 });
+  assert.deepEqual(blastDamageAt(40, 30, 25), { rings: 1, damage: 20 });
+  assert.equal(blastDamageAt(3, 20, 5).damage, 0);
+});
+
+test("grapple benefits name the conditions they change on each side", () => {
+  assert.deepEqual(grappleBenefitChanges(["pin"]), [{ side: "loser", id: "pinned", active: true }]);
+  assert.deepEqual(grappleBenefitChanges(["sprawl"]), [
+    { side: "winner", id: "prone", active: true },
+    { side: "loser", id: "sprawled", active: true }
+  ]);
+  assert.deepEqual(grappleBenefitChanges(["escape"]), [
+    { side: "winner", id: "held", active: false },
+    { side: "winner", id: "pinned", active: false }
+  ]);
+  assert.deepEqual(grappleBenefitChanges(["draw", "injure"]), []);
+  assert.throws(() => grappleBenefitChanges(["tickle"]), /listed grapple benefit/);
 });

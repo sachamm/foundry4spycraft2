@@ -93,6 +93,7 @@ import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
+import { nonLethalTotals } from "../apps/damage-application.mjs";
 import { reloadWeapon, resupplyWeapon, weaponAmmunition } from "../apps/ammunition-use.mjs";
 import { ammunitionLabel } from "../rules/ammunition-use.mjs";
 import { planAmmunitionStockpile } from "../apps/ammunition-planner.mjs";
@@ -138,6 +139,8 @@ const playLabels = () => ({
   reload: loc`Reload`,
   resupply: loc`Restore the printed supply`,
   rest: loc`Rest and recover`,
+  stress: loc`Stress damage`,
+  subdual: loc`Subdual damage`,
   dying: loc`Dying: roll to stabilize`
 });
 
@@ -1765,6 +1768,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
           shots: weaponShots(w)
         })),
       playLabels: playLabels(),
+      nonLethal: nonLethalTotals(this.actor),
       dying: this.actor.system.wounds?.value <= -1 && this.actor.system.wounds?.value >= -9,
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),
       npcTypes: {

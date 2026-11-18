@@ -6,6 +6,7 @@
  * module/apps/damage-application.mjs.
  */
 import { autofireHits, burstHits } from "./combat-actions.mjs";
+import { accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
 
 const whole = value => Number.isSafeInteger(value) && value >= 0;
@@ -258,4 +259,82 @@ export function opposedNote(check) {
     : o.outcome === "won"
       ? loc`Opposed by ${against}: won.`
       : loc`Opposed by ${against}: lost.`;
+}
+
+/* -------------------------------------------- */
+/*  Stress and subdual damage without a ledger   */
+/* -------------------------------------------- */
+
+/**
+ * Stress or subdual damage on a character whose running totals are plain numbers (a special NPC), pp.339–340.
+ * Damage reduction is twice as effective against subdual damage; stress damage ignores it.
+ * @param {object} system  the character's system data (thresholds or attribute scores)
+ * @param {object} totals  { stress, subdual } accumulated so far
+ * @param {object} hit     { kind, damage, dr, armorPiercing, armorPiercingAll, critical }
+ */
+export function nonLethalHitPlan(system, totals = {}, hit = {}) {
+  const kind = hit.kind;
+  if (!["stress", "subdual"].includes(kind)) throw new Error(loc`Choose stress or subdual damage.`);
+  const reduced =
+    kind === "subdual"
+      ? reducedDamage({
+          damage: hit.damage,
+          dr: hit.armorPiercingAll ? 0 : 2 * Math.max(0, int(hit.dr) - int(hit.armorPiercing)),
+          armorPiercing: 0
+        })
+      : reducedDamage({ damage: hit.damage });
+  const current = Math.max(0, int(totals[kind]));
+  const plan = accumulatedDamagePlan(system, {
+    kind,
+    currentDamage: current,
+    newDamage: reduced.net,
+    criticalHit: hit.critical === true,
+    confirmed: true
+  });
+  return { ...plan, ...reduced, damage: hit.damage, totals: { ...totals, [kind]: plan.total } };
+}
+
+const KNOCKOUT_UNITS = ["round", "minute", "hour", "day", "week"];
+/** How long a failed subdual save knocks a character out: the band's unit × half the margin (p.339), at least 1. */
+export function knockoutDuration(base, dc, result) {
+  const unit = KNOCKOUT_UNITS.find(word => String(base ?? "").includes(word));
+  if (!unit || !Number.isFinite(dc) || !Number.isFinite(result)) return null;
+  return { count: Math.max(1, Math.floor((dc - result) / 2)), unit };
+}
+
+/**
+ * Stress or subdual damage wearing off outside combat (Tables 5.8 and 5.9): the highest threshold still exceeded
+ * sets the rate, so recovery speeds up as the total falls.
+ * @param {number} total    accumulated damage now
+ * @param {object[]} rates  recoveryRatePlan's rows: [{ thresholdValue, points, seconds }], lowest threshold first
+ * @param {number} seconds  time spent out of combat
+ */
+export function wearOffPlan(total, rates = [], seconds = 0) {
+  let left = Math.max(0, int(total)),
+    time = Math.max(0, Number(seconds) || 0);
+  const usable = rates.filter(row => Number.isFinite(row?.thresholdValue) && row.seconds > 0);
+  if (!usable.length) return { total: left, recovered: 0 };
+  const start = left;
+  for (let guard = 0; guard < 64 && left > 0 && time > 0; guard++) {
+    // Below the first threshold the first row's rate still applies.
+    const band = usable.findLast(row => left > row.thresholdValue) ?? usable[0];
+    if (!(band.points > 0)) break;
+    const floor = band === usable[0] ? 0 : band.thresholdValue;
+    const needed = Math.ceil((left - floor) / band.points),
+      possible = Math.floor(time / band.seconds),
+      steps = Math.min(needed, possible);
+    if (steps < 1) break;
+    left = Math.max(floor, left - steps * band.points);
+    time -= steps * band.seconds;
+  }
+  return { total: left, recovered: start - left };
+}
+
+/** Blast damage at a distance from Ground Zero: halved for each whole increment out (p.343). */
+export function blastDamageAt(damage, distanceFeet, incrementFeet = 5) {
+  const step = Math.max(5, int(incrementFeet) || 5),
+    rings = Math.floor(Math.max(0, Number(distanceFeet) || 0) / step);
+  let value = Math.max(0, int(damage));
+  for (let i = 0; i < rings && value > 0; i++) value = Math.floor(value / 2);
+  return { rings, damage: value };
 }

@@ -4,12 +4,19 @@
  */
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { recoveryRatePlan } from "../rules/health.mjs";
-import { dyingPlan, firstAidPlan, firstAidStandard, restPlan, woundState } from "../rules/damage-application.mjs";
+import {
+  dyingPlan,
+  firstAidPlan,
+  firstAidStandard,
+  restPlan,
+  wearOffPlan,
+  woundState
+} from "../rules/damage-application.mjs";
 import { validateDamageLedger } from "../rules/accumulated-damage.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { damageSaveState, npcIsSpecial, resetDamageTrack } from "./gc/npc-play.mjs";
 import { sceneEpoch } from "./gc/state.mjs";
-import { targetChoices } from "./damage-application.mjs";
+import { nonLethalTotals, targetChoices } from "./damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
@@ -54,7 +61,7 @@ export async function restAndRecover(actor, options = {}) {
       window: { title: loc`${actor.name}: rest` },
       rejectClose: false,
       ok: { label: loc`Rest` },
-      content: `<div class="spycraft2-roll-options"><label>${loc`Hours of rest (vitality)`} <input type="number" name="hours" min="0" step="1" value="8" /></label><label>${loc`Days of rest (wounds)`} <input type="number" name="days" min="0" step="1" value="0" /></label><label>${loc`Medicine/Treatment for these days`} <select name="treatment"><option value="none">${loc`None`}</option><option value="success">${loc`Success (×2)`}</option><option value="threat">${loc`Threat (×3)`}</option><option value="criticalSuccess">${loc`Activated critical success (×5)`}</option><option value="error">${loc`An error: no natural healing`}</option></select></label><label><input type="checkbox" name="poorForaging" /> ${loc`Failed Survival/Foraging (half rate)`}</label><p class="hint">${loc`Rest means light activity and no combat. Stress and subdual damage recover on their own schedule: see "Recovery rates".`}</p></div>`
+      content: `<div class="spycraft2-roll-options"><label>${loc`Hours of rest (vitality)`} <input type="number" name="hours" min="0" step="1" value="8" /></label><label>${loc`Days of rest (wounds)`} <input type="number" name="days" min="0" step="1" value="0" /></label><label>${loc`Medicine/Treatment for these days`} <select name="treatment"><option value="none">${loc`None`}</option><option value="success">${loc`Success (×2)`}</option><option value="threat">${loc`Threat (×3)`}</option><option value="criticalSuccess">${loc`Activated critical success (×5)`}</option><option value="error">${loc`An error: no natural healing`}</option></select></label><label><input type="checkbox" name="poorForaging" /> ${loc`Failed Survival/Foraging (half rate)`}</label><label><input type="checkbox" name="interest" /> ${loc`An hour or more spent on Interests (stress wears off faster)`}</label><p class="hint">${loc`Rest means light activity and no combat. Stress and subdual damage wear off over the same time, at the rate their totals set.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -69,7 +76,7 @@ export async function restAndRecover(actor, options = {}) {
         : { ...actor.system, level: actor.system.level ?? actor.system.effectiveThreatLevel ?? 1 };
     rates = recoveryRatePlan(system, {
       treatment: input.treatment ?? "none",
-      interest: false,
+      interest: input.interest === true,
       poorForaging: input.poorForaging === true
     });
     plan = restPlan(healthOf(actor), {
@@ -86,11 +93,48 @@ export async function restAndRecover(actor, options = {}) {
   const lines = [
     loc`${esc(actor.name)} rests ${hours} hour(s) and ${days} day(s): vitality +${plan.vitalityGain} (now ${plan.vitality}), wounds +${plan.woundGain} (now ${plan.wounds}).`
   ];
+  lines.push(...(await wearOff(actor, rates, hours * 3600 + days * 86400)));
   // Fatigue from lost vitality or wounds lifts after 8 hours of rest (p.341).
   if (hours + days * 24 >= 8) lines.push(await clear(actor, "fatigued", loc`Fatigued`));
   if (plan.wounds > 0) lines.push(await clear(actor, "dying", loc`Dying`));
   await post(actor, lines);
   return plan;
+}
+
+/**
+ * Stress and subdual damage wearing off over a rest (Tables 5.8 and 5.9). An agent's totals are in the ledger; a
+ * special NPC's are two running numbers.
+ */
+async function wearOff(actor, rates, seconds) {
+  const agent = actor.type === "agent",
+    ledger = agent ? actor.system.accumulatedDamage : null;
+  if (agent) {
+    try {
+      validateDamageLedger(ledger);
+    } catch {
+      return [];
+    }
+    if (ledger.pending.length)
+      return [loc`Stress and subdual damage are left as they are: a damage save is still waiting on the sheet.`];
+  }
+  const before = agent ? { stress: ledger.stress, subdual: ledger.subdual } : nonLethalTotals(actor);
+  const stress = wearOffPlan(before.stress, rates.stress, seconds),
+    subdual = wearOffPlan(before.subdual, rates.subdual, seconds);
+  if (!stress.recovered && !subdual.recovered) return [];
+  if (agent)
+    await actor.update({
+      "system.accumulatedDamage": {
+        ...ledger,
+        revision: ledger.revision + 1,
+        stress: stress.total,
+        subdual: subdual.total
+      }
+    });
+  else await actor.update({ "flags.spycraft2.nonLethal": { stress: stress.total, subdual: subdual.total } });
+  return [
+    loc`Stress damage ${before.stress} → ${stress.total}; subdual damage ${before.subdual} → ${subdual.total}.`,
+    stress.recovered ? loc`A Shaken condition ends when stress damage drops below its threshold: review it.` : ""
+  ];
 }
 
 /* -------------------------------------------- */
@@ -170,6 +214,13 @@ async function healSubdual(patient, amount) {
   return healed;
 }
 
+async function healNpcSubdual(patient, amount) {
+  const totals = nonLethalTotals(patient),
+    healed = Math.min(totals.subdual, amount);
+  if (healed) await patient.update({ "flags.spycraft2.nonLethal": { ...totals, subdual: totals.subdual - healed } });
+  return healed;
+}
+
 /** Apply a successful First Aid check to a patient, once per patient per scene. */
 export async function applyFirstAid(message, options = {}) {
   const check = message.flags?.spycraft2;
@@ -196,7 +247,7 @@ export async function applyFirstAid(message, options = {}) {
     const plan = firstAidPlan(
       {
         ...healthOf(patient),
-        subdual: ledger?.subdual ?? 0,
+        subdual: patient.type === "agent" ? (ledger?.subdual ?? 0) : nonLethalTotals(patient).subdual,
         level: patient.system.level ?? patient.system.effectiveThreatLevel ?? 0
       },
       { wounds: woundRoll.total, subdual: subdualRoll.total }
@@ -205,7 +256,10 @@ export async function applyFirstAid(message, options = {}) {
     lines.push(
       loc`First Aid on ${esc(patient.name)}: wounds +${plan.woundGain} (now ${plan.wounds}), vitality +${plan.vitalityGain} (now ${plan.vitality}).`
     );
-    const healed = await healSubdual(patient, subdualRoll.total);
+    const healed =
+      patient.type === "agent"
+        ? await healSubdual(patient, subdualRoll.total)
+        : await healNpcSubdual(patient, subdualRoll.total);
     lines.push(
       healed === null
         ? loc`Subdual damage healed: ${subdualRoll.total}. Take it off the recorded total by hand.`

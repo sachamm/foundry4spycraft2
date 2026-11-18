@@ -286,6 +286,33 @@ export const GRAPPLE_BENEFITS = [
   { id: "useWeapon", needs: "pinnedOpponent" }
 ];
 
+/**
+ * The conditions a chosen grapple benefit changes (p.357): { winner: {add, remove}, loser: {add, remove} }.
+ * Benefits with no entry change no condition.
+ */
+export const GRAPPLE_BENEFIT_CONDITIONS = {
+  breakPin: { winner: { remove: ["pinned"] } },
+  escape: { winner: { remove: ["held", "pinned"] } },
+  mute: { loser: { add: ["mute"] } },
+  pin: { loser: { add: ["pinned"] } },
+  sprawl: { loser: { add: ["sprawled"] }, winner: { add: ["prone"] } },
+  throw: { loser: { add: ["sprawled"], remove: ["held", "pinned"] } }
+};
+
+/** What chosen benefits do to each side's conditions, in order: [{ side, id, active }]. */
+export function grappleBenefitChanges(benefits = []) {
+  const changes = [];
+  for (const id of benefits) {
+    if (!GRAPPLE_BENEFITS.some(benefit => benefit.id === id)) throw new Error(loc`Choose a listed grapple benefit.`);
+    for (const side of ["winner", "loser"]) {
+      const effect = GRAPPLE_BENEFIT_CONDITIONS[id]?.[side];
+      for (const condition of effect?.remove ?? []) changes.push({ side, id: condition, active: false });
+      for (const condition of effect?.add ?? []) changes.push({ side, id: condition, active: true });
+    }
+  }
+  return changes;
+}
+
 /** Names and one-line summaries of the grapple benefits, in the reader's language. */
 export function grappleBenefitText(id) {
   return {
