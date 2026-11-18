@@ -93,7 +93,7 @@ export function buildNpcTemplates(data, packs, { id, stats, skillKeys, commonCat
       _id: actorId,
       name: template.name,
       type: "npc",
-      img: "icons/svg/mystery-man.svg",
+      img: template.portrait ?? "icons/svg/mystery-man.svg",
       system: {
         npcType: "standard",
         threatLevel: data.defaultThreatLevel,
@@ -108,7 +108,7 @@ export function buildNpcTemplates(data, packs, { id, stats, skillKeys, commonCat
         name: template.name,
         actorLink: false,
         disposition: 0,
-        texture: { src: "icons/svg/mystery-man.svg" }
+        texture: { src: template.token ?? template.portrait ?? "icons/svg/mystery-man.svg" }
       },
       items: [...items, ...featItems].map(item => item._id),
       effects: [],

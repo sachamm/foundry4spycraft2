@@ -73,7 +73,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/security-guard.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/security-guard.png"
     },
     {
       "id": "police-officer",
@@ -167,7 +169,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/police-officer.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/police-officer.png"
     },
     {
       "id": "detective",
@@ -267,7 +271,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/detective.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/detective.png"
     },
     {
       "id": "bodyguard",
@@ -368,7 +374,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/bodyguard.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/bodyguard.png"
     },
     {
       "id": "soldier",
@@ -474,7 +482,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/soldier.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/soldier.png"
     },
     {
       "id": "commando",
@@ -597,7 +607,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/commando.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/commando.png"
     },
     {
       "id": "mercenary",
@@ -708,7 +720,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/mercenary.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/mercenary.png"
     },
     {
       "id": "street-tough",
@@ -774,13 +788,15 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/street-tough.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/street-tough.png"
     },
     {
       "id": "criminal-enforcer",
       "name": "Criminal Enforcer",
       "category": "Crime & Intrusion",
-      "description": "A disciplined collector who turns an employer’s demands into credible pressure.",
+      "description": "A disciplined collector who turns an employer\u2019s demands into credible pressure.",
       "behavior": "Corners a target, names the demand and demonstrates that consequences are close at hand.",
       "customization": "Specify the employer, debt or demand, permitted violence and person the enforcer refuses to harm.",
       "grades": {
@@ -863,7 +879,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/criminal-enforcer.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/criminal-enforcer.png"
     },
     {
       "id": "burglar",
@@ -947,7 +965,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/burglar.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/burglar.png"
     },
     {
       "id": "contract-killer",
@@ -1048,13 +1068,15 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/contract-killer.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/contract-killer.png"
     },
     {
       "id": "enemy-agent",
       "name": "Enemy Agent",
       "category": "Intelligence & Technical",
-      "description": "A rival service’s operative who can maintain cover while pursuing a specific objective.",
+      "description": "A rival service\u2019s operative who can maintain cover while pursuing a specific objective.",
       "behavior": "Keeps a plausible explanation ready and values the intelligence objective above a public confrontation.",
       "customization": "Choose an agency, cover identity, handler and point where cooperation becomes possible.",
       "grades": {
@@ -1156,7 +1178,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/enemy-agent.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/enemy-agent.png"
     },
     {
       "id": "analyst",
@@ -1232,7 +1256,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/analyst.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/analyst.png"
     },
     {
       "id": "hacker",
@@ -1313,7 +1339,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/hacker.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/hacker.png"
     },
     {
       "id": "scientist",
@@ -1389,7 +1417,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/scientist.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/scientist.png"
     },
     {
       "id": "medic",
@@ -1470,7 +1500,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/medic.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/medic.png"
     },
     {
       "id": "driver",
@@ -1548,7 +1580,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/driver.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/driver.png"
     },
     {
       "id": "executive",
@@ -1623,7 +1657,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/executive.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/executive.png"
     },
     {
       "id": "journalist",
@@ -1713,7 +1749,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/journalist.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/journalist.png"
     },
     {
       "id": "ordinary-civilian",
@@ -1772,7 +1810,9 @@
       "personalEffects": [
         "Appropriate everyday clothing",
         "Personal keys"
-      ]
+      ],
+      "portrait": "systems/spycraft2/assets/npcs/portraits/ordinary-civilian.png",
+      "token": "systems/spycraft2/assets/npcs/tokens/ordinary-civilian.png"
     }
   ]
 }

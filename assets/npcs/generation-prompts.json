@@ -1,0 +1,413 @@
+{
+  "tool": "OpenAI built-in image_gen.imagegen",
+  "mode": "built-in",
+  "date": "2026-11-18",
+  "style": "Original painted modern espionage portraits with matching circular tokens",
+  "images": [
+    {
+      "templateId": "security-guard",
+      "role": "Security Guard",
+      "portrait": {
+        "file": "assets/npcs/portraits/security-guard.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "8a45d213c69442d44ad5e8957ec9ec82adb486e8f34621f7f508d12a8a1f817d",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless SECURITY GUARD: a tired but attentive middle-aged Black woman with close-cropped natural hair, a sturdy build, navy private-security uniform, small blank identification badge and radio earpiece. Head-and-shoulders three-quarter portrait, eyes visible, centered face with generous room around head for a later circular crop. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. Modern civilian security, no military helmet."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/security-guard.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "645367f6acd2006f4d1e22eb4cf3d70ef1bc2855983b1e33cd1d8f9023536f82",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 366467,
+        "reference": "assets/npcs/portraits/security-guard.png"
+      }
+    },
+    {
+      "templateId": "police-officer",
+      "role": "Police Officer",
+      "portrait": {
+        "file": "assets/npcs/portraits/police-officer.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "4b3f99ffda34ea65d30a61046bb3aebfefa469385e57aa891d6b9710eef4286b",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. POLICE OFFICER: a Latino man in his thirties with short dark hair and calm focused expression, practical dark police patrol uniform and body armor, blank metal shield badge, shoulder radio. No readable insignia."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/police-officer.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "92d14b77318d9c6a5f6dbda8f674577c735b7dadb1a34fb70a11c92a62347743",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 381354,
+        "reference": "assets/npcs/portraits/police-officer.png"
+      }
+    },
+    {
+      "templateId": "detective",
+      "role": "Detective",
+      "portrait": {
+        "file": "assets/npcs/portraits/detective.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "06aa5b051ff98731befd98b50700b2d1d54c420b08083643550c31ef244f5865",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. DETECTIVE: an East Asian woman in her forties, chin-length straight dark hair, thoughtful observant eyes, slightly rumpled gray blazer over a pale shirt, discreet notebook at the edge of frame."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/detective.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "a645b8750271d3d43f8f150e4145d349d001e2a12d60ee0563d494bb554a39d3",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 371574,
+        "reference": "assets/npcs/portraits/detective.png"
+      }
+    },
+    {
+      "templateId": "bodyguard",
+      "role": "Bodyguard",
+      "portrait": {
+        "file": "assets/npcs/portraits/bodyguard.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "67fd4eaa940c860d2252d8235d30e9293a6e5188dea6d388bac254fb7278bdee",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. BODYGUARD: a tall broad-shouldered white man in his forties with close-cropped hair and a slightly weathered face, charcoal business suit, plain tie, discreet coiled earpiece, watchful composed expression."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/bodyguard.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "310812441022966f9c53ec45b2b1eba1e46d3fcbf56cfeaf547317fbb4bce8a7",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 381554,
+        "reference": "assets/npcs/portraits/bodyguard.png"
+      }
+    },
+    {
+      "templateId": "soldier",
+      "role": "Soldier",
+      "portrait": {
+        "file": "assets/npcs/portraits/soldier.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "45b6fe4bee71566cffa39043735181b77d308d78e4a275251bcf1002087dc30f",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. SOLDIER: a South Asian woman in her late twenties, dark hair tied neatly back, practical olive field uniform and tactical vest, confident attentive gaze, no helmet, no flag or insignia."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/soldier.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "6016114784f27c74ab00196cd17ca044fd75c1af37c63731e97b4d8b225aea63",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 381031,
+        "reference": "assets/npcs/portraits/soldier.png"
+      }
+    },
+    {
+      "templateId": "commando",
+      "role": "Commando",
+      "portrait": {
+        "file": "assets/npcs/portraits/commando.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "ba7f932a041e5423d019a3befb6465a08f9b848c430a2ac9bea0c7e2342727d7",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. COMMANDO: a Black man in his thirties with tightly cropped hair, lean athletic build, serious watchful expression, dark green special operations field clothing and restrained tactical equipment, no mask and no helmet."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/commando.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "3ddd17c030279f6cab5d9f9744ac0c63508ad873064ae6792e5ebc00b23bb40e",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 376097,
+        "reference": "assets/npcs/portraits/commando.png"
+      }
+    },
+    {
+      "templateId": "mercenary",
+      "role": "Mercenary",
+      "portrait": {
+        "file": "assets/npcs/portraits/mercenary.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "16be372107a62f55a48797c8059c1d90714e05042b7c7f558e04933622d56af5",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. MERCENARY: a white woman in her forties with short sandy hair, sun-weathered features and steady practical expression, faded earth-tone field jacket and worn flak vest, no insignia, no scars required."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/mercenary.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "9f06124b78d5f40b33dd4b9f6690f4f5bcf506f80b09df69959b31e49ad15e3a",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 403298,
+        "reference": "assets/npcs/portraits/mercenary.png"
+      }
+    },
+    {
+      "templateId": "street-tough",
+      "role": "Street Tough",
+      "portrait": {
+        "file": "assets/npcs/portraits/street-tough.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "ed83bcdb4b3196c0460bcf87e277aea3918b2afd11748e40cbed2301ed611b32",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. STREET TOUGH: a young white man in his twenties with a scruffy uneven haircut, wiry build, worn street jacket over a plain hoodie, wary challenging expression, no tattoos required, no weapon in frame."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/street-tough.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "9bcda30358f0dfebce3a9f5ab51d22204a6e0c4bc86d347cc17975e4e053853f",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 387912,
+        "reference": "assets/npcs/portraits/street-tough.png"
+      }
+    },
+    {
+      "templateId": "criminal-enforcer",
+      "role": "Criminal Enforcer",
+      "portrait": {
+        "file": "assets/npcs/portraits/criminal-enforcer.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "5587bde80975463b7bda5bfa8d919e2b3752974e32f7b41cc182fd019f04e10b",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. CRIMINAL ENFORCER: a stocky East Asian man in his forties with a broad face and short neat hair, dark leather jacket over an open-collar shirt, controlled intimidating expression, no weapon in frame."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/criminal-enforcer.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "48362905c38e76dc7e1bde97a3e92a20dc3d6c031367a724f9b69010fc3db93f",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 385761,
+        "reference": "assets/npcs/portraits/criminal-enforcer.png"
+      }
+    },
+    {
+      "templateId": "burglar",
+      "role": "Burglar",
+      "portrait": {
+        "file": "assets/npcs/portraits/burglar.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "e2dd12f427bf6e9fd9864df623c39873b18915ff2005b245c437d798ae4a3eb7",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. BURGLAR: a Middle Eastern woman in her late twenties, curly dark hair tucked loosely behind her ears, alert cautious expression, practical dark work jacket with a small tool pouch at the edge of the frame, no mask or goggles."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/burglar.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "4d7c884739d3d642f34c621461b0f4b20bc6c223755781f8c12c024e77e35722",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 365232,
+        "reference": "assets/npcs/portraits/burglar.png"
+      }
+    },
+    {
+      "templateId": "contract-killer",
+      "role": "Contract Killer",
+      "portrait": {
+        "file": "assets/npcs/portraits/contract-killer.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "87293f5e7230032436d5cb2924c9df4199298d7a362f31fe9aa10b55ee28d50d",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. CONTRACT KILLER: a white woman in her late thirties with a short auburn bob, ordinary understated dark travel coat over a neutral shirt, unremarkable but observant features, calm unreadable expression, no blood or visible weapon."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/contract-killer.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "4e599e2a53bed641f234f1e7a26f46c24ca473e09e51a57ec611c5d7c0ac8d77",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 378165,
+        "reference": "assets/npcs/portraits/contract-killer.png"
+      }
+    },
+    {
+      "templateId": "enemy-agent",
+      "role": "Enemy Agent",
+      "portrait": {
+        "file": "assets/npcs/portraits/enemy-agent.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "b367ddfabe26ab2e0ad22545cb7cf18e9e76034256becef22c27133450046dd8",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. ENEMY AGENT: a South Asian man in his thirties, neatly groomed dark hair and short beard, tasteful gray suit and open collar, composed persuasive expression, discreet earpiece. No national symbols."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/enemy-agent.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "702323ca5985307c1d9247e2d4af8e80c9d7a8c6fc912c46a6093e4c0c3c7354",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 382091,
+        "reference": "assets/npcs/portraits/enemy-agent.png"
+      }
+    },
+    {
+      "templateId": "analyst",
+      "role": "Analyst",
+      "portrait": {
+        "file": "assets/npcs/portraits/analyst.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "20adf042cc55515ec752e74728b3034980007dbeca2107a9a7b5c79aaab2e5a6",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. ANALYST: a Black woman in her early thirties with natural hair in a loose bun, thin rectangular glasses, thoughtful focused expression, comfortable office cardigan and blouse, an understated office professional."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/analyst.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "76eeb2203d5ec9c12d1977fce2ceb13e1c046161f354de652f10e365d96807c6",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 391422,
+        "reference": "assets/npcs/portraits/analyst.png"
+      }
+    },
+    {
+      "templateId": "hacker",
+      "role": "Hacker",
+      "portrait": {
+        "file": "assets/npcs/portraits/hacker.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "7b5d90ec0ca7c2e77e835b1f0a33bb07b7bbb8f433cc296d0b3e3b9fa07578df",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. HACKER: an East Asian nonbinary adult in their late twenties with short asymmetrical dark hair, simple clear glasses and an expressive thoughtful face, practical casual overshirt over a plain T-shirt, no cyberpunk implants or glowing electronics."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/hacker.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "55816681154057550d77cc664592cd260c7b9905795938a9197c712b10b46d8b",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 373813,
+        "reference": "assets/npcs/portraits/hacker.png"
+      }
+    },
+    {
+      "templateId": "scientist",
+      "role": "Scientist",
+      "portrait": {
+        "file": "assets/npcs/portraits/scientist.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "aa15517d26f1eeb38d6fb8f79a4f8154801bacc077a42f575514faea71bd1d41",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. SCIENTIST: a white man in his late fifties with curly gray hair and a neatly trimmed gray beard, curious thoughtful expression, white laboratory coat over a muted collared shirt, no goggles obscuring the face, no fanciful machinery."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/scientist.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "70e567bd60d0618cdeef319d0ffe892fb5cde80b29b0217f101b70a7e36d37b1",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 377967,
+        "reference": "assets/npcs/portraits/scientist.png"
+      }
+    },
+    {
+      "templateId": "medic",
+      "role": "Medic",
+      "portrait": {
+        "file": "assets/npcs/portraits/medic.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "c75142e4bff95c6d36c6b0f79308f18cd9cf582aed8b27a7184d37accdd75f4a",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. MEDIC: a Latina woman in her thirties with dark hair tied back, reassuring but focused expression, practical dark blue paramedic jacket and a small plain medical kit strap, no text or medical logos."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/medic.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "b33a6549c0981400391c52c2d50cd547a68105adafe9a1c683c3d033dac4cf57",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 384030,
+        "reference": "assets/npcs/portraits/medic.png",
+        "refinement": {
+          "prompt": "Use case: background-extraction. Precise alpha-only cleanup of this existing circular Foundry token. Keep the entire portrait, face, clothing, pose, circular charcoal border and brass rim unchanged. Remove the faint residual matte outside the circle: EVERY pixel outside the outer circular rim must be completely transparent alpha 0, particularly ALL FOUR CORNERS and the whole outer square margin. No faint gray wash, semi-transparent rectangle, checkerboard, halo, or backdrop outside the ring. Preserve the painted image inside the circle. Return the same single square PNG token with a truly transparent exterior.",
+          "inputSha256": "0b9aa2866a8386b3a362713d7eadddb9b8a555e459df2cd7160e8de3febbe9e8",
+          "inputKind": "earlier generated token for the same portrait"
+        }
+      }
+    },
+    {
+      "templateId": "driver",
+      "role": "Driver",
+      "portrait": {
+        "file": "assets/npcs/portraits/driver.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "ccdf0187e0c2fc89d06de0cdb1ab4025b1bf8f6c2c2254f10d171a2c102c8419",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. DRIVER: a Middle Eastern man in his early forties with wavy dark hair and light stubble, attentive confident expression, practical canvas driving jacket over a dark shirt, ordinary modern clothes, no racing logos."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/driver.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "efa3e76e8e0c646306bab5ea21456da3148efdd6574f3be372eae2a8c3a69c1a",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 385146,
+        "reference": "assets/npcs/portraits/driver.png"
+      }
+    },
+    {
+      "templateId": "executive",
+      "role": "Executive",
+      "portrait": {
+        "file": "assets/npcs/portraits/executive.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "4a952cfbe4a40fd83f3acf58c2e0761dead5da18cd5bba1c7be6b957e6dd95a7",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. EXECUTIVE: a Black man in his fifties with closely trimmed salt-and-pepper hair, composed calculating expression, well-tailored navy business suit and understated tie, no conspicuous luxury brand."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/executive.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "c0e32f57de449568d521340fb164859f39c3abe4408b62bc067f297457871446",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 371265,
+        "reference": "assets/npcs/portraits/executive.png"
+      }
+    },
+    {
+      "templateId": "journalist",
+      "role": "Journalist",
+      "portrait": {
+        "file": "assets/npcs/portraits/journalist.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "accf056cc440a5f4f43216598e874cf5f5fd079804dd83b4150bfa59278aa83e",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. JOURNALIST: a white woman in her early thirties with shoulder-length wavy brown hair, curious determined expression, practical field jacket over a casual shirt, a small ordinary camera strap visible, no text or logos."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/journalist.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "92303a341c033442801aaad4ba2adcfffda2ce77b753bc462f8edbd26b29051d",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 379975,
+        "reference": "assets/npcs/portraits/journalist.png"
+      }
+    },
+    {
+      "templateId": "ordinary-civilian",
+      "role": "Ordinary Civilian",
+      "portrait": {
+        "file": "assets/npcs/portraits/ordinary-civilian.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "03dc1c4bc63cbf4c97a823e0c6d97b0c1059b9053c2eebac7c01cb4ab559c679",
+        "prompt": "Use case: stylized-concept. Asset type: square character portrait for a modern espionage tabletop RPG. Create ONE original nameless character. Style: polished realistic painted editorial character illustration for a grounded spy thriller, tactile brushwork, convincing anatomy and understated professional clothing, soft cinematic light, muted neutral background, strong readable silhouette at thumbnail size. Composition: centered head-and-shoulders three-quarter portrait, eyes unobscured, generous room around head for a later circular crop. No text, lettering, logos, watermark, frame, collage, or extra people. Not a celebrity. ORDINARY CIVILIAN: an older East Asian man in his sixties, short graying hair and gentle mildly concerned expression, ordinary knit sweater over a checkered shirt, no equipment, uniform or dramatic spy accessories."
+      },
+      "token": {
+        "file": "assets/npcs/tokens/ordinary-civilian.png",
+        "width": 1254,
+        "height": 1254,
+        "sha256": "acfb5d44f39c80a041897afb16a96b6ed9d51424eb32536756c60136062751f7",
+        "prompt": "Use case: identity-preserve. Asset type: circular portrait token for Foundry VTT. Edit the reference portrait into ONE matching circular tabletop token of exactly the SAME person. Preserve face, age, hair, clothing, expression, painted style and identity. Reframe as a close head-and-shoulders crop centered inside a clean circular medallion; keep whole head, eyes and upper shoulders visible. A simple narrow dark charcoal outer ring and thin muted brass inner rim, flat crisp geometry. The portrait's neutral background remains INSIDE the circle. Everything OUTSIDE the circular ring is genuinely transparent alpha, including all four corners. The circle nearly fills the square canvas but remains fully inside it. No text, numbers, symbols, labels, watermark, extra objects or additional people. No square backdrop or simulated checkerboard. Optimize face readability at a small tabletop token size.",
+        "transparentPixels": 370197,
+        "reference": "assets/npcs/portraits/ordinary-civilian.png"
+      }
+    }
+  ]
+}
