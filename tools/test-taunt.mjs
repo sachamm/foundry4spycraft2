@@ -174,3 +174,15 @@ test("False Start: the restart step follows Table 3.1", async () => {
     ["", "round", "minute", "10 minutes", "hour", "day", "week", ""]
   );
 });
+
+test("Cleave Mastery: one cleave per drop, any number per round", async () => {
+  const { triggerUsed } = await import("../module/rules/drop-follow-up.mjs");
+  const { limitedUseAbilities } = await import("../module/rules/limited-uses.mjs");
+  const { SPYCRAFT: cfg } = await import("../module/config.mjs");
+  assert.ok(triggerUsed("M1", [{ finalAttack: { triggerMessageUuid: "M1" } }]));
+  assert.equal(triggerUsed("M2", [{ finalAttack: { triggerMessageUuid: "M1" } }]), false);
+  const limit = feats =>
+    limitedUseAbilities({ activeFeatNames: feats }, [], cfg).find(s => s.id === "cleaveBasics").limit;
+  assert.equal(limit(["Cleave Basics"]), 1);
+  assert.equal(limit(["Cleave Basics", "Cleave Mastery"]), 20);
+});

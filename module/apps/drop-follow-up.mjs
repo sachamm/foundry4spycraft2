@@ -1,6 +1,6 @@
 /** The Cleave Basics and Snap Shot controls on the Main tab (see module/rules/drop-follow-up.mjs). */
 import { postFinalAttack, finalAttackOptions, finalWeaponReady } from "./final-attack.mjs";
-import { DROP_FOLLOW_UPS, dropTriggerEligible, dropFollowUpPlan } from "../rules/drop-follow-up.mjs";
+import { DROP_FOLLOW_UPS, dropTriggerEligible, dropFollowUpPlan, triggerUsed } from "../rules/drop-follow-up.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
@@ -12,8 +12,10 @@ const triggerChoices = (actor, combat, ranged) =>
       m.visible !== false &&
       m.isContentVisible !== false &&
       (!m.blind || game.user.isGM) &&
-      dropTriggerEligible(m.flags?.spycraft2, { actorUuid: actor.uuid, combat, ranged })
+      dropTriggerEligible(m.flags?.spycraft2, { actorUuid: actor.uuid, combat, ranged }) &&
+      !triggerUsed(m.uuid, posted())
   );
+const posted = () => [...(game.messages ?? [])].map(m => m.flags?.spycraft2).filter(Boolean);
 
 export async function takeDropFollowUp(actor, key, options = {}) {
   const d = DROP_FOLLOW_UPS[key];
@@ -36,8 +38,10 @@ export async function takeDropFollowUp(actor, key, options = {}) {
       content: `<div class="spycraft2-roll-options"><p>${
         d.ranged
           ? loc`Once per round, when one of your ranged attacks leaves an opponent unconscious or dead, make one more ranged attack with the same weapon against another opponent (p.182).`
-          : loc`Once per round, when one of your melee attacks leaves an opponent unconscious or dead, make one more melee attack with the same weapon against another opponent (p.177).`
-      }</p><label>${loc`Your hit that dropped the opponent`} <select name="messageId"><option value="">${loc`Choose the recorded hit`}</option>${choices}</select></label>${standardAttackContextContent(actor)}<label><input name="droppedConfirmed" type="checkbox" /> ${loc`The GC confirms that hit left its opponent unconscious or dead`}</label><label><input name="anotherOpponentConfirmed" type="checkbox" /> ${loc`This attack targets a different opponent`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This attack follows that hit at once`}</label></div>`
+          : actor.system.activeFeatNames?.includes("Cleave Mastery")
+            ? loc`Each time one of your melee attacks leaves an opponent unconscious or dead, make one more melee attack with the same weapon against another opponent (Cleave Mastery, p.177).`
+            : loc`Once per round, when one of your melee attacks leaves an opponent unconscious or dead, make one more melee attack with the same weapon against another opponent (p.177).`
+      }${!d.ranged && actor.system.activeFeatNames?.includes("Cleave Supremacy") ? `</p><p>${loc`Cleave Supremacy: you may move 5 ft. before this attack, as long as your total movement this way stays within your Speed (p.177).`}` : ""}</p><label>${loc`Your hit that dropped the opponent`} <select name="messageId"><option value="">${loc`Choose the recorded hit`}</option>${choices}</select></label>${standardAttackContextContent(actor)}<label><input name="droppedConfirmed" type="checkbox" /> ${loc`The GC confirms that hit left its opponent unconscious or dead`}</label><label><input name="anotherOpponentConfirmed" type="checkbox" /> ${loc`This attack targets a different opponent`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This attack follows that hit at once`}</label></div>`
     });
     if (!input) return null;
   }
@@ -52,15 +56,14 @@ export async function takeDropFollowUp(actor, key, options = {}) {
       (message.blind && !game.user.isGM)
     )
       throw new Error(loc`Choose your visible recorded hit from this combat.`);
-    return {
-      message,
-      plan: dropFollowUpPlan(actor.system, now, message.flags?.spycraft2, {
-        ...input,
-        key,
-        actorUuid: actor.uuid,
-        targetUuid: opts.targetActorUuid ?? ""
-      })
-    };
+    const plan = dropFollowUpPlan(actor.system, now, message.flags?.spycraft2, {
+      ...input,
+      key,
+      actorUuid: actor.uuid,
+      targetUuid: opts.targetActorUuid ?? ""
+    });
+    if (triggerUsed(message.uuid, posted())) throw new Error(loc`That hit already earned its extra attack.`);
+    return { message, plan };
   };
   if (JSON.stringify(expertiseCombatContext(actor)) !== clock)
     throw new Error(loc`The Initiative Count changed. Review the attack again.`);

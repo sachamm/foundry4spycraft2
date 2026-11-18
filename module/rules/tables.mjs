@@ -11364,10 +11364,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:drive",
   "text": "Stunts are easier (–5 DC, –1 error), vehicle jumps go 50% farther, and your vehicle takes half falling damage."
  },
- "Horde Mastery": {
-  "rolls": "skill:athletics",
-  "text": "With a 2-to-1 advantage, you and teammates can Pummel as a half action and gain +1 to Grapple skill checks."
- },
  "Kicking Basics": {
   "rolls": "attack",
   "text": "Kicks don't lower your Initiative Count; gain a kicking stance and trick."
@@ -11403,10 +11399,6 @@ export const FEAT_REMINDERS = {
  "Steel Rain": {
   "rolls": "attack",
   "text": "Hurled weapons are drawn freely and always readied, can Burst, Cover Fire and Suppressive Fire, and are easier to stash."
- },
- "Submission Basics": {
-  "rolls": "attack",
-  "text": "Cheap Shot penalties from your unarmed hits are doubled; gain a ground-fighting stance and trick."
  },
  "Submission Moves": {
   "rolls": "attack",

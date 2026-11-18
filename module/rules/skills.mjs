@@ -19,6 +19,7 @@ import "./rank-synergy-feats.mjs";
 import { stoneColdSkillPlan } from "./stone-cold.mjs";
 import "./threaten.mjs";
 import "./taunt.mjs";
+import "./grapple-check.mjs";
 import "./bug-basics.mjs";
 import "./documentation.mjs";
 import { oneHandManeuverPlan } from "./maneuver-actions.mjs";
@@ -1175,7 +1176,11 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     ]),
     armor,
     missingFocus: !!missingFocus,
-    threat: taking ? 0 : conditionalThreat ? Math.max(1, conditionalThreat - ambush.threatIncrease) : 0,
+    threat: taking
+      ? 0
+      : conditionalThreat
+        ? Math.max(1, conditionalThreat - ambush.threatIncrease - terms.sum("threatIncrease"))
+        : 0,
     error: taking ? 0 : error,
     cap: method === "take20" && attention ? null : cap,
     blocked: blockedReasons.length > 0,

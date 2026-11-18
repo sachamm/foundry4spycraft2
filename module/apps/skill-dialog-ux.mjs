@@ -18,6 +18,8 @@ const CHECK_SECTIONS = {
   threatenOpponentName: ["threaten", "resist-threaten"],
   tauntOpponentUuid: ["taunt", "resist-taunt"],
   skillTrick: ["trip", "bull-rush", "feint"],
+  grappleAdvantageConfirmed: ["grapple", "restraint-escape"],
+  grappleGarrote: ["grapple", "restraint-escape"],
   trackingSurface: ["tracking"],
   nest: ["hide"],
   hideMovement: ["hide"],

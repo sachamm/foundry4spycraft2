@@ -1,5 +1,6 @@
 import test from "node:test";
 import { tauntSkillChecks } from "../module/rules/taunt.mjs";
+import { grappleSkillChecks } from "../module/rules/grapple-check.mjs";
 import assert from "node:assert/strict";
 import {
   RollPipeline,
@@ -361,6 +362,7 @@ const { rollPipeline } = await import("../module/rolls/index.mjs");
 
 // The order contributors run in, phase by phase. Validation order decides which failure a player is shown first.
 const EXPECTED_ORDER = [
+  "grappleContent:skill",
   "meleeFireContextContent:rangedAttack",
   "detectionObserverContent:skill",
   "feintContent:skill",
@@ -499,6 +501,7 @@ const EXPECTED_ORDER = [
   "taskPressureChecks",
   "threatenChecks",
   "tauntChecks",
+  "grappleChecks",
   "feintChecks",
   "tripDefenseChecks",
   "tripAttackChecks",
@@ -551,6 +554,7 @@ const EXPECTED_ORDER = [
   "spiderSkillTerm",
   "containmentSkillTerm",
   "skillTrickSkillTerm",
+  "grappleSkillTerm",
   "conveyanceBullRushSkillTerm",
   "bullRushAttackSkillTerm",
   "bullRushDefenseSkillTerm",
@@ -740,11 +744,14 @@ test("named skill checks match the original fixed composition for every skill", 
               key,
               feintSkillChecks(
                 key,
-                tauntSkillChecks(
+                grappleSkillChecks(
                   key,
-                  threatenSkillChecks(
+                  tauntSkillChecks(
                     key,
-                    taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
+                    threatenSkillChecks(
+                      key,
+                      taskPressureSkillChecks(actor.system, key, restraintSkillChecks(actor.system, key, base))
+                    )
                   )
                 )
               )

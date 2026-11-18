@@ -252,7 +252,8 @@ export function limitedUseAbilities(system, items, cfg) {
         id: key,
         name: loc`${d.name} (extra attack after a drop)`,
         period: "round",
-        limit: 1,
+        // Cleave Mastery (p.177): any number of cleave attacks per round, one for each opponent dropped.
+        limit: key === "cleaveBasics" && system.activeFeatNames?.includes("Cleave Mastery") ? 20 : 1,
         workflow: key,
         combatScoped: true,
         manualReviewable: true,

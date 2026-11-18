@@ -188,10 +188,13 @@ export function conditionRollPenalties(system) {
     bound = system.conditionContext?.bound === true,
     entangled = bound || system.conditionContext?.entangled === true,
     value = sickened ? -2 : 0;
-  const sprawled =
+  // Prone Stance (Submission Basics, p.188): anything that would leave the character sprawled leaves them prone.
+  const proneStance = system.combatStance?.key === "prone" && system.activeFeatNames?.includes("Submission Basics"),
+    sprawledRaw =
       system.conditionContext?.sprawled === true ||
       (system.attributeCollapse ?? attributeCollapsePlan(system)).conditions.includes("Sprawled"),
-    prone = system.conditionContext?.prone === true;
+    sprawled = sprawledRaw && !proneStance,
+    prone = system.conditionContext?.prone === true || (sprawledRaw && proneStance);
   return {
     sprawled,
     prone,

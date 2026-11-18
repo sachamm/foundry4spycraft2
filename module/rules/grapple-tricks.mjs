@@ -40,6 +40,13 @@ export const GRAPPLE_TRICKS = Object.freeze([
       loc`Sleeper Hold: free action; an opponent you hold or pin makes a Fortitude save, DC 15 + 1 per consecutive round of use, or sleeps for 1d6 + ${strMod(system)} minutes.`
   },
   {
+    id: "snap",
+    feat: "Submission Basics",
+    page: 188,
+    text: () =>
+      loc`Snap!: when your unarmed damage hits an opponent you pin, try to break a limb of your choice; they make a Fortitude save (DC 10 + half the damage) or suffer a broken limb critical injury (p.332).`
+  },
+  {
     id: "boneGrind",
     feat: "Submission Moves",
     page: 188,

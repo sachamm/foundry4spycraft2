@@ -261,10 +261,12 @@ export const RECORD_SHAPES = {
         resolution: "string"
       },
       choice: "string",
+      doubled: "boolean",
       lastSaveAt: "null|number",
       madeAt: "number",
       recovered: "boolean",
       recoveryMessage: "string",
+      repeat: "boolean",
       scene: "string",
       sourceMessage: "string",
       version: "number"

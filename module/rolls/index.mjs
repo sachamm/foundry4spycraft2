@@ -79,6 +79,7 @@ import "../rules/finesse.mjs";
 import "../rules/firearms.mjs";
 import "../rules/forensic-genius.mjs";
 import "../rules/gear-checks.mjs";
+import "../rules/grapple-check.mjs";
 import "../rules/gripping-stance.mjs";
 import "../rules/hard-core.mjs";
 import "../rules/hazards.mjs";

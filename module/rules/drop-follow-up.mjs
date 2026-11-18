@@ -90,6 +90,10 @@ export function dropFollowUpPlan(
   };
 }
 
+/** Whether a hit already set off a follow-up attack (each drop earns one). */
+export const triggerUsed = (messageUuid, posted = []) =>
+  !!messageUuid && posted.some(c => c?.finalAttack?.triggerMessageUuid === messageUuid && !c.superseded);
+
 export function dropFollowUpNote(finalAttack) {
   const d = DROP_FOLLOW_UPS[finalAttack?.source];
   return d
