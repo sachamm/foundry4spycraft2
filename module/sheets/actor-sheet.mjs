@@ -43,6 +43,15 @@ import { reviewDamageLedger, applyAccumulatedDamage } from "../apps/damage-ledge
 import { checkAccumulatedDamage } from "../apps/accumulated-damage.mjs";
 import { settleGrapple } from "../apps/combat-actions.mjs";
 import {
+  acidStep,
+  endSurvivalHazard,
+  endTypedExposure,
+  exposureFailedSave,
+  sufferTypedDamage,
+  survivalSave
+} from "../apps/damage-types.mjs";
+import { cancelReady, coupDeGraceSave, recordAnticipate, standOff, tireResult } from "../apps/combat-options.mjs";
+import {
   burningRound,
   cureHazard,
   exposeToContagion,
@@ -424,6 +433,39 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       settleGrapple() {
         return settleGrapple(this.actor);
+      },
+      sufferTypedDamage() {
+        return sufferTypedDamage(this.actor);
+      },
+      survivalSave() {
+        return survivalSave(this.actor);
+      },
+      acidStep(event, target) {
+        return acidStep(this.actor, target.dataset.step);
+      },
+      exposureFailedSave() {
+        return exposureFailedSave(this.actor);
+      },
+      endTypedExposure() {
+        return endTypedExposure(this.actor);
+      },
+      endSurvivalHazard(event, target) {
+        return endSurvivalHazard(this.actor, target.dataset.kind);
+      },
+      recordAnticipate() {
+        return recordAnticipate(this.actor);
+      },
+      standOff() {
+        return standOff(this.actor);
+      },
+      tireResult() {
+        return tireResult(this.actor);
+      },
+      coupDeGraceSave() {
+        return coupDeGraceSave(this.actor);
+      },
+      cancelReady() {
+        return cancelReady(this.actor);
       },
       rollContagionSave(event, target) {
         return rollContagionSave(this.actor, target.dataset.id);

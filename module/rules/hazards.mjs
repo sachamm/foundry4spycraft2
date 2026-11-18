@@ -90,7 +90,7 @@ export function dosePenalty(doses) {
   return extra ? -Math.min(DOSE_PENALTY_LIMIT, extra) : 0;
 }
 
-const empty = () => ({ contagions: {}, recovered: [], fire: null });
+const empty = () => ({ contagions: {}, recovered: [], fire: null, acid: null, exposure: null, survival: {} });
 
 /** A character's hazards with every part present. */
 export function hazardState(system) {
@@ -98,7 +98,13 @@ export function hazardState(system) {
   return {
     contagions: { ...(stored?.contagions ?? {}) },
     recovered: [...(stored?.recovered ?? [])],
-    fire: stored?.fire ? { ...stored.fire } : null
+    fire: stored?.fire ? { ...stored.fire } : null,
+    // Other damage types and survival saves (module/rules/damage-types.mjs).
+    acid: stored?.acid ? { ...stored.acid } : null,
+    exposure: stored?.exposure
+      ? { ...stored.exposure, injuriesChecked: [...(stored.exposure.injuriesChecked ?? [])] }
+      : null,
+    survival: { ...(stored?.survival ?? {}) }
   };
 }
 
@@ -337,7 +343,10 @@ rollPipeline.register({
       rowAt: 110,
       rows: [
         [loc`Extra doses`, save.dosePenalty ?? 0],
-        [loc`Sealed suit`, save.suitBonus ?? 0]
+        [loc`Sealed suit`, save.suitBonus ?? 0],
+        // A hazard's own situational modifier (movement before an explosion, half actions given up to acid, armor
+        // against heat), labelled by the rule that set it.
+        ...(Number(save.bonus) ? [[String(save.bonusLabel ?? loc`Hazard modifier`), Number(save.bonus)]] : [])
       ],
       flavorAt: 45,
       flavor: loc` — ${save.label} DC${Number(save.dc)}`,

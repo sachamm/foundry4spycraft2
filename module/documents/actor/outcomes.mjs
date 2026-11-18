@@ -36,6 +36,7 @@ import { queueResources } from "../../rules/transactions.mjs";
 import { finishGearAcquisition } from "../../apps/gear-acquisition.mjs";
 import { gcDiceStatus, spendGCDice, gcDiceController, refreshGCDiceTransaction } from "../../rules/gc-dice.mjs";
 import { criticalPlan } from "../../rules/criticals.mjs";
+import { applyCriticalChoice, criticalHitChoices, criticalMissChoices } from "../../rules/critical-effects.mjs";
 import {
   checkCandidates,
   errorDecisionPending,
@@ -47,6 +48,19 @@ import { rerollEligibility } from "../../rules/limited-uses.mjs";
 import { betterLuckSettlement, betterLuckNote } from "../../rules/better-luck.mjs";
 import { actionDieBoostPlan, actionDieBoostResult, generousBoostPlan } from "../../rules/action-dice.mjs";
 import { loc } from "../../i18n.mjs";
+
+/** The ready-made attack effects for the critical activation dialog: Table 5.4 for errors, p.329 for threats. */
+function criticalPresetContent(check) {
+  const esc = foundry.utils.escapeHTML,
+    group = (label, choices) =>
+      choices.length
+        ? `<optgroup label="${esc(label)}">${choices.map(c => `<option value="${esc(c.id)}">${esc(loc`${c.cost} die/dice — ${c.label}`)}</option>`).join("")}</optgroup>`
+        : "";
+  const hits = check.threatConfirmed ? criticalHitChoices(check) : [],
+    misses = check.errorConfirmed ? criticalMissChoices(check) : [];
+  if (!hits.length && !misses.length) return "";
+  return `<label>${loc`Ready-made effect (sets the effect and base cost; match it to the result chosen above)`} <select name="preset"><option value="">${loc`None — describe the effect below`}</option>${group(loc`Critical hit`, hits)}${group(loc`Critical miss (one per error; needs the listed error range)`, misses)}</select></label>`;
+}
 
 export const ActorOutcomes = Base =>
   class ActorOutcomes extends Base {
@@ -678,7 +692,8 @@ export const ActorOutcomes = Base =>
           .join("")}</details>
         <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1cost, minimum0; one Chance-based session use)`}</label>
         <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
-        <label>${loc`Critical effect`} <textarea name="effect" required></textarea></label>
+        ${criticalPresetContent(check)}
+        <label>${loc`Critical effect`} <textarea name="effect"></textarea></label>
         <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
         <label><input type="checkbox" name="beforeDamage" /> ${loc`Critical hit: damage has not been rolled`}</label>
         <label><input type="checkbox" name="opponent" /> ${loc`Failure payer is an opponent`}</label>
@@ -698,6 +713,11 @@ export const ActorOutcomes = Base =>
               }))
           ])
           .filter(p => p.count);
+      }
+      try {
+        input = applyCriticalChoice(message.flags.spycraft2, input);
+      } catch (error) {
+        return ui.notifications.warn(error.message);
       }
       const useGC = input.kind === "failure" && (input.payerId === "gc" || input.payer === "gc");
       if (useGC && !game.user?.isGM) return ui.notifications.warn(loc`Only the GC can spend the GC pool.`);
