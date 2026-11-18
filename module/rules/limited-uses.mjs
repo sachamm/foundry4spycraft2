@@ -262,6 +262,17 @@ export function limitedUseAbilities(system, items, cfg) {
   for (const spec of chanceReactionSpecs(system)) add(spec);
   const brawling = brawlingSupremacySpec(system);
   const handOfGod = handOfGodSpec(system);
+  if (system.activeFeatNames?.includes("Spirit Moves"))
+    add({
+      id: "shatterWeapon",
+      name: loc`Shatter Weapon (Smash an attacker’s weapon in Total Defense)`,
+      period: "round",
+      limit: 1,
+      workflow: "shatterWeapon",
+      combatScoped: true,
+      manualReviewable: true,
+      hidden: true
+    });
   if (handOfGod) add(handOfGod);
   if (brawling) add(brawling);
   const fireTeam = fireTeamSupremacySpec(system);

@@ -98,3 +98,10 @@ test("Intense Stance: a round without attacks, then +2 melee attack and damage",
   assert.equal(intenseDamage(sys, { proficiency: "exoticBlunt", range: 0 }), 2);
   assert.equal(intenseDamage(sys, { proficiency: "rifle", range: 100 }), 0);
 });
+
+test("Sweep: a lost Trip leaves no flat-footed unless it was a critical failure, which grants no counter-Trip", async () => {
+  const { tripOutcomePlan } = await import("../module/rules/trip-outcomes.mjs");
+  const plan = tripOutcomePlan.toString();
+  assert.match(plan, /sweep && a\.criticalFailure !== true \? null : "flat-footed"/);
+  assert.match(plan, /a\.criticalFailure === true && !sweep/);
+});

@@ -106,3 +106,59 @@ test("Stone Cold stacks +1 Intimidate per confirmed drop this combat, to +4; Gli
   assert.equal(woundDropEligible({ activeFeatNames: [] }, hit), false);
   assert.equal(woundDropEligible(sys, { ...hit, woundDrop: true }), false);
 });
+
+test("One Warning lets a Spirit Moves character Threaten an uninjured target", async () => {
+  const { threatenCheckPlan } = await import("../module/rules/threaten.mjs");
+  const combat = { id: "c", started: true, round: 1, turn: 0, combatantId: "own", ownTurnIndex: 0 };
+  const input = extra => ({
+    threatenOpponentName: "Vex",
+    threatenOpponentConfirmed: true,
+    threatenContextConfirmed: true,
+    threatenDistanceFeet: 10,
+    threatenCombat: combat,
+    ...extra
+  });
+  const sys = feats => ({ activeFeatNames: feats, cqbRange: 30, readiedRangedWeapons: [] });
+  const check = { id: "threaten" };
+  assert.match(
+    threatenCheckPlan(sys([]), "intimidate", check, input({ threatenOneWarning: true })).blockedReason,
+    /lost5vitality/
+  );
+  const plan = threatenCheckPlan(sys(["Spirit Moves"]), "intimidate", check, input({ threatenOneWarning: true }));
+  assert.equal(plan.blockedReason, "");
+  assert.equal(plan.evidence.target.oneWarning, true);
+  assert.match(plan.notes[0], /One Warning/);
+  const { shatterWeaponEligible } = await import("../module/apps/shatter-weapon.mjs");
+  const def = { activeFeatNames: ["Spirit Moves"], totalDefenseState: { active: true } };
+  assert.ok(shatterWeaponEligible(def, { checkKind: "attack", resolved: true }));
+  assert.equal(shatterWeaponEligible(def, { checkKind: "attack", resolved: true, ranged: true }), false);
+});
+
+test("Snake Strike: once per opponent per combat with an unused weapon; one sneak die on its next hit this round", async () => {
+  const { snakeStrikePlan, snakeStrikeOpen } = await import("../module/rules/snake-strike.mjs");
+  const { sneakAttackSources } = await import("../module/rules/sneak-attack.mjs");
+  const sys = { activeFeatNames: ["Snake Strike"], snakeStrikes: [] };
+  const combat = { id: "c", started: true, round: 2 };
+  const args = { targetUuid: "Actor.t", weaponId: "w", weaponUuid: "Item.w", feintWonConfirmed: true };
+  const record = { ...snakeStrikePlan(sys, combat, args), id: "S1" };
+  assert.throws(
+    () =>
+      snakeStrikePlan(sys, combat, {
+        ...args,
+        posted: [{ checkKind: "attack", weaponUuid: "Item.w", rollCombat: { id: "c" } }]
+      }),
+    /not used yet/
+  );
+  const after = { ...sys, snakeStrikes: [record] };
+  assert.throws(() => snakeStrikePlan(after, combat, args), /already used against this opponent/);
+  const open = q => snakeStrikeOpen(after, { combatId: "c", round: 2, weaponId: "w", targetUuid: "Actor.t", ...q });
+  assert.equal(open({}).id, "S1");
+  assert.equal(open({ round: 3 }), null);
+  assert.equal(open({ posted: [{ checkKind: "damage", snakeStrike: "S1" }] }), null);
+  const rows = sneakAttackSources(
+    { activeFeatNames: [] },
+    { proficiency: "rifle", range: 100 },
+    { trickSneak: { source: "Snake Strike", dice: 1 } }
+  );
+  assert.deepEqual(rows.find(r => r.source === "Snake Strike")?.dice, 1);
+});

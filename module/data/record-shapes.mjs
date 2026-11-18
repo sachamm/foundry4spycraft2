@@ -320,6 +320,16 @@ export const RECORD_SHAPES = {
     tier: "string",
     version: "number"
   },
+  snakeStrikes: [
+    {
+      combatId: "string",
+      id: "string",
+      round: "number",
+      targetUuid: "string",
+      version: "number",
+      weaponId: "string"
+    }
+  ],
   woundDrops: {
     $also: "null",
     combatId: "string",

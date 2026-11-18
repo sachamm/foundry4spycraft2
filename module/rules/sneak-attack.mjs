@@ -23,8 +23,14 @@ export function sneakAttackSources(
   add("Scout Sneak Attack", Math.max(scout, borrowed ? 1 : 0));
   if (sideStanceDie === true) add("Side Stance", 1);
   if (trickSneak) {
-    if (trickSneak.source !== "Between the Ribs" || trickSneak.dice !== 1 || unarmed(weapon) || !melee(weapon))
-      throw new Error(loc`Review the recorded melee trick sneak attack die.`);
+    // Snake Strike (p.183) adds its die with any weapon; Between the Ribs only with a melee, non-unarmed weapon.
+    const snake = trickSneak.source === "Snake Strike";
+    if (
+      (!snake && trickSneak.source !== "Between the Ribs") ||
+      trickSneak.dice !== 1 ||
+      (!snake && (unarmed(weapon) || !melee(weapon)))
+    )
+      throw new Error(loc`Review the recorded trick sneak attack die.`);
     add(trickSneak.source, trickSneak.dice);
   }
   for (const name of ["Ambush Basics", "Ambush Supremacy"]) if (has(system, name)) add(name, 1);

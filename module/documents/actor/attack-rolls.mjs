@@ -1,4 +1,5 @@
 /** Attacks and damage. */
+import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
 import { reachIncreaseFeet } from "../../rules/reach.mjs";
@@ -650,6 +651,21 @@ export const ActorAttackRolls = Base =>
           ? options.targetActorUuid
           : (options.targetActor?.uuid ?? targetChoices.selected),
         targetActor = await resolveDamageTarget(targetUuid);
+      // Snake Strike: the drawn weapon's next hit this round on the Feinted opponent adds 1 sneak attack die.
+      const snakeStrike =
+        options.snakeStrike === true && options.includeSneakAttack === true
+          ? snakeStrikeOpen(this.system, {
+              combatId: this.participatingCombat?.id,
+              round: this.participatingCombat?.round,
+              weaponId: item.id,
+              targetUuid: targetActor?.uuid ?? "",
+              posted: [...(game.messages ?? [])].map(m => m.flags?.spycraft2).filter(Boolean)
+            })
+          : null;
+      if (options.snakeStrike === true && options.includeSneakAttack === true && !snakeStrike)
+        throw new Error(
+          loc`No open Snake Strike for this weapon and target this round. Record it from the Main tab after the Feint.`
+        );
       const sneak = sneakAttackDamagePlan(
           this.system,
           { ...item.system, range: this.weaponAttack(item, options).range },
@@ -659,7 +675,9 @@ export const ActorAttackRolls = Base =>
             trickSneak:
               options.includeSneakAttack === true && attackDamageBenefit?.sneakDice
                 ? { source: attackDamageBenefit.sneakSource, dice: attackDamageBenefit.sneakDice }
-                : null,
+                : snakeStrike
+                  ? { source: "Snake Strike", dice: 1 }
+                  : null,
             whirlingFlankingProof: whirlingAttackProof(this, {
               targetFlanked: options.targetFlanked,
               targetActorUuid: targetActor?.uuid
@@ -697,6 +715,7 @@ export const ActorAttackRolls = Base =>
         styleOverCaliber: options.styleOverCaliber === true,
         kick: options.kick === true,
         hordeSupremacy: options.hordeSupremacy === true,
+        ...(snakeStrike && sneak.active ? { snakeStrike: snakeStrike.id } : {}),
         kickTrick: options.kickTrick ?? null,
         doubleJab: options.doubleJab === true,
         brush: options.brush === true,

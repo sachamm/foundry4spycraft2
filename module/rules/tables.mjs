@@ -11360,10 +11360,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:drive",
   "text": "Stunts are easier (–5 DC, –1 error), vehicle jumps go 50% farther, and your vehicle takes half falling damage."
  },
- "Kicking Basics": {
-  "rolls": "attack",
-  "text": "Kicks don't lower your Initiative Count; gain a kicking stance and trick."
- },
  "Mingling Mastery": {
   "rolls": "skill:blend",
   "text": "Halved Stealth penalties for moving or speaking, no Disposition tag, and you're invisible in crowds of 500+."
@@ -11387,10 +11383,6 @@ export const FEAT_REMINDERS = {
  "Spider Supremacy": {
   "rolls": "skill:athletics",
   "text": "Climb at full Speed, don't need extra checks when hurt while climbing, and climbing with a kit is easier."
- },
- "Spirit Moves": {
-  "rolls": "attack",
-  "text": "Gain tricks such as intimidating warnings and shattering weapons."
  },
  "Steel Rain": {
   "rolls": "attack",

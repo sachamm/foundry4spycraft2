@@ -4,6 +4,10 @@ import { tripOutcomePlan } from "../rules/trip-outcomes.mjs";
 import { queueResources } from "../rules/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
+
+/** Sweep (Kicking Basics): whether the attacking character has the feat. */
+const sweepFor = uuid =>
+  globalThis.fromUuidSync?.(uuid)?.system?.activeFeatNames?.includes("Kicking Basics") === true;
 import { endCombatStance } from "./combat-stance.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";
@@ -50,7 +54,8 @@ function savedOutcome(a, d) {
       tieResolvedConfirmed: r.tieResolved,
       allowCriticalAttackerWin: [2, 4].includes(r.version),
       allowCriticalCounter: [3, 4].includes(r.version),
-      activeCombatantId: a.flags.spycraft2.tripAttack?.counterTrip?.activeCombatantId
+      activeCombatantId: a.flags.spycraft2.tripAttack?.counterTrip?.activeCombatantId,
+      sweep: sweepFor(a.flags.spycraft2.actorUuid)
     });
     if (
       Object.entries(plan).some(([k, v]) => stable(r[k]) !== stable(v)) ||
@@ -98,7 +103,7 @@ export async function settleTripOutcome(actor, a, d, input = {}) {
           effect = [...t.effects].find(
             e => e.flags?.spycraft2?.conditionOperation === saved.operationId && e.statuses.has(saved.condition)
           );
-        if (!saved.wasCondition && !effect)
+        if (saved.condition && !saved.wasCondition && !effect)
           throw Error(
             loc`The interrupted Trip condition needs explicit GC review; it may already have ended. Do not refresh it automatically.`
           );
@@ -112,7 +117,8 @@ export async function settleTripOutcome(actor, a, d, input = {}) {
           tieResolvedConfirmed: input.tieResolvedConfirmed,
           allowCriticalAttackerWin: true,
           allowCriticalCounter: true,
-          activeCombatantId: tripActiveCombatantId(actor)
+          activeCombatantId: tripActiveCombatantId(actor),
+          sweep: sweepFor(actor.uuid)
         }),
         t = plan.conditionActorUuid === actor.uuid ? actor : opponent,
         prepared = {
@@ -122,16 +128,20 @@ export async function settleTripOutcome(actor, a, d, input = {}) {
           sourceEvidence: evidence(a, d),
           operationId: "trip-" + foundry.utils.randomID(),
           wasCondition:
-            t.statuses.has(plan.condition) || (plan.condition === "flat-footed" && t.statuses.has("flatFooted")),
+            !!plan.condition &&
+            (t.statuses.has(plan.condition) || (plan.condition === "flat-footed" && t.statuses.has("flatFooted"))),
           state: "prepared"
         };
       // Persist both reservations before the external effect. An uncertain interrupted effect requires GC review.
       for (const m of [a, d]) await m.update({ "flags.spycraft2.tripSettlement": prepared });
-      const effect = await setConditionStatus(t, plan.condition, true, {
-        label: plan.condition === "sprawled" ? loc`Sprawled` : loc`Flat-footed`,
-        aliases: plan.condition === "flat-footed" ? ["flatFooted"] : [],
-        operationId: prepared.operationId
-      });
+      // Sweep can leave the losing attacker with no condition at all.
+      const effect = plan.condition
+        ? await setConditionStatus(t, plan.condition, true, {
+            label: plan.condition === "sprawled" ? loc`Sprawled` : loc`Flat-footed`,
+            aliases: plan.condition === "flat-footed" ? ["flatFooted"] : [],
+            operationId: prepared.operationId
+          })
+        : { changed: false };
       if (plan.condition === "sprawled") await finishSprawledExit(t);
       return stamp(a, d, prepared, {
         conditionChanged: effect.changed,
@@ -156,7 +166,7 @@ export async function reviewTripOutcome(actor, a, d, { confirmed = false, resolu
       if (!saved || saved.state !== "prepared") throw Error(loc`Choose a matching interrupted prepared Trip pair.`);
       const t = saved.conditionActorUuid === actor.uuid ? actor : opponent;
       let effect = { changed: false };
-      if (resolution === "applyPending")
+      if (resolution === "applyPending" && saved.condition)
         effect = await setConditionStatus(t, saved.condition, true, {
           operationId: saved.operationId,
           aliases: saved.condition === "flat-footed" ? ["flatFooted"] : []
