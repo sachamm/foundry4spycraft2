@@ -18,6 +18,38 @@ const type = id => {
   return found;
 };
 
+/**
+ * Chase feats the tracker carries out (pp.192–193). Each side records which of them its participant has.
+ * - Jackrabbit Start (Prey) / Relentless Pursuit (Predator), chase or manhunt: starting Lead ±2 in their favour, and
+ *   every Strategy offers them the Lead Advantage.
+ * - Daredevil, chase: Strategies are chosen as if Acceleration and Turning were 2 higher, and Stunt is open.
+ * - Defensive Driving (Prey Strategies) / Offensive Driving (Predator Strategies), chase: the Strategy's penalty is
+ *   halved, rounded down. Each also has a once-per-chase use, recorded with `useConflictFeat`.
+ * - Photo Finish, chase: the side lowers its own Acceleration and Turning by 2, and every other participant's by 2.
+ */
+export const CONFLICT_FEATS = Object.freeze([
+  "Jackrabbit Start",
+  "Relentless Pursuit",
+  "Daredevil",
+  "Defensive Driving",
+  "Offensive Driving",
+  "Photo Finish"
+]);
+const has = (conflict, side, feat) => (conflict[side]?.feats ?? []).includes(feat);
+const LEAD_FEATS = { prey: "Jackrabbit Start", predator: "Relentless Pursuit" };
+const leadFeat = (conflict, side) =>
+  ["chase", "manhunt"].includes(conflict.type) && has(conflict, side, LEAD_FEATS[side]);
+
+/** A side's ratings with Photo Finish reductions applied. */
+export function conflictRatings(conflict, side) {
+  const ratings = { ...(conflict[side]?.ratings ?? {}) },
+    drop = 2 * (conflict.photoFinish ?? 0);
+  if (drop)
+    for (const key of ["Acceleration", "Turning"])
+      if (key in ratings) ratings[key] = Math.max(0, (ratings[key] ?? 0) - drop);
+  return ratings;
+}
+
 /** Starting Lead from the type's printed rule: the listed default unless the GC picks one of its conditional values. */
 export function startConflict(typeId, { lead = null, predator = {}, prey = {}, name = "" } = {}) {
   const rules = type(typeId);
@@ -30,11 +62,12 @@ export function startConflict(typeId, { lead = null, predator = {}, prey = {}, n
     name: data.name ?? "",
     actorUuid: data.actorUuid ?? null,
     ratings: { ...(data.ratings ?? {}) },
+    feats: (data.feats ?? []).filter(feat => CONFLICT_FEATS.includes(feat)),
     strategy: null,
     result: null,
     critical: null
   });
-  return {
+  const conflict = {
     version: 1,
     type: typeId,
     name: name || rules.name,
@@ -47,13 +80,22 @@ export function startConflict(typeId, { lead = null, predator = {}, prey = {}, n
     history: [],
     carry: {}
   };
+  // Jackrabbit Start raises the starting Lead by 2, Relentless Pursuit lowers it by 2; it stays inside the track.
+  const shift = (leadFeat(conflict, "prey") ? 2 : 0) - (leadFeat(conflict, "predator") ? 2 : 0);
+  if (shift) {
+    conflict.lead = Math.min(C.leadMax - 1, Math.max(C.leadMin + 1, start + shift));
+    conflict.startingLeadFeats = { before: start, shift };
+  }
+  return conflict;
 }
 
 /** Strategies a side may choose now. Requirements the tracker cannot verify are returned as `other` for the GC. */
 export function availableStrategies(conflict, side) {
   if (!SIDES.includes(side)) throw new Error(loc`Choose Predator or Prey.`);
   const rules = type(conflict.type),
-    ratings = conflict[side].ratings ?? {};
+    daredevil = conflict.type === "chase" && has(conflict, side, "Daredevil"),
+    ratings = conflictRatings(conflict, side);
+  if (daredevil) for (const key of ["Acceleration", "Turning"]) ratings[key] = (ratings[key] ?? 0) + 2;
   return rules.strategies
     .filter(strategy => strategy.side === "general" || strategy.side === side)
     .map(strategy => {
@@ -70,7 +112,9 @@ export function availableStrategies(conflict, side) {
             needs.map(need => `${need.rating} ${need.min}+`).join(strategy.ratingsMode === "all" ? " and " : " or ")
           );
       }
-      return { ...strategy, available: reasons.length === 0, reasons, confirm: strategy.other || "" };
+      // Daredevil supplies the Stunt Strategy's feat requirement.
+      const confirm = daredevil && strategy.id === "stunt" ? "" : strategy.other || "";
+      return { ...strategy, available: reasons.length === 0, reasons, confirm };
     });
 }
 
@@ -89,10 +133,16 @@ export function chooseStrategy(conflict, side, strategyId, { confirmOther = fals
   return next;
 }
 
-/** The Strategy's printed modifier to that side's opposed skill check. */
+/** The Strategy's printed modifier to that side's opposed skill check, after Defensive or Offensive Driving. */
 export function strategyModifier(conflict, side) {
-  const strategy = type(conflict.type).strategies.find(entry => entry.id === conflict[side].strategy);
-  return strategy?.modifier ?? 0;
+  const strategy = type(conflict.type).strategies.find(entry => entry.id === conflict[side].strategy),
+    printed = strategy?.modifier ?? 0;
+  const halves =
+    conflict.type === "chase" &&
+    printed < 0 &&
+    ((strategy.side === "prey" && has(conflict, side, "Defensive Driving")) ||
+      (strategy.side === "predator" && has(conflict, side, "Offensive Driving")));
+  return halves ? -Math.floor(-printed / 2) : printed;
 }
 
 /**
@@ -132,9 +182,10 @@ export function advantageOptions(conflict) {
   if (!conflict.pending) return [];
   const rules = type(conflict.type),
     strategy = rules.strategies.find(entry => entry.id === conflict[conflict.pending.winner].strategy);
-  const names = strategy?.advantages ?? [];
+  const names = strategy?.advantages ?? [],
+    alwaysLead = leadFeat(conflict, conflict.pending.winner);
   return rules.advantages.filter(advantage =>
-    names.includes("*") ? !advantage.victory : names.includes(advantage.name)
+    names.includes("*") ? !advantage.victory : names.includes(advantage.name) || (alwaysLead && advantage.id === "lead")
   );
 }
 
@@ -228,6 +279,31 @@ export function nextRound(conflict) {
   next.step = "strategies";
   for (const side of SIDES) Object.assign(next[side], { strategy: null, result: null, critical: null });
   return next;
+}
+
+/** Photo Finish: the side lowers its own Acceleration and Turning by 2, and each other participant's by 2. */
+export function photoFinish(conflict, side) {
+  if (!SIDES.includes(side)) throw new Error(loc`Choose Predator or Prey.`);
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
+  if (conflict.type !== "chase" || !has(conflict, side, "Photo Finish"))
+    throw new Error(loc`Photo Finish needs a chase participant with the feat.`);
+  return { ...structuredClone(conflict), photoFinish: (conflict.photoFinish ?? 0) + 1 };
+}
+
+const ONCE_PER_CHASE = {
+  "Defensive Driving": () => loc`forces 1 opponent to suffer the effects of a Crisis Advantage`,
+  "Offensive Driving": () => loc`ignores 1 Crisis without a skill check or save`
+};
+/** Defensive or Offensive Driving's once-per-chase use; the effect itself is resolved at the table. */
+export function useConflictFeat(conflict, side, feat) {
+  if (!SIDES.includes(side)) throw new Error(loc`Choose Predator or Prey.`);
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
+  if (conflict.type !== "chase" || !Object.hasOwn(ONCE_PER_CHASE, feat) || !has(conflict, side, feat))
+    throw new Error(loc`That side has no once-per-chase use of this feat.`);
+  if (conflict.featUses?.[side]?.includes(feat)) throw new Error(loc`${feat} was already used this chase.`);
+  const next = structuredClone(conflict);
+  next.featUses = { ...(next.featUses ?? {}), [side]: [...(next.featUses?.[side] ?? []), feat] };
+  return { next, note: `${feat}: ${ONCE_PER_CHASE[feat]()}.` };
 }
 
 /** A side may concede at any time: the opponent applies its Victory result. */

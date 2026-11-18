@@ -401,24 +401,24 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Demolition Derby | 192 | No | Manual/descriptive | — |
 | Death Ride | 192 | No | Manual/descriptive | — |
 | Bail Out! | 191 | No | Manual/descriptive | — |
-| Daredevil | 192 | No | Manual/descriptive | — |
+| Daredevil | 192 | No | Covered (batch 383): Strategy rating requirements are checked with Acceleration and Turning +2; Stunt needs no GC confirmation | Native Foundry QA not claimed |
 | Crew Dog | 191 | No | Manual/descriptive | — |
 | Lane Dancer | 192 | No | Manual/descriptive | — |
 | Mount Up | 192 | No | Manual/descriptive | — |
-| Photo Finish | 193 | No | Manual/descriptive | — |
+| Photo Finish | 193 | No | Covered (batch 383): every participant’s Acceleration and Turning drop by 2 per use, kept through rating refreshes | Native Foundry QA not claimed |
 | Wave Runner | 193 | No | Breath allowance executes; vehicle maneuvering/Crisis benefits manual | — |
 | Wind Rider | 193 | No | Manual/descriptive | — |
 | Dash | 192 | No | Manual/descriptive | — |
 | Sprint | 193 | No | Verified complete: +10 ft. Speed with earned Dash prerequisite | Batch229; duplicate/source removal, single halving and independent Fleet/class interaction verified; Dash effects remain separately open |
-| Defensive Driving | 192 | No | Manual/descriptive | — |
-| Jackrabbit Start | 192 | No | Manual/descriptive | — |
+| Defensive Driving | 192 | No | Covered (batch 383): Prey Strategy penalties halved (rounded down); once-per-chase forced Crisis recorded for the GC | Native Foundry QA not claimed |
+| Jackrabbit Start | 192 | No | Covered (batch 383): chase or manhunt Prey: starting Lead +2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
 | Driving Instincts | 192 | No | Manual/descriptive | — |
 | Professional Driver - Closed Course | 193 | No | Implemented: Impress synergy on all five Maneuvers; Acrobatics or Drive synergy on all Impress uses when the target sees both you and your vehicle | Batch259; all named uses, rank thresholds/cap, typed stacking, source guards, actual dialog and native persistence verified |
 | Duct Tape and Bubblegum | 192 | No | Manual/descriptive | — |
 | Get Radical! | 192 | No | Manual/descriptive | — |
 | Need for Speed | 192 | No | Manual/descriptive | — |
-| Offensive Driving | 192 | No | Manual/descriptive | — |
-| Relentless Pursuit | 193 | No | Manual/descriptive | — |
+| Offensive Driving | 192 | No | Covered (batch 383): Predator Strategy penalties halved (rounded down); once-per-chase ignored Crisis recorded for the GC | Native Foundry QA not claimed |
+| Relentless Pursuit | 193 | No | Covered (batch 383): chase or manhunt Predator: starting Lead −2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
 | One Hand on the Wheel | 193 | No | Vehicle Maneuver one-handed penalty waived; selected free Maneuvers share a scene allowance equal to active Chase feats; legality, own-count timing, reservations, refunds and frozen receipts verified (batch258) | — |
 | Simulator Jockey | 193 | No | Manual/descriptive | — |
 | Ambush Basics | 193 | No | Sneak die and role-scoped Cross-Check implemented; outcome rewards remain manual | — |
@@ -1615,3 +1615,16 @@ Source: rules reference pp.189 and 191 (local markdown edition; original PDF pag
 - **Tough Luck.** Activating a threat on a check with a Tough Luck mark costs 1 more action die, listed among the activation’s cost sources.
 
 Verification: 513 legacy assertions, 3368 of 3369 Node tests (6 new, including a real marked attack and the replacement-roll guard through `rollCheck`), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 103 manual / 53 partial / 158 other; at least 156 of 314 explicitly unfinished; 40 whole-feat closures.
+
+## Residual implementation batch 383 — chase feats in the Conflict tracker
+
+Source: rules reference pp.192–193 (local markdown edition; original PDF pages not visually re-checked).
+
+- Each Conflict side now records which tracked chase feats its participant has (`CONFLICT_FEATS` in `module/rules/gc/conflict.mjs`). The GC’s start dialog pre-ticks them from the chosen character, or from a vehicle’s driver, and the GC can change them (manhunts have no actors).
+- **Jackrabbit Start / Relentless Pursuit** (chase or manhunt): the starting Lead moves 2 in the side’s favour after the GC’s value, staying inside 1–9, and the shift is recorded. The side’s won Strategies always offer the Lead Advantage.
+- **Daredevil** (chase): Strategy availability uses Acceleration and Turning +2; stored ratings are unchanged. Stunt, whose printed requirement is this feat, needs no further GC confirmation.
+- **Defensive / Offensive Driving** (chase): a negative modifier of a Prey (Defensive) or Predator (Offensive) Strategy is halved, rounded down (−12 → −6). General Strategies and bonuses are unchanged. Interpretation: “a Prey chase Strategy” means a Strategy from the Prey list. Each feat’s once-per-chase effect (force a Crisis; ignore a Crisis) is a manage action, recorded once per side and posted for the GC to resolve.
+- **Photo Finish** (chase): a manage action lowers every participant’s Acceleration and Turning by 2 per use (not below 0). It is kept as an offset, so the per-round rating refresh from the vehicles keeps it.
+- Death Ride’s extracted text duplicates Defensive Driving’s; its real benefit (DR while driving, staying up at 0 wounds) belongs with the vehicle damage feats and is not part of this batch.
+
+Verification: 513 legacy assertions, 3375 of 3376 Node tests (7 new), GC rule and app suites unchanged. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 97 manual / 53 partial / 164 other; at least 150 of 314 explicitly unfinished; 46 whole-feat closures.

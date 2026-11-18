@@ -11,7 +11,10 @@ import {
   nextRound,
   concede,
   adjustLead,
-  conflictSummary
+  conflictSummary,
+  CONFLICT_FEATS,
+  photoFinish,
+  useConflictFeat
 } from "../../rules/gc/conflict.mjs";
 import { requireGC, getConflicts, saveConflict } from "./state.mjs";
 import {
@@ -62,6 +65,18 @@ const chaseActorOptions = () => [
     .sort((a, b) => (a.type === "vehicle" ? 0 : 1) - (b.type === "vehicle" ? 0 : 1) || a.name.localeCompare(b.name))
     .map(a => [a.uuid, `${a.name}${a.type === "vehicle" ? "" : " (on foot)"}`])
 ];
+/** The tracked chase feats a participant has: a vehicle's driver supplies them, a character their own. */
+const participantFeats = uuid => {
+  const actor = uuid ? fromUuidSync(uuid) : null,
+    person = actor?.type === "vehicle" ? (actor.system.driver ? fromUuidSync(actor.system.driver) : null) : actor;
+  return (person?.system?.activeFeatNames ?? []).filter(feat => CONFLICT_FEATS.includes(feat));
+};
+const featBoxes = (side, ticked) =>
+  `<p>${CONFLICT_FEATS.map(
+    feat =>
+      `<label><input type="checkbox" name="${side}Feat-${esc(feat)}"${ticked.includes(feat) ? " checked" : ""} /> ${esc(feat)}</label>`
+  ).join(" ")}</p>`;
+const tickedFeats = (input, side) => CONFLICT_FEATS.filter(feat => input[`${side}Feat-${feat}`] === true);
 const roomRows = () =>
   Object.entries(MANEUVERING_ROOM).map(([key, r]) => [
     key,
@@ -152,7 +167,10 @@ export async function startConflictDialog() {
     <p>${loc`Predator skill: ${esc(rules.predatorSkills.join("; "))}`}<br>${loc`Prey skill: ${esc(rules.preySkills.join("; "))}`}<br>${loc`Each round: ${esc(rules.roundTime)}`}</p>
     ${chaseNote}
     <label>${loc`Starting Lead (1–9)`} <input type="number" name="lead" min="1" max="9" value="${suggested.lead ?? rules.startingLead?.default ?? 5}" required /></label>
-    ${ratingInputs}`
+    ${ratingInputs}
+    <fieldset><legend>${loc`Chase feats (pp.192–193): Predator`}</legend>${featBoxes("p", participantFeats(chase?.predator))}</fieldset>
+    <fieldset><legend>${loc`Chase feats: Prey`}</legend>${featBoxes("q", participantFeats(chase?.prey))}</fieldset>
+    <p>${loc`Jackrabbit Start and Relentless Pursuit move the starting Lead by 2 after the value above.`}</p>`
   );
   if (!second) return null;
   const ratings = side =>
@@ -161,8 +179,13 @@ export async function startConflictDialog() {
     const conflict = startConflict(first.type, {
       lead: Number(second.lead),
       name: first.name,
-      predator: { name: first.predator, actorUuid: chase?.predator || null, ratings: ratings("p") },
-      prey: { name: first.prey, actorUuid: chase?.prey || null, ratings: ratings("q") }
+      predator: {
+        name: first.predator,
+        actorUuid: chase?.predator || null,
+        ratings: ratings("p"),
+        feats: tickedFeats(second, "p")
+      },
+      prey: { name: first.prey, actorUuid: chase?.prey || null, ratings: ratings("q"), feats: tickedFeats(second, "q") }
     });
     if (chase) conflict.chase = chase;
     const id = foundry.utils.randomID();
@@ -358,6 +381,23 @@ export async function manageConflict(id) {
               ["smash", loc`Set Smash points (altitude)`]
             ]
           : []),
+        ...(conflict.type === "chase"
+          ? ["predator", "prey"].flatMap(side => [
+              ...((conflict[side].feats ?? []).includes("Photo Finish")
+                ? [
+                    [
+                      `photoFinish-${side}`,
+                      loc`${sideName(conflict, side)}: Photo Finish (all Acceleration and Turning −2)`
+                    ]
+                  ]
+                : []),
+              ...["Defensive Driving", "Offensive Driving"]
+                .filter(
+                  feat => (conflict[side].feats ?? []).includes(feat) && !conflict.featUses?.[side]?.includes(feat)
+                )
+                .map(feat => [`feat-${side}-${feat}`, loc`${sideName(conflict, side)}: ${feat} (once per chase)`])
+            ])
+          : []),
         ["concedePredator", `${sideName(conflict, "predator")} concedes`],
         ["concedePrey", `${sideName(conflict, "prey")} concedes`],
         ["remove", loc`Remove this conflict`]
@@ -386,6 +426,20 @@ export async function manageConflict(id) {
   if (!input) return null;
   try {
     if (input.action === "remove") return saveConflict(id, null);
+    if (input.action.startsWith("photoFinish-")) {
+      const side = input.action.slice("photoFinish-".length),
+        next = photoFinish(conflict, side);
+      await saveConflict(id, next);
+      return say(
+        `<b>${esc(conflict.name)}</b>${loc`: ${esc(sideName(conflict, side))} uses Photo Finish — every participant’s Acceleration and Turning drop by 2 (total −${2 * next.photoFinish}).`}`
+      );
+    }
+    if (input.action.startsWith("feat-")) {
+      const [, side, ...rest] = input.action.split("-"),
+        { next, note } = useConflictFeat(conflict, side, rest.join("-"));
+      await saveConflict(id, next);
+      return say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(conflict, side))} — ${esc(note)}`);
+    }
     if (input.action === "smash") {
       const next = structuredClone(conflict),
         side = input.smashSide || "";
