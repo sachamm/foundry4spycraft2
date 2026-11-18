@@ -89,7 +89,9 @@ export function hazardsView(actor) {
 }
 
 async function writeHazards(actor, hazards) {
-  await actor.update({ "system.hazards": hazards }, { diff: false, recursive: false });
+  // "==" replaces the hazards record whole (so ended contagions drop out) without touching the rest of `system`.
+  // A non-recursive update would replace all of `system` and reset the character to defaults.
+  await actor.update({ "system.==hazards": hazards });
 }
 
 /** Take lethal damage off vitality, then wounds, where the character tracks them. Returns what was lost. */
