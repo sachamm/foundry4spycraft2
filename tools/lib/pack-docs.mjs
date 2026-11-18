@@ -1,3 +1,4 @@
+import { buildSampleNpcs } from "./sample-npcs.mjs";
 import { buildSampleAgents } from "./sample-agents.mjs";
 /**
  * Turns src/data/*.json into compendium documents and the generated rules modules, in memory.
@@ -996,6 +997,7 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
   };
   const npcTemplates = read("npc-templates.json");
   packs["core-npcs"] = buildNpcTemplates(npcTemplates, packs, npcOptions);
+  packs["sample-npcs"] = buildSampleNpcs(read("sample-npcs.json"), npcTemplates, packs, npcOptions);
   const npcPackages = buildNpcPackages(read("npc-packages.json"), npcTemplates, packs, npcOptions);
   generated["module/data/npc-packages.json"] = JSON.stringify(npcPackages) + "\n";
 

@@ -47,7 +47,7 @@ jobs:
           node -e 'const m=require("./system.json");if(m.version!=="0.3.2-rc.1"||!m.download.includes("v0.3.2-rc.1"))process.exit(1)'
       - name: Package and validate archive
         run: |
-          zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md docs/sample-agents.md
+          zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md docs/sample-agents.md docs/sample-cast.md
           unzip -t spycraft2.zip
           sha256sum spycraft2.zip system.json > SHA256SUMS.txt
       - name: Publish release candidate without replacing stable latest

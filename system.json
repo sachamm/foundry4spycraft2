@@ -265,6 +265,18 @@
       "flags": {}
     },
     {
+      "name": "sample-npcs",
+      "label": "Sample Villains & Minions",
+      "path": "packs/sample-npcs",
+      "type": "Actor",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "NONE",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
       "name": "sample-agents",
       "label": "Sample Level-1 Agents",
       "path": "packs/sample-agents",
@@ -308,6 +320,7 @@
         "sample-scenes",
         "soundtrack",
         "core-npcs",
+        "sample-npcs",
         "sample-agents"
       ]
     }

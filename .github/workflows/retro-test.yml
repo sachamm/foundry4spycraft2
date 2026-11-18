@@ -45,7 +45,7 @@ jobs:
 
       - name: Package installable system
         run: |
-          zip -r "$TEST_ARCHIVE" system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md docs/sample-agents.md
+          zip -r "$TEST_ARCHIVE" system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md docs/sample-agents.md docs/sample-cast.md
           unzip -t "$TEST_ARCHIVE"
 
       - name: Publish test download and update manifest

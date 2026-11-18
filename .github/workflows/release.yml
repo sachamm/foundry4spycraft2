@@ -32,7 +32,7 @@ jobs:
         run: npm ci && npm run build && npm test
 
       - name: Build zip
-        run: zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md docs/sample-agents.md
+        run: zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md docs/sample-agents.md docs/sample-cast.md
 
       - name: Upload release assets
         env:

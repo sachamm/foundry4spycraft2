@@ -12,9 +12,8 @@ const esc = text =>
 export function buildNpcTemplates(
   data,
   packs,
-  { id, stats, skillKeys, commonCatalog = [], ammoCatalog = [], iconData = null }
+  { id, stats, skillKeys, commonCatalog = [], ammoCatalog = [], iconData = null, packName = "core-npcs" }
 ) {
-  const packName = "core-npcs";
   const categories = [...new Set(data.templates.map(template => template.category))];
   const folders = categories.map((name, index) => ({
     _id: id(packName, "folder", name),
@@ -33,6 +32,7 @@ export function buildNpcTemplates(
     ids.add(template.id);
     for (const skill of template.skills)
       if (!skillKeys.has(skill.key)) throw new Error(`${template.name}: unknown skill ${skill.key}`);
+    const type = template.npcType ?? "standard";
     const abilities = Object.fromEntries(
       ["str", "dex", "con", "int", "wis", "cha"].map(key => [key, { value: template.abilities[key] ?? 10 }])
     );
@@ -63,7 +63,7 @@ export function buildNpcTemplates(
       commonCatalog,
       ammoCatalog,
       iconData,
-      type: "standard"
+      type
     });
     const items = loadout.items;
     profile.equipment = loadout.equipment;
@@ -83,7 +83,7 @@ export function buildNpcTemplates(
     for (const item of [...items, ...featItems]) {
       item.flags.spycraft2 = { ...item.flags.spycraft2, npcPackageManaged: template.id };
     }
-    const result = computeNpcProfile(profile, "standard", data.defaultThreatLevel, abilities);
+    const result = computeNpcProfile(profile, type, data.defaultThreatLevel, abilities);
     if (!result.complete) throw new Error(`${template.name}: ${result.warnings.join("; ")}`);
     const actorId = id(packName, "npc", template.id);
     const biography = [
@@ -106,18 +106,18 @@ export function buildNpcTemplates(
       type: "npc",
       img: template.portrait ?? "icons/svg/mystery-man.svg",
       system: {
-        npcType: "standard",
+        npcType: type,
         threatLevel: data.defaultThreatLevel,
         followMission: true,
         abilities,
-        vitality: { value: 0, max: 0 },
-        wounds: { value: 0, max: 0 },
+        vitality: { value: type === "special" ? result.health[0] : 0 },
+        wounds: { value: type === "special" ? result.health[1] : 0 },
         npcProfile: profile,
         biography
       },
       prototypeToken: {
         name: template.name,
-        actorLink: false,
+        actorLink: type === "special",
         disposition: 0,
         texture: { src: template.token ?? template.portrait ?? "icons/svg/mystery-man.svg" }
       },

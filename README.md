@@ -7,7 +7,7 @@ An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com)
 
 ## Sample characters
 
-The **Sample Level-1 Agents** compendium contains 16 fully built agents covering all 12 base classes, including four alternate builds. Each has completed creation choices, an example Caliber-II mission loadout, background, contacts, portrait and matching token. Import a character from the compendium; importing Tomas also creates his linked animal partner, Bracken. See [the roster and build assumptions](docs/sample-agents.md) and [art gallery](assets/agents/catalog.html).
+The **Sample Level-1 Agents** compendium contains 16 fully built agents covering all 12 base classes, including four alternate builds. Each has completed creation choices, an example Caliber-II mission loadout, background, contacts, portrait and matching token. All 16 are copied into the Sample PCs Actor folder on the first GM launch; Tomas also receives his linked animal partner, Bracken. Additional copies can be imported from the compendium. See [the roster and build assumptions](docs/sample-agents.md) and [art gallery](assets/agents/catalog.html).
 
 ## Development setup
 
@@ -267,3 +267,9 @@ icon controls have contextual names and tooltips.
 The system includes a **Sample Scenes** compendium with Warehouse Breach, Night Infiltration and Embassy Reception. Import any of them into your world for backgrounds with walls, doors and lighting already configured. Add your own actors and tokens. See [scene notes](assets/scenes/README.md) for setup details and art provenance.
 
 New empty worlds receive these three scenes automatically on the first GM launch. Setup runs once, so deleted samples stay deleted. Existing worlds are left as they are; import samples from the compendium when wanted. Interrupted setup resumes on the next GM launch.
+
+### Starter Actors
+
+On the first GM launch after installation or upgrade, the system copies one sample mastermind, three henchmen, eight minion profiles and all 16 sample PCs into the Actors tab. The folders are **Masterminds**, **Henchmen**, **Minions** and **Sample PCs**. The Scout's animal partner is included and linked to its PC. The former Sample Level-1 Agents world folder is renamed to Sample PCs.
+
+Recognizable sample PCs already imported into the world are reused. Setup resumes after an interruption without making duplicate copies, and later launches preserve your edits, moves and deletions. The **Sample Villains & Minions** and **Sample Level-1 Agents** compendiums remain available for additional imports. See [the starter cast](docs/sample-cast.md).
