@@ -13,7 +13,8 @@ export const FINAL_ATTACK_WORKFLOWS = new Set([
   "cleaveBasics",
   "snapShot",
   "opportunist",
-  "fireTeamSupremacy"
+  "fireTeamSupremacy",
+  "brawlingSupremacy"
 ]);
 export function finalAttackRoundSpec(system) {
   const nauseated = system.conditionContext?.nauseated === true,

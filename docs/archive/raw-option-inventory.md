@@ -293,7 +293,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Wolfpack Supremacy | 176 | No | Flanked-target sneak die and scoped threat implemented; geometry confirmed at table | — |
 | All-out Attack | 176 | No | Implemented: bounded pre-roll melee penalty, twice that recorded-hit damage bonus once, and miss flat-footed outcome | Batch350; actual/named GC targets including objects, private damage leases, combined Side damage, replacements and GC recovery/reload verified |
 | Axe Basics | 176 | No | Partial: readied reviewed axe +1 gear with ordinary attacking/defending Trip skill checks and melee Disarm attacks; Chop! full-action attack/damage/TKD and ordinary recorded TKD save/outcome implemented; Menacing fixed stress and readied-axe AP(2) implemented; mixed TKD grouping remains open | Batches317–318,354–356,358,360; actual family/readiness/grip/source proof, native dialog/reload verified |
-| Battering Blows | 176 | No | Manual/descriptive | — |
+| Battering Blows | 176 | No | Partial: Clobber is a grapple trick; the grapple card lists it with the character’s numbers (batch 408); the result is applied by the players and GC, including the −2/−4 check penalty and the weapon damage repeated once more for each of Darting and Flashing Weapon | Native Foundry QA not claimed |
 | Cleave Basics | 177 | No | Covered (batch 377): once per round, after the character’s own resolved melee hit that the GC confirms dropped its opponent, one free extra melee attack with the same weapon against a different opponent | Native Foundry QA not claimed |
 | Cleave Mastery | 177 | No | Partial: +1 melee threat versus confirmed standard characters; reaction attacks remain open | Batch217; typed target/source evidence |
 | Cleave Supremacy | 177 | No | Partial: melee critical cost −1 versus confirmed standard characters; cleave movement remains open | Batch217; frozen target and legacy GC confirmation |
@@ -354,7 +354,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Boxing Supremacy | 185 | No | Partial: static numerical effects | — |
 | Brawling Basics | 185 | No | Partial: static numerical effects | — |
 | Brawling Moves | 185 | No | Partial (batch 395): Haymaker (Fortitude DC 10 + damage or nauseated) on unarmed Standard Attacks; Body Slam (Trip) and Fake Out (Feint) are skill reminders | Native Foundry QA not claimed |
-| Brawling Supremacy | 185 | No | Manual/descriptive | — |
+| Brawling Supremacy | 185 | No | Partial (batch 408): the second non-final unarmed hit on one opponent in a round offers a free final attack on that opponent (once per opponent per round, sharing the Nauseated final-attack reservation); One-Two is an unarmed trick whose damage roll states the doubled amount for a hit 4 or more over Defense; Sleeper Hold is listed on the grapple card with its DC and duration | Native Foundry QA not claimed |
 | Dirty Fighting Basics | 185 | No | Covered (batch 395): sneak attack damage the owner suffers is halved, rounded up, when an attacker’s damage roll names them as target; Ready Stance (−2 to the hit target’s attacks this round, on the card); Low Blow (Fortitude DC 10 + damage or sickened, from the hit’s damage roll) | Native Foundry QA not claimed |
 | Dirty Fighting Moves | 185 | No | Partial (batch 395): Eye Gouge (Reflex DC 10 + damage or blinded) and Rabbit Punch (−4, threat +1, nauseated on a threat) on unarmed Standard Attacks; Mud in Your Eye is a Feint reminder | Native Foundry QA not claimed |
 | Dirty Fighting Supremacy | 185 | No | Unarmed sneak die implemented; tricks remain manual | — |
@@ -367,11 +367,11 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Rolling Moves | 187 | No | Covered (batch 395): Circle, Leap and Sway on a Kick or unarmed Standard Attack, with their movement and +1 dodge stated on the card for the table | Native Foundry QA not claimed |
 | Rolling Supremacy | 187 | No | Partial: static numerical effects | — |
 | Spirit Basics | 187 | No | Covered (batch 396): once per combat at any Count, a receipt reducing one source’s lethal damage by base attack bonus (minimum 1); Rooted Stance (+1 to all saves; movement checks refuse leaving the square); Palm Strike (push or 1d4 subdual, on the card) | Native Foundry QA not claimed |
-| Spirit Moves | 187 | No | Manual/descriptive | — |
+| Spirit Moves | 187 | No | Partial (batch 408): Vitalize is an unarmed trick whose card states the healing on a hit; One Warning (Threaten) and Shatter Weapon (Total Defense smash) stay as reminders | Native Foundry QA not claimed |
 | Spirit Supremacy | 187 | No | Partial: static numerical effects | — |
 | Submission Basics | 188 | No | Partial (batch 396): Prone Stance survives being prone and waives the prone attack penalty; its +1 to Grapple skill checks, sprawled-to-prone conversion, the doubled Cheap Shot penalties and Snap! are not yet carried out | Native Foundry QA not claimed |
-| Submission Moves | 188 | No | Manual/descriptive | — |
-| Submission Supremacy | 188 | No | Manual/descriptive | — |
+| Submission Moves | 188 | No | Partial: Bone Grind, Joint Lock and Reversal are grapple tricks; the grapple card lists it with the character’s numbers (batch 408); the result is applied by the players and GC | Native Foundry QA not claimed |
+| Submission Supremacy | 188 | No | Partial: Death Grip and Breathtaking Hold are grapple tricks; the grapple card lists it with the character’s numbers (batch 408); the result is applied by the players and GC; repeated Cheap Shot choices per scene stay with the GC | Native Foundry QA not claimed |
 | Two-hit Combo | 188 | No | Covered (batch 401): a start-of-Count declaration grants 1 final unarmed attack and −2 to attack and skill checks for 1 full round (the shared final-attack tradeoff; one such declaration per round) | Native Foundry QA not claimed |
 | Warrior's Grace | 189 | No | Covered (batch 401): the Two-Hit Combo declaration may grant 2 final unarmed attacks at −4 | Native Foundry QA not claimed |
 | Vital Points Basics | 188 | No | Sneak-attack resistance 6 executes; stance/trick remain manual | — |

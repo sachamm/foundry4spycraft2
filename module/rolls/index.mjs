@@ -4,6 +4,7 @@
  */
 import "../apps/attack-damage-benefits.mjs";
 import "../apps/autofire.mjs";
+import "../apps/brawling-supremacy.mjs";
 import "../apps/chance-reactions.mjs";
 import "../apps/cheap-shot.mjs";
 import "../apps/counter-trip.mjs";

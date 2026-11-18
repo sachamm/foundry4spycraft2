@@ -52,7 +52,13 @@ test("notes state each effect; save tricks give the DC from the damage", () => {
   );
   assert.match(unarmedTrickDamageNote("eyeGouge", 9), /Reflex save, DC 19, or is blinded/);
   assert.equal(unarmedTrickDamageNote("spike", 9), "");
-  assert.equal(Object.keys(UNARMED_TRICKS).length, 13);
+  assert.equal(Object.keys(UNARMED_TRICKS).length, 15);
+  assert.equal(
+    unarmedTrickDamageNote("oneTwo", 7),
+    "One-Two: if the attack beat Defense by 4 or more, the damage is doubled to 14 (p.185)."
+  );
+  assert.match(unarmedTrickNote({ key: "vitalize" }), /1 wound point and 1d6 vitality/);
+  assert.equal(unarmedTrickPlan(owner(["Brawling Supremacy"]), fists, { trick: "oneTwo" }).blocked, false);
 });
 
 test("one unarmed trick per action, Ready Stance, and Dirty Fighting Basics halves sneak damage suffered", () => {

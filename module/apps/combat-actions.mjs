@@ -17,6 +17,7 @@ import {
   strafeHits
 } from "../rules/combat-actions.mjs";
 import { parseAmmunitionCode } from "../rules/ammunition.mjs";
+import { grappleTrickLines } from "../rules/grapple-tricks.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
@@ -303,6 +304,9 @@ export async function settleGrapple(actor, options = {}) {
           .join("")}</ul>`
       ]
     : [];
+  const tricks = grappleTrickLines(actor.system);
+  if (tricks.length)
+    benefits.push(loc`Your grapple tricks:`, `<ul>${tricks.map(line => `<li>${esc(line)}</li>`).join("")}</ul>`);
   await post(actor, [
     loc`Grapple: ${input.total} against ${input.opponentTotal}.`,
     ...outcome.effects.map(esc),

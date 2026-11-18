@@ -615,6 +615,7 @@ const EXPECTED_ORDER = [
   "chanceReactionControls",
   "sneakAttackRecord",
   "duelingReachControl",
+  "brawlingSupremacyControl",
   "noQuarterControl",
   "targetSkillEffectsRecord",
   "blastMapControl",

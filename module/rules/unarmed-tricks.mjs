@@ -67,7 +67,9 @@ export const UNARMED_TRICKS = Object.freeze({
   },
   spike: { feat: "Vital Points Moves", name: "Spike", action: "standard", threat: 1, page: 188 },
   roll: { feat: "Rolling Basics", name: "Roll", action: "either", damage: 1, page: 187 },
-  palmStrike: { feat: "Spirit Basics", name: "Palm Strike", action: "standard", page: 187 }
+  palmStrike: { feat: "Spirit Basics", name: "Palm Strike", action: "standard", page: 187 },
+  oneTwo: { feat: "Brawling Supremacy", name: "One-Two", action: "standard", doubleMargin: 4, page: 185 },
+  vitalize: { feat: "Spirit Moves", name: "Vitalize", action: "standard", page: 187 }
 });
 
 const NOTES = {
@@ -80,7 +82,10 @@ const NOTES = {
   spike: () => loc`Spike: threat range +1`,
   roll: () => loc`Roll: move 5 ft. before this attack; +1 damage (roll it from this card)`,
   palmStrike: () =>
-    loc`Palm Strike: on a hit, push the opponent 5 ft. away; if that square is occupied or blocked, they take 1d4 subdual instead`
+    loc`Palm Strike: on a hit, push the opponent 5 ft. away; if that square is occupied or blocked, they take 1d4 subdual instead`,
+  oneTwo: () => loc`One-Two: if the result beats the target’s Defense by 4 or more, the damage is doubled`,
+  vitalize: () =>
+    loc`Vitalize: aimed at a teammate (once per teammate per scene); on a hit they recover 1 wound point and 1d6 vitality points`
 };
 
 export function unarmedTrickPlan(
@@ -141,6 +146,8 @@ export function unarmedTrickNote(plan) {
 /** The damage card’s line for a trick with a save on a hit. */
 export function unarmedTrickDamageNote(trick, damage) {
   const d = UNARMED_TRICKS[trick];
+  if (d?.doubleMargin)
+    return loc`${d.name}: if the attack beat Defense by ${d.doubleMargin} or more, the damage is doubled to ${2 * damage} (p.${d.page}).`;
   return d?.hitSave
     ? loc`${d.name}: the target makes a ${d.hitSave[0]} save, DC ${10 + damage}, or is ${d.hitSave[1]} (p.${d.page}).`
     : "";
