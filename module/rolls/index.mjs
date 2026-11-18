@@ -33,6 +33,7 @@ import "../rules/appearance.mjs";
 import "../rules/attribute-damage.mjs";
 import "../rules/baffled.mjs";
 import "../rules/balance.mjs";
+import "../rules/boxing.mjs";
 import "../rules/breakthrough.mjs";
 import "../rules/bug-basics.mjs";
 import "../rules/bull-rush-attack.mjs";

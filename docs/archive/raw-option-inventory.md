@@ -349,7 +349,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Berserker Basics | 183 | No | Covered (batch 386): a rage for 2d4+2 combat rounds, Strength and Constitution +3 and the Enraged status, entered with a full action and ended early with a half action; afterwards exhausted; uses per session equal starting action dice. The enraged condition’s restrictions are left to the table | Native Foundry QA not claimed |
 | Berserker Mastery | 183 | No | Covered (batch 386): free entry, 3d4+3 rounds, Strength and Constitution +5 | Native Foundry QA not claimed |
 | Berserker Supremacy | 184 | No | Partial (batch 386): free ending, 4d4+4 rounds, fatigued instead of exhausted; the +4 to resist becoming frenzied is a save reminder, since saves do not record what they resist | Native Foundry QA not claimed |
-| Boxing Basics | 184 | No | Partial: static numerical effects | — |
+| Boxing Basics | 184 | No | Covered (batch 392): +2 wound points; Closed Stance (+2 unarmed damage against an opponent the damage roll confirms shares the square; DR 2/— against them and their lost bonus 5-ft. steps are card reminders, as DR is applied at the table); Double Jab (unarmed Standard Attacks at −2, damage −2 per die, minimum 1) | Native Foundry QA not claimed |
 | Boxing Moves | 185 | No | Manual/descriptive | — |
 | Boxing Supremacy | 185 | No | Partial: static numerical effects | — |
 | Brawling Basics | 185 | No | Partial: static numerical effects | — |
@@ -1714,3 +1714,13 @@ Source: rules reference p.186 (local markdown edition; original PDF page not vis
 - **Power Kick:** a Kick whose damage roll carries armor-piercing (2) and takedown, merged into the weapon’s own qualities.
 
 Verification: 513 legacy assertions, 3398 of 3399 Node tests (1 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 77 manual / 57 partial / 180 other; at least 134 of 314 explicitly unfinished; 62 whole-feat closures.
+
+## Residual implementation batch 392 — Boxing Basics
+
+Source: rules reference p.184 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/boxing.mjs`. Closed Stance joins the shared stance lifecycle. An unarmed damage roll in it asks whether the target shares the character’s square, and adds +2 if so. The attack card and stance help remind of DR 2/— against that opponent, the shared-square adjacency and the opponent’s lost bonus 5-ft. steps; DR is applied at the table throughout this system.
+- Double Jab: an unarmed Standard Attack option for Boxing Basics owners at −2. Its card offers “Roll Double Jab damage”, which writes each die as `NdXmin3 − 2N` (2 fewer per die, never below 1). The player rolls each of the two attacks.
+- Kicking Moves leaves `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3401 of 3402 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 77 manual / 56 partial / 181 other; at least 133 of 314 explicitly unfinished; 63 whole-feat closures.

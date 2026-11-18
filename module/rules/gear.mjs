@@ -1,4 +1,5 @@
 import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
+import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { markDamagePlan } from "./marks.mjs";
 import { reachWeaponPlan } from "./reach-weapon.mjs";
@@ -758,13 +759,16 @@ export function weaponDamage(
   const conditionDamagePenalty = conditionRollPenalties(system).damage;
   // Signature / Trademark Gear, p.197: +1 or +2 morale to damage with the item.
   const signatureDamage = signatureBonus(system, weapon.id),
-    kickDamage = weapon.kick === true && unarmedWeapon(weapon) ? kickDamageBonus(system) : 0;
+    kickDamage = weapon.kick === true && unarmedWeapon(weapon) ? kickDamageBonus(system) : 0,
+    closedDamage =
+      weapon.closedStanceTarget === true && unarmedWeapon(weapon) && inClosedStance(system) ? CLOSED_STANCE_DAMAGE : 0;
   bonus +=
     conditionDamagePenalty +
     cqbRange.damageBonus +
     markDamage.bonus +
     signatureDamage +
     kickDamage +
+    closedDamage +
     (options.attackDamageBonus ?? 0);
   const min = parsed.minimum;
   return {
@@ -777,7 +781,7 @@ export function weaponDamage(
     conditionDamagePenalty,
     mortarOperation,
     launcherOperation,
-    formula: `max(${min}, ${base} + (${bonus}))`,
+    formula: `max(${min}, ${weapon.doubleJab === true && unarmedWeapon(weapon) ? doubleJabFormula(base) : base} + (${bonus}))`,
     damageText: text,
     ammunition: projectile.name ?? "",
     explosive: projectile.explosive,

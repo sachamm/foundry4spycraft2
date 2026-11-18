@@ -11424,10 +11424,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "Kicks don't lower your Initiative Count; gain a kicking stance and trick."
  },
- "Kicking Moves": {
-  "rolls": "attack",
-  "text": "Gain mobile and high-threat kicking tricks."
- },
  "Lane Dancer": {
   "rolls": "skill:drive",
   "text": "Ground vehicles treat maneuvering room as one step wider, and +2 on Crisis Advantage checks in ground chases."
