@@ -66,8 +66,10 @@ import { evaluate, renderTemplate } from "./module/rules/formula.mjs";
 import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
 import { loc } from "./module/i18n.mjs";
 import { localizeConfig } from "./module/i18n-data.mjs";
+import { registerErrorNotices } from "./module/error-notices.mjs";
 
 Hooks.once("init", () => {
+  registerErrorNotices();
   console.log("Spycraft 2.0 | Initializing system");
   installChatSearchHooks();
   installDialogThemeHooks();

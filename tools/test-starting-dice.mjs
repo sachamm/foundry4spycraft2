@@ -146,6 +146,26 @@ test("new/imported agent creation tags the actual session, preserves other flags
   assert.deepEqual(a.source.items, [{ _id: "gear", name: "Gear" }]);
   assert.deepEqual(a.source.flags, data.flags);
 });
+test("a new or imported agent starts with a zero stress and subdual ledger, and keeps one it already has", async () => {
+  const a = new SpycraftActor();
+  a.system.accumulatedDamage = null;
+  a._source = { system: { keep: 1, accumulatedDamage: null } };
+  await a._preCreate({ type: "agent" }, {}, {});
+  assert.equal(a.source.system.keep, 1);
+  assert.deepEqual(a.source.system.accumulatedDamage, {
+    version: 1,
+    revision: 1,
+    stress: 0,
+    subdual: 0,
+    pending: [],
+    lastReview: null
+  });
+  const b = new SpycraftActor(),
+    ledger = { version: 1, revision: 4, stress: 3, subdual: 9, pending: [] };
+  b.system.accumulatedDamage = ledger;
+  await b._preCreate({ type: "agent", system: { accumulatedDamage: ledger } }, {}, {});
+  assert.equal(b.source.system, undefined);
+});
 test("actual first entry grants one starting balance and freezes its receipt without GC dice, award XP, healing or repeat credit", async () => {
   const a = new SpycraftActor(),
     r = await a.initializeStartingDice();

@@ -239,13 +239,36 @@ test("unconfirmed, unfinished, contradictory or unsupported critical save result
     /own action/
   );
 });
-test("failed knockout, Drained and unresolved below-threshold critical outcomes retain their pending receipt without invented effects", async () => {
-  for (const opts of [{ kind: "subdual", damage: 15 }, { damage: 61 }, { damage: 1, criticalHit: true }]) {
+test("a failed subdual save knocks the agent out for the band's unit times half the margin, once", async () => {
+  globalThis.CONFIG = { statusEffects: [{ id: "unconscious", name: "Unconscious" }] };
+  try {
+    // 15 subdual over a threshold of 14 is band I: DC 12, 1 round; a result of 5 fails by 7, so 3 rounds.
+    const { a } = pending({ kind: "subdual", damage: 15 });
+    const r = await settlePendingDamageSave(a, confirm);
+    assert.equal(r.state, "settled");
+    assert.equal(r.settlement.unconscious, true);
+    assert.deepEqual(r.settlement.knockout, { count: 3, unit: "round" });
+    assert.ok(a.statuses.has("unconscious"));
+    assert.equal(a.effects.length, 1);
+    assert.deepEqual(a.system.accumulatedDamage.pending, []);
+    await settlePendingDamageSave(a, { ...confirm, eventId: "event1" });
+    assert.equal(a.effects.length, 1);
+  } finally {
+    delete globalThis.CONFIG;
+  }
+});
+test("Drained and below-threshold critical outcomes stay pending until the GC settles them as applied by hand", async () => {
+  for (const opts of [{ damage: 61 }, { damage: 1, criticalHit: true }]) {
     const { a } = pending(opts);
-    await assert.rejects(settlePendingDamageSave(a, confirm), /separately|critical failure outcome/);
+    await assert.rejects(settlePendingDamageSave(a, confirm), /by hand/);
     assert.equal(a.effects.length, 0);
     assert.equal(a.flags.spycraft2.damageEvents.event1.state, "pending");
     assert.equal(a.system.accumulatedDamage.pending.length, 1);
+    const r = await settlePendingDamageSave(a, { ...confirm, outcomeHandled: true });
+    assert.equal(r.state, "settled");
+    assert.equal(r.settlement.handledByGC, true);
+    assert.equal(a.effects.length, 0);
+    assert.deepEqual(a.system.accumulatedDamage.pending, []);
   }
 });
 test("an interrupted final ledger commit resumes the exact Shaken application without applying the grade twice", async () => {

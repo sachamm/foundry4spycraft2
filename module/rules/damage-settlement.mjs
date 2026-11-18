@@ -1,11 +1,12 @@
 import { rollEvidence } from "./outcomes.mjs";
+import { knockoutDuration } from "./damage-application.mjs";
 import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function damageEventEvidence(record) {
   const { state, settlement, ...event } = record;
   return JSON.stringify(event);
 }
-export function damageSettlementPlan(record, message, { confirmed, selfInflicted } = {}, id, at) {
+export function damageSettlementPlan(record, message, { confirmed, selfInflicted, outcomeHandled } = {}, id, at) {
   const check = message?.flags?.spycraft2;
   if (
     confirmed !== true ||
@@ -33,17 +34,26 @@ export function damageSettlementPlan(record, message, { confirmed, selfInflicted
     throw new Error(
       loc`The confirmed save outcome disagrees with its final result and recorded DC. Correct it before settlement.`
     );
-  let grade = 0;
+  let grade = 0,
+    unconscious = false,
+    knockout = null,
+    handledByGC = false;
   if (!succeeded) {
-    if (record.save.needsOutcomeReview || record.save.tier === 0)
-      throw new Error(loc`The GC must resolve this below-threshold critical failure outcome before it can be applied.`);
-    if (record.kind !== "stress" || record.save.tier > 4)
+    const listed = !record.save.needsOutcomeReview && record.save.tier > 0;
+    if (listed && record.kind === "subdual") {
+      // A failed subdual save knocks the character out for the band's unit × half the margin (p.339).
+      unconscious = true;
+      knockout = knockoutDuration(record.save.knockoutBase, record.save.dc, check.effectiveTotal);
+    } else if (listed && record.kind === "stress" && record.save.tier <= 4) {
+      grade = record.save.tier;
+      if (typeof selfInflicted !== "boolean")
+        throw new Error(loc`Declare whether this stress source was caused by the character’s own action.`);
+    } else if (outcomeHandled === true) handledByGC = true;
+    else if (!listed)
       throw new Error(
-        loc`This failed save needs its knockout or Drained outcome resolved separately; its pending receipt is retained.`
+        loc`The GC must resolve this below-threshold critical failure outcome, then settle it as applied by hand.`
       );
-    grade = record.save.tier;
-    if (typeof selfInflicted !== "boolean")
-      throw new Error(loc`Declare whether this stress source was caused by the character’s own action.`);
+    else throw new Error(loc`Apply the Drained outcome by hand, then settle this save as applied by hand.`);
   }
   if (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,80}$/.test(id) || !Number.isFinite(at))
     throw new Error(loc`Review the settlement reference and time.`);
@@ -61,6 +71,9 @@ export function damageSettlementPlan(record, message, { confirmed, selfInflicted
     grade,
     selfInflicted: grade ? selfInflicted : null,
     applicationId: grade ? applicationId : null,
+    // Only present when they apply, so settlements prepared by earlier versions still validate.
+    ...(unconscious ? { unconscious, knockout } : {}),
+    ...(handledByGC ? { handledByGC } : {}),
     at,
     state: "prepared"
   };
@@ -79,7 +92,7 @@ export function validateDamageSettlement(record, message, plan) {
   const expected = damageSettlementPlan(
     record,
     message,
-    { confirmed: true, selfInflicted: plan.selfInflicted },
+    { confirmed: true, selfInflicted: plan.selfInflicted, outcomeHandled: plan.handledByGC },
     plan.id,
     plan.at
   );

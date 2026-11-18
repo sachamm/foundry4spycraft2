@@ -3,6 +3,7 @@ import { pendingDamageSave, currentDamageSaveMessage } from "../rules/damage-sav
 import { damageSettlementPlan, validateDamageSettlement } from "../rules/damage-settlement.mjs";
 import { shakenApplicationSnapshot } from "../rules/shaken.mjs";
 import { applyShakenLocked } from "./shaken-application.mjs";
+import { setConditionStatus } from "../rules/condition-status.mjs";
 import { queueResources } from "../rules/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -30,7 +31,15 @@ export async function settlePendingDamageSave(actor, options = {}) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Settle next damage save` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}. Confirm and finish this save in chat before continuing.`}</p><label><input name="selfInflicted" type="checkbox"${record.settlement?.selfInflicted ? " checked" : ""} /> ${loc`This stress source was caused by the character's own action`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirmed the finished result and source. Settle success, or apply the failed stress save’s Shaken grade once`}</label><p>${loc`Accumulated damage remains until separately recovered. An interrupted settlement resumes its original recorded details. Knockout, Drained and unlisted critical outcomes remain pending for separate resolution.`}</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}. Confirm and finish this save in chat before continuing.`}</p>${
+        record.kind === "stress"
+          ? `<label><input name="selfInflicted" type="checkbox"${record.settlement?.selfInflicted ? " checked" : ""} /> ${loc`This stress source was caused by the character's own action`}</label>`
+          : ""
+      }<label><input name="confirmed" type="checkbox" /> ${
+        record.kind === "stress"
+          ? loc`The GC confirmed the finished result and source. Settle success, or apply the failed stress save’s Shaken grade once`
+          : loc`The GC confirmed the finished result. Settle success, or knock the character out on a failed save`
+      }</label><label><input name="outcomeHandled" type="checkbox" /> ${loc`A Drained or GC-decided outcome has been applied by hand`}</label><p>${loc`Accumulated damage remains until separately recovered. An interrupted settlement resumes its original recorded details.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -70,6 +79,8 @@ export async function settlePendingDamageSave(actor, options = {}) {
           confirmed: true,
           selfInflicted: plan.selfInflicted
         });
+      if (plan.unconscious && !actor.statuses?.has("unconscious"))
+        await setConditionStatus(actor, "unconscious", true, { label: loc`Unconscious` });
       validateDamageSettlement(actor.flags.spycraft2.damageEvents[record.id], actual, plan);
       const ledger = actor.system.accumulatedDamage;
       if (ledger.pending[0] !== record.id || !Number.isSafeInteger(ledger.revision + 1))
@@ -87,6 +98,17 @@ export async function settlePendingDamageSave(actor, options = {}) {
           same(actor.system.accumulatedDamage, next) &&
           same(actor.flags?.spycraft2?.damageEvents?.[record.id], completed)
       );
+      if (plan.unconscious && globalThis.ChatMessage?.create) {
+        const name = foundry.utils.escapeHTML(actor.name ?? "");
+        await ChatMessage.create({
+          speaker: ChatMessage.getSpeaker({ actor }),
+          content: `<div class="spycraft2 chat-note"><p>${
+            plan.knockout
+              ? loc`${name} fails the save and is unconscious for ${plan.knockout.count} ${plan.knockout.unit}(s).`
+              : loc`${name} fails the save and is unconscious; the GC sets how long.`
+          }</p></div>`
+        });
+      }
       return completed;
     },
     { messages: [message] }

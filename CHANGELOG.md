@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+Fixes from a live test of 0.5.0:
+
+- A failed subdual save on an agent now settles: the agent is knocked unconscious for the band's time × half the
+  margin. Drained and GC-decided outcomes settle once the GC ticks "applied by hand"; before, all three stayed
+  pending for good.
+- New agents and agents imported from a compendium start with stress and subdual totals of 0, so subdual and stress
+  damage record straight away. Agents already in a world still need "Review accumulated totals" once, and the
+  message now says so.
+- A refused sheet, dialog or chat button now shows its reason on screen instead of only in the browser console.
+- Lethal damage from explosive, acid and the other special damage types, fire, contagions and survival failures now
+  sets fatigued, unconscious, dying and dead like any other lethal hit.
+- The explosive takedown counts the damage left after the Reflex save.
+- A grenade or other blast uses the "other damage" column of damage reduction instead of "non-grenade hurled".
+- Winning an opening grapple also makes the grappler vulnerable.
+- The settle dialog for a subdual save no longer talks about stress and Shaken.
+
 ## 0.5.0 — 2026-11-18
 
 - Added the Sample Level-1 Agents compendium: 16 complete characters across all 12 base classes, four alternate builds, matching compressed WebP portraits and tokens, and a linked Scout animal partner created on import.

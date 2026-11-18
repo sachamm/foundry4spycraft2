@@ -71,7 +71,9 @@ export function validateDamageLedger(ledger) {
     ledger.pending.some(id => !eventId(id)) ||
     new Set(ledger.pending).size !== ledger.pending.length
   )
-    throw new Error(loc`The GC must initialize or review the accumulated-damage ledger.`);
+    throw new Error(
+      loc`The GC must set this agent's stress and subdual ledger first: "Review accumulated totals" on the agent sheet.`
+    );
   return ledger;
 }
 export function damageLedgerSnapshot(actor) {

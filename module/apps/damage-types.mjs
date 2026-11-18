@@ -94,7 +94,8 @@ async function sufferTypedLethal(actor, type, amount, label) {
     lines = [
       loss
         ? loc`${label}: ${amount} damage, vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-        : loc`${label}: ${amount} damage; the GC applies it (a standard character makes a Damage save).`
+        : loc`${label}: ${amount} damage; the GC applies it (a standard character makes a Damage save).`,
+      ...(loss?.notes ?? [])
     ],
     lost = loss ? loss.vitalityLoss + loss.woundLoss : amount,
     stress = typedStress(type, lost);
@@ -462,7 +463,9 @@ async function resolveExplosiveReflex(actor, message, save, succeeded) {
       ? loc`The Reflex save succeeds: half damage, and the character moves to the next blast increment out.`
       : loc`The Reflex save fails: full damage.`
   );
-  if (save.damage > 20) result.lines.push(loc`More than 20 explosive damage: the takedown effect applies (p.302).`);
+  // More than 20 points suffered, counted after the Reflex save but before damage reduction (p.302).
+  if (explosiveDamageTaken(save.damage, succeeded) > 20)
+    result.lines.push(loc`More than 20 explosive damage: the takedown effect applies (p.302).`);
   await post(actor, result.lines, result.rolls);
   return actor.rollSave("fort", {
     askContext: true,
@@ -575,7 +578,8 @@ const resolvers = {
       lines.push(
         loss
           ? loc`${damage.total} lethal damage: vitality −${loss.vitalityLoss}, wounds −${loss.woundLoss}.`
-          : loc`${damage.total} lethal damage: the GC applies it.`
+          : loc`${damage.total} lethal damage: the GC applies it.`,
+        ...(loss?.notes ?? [])
       );
     }
     if (failure.subdual) {
