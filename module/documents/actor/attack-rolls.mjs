@@ -521,7 +521,8 @@ export const ActorAttackRolls = Base =>
       }
       const attackDamageBenefit = options.attackDamageSourceUuid
         ? makeAttackDamageProof(this, item, options.attackDamageSourceUuid, {
-            targetUuid: options.targetActorUuid || options.targetActor?.uuid
+            targetUuid: options.targetActorUuid || options.targetActor?.uuid,
+            impaleDefense: options.impaleDefense
           })
         : null;
       options = {

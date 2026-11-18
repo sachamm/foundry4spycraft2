@@ -99,6 +99,7 @@ import "../rules/still-standing.mjs";
 import "../rules/stone-cold.mjs";
 import "../rules/strut.mjs";
 import "../rules/superior-accuracy-weapon.mjs";
+import "../rules/sword-basics.mjs";
 import "../rules/target-skill-effects.mjs";
 import "../rules/task-pressure.mjs";
 import "../rules/terrain.mjs";

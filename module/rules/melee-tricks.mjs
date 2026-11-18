@@ -8,6 +8,7 @@ import { bullseyeDamageSourceFacts } from "./bullseye.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 import { feintAttackTarget } from "./feint-bonus.mjs";
+import { swordBasicsActive, swordBasicsInactiveReason } from "./sword-basics.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -92,6 +93,19 @@ export const MELEE_ATTACK_TRICKS = Object.freeze(
         threatIncrease: 0,
         sneakDice: 1
       },
+      impale: {
+        source: "Impale",
+        feat: "Sword Basics",
+        family: "oneHandedSword",
+        weaponLabel: "one-handed sword without the finesse quality",
+        attackBonus: 0,
+        damageBonus: 0,
+        threatIncrease: 0,
+        fullAction: false,
+        finesse: false,
+        variableDamage: "impale",
+        page: 180
+      },
       outOfThePark: {
         source: "Out of the Park",
         feat: "Club Basics",
@@ -141,7 +155,13 @@ export function meleeTrickPlan(
         ? loc`${d.source} requires a melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied.`
         : loc`This melee feat trick requires a full-action melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied.`
     );
-  const source = readiedMeleeFeatSource(system, { name: d.feat, family: d.family, bonus: d.attackBonus }),
+  if (d.feat === "Sword Basics" && !swordBasicsActive(system)) throw Error(swordBasicsInactiveReason(system));
+  const source = readiedMeleeFeatSource(system, {
+      name: d.feat,
+      family: d.family,
+      bonus: d.attackBonus,
+      ...(d.finesse === false ? { finesse: false } : {})
+    }),
     held = source?.weapons.find(w => w.id === weapon.id);
   if (
     !held ||
@@ -363,9 +383,11 @@ rollPipeline.register({
               ? loc`Between the Ribs: full-action Standard Attack with this readied knife. A hit inflicts 1 die of sneak attack damage: roll damage from this recorded hit and include its sneak attack die. The general sneak attack conditions still apply (p.179).`
               : plan.key === "threadNeedle"
                 ? loc`Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond5ft ends this hold (p.180).`
-                : plan.key === "fend"
-                  ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
-                  : loc` ${plan.source}: full-action Standard Attack; ${plan.attackBonus >= 0 ? "+" : ""}${plan.attackBonus} attack, +${plan.damageBonus} recorded-hit damage${plan.threatIncrease ? `, +${plan.threatIncrease} threat range` : ""}${plan.grantedQuality ? ", takedown quality" : ""} (p.${MELEE_ATTACK_TRICKS[plan.key].page}).`
+                : plan.key === "impale"
+                  ? loc`Impale: on a hit, +1 damage for every 2 points by which this attack result beats the target’s Defense. Roll damage from this recorded hit; the GC confirms the target’s Defense then (p.180).`
+                  : plan.key === "fend"
+                    ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
+                    : loc` ${plan.source}: full-action Standard Attack; ${plan.attackBonus >= 0 ? "+" : ""}${plan.attackBonus} attack, +${plan.damageBonus} recorded-hit damage${plan.threatIncrease ? `, +${plan.threatIncrease} threat range` : ""}${plan.grantedQuality ? ", takedown quality" : ""} (p.${MELEE_ATTACK_TRICKS[plan.key].page}).`
           ]
         : []
     };

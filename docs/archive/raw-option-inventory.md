@@ -317,7 +317,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Polearm Basics | 179 | No | Implemented: readied reviewed polearm +1 gear Defense, adjacent-target penalty waiver, Fend completed5ft movement and Striking Stance adjacent-entry reaction | Batches320/367–369; actual attacking family/source, shared limits, stance caps, adopted source/replay/recovery and native controls/reload verified |
 | Spear Basics | 179 | No | Implemented: readied spear actual Bull Rush/Trip skill+2gear, including supported defense/counter/conveyance scopes, Gripping Stance and Spear Charge | Batches317/348/360/364/365/371; actual source/total held capacity, completed route/current Speed/stance caps, recorded-hit damage/recovery, native controls and printed-benefit audit verified |
 | Staff Basics | 179 | No | Covered: readied reviewed staff +3 gear with Acrobatics/Jump (317), Whirling Stance lower-level flanking protection (366), Thread the Needle hit, hold, release, holder movement ending (370) and opposed Athletics escape (372) | Whole-feat source audit in batch 375; native reload verified in the earlier batches |
-| Sword Basics | 180 | No | Manual/descriptive | — |
+| Sword Basics | 180 | No | Covered (batch 376): lost while any wielded weapon has finesse; post-hit opposite-side move reminder; Unbeatable Stance +1 morale against a GC-confirmed damaged opponent; Impale +1 damage per 2 points over the GC-confirmed Defense | Native Foundry QA not claimed |
 | Whip Basics | 180 | No | Partial: readied reviewed whip +2gear with Jump and ordinary attacking/defending Trip skill checks; Intense Stance, Entwine and other Trip variants remain open | Batches317/360; actual family/readiness/grip/source proof; attacking scope automated tests, native response verified in317 |
 | Autofire Basics | 180 | No | Manual/descriptive | — |
 | Autofire Mastery | 180 | No | Manual/descriptive | — |
@@ -1541,3 +1541,14 @@ Source: rules reference pp.177, 179, 193 and 345 (text read from the user’s lo
 - Trick notes now cite each trick’s own page instead of a shared “pp.176,179”.
 
 Verification: 513 legacy assertions, 3324 Node tests (10 new Club Basics tests), 8 pack checks. Layout fixtures were not re-run (no template change). Native Foundry QA is **not claimed**. Inventory: 112 manual / 53 partial / 149 other; at least 165 of 314 explicitly unfinished; 31 whole-feat closures (Staff Basics, Club Basics).
+
+## Residual implementation batch 376 — Sword Basics
+
+Source: rules reference p.180 (local markdown edition; original PDF page not visually re-checked).
+
+- **Finesse loss.** `module/rules/sword-basics.mjs` prepares `system.swordBasics`: the feat applies only while no equipped, carried, usable weapon has the finesse quality, including finesse granted by Finesse Basics. Every benefit below checks it.
+- **Opposite-side move.** A melee attack with a one-handed sword without finesse carries a reminder that after a hit the character may move to the unoccupied square on the opposite side of the opponent. Movement stays at the table.
+- **Unbeatable Stance.** Joins the shared stance lifecycle. In the stance, the attack dialog offers a GC-confirmed declaration that one of the character’s melee weapons has already damaged this opponent during this combat; it adds a +1 morale row. Interpretation: damage history is not tracked per target, so the GC confirms it.
+- **Impale.** A Standard Attack trick (not a full action) with a held one-handed sword without finesse. `readiedMeleeFeatSource` gains an explicit `finesse: false` option for this; Fencing’s finesse rule is unchanged. Damage from the recorded hit asks for the target’s Defense (a damage-dialog field after the recorded-hit selector). The proof records `impale: { defense, attackResult, bonus }`, with bonus ⌊(result − Defense) / 2⌋ from the attack’s effective total after boosts. Every later check (reservation, replacement roll, GC review) recomputes the bonus from the recorded Defense. A Defense above the result is rejected as not a hit.
+
+Verification: 513 legacy assertions, 3336 of 3337 Node tests (9 new Sword Basics tests). The one failure is the sample-scenes pack test, locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 111 manual / 53 partial / 150 other; at least 164 of 314 explicitly unfinished; 32 whole-feat closures.
