@@ -381,7 +381,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Wrestling Moves | 189 | No | Manual/descriptive | — |
 | Wrestling Supremacy | 189 | No | Partial: static numerical effects | — |
 | All or Nothing | 189 | No | Manual/descriptive | — |
-| Better Luck Next Time | 189 | No | Manual/descriptive | — |
+| Better Luck Next Time | 189 | No | Covered (batch 380): a single boosting die on a skill check or save that rolls a natural 1 is returned once when the check is resolved (ordinary dice, or a still-live unrestricted bonus pool) | Native Foundry QA not claimed |
 | Fortune's Fool | 189 | No | Manual/descriptive | — |
 | Black Cat | 189 | No | Manual/descriptive | — |
 | Jinx | 190 | No | Implemented: selected paying-opponent critical-failure discount, Chance-based session allowance and combined payment recovery | Batches269–270; Shaken-after-waiver fees, concurrent/source/counter guards, actual GC review and native persistence verified |
@@ -1584,3 +1584,13 @@ Source: rules reference p.189 (local markdown edition; original PDF page not vis
 - **Grant.** The feat is a request to the GC, so the control on the Main tab is the GC’s. The GC chooses who gains the matching d4: the GC pool (`adjustGCDice`, after checking the session’s pool is initialized) or a named opponent, which the chat receipt notes. If the GC pool write fails after the character’s die is saved, the character keeps the die and the receipt and a warning ask the GC to add the match by hand.
 
 Verification: 513 legacy assertions, 3353 of 3354 Node tests (6 new, including a real grant, a refused second use and the GC-only check), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 107 manual / 53 partial / 154 other; at least 160 of 314 explicitly unfinished; 36 whole-feat closures.
+
+## Residual implementation batch 380 — Better Luck Next Time
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- **Qualifying boost.** The boost plan (`actionDieBoostPlan`) marks skill checks and saves boosted by an owner of the feat. Its result (`actionDieBoostResult`, shared by the ordinary and surcharged boost paths) adds a pending entry to the check’s `betterLuckRefunds` when exactly one die was spent and rolled, and it shows a natural 1. Every qualifying boost on the same check adds its own entry. Two dice spent, or a doubled die (Card Shark and the like), does not qualify. Knowledge checks are not skill checks and do not qualify.
+- **Return.** The die comes back “after the action is resolved”, so the refund waits for resolution; an immediate refund would let the same check be boosted again for free. `finishCheck` settles every pending entry in the same update that marks the check resolved, recording `betterLuckRefunded` so it pays out once (`module/rules/better-luck.mjs`). An ordinary die returns to the ordinary count. A bonus-pool die returns only to a still-live unrestricted pool, never above its grant. A check-bound pool belongs to the check just resolved, and an expired pool is gone, so those dice are lost. A notification reports the result; if the balance write fails, a warning asks the GC to add the die by hand.
+- A check that is replaced before resolution passes no pending refund to its replacement.
+
+Verification: 513 legacy assertions, 3357 of 3358 Node tests (4 new, including a real resolution through `finishCheck`). The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Layout fixtures were not re-run (no template change). Native Foundry QA is **not claimed**. Inventory: 106 manual / 53 partial / 155 other; at least 159 of 314 explicitly unfinished; 37 whole-feat closures.

@@ -44,6 +44,7 @@ import {
   rollEvidence
 } from "../../rules/outcomes.mjs";
 import { rerollEligibility } from "../../rules/limited-uses.mjs";
+import { betterLuckSettlement, betterLuckNote } from "../../rules/better-luck.mjs";
 import { actionDieBoostPlan, actionDieBoostResult, generousBoostPlan } from "../../rules/action-dice.mjs";
 import { loc } from "../../i18n.mjs";
 
@@ -1008,15 +1009,36 @@ export const ActorOutcomes = Base =>
               .available
           )
             return ui.notifications.warn(loc`Spend the required class bonus die before resolving this check.`);
+          const luck = betterLuckSettlement(this.system, current, { periods: this.usagePeriods });
           const result = await message.update({
             "flags.spycraft2.resolved": true,
+            ...(luck ? { "flags.spycraft2.betterLuckRefunded": true } : {}),
             flavor: checkFlavor({ ...current, resolved: true })
           });
           await this.retireCheckBonusPool(message);
+          if (luck) await this.settleBetterLuck(luck, message);
           return result;
         },
         { messages: [message] }
       );
+    }
+
+    /** Better Luck Next Time: return the recorded dice once; the check already records the refund as made. */
+    async settleBetterLuck(luck, message) {
+      const patch = {
+        ...(luck.ordinary ? { "system.actionDice.value": luck.value } : {}),
+        ...Object.fromEntries(
+          Object.entries(luck.pools).map(([id, remaining]) => [`system.bonusActionDice.${id}.remaining`, remaining])
+        )
+      };
+      try {
+        if (Object.keys(patch).length) await this.update(patch);
+        ui.notifications.info?.(betterLuckNote(luck));
+      } catch (error) {
+        ui.notifications.warn(
+          loc`Better Luck Next Time could not return the action die (${error.message}). The GC should add it by hand for ${message.uuid ?? message.id}.`
+        );
+      }
     }
 
     async retireCheckBonusPool(message) {

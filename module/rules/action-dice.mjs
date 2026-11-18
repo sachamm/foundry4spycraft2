@@ -77,7 +77,9 @@ export function actionDieBoostPlan(
         kind === "damage"),
     intelligence: system.abilities?.int?.mod ?? 0,
     formula: Array(rolls).fill(`1d${die}x>=${explodeAt}`).join(" + "),
-    wellRounded: system.activeFeatNames?.some(name => name.replaceAll("-", " ") === "Well Rounded") && kind === "skill"
+    wellRounded: system.activeFeatNames?.some(name => name.replaceAll("-", " ") === "Well Rounded") && kind === "skill",
+    // Better Luck Next Time, p.189: a single boosting die on a skill check or save that rolls a natural 1 comes back.
+    betterLuck: system.activeFeatNames?.includes("Better Luck Next Time") === true && ["skill", "save"].includes(kind)
   };
 }
 export function actionDieBoostResult(check, plan, dieResults) {
@@ -101,9 +103,18 @@ export function actionDieBoostResult(check, plan, dieResults) {
     threat: check.threat ?? 0,
     actionDieBonus: boostTotal
   });
+  const naturalOne = plan.betterLuck === true && plan.count === 1 && plan.rolls === 1 && Number(dieResults[0]) === 1;
   return {
     added,
     boostTotal,
+    ...(naturalOne
+      ? {
+          betterLuckRefunds: [
+            ...(check.betterLuckRefunds ?? []),
+            { bonusPoolId: plan.bonusPoolId ?? "", die: plan.die }
+          ]
+        }
+      : {}),
     boostSpent: (check.boostSpent ?? 0) + plan.count,
     wellRoundedBoosts,
     effectiveTotal: resolved.total,
