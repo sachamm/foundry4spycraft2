@@ -6,6 +6,14 @@ import { managedClassGearGrant } from "./class-gear.mjs";
 import { loc } from "../i18n.mjs";
 /** Mission reserves and field acquisition, pp.219–220. */
 export const PICK_CATEGORIES = ["R", "T", "V", "S", "G", "W", "E", "CHA"];
+/** Delivery for a Request that is immediately available (Political Clout, Favors and Immunity). */
+export const IMMEDIATE_DELIVERY = Object.freeze({
+  formula: "0",
+  unit: "minutes",
+  get label() {
+    return loc`Immediately available`;
+  }
+});
 export const DELIVERY = {
   largeCity: {
     formula: "3d20",
@@ -319,7 +327,7 @@ export function gearAcquisitionPlan(
     bonusSources: [...priority.sources, ...local.sources],
     location,
     deliveryMultiplier: useProcure ? 0.5 : 1,
-    delivery: DELIVERY[location],
+    delivery: benefit?.immediate ? IMMEDIATE_DELIVERY : DELIVERY[location],
     record: {
       ...record,
       charismaPicks:

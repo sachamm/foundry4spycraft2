@@ -78,6 +78,25 @@ export function requestSources(system, items = []) {
         cost: 0,
         workflow: "requestBenefit"
       });
+  // Political Clout, Favors and Immunity, p.204: once per mission, one named Request succeeds without a check or
+  // action dice and is immediately available. The GC confirms the item; the Resources have Power Rating 6.
+  for (const [feat, id, category, item] of [
+    ["Political Clout", "requestPoliticalClout", "S", () => loc`an invitation (Security pick)`],
+    ["Political Favors", "requestPoliticalFavors", "R", () => loc`an extradition Resource (Power Rating 6)`],
+    ["Political Immunity", "requestPoliticalImmunity", "R", () => loc`a legal immunity Resource (Power Rating 6)`]
+  ])
+    if (system.activeFeatNames?.includes(feat))
+      sources.push({
+        id,
+        name: loc`${feat}: ${item()}, automatic and immediately available`,
+        category,
+        automatic: true,
+        immediate: true,
+        period: "mission",
+        limit: 1,
+        cost: 0,
+        workflow: "requestBenefit"
+      });
   if ((system.classLevels?.politico ?? 0) >= 10)
     sources.push({
       id: "requestExecutiveDecision",

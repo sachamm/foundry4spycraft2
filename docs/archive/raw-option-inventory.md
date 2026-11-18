@@ -518,9 +518,9 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Military Contacts | 204 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
 | Personal Lieutenant | 204 | No | Manual/descriptive | — |
 | Police Contacts | 204 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
-| Political Clout | 204 | No | Manual/descriptive | — |
-| Political Favors | 204 | No | Manual/descriptive | — |
-| Political Immunity | 204 | No | Manual/descriptive | — |
+| Political Clout | 204 | No | Covered (batch 388): once per mission, an automatic Security Request for an invitation with no action dice, immediately available | Native Foundry QA not claimed |
+| Political Favors | 204 | No | Covered (batch 388): once per mission, an automatic Resource Request for extradition (Power Rating 6) with no action dice, immediately available | Native Foundry QA not claimed |
+| Political Immunity | 204 | No | Covered (batch 388): once per mission, an automatic Resource Request for legal immunity (Power Rating 6) with no action dice, immediately available | Native Foundry QA not claimed |
 | Polyglot | 204 | No | Implemented: two extra Cultures focuses and automatic rank synergy on all Impress/Networking uses, without regional focus requirement | Batch230; typed stacking, Language exclusion, source guard and persisted native evidence verified |
 | Research Contacts | 205 | No | Implemented: new associate or one-grade Favored improvement, scoped Contact timing/error and later Networking associates | Batches233–236; Table2.35 correction, both grant modes, shared-grade caps, unnamed error stacking, history retention and native persistence verified |
 | Silver Tongue | 205 | No | Partial: all four printed benefits on verified agent/single-target paths, including GC-confirmed seduction Wisdom damage and mission-end recovery | Batches283–284,286–289; actual source/target, signed Charisma error, synergy/language scopes, floor6/zero claims, duplicate/partial-save/correction/source-loss/reload guards and five actual UI paths verified; generic NPC profiles, group/multiple-target checks and Surgery/source-specific recovery remain open |
@@ -1673,3 +1673,13 @@ Source: rules reference pp.208–209 (local markdown edition; original PDF pages
 - **Round pace:** a manage action (`declarePace`) records that the side takes +1 error range on its check this round. The round then takes half (Breaking Points) or twice (Hold Out) its usual time. Once per side per round, before the check is resolved. The GC applies the error range when that check is rolled.
 
 Verification: 3388 of 3389 Node tests (1 new). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 86 manual / 55 partial / 173 other; at least 141 of 314 explicitly unfinished; 55 whole-feat closures.
+
+## Residual implementation batch 388 — Political Clout, Favors and Immunity
+
+Source: rules reference p.204 (local markdown edition; original PDF page not visually re-checked).
+
+- Each feat is a once-per-mission Request benefit in `module/rules/requests.mjs`, used through the existing Request workflow. The Request is automatic (no check, network confirmed by the GC as for Executive Decision) and costs no action dice. It is tied to its category: Security for Clout’s invitation, Resource for Favors’ extradition and Immunity’s legal immunity, which have Power Rating 6.
+- “Immediately available”: these Requests use a new zero-time delivery (`IMMEDIATE_DELIVERY`) instead of the location’s delivery roll.
+- As with every Request, one matching Reserve pick is consumed and the mission Caliber limit applies. Interpretation: the feats waive the check and the action dice, not the pick.
+
+Verification: 3389 of 3390 Node tests (1 new; the Request suite’s 85 pass). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 83 manual / 55 partial / 176 other; at least 138 of 314 explicitly unfinished; 58 whole-feat closures.
