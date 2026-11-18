@@ -86,6 +86,7 @@ import "../rules/knowledge.mjs";
 import "../rules/medical.mjs";
 import "../rules/melee-armor-piercing.mjs";
 import "../rules/melee-skill-feats.mjs";
+import "../rules/mingling.mjs";
 import "../rules/melee-tradeoff.mjs";
 import "../rules/melee-tricks.mjs";
 import "../rules/mental-leap.mjs";
