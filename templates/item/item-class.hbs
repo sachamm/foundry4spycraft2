@@ -13,7 +13,7 @@
   {{#if levelBonuses}}<p><b>{{localize "SPYCRAFT.Class.LevelBonuses"}}:</b> {{levelBonuses}}</p>{{/if}}
   <h3>{{localize "SPYCRAFT.Class.Table"}}</h3>
   <table class="class-table">
-    <thead><tr><th>Lvl</th><th>BAB</th><th>Fort</th><th>Ref</th><th>Will</th><th>Def</th><th>Init</th><th>{{localize "SPYCRAFT.Wealth"}}</th><th>R</th><th>T</th><th>V</th><th>S</th><th>G</th><th>W</th><th>E</th></tr></thead>
+    <thead><tr><th>{{localize "SPYCRAFT.Template.ItemItemClass.Lvl"}}</th><th>{{localize "SPYCRAFT.Template.ItemItemClass.BAB"}}</th><th>{{localize "SPYCRAFT.Template.ItemItemClass.Fort"}}</th><th>{{localize "SPYCRAFT.Template.ItemItemClass.Ref"}}</th><th>{{localize "SPYCRAFT.Template.ItemItemClass.Will"}}</th><th>{{localize "SPYCRAFT.Template.ItemItemClass.Def"}}</th><th>{{localize "SPYCRAFT.Template.ItemItemClass.Init"}}</th><th>{{localize "SPYCRAFT.Wealth"}}</th><th>R</th><th>T</th><th>V</th><th>S</th><th>G</th><th>W</th><th>E</th></tr></thead>
     <tbody>{{#each system.table}}<tr><td>{{level}}</td><td>+{{bab}}</td><td>+{{fort}}</td><td>+{{ref}}</td><td>+{{will}}</td><td>+{{defense}}</td><td>+{{initiative}}</td><td>{{wealth}}</td><td>{{gearR}}</td><td>{{gearT}}</td><td>{{gearV}}</td><td>{{gearS}}</td><td>{{gearG}}</td><td>{{gearW}}</td><td>{{gearE}}</td></tr>{{/each}}</tbody>
   </table>
   <h3>{{localize "SPYCRAFT.Class.Abilities"}}</h3>

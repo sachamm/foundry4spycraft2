@@ -1,48 +1,48 @@
 <section class="item-details">
   <div class="form-fields-grid">
-    <label>Category <select name="system.vehicleClass">{{selectOptions vehicleClassOptions selected=system.vehicleClass}}</select></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Category"}} <select name="system.vehicleClass">{{selectOptions vehicleClassOptions selected=system.vehicleClass}}</select></label>
     <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
     <label>{{localize "SPYCRAFT.Quantity"}} <input type="number" name="system.quantity" value="{{system.quantity}}" class="w-2" /></label>
     <label>{{localize "SPYCRAFT.Pick"}} <select name="system.pick">{{selectOptions pickOptions selected=system.pick}}</select></label>
-    {{#if system.pick}}<label>Mission picks paid <input type="number" min="1" name="system.pickCount" value="{{system.pickCount}}" class="w-2" /></label>{{/if}}
+    {{#if system.pick}}<label>{{localize "SPYCRAFT.Template.ItemItemVehicle.MissionPicksPaid"}} <input type="number" min="1" name="system.pickCount" value="{{system.pickCount}}" class="w-2" /></label>{{/if}}
     <label><input type="checkbox" name="system.reserve" {{checked system.reserve}} /> {{localize "SPYCRAFT.Reserve"}}</label>
   </div>
-  {{#if vehicleClassInfo}}<p class="muted">Controlled with {{vehicleClassInfo.skill}}{{#if vehicleClassInfo.focus}} · Drive focus: {{vehicleClassInfo.focus}}{{/if}} · untrained {{vehicleClassInfo.untrainedPenalty}}</p>{{/if}}
-  {{#if system.standingOnly}}<p class="muted">Requested with Reputation or Net Worth only{{#if system.standingCost}}: {{system.standingCost}}{{/if}}.</p>{{/if}}
-  {{#if system.optionOf}}<p class="muted">Option for {{system.optionOf}}.</p>{{/if}}
-  {{#if standing}}<p class="muted">Request cost: {{standing.cost.reputation}} Reputation or {{standing.netWorthLabel}} Net Worth{{#if standing.charge}} · <strong>paid</strong> ({{standing.charge.amount}} {{standing.charge.currency}}){{/if}}{{#if standing.canCharge}} · <a data-action="chargeStanding"><i class="fa-solid fa-coins"></i> Pay the cost</a>{{/if}}{{#if standing.canRefund}} · <a data-action="refundStanding"><i class="fa-solid fa-rotate-left"></i> Refund</a>{{/if}}</p>{{/if}}
+  {{#if vehicleClassInfo}}<p class="muted">{{localize "SPYCRAFT.Template.ItemItemVehicle.ControlledWith"}} {{vehicleClassInfo.skill}}{{#if vehicleClassInfo.focus}} {{localize "SPYCRAFT.Template.ItemItemVehicle.DriveFocus"}} {{vehicleClassInfo.focus}}{{/if}} {{localize "SPYCRAFT.Template.ItemItemVehicle.Untrained"}} {{vehicleClassInfo.untrainedPenalty}}</p>{{/if}}
+  {{#if system.standingOnly}}<p class="muted">{{localize "SPYCRAFT.Template.ItemItemVehicle.RequestedWithReputationOrNetWorth"}}{{#if system.standingCost}}: {{system.standingCost}}{{/if}}.</p>{{/if}}
+  {{#if system.optionOf}}<p class="muted">{{localize "SPYCRAFT.Template.ItemItemVehicle.OptionFor"}} {{system.optionOf}}.</p>{{/if}}
+  {{#if standing}}<p class="muted">{{localize "SPYCRAFT.Template.ItemItemVehicle.RequestCost"}} {{standing.cost.reputation}} {{localize "SPYCRAFT.Template.ItemItemVehicle.ReputationOr"}} {{standing.netWorthLabel}} {{localize "SPYCRAFT.Template.ItemItemVehicle.NetWorth"}}{{#if standing.charge}} · <strong>{{localize "SPYCRAFT.Template.ItemItemVehicle.Paid"}}</strong> ({{standing.charge.amount}} {{standing.charge.currency}}){{/if}}{{#if standing.canCharge}} · <a data-action="chargeStanding"><i class="fa-solid fa-coins"></i> {{localize "SPYCRAFT.Template.ItemItemVehicle.PayTheCost"}}</a>{{/if}}{{#if standing.canRefund}} · <a data-action="refundStanding"><i class="fa-solid fa-rotate-left"></i> {{localize "SPYCRAFT.Template.ItemItemVehicle.Refund"}}</a>{{/if}}</p>{{/if}}
   {{#if system.footnotes.length}}<ul class="footnotes muted">{{#each system.footnotes}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
-  {{#if system.bundled}}<p class="muted">Comes with: {{system.bundled}}</p>{{/if}}
-  {{#if system.perTeamMember}}<p class="muted">Issued to every team member{{#if canIssueTeam}} · <a data-action="issueToTeam"><i class="fa-solid fa-users"></i> Issue to the team</a>{{/if}}</p>{{/if}}
+  {{#if system.bundled}}<p class="muted">{{localize "SPYCRAFT.Template.ItemItemVehicle.ComesWith"}} {{system.bundled}}</p>{{/if}}
+  {{#if system.perTeamMember}}<p class="muted">{{localize "SPYCRAFT.Template.ItemItemVehicle.IssuedToEveryTeamMember"}}{{#if canIssueTeam}} · <a data-action="issueToTeam"><i class="fa-solid fa-users"></i> {{localize "SPYCRAFT.Template.ItemItemVehicle.IssueToTheTeam"}}</a>{{/if}}</p>{{/if}}
 
-  <h3>Statistics{{#if system.sourceTable}} — {{system.sourceTable}}{{/if}}</h3>
+  <h3>{{localize "SPYCRAFT.Template.ItemItemVehicle.Statistics"}}{{#if system.sourceTable}} — {{system.sourceTable}}{{/if}}</h3>
   <div class="form-fields-grid">
-    <label>Size <input name="system.size" value="{{system.size}}" class="w-2" maxlength="1" /></label>
-    <label>Size and footprint <input name="system.sizeLabel" value="{{system.sizeLabel}}" /></label>
-    <label>Occupancy <input name="system.occupancy" value="{{system.occupancy}}" /></label>
-    <label>Acceleration/Turning <input name="system.accelerationTurning" value="{{system.accelerationTurning}}" /></label>
-    <label>Acceleration <input name="system.acceleration" type="number" value="{{system.acceleration}}" class="w-2" /></label>
-    <label>Turning <input name="system.turning" type="number" value="{{system.turning}}" class="w-2" /></label>
-    <label>MPH <input name="system.mph" value="{{system.mph}}" /></label>
-    <label>Cruising MPH <input name="system.cruiseMph" type="number" value="{{system.cruiseMph}}" /></label>
-    <label>Top MPH <input name="system.topMph" type="number" value="{{system.topMph}}" /></label>
-    <label>Defense <input name="system.defense" type="number" value="{{system.defense}}" class="w-2" /></label>
-    <label>Damage save <input name="system.damageSave" type="number" value="{{system.damageSave}}" class="w-2" /></label>
-    <label>Upgrades <input name="system.upgrades" type="number" min="0" value="{{system.upgrades}}" class="w-2" /></label>
-    <label>Complexity <input name="system.complexity" value="{{system.complexity}}" /></label>
-    <label>Cargo <input name="system.cargo" value="{{system.cargo}}" /></label>
-    <label>Range/Fuel <input name="system.rangeFuel" value="{{system.rangeFuel}}" /></label>
-    <label>Year <input name="system.year" value="{{system.year}}" /></label>
-    <label>Street value <input name="system.streetValue" value="{{system.streetValue}}" /></label>
-    <label><input type="checkbox" name="system.restricted" {{checked system.restricted}} /> Restricted sale</label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Size"}} <input name="system.size" value="{{system.size}}" class="w-2" maxlength="1" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.SizeAndFootprint"}} <input name="system.sizeLabel" value="{{system.sizeLabel}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Occupancy"}} <input name="system.occupancy" value="{{system.occupancy}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.AccelerationTurning"}} <input name="system.accelerationTurning" value="{{system.accelerationTurning}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Acceleration"}} <input name="system.acceleration" type="number" value="{{system.acceleration}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Turning"}} <input name="system.turning" type="number" value="{{system.turning}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.MPH"}} <input name="system.mph" value="{{system.mph}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.CruisingMPH"}} <input name="system.cruiseMph" type="number" value="{{system.cruiseMph}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.TopMPH"}} <input name="system.topMph" type="number" value="{{system.topMph}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Defense"}} <input name="system.defense" type="number" value="{{system.defense}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.DamageSave"}} <input name="system.damageSave" type="number" value="{{system.damageSave}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Upgrades"}} <input name="system.upgrades" type="number" min="0" value="{{system.upgrades}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Complexity"}} <input name="system.complexity" value="{{system.complexity}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Cargo"}} <input name="system.cargo" value="{{system.cargo}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.RangeFuel"}} <input name="system.rangeFuel" value="{{system.rangeFuel}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Year"}} <input name="system.year" value="{{system.year}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.StreetValue"}} <input name="system.streetValue" value="{{system.streetValue}}" /></label>
+    <label><input type="checkbox" name="system.restricted" {{checked system.restricted}} /> {{localize "SPYCRAFT.Template.ItemItemVehicle.RestrictedSale"}}</label>
   </div>
-  <label>Qualities <input name="system.qualities" value="{{system.qualities}}" /></label>
+  <label>{{localize "SPYCRAFT.Template.ItemItemVehicle.Qualities"}} <input name="system.qualities" value="{{system.qualities}}" /></label>
   {{#if vehicleQualities.length}}<ul class="vehicle-qualities">{{#each vehicleQualities}}<li><strong>{{label}}</strong> — {{name}}{{#if summary}}: {{summary}}{{/if}}</li>{{/each}}</ul>{{/if}}
   <p class="controls">
-    {{#if hasDamageSave}}<a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
-    · failed saves <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
+    {{#if hasDamageSave}}<a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> {{localize "SPYCRAFT.Template.ItemItemVehicle.DamageSave"}}</a>
+    {{localize "SPYCRAFT.Template.ItemItemVehicle.FailedSaves"}} <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
     · <strong class="{{#unless (sc2eq breakState.state 'intact')}}bad{{/unless}}">{{breakState.state}}</strong> ·{{/if}}
-    <a data-action="deployVehicle"><i class="fa-solid fa-map-location-dot"></i> Place on a scene</a>
+    <a data-action="deployVehicle"><i class="fa-solid fa-map-location-dot"></i> {{localize "SPYCRAFT.Template.ItemItemVehicle.PlaceOnAScene"}}</a>
   </p>
   <h3>{{localize "SPYCRAFT.Description"}}</h3>
   {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}

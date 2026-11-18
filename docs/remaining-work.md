@@ -120,33 +120,44 @@ Still inline, and worth doing as rules are next touched:
 
 ## Architecture (from the November review)
 
+Status after the live checks of 2026-11-17 on Foundry 14.370 (two clients: the GC and a second GM-role user).
+
 - [ ] **Decision needed: how far feat automation goes.** Recommendation: keep the proof/lease/receipt pattern for the
       roughly forty workflows that have it, and stop there. For the rest, add a "declare and remind" tier: a feat
       names the roll kinds it bears on and a one-line reminder; the roll dialog lists the ones that apply, and those
       ticked are noted on the card for the GC to adjudicate. The dialog, read, record and flavor phases already
       support this; it needs a field on feat items and the reminder text for each feat.
-- [ ] Resource locks. A GM-arbitrated lock exists (`module/rules/gm-locks.mjs`): the lock lives in the GC client's
-      memory, nothing is written to the character, and a disconnecting client loses its locks. It is **off by
-      default** (world setting "Resource locking"), because it has not been run with two live clients. The work
-      itself still runs on the acting client; only the lock is arbitrated. To finish: check it with two clients, then
-      make it the default and retire the lock documents.
-- [ ] Typed schemas. The world now records a schema version and runs migrations on start
-      (`module/migrations/index.mjs`; none are needed yet). `npm run check:schemas` validates every data model with
-      Foundry's own field classes from a local installation. The untyped `ObjectField`s remain: 33 on agents, 4 on
-      NPCs, 5 on each item type. Typing them safely needs each record's real shape; a strict schema drops keys it
-      does not list.
-- [ ] Round-scoped states. `module/apps/round-state-effects.mjs` shows stances, Total Defense, Combat Expertise,
-      Superior Cover, Darting Weapon, Two-Weapon Fighting and the three action-die boosts as Active Effects with a
-      duration, kept in step by the GC's client. They are a display: the state is still the record on the character.
-      Creating and removing the effects was checked in Foundry 14.370; a real state change with this client as the
-      active GC was not.
+- [x] Resource locks. A GM-arbitrated lock exists (`module/rules/gm-locks.mjs`, world setting "Resource locking").
+      Checked with two clients: a held character is refused with the usual message, the lock is freed afterwards,
+      and no lock document is written. **The document lock stays the default on purpose:** the arbitrated table
+      lives in one client, so a GC signed in from two browsers would have two tables. Only the lock is arbitrated;
+      the work still runs on the acting client. Routing the writes themselves would mean rewriting each workflow as
+      a request the GC's client carries out.
+- [x] Schema version and migrations: the world records its schema version and runs pending migrations on start
+      (`module/migrations/index.mjs`). The live world was stamped at version 1 by the GC's client.
+- [ ] Typed records. 42 of the open object fields on agents and NPCs now declare their shape
+      (`module/data/record-shapes.mjs`), learnt from every update the test suite makes and checked against the
+      live world's 48 actors. The check is soft: a misfit is reported once in the console and nothing is rejected
+      or stripped. Still open: eight fields with no observed writes (`cheapShots`, `promotion`, `damageTrack`,
+      `attributeDamage`, `gearPickLosses`, `armorMissionGrant`, `bigStickMissionPick`, `missionCaliberPicks`), the
+      item models' object fields, and turning the check strict once the shapes have survived real play
+      (`CONFIG.debug.spycraft2Records = true` makes a misfit fail validation).
+- [x] Round-scoped states are shown as Active Effects with a duration (`module/apps/round-state-effects.mjs`),
+      kept in step by the GC's client. Checked live: declaring Combat Expertise produced its effect, and the
+      effect went when the character's count came round. **The record on the character is still the state**; the
+      effect is its display. Making the effect the storage would mean rewriting each state's write, rollback and
+      review path, and the rules' own-count clocks do not map onto Foundry's durations.
 - [x] Formatter and linter: Prettier and ESLint (`npm run format`, `format:check`, `lint`), run in CI. Every module
       was reformatted in one pass. Lint reports 27 unused-variable warnings and no errors.
 - [x] Tests are discovered by pattern (`tools/test-*.mjs`), and the engine fixtures build their documents from
       `src/data`, so `npm test` runs with Foundry open.
 - [x] Batch ledgers and QA records moved to `docs/archive/`.
-- [ ] Localization. Chat buttons and the new settings are translatable (keys in `lang/en.json`, English fallback in
-      code). Dialog and sheet text is still hard-coded English.
+- [ ] Localization. Every sheet and application template takes its text from `lang/en.json` (1,131 strings under
+      `SPYCRAFT.Template`), as do chat buttons and the new settings; the English output is unchanged. Still
+      hard-coded: roll dialog text (`module/rolls/dialogs/` and the rule modules' dialog sections), chat card
+      flavor and notes, notifications and error messages, and labels built in JavaScript. Template strings were
+      extracted mechanically, so a sentence interrupted by a value is several fragments; those want rewriting as
+      single formatted strings before anyone translates them.
 
 ## Game areas still missing or thin
 

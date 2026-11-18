@@ -9,114 +9,114 @@
     <div class="header-main">
       <input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" />
       <div class="summary">
-        <label>Category <select name="system.vehicleClass">{{selectOptions classOptions selected=system.vehicleClass}}</select></label>
+        <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Category"}} <select name="system.vehicleClass">{{selectOptions classOptions selected=system.vehicleClass}}</select></label>
         <label>{{localize "SPYCRAFT.Caliber"}} <select name="system.caliber" data-dtype="Number">{{selectOptions calibers selected=system.caliber}}</select></label>
-        {{#if system.sourceItem}}<a data-action="openSource">Open gear pick</a>{{/if}}
+        {{#if system.sourceItem}}<a data-action="openSource">{{localize "SPYCRAFT.Template.ActorVehicleSheet.OpenGearPick"}}</a>{{/if}}
       </div>
-      {{#if control}}<p class="muted">Controlled with {{control.skill}}{{#if control.focus}} · Drive focus: {{control.focus}}{{/if}} · untrained {{control.untrainedPenalty}}</p>{{/if}}
+      {{#if control}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.ControlledWith"}} {{control.skill}}{{#if control.focus}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.DriveFocus"}} {{control.focus}}{{/if}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.Untrained"}} {{control.untrainedPenalty}}</p>{{/if}}
     </div>
   </header>
 
-  <h3>Condition</h3>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Condition"}}</h3>
   <p>
     <strong class="{{#unless (sc2eq system.breakState.state 'intact')}}bad{{/unless}}">{{system.breakState.state}}</strong>
-    · failed Damage saves <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
-    (broken at {{system.breakState.brokenAt}}, destroyed at {{system.breakState.destroyedAt}})
-    {{#if system.condition.immobilized}}· <strong class="bad">immobilized</strong>{{/if}}
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.FailedDamageSaves"}} <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.BrokenAt"}} {{system.breakState.brokenAt}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.DestroyedAt"}} {{system.breakState.destroyedAt}})
+    {{#if system.condition.immobilized}}· <strong class="bad">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Immobilized"}}</strong>{{/if}}
   </p>
   <p>
-    Defense <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>{{#if system.defenseNow.rows.length}} <span class="muted">({{#each system.defenseNow.rows}}{{label}} {{signed value}}{{#unless @last}}, {{/unless}}{{/each}})</span>{{/if}}
-    · Damage save <strong>{{#if (sc2eq system.damageSaveNow null)}}—{{else}}{{signed system.damageSaveNow}}{{/if}}</strong>
-    · Acceleration <strong>{{#if (sc2eq system.condition.acceleration null)}}{{system.accelerationTurning}}{{else}}{{system.condition.acceleration}}{{/if}}</strong>
-    · Turning <strong>{{#if (sc2eq system.condition.turning null)}}—{{else}}{{system.condition.turning}}{{/if}}</strong>
-    · MPH <strong>{{#if (sc2eq system.condition.cruiseMph null)}}{{system.mph}}{{else}}{{system.condition.cruiseMph}}/{{system.condition.topMph}}{{/if}}</strong>
-    {{#if system.condition.maneuverErrorIncrease}}· Maneuver error +{{system.condition.maneuverErrorIncrease}}{{/if}}
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Defense"}} <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>{{#if system.defenseNow.rows.length}} <span class="muted">({{#each system.defenseNow.rows}}{{label}} {{signed value}}{{#unless @last}}, {{/unless}}{{/each}})</span>{{/if}}
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave"}} <strong>{{#if (sc2eq system.damageSaveNow null)}}—{{else}}{{signed system.damageSaveNow}}{{/if}}</strong>
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Acceleration"}} <strong>{{#if (sc2eq system.condition.acceleration null)}}{{system.accelerationTurning}}{{else}}{{system.condition.acceleration}}{{/if}}</strong>
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Turning"}} <strong>{{#if (sc2eq system.condition.turning null)}}—{{else}}{{system.condition.turning}}{{/if}}</strong>
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.MPH"}} <strong>{{#if (sc2eq system.condition.cruiseMph null)}}{{system.mph}}{{else}}{{system.condition.cruiseMph}}/{{system.condition.topMph}}{{/if}}</strong>
+    {{#if system.condition.maneuverErrorIncrease}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.ManeuverError"}}{{system.condition.maneuverErrorIncrease}}{{/if}}
   </p>
   <p>
-    <label><input type="checkbox" name="system.moving" {{checked system.moving}} /> In motion</label>
-    · <label><input type="checkbox" name="system.aboveCruising" {{checked system.aboveCruising}} /> Above cruising MPH</label>
-    · <label><input type="checkbox" name="system.onFire" {{checked system.onFire}} /> On fire</label>
-    · <label>Defense against <select name="system.attacker">{{selectOptions attackerOptions selected=system.attacker}}</select></label>
+    <label><input type="checkbox" name="system.moving" {{checked system.moving}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.InMotion"}}</label>
+    · <label><input type="checkbox" name="system.aboveCruising" {{checked system.aboveCruising}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.AboveCruisingMPH"}}</label>
+    · <label><input type="checkbox" name="system.onFire" {{checked system.onFire}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.OnFire"}}</label>
+    · <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.DefenseAgainst"}} <select name="system.attacker">{{selectOptions attackerOptions selected=system.attacker}}</select></label>
   </p>
   <p class="controls">
-    <a data-action="controlCheck"><i class="fa-solid fa-car-side"></i> Control check</a>
-    · <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> Damage save</a>
-    · <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> Vehicle Damage result</a>
-    · <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> Tyre save</a>
-    · <a data-action="fuelExplosion"><i class="fa-solid fa-fire"></i> Fuel explosion</a>
-    · <a data-action="repair"><i class="fa-solid fa-wrench"></i> Repaired</a>
+    <a data-action="controlCheck"><i class="fa-solid fa-car-side"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.ControlCheck"}}</a>
+    · <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave2"}}</a>
+    · <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleDamageResult"}}</a>
+    · <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TyreSave"}}</a>
+    · <a data-action="fuelExplosion"><i class="fa-solid fa-fire"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.FuelExplosion"}}</a>
+    · <a data-action="repair"><i class="fa-solid fa-wrench"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Repaired"}}</a>
   </p>
   <div class="form-fields-grid">
     {{#each counters}}<label>{{label}} <input name="system.damage.{{key}}" type="number" min="0" value="{{value}}" class="w-2" /></label>{{/each}}
   </div>
 
-  <h3>Surroundings</h3>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Surroundings"}}</h3>
   <div class="form-fields-grid">
     {{#each hazardFields}}<label>{{label}} <select name="system.hazards.{{group}}">{{selectOptions options selected=value}}</select></label>{{/each}}
-    {{#if toleranceChoice}}<label>Tolerance ignores <select name="system.hazards.tolerance">{{selectOptions toleranceChoice.options selected=toleranceChoice.value}}</select></label>{{/if}}
+    {{#if toleranceChoice}}<label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.ToleranceIgnores"}} <select name="system.hazards.tolerance">{{selectOptions toleranceChoice.options selected=toleranceChoice.value}}</select></label>{{/if}}
   </div>
-  {{#if system.hazardSummary}}<p class="{{#if system.hazardEffect.blocked}}bad{{/if}}">{{system.hazardSummary}} <span class="muted">Applied to control checks.</span></p>{{/if}}
-  {{#if signatures.length}}<p>Signature Defense/DC: {{#each signatures}}<strong data-tooltip="{{detail}}">{{label}} {{value}}</strong>{{#unless @last}} · {{/unless}}{{/each}}
-    {{#if hasJamming}}· <label><input type="checkbox" name="system.jamming" {{checked system.jamming}} /> Jamming on</label>{{/if}}
-    <span class="muted">(Table 4.75; Maneuvering Room adds Open +5, Crowded −5, Tight −10)</span></p>{{/if}}
-  {{#if acceleration}}<p>Acceleration to distance: <strong>{{acceleration.first}}</strong> in round 1 ({{acceleration.firstShare}} top MPH), then <strong>{{acceleration.later}}</strong> a round ({{acceleration.laterShare}}){{#if acceleration.rounds}}, top MPH after {{acceleration.rounds}} round{{#unless (sc2eq acceleration.rounds 1)}}s{{/unless}}{{/if}} <span class="muted">(Table 4.74; a drawn vehicle uses its puller's rating −2)</span></p>{{/if}}
+  {{#if system.hazardSummary}}<p class="{{#if system.hazardEffect.blocked}}bad{{/if}}">{{system.hazardSummary}} <span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.AppliedToControlChecks"}}</span></p>{{/if}}
+  {{#if signatures.length}}<p>{{localize "SPYCRAFT.Template.ActorVehicleSheet.SignatureDefenseDC"}} {{#each signatures}}<strong data-tooltip="{{detail}}">{{label}} {{value}}</strong>{{#unless @last}} · {{/unless}}{{/each}}
+    {{#if hasJamming}}· <label><input type="checkbox" name="system.jamming" {{checked system.jamming}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.JammingOn"}}</label>{{/if}}
+    <span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Table475ManeuveringRoomAdds"}}</span></p>{{/if}}
+  {{#if acceleration}}<p>{{localize "SPYCRAFT.Template.ActorVehicleSheet.AccelerationToDistance"}} <strong>{{acceleration.first}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.InRound1"}}{{acceleration.firstShare}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.TopMPHThen"}} <strong>{{acceleration.later}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.ARound"}}{{acceleration.laterShare}}){{#if acceleration.rounds}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.TopMPHAfter"}} {{acceleration.rounds}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.Round"}}{{#unless (sc2eq acceleration.rounds 1)}}s{{/unless}}{{/if}} <span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Table474ADrawnVehicle"}}</span></p>{{/if}}
 
-  <h3>Aboard</h3>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Aboard"}}</h3>
   <p>
-    Driver: {{#if system.driverName}}<strong>{{system.driverName}}</strong> <a data-action="clearDriver" data-tooltip="Remove driver"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">drop a character here</span>{{/if}}
-    {{#if (sc2eq system.vehicleClass 'M/AD')}} · Mount: {{#if system.mountName}}<strong>{{system.mountName}}</strong> <a data-action="clearMount" data-tooltip="Unlink the animal"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">drop an NPC to use its statistics</span>{{/if}}{{/if}}
-    · enter or leave: {{system.entryFeet}} ft. of movement
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Driver"}} {{#if system.driverName}}<strong>{{system.driverName}}</strong> <a data-action="clearDriver" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.RemoveDriver'}}"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.DropACharacterHere"}}</span>{{/if}}
+    {{#if (sc2eq system.vehicleClass 'M/AD')}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.Mount"}} {{#if system.mountName}}<strong>{{system.mountName}}</strong> <a data-action="clearMount" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.UnlinkTheAnimal'}}"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.DropAnNPCToUseIts"}}</span>{{/if}}{{/if}}
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.EnterOrLeave"}} {{system.entryFeet}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.FtOfMovement"}}
   </p>
   {{#if system.occupantList.length}}<table class="items"><tbody>
-    {{#each system.occupantList}}<tr><td>{{name}}</td><td><a data-action="toggleRole" data-index="{{index}}" data-tooltip="Switch crew/passenger">{{role}}</a></td>
-      <td><a data-action="bailOut" data-uuid="{{uuid}}"><i class="fa-solid fa-person-falling"></i> Bail out</a></td>
-      <td><a data-action="leave" data-index="{{index}}" data-tooltip="Leave the vehicle"><i class="fa-solid fa-xmark"></i></a></td></tr>{{/each}}
+    {{#each system.occupantList}}<tr><td>{{name}}</td><td><a data-action="toggleRole" data-index="{{index}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.SwitchCrewPassenger'}}">{{role}}</a></td>
+      <td><a data-action="bailOut" data-uuid="{{uuid}}"><i class="fa-solid fa-person-falling"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.BailOut"}}</a></td>
+      <td><a data-action="leave" data-index="{{index}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.LeaveTheVehicle'}}"><i class="fa-solid fa-xmark"></i></a></td></tr>{{/each}}
   </tbody></table>{{/if}}
-  {{#if system.driverName}}<p><a data-action="bailOut" data-uuid="{{system.driver}}"><i class="fa-solid fa-person-falling"></i> Driver bails out</a></p>{{/if}}
+  {{#if system.driverName}}<p><a data-action="bailOut" data-uuid="{{system.driver}}"><i class="fa-solid fa-person-falling"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DriverBailsOut"}}</a></p>{{/if}}
   <p>
-    <label>Acquired as <select name="system.acquiredAs">{{selectOptions acquiredOptions selected=system.acquiredAs}}</select></label>
-    {{#if skeletonCrew}}· skeleton crew: <strong>{{skeletonCrew.count}}</strong> Tier I vehicle crew <span class="muted">({{skeletonCrew.source}})</span>{{/if}}
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.AcquiredAs"}} <select name="system.acquiredAs">{{selectOptions acquiredOptions selected=system.acquiredAs}}</select></label>
+    {{#if skeletonCrew}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.SkeletonCrew"}} <strong>{{skeletonCrew.count}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TierIVehicleCrew"}} <span class="muted">({{skeletonCrew.source}})</span>{{/if}}
   </p>
 
-  <h3>Fuel</h3>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Fuel"}}</h3>
   {{#if fuel}}<p>
-    <strong class="{{#if fuel.empty}}bad{{/if}}">{{fuel.remainingLabel}}</strong> of {{fuel.capacityLabel}} hours left · {{fuel.fuelName}}
-    · <a data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> Record use</a> · <a data-action="refuel"><i class="fa-solid fa-rotate"></i> Refuel</a>
-    · used <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> hr
-  </p>{{else}}<p class="muted">No fuel range to track ({{system.rangeFuel}}).</p>{{/if}}
+    <strong class="{{#if fuel.empty}}bad{{/if}}">{{fuel.remainingLabel}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{fuel.capacityLabel}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.HoursLeft"}} {{fuel.fuelName}}
+    · <a data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.RecordUse"}}</a> · <a data-action="refuel"><i class="fa-solid fa-rotate"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Refuel"}}</a>
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Used"}} <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Hr"}}
+  </p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.NoFuelRangeToTrack"}}{{system.rangeFuel}}).</p>{{/if}}
 
-  <h3>Qualities</h3>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Qualities"}}</h3>
   {{#if system.qualityList.length}}<ul class="vehicle-qualities">{{#each system.qualityList}}<li><strong data-tooltip="{{summary}}">{{label}}</strong> — {{name}}{{#if summary}}: {{summary}}{{/if}}</li>{{/each}}</ul>
-  <p class="muted">Vehicle qualities, pp.292–295.</p>{{else}}<p class="muted">None.</p>{{/if}}
+  <p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleQualitiesPp292295"}}</p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.None"}}</p>{{/if}}
 
-  <h3>Upgrades and weapons</h3>
-  <p>Upgrades used <strong class="{{#if upgradesOver}}bad{{/if}}">{{system.upgraded.used}}</strong> of {{system.upgraded.free}} free · weapon spaces {{weapons.length}} of {{system.weaponSpaces}}{{#if weaponsOver}} <strong class="bad">over</strong>{{/if}} <span class="muted">· drop upgrades and vehicle weapons here</span></p>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.UpgradesAndWeapons"}}</h3>
+  <p>{{localize "SPYCRAFT.Template.ActorVehicleSheet.UpgradesUsed"}} <strong class="{{#if upgradesOver}}bad{{/if}}">{{system.upgraded.used}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{system.upgraded.free}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.FreeWeaponSpaces"}} {{weapons.length}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{system.weaponSpaces}}{{#if weaponsOver}} <strong class="bad">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Over"}}</strong>{{/if}} <span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.DropUpgradesAndVehicleWeaponsHere"}}</span></p>
   {{#if upgrades.length}}<table class="items"><tbody>{{#each upgrades}}<tr><td><a data-action="openItem" data-item-id="{{id}}">{{name}}</a></td><td>{{cost}}</td><td><a data-action="removeItem" data-item-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
-  {{#if system.upgraded.addedQualities.length}}<p class="muted">Added by upgrades: {{#each system.upgraded.addedQualities}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+  {{#if system.upgraded.addedQualities.length}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.AddedByUpgrades"}} {{#each system.upgraded.addedQualities}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
   {{#if weapons.length}}<table class="items"><tbody>{{#each weapons}}<tr><td><a data-action="openItem" data-item-id="{{id}}">{{name}}</a></td><td>{{damage}}</td><td>{{errorThreat}}</td>
-    <td><a data-action="fireWeapon" data-item-id="{{id}}"><i class="fa-solid fa-crosshairs"></i> Fire</a></td><td><a data-action="removeItem" data-item-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
-  {{#if otherItems.length}}<p class="muted">Also aboard: {{#each otherItems}}<a data-action="openItem" data-item-id="{{id}}">{{name}}</a>{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+    <td><a data-action="fireWeapon" data-item-id="{{id}}"><i class="fa-solid fa-crosshairs"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Fire"}}</a></td><td><a data-action="removeItem" data-item-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
+  {{#if otherItems.length}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.AlsoAboard"}} {{#each otherItems}}<a data-action="openItem" data-item-id="{{id}}">{{name}}</a>{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
 
-  <h3>Statistics</h3>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Statistics"}}</h3>
   <div class="form-fields-grid">
-    <label>Size <input name="system.size" value="{{system.size}}" class="w-2" maxlength="1" /></label>
-    <label>Size and footprint <input name="system.sizeLabel" value="{{system.sizeLabel}}" /></label>
-    <label>Occupancy <input name="system.occupancy" value="{{system.occupancy}}" /></label>
-    <label>Acceleration <input name="system.acceleration" type="number" value="{{system.acceleration}}" class="w-2" /></label>
-    <label>Turning <input name="system.turning" type="number" value="{{system.turning}}" class="w-2" /></label>
-    <label>Cruising MPH <input name="system.cruiseMph" type="number" value="{{system.cruiseMph}}" /></label>
-    <label>Top MPH <input name="system.topMph" type="number" value="{{system.topMph}}" /></label>
-    <label>Defense <input name="system.defense" type="number" value="{{system.defense}}" class="w-2" /></label>
-    <label>Damage save <input name="system.damageSave" type="number" value="{{system.damageSave}}" class="w-2" /></label>
-    <label>Upgrades <input name="system.upgrades" type="number" min="0" value="{{system.upgrades}}" class="w-2" /></label>
-    <label>Complexity <input name="system.complexity" value="{{system.complexity}}" /></label>
-    <label>Cargo <input name="system.cargo" value="{{system.cargo}}" /></label>
-    <label>Range/Fuel <input name="system.rangeFuel" value="{{system.rangeFuel}}" /></label>
-    <label>Year <input name="system.year" value="{{system.year}}" /></label>
-    <label>Street value <input name="system.streetValue" value="{{system.streetValue}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Size"}} <input name="system.size" value="{{system.size}}" class="w-2" maxlength="1" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.SizeAndFootprint"}} <input name="system.sizeLabel" value="{{system.sizeLabel}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Occupancy"}} <input name="system.occupancy" value="{{system.occupancy}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Acceleration2"}} <input name="system.acceleration" type="number" value="{{system.acceleration}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Turning2"}} <input name="system.turning" type="number" value="{{system.turning}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.CruisingMPH"}} <input name="system.cruiseMph" type="number" value="{{system.cruiseMph}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.TopMPH"}} <input name="system.topMph" type="number" value="{{system.topMph}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Defense"}} <input name="system.defense" type="number" value="{{system.defense}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave2"}} <input name="system.damageSave" type="number" value="{{system.damageSave}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Upgrades"}} <input name="system.upgrades" type="number" min="0" value="{{system.upgrades}}" class="w-2" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Complexity"}} <input name="system.complexity" value="{{system.complexity}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Cargo"}} <input name="system.cargo" value="{{system.cargo}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.RangeFuel"}} <input name="system.rangeFuel" value="{{system.rangeFuel}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Year"}} <input name="system.year" value="{{system.year}}" /></label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.StreetValue"}} <input name="system.streetValue" value="{{system.streetValue}}" /></label>
   </div>
-  <label>Qualities <input name="system.qualities" value="{{system.qualities}}" /></label>
+  <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Qualities"}} <input name="system.qualities" value="{{system.qualities}}" /></label>
 
-  <h3>Notes</h3>
+  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Notes"}}</h3>
   {{#if editable}}<prose-mirror name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
 </section>

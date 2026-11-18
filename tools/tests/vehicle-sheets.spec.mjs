@@ -7,7 +7,19 @@ import { test, expect } from "@playwright/test";
 const css = ["spycraft2.css", "retro.css"]
   .map(file => readFileSync(new URL(`../../styles/${file}`, import.meta.url), "utf8"))
   .join("\n");
-const template = name => readFileSync(new URL(`../../templates/${name}`, import.meta.url), "utf8");
+// Template text lives in lang/en.json; read each template with its English strings filled back in.
+const strings = (function flatten(node, prefix = "", out = {}) {
+  for (const [key, value] of Object.entries(node)) {
+    if (typeof value === "object") flatten(value, `${prefix}${key}.`, out);
+    else out[prefix + key] = value;
+  }
+  return out;
+})(JSON.parse(readFileSync(new URL("../../lang/en.json", import.meta.url), "utf8")));
+const template = name =>
+  readFileSync(new URL(`../../templates/${name}`, import.meta.url), "utf8").replace(
+    /\{\{localize ["']([\w.]+)["']\}\}/g,
+    (match, key) => strings[key] ?? match
+  );
 const rootClass = (source, tag) => new RegExp(`<${tag} class="([^"]+)"`).exec(source)[1];
 
 const FIXTURES = {

@@ -71,7 +71,7 @@ The Chat Messages sidebar has a text search and Character / Roll type filters. F
 | `system.json` | Manifest |
 | `spycraft2.mjs` | Entry point / init hooks |
 | `module/config.mjs` | `CONFIG.SPYCRAFT` constants |
-| `module/data/` | Actor & Item TypeDataModels |
+| `module/data/` | Actor & Item TypeDataModels; `record-shapes.mjs` declares the shape of each stored record |
 | `module/documents/` | Actor & Item document classes; the Actor's methods are split by workflow in `module/documents/actor/` |
 | `module/sheets/` | ApplicationV2 sheets |
 | `templates/` | Handlebars templates |

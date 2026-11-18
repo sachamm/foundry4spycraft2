@@ -1,8 +1,8 @@
 {{!-- A template part must render exactly one root element, so the header, to-do and warnings share a wrapper. --}}
 <div class="sheet-top">
 <div class="sheet-mode-bar">
-  <span class="mode-label">{{#if editMode}}Character setup{{else}}Field dossier{{/if}}</span>
-  {{#if editable}}<button type="button" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}Done editing · Return to play{{else}}Edit character{{/if}}</button>{{/if}}
+  <span class="mode-label">{{#if editMode}}{{localize "SPYCRAFT.Template.ActorAgentHeader.CharacterSetup"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.FieldDossier"}}{{/if}}</span>
+  {{#if editable}}<button type="button" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}{{localize "SPYCRAFT.Template.ActorAgentHeader.DoneEditingReturnToPlay"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.EditCharacter"}}{{/if}}</button>{{/if}}
 </div>
 <div class="dossier-band edit-only" aria-hidden="true">
   <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
@@ -21,11 +21,11 @@
       <label class="edit-only">{{localize "SPYCRAFT.XP"}} <input type="number" name="system.xp" value="{{system.xp}}" class="w-xp" /></label>
       {{#if xpNext}}<span class="muted edit-only">/ {{xpNext}}</span>{{/if}}
       <span class="talent origin" {{#if talent}}data-item-id="{{talent.id}}"{{/if}}>{{#if talent}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.talent">{{talent.name}}</a>
-        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent" aria-label="Change talent" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
-        <a class="edit-only" data-action="itemDelete" aria-label="Remove talent" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>
+        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeTalent'}}" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
+        <a class="edit-only" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveTalent'}}" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>
       <span class="specialty origin" {{#if specialty}}data-item-id="{{specialty.id}}"{{/if}}>{{#if specialty}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.specialty">{{specialty.name}}</a>
-        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="specialty" aria-label="Change specialty" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
-        <a class="edit-only" data-action="itemDelete" aria-label="Remove specialty" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a class="edit-only" data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</a>{{/if}}</span>
+        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="specialty" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeSpecialty'}}" data-tooltip="SPYCRAFT.Origin.Change"><i class="fa-solid fa-right-left"></i></a>
+        <a class="edit-only" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveSpecialty'}}" data-tooltip="SPYCRAFT.Origin.Remove"><i class="fa-solid fa-xmark"></i></a>{{else}}<a class="edit-only" data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</a>{{/if}}</span>
     </div>
     <div class="resources">
       <label class="res vitality">{{localize "SPYCRAFT.Vitality"}}
@@ -34,23 +34,23 @@
         <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span {{sc2tip tips.wounds}}>/ {{system.wounds.max}}</span></label>
       <span class="res action-dice">{{localize "SPYCRAFT.ActionDice.Label"}}
         <input type="number" name="system.actionDice.value" aria-label="{{localize 'SPYCRAFT.ActionDice.Label'}}" value="{{system.actionDice.value}}" /> <span {{sc2tip tips.actionDice}}>{{localize "SPYCRAFT.ActionDice.Starting"}} {{system.actionDice.max}} (d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}})</span>
-        {{#unless startingDiceEntry.blocked}}<a data-action="initializeStartingDice" data-tooltip="Begin play once with this character’s starting action dice">Begin play</a>{{/unless}}
-        <a data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend"><i class="fa-solid fa-dice" aria-hidden="true"></i> Spend</a>
-        <a data-action="healActionDice" data-tooltip="Heal outside combat with action dice"><i class="fa-solid fa-heart" aria-hidden="true"></i> Heal</a>
-        <a data-action="refreshAction" data-tooltip="Begin or complete a full-round Refresh"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> Refresh</a>
-        <a data-action="boostDefense" data-tooltip="Boost Defense with an action die at round start"><i class="fa-solid fa-shield" aria-hidden="true"></i> Defense</a>
+        {{#unless startingDiceEntry.blocked}}<a data-action="initializeStartingDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginPlayOnceWithThisCharacter'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.BeginPlay"}}</a>{{/unless}}
+        <a data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend"><i class="fa-solid fa-dice" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.Spend"}}</a>
+        <a data-action="healActionDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.HealOutsideCombatWithActionDice'}}"><i class="fa-solid fa-heart" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.Heal"}}</a>
+        <a data-action="refreshAction" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginOrCompleteAFullRound'}}"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.Refresh"}}</a>
+        <a data-action="boostDefense" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BoostDefenseWithAnActionDie'}}"><i class="fa-solid fa-shield" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.Defense"}}</a>
       </span>
     </div>
   </div>
 </header>
 {{#if setupGuide.next}}
-<aside class="setup-next edit-only" aria-label="Next setup choice">
-  <div><strong>Next: {{setupGuide.next.label}}</strong><p>{{setupGuide.next.text}}</p></div>
-  {{#if editable}}<button type="button" class="sc2-primary-action" data-action="setupTask" data-tab="{{setupGuide.next.tab}}" data-order="{{setupGuide.next.order}}" {{#if setupGuide.next.skillLevel}}data-skill-level="{{setupGuide.next.skillLevel}}"{{/if}} {{#if setupGuide.next.browse}}data-type="{{setupGuide.next.browse.type}}" data-origin-type="{{setupGuide.next.browse.originType}}"{{/if}}>Continue setup</button>{{/if}}
+<aside class="setup-next edit-only" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.NextSetupChoice'}}">
+  <div><strong>{{localize "SPYCRAFT.Template.ActorAgentHeader.Next"}} {{setupGuide.next.label}}</strong><p>{{setupGuide.next.text}}</p></div>
+  {{#if editable}}<button type="button" class="sc2-primary-action" data-action="setupTask" data-tab="{{setupGuide.next.tab}}" data-order="{{setupGuide.next.order}}" {{#if setupGuide.next.skillLevel}}data-skill-level="{{setupGuide.next.skillLevel}}"{{/if}} {{#if setupGuide.next.browse}}data-type="{{setupGuide.next.browse.type}}" data-origin-type="{{setupGuide.next.browse.originType}}"{{/if}}>{{localize "SPYCRAFT.Template.ActorAgentHeader.ContinueSetup"}}</button>{{/if}}
 </aside>
 <details class="todo" data-key="todo" {{#if open.todo}}open{{/if}}>
-  <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> Setup checklist · {{setupGuide.count}} reminders</summary>
-  <ol class="setup-steps" aria-label="Remaining character setup">
+  <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.SetupChecklist"}} {{setupGuide.count}} {{localize "SPYCRAFT.Template.ActorAgentHeader.Reminders"}}</summary>
+  <ol class="setup-steps" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemainingCharacterSetup'}}">
     {{#each setupGuide.steps}}<li><details data-key="setup-{{tab}}">
       <summary>{{label}} <span class="setup-count">{{count}}</span></summary>
       <ul>{{#each tasks}}<li>{{#if @root.editable}}<button type="button" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{else}}{{text}}{{/if}}</li>{{/each}}</ul>
@@ -58,7 +58,7 @@
   </ol>
 </details>
 {{else}}
-<p class="setup-clear edit-only">No setup reminders. Check any character-building warnings before play.</p>
+<p class="setup-clear edit-only">{{localize "SPYCRAFT.Template.ActorAgentHeader.NoSetupRemindersCheckAnyCharacter"}}</p>
 {{/if}}
 {{#if warnings.length}}
 <details class="warnings" data-key="warnings" {{#if open.warnings}}open{{/if}}>
