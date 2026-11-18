@@ -25,7 +25,8 @@ export const SKILL_TRICKS = Object.freeze({
   doubleHurl: { feat: "Wrestling Supremacy", name: "Double Hurl", check: "trip", page: 189 },
   torpedo: { feat: "Rolling Supremacy", name: "Torpedo", check: "bull-rush", bonus: 2, page: 187 },
   mudInYourEye: { feat: "Dirty Fighting Moves", name: "Mud in Your Eye", check: "feint", bonus: 4, page: 185 },
-  fakeOut: { feat: "Brawling Moves", name: "Fake Out", check: "feint", page: 185 }
+  fakeOut: { feat: "Brawling Moves", name: "Fake Out", check: "feint", page: 185 },
+  clobber: { feat: "Battering Blows", name: "Clobber", check: "grapple", bonus: -2, page: 176 }
 });
 
 const EFFECTS = {
@@ -38,13 +39,30 @@ const EFFECTS = {
   torpedo: u =>
     loc`Torpedo: a full-action Bull Rush at +2; on success the target takes double your unarmed damage (${u} × 2)`,
   mudInYourEye: () => loc`Mud in Your Eye: +4 on this Feint (once per opponent per combat)`,
+  clobber: (u, system, twoHanded) => {
+    const repeats =
+      1 +
+      (system?.activeFeatNames?.includes("Darting Weapon") ? 1 : 0) +
+      (system?.activeFeatNames?.includes("Flashing Weapon") ? 1 : 0);
+    return loc`Clobber: ${twoHanded ? "−4 (2-handed weapon)" : "−2 (1-handed weapon)"}; on success deal your unarmed damage (${u}), then the weapon’s damage ${repeats} time(s), each with takedown; move the opponent to an adjacent open square. Either way the grapple ends and you cannot attack them again this round`;
+  },
   fakeOut: () =>
     loc`Fake Out: if this Feint succeeds, your Defense against the target’s attacks rises by 2 for 1 full round`
 };
 
-const CHECKS = { trip: ["acrobatics"], "bull-rush": ["athletics"], feint: ["sleightOfHand", "impress"] };
+const CHECKS = {
+  trip: ["acrobatics"],
+  "bull-rush": ["athletics"],
+  feint: ["sleightOfHand", "impress"],
+  grapple: ["athletics"]
+};
 
-export function skillTrickPlan(system, key, check, { skillTrick = "", skillTrickOnceConfirmed = false } = {}) {
+export function skillTrickPlan(
+  system,
+  key,
+  check,
+  { skillTrick = "", skillTrickOnceConfirmed = false, skillTrickTwoHanded = false } = {}
+) {
   const empty = { evidence: null, bonuses: [], blockedReason: "", notes: [] };
   if (!skillTrick) return empty;
   const d = Object.hasOwn(SKILL_TRICKS, skillTrick) ? SKILL_TRICKS[skillTrick] : null;
@@ -57,12 +75,14 @@ export function skillTrickPlan(system, key, check, { skillTrick = "", skillTrick
       ...empty,
       blockedReason: loc`Confirm Mud in Your Eye has not been used against this opponent this combat.`
     };
+  const twoHanded = skillTrick === "clobber" && skillTrickTwoHanded === true,
+    bonus = twoHanded ? -4 : (d.bonus ?? 0);
   return {
-    evidence: { version: 1, key: skillTrick, feat: d.feat, bonus: d.bonus ?? 0 },
+    evidence: { version: 1, key: skillTrick, feat: d.feat, bonus },
     bonuses: [],
-    sizeBonus: d.bonus ?? 0,
+    sizeBonus: bonus,
     blockedReason: "",
-    notes: [`${EFFECTS[skillTrick](unarmedDamageFormula(system))} (p.${d.page}).`]
+    notes: [`${EFFECTS[skillTrick](unarmedDamageFormula(system), system, twoHanded)} (p.${d.page}).`]
   };
 }
 
@@ -81,7 +101,7 @@ rollPipeline.register({
               .map(([k, d]) => `<option value="${k}">${d.name} (${d.feat})</option>`)
               .join(
                 ""
-              )}</select></label>${owned.some(([k]) => k === "mudInYourEye") ? `<label><input name="skillTrickOnceConfirmed" type="checkbox" /> ${loc`Mud in Your Eye: not yet used against this opponent this combat`}</label>` : ""}</details>`
+              )}</select></label>${owned.some(([k]) => k === "clobber") ? `<label><input name="skillTrickTwoHanded" type="checkbox" /> ${loc`Clobber: my readied melee weapon is 2-handed (−4 instead of −2)`}</label>` : ""}${owned.some(([k]) => k === "mudInYourEye") ? `<label><input name="skillTrickOnceConfirmed" type="checkbox" /> ${loc`Mud in Your Eye: not yet used against this opponent this combat`}</label>` : ""}</details>`
           : ""
       }
     ];

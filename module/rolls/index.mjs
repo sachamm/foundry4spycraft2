@@ -42,6 +42,7 @@ import "../rules/appearance.mjs";
 import "../rules/attribute-damage.mjs";
 import "../rules/baffled.mjs";
 import "../rules/balance.mjs";
+import "../rules/berserker.mjs";
 import "../rules/bounce.mjs";
 import "../rules/boxing.mjs";
 import "../rules/breakthrough.mjs";

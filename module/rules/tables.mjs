@@ -11324,18 +11324,6 @@ export const CONTAGIONS = [
  }
 ];
 export const FEAT_REMINDERS = {
- "Battering Blows": {
-  "rolls": "damage",
-  "text": "Grants a grapple trick that lets you strike a held foe with both your unarmed and your weapon damage."
- },
- "Berserker Supremacy": {
-  "rolls": "save",
-  "text": "End rage freely; rages last 4d4+4 rounds, +4 to resist frenzy, and you're only fatigued afterwards."
- },
- "Brawling Supremacy": {
-  "rolls": "attack, damage",
-  "text": "Two unarmed hits on one foe in a round earn a free final attack; gain tricks such as double-damage combos."
- },
  "Crippling Strike": {
   "rolls": "attack",
   "text": "Your Cheap Shots on vulnerable foes impose an extra –1 penalty or –5 ft. Speed."
@@ -11387,14 +11375,6 @@ export const FEAT_REMINDERS = {
  "Steel Rain": {
   "rolls": "attack",
   "text": "Hurled weapons are drawn freely and always readied, can Burst, Cover Fire and Suppressive Fire, and are easier to stash."
- },
- "Submission Moves": {
-  "rolls": "attack",
-  "text": "Gain grapple tricks that sap attributes and lock joints."
- },
- "Submission Supremacy": {
-  "rolls": "attack",
-  "text": "Cheap Shot a foe repeatedly (different penalty each time) and gain lethal grapple tricks."
  },
  "This… is my Boomstick": {
   "rolls": "attack",

@@ -162,3 +162,23 @@ test("Snake Strike: once per opponent per combat with an unused weapon; one snea
   );
   assert.deepEqual(rows.find(r => r.source === "Snake Strike")?.dice, 1);
 });
+
+test("Clobber rides the Grapple check; Joint Lock hampers escape; Berserker Supremacy resists frenzy", async () => {
+  const { skillTrickPlan } = await import("../module/rules/skill-tricks.mjs");
+  const sys = { activeFeatNames: ["Battering Blows", "Darting Weapon"], unarmed: { die: 4, damageBonus: 1 } };
+  const one = skillTrickPlan(sys, "athletics", { id: "grapple" }, { skillTrick: "clobber" });
+  assert.equal(one.sizeBonus, -2);
+  assert.match(one.notes[0], /weapon’s damage 2 time\(s\)/);
+  assert.equal(
+    skillTrickPlan(sys, "athletics", { id: "grapple" }, { skillTrick: "clobber", skillTrickTwoHanded: true }).sizeBonus,
+    -4
+  );
+  const escape = { id: "restraint-escape" };
+  assert.deepEqual(grappleCheckPlan(state([]), "athletics", escape, { grappleJointLock: true }).bonuses, [
+    { source: "Joint Lock", value: -4 }
+  ]);
+  assert.deepEqual(grappleCheckPlan(state([]), "athletics", GRAPPLE_CHECK, { grappleJointLock: true }).bonuses, []);
+  const { frenzySaveBonus } = await import("../module/rules/berserker.mjs");
+  assert.equal(frenzySaveBonus({ activeFeatNames: ["Berserker Supremacy"] }, { resistFrenzy: true }), 4);
+  assert.equal(frenzySaveBonus({ activeFeatNames: [] }, { resistFrenzy: true }), 0);
+});

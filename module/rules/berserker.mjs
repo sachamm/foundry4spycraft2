@@ -12,6 +12,7 @@
  * `berserkerRageState` reports it active. Supremacy's +4 to saves against becoming frenzied is a reminder on the
  * save, since saves do not record what they resist.
  */
+import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 
 export const BERSERKER_TIERS = Object.freeze([
@@ -91,3 +92,37 @@ export const berserkerNote = (name, plan) =>
   plan.after === "fatigued"
     ? loc`${name}’s rage ends after ${plan.rounds} rounds: fatigued for ${plan.minutes} minutes (Berserker Supremacy).`
     : loc`${name}’s rage ends after ${plan.rounds} rounds: exhausted for ${plan.minutes} minutes.`;
+
+// Berserker Supremacy (p.184): +4 on saves to resist becoming frenzied, declared in the save dialog.
+export const frenzySaveBonus = (system, input = {}) =>
+  input?.resistFrenzy === true && system?.activeFeatNames?.includes("Berserker Supremacy") ? 4 : 0;
+
+rollPipeline.register({
+  id: "frenzySaveContent:save",
+  dialogs: ["save"],
+  dialog: ({ actor }) => [
+    {
+      at: 135,
+      html: actor?.system?.activeFeatNames?.includes("Berserker Supremacy")
+        ? `<label><input type="checkbox" name="resistFrenzy" /> ${loc`This save resists becoming frenzied (Berserker Supremacy +4)`}</label>`
+        : ""
+    }
+  ]
+});
+
+rollPipeline.register({
+  id: "frenzySaveTerm",
+  kinds: ["save"],
+  order: 9491,
+  terms({ system, input }) {
+    const bonus = frenzySaveBonus(system, input);
+    return bonus
+      ? {
+          rowAt: 101,
+          rows: [[loc`Berserker Supremacy (resisting frenzy)`, bonus]],
+          flavorAt: 51,
+          flavor: loc` — resisting frenzy +4`
+        }
+      : null;
+  }
+});
