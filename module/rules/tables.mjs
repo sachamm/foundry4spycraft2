@@ -11324,10 +11324,6 @@ export const CONTAGIONS = [
  }
 ];
 export const FEAT_REMINDERS = {
- "All or Nothing": {
-  "rolls": "attack, skill, knowledge",
-  "text": "Once per session, widen a roll's threat and error ranges by 5 each."
- },
  "Autofire Basics": {
   "rolls": "attack",
   "text": "Use a Two-Shot Burst with Single-Shot or Burst weapons, and take Cover Fire as a half action once per round."
@@ -11344,10 +11340,6 @@ export const FEAT_REMINDERS = {
   "rolls": "damage",
   "text": "Grants a grapple trick that lets you strike a held foe with both your unarmed and your weapon damage."
  },
- "Better Luck Next Time": {
-  "rolls": "skill, save",
-  "text": "If an action die spent on a skill check or save rolls a natural 1, you get it back."
- },
  "Boxing Moves": {
   "rolls": "attack",
   "text": "Gain boxing tricks that can knock out or daze standard characters."
@@ -11360,14 +11352,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack, damage",
   "text": "Two unarmed hits on one foe in a round earn a free final attack; gain tricks such as double-damage combos."
  },
- "Cleave Basics": {
-  "rolls": "attack",
-  "text": "Once per round, when a melee attack drops a foe, make one more melee attack on another opponent."
- },
- "Club Basics": {
-  "rolls": "damage",
-  "text": "Swap lethal/subdual damage freely with clubs, use improvised clubs without penalty, and gain a club stance and trick."
- },
  "Crippling Strike": {
   "rolls": "attack",
   "text": "Your Cheap Shots on vulnerable foes impose an extra –1 penalty or –5 ft. Speed."
@@ -11375,14 +11359,6 @@ export const FEAT_REMINDERS = {
  "Cryptographer": {
   "rolls": "skill:analysis",
   "text": "Treat codes as 2 Power Rating lower when breaking, writing or requesting them."
- },
- "Daredevil": {
-  "rolls": "skill:drive",
-  "text": "Choose chase Strategies as if Acceleration and Turning were 2 higher, and gain access to the Stunt Strategy."
- },
- "Defensive Driving": {
-  "rolls": "skill:drive",
-  "text": "Halved Maneuver penalties from Prey Strategies, and once per chase force a foe to suffer a Crisis Advantage."
  },
  "Dirty Fighting Basics": {
   "rolls": "attack",
@@ -11395,10 +11371,6 @@ export const FEAT_REMINDERS = {
  "Dueling Basics": {
   "rolls": "attack",
   "text": "Choose a foe each round for +2 dodge Defense against them (or +1 vs. everyone), and occasionally strike 5 ft. beyond your Reach."
- },
- "Dueling Supremacy": {
-  "rolls": "attack",
-  "text": "+2 dodge Defense, and each melee hit raises your Initiative Count by 1."
  },
  "Executioner": {
   "rolls": "attack",
@@ -11488,18 +11460,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack, damage",
   "text": "Trade sneak attack dice for an equal increase in threat range on that attack."
  },
- "Offensive Driving": {
-  "rolls": "skill:drive",
-  "text": "Halved Maneuver penalties from Predator Strategies, and once per chase ignore a Crisis without a check."
- },
- "Opportunist": {
-  "rolls": "attack",
-  "text": "Once per round, when a second foe you both can see is stunned or drops below 0 wounds, make a free half-damage final attack on your opponent."
- },
- "Photo Finish": {
-  "rolls": "skill:drive",
-  "text": "In a chase, lower your own Acceleration and Turning by 2 to lower everyone else's by 2 too."
- },
  "Rock and Roll": {
   "rolls": "attack",
   "text": "Autofire and Strafe volleys use only 2 shots each; fire rifles and machine guns one-handed at –2; requests for autofire ammo yield double."
@@ -11515,14 +11475,6 @@ export const FEAT_REMINDERS = {
  "Signature Gear": {
   "rolls": "attack, damage, skill",
   "text": "One Favored Gear item grants +1 to checks and damage and can't be destroyed by a critical failure."
- },
- "Simulator Jockey": {
-  "rolls": "attack, skill",
-  "text": "No penalty for attacks and checks made through a drone, and you can Regroup while operating one."
- },
- "Snap Shot": {
-  "rolls": "attack",
-  "text": "Once per round, when a ranged attack drops a foe, immediately take another shot at a different opponent."
  },
  "Spider Basics": {
   "rolls": "skill:athletics",
@@ -11547,10 +11499,6 @@ export const FEAT_REMINDERS = {
  "Steel Rain": {
   "rolls": "attack",
   "text": "Hurled weapons are drawn freely and always readied, can Burst, Cover Fire and Suppressive Fire, and are easier to stash."
- },
- "Style Over Caliber": {
-  "rolls": "damage",
-  "text": "Pistols can deal a flat 1d10+2 base damage instead of their normal damage, and Cheap Shots with pistols are easier."
  },
  "Submission Basics": {
   "rolls": "attack",

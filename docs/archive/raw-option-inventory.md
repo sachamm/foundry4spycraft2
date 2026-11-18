@@ -301,8 +301,8 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Darting Weapon | 178 | No | Start-of-own-Count −2 timed attack/skill tradeoff and one counted final melee/unarmed/hurled Standard Attack execute; current weapon/Count/receipt validated. Shared Nauseated final-attack allowance now executes across the five implemented final-attack controls | — |
 | Flashing Weapon | 178 | No | Earned two-attack/−4 Darting choice executes with durable declaration-scoped counters and own-next-Count expiry; shared Nauseated final-attack limit executes | — |
 | Dueling Basics | 178 | No | Manual/descriptive | — |
-| Dueling Mastery | 178 | No | Manual/descriptive | — |
-| Dueling Supremacy | 178 | No | Manual/descriptive | — |
+| Dueling Mastery | 178 | No | Covered (batch 385): +1 Defense while a readied melee weapon is held; a GC control on an adjacent attacker’s resolved miss lowers that attacker’s Initiative Count by 2, once per attack; unarmed stances are not modelled, so melee attacks in them are not restricted | Native Foundry QA not claimed |
+| Dueling Supremacy | 178 | No | Covered (batch 385): +2 dodge bonus to Defense; each resolved melee-weapon hit offers +1 Initiative Count, once per hit | Native Foundry QA not claimed |
 | Fencing Basics | 178 | No | Implemented: Disarm/Feint gear benefit, Remiss final attack and Side Stance | Batches333–346: reviewed FIN sword; recorded opponent/attack sources; one pending Side die, Defense−1 and reviewed20ft round movement cap |
 | Finesse Basics | 178 | No | Optional FIN grant on one-handed melee weapons and trained Dexterity damage execute separately; two-handed melee Massive Initiative-loss waiver preserves its Strength attack penalty and other Initiative losses. Initiative-loss settlement remains table-managed | — |
 | Finesse Mastery | 178 | No | +1 threat range on actual melee/unarmed attacks; stacks once with Supremacy and other applicable threat sources, with saved source evidence | — |
@@ -343,7 +343,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Sharpshooter Supremacy | 182 | No | Partial: aimed threat and ranged critical cost | — |
 | Snap Shot | 182 | No | Covered (batch 377): the ranged counterpart of Cleave Basics, through the same control | Native Foundry QA not claimed |
 | Steel Rain | 182 | No | Manual/descriptive | — |
-| Style Over Caliber | 183 | No | Manual/descriptive | — |
+| Style Over Caliber | 183 | No | Covered (batch 385): a pistol’s damage roll may replace its standard damage with 1d10+2, keeping other damage, qualities and effects | Native Foundry QA not claimed |
 | This… is my Boomstick | 183 | No | Manual/descriptive | — |
 | Trick Shot | 183 | No | Manual/descriptive | — |
 | Berserker Basics | 183 | No | Manual/descriptive | — |
@@ -1640,3 +1640,14 @@ Source: rules reference pp.192–193 (local markdown edition; original PDF pages
 - Need for Speed was examined: the over-half-top-speed Maneuver DC row (p.125) is not modelled, so there is nothing to waive yet. It stays manual.
 
 Verification: 513 legacy assertions, 3378 of 3379 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 94 manual / 54 partial / 166 other; at least 148 of 314 explicitly unfinished; 48 whole-feat closures.
+
+## Residual implementation batch 385 — Dueling Mastery and Supremacy, Style Over Caliber
+
+Source: rules reference pp.178 and 183 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Dueling Supremacy:** +2 dodge to Defense, prepared with the character’s other Defense sources so dodge-loss rules see it. Each resolved melee-weapon hit (not unarmed, not a Disarm) offers its attacker “Initiative Count +1”, once per card (`module/apps/dueling.mjs`).
+- **Dueling Mastery:** +1 to Defense while a readied Blunt or Edged weapon is held. When an attack against the feat’s owner is resolved as a miss, the GC (who confirms the attacker is adjacent) can lower the attacker’s Initiative Count by 2, once per card. Unarmed combat stances are not modelled, so nothing stops melee attacks in them.
+- **Style Over Caliber:** the damage dialog offers 1d10+2 in place of a pistol’s standard damage (`module/rules/style-over-caliber.mjs`). A pistol is a Handgun-proficiency weapon from a pistol or revolver table, or a hand-built Handgun. The roll records `styleOverCaliber`; qualities and other damage are unchanged.
+- **Feat reminders:** the 13 feats the system now carries out (All or Nothing, Better Luck Next Time, Cleave Basics, Club Basics, Daredevil, Defensive and Offensive Driving, Dueling Supremacy, Opportunist, Photo Finish, Simulator Jockey, Snap Shot, Style Over Caliber) are removed from `src/data/feat-reminders.json`, and `module/rules/tables.mjs` is regenerated. Feat items already in a world keep the reminder version 2 gave them until edited. The real packs pick this up at the deferred rebuild.
+
+Verification: 513 legacy assertions, 3382 of 3383 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 91 manual / 54 partial / 169 other; at least 145 of 314 explicitly unfinished; 51 whole-feat closures.

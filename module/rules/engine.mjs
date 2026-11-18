@@ -342,6 +342,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
         ...["knowledge", "saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "-2" }))
       ]
     });
+  // Dueling Supremacy, p.178: +2 dodge bonus to Defense.
+  if (sys.activeFeatNames?.includes("Dueling Supremacy"))
+    sources.push({
+      name: "Dueling Supremacy",
+      rank: 1,
+      bonuses: [{ target: "defense", value: "2", bonusType: "dodge" }]
+    });
   if ((classLevels.triggerman ?? 0) >= 8)
     sources.push({
       name: loc`Eye of the Storm (all attackers)`,
@@ -1205,6 +1212,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
     wornArmor: sys.armor?.adjustments ?? []
   });
   if (sys.bloodstainDefense.bonus) B.add("defense", sys.bloodstainDefense.bonus, "Bloodstain Resistant");
+  // Dueling Mastery, p.178: +1 to Defense while holding a readied melee weapon.
+  if (
+    sys.activeFeatNames.includes("Dueling Mastery") &&
+    !sys.disarmWeapons.blockedReason &&
+    sys.disarmWeapons.weapons.some(w => ["blunt", "exoticBlunt", "edged", "exoticEdged"].includes(w.proficiency))
+  )
+    B.add("defense", 1, "Dueling Mastery (readied melee weapon)");
   sys.totalDefenseState = totalDefenseState(sys);
   if (sys.totalDefenseState.needsReview) {
     warnings.push(sys.totalDefenseState.reason);
