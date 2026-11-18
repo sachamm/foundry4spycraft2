@@ -6,6 +6,14 @@
 
 Not yet tried in a running Foundry world; see `docs/remaining-work.md` for the checks to make.
 
+- Attacks resolve against a target: "Resolve against Defense" on an attack card, "Roll damage" on a hit, and "Apply
+  damage to a target" on a damage card (vitality and wounds, damage reduction, critical hits, conditions, standard NPC
+  and vehicle Damage saves).
+- Ammunition is counted: attacks spend shots, an empty weapon must be reloaded, and Reload draws on the reserve. New
+  weapon fields `system.shotsLoaded` and `system.shotsSpare`; world setting "Count ammunition" (on by default).
+- Healing: "Rest and recover", First Aid and Stabilize applied from their checks, and a dying character's roll.
+- Opposed checks: "Compare with an opposing check" on a rolled skill check.
+- More token statuses (stunned, dazed, helpless, dying and others); an opening grapple check sets its conditions.
 - Feat reminders: feats the system does not work out are listed in roll dialogs for the rolls they bear on, and the
   ones ticked are noted on the check. New feat field `system.reminder`; schema version 2 fills it for feats already
   in a world.

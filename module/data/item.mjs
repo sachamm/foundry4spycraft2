@@ -252,6 +252,8 @@ export class WeaponData extends GearData {
       ammunitionKind: str(),
       explosiveAmmunition: new BooleanField(),
       loadedAmmoId: str(),
+      shotsLoaded: int(null, { nullable: true, min: 0 }),
+      shotsSpare: int(null, { nullable: true, min: 0 }),
       stockpileSize: int(0, { min: 0 }),
       shotWeight: num(0, { min: 0 }),
       upgradeCost: int(0, { min: 0 }),

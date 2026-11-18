@@ -164,6 +164,15 @@ them with `planTerms`.
   and saves, and a fire burning the character.
 - **Combat actions.** The ranged attack dialog offers Burst, Autofire, Strafe, Cover Fire and Suppressive Fire; an
   unarmed attack offers Pummel; the sheet settles grapple checks; a blast weapon's damage tapers by distance.
+- **Hits and damage.** An attack card has "Resolve against Defense": pick the target and the check is settled
+  against its Defense. A hit offers "Roll damage", and the damage card has "Apply damage to a target", which changes
+  vitality and wounds, rolls a standard NPC's or vehicle's Damage save, and sets the conditions that follow. You can
+  apply damage to characters you own; the GC can apply it to anyone.
+- **Ammunition.** Weapons with an ammunition code count their shots. Attacks spend them and "Reload" refills from the
+  reserve. World setting "Count ammunition".
+- **Healing.** "Rest and recover" on the Main tab; a successful First Aid or Stabilize check offers to apply itself
+  to a patient.
+- **Opposed checks.** "Compare with an opposing check" on a skill check picks the other side's result from chat.
 - **Map measurement.** With a token for the character and one token targeted, attack dialogs open with the distance,
   flanking and adjacency the scene shows, and say what cover walls give. Client setting, on by default.
 - **NPC qualities.** An NPC's qualities are listed on its sheet with what each does, and apply to its statistics and

@@ -35,6 +35,7 @@ import {
   startingLead
 } from "../../rules/chase.mjs";
 import { spendFuel } from "../vehicle-play.mjs";
+import { recentResultsHint } from "../opposed-checks.mjs";
 import { loc } from "../../i18n.mjs";
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
@@ -268,6 +269,7 @@ export async function advanceConflict(id) {
         loc`${conflict.name}: opposed check`,
         `
         <p>${loc`Enter each final result with its Strategy modifier already applied (${esc(strategy(conflict, "predator").name)} ${signed(strategyModifier(conflict, "predator"))}; ${esc(strategy(conflict, "prey").name)} ${signed(strategyModifier(conflict, "prey"))}). Criticals only shift the Lead by 1; threats and errors otherwise do nothing here.`}</p>
+        <p class="hint">${recentResultsHint()}</p>
         <label>${loc`${esc(sideName(conflict, "predator"))} result`} <input type="number" name="predator" required /></label>${critical("predator")}
         <label>${loc`${esc(sideName(conflict, "prey"))} result`} <input type="number" name="prey" required /></label>${critical("prey")}
         <label>${loc`If tied, winner`} <select name="tieWinner">${options(

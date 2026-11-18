@@ -99,7 +99,19 @@ Hooks.once("init", () => {
     ["exhausted", "Exhausted"],
     ["enraged", "Enraged"],
     ["unconscious", "Unconscious"],
-    ["flat-footed", "Flat-footed"]
+    ["flat-footed", "Flat-footed"],
+    ["stunned", "Stunned"],
+    ["dazed", "Dazed"],
+    ["helpless", "Helpless"],
+    ["vulnerable", "Vulnerable"],
+    ["paralyzed", "Paralyzed"],
+    ["dying", "Dying"],
+    ["bleeding", "Bleeding"],
+    ["fixated", "Fixated"],
+    ["frightened", "Frightened"],
+    ["terrified", "Terrified"],
+    ["frenzied", "Frenzied"],
+    ["hidden", "Hidden"]
   ])
     if (!CONFIG.statusEffects.some(effect => effect.id === id))
       CONFIG.statusEffects.push({ id, name, img: "icons/svg/downgrade.svg" });
@@ -114,6 +126,15 @@ Hooks.once("init", () => {
     config: true,
     type: Boolean,
     default: false
+  });
+
+  game.settings.register("spycraft2", "countAmmunition", {
+    name: loc`Count ammunition`,
+    hint: loc`Attacks take their shots from the weapon, a weapon that is empty must be reloaded, and Reload draws on the loads its ammunition code supplies.`,
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
   });
 
   game.settings.register("spycraft2", "usagePeriods", {
