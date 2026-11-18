@@ -25,6 +25,22 @@
     {{#if activeConditions.length}}<div class="condition-summary"><b>{{localize "SPYCRAFT.Template.ActorAgentMain.CurrentConditions"}}</b>{{#each activeConditions}}<span class="tag bad">{{this}}</span>{{/each}}</div>{{/if}}
   </div>
 
+  {{#if flawlessIdentity}}
+  <section class="identities" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.Identities'}}">
+    <h3>{{localize "SPYCRAFT.Template.ActorAgentMain.Identities"}}</h3>
+    {{#if system.activeIdentityState}}<p><b>{{localize "SPYCRAFT.Template.ActorAgentMain.InCharacterAs"}} {{system.activeIdentityState.name}}</b> · <a data-action="leaveIdentity">{{localize "SPYCRAFT.Template.ActorAgentMain.LeaveIdentity"}}</a></p>{{/if}}
+    <ul>{{#each system.identities}}<li>{{name}} <span class="muted">({{professionFocus}}; {{#each interests}}{{this}}{{#unless @last}}, {{/unless}}{{/each}})</span> · <a data-action="enterIdentity" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.EnterIdentity"}}</a> · <a data-action="editIdentity" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.EditIdentity"}}</a> · <a data-action="removeIdentity" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.RemoveIdentity"}}</a></li>{{/each}}</ul>
+    <p><a data-action="editIdentity">{{localize "SPYCRAFT.Template.ActorAgentMain.AddIdentity"}}</a></p>
+  </section>
+  {{/if}}
+  {{#if companions}}
+  <section class="companions" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.Companions'}}">
+    <h3>{{localize "SPYCRAFT.Template.ActorAgentMain.Companions"}}</h3>
+    <ul>{{#each companions.linked}}<li><a data-action="openCompanion" data-uuid="{{uuid}}">{{name}}</a> <span class="muted">({{feat}})</span>{{#each warnings}} <span class="bad">{{this}}</span>{{/each}}{{#if @root.isGM}} · <a data-action="companionDied" data-uuid="{{uuid}}">{{localize "SPYCRAFT.Template.ActorAgentMain.CompanionDied"}}</a>{{/if}}</li>{{/each}}</ul>
+    {{#if companions.slots.animalPartner}}<p><a data-action="createCompanion" data-feat="Animal Partner">{{localize "SPYCRAFT.Template.ActorAgentMain.CreateAnimalPartner"}}</a> <span class="muted">{{localize "SPYCRAFT.Template.ActorAgentMain.XPCap"}} {{companions.partnerCap}}</span></p>{{/if}}
+    {{#if companions.slots.personalLieutenant}}<p><a data-action="createCompanion" data-feat="Personal Lieutenant">{{localize "SPYCRAFT.Template.ActorAgentMain.CreateLieutenant"}}</a> <span class="muted">{{localize "SPYCRAFT.Template.ActorAgentMain.LieutenantLevel"}} {{companions.lieutenantLevel}}</span></p>{{/if}}
+  </section>
+  {{/if}}
   <section class="combat-toolbox play-only" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CombatTools'}}">
     <h3>{{localize "SPYCRAFT.Template.ActorAgentMain.CombatTools"}}</h3>
     <div class="combat-tool-groups">

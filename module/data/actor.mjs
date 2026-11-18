@@ -43,6 +43,13 @@ import { SKILLS } from "../rules/tables.mjs";
 import { underminedState } from "../rules/taunt.mjs";
 import { mountUpPlan } from "../rules/driving-feats.mjs";
 import {
+  ANIMAL_PARTNER,
+  PERSONAL_LIEUTENANT,
+  animalPartnerReview,
+  lieutenantReview,
+  partnerThreatLevel
+} from "../rules/companions.mjs";
+import {
   HAZARD_GROUPS,
   accelerationSchedule,
   hazardLine,
@@ -98,6 +105,7 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
         will: new SchemaField({ base: int(0) })
       }),
       feintBonuses: recordList("feintBonuses"),
+      companionOf: record("companionOf", { nullable: true, initial: null }),
       tauntBonuses: recordList("tauntBonuses"),
       undermined: record("undermined", { nullable: true, initial: null }),
       feintHistory: recordList("feintHistory"),
@@ -150,6 +158,16 @@ export class NpcData extends BaseActorData {
     const missionTL = this.followMission ? missionThreatLevelSetting() : null;
     this.effectiveThreatLevel = missionTL ?? this.threatLevel;
     this.usesMissionThreatLevel = missionTL !== null;
+    // Animal Partner (p.201): a special character at the owner's career level − 2, one health grade higher.
+    const partnerOwner =
+      this.companionOf?.feat === ANIMAL_PARTNER
+        ? (globalThis.fromUuidSync?.(this.companionOf.ownerUuid) ?? null)
+        : null;
+    this.animalPartner = !!partnerOwner;
+    if (partnerOwner) {
+      this.effectiveThreatLevel = partnerThreatLevel(partnerOwner.system?.level);
+      this.usesMissionThreatLevel = false;
+    }
     // p.398: a promoted standard NPC is special until the mission ends.
     this.promoted = !!this.promotion && this.promotion.mission === String(this.usagePeriods?.mission ?? "initial");
     // What the NPC's qualities do at the table (module/rules/npc-qualities.mjs).
@@ -188,8 +206,19 @@ export class NpcData extends BaseActorData {
         this.damageSave = null;
       }
     }
+    if (partnerOwner) {
+      const grade = Math.min(10, (this.npcProfile.grades?.health ?? 1) + 1),
+        health = npcTableValue("health", grade, result.effectiveLevel);
+      if (Array.isArray(health)) {
+        [this.vitality.max, this.wounds.max] = health;
+        this.damageSave = null;
+      }
+    }
     this.competence = result.competence;
-    this.warnings = result.warnings;
+    this.warnings = [
+      ...(result.warnings ?? []),
+      ...(partnerOwner ? animalPartnerReview(partnerOwner.system, this).warnings : [])
+    ];
   }
 
   static defineSchema() {
@@ -312,6 +341,8 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       intenseStance: record("intenseStance", { nullable: true, initial: null }),
       woundDrops: record("woundDrops", { nullable: true, initial: null }),
       snakeStrikes: recordList("snakeStrikes"),
+      identities: recordList("identities"),
+      activeIdentity: str(),
       twoWeaponStyle: record("twoWeaponStyle", { nullable: true, initial: null }),
       dartingStyle: record("dartingStyle", { nullable: true, initial: null }),
       totalDefense: record("totalDefense", { nullable: true, initial: null }),
@@ -388,6 +419,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       }),
       misc: new SchemaField(misc),
       feintBonuses: recordList("feintBonuses"),
+      companionOf: record("companionOf", { nullable: true, initial: null }),
       tauntBonuses: recordList("tauntBonuses"),
       undermined: record("undermined", { nullable: true, initial: null }),
       feintHistory: recordList("feintHistory"),
@@ -475,6 +507,17 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       : null;
     this.underminedCombatContext = underminedCombatContext(this);
     this.currentCombatId = this.parent.participatingCombat?.id ?? null;
+    // Personal Lieutenant (p.204): the owner's career level and feats, for the lieutenant's limits.
+    const lieutenantOwner =
+      this.companionOf?.feat === PERSONAL_LIEUTENANT
+        ? (globalThis.fromUuidSync?.(this.companionOf.ownerUuid) ?? null)
+        : null;
+    this.lieutenantOwner = lieutenantOwner
+      ? {
+          level: lieutenantOwner.system?.level ?? 0,
+          activeFeatNames: [...(lieutenantOwner.system?.activeFeatNames ?? [])]
+        }
+      : null;
     // Death Ride: whether this character is driving a vehicle or riding a mount (its recorded driver).
     this.operatingVehicle = [...(globalThis.game?.actors ?? [])].some(
       a => a.type === "vehicle" && a.system?.driver === this.parent.uuid

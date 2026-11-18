@@ -13,6 +13,8 @@ import { duelingAllDodge } from "./dueling-basics.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
 import { notTheFaceDR } from "./not-the-face.mjs";
 import { underminedState } from "./taunt.mjs";
+import { PERSONAL_LIEUTENANT, lieutenantReview } from "./companions.mjs";
+import { activeIdentity, identityReview, professionFocusesWithIdentity } from "./flawless-identity.mjs";
 import { intenseStanceState } from "./intense-stance.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
@@ -1500,6 +1502,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
       sys.actionDice.max *= 2;
     } else sys.actionDice.die += 2;
   }
+  // Personal Lieutenant (p.204): always exactly 1 action die.
+  if (sys.companionOf?.feat === PERSONAL_LIEUTENANT) {
+    sys.actionDice.max = 1;
+    if (sys.lieutenantOwner) warnings.push(...lieutenantReview(sys, sys.lieutenantOwner).warnings);
+    else warnings.push(loc`Personal Lieutenant: the owner could not be found.`);
+  }
   sys.adrenalineJunkieSource = adrenalineSource(sys);
   sys.actionDieAwardSummary = actionDieAwardSummary(sys);
   sys.combatMovement = combatMovementRules(sys);
@@ -1713,6 +1721,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
     activeFeatIds
   });
   sys.focusTotals = focuses.totals;
+  // Flawless Identity (p.209): the identity in use adds its Profession focus.
+  sys.activeIdentityState = activeIdentity(sys);
+  if (sys.activeIdentityState && sys.focusTotals?.profession)
+    sys.focusTotals.profession = professionFocusesWithIdentity(sys, sys.focusTotals.profession);
+  warnings.push(...identityReview(sys));
   sys.temporaryFocusGrants = focuses.temporaryGrants;
   sys.skillForteTotals = focuses.activeFortes;
   sys.forcedFocuses = Object.fromEntries(Object.entries(focuses.forced).map(([key, value]) => [key, [...value]]));

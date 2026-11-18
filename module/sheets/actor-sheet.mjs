@@ -66,6 +66,8 @@ import { takeFireTeamSupremacy } from "../apps/team-final-attack.mjs";
 import { declareDuelingBasics } from "../apps/dueling-basics.mjs";
 import { declareFightDefensively, declareIntenseStance } from "../apps/fight-defensively.mjs";
 import { declareSnakeStrike } from "../apps/snake-strike.mjs";
+import { companionsContext, createCompanion, recordCompanionDeath } from "../apps/companions.mjs";
+import { editIdentity, removeIdentity, enterIdentity, leaveIdentity } from "../apps/flawless-identity.mjs";
 import { rollDisarmResponse } from "../apps/disarm-response.mjs";
 import { takeMissTrick } from "../apps/miss-tricks.mjs";
 import { rollCheapShot } from "../apps/cheap-shot.mjs";
@@ -269,6 +271,27 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       declareSnakeStrike() {
         return declareSnakeStrike(this.actor);
+      },
+      createCompanion(event, target) {
+        return createCompanion(this.actor, target.dataset.feat);
+      },
+      openCompanion(event, target) {
+        return fromUuidSync(target.dataset.uuid)?.sheet?.render(true);
+      },
+      companionDied(event, target) {
+        return recordCompanionDeath(this.actor, target.dataset.uuid);
+      },
+      editIdentity(event, target) {
+        return editIdentity(this.actor, target.dataset.id ?? "");
+      },
+      removeIdentity(event, target) {
+        return removeIdentity(this.actor, target.dataset.id);
+      },
+      enterIdentity(event, target) {
+        return enterIdentity(this.actor, target.dataset.id);
+      },
+      leaveIdentity() {
+        return leaveIdentity(this.actor);
       },
       endBerserkerRage() {
         return endBerserkerRage(this.actor);
@@ -1108,6 +1131,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.berserker = (this.actor.limitedUseStatus ?? []).find(s => s.id === "berserkerRage");
     context.gunslinger = (this.actor.limitedUseStatus ?? []).find(s => s.id === "gunslingersEye");
     context.fireTeamSupremacy = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fireTeamSupremacy");
+    context.companions = this.actor.type === "agent" ? companionsContext(this.actor) : null;
+    context.flawlessIdentity = this.actor.system.activeFeatNames?.includes("Flawless Identity") === true;
     context.twoWeaponFinalAttack = (this.actor.limitedUseStatus ?? []).find(s => s.id === "twoWeaponFinalAttack");
     context.jinxUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "jinx");
     context.markUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "mark");

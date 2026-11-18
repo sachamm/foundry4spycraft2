@@ -320,6 +320,19 @@ export const RECORD_SHAPES = {
     tier: "string",
     version: "number"
   },
+  companionOf: {
+    $also: "null",
+    feat: "string",
+    ownerUuid: "string"
+  },
+  identities: [
+    {
+      id: "string",
+      interests: ["string"],
+      name: "string",
+      professionFocus: "string"
+    }
+  ],
   snakeStrikes: [
     {
       combatId: "string",
