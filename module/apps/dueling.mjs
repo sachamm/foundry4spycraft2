@@ -59,6 +59,17 @@ rollPipeline.register({
         label: loc`Dueling Supremacy: Initiative Count +1`,
         run: () => shiftCount(message, actor, 1, "duelingSupremacy", "Dueling Supremacy")
       });
+    // Forward Stance (Rolling Basics, p.187): each hit raises the attacker's Initiative Count by 1.
+    if (
+      check.successConfirmed === true &&
+      !check.forwardStance &&
+      actor?.system?.combatStance?.key === "forward" &&
+      actor.system.activeFeatNames?.includes("Rolling Basics")
+    )
+      controls.push({
+        label: loc`Forward Stance: Initiative Count +1`,
+        run: () => shiftCount(message, actor, 1, "forwardStance", "Forward Stance")
+      });
     const target = check.attackContext?.targetActorUuid ? fromUuidSync(check.attackContext.targetActorUuid) : null;
     if (
       user?.isGM &&

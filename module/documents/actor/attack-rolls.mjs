@@ -549,6 +549,7 @@ export const ActorAttackRolls = Base =>
         ...styleOverCaliberWeapon(this.system, current.system, options),
         ...(options.kick === true ? { kick: true } : {}),
         ...(options.closedStanceTarget === true ? { closedStanceTarget: true } : {}),
+        ...(options.unarmedTrick ? { unarmedTrick: options.unarmedTrick } : {}),
         ...(options.doubleJab === true ? { doubleJab: true } : {}),
         ...(options.brush === true && unarmedWeapon(current.system) ? { damage: "1d6", brush: true } : {}),
         id: current.id ?? current._id,

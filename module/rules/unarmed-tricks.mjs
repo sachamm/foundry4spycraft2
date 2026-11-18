@@ -65,7 +65,9 @@ export const UNARMED_TRICKS = Object.freeze({
     flatFooted: true,
     page: 188
   },
-  spike: { feat: "Vital Points Moves", name: "Spike", action: "standard", threat: 1, page: 188 }
+  spike: { feat: "Vital Points Moves", name: "Spike", action: "standard", threat: 1, page: 188 },
+  roll: { feat: "Rolling Basics", name: "Roll", action: "either", damage: 1, page: 187 },
+  palmStrike: { feat: "Spirit Basics", name: "Palm Strike", action: "standard", page: 187 }
 });
 
 const NOTES = {
@@ -75,7 +77,10 @@ const NOTES = {
     loc`Leap: before this attack, move up to your Speed, passing freely through squares adjacent to or occupied by opponents`,
   sway: () => loc`Sway: on a hit, +1 dodge bonus to Defense against the target’s attacks for 1 full round`,
   oneFinger: () => loc`One Finger: only against a flat-footed opponent`,
-  spike: () => loc`Spike: threat range +1`
+  spike: () => loc`Spike: threat range +1`,
+  roll: () => loc`Roll: move 5 ft. before this attack; +1 damage (roll it from this card)`,
+  palmStrike: () =>
+    loc`Palm Strike: on a hit, push the opponent 5 ft. away; if that square is occupied or blocked, they take 1d4 subdual instead`
 };
 
 export function unarmedTrickPlan(
@@ -107,9 +112,13 @@ export function unarmedTrickPlan(
     name: d.name,
     attackBonus: d.attack ?? 0,
     threatIncrease: d.threat ?? 0,
-    ...(d.qualities ? { qualities: d.qualities } : {})
+    ...(d.qualities ? { qualities: d.qualities } : {}),
+    ...(d.damage ? { damageBonus: d.damage } : {})
   };
 }
+
+/** The extra damage a trick adds to its hit’s damage roll. */
+export const unarmedTrickDamageBonus = trick => UNARMED_TRICKS[trick]?.damage ?? 0;
 
 /** The card’s line for the trick on the attack. */
 export function unarmedTrickNote(plan) {

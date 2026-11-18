@@ -25,7 +25,7 @@ rollPipeline.register({
       check.successConfirmed === true &&
       unarmedWeaponItem &&
       !check.unarmedTrickDamage &&
-      (UNARMED_TRICKS[unarmed.key]?.hitSave || unarmed.key === "clothesline")
+      (UNARMED_TRICKS[unarmed.key]?.hitSave || UNARMED_TRICKS[unarmed.key]?.damage || unarmed.key === "clothesline")
     )
       controls.push({
         label: loc`Roll ${unarmed.name} damage`,

@@ -11448,10 +11448,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "Autofire and Strafe volleys use only 2 shots each; fire rifles and machine guns one-handed at –2; requests for autofire ammo yield double."
  },
- "Rolling Basics": {
-  "rolls": "attack",
-  "text": "Stand Up is free and safe; gain a rolling stance and trick."
- },
  "Spider Basics": {
   "rolls": "skill:athletics",
   "text": "No penalties while climbing (including without a kit), foes get no bonus against climbing you, and Initiative bonus when combat starts on a wall."
@@ -11463,10 +11459,6 @@ export const FEAT_REMINDERS = {
  "Spider Supremacy": {
   "rolls": "skill:athletics",
   "text": "Climb at full Speed, don't need extra checks when hurt while climbing, and climbing with a kit is easier."
- },
- "Spirit Basics": {
-  "rolls": "attack",
-  "text": "Once per combat reduce lethal damage from one source by your BAB; gain a spirit stance and trick."
  },
  "Spirit Moves": {
   "rolls": "attack",

@@ -363,13 +363,13 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Kicking Supremacy | 186 | No | Partial: static numerical effects | — |
 | Martial Arts | 186 | No | Partial: chosen/roll effects | — |
 | Master's Art | 187 | No | Partial: chosen/roll effects | — |
-| Rolling Basics | 187 | No | Manual/descriptive | — |
+| Rolling Basics | 187 | No | Covered (batch 396): Forward Stance (a hit’s card offers Initiative Count +1; movement checks refuse anything but Jump checks and the bonus 5-ft. step) and Roll (Kick or unarmed Standard Attack, +1 damage from the hit’s card, the 5-ft. move noted). The system never applies flat-footed or an action cost for standing up, so the free, safe Stand Up holds as is | Native Foundry QA not claimed |
 | Rolling Moves | 187 | No | Covered (batch 395): Circle, Leap and Sway on a Kick or unarmed Standard Attack, with their movement and +1 dodge stated on the card for the table | Native Foundry QA not claimed |
 | Rolling Supremacy | 187 | No | Partial: static numerical effects | — |
-| Spirit Basics | 187 | No | Manual/descriptive | — |
+| Spirit Basics | 187 | No | Covered (batch 396): once per combat at any Count, a receipt reducing one source’s lethal damage by base attack bonus (minimum 1); Rooted Stance (+1 to all saves; movement checks refuse leaving the square); Palm Strike (push or 1d4 subdual, on the card) | Native Foundry QA not claimed |
 | Spirit Moves | 187 | No | Manual/descriptive | — |
 | Spirit Supremacy | 187 | No | Partial: static numerical effects | — |
-| Submission Basics | 188 | No | Manual/descriptive | — |
+| Submission Basics | 188 | No | Partial (batch 396): Prone Stance survives being prone and waives the prone attack penalty; its +1 to Grapple skill checks, sprawled-to-prone conversion, the doubled Cheap Shot penalties and Snap! are not yet carried out | Native Foundry QA not claimed |
 | Submission Moves | 188 | No | Manual/descriptive | — |
 | Submission Supremacy | 188 | No | Manual/descriptive | — |
 | Two-hit Combo | 188 | No | Manual/descriptive | — |
@@ -1756,3 +1756,14 @@ Source: rules reference pp.185–189 (local markdown edition; original PDF pages
 - Tricks riding a Trip, Feint or grapple (Hip Toss, Fling, Body Slam, Fake Out, Mud in Your Eye) stay as skill reminders. The reminders of Wrestling, Brawling and Dirty Fighting Moves now point at those skills; Rolling Moves, Vital Points Moves and Dirty Fighting Basics leave the list (tables regenerated).
 
 Verification: 513 legacy assertions, 3412 of 3413 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 64 manual / 59 partial / 191 other; at least 123 of 314 explicitly unfinished; 73 whole-feat closures.
+
+## Residual implementation batch 396 — Rolling, Spirit and Submission Basics
+
+Source: rules reference pp.187–188 (local markdown edition; original PDF pages not visually re-checked).
+
+- Three stances join the shared lifecycle. **Forward:** a hit’s card offers Initiative Count +1 (alongside Dueling Supremacy’s control), and movement checks refuse anything but Jump checks or the bonus step. **Rooted:** +1 to all saves, prepared with the character, and movement checks refuse leaving the square. **Prone:** becoming prone no longer forces normal stance, and the prone attack penalty is waived.
+- The unarmed-trick table gains Roll (Kick or Standard Attack, +1 damage through `weaponDamage`) and Palm Strike (the push, or 1d4 subdual into a blocked square, on the card).
+- Spirit Basics’ once-per-combat damage reduction is a round-action receipt (now allowing a per-combat period), usable at any Count.
+- Submission Basics stays partial; its remaining pieces are listed in its row.
+
+Verification: 513 legacy assertions, 3417 of 3418 Node tests (5 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 61 manual / 60 partial / 193 other; at least 121 of 314 explicitly unfinished; 75 whole-feat closures.

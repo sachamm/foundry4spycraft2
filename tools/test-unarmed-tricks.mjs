@@ -52,7 +52,7 @@ test("notes state each effect; save tricks give the DC from the damage", () => {
   );
   assert.match(unarmedTrickDamageNote("eyeGouge", 9), /Reflex save, DC 19, or is blinded/);
   assert.equal(unarmedTrickDamageNote("spike", 9), "");
-  assert.equal(Object.keys(UNARMED_TRICKS).length, 11);
+  assert.equal(Object.keys(UNARMED_TRICKS).length, 13);
 });
 
 test("one unarmed trick per action, Ready Stance, and Dirty Fighting Basics halves sneak damage suffered", () => {

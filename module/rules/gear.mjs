@@ -1,5 +1,6 @@
 import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
 import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
+import { unarmedTrickDamageBonus } from "./unarmed-tricks.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { markDamagePlan } from "./marks.mjs";
 import { reachWeaponPlan } from "./reach-weapon.mjs";
@@ -761,7 +762,8 @@ export function weaponDamage(
   const signatureDamage = signatureBonus(system, weapon.id),
     kickDamage = weapon.kick === true && unarmedWeapon(weapon) ? kickDamageBonus(system) : 0,
     closedDamage =
-      weapon.closedStanceTarget === true && unarmedWeapon(weapon) && inClosedStance(system) ? CLOSED_STANCE_DAMAGE : 0;
+      weapon.closedStanceTarget === true && unarmedWeapon(weapon) && inClosedStance(system) ? CLOSED_STANCE_DAMAGE : 0,
+    trickDamage = unarmedWeapon(weapon) ? unarmedTrickDamageBonus(weapon.unarmedTrick) : 0;
   bonus +=
     conditionDamagePenalty +
     cqbRange.damageBonus +
@@ -769,6 +771,7 @@ export function weaponDamage(
     signatureDamage +
     kickDamage +
     closedDamage +
+    trickDamage +
     (options.attackDamageBonus ?? 0);
   const min = parsed.minimum;
   return {

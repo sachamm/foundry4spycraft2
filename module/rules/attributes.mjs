@@ -193,7 +193,11 @@ export function conditionRollPenalties(system) {
   return {
     sprawled,
     prone,
-    meleeAttack: prone ? -2 : 0,
+    // Prone Stance (Submission Basics, p.188): no attack penalty for being prone.
+    meleeAttack:
+      prone && !(system.combatStance?.key === "prone" && system.activeFeatNames?.includes("Submission Basics"))
+        ? -2
+        : 0,
     sickened,
     bound,
     entangled,

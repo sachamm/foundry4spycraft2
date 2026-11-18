@@ -344,6 +344,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
         ...["knowledge", "saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "-2" }))
       ]
     });
+  // Rooted Stance (Spirit Basics, p.187): +1 to all saves while in the stance.
+  if (sys.combatStance?.key === "rooted" && sys.activeFeatNames?.includes("Spirit Basics"))
+    sources.push({
+      name: "Rooted Stance",
+      rank: 1,
+      bonuses: ["saves.fort", "saves.ref", "saves.will"].map(target => ({ target, value: "1" }))
+    });
   // Dueling Supremacy, p.178: +2 dodge bonus to Defense.
   if (sys.activeFeatNames?.includes("Dueling Supremacy"))
     sources.push({

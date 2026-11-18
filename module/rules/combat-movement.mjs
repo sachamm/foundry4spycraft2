@@ -47,8 +47,12 @@ export function combatMovementPlan(
   const block = restraintActionBlock(system) || attributeActionBlock(system, { kind: "skill", ability: "dex" });
   if (block || system.wounds?.value < 0) throw new Error(block || loc`This character cannot take a movement action.`);
   const rules = combatMovementRules(system);
-  if (action === "run" && combatStanceState(system)?.key === "open")
-    throw new Error(loc`Open Stance allows no Run actions (p.189).`);
+  const stanceKey = combatStanceState(system)?.key;
+  if (action === "run" && stanceKey === "open") throw new Error(loc`Open Stance allows no Run actions (p.189).`);
+  if (stanceKey === "rooted" && distanceFeet > 0)
+    throw new Error(loc`Rooted Stance: you may not leave your current square (p.187).`);
+  if (stanceKey === "forward" && distanceFeet > 0)
+    throw new Error(loc`Forward Stance: move only with Acrobatics/Jump checks or your bonus 5-ft. step (p.187).`);
   if (rules.speed === null || system.conditionSpeedReview)
     throw new Error(loc`Resolve the character’s current Speed before checking movement.`);
   if (!Number.isFinite(distanceFeet) || distanceFeet < 0)

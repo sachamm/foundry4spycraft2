@@ -37,6 +37,15 @@ export const ROUND_ACTION_FEATS = Object.freeze({
     advantage: true
   },
   merciless: { feat: "Merciless", actions: ["Coup de Grace against a helpless character"], perRound: 1, cost: "free" },
+  spiritBasics: {
+    feat: "Spirit Basics",
+    label: "Spirit Basics",
+    actions: ["Reduce the lethal damage from one source by your base attack bonus (minimum 1)"],
+    perRound: 1,
+    period: "combat",
+    cost: "free",
+    anyCount: true
+  },
   weatherTheStorm: {
     feat: "Boxing Moves",
     label: "Weather the Storm",
@@ -60,7 +69,7 @@ export function roundActionSpecs(system) {
     .map(([id, d]) => ({
       id,
       name: loc`${d.label ?? d.feat}: ${d.actions.join(" / ")} as a ${d.cost} action`,
-      period: "round",
+      period: d.period ?? "round",
       limit: d.perRound,
       workflow: "featFreeAction",
       combatScoped: true,
