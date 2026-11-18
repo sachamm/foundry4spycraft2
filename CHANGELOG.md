@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added the Sample Level-1 Agents compendium: 16 complete characters across all 12 base classes, four alternate builds, matching compressed WebP portraits and tokens, and a linked Scout animal partner created on import.
+
 Not yet tried in a running Foundry world; see `docs/remaining-work.md` for the checks to make.
 
 - Feat reminders: feats the system does not work out are listed in roll dialogs for the rolls they bear on, and the

@@ -72,9 +72,10 @@ system.packs = Object.entries(packs).map(([name, pack]) => ({
   path: `packs/${name}`,
   type: pack.type ?? "Item",
   system: "spycraft2",
-  ownership: ["RollTable", "Actor"].includes(pack.type)
-    ? { PLAYER: "NONE", ASSISTANT: "OWNER" }
-    : { PLAYER: "OBSERVER", ASSISTANT: "OWNER" },
+  ownership:
+    name !== "sample-agents" && ["RollTable", "Actor"].includes(pack.type)
+      ? { PLAYER: "NONE", ASSISTANT: "OWNER" }
+      : { PLAYER: "OBSERVER", ASSISTANT: "OWNER" },
   flags: {}
 }));
 system.packFolders = [{ name: "Spycraft 2.0", sorting: "m", color: "#1d2b3a", packs: Object.keys(packs) }];

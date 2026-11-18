@@ -5,6 +5,10 @@ An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com)
 - **System ID:** `spycraft2`
 - **Foundry compatibility:** v14 (minimum 14, verified on 14.370)
 
+## Sample characters
+
+The **Sample Level-1 Agents** compendium contains 16 fully built agents covering all 12 base classes, including four alternate builds. Each has completed creation choices, an example Caliber-II mission loadout, background, contacts, portrait and matching token. Import a character from the compendium; importing Tomas also creates his linked animal partner, Bracken. See [the roster and build assumptions](docs/sample-agents.md) and [art gallery](assets/agents/catalog.html).
+
 ## Development setup
 
 Foundry loads systems from `{userData}/Data/systems/<id>`. Run this from the repository root to symlink this checkout there so edits show up after a reload:

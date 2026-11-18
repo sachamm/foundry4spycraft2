@@ -62,7 +62,9 @@ for (const [roleId, role] of Object.entries(packageData.roles)) {
       embedded: { items: variant.items }
     });
 }
-for (const doc of npcTemplates) {
+const samplePack = built.packs["sample-agents"];
+const sampleActors = [...samplePack.docs, ...samplePack.companions];
+for (const doc of [...npcTemplates, ...sampleActors]) {
   for (const [kind, type, data, label] of [
     ["Actor", doc.type, doc.system, doc.name],
     ...doc.embedded.items.map(item => ["Item", item.type, item.system, `${doc.name}: ${item.name}`])
@@ -78,7 +80,9 @@ for (const doc of npcTemplates) {
     }
   }
 }
-console.log(`Validated ${npcTemplates.length} NPC template/package systems and their embedded item systems.`);
+console.log(
+  `Validated ${npcTemplates.length} NPC template/package systems and ${sampleActors.length} sample agent/companion systems, with all embedded item systems.`
+);
 // Exercise v14's actual embedded collection replacement, including deletion and schema-cleaned inputs.
 try {
   const assert = (await import("node:assert/strict")).default;
@@ -89,9 +93,9 @@ try {
   for (const kind of ["Actor", "Item", "ActiveEffect", "Folder", "Token", "RollTable", "TableResult"])
     CONFIG[kind] = { documentClass: foundry.documents[`Base${kind}`], dataModels: models[kind.toLowerCase()] ?? {} };
   globalThis.game = {
-    system: { id: "spycraft2", documentTypes: { Actor: ["npc"], Item: Object.keys(models.item) } },
+    system: { id: "spycraft2", documentTypes: { Actor: ["npc", "agent"], Item: Object.keys(models.item) } },
     modules: new Map(),
-    model: { Actor: { npc: {} }, Item: Object.fromEntries(Object.keys(models.item).map(type => [type, {}])) }
+    model: { Actor: { npc: {}, agent: {} }, Item: Object.fromEntries(Object.keys(models.item).map(type => [type, {}])) }
   };
   const { planNpcPackage } = await import("../module/rules/npc-packages.mjs");
   for (const original of npcTemplates.slice(0, 20)) {
@@ -113,6 +117,28 @@ try {
     }
   }
   console.log("Validated native Foundry package replacement and fixed-loadout restoration for all 20 templates.");
+  game.packs = new Map(
+    Object.entries(built.packs).map(([name, pack]) => [`spycraft2.${name}`, { documentName: pack.type ?? "Item" }])
+  );
+  for (const original of sampleActors) {
+    const { embedded, ...source } = original;
+    const actor = new foundry.documents.BaseActor({ ...source, items: embedded.items });
+    assert.equal(actor.items.size, embedded.items.length);
+    if (actor.type === "agent") {
+      const { computeAgent } = await import("../module/rules/engine.mjs");
+      const prepared = computeAgent(
+        actor.system.toObject(),
+        actor.items.map(item => ({ ...item.toObject(), id: item.id })),
+        CONFIG.SPYCRAFT
+      );
+      assert.deepEqual(prepared.todo, [], original.name);
+      assert.deepEqual(prepared.warnings, [], original.name);
+      assert.equal(actor.system.vitality.value, prepared.vitality.max);
+      assert.equal(actor.system.wounds.value, prepared.wounds.max);
+      assert.equal(actor.system.actionDice.value, prepared.actionDice.max);
+    }
+  }
+  console.log("Validated native sample actor documents and complete preparation after schema cleaning.");
   game.model.TableResult = Object.fromEntries(Object.values(CONST.TABLE_RESULT_TYPES).map(type => [type, {}]));
   let tableResults = 0;
   for (const { embedded, ...source } of built.packs["gc-tables"].docs) {

@@ -263,6 +263,18 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "sample-agents",
+      "label": "Sample Level-1 Agents",
+      "path": "packs/sample-agents",
+      "type": "Actor",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -295,7 +307,8 @@
         "gc-tables",
         "sample-scenes",
         "soundtrack",
-        "core-npcs"
+        "core-npcs",
+        "sample-agents"
       ]
     }
   ]

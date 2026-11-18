@@ -8247,6 +8247,7 @@
    "TheSafeHouseDeclarationMayStill_1h7gaj3": "The Safe House declaration may still exist; its uses remain spent. Review the record and counters before retrying.",
    "TheSafeHouseOrOwnershipChanged_1kq4g47": "The Safe House or ownership changed during placement.",
    "TheSafeHouseSourceLifestyleMission_0kcbytv": "The Safe House source, Lifestyle, mission or scene changed before posting.",
+   "TheSampleCompanionCouldNotFinish_133eu7b": "The sample companion could not finish importing. It will retry on the next GM launch.",
    "TheSaveFailsScarring_06sy525": "The save fails: scarring.",
    "TheSaveFailsTheCharacterIs_1evhw52": "The save fails: the character is on fire and takes {0} fire damage as each round begins.",
    "TheSaveFails_1o53qru": "{0}: the save fails ({1}).",

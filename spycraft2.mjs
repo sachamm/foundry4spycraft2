@@ -1,3 +1,4 @@
+import { installSampleAgentHooks } from "./module/sample-agents.mjs";
 import { registerGCTableSetup, setupGCTables, inputRollTableClass } from "./module/gc-table-setup.mjs";
 import { registerSoundtrackSetup, setupSoundtrack } from "./module/soundtrack.mjs";
 import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-scenes.mjs";
@@ -141,6 +142,7 @@ Hooks.once("init", () => {
   registerGCConsoleTab();
   registerGCTableSetup();
   CONFIG.RollTable.documentClass = inputRollTableClass(CONFIG.RollTable.documentClass);
+  installSampleAgentHooks();
   registerSampleSceneSetup();
   registerSoundtrackSetup();
   registerMigrationSettings();
