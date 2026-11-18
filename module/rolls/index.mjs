@@ -23,6 +23,7 @@ import "../apps/side-stance.mjs";
 import "../apps/striking-stance.mjs";
 import "../apps/takedown.mjs";
 import "../apps/target-skill-effects.mjs";
+import "../apps/trick-shot.mjs";
 import "../apps/trip-attack.mjs";
 import "../apps/trip-final-attack.mjs";
 import "../apps/trip.mjs";

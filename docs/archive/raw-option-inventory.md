@@ -345,7 +345,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Steel Rain | 182 | No | Partial (batch 407): a hurled weapon without a blast increment offers the Burst trick, Cover Fire and Suppressive Fire in the ranged attack dialog, each weapon thrown counting as a shot; free draw, always-readied and the +4 Stash Item bonus stay with the GC | Native Foundry QA not claimed |
 | Style Over Caliber | 183 | No | Covered (batch 385): a pistol’s damage roll may replace its standard damage with 1d10+2, keeping other damage, qualities and effects | Native Foundry QA not claimed |
 | This… is my Boomstick | 183 | No | Manual/descriptive | — |
-| Trick Shot | 183 | No | Manual/descriptive | — |
+| Trick Shot | 183 | No | Covered (batch 412): a hit with a non-grenade hurled weapon offers a control that rolls the damage as the escape DC and states the target is held instead of damaged; the GC records the held condition and combines several Trick Shots in a round | Native Foundry QA not claimed |
 | Berserker Basics | 183 | No | Covered (batch 386): a rage for 2d4+2 combat rounds, Strength and Constitution +3 and the Enraged status, entered with a full action and ended early with a half action; afterwards exhausted; uses per session equal starting action dice. The enraged condition’s restrictions are left to the table | Native Foundry QA not claimed |
 | Berserker Mastery | 183 | No | Covered (batch 386): free entry, 3d4+3 rounds, Strength and Constitution +5 | Native Foundry QA not claimed |
 | Berserker Supremacy | 184 | No | Partial (batch 386): free ending, 4d4+4 rounds, fatigued instead of exhausted; the +4 to resist becoming frenzied is a save reminder, since saves do not record what they resist | Native Foundry QA not claimed |
@@ -415,8 +415,8 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Driving Instincts | 192 | No | Covered (batch 409): the chase tracker records the side’s guess before the reveal; a right guess subtracts the side’s Chase feats from the opponent’s Strategy modifier for that check | Native Foundry QA not claimed |
 | Professional Driver - Closed Course | 193 | No | Implemented: Impress synergy on all five Maneuvers; Acrobatics or Drive synergy on all Impress uses when the target sees both you and your vehicle | Batch259; all named uses, rank thresholds/cap, typed stacking, source guards, actual dialog and native persistence verified |
 | Duct Tape and Bubblegum | 192 | No | Covered (batch 384): a vehicle gains the best half-Mechanics-ranks (rounded up) Damage save bonus among its driver and occupants with the feat | Native Foundry QA not claimed |
-| Get Radical! | 192 | No | Manual/descriptive | — |
-| Need for Speed | 192 | No | Manual/descriptive | — |
+| Get Radical! | 192 | No | Partial (batch 412): the vehicle control check now declares a stunt (DC +5/+10/+15/+20, error +0–3) and speed above half top MPH (DC +5); Get Radical! takes 5 off the stunt DC and 1 off its error increase, the DC change stated on the card for the GC; the jump distance and halved falling damage stay with the GC | Native Foundry QA not claimed |
+| Need for Speed | 192 | No | Covered (batch 412): the control check’s speed declaration adds no DC for a driver with the feat, and the card says why | Native Foundry QA not claimed |
 | Offensive Driving | 192 | No | Covered (batch 383): Predator Strategy penalties halved (rounded down); once-per-chase ignored Crisis recorded for the GC | Native Foundry QA not claimed |
 | Relentless Pursuit | 193 | No | Covered (batch 383): chase or manhunt Predator: starting Lead −2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
 | One Hand on the Wheel | 193 | No | Vehicle Maneuver one-handed penalty waived; selected free Maneuvers share a scene allowance equal to active Chase feats; legality, own-count timing, reservations, refunds and frozen receipts verified (batch258) | — |

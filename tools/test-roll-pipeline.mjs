@@ -619,6 +619,7 @@ const EXPECTED_ORDER = [
   "duelingReachControl",
   "brawlingSupremacyControl",
   "noQuarterControl",
+  "trickShotControl",
   "targetSkillEffectsRecord",
   "blastMapControl",
   "terrainRecord",

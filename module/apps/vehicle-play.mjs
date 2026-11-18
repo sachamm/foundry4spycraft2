@@ -17,6 +17,7 @@ import {
 import {
   bailOut,
   controlCheckPlan,
+  maneuverDifficulty,
   hasQuality,
   heavyArmorDice,
   secondaryDamage,
@@ -426,7 +427,7 @@ export function skeletonCrewFor(actor, teamSize) {
 /* ---------------------------------------------------------------------- */
 
 /** The driver makes a Maneuver check with the vehicle's skill, Drive focus, untrained penalty and error increases. */
-export async function rollControlCheck(actor, { modifier = null, topMphBonus = false } = {}) {
+export async function rollControlCheck(actor, { modifier = null, topMphBonus = false, stunt = "", fast = false } = {}) {
   const driver = actor.system.driver ? fromUuidSync(actor.system.driver) : null;
   if (!driver) return ui.notifications.warn(loc`Drop a character on the vehicle sheet to set the driver first.`);
   if (!driver.isOwner) return ui.notifications.warn(loc`Only ${driver.name}'s owner or the GC can roll this check.`);
@@ -443,22 +444,27 @@ export async function rollControlCheck(actor, { modifier = null, topMphBonus = f
       <p>${esc(plan.note)}</p>${hazardNote ? `<p>${esc(hazardNote)}</p>` : ""}
       <label>${loc`Other modifier (Strategy, situation)`} <input name="modifier" type="number" step="1" value="0" /></label>
       <label><input name="topMphBonus" type="checkbox" /> ${loc`Chase: this vehicle has the fastest top MPH (Maneuvering Room bonus)`}</label>
+      <label>${loc`Stunt`} <select name="stunt"><option value="">${loc`None`}</option><option value="minor">${loc`Minor (DC +5)`}</option><option value="moderate">${loc`Moderate (DC +10, error +1)`}</option><option value="major">${loc`Major (DC +15, error +2)`}</option><option value="deathDefying">${loc`Death-defying (DC +20, error +3)`}</option></select></label>
+      <label><input name="fast" type="checkbox" /> ${loc`Moving faster than half the top MPH (DC +5)`}</label>
       <label>${loc`Chase Maneuvering Room`} <select name="room"><option value="0">—</option><option value="6">${loc`Open +6`}</option><option value="4">${loc`Close +4`}</option><option value="2">${loc`Crowded +2`}</option><option value="0">${loc`Tight +0`}</option></select></label>`
     );
     if (!input) return null;
     modifier = (Number(input.modifier) || 0) + (input.topMphBonus ? Number(input.room) || 0 : 0);
     topMphBonus = !!input.topMphBonus;
+    stunt = input.stunt || "";
+    fast = input.fast === true;
   }
+  const difficulty = maneuverDifficulty(driver.system, { stunt, fast });
   return driver.rollSkill(plan.skillKey, null, {
     check: "maneuver",
     modifier: (plan.penalty || 0) + modifier,
     focus: plan.focus,
     gearStatus: "available",
     synergySkill: "auto",
-    vehicleErrorIncrease: plan.errorIncrease,
+    vehicleErrorIncrease: plan.errorIncrease + difficulty.errorIncrease,
     vehicleControl: {
       vehicleUuid: actor.uuid,
-      note: `${plan.note}${hazardNote ? ` ${hazardNote}` : ""}${topMphBonus ? loc` Fastest vehicle in the chase.` : ""}`
+      note: `${plan.note}${hazardNote ? ` ${hazardNote}` : ""}${topMphBonus ? loc` Fastest vehicle in the chase.` : ""}${difficulty.notes.length ? ` ${difficulty.notes.join(" ")}` : ""}`
     }
   });
 }

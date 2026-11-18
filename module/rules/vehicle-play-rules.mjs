@@ -168,6 +168,42 @@ const norm = text =>
  * category's untrained penalty adjusted by Forgiving and Unforgiving, Trained Only, and error increases from
  * Lift damage and the Drone quality. `hazards` is a vehicleHazards() result for the current terrain and weather.
  */
+/** Maneuver DC changes for a stunt and for speed (p.125 table), as [DC, error]. */
+export const MANEUVER_STUNTS = Object.freeze({
+  minor: [5, 0],
+  moderate: [10, 1],
+  major: [15, 2],
+  deathDefying: [20, 3]
+});
+/**
+ * The declared stunt and speed of a Maneuver: the DC change for the GC and the error increase for the roll.
+ * Get Radical! (p.192): a stunt's DC is 5 lower and the error range 1 lower (never below the check's own).
+ * Need for Speed (p.192): no penalty for moving faster than half the top MPH.
+ */
+export function maneuverDifficulty(driver, { stunt = "", fast = false } = {}) {
+  const feats = driver?.activeFeatNames ?? [],
+    notes = [];
+  let dc = 0,
+    error = 0;
+  if (stunt) {
+    const row = MANEUVER_STUNTS[stunt];
+    if (!row) throw new Error(loc`Choose a listed stunt.`);
+    dc += row[0];
+    error += row[1];
+    if (feats.includes("Get Radical!")) {
+      dc -= 5;
+      error = Math.max(0, error - 1);
+      notes.push(loc`Get Radical!: the stunt’s DC is 5 lower and its error range 1 lower.`);
+    }
+  }
+  if (fast) {
+    if (feats.includes("Need for Speed")) notes.push(loc`Need for Speed: no penalty for the speed.`);
+    else dc += 5;
+  }
+  if (dc) notes.unshift(loc`Maneuver DC ${dc > 0 ? "+" : ""}${dc} for the declared stunt and speed.`);
+  return { dc, errorIncrease: error, notes };
+}
+
 export function controlCheckPlan(vehicle, driver, { hazards = null } = {}) {
   const cls = vehicleClass(vehicle?.vehicleClass);
   if (!cls) return { blocked: loc`Choose the vehicle's category first.` };
