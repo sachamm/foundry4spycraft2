@@ -8,6 +8,10 @@
  *
  * It is used only when the world setting `spycraft2.lockMode` is "gm" and a GM is connected; otherwise the
  * document locks are used. Requests travel over Foundry's user queries (CONFIG.queries, User#query).
+ *
+ * Limit: the table lives in one client. If the active GM is signed in from two browsers, each has its own table and
+ * their own actions are not excluded from one another. The document lock has no such limit, which is why it stays
+ * the default.
  */
 
 export const LOCK_QUERY = "spycraft2.resourceLock";

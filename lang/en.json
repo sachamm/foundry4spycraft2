@@ -285,7 +285,7 @@
   "Settings": {
    "LockMode": {
     "Name": "Resource locking",
-    "Hint": "How two clients are kept from spending the same character's resources at once. The default writes a short-lived lock on the character. The alternative asks the Game Control's client instead and writes nothing; it needs a GC connected.",
+    "Hint": "How two clients are kept from spending the same character's resources at once. The default writes a short-lived lock on the character. The alternative asks the Game Control's client instead and writes nothing; it needs a GC connected, and must not be used while the GC is signed in from two browsers at once.",
     "Items": "Lock on the character (default)",
     "Gm": "Arbitrated by the Game Control's client"
    },
