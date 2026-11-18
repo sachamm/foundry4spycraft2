@@ -23,7 +23,7 @@ const strategies = (c, side) => Object.fromEntries(availableStrategies(c, side).
 
 test("only the tracked chase feats are kept on a side", () => {
   assert.deepEqual(chase(["Daredevil", "Quick Draw"]).predator.feats, ["Daredevil"]);
-  assert.equal(CONFLICT_FEATS.length, 6);
+  assert.equal(CONFLICT_FEATS.length, 8);
 });
 
 test("Jackrabbit Start and Relentless Pursuit move the starting Lead by 2, inside the track", () => {
@@ -112,4 +112,31 @@ test("Photo Finish lowers every participant's Acceleration and Turning by 2 and 
   assert.equal(strategies(once, "predator")["cut-off"].available, false, "availability uses the lowered ratings");
   assert.deepEqual(once.predator.ratings, { Acceleration: 7, Turning: 3 }, "stored ratings stay as refreshed");
   assert.throws(() => photoFinish(c, "prey"), /Photo Finish needs/);
+});
+
+test("Breaking Points and Hold Out: interrogation or brainwashing Lead ±1 and any Strategy of their own list", async () => {
+  const { declarePace } = await import("../module/rules/gc/conflict.mjs");
+  const talk = (pFeats = [], qFeats = []) =>
+    startConflict("interrogation", {
+      lead: 5,
+      predator: { ratings: { "Base Will Save": 0 }, feats: pFeats },
+      prey: { ratings: { "Base Will Save": 0 }, feats: qFeats }
+    });
+  assert.equal(talk(["Breaking Points"]).lead, 4);
+  assert.equal(talk([], ["Hold Out"]).lead, 6);
+  assert.equal(startConflict("chase", { lead: 5, predator: { feats: ["Breaking Points"] } }).lead, 5, "not in a chase");
+  const plain = strategies(talk(), "predator"),
+    broken = strategies(talk(["Breaking Points"]), "predator");
+  assert.equal(plain["worse-cop"].available, false);
+  assert.equal(broken["worse-cop"].available, true);
+  assert.equal(broken["worse-cop"].confirm, "", "the printed extra requirement is waived too");
+  assert.equal(strategies(talk([], ["Hold Out"]), "prey")["the-5th"].available, true);
+  assert.equal(strategies(talk(["Breaking Points"]), "prey")["the-5th"].available, false, "only the side's own list");
+
+  const paced = declarePace(talk(["Breaking Points"], ["Hold Out"]), "predator");
+  assert.match(paced.note, /half its usual time.*\+1 error range/);
+  assert.deepEqual(paced.next.pace, { round: 1, sides: ["predator"] });
+  assert.match(declarePace(paced.next, "prey").note, /twice its usual time/);
+  assert.throws(() => declarePace(paced.next, "predator"), /Already declared/);
+  assert.throws(() => declarePace(talk(), "predator"), /cannot change/);
 });

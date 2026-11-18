@@ -14,7 +14,8 @@ import {
   conflictSummary,
   CONFLICT_FEATS,
   photoFinish,
-  useConflictFeat
+  useConflictFeat,
+  declarePace
 } from "../../rules/gc/conflict.mjs";
 import { requireGC, getConflicts, saveConflict } from "./state.mjs";
 import {
@@ -168,8 +169,8 @@ export async function startConflictDialog() {
     ${chaseNote}
     <label>${loc`Starting Lead (1–9)`} <input type="number" name="lead" min="1" max="9" value="${suggested.lead ?? rules.startingLead?.default ?? 5}" required /></label>
     ${ratingInputs}
-    <fieldset><legend>${loc`Chase feats (pp.192–193): Predator`}</legend>${featBoxes("p", participantFeats(chase?.predator))}</fieldset>
-    <fieldset><legend>${loc`Chase feats: Prey`}</legend>${featBoxes("q", participantFeats(chase?.prey))}</fieldset>
+    <fieldset><legend>${loc`Conflict feats (pp.192–193, 208–209): Predator`}</legend>${featBoxes("p", participantFeats(chase?.predator))}</fieldset>
+    <fieldset><legend>${loc`Conflict feats: Prey`}</legend>${featBoxes("q", participantFeats(chase?.prey))}</fieldset>
     <p>${loc`Jackrabbit Start and Relentless Pursuit move the starting Lead by 2 after the value above.`}</p>`
   );
   if (!second) return null;
@@ -398,6 +399,17 @@ export async function manageConflict(id) {
                 .map(feat => [`feat-${side}-${feat}`, loc`${sideName(conflict, side)}: ${feat} (once per chase)`])
             ])
           : []),
+        ...(["interrogation", "brainwashing"].includes(conflict.type)
+          ? [
+              ["predator", "Breaking Points"],
+              ["prey", "Hold Out"]
+            ]
+              .filter(([side, feat]) => (conflict[side].feats ?? []).includes(feat))
+              .map(([side, feat]) => [
+                `pace-${side}`,
+                loc`${sideName(conflict, side)}: ${feat} (+1 error range, change this round’s duration)`
+              ])
+          : []),
         ["concedePredator", `${sideName(conflict, "predator")} concedes`],
         ["concedePrey", `${sideName(conflict, "prey")} concedes`],
         ["remove", loc`Remove this conflict`]
@@ -433,6 +445,12 @@ export async function manageConflict(id) {
       return say(
         `<b>${esc(conflict.name)}</b>${loc`: ${esc(sideName(conflict, side))} uses Photo Finish — every participant’s Acceleration and Turning drop by 2 (total −${2 * next.photoFinish}).`}`
       );
+    }
+    if (input.action.startsWith("pace-")) {
+      const side = input.action.slice("pace-".length),
+        { next, note } = declarePace(conflict, side);
+      await saveConflict(id, next);
+      return say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(conflict, side))} — ${esc(note)}`);
     }
     if (input.action.startsWith("feat-")) {
       const [, side, ...rest] = input.action.split("-"),

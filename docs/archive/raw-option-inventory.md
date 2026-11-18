@@ -546,7 +546,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Tracking Basics | 207 | No | Named take-10 timing and Analysis synergy implemented; trail information adjudicated | — |
 | Tracking Mastery | 207 | No | Partial: Tracking take20, physical-trail surprise insight and declared/recorded Forensics task−1execute | Batch271; combined Forensic Genius reduction, scope, pressure/deadline/recovery and source/evidence/reroll guards verified natively; cross-skill/shared tasks and history corrections remain open |
 | Urban Training | 207 | No | Partial: urban insight and city10000+ Tracking synergy execute; ambush opposition recorded | Batch243; city boundary, source loss during RNG, immutable terrain/outcome context and native persistence verified; actual opposition settlement remains open |
-| Breaking Points | 208 | No | Manual/descriptive | — |
+| Breaking Points | 208 | No | Covered (batch 387): interrogation or brainwashing Predator: starting Lead −1; any Predator Strategy regardless of requirements; a per-round declaration halves the round’s duration for +1 error range on the Predator’s check | Native Foundry QA not claimed |
 | Bug Basics | 208 | No | Partial: named-bug concealment grants+2gear on Sleight of Hand/Stash Item and Sneak/Stash Item | Batch276; exact scopes, gear stacking, source/evidence guards and native dialogs/persistence verified; personal bug, request quantity and planted range remain open |
 | Candidate | 208 | No | Implemented: first-level+1to each of the two lowest attributes, with recorded tie choices and original-score history | Batch255; all15pairs/orderings, origins, INT skill budgets, advancement, explicit historical corrections and native persistence verified |
 | Career Agent | 208 | No | Implemented: +1insight to all saves and one additional affiliation-specific reward at mission end | Batch256; Faction+1Reputation/Freelance+$50000Net Worth, duplicate claims, atomic/partial-save recovery and native persistence verified |
@@ -556,7 +556,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Disease Basics | 208 | No | Partial: declared disease resistance saves gain+2untyped | Batch274; all saves, typed stacking, source/evidence guards and native controls/persistence verified; disease sample and accidental exposure prevention remain open |
 | Flawless Identity | 209 | No | Manual/descriptive | — |
 | Forensic Genius | 209 | No | Partial: Analysis synergy on all Search uses and declared Complex Analysis challenge count−2(minimum1) execute | Batches260–271; synergy/counts, normal/critical progress, deadlines, GC error-decline, pressure/stress/save and combined Tracking Mastery Forensics scopes execute with recovery; cross-skill/shared tasks and source/history corrections remain open |
-| Hold Out | 209 | No | Manual/descriptive | — |
+| Hold Out | 209 | No | Covered (batch 387): interrogation or brainwashing Prey: starting Lead +1; any Prey Strategy regardless of requirements; a per-round declaration doubles the round’s duration for +1 error range on the Prey’s check | Native Foundry QA not claimed |
 | Living Cipher | 209 | No | Manual/descriptive | — |
 | Old School | 209 | No | Implemented: +4to qualifying Charisma-based checks with named GC-confirmed shared-source and level evidence | Batch266; all final-attribute paths, caps/fixed/rerolls, source/mission guards, actual dialog and native persistence verified |
 | Poison Basics | 209 | No | Partial: declared poison resistance saves gain+2untyped, stacking with Swamp insight | Batch274; all saves, source/evidence guards and native controls/persistence verified; personal injector, extra requested dose and accidental poisoning prevention remain open |
@@ -1662,3 +1662,14 @@ Source: rules reference pp.183–184 (local markdown edition; original PDF pages
 - Supremacy’s +4 against becoming frenzied is now a save reminder in `feat-reminders.json` (tables regenerated).
 
 Verification: 513 legacy assertions, 3387 of 3388 Node tests (5 new, including the engine’s ability bonus during and after a rage), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 88 manual / 55 partial / 171 other; at least 143 of 314 explicitly unfinished; 53 whole-feat closures.
+
+## Residual implementation batch 387 — Breaking Points and Hold Out
+
+Source: rules reference pp.208–209 (local markdown edition; original PDF pages not visually re-checked).
+
+- Both join the Conflict tracker’s feat list (`CONFLICT_FEATS`), for interrogations and brainwashings. The GC ticks them at the start, since those Conflicts have no actors.
+- **Starting Lead:** −1 with Breaking Points (Predator), +1 with Hold Out (Prey), applied with the chase feats’ shifts and kept inside 1–9.
+- **Strategies:** every Strategy on the side’s own list is available whatever its rating, Lead or printed requirement; the other side’s list and the general Strategies are unchanged.
+- **Round pace:** a manage action (`declarePace`) records that the side takes +1 error range on its check this round. The round then takes half (Breaking Points) or twice (Hold Out) its usual time. Once per side per round, before the check is resolved. The GC applies the error range when that check is rolled.
+
+Verification: 3388 of 3389 Node tests (1 new). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 86 manual / 55 partial / 173 other; at least 141 of 314 explicitly unfinished; 55 whole-feat closures.

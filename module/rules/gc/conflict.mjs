@@ -26,6 +26,9 @@ const type = id => {
  * - Defensive Driving (Prey Strategies) / Offensive Driving (Predator Strategies), chase: the Strategy's penalty is
  *   halved, rounded down. Each also has a once-per-chase use, recorded with `useConflictFeat`.
  * - Photo Finish, chase: the side lowers its own Acceleration and Turning by 2, and every other participant's by 2.
+ * - Breaking Points (Predator) / Hold Out (Prey), interrogation or brainwashing (pp.208–209): starting Lead ±1 in
+ *   the side's favour; any Strategy of the side's own list regardless of its requirements; and, for +1 error range on
+ *   the side's check, the round's duration is halved (Breaking Points) or doubled (Hold Out), via `declarePace`.
  */
 export const CONFLICT_FEATS = Object.freeze([
   "Jackrabbit Start",
@@ -33,12 +36,17 @@ export const CONFLICT_FEATS = Object.freeze([
   "Daredevil",
   "Defensive Driving",
   "Offensive Driving",
-  "Photo Finish"
+  "Photo Finish",
+  "Breaking Points",
+  "Hold Out"
 ]);
 const has = (conflict, side, feat) => (conflict[side]?.feats ?? []).includes(feat);
 const LEAD_FEATS = { prey: "Jackrabbit Start", predator: "Relentless Pursuit" };
 const leadFeat = (conflict, side) =>
   ["chase", "manhunt"].includes(conflict.type) && has(conflict, side, LEAD_FEATS[side]);
+const MIND_FEATS = { predator: "Breaking Points", prey: "Hold Out" };
+const mindFeat = (conflict, side) =>
+  ["interrogation", "brainwashing"].includes(conflict.type) && has(conflict, side, MIND_FEATS[side]);
 
 /** A side's ratings with Photo Finish reductions applied. */
 export function conflictRatings(conflict, side) {
@@ -81,7 +89,11 @@ export function startConflict(typeId, { lead = null, predator = {}, prey = {}, n
     carry: {}
   };
   // Jackrabbit Start raises the starting Lead by 2, Relentless Pursuit lowers it by 2; it stays inside the track.
-  const shift = (leadFeat(conflict, "prey") ? 2 : 0) - (leadFeat(conflict, "predator") ? 2 : 0);
+  const shift =
+    (leadFeat(conflict, "prey") ? 2 : 0) -
+    (leadFeat(conflict, "predator") ? 2 : 0) +
+    (mindFeat(conflict, "prey") ? 1 : 0) -
+    (mindFeat(conflict, "predator") ? 1 : 0);
   if (shift) {
     conflict.lead = Math.min(C.leadMax - 1, Math.max(C.leadMin + 1, start + shift));
     conflict.startingLeadFeats = { before: start, shift };
@@ -113,7 +125,12 @@ export function availableStrategies(conflict, side) {
           );
       }
       // Daredevil supplies the Stunt Strategy's feat requirement.
-      const confirm = daredevil && strategy.id === "stunt" ? "" : strategy.other || "";
+      let confirm = daredevil && strategy.id === "stunt" ? "" : strategy.other || "";
+      // Breaking Points and Hold Out open every Strategy of the side's own list, whatever it requires.
+      if (strategy.side === side && mindFeat(conflict, side)) {
+        reasons.length = 0;
+        confirm = "";
+      }
       return { ...strategy, available: reasons.length === 0, reasons, confirm };
     });
 }
@@ -304,6 +321,30 @@ export function useConflictFeat(conflict, side, feat) {
   const next = structuredClone(conflict);
   next.featUses = { ...(next.featUses ?? {}), [side]: [...(next.featUses?.[side] ?? []), feat] };
   return { next, note: `${feat}: ${ONCE_PER_CHASE[feat]()}.` };
+}
+
+/**
+ * Breaking Points / Hold Out: for +1 error range on the side's check this round, the round's duration is halved or
+ * doubled. Declared while Strategies are being chosen or before the check; one declaration per side per round.
+ */
+export function declarePace(conflict, side) {
+  if (!SIDES.includes(side)) throw new Error(loc`Choose Predator or Prey.`);
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
+  if (!mindFeat(conflict, side)) throw new Error(loc`That side cannot change the round’s duration.`);
+  if (!["strategies", "check"].includes(conflict.step))
+    throw new Error(loc`Declare it before the opposed check is resolved.`);
+  if (conflict.pace?.round === conflict.round && conflict.pace.sides?.includes(side))
+    throw new Error(loc`Already declared this round.`);
+  const next = structuredClone(conflict),
+    sides = next.pace?.round === next.round ? [...next.pace.sides, side] : [side];
+  next.pace = { round: next.round, sides };
+  const halved = side === "predator";
+  return {
+    next,
+    note: halved
+      ? loc`Breaking Points: this round takes half its usual time; the Predator’s check has +1 error range.`
+      : loc`Hold Out: this round takes twice its usual time; the Prey’s check has +1 error range.`
+  };
 }
 
 /** A side may concede at any time: the opponent applies its Victory result. */
