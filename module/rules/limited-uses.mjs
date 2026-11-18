@@ -11,6 +11,7 @@ import { allOrNothingSpec } from "./all-or-nothing.mjs";
 import { blackCatSpec } from "./black-cat.mjs";
 import { berserkerSpec } from "./berserker.mjs";
 import { roundActionSpecs } from "./feat-free-actions.mjs";
+import { openStanceSpec } from "./wrestling.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { adrenalineSource } from "./adrenaline.mjs";
@@ -184,6 +185,8 @@ export function limitedUseAbilities(system, items, cfg) {
     });
   }
   for (const spec of roundActionSpecs(system)) add(spec);
+  const openStance = openStanceSpec(system);
+  if (openStance) add(openStance);
   if (system.activeFeatNames?.includes("Polearm Basics"))
     add({
       id: "strikingStance",

@@ -1,4 +1,5 @@
 import { stanceMovementRoutePlan } from "./stance-movement.mjs";
+import { combatStanceState } from "./combat-stance.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { loc } from "../i18n.mjs";
@@ -46,6 +47,8 @@ export function combatMovementPlan(
   const block = restraintActionBlock(system) || attributeActionBlock(system, { kind: "skill", ability: "dex" });
   if (block || system.wounds?.value < 0) throw new Error(block || loc`This character cannot take a movement action.`);
   const rules = combatMovementRules(system);
+  if (action === "run" && combatStanceState(system)?.key === "open")
+    throw new Error(loc`Open Stance allows no Run actions (p.189).`);
   if (rules.speed === null || system.conditionSpeedReview)
     throw new Error(loc`Resolve the character’s current Speed before checking movement.`);
   if (!Number.isFinite(distanceFeet) || distanceFeet < 0)

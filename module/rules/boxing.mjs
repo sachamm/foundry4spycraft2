@@ -108,7 +108,12 @@ rollPipeline.register({
  */
 /** Only one unarmed feat trick applies to an action. */
 export function unarmedTrickClash(options = {}) {
-  const tricks = [options.doubleJab === true, !!options.boxingTrick, !!options.kickTrick].filter(Boolean).length;
+  const tricks = [
+    options.doubleJab === true,
+    !!options.boxingTrick,
+    !!options.kickTrick,
+    options.brush === true
+  ].filter(Boolean).length;
   return tricks > 1 ? loc`Only one Unarmed Combat feat trick may apply to this action.` : "";
 }
 

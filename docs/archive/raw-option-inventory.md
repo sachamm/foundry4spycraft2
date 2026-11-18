@@ -377,7 +377,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Vital Points Basics | 188 | No | Sneak-attack resistance 6 executes; stance/trick remain manual | — |
 | Vital Points Moves | 188 | No | Manual/descriptive | — |
 | Vital Points Supremacy | 188 | No | Unarmed sneak die implemented; tricks remain manual | — |
-| Wrestling Basics | 189 | No | Manual/descriptive | — |
+| Wrestling Basics | 189 | No | Covered (batch 394): +1 Defense against an adjacent opponent (Incoming attack preview); Open Stance (no Run actions; once per round the GC offers its pull-in and free Grapple or Trip on a resolved miss against the owner); Brush (unarmed Standard Attack for 1d6 subdual whose damage lowers the target’s Initiative Count) | Native Foundry QA not claimed |
 | Wrestling Moves | 189 | No | Manual/descriptive | — |
 | Wrestling Supremacy | 189 | No | Partial: static numerical effects | — |
 | All or Nothing | 189 | No | Covered (batch 381): once per session, a rolled skill, Knowledge or attack check declared on its dialog widens error and threat ranges by 5; its error stays open to activation on a success, which then becomes a failure | Native Foundry QA not claimed |
@@ -1734,3 +1734,14 @@ Source: rules reference pp.172–175, 185, 195 (local markdown edition; original
 - Boxing Moves, Merciless, Fire-Team Basics and Tac-Squad Mastery leave `feat-reminders.json` (tables regenerated).
 
 Verification: 513 legacy assertions, 3406 of 3407 Node tests (5 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 71 manual / 56 partial / 187 other; at least 127 of 314 explicitly unfinished; 69 whole-feat closures.
+
+## Residual implementation batch 394 — Wrestling Basics
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/wrestling.mjs`, `module/apps/wrestling.mjs`. The Incoming attack preview adds +1 to Defense, with a note, when the attack is declared adjacent and not ranged.
+- **Open Stance:** joins the shared stance lifecycle, and the movement check refuses Run actions while in it. When an attack against the owner is resolved as a miss, the GC (who confirms the attacker is within Reach) can spend the owner’s once-per-round use to post the pull-in and free Grapple or Trip, which is resolved normally.
+- **Brush:** an unarmed Standard Attack option. Its hit’s card rolls 1d6 in place of standard damage, then lowers the target’s Initiative Count by that amount, once. It counts as the action’s one unarmed trick.
+- Wrestling Basics leaves `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3409 of 3410 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 70 manual / 56 partial / 188 other; at least 126 of 314 explicitly unfinished; 70 whole-feat closures.

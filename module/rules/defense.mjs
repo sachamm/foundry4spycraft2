@@ -6,6 +6,7 @@ import { greatSwordDefensePlan } from "./great-sword-defense.mjs";
 import { totalDefenseState } from "./total-defense.mjs";
 import { coverPlan } from "./cover.mjs";
 import { circlingDefensePlan } from "./knife-basics.mjs";
+import { wrestlingDefense } from "./wrestling.mjs";
 import { knownSneakAttackImmunity } from "./sneak-attack.mjs";
 import { attributeCollapsePlan, attributeDefensePlan } from "./attributes.mjs";
 import { loc } from "../i18n.mjs";
@@ -112,11 +113,13 @@ export function incomingDefensePlan(system, options = {}) {
   const cover = coverPlan({ ...options.cover, defenderSystem: system, ranged });
   const sharpshooter = sharpshooterDefensePlan(system, { ...options.cover, ranged }),
     greatSword = greatSwordDefensePlan(system, { ranged }),
-    guard = guardDefensePlan(system, { ranged });
+    guard = guardDefensePlan(system, { ranged }),
+    wrestling = wrestlingDefense(system, { adjacent, ranged });
   const total =
     -circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
+    wrestling +
     greatSword.increment +
     cover.defenseBonus +
     system.defense.total +
@@ -180,6 +183,7 @@ export function incomingDefensePlan(system, options = {}) {
             loc`Whirling Stance: career level ${whirling.defenderLevel}; ${whirling.declared ? loc`this attacker level ` + whirling.attackerLevel + (whirling.prevented ? loc` cannot flank you.` : loc` retains ordinary flanking eligibility.`) : loc`review the actual attacker’s career level if flanking is declared.`} No unconditional Defense bonus (p.179).`
           ]
         : []),
+      ...(wrestling ? [loc`Wrestling Basics: +1 to Defense against this adjacent opponent (p.189).`] : []),
       ...(circling.shifting
         ? [
             circling.active

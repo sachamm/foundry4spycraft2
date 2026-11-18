@@ -11528,10 +11528,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:notice, skill:drive",
   "text": "Halved visual-range Notice penalty, better gliding, and air vehicles treat maneuvering room as wider with +2 on Crisis Advantage checks."
  },
- "Wrestling Basics": {
-  "rolls": "attack",
-  "text": "+1 Defense against adjacent foes; gain a wrestling stance and trick."
- },
  "Wrestling Moves": {
   "rolls": "attack",
   "text": "Gain takedown tricks like clotheslines and hip tosses."
