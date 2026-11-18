@@ -819,6 +819,10 @@ export const ActorOutcomes = Base =>
                 }
               : {}),
             [plan.kind === "success" ? "criticalSuccess" : "criticalFailure"]: true,
+            // All or Nothing: an activated error turns even a success into a critical failure or miss.
+            ...(plan.kind === "failure" && check.allOrNothing === true && check.successConfirmed === true
+              ? { successConfirmed: false, allOrNothingOverturned: true }
+              : {}),
             criticalActivation: {
               ...(plan.jinx ? { jinx: { ...plan.jinx, use: structuredClone(jinxReservation.record) } } : {}),
               kind: plan.kind,
@@ -1346,6 +1350,9 @@ export const ActorOutcomes = Base =>
               millionCommitted: false,
               tenSecondSolution: false,
               solutionCommitted: false,
+              // A replacement keeps All or Nothing: its ranges are already in the check's threat and error.
+              allOrNothingCommitted: check.allOrNothing === true,
+              allOrNothingRangesApplied: check.allOrNothing === true,
               noForcedReroll: false,
               forcedThreat: false,
               cannotError: check.manualAdjustment ? (check.cannotErrorBeforeManual ?? false) : check.cannotError,

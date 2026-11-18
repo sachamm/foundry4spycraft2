@@ -1,4 +1,5 @@
 /** Checks a character rolls: the shared roll itself, attribute checks, saves and action dice. */
+import { allOrNothingEligible, allOrNothingRanges } from "../../rules/all-or-nothing.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
 import { formulaWithModifiers, planTerms, planTotal } from "../../rules/roll-pipeline.mjs";
@@ -120,6 +121,36 @@ export const ActorRolls = Base =>
       const million = !!options.oneInAMillion,
         solution = !!options.tenSecondSolution,
         twenty = million || solution;
+      // All or Nothing, p.189: reserve its session use with whichever declaration reserves first, then widen ranges.
+      const allOrNothing = options.allOrNothing === true;
+      if (allOrNothing) {
+        if (!allOrNothingEligible(this.system, { checkKind, checkMethod, formula }))
+          throw new Error(loc`All or Nothing applies to a rolled skill check, Knowledge check or attack.`);
+        if (!options.allOrNothingCommitted) {
+          const extras = [...(options.additionalUses ?? []), { id: "allOrNothing", workflow: "allOrNothing" }];
+          if (million || solution || (options.cunningPlan === true && !options.cunningPlanCommitted))
+            options = { ...options, allOrNothingCommitted: true, additionalUses: extras };
+          else
+            return this.useLimitedAbility(
+              "allOrNothing",
+              (status, payment) =>
+                this.rollCheck(formula, data, {
+                  ...options,
+                  preRollFunding: this.preRollPaymentReceipt(payment) ?? options.preRollFunding,
+                  allOrNothingCommitted: true
+                }),
+              {
+                workflow: "allOrNothing",
+                additionalCost: options.additionalCost ?? 0,
+                additionalBenefitCount: options.additionalBenefitCount ?? ((options.additionalCost ?? 0) > 0 ? 1 : 0),
+                ...surchargeFundingInput(options),
+                ...unrolledPaymentFundingInput(options),
+                additionalUses: options.additionalUses ?? [],
+                bonusPoolId: options.bonusPoolId ?? ""
+              }
+            );
+        }
+      }
       let cunning = typeof options.cunningPlan === "object" ? options.cunningPlan : null;
       if (options.cunningPlan === true) {
         cunning = cunningPlanEffect(this.system, error);
@@ -222,6 +253,8 @@ export const ActorRolls = Base =>
           }
         );
       }
+      if (allOrNothing && !options.allOrNothingRangesApplied)
+        ({ threat, error } = allOrNothingRanges({ threat, error }));
       // Reservations, validation, modifiers and extra record fields come from the roll pipeline (module/rolls).
       const rollContext = {
         actor: this,
@@ -364,6 +397,7 @@ export const ActorRolls = Base =>
         opponentResult,
         oneInAMillion: million,
         tenSecondSolution: solution,
+        ...(allOrNothing ? { allOrNothing: true } : {}),
         standaloneCheckConfirmed: !!options.standaloneCheckConfirmed,
         forcedThreat: twenty,
         noForcedReroll: twenty,

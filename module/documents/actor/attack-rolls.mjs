@@ -260,6 +260,7 @@ export const ActorAttackRolls = Base =>
           choiceSource: "Million Dollar Skill",
           choiceResourceId: millionDollar ? "millionDollarSkill" : "",
           oneInAMillion: !!options.oneInAMillion,
+          allOrNothing: options.allOrNothing === true,
           checkKind: "attack",
           ability: atk.ability,
           weaponUuid: item.uuid,

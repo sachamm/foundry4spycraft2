@@ -380,7 +380,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Wrestling Basics | 189 | No | Manual/descriptive | — |
 | Wrestling Moves | 189 | No | Manual/descriptive | — |
 | Wrestling Supremacy | 189 | No | Partial: static numerical effects | — |
-| All or Nothing | 189 | No | Manual/descriptive | — |
+| All or Nothing | 189 | No | Covered (batch 381): once per session, a rolled skill, Knowledge or attack check declared on its dialog widens error and threat ranges by 5; its error stays open to activation on a success, which then becomes a failure | Native Foundry QA not claimed |
 | Better Luck Next Time | 189 | No | Covered (batch 380): a single boosting die on a skill check or save that rolls a natural 1 is returned once when the check is resolved (ordinary dice, or a still-live unrestricted bonus pool) | Native Foundry QA not claimed |
 | Fortune's Fool | 189 | No | Manual/descriptive | — |
 | Black Cat | 189 | No | Manual/descriptive | — |
@@ -1594,3 +1594,14 @@ Source: rules reference p.189 (local markdown edition; original PDF page not vis
 - A check that is replaced before resolution passes no pending refund to its replacement.
 
 Verification: 513 legacy assertions, 3357 of 3358 Node tests (4 new, including a real resolution through `finishCheck`). The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Layout fixtures were not re-run (no template change). Native Foundry QA is **not claimed**. Inventory: 106 manual / 53 partial / 155 other; at least 159 of 314 explicitly unfinished; 37 whole-feat closures.
+
+## Residual implementation batch 381 — All or Nothing
+
+Source: rules reference p.189 (local markdown edition; original PDF page not visually re-checked).
+
+- **Declaration.** The skill, Knowledge, attack and ranged-attack dialogs offer All or Nothing to an owner of the feat (`module/rules/all-or-nothing.mjs`). It applies to rolled checks with both ranges; saves have neither range here, and taking 10 or 20 is not a roll.
+- **Use.** One per session. Skill and Knowledge checks spend it with their other pre-roll uses. For an attack, `rollCheck` spends it itself, or alongside One in a Million, 10-Second Solution or an unspent Cunning Plan when one of those reserves first.
+- **Ranges.** Threat range 20 becomes 15–20 (never below 2); error range 1 becomes 1–6 (never above 19). A roll with no range of a kind keeps none. The check records `allOrNothing`, and the card notes the declaration. A reroll keeps it without spending another use or widening twice.
+- **Error on a success.** For an All or Nothing roll, an error in range is confirmed and awaits the opponent’s decision even when the result succeeds (`errorDecisionPending`, `adjudicateCheck`). If an opponent activates it as a critical failure, a success becomes a failure (`successConfirmed: false`, `allOrNothingOverturned`).
+
+Verification: 513 legacy assertions, 3362 of 3363 Node tests (5 new, including a real declared attack and a refused second use), 127 browser layout fixtures; the captured-dialog comparison is unchanged for characters without the feat. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 105 manual / 53 partial / 156 other; at least 158 of 314 explicitly unfinished; 38 whole-feat closures.

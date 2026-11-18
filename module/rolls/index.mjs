@@ -24,6 +24,7 @@ import "../apps/whirling-stance.mjs";
 import "../rules/accurized-weapon.mjs";
 import "../rules/action-dice.mjs";
 import "../rules/action-die-payments.mjs";
+import "../rules/all-or-nothing.mjs";
 import "../rules/ambush.mjs";
 import "../rules/analysis-tasks.mjs";
 import "../rules/appearance.mjs";

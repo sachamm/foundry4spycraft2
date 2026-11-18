@@ -7,6 +7,7 @@ import { toolShedSource } from "./tool-shed.mjs";
 import { finalAttackRoundSpec } from "./final-round.mjs";
 import { DROP_FOLLOW_UPS } from "./drop-follow-up.mjs";
 import { fortunateSpec } from "./fortunate.mjs";
+import { allOrNothingSpec } from "./all-or-nothing.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { adrenalineSource } from "./adrenaline.mjs";
@@ -245,6 +246,8 @@ export function limitedUseAbilities(system, items, cfg) {
         manualReviewable: true,
         hidden: true
       });
+  const allOrNothing = allOrNothingSpec(system);
+  if (allOrNothing) add(allOrNothing);
   const fortunate = fortunateSpec(system);
   if (fortunate) add(fortunate);
   if (system.activeFeatNames?.includes("Opportunist"))
