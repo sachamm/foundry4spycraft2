@@ -113,12 +113,12 @@ export async function requestLock(action, keys, token, { game = globalThis.game,
 /** Register the setting, the query handler and disconnect clean-up. Call during `init`. */
 export function registerGmLocks() {
   game.settings.register("spycraft2", "lockMode", {
-    name: "Resource locking",
-    hint: "How two clients are kept from spending the same character's resources at once. The default writes a short-lived lock on the character. The alternative asks the Game Control's client instead and writes nothing; it needs a GC connected.",
+    name: "SPYCRAFT.Settings.LockMode.Name",
+    hint: "SPYCRAFT.Settings.LockMode.Hint",
     scope: "world",
     config: true,
     type: String,
-    choices: { items: "Lock on the character (default)", gm: "Arbitrated by the Game Control's client" },
+    choices: { items: "SPYCRAFT.Settings.LockMode.Items", gm: "SPYCRAFT.Settings.LockMode.Gm" },
     default: "items"
   });
   CONFIG.queries[LOCK_QUERY] = lockQueryHandler();

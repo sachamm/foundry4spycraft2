@@ -267,6 +267,32 @@
   "ThreatLevel": "Threat level",
   "Condition": {
    "Bound": "Bound"
+  },
+  "RollControl": {
+   "gearAcquisitionControl": "Complete acquisition record",
+   "cunningPlanControl": "Cunning Plan",
+   "manualAdjustmentControl": "Manual Adjustment",
+   "requiredBonusControl": "Spend required class bonus die",
+   "criticalControl": "Activate critical",
+   "boostControl": "Boost before outcome",
+   "generousControl": "Generous teammate die",
+   "rerollControl": "Reroll with ability",
+   "confirmControl": "Confirm result",
+   "finishControl": "Outcome resolved",
+   "unnervingControl": "Resolve Unnerving stress",
+   "strutControl": "Strut: posture next half action"
+  },
+  "Settings": {
+   "LockMode": {
+    "Name": "Resource locking",
+    "Hint": "How two clients are kept from spending the same character's resources at once. The default writes a short-lived lock on the character. The alternative asks the Game Control's client instead and writes nothing; it needs a GC connected.",
+    "Items": "Lock on the character (default)",
+    "Gm": "Arbitrated by the Game Control's client"
+   },
+   "RoundStateEffects": {
+    "Name": "Show stances and round effects on tokens",
+    "Hint": "Adds an Active Effect for each stance, Total Defense, Combat Expertise and similar state a character has, and removes it when the state ends. The effect is a display only."
+   }
   }
  }
 }

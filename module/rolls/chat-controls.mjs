@@ -3,6 +3,8 @@
  * follow-ups a resolved check can still need. Rules that add their own button register it from their own module.
  *
  * `renderCheckControls` is the one chat hook: it asks the pipeline for the buttons and lays them out.
+ * A button is translated through lang/*.json under SPYCRAFT.RollControl.<contributor id>; a contributor whose
+ * button text varies (the grapple escape steps) is shown as it supplies it.
  *   placement "card"    — one row under the whole card
  *   placement "content" — one row inside the message body
  *   placement "plain"   — a button of its own under the card (the default)
@@ -126,10 +128,16 @@ core("finishControl", 9180, ctx =>
 
 /* ---- The chat hook ---- */
 
+/** A button's text: the translation keyed by its contributor id, or the contributor's own English label. */
+export function localizedLabel(control, i18n = globalThis.game?.i18n) {
+  const key = `SPYCRAFT.RollControl.${control.id}`;
+  return i18n?.has?.(key) ? i18n.localize(key) : control.label;
+}
+
 function button(control) {
   const element = document.createElement("button");
   element.type = "button";
-  element.textContent = control.label;
+  element.textContent = localizedLabel(control);
   element.dataset.rollControl = control.id;
   element.addEventListener("click", async () => {
     element.disabled = true;

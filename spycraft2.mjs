@@ -6,6 +6,7 @@ import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/app
 import { rollPipeline } from "./module/rolls/index.mjs";
 import { registerMigrationSettings, runWorldMigrations } from "./module/migrations/index.mjs";
 import { registerGmLocks } from "./module/rules/gm-locks.mjs";
+import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
 import {
   startUsagePeriod,
@@ -131,6 +132,7 @@ Hooks.once("init", () => {
   registerGCSettings();
   registerMigrationSettings();
   registerGmLocks();
+  installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);

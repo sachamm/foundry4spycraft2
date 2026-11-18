@@ -72,12 +72,13 @@ The Chat Messages sidebar has a text search and Character / Roll type filters. F
 | `spycraft2.mjs` | Entry point / init hooks |
 | `module/config.mjs` | `CONFIG.SPYCRAFT` constants |
 | `module/data/` | Actor & Item TypeDataModels |
-| `module/documents/` | Actor & Item document classes |
+| `module/documents/` | Actor & Item document classes; the Actor's methods are split by workflow in `module/documents/actor/` |
 | `module/sheets/` | ApplicationV2 sheets |
 | `templates/` | Handlebars templates |
 | `lang/` | Localization |
 | `module/rules/` | Rules engine (`engine.mjs`), prerequisite checks, formula evaluator, generated tables |
-| `module/rolls/` | Roll pipeline contributors: reservations, validators, named checks and chat buttons (registry in `module/rules/roll-pipeline.mjs`) |
+| `module/rolls/` | Roll pipeline: the contributor index, chat buttons, dialog layouts and checks that belong to no single rule |
+| `module/migrations/` | World data schema version and migrations |
 | `module/apps/` | Compendium browser |
 | `src/data/` | Rules data (source of truth; edit directly) |
 | `tools/` | Pack build and engine test scripts |
@@ -129,13 +130,31 @@ entries: nothing installs them onto an item.
 
 ## Roll pipeline
 
-Every roll made through the Actor's `rollCheck` (skill, Knowledge, attack, damage, save and ability rolls) passes through one
-registry, `module/rules/roll-pipeline.mjs`. A rule joins it by
-registering a contributor from `module/rolls/` instead of being edited into the Actor document. A contributor may:
-offer named skill checks, hold a reservation while the roll is made, validate before and after the dice, add a labelled
-modifier, add fields to the posted check, and add buttons under it. The existing validators, reservations, named-check
-additions and two of the chat buttons run this way; dialog content and most modifier arithmetic are still inside
-`rollSkill`, `rollAttack` and `weaponAttack`. `game.spycraft2.rollPipeline` exposes the registry to macros and modules.
+Every roll made through the Actor's `rollCheck` (skill, Knowledge, attack, damage, save and ability rolls) passes
+through one registry, `module/rules/roll-pipeline.mjs`. A rule joins it by registering a contributor from its own
+module; `module/rolls/index.mjs` imports every module that does. A contributor may:
+
+- offer named skill checks (`skillChecks`);
+- add a section to a roll dialog at a position (`dialog`) and adjust what was entered (`read`);
+- hold a reservation while the roll is made (`acquire`);
+- validate before and after the dice (`validate`);
+- add a labelled modifier, either to the previewed total (`stage: "plan"`) or at the roll (`modifiers`);
+- copy a roll option onto the posted check (`record`) or add computed fields (`flags`);
+- add a button under the posted check (`chatControls`).
+
+The six main roll dialogs live in `module/rolls/dialogs/` as ordered parts. `game.spycraft2.rollPipeline` exposes
+the registry to macros and modules. The feat-specific arithmetic inside `weaponAttack` and `resolveSkillCheck` is
+still worked out there; see [remaining work](docs/remaining-work.md).
+
+## Code style and checks
+
+```bash
+npm run format        # Prettier over every .mjs file
+npm run lint          # ESLint
+npm run check:schemas # validate the data models with a local Foundry installation's field classes
+```
+
+CI runs `lint`, `format:check`, the build, `npm test` and `npm run test:packs`.
 
 ## NPC creation
 

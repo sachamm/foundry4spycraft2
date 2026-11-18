@@ -192,3 +192,30 @@ test("the chat hook lays buttons out by placement and runs them once per click",
   renderCheckControls(message({}), foreign);
   assert.equal(foreign.children.length, 0);
 });
+
+test("button text is translated by contributor id and falls back to the contributor's own label", async () => {
+  const { localizedLabel } = await import("../module/rolls/chat-controls.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const strings = JSON.parse(await readFile(new URL("../lang/en.json", import.meta.url), "utf8")).SPYCRAFT.RollControl;
+  const i18n = { has: key => key === "SPYCRAFT.RollControl.finishControl", localize: () => "Résolu" };
+  assert.equal(localizedLabel({ id: "finishControl", label: "Outcome resolved" }, i18n), "Résolu");
+  assert.equal(
+    localizedLabel({ id: "restraintEscapeControl", label: "Apply grapple escape benefit" }, i18n),
+    "Apply grapple escape benefit"
+  );
+  assert.equal(localizedLabel({ id: "finishControl", label: "Outcome resolved" }, undefined), "Outcome resolved");
+  // Every fixed-label button has an English entry that matches what the contributor supplies.
+  actor = makeActor();
+  const shown = Object.fromEntries(
+    rollPipeline
+      .chatControls({
+        message: message({ naturalDie: 20, threat: 20, threatConfirmed: true, requiredBonusPoolId: "p" }),
+        check: message({ naturalDie: 20, threat: 20, threatConfirmed: true, requiredBonusPoolId: "p" }).flags.spycraft2,
+        actor,
+        user: game.user,
+        checkKind: "skill"
+      })
+      .map(c => [c.id, c.label])
+  );
+  for (const [id, label] of Object.entries(shown)) assert.equal(strings[id], label, id);
+});

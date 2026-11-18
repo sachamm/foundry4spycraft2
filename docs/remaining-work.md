@@ -88,27 +88,65 @@ Checked live in Foundry 14.370 on 2026-11-17 (world `spycraft-test`, throwaway a
 
 ## Roll pipeline
 
-The registry exists and the validators, reservations, named checks and two chat buttons use it. Still inline:
+Done on 2026-11-17. The registry is `module/rules/roll-pipeline.mjs`; a rule registers from its own module and
+`module/rolls/index.mjs` imports every module that does (a test checks none is missed).
 
-- [ ] Dialog content and input parsing in `rollSkill`, `rollAttack`, `rollSave` and `rollDamage`: add a dialog phase.
-- [ ] Modifier arithmetic in `weaponAttack` and `resolveSkillCheck`: move onto the `modifiers` phase.
-- [ ] The main chat-button hook in `spycraft2.mjs`: move onto `chatControls`.
-- [ ] The pass-through list of record fields in `rollCheck`: move onto `flags`.
-- [ ] Let each rule module register its own contributor instead of listing them centrally in `module/rolls/`.
-- [ ] Keep splitting `module/documents/actor.mjs` (still about 395 KB) by workflow.
+- [x] Dialog phase. The skill, save, Knowledge, attack, ranged attack and damage dialogs are ordered parts in
+      `module/rolls/dialogs/`; a rule adds a section with a `dialog` contributor and an `at` position. Thirteen
+      rule-owned sections register from their own modules. The HTML of 94 captured dialogs is identical to before.
+      The skill dialog's field coercion runs on the `read` phase.
+- [x] Modifier rows. The attack bonus (30 parts), the skill total and the save total are labelled rows built by
+      `planTotal`, which also lets `stage: "plan"` contributors add to the previewed total; plan rows are recorded on
+      the posted check and never counted again at the roll.
+- [x] Every chat button comes from a `chatControls` contributor behind one render hook
+      (`module/rolls/chat-controls.mjs`).
+- [x] The 90 pass-through record fields use `record`: 32 are named by the contributor that validates them, 58 are
+      listed in `module/rolls/record-fields.mjs`.
+- [x] Contributors register from the module that owns the rule (82 modules). Validation order is unchanged and pinned
+      by a test.
+- [x] `module/documents/actor.mjs` is a 65-line class composed from seven workflow files in `module/documents/actor/`.
+
+Still inline, and worth doing as rules are next touched:
+
+- [ ] The individual feat terms inside `weaponAttack` and `resolveSkillCheck` are still worked out there, because each
+      also feeds threat, error and notes. Moving one out means giving it a plan-stage contributor that returns all of
+      those, not just a number.
+- [ ] After a dialog closes, the roll methods still build their own plans from the input. Only field coercion is on
+      the `read` phase.
+- [ ] The small follow-up dialogs (reach geometry, mortar and launcher circumstances, Killer Instinct range) are
+      still inline templates.
+- [ ] `module/documents/actor/rolls.mjs` is still about 2,400 lines; `rollSkill` is the bulk of it.
+- [ ] 58 record fields are in the central list because no contributor owns them yet.
 
 ## Architecture (from the November review)
 
-- [ ] Decide how far feat automation goes before extending the proof/lease/receipt pattern to the remaining feats;
-      consider a lighter "declare and remind" tier for most of them.
-- [ ] Replace the embedded-Item resource locks with writes routed through the active GM.
-- [ ] Give the roughly fifty untyped `ObjectField`s on the agent schema real schemas and a version, and add migrations.
-- [ ] Move round-scoped states (stances, Total Defense and similar) to Active Effects with durations.
-- [ ] Adopt a formatter and linter and reformat the dense one-line modules in one pass.
-- [ ] Tests: discover test files by pattern instead of listing them in `package.json`; make the engine fixtures read
-      `src/data` rather than built packs so `npm test` runs while Foundry is open without `SPYCRAFT_PACKS_DIR`.
-- [ ] Docs: archive the batch ledgers and QA records; `docs/resume-checkpoint.md` still names the other checkout.
-- [ ] Localization: most dialog and sheet text, including everything added for gear and vehicles, is hard-coded English.
+- [ ] **Decision needed: how far feat automation goes.** Recommendation: keep the proof/lease/receipt pattern for the
+      roughly forty workflows that have it, and stop there. For the rest, add a "declare and remind" tier: a feat
+      names the roll kinds it bears on and a one-line reminder; the roll dialog lists the ones that apply, and those
+      ticked are noted on the card for the GC to adjudicate. The dialog, read, record and flavor phases already
+      support this; it needs a field on feat items and the reminder text for each feat.
+- [ ] Resource locks. A GM-arbitrated lock exists (`module/rules/gm-locks.mjs`): the lock lives in the GC client's
+      memory, nothing is written to the character, and a disconnecting client loses its locks. It is **off by
+      default** (world setting "Resource locking"), because it has not been run with two live clients. The work
+      itself still runs on the acting client; only the lock is arbitrated. To finish: check it with two clients, then
+      make it the default and retire the lock documents.
+- [ ] Typed schemas. The world now records a schema version and runs migrations on start
+      (`module/migrations/index.mjs`; none are needed yet). `npm run check:schemas` validates every data model with
+      Foundry's own field classes from a local installation. The untyped `ObjectField`s remain: 33 on agents, 4 on
+      NPCs, 5 on each item type. Typing them safely needs each record's real shape; a strict schema drops keys it
+      does not list.
+- [ ] Round-scoped states. `module/apps/round-state-effects.mjs` shows stances, Total Defense, Combat Expertise,
+      Superior Cover, Darting Weapon, Two-Weapon Fighting and the three action-die boosts as Active Effects with a
+      duration, kept in step by the GC's client. They are a display: the state is still the record on the character.
+      Creating and removing the effects was checked in Foundry 14.370; a real state change with this client as the
+      active GC was not.
+- [x] Formatter and linter: Prettier and ESLint (`npm run format`, `format:check`, `lint`), run in CI. Every module
+      was reformatted in one pass. Lint reports 27 unused-variable warnings and no errors.
+- [x] Tests are discovered by pattern (`tools/test-*.mjs`), and the engine fixtures build their documents from
+      `src/data`, so `npm test` runs with Foundry open.
+- [x] Batch ledgers and QA records moved to `docs/archive/`.
+- [ ] Localization. Chat buttons and the new settings are translatable (keys in `lang/en.json`, English fallback in
+      code). Dialog and sheet text is still hard-coded English.
 
 ## Game areas still missing or thin
 

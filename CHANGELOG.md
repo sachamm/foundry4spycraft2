@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- Roll pipeline completed: dialog sections, input coercion, modifier rows with a plan stage, record fields and every
+  chat button are contributors, registered from the module that owns each rule. Dialogs and rolls are unchanged.
+- The Actor document is split into workflow files under `module/documents/actor/`.
+- Stances, Total Defense, Combat Expertise and similar round effects are shown as Active Effects on the token
+  (world setting, on by default; display only).
+- Optional resource locking arbitrated by the Game Control's client (world setting, off by default).
+- World data now carries a schema version, with a migration runner for future changes.
+- Chat buttons and the new settings are translatable.
+- Development: Prettier and ESLint with CI checks; tests discovered by pattern; engine fixtures no longer need built
+  packs; `npm run check:schemas`; batch ledgers moved to `docs/archive/`.
+
 ## 0.3.2 — 2026-11-17
 
 - Chat history search with combined character, roll-type and text filters, newest-first results, pagination and original-message popouts. Searches respect message and secret visibility.
