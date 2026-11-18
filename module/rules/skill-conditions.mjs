@@ -1,8 +1,9 @@
 import { cheapShotPenalty } from "./cheap-shot-effects.mjs";
 import { conditionSkillPenalty, conditionRollPenalties } from "./attributes.mjs";
+import { loc } from "../i18n.mjs";
 /** pp.87,340,342: change the skill bonus, keeping check penalties and synergy separate. */
 export function skillBonusCondition(system, normal) {
-  if (!Number.isFinite(normal)) throw new Error("Review the skill bonus before applying its condition.");
+  if (!Number.isFinite(normal)) throw new Error(loc`Review the skill bonus before applying its condition.`);
   const c = system.conditionContext ?? {},
     state = c.incompetent === true ? "incompetent" : c.baffled === true ? "baffled" : "",
     total = state === "incompetent" ? 0 : state === "baffled" ? Math.ceil(normal / 2) || 0 : normal;

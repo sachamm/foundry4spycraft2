@@ -26,6 +26,7 @@ import { hintSources } from "./hints.mjs";
 import { hasMasterThief, manualAdjustmentSource } from "./class-checks.mjs";
 import { hasImprovisation } from "./class-gear.mjs";
 import { resolveFeatChoices } from "./feats.mjs";
+import { loc } from "../i18n.mjs";
 const norm = value =>
   String(value ?? "")
     .trim()
@@ -78,7 +79,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Well-Funded"))
     add({
       id: "wellFunded",
-      name: "Well-Funded (cash at home)",
+      name: loc`Well-Funded (cash at home)`,
       period: "mission",
       limit: 1,
       workflow: "wellFundedCash",
@@ -90,7 +91,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (mark)
     add({
       id: "mark",
-      name: "Mark (three target skill bonuses)",
+      name: loc`Mark (three target skill bonuses)`,
       limit: mark.limit,
       workflow: "markObservation",
       manualReviewable: true,
@@ -100,7 +101,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (wheel)
     add({
       id: "oneHandManeuver",
-      name: "One Hand on the Wheel (free Maneuver)",
+      name: loc`One Hand on the Wheel (free Maneuver)`,
       period: "scene",
       limit: wheel.limit,
       workflow: "freeManeuver",
@@ -131,7 +132,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (shed)
     add({
       id: "toolShed",
-      name: "Tool Shed (one Grade III kit after one hour at home)",
+      name: loc`Tool Shed (one Grade III kit after one hour at home)`,
       period: "mission",
       limit: shed.limit,
       workflow: "toolShedKit",
@@ -140,7 +141,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Personal Stash"))
     add({
       id: "personalStash",
-      name: "Personal Stash (Gear check without a Reserve Common Item)",
+      name: loc`Personal Stash (Gear check without a Reserve Common Item)`,
       limit: 1,
       workflow: "personalStashGear",
       manualReviewable: true,
@@ -149,7 +150,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Quick Draw"))
     add({
       id: "quickDraw",
-      name: "Quick Draw (free weapon action)",
+      name: loc`Quick Draw (free weapon action)`,
       period: "round",
       limit: 2,
       workflow: "featFreeAction",
@@ -160,7 +161,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Surge of Speed")) {
     add({
       id: "surgeOfSpeed",
-      name: "Surge of Speed (free non-attack half action)",
+      name: loc`Surge of Speed (free non-attack half action)`,
       limit: system.actionDice?.max ?? 0,
       workflow: "featFreeAction",
       hidden: true
@@ -179,7 +180,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Polearm Basics"))
     add({
       id: "strikingStance",
-      name: "Striking Stance (adjacent entry reaction)",
+      name: loc`Striking Stance (adjacent entry reaction)`,
       period: "round",
       limit: 1,
       workflow: "strikingStance",
@@ -223,7 +224,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.some(n => ["Flail Basics", "Fencing Basics"].includes(n)))
     add({
       id: "missTrick",
-      name: "Immediate miss tricks (one per resolved trigger)",
+      name: loc`Immediate miss tricks (one per resolved trigger)`,
       period: "round",
       limit: Number.MAX_SAFE_INTEGER,
       workflow: "missTrick",
@@ -233,7 +234,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.activeFeatNames?.includes("Combat Instincts"))
     add({
       id: "combatInstincts",
-      name: "Combat Instincts (immediate final attack)",
+      name: loc`Combat Instincts (immediate final attack)`,
       period: "round",
       limit: 1,
       workflow: "combatInstincts",
@@ -245,7 +246,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (darting.active)
     add({
       id: "dartingFinalAttack",
-      name: "Darting Weapon final attacks (recorded declaration)",
+      name: loc`Darting Weapon final attacks (recorded declaration)`,
       period: "darting declaration",
       limit: darting.extraAttacks,
       workflow: "dartingFinalAttack",
@@ -257,7 +258,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (twoWeapon.active)
     add({
       id: "twoWeaponFinalAttack",
-      name: "Two-weapon final attacks (recorded declaration)",
+      name: loc`Two-weapon final attacks (recorded declaration)`,
       period: "two-weapon declaration",
       limit: twoWeapon.extraAttacks,
       workflow: "twoWeaponFinalAttack",
@@ -270,7 +271,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (hasFinalDeduction(system))
     add({
       id: "finalDeduction",
-      name: "Final Deduction (one special character; study rounds)",
+      name: loc`Final Deduction (one special character; study rounds)`,
       limit: 1,
       workflow: "finalDeduction"
     });
@@ -278,7 +279,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (search)
     add({
       id: "globalSearch",
-      name: "Global Search (completed dedicated search)",
+      name: loc`Global Search (completed dedicated search)`,
       period: "mission",
       limit: search.limit,
       workflow: "globalSearch"
@@ -287,7 +288,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (details) {
     add({
       id: "littleDetails",
-      name: "Little Details (free action; once per round)",
+      name: loc`Little Details (free action; once per round)`,
       limit: details.limit,
       workflow: "littleDetails"
     });
@@ -303,7 +304,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if ((system.classLevels?.schemer ?? 0) >= 8)
     add({
       id: "masterPlan",
-      name: "Master Plan (free action; scene bonus d4s)",
+      name: loc`Master Plan (free action; scene bonus d4s)`,
       period: "mission",
       limit: 1,
       workflow: "masterPlan"
@@ -311,7 +312,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if ((system.classLevels?.schemer ?? 0) >= 2)
     add({
       id: "cunningPlan",
-      name: "Cunning Plan (free action, reduce error range)",
+      name: loc`Cunning Plan (free action, reduce error range)`,
       period: "scene",
       limit: system.classLevels.schemer >= 7 ? 2 : 1,
       workflow: "cunningPlan"
@@ -320,7 +321,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (genius)
     add({
       id: "everydayGenius",
-      name: "Everyday Genius (temporary Basic Skill feat; full action)",
+      name: loc`Everyday Genius (temporary Basic Skill feat; full action)`,
       period: "mission",
       limit: genius.limit,
       workflow: "sessionBasicFeat"
@@ -330,7 +331,7 @@ export function limitedUseAbilities(system, items, cfg) {
     if (source)
       add({
         id,
-        name: `${source.name} (city; non-combat assistants)`,
+        name: loc`${source.name} (city; non-combat assistants)`,
         period: "mission",
         limit: 1,
         workflow: "summonAssistants"
@@ -340,7 +341,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (mental)
     add({
       id: "mentalLeap",
-      name: "Mental Leap (temporary DEX/INT/WIS; exhaustion follows)",
+      name: loc`Mental Leap (temporary DEX/INT/WIS; exhaustion follows)`,
       limit: mental.limit,
       workflow: "mentalLeap"
     });
@@ -348,7 +349,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (knowAll)
     add({
       id: "knowItAll",
-      name: "Know It All (two temporary Advanced Skill feats; free action)",
+      name: loc`Know It All (two temporary Advanced Skill feats; free action)`,
       period: "mission",
       limit: knowAll.limit,
       workflow: "selfAdvancedFeats"
@@ -357,7 +358,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (anyTime)
     add({
       id: "anyTimeAnyPlace",
-      name: "Any Time, Any Place (temporary Terrain feat; free action)",
+      name: loc`Any Time, Any Place (temporary Terrain feat; free action)`,
       period: "mission",
       limit: anyTime.limit,
       workflow: "selfTerrainFeat"
@@ -365,7 +366,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if ((system.classLevels?.schemer ?? 0) >= 3)
     add({
       id: "renaissanceMan",
-      name: "Renaissance Man (temporary Basic Skill feat; free action)",
+      name: loc`Renaissance Man (temporary Basic Skill feat; free action)`,
       period: "mission",
       limit: system.classLevels.schemer >= 7 ? 2 : 1,
       workflow: "selfTemporaryFeat"
@@ -373,14 +374,14 @@ export function limitedUseAbilities(system, items, cfg) {
   if ((system.classLevels?.schemer ?? 0) >= 4)
     add({
       id: "allAccordingToPlan",
-      name: "All According to Plan (substitute INT)",
+      name: loc`All According to Plan (substitute INT)`,
       limit: system.actionDice?.max ?? 0,
       workflow: "attributeSubstitution"
     });
   if ((system.classLevels?.sniper ?? 0) >= 10)
     add({
       id: "millionDollarSkill",
-      name: "Million Dollar Skill (vulnerable opponent; eligible weapon)",
+      name: loc`Million Dollar Skill (vulnerable opponent; eligible weapon)`,
       period: "round",
       limit: 1,
       workflow: "millionDollarSkill"
@@ -388,7 +389,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if (system.coreClassIds?.includes("sniper"))
     add({
       id: "eagleEye",
-      name: "Eagle Eye (range increment for this scene)",
+      name: loc`Eagle Eye (range increment for this scene)`,
       period: "scene",
       limit: 1,
       cost: 1,
@@ -399,7 +400,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if ((system.classLevels?.stuntman ?? 0) >= 8)
     add({
       id: "iKnowWhatDoing",
-      name: "…I Know What I’m Doing. (STR/DEX skill, DC > Career Level +20)",
+      name: loc`…I Know What I’m Doing. (STR/DEX skill, DC > Career Level +20)`,
       period: "scene",
       limit: 1,
       workflow: "difficultSkillBonus"
@@ -407,14 +408,14 @@ export function limitedUseAbilities(system, items, cfg) {
   if (hasMasterThief(system))
     add({
       id: "masterThief",
-      name: "Master Thief (opposed Intruder skill, 4+ ranks)",
+      name: loc`Master Thief (opposed Intruder skill, 4+ ranks)`,
       limit: 1,
       workflow: "masterThief"
     });
   if (hasImprovisation(system))
     add({
       id: "improvisation",
-      name: "Improvisation (full action, one Common Item)",
+      name: loc`Improvisation (full action, one Common Item)`,
       period: "mission",
       limit: system.actionDice?.max ?? 0,
       workflow: "improvisation"
@@ -422,7 +423,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if ((system.classLevels?.virtuoso ?? 0) >= 10)
     add({
       id: "breakthrough",
-      name: "Breakthrough (INT/WIS skill or Knowledge)",
+      name: loc`Breakthrough (INT/WIS skill or Knowledge)`,
       period: "scene",
       limit: 1,
       workflow: "breakthrough"
@@ -430,7 +431,7 @@ export function limitedUseAbilities(system, items, cfg) {
   if ((system.classLevels?.scientist ?? 0) >= 14)
     add({
       id: "tenSecondSolution",
-      name: "10-Second Solution (standalone INT skill or Knowledge)",
+      name: loc`10-Second Solution (standalone INT skill or Knowledge)`,
       limit: 1,
       workflow: "tenSecondSolution"
     });
@@ -462,7 +463,7 @@ export function limitedUseAbilities(system, items, cfg) {
     if (system.weaponSpecialist.abilities.includes("Mow Down"))
       add({
         id: "mowDown",
-        name: "Mow Down (selected proficiencies; final attack vs standard character)",
+        name: loc`Mow Down (selected proficiencies; final attack vs standard character)`,
         period: "round",
         limit: 1,
         workflow: "manual"
@@ -470,7 +471,7 @@ export function limitedUseAbilities(system, items, cfg) {
     if (system.weaponSpecialist.abilities.includes("Showdown"))
       add({
         id: "showdown",
-        name: "Showdown (selected proficiencies; Stand Off without action-die cost)",
+        name: loc`Showdown (selected proficiencies; Stand Off without action-die cost)`,
         limit: system.actionDice?.max ?? 0,
         workflow: "manual"
       });
@@ -480,18 +481,18 @@ export function limitedUseAbilities(system, items, cfg) {
     if (source)
       add({
         id,
-        name: `${source.name} (${source.count} temporary ${source.tree} feat${source.count === 1 ? "" : "s"} during Intel)`,
+        name: loc`${source.name} (${source.count} temporary ${source.tree} feat${source.count === 1 ? "" : "s"} during Intel)`,
         period: "mission",
         limit: 1,
         workflow: "intelTemporaryFeat"
       });
   }
   if ((system.classLevels?.stuntman ?? 0) >= 7)
-    add({ id: "noFear", name: "No Fear II (temporary stress resistance)", limit: 1, workflow: "noFear" });
+    add({ id: "noFear", name: loc`No Fear II (temporary stress resistance)`, limit: 1, workflow: "noFear" });
   if (system.legacyAbilities?.fortunesOfWar?.grade > 0)
     add({
       id: "fortunesOfWar",
-      name: "Fortunes of War (double its DR for one full round)",
+      name: loc`Fortunes of War (double its DR for one full round)`,
       limit: system.actionDice?.max ?? 0,
       workflow: "fortunesOfWar"
     });
@@ -515,7 +516,7 @@ export function limitedUseAbilities(system, items, cfg) {
   }
   add({
     id: "tripFinalAttack",
-    name: "Critical Trip final attack (one per earned trigger)",
+    name: loc`Critical Trip final attack (one per earned trigger)`,
     period: "round",
     limit: Number.MAX_SAFE_INTEGER,
     workflow: "tripFinalAttack",
@@ -550,14 +551,14 @@ export function resourceStatus(spec, uses = {}, periods = {}) {
   };
 }
 export function resourceUsePlan(spec, uses, periods, actionDice = 0) {
-  if (!spec) return { blocked: true, reason: "This ability is not currently available." };
+  if (!spec) return { blocked: true, reason: loc`This ability is not currently available.` };
   const status = resourceStatus(spec, uses, periods);
   if (status.counterReview)
-    return { blocked: true, reason: `${spec.name}: review its saved use count or limit before spending.` };
+    return { blocked: true, reason: loc`${spec.name}: review its saved use count or limit before spending.` };
   if (!Number.isSafeInteger(spec.cost) || spec.cost < 0 || !Number.isSafeInteger(actionDice) || actionDice < 0)
-    return { blocked: true, reason: "Review the ability cost and current action-die balance before spending." };
-  if (!status.remaining) return { blocked: true, reason: `${spec.name}: no uses remain this ${spec.period}.` };
-  if (actionDice < spec.cost) return { blocked: true, reason: `${spec.name} requires ${spec.cost} action die.` };
+    return { blocked: true, reason: loc`Review the ability cost and current action-die balance before spending.` };
+  if (!status.remaining) return { blocked: true, reason: loc`${spec.name}: no uses remain this ${spec.period}.` };
+  if (actionDice < spec.cost) return { blocked: true, reason: loc`${spec.name} requires ${spec.cost} action die.` };
   return { blocked: false, status, record: { epoch: status.epoch, used: status.used + 1 } };
 }
 export function rerollEligibility(spec, check, { failed = false, criticalFailure = false, forced = false } = {}) {
@@ -592,11 +593,11 @@ export function rerollEligibility(spec, check, { failed = false, criticalFailure
 /** An explicit GC correction of malformed history, never an automatic refill. */
 export function resourceCounterReviewPlan(spec, uses, periods, { used, reason = "", confirmed = false } = {}) {
   if (!spec || !Number.isSafeInteger(spec.limit) || spec.limit < 0)
-    throw new Error("Correct this ability’s source/limit before reviewing its use count.");
+    throw new Error(loc`Correct this ability’s source/limit before reviewing its use count.`);
   const status = resourceStatus(spec, uses, periods);
-  if (!status.counterReview && !spec.manualReviewable) throw new Error("This saved counter no longer needs review.");
+  if (!status.counterReview && !spec.manualReviewable) throw new Error(loc`This saved counter no longer needs review.`);
   if (!confirmed || !Number.isSafeInteger(used) || used < 0 || !String(reason).trim())
-    throw new Error("Enter the GC-confirmed current-period use count and a reason.");
+    throw new Error(loc`Enter the GC-confirmed current-period use count and a reason.`);
   return {
     record: { epoch: status.epoch, used },
     previous: structuredClone(uses?.[spec.id]),

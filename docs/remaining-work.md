@@ -135,13 +135,13 @@ Status after the live checks of 2026-11-17 on Foundry 14.370 (two clients: the G
       a request the GC's client carries out.
 - [x] Schema version and migrations: the world records its schema version and runs pending migrations on start
       (`module/migrations/index.mjs`). The live world was stamped at version 1 by the GC's client.
-- [ ] Typed records. 42 of the open object fields on agents and NPCs now declare their shape
-      (`module/data/record-shapes.mjs`), learnt from every update the test suite makes and checked against the
-      live world's 48 actors. The check is soft: a misfit is reported once in the console and nothing is rejected
-      or stripped. Still open: eight fields with no observed writes (`cheapShots`, `promotion`, `damageTrack`,
-      `attributeDamage`, `gearPickLosses`, `armorMissionGrant`, `bigStickMissionPick`, `missionCaliberPicks`), the
-      item models' object fields, and turning the check strict once the shapes have survived real play
-      (`CONFIG.debug.spycraft2Records = true` makes a misfit fail validation).
+- [x] Typed records. Every open object field on every actor and item model declares its shape
+      (`module/data/record-shapes.mjs`, 67 records; `npm run check:schemas` reports none untyped). The shapes come
+      from about 6,000 recorded updates across the test suite, the compendium documents, and the stored test world;
+      2,458 recorded writes, 1,921 compendium documents and 1,257 stored records all fit. Thirteen records nothing
+      ever wrote list the keys the code reads and are otherwise open. The check stays soft on purpose: a misfit is
+      reported once in the console and nothing is rejected or stripped. `CONFIG.debug.spycraft2Records = true`
+      makes a misfit fail validation, for use while developing.
 - [x] Round-scoped states are shown as Active Effects with a duration (`module/apps/round-state-effects.mjs`),
       kept in step by the GC's client. Checked live: declaring Combat Expertise produced its effect, and the
       effect went when the character's count came round. **The record on the character is still the state**; the
@@ -152,12 +152,24 @@ Status after the live checks of 2026-11-17 on Foundry 14.370 (two clients: the G
 - [x] Tests are discovered by pattern (`tools/test-*.mjs`), and the engine fixtures build their documents from
       `src/data`, so `npm test` runs with Foundry open.
 - [x] Batch ledgers and QA records moved to `docs/archive/`.
-- [ ] Localization. Every sheet and application template takes its text from `lang/en.json` (1,131 strings under
-      `SPYCRAFT.Template`), as do chat buttons and the new settings; the English output is unchanged. Still
-      hard-coded: roll dialog text (`module/rolls/dialogs/` and the rule modules' dialog sections), chat card
-      flavor and notes, notifications and error messages, and labels built in JavaScript. Template strings were
-      extracted mechanically, so a sentence interrupted by a value is several fragments; those want rewriting as
-      single formatted strings before anyone translates them.
+- [x] Localization. Text is translatable in three ways, all with unchanged English output:
+      templates read `SPYCRAFT.Template.*` (1,131 strings); chat buttons and settings have their own keys; and
+      text written in JavaScript uses the `loc` template tag (`module/i18n.mjs`): the English stays in the source,
+      its pattern is the key, and `npm run strings` collects every pattern into `lang/en.json` (5,952 strings from
+      6,335 places: dialogs, chat notes, notifications and error messages). A test keeps the file in step with the
+      source. Checked in Foundry: all strings load, and a translation supplied at runtime appears in the roll dialog.
+- [ ] Localization leftovers, none of which change English play:
+      - About a hundred label tables built when a module loads (before the language is known) are still English.
+      - `module/apps/gc/console.mjs` and `spycraft2.mjs` were left alone because another session had uncommitted
+        changes in them; run the same pass over them once those land.
+      - Short phrases without sentence punctuation that are not in a recognised place (list entries, `name:`
+        values) were not tagged, to avoid tagging game terms that the rules compare.
+      - Names that come from data (feats, skills, named checks, class abilities, compendium entries) are not in the
+        language file.
+      - Some rules compare English text (a note that starts with a given phrase, a feat name); a translation of
+        those strings would need the comparison changed too.
+      - Strings were extracted mechanically. A sentence built from several pieces is several entries, and markup is
+        kept out of entries only where the text sat between tags.
 
 ## Game areas still missing or thin
 

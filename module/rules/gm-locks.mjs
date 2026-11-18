@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /**
  * Resource locks arbitrated by the Game Control's client.
  *
@@ -25,9 +26,10 @@ export class LockTable {
   /** Take every key or none. Returns { ok: true } or { ok: false, busy: [keys], holders: [userIds] }. */
   acquire(keys, token, userId, now = Date.now()) {
     if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== "string" || !k)) {
-      return { ok: false, busy: [], error: "A lock request names at least one key." };
+      return { ok: false, busy: [], error: loc`A lock request names at least one key.` };
     }
-    if (typeof token !== "string" || !token) return { ok: false, busy: [], error: "A lock request carries a token." };
+    if (typeof token !== "string" || !token)
+      return { ok: false, busy: [], error: loc`A lock request carries a token.` };
     const busy = keys.filter(key => this.#locks.has(key) && this.#locks.get(key).token !== token);
     if (busy.length) return { ok: false, busy, holders: [...new Set(busy.map(key => this.#locks.get(key).userId))] };
     for (const key of keys) this.#locks.set(key, { token, userId, at: now });

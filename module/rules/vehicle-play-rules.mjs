@@ -4,6 +4,7 @@
  */
 import { VEHICLE_RULES } from "./tables.mjs";
 import { SIZE_CODES, sizeCode, vehicleClass } from "./vehicles.mjs";
+import { loc } from "../i18n.mjs";
 
 /* ---------------------------------------------------------------------- */
 /*  Qualities                                                              */
@@ -61,7 +62,7 @@ export const heavyArmorDice = qualities => Math.max(0, qualityNumber(qualities, 
  * vehicle's Damage save bonus. Armor-piercing lowers that bonus first. Animals can take 0; the others take at least 1.
  */
 export function secondaryDamage({ damage, saveBonus = 0, armorPiercing = 0, minimum = 1 }) {
-  if (!Number.isSafeInteger(damage) || damage < 0) throw new Error("Damage must be a whole number.");
+  if (!Number.isSafeInteger(damage) || damage < 0) throw new Error(loc`Damage must be a whole number.`);
   const bonus = Math.max(0, (Number(saveBonus) || 0) - Math.max(0, Number(armorPiercing) || 0));
   return Math.max(minimum, damage - bonus);
 }
@@ -168,7 +169,7 @@ const norm = text =>
  */
 export function controlCheckPlan(vehicle, driver, { hazards = null } = {}) {
   const cls = vehicleClass(vehicle?.vehicleClass);
-  if (!cls) return { blocked: "Choose the vehicle's category first." };
+  if (!cls) return { blocked: loc`Choose the vehicle's category first.` };
   if (hazards?.blocked) return { blocked: hazards.blocked };
   const qualities = vehicle?.qualitiesNow ?? vehicle?.qualities ?? "",
     notes = [];
@@ -185,15 +186,15 @@ export function controlCheckPlan(vehicle, driver, { hazards = null } = {}) {
     penalty = cls.untrainedPenalty;
     if (hasQuality(qualities, "FOR")) {
       penalty += 2;
-      notes.push("Forgiving: untrained penalty 2 less.");
+      notes.push(loc`Forgiving: untrained penalty 2 less.`);
     }
     if (hasQuality(qualities, "UNF")) {
       penalty -= 4;
-      notes.push("Unforgiving: untrained penalty 4 worse.");
+      notes.push(loc`Unforgiving: untrained penalty 4 worse.`);
     }
     if (hasQuality(qualities, "TRO"))
       return {
-        blocked: "Trained only: this vehicle allows no untrained Maneuver checks.",
+        blocked: loc`Trained only: this vehicle allows no untrained Maneuver checks.`,
         skillKey,
         skillName,
         focus,
@@ -204,17 +205,17 @@ export function controlCheckPlan(vehicle, driver, { hazards = null } = {}) {
   const lift = vehicle?.damage?.lift ?? 0;
   if (lift) {
     errorIncrease += lift;
-    notes.push(`Lift damage: error +${lift}.`);
+    notes.push(loc`Lift damage: error +${lift}.`);
   }
   if (hasQuality(qualities, "DRN")) {
     errorIncrease += 1;
-    notes.push("Drone: error +1.");
+    notes.push(loc`Drone: error +1.`);
   }
   if (hazards?.rows?.length) {
     penalty += hazards.modifier;
     errorIncrease += hazards.errorIncrease;
     notes.push(
-      `Hazards ${hazards.modifier >= 0 ? "+" : ""}${hazards.modifier}${hazards.errorIncrease ? `, error +${hazards.errorIncrease}` : ""}.`
+      loc`Hazards ${hazards.modifier >= 0 ? "+" : ""}${hazards.modifier}${hazards.errorIncrease ? loc`, error +${hazards.errorIncrease}` : ""}.`
     );
   }
   const why = !ranks ? `no ${skillName} ranks` : !hasFocus ? `no Drive (${focus}) focus` : "";

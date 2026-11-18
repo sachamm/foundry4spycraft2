@@ -93,6 +93,7 @@ import {
 } from "../../rules/gear.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
 import { resolveSkillCheck } from "../../rules/skills.mjs";
+import { loc } from "../../i18n.mjs";
 
 export const ActorRolls = Base =>
   class ActorRolls extends Base {
@@ -161,7 +162,9 @@ export const ActorRolls = Base =>
           options.tenSecondSolution ||
           !/^1d20\b/.test(formula)
         )
-          throw new Error("Only Evasion III may take 10 on a Reflex save, without roll-choice or forced-20 abilities.");
+          throw new Error(
+            loc`Only Evasion III may take 10 on a Reflex save, without roll-choice or forced-20 abilities.`
+          );
         formula = formula.replace(/^1d20\b/, "10");
         actionDiceAllowed = false;
         resultSource = "evasion";
@@ -173,7 +176,7 @@ export const ActorRolls = Base =>
         (this.system.classLevels?.fieldAnalyst ?? 0) >= 8
       ) {
         if (rollMode === "blindroll" && !game.user?.isGM)
-          throw new Error("The GC resolves Eye for Detail for a secret or passive Search check.");
+          throw new Error(loc`The GC resolves Eye for Detail for a secret or passive Search check.`);
         chooseTwice = true;
         choiceSource = "Eye for Detail";
       }
@@ -213,19 +216,19 @@ export const ActorRolls = Base =>
         error = cunning.error;
       }
 
-      if (million && solution) throw new Error("Choose one declared natural-20 ability.");
+      if (million && solution) throw new Error(loc`Choose one declared natural-20 ability.`);
       if (solution && !options.solutionCommitted) {
         if (!tenSecondSolutionEligible(this.system, { ...options, chooseTwice }) || !/^1d20\b/.test(formula))
           throw new Error(
-            "10-Second Solution requires Scientist 14 and a standalone rolled Intelligence skill or Knowledge check, without another roll-choice ability."
+            loc`10-Second Solution requires Scientist 14 and a standalone rolled Intelligence skill or Knowledge check, without another roll-choice ability.`
           );
         if (rollMode === "blindroll" && !game.user?.isGM)
-          throw new Error("The GC resolves 10-Second Solution for a secret check.");
+          throw new Error(loc`The GC resolves 10-Second Solution for a secret check.`);
         return this.useLimitedAbility(
           "tenSecondSolution",
           (status, payment) => {
             if (!tenSecondSolutionEligible(this.system, { ...options, chooseTwice }))
-              throw new Error("10-Second Solution no longer qualifies for this check.");
+              throw new Error(loc`10-Second Solution no longer qualifies for this check.`);
             if (options.refreshPaidSkill)
               return options.refreshPaidSkill(payment, {
                 solutionCommitted: true,
@@ -251,15 +254,15 @@ export const ActorRolls = Base =>
       if (million && !options.millionCommitted) {
         if (!oneInAMillionEligible(this.system, { ...options, chooseTwice }) || !/^1d20\b/.test(formula))
           throw new Error(
-            "One in a Million requires Soldier 14 and a rolled attack, Fortitude save or Strength/Constitution skill check. It cannot combine with Bright Idea."
+            loc`One in a Million requires Soldier 14 and a rolled attack, Fortitude save or Strength/Constitution skill check. It cannot combine with Bright Idea.`
           );
         if (rollMode === "blindroll" && !game.user?.isGM)
-          throw new Error("The GC resolves One in a Million for a secret check.");
+          throw new Error(loc`The GC resolves One in a Million for a secret check.`);
         return this.useLimitedAbility(
           "oneInAMillion",
           (status, payment) => {
             if (!oneInAMillionEligible(this.system, { ...options, chooseTwice }))
-              throw new Error("This check no longer qualifies for One in a Million.");
+              throw new Error(loc`This check no longer qualifies for One in a Million.`);
             if (options.refreshPaidSkill)
               return options.refreshPaidSkill(payment, {
                 millionCommitted: true,
@@ -312,7 +315,7 @@ export const ActorRolls = Base =>
           payment?.shakenSignature &&
           payment.shakenSignature !== JSON.stringify(shakenRules(this.actionDiceFundingSystem))
         )
-          throw new Error("The Shaken condition changed before this paid check.");
+          throw new Error(loc`The Shaken condition changed before this paid check.`);
       await rollPipeline.validate(rollContext);
       // Contributor modifiers apply to the dice only; the recorded formula stays as declared so a reroll adds them once.
       const pipelineModifiers = rollPipeline.modifiers(rollContext),
@@ -329,9 +332,9 @@ export const ActorRolls = Base =>
           rolls = [roll, second];
         alternatives = rolls.map(r => ({ total: r.total, naturalDie: r.dice[0]?.total ?? null }));
         const selection = await systemDialog.input({
-          window: { title: `${choiceSource}: choose the preferred result` },
+          window: { title: loc`${choiceSource}: choose the preferred result` },
           rejectClose: false,
-          content: `<label>Result <select name="chosen">${alternatives.map((r, index) => `<option value="${index}">Roll ${index + 1}: ${r.total} (natural ${r.naturalDie})</option>`).join("")}</select></label><p>Closing this dialog keeps the first result.</p>`
+          content: `<label>${loc`Result`} <select name="chosen">${alternatives.map((r, index) => `<option value="${index}">${loc`Roll ${index + 1}: ${r.total} (natural ${r.naturalDie})`}</option>`).join("")}</select></label><p>${loc`Closing this dialog keeps the first result.`}</p>`
         });
         chosenIndex = Number(selection?.chosen) === 1 ? 1 : 0;
         roll = rolls[chosenIndex];
@@ -341,7 +344,7 @@ export const ActorRolls = Base =>
           payment?.shakenSignature &&
           payment.shakenSignature !== JSON.stringify(shakenRules(this.actionDiceFundingSystem))
         )
-          throw new Error("The Shaken condition changed while resolving this paid check.");
+          throw new Error(loc`The Shaken condition changed while resolving this paid check.`);
       rollContext.phase = "after";
       await rollPipeline.validate(rollContext);
       const die = twenty ? 20 : checkMethod === "roll" && checkKind !== "damage" ? (roll.dice[0]?.total ?? null) : null;
@@ -357,7 +360,7 @@ export const ActorRolls = Base =>
         shaken.needsReview &&
         ["skill", "knowledge", "attack", "ability", "save", "initiative"].includes(options.checkKind)
       )
-        throw new Error("Review the current Shaken sources before rolling.");
+        throw new Error(loc`Review the current Shaken sources before rolling.`);
       const shakenContext = Object.hasOwn(options, "shakenContext")
         ? options.shakenContext
         : shaken.grade && ["skill", "knowledge", "attack", "ability", "save", "initiative"].includes(options.checkKind)
@@ -526,7 +529,7 @@ export const ActorRolls = Base =>
         { mod },
         {
           flavor:
-            game.i18n.localize(CONFIG.SPYCRAFT.abilities[key]) + (conditionAbilityAdjustment ? " — Drunk −2" : ""),
+            game.i18n.localize(CONFIG.SPYCRAFT.abilities[key]) + (conditionAbilityAdjustment ? loc` — Drunk −2` : ""),
           checkKind: "ability",
           ability: key,
           conditionAbilityAdjustment,
@@ -539,12 +542,12 @@ export const ActorRolls = Base =>
       let input = options;
       if (!CONFIG.SPYCRAFT.saves[key]) return null;
       if (attributeCollapsePlan(this.system).dead || this.system.conditionContext?.dead || this.statuses?.has("dead"))
-        return ui.notifications.warn("A dead character cannot make a saving throw.");
+        return ui.notifications.warn(loc`A dead character cannot make a saving throw.`);
       const feats = new Set(this.system.activeFeatNames ?? []),
         manualStandingContent = stillStandingSaveContent(this.system, key),
         stillStandingContent =
           options.takedown && manualStandingContent
-            ? "<p>This recorded Fortitude save resists takedown. Earned Still Standing applies automatically.</p>"
+            ? `<p>${loc`This recorded Fortitude save resists takedown. Earned Still Standing applies automatically.`}</p>`
             : manualStandingContent;
       if (
         input.askContext &&
@@ -583,16 +586,18 @@ export const ActorRolls = Base =>
             ? (this.system.mentalLeapState?.exhaustionSaveBonus ?? 0)
             : 0;
       if (input.resistingBaffled === true && getBaffledReview(this).needsReview)
-        return ui.notifications.warn("The GC must review the interrupted Baffled event before this resistance save.");
+        return ui.notifications.warn(
+          loc`The GC must review the interrupted Baffled event before this resistance save.`
+        );
       const baffledSaveBonus =
         this.system.conditionContext?.baffled === true && input.resistingBaffled === true ? 8 : 0;
       const checkMethod = input.checkMethod ?? "roll";
       if (shakenRules(this.system).needsReview)
-        return ui.notifications.warn("Review the current Shaken sources before saving throws.");
+        return ui.notifications.warn(loc`Review the current Shaken sources before saving throws.`);
       if (["take10", "take20"].includes(checkMethod) && shakenRules(this.system).fixedResultsForbidden)
-        return ui.notifications.warn("Shaken: taking 10 or 20 is unavailable (p.342).");
+        return ui.notifications.warn(loc`Shaken: taking 10 or 20 is unavailable (p.342).`);
       if (checkMethod !== "roll" && (checkMethod !== "take10" || key !== "ref" || !evasionPlan(this.system).canTake10))
-        return ui.notifications.warn("Only Evasion III permits taking 10 with a Reflex save.");
+        return ui.notifications.warn(loc`Only Evasion III permits taking 10 with a Reflex save.`);
       const evasionContext =
         key === "ref"
           ? evasionSaveContext(this.system, {
@@ -603,16 +608,16 @@ export const ActorRolls = Base =>
       const securityBonus =
         key === "ref" && input.securityDevice === true ? uncannyDodgePlan(this.system).securityBonus : 0;
       const { total, planModifiers } = planTotal("save", { actor: this, system: this.system, saveKey: key, input }, [
-        ["Save bonus", this.system.saves?.[key]?.total ?? 0],
-        ["Still Standing", stillStandingSave?.bonus ?? 0],
-        ["Stone Cold", stoneCold?.bonus ?? 0],
-        ["Brace", penalty],
-        ["Terrain", terrainSave.adjustment],
-        ["Underwater", underwaterContext.penalty],
-        ["Fatigue resistance", fatigueBonus],
-        ["Security device", securityBonus],
-        ["Baffled resistance", baffledSaveBonus],
-        ["Cover", coverSave?.bonus ?? 0]
+        [loc`Save bonus`, this.system.saves?.[key]?.total ?? 0],
+        [loc`Still Standing`, stillStandingSave?.bonus ?? 0],
+        [loc`Stone Cold`, stoneCold?.bonus ?? 0],
+        [loc`Brace`, penalty],
+        [loc`Terrain`, terrainSave.adjustment],
+        [loc`Underwater`, underwaterContext.penalty],
+        [loc`Fatigue resistance`, fatigueBonus],
+        [loc`Security device`, securityBonus],
+        [loc`Baffled resistance`, baffledSaveBonus],
+        [loc`Cover`, coverSave?.bonus ?? 0]
       ]);
       return this.rollCheck(
         "1d20 + @total",
@@ -621,16 +626,16 @@ export const ActorRolls = Base =>
           planModifiers,
           flavor:
             game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label) +
-            (checkMethod === "take10" ? " — Evasion III: take 10" : "") +
-            (options.takedown ? " — Takedown DC" + Number(options.takedown.dc) : "") +
-            (options.damageSave ? ` — Damage event DC${Number(options.damageSave.dc)}` : "") +
-            (coverSave?.bonus ? ` — Cover/Reflex +${coverSave.bonus}` : "") +
-            (securityBonus ? ` — Uncanny Dodge/security device +${securityBonus}` : "") +
-            (baffledSaveBonus ? " — Baffled resistance +8" : "") +
-            (fatigueBonus ? ` — Fatigue/exhaustion resistance +${fatigueBonus}` : "") +
-            (stillStandingSave?.bonus ? " — Still Standing: takedown Fortitude +8" : "") +
-            (stoneCold ? " — Stone Cold: combat Will +1" : "") +
-            (penalty ? ` — Brace ${penalty}` : "") +
+            (checkMethod === "take10" ? loc` — Evasion III: take 10` : "") +
+            (options.takedown ? loc` — Takedown DC` + Number(options.takedown.dc) : "") +
+            (options.damageSave ? loc` — Damage event DC${Number(options.damageSave.dc)}` : "") +
+            (coverSave?.bonus ? loc` — Cover/Reflex +${coverSave.bonus}` : "") +
+            (securityBonus ? loc` — Uncanny Dodge/security device +${securityBonus}` : "") +
+            (baffledSaveBonus ? loc` — Baffled resistance +8` : "") +
+            (fatigueBonus ? loc` — Fatigue/exhaustion resistance +${fatigueBonus}` : "") +
+            (stillStandingSave?.bonus ? loc` — Still Standing: takedown Fortitude +8` : "") +
+            (stoneCold ? loc` — Stone Cold: combat Will +1` : "") +
+            (penalty ? loc` — Brace ${penalty}` : "") +
             (underwaterContext.notes.length ? ` — ${underwaterContext.notes.join(" ")}` : "") +
             (terrainSave.notes.length ? ` — ${terrainSave.notes.join(" ")}` : ""),
           takedown: options.takedown ?? null,
@@ -660,7 +665,7 @@ export const ActorRolls = Base =>
                       JSON.stringify(stillStandingSave)
                   )
                     throw new Error(
-                      "The conditional save feat, Still Standing source or confirmed save purpose changed before posting."
+                      loc`The conditional save feat, Still Standing source or confirmed save purpose changed before posting.`
                     );
                 }
               : undefined,
@@ -690,7 +695,7 @@ export const ActorRolls = Base =>
         const choices = checks
           .map(
             check =>
-              `<option value="${check.id}"${options.initialCheck === check.id ? " selected" : ""}>${esc(check.name)} (${check.attributes.join("/").toUpperCase()}, ${esc(check.mode)}, error 1–${check.error})</option>`
+              `<option value="${check.id}"${options.initialCheck === check.id ? " selected" : ""}>${loc`${esc(check.name)} (${check.attributes.join("/").toUpperCase()}, ${esc(check.mode)}, error 1–${check.error})`}</option>`
           )
           .join("");
         const abilities = skill.totals
@@ -702,7 +707,7 @@ export const ActorRolls = Base =>
         input = await systemDialog.input({
           window: { title: skill.name },
           rejectClose: false,
-          ok: { label: "Roll check" },
+          ok: { label: loc`Roll check` },
           render: (event, dialog) => enhanceSkillDialog(event, dialog, checks),
           content: rollPipeline.dialog({
             dialog: "skill",
@@ -724,7 +729,7 @@ export const ActorRolls = Base =>
       const workTarget = () =>
         input.weaponWork === true && input.weaponWorkItemId ? this.items?.get?.(input.weaponWorkItemId) : null;
       if (input.weaponWork === true && input.weaponWorkItemId && workTarget()?.type !== "weapon")
-        return ui.notifications.warn("Choose an actual target weapon/model or confirm its specifications again.");
+        return ui.notifications.warn(loc`Choose an actual target weapon/model or confirm its specifications again.`);
       if (
         input.gearItem &&
         (!gearItem ||
@@ -735,20 +740,20 @@ export const ActorRolls = Base =>
           gearItem.system.quantity === 0 ||
           possessionUnavailable(gearItem.system))
       )
-        return ui.notifications.warn("Choose available gear being used for this check.");
+        return ui.notifications.warn(loc`Choose available gear being used for this check.`);
       if (
         check?.id === "restraint-escape" &&
         restraintRollSource.sources.length > 1 &&
         input.grappleAllSourcesConfirmed !== true
       )
-        throw new Error("Confirm which restraint sources belong to this grapple before rolling.");
+        throw new Error(loc`Confirm which restraint sources belong to this grapple before rolling.`);
       if (check?.id === "restraint-escape" && this.system.size !== restraintRollSize)
-        throw new Error("Size changed while choosing this grapple check.");
+        throw new Error(loc`Size changed while choosing this grapple check.`);
       if (
         check?.id === "restraint-escape" &&
         JSON.stringify(restraintSourceSnapshot(this)) !== JSON.stringify(restraintRollSource)
       )
-        throw new Error("The grapple sources changed while choosing this check.");
+        throw new Error(loc`The grapple sources changed while choosing this check.`);
       let result = resolveSkillCheck(this.system, key, check, {
         ...this.sensoryContext(input),
         ...feintTargetInput(input, this),
@@ -795,7 +800,7 @@ export const ActorRolls = Base =>
           ability: input.ability ?? ability
         });
         if (!result || result.blocked)
-          return ui.notifications.warn(result?.blockedReason ?? "This check is no longer available.");
+          return ui.notifications.warn(result?.blockedReason ?? loc`This check is no longer available.`);
       }
 
       if (input.breakthrough)
@@ -831,22 +836,22 @@ export const ActorRolls = Base =>
         [input.oneInAMillion, input.brightIdea, input.iKnowWhatDoing, input.tenSecondSolution].filter(Boolean).length >
         1
       )
-        throw new Error("Choose one pre-roll class ability for this check.");
+        throw new Error(loc`Choose one pre-roll class ability for this check.`);
       if (input.iKnowWhatDoing) {
         difficultSkillBonusPlan(this.system, result, {
           dc: result.weaponFocusWork?.effectiveDC ?? input.difficultyClass
         });
         if (result.rollMode === "blindroll" && !game.user?.isGM)
-          throw new Error("The GC resolves this bonus for a secret or passive check.");
+          throw new Error(loc`The GC resolves this bonus for a secret or passive check.`);
       }
       if (input.brightIdea && key === "search" && (this.system.classLevels?.fieldAnalyst ?? 0) >= 8)
         return ui.notifications.warn(
-          "Eye for Detail already rolls Search twice. Clear Bright Idea to preserve its limited use."
+          loc`Eye for Detail already rolls Search twice. Clear Bright Idea to preserve its limited use.`
         );
       if (input.brightIdea && (result.method !== "roll" || !["int", "wis"].includes(result.ability)))
-        return ui.notifications.warn("Bright Idea requires a rolled Intelligence- or Wisdom-based skill check.");
+        return ui.notifications.warn(loc`Bright Idea requires a rolled Intelligence- or Wisdom-based skill check.`);
       if (input.brightIdea && result.rollMode === "blindroll" && !game.user?.isGM)
-        return ui.notifications.warn("Ask the GC to resolve Bright Idea for this secret or passive check.");
+        return ui.notifications.warn(loc`Ask the GC to resolve Bright Idea for this secret or passive check.`);
       const brightSource = input.brightIdea ? this.resolveBrightIdeaSource(input.brightIdeaSource) : null;
       if (input.brightIdea && !brightSource) return null;
       let difficultGain = null;
@@ -859,9 +864,9 @@ export const ActorRolls = Base =>
           (solutionCommitted && input.tenSecondSolution !== true) ||
           (millionCommitted && input.oneInAMillion !== true)
         )
-          throw new Error("The paid class declaration changed before the skill roll.");
+          throw new Error(loc`The paid class declaration changed before the skill roll.`);
         if (input.weaponWork === true && input.weaponWorkItemId && workTarget()?.type !== "weapon")
-          throw new Error("The target weapon/model is no longer available. Confirm the check again.");
+          throw new Error(loc`The target weapon/model is no longer available. Confirm the check again.`);
         const currentGear = input.gearItem ? this.items?.get?.(input.gearItem) : null;
         if (
           input.gearItem &&
@@ -872,14 +877,14 @@ export const ActorRolls = Base =>
             currentGear.system.quantity === 0 ||
             possessionUnavailable(currentGear.system))
         )
-          throw new Error("The selected gear is no longer available.");
+          throw new Error(loc`The selected gear is no longer available.`);
         if (check?.id === "restraint-escape" && this.system.size !== restraintRollSize)
-          throw new Error("Size changed before this grapple check.");
+          throw new Error(loc`Size changed before this grapple check.`);
         if (
           check?.id === "restraint-escape" &&
           JSON.stringify(restraintSourceSnapshot(this)) !== JSON.stringify(restraintRollSource)
         )
-          throw new Error("The grapple sources changed before the roll.");
+          throw new Error(loc`The grapple sources changed before the roll.`);
         const fresh = resolveSkillCheck(this.system, key, check, {
           ...this.sensoryContext(input),
           ...feintTargetInput(input, this),
@@ -900,10 +905,12 @@ export const ActorRolls = Base =>
           fresh.actionDiceCost !== result.actionDiceCost ||
           fresh.actionDiceBenefits !== result.actionDiceBenefits
         )
-          throw new Error(fresh?.blockedReason || "This check’s requirements changed. Review it before rolling again.");
+          throw new Error(
+            fresh?.blockedReason || loc`This check’s requirements changed. Review it before rolling again.`
+          );
         if (input.brightIdea && key === "search" && (this.system.classLevels?.fieldAnalyst ?? 0) >= 8)
           throw new Error(
-            "Eye for Detail now covers this Search check; preserve Bright Idea and roll again without it."
+            loc`Eye for Detail now covers this Search check; preserve Bright Idea and roll again without it.`
           );
         if (
           input.brightIdea &&
@@ -911,7 +918,7 @@ export const ActorRolls = Base =>
             !["int", "wis"].includes(fresh.ability) ||
             (fresh.rollMode === "blindroll" && !game.user?.isGM))
         )
-          throw new Error("Bright Idea no longer qualifies for this check.");
+          throw new Error(loc`Bright Idea no longer qualifies for this check.`);
         if (input.breakthrough)
           Object.assign(
             fresh,
@@ -935,7 +942,8 @@ export const ActorRolls = Base =>
           difficultGain = difficultSkillBonusPlan(this.system, fresh, {
             dc: fresh.weaponFocusWork?.effectiveDC ?? input.difficultyClass
           });
-          if (fresh.rollMode === "blindroll" && !game.user?.isGM) throw new Error("The GC resolves this secret bonus.");
+          if (fresh.rollMode === "blindroll" && !game.user?.isGM)
+            throw new Error(loc`The GC resolves this secret bonus.`);
         }
         return this.rollCheck(
           fresh.fixedDie ? `${fresh.fixedDie} + @total` : "1d20 + @total",
@@ -1128,7 +1136,7 @@ export const ActorRolls = Base =>
                         ])
                     )
                       throw new Error(
-                        "The declared skill modifiers or their feat sources changed before the check was posted."
+                        loc`The declared skill modifiers or their feat sources changed before the check was posted.`
                       );
                   }
                 : undefined,
@@ -1221,7 +1229,7 @@ export const ActorRolls = Base =>
           "iKnowWhatDoing",
           async (status, payment) => {
             const id = foundry.utils.randomID();
-            if (this.system.bonusActionDice?.[id]) throw new Error("This bonus-pool identifier already exists.");
+            if (this.system.bonusActionDice?.[id]) throw new Error(loc`This bonus-pool identifier already exists.`);
             let message;
             try {
               message = await perform(id, payment);
@@ -1241,7 +1249,7 @@ export const ActorRolls = Base =>
                   await message.delete();
                 } catch (cleanupError) {
                   ui.notifications.warn(
-                    "The skill result may still exist after a bonus-grant failure. Its use and costs remain spent; ask the GC to review the check and bonus before retrying."
+                    loc`The skill result may still exist after a bonus-grant failure. Its use and costs remain spent; ask the GC to review the check and bonus before retrying.`
                   );
                   return message;
                 }
@@ -1297,22 +1305,22 @@ export const ActorRolls = Base =>
 
     async useFinalDeduction(options = {}) {
       if (!this.isOwner || !hasFinalDeduction(this.system))
-        return ui.notifications.warn("Final Deduction is not currently available.");
+        return ui.notifications.warn(loc`Final Deduction is not currently available.`);
       const epoch = String(this.usagePeriods.session ?? "initial"),
         study = finalDeductionStudy(this.flags?.spycraft2?.finalDeduction, epoch),
         esc = foundry.utils.escapeHTML;
       let input = options;
       if (!Object.hasOwn(input, "expectedRound")) {
         input = await systemDialog.input({
-          window: { title: "Final Deduction study" },
+          window: { title: loc`Final Deduction study` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${study ? `Continue ${esc(study.target)} after ${study.rounds} completed full rounds. Interruptions within this session preserve progress.` : "Begin one special-character study this session. First observe the target for at least one round in person or by audio/visual recording."} Each confirmation records one additional completed full round. The GC supplies all revelations; ties and final ordering belong to the GC.</p><label>Target special character <input name="target" value="${esc(study?.target ?? "")}" ${study ? "readonly" : ""} required /></label>${study ? "" : '<label><input name="specialCharacterConfirmed" type="checkbox" /> The target is a special character</label><label><input name="observedRoundConfirmed" type="checkbox" /> I previously observed this target for at least one round</label>'}<label><input name="fullRoundConfirmed" type="checkbox" /> I completed another full round studying this target</label>${(study?.rounds ?? 0) >= 4 ? '<label>Next information <select name="stage"><option value="classes">Next class and level</option><option value="skills">Next skill and ranks</option><option value="remaining">Remaining Subplots and proficiencies</option></select></label><label><input name="allClassesKnownConfirmed" type="checkbox" /> All target class names and levels are already known</label><label><input name="allSkillsKnownConfirmed" type="checkbox" /> All target skill names and ranks are already known</label>' : ""}</div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`${study ? loc`Continue ${esc(study.target)} after ${study.rounds} completed full rounds. Interruptions within this session preserve progress.` : loc`Begin one special-character study this session. First observe the target for at least one round in person or by audio/visual recording.`} Each confirmation records one additional completed full round. The GC supplies all revelations; ties and final ordering belong to the GC.`}</p><label>${loc`Target special character`} <input name="target" value="${esc(study?.target ?? "")}" ${study ? "readonly" : ""} required /></label>${study ? "" : `<label><input name="specialCharacterConfirmed" type="checkbox" /> ${loc`The target is a special character`}</label><label><input name="observedRoundConfirmed" type="checkbox" /> ${loc`I previously observed this target for at least one round`}</label>`}<label><input name="fullRoundConfirmed" type="checkbox" /> ${loc`I completed another full round studying this target`}</label>${(study?.rounds ?? 0) >= 4 ? `<label>${loc`Next information`} <select name="stage"><option value="classes">${loc`Next class and level`}</option><option value="skills">${loc`Next skill and ranks`}</option><option value="remaining">${loc`Remaining Subplots and proficiencies`}</option></select></label><label><input name="allClassesKnownConfirmed" type="checkbox" /> ${loc`All target class names and levels are already known`}</label><label><input name="allSkillsKnownConfirmed" type="checkbox" /> ${loc`All target skill names and ranks are already known`}</label>` : ""}</div>`
         });
         if (!input) return null;
         input = { ...input, expectedEpoch: epoch, expectedRound: study?.rounds ?? 0 };
       }
       return queueResources([this], async () => {
-        if (!this.isOwner) throw new Error("You must own this actor.");
+        if (!this.isOwner) throw new Error(loc`You must own this actor.`);
         const currentEpoch = String(this.usagePeriods.session ?? "initial"),
           before = structuredClone(this.flags?.spycraft2?.finalDeduction),
           plan = finalDeductionPlan(this.system, before, currentEpoch, input),
@@ -1326,7 +1334,7 @@ export const ActorRolls = Base =>
           };
         const previousUse = structuredClone(this.system.resourceUses?.finalDeduction);
         const spec = this.system.limitedUses?.find(s => s.id === "finalDeduction" && s.workflow === "finalDeduction");
-        if (!spec) throw new Error("Final Deduction is no longer available.");
+        if (!spec) throw new Error(loc`Final Deduction is no longer available.`);
         if (plan.starting) {
           const use = resourceUsePlan(
             spec,
@@ -1339,13 +1347,13 @@ export const ActorRolls = Base =>
         } else {
           const status = resourceStatus(spec, this.system.resourceUses, this.usagePeriods);
           if (status.counterReview || status.used !== 1)
-            throw new Error("The GC must review this study’s session use count.");
+            throw new Error(loc`The GC must review this study’s session use count.`);
         }
         await this.update(updates);
         try {
           return await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `Final Deduction: ${esc(plan.target)}, study round ${plan.rounds}. The GC supplies: ${esc(plan.revelation)}.`,
+            content: loc`Final Deduction: ${esc(plan.target)}, study round ${plan.rounds}. The GC supplies: ${esc(plan.revelation)}.`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -1371,13 +1379,13 @@ export const ActorRolls = Base =>
 
     async useGlobalSearch(options = {}) {
       const source = globalSearchSource(this.system);
-      if (!this.isOwner || !source) return ui.notifications.warn("Global Search is not currently available.");
+      if (!this.isOwner || !source) return ui.notifications.warn(loc`Global Search is not currently available.`);
       let input = options;
       if (!input.target) {
         input = await systemDialog.input({
-          window: { title: "Record completed Global Search" },
+          window: { title: loc`Record completed Global Search` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Complete ${source.hoursPerLevel} hours × target level while taking only free actions, then record this use. The GC supplies the city or 20-mile × 20-mile area.</p><label>Target special character <input name="target" required /></label><label>GC-supplied target level <input name="targetLevel" type="number" min="1" step="1" required /></label><label>Hours completed <input name="hoursCompleted" type="number" min="0" step="any" required /></label><label><input name="specialCharacterConfirmed" type="checkbox" /> The target is a special character</label><label><input name="onlyFreeActionsConfirmed" type="checkbox" /> I performed no other non-free actions during the required search time</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Complete ${source.hoursPerLevel} hours × target level while taking only free actions, then record this use. The GC supplies the city or 20-mile × 20-mile area.`}</p><label>${loc`Target special character`} <input name="target" required /></label><label>${loc`GC-supplied target level`} <input name="targetLevel" type="number" min="1" step="1" required /></label><label>${loc`Hours completed`} <input name="hoursCompleted" type="number" min="0" step="any" required /></label><label><input name="specialCharacterConfirmed" type="checkbox" /> ${loc`The target is a special character`}</label><label><input name="onlyFreeActionsConfirmed" type="checkbox" /> ${loc`I performed no other non-free actions during the required search time`}</label></div>`
         });
         if (!input) return null;
       }
@@ -1388,7 +1396,7 @@ export const ActorRolls = Base =>
           const plan = globalSearchPlan(this.system, input);
           return ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `Global Search: ${foundry.utils.escapeHTML(plan.target)}; ${plan.requiredHours} hours completed. The GC supplies the city or 20-mile × 20-mile area containing this special character.`,
+            content: loc`Global Search: ${foundry.utils.escapeHTML(plan.target)}; ${plan.requiredHours} hours completed. The GC supplies the city or 20-mile × 20-mile area containing this special character.`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -1405,19 +1413,18 @@ export const ActorRolls = Base =>
 
     async useLittleDetails(options = {}) {
       if (!this.isOwner || !littleDetailsSource(this.system))
-        return ui.notifications.warn("Little Details is not currently available.");
+        return ui.notifications.warn(loc`Little Details is not currently available.`);
       let input = options;
       if (!input.action) {
         input = await systemDialog.input({
-          window: { title: "Little Details" },
+          window: { title: loc`Little Details` },
           rejectClose: false,
-          content:
-            '<div class="spycraft2-roll-options"><label>Free action <select name="action"><option value="smash">Athletics/Smash</option><option value="disarm">Disarm</option><option value="feint">Feint</option><option value="tire">Tire</option></select></label><label>Target / note <input name="target" /></label><label>Smash situational modifier <input type="number" name="modifier" value="0" /></label><label><input type="checkbox" name="actionLegalConfirmed" /> Normal target/action requirements are satisfied; spend the free action</label><p>Consumes one session use and this round’s allowance. Disarm/Feint/Tire resolution remains at the table. Smash rolls normally, including skill cap/error and any applicable conditions.</p></div>'
+          content: `<div class="spycraft2-roll-options"><label>${loc`Free action`} <select name="action"><option value="smash">${loc`Athletics/Smash`}</option><option value="disarm">${loc`Disarm`}</option><option value="feint">${loc`Feint`}</option><option value="tire">${loc`Tire`}</option></select></label><label>${loc`Target / note`} <input name="target" /></label><label>${loc`Smash situational modifier`} <input type="number" name="modifier" value="0" /></label><label><input type="checkbox" name="actionLegalConfirmed" /> ${loc`Normal target/action requirements are satisfied; spend the free action`}</label><p>${loc`Consumes one session use and this round’s allowance. Disarm/Feint/Tire resolution remains at the table. Smash rolls normally, including skill cap/error and any applicable conditions.`}</p></div>`
         });
         if (!input) return null;
       }
       if (!["smash", "disarm", "feint", "tire"].includes(input.action) || input.actionLegalConfirmed !== true)
-        throw new Error("Confirm one legal Little Details action and its normal requirements.");
+        throw new Error(loc`Confirm one legal Little Details action and its normal requirements.`);
       if (input.action === "smash")
         return this.rollSkill("athletics", "str", { ...input, check: "smash", littleDetails: true });
       return this.useLimitedAbility(
@@ -1425,7 +1432,7 @@ export const ActorRolls = Base =>
         () =>
           ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `Little Details: ${foundry.utils.escapeHTML(input.action)} as a free action${input.target ? " targeting " + foundry.utils.escapeHTML(input.target) : ""}. Resolve the normal action at the table.`,
+            content: loc`Little Details: ${foundry.utils.escapeHTML(input.action)} as a free action${input.target ? " targeting " + foundry.utils.escapeHTML(input.target) : ""}. Resolve the normal action at the table.`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -1447,13 +1454,13 @@ export const ActorRolls = Base =>
     resolveBrightIdeaSource(id = "") {
       const status = brightIdeaPoolStatus(this.system, this.usagePeriods);
       if (status.needsReview) {
-        ui.notifications.warn("The GC must allocate legacy combined Bright Idea uses on Classes first.");
+        ui.notifications.warn(loc`The GC must allocate legacy combined Bright Idea uses on Classes first.`);
         return null;
       }
       const available = this.limitedUseStatus.filter(s => s.workflow === "brightIdea");
       const source = id ? available.find(s => s.id === id) : (available.find(s => s.remaining > 0) ?? available[0]);
       if (!source) {
-        ui.notifications.warn("No matching Bright Idea source is available.");
+        ui.notifications.warn(loc`No matching Bright Idea source is available.`);
         return null;
       }
       return source;
@@ -1464,7 +1471,7 @@ export const ActorRolls = Base =>
       const esc = foundry.utils.escapeHTML;
       if (!input.skill) {
         input = await systemDialog.input({
-          window: { title: "Knowledge" },
+          window: { title: loc`Knowledge` },
           rejectClose: false,
           content: rollPipeline.dialog({ dialog: "knowledge", actor: this, esc })
         });
@@ -1483,11 +1490,11 @@ export const ActorRolls = Base =>
         ...(input.cunningPlan ? [{ id: "cunningPlan", workflow: "cunningPlan" }] : [])
       ];
       if (input.brightIdea && input.tenSecondSolution)
-        throw new Error("Choose one pre-roll class ability for Knowledge.");
+        throw new Error(loc`Choose one pre-roll class ability for Knowledge.`);
       if (input.brightIdea && result.method !== "roll")
-        throw new Error("Bright Idea requires a rolled Knowledge check.");
+        throw new Error(loc`Bright Idea requires a rolled Knowledge check.`);
       if ((input.brightIdea || input.tenSecondSolution) && result.rollMode === "blindroll" && !game.user?.isGM)
-        throw new Error("The GC resolves class abilities for passive Knowledge checks.");
+        throw new Error(loc`The GC resolves class abilities for passive Knowledge checks.`);
       const brightSource = input.brightIdea ? this.resolveBrightIdeaSource(input.brightIdeaSource) : null;
       if (input.brightIdea && !brightSource) return null;
       const perform = () => {
@@ -1503,7 +1510,7 @@ export const ActorRolls = Base =>
             })
           );
         if ((input.brightIdea || input.tenSecondSolution) && fresh.rollMode === "blindroll" && !game.user?.isGM)
-          throw new Error("The GC resolves this passive Knowledge ability.");
+          throw new Error(loc`The GC resolves this passive Knowledge ability.`);
         return this.rollCheck(
           fresh.fixedDie ? `${fresh.fixedDie} + @total` : "1d20 + @total",
           { total: fresh.total },
@@ -1520,10 +1527,12 @@ export const ActorRolls = Base =>
                       JSON.stringify([now.cardSharkKnowledge, now.photographicMemory]) !==
                         JSON.stringify([fresh.cardSharkKnowledge, fresh.photographicMemory])
                     )
-                      throw new Error("The Knowledge scope, method or supporting feat source changed before posting.");
+                      throw new Error(
+                        loc`The Knowledge scope, method or supporting feat source changed before posting.`
+                      );
                   }
                 : undefined,
-            flavor: `Knowledge${input.topic ? `: ${esc(input.topic)}` : ""}<br><small>${esc(fresh.notes)}</small>`,
+            flavor: `${loc`Knowledge${input.topic ? `: ${esc(input.topic)}` : ""}`}<br><small>${esc(fresh.notes)}</small>`,
             threat: fresh.threat,
             error: fresh.error,
             cap: fresh.cap,
@@ -1569,12 +1578,12 @@ export const ActorRolls = Base =>
           options.finalAttack?.targetUuid
       });
       if (options.freeFinalAttack && options.disarm)
-        throw new Error("A final attack cannot combine with a Disarm action.");
+        throw new Error(loc`A final attack cannot combine with a Disarm action.`);
       if (
         options.freeFinalAttack &&
         (!(options.twoWeaponFinalAttack || options.finalAttack) || typeof options.validateFinalAttack !== "function")
       )
-        throw new Error("Use the final-attack control to reserve this opportunity.");
+        throw new Error(loc`Use the final-attack control to reserve this opportunity.`);
       if (options.freeFinalAttack) {
         const reservation = this._finalAttackReservation,
           sourceValidator = options.validateFinalAttack;
@@ -1599,7 +1608,7 @@ export const ActorRolls = Base =>
       ) {
         const needsCQB = cqbRangePlan(this.system, item.system, options).active;
         const input = await systemDialog.input({
-          window: { title: "Attack circumstances" },
+          window: { title: loc`Attack circumstances` },
           rejectClose: false,
           content: rollPipeline.dialog({ dialog: "attack", actor: this, item, needsCQB, options })
         });
@@ -1616,7 +1625,7 @@ export const ActorRolls = Base =>
             }
           : {};
         if (needsCQB && (!Number.isFinite(cqbInput.distanceFeet) || cqbInput.distanceFeet < 0))
-          throw new Error("Enter the actual finite nonnegative CQB attack distance.");
+          throw new Error(loc`Enter the actual finite nonnegative CQB attack distance.`);
         options = {
           ...options,
           ...(cqbRangedWeapon(item.system) ? quickRangedAimInput(input) : quickAttackActionInput(input)),
@@ -1647,14 +1656,14 @@ export const ActorRolls = Base =>
         (typeof options.reachAdjacent !== "boolean" || options.reachGeometryConfirmed !== true)
       ) {
         const input = await systemDialog.input({
-          window: { title: "Reach weapon — actual target geometry" },
+          window: { title: loc`Reach weapon — actual target geometry` },
           rejectClose: false,
           content: '<div class="spycraft2-roll-options">' + reachContextContent(options) + "</div>"
         });
         if (!input) return null;
         options = { ...options, ...reachContextInput(input) };
         if (typeof options.reachAdjacent !== "boolean" || options.reachGeometryConfirmed !== true)
-          throw Error("Confirm actual target adjacency and legal Reach geometry before this attack.");
+          throw Error(loc`Confirm actual target adjacency and legal Reach geometry before this attack.`);
       }
       const completedTarget = await completeCharacterTarget(this, item.system, options, {
         prompt: !options.freeFinalAttack
@@ -1667,7 +1676,7 @@ export const ActorRolls = Base =>
           (options.characterTarget?.actorUuid || options.targetActorUuid || null) !== declaredTargetUuid ||
           (declaredTargetUuid && !attackCharacterTargetChoices().some(a => a.uuid === declaredTargetUuid))
         )
-          throw Error("The explicitly selected attack target changed or is no longer an observed character.");
+          throw Error(loc`The explicitly selected attack target changed or is no longer an observed character.`);
       };
       validateDeclaredTarget();
       let feintBonusProof = null,
@@ -1683,7 +1692,7 @@ export const ActorRolls = Base =>
         : atk.sideStance;
       if (atk.blocked) return ui.notifications.warn(atk.reason);
       if (options.attackAction === "standard" && atk.firearm && atk.fireMode !== "single")
-        return ui.notifications.warn("A Standard Attack requires Single-Shot mode.");
+        return ui.notifications.warn(loc`A Standard Attack requires Single-Shot mode.`);
       const meleeSnapshot = atk.meleeFire?.applies ? JSON.stringify(atk.meleeFire) : null;
       const trainedOnly = atk.trainedOnly ? { ...atk.trainedOnly, weaponId: item.id ?? item._id ?? null } : null;
       const quirky = atk.quirky ? { ...atk.quirky, weaponId: item.id ?? item._id ?? null } : null;
@@ -1718,10 +1727,10 @@ export const ActorRolls = Base =>
         await options.validateAttackContext?.();
         await validateCharacterTarget(options.characterTarget);
         const current = item.id && this.items?.get ? this.items.get(item.id) : item;
-        if (!current) throw new Error("The attack weapon no longer exists.");
+        if (!current) throw new Error(loc`The attack weapon no longer exists.`);
         const preview = this.weaponAttack(current, feintContext());
         if (meleeSnapshot && JSON.stringify(preview.meleeFire) !== meleeSnapshot)
-          throw new Error("The ranged melee-fire circumstances or CQB waiver source changed during the attack.");
+          throw new Error(loc`The ranged melee-fire circumstances or CQB waiver source changed during the attack.`);
         if (
           JSON.stringify({
             reach: preview.reach,
@@ -1750,7 +1759,7 @@ export const ActorRolls = Base =>
           }) !== finesseSnapshot
         )
           throw new Error(
-            "The attack weapon, proficiency or Finesse threat source changed during the attack (including conditional weapon qualities and Cleave threat)."
+            loc`The attack weapon, proficiency or Finesse threat source changed during the attack (including conditional weapon qualities and Cleave threat).`
           );
       };
       const cqbSnapshot = atk.cqbRange?.active ? JSON.stringify(atk.cqbRange) : null;
@@ -1758,20 +1767,21 @@ export const ActorRolls = Base =>
         ? () => {
             const current = item.id && this.items?.get ? this.items.get(item.id) : item;
             if (!current || JSON.stringify(this.weaponAttack(current, feintContext()).cqbRange) !== cqbSnapshot)
-              throw new Error("CQB source, weapon or range changed during this attack.");
+              throw new Error(loc`CQB source, weapon or range changed during this attack.`);
           }
         : null;
       const millionDollar = !!options.millionDollarSkill;
       if (millionDollar) {
         const plan = millionDollarSkillPlan(this.system, w, options);
         if (plan.blocked) return ui.notifications.warn(plan.reason);
-        if (options.oneInAMillion) return ui.notifications.warn("Choose one attack roll-choice/declaration ability.");
+        if (options.oneInAMillion)
+          return ui.notifications.warn(loc`Choose one attack roll-choice/declaration ability.`);
         if (!options.millionDollarSkillCommitted)
           return this.useLimitedAbility(
             "millionDollarSkill",
             () => {
               const current = item.id && this.items?.get ? this.items.get(item.id) : item;
-              if (!current) throw new Error("The chosen weapon was removed.");
+              if (!current) throw new Error(loc`The chosen weapon was removed.`);
               const eligible = millionDollarSkillPlan(this.system, current.system, options),
                 preview = this.weaponAttack(current, feintContext());
               if (
@@ -1779,7 +1789,7 @@ export const ActorRolls = Base =>
                 preview.blocked ||
                 (options.attackAction === "standard" && preview.firearm && preview.fireMode !== "single")
               )
-                throw new Error(eligible.reason || preview.reason || "The current attack no longer qualifies.");
+                throw new Error(eligible.reason || preview.reason || loc`The current attack no longer qualifies.`);
               return this.rollAttack(current, { ...options, millionDollarSkillCommitted: true });
             },
             {
@@ -1796,7 +1806,7 @@ export const ActorRolls = Base =>
         { total: atk.total - tripPenalty },
         {
           planModifiers: atk.planModifiers,
-          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? " — Trip final attack −4" : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
+          flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? loc` — Trip final attack −4` : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
           validateCQBRange,
@@ -1908,9 +1918,9 @@ export const ActorRolls = Base =>
       if (!input.kind) {
         const esc = foundry.utils.escapeHTML;
         input = await systemDialog.input({
-          window: { title: "One in a Million: declare before rolling" },
+          window: { title: loc`One in a Million: declare before rolling` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Once per session, Soldier 14 may declare a natural 20 before an attack, Fortitude save or STR/CON skill check. For skills, choose this ability in the skill dialog instead.</p><label>Check <select name="kind"><option value="attack">Weapon attack</option><option value="fort">Fortitude save</option></select></label><label>Weapon for attack <select name="weaponId">${this.items
+          content: `<div class="spycraft2-roll-options"><p>${loc`Once per session, Soldier 14 may declare a natural 20 before an attack, Fortitude save or STR/CON skill check. For skills, choose this ability in the skill dialog instead.`}</p><label>${loc`Check`} <select name="kind"><option value="attack">${loc`Weapon attack`}</option><option value="fort">${loc`Fortitude save`}</option></select></label><label>${loc`Weapon for attack`} <select name="weaponId">${this.items
             .filter(i => i.type === "weapon" && !isResourceLock(i))
             .map(i => `<option value="${i.id}">${esc(i.name)}</option>`)
             .join("")}</select></label></div>`
@@ -1920,7 +1930,7 @@ export const ActorRolls = Base =>
       if (input.kind === "fort") return this.rollSave("fort", { oneInAMillion: true });
       const weapon = this.items.get(input.weaponId);
       if (input.kind !== "attack" || !weapon || weapon.type !== "weapon")
-        throw new Error("Choose an owned weapon or Fortitude save.");
+        throw new Error(loc`Choose an owned weapon or Fortitude save.`);
       return this.rollAttack(weapon, { oneInAMillion: true });
     }
 
@@ -1931,14 +1941,14 @@ export const ActorRolls = Base =>
         const preview = this.weaponAttack(item),
           esc = foundry.utils.escapeHTML;
         input = await systemDialog.input({
-          window: { title: `Ranged attack: ${item.name}` },
+          window: { title: loc`Ranged attack: ${item.name}` },
           rejectClose: false,
           content: rollPipeline.dialog({ dialog: "rangedAttack", actor: this, esc, item, options, preview })
         });
         if (!input) return null;
       }
       if (input.distanceFeet === "" || input.distanceFeet == null)
-        return ui.notifications.warn("Enter the target distance before making a measured attack.");
+        return ui.notifications.warn(loc`Enter the target distance before making a measured attack.`);
       return this.rollAttack(item, {
         ...input,
         vehicleMounted: !!input.vehicleMounted,
@@ -1948,16 +1958,15 @@ export const ActorRolls = Base =>
 
     async resolveUnnerving(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid || (message.blind && !game.user.isGM))
-        throw new Error("Use an owned visible damage record.");
+        throw new Error(loc`Use an owned visible damage record.`);
       if (!unnervingEligible(this.system, message.flags.spycraft2))
-        return ui.notifications.warn("Unnerving is not available for this damage record.");
+        return ui.notifications.warn(loc`Unnerving is not available for this damage record.`);
       let input = options;
       if (!input.target) {
         input = await systemDialog.input({
-          window: { title: "Unnerving: additional stress" },
+          window: { title: loc`Unnerving: additional stress` },
           rejectClose: false,
-          content:
-            '<div class="spycraft2-roll-options"><label>Target <input name="target" required /></label><label><input type="checkbox" name="damageInflictedConfirmed" /> This unarmed/melee attack actually inflicted at least one point of damage after defenses</label><p>Rolls 1d4 stress per selected grade, maximum 3d4. Apply the target’s stress defenses separately. Record each attack’s added stress once.</p></div>'
+          content: `<div class="spycraft2-roll-options"><label>${loc`Target`} <input name="target" required /></label><label><input type="checkbox" name="damageInflictedConfirmed" /> ${loc`This unarmed/melee attack actually inflicted at least one point of damage after defenses`}</label><p>${loc`Rolls 1d4 stress per selected grade, maximum 3d4. Apply the target’s stress defenses separately. Record each attack’s added stress once.`}</p></div>`
         });
         if (!input) return null;
       }
@@ -1966,14 +1975,14 @@ export const ActorRolls = Base =>
         [this],
         async () => {
           if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid)
-            throw new Error("Ownership or the acting character changed.");
+            throw new Error(loc`Ownership or the acting character changed.`);
           const check = message.flags.spycraft2,
             plan = unnervingPlan(this.system, check, input),
             before = structuredClone(check.unnerving);
           await message.update({ "flags.spycraft2.unnerving": { ...plan, recorded: true } });
           try {
             return await this.rollCheck(plan.formula, this.getRollData(), {
-              flavor: `Unnerving: ${foundry.utils.escapeHTML(plan.target)} — ${plan.formula} additional stress damage (p.451). Apply stress defenses separately.`,
+              flavor: loc`Unnerving: ${foundry.utils.escapeHTML(plan.target)} — ${plan.formula} additional stress damage (p.451). Apply stress defenses separately.`,
               checkKind: "damage",
               unnervingStress: { ...plan, parentMessageUuid: message.uuid ?? message.id },
               unarmed: check.unarmed === true,
@@ -2009,10 +2018,9 @@ export const ActorRolls = Base =>
         !Object.hasOwn(options, "mortarSpaceConfirmed")
       ) {
         const input = await systemDialog.input({
-          window: { title: "Mortar damage circumstances" },
+          window: { title: loc`Mortar damage circumstances` },
           rejectClose: false,
-          content:
-            '<div class="spycraft2-roll-options"><label><input name="mortarSpaceConfirmed" type="checkbox" /> Mortar fired outdoors or in a very large indoor area suitable for its high-arc trajectory</label></div>'
+          content: `<div class="spycraft2-roll-options"><label><input name="mortarSpaceConfirmed" type="checkbox" /> ${loc`Mortar fired outdoors or in a very large indoor area suitable for its high-arc trajectory`}</label></div>`
         });
         if (!input) return null;
         options = { ...options, ...input };
@@ -2024,9 +2032,9 @@ export const ActorRolls = Base =>
         !["underbarrelMountConfirmed", "usingIntegralTripod", "vehicleMounted"].some(key => Object.hasOwn(options, key))
       ) {
         const input = await systemDialog.input({
-          window: { title: "Launcher damage circumstances" },
+          window: { title: loc`Launcher damage circumstances` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Confirm the mount and firing mode used for the attack producing this damage.</p>${["underbarrel", "optionalUnderbarrel"].includes(item.system.mountRequirement) ? '<label><input type="checkbox" name="underbarrelMountConfirmed" /> Underbarrel version was attached to a compatible rifle’s available underbarrel location</label>' : ""}${item.system.mountRequirement === "tripodOrVehicle" ? '<label><input type="checkbox" name="usingIntegralTripod" /> Integral tripod was in use</label><label><input type="checkbox" name="vehicleMounted" /> Launcher was attached to a vehicle</label>' : ""}<label><input type="checkbox" name="indirectFire" /> Target was outside line of sight (Indirect/INT)</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Confirm the mount and firing mode used for the attack producing this damage.`}</p>${["underbarrel", "optionalUnderbarrel"].includes(item.system.mountRequirement) ? `<label><input type="checkbox" name="underbarrelMountConfirmed" /> ${loc`Underbarrel version was attached to a compatible rifle’s available underbarrel location`}</label>` : ""}${item.system.mountRequirement === "tripodOrVehicle" ? `<label><input type="checkbox" name="usingIntegralTripod" /> ${loc`Integral tripod was in use`}</label><label><input type="checkbox" name="vehicleMounted" /> ${loc`Launcher was attached to a vehicle`}</label>` : ""}<label><input type="checkbox" name="indirectFire" /> ${loc`Target was outside line of sight (Indirect/INT)`}</label></div>`
         });
         if (!input) return null;
         options = { ...options, ...input };
@@ -2037,7 +2045,7 @@ export const ActorRolls = Base =>
       ) {
         const trickSneakHit = automaticAttackBonus?.proof.sneakDice ? automaticAttackBonus : null;
         const input = await systemDialog.input({
-          window: { title: attackBonusHits.length ? "Damage and attack benefits" : "Damage and sneak attack" },
+          window: { title: attackBonusHits.length ? loc`Damage and attack benefits` : loc`Damage and sneak attack` },
           rejectClose: false,
           content: rollPipeline.dialog({
             dialog: "damage",
@@ -2055,10 +2063,9 @@ export const ActorRolls = Base =>
       const cqbPreview = cqbRangePlan(this.system, item.system, options, "damage");
       if (cqbPreview.active && cqbPreview.basics && !cqbPreview.known) {
         const input = await systemDialog.input({
-          window: { title: "CQB damage target distance" },
+          window: { title: loc`CQB damage target distance` },
           rejectClose: false,
-          content:
-            '<div class="spycraft2-roll-options"><p>CQB Basics adds1 damage against targets within current CQB Range. Enter the actual target distance for this damage; this does not take another attack or spend dice.</p><label>Target distance (feet) <input name="distanceFeet" type="number" min="0" step="any" required /></label></div>'
+          content: `<div class="spycraft2-roll-options"><p>${loc`CQB Basics adds1 damage against targets within current CQB Range. Enter the actual target distance for this damage; this does not take another attack or spend dice.`}</p><label>${loc`Target distance (feet)`} <input name="distanceFeet" type="number" min="0" step="any" required /></label></div>`
         });
         if (!input) return null;
         const n =
@@ -2067,7 +2074,8 @@ export const ActorRolls = Base =>
             : typeof input.distanceFeet === "string" && input.distanceFeet.trim()
               ? Number(input.distanceFeet)
               : NaN;
-        if (!Number.isFinite(n) || n < 0) throw new Error("Enter the actual finite nonnegative CQB damage distance.");
+        if (!Number.isFinite(n) || n < 0)
+          throw new Error(loc`Enter the actual finite nonnegative CQB damage distance.`);
         options = { ...options, distanceFeet: n };
       }
       if (
@@ -2077,9 +2085,9 @@ export const ActorRolls = Base =>
         options.withinCQB === undefined
       ) {
         const input = await systemDialog.input({
-          window: { title: "Killer Instinct range" },
+          window: { title: loc`Killer Instinct range` },
           rejectClose: false,
-          content: `<label><input type="checkbox" name="withinCQB" /> The target is beyond Reach and within CQB range (${this.system.cqbRange ?? 30} ft.)</label>`
+          content: `<label><input type="checkbox" name="withinCQB" /> ${loc`The target is beyond Reach and within CQB range (${this.system.cqbRange ?? 30} ft.)`}</label>`
         });
         if (!input) return null;
         options = { ...options, ...input };
@@ -2129,7 +2137,7 @@ export const ActorRolls = Base =>
       const validateFinesseDamage = async () => {
         await options.validateAttackContext?.();
         const current = item.id && this.items?.get ? this.items.get(item.id) : item;
-        if (!current) throw new Error("The finesse damage weapon was removed.");
+        if (!current) throw new Error(loc`The finesse damage weapon was removed.`);
         const next = weaponDamage(this.system, damageWeaponSource(current), damageWeaponContext(current), this.type);
         if (
           JSON.stringify({
@@ -2142,13 +2150,13 @@ export const ActorRolls = Base =>
             grip: next?.grip
           }) !== JSON.stringify(finesseDamage)
         )
-          throw new Error("The finesse damage source or modifier changed during the roll.");
+          throw new Error(loc`The finesse damage source or modifier changed during the roll.`);
       };
       const cqbDamageSnapshot = damage?.cqbRange?.active ? JSON.stringify(damage.cqbRange) : null,
         validateCQBRange = cqbDamageSnapshot
           ? () => {
               const current = item.id && this.items?.get ? this.items.get(item.id) : item;
-              if (!current) throw new Error("The CQB damage weapon was removed.");
+              if (!current) throw new Error(loc`The CQB damage weapon was removed.`);
               const next = weaponDamage(
                 this.system,
                 damageWeaponSource(current),
@@ -2156,7 +2164,7 @@ export const ActorRolls = Base =>
                 this.type
               );
               if (JSON.stringify(next?.cqbRange) !== cqbDamageSnapshot)
-                throw new Error("CQB source, weapon or range changed during this damage roll.");
+                throw new Error(loc`CQB source, weapon or range changed during this damage roll.`);
             }
           : null;
       const sideStanceDamage =
@@ -2167,7 +2175,7 @@ export const ActorRolls = Base =>
           : null;
       if (sideStanceDamage) {
         if (attackDamageBenefit && attackDamageBenefit.attackUuid !== sideStanceDamage.attackUuid)
-          throw Error("Choose the same recorded attack for its damage bonus and Side Stance die.");
+          throw Error(loc`Choose the same recorded attack for its damage bonus and Side Stance die.`);
         options = { ...options, targetActorUuid: sideStanceDamage.targetUuid };
       }
       if (attackDamageBenefit)
@@ -2206,7 +2214,7 @@ export const ActorRolls = Base =>
         finesseDamage,
         validateAttackContext: validateFinesseDamage,
         weaponQualities: damage.effectiveQualities,
-        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? "the recorded target")}.${attackDamageBenefit.sneakDice ? ` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? " Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled." : ""}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}`,
+        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}`,
         validateCQBRange,
         cqbRange: damage.cqbRange?.active ? damage.cqbRange : null,
         mortarOperation: damage.mortarOperation?.applicable ? damage.mortarOperation : null,
@@ -2236,9 +2244,9 @@ export const ActorRolls = Base =>
           unrestrictedBonusPools(this.actionDiceFundingSystem, this.usagePeriods).some(p => p.available))
       ) {
         input = await systemDialog.input({
-          window: { title: "Spend an action die" },
+          window: { title: loc`Spend an action die` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Roll one benefit die. Surcharge dice are spent without being rolled.</p></div>`
+          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>${loc`Roll one benefit die. Surcharge dice are spent without being rolled.`}</p></div>`
         });
         if (!input) return null;
       }
@@ -2250,7 +2258,7 @@ export const ActorRolls = Base =>
               `1d${ad.die}x>=${ad.explodeAt ?? ad.die}${ad.bonus ? ` + ${ad.bonus}` : ""}`
             ).evaluate();
           if (JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken)
-            throw new Error("The Shaken condition changed while rolling this action die.");
+            throw new Error(loc`The Shaken condition changed while rolling this action die.`);
           const actionDieReceiptId =
             globalThis.foundry?.utils?.randomID?.() ??
             "actionDie-" + (this._actionDieReceiptSequence = (this._actionDieReceiptSequence ?? 0) + 1);
@@ -2260,7 +2268,7 @@ export const ActorRolls = Base =>
               flavor:
                 game.i18n.localize("SPYCRAFT.ActionDice.Spend") +
                 (payment.surcharge
-                  ? ` — ${payment.cost} spent: one benefit die + ${payment.surcharge} Shaken surcharge`
+                  ? loc` — ${payment.cost} spent: one benefit die + ${payment.surcharge} Shaken surcharge`
                   : ""),
               flags: {
                 spycraft2: {

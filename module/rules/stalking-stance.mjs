@@ -1,6 +1,7 @@
 import { combatStanceState } from "./combat-stance.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** The p.179 bonus applies to Sneak checks, not the underlying skill bonus. */
 export function stalkingStancePlan(system, key, check, { combat = null } = {}) {
   const empty = { evidence: null, bonuses: [], notes: [] };
@@ -19,7 +20,7 @@ export function stalkingStancePlan(system, key, check, { combat = null } = {}) {
   return {
     evidence,
     bonuses: active ? [{ source: "Stalking Stance", type: "unnamed", value: 3 }] : [],
-    notes: active ? ["Stalking Stance: +3 with this Sneak check made in combat (p.179)."] : []
+    notes: active ? [loc`Stalking Stance: +3 with this Sneak check made in combat (p.179).`] : []
   };
 }
 const stable = v =>
@@ -51,7 +52,9 @@ export function validateStalkingStanceProof(actor, proof, { checkKind, skillKey,
       stable(c.stalkingStance) !== stable(proof) ||
       (proof.bonus === 3 && !actor.system.activeFeatNames?.includes("Garrote Basics"))
     )
-      throw Error("Use the original owned Sneak check and its qualified Stalking Stance source for this replacement.");
+      throw Error(
+        loc`Use the original owned Sneak check and its qualified Stalking Stance source for this replacement.`
+      );
     return;
   }
   const p = stalkingStancePlan(
@@ -61,7 +64,7 @@ export function validateStalkingStanceProof(actor, proof, { checkKind, skillKey,
     { combat: actor.mentalLeapCombatContext?.() ?? null }
   );
   if (checkKind !== "skill" || !p.evidence || stable(p.evidence) !== stable(proof))
-    throw Error("The Stalking Stance, qualified source or actual combat participation changed before posting.");
+    throw Error(loc`The Stalking Stance, qualified source or actual combat participation changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

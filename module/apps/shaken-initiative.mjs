@@ -8,6 +8,7 @@ import {
   reviewedShakenInitiativePlan
 } from "../rules/shaken-initiative.mjs";
 import { queueResources, isResourceLock, periodResourceActors } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const localReviews = new WeakMap();
 const record = c => {
   const local = localReviews.get(c),
@@ -50,8 +51,7 @@ const planFor = c => {
       return { changed: false, initiative: c.initiative, record: saved, delta: 0 };
     return {
       needsReview: true,
-      reason:
-        "This shared Initiative group needs individual Count adjudication. Remove this combatant from the shared group before reconciling its Shaken penalty."
+      reason: loc`This shared Initiative group needs individual Count adjudication. Remove this combatant from the shared group before reconciling its Shaken penalty.`
     };
   }
   return shakenInitiativePlan(system(c.actor), { initiative: c.initiative, record: record(c) });
@@ -97,7 +97,7 @@ async function writePlan(c, plan, expected, { updates = {}, options = {} } = {})
       throw error;
     }
     if (c.initiative !== plan.initiative || !markerMatches(record(c), marker))
-      throw new Error("Initiative Count did not settle. Review its current value.");
+      throw new Error(loc`Initiative Count did not settle. Review its current value.`);
     return plan;
   });
 }
@@ -118,7 +118,7 @@ export function reconcileShakenInitiative(actor) {
         try {
           await writePlan(c, plan, expected);
         } catch (error) {
-          const held = hold(c, "The Shaken Initiative Count update could not be verified: " + error.message);
+          const held = hold(c, loc`The Shaken Initiative Count update could not be verified: ` + error.message);
           try {
             await c.update({ "flags.spycraft2.shakenInitiative": held });
           } catch {}
@@ -131,18 +131,18 @@ export function reconcileShakenInitiative(actor) {
   );
 }
 export async function reviewShakenInitiative(actor, combatId, combatantId, options = {}) {
-  if (!game.user.isGM) throw new Error("Only the GC can review an existing Initiative Count.");
+  if (!game.user.isGM) throw new Error(loc`Only the GC can review an existing Initiative Count.`);
   const c = game.combats.get(combatId)?.combatants.get(combatantId);
-  if (!c || c.actor?.uuid !== actor.uuid) throw new Error("Choose this character’s tracked combatant.");
+  if (!c || c.actor?.uuid !== actor.uuid) throw new Error(loc`Choose this character’s tracked combatant.`);
   if (c.group && Number.isFinite(c.group.initiative)) throw new Error(planFor(c).reason);
   const expected = shakenInitiativeEvidence(c);
   let input = options;
   if (!Object.keys(input).length) {
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review Shaken Initiative Count" },
+      window: { title: loc`Review Shaken Initiative Count` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${esc(actor.name)}: current Count ${c.initiative}. ${esc(planFor(c).reason ?? "Confirm its included component.")}</p><p>Confirm the penalty already in this current number. The current Shaken grade determines what should remain after reconciliation. A newly entered or rolled Count is its final value, including current modifiers. Its Initiative check penalty remains −4. Choose a cause below only when applying or correcting a condition-induced Count loss.</p><label>Current Count includes <select name="includedPenalty"><option value="">Choose explicitly</option><option value="0">No Shaken penalty</option><option value="-2">The protected −2 Shaken penalty</option><option value="-4">The full −4 Shaken penalty</option></select></label><label>Cause of a missing or corrected Count loss (Uncanny Dodge IV) <select name="incomingSelfInflicted"><option value="">Use verified source information</option><option value="false">Incoming attack or effect</option><option value="true">My own action</option></select></label><label>Review note <input name="resolution" /></label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(actor.name)}: current Count ${c.initiative}. ${esc(planFor(c).reason ?? loc`Confirm its included component.`)}`}</p><p>${loc`Confirm the penalty already in this current number. The current Shaken grade determines what should remain after reconciliation. A newly entered or rolled Count is its final value, including current modifiers. Its Initiative check penalty remains −4. Choose a cause below only when applying or correcting a condition-induced Count loss.`}</p><label>${loc`Current Count includes`} <select name="includedPenalty"><option value="">${loc`Choose explicitly`}</option><option value="0">${loc`No Shaken penalty`}</option><option value="-2">${loc`The protected −2 Shaken penalty`}</option><option value="-4">${loc`The full −4 Shaken penalty`}</option></select></label><label>${loc`Cause of a missing or corrected Count loss (Uncanny Dodge IV)`} <select name="incomingSelfInflicted"><option value="">${loc`Use verified source information`}</option><option value="false">${loc`Incoming attack or effect`}</option><option value="true">${loc`My own action`}</option></select></label><label>${loc`Review note`} <input name="resolution" /></label></div>`
     });
     if (!input) return null;
   }
@@ -154,19 +154,19 @@ export async function reviewShakenInitiative(actor, combatId, combatantId, optio
         ? true
         : undefined;
   if (input.incomingSelfInflicted !== undefined && input.incomingSelfInflicted !== "" && selfInflicted === undefined)
-    throw new Error("Choose the cause of the missing Count loss.");
+    throw new Error(loc`Choose the cause of the missing Count loss.`);
   if (
     included === null ||
     typeof input.resolution !== "string" ||
     !input.resolution.trim() ||
     input.resolution.length > 500
   )
-    throw new Error("Choose the included penalty and record a review note.");
+    throw new Error(loc`Choose the included penalty and record a review note.`);
   return queueResources(
     [actor],
     async () => {
       if (shakenInitiativeEvidence(c) !== expected)
-        throw new Error("The Count, Shaken sources or saved record changed. Review them again.");
+        throw new Error(loc`The Count, Shaken sources or saved record changed. Review them again.`);
       const plan = reviewedShakenInitiativePlan(
         system(actor),
         { initiative: c.initiative, record: record(c) },
@@ -195,7 +195,7 @@ export function guardShakenInitiativeUpdate(c, changed, options = {}) {
   const own = options.spycraft2ShakenInitiative;
   if (own) {
     if (shakenInitiativeEvidence(c) !== own.expected)
-      throw new Error("The Count or Shaken sources changed before their update.");
+      throw new Error(loc`The Count or Shaken sources changed before their update.`);
     changed["flags.spycraft2.shakenInitiative"] = own.marker;
     return;
   }
@@ -205,7 +205,7 @@ export function guardShakenInitiativeUpdate(c, changed, options = {}) {
       count: changed.initiative ?? c.initiative,
       includedPenalty: null,
       needsReview: true,
-      reason: "The combatant’s character changed. Review its included Shaken penalty."
+      reason: loc`The combatant’s character changed. Review its included Shaken penalty.`
     };
     return;
   }
@@ -220,7 +220,7 @@ export const shakenCombatantClass = Base =>
   class extends Base {
     getInitiativeRoll(formula) {
       if (this.actor && shakenRules(system(this.actor)).needsReview)
-        throw new Error("Review the Shaken sources before rolling Initiative.");
+        throw new Error(loc`Review the Shaken sources before rolling Initiative.`);
       const roll = super.getInitiativeRoll(formula);
       if (!this.actor?.system.activeFeatNames?.includes("Lightning Reflexes")) return roll;
       const evidence = () =>
@@ -244,7 +244,7 @@ export const shakenCombatantClass = Base =>
             !this.actor?.system.activeFeatNames?.includes("Lightning Reflexes") ||
             evidence() !== expected
           )
-            throw new Error("The character, Initiative Count or condition changed. Confirm Initiative again.");
+            throw new Error(loc`The character, Initiative Count or condition changed. Confirm Initiative again.`);
         }
       });
     }
@@ -274,7 +274,7 @@ export function installShakenInitiativeHooks() {
           await reconcileShakenInitiative(actor);
         } while (state.again);
       })
-      .catch(error => ui.notifications.warn("Shaken Initiative Count needs review: " + error.message))
+      .catch(error => ui.notifications.warn(loc`Shaken Initiative Count needs review: ` + error.message))
       .finally(() => pending.delete(actor));
   };
   Hooks.on("preCreateCombatant", c => {
@@ -312,12 +312,14 @@ export function installShakenInitiativeHooks() {
 /** Already inside the Actor transaction: another Count loss must retain the actual Shaken component. */
 export function assertShakenInitiativeCountReady(c) {
   if (!c?.actor || !Number.isFinite(c.initiative))
-    throw new Error("Choose a character with an existing numeric Initiative Count.");
+    throw new Error(loc`Choose a character with an existing numeric Initiative Count.`);
   if (c.group && Number.isFinite(c.group.initiative))
-    throw new Error("An individual Count loss in a shared Initiative group needs GC adjudication.");
+    throw new Error(loc`An individual Count loss in a shared Initiative group needs GC adjudication.`);
   const current = planFor(c);
   if (current.needsReview || current.delta)
-    throw new Error(current.reason ?? "Reconcile the pending Shaken Count adjustment before another Initiative loss.");
+    throw new Error(
+      current.reason ?? loc`Reconcile the pending Shaken Count adjustment before another Initiative loss.`
+    );
   return current;
 }
 export async function changeInitiativeCountPreservingShaken(c, initiative, extra = {}) {

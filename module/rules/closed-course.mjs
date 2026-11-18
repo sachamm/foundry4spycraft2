@@ -1,4 +1,5 @@
 import { MANEUVER_SKILLS } from "./maneuver-actions.mjs";
+import { loc } from "../i18n.mjs";
 /** p.193. The target must see both the driver and vehicle for the Impress benefit. */
 export function closedCoursePlan(
   system,
@@ -25,7 +26,7 @@ export function closedCoursePlan(
       synergyRanks: Object.fromEntries(skills.map(k => [k, system.skillTotals?.[k]?.ranks ?? 0]))
     },
     notes: [
-      `${source}: ${maneuver ? "Impress synergy is available for this Maneuver." : visible ? "Acrobatics or Drive synergy is available; the target sees you and your vehicle." : "Acrobatics/Drive synergy requires the target to see both you and your vehicle."} Apply the normal single highest synergy bonus (p.193).`
+      loc`${source}: ${maneuver ? loc`Impress synergy is available for this Maneuver.` : visible ? loc`Acrobatics or Drive synergy is available; the target sees you and your vehicle.` : loc`Acrobatics/Drive synergy requires the target to see both you and your vehicle.`} Apply the normal single highest synergy bonus (p.193).`
     ]
   };
 }

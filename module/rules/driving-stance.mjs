@@ -1,4 +1,5 @@
 import { conditionRollPenalties } from "./attributes.mjs";
+import { loc } from "../i18n.mjs";
 export const drivingPenalty = actor => conditionRollPenalties(actor.system).damage;
 export const drivingFormula = penalty => (penalty ? "max(0, (1d4) + (" + penalty + "))" : "1d4");
 export const stableDriving = v =>
@@ -47,21 +48,21 @@ function attackRoot(actor, m) {
       c.attackContext?.ranged !== false ||
       stableDriving(c.attackContext?.combatStance) !== stableDriving(initial.attackContext.combatStance)
     )
-      throw Error("The original Driving Stance attack changed.");
+      throw Error(loc`The original Driving Stance attack changed.`);
     if (!c.rerollOf) return current.uuid;
     const p = drivingMessage(c.rerollOf);
     if (p?.flags?.spycraft2?.superseded !== current.uuid)
-      throw Error("Use the actually adopted original Driving Stance hit.");
+      throw Error(loc`Use the actually adopted original Driving Stance hit.`);
     current = p;
   }
-  throw Error("The original Driving Stance hit is missing or cyclic.");
+  throw Error(loc`The original Driving Stance hit is missing or cyclic.`);
 }
 export function drivingHit(actor, reference) {
   const m = drivingMessage(typeof reference === "string" ? reference : reference?.uuid),
     c = m?.flags?.spycraft2,
     s = c?.attackContext?.combatStance?.stance;
   if (!actor.isOwner || !visible(m) || c?.actorUuid !== actor.uuid)
-    throw Error("Choose your own readable Driving Stance attack; the GC resolves secret hits.");
+    throw Error(loc`Choose your own readable Driving Stance attack; the GC resolves secret hits.`);
   if (
     c.checkKind !== "attack" ||
     c.resolved !== true ||
@@ -77,11 +78,11 @@ export function drivingHit(actor, reference) {
     !s.id ||
     c.attackContext?.characterTarget?.object === true
   )
-    throw Error("Choose a finished successful melee hit made in Driving Stance against an opponent.");
+    throw Error(loc`Choose a finished successful melee hit made in Driving Stance against an opponent.`);
   const targetUuid = c.attackContext?.targetActorUuid ?? c.attackContext?.characterTarget?.actorUuid,
     target = targetUuid && globalThis.fromUuidSync?.(targetUuid);
   if (!targetUuid || !["agent", "npc"].includes(target?.type) || target.uuid === actor.uuid)
-    throw Error("The Driving Stance hit must identify its actual character opponent.");
+    throw Error(loc`The Driving Stance hit must identify its actual character opponent.`);
   return {
     version: 1,
     actorUuid: actor.uuid,
@@ -106,7 +107,7 @@ export function drivingFacts(actor, reference, input = {}) {
     (input.outcome === "blocked" && input.follow)
   )
     throw Error(
-      "Confirm the actual push route or occupied/blocked destination; following is available only after a push."
+      loc`Confirm the actual push route or occupied/blocked destination; following is available only after a push.`
     );
   return {
     ...hit,
@@ -121,7 +122,7 @@ export function drivingFacts(actor, reference, input = {}) {
 export function drivingRows(actor) {
   const rows = actor.flags?.spycraft2?.drivingStanceUses ?? [],
     roots = new Set();
-  if (!Array.isArray(rows)) throw Error("Review recorded Driving Stance outcomes.");
+  if (!Array.isArray(rows)) throw Error(loc`Review recorded Driving Stance outcomes.`);
   for (const r of rows) {
     const p = r?.proof;
     if (
@@ -147,7 +148,7 @@ export function drivingRows(actor) {
       (p.outcome === "push" && (p.damageFormula !== null || p.damageType !== null)) ||
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid))
     )
-      throw Error("Review the recorded Driving Stance outcome references.");
+      throw Error(loc`Review the recorded Driving Stance outcome references.`);
     roots.add(p.rootAttackUuid);
   }
   return rows;
@@ -155,7 +156,7 @@ export function drivingRows(actor) {
 export function validateDrivingSource(actor, proof) {
   const fresh = drivingHit(actor, proof.sourceMessage),
     { outcomeId, outcome, pushFeet, followFeet, damagePenalty, damageFormula, damageType, ...old } = proof;
-  if (stableDriving(fresh) !== stableDriving(old)) throw Error("The actual Driving Stance hit or target changed.");
+  if (stableDriving(fresh) !== stableDriving(old)) throw Error(loc`The actual Driving Stance hit or target changed.`);
   const expected = drivingFacts(actor, proof.sourceMessage, {
     outcome,
     outcomeConfirmed: true,
@@ -167,7 +168,7 @@ export function validateDrivingSource(actor, proof) {
     expected.damageFormula = drivingFormula(damagePenalty);
   }
   if (![-2, 0].includes(damagePenalty) || stableDriving({ ...expected, outcomeId }) !== stableDriving(proof))
-    throw Error("The recorded Driving Stance route or damage changed.");
+    throw Error(loc`The recorded Driving Stance route or damage changed.`);
   return fresh;
 }
 export function currentDrivingReceipt(actor, row) {
@@ -177,7 +178,7 @@ export function currentDrivingReceipt(actor, row) {
     );
   if (!matches.length) return null;
   const finals = matches.filter(m => !m.flags.spycraft2.superseded);
-  if (finals.length !== 1) throw Error("Review duplicate Driving Stance outcome results.");
+  if (finals.length !== 1) throw Error(loc`Review duplicate Driving Stance outcome results.`);
   let current = finals[0],
     seen = new Set();
   while (current && !seen.has(current.uuid)) {
@@ -194,16 +195,16 @@ export function currentDrivingReceipt(actor, row) {
           c.checkMethod !== "roll")) ||
       (p.outcome === "push" && (c.checkKind !== "drivingStance" || c.actionDiceAllowed !== false || c.rerollOf))
     )
-      throw Error("The Driving Stance outcome receipt changed.");
+      throw Error(loc`The Driving Stance outcome receipt changed.`);
     if (!c.rerollOf) {
       if (row.receiptUuid && current.uuid !== row.receiptUuid)
-        throw Error("The original Driving Stance outcome receipt changed.");
+        throw Error(loc`The original Driving Stance outcome receipt changed.`);
       return finals[0];
     }
     const previous = drivingMessage(c.rerollOf);
     if (previous?.flags?.spycraft2?.superseded !== current.uuid)
-      throw Error("Use the actually adopted Driving Stance damage replacement.");
+      throw Error(loc`Use the actually adopted Driving Stance damage replacement.`);
     current = previous;
   }
-  throw Error("The original Driving Stance outcome is missing or cyclic.");
+  throw Error(loc`The original Driving Stance outcome is missing or cyclic.`);
 }

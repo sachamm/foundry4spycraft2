@@ -3,6 +3,7 @@ import { mobileOffensePlan } from "../rules/mobile-offense.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, finalWeaponReady, postFinalAttack } from "./final-attack.mjs";
+import { loc } from "../i18n.mjs";
 const number = v => (typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v) : NaN);
 export async function takeMobileOffense(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
@@ -16,9 +17,9 @@ export async function takeMobileOffense(actor, options = {}) {
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Mobile Offense during Standard Move" },
+      window: { title: loc`Mobile Offense during Standard Move` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>Once per round, take one free final Standard Attack at any point during a legal Standard Move. This control does not take a move or move tokens. The GC confirms the action is actually in progress, its full counted route and the attack point. A legal Standard Move granted by another ability may occur outside own Count.</p><label>Source allowing Standard Move outside own Count (if applicable) <input name="offCountMoveSource" maxlength="300" /></label><label>Move source <select name="movementKind"><option value="standardMove">Standard Move already being taken</option><option value="totalDefense">Included Standard Move in already recorded Total Defense</option></select></label><label>Full counted move distance (terrain/diagonals included, ft.) <input name="moveDistanceFeet" type="number" min="0" step="any" required /></label><label>Attack point along that counted move (ft. from start) <input name="attackAtFeet" type="number" min="0" step="any" required /></label><label><input name="adjacentThreateningOpponent" type="checkbox" /> The Standard Move starts adjacent to a threatening opponent</label><label><input name="passesThreateningAdjacency" type="checkbox" /> The route continues after entering new threatening adjacency</label><label><input name="routeConfirmed" type="checkbox" /> The GC confirms counted distance, terrain, route and threatening opponents</label><label>Your readied weapon <select name="weaponId">${weapons}</select></label>${standardAttackContextContent(actor)}<label><input name="moveConfirmed" type="checkbox" /> A legal Standard Move is actually in progress and this final attack occurs at the declared point against its actual target now</label><p>Set Single-Shot mode beforehand. No adjustments or other action combinations. Other class attack controls may be used with GC review of the Mobile Offense counter.</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Once per round, take one free final Standard Attack at any point during a legal Standard Move. This control does not take a move or move tokens. The GC confirms the action is actually in progress, its full counted route and the attack point. A legal Standard Move granted by another ability may occur outside own Count.`}</p><label>${loc`Source allowing Standard Move outside own Count (if applicable)`} <input name="offCountMoveSource" maxlength="300" /></label><label>${loc`Move source`} <select name="movementKind"><option value="standardMove">${loc`Standard Move already being taken`}</option><option value="totalDefense">${loc`Included Standard Move in already recorded Total Defense`}</option></select></label><label>${loc`Full counted move distance (terrain/diagonals included, ft.)`} <input name="moveDistanceFeet" type="number" min="0" step="any" required /></label><label>${loc`Attack point along that counted move (ft. from start)`} <input name="attackAtFeet" type="number" min="0" step="any" required /></label><label><input name="adjacentThreateningOpponent" type="checkbox" /> ${loc`The Standard Move starts adjacent to a threatening opponent`}</label><label><input name="passesThreateningAdjacency" type="checkbox" /> ${loc`The route continues after entering new threatening adjacency`}</label><label><input name="routeConfirmed" type="checkbox" /> ${loc`The GC confirms counted distance, terrain, route and threatening opponents`}</label><label>${loc`Your readied weapon`} <select name="weaponId">${weapons}</select></label>${standardAttackContextContent(actor)}<label><input name="moveConfirmed" type="checkbox" /> ${loc`A legal Standard Move is actually in progress and this final attack occurs at the declared point against its actual target now`}</label><p>${loc`Set Single-Shot mode beforehand. No adjustments or other action combinations. Other class attack controls may be used with GC review of the Mobile Offense counter.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -32,8 +33,8 @@ export async function takeMobileOffense(actor, options = {}) {
     item = actor.items.get(input.weaponId);
   if (!opts) return null;
   if (JSON.stringify(expertiseCombatContext(actor)) !== clock)
-    throw new Error("The Initiative Count changed. Review the actual move and attack point again.");
-  if (!finalWeaponReady(item)) throw new Error("Choose an owned readied weapon.");
+    throw new Error(loc`The Initiative Count changed. Review the actual move and attack point again.`);
+  if (!finalWeaponReady(item)) throw new Error(loc`Choose an owned readied weapon.`);
   const preview = actor.weaponAttack(item, opts);
   if (
     (preview.ranged && !Number.isFinite(opts.distanceFeet)) ||
@@ -41,7 +42,7 @@ export async function takeMobileOffense(actor, options = {}) {
     (preview.firearm && preview.fireMode !== "single")
   )
     throw new Error(
-      preview.reason || "A ranged final Standard Attack requires measured target distance and Single-Shot mode."
+      preview.reason || loc`A ranged final Standard Attack requires measured target distance and Single-Shot mode.`
     );
   const signature = JSON.stringify(preview),
     receipt = { ...plan, id: foundry.utils.randomID(), weaponId: item.id, weaponUuid: item.uuid };
@@ -50,7 +51,7 @@ export async function takeMobileOffense(actor, options = {}) {
     async status => {
       const validate = () => {
         if (!actor.isOwner || JSON.stringify(expertiseCombatContext(actor)) !== clock)
-          throw new Error("The move’s Count or ownership changed.");
+          throw new Error(loc`The move’s Count or ownership changed.`);
         const fresh = mobileOffensePlan(actor.system, expertiseCombatContext(actor), movement),
           w = actor.items.get(input.weaponId),
           counter = actor.system.resourceUses?.mobileOffense;
@@ -61,7 +62,7 @@ export async function takeMobileOffense(actor, options = {}) {
           counter?.epoch !== status.epoch ||
           counter.used !== status.used + 1
         )
-          throw new Error("The actual move, attack point, weapon or reserved use changed. Review it again.");
+          throw new Error(loc`The actual move, attack point, weapon or reserved use changed. Review it again.`);
       };
       return postFinalAttack(actor, input.weaponId, opts, receipt, validate);
     },

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Charmer p.202 / Hard Core p.203; Influence quick/slow checks p.132. */
 function influenceTimingPlan(
   system,
@@ -9,14 +10,14 @@ function influenceTimingPlan(
   if (requested !== true) return { active: false, timeChoices: [], blockedReason: "", notes: [] };
   const fail = reason => ({ active: true, timeChoices: [], blockedReason: reason, notes: [] });
   if (key !== "impress" || check?.id !== "influence")
-    return fail(`${feat} applies only to Impress/Influence (p.${page}).`);
-  if (!system.activeFeatNames?.includes(feat)) return fail(`${feat} is not currently earned.`);
+    return fail(loc`${feat} applies only to Impress/Influence (p.${page}).`);
+  if (!system.activeFeatNames?.includes(feat)) return fail(loc`${feat} is not currently earned.`);
   if (npcConfirmed !== true || typeof target !== "string" || !target.trim() || target.length > 200)
-    return fail(`Confirm one named NPC and their disposition toward you for ${feat}.`);
+    return fail(loc`Confirm one named NPC and their disposition toward you for ${feat}.`);
   if (!dispositions.includes(disposition))
-    return fail(`${feat} requires an NPC whose disposition toward you is ${dispositions.join(", ")}.`);
+    return fail(loc`${feat} requires an NPC whose disposition toward you is ${dispositions.join(", ")}.`);
   if (!["quick", "slow"].includes(duration))
-    return fail(`Choose quick (1-minute) or slow (10-minute) Influence for ${feat}.`);
+    return fail(loc`Choose quick (1-minute) or slow (10-minute) Influence for ${feat}.`);
   const baseSeconds = duration === "quick" ? 60 : 600,
     baseTime = duration === "quick" ? "1 Minute (Take 10/Take 20)" : "10 Minutes (Take 10/Take 20)";
   return {
@@ -35,7 +36,7 @@ function influenceTimingPlan(
     timeChoices: [{ id, name: feat, multiplier: 0.1, minimum: 0, rounding: null }],
     blockedReason: "",
     notes: [
-      `${feat}: GC-confirmed ${disposition} NPC ${target.trim()}; ${duration === "quick" ? "quick Influence (scene duration), 1 minute → 1 full action" : "slow Influence (mission duration), 10 minutes → 1 minute"} before check-method multipliers; only one time reduction applies (pp.132,${page}).`
+      loc`${feat}: GC-confirmed ${disposition} NPC ${target.trim()}; ${duration === "quick" ? loc`quick Influence (scene duration), 1 minute → 1 full action` : loc`slow Influence (mission duration), 10 minutes → 1 minute`} before check-method multipliers; only one time reduction applies (pp.132,${page}).`
     ]
   };
 }

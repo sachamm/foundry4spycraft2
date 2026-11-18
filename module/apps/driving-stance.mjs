@@ -10,6 +10,7 @@ import {
 } from "../rules/driving-stance.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   key = (a, id) => a.uuid + ":" + id;
@@ -20,11 +21,11 @@ async function write(actor, rows) {
     if (stable(actor.flags?.spycraft2?.drivingStanceUses) !== stable(rows)) throw e;
   }
   if (stable(actor.flags?.spycraft2?.drivingStanceUses) !== stable(rows))
-    throw Error("Review the saved Driving Stance outcome before retrying.");
+    throw Error(loc`Review the saved Driving Stance outcome before retrying.`);
 }
 const find = (actor, p) => {
   const r = drivingRows(actor).find(r => r.id === p?.outcomeId);
-  if (!r || stable(r.proof) !== stable(p)) throw Error("The Driving Stance outcome reservation changed.");
+  if (!r || stable(r.proof) !== stable(p)) throw Error(loc`The Driving Stance outcome reservation changed.`);
   return r;
 };
 export function validateDrivingDamageProof(
@@ -44,19 +45,19 @@ export function validateDrivingDamageProof(
     Object.keys(data ?? {}).length ||
     weaponUuid
   )
-    throw Error("Roll only the reserved Driving Stance 1d4 subdual component, without weapon bonuses.");
+    throw Error(loc`Roll only the reserved Driving Stance 1d4 subdual component, without weapon bonuses.`);
   if (rerollOf) {
     const m = currentDrivingReceipt(actor, row),
       c = m?.flags?.spycraft2;
     if (!row.receiptUuid || m?.uuid !== rerollOf || c.resolved || c.superseded)
-      throw Error("Use the current owned unresolved Driving Stance damage for its replacement.");
+      throw Error(loc`Use the current owned unresolved Driving Stance damage for its replacement.`);
     return;
   }
   if (drivingPenalty(actor) !== proof.damagePenalty)
-    throw Error("The damage condition changed before the Driving Stance roll posted.");
+    throw Error(loc`The damage condition changed before the Driving Stance roll posted.`);
   const held = lease && leases.get(lease);
   if (row.receiptUuid || held?.actor !== actor || held.id !== row.id)
-    throw Error("Reserve the blocked Driving Stance outcome through its actual hit.");
+    throw Error(loc`Reserve the blocked Driving Stance outcome through its actual hit.`);
 }
 function factsFor(actor, reference, input) {
   const facts = drivingFacts(actor, reference, input),
@@ -74,18 +75,18 @@ export async function settleDrivingStance(actor, reference, input = {}) {
   const facts = factsFor(actor, reference, input),
     reserved = await queueRuleState(actor, async () => {
       if (stable(factsFor(actor, reference, input)) !== stable(facts))
-        throw Error("The Driving Stance outcome changed before reservation.");
+        throw Error(loc`The Driving Stance outcome changed before reservation.`);
       const rows = drivingRows(actor),
         prior = rows.find(r => r.proof.rootAttackUuid === facts.rootAttackUuid);
       if (prior) {
         const { outcomeId, ...old } = prior.proof;
-        if (stable(old) !== stable(facts)) throw Error("This hit already has a different Driving Stance outcome.");
+        if (stable(old) !== stable(facts)) throw Error(loc`This hit already has a different Driving Stance outcome.`);
         if (prior.receiptUuid) {
           const m = currentDrivingReceipt(actor, prior);
-          if (!m) throw Error("Review the missing original Driving Stance receipt.");
+          if (!m) throw Error(loc`Review the missing original Driving Stance receipt.`);
           return { existing: m };
         }
-        throw Error("This hit has an interrupted Driving Stance outcome awaiting GC review.");
+        throw Error(loc`This hit has an interrupted Driving Stance outcome awaiting GC review.`);
       }
       const id = foundry.utils.randomID(),
         row = { version: 1, id, proof: { ...facts, outcomeId: id }, receiptUuid: null };
@@ -103,7 +104,7 @@ export async function settleDrivingStance(actor, reference, input = {}) {
       const rows = drivingRows(actor),
         current = find(actor, p);
       if (current.receiptUuid && current.receiptUuid !== receipt?.uuid)
-        throw Error("The original Driving Stance receipt changed.");
+        throw Error(loc`The original Driving Stance receipt changed.`);
       await write(
         actor,
         receipt
@@ -127,8 +128,7 @@ export async function settleDrivingStance(actor, reference, input = {}) {
           drivingStance: p,
           drivingStanceLease: lease,
           rollMode: p.visibility.blind ? "blindroll" : p.visibility.whisper.length ? "gmroll" : "publicroll",
-          flavor:
-            "Driving Stance: occupied or blocked destination — 1d4 subdual, without weapon damage bonuses (p.179). Resolve defenses and health separately."
+          flavor: loc`Driving Stance: occupied or blocked destination — 1d4 subdual, without weapon damage bonuses (p.179). Resolve defenses and health separately.`
         }
       );
     else
@@ -137,15 +137,15 @@ export async function settleDrivingStance(actor, reference, input = {}) {
         blind: p.visibility.blind,
         whisper: p.visibility.whisper,
         content:
-          "Driving Stance (p.179): push the recorded opponent 5 ft. away." +
-          (p.followFeet ? " Follow 5 ft. toward that opponent." : " Declined the optional 5 ft. follow.") +
-          " The GC resolves these reviewed positions at the table; this receipt does not move tokens.",
+          loc`Driving Stance (p.179): push the recorded opponent 5 ft. away.` +
+          (p.followFeet ? loc` Follow 5 ft. toward that opponent.` : loc` Declined the optional 5 ft. follow.`) +
+          loc` The GC resolves these reviewed positions at the table; this receipt does not move tokens.`,
         flags: {
           spycraft2: { actorUuid: actor.uuid, checkKind: "drivingStance", actionDiceAllowed: false, drivingStance: p }
         }
       });
     const posted = currentDrivingReceipt(actor, find(actor, p));
-    if (receipt && !posted) throw Error("The actual Driving Stance outcome posted no matching receipt.");
+    if (receipt && !posted) throw Error(loc`The actual Driving Stance outcome posted no matching receipt.`);
     await stamp(posted);
     return posted ?? receipt;
   } catch (error) {
@@ -156,7 +156,7 @@ export async function settleDrivingStance(actor, reference, input = {}) {
     } catch (cleanup) {
       throw new AggregateError(
         [error, cleanup],
-        "Driving Stance needs GC review; inspect the existing result before retrying."
+        loc`Driving Stance needs GC review; inspect the existing result before retrying.`
       );
     }
     if (receipt) return receipt;
@@ -168,12 +168,12 @@ export async function settleDrivingStance(actor, reference, input = {}) {
 }
 export async function reviewDrivingStance(actor, { outcomeId, confirmed = false } = {}) {
   if (!actor.isOwner || game.user.isGM !== true || confirmed !== true)
-    throw Error("The owning GC must inspect all clients and posted Driving Stance receipts.");
-  if (active.has(key(actor, outcomeId))) throw Error("This client is still recording that Driving Stance outcome.");
+    throw Error(loc`The owning GC must inspect all clients and posted Driving Stance receipts.`);
+  if (active.has(key(actor, outcomeId))) throw Error(loc`This client is still recording that Driving Stance outcome.`);
   return queueRuleState(actor, async () => {
     const rows = drivingRows(actor),
       row = rows.find(r => r.id === outcomeId && !r.receiptUuid);
-    if (!row) throw Error("Choose an interrupted Driving Stance outcome.");
+    if (!row) throw Error(loc`Choose an interrupted Driving Stance outcome.`);
     validateDrivingSource(actor, row.proof);
     const receipt = currentDrivingReceipt(actor, row);
     await write(
@@ -197,13 +197,13 @@ export async function manageDrivingStance(actor, input = {}) {
       }),
       rows = drivingRows(actor).filter(r => !r.receiptUuid);
     if (!hits.length && !rows.length)
-      return ui.notifications.info("No finished Driving Stance hit or interrupted outcome is available.");
+      return ui.notifications.info(loc`No finished Driving Stance hit or interrupted outcome is available.`);
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Driving Stance outcome" },
+      window: { title: loc`Driving Stance outcome` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Finish and confirm the actual melee hit first. Review the opponent’s square 5 ft. directly away: push if free, or roll 1d4 subdual if occupied or blocked. Only a push permits the optional 5 ft. move toward that opponent. Resolve positions and damage defenses/health at the table. One outcome is recorded per original hit.</p><label>Recorded hit or review <select name="operation">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Finish and confirm the actual melee hit first. Review the opponent’s square 5 ft. directly away: push if free, or roll 1d4 subdual if occupied or blocked. Only a push permits the optional 5 ft. move toward that opponent. Resolve positions and damage defenses/health at the table. One outcome is recorded per original hit.`}</p><label>${loc`Recorded hit or review`} <select name="operation">` +
         hits
           .map(
             ({ m, p }, i) =>
@@ -232,14 +232,14 @@ export async function manageDrivingStance(actor, input = {}) {
               )
               .join("")
           : "") +
-        '</select></label><label>Outcome <select name="outcome"><option value="push">Free destination: push opponent 5 ft.</option><option value="blocked">Occupied or blocked: 1d4 subdual</option></select></label><label><input name="follow" type="checkbox" /> After the push, move 5 ft. toward that opponent</label><label><input name="routeConfirmed" type="checkbox" /> The GC confirms the actual destination and legal push/follow route</label><label><input name="outcomeConfirmed" type="checkbox" /> The GC confirms this actual hit’s outcome; for recovery, all clients are idle and existing receipts were checked</label></div>'
+        `</select></label><label>${loc`Outcome`} <select name="outcome"><option value="push">${loc`Free destination: push opponent 5 ft.`}</option><option value="blocked">${loc`Occupied or blocked: 1d4 subdual`}</option></select></label><label><input name="follow" type="checkbox" /> ${loc`After the push, move 5 ft. toward that opponent`}</label><label><input name="routeConfirmed" type="checkbox" /> ${loc`The GC confirms the actual destination and legal push/follow route`}</label><label><input name="outcomeConfirmed" type="checkbox" /> ${loc`The GC confirms this actual hit’s outcome; for recovery, all clients are idle and existing receipts were checked`}</label></div>`
     });
     if (!input) return null;
   }
   if (input.operation) {
     const [k, id] = input.operation.split("|");
     if (k === "review") return reviewDrivingStance(actor, { outcomeId: id, confirmed: input.outcomeConfirmed });
-    if (k !== "hit") throw Error("Choose a listed Driving Stance hit.");
+    if (k !== "hit") throw Error(loc`Choose a listed Driving Stance hit.`);
     input = { ...input, sourceMessage: id };
   }
   return settleDrivingStance(actor, input.sourceMessage, { ...input, follow: input.follow === true });

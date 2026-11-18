@@ -1,4 +1,5 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Faceless p.195, Traceless p.196, Silver Tongue p.205; Ghost Basics p.195: automatic named-rank synergy. */
 const SOURCES = [
   { feat: "Faceless", targets: ["blend"], skill: "sneak" },
@@ -19,7 +20,7 @@ export function rankSynergyFeatPlan(
     if (!system.activeFeatNames?.includes("Ghost Basics") || key !== "sneak" || check.id !== "hide")
       return {
         ...empty,
-        blockedReason: "Ghost Basics target synergies apply only to your Sneak/Hide check with the qualified feat."
+        blockedReason: loc`Ghost Basics target synergies apply only to your Sneak/Hide check with the qualified feat.`
       };
     if (
       !["sensor", "living", "both"].includes(ghostHideTargetKind) ||
@@ -30,8 +31,7 @@ export function rankSynergyFeatPlan(
     )
       return {
         ...empty,
-        blockedReason:
-          "Name the actual security sensor, living opponent, or both, and confirm those Hide targets with the GC."
+        blockedReason: loc`Name the actual security sensor, living opponent, or both, and confirm those Hide targets with the GC.`
       };
     ghostHide = { targetKind: ghostHideTargetKind, targetName: ghostHideTargetName.trim(), confirmed: true };
     if (["sensor", "both"].includes(ghostHideTargetKind)) eligible.push({ feat: "Ghost Basics", skill: "acrobatics" });
@@ -48,7 +48,7 @@ export function rankSynergyFeatPlan(
   });
   if (!sources.length) return empty;
   const blockedReason = sources.some(s => s.synergy === null)
-    ? "Review the supporting skill ranks before applying the feat synergy."
+    ? loc`Review the supporting skill ranks before applying the feat synergy.`
     : "";
   return {
     evidence: {
@@ -64,11 +64,12 @@ export function rankSynergyFeatPlan(
     blockedReason,
     notes: [
       ...sources.map(
-        s => `${s.feat}: +${s.synergy ?? "unreviewed"} synergy from ${s.skill} ranks; normal synergy stacking applies.`
+        s =>
+          loc`${s.feat}: +${s.synergy ?? "unreviewed"} synergy from ${s.skill} ranks; normal synergy stacking applies.`
       ),
       ...(ghostHide
         ? [
-            `Ghost Basics: hiding from GC-confirmed ${ghostHide.targetKind === "sensor" ? "security sensor" : ghostHide.targetKind === "living" ? "living opponent" : "security sensors and living opponents"} ${ghostHide.targetName}.`
+            loc`Ghost Basics: hiding from GC-confirmed ${ghostHide.targetKind === "sensor" ? loc`security sensor` : ghostHide.targetKind === "living" ? loc`living opponent` : loc`security sensors and living opponents`} ${ghostHide.targetName}.`
           ]
         : [])
     ]
@@ -99,7 +100,9 @@ export function validateRankSynergyFeatProof(system, proof, { checkKind, skillKe
     !p.evidence ||
     JSON.stringify(p.evidence) !== JSON.stringify(proof)
   )
-    throw new Error("The rank-synergy feat, supporting ranks, language or Hide-target context changed before posting.");
+    throw new Error(
+      loc`The rank-synergy feat, supporting ranks, language or Hide-target context changed before posting.`
+    );
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

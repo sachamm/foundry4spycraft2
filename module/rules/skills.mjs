@@ -56,6 +56,7 @@ import { closedCoursePlan } from "./closed-course.mjs";
 import { skillSynergy } from "./synergies.mjs";
 import { stackedBonuses as stacked } from "./knowledge.mjs";
 import { planTotal } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Rules common to the 100 named checks (pp.87–169). Context tags remain explicit. */
 export function resolveSkillCheck(
   system,
@@ -779,7 +780,7 @@ export function resolveSkillCheck(
     (inComplexTask || inDramaticConflict || check.tags?.includes("Complex"))
   )
     blockedReasons.push(
-      "Faceless timing for an entire Complex Task or Dramatic Conflict remains a separate workflow; use this entry only for a standalone check."
+      loc`Faceless timing for an entire Complex Task or Dramatic Conflict remains a separate workflow; use this entry only for a standalone check.`
     );
   if (targetSkillEffect.blockedReason) blockedReasons.push(targetSkillEffect.blockedReason);
   if (rankSynergyFeats.blockedReason) blockedReasons.push(rankSynergyFeats.blockedReason);
@@ -787,7 +788,7 @@ export function resolveSkillCheck(
   if (bugConcealment.blockedReason) blockedReasons.push(bugConcealment.blockedReason);
   if (documentation.blockedReason) blockedReasons.push(documentation.blockedReason);
   if (analysisTask.context?.stage && method !== "roll")
-    blockedReasons.push("Taking10/20 is unavailable while this task is under pressure.");
+    blockedReasons.push(loc`Taking10/20 is unavailable while this task is under pressure.`);
   if (analysisTask.blockedReason) blockedReasons.push(analysisTask.blockedReason);
   if (forensic.blockedReason) blockedReasons.push(forensic.blockedReason);
   if (wheel.blockedReason) blockedReasons.push(wheel.blockedReason);
@@ -795,16 +796,16 @@ export function resolveSkillCheck(
   if (polyglot?.blockedReason) blockedReasons.push(polyglot.blockedReason);
   if (charmerPlan.blockedReason) blockedReasons.push(charmerPlan.blockedReason);
   if (charmer === true && hardCore === true)
-    blockedReasons.push("Choose one Influence timing feat and one target for this check.");
+    blockedReasons.push(loc`Choose one Influence timing feat and one target for this check.`);
   if (hardCorePlan.blockedReason) blockedReasons.push(hardCorePlan.blockedReason);
   if (dartingStyleState(system).needsReview) blockedReasons.push(dartingStyleState(system).reason);
   if (twoWeaponStyleState(system).needsReview) blockedReasons.push(twoWeaponStyleState(system).reason);
   if (weaponFocusWork.blockedReason) blockedReasons.push(weaponFocusWork.blockedReason);
   if (shakenRules(system).fixedResultsForbidden && ["take10", "take20"].includes(method))
-    blockedReasons.push("Shaken: taking 10 or 20 is unavailable (p.342).");
+    blockedReasons.push(loc`Shaken: taking 10 or 20 is unavailable (p.342).`);
   if (restraint.blockedReason) blockedReasons.push(restraint.blockedReason);
   if (system.baffledApplicationReview?.needsReview)
-    blockedReasons.push("The GC must review the interrupted Baffled event before skill checks.");
+    blockedReasons.push(loc`The GC must review the interrupted Baffled event before skill checks.`);
   if (gamblingReview) blockedReasons.push(gamblingReview);
   if (sensoryConditions.blockedReason) blockedReasons.push(sensoryConditions.blockedReason);
   if (
@@ -812,15 +813,15 @@ export function resolveSkillCheck(
     key === "acrobatics" &&
     ["jump", "tumble"].includes(check.id)
   )
-    blockedReasons.push("Entangled/Bound: Jump and Tumble checks are unavailable (p.341).");
+    blockedReasons.push(loc`Entangled/Bound: Jump and Tumble checks are unavailable (p.341).`);
   const sleepingCoreReview =
     system.conditionContext?.sleeping === true && key === "notice" && check.id === "awareness" && activeCore;
   if (sleepingCoreReview)
-    blockedReasons.push("Sleeping Awareness with Keen/Cultured requires the pending GC ruling on its active mode.");
+    blockedReasons.push(loc`Sleeping Awareness with Keen/Cultured requires the pending GC ruling on its active mode.`);
   if (system.conditionContext?.sleeping === true && (cunningPlan || tenSecondSolution))
-    blockedReasons.push("Sleeping: this option requires a deliberate action; only passive actions are available.");
+    blockedReasons.push(loc`Sleeping: this option requires a deliberate action; only passive actions are available.`);
   if (restraint.state === "pinned" && cunningPlan)
-    blockedReasons.push("Pinned: Cunning Plan requires a separate free action.");
+    blockedReasons.push(loc`Pinned: Cunning Plan requires a separate free action.`);
   const restraintBlock = restraintActionBlock(system, {
     passive: mode.includes("Passive") && method === "roll" && !cunningPlan && !tenSecondSolution,
     free:
@@ -847,22 +848,23 @@ export function resolveSkillCheck(
     allAccordingToPlan &&
     (!Number.isFinite(system.abilities?.int?.mod) || !Number.isFinite(system.abilities?.[originalAbility]?.mod))
   )
-    blockedReasons.push("Review the attributes before substituting Intelligence.");
-  if (allAccordingToPlan && !accordingEligible) blockedReasons.push("All According to Plan requires Schemer 4.");
+    blockedReasons.push(loc`Review the attributes before substituting Intelligence.`);
+  if (allAccordingToPlan && !accordingEligible) blockedReasons.push(loc`All According to Plan requires Schemer 4.`);
   if (tenSecondSolution && !solutionEligible)
     blockedReasons.push(
-      "10-Second Solution requires Scientist 14, a rolled Intelligence skill and confirmation it is outside Complex Tasks and Dramatic Conflicts."
+      loc`10-Second Solution requires Scientist 14, a rolled Intelligence skill and confirmation it is outside Complex Tasks and Dramatic Conflicts.`
     );
   if (check.optionalRule && !optionalRules.includes(check.optionalRule))
-    blockedReasons.push("This optional skill use is disabled by the campaign rules.");
-  if (crossCheckActive && !crossCheckAvailable) blockedReasons.push("This check does not have the Cross-Check tag.");
+    blockedReasons.push(loc`This optional skill use is disabled by the campaign rules.`);
+  if (crossCheckActive && !crossCheckAvailable) blockedReasons.push(loc`This check does not have the Cross-Check tag.`);
   if (hailMaryActive && !originallySecret && !check.mode.includes("Passive"))
-    blockedReasons.push("This Hail Mary option applies only to passive or secret checks.");
+    blockedReasons.push(loc`This Hail Mary option applies only to passive or secret checks.`);
   if (hailMaryUntrained && skill.ranks > 0)
-    blockedReasons.push("This Hail Mary option applies only to untrained checks.");
+    blockedReasons.push(loc`This Hail Mary option applies only to untrained checks.`);
   if (synergy.reason) blockedReasons.push(synergy.reason);
-  if (cap !== null && cap < 5) blockedReasons.push("This check cannot be used while its result cap is below 5 (p.88).");
-  if (!["roll", "take10", "take20"].includes(method)) blockedReasons.push("Unknown check method.");
+  if (cap !== null && cap < 5)
+    blockedReasons.push(loc`This check cannot be used while its result cap is below 5 (p.88).`);
+  if (!["roll", "take10", "take20"].includes(method)) blockedReasons.push(loc`Unknown check method.`);
   const wellFundedBribe =
     method === "take10" &&
     key === "bureaucracy" &&
@@ -914,12 +916,14 @@ export function resolveSkillCheck(
     } catch (e) {
       blockedReasons.push(e.message);
     }
-  if (taking && actionDiceCost) blockedReasons.push("Choose a rolled check when spending action dice for Hail Mary.");
+  if (taking && actionDiceCost)
+    blockedReasons.push(loc`Choose a rolled check when spending action dice for Hail Mary.`);
   if (taking) {
-    if (!safeToTake) blockedReasons.push("Taking 10/20 requires being neither distracted nor endangered (pp.97–98).");
+    if (!safeToTake)
+      blockedReasons.push(loc`Taking 10/20 requires being neither distracted nor endangered (pp.97–98).`);
     if (/with permission/i.test(check.time) && gcTakingPermissionConfirmed !== true)
       blockedReasons.push(
-        "This named check requires the GC’s permission to take 10/20; confirm that permission separately from safety."
+        loc`This named check requires the GC’s permission to take 10/20; confirm that permission separately from safety.`
       );
     if (
       !wellFundedBribe &&
@@ -927,16 +931,16 @@ export function resolveSkillCheck(
       error > (method === "take20" && attention ? 2 : 1)
     )
       blockedReasons.push(
-        `Taking ${fixedDie} requires a final error range no worse than ${method === "take20" && attention ? 2 : 1} (pp.97–98,200).`
+        loc`Taking ${fixedDie} requires a final error range no worse than ${method === "take20" && attention ? 2 : 1} (pp.97–98,200).`
       );
     if (check.tags.includes("Concentration"))
-      blockedReasons.push("Taking 10/20 is unavailable for a Concentration check (pp.97–98).");
+      blockedReasons.push(loc`Taking 10/20 is unavailable for a Concentration check (pp.97–98).`);
     if (
       !wellFundedBribe &&
       !check.time.includes(`Take ${fixedDie}`) &&
       !(fixedDie === 10 ? tracking.take10Allowed : tracking.take20Allowed)
     )
-      blockedReasons.push(`This use does not permit taking ${fixedDie}.`);
+      blockedReasons.push(loc`This use does not permit taking ${fixedDie}.`);
   }
   // pp.87,92,101: distinguish the substituted skill bonus from modifiers on this named check.
   const baseSkillEntries = skillConditionEntries(system, skill.bonusEntries ?? []),
@@ -1210,9 +1214,9 @@ export function resolveSkillCheck(
     synergy: synergy.value,
     synergySkill: synergy.skill,
     ...planTotal("skill", { system, skillKey: key, check, ability: selected, method }, [
-      ["Skill bonus", condition.total],
-      ["Synergy", synergyExtra],
-      ["Check adjustments", checkAdjustment]
+      [loc`Skill bonus`, condition.total],
+      [loc`Synergy`, synergyExtra],
+      [loc`Check adjustments`, checkAdjustment]
     ]),
     armor,
     missingFocus: !!missingFocus,
@@ -1223,6 +1227,6 @@ export function resolveSkillCheck(
     rollMode: mode.includes("Passive") || mode === "Secret" || (!forceActive && secret) ? "blindroll" : undefined,
     take10TimeMultiplier:
       (system.classLevels?.schemer ?? 0) >= 10 && selected === "int" ? 1 : (skill.take10TimeMultiplier ?? 2),
-    notes: `${vehicleControl?.note ? `${vehicleControl.note} ` : ""}${stalkingStance.notes.join(" ")} ${feint.notes.join(" ")} ${meleeSkillFeats.notes.join(" ")} ${conveyanceBullRush.notes.join(" ")} ${bullRushAttack.notes.join(" ")} ${bullRushDefense.notes.join(" ")} ${tumblePath.notes.join(" ")} ${tripAttack.notes.join(" ")} ${tripDefense.notes.join(" ")} ${fallDistance.notes.join(" ")} ${balance.notes.join(" ")} ${hideCircumstance.notes.join(" ")} ${detectionObserver.notes.join(" ")} ${hideMovementPlanResult.notes.join(" ")} ${targetSkillEffect.notes.join(" ")} ${rankSynergyFeats.notes.join(" ")} ${stoneCold.notes.join(" ")} ${threaten.notes.join(" ")} ${bugConcealment.notes.join(" ")} ${documentation.notes.join(" ")} ${analysisTask.notes.join(" ")} ${forensic.notes.join(" ")} ${closedCourse.notes.join(" ")} ${wheel.notes} ${wellFundedBribe ? "Well-Funded: Bribe take 10 ignores the error-range restriction (p.198). " : ""}${pursuit.notes.join(" ")} ${contactFeat.evidence ? `Contact ${contactFeat.evidence.contact.name}: DC${contactFeat.evidence.dc}, summon ${contactTimeLabel(Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6)}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table2.35, p.144; response/outcomes resolved separately). ` : ""}${contactFeat.evidence?.source ? `${contactFeat.evidence.source}: primary contact ${contactFeat.evidence.contact.name}; error range −${contactFeat.errorReduction} (minimum0), optional half time rounded down. ` : ""}${polyglot ? `Polyglot: +${polyglot.evidence.synergy} Cultures synergy, including targets outside owned regions. ` : ""}${dartingStyleState(system).active ? `Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? "Superior Cover: attack/skill check penalty −2. " : ""}${twoWeaponSkillNote(system)}${weaponFocusWork.notes}${weaponFocusWork.notes ? " " : ""}${guts ? "Guts: +4 with this named Athletics check. " : ""}${combatExpertiseState(system).active ? `Combat Expertise: attack/skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? `${condition.state === "baffled" ? "Baffled" : "Incompetent"}: skill bonus ${condition.normal} → ${condition.total}; separate check modifiers remain. ` : ""}${gamblingDice ? `The Dice are Hot: ${gamblingDice.total} possessed action dice (${gamblingDice.ordinary} ordinary + ${gamblingDice.bonus} bonus); Gambling synergy uses normal named-bonus stacking. ` : ""}${conditionRollPenalties(conditionSystem).entangled && selected === "dex" ? "Entangled/Bound: Dexterity-based skill penalty −4. " : ""}${conditionAbilityPenalty(conditionSystem, selected) ? "Drunk: Dexterity-/Wisdom-based check penalty −2. " : ""}${cardSharkProfession ? `Card Shark: Streetwise rank synergy +${cardSharkProfession.synergy} (pp.201–202). ` : ""}${appearancePlan.notes.join(" ")} ${charmerPlan.notes.join(" ")} ${hardCorePlan.notes.join(" ")} ${underwaterContext.notes.join(" ")} ${qualityChecks.notes.join(" ")} ${medical.notes.join(" ")} ${details.notes.join(" ")} ${skillTags.notes.join(" ")} ${skillGear.notes.join(" ")} ${gearUse.notes.join(" ")} ${fogSmoke.notes.join(" ")} ${localHeroOpposition.notes.join(" ")} ${terrainPlan.notes.join(" ")} ${senses.notes.join(" ")} ${sensoryConditions.notes.join(" ")} ${tracking.notes.join(" ")} ${ambush.notes.join(" ")} ${ambush.applicable ? `Required Ambush preparation: ${requiredPreparationSeconds} seconds. ` : ""} ${light.notes.join(" ")} ${cunning ? `Cunning Plan: free action; error range ${cunning.originalError} → ${cunning.error} (p.79). ` : ""}${substituted ? "All According to Plan: Intelligence replaces the check’s key attribute (p.79). " : ""}${(system.classLevels?.schemer ?? 0) >= 10 && selected === "int" && method === "take10" ? "Hyperconscious: take 10 without doubling time. " : ""}${classEffects.notes.filter(note => !note.startsWith("Intelligence Analysis:") && !note.startsWith("Booby Trap:")).join(" ")} ${timing.notes} ${charmerPlan.evidence ? `Required Influence time: ${Math.round(Math.max(charmerPlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. ` : ""}${hardCorePlan.evidence ? `Required Influence time: ${Math.round(Math.max(hardCorePlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. ` : ""}${armor ? `Armor/load check penalty ${armor}. ` : ""}${vision ? `Vision ${vision}. ` : ""}${hasForte ? "Forte +1. " : ""}${Number(modifier) ? `Situational modifier ${Number(modifier) >= 0 ? "+" : ""}${Number(modifier)}. ` : ""}${synergy.value ? `Synergy +${synergy.value} (${synergy.skill}). ` : ""}${taking && /with permission/i.test(check.time) && gcTakingPermissionConfirmed === true ? "GC permission to take this fixed result confirmed. " : ""}${taking ? `Taking ${fixedDie}: ${timeMultiplier}× the listed time; no threat or action-die boost. ` : ""}${timing.timeReduction === "take10" ? "Taking 10 uses normal time. " : ""}${crossCheckActive && crossCheckAvailable ? "Cross-Check: triple the required time; active check. " : ""}${minimumTime ? `Minimum time ${minimumTime}. ` : ""}${attention ? "Secret checks have the Cross-Check tag. " : ""}${listedTime}. ${mode}. ${check.tags || "No tags"}. Rules p.${check.page}.${restraint.escape ? ` Opposed Grapple: Size bonus +${restraint.sizeBonus}; ${restraint.timeLocked ? "untrained Proficiency: error +2, two full actions, no time reduction." : "proficient: one full action."}` : ""}`
+    notes: loc`${vehicleControl?.note ? `${vehicleControl.note} ` : ""}${stalkingStance.notes.join(" ")} ${feint.notes.join(" ")} ${meleeSkillFeats.notes.join(" ")} ${conveyanceBullRush.notes.join(" ")} ${bullRushAttack.notes.join(" ")} ${bullRushDefense.notes.join(" ")} ${tumblePath.notes.join(" ")} ${tripAttack.notes.join(" ")} ${tripDefense.notes.join(" ")} ${fallDistance.notes.join(" ")} ${balance.notes.join(" ")} ${hideCircumstance.notes.join(" ")} ${detectionObserver.notes.join(" ")} ${hideMovementPlanResult.notes.join(" ")} ${targetSkillEffect.notes.join(" ")} ${rankSynergyFeats.notes.join(" ")} ${stoneCold.notes.join(" ")} ${threaten.notes.join(" ")} ${bugConcealment.notes.join(" ")} ${documentation.notes.join(" ")} ${analysisTask.notes.join(" ")} ${forensic.notes.join(" ")} ${closedCourse.notes.join(" ")} ${wheel.notes} ${wellFundedBribe ? loc`Well-Funded: Bribe take 10 ignores the error-range restriction (p.198). ` : ""}${pursuit.notes.join(" ")} ${contactFeat.evidence ? loc`Contact ${contactFeat.evidence.contact.name}: DC${contactFeat.evidence.dc}, summon ${contactTimeLabel(Math.round(Math.max(contactFeat.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6)}; after success, response ${contactFeat.evidence.response.formula} hours ×${contactFeat.evidence.response.missionMultiplier} (Table2.35, p.144; response/outcomes resolved separately). ` : ""}${contactFeat.evidence?.source ? loc`${contactFeat.evidence.source}: primary contact ${contactFeat.evidence.contact.name}; error range −${contactFeat.errorReduction} (minimum0), optional half time rounded down. ` : ""}${polyglot ? loc`Polyglot: +${polyglot.evidence.synergy} Cultures synergy, including targets outside owned regions. ` : ""}${dartingStyleState(system).active ? loc`Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? loc`Superior Cover: attack/skill check penalty −2. ` : ""}${twoWeaponSkillNote(system)}${weaponFocusWork.notes}${weaponFocusWork.notes ? " " : ""}${guts ? loc`Guts: +4 with this named Athletics check. ` : ""}${combatExpertiseState(system).active ? loc`Combat Expertise: attack/skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? loc`${condition.state === "baffled" ? loc`Baffled` : loc`Incompetent`}: skill bonus ${condition.normal} → ${condition.total}; separate check modifiers remain. ` : ""}${gamblingDice ? loc`The Dice are Hot: ${gamblingDice.total} possessed action dice (${gamblingDice.ordinary} ordinary + ${gamblingDice.bonus} bonus); Gambling synergy uses normal named-bonus stacking. ` : ""}${conditionRollPenalties(conditionSystem).entangled && selected === "dex" ? loc`Entangled/Bound: Dexterity-based skill penalty −4. ` : ""}${conditionAbilityPenalty(conditionSystem, selected) ? loc`Drunk: Dexterity-/Wisdom-based check penalty −2. ` : ""}${cardSharkProfession ? loc`Card Shark: Streetwise rank synergy +${cardSharkProfession.synergy} (pp.201–202). ` : ""}${appearancePlan.notes.join(" ")} ${charmerPlan.notes.join(" ")} ${hardCorePlan.notes.join(" ")} ${underwaterContext.notes.join(" ")} ${qualityChecks.notes.join(" ")} ${medical.notes.join(" ")} ${details.notes.join(" ")} ${skillTags.notes.join(" ")} ${skillGear.notes.join(" ")} ${gearUse.notes.join(" ")} ${fogSmoke.notes.join(" ")} ${localHeroOpposition.notes.join(" ")} ${terrainPlan.notes.join(" ")} ${senses.notes.join(" ")} ${sensoryConditions.notes.join(" ")} ${tracking.notes.join(" ")} ${ambush.notes.join(" ")} ${ambush.applicable ? loc`Required Ambush preparation: ${requiredPreparationSeconds} seconds. ` : ""} ${light.notes.join(" ")} ${cunning ? loc`Cunning Plan: free action; error range ${cunning.originalError} → ${cunning.error} (p.79). ` : ""}${substituted ? loc`All According to Plan: Intelligence replaces the check’s key attribute (p.79). ` : ""}${(system.classLevels?.schemer ?? 0) >= 10 && selected === "int" && method === "take10" ? loc`Hyperconscious: take 10 without doubling time. ` : ""}${classEffects.notes.filter(note => !note.startsWith("Intelligence Analysis:") && !note.startsWith("Booby Trap:")).join(" ")} ${timing.notes} ${charmerPlan.evidence ? loc`Required Influence time: ${Math.round(Math.max(charmerPlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. ` : ""}${hardCorePlan.evidence ? loc`Required Influence time: ${Math.round(Math.max(hardCorePlan.baseSeconds * timeMultiplier, minimumTimeSeconds) * 1e6) / 1e6} seconds. ` : ""}${armor ? loc`Armor/load check penalty ${armor}. ` : ""}${vision ? loc`Vision ${vision}. ` : ""}${hasForte ? loc`Forte +1. ` : ""}${Number(modifier) ? loc`Situational modifier ${Number(modifier) >= 0 ? "+" : ""}${Number(modifier)}. ` : ""}${synergy.value ? loc`Synergy +${synergy.value} (${synergy.skill}). ` : ""}${taking && /with permission/i.test(check.time) && gcTakingPermissionConfirmed === true ? loc`GC permission to take this fixed result confirmed. ` : ""}${taking ? loc`Taking ${fixedDie}: ${timeMultiplier}× the listed time; no threat or action-die boost. ` : ""}${timing.timeReduction === "take10" ? loc`Taking 10 uses normal time. ` : ""}${crossCheckActive && crossCheckAvailable ? loc`Cross-Check: triple the required time; active check. ` : ""}${minimumTime ? loc`Minimum time ${minimumTime}. ` : ""}${attention ? loc`Secret checks have the Cross-Check tag. ` : ""}${listedTime}. ${mode}. ${check.tags || loc`No tags`}. Rules p.${check.page}.${restraint.escape ? loc` Opposed Grapple: Size bonus +${restraint.sizeBonus}; ${restraint.timeLocked ? loc`untrained Proficiency: error +2, two full actions, no time reduction.` : loc`proficient: one full action.`}` : ""}`
   };
 }

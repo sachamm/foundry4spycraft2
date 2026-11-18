@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 const norm = value =>
   String(value ?? "")
     .trim()
@@ -16,7 +17,7 @@ export function proficiencyTotals(system, cfg, bonus, available) {
     if (selected.proficient && !granted) used++;
     if (selected.forte && !forteGranted) used++;
     if ((selected.forte || forteGranted) && !proficient)
-      warnings.push(`${cfg.proficiencies[key].label}: a forte requires its weapon proficiency.`);
+      warnings.push(loc`${cfg.proficiencies[key].label}: a forte requires its weapon proficiency.`);
     totals[key] = { proficient, forte, granted, forteGranted };
     hints[key] = granted;
   }
@@ -45,9 +46,9 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
       skill = rules.choiceSkill;
     if (skill) {
       const selected = String(item.system.originChoices?.grantedFocus ?? "").trim();
-      if (!selected) pending.push(`${item.name}: choose its granted ${skill} focus on Main.`);
+      if (!selected) pending.push(loc`${item.name}: choose its granted ${skill} focus on Main.`);
       else if (rules.domain && !rules.domain.includes(canonical(selected)))
-        warnings.push(`${item.name}: its granted focus must come from the permitted vehicle category.`);
+        warnings.push(loc`${item.name}: its granted focus must come from the permitted vehicle category.`);
       else {
         focus = canonical(selected);
         forced[skill].add(focus);
@@ -69,7 +70,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
       !totals[row.skill].some(value => norm(value) === norm(canonical(row.focus))) ||
       !row.forte?.trim()
     )
-      warnings.push("A skill forte must name an owned focus and one of its subdivisions.");
+      warnings.push(loc`A skill forte must name an owned focus and one of its subdivisions.`);
   }
   const picks = {};
   let genericUsed = (system.focuses?.fortes ?? []).length;
@@ -92,7 +93,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
           norm(canonical(row.focus)) === norm(grant.focus)
       );
       if (index >= 0) claimed.add(index);
-      else pending.push(`${grant.name}: choose its granted forte in ${grant.focus || "the granted focus"}.`);
+      else pending.push(loc`${grant.name}: choose its granted forte in ${grant.focus || "the granted focus"}.`);
     }
     const unrestricted = Math.max(0, reservedFortes - grants.length);
     const otherEligible = fortes.filter(
@@ -114,7 +115,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
       genericSpent: general
     };
     if (unrestricted > otherEligible)
-      pending.push(`${key}: choose ${unrestricted - otherEligible} granted forte(s) relating to the granted focus.`);
+      pending.push(loc`${key}: choose ${unrestricted - otherEligible} granted forte(s) relating to the granted focus.`);
   }
   const unscopedUsed = genericUsed;
   picks.generic = {
@@ -123,7 +124,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
   };
   picks.generic.remaining = picks.generic.available - genericUsed;
   if (picks.generic.remaining < 0)
-    warnings.push(`Focuses/fortes: ${-picks.generic.remaining} more flexible picks spent than available.`);
+    warnings.push(loc`Focuses/fortes: ${-picks.generic.remaining} more flexible picks spent than available.`);
   const temporaryGrants = [],
     activeFortes = fortes.map(row => ({ ...row }));
   for (const feat of items.filter(
@@ -151,11 +152,11 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
       source.choices = choices;
       source.used = choices.length;
     } catch (error) {
-      warnings.push(`Temporary Depth of Study (${feat.id}): ${error.message}`);
+      warnings.push(loc`Temporary Depth of Study (${feat.id}): ${error.message}`);
     }
     if (source.used < 2)
       pending.push(
-        `Temporary Depth of Study (${feat.id}): choose ${2 - source.used} source-scoped focus/forte pick(s) on Training.`
+        loc`Temporary Depth of Study (${feat.id}): choose ${2 - source.used} source-scoped focus/forte pick(s) on Training.`
       );
   }
   picks.generic.reservedAvailable = temporaryGrants.length * 2;
@@ -166,7 +167,7 @@ export function focusTotals(system, items, cfg, bonus, { level, startingIntellig
   picks.generic.remaining = picks.generic.available - picks.generic.used;
   if (picks.generic.reservedAvailable && picks.generic.unscopedRemaining < 0)
     warnings.push(
-      "Ordinary focus selections exceed their permanent allowance; temporary Depth of Study choices must use their source on Training. Review legacy choice provenance."
+      loc`Ordinary focus selections exceed their permanent allowance; temporary Depth of Study choices must use their source on Training. Review legacy choice provenance.`
     );
   return { totals, forced, picks, warnings, pending, temporaryGrants, activeFortes };
 }
@@ -189,9 +190,9 @@ export function temporaryFocusPlan(
     feat.system.featKind !== "temporary" ||
     system.featStatus?.[feat.id]?.ok !== true
   )
-    throw new Error("Choose an active temporary Depth of Study feat.");
+    throw new Error(loc`Choose an active temporary Depth of Study feat.`);
   if (!Array.isArray(choices) || choices.length > 2 || (!allowPartial && choices.length !== 2))
-    throw new Error("Choose exactly two focuses or fortes for this temporary feat.");
+    throw new Error(loc`Choose exactly two focuses or fortes for this temporary feat.`);
   const owned = Object.fromEntries(
       ["cultures", "drive", "profession", "science"].map(key => [key, [...(ownedFocuses[key] ?? [])]])
     ),
@@ -206,21 +207,21 @@ export function temporaryFocusPlan(
       typeof row.focus !== "string" ||
       !row.focus.trim()
     )
-      throw new Error("Each temporary choice needs a focus skill, a focus, and its choice type.");
+      throw new Error(loc`Each temporary choice needs a focus skill, a focus, and its choice type.`);
     const focus = canonical(row.focus.trim()),
       forte = String(row.forte ?? "").trim();
     if (row.skill !== "profession" && !cfg.focuses[row.skill]?.includes(focus))
-      throw new Error("Choose a focus from the skill’s printed list.");
+      throw new Error(loc`Choose a focus from the skill’s printed list.`);
     if (row.kind === "focus") {
       if (owned[row.skill].some(v => norm(v) === norm(focus)))
-        throw new Error("This focus is already possessed or selected.");
-      if (forte) throw new Error("A focus choice cannot also select a forte.");
+        throw new Error(loc`This focus is already possessed or selected.`);
+      if (forte) throw new Error(loc`A focus choice cannot also select a forte.`);
       owned[row.skill].push(focus);
     } else {
       if (!owned[row.skill].some(v => norm(v) === norm(focus)) || !forte)
-        throw new Error("A forte needs a previously owned focus and a named subdivision.");
+        throw new Error(loc`A forte needs a previously owned focus and a named subdivision.`);
       if (fortes.some(v => v.skill === row.skill && norm(v.focus) === norm(focus) && norm(v.forte) === norm(forte)))
-        throw new Error("This forte is already possessed or selected.");
+        throw new Error(loc`This forte is already possessed or selected.`);
       fortes.push({ skill: row.skill, focus, forte });
     }
     out.push({ kind: row.kind, skill: row.skill, focus, forte });

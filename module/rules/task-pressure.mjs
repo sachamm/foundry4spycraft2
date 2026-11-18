@@ -1,5 +1,6 @@
 import { rollEvidence, errorDecisionPending } from "./outcomes.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const whole = n => Number.isSafeInteger(n) && n >= 0;
 export const TASK_PRESSURE_CHECK = {
   id: "task-pressure",
@@ -23,9 +24,9 @@ export function taskPressureState(task) {
     (task.pressured !== undefined && typeof task.pressured !== "boolean") ||
     (task.pressureAttempts !== undefined && !Array.isArray(task.pressureAttempts))
   )
-    throw new Error("Review the task’s pressure history.");
+    throw new Error(loc`Review the task’s pressure history.`);
   const attempts = task.pressureAttempts ?? [];
-  if (!task.pressured && attempts.length) throw new Error("An unpressured task cannot contain pressure attempts.");
+  if (!task.pressured && attempts.length) throw new Error(loc`An unpressured task cannot contain pressure attempts.`);
   let immune = false,
     passedAt = null,
     passedDC = null,
@@ -55,10 +56,10 @@ export function taskPressureState(task) {
       (e.criticalSuccess && (!e.success || e.criticalFailure)) ||
       (e.criticalFailure && e.success)
     )
-      throw new Error("Review the task’s pressure attempts and their order.");
+      throw new Error(loc`Review the task’s pressure attempts and their order.`);
     if (e.success) {
       if (e.stressRaw !== 0 || e.damageEventId !== null)
-        throw new Error("A successful pressure check cannot inflict failure stress.");
+        throw new Error(loc`A successful pressure check cannot inflict failure stress.`);
       passedAt = e.challengeRevision;
       passedDC = e.challengeDC;
       if (e.criticalSuccess) immune = true;
@@ -71,7 +72,7 @@ export function taskPressureState(task) {
         !e.damageEventId ||
         damageEvents.has(e.damageEventId)
       )
-        throw new Error("A failed pressure check needs its unique1d6stress event.");
+        throw new Error(loc`A failed pressure check needs its unique1d6stress event.`);
       damageEvents.add(e.damageEventId);
       if (e.criticalFailure)
         errorIncrease++; /* User ruling: full resistance does not negate this separate consequence. */
@@ -129,7 +130,7 @@ export function taskPressureStressRollProof(task, check, stressMessage, { actorU
     c.rawTotal !== roll.total ||
     c.effectiveTotal !== roll.total
   )
-    throw new Error("Use the locked pressure check’s actual unboosted1d6stress receipt.");
+    throw new Error(loc`Use the locked pressure check’s actual unboosted1d6stress receipt.`);
   return { raw: roll.total, stressMessageUuid: stressMessage.uuid };
 }
 export function taskPressureStressProof(task, check, stressMessage, damageEvent, options = {}) {
@@ -162,7 +163,7 @@ export function taskPressureStressProof(task, check, stressMessage, damageEvent,
     !["recorded", "settled"].includes(damageEvent.state)
   )
     throw new Error(
-      "Apply this exact stress event, including resistance and any required save, before settling pressure."
+      loc`Apply this exact stress event, including resistance and any required save, before settling pressure.`
     );
   return { raw: roll.total, damageEventId: damageEvent.id, stressMessageUuid: stressMessage.uuid };
 }
@@ -175,7 +176,7 @@ export function taskPressureResultPlan(
   const state = taskPressureState(task),
     binding = check?.analysisTask;
   if (task.status !== "active" || !state.needsCheck)
-    throw new Error("This task does not need another pressure check for its current Challenge.");
+    throw new Error(loc`This task does not need another pressure check for its current Challenge.`);
   if (
     !actorUuid ||
     typeof messageUuid !== "string" ||
@@ -194,29 +195,29 @@ export function taskPressureResultPlan(
     check.superseded ||
     check.analysisTaskSettlement
   )
-    throw new Error("Choose the current task’s actual Resolve pressure receipt.");
+    throw new Error(loc`Choose the current task’s actual Resolve pressure receipt.`);
   if (
     !Number.isSafeInteger(binding.challengeDC) ||
     binding.challengeDC < 0 ||
     !Number.isFinite(check.effectiveTotal) ||
     check.successConfirmed !== (check.effectiveTotal >= binding.challengeDC && !check.criticalFailure)
   )
-    throw new Error("The pressure outcome must match its final result and the GC-confirmed Challenge DC.");
+    throw new Error(loc`The pressure outcome must match its final result and the GC-confirmed Challenge DC.`);
   if (
     sourceEffectsResolved !== true ||
     typeof check.successConfirmed !== "boolean" ||
     (!check.criticalFailure && errorDecisionPending(check))
   )
-    throw new Error("The GC must resolve success, activation decisions and other pressure-check effects first.");
+    throw new Error(loc`The GC must resolve success, activation decisions and other pressure-check effects first.`);
   if (
     (check.criticalSuccess && (!check.successConfirmed || check.criticalFailure)) ||
     (check.criticalFailure && check.successConfirmed)
   )
-    throw new Error("The pressure critical result contradicts its outcome.");
+    throw new Error(loc`The pressure critical result contradicts its outcome.`);
   if (check.criticalSuccess || check.criticalFailure) {
     const a = check.criticalActivation;
     if (a?.kind !== (check.criticalSuccess ? "success" : "failure") || !whole(a.cost))
-      throw new Error("The pressure critical result needs its recorded actual activation.");
+      throw new Error(loc`The pressure critical result needs its recorded actual activation.`);
   }
   if (
     task.timing &&
@@ -225,7 +226,7 @@ export function taskPressureResultPlan(
       binding.completedAt >= task.timing.deadline ||
       binding.completedAt > at)
   )
-    throw new Error("The pressure check did not finish before the task deadline.");
+    throw new Error(loc`The pressure check did not finish before the task deadline.`);
   return { state, binding };
 }
 export function taskPressureAttemptPlan(
@@ -308,7 +309,7 @@ export function taskPressureUseProof(system, binding) {
     use.used !== 1 ||
     (binding.pressureUse && JSON.stringify(binding.pressureUse) !== JSON.stringify(use))
   )
-    throw new Error("The reserved pressure-check attempt changed before posting.");
+    throw new Error(loc`The reserved pressure-check attempt changed before posting.`);
   return structuredClone(use);
 }
 

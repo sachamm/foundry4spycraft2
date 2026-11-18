@@ -6,6 +6,7 @@ import {
   vitalityReviewRecord
 } from "../rules/vitality.mjs";
 import { queueResources } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   owned = a => a?.type === "agent" && a.isOwner === true;
 const validIndex = (a, i) => Number.isSafeInteger(i) && i > 0 && i < (a.system.progression?.length ?? 0);
@@ -21,12 +22,12 @@ async function commit(actor, patch, proof) {
   } catch (error) {
     if (!proof()) throw error;
   }
-  if (!proof()) throw new Error("Review the recorded vitality source before retrying.");
+  if (!proof()) throw new Error(loc`Review the recorded vitality source before retrying.`);
 }
 function restoreRoll(record) {
   const roll = Roll.fromJSON(JSON.stringify(record.rollData));
   if (roll._evaluated !== true || roll.formula !== record.formula || roll.total !== record.value)
-    throw new Error("Review the stored vitality roll data.");
+    throw new Error(loc`Review the stored vitality roll data.`);
   return roll;
 }
 async function postStoredRoll(actor, record, roll) {
@@ -37,14 +38,14 @@ async function postStoredRoll(actor, record, roll) {
         m.flags.spycraft2.vitalityRoll.levelId === record.id
     );
   if (candidates.some(m => !same(m.flags.spycraft2.vitalityRoll, tag)))
-    throw new Error("Review the conflicting vitality chat receipt.");
+    throw new Error(loc`Review the conflicting vitality chat receipt.`);
   let message = candidates.find(m => m.id === record.messageId) ?? candidates[0];
   if (!message) {
     const sourceRoll = roll ?? restoreRoll(record);
     try {
       message = await sourceRoll.toMessage({
         speaker: ChatMessage.getSpeaker({ actor }),
-        flavor: `Original raw vitality — Career Level ${record.careerLevel}, ${foundry.utils.escapeHTML(record.className)} (1d${record.die}); Constitution and other vitality bonuses apply separately.`,
+        flavor: loc`Original raw vitality — Career Level ${record.careerLevel}, ${foundry.utils.escapeHTML(record.className)} (1d${record.die}); Constitution and other vitality bonuses apply separately.`,
         flags: { spycraft2: { vitalityRoll: tag } }
       });
     } catch (error) {
@@ -54,7 +55,7 @@ async function postStoredRoll(actor, record, roll) {
   }
   const current = actor.flags?.spycraft2?.vitalityRolls?.[record.id];
   if (!current || current.value !== record.value || current.classId !== record.classId)
-    throw new Error("The stored vitality receipt changed before its chat binding.");
+    throw new Error(loc`The stored vitality receipt changed before its chat binding.`);
   if (current.messageId !== message.id)
     await commit(
       actor,
@@ -78,7 +79,7 @@ async function ensureLevelId(actor, source) {
 export async function rollCareerVitality(actor, index) {
   if (!owned(actor) || !validIndex(actor, index)) return null;
   return queueResources([actor], async () => {
-    if (!owned(actor)) throw new Error("You must own the character before rolling vitality.");
+    if (!owned(actor)) throw new Error(loc`You must own the character before rolling vitality.`);
     let source = vitalitySource(actor, index);
     if (source.value > 0) {
       const record = source.levelId && actor.flags?.spycraft2?.vitalityRolls?.[source.levelId];
@@ -86,12 +87,14 @@ export async function rollCareerVitality(actor, index) {
         try {
           await postStoredRoll(actor, record);
         } catch (error) {
-          globalThis.ui?.notifications?.warn?.("Vitality remains recorded. " + error.message);
+          globalThis.ui?.notifications?.warn?.(loc`Vitality remains recorded. ` + error.message);
         }
       return { total: source.value, recorded: true, legacy: !record, levelId: source.levelId };
     }
     if (source.reviewId || (source.levelId && actor.flags?.spycraft2?.vitalityRolls?.[source.levelId]))
-      throw new Error("The current vitality value disagrees with its recorded history. Review it before continuing.");
+      throw new Error(
+        loc`The current vitality value disagrees with its recorded history. Review it before continuing.`
+      );
     source = await ensureLevelId(actor, source);
     const expected = vitalitySourceEvidence(source),
       key = cacheKey(actor, source.levelId),
@@ -99,18 +102,18 @@ export async function rollCareerVitality(actor, index) {
     let record, roll;
     if (pending) {
       if (pending.source !== expected)
-        throw new Error("Review the pending raw vitality result after its class/level context changed.");
+        throw new Error(loc`Review the pending raw vitality result after its class/level context changed.`);
       record = pending.record;
       roll = restoreRoll(record);
     } else {
       roll = await new Roll(`1d${source.die}`).evaluate();
       if (!owned(actor) || vitalitySourceEvidence(vitalitySource(actor, index)) !== expected)
-        throw new Error("The vitality class/level source changed during the roll.");
+        throw new Error(loc`The vitality class/level source changed during the roll.`);
       record = vitalityRollRecord(actor, source, roll, game.time.worldTime);
       cache()[key] = { source: expected, record };
     }
     if (!owned(actor) || vitalitySourceEvidence(vitalitySource(actor, index)) !== expected)
-      throw new Error("The vitality source changed before its result was recorded.");
+      throw new Error(loc`The vitality source changed before its result was recorded.`);
     const progression = cloneProgression(actor);
     progression[index].vitality = record.value;
     await commit(
@@ -125,7 +128,7 @@ export async function rollCareerVitality(actor, index) {
     try {
       await postStoredRoll(actor, record, roll);
     } catch (error) {
-      globalThis.ui?.notifications?.warn?.("Vitality remains recorded. " + error.message);
+      globalThis.ui?.notifications?.warn?.(loc`Vitality remains recorded. ` + error.message);
     }
     return roll;
   });
@@ -138,16 +141,16 @@ export async function reviewCareerVitality(actor, index, options = {}) {
   if (!Object.keys(input).length) {
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Record or review raw vitality" },
+      window: { title: loc`Record or review raw vitality` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>Career Level ${index + 1}, ${esc(initial.className)}, d${initial.die}. Current raw value ${initial.value || "not recorded"}. Record an external result or correct the existing record; this does not reroll the die.</p><label>Actual raw die result <input name="value" type="number" min="1" max="${initial.die}" step="1" value="${initial.value || ""}" required /></label><label>Source/review note <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> The GC confirms this actual raw result and review</label><p>Constitution and other vitality bonuses apply separately. Current vitality is not healed by this review. First-career vitality remains automatic maximum; action dice cannot boost vitality gains (pp.60–61).</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Career Level ${index + 1}, ${esc(initial.className)}, d${initial.die}. Current raw value ${initial.value || loc`not recorded`}. Record an external result or correct the existing record; this does not reroll the die.`}</p><label>${loc`Actual raw die result`} <input name="value" type="number" min="1" max="${initial.die}" step="1" value="${initial.value || ""}" required /></label><label>${loc`Source/review note`} <input name="note" maxlength="500" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this actual raw result and review`}</label><p>${loc`Constitution and other vitality bonuses apply separately. Current vitality is not healed by this review. First-career vitality remains automatic maximum; action dice cannot boost vitality gains (pp.60–61).`}</p></div>`
     });
     if (!input) return null;
   }
   if (input.confirmed !== true) return null;
   return queueResources([actor], async () => {
     if (!owned(actor) || vitalitySourceEvidence(vitalitySource(actor, index)) !== expected)
-      throw new Error("The vitality source changed before review. Open it again.");
+      throw new Error(loc`The vitality source changed before review. Open it again.`);
     const parsed =
       typeof input.value === "number"
         ? input.value

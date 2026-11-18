@@ -1,6 +1,7 @@
 import { combatStanceState } from "./combat-stance.mjs";
 import { stanceMovementState } from "./stance-movement.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 export const stableStriking = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -32,9 +33,9 @@ export function strikingTriggerPlan(
 ) {
   const stance = combatStanceState(system);
   if (stance?.key !== "striking" || !Number.isFinite(system.combatStance?.enteredAt))
-    throw Error("Enter the earned Striking Stance before the opponent moves into adjacency.");
+    throw Error(loc`Enter the earned Striking Stance before the opponent moves into adjacency.`);
   if (!validOwnCountClock(combat) || typeof activeCombatantId !== "string" || !activeCombatantId)
-    throw Error("Take the immediate Striking reaction in its actual started combat and active participant’s Count.");
+    throw Error(loc`Take the immediate Striking reaction in its actual started combat and active participant’s Count.`);
   if (
     [entryConfirmed, alreadyInStanceConfirmed, immediateConfirmed, roundMovementConfirmed, attackLegalConfirmed].some(
       v => v !== true
@@ -43,12 +44,12 @@ export function strikingTriggerPlan(
     entryDescription.length > 300
   )
     throw Error(
-      "The GC must confirm this actual opponent just entered adjacency while you were already in this stance, the immediate legal melee final attack and all completed round movement."
+      loc`The GC must confirm this actual opponent just entered adjacency while you were already in this stance, the immediate legal melee final attack and all completed round movement.`
     );
   const movement = stanceMovementState(system, combat);
   if (movement.feet > 5)
     throw Error(
-      "Striking Stance permits no more than5ft movement during any round. Review all completed movement before reacting."
+      loc`Striking Stance permits no more than5ft movement during any round. Review all completed movement before reacting.`
     );
   return {
     version: 1,

@@ -2,14 +2,15 @@ import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { readiedDisarmWeapons } from "./disarm-response.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Fencing Basics p.178: current qualified feat plus a readied 1h FIN sword.
  * Shared ready-source proof for melee Disarm and Feint; stance/trick are separate.
  */
 export function fencingDisarmPlan(system, { ranged = false } = {}) {
-  if (typeof ranged !== "boolean") throw Error("Review the actual melee/ranged Disarm check.");
+  if (typeof ranged !== "boolean") throw Error(loc`Review the actual melee/ranged Disarm check.`);
   if (ranged) return null;
   const weapons = system.readiedMeleeWeapons ?? [];
-  if (!Array.isArray(weapons)) throw Error("Review the current readied sword sources.");
+  if (!Array.isArray(weapons)) throw Error(loc`Review the current readied sword sources.`);
   const source = readiedMeleeFeatSource(
     { ...system, readiedMeleeWeapons: weapons.filter(w => w?.family !== "oneHandedSword" || w.finesse === true) },
     { name: "Fencing Basics", family: "oneHandedSword", bonus: 2 }
@@ -17,9 +18,9 @@ export function fencingDisarmPlan(system, { ranged = false } = {}) {
   if (!source) return null;
   const ready = system.disarmWeapons;
   if (!ready || ready.blockedReason)
-    throw Error(ready?.blockedReason || "Prepare the actual held weapons for Fencing Basics.");
+    throw Error(ready?.blockedReason || loc`Prepare the actual held weapons for Fencing Basics.`);
   if (source.weapons.some(w => !ready.weapons.some(r => r.id === w.id && r.hands === w.hands)))
-    throw Error("The Fencing Basics sword is not physically held with this grip.");
+    throw Error(loc`The Fencing Basics sword is not physically held with this grip.`);
   return { ...source, gearBonus: 2 };
 }
 const stable = v =>
@@ -47,7 +48,7 @@ export function validateFencingDisarmProof(actor, disarm, { checkKind, weaponPro
     stable(fencingDisarmPlan(system, { ranged: !melee })) !== stable(disarm.fencingBasics)
   )
     throw Error(
-      "The qualified Fencing Basics, readied one-handed sword or effective FIN quality changed before posting."
+      loc`The qualified Fencing Basics, readied one-handed sword or effective FIN quality changed before posting.`
     );
 }
 

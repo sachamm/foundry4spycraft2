@@ -2,6 +2,7 @@
 import { defaultMission, threatLevel, threatBonusActionDice, missionBaseXP } from "../../rules/gc/mission.mjs";
 import { activeQualities, campaignEffects } from "../../rules/gc/campaign.mjs";
 import { missionCatalog } from "./mission-defaults.mjs";
+import { loc } from "../../i18n.mjs";
 
 const SYSTEM = "spycraft2";
 const refresh = () => {
@@ -21,7 +22,7 @@ export function registerGCSettings() {
   game.settings.register(SYSTEM, "conflicts", hidden({}));
   game.settings.register(SYSTEM, "fluidInitiative", {
     name: "Fluid initiative",
-    hint: "Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).",
+    hint: loc`Apply recorded Table 5.2 modifiers to Initiative Counts when each combat round ends (p.324).`,
     scope: "world",
     config: true,
     type: Boolean,
@@ -29,7 +30,7 @@ export function registerGCSettings() {
   });
   game.settings.register(SYSTEM, "startFlatFooted", {
     name: "Start combat flat-footed",
-    hint: "Mark every combatant flat-footed when a combat begins (p.323). Clear it as each character acts or is hit.",
+    hint: loc`Mark every combatant flat-footed when a combat begins (p.323). Clear it as each character acts or is hit.`,
     scope: "world",
     config: true,
     type: Boolean,
@@ -45,7 +46,7 @@ const read = (key, fallback) => {
   }
 };
 export const requireGC = () => {
-  if (!game.user?.isGM) throw new Error("Only the GC can do this.");
+  if (!game.user?.isGM) throw new Error(loc`Only the GC can do this.`);
 };
 
 export const getMission = () => ({ ...defaultMission(), ...read("mission", {}) });

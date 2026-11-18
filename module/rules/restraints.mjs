@@ -1,25 +1,26 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Held/Pinned action restrictions and their Athletics escape exception (p.342). */
 export function restraintState(system) {
   return system.conditionContext?.pinned === true ? "pinned" : system.conditionContext?.held === true ? "held" : "";
 }
 export function restraintActionBlock(system, { passive = false, free = false, escape = false } = {}) {
   if (system.restraintReleaseReview?.needsReview)
-    return "The GC must review the interrupted grapple release before further actions.";
+    return loc`The GC must review the interrupted grapple release before further actions.`;
   if ((system.pendingRestraintMoves ?? []).length && passive !== true)
-    return "Complete the immediate Standard Move required by Escape Hold first.";
+    return loc`Complete the immediate Standard Move required by Escape Hold first.`;
   const state = restraintState(system);
   if (!state || passive === true || escape === true || (state === "held" && free === true)) return "";
   return state === "pinned"
-    ? "Pinned: no actions except the full-action Athletics escape check (p.342)."
-    : "Held: only free actions or the full-action Athletics escape check are available (p.342).";
+    ? loc`Pinned: no actions except the full-action Athletics escape check (p.342).`
+    : loc`Held: only free actions or the full-action Athletics escape check are available (p.342).`;
 }
 export function restraintSkillChecks(system, key, checks = []) {
   const state = restraintState(system);
   if (!state || key !== "athletics") return checks;
   const check = {
     id: "restraint-escape",
-    name: state === "pinned" ? "Break Pin (opposed Grapple)" : "Escape Hold (opposed Grapple)",
+    name: state === "pinned" ? loc`Break Pin (opposed Grapple)` : loc`Escape Hold (opposed Grapple)`,
     attributes: ["str"],
     mode: "Active",
     tags: "Armor Check Penalty, Grasp",
@@ -57,7 +58,7 @@ export function restraintSkillContext(
     timeLocked: untrained,
     blockedReason: valid
       ? ""
-      : "Confirm the opposed Grapple participants, applicable proficiency and Size difference with the GC.",
+      : loc`Confirm the opposed Grapple participants, applicable proficiency and Size difference with the GC.`,
     check: { ...restraintSkillChecks(system, key).at(-1), time: untrained ? "2 Full Actions" : "1 Full Action" }
   };
 }
@@ -106,7 +107,7 @@ export function restraintReleasePlan(
     current = restraintSourceSnapshot(actor),
     same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   if (!actor.isOwner || check?.actorUuid !== actor.uuid || (message.blind && !globalThis.game?.user?.isGM))
-    throw new Error("Choose an owned recorded grapple result; the GC resolves secret results.");
+    throw new Error(loc`Choose an owned recorded grapple result; the GC resolves secret results.`);
   if (
     !message.id ||
     !/^[A-Za-z0-9_-]+$/.test(message.id) ||
@@ -123,29 +124,31 @@ export function restraintReleasePlan(
     check.restraintEscape?.kind !== "opposedGrapple" ||
     confirmed !== true
   )
-    throw new Error("Finish and confirm the successful opposed Grapple check before applying its benefit.");
+    throw new Error(loc`Finish and confirm the successful opposed Grapple check before applying its benefit.`);
   if (source?.sources?.length > 1 && check.restraintEscape.sourceScopeConfirmed !== true)
-    throw new Error("Review which restraint sources belong to this same grapple before releasing any of them.");
+    throw new Error(loc`Review which restraint sources belong to this same grapple before releasing any of them.`);
   if (!source || !same(current, source) || !source.sources.length)
-    throw new Error("The grapple sources changed or were not recorded with this roll. Review the current hold or pin.");
+    throw new Error(
+      loc`The grapple sources changed or were not recorded with this roll. Review the current hold or pin.`
+    );
   const state = restraintState({ conditionContext: source });
   if (!state || check.restraintEscape.condition !== state)
-    throw new Error("The recorded grapple condition does not match its sources.");
+    throw new Error(loc`The recorded grapple condition does not match its sources.`);
   if (typeof opponentCriticalFailureConfirmed !== "boolean")
-    throw new Error("Confirm the opponent’s critical-failure context.");
+    throw new Error(loc`Confirm the opponent’s critical-failure context.`);
   const twoBenefits = check.criticalSuccess === true || opponentCriticalFailureConfirmed === true;
   if (
     state === "pinned"
       ? !["breakPin", ...(twoBenefits ? ["breakPinAndEscapeHold"] : [])].includes(benefit)
       : benefit !== "escapeHold"
   )
-    throw new Error("Choose a grapple escape benefit earned by this result.");
+    throw new Error(loc`Choose a grapple escape benefit earned by this result.`);
   const escapeHold = benefit !== "breakPin",
     targetStatuses = new Set(escapeHold ? ["held", "pinned"] : ["pinned"]),
     targets = source.sources.filter(s => s.statuses.some(k => targetStatuses.has(k)));
   if (targets.some(s => !s.own))
     throw new Error(
-      "A continuing item or foreign source supplies this restraint. Review its source before releasing it."
+      loc`A continuing item or foreign source supplies this restraint. Review its source before releasing it.`
     );
   const addHeld = !escapeHold && !source.held;
   if (
@@ -156,13 +159,13 @@ export function restraintReleasePlan(
         ["seconds", "rounds", "turns"].some(k => Number.isFinite(s.duration?.[k]) && s.duration[k] > 0)
     )
   )
-    throw new Error("Review this timed pin source before converting it to an ongoing hold.");
+    throw new Error(loc`Review this timed pin source before converting it to an ongoing hold.`);
   const updates = targets.map(s => ({
     id: s.id,
     before: s.statuses,
     after: [...new Set([...s.statuses.filter(k => !targetStatuses.has(k)), ...(addHeld ? ["held"] : [])])].sort()
   }));
-  if (!updates.length) throw new Error("This result has no editable restraint source.");
+  if (!updates.length) throw new Error(loc`This result has no editable restraint source.`);
   return {
     benefit,
     source,

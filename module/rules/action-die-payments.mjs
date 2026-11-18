@@ -6,6 +6,7 @@ import {
 } from "./bonus-pools.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { RESOURCE_LOCK_ID } from "./transactions.mjs";
+import { loc } from "../i18n.mjs";
 const active = new WeakMap(),
   local = new WeakMap(),
   same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -15,7 +16,7 @@ export const paymentLockToken = actor =>
   [...(actor.items ?? [])].find(i => i.id === RESOURCE_LOCK_ID)?.flags?.spycraft2?.resourceLock?.token ?? null;
 export function beginActionDiePayment(actor, id) {
   const ids = active.get(actor) ?? new Set();
-  if (ids.size) throw new Error("Combine this character’s payment sources in one transaction.");
+  if (ids.size) throw new Error(loc`Combine this character’s payment sources in one transaction.`);
   ids.add(id);
   active.set(actor, ids);
 }
@@ -51,8 +52,7 @@ export function getActionDieSettlementReview(actor) {
       markerIds: [record.id],
       purpose: record.purpose,
       messageUuid: record.messageUuid,
-      reason:
-        "An interrupted payment has no final receipt. Review the actual benefit and every selected balance before retrying."
+      reason: loc`An interrupted payment has no final receipt. Review the actual benefit and every selected balance before retrying.`
     };
   }
   return stored ?? {};
@@ -64,8 +64,8 @@ export function multipartActionDicePlan(
 ) {
   const shaken = shakenRules(system);
   if (shaken.needsReview || system.actionDieAwardReview?.needsReview || system.actionDiceSettlementReview?.needsReview)
-    throw new Error("Review the interrupted action-die or condition records before spending.");
-  if (shaken.spendingForbidden) throw new Error("Shaken IV: no action dice may be spent at all (p.342).");
+    throw new Error(loc`Review the interrupted action-die or condition records before spending.`);
+  if (shaken.spendingForbidden) throw new Error(loc`Shaken IV: no action dice may be spent at all (p.342).`);
   if (
     !paymentIdValid(id) ||
     typeof actorUuid !== "string" ||
@@ -77,7 +77,7 @@ export function multipartActionDicePlan(
     !allocations.length ||
     allocations.length > 32
   )
-    throw new Error("Choose a valid payment reference and its action-die sources.");
+    throw new Error(loc`Choose a valid payment reference and its action-die sources.`);
   const groups = new Map(),
     parts = [];
   for (const allocation of allocations) {
@@ -89,7 +89,7 @@ export function multipartActionDicePlan(
       count < 1 ||
       !["general", "boost", "surcharge"].includes(scope)
     )
-      throw new Error("Choose whole positive amounts from valid action-die sources.");
+      throw new Error(loc`Choose whole positive amounts from valid action-die sources.`);
     let funding;
     if (scope === "boost") {
       const check = message?.flags?.spycraft2;
@@ -100,7 +100,7 @@ export function multipartActionDicePlan(
         check.superseded ||
         check.criticalFailure
       )
-        throw new Error("Choose this character’s unresolved recorded roll for boost funding.");
+        throw new Error(loc`Choose this character’s unresolved recorded roll for boost funding.`);
       if (bonusPoolId) {
         const pool = bonusPoolForCheck(system, bonusPoolId, message, { periods });
         if (!pool.available) throw new Error(pool.reason);
@@ -116,7 +116,7 @@ export function multipartActionDicePlan(
           system: { ...system, actionDice: { ...ad, value: pool.remaining, die: pool.die, explodeAt: threshold } }
         };
       } else {
-        if (check.actionDiceAllowed === false) throw new Error("Ordinary action dice cannot fund this result.");
+        if (check.actionDiceAllowed === false) throw new Error(loc`Ordinary action dice cannot fund this result.`);
         funding = actionDiceFundingContext(system, { periods });
       }
     } else funding = actionDiceFundingContext(system, { bonusPoolId, periods });
@@ -124,7 +124,7 @@ export function multipartActionDicePlan(
     const existing = groups.get(bonusPoolId),
       total = (existing?.count ?? 0) + count;
     if (!Number.isSafeInteger(total) || total > funding.balance)
-      throw new Error("Not enough dice remain in a selected payment source.");
+      throw new Error(loc`Not enough dice remain in a selected payment source.`);
     groups.set(bonusPoolId, {
       ...funding,
       count: total,
@@ -135,7 +135,7 @@ export function multipartActionDicePlan(
   }
   const prepared = [...groups.values()],
     total = prepared.reduce((sum, row) => sum + row.count, 0);
-  if (!Number.isSafeInteger(total)) throw new Error("The total action-die payment is unsafe.");
+  if (!Number.isSafeInteger(total)) throw new Error(loc`The total action-die payment is unsafe.`);
   const payments = prepared.map(
       ({ bonusPoolId, label, paymentPath, balance, die, poolFingerprint, count, afterBalance }) => ({
         bonusPoolId,
@@ -168,7 +168,7 @@ export function multipartActionDicePlan(
   };
 }
 export function multipartPaymentRecord(plan, { lockToken = null, at = 0, details = {} } = {}) {
-  if (!Number.isFinite(at)) throw new Error("Review the payment time.");
+  if (!Number.isFinite(at)) throw new Error(loc`Review the payment time.`);
   return {
     id: plan.id,
     actorUuid: plan.actorUuid,
@@ -196,7 +196,7 @@ export function multipartRefundPatch(system, record) {
     !record.payments.length ||
     new Set(record.payments.map(p => p.paymentPath)).size !== record.payments.length
   )
-    throw new Error("Review the original payment sources.");
+    throw new Error(loc`Review the original payment sources.`);
   const patch = {};
   for (const payment of record.payments) Object.assign(patch, actionDicePaymentRefund(system, payment));
   patch["flags.spycraft2.actionDiePayments." + record.id] = { ...record, state: "refunded" };

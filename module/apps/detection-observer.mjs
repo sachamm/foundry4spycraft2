@@ -1,5 +1,6 @@
 import { detectionObserverPlan } from "../rules/detection-observer.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const actors = () =>
     Array.isArray(game.actors?.contents)
       ? game.actors.contents
@@ -36,11 +37,11 @@ export function detectionObserverContext(input) {
       detectionConfirmed: false
     };
   const uuid = input.detectionActorUuid;
-  if (typeof uuid !== "string") throw new Error("Choose a listed detection target.");
+  if (typeof uuid !== "string") throw new Error(loc`Choose a listed detection target.`);
   const a = actors().find(a => a.uuid === uuid);
   if (!a || a.type !== "agent" || !readable(a))
     throw new Error(
-      "Choose an actual readable agent character. Ask the GC to resolve unavailable targets or generic NPC profiles."
+      loc`Choose an actual readable agent character. Ask the GC to resolve unavailable targets or generic NPC profiles.`
     );
   return {
     detectionDistraction: severity,
@@ -55,7 +56,7 @@ export function detectionObserverContent(key) {
   const candidates = detectionObserverCandidates();
   if (!candidates.length) return "";
   const esc = foundry.utils.escapeHTML;
-  return `<details><summary>Character-detection distraction</summary><p>Only Notice/Awareness or Search/Perception against one actual agent character. Apply the observer’s distraction from Table2.25and Ghost Mastery’s additional−4when the target has it.</p><label>Distraction <select name="detectionDistraction"><option value="">No selected distraction component</option><option value="minor">Minor: check−2, error+0</option><option value="moderate">Moderate: check−4, error+1</option><option value="major">Major: check−8, error+3</option></select></label><label>Character being detected <select name="detectionActorUuid"><option value="">Choose the actual character</option>${candidates.map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`).join("")}</select></label><label><input name="detectionConfirmed" type="checkbox" /> The GC confirms this detection check targets that character and the observer faces the selected distraction</label></details>`;
+  return `<details><summary>${loc`Character-detection distraction`}</summary><p>${loc`Only Notice/Awareness or Search/Perception against one actual agent character. Apply the observer’s distraction from Table2.25and Ghost Mastery’s additional−4when the target has it.`}</p><label>${loc`Distraction`} <select name="detectionDistraction"><option value="">${loc`No selected distraction component`}</option><option value="minor">${loc`Minor: check−2, error+0`}</option><option value="moderate">${loc`Moderate: check−4, error+1`}</option><option value="major">${loc`Major: check−8, error+3`}</option></select></label><label>${loc`Character being detected`} <select name="detectionActorUuid"><option value="">${loc`Choose the actual character`}</option>${candidates.map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`).join("")}</select></label><label><input name="detectionConfirmed" type="checkbox" /> ${loc`The GC confirms this detection check targets that character and the observer faces the selected distraction`}</label></details>`;
 }
 export function validateDetectionObserverProof(proof, { checkKind, skillKey, checkId, checkMethod = "roll" } = {}) {
   if (!proof) return;
@@ -86,7 +87,7 @@ export function validateDetectionObserverProof(proof, { checkKind, skillKey, che
     !same(p.evidence, proof)
   )
     throw new Error(
-      p.blockedReason || "The detection target, distraction or Ghost Mastery source changed before posting."
+      p.blockedReason || loc`The detection target, distraction or Ghost Mastery source changed before posting.`
     );
 }
 

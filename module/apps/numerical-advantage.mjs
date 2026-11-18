@@ -1,4 +1,5 @@
 import { numericalAdvantagePlan } from "../rules/numerical-advantage.mjs";
+import { loc } from "../i18n.mjs";
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const readable = a => a && ["agent", "npc"].includes(a.type) && (a.visible || a.isOwner || game.user.isGM);
 export function numericalAdvantageCandidates(actor) {
@@ -25,17 +26,18 @@ export async function checkNumericalAdvantage(actor) {
   const candidates = numericalAdvantageCandidates(actor),
     esc = foundry.utils.escapeHTML;
   const table = (side, title) =>
-    `<fieldset><legend>${title}</legend><table class="sc2-numerical-roster"><thead><tr><th>Character / group</th><th>Physical count</th><th>Teammate group</th><th>Already counts as</th><th>Other counting ability</th></tr></thead><tbody>${candidates.map(c => `<tr data-side="${side}" data-character="${esc(c.actorUuid)}"><td>${esc(c.name)}</td><td><input name="${side}Count__${c.key}" type="number" min="0" step="1" value="${side === "own" ? c.defaultOwn : 0}" /></td><td><input name="${side}Team__${c.key}" value="${side === "own" && c.defaultOwn ? "your-team" : ""}" /></td><td><input name="${side}Base__${c.key}" type="number" min="1" step="1" value="1" /></td><td><input name="${side}Source__${c.key}" /></td></tr>`).join("")}</tbody></table></fieldset>`;
+    `<fieldset><legend>${title}</legend><table class="sc2-numerical-roster"><thead><tr><th>${loc`Character / group`}</th><th>${loc`Physical count`}</th><th>${loc`Teammate group`}</th><th>${loc`Already counts as`}</th><th>${loc`Other counting ability`}</th></tr></thead><tbody>${candidates.map(c => `<tr data-side="${side}" data-character="${esc(c.actorUuid)}"><td>${esc(c.name)}</td><td><input name="${side}Count__${c.key}" type="number" min="0" step="1" value="${side === "own" ? c.defaultOwn : 0}" /></td><td><input name="${side}Team__${c.key}" value="${side === "own" && c.defaultOwn ? "your-team" : ""}" /></td><td><input name="${side}Base__${c.key}" type="number" min="1" step="1" value="1" /></td><td><input name="${side}Source__${c.key}" /></td></tr>`).join("")}</tbody></table></fieldset>`;
   const input = await foundry.applications.api.DialogV2.input({
-    window: { title: "Check numerical advantage" },
+    window: { title: loc`Check numerical advantage` },
     position: { width: 820 },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>Enter physically present characters, not automatic counts of the directory. A group can share one Actor. Use the same teammate-group label only for actual teammates; allies in different groups do not automatically receive Tactical Advantage. Its current feat source is read from the selected character. A zero physical count with a teammate-group label may identify a remote provider.</p>${table("own", "Your side")}${table("enemy", "Opposition")}<label><input name="rosterConfirmed" type="checkbox" /> The GC confirms physical counts, opposing sides, teammate relationships and other counting sources</label></div>`
+    content: `<div class="spycraft2-roll-options"><p>${loc`Enter physically present characters, not automatic counts of the directory. A group can share one Actor. Use the same teammate-group label only for actual teammates; allies in different groups do not automatically receive Tactical Advantage. Its current feat source is read from the selected character. A zero physical count with a teammate-group label may identify a remote provider.`}</p>${table("own", "Your side")}${table("enemy", "Opposition")}<label><input name="rosterConfirmed" type="checkbox" /> ${loc`The GC confirms physical counts, opposing sides, teammate relationships and other counting sources`}</label></div>`
   });
   if (!input) return null;
-  if (!actor.isOwner) throw new Error("You must own the character.");
+  if (!actor.isOwner) throw new Error(loc`You must own the character.`);
   try {
-    if (input.rosterConfirmed !== true) throw new Error("The GC must confirm the roster and counting circumstances.");
+    if (input.rosterConfirmed !== true)
+      throw new Error(loc`The GC must confirm the roster and counting circumstances.`);
     const lookup = new Map(candidates.map(c => [c.key, c])),
       side = async prefix => {
         const rows = [];
@@ -45,10 +47,10 @@ export async function checkNumericalAdvantage(actor) {
             team = input[prefix + "Team__" + key] ?? "",
             base = number(input[prefix + "Base__" + key]),
             source = input[prefix + "Source__" + key] ?? "";
-          if (!Number.isSafeInteger(count) || count < 0) throw new Error("Use a nonnegative whole physical count.");
+          if (!Number.isSafeInteger(count) || count < 0) throw new Error(loc`Use a nonnegative whole physical count.`);
           if (!count && !String(team).trim()) continue;
           const c = lookup.get(key);
-          if (!c) throw new Error("A declared roster character is no longer available. Confirm the roster again.");
+          if (!c) throw new Error(loc`A declared roster character is no longer available. Confirm the roster again.`);
           const doc = await fromUuid(c.uuid),
             current = doc?.documentName === "Token" ? doc.actor : doc;
           if (
@@ -56,7 +58,7 @@ export async function checkNumericalAdvantage(actor) {
             current.uuid !== c.actorUuid ||
             (doc?.documentName === "Token" && doc.hidden && !game.user.isGM)
           )
-            throw new Error("A declared roster character changed or became unavailable. Confirm the roster again.");
+            throw new Error(loc`A declared roster character changed or became unavailable. Confirm the roster again.`);
           rows.push({
             id: c.uuid,
             name: doc?.documentName === "Token" ? doc.name : current.name,
@@ -73,7 +75,7 @@ export async function checkNumericalAdvantage(actor) {
       opposition = await side("enemy"),
       plan = numericalAdvantagePlan({ own, opposition, rosterConfirmed: true });
     const details = (side, name) =>
-      `<p><b>${name}: ${side.physical} physical / ${side.effective} counted characters.</b></p>${side.rows
+      `<p><b>${loc`${name}: ${side.physical} physical / ${side.effective} counted characters.`}</b></p>${side.rows
         .filter(r => r.characters || (r.tacticalAdvantage && r.team))
         .map(
           r =>
@@ -81,10 +83,10 @@ export async function checkNumericalAdvantage(actor) {
         )
         .join("")}`;
     await foundry.applications.api.DialogV2.input({
-      window: { title: "Numerical advantage — result" },
+      window: { title: loc`Numerical advantage — result` },
       position: { width: 720 },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options">${details(plan.own, "Your side")}${details(plan.opposition, "Opposition")}<p>At least 2-to-1: ${plan.twoToOne ? "yes" : "no"}; at least 3-to-1: ${plan.threeToOne ? "yes" : "no"}. ${plan.opponentsPresent ? "" : "Both sides need actual opposing characters to evaluate combat thresholds."}</p>${plan.notes.map(n => `<p>${esc(n)}</p>`).join("")}</div>`
+      content: `<div class="spycraft2-roll-options">${details(plan.own, "Your side")}${details(plan.opposition, "Opposition")}<p>${loc`At least 2-to-1: ${plan.twoToOne ? "yes" : "no"}; at least 3-to-1: ${plan.threeToOne ? "yes" : "no"}. ${plan.opponentsPresent ? "" : loc`Both sides need actual opposing characters to evaluate combat thresholds.`}`}</p>${plan.notes.map(n => `<p>${esc(n)}</p>`).join("")}</div>`
     });
     return plan;
   } catch (error) {

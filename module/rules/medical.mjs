@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Named Medicine combat restrictions, pp.141–143; Bandage's error-range benefit, p.172. */
 export function medicalSkillPlan(
   system,
@@ -30,11 +31,11 @@ export function medicalSkillPlan(
     nearbyConflict = dramaticConflictNearby === true || inDramaticConflict === true,
     blockedReason =
       check.id === "therapy" && (activeCombat || nearbyTask || nearbyConflict)
-        ? "Therapy cannot occur during combat or while a Complex Task or Dramatic Conflict is under way nearby (p.143)."
+        ? loc`Therapy cannot occur during combat or while a Complex Task or Dramatic Conflict is under way nearby (p.143).`
         : "";
   const notes = errorIncrease
     ? [
-        `Medicine combat error increase +${errorIncrease}${bandage ? " (Bandage halves the normal increase)" : ""}${surgeryCombat ? "; combat occurred within line of sight during Surgery" : ""}.`
+        loc`Medicine combat error increase +${errorIncrease}${bandage ? loc` (Bandage halves the normal increase)` : ""}${surgeryCombat ? loc`; combat occurred within line of sight during Surgery` : ""}.`
       ]
     : [];
   return {

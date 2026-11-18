@@ -1,5 +1,6 @@
 import { knownSneakAttackImmunity } from "../rules/sneak-attack.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 export function damageTargetChoices() {
   const targets = values(game.user?.targets),
@@ -19,10 +20,10 @@ export function damageTargetChoices() {
 }
 export async function resolveDamageTarget(uuid) {
   if (uuid === "" || uuid === undefined || uuid === null) return null;
-  if (typeof uuid !== "string") throw new Error("Choose an actual character target or confirm a manual target.");
+  if (typeof uuid !== "string") throw new Error(loc`Choose an actual character target or confirm a manual target.`);
   const actor = await fromUuid(uuid);
   if (actor?.documentName !== "Actor" || !["agent", "npc"].includes(actor.type) || !actor.system)
-    throw new Error("The selected character target is unavailable. Confirm it again.");
+    throw new Error(loc`The selected character target is unavailable. Confirm it again.`);
   return actor;
 }
 const protectionSignature = actor =>
@@ -36,11 +37,11 @@ export const sneakAttackTargetSnapshot = actor =>
 export async function validateSneakAttackTarget(snapshot) {
   if (!snapshot) return;
   if (typeof snapshot.actorUuid !== "string" || typeof snapshot.protectionSignature !== "string")
-    throw new Error("Review the saved sneak attack target.");
+    throw new Error(loc`Review the saved sneak attack target.`);
   const actor = await resolveDamageTarget(snapshot.actorUuid);
   if (!actor || protectionSignature(actor) !== snapshot.protectionSignature)
-    throw new Error("The target’s armor or protection changed. Confirm damage again.");
-  if (knownSneakAttackImmunity(actor.system).immune) throw new Error("The target is immune to sneak attack damage.");
+    throw new Error(loc`The target’s armor or protection changed. Confirm damage again.`);
+  if (knownSneakAttackImmunity(actor.system).immune) throw new Error(loc`The target is immune to sneak attack damage.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

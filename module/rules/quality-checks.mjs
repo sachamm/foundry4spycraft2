@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 export const CAMOUFLAGE_TERRAINS = {
   aquatic: "Aquatic",
   arctic: "Arctic",
@@ -50,7 +51,7 @@ export function qualitySkillChecks(
     if (value) {
       bonuses.push({ source, value, type: "" });
       notes.push(
-        `${source}: +${value} to this ${source === "Seductive" ? "declared disposition/seduction" : "named"} check.`
+        loc`${source}: +${value} to this ${source === "Seductive" ? loc`declared disposition/seduction` : "named"} check.`
       );
     }
   return {

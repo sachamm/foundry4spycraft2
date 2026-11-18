@@ -20,6 +20,7 @@ import {
   bullseyeContent
 } from "../../apps/standard-attack-context.mjs";
 import { cqbRangedWeapon } from "../../rules/cqb.mjs";
+import { loc } from "../../i18n.mjs";
 
 /** [position, render(context)] — context holds the acting character and the values the roll has worked out so far. */
 const parts = [
@@ -35,7 +36,7 @@ const parts = [
   [
     40,
     () =>
-      `<label><input type="checkbox" name="targetFlanked" /> I am flanking this opponent with this attack, satisfying the applicable position, ready-weapon and Reach/CQB requirements (p.341)</label><label><input type="checkbox" name="targetPinnedAdjacent" /> Target is pinned and I am adjacent (+4 melee/unarmed attack)</label><label><input type="checkbox" name="targetAnimal" /> This attack targets an animal (Scout Game Hunter, p.43)</label>`
+      `<label><input type="checkbox" name="targetFlanked" /> ${loc`I am flanking this opponent with this attack, satisfying the applicable position, ready-weapon and Reach/CQB requirements (p.341)`}</label><label><input type="checkbox" name="targetPinnedAdjacent" /> ${loc`Target is pinned and I am adjacent (+4 melee/unarmed attack)`}</label><label><input type="checkbox" name="targetAnimal" /> ${loc`This attack targets an animal (Scout Game Hunter, p.43)`}</label>`
   ],
   [
     50,
@@ -48,7 +49,7 @@ const parts = [
     60,
     ({ needsCQB, options }) =>
       needsCQB
-        ? `<label>CQB target distance (feet) <input name="distanceFeet" type="number" min="0" step="any" required value="${Number.isFinite(options.distanceFeet) ? options.distanceFeet : ""}" /></label><label><input name="targetOpponentConfirmed" type="checkbox" /> This attack targets an opponent (CQB Mastery threat benefit)</label>`
+        ? `<label>${loc`CQB target distance (feet)`} <input name="distanceFeet" type="number" min="0" step="any" required value="${Number.isFinite(options.distanceFeet) ? options.distanceFeet : ""}" /></label><label><input name="targetOpponentConfirmed" type="checkbox" /> ${loc`This attack targets an opponent (CQB Mastery threat benefit)`}</label>`
         : ""
   ],
   [70, () => `</div>`]

@@ -2,6 +2,7 @@ import { weaponGrip } from "./gear.mjs";
 import { combatStanceState } from "./combat-stance.mjs";
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Record the physical grip only when the new stance affects this melee attack. */
 export function grippingAttackProof(system, weapon, { ranged = false, hands = weapon.useHands ?? 0 } = {}) {
   const stance = combatStanceState(system),
@@ -42,7 +43,7 @@ export function validateGrippingAttackProof(
     attackContext.ranged !== false ||
     !actor.system.activeFeatNames?.includes("Spear Basics")
   )
-    throw Error("The qualified Gripping Stance melee attack changed.");
+    throw Error(loc`The qualified Gripping Stance melee attack changed.`);
   let system = actor.system,
     items = [...(actor.items ?? [])];
   if (rerollOf) {
@@ -56,20 +57,20 @@ export function validateGrippingAttackProof(
       c.superseded ||
       stable(c.attackContext?.grippingStance) !== stable(proof)
     )
-      throw Error("Use the original owned Gripping Stance attack for this replacement.");
+      throw Error(loc`Use the original owned Gripping Stance attack for this replacement.`);
     system = { ...system, combatStance: { ...proof.stance } };
     items = readiedItemsForCheck(actor, { rerollOf, disarm: c.attackContext?.disarm });
   }
   const item = items.find(i => (i.id ?? i._id) === proof.weaponId);
   if (!item || item.type !== "weapon" || (weaponUuid && item.uuid !== weaponUuid))
-    throw Error("The actual Gripping Stance weapon changed.");
+    throw Error(loc`The actual Gripping Stance weapon changed.`);
   const current = grippingAttackProof(
     system,
     { ...item.system, id: item.id ?? item._id },
     { ranged: false, hands: attackContext.hands ?? item.system.useHands ?? 0 }
   );
   if (stable(current) !== stable(proof))
-    throw Error("The actual grip, qualified Gripping Stance or weapon changed before posting.");
+    throw Error(loc`The actual grip, qualified Gripping Stance or weapon changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

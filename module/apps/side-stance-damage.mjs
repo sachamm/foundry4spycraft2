@@ -2,6 +2,7 @@ import { sideStanceAttackRoot } from "./side-stance.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   stable = v =>
@@ -20,7 +21,7 @@ const message = id =>
 export function sideDamageUseRows(system) {
   const rows = system.sideStanceDamageUses ?? [],
     seen = new Set();
-  if (!Array.isArray(rows)) throw Error("Review the recorded Side Stance damage uses.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the recorded Side Stance damage uses.`);
   for (const r of rows) {
     if (
       r?.version !== 1 ||
@@ -39,7 +40,7 @@ export function sideDamageUseRows(system) {
       !r.sourceEvidence ||
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid))
     )
-      throw Error("Review the recorded Side Stance damage uses.");
+      throw Error(loc`Review the recorded Side Stance damage uses.`);
     seen.add(r.rootAttackUuid);
   }
   return rows;
@@ -63,7 +64,7 @@ export function sideStanceDamageSource(actor, attack, item, { targetUuid } = {})
     item?.uuid !== c.weaponUuid
   )
     throw Error(
-      "Choose a resolved successful Standard Attack with this exact weapon and its recorded Side Stance die."
+      loc`Choose a resolved successful Standard Attack with this exact weapon and its recorded Side Stance die.`
     );
   const owned = actor.items?.get?.(item.id) ?? values(actor.items).find(i => i.id === item.id);
   if (
@@ -73,7 +74,7 @@ export function sideStanceDamageSource(actor, attack, item, { targetUuid } = {})
     owned.system.proficiency !== c.weaponProficiency ||
     item.system.proficiency !== c.weaponProficiency
   )
-    throw Error("Use the actual owned weapon and operating proficiency of the recorded Side Stance attack.");
+    throw Error(loc`Use the actual owned weapon and operating proficiency of the recorded Side Stance attack.`);
   const actualTarget =
     c.attackContext.targetActorUuid ||
     c.attackContext.characterTarget?.actorUuid ||
@@ -81,7 +82,7 @@ export function sideStanceDamageSource(actor, attack, item, { targetUuid } = {})
     c.finalAttack?.opponentUuid ||
     c.finalAttack?.targetUuid;
   if (actualTarget !== p.targetUuid || (targetUuid && targetUuid !== p.targetUuid))
-    throw Error("Use the recorded Side Stance attack’s actual target.");
+    throw Error(loc`Use the recorded Side Stance attack’s actual target.`);
   const rootAttackUuid = sideStanceAttackRoot(actor, p, attack);
   return {
     version: 1,
@@ -126,7 +127,7 @@ function validateSource(actor, proof) {
   const expected = sideStanceDamageSource(actor, attack, item, { targetUuid: proof.targetUuid }),
     { reservationId, ...facts } = proof;
   if (typeof reservationId !== "string" || !reservationId || stable(expected) !== stable(facts))
-    throw Error("The original Side Stance hit, target or damage source changed.");
+    throw Error(loc`The original Side Stance hit, target or damage source changed.`);
   return expected;
 }
 function originalDamage(actor, proof, rerollOf) {
@@ -139,7 +140,7 @@ function originalDamage(actor, proof, rerollOf) {
     c.superseded ||
     stable(c.sideStanceDamage) !== stable(proof)
   )
-    throw Error("Use the actual original damage receipt to replace its Side Stance die.");
+    throw Error(loc`Use the actual original damage receipt to replace its Side Stance die.`);
   const use = sideDamageUseRows(actor.system).find(
       r => r.rootAttackUuid === proof.rootAttackUuid && r.reservationId === proof.reservationId
     ),
@@ -156,7 +157,7 @@ function originalDamage(actor, proof, rerollOf) {
       break;
     current = previous;
   }
-  throw Error("This damage receipt does not own the recorded Side Stance use.");
+  throw Error(loc`This damage receipt does not own the recorded Side Stance use.`);
 }
 export function validateSideStanceDamageProof(
   actor,
@@ -170,7 +171,7 @@ export function validateSideStanceDamageProof(
     sneakAttack?.active !== true ||
     !sneakAttack.sources?.some(s => s.source === "Side Stance" && s.dice === 1)
   )
-    throw Error("Side Stance must augment this recorded attack’s combined sneak damage.");
+    throw Error(loc`Side Stance must augment this recorded attack’s combined sneak damage.`);
   validateSource(actor, proof);
   if (rerollOf) {
     originalDamage(actor, proof, rerollOf);
@@ -182,7 +183,7 @@ export function validateSideStanceDamageProof(
       r => r.rootAttackUuid === proof.rootAttackUuid && r.reservationId === proof.reservationId && !r.receiptUuid
     )
   )
-    throw Error("Reserve this Side Stance damage use through the original hit.");
+    throw Error(loc`Reserve this Side Stance damage use through the original hit.`);
 }
 export async function withSideStanceDamage(actor, proof, perform) {
   const lease = {};
@@ -190,7 +191,7 @@ export async function withSideStanceDamage(actor, proof, perform) {
     validateSource(actor, proof);
     const rows = sideDamageUseRows(actor.system);
     if (rows.some(r => r.rootAttackUuid === proof.rootAttackUuid))
-      throw Error("This Side Stance attack already has damage, or an interrupted damage use awaiting GC review.");
+      throw Error(loc`This Side Stance attack already has damage, or an interrupted damage use awaiting GC review.`);
     await actor.update({
       "system.sideStanceDamageUses": [
         ...rows,
@@ -221,7 +222,7 @@ export async function withSideStanceDamage(actor, proof, perform) {
         const rows = sideDamageUseRows(actor.system),
           use = rows.find(r => r.rootAttackUuid === proof.rootAttackUuid);
         if (use?.reservationId !== proof.reservationId)
-          throw Error("The Side Stance damage reservation changed; ask the GC to review it.");
+          throw Error(loc`The Side Stance damage reservation changed; ask the GC to review it.`);
         await actor.update({
           "system.sideStanceDamageUses": receipt
             ? rows.map(r => (r.rootAttackUuid === proof.rootAttackUuid ? { ...r, receiptUuid: receipt.uuid } : r))
@@ -243,7 +244,7 @@ export async function withSideStanceDamage(actor, proof, perform) {
     } catch (cleanup) {
       throw new AggregateError(
         [error, cleanup],
-        "The Side Stance damage needs GC review; inspect its receipt before retrying."
+        loc`The Side Stance damage needs GC review; inspect its receipt before retrying.`
       );
     }
     if (receipt) return receipt;
@@ -255,8 +256,8 @@ export async function withSideStanceDamage(actor, proof, perform) {
 }
 export async function reviewSideStanceDamage(actor, { reservationId, confirmed = false } = {}) {
   if (!game.user.isGM || !actor.isOwner || confirmed !== true)
-    throw Error("The GC must confirm the interrupted Side Stance damage was reviewed.");
-  if (active.has(actor.uuid + ":" + reservationId)) throw Error("This client is still executing that damage roll.");
+    throw Error(loc`The GC must confirm the interrupted Side Stance damage was reviewed.`);
+  if (active.has(actor.uuid + ":" + reservationId)) throw Error(loc`This client is still executing that damage roll.`);
   return queueRuleState(actor, async () => {
     const rows = sideDamageUseRows(actor.system),
       use = rows.find(r => r.reservationId === reservationId && !r.receiptUuid);
@@ -267,14 +268,14 @@ export async function reviewSideStanceDamage(actor, { reservationId, confirmed =
         m.flags.spycraft2.checkKind === "damage" &&
         m.flags.spycraft2.sideStanceDamage?.reservationId === reservationId
     );
-    if (posted.length > 1) throw Error("Multiple damage receipts require manual GC review.");
+    if (posted.length > 1) throw Error(loc`Multiple damage receipts require manual GC review.`);
     const receipt = posted[0];
     if (
       receipt &&
       (receipt.flags.spycraft2.sideStanceDamage.rootAttackUuid !== use.rootAttackUuid ||
         receipt.flags.spycraft2.sideStanceDamage.sourceEvidence !== use.sourceEvidence)
     )
-      throw Error("The posted damage does not match its interrupted Side Stance hit.");
+      throw Error(loc`The posted damage does not match its interrupted Side Stance hit.`);
     await actor.update({
       "system.sideStanceDamageUses": receipt
         ? rows.map(r => (r.reservationId === reservationId ? { ...r, receiptUuid: receipt.uuid } : r))

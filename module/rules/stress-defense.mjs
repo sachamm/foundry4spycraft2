@@ -1,4 +1,5 @@
 import { preparedResistanceSource } from "./resistances.mjs";
+import { loc } from "../i18n.mjs";
 /** p.333 resistance still applies to stress; p.339 stress bypasses all DR. */
 export function stressDefenseSource(system) {
   return {
@@ -11,8 +12,8 @@ export const fireStressDefenseSourceSnapshot = system =>
   JSON.stringify([stressDefenseSource(system), system.activeFeatNames?.includes("Firefighter Training") === true]);
 export function stressDefensePlan(system, rawDamage, { fromFire = false } = {}) {
   if (!Number.isSafeInteger(rawDamage) || rawDamage < 0)
-    throw new Error("Enter safe nonnegative whole stress damage before prepared resistance.");
-  if (typeof fromFire !== "boolean") throw new Error("Confirm whether this stress damage was caused by fire.");
+    throw new Error(loc`Enter safe nonnegative whole stress damage before prepared resistance.`);
+  if (typeof fromFire !== "boolean") throw new Error(loc`Confirm whether this stress damage was caused by fire.`);
   const source = stressDefenseSource(system),
     firefighter = fromFire && system.activeFeatNames?.includes("Firefighter Training") === true,
     adjustedDamage = firefighter ? Math.floor(rawDamage / 2) : rawDamage,

@@ -1,4 +1,5 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Current Hide circumstances, p.161; Ghost Supremacy's hiding-place exception, p.195. */
 export function hideCircumstancePlan(
   system,
@@ -17,7 +18,7 @@ export function hideCircumstancePlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (hideCircumstances === false) return empty;
   if (hideCircumstances !== true || key !== "sneak" || check?.id !== "hide")
-    return reject("Declare these current circumstances only for a Sneak/Hide check.");
+    return reject(loc`Declare these current circumstances only for a Sneak/Hide check.`);
   if (
     hideCircumstancesConfirmed !== true ||
     [hideApparentPlace, hideLocationKnown, hideDistractionOpportunity].some(v => typeof v !== "boolean") ||
@@ -25,18 +26,18 @@ export function hideCircumstancePlan(
     hideAreaPeople < 0
   )
     return reject(
-      "The GC must confirm the actual people in this 30-ft. × 30-ft. area, apparent hiding place and observer/distraction circumstances."
+      loc`The GC must confirm the actual people in this 30-ft. × 30-ft. area, apparent hiding place and observer/distraction circumstances.`
     );
   if (hideLocationKnown && !hideDistractionOpportunity)
     return reject(
-      "An observer who knows your location must have an actual distraction opportunity before you can escape detection with Hide (p.161), including with Ghost Supremacy."
+      loc`An observer who knows your location must have an actual distraction opportunity before you can escape detection with Hide (p.161), including with Ghost Supremacy.`
     );
   const sources = [];
   if (!hideApparentPlace) {
     if (!Array.isArray(system?.activeFeatNames) || system.activeFeatNames.some(n => typeof n !== "string" || !n.trim()))
-      return reject("Review the character’s current qualified Ghost sources.");
+      return reject(loc`Review the character’s current qualified Ghost sources.`);
     if (!system.activeFeatNames.includes("Ghost Supremacy"))
-      return reject("Hiding without an apparent place requires current qualified Ghost Supremacy (p.195).");
+      return reject(loc`Hiding without an apparent place requires current qualified Ghost Supremacy (p.195).`);
     sources.push("Ghost Supremacy");
   }
   const baseAbility = hideAreaPeople < 10 ? "dex" : "cha";
@@ -58,14 +59,14 @@ export function hideCircumstancePlan(
     baseAbility,
     blockedReason: "",
     notes: [
-      `GC-confirmed Hide area: ${hideAreaPeople} people in 30 ft. × 30 ft.; normal key attribute ${baseAbility.toUpperCase()} (p.161), before any actual attribute substitution.`,
-      ...(sources.length ? ["Ghost Supremacy permits this check without an apparent hiding place (p.195)."] : []),
+      loc`GC-confirmed Hide area: ${hideAreaPeople} people in 30 ft. × 30 ft.; normal key attribute ${baseAbility.toUpperCase()} (p.161), before any actual attribute substitution.`,
+      ...(sources.length ? [loc`Ghost Supremacy permits this check without an apparent hiding place (p.195).`] : []),
       ...(hideLocationKnown
         ? [
-            "The observer knows your location; the GC confirms an actual opportunity to duck away while distracted (p.161)."
+            loc`The observer knows your location; the GC confirms an actual opportunity to duck away while distracted (p.161).`
           ]
         : []),
-      "Resolve the opposed observer result and any gained/lost hidden state separately."
+      loc`Resolve the opposed observer result and any gained/lost hidden state separately.`
     ]
   };
 }
@@ -104,9 +105,9 @@ export function validateHideCircumstanceProof(
     attributeSubstitution.ability === "int" &&
     (system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : proof.baseAbility))
-    throw Error("The Hide key attribute or actual substitution source changed before posting.");
+    throw Error(loc`The Hide key attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
-    throw Error("The Hide circumstances or qualified Ghost Supremacy source changed before posting.");
+    throw Error(loc`The Hide circumstances or qualified Ghost Supremacy source changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

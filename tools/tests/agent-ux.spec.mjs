@@ -9,8 +9,12 @@ const css =
   readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8") +
   readFileSync(new URL("../../styles/retro.css", import.meta.url), "utf8");
 
+// The modules import the translation tag; a page script cannot resolve that path, so it is inlined.
+const i18n = readFileSync(new URL("../../module/i18n.mjs", import.meta.url), "utf8").replace(/^export /gm, "");
+const inline = source => source.replace(/^import \{ loc \} from "[^"]+";\n/m, `${i18n}\n`);
+
 async function load(page, source, name) {
-  await page.addScriptTag({ type: "module", content: `${source}\nwindow.${name}=${name};` });
+  await page.addScriptTag({ type: "module", content: `${inline(source)}\nwindow.${name}=${name};` });
   await page.waitForFunction(name => typeof window[name] === "function", name);
 }
 

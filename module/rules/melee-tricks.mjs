@@ -6,6 +6,7 @@ import { tradeoffTarget } from "./melee-tradeoff.mjs";
 import { ownedWeaponTraining, weaponSourceIdentity } from "./weapon-training.mjs";
 import { bullseyeDamageSourceFacts } from "./bullseye.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -123,8 +124,8 @@ export function meleeTrickPlan(
     throw Error(
       d?.fullAction === false
         ? d.source +
-            " requires a melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied."
-        : "This melee feat trick requires a full-action melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied."
+            loc` requires a melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied.`
+        : loc`This melee feat trick requires a full-action melee Standard Attack and confirmation that it is the only Melee/Unarmed Combat feat trick applied.`
     );
   const source = readiedMeleeFeatSource(system, { name: d.feat, family: d.family, bonus: d.attackBonus }),
     held = source?.weapons.find(w => w.id === weapon.id);
@@ -136,12 +137,12 @@ export function meleeTrickPlan(
     held.requiredHands !== grip.required
   )
     throw Error(
-      `${d.source} requires its earned ${d.feat} feat and this actual readied ${d.weaponLabel} with a legal grip.`
+      loc`${d.source} requires its earned ${d.feat} feat and this actual readied ${d.weaponLabel} with a legal grip.`
     );
   if (trick === "threadNeedle" && (typeof targetUuid !== "string" || !targetUuid || targetUuid.startsWith("manual:")))
-    throw Error("Thread the Needle requires its actual observed character target.");
+    throw Error(loc`Thread the Needle requires its actual observed character target.`);
   if (trick === "fend" && !validFendTiming(fendTiming))
-    throw Error("Declare Fend with the actual active participant or out-of-combat world time.");
+    throw Error(loc`Declare Fend with the actual active participant or out-of-combat world time.`);
   const movement = trick === "spearCharge" ? spearChargeMovementPlan(system, spearChargeMovement ?? {}) : null;
   return {
     version: 1,
@@ -220,7 +221,7 @@ export function validateMeleeTrickProof(
   if (!proof) return;
   const item = actor.items?.get?.(proof.weaponId) ?? actor.items?.find?.(i => i.id === proof.weaponId);
   if (checkKind !== "attack" || !item || item.uuid !== weaponUuid)
-    throw Error("The actual owned melee trick weapon changed.");
+    throw Error(loc`The actual owned melee trick weapon changed.`);
   ownedWeaponTraining(actor, proof, { checkKind, weaponUuid, weaponProficiency, attackContext });
   if (rerollOf) {
     const c = globalThis.fromUuidSync?.(rerollOf)?.flags?.spycraft2;
@@ -233,11 +234,11 @@ export function validateMeleeTrickProof(
       stable(c.attackContext?.meleeTrick) !== stable(proof) ||
       (proof.grantedQuality && c.weaponQualities !== weaponQualities)
     )
-      throw Error("Use the original owned melee trick attack for its replacement.");
+      throw Error(loc`Use the original owned melee trick attack for its replacement.`);
     return;
   }
   if (finalAttack && MELEE_ATTACK_TRICKS[proof.key]?.fullAction !== false)
-    throw Error("This melee feat trick requires its own full action, not a final attack opportunity.");
+    throw Error(loc`This melee feat trick requires its own full action, not a final attack opportunity.`);
   const p = actor.weaponAttack(item, {
     ...attackContext,
     ambientLight: typeof attackContext.ambientLight === "string" ? attackContext.ambientLight : "",
@@ -258,13 +259,13 @@ export function validateMeleeTrickProof(
     stable(meleeTrickSourceFacts(p.meleeTrick)) !== stable(meleeTrickSourceFacts(proof)) ||
     (proof.grantedQuality && p.effectiveQualities !== weaponQualities)
   )
-    throw Error("The actual melee trick, qualified source, readied weapon, grip or target changed before posting.");
+    throw Error(loc`The actual melee trick, qualified source, readied weapon, grip or target changed before posting.`);
 }
 
 /** Local derived view only; never edits the source Item or accepts arbitrary qualities. */
 export function grantedMeleeQuality(qualities = "", quality) {
   if (!quality) return qualities;
-  if (quality !== "TKD") throw Error("Unsupported earned melee trick quality.");
+  if (quality !== "TKD") throw Error(loc`Unsupported earned melee trick quality.`);
   return /\bTKD\b/.test(qualities) ? qualities : [qualities, "TKD"].filter(Boolean).join(", ");
 }
 

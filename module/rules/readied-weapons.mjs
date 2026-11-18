@@ -1,6 +1,7 @@
 import { finesseWeaponPlan } from "./finesse.mjs";
 import { weaponGrip, weaponUnavailable } from "./gear.mjs";
 import { cqbRangedWeapon } from "./cqb.mjs";
+import { loc } from "../i18n.mjs";
 /** Gear represents a physically held/readied personal weapon with equipped+carried flags.
  * Ammunition and proficiency are not prerequisites for merely holding the weapon.
  */
@@ -113,7 +114,7 @@ export function readiedMeleeFeatSource(system, { name, family, bonus }) {
   const names = system.activeFeatNames ?? [],
     weapons = system.readiedMeleeWeapons ?? [];
   if (!Array.isArray(names) || names.some(n => typeof n !== "string") || !Array.isArray(weapons))
-    throw Error("Review the current qualified melee feats and readied weapon families.");
+    throw Error(loc`Review the current qualified melee feats and readied weapon families.`);
   if (!names.includes(name)) return null;
   const held = weapons.filter(w => w?.family === family);
   if (
@@ -130,14 +131,14 @@ export function readiedMeleeFeatSource(system, { name, family, bonus }) {
     ) ||
     new Set(held.map(w => w.id)).size !== held.length
   )
-    throw Error("Review the actual held melee weapon identity and legal grip.");
+    throw Error(loc`Review the actual held melee weapon identity and legal grip.`);
   if (held.length) {
     const ready = system.disarmWeapons;
     if (
       ready !== undefined &&
       (ready?.version !== 1 || !Array.isArray(ready.weapons) || typeof ready.blockedReason !== "string")
     )
-      throw Error("Review the actual physically held weapon capacity.");
+      throw Error(loc`Review the actual physically held weapon capacity.`);
     if (ready?.blockedReason) throw Error(ready.blockedReason);
     const physical = ready?.weapons ?? weapons;
     if (
@@ -145,7 +146,9 @@ export function readiedMeleeFeatSource(system, { name, family, bonus }) {
       new Set(physical.map(w => w.id)).size !== physical.length ||
       physical.reduce((n, w) => n + w.hands, 0) > 2
     )
-      throw Error("Review which weapons are actually held: melee feat benefits require legal grips within two hands.");
+      throw Error(
+        loc`Review which weapons are actually held: melee feat benefits require legal grips within two hands.`
+      );
     if (
       ready &&
       held.some(
@@ -159,7 +162,7 @@ export function readiedMeleeFeatSource(system, { name, family, bonus }) {
           )
       )
     )
-      throw Error("The melee feat weapon is not physically held with its recorded grip.");
+      throw Error(loc`The melee feat weapon is not physically held with its recorded grip.`);
   }
   return held.length
     ? {

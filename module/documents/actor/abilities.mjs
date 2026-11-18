@@ -71,6 +71,7 @@ import {
 import { pointmanLevel } from "../../rules/action-dice.mjs";
 import { computeAgent } from "../../rules/engine.mjs";
 import { LimitedUseCancelled } from "./shared.mjs";
+import { loc } from "../../i18n.mjs";
 
 export const ActorAbilities = Base =>
   class ActorAbilities extends Base {
@@ -145,27 +146,27 @@ export const ActorAbilities = Base =>
     }
 
     async reviewLimitedUseCounter(id, options = {}) {
-      if (!game.user?.isGM || !this.isOwner) throw new Error("Only an owning GC can correct a saved use counter.");
+      if (!game.user?.isGM || !this.isOwner) throw new Error(loc`Only an owning GC can correct a saved use counter.`);
       const candidate = this.counterReviewSpec(id),
         spec = candidate ? { ...candidate } : null,
         before = JSON.stringify(this.system.resourceUses?.[id]),
         epoch = String(this.usagePeriods[spec?.period] ?? "initial");
       if (spec?.combatScoped && !this.participatingCombat?.started)
-        throw new Error("Start the character’s combat before reviewing its current combat or round allowance.");
+        throw new Error(loc`Start the character’s combat before reviewing its current combat or round allowance.`);
       if (
         !spec ||
         (!spec.manualReviewable && !resourceStatus(spec, this.system.resourceUses, this.usagePeriods).counterReview)
       )
-        return ui.notifications.warn("This saved counter does not need review.");
+        return ui.notifications.warn(loc`This saved counter does not need review.`);
       if (!Number.isSafeInteger(spec.limit) || spec.limit < 0)
-        throw new Error("Correct this ability’s source/limit before reviewing its use count.");
+        throw new Error(loc`Correct this ability’s source/limit before reviewing its use count.`);
       let input = options;
       if (!Object.hasOwn(input, "used")) {
         const esc = foundry.utils.escapeHTML;
         input = await systemDialog.input({
-          window: { title: `Review saved uses: ${spec.name}` },
+          window: { title: loc`Review saved uses: ${spec.name}` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${resourceStatus(spec, this.system.resourceUses, this.usagePeriods).counterReview ? "This use history needs verification." : "Review the actual uses already resolved, including uses handled at the table or through other controls."} Confirm the actual uses already spent in the current ${esc(spec.period)}. No unused allowance is assumed. Current source allowance: ${esc(spec.limitLabel ?? String(spec.limit))}.</p><details><summary>Saved record for review</summary><pre>${esc(JSON.stringify(this.system.resourceUses?.[id]) ?? "missing")}</pre></details><label>Uses already spent <input name="used" type="number" min="0" step="1" required /></label><label>Reason / source of corrected history <input name="reason" required /></label><label><input name="confirmed" type="checkbox" /> This is the GC-confirmed count for the current period</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`${resourceStatus(spec, this.system.resourceUses, this.usagePeriods).counterReview ? loc`This use history needs verification.` : loc`Review the actual uses already resolved, including uses handled at the table or through other controls.`} Confirm the actual uses already spent in the current ${esc(spec.period)}. No unused allowance is assumed. Current source allowance: ${esc(spec.limitLabel ?? String(spec.limit))}.`}</p><details><summary>${loc`Saved record for review`}</summary><pre>${esc(JSON.stringify(this.system.resourceUses?.[id]) ?? "missing")}</pre></details><label>${loc`Uses already spent`} <input name="used" type="number" min="0" step="1" required /></label><label>${loc`Reason / source of corrected history`} <input name="reason" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`This is the GC-confirmed count for the current period`}</label></div>`
         });
         if (!input) return null;
       }
@@ -176,10 +177,10 @@ export const ActorAbilities = Base =>
             ? Number(input.used)
             : NaN;
       return queueResources([this], async () => {
-        if (!game.user?.isGM || !this.isOwner) throw new Error("Only an owning GC can correct this counter.");
+        if (!game.user?.isGM || !this.isOwner) throw new Error(loc`Only an owning GC can correct this counter.`);
         const fresh = this.counterReviewSpec(id);
         if (fresh?.combatScoped && !this.participatingCombat?.started)
-          throw new Error("The combat ended during review; the saved history was retained.");
+          throw new Error(loc`The combat ended during review; the saved history was retained.`);
         if (
           !fresh ||
           fresh.limit !== spec.limit ||
@@ -187,7 +188,7 @@ export const ActorAbilities = Base =>
           String(this.usagePeriods[fresh.period] ?? "initial") !== epoch ||
           JSON.stringify(this.system.resourceUses?.[id]) !== before
         )
-          throw new Error("This source, period or counter changed during review. Review its current history again.");
+          throw new Error(loc`This source, period or counter changed during review. Review its current history again.`);
         const plan = resourceCounterReviewPlan(fresh, this.system.resourceUses, this.usagePeriods, {
           used,
           reason: input.reason,
@@ -198,7 +199,7 @@ export const ActorAbilities = Base =>
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
             whisper: ChatMessage.getWhisperRecipients("GM").map(u => u.id),
-            content: `Saved-use review: ${foundry.utils.escapeHTML(fresh.name)}; ${used} already spent this ${foundry.utils.escapeHTML(fresh.period)}. ${foundry.utils.escapeHTML(plan.reason)}`,
+            content: loc`Saved-use review: ${foundry.utils.escapeHTML(fresh.name)}; ${used} already spent this ${foundry.utils.escapeHTML(fresh.period)}. ${foundry.utils.escapeHTML(plan.reason)}`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -220,7 +221,7 @@ export const ActorAbilities = Base =>
             await this.update(resourceCounterRestorePatch(id, plan.previous));
           } catch (restoreError) {
             ui.notifications.warn(
-              "The corrected count may remain after a review-receipt failure. Inspect the current count before retrying."
+              loc`The corrected count may remain after a review-receipt failure. Inspect the current count before retrying.`
             );
             return plan.record;
           }
@@ -233,13 +234,13 @@ export const ActorAbilities = Base =>
     async useManualLimitedAbility(id, options = {}) {
       if (!this.isOwner) return null;
       const spec = this.system.limitedUses?.find(s => s.id === id && s.workflow === "manual");
-      if (!spec) throw new Error("Choose an available manual class ability.");
+      if (!spec) throw new Error(loc`Choose an available manual class ability.`);
       let input = options;
       if (spec.cost > 0 && !Object.keys(input).length) {
         input = await systemDialog.input({
           window: { title: spec.name },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Use ${foundry.utils.escapeHTML(spec.name)}. Base cost ${spec.cost} action dice. Apply its stated actions, circumstances and effect at the table.</p>${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl({ unrolled: true })}</div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Use ${foundry.utils.escapeHTML(spec.name)}. Base cost ${spec.cost} action dice. Apply its stated actions, circumstances and effect at the table.`}</p>${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl({ unrolled: true })}</div>`
         });
         if (!input) return null;
       }
@@ -261,7 +262,7 @@ export const ActorAbilities = Base =>
             return await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
               content: foundry.utils.escapeHTML(
-                `${this.name} uses ${spec.name}.${payment ? ` Spent ${payment.count} action dice${payment.surcharge ? ` (${payment.surcharge} Shaken surcharge)` : ""}.` : ""} Apply the ability's stated actions and circumstances at the table.`
+                loc`${this.name} uses ${spec.name}.${payment ? loc` Spent ${payment.count} action dice${payment.surcharge ? loc` (${payment.surcharge} Shaken surcharge)` : ""}.` : ""} Apply the ability's stated actions and circumstances at the table.`
               ),
               flags: {
                 spycraft2: {
@@ -293,20 +294,20 @@ export const ActorAbilities = Base =>
 
     async useFeatFreeAction(source, options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!Object.hasOwn(FREE_ACTION_FEATS, source)) throw new Error("Choose a supported free-action feat.");
+      if (!Object.hasOwn(FREE_ACTION_FEATS, source)) throw new Error(loc`Choose a supported free-action feat.`);
       let input = options;
       const esc = foundry.utils.escapeHTML;
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
           window: { title: FREE_ACTION_FEATS[source] },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${source === "quickDraw" ? "Twice per round, take Draw Weapon, Holster Weapon, Pick Up Weapon or Reload as a free action. Each action retains its ordinary limits (one two-handed weapon or two one-handed weapons for Draw/Holster/Pick Up; normal Reload amount)." + (this.system.knifeBasics?.active ? " Knife Basics already makes drawing a knife a free action: do not spend a Quick Draw use to draw a knife." : "") : "Once per round, take one additional non-attack half action as a free action; session uses equal starting action dice."}</p>${
+          content: `<div class="spycraft2-roll-options"><p>${source === "quickDraw" ? loc`Twice per round, take Draw Weapon, Holster Weapon, Pick Up Weapon or Reload as a free action. Each action retains its ordinary limits (one two-handed weapon or two one-handed weapons for Draw/Holster/Pick Up; normal Reload amount).` + (this.system.knifeBasics?.active ? loc` Knife Basics already makes drawing a knife a free action: do not spend a Quick Draw use to draw a knife.` : "") : loc`Once per round, take one additional non-attack half action as a free action; session uses equal starting action dice.`}</p>${
             source === "quickDraw"
-              ? `<label>Action <select name="action">${Object.entries(QUICK_DRAW_ACTIONS)
+              ? `<label>${loc`Action`} <select name="action">${Object.entries(QUICK_DRAW_ACTIONS)
                   .map(([id, name]) => `<option value="${id}">${esc(name)}</option>`)
                   .join("")}</select></label>`
-              : '<input type="hidden" name="action" value="nonAttackHalfAction" /><label><input type="checkbox" name="nonAttackHalfActionConfirmed" /> This is one non-attack half action</label><label><input type="checkbox" name="purelyMentalConfirmed" /> GC confirms this is purely mental</label>'
-          }<label>Action and weapon(s) / circumstances <textarea name="description" maxlength="1000" required></textarea></label><label><input type="checkbox" name="confirmed" /> GC confirms this action is otherwise legal now; resolve its checks, movement, gear and ammunition changes at the table</label></div>`
+              : `<input type="hidden" name="action" value="nonAttackHalfAction" /><label><input type="checkbox" name="nonAttackHalfActionConfirmed" /> ${loc`This is one non-attack half action`}</label><label><input type="checkbox" name="purelyMentalConfirmed" /> ${loc`GC confirms this is purely mental`}</label>`
+          }<label>${loc`Action and weapon(s) / circumstances`} <textarea name="description" maxlength="1000" required></textarea></label><label><input type="checkbox" name="confirmed" /> ${loc`GC confirms this action is otherwise legal now; resolve its checks, movement, gear and ammunition changes at the table`}</label></div>`
         });
         if (!input) return null;
       }
@@ -317,13 +318,13 @@ export const ActorAbilities = Base =>
         async () => {
           const fresh = plan();
           if (JSON.stringify(fresh) !== JSON.stringify(expected))
-            throw new Error("The free-action source, combat or declaration changed.");
+            throw new Error(loc`The free-action source, combat or declaration changed.`);
           const receiptId = foundry.utils.randomID();
           try {
             return await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
               content: esc(
-                `${this.name}: ${fresh.source} — ${fresh.action} as a free action. ${fresh.description} Resolve the ordinary action and its remaining requirements at the table.`
+                loc`${this.name}: ${fresh.source} — ${fresh.action} as a free action. ${fresh.description} Resolve the ordinary action and its remaining requirements at the table.`
               ),
               flags: {
                 spycraft2: {
@@ -370,12 +371,12 @@ export const ActorAbilities = Base =>
     ) {
       const expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem));
       const work = async () => {
-        if (!this.isOwner) throw new Error("You must own this actor.");
+        if (!this.isOwner) throw new Error(loc`You must own this actor.`);
         const mastery =
           workflow === "improvisedSearch" ? improvisedMasterySpec(this.system, this.participatingCombat?.id) : null;
         const spec = this.system.limitedUses?.find(entry => entry.id === id) ?? (mastery?.id === id ? mastery : null);
         if (!spec || spec.workflow !== workflow)
-          throw new Error("Use this ability through its appropriate roll control.");
+          throw new Error(loc`Use this ability through its appropriate roll control.`);
         if (
           !Number.isSafeInteger(additionalCost) ||
           additionalCost < 0 ||
@@ -384,11 +385,11 @@ export const ActorAbilities = Base =>
           additionalBenefitCount > additionalCost ||
           (additionalCost > 0 && additionalBenefitCount === 0)
         )
-          throw new Error("Invalid additional action-die cost or benefit count.");
+          throw new Error(loc`Invalid additional action-die cost or benefit count.`);
         if (workflow === "brightIdea") {
           const source = brightIdeaPoolStatus(this.system, this.usagePeriods).sources.find(s => s.id === id);
           if (!source || source.used === null)
-            throw new Error("Review this Bright Idea source and its saved use count before rolling.");
+            throw new Error(loc`Review this Bright Idea source and its saved use count before rolling.`);
           const migration = brightIdeaMigrationPlan(this.system, this.usagePeriods, undefined, {
             at: Date.now(),
             reviewedBy: "single-source automatic migration"
@@ -399,32 +400,32 @@ export const ActorAbilities = Base =>
           !Array.isArray(additionalUses) ||
           new Set([id, ...additionalUses.map(s => s.id)]).size !== additionalUses.length + 1
         )
-          throw new Error("Choose distinct additional ability sources.");
+          throw new Error(loc`Choose distinct additional ability sources.`);
         const specs = [
           { ...spec, cost: spec.cost + additionalCost },
           ...additionalUses.map(request => {
             const extra = this.system.limitedUses?.find(s => s.id === request.id);
             if (!extra || extra.workflow !== request.workflow || extra.workflow === "brightIdea")
-              throw new Error("An additional ability no longer qualifies for this check.");
+              throw new Error(loc`An additional ability no longer qualifies for this check.`);
             return extra;
           })
         ];
         if (FINAL_ATTACK_WORKFLOWS.has(workflow)) {
           const shared = this.system.limitedUses.find(s => s.id === "finalAttackRound");
           if (!shared || shared.workflow !== "finalAttackRound")
-            throw new Error("The shared final-attack counter is unavailable. Reload before attacking.");
+            throw new Error(loc`The shared final-attack counter is unavailable. Reload before attacking.`);
           if (specs.some(s => s.id === shared.id))
-            throw new Error("Do not select the shared final-attack counter as an additional source.");
+            throw new Error(loc`Do not select the shared final-attack counter as an additional source.`);
           specs.push({ ...shared });
         }
         if (specs.some(s => !Number.isSafeInteger(s.cost) || s.cost < 0))
-          throw new Error("Invalid action-die cost for an ability source.");
+          throw new Error(loc`Invalid action-die cost for an ability source.`);
         const benefitCount =
           Number(spec.cost > 0) + specs.slice(1).filter(s => s.cost > 0).length + additionalBenefitCount;
         const cost = specs.reduce((n, s) => n + s.cost, 0);
-        if (!Number.isSafeInteger(cost) || cost < 0) throw new Error("Invalid combined ability cost.");
+        if (!Number.isSafeInteger(cost) || cost < 0) throw new Error(loc`Invalid combined ability cost.`);
         if (allocations !== undefined && workflow === "eagleEye")
-          throw new Error("Eagle Eye must retain one selected benefit die source; split only its surcharge.");
+          throw new Error(loc`Eagle Eye must retain one selected benefit die source; split only its surcharge.`);
         if (
           allocations !== undefined ||
           (cost &&
@@ -454,7 +455,8 @@ export const ActorAbilities = Base =>
         const plans = specs.map(s => resourceUsePlan(s, this.system.resourceUses, this.usagePeriods, funding.balance));
         const blocked = plans.find(p => p.blocked);
         if (blocked) return ui.notifications.warn(blocked.reason);
-        if (cost > funding.balance) return ui.notifications.warn("Not enough action dice remain for these abilities.");
+        if (cost > funding.balance)
+          return ui.notifications.warn(loc`Not enough action dice remain for these abilities.`);
         const before = specs.map(s => structuredClone(this.system.resourceUses?.[s.id])),
           settlementBefore = JSON.stringify(getActionDieSettlementReview(this));
         let callbackStarted = false;
@@ -484,7 +486,7 @@ export const ActorAbilities = Base =>
             const result = await withFinalRoundReservation(this, reservation, () =>
               perform?.(plans[0].status, payment)
             );
-            if (result === null) throw new LimitedUseCancelled("The ability was cancelled before completion.");
+            if (result === null) throw new LimitedUseCancelled(loc`The ability was cancelled before completion.`);
             return result ?? plans[0].status;
           };
           const result = cost
@@ -499,7 +501,7 @@ export const ActorAbilities = Base =>
                 purpose: (
                   "Class use: " +
                   specs.map(s => s.name ?? s.id).join(" + ") +
-                  (additionalCost ? "; additional action-die benefits" : "")
+                  (additionalCost ? loc`; additional action-die benefits` : "")
                 ).slice(0, 500),
                 benefit: "classAbility",
                 details: {
@@ -533,14 +535,16 @@ export const ActorAbilities = Base =>
             try {
               await this.update(this.actorRecordRestorePatch("flags.spycraft2.actionDiceSettlementReview", review));
             } catch {
-              ui.notifications.warn("The payment and limited-use counters remain reserved; include both in GC review.");
+              ui.notifications.warn(
+                loc`The payment and limited-use counters remain reserved; include both in GC review.`
+              );
             }
             throw error;
           }
           try {
             await refundUses();
           } catch (rollback) {
-            throw new AggregateError([error, rollback], "The limited-use count needs GC review before retrying.");
+            throw new AggregateError([error, rollback], loc`The limited-use count needs GC review before retrying.`);
           }
           if (error instanceof LimitedUseCancelled) return null;
           throw error;
@@ -556,9 +560,9 @@ export const ActorAbilities = Base =>
       if (!input.ids) {
         const esc = foundry.utils.escapeHTML;
         input = await systemDialog.input({
-          window: { title: "Improved Fortune teammates" },
+          window: { title: loc`Improved Fortune teammates` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Choose actual Pointman teammates. Their Improved Fortune combines with your own, up to +3 starting action dice. Current dice are not refilled by changing this list.</p>${candidates.map(actor => `<label><input type="checkbox" name="ally_${actor.id}" ${this.system.fortuneTeammateIds?.includes(actor.id) ? "checked" : ""} /> ${esc(actor.name)} (Pointman ${pointmanLevel(actor)})</label>`).join("")}<label><input type="checkbox" name="teammatesConfirmed" /> These characters are teammates who provide Improved Fortune</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Choose actual Pointman teammates. Their Improved Fortune combines with your own, up to +3 starting action dice. Current dice are not refilled by changing this list.`}</p>${candidates.map(actor => `<label><input type="checkbox" name="ally_${actor.id}" ${this.system.fortuneTeammateIds?.includes(actor.id) ? "checked" : ""} /> ${loc`${esc(actor.name)} (Pointman ${pointmanLevel(actor)})`}</label>`).join("")}<label><input type="checkbox" name="teammatesConfirmed" /> ${loc`These characters are teammates who provide Improved Fortune`}</label></div>`
         });
         if (!input) return null;
         input.ids = candidates.filter(actor => input[`ally_${actor.id}`]).map(actor => actor.id);
@@ -568,7 +572,7 @@ export const ActorAbilities = Base =>
         input.ids.some(id => !candidates.some(actor => actor.id === id)) ||
         (input.ids.length && !input.teammatesConfirmed)
       )
-        return ui.notifications.warn("Choose actual qualifying teammates and confirm their team membership.");
+        return ui.notifications.warn(loc`Choose actual qualifying teammates and confirm their team membership.`);
       return this.update({ "system.fortuneTeammateIds": [...new Set(input.ids)] });
     }
 
@@ -582,13 +586,13 @@ export const ActorAbilities = Base =>
           unrestrictedBonusPools(this.actionDiceFundingSystem, this.usagePeriods).some(p => p.available))
       ) {
         input = await systemDialog.input({
-          window: { title: "Eagle Eye" },
+          window: { title: loc`Eagle Eye` },
           rejectClose: false,
           content:
             '<div class="spycraft2-roll-options">' +
             this.actionDiceFundingControl() +
             this.actionDiceSurchargeControl() +
-            "<p>Roll one selected action die. Its result ×10 adds to the range increment of your two-handed firearms and hurled weapons for this scene.</p></div>"
+            `<p>${loc`Roll one selected action die. Its result ×10 adds to the range increment of your two-handed firearms and hurled weapons for this scene.`}</p></div>`
         });
         if (!input) return null;
       }
@@ -598,7 +602,7 @@ export const ActorAbilities = Base =>
           const scene = String(this.usagePeriods.scene ?? "initial"),
             guard = () => {
               if (JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken)
-                throw new Error("The Shaken condition changed while resolving Eagle Eye.");
+                throw new Error(loc`The Shaken condition changed while resolving Eagle Eye.`);
               const blocked = attributeActionBlock(this.system, { kind: "mentalAbility" });
               if (blocked) throw new Error(blocked);
               if (
@@ -606,7 +610,7 @@ export const ActorAbilities = Base =>
                 String(this.usagePeriods.scene ?? "initial") !== scene ||
                 status.epoch !== scene
               )
-                throw new Error("Eagle Eye source or scene changed.");
+                throw new Error(loc`Eagle Eye source or scene changed.`);
             };
           guard();
           const plan = eagleEyeDiePlan({ ...this.system, actionDice: payment.system.actionDice }),
@@ -642,7 +646,7 @@ export const ActorAbilities = Base =>
             guard();
             await roll.toMessage({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              flavor: `Eagle Eye: spent ${payment.count} action dice${payment.surcharge ? ` (one benefit die + ${payment.surcharge} Shaken surcharge)` : ""}; result ${record.result}. Range increment +${record.rangeIncrease} ft. with any 2-handed firearm or hurled weapon for this scene (p.80).`,
+              flavor: loc`Eagle Eye: spent ${payment.count} action dice${payment.surcharge ? loc` (one benefit die + ${payment.surcharge} Shaken surcharge)` : ""}; result ${record.result}. Range increment +${record.rangeIncrease} ft. with any 2-handed firearm or hurled weapon for this scene (p.80).`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -671,7 +675,7 @@ export const ActorAbilities = Base =>
                 await this.update(this.actorRecordRestorePatch("system.eagleEyeBoost", before));
               } catch (rollback) {
                 if (!same(current(), before)) {
-                  const failure = new AggregateError([error, rollback], "Eagle Eye could not be safely restored.");
+                  const failure = new AggregateError([error, rollback], loc`Eagle Eye could not be safely restored.`);
                   failure.actionDiceSettlementReview = {
                     purpose: "Eagle Eye",
                     beforeBoost: before,
@@ -699,9 +703,9 @@ export const ActorAbilities = Base =>
     async useIntelTemporaryFeats(ability, options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
       const source = intelTemporaryFeatSource(this.system, ability);
-      if (!source) return ui.notifications.warn("This Intel-phase feat grant has not been earned.");
+      if (!source) return ui.notifications.warn(loc`This Intel-phase feat grant has not been earned.`);
       const pack = game.packs?.get("spycraft2.feats");
-      if (!pack) throw new Error("The system feat compendium is unavailable.");
+      if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
       if (!input.featIds) {
         const index = await pack.getIndex({ fields: ["system.tree"] }),
@@ -716,7 +720,7 @@ export const ActorAbilities = Base =>
         input = await systemDialog.input({
           window: { title: source.name },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Choose ${source.count} temporary ${esc(CONFIG.SPYCRAFT.featTrees[source.tree] ?? source.tree)} feat(s) in acquisition order, until this mission ends. All prerequisites apply. A prior temporary selection can qualify a later temporary selection; it cannot qualify permanent feats or expert classes.</p>${Array.from({ length: source.count }, (_, i) => `<label>Feat ${i + 1} <select name="feat${i}"><option value="">Choose a feat</option>${choices.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label>${source.tree === "basicCombat" ? `<label>Choice for selection ${i + 1}: Weapon Focus proficiency or Armor Basics/Mastery type <select name="choice${i}"><option value="">Choose only if required by this feat</option><optgroup label="Armor type"><option value="P">Partial</option><option value="M">Moderate</option><option value="F">Full</option></optgroup><optgroup label="Weapon Focus proficiency">${proficiencies}</optgroup></select></label>` : ""}`).join("")}<label><input name="intelPhaseConfirmed" type="checkbox" /> I choose these during the current mission’s Intel Phase</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Choose ${source.count} temporary ${esc(CONFIG.SPYCRAFT.featTrees[source.tree] ?? source.tree)} feat(s) in acquisition order, until this mission ends. All prerequisites apply. A prior temporary selection can qualify a later temporary selection; it cannot qualify permanent feats or expert classes.`}</p>${Array.from({ length: source.count }, (_, i) => `<label>${loc`Feat ${i + 1}`} <select name="feat${i}"><option value="">${loc`Choose a feat`}</option>${choices.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label>${source.tree === "basicCombat" ? `<label>${loc`Choice for selection ${i + 1}: Weapon Focus proficiency or Armor Basics/Mastery type`} <select name="choice${i}"><option value="">${loc`Choose only if required by this feat`}</option><optgroup label="Armor type"><option value="P">${loc`Partial`}</option><option value="M">${loc`Moderate`}</option><option value="F">${loc`Full`}</option></optgroup><optgroup label="Weapon Focus proficiency">${proficiencies}</optgroup></select></label>` : ""}`).join("")}<label><input name="intelPhaseConfirmed" type="checkbox" /> ${loc`I choose these during the current mission’s Intel Phase`}</label></div>`
         });
         if (!input) return null;
         input = {
@@ -726,14 +730,14 @@ export const ActorAbilities = Base =>
         };
       }
       if (input.intelPhaseConfirmed !== true)
-        return ui.notifications.warn("Confirm the current mission’s Intel Phase.");
+        return ui.notifications.warn(loc`Confirm the current mission’s Intel Phase.`);
       return this.useLimitedAbility(
         ability,
         async () => {
           const fresh = intelTemporaryFeatSource(this.system, ability);
-          if (!fresh) throw new Error("This temporary-feat source changed.");
+          if (!fresh) throw new Error(loc`This temporary-feat source changed.`);
           if (!Array.isArray(input.featIds) || input.featIds.length !== fresh.count)
-            throw new Error(`Choose exactly ${fresh.count} feat(s).`);
+            throw new Error(loc`Choose exactly ${fresh.count} feat(s).`);
           const feats = [];
           for (const id of input.featIds) feats.push(await pack.getDocument(id));
           const epoch = String(this.usagePeriods.mission ?? "initial"),
@@ -753,13 +757,14 @@ export const ActorAbilities = Base =>
               current.count !== fresh.count ||
               String(this.usagePeriods.mission ?? "initial") !== epoch
             )
-              throw new Error("This temporary-feat source or mission changed.");
+              throw new Error(loc`This temporary-feat source or mission changed.`);
           };
           try {
             for (const entry of data) {
               guard();
               const eligible = this.checkPrerequisites(entry.system.prerequisites, { temporary: true });
-              if (!eligible.ok) throw new Error(`Temporary feat prerequisites not met: ${eligible.unmet.join("; ")}.`);
+              if (!eligible.ok)
+                throw new Error(loc`Temporary feat prerequisites not met: ${eligible.unmet.join("; ")}.`);
               const candidate = { ...entry, id: "__intelCandidate__" },
                 items = [...this.items, candidate],
                 active = new Set(
@@ -769,13 +774,13 @@ export const ActorAbilities = Base =>
               if (choice.pending.length || choice.warnings.length)
                 throw new Error([...choice.pending, ...choice.warnings].join("; "));
               const [item] = await this.createEmbeddedDocuments("Item", [entry]);
-              if (!item) throw new Error("Temporary feat creation failed.");
+              if (!item) throw new Error(loc`Temporary feat creation failed.`);
               created.push(item);
             }
             guard();
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `${fresh.name}: gained ${created.map(i => foundry.utils.escapeHTML(i.name)).join(", ")} during Intel, until the end of this mission. One mission use spent; no action die spent.`,
+              content: loc`${fresh.name}: gained ${created.map(i => foundry.utils.escapeHTML(i.name)).join(", ")} during Intel, until the end of this mission. One mission use spent; no action die spent.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -797,7 +802,7 @@ export const ActorAbilities = Base =>
                 );
               } catch (cleanupError) {
                 ui.notifications.warn(
-                  "Some temporary feats may remain after cleanup failed. The mission use remains spent; review the granted feats before retrying."
+                  loc`Some temporary feats may remain after cleanup failed. The mission use remains spent; review the granted feats before retrying.`
                 );
                 return created;
               }
@@ -818,7 +823,7 @@ export const ActorAbilities = Base =>
         feat.system.featKind !== "temporary" ||
         !this.system.featStatus?.[feat.id]?.ok
       )
-        return ui.notifications.warn("Choose an active temporary Depth of Study feat.");
+        return ui.notifications.warn(loc`Choose an active temporary Depth of Study feat.`);
       const epoch = String(this.usagePeriods.mission ?? "initial"),
         esc = foundry.utils.escapeHTML;
       let choices = options.choices;
@@ -827,14 +832,14 @@ export const ActorAbilities = Base =>
           existing = feat.system.focusChoices ?? [];
         const selected = (a, b) => (a === b ? " selected" : "");
         const input = await systemDialog.input({
-          window: { title: "Temporary Depth of Study choices" },
+          window: { title: loc`Temporary Depth of Study choices` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Choose two focuses or fortes in order. A forte must name a subdivision of a focus already possessed, including an earlier choice. Profession names and forte subdivisions require the GC’s ordinary approval. These choices expire with this feat.</p>${[
+          content: `<div class="spycraft2-roll-options"><p>${loc`Choose two focuses or fortes in order. A forte must name a subdivision of a focus already possessed, including an earlier choice. Profession names and forte subdivisions require the GC’s ordinary approval. These choices expire with this feat.`}</p>${[
             0, 1
           ]
             .map(i => {
               const row = existing[i] ?? {};
-              return `<fieldset><legend>Choice ${i + 1}</legend><label>Type <select name="kind${i}"><option value="focus"${selected(row.kind, "focus")}>Focus</option><option value="forte"${selected(row.kind, "forte")}>Forte</option></select></label><label>Skill <select name="skill${i}">${groups.map(key => `<option value="${key}"${selected(row.skill, key)}>${esc(CONFIG.SPYCRAFT.skills[key].name)}</option>`).join("")}</select></label><label>Focus <input name="focus${i}" type="text" list="temporary-focus-names" value="${esc(row.focus ?? "")}" /></label><label>Forte subdivision (forte only) <input name="forte${i}" type="text" value="${esc(row.forte ?? "")}" /></label></fieldset>`;
+              return `<fieldset><legend>${loc`Choice ${i + 1}`}</legend><label>${loc`Type`} <select name="kind${i}"><option value="focus"${selected(row.kind, "focus")}>${loc`Focus`}</option><option value="forte"${selected(row.kind, "forte")}>${loc`Forte`}</option></select></label><label>${loc`Skill`} <select name="skill${i}">${groups.map(key => `<option value="${key}"${selected(row.skill, key)}>${esc(CONFIG.SPYCRAFT.skills[key].name)}</option>`).join("")}</select></label><label>${loc`Focus`} <input name="focus${i}" type="text" list="temporary-focus-names" value="${esc(row.focus ?? "")}" /></label><label>${loc`Forte subdivision (forte only)`} <input name="forte${i}" type="text" value="${esc(row.forte ?? "")}" /></label></fieldset>`;
             })
             .join("")}<datalist id="temporary-focus-names">${Object.values(CONFIG.SPYCRAFT.focuses)
             .flat()
@@ -857,7 +862,7 @@ export const ActorAbilities = Base =>
             !this.system.featStatus?.[feat.id]?.ok ||
             String(this.usagePeriods.mission ?? "initial") !== epoch
           )
-            throw new Error("The temporary focus source or mission changed.");
+            throw new Error(loc`The temporary focus source or mission changed.`);
         };
         guard();
         const system = this.system.toObject?.() ?? foundry.utils.deepClone(this.system);
@@ -886,7 +891,7 @@ export const ActorAbilities = Base =>
           guard();
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `Temporary Depth of Study: ${next.map(row => esc(`${CONFIG.SPYCRAFT.skills[row.skill].name}: ${row.focus}${row.forte ? " / " + row.forte : ""}`)).join("; ")}. Choices expire with their source feat.`,
+            content: loc`Temporary Depth of Study: ${next.map(row => esc(`${CONFIG.SPYCRAFT.skills[row.skill].name}: ${row.focus}${row.forte ? " / " + row.forte : ""}`)).join("; ")}. Choices expire with their source feat.`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -909,9 +914,9 @@ export const ActorAbilities = Base =>
 
     async useKnowItAll(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!knowItAllSource(this.system)) return ui.notifications.warn("Know It All has not been earned.");
+      if (!knowItAllSource(this.system)) return ui.notifications.warn(loc`Know It All has not been earned.`);
       const pack = game.packs?.get("spycraft2.feats");
-      if (!pack) throw new Error("The system feat compendium is unavailable.");
+      if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
       const interactive = !input.featIds,
         esc = foundry.utils.escapeHTML;
@@ -921,25 +926,25 @@ export const ActorAbilities = Base =>
             .filter(f => f.type === "feat" && f.system.tree === "advancedSkill")
             .sort((a, b) => a.name.localeCompare(b.name));
         input = await systemDialog.input({
-          window: { title: "Know It All" },
+          window: { title: loc`Know It All` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Gain two temporary Advanced Skill feats in acquisition order until this mission ends. All prerequisites apply; level-one-only feats remain unavailable at Scientist 10+. Repeatable self-grants follow each feat’s own restrictions.</p>${[0, 1].map(i => `<label>Feat ${i + 1} <select name="feat${i}"><option value="">Choose a feat</option>${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label>`).join("")}<label><input name="freeActionConfirmed" type="checkbox" /> I spend the required free action (during my initiative if in combat)</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Gain two temporary Advanced Skill feats in acquisition order until this mission ends. All prerequisites apply; level-one-only feats remain unavailable at Scientist 10+. Repeatable self-grants follow each feat’s own restrictions.`}</p>${[0, 1].map(i => `<label>${loc`Feat ${i + 1}`} <select name="feat${i}"><option value="">${loc`Choose a feat`}</option>${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label>`).join("")}<label><input name="freeActionConfirmed" type="checkbox" /> ${loc`I spend the required free action (during my initiative if in combat)`}</label></div>`
         });
         if (!input) return null;
         input = { ...input, featIds: [input.feat0, input.feat1] };
       }
-      if (input.freeActionConfirmed !== true) return ui.notifications.warn("Confirm the required free action.");
+      if (input.freeActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the required free action.`);
       if (
         !Array.isArray(input.featIds) ||
         input.featIds.length !== 2 ||
         input.featIds.some(id => typeof id !== "string" || !id)
       )
-        return ui.notifications.warn("Choose exactly two Advanced Skill feats.");
+        return ui.notifications.warn(loc`Choose exactly two Advanced Skill feats.`);
       if (interactive) {
         const selected = [];
         for (const id of input.featIds) selected.push(await pack.getDocument(id));
         if (selected.some(f => !f || f.type !== "feat" || f.system.tree !== "advancedSkill"))
-          throw new Error("Choose Advanced Skill feats.");
+          throw new Error(loc`Choose Advanced Skill feats.`);
         const descriptors = selected.map(f => knowItAllChoiceOptions(this.system, f, CONFIG.SPYCRAFT));
         if (descriptors.some(d => d.kind !== "none")) {
           const fields = descriptors
@@ -947,7 +952,7 @@ export const ActorAbilities = Base =>
               (d, i) =>
                 `<fieldset><legend>${esc(selected[i].name)}</legend>${
                   d.kind === "training"
-                    ? `<p>Allocate five rank points; one rank per point, subject to current limits. Unspent points require I Can Swim, possessed now or as an earlier selection.</p><div class="form-fields-grid">${Object.entries(
+                    ? `<p>${loc`Allocate five rank points; one rank per point, subject to current limits. Unspent points require I Can Swim, possessed now or as an earlier selection.`}</p><div class="form-fields-grid">${Object.entries(
                         CONFIG.SPYCRAFT.skills
                       )
                         .map(
@@ -956,17 +961,17 @@ export const ActorAbilities = Base =>
                         )
                         .join("")}</div>`
                     : ["basicSkill", "skill"].includes(d.kind)
-                      ? `<label>Choice <select name="choice${i}"><option value="">Choose a target</option>${Object.entries(
+                      ? `<label>${loc`Choice`} <select name="choice${i}"><option value="">${loc`Choose a target`}</option>${Object.entries(
                           d.options
                         )
                           .map(([key, label]) => `<option value="${esc(key)}">${esc(label)}</option>`)
                           .join("")}</select></label>`
-                      : "<p>No additional choice.</p>"
+                      : `<p>${loc`No additional choice.`}</p>`
                 }</fieldset>`
             )
             .join("");
           const detail = await systemDialog.input({
-            window: { title: "Know It All choices" },
+            window: { title: loc`Know It All choices` },
             rejectClose: false,
             content: `<div class="spycraft2-roll-options">${fields}</div>`
           });
@@ -995,9 +1000,9 @@ export const ActorAbilities = Base =>
                 (this.system.resourceUses?.knowItAll?.used ?? 0) > source.limit ||
                 String(this.usagePeriods.mission ?? "initial") !== epoch
               )
-                throw new Error("Know It All source or mission changed.");
+                throw new Error(loc`Know It All source or mission changed.`);
               if (checkTurn && combat?.started && combat.combatant?.actor?.uuid !== this.uuid)
-                throw new Error("Take this free action during this character’s initiative.");
+                throw new Error(loc`Take this free action during this character’s initiative.`);
             };
           guard();
           const feats = [];
@@ -1014,7 +1019,8 @@ export const ActorAbilities = Base =>
             for (const entry of data) {
               guard();
               const eligible = this.checkPrerequisites(entry.system.prerequisites, { temporary: true });
-              if (!eligible.ok) throw new Error(`Temporary feat prerequisites not met: ${eligible.unmet.join("; ")}.`);
+              if (!eligible.ok)
+                throw new Error(loc`Temporary feat prerequisites not met: ${eligible.unmet.join("; ")}.`);
               const candidate = { ...entry, id: "__knowItAllCandidate__" },
                 items = [...this.items, candidate],
                 active = new Set(
@@ -1028,20 +1034,20 @@ export const ActorAbilities = Base =>
                 Object.values(entry.system.trainingSkills ?? {}).reduce((n, v) => n + v, 0) < 5 &&
                 !this.system.activeFeatNames?.includes("I Can Swim")
               )
-                throw new Error("Unspent Training points require I Can Swim.");
+                throw new Error(loc`Unspent Training points require I Can Swim.`);
               for (const [key, points] of Object.entries(entry.system.trainingSkills ?? {})) {
                 const skill = this.system.skillTotals?.[key];
                 if (!skill || !Number.isFinite(skill.maxRanks) || skill.ranks + points > skill.maxRanks)
-                  throw new Error(`Training exceeds the current rank limit for ${key}.`);
+                  throw new Error(loc`Training exceeds the current rank limit for ${key}.`);
               }
               const [item] = await this.createEmbeddedDocuments("Item", [entry]);
-              if (!item) throw new Error("Temporary feat creation failed.");
+              if (!item) throw new Error(loc`Temporary feat creation failed.`);
               created.push(item);
             }
             guard(false);
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `Know It All: free action; gained ${created.map(i => esc(i.name)).join(", ")} until the end of this mission. One mission use spent; no action die spent.`,
+              content: loc`Know It All: free action; gained ${created.map(i => esc(i.name)).join(", ")} until the end of this mission. One mission use spent; no action die spent.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -1063,7 +1069,7 @@ export const ActorAbilities = Base =>
                 );
               } catch (cleanupError) {
                 ui.notifications.warn(
-                  "Some Know It All feats may remain after cleanup failed. The mission use remains spent; review the granted feats before retrying."
+                  loc`Some Know It All feats may remain after cleanup failed. The mission use remains spent; review the granted feats before retrying.`
                 );
                 return created;
               }
@@ -1076,9 +1082,10 @@ export const ActorAbilities = Base =>
 
     async useAnyTimeAnyPlace(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!anyTimeAnyPlaceSource(this.system)) return ui.notifications.warn("Any Time, Any Place has not been earned.");
+      if (!anyTimeAnyPlaceSource(this.system))
+        return ui.notifications.warn(loc`Any Time, Any Place has not been earned.`);
       const pack = game.packs?.get("spycraft2.feats");
-      if (!pack) throw new Error("The system feat compendium is unavailable.");
+      if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
       if (!input.featId) {
         const index = await pack.getIndex({ fields: ["system.tree"] }),
@@ -1087,13 +1094,13 @@ export const ActorAbilities = Base =>
             .filter(i => i.type === "feat" && i.system.tree === "terrain")
             .sort((a, b) => a.name.localeCompare(b.name));
         input = await systemDialog.input({
-          window: { title: "Any Time, Any Place" },
+          window: { title: loc`Any Time, Any Place` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Gain one temporary Terrain feat until this mission ends. All prerequisites apply. One use is earned at Guide 4 and another at Guide 8.</p><label>Feat <select name="featId">${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label><label><input name="freeActionConfirmed" type="checkbox" /> I spend the required free action (during my initiative if in combat)</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Gain one temporary Terrain feat until this mission ends. All prerequisites apply. One use is earned at Guide 4 and another at Guide 8.`}</p><label>${loc`Feat`} <select name="featId">${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label><label><input name="freeActionConfirmed" type="checkbox" /> ${loc`I spend the required free action (during my initiative if in combat)`}</label></div>`
         });
         if (!input) return null;
       }
-      if (input.freeActionConfirmed !== true) return ui.notifications.warn("Confirm the required free action.");
+      if (input.freeActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the required free action.`);
       return this.useLimitedAbility(
         "anyTimeAnyPlace",
         async () => {
@@ -1108,9 +1115,9 @@ export const ActorAbilities = Base =>
               used > source.limit ||
               String(this.usagePeriods.mission ?? "initial") !== epoch
             )
-              throw new Error("The Terrain-feat source or mission changed.");
+              throw new Error(loc`The Terrain-feat source or mission changed.`);
             if (checkTurn && combat?.started && combat.combatant?.actor?.uuid !== this.uuid)
-              throw new Error("Take this free action during this character’s initiative.");
+              throw new Error(loc`Take this free action during this character’s initiative.`);
           };
           guard();
           const feat = await pack.getDocument(input.featId);
@@ -1118,15 +1125,15 @@ export const ActorAbilities = Base =>
           const data = anyTimeAnyPlacePlan(this.system, [...this.items], feat, { epoch, sourceActorUuid: this.uuid }),
             eligible = this.checkPrerequisites(data.system.prerequisites, { temporary: true });
           if (!eligible.ok)
-            throw new Error(`Temporary Terrain feat prerequisites not met: ${eligible.unmet.join("; ")}.`);
+            throw new Error(loc`Temporary Terrain feat prerequisites not met: ${eligible.unmet.join("; ")}.`);
           let created;
           try {
             [created] = await this.createEmbeddedDocuments("Item", [data]);
-            if (!created) throw new Error("Temporary Terrain feat creation failed.");
+            if (!created) throw new Error(loc`Temporary Terrain feat creation failed.`);
             guard(false);
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `Any Time, Any Place: free action; gained ${foundry.utils.escapeHTML(created.name)} until the end of this mission. One mission use spent; no action die spent.`,
+              content: loc`Any Time, Any Place: free action; gained ${foundry.utils.escapeHTML(created.name)} until the end of this mission. One mission use spent; no action die spent.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -1145,7 +1152,7 @@ export const ActorAbilities = Base =>
                 await this.deleteEmbeddedDocuments("Item", [created.id]);
               } catch (cleanupError) {
                 ui.notifications.warn(
-                  "The temporary Terrain feat remains after cleanup failed. Its mission use remains spent; review the existing feat before retrying."
+                  loc`The temporary Terrain feat remains after cleanup failed. Its mission use remains spent; review the existing feat before retrying.`
                 );
                 return created;
               }
@@ -1180,22 +1187,22 @@ export const ActorAbilities = Base =>
 
     async activateMentalLeap(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!mentalLeapSource(this.system)) return ui.notifications.warn("Mental Leap has not been earned.");
+      if (!mentalLeapSource(this.system)) return ui.notifications.warn(loc`Mental Leap has not been earned.`);
       let input = options;
       if (!input.ability) {
         input = await systemDialog.input({
-          window: { title: "Mental Leap" },
+          window: { title: loc`Mental Leap` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Add your current starting action-die count (${this.system.actionDice.max}) to one attribute for ten rounds. When it ends, exhaustion lasts twice the active rounds. Ending during the activation initiative counts as one round and two exhausted rounds. Existing unnamed Mental Leap bonuses may overlap; repeated exhaustion causes unconsciousness.</p><label>Attribute <select name="ability"><option value="dex">Dexterity</option><option value="int">Intelligence</option><option value="wis">Wisdom</option></select></label><label><input name="confirmed" type="checkbox" /> I activate Mental Leap now (during my initiative if in combat)</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Add your current starting action-die count (${this.system.actionDice.max}) to one attribute for ten rounds. When it ends, exhaustion lasts twice the active rounds. Ending during the activation initiative counts as one round and two exhausted rounds. Existing unnamed Mental Leap bonuses may overlap; repeated exhaustion causes unconsciousness.`}</p><label>${loc`Attribute`} <select name="ability"><option value="dex">${loc`Dexterity`}</option><option value="int">${loc`Intelligence`}</option><option value="wis">${loc`Wisdom`}</option></select></label><label><input name="confirmed" type="checkbox" /> ${loc`I activate Mental Leap now (during my initiative if in combat)`}</label></div>`
         });
         if (!input) return null;
       }
-      if (input.confirmed !== true) return ui.notifications.warn("Confirm Mental Leap activation.");
+      if (input.confirmed !== true) return ui.notifications.warn(loc`Confirm Mental Leap activation.`);
       return this.useLimitedAbility(
         "mentalLeap",
         async () => {
           const incapacity = attributeActionBlock(this.system, { kind: "mentalAbility" });
-          if (incapacity) throw new Error(`This character cannot currently activate Mental Leap: ${incapacity}`);
+          if (incapacity) throw new Error(loc`This character cannot currently activate Mental Leap: ${incapacity}`);
           const session = String(this.usagePeriods.session ?? "initial"),
             before = foundry.utils.deepClone(this.system.mentalLeaps ?? []),
             source = mentalLeapSource(this.system),
@@ -1211,7 +1218,7 @@ export const ActorAbilities = Base =>
               (this.system.resourceUses?.mentalLeap?.used ?? 0) > now.limit ||
               String(this.usagePeriods.session ?? "initial") !== session
             )
-              throw new Error("Mental Leap source, allowance or session changed.");
+              throw new Error(loc`Mental Leap source, allowance or session changed.`);
           };
           guard();
           try {
@@ -1219,7 +1226,7 @@ export const ActorAbilities = Base =>
             guard();
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `Mental Leap: +${record.bonus} ${record.ability.toUpperCase()} for ten rounds, followed by twenty rounds exhausted unless ended earlier. One session use spent; no action die spent.`,
+              content: loc`Mental Leap: +${record.bonus} ${record.ability.toUpperCase()} for ten rounds, followed by twenty rounds exhausted unless ended earlier. One session use spent; no action die spent.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -1239,7 +1246,7 @@ export const ActorAbilities = Base =>
               await this.update({ "system.mentalLeaps": before });
             } catch (rollbackError) {
               ui.notifications.warn(
-                "Mental Leap may remain after rollback failed. Its use remains spent; review the effect before trying again."
+                loc`Mental Leap may remain after rollback failed. Its use remains spent; review the effect before trying again.`
               );
               return record;
             }
@@ -1255,12 +1262,12 @@ export const ActorAbilities = Base =>
       let input = options;
       const active = (this.system.mentalLeapState?.rows ?? []).filter(r => r.phase === "boost"),
         esc = foundry.utils.escapeHTML;
-      if (!active.length) return ui.notifications.warn("No Mental Leap is currently active.");
+      if (!active.length) return ui.notifications.warn(loc`No Mental Leap is currently active.`);
       if (input.freeActionConfirmed === undefined) {
         input = await systemDialog.input({
-          window: { title: "End Mental Leap" },
+          window: { title: loc`End Mental Leap` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><label>Active benefit <select name="id">${active.map(r => `<option value="${esc(r.id)}" ${r.id === options.id ? "selected" : ""}>${r.ability.toUpperCase()} +${r.bonus}; ${Math.ceil(r.remainingSeconds / 6)} round(s) remain</option>`).join("")}</select></label><label><input name="freeActionConfirmed" type="checkbox" /> I end this effect as a free action during my initiative (if in combat)</label><p>At least one active round counts, even if you end it during its activation initiative. Exhaustion follows immediately for twice the active rounds.</p></div>`
+          content: `<div class="spycraft2-roll-options"><label>${loc`Active benefit`} <select name="id">${active.map(r => `<option value="${esc(r.id)}" ${r.id === options.id ? "selected" : ""}>${loc`${r.ability.toUpperCase()} +${r.bonus}; ${Math.ceil(r.remainingSeconds / 6)} round(s) remain`}</option>`).join("")}</select></label><label><input name="freeActionConfirmed" type="checkbox" /> ${loc`I end this effect as a free action during my initiative (if in combat)`}</label><p>${loc`At least one active round counts, even if you end it during its activation initiative. Exhaustion follows immediately for twice the active rounds.`}</p></div>`
         });
         if (!input) return null;
       }
@@ -1271,7 +1278,7 @@ export const ActorAbilities = Base =>
         if (incapacity) throw new Error(incapacity);
         const before = foundry.utils.deepClone(this.system.mentalLeaps ?? []),
           index = before.findIndex(r => r.id === input.id);
-        if (index < 0) throw new Error("This Mental Leap record is unavailable.");
+        if (index < 0) throw new Error(loc`This Mental Leap record is unavailable.`);
         const ended = endMentalLeapPlan({ ...this.system, ...this.attributeRuleContext }, before[index], {
             ...input,
             combat: this.mentalLeapCombatContext()
@@ -1282,7 +1289,7 @@ export const ActorAbilities = Base =>
           await this.update({ "system.mentalLeaps": next });
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `Mental Leap ended as a free action after ${ended.ended.rounds} active round(s). Exhausted for ${2 * ended.ended.rounds} rounds; the session use stays spent.`,
+            content: loc`Mental Leap ended as a free action after ${ended.ended.rounds} active round(s). Exhausted for ${2 * ended.ended.rounds} rounds; the session use stays spent.`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -1320,7 +1327,7 @@ export const ActorAbilities = Base =>
 
     async recordAdrenalineWoundLoss(options = {}) {
       if (this.type !== "agent" || !this.isOwner || !game.user?.isGM)
-        throw new Error("The GC records an owned Stuntman’s final wound-loss event.");
+        throw new Error(loc`The GC records an owned Stuntman’s final wound-loss event.`);
       const state = () =>
           JSON.stringify({
             wounds: this.system.wounds.value,
@@ -1332,14 +1339,13 @@ export const ActorAbilities = Base =>
           }),
         expected = state();
       if (!adrenalineSource(this.system))
-        throw new Error("This character does not have the Adrenaline Junkie core ability.");
+        throw new Error(loc`This character does not have the Adrenaline Junkie core ability.`);
       let input = options;
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
-          window: { title: "Adrenaline Junkie — record wound loss" },
+          window: { title: loc`Adrenaline Junkie — record wound loss` },
           rejectClose: false,
-          content:
-            '<p>Record one event after the GC resolves defenses and determines final wound loss. This subtracts that wound loss and grants at most one bonus die for an eligible event, within the session limit. It does not resolve damage defenses, critical injuries or death.</p><label>Unique attack/fall/damage-event reference <input name="eventRef" required /></label><label>Final wound loss <input type="number" min="1" step="1" name="loss" value="1" /></label><label>Cause <select name="cause"><option value="attack">Attack</option><option value="fall">Falling damage</option><option value="explosion">Explosive damage</option><option value="other">Other wound loss</option></select></label><label><input type="checkbox" name="opponentAttack" /> Attack: made by an opponent</label><label><input type="checkbox" name="confirmed" /> The GC confirms this single event and final wound loss have not already been applied</label>'
+          content: `<p>${loc`Record one event after the GC resolves defenses and determines final wound loss. This subtracts that wound loss and grants at most one bonus die for an eligible event, within the session limit. It does not resolve damage defenses, critical injuries or death.`}</p><label>${loc`Unique attack/fall/damage-event reference`} <input name="eventRef" required /></label><label>${loc`Final wound loss`} <input type="number" min="1" step="1" name="loss" value="1" /></label><label>${loc`Cause`} <select name="cause"><option value="attack">${loc`Attack`}</option><option value="fall">${loc`Falling damage`}</option><option value="explosion">${loc`Explosive damage`}</option><option value="other">${loc`Other wound loss`}</option></select></label><label><input type="checkbox" name="opponentAttack" /> ${loc`Attack: made by an opponent`}</label><label><input type="checkbox" name="confirmed" /> ${loc`The GC confirms this single event and final wound loss have not already been applied`}</label>`
         });
         if (!input) return null;
         input = {
@@ -1355,19 +1361,19 @@ export const ActorAbilities = Base =>
       }
       const key = woundEventKey(input.eventRef);
       return queueResources([this], async () => {
-        if (!game.user?.isGM) throw new Error("Only the GC may record this wound loss.");
-        if (input.confirmed !== true) throw new Error("Confirm the actual wound-loss event.");
+        if (!game.user?.isGM) throw new Error(loc`Only the GC may record this wound loss.`);
+        if (input.confirmed !== true) throw new Error(loc`Confirm the actual wound-loss event.`);
         const existing = recordedWoundEvent(this.flags?.spycraft2?.woundEvents?.[key], {
           ...input,
           opponentAttack: input.opponentAttack ?? false,
           actorUuid: this.uuid
         });
         if (existing) {
-          ui.notifications.info?.("This wound event was already recorded; no new wound loss or dice were applied.");
+          ui.notifications.info?.(loc`This wound event was already recorded; no new wound loss or dice were applied.`);
           return existing;
         }
         if (state() !== expected)
-          throw new Error("Wounds, source, allowance or usage period changed. Review the actual event again.");
+          throw new Error(loc`Wounds, source, allowance or usage period changed. Review the actual event again.`);
         const spec = adrenalineSource(this.system),
           status = resourceStatus(spec, this.system.resourceUses, this.usagePeriods),
           id = foundry.utils.randomID(),
@@ -1395,7 +1401,7 @@ export const ActorAbilities = Base =>
         try {
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `Wound-loss event ${foundry.utils.escapeHTML(input.eventRef)}: lose ${plan.record.loss} wounds (${plan.record.beforeWounds} → ${plan.record.afterWounds}). ${plan.record.granted ? `Adrenaline Junkie: gain ${plan.record.units} bonus d${plan.record.die}, expiring at scene end; session grants ${plan.record.usedAfter}/${plan.record.limit}.` : "No Adrenaline die granted: ineligible cause or session limit reached."} Resolve any critical injury/death consequences with the GC.`,
+            content: loc`Wound-loss event ${foundry.utils.escapeHTML(input.eventRef)}: lose ${plan.record.loss} wounds (${plan.record.beforeWounds} → ${plan.record.afterWounds}). ${plan.record.granted ? loc`Adrenaline Junkie: gain ${plan.record.units} bonus d${plan.record.die}, expiring at scene end; session grants ${plan.record.usedAfter}/${plan.record.limit}.` : loc`No Adrenaline die granted: ineligible cause or session limit reached.`} Resolve any critical injury/death consequences with the GC.`,
             flags: {
               spycraft2: { actorUuid: this.uuid, checkKind: "woundLoss", woundEventKey: key, actionDiceAllowed: false }
             }
@@ -1407,7 +1413,7 @@ export const ActorAbilities = Base =>
             )
           )
             ui.notifications.warn(
-              "The wound loss and any Adrenaline die are already recorded; the chat receipt failed. Do not apply the event again."
+              loc`The wound loss and any Adrenaline die are already recorded; the chat receipt failed. Do not apply the event again.`
             );
         }
         return plan.record;
@@ -1416,7 +1422,7 @@ export const ActorAbilities = Base =>
 
     async useStrut(message, options = {}) {
       if (this.type !== "agent" || !this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) throw new Error("The GC resolves secret Strut results.");
+      if (message.blind && !game.user?.isGM) throw new Error(loc`The GC resolves secret Strut results.`);
       const expected = rollEvidence(message.flags.spycraft2),
         combat = this.mentalLeapCombatContext(),
         signature = JSON.stringify(combat),
@@ -1433,10 +1439,9 @@ export const ActorAbilities = Base =>
       let input = options;
       if (input.nextHalfActionConfirmed === undefined) {
         input = await systemDialog.input({
-          window: { title: "Strut — next half action" },
+          window: { title: loc`Strut — next half action` },
           rejectClose: false,
-          content:
-            '<p>Gain one default-type bonus action die, improved by Fortune Favors the Bold if applicable. Unspent dice expire at combat end, without award XP.</p><label><input type="checkbox" name="nextHalfActionConfirmed" /> The GC confirms that my next half action after this attack was spent posturing</label>'
+          content: `<p>${loc`Gain one default-type bonus action die, improved by Fortune Favors the Bold if applicable. Unspent dice expire at combat end, without award XP.`}</p><label><input type="checkbox" name="nextHalfActionConfirmed" /> ${loc`The GC confirms that my next half action after this attack was spent posturing`}</label>`
         });
         if (!input) return null;
       }
@@ -1447,8 +1452,8 @@ export const ActorAbilities = Base =>
             rollEvidence(message.flags.spycraft2) !== expected ||
             JSON.stringify(this.mentalLeapCombatContext()) !== signature
           )
-            throw new Error("The attack or initiative changed. Review the current Strut action.");
-          if (message.blind && !game.user?.isGM) throw new Error("The GC resolves secret Strut results.");
+            throw new Error(loc`The attack or initiative changed. Review the current Strut action.`);
+          if (message.blind && !game.user?.isGM) throw new Error(loc`The GC resolves secret Strut results.`);
           const gain = plan(input.nextHalfActionConfirmed),
             id = foundry.utils.randomID(),
             pool = strutPool(
@@ -1486,7 +1491,7 @@ export const ActorAbilities = Base =>
               } catch (e) {
                 if (present()) rollback = e;
               }
-            else rollback = new Error("The Strut grant changed during restoration.");
+            else rollback = new Error(loc`The Strut grant changed during restoration.`);
             if (rollback) {
               try {
                 await this.update({ [path + ".needsReview"]: true });
@@ -1498,13 +1503,13 @@ export const ActorAbilities = Base =>
                   paymentPath: path + ".remaining",
                   bonusPoolId: id,
                   die: pool.die,
-                  label: "Strut",
+                  label: loc`Strut`,
                   poolFingerprint: actionDicePoolFingerprint(pool)
                 },
                 rollback,
                 { purpose: "Strut grant", grantReview: true, messageUuid: message.uuid ?? message.id }
               );
-              throw new AggregateError([error, rollback], "The Strut grant needs GC review.");
+              throw new AggregateError([error, rollback], loc`The Strut grant needs GC review.`);
             }
             throw error;
           }
@@ -1521,13 +1526,13 @@ export const ActorAbilities = Base =>
       let input = options;
       if (input.freeActionConfirmed === undefined) {
         input = await systemDialog.input({
-          window: { title: "Master Plan" },
+          window: { title: loc`Master Plan` },
           rejectClose: false,
-          content: `<p>Gain ${initial.units} bonus d${initial.die} action dice as a free action, once per mission. Unused dice expire at the end of this scene. Current Intelligence modifier ${initial.intelligenceModifier} is frozen when granted.</p><label><input name="freeActionConfirmed" type="checkbox" /> The GC confirms this free action may be taken now</label>`
+          content: `<p>${loc`Gain ${initial.units} bonus d${initial.die} action dice as a free action, once per mission. Unused dice expire at the end of this scene. Current Intelligence modifier ${initial.intelligenceModifier} is frozen when granted.`}</p><label><input name="freeActionConfirmed" type="checkbox" /> ${loc`The GC confirms this free action may be taken now`}</label>`
         });
         if (!input) return null;
       }
-      if (input.freeActionConfirmed !== true) return ui.notifications.warn("Confirm the Master Plan free action.");
+      if (input.freeActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the Master Plan free action.`);
       return this.useLimitedAbility(
         "masterPlan",
         async () => {
@@ -1537,16 +1542,16 @@ export const ActorAbilities = Base =>
           if (blocked) throw new Error(blocked);
           const combat = this.participatingCombat;
           if (combat?.started && combat.combatant?.actor?.uuid !== this.uuid)
-            throw new Error("Take this free action during this character’s initiative.");
+            throw new Error(loc`Take this free action during this character’s initiative.`);
           if (
             JSON.stringify(["scene", "session", "mission"].map(k => String(this.usagePeriods[k] ?? "initial"))) !==
             expected
           )
-            throw new Error("The scene, session or mission changed while confirming Master Plan.");
+            throw new Error(loc`The scene, session or mission changed while confirming Master Plan.`);
           const gain = masterPlanGainPlan(this.system);
           if (gain.intelligenceModifier !== initial.intelligenceModifier || gain.die !== initial.die)
             throw new Error(
-              "The Intelligence modifier or gained die type changed; confirm the current Master Plan benefit."
+              loc`The Intelligence modifier or gained die type changed; confirm the current Master Plan benefit.`
             );
           const id = foundry.utils.randomID(),
             pool = masterPlanPool({ ...this.system, ...this.attributeRuleContext }, gain, {
@@ -1558,7 +1563,7 @@ export const ActorAbilities = Base =>
             await this.update({ ["system.bonusActionDice." + id]: pool });
             message = await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `Master Plan: ${pool.granted} bonus d${pool.die} action dice; unused dice are lost at scene end. Free action; one mission use.`,
+              content: loc`Master Plan: ${pool.granted} bonus d${pool.die} action dice; unused dice are lost at scene end. Free action; one mission use.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -1585,7 +1590,7 @@ export const ActorAbilities = Base =>
             if (!cleanupError && this.system.bonusActionDice?.[id]) {
               const current = this.system.bonusActionDice[id];
               if (current.remaining !== pool.granted)
-                cleanupError = new Error("The granted dice changed; preserve their use for review.");
+                cleanupError = new Error(loc`The granted dice changed; preserve their use for review.`);
               else
                 try {
                   await this.update({ ["system.bonusActionDice.-=" + id]: null });
@@ -1614,7 +1619,7 @@ export const ActorAbilities = Base =>
                 );
               else
                 ui.notifications.warn(
-                  "Master Plan could not be fully restored. Its mission use remains spent; ask the GC to review the grant and receipt."
+                  loc`Master Plan could not be fully restored. Its mission use remains spent; ask the GC to review the grant and receipt.`
                 );
               return { ...pool, needsReview: true };
             }
@@ -1628,14 +1633,14 @@ export const ActorAbilities = Base =>
     async summonClassAssistants(sourceId, options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
       const source = assistantSource(this.system, sourceId);
-      if (!source) return ui.notifications.warn("This assistant option has not been earned.");
+      if (!source) return ui.notifications.warn(loc`This assistant option has not been earned.`);
       let input = options;
       const esc = foundry.utils.escapeHTML;
       if (!input.city) {
         input = await systemDialog.input({
           window: { title: source.name },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Summon ${this.system.actionDice.max} Tier II ${esc(source.template)} assistants until the end of the following scene. This records the group; the GC supplies its NPCs and adjudicates their help. No action die is spent.</p><label>Current city <input name="city" type="text" /></label><label>City population <input name="population" type="number" min="10000" step="1" /></label><label><input name="quickContactConfirmed" type="checkbox" /> A method of quick contact is available</label><label><input name="nonCombatConfirmed" type="checkbox" /> The requested help is non-combat work within their skills/equipment</label><label><input name="gcHelpApproved" type="checkbox" /> The GC approved this assistance</label>${source.kitGrade ? "<p>For required-kit skill checks while helping, these standard NPCs are assumed to possess one appropriate grade I kit.</p>" : ""}</div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Summon ${this.system.actionDice.max} Tier II ${esc(source.template)} assistants until the end of the following scene. This records the group; the GC supplies its NPCs and adjudicates their help. No action die is spent.`}</p><label>${loc`Current city`} <input name="city" type="text" /></label><label>${loc`City population`} <input name="population" type="number" min="10000" step="1" /></label><label><input name="quickContactConfirmed" type="checkbox" /> ${loc`A method of quick contact is available`}</label><label><input name="nonCombatConfirmed" type="checkbox" /> ${loc`The requested help is non-combat work within their skills/equipment`}</label><label><input name="gcHelpApproved" type="checkbox" /> ${loc`The GC approved this assistance`}</label>${source.kitGrade ? `<p>${loc`For required-kit skill checks while helping, these standard NPCs are assumed to possess one appropriate grade I kit.`}</p>` : ""}</div>`
         });
         if (!input) return null;
         input = { ...input, population: Number(input.population) };
@@ -1657,7 +1662,7 @@ export const ActorAbilities = Base =>
               String(this.usagePeriods.scene ?? "initial") !== scene ||
               sceneSequence(this.usagePeriods) !== sequence
             )
-              throw new Error("The assistant source or usage period changed.");
+              throw new Error(loc`The assistant source or usage period changed.`);
           };
           guard();
           try {
@@ -1665,7 +1670,7 @@ export const ActorAbilities = Base =>
             guard();
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `${esc(source.name)}: ${plan.count} Tier II ${esc(plan.template)} assistants in ${esc(plan.city)}; non-combat help at the GC’s discretion until the end of the following scene, subject to their withdrawal conditions.${plan.kitGrade ? " Required-kit checks assume one appropriate grade I kit." : ""} One mission use spent; no action die spent.`,
+              content: loc`${esc(source.name)}: ${plan.count} Tier II ${esc(plan.template)} assistants in ${esc(plan.city)}; non-combat help at the GC’s discretion until the end of the following scene, subject to their withdrawal conditions.${plan.kitGrade ? loc` Required-kit checks assume one appropriate grade I kit.` : ""} One mission use spent; no action die spent.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -1687,7 +1692,7 @@ export const ActorAbilities = Base =>
               await this.update({ "system.assistantGroups": before });
             } catch (rollbackError) {
               ui.notifications.warn(
-                "The assistant group may remain after rollback failed. Its mission use remains spent; review the group before trying again."
+                loc`The assistant group may remain after rollback failed. Its mission use remains spent; review the group before trying again.`
               );
               return plan;
             }
@@ -1702,14 +1707,14 @@ export const ActorAbilities = Base =>
       if (this.type !== "agent" || !this.isOwner) return null;
       const group = (this.system.assistantGroups ?? []).find(g => g.id === groupId);
       if (!group || !assistantGroupStatus(this.system, group).active)
-        return ui.notifications.warn("This assistant group is not active.");
+        return ui.notifications.warn(loc`This assistant group is not active.`);
       let input = options;
       const police = group.source === "friendsOnForce";
       if (!input.event) {
         input = await systemDialog.input({
-          window: { title: "Assistant group withdrawal" },
+          window: { title: loc`Assistant group withdrawal` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>The entire group leaves when any one member meets a stated withdrawal condition.</p><label>Condition <select name="event"><option value="failedMorale">Failed Morale check</option><option value="criticalInjury">Critical injury</option>${police ? '<option value="vitalityLoss">Lost more than half maximum vitality (rounded down)</option><option value="woundLoss">Lost at least one wound point</option>' : '<option value="failedDamageSave">Failed Damage save</option>'}</select></label>${police ? '<label>Officer maximum vitality <input name="maxVitality" type="number" min="1" step="1" value="1" /></label><label>Total vitality lost by that officer <input name="vitalityLost" type="number" min="0" step="1" value="0" /></label><label>Wounds lost by that officer <input name="woundsLost" type="number" min="0" step="1" value="0" /></label>' : ""}<label><input name="confirmed" type="checkbox" /> The GC confirmed at least one member met this condition</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`The entire group leaves when any one member meets a stated withdrawal condition.`}</p><label>${loc`Condition`} <select name="event"><option value="failedMorale">${loc`Failed Morale check`}</option><option value="criticalInjury">${loc`Critical injury`}</option>${police ? `<option value="vitalityLoss">${loc`Lost more than half maximum vitality (rounded down)`}</option><option value="woundLoss">${loc`Lost at least one wound point`}</option>` : `<option value="failedDamageSave">${loc`Failed Damage save`}</option>`}</select></label>${police ? `<label>${loc`Officer maximum vitality`} <input name="maxVitality" type="number" min="1" step="1" value="1" /></label><label>${loc`Total vitality lost by that officer`} <input name="vitalityLost" type="number" min="0" step="1" value="0" /></label><label>${loc`Wounds lost by that officer`} <input name="woundsLost" type="number" min="0" step="1" value="0" /></label>` : ""}<label><input name="confirmed" type="checkbox" /> ${loc`The GC confirmed at least one member met this condition`}</label></div>`
         });
         if (!input) return null;
         input = {
@@ -1724,7 +1729,7 @@ export const ActorAbilities = Base =>
         };
       }
       return queueResources([this], async () => {
-        if (!this.isOwner) throw new Error("Ownership changed before group withdrawal.");
+        if (!this.isOwner) throw new Error(loc`Ownership changed before group withdrawal.`);
         const before = foundry.utils.deepClone(this.system.assistantGroups ?? []),
           index = before.findIndex(g => g.id === groupId),
           next = assistantWithdrawalPlan(this.system, before[index], input),
@@ -1734,7 +1739,7 @@ export const ActorAbilities = Base =>
           await this.update({ "system.assistantGroups": groups });
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `${foundry.utils.escapeHTML(next.name)}: the entire group withdraws. ${foundry.utils.escapeHTML(next.withdrawal.reason)} Its spent mission use is unchanged.`,
+            content: loc`${foundry.utils.escapeHTML(next.name)}: the entire group withdraws. ${foundry.utils.escapeHTML(next.withdrawal.reason)} Its spent mission use is unchanged.`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -1757,15 +1762,15 @@ export const ActorAbilities = Base =>
       if (this.type !== "agent" || !this.isOwner) return null;
       const pools = deferredSkillPools(this.system, [...this.items]);
       if (!pools || !Object.hasOwn(CONFIG.SPYCRAFT.skills, key))
-        return ui.notifications.warn("I Can Swim is not available for this skill.");
+        return ui.notifications.warn(loc`I Can Swim is not available for this skill.`);
       const level = pools.level,
         esc = foundry.utils.escapeHTML;
       let input = options;
       if (input.points === undefined && input.trainingPoints === undefined) {
         input = await systemDialog.input({
-          window: { title: `I Can Swim — ${CONFIG.SPYCRAFT.skills[key].name}` },
+          window: { title: loc`I Can Swim — ${CONFIG.SPYCRAFT.skills[key].name}` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Before this skill check, spend current-level points only in ${esc(CONFIG.SPYCRAFT.skills[key].name)}. Class/cross-class costs, discounts, linked ranks and rank limits apply normally. Training costs one point per rank. Allocated ranks remain purchased even if the following check is cancelled.</p><label>Career-level ${level} points (${pools.careerPoints} available) <input name="points" type="number" min="0" max="${pools.careerPoints}" step="1" value="0" /></label>${pools.training.map(p => `<label>Training ${esc(p.id)} (${p.remaining} available) <input name="training_${esc(p.id)}" type="number" min="0" max="${p.remaining}" step="1" value="0" /></label>`).join("")}<label><input type="checkbox" name="freeActionConfirmed" /> I spend the free action before this skill check (during my initiative if in combat)</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Before this skill check, spend current-level points only in ${esc(CONFIG.SPYCRAFT.skills[key].name)}. Class/cross-class costs, discounts, linked ranks and rank limits apply normally. Training costs one point per rank. Allocated ranks remain purchased even if the following check is cancelled.`}</p><label>${loc`Career-level ${level} points (${pools.careerPoints} available)`} <input name="points" type="number" min="0" max="${pools.careerPoints}" step="1" value="0" /></label>${pools.training.map(p => `<label>${loc`Training ${esc(p.id)} (${p.remaining} available)`} <input name="training_${esc(p.id)}" type="number" min="0" max="${p.remaining}" step="1" value="0" /></label>`).join("")}<label><input type="checkbox" name="freeActionConfirmed" /> ${loc`I spend the free action before this skill check (during my initiative if in combat)`}</label></div>`
         });
         if (!input) return null;
         input = {
@@ -1776,10 +1781,10 @@ export const ActorAbilities = Base =>
         };
       }
       return queueResources([this], async () => {
-        if (!this.isOwner) throw new Error("Ownership changed before this purchase.");
+        if (!this.isOwner) throw new Error(loc`Ownership changed before this purchase.`);
         const combat = this.participatingCombat;
         if (combat?.started && combat.combatant?.actor?.uuid !== this.uuid)
-          throw new Error("Take this free action during this character’s initiative.");
+          throw new Error(loc`Take this free action during this character’s initiative.`);
         const current = this.system.toObject?.() ?? foundry.utils.deepClone(this.system);
         current.usagePeriods = this.usagePeriods;
         Object.assign(current, this.attributeRuleContext);
@@ -1824,7 +1829,7 @@ export const ActorAbilities = Base =>
               String(this.usagePeriods.session ?? "initial") !== session ||
               plan.updates.some(u => !this.system.featStatus?.[u._id]?.ok)
             )
-              throw new Error("The level, period or deferred skill source changed during the purchase.");
+              throw new Error(loc`The level, period or deferred skill source changed during the purchase.`);
           };
         try {
           if (plan.updates.length) await this.updateEmbeddedDocuments("Item", plan.updates);
@@ -1832,7 +1837,7 @@ export const ActorAbilities = Base =>
           guard();
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `I Can Swim: free action before ${esc(CONFIG.SPYCRAFT.skills[key].name)}; spent ${plan.totalPoints} saved skill point(s) for ${plan.ranks} rank(s). No action die spent.`,
+            content: loc`I Can Swim: free action before ${esc(CONFIG.SPYCRAFT.skills[key].name)}; spent ${plan.totalPoints} saved skill point(s) for ${plan.ranks} rank(s). No action die spent.`,
             flags: {
               spycraft2: {
                 actorUuid: this.uuid,
@@ -1855,7 +1860,7 @@ export const ActorAbilities = Base =>
             if (plan.points) await this.update({ "system.progression": previous });
           } catch (rollbackError) {
             ui.notifications.warn(
-              "The deferred purchase needs review after rollback failed. Check its skill points and ranks before rolling or trying again."
+              loc`The deferred purchase needs review after rollback failed. Check its skill points and ranks before rolling or trying again.`
             );
             return { review: true };
           }
@@ -1867,9 +1872,9 @@ export const ActorAbilities = Base =>
     async useEverydayGenius(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
       if (!everydayGeniusSource(this.system))
-        return ui.notifications.warn("Everyday Genius is not currently available.");
+        return ui.notifications.warn(loc`Everyday Genius is not currently available.`);
       const pack = game.packs?.get("spycraft2.feats");
-      if (!pack) throw new Error("The system feat compendium is unavailable.");
+      if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
       const esc = foundry.utils.escapeHTML;
       if (!input.featId) {
@@ -1878,13 +1883,13 @@ export const ActorAbilities = Base =>
             .filter(f => f.type === "feat" && f.system.tree === "basicSkill")
             .sort((a, b) => a.name.localeCompare(b.name));
         input = await systemDialog.input({
-          window: { title: "Everyday Genius" },
+          window: { title: loc`Everyday Genius` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>As a full action, gain one unpossessed non-virtual Basic Skill feat until this session ends. Uses per mission equal your number of eligible Advanced Skill feats; granted Basic Skill feats do not increase this limit.</p><label>Basic Skill feat <select name="featId">${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label><label><input type="checkbox" name="fullActionConfirmed" /> I spend the required full action (during my initiative if in combat)</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`As a full action, gain one unpossessed non-virtual Basic Skill feat until this session ends. Uses per mission equal your number of eligible Advanced Skill feats; granted Basic Skill feats do not increase this limit.`}</p><label>${loc`Basic Skill feat`} <select name="featId">${feats.map(f => `<option value="${esc(f._id)}">${esc(f.name)}</option>`).join("")}</select></label><label><input type="checkbox" name="fullActionConfirmed" /> ${loc`I spend the required full action (during my initiative if in combat)`}</label></div>`
         });
         if (!input) return null;
       }
-      if (input.fullActionConfirmed !== true) return ui.notifications.warn("Confirm the required full action.");
+      if (input.fullActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the required full action.`);
       return this.useLimitedAbility(
         "everydayGenius",
         async () => {
@@ -1900,9 +1905,9 @@ export const ActorAbilities = Base =>
               String(this.usagePeriods.mission ?? "initial") !== mission ||
               String(this.usagePeriods.session ?? "initial") !== session
             )
-              throw new Error("Everyday Genius source, allowance or period changed.");
+              throw new Error(loc`Everyday Genius source, allowance or period changed.`);
             if (checkTurn && combat?.started && combat.combatant?.actor?.uuid !== this.uuid)
-              throw new Error("Take this full action during this character’s initiative.");
+              throw new Error(loc`Take this full action during this character’s initiative.`);
           };
           guard();
           const feat = await pack.getDocument(input.featId);
@@ -1913,15 +1918,15 @@ export const ActorAbilities = Base =>
             }),
             eligible = this.checkPrerequisites(data.system.prerequisites, { temporary: true });
           if (!eligible.ok)
-            throw new Error(`Temporary Basic Skill prerequisites not met: ${eligible.unmet.join("; ")}.`);
+            throw new Error(loc`Temporary Basic Skill prerequisites not met: ${eligible.unmet.join("; ")}.`);
           let created;
           try {
             [created] = await this.createEmbeddedDocuments("Item", [data]);
-            if (!created) throw new Error("Temporary Basic Skill feat creation failed.");
+            if (!created) throw new Error(loc`Temporary Basic Skill feat creation failed.`);
             guard(false);
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `Everyday Genius: full action; gained ${esc(created.name)} until the end of this session. One mission use spent; no action die spent.`,
+              content: loc`Everyday Genius: full action; gained ${esc(created.name)} until the end of this session. One mission use spent; no action die spent.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -1942,7 +1947,7 @@ export const ActorAbilities = Base =>
                 await this.deleteEmbeddedDocuments("Item", [created.id]);
               } catch (cleanupError) {
                 ui.notifications.warn(
-                  "The temporary Basic Skill feat remains after cleanup failed. Its mission use remains spent; review the existing feat before retrying."
+                  loc`The temporary Basic Skill feat remains after cleanup failed. Its mission use remains spent; review the existing feat before retrying.`
                 );
                 return created;
               }
@@ -1956,7 +1961,7 @@ export const ActorAbilities = Base =>
     async useRenaissanceMan(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
       const pack = game.packs?.get("spycraft2.feats");
-      if (!pack) throw new Error("The system feat compendium is unavailable.");
+      if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
       if (!input.featId) {
         const index = await pack.getIndex({ fields: ["system.tree"] }),
@@ -1965,13 +1970,13 @@ export const ActorAbilities = Base =>
           .filter(i => i.type === "feat" && i.system.tree === "basicSkill")
           .sort((a, b) => a.name.localeCompare(b.name));
         input = await systemDialog.input({
-          window: { title: "Renaissance Man" },
+          window: { title: loc`Renaissance Man` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Gain one temporary Basic Skill feat until this mission ends. Choose a feat you do not already possess. It supplies no permanent feat slot or permanent prerequisite qualification.</p><label>Feat <select name="featId">${choices.map(i => `<option value="${esc(i._id)}">${esc(i.name)}</option>`).join("")}</select></label><label><input type="checkbox" name="freeActionConfirmed" /> I spend the required free action</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Gain one temporary Basic Skill feat until this mission ends. Choose a feat you do not already possess. It supplies no permanent feat slot or permanent prerequisite qualification.`}</p><label>${loc`Feat`} <select name="featId">${choices.map(i => `<option value="${esc(i._id)}">${esc(i.name)}</option>`).join("")}</select></label><label><input type="checkbox" name="freeActionConfirmed" /> ${loc`I spend the required free action`}</label></div>`
         });
         if (!input) return null;
       }
-      if (!input.freeActionConfirmed) return ui.notifications.warn("Confirm the required free action.");
+      if (!input.freeActionConfirmed) return ui.notifications.warn(loc`Confirm the required free action.`);
       return this.useLimitedAbility(
         "renaissanceMan",
         async () => {
@@ -1980,14 +1985,14 @@ export const ActorAbilities = Base =>
           const data = renaissanceManPlan(this.system, this.items, feat, { epoch, sourceActorUuid: this.uuid });
           const eligible = this.checkPrerequisites(data.system.prerequisites, { temporary: true });
           if (!eligible.ok)
-            throw new Error(`This temporary feat's prerequisites are not met: ${eligible.unmet.join("; ")}.`);
+            throw new Error(loc`This temporary feat's prerequisites are not met: ${eligible.unmet.join("; ")}.`);
           let created;
           try {
             [created] = await this.createEmbeddedDocuments("Item", [data]);
-            if (!created) throw new Error("The temporary feat was not created.");
+            if (!created) throw new Error(loc`The temporary feat was not created.`);
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `Renaissance Man: free action; gained ${foundry.utils.escapeHTML(created.name)} until the end of this mission.`,
+              content: loc`Renaissance Man: free action; gained ${foundry.utils.escapeHTML(created.name)} until the end of this mission.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -2006,7 +2011,7 @@ export const ActorAbilities = Base =>
                 await this.deleteEmbeddedDocuments("Item", [created.id]);
               } catch (cleanupError) {
                 ui.notifications.warn(
-                  "The temporary feat remains after a posting/cleanup failure. Its use remains spent; review the existing feat before retrying."
+                  loc`The temporary feat remains after a posting/cleanup failure. Its use remains spent; review the existing feat before retrying.`
                 );
                 return created;
               }
@@ -2018,10 +2023,10 @@ export const ActorAbilities = Base =>
     }
 
     async shareTemporaryFeats(ability, options = {}) {
-      if (!this.isOwner) throw new Error("You must own the source actor.");
+      if (!this.isOwner) throw new Error(loc`You must own the source actor.`);
       let input = options;
       const definition = SHARE_ABILITIES[ability];
-      if (!definition) throw new Error("Unknown sharing ability.");
+      if (!definition) throw new Error(loc`Unknown sharing ability.`);
       if (!input.featIds) {
         const esc = foundry.utils.escapeHTML;
         const eligible = this.items.filter(
@@ -2035,13 +2040,13 @@ export const ActorAbilities = Base =>
           actor => actor.type === "agent" && actor.id !== this.id && actor.isOwner
         );
         input = await systemDialog.input({
-          window: { title: `${definition.name}: share temporary feats` },
+          window: { title: loc`${definition.name}: share temporary feats` },
           rejectClose: false,
           content: `
-        <p>Choose up to ${this.system.actionDice.max} owned ${definition.tree} feats at session start. Recipients must meet the prerequisites to benefit. A GC can apply this to teammates owned by other players.</p>
+        <p>${loc`Choose up to ${this.system.actionDice.max} owned ${definition.tree} feats at session start. Recipients must meet the prerequisites to benefit. A GC can apply this to teammates owned by other players.`}</p>
         ${eligible.map(item => `<label><input type="checkbox" name="feat_${item.id}" /> ${esc(item.name)}</label>`).join("")}
-        <h4>Teammates</h4>${recipients.map(actor => `<label><input type="checkbox" name="recipient_${actor.id}" /> ${esc(actor.name)}</label>`).join("")}
-        <label><input type="checkbox" name="atSessionStart" /> This selection is being made at the start of the session</label>`
+        <h4>${loc`Teammates`}</h4>${recipients.map(actor => `<label><input type="checkbox" name="recipient_${actor.id}" /> ${esc(actor.name)}</label>`).join("")}
+        <label><input type="checkbox" name="atSessionStart" /> ${loc`This selection is being made at the start of the session`}</label>`
         });
         if (!input) return null;
         input.featIds = eligible.filter(item => input[`feat_${item.id}`]).map(item => item.id);
@@ -2056,7 +2061,7 @@ export const ActorAbilities = Base =>
         });
         const recipients = [...new Set(input.recipients ?? [])];
         if (!recipients.length || recipients.some(actor => actor === this || actor.type !== "agent" || !actor.isOwner))
-          throw new Error("Choose teammates you can update; ask the GC to apply sharing for other players.");
+          throw new Error(loc`Choose teammates you can update; ask the GC to apply sharing for other players.`);
         const created = [];
         try {
           for (const actor of recipients) {
@@ -2066,7 +2071,7 @@ export const ActorAbilities = Base =>
             created.push({ actor, ids: docs.map(doc => doc.id) });
           }
           if (String(this.usagePeriods.session ?? "initial") !== epoch)
-            throw new Error("The session changed during sharing; repeat the selection.");
+            throw new Error(loc`The session changed during sharing; repeat the selection.`);
           await this.update({
             "system.temporaryShares": {
               ...this.system.temporaryShares,

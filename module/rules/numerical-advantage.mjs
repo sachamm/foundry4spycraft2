@@ -1,6 +1,7 @@
+import { loc } from "../i18n.mjs";
 /** Numerical advantage p.172 and Tactical Advantage p.175. Team membership is a GC-confirmed relationship. */
 function countedSide(rows) {
-  if (!Array.isArray(rows)) throw new Error("Declare each side’s actual characters and teammate groups.");
+  if (!Array.isArray(rows)) throw new Error(loc`Declare each side’s actual characters and teammate groups.`);
   const ids = new Set(),
     prepared = rows.map(r => {
       if (
@@ -24,7 +25,7 @@ function countedSide(rows) {
         (r.countsAs > 1 && !r.countingSource.trim())
       )
         throw new Error(
-          "Each roster group needs a unique reference, whole physical count, teammate group and source for other counting abilities."
+          loc`Each roster group needs a unique reference, whole physical count, teammate group and source for other counting abilities.`
         );
       ids.add(r.id);
       return { ...r, team: r.team.trim().toLowerCase() };
@@ -40,7 +41,7 @@ function countedSide(rows) {
     physical += r.characters;
     effective += weight;
     if (!Number.isSafeInteger(weight) || !Number.isSafeInteger(physical) || !Number.isSafeInteger(effective))
-      throw new Error("The roster count exceeds safe whole-character arithmetic.");
+      throw new Error(loc`The roster count exceeds safe whole-character arithmetic.`);
     return { ...r, tacticalApplies: applies && r.countsAs < 2, perCharacter, effective: weight };
   });
   return {
@@ -53,7 +54,7 @@ function countedSide(rows) {
 export function numericalAdvantagePlan({ own = [], opposition = [], rosterConfirmed = false } = {}) {
   if (rosterConfirmed !== true)
     throw new Error(
-      "The GC must confirm actual physical characters, opposing sides, teammate relationships and other counting abilities."
+      loc`The GC must confirm actual physical characters, opposing sides, teammate relationships and other counting abilities.`
     );
   const a = countedSide(own),
     b = countedSide(opposition),
@@ -66,10 +67,10 @@ export function numericalAdvantagePlan({ own = [], opposition = [], rosterConfir
     twoToOne: meets(2),
     threeToOne: meets(3),
     notes: [
-      "Only physically present characters add to each side’s physical count. A shared Actor can represent a declared group; do not count both its prototype and placed tokens twice.",
-      "Tactical Advantage affects the owner and actual teammates, not every ally. Distinct team identifiers separate allied groups. Multiple copies do not multiply the doubling; another ability already counting a character as 2 or more takes precedence.",
-      "The counting benefit has no printed distance or owner-participation requirement; a declared zero-count provider may supply it to confirmed teammates, without adding an absent character to the physical roster.",
-      "These totals check numerical-advantage thresholds. Other feat conditions, actions, uses and effects require their own resolution. Joint Action DC stacking is separate."
+      loc`Only physically present characters add to each side’s physical count. A shared Actor can represent a declared group; do not count both its prototype and placed tokens twice.`,
+      loc`Tactical Advantage affects the owner and actual teammates, not every ally. Distinct team identifiers separate allied groups. Multiple copies do not multiply the doubling; another ability already counting a character as 2 or more takes precedence.`,
+      loc`The counting benefit has no printed distance or owner-participation requirement; a declared zero-count provider may supply it to confirmed teammates, without adding an absent character to the physical roster.`,
+      loc`These totals check numerical-advantage thresholds. Other feat conditions, actions, uses and effects require their own resolution. Joint Action DC stacking is separate.`
     ]
   };
 }

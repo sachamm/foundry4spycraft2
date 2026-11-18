@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** City prerequisites p.28; native option groups pp.42,46,51. Class prose specifies Tier II. */
 export const ASSISTANT_SOURCES = {
   faculty: { classId: "scientist", name: "Faculty", template: "academic", page: 42, kitGrade: 1 },
@@ -20,7 +21,7 @@ export function assistantSource(system, id) {
 export function sceneSequence(periods) {
   const n = periods?.sceneSequence ?? 0;
   if (!Number.isSafeInteger(n) || n < 0)
-    throw new Error("Review the saved scene sequence before tracking assistant duration.");
+    throw new Error(loc`Review the saved scene sequence before tracking assistant duration.`);
   return n;
 }
 export function assistantSummonPlan(
@@ -36,13 +37,13 @@ export function assistantSummonPlan(
   } = {}
 ) {
   const source = assistantSource(system, id);
-  if (!source) throw new Error("This summoned-assistant option is not currently earned.");
+  if (!source) throw new Error(loc`This summoned-assistant option is not currently earned.`);
   if (
     typeof groupId !== "string" ||
     !/^[A-Za-z0-9_-]+$/.test(groupId) ||
     (system.assistantGroups ?? []).some(g => g.id === groupId)
   )
-    throw new Error("A new group identifier is required.");
+    throw new Error(loc`A new group identifier is required.`);
   if (
     typeof city !== "string" ||
     !city.trim() ||
@@ -50,14 +51,17 @@ export function assistantSummonPlan(
     population < 10000 ||
     quickContactConfirmed !== true
   )
-    throw new Error("Use this city ability in a named city of at least 10,000 people with a method of quick contact.");
+    throw new Error(
+      loc`Use this city ability in a named city of at least 10,000 people with a method of quick contact.`
+    );
   if (nonCombatConfirmed !== true || gcHelpApproved !== true)
-    throw new Error("The GC must approve non-combat help within the group’s skills and equipment.");
+    throw new Error(loc`The GC must approve non-combat help within the group’s skills and equipment.`);
   const count = system.actionDice?.max;
-  if (!Number.isSafeInteger(count) || count < 1) throw new Error("Review the character’s starting action-die count.");
+  if (!Number.isSafeInteger(count) || count < 1)
+    throw new Error(loc`Review the character’s starting action-die count.`);
   const sequence = sceneSequence(system.usagePeriods);
   if (!Number.isSafeInteger(sequence + 2))
-    throw new Error("The scene sequence cannot safely track another two scenes.");
+    throw new Error(loc`The scene sequence cannot safely track another two scenes.`);
   return {
     id: groupId,
     source: id,
@@ -115,8 +119,8 @@ export function assistantGroupStatus(system, group) {
     active: true,
     state:
       sequence === group.sceneSequence
-        ? "Current scene; also available through the following scene"
-        : "Following scene; leaves when this scene ends"
+        ? loc`Current scene; also available through the following scene`
+        : loc`Following scene; leaves when this scene ends`
   };
 }
 export function assistantWithdrawalPlan(
@@ -125,12 +129,13 @@ export function assistantWithdrawalPlan(
   { event = "", confirmed = false, maxVitality = 0, vitalityLost = 0, woundsLost = 0 } = {}
 ) {
   const status = assistantGroupStatus(system, group);
-  if (!status.active) throw new Error("Only an active, valid assistant group can withdraw.");
-  if (confirmed !== true) throw new Error("Confirm that at least one group member met the withdrawal condition.");
+  if (!status.active) throw new Error(loc`Only an active, valid assistant group can withdraw.`);
+  if (confirmed !== true) throw new Error(loc`Confirm that at least one group member met the withdrawal condition.`);
   let reason = "";
-  if (event === "failedMorale") reason = "A member failed a Morale check.";
-  else if (event === "criticalInjury") reason = "A member suffered a critical injury.";
-  else if (group.source !== "friendsOnForce" && event === "failedDamageSave") reason = "A member failed a Damage save.";
+  if (event === "failedMorale") reason = loc`A member failed a Morale check.`;
+  else if (event === "criticalInjury") reason = loc`A member suffered a critical injury.`;
+  else if (group.source !== "friendsOnForce" && event === "failedDamageSave")
+    reason = loc`A member failed a Damage save.`;
   else if (group.source === "friendsOnForce" && event === "vitalityLoss") {
     if (
       !Number.isSafeInteger(maxVitality) ||
@@ -139,15 +144,15 @@ export function assistantWithdrawalPlan(
       vitalityLost < 0 ||
       vitalityLost > maxVitality
     )
-      throw new Error("Enter a valid maximum vitality and total vitality lost by one police officer.");
+      throw new Error(loc`Enter a valid maximum vitality and total vitality lost by one police officer.`);
     if (vitalityLost <= Math.floor(maxVitality / 2))
-      throw new Error("The officer must lose more than half maximum vitality, rounded down.");
-    reason = `An officer lost ${vitalityLost} of ${maxVitality} vitality (more than ${Math.floor(maxVitality / 2)}).`;
+      throw new Error(loc`The officer must lose more than half maximum vitality, rounded down.`);
+    reason = loc`An officer lost ${vitalityLost} of ${maxVitality} vitality (more than ${Math.floor(maxVitality / 2)}).`;
   } else if (group.source === "friendsOnForce" && event === "woundLoss") {
     if (!Number.isSafeInteger(woundsLost) || woundsLost < 1)
-      throw new Error("An officer must lose at least one wound point.");
-    reason = `An officer lost ${woundsLost} wound point(s).`;
-  } else throw new Error("Choose a withdrawal condition stated by this class ability.");
+      throw new Error(loc`An officer must lose at least one wound point.`);
+    reason = loc`An officer lost ${woundsLost} wound point(s).`;
+  } else throw new Error(loc`Choose a withdrawal condition stated by this class ability.`);
   return {
     ...group,
     status: "withdrawn",

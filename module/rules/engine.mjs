@@ -82,6 +82,7 @@ import {
 } from "./gear.mjs";
 import { proficiencyTotals, focusTotals } from "./training.mjs";
 import { purchasedSkillRanks, availableSkillPoints } from "./checks.mjs";
+import { loc } from "../i18n.mjs";
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const GEAR = ["R", "T", "V", "S", "G", "W", "E"];
@@ -171,7 +172,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     const temporary = feat.system.featKind === "temporary",
       selfTemporary = temporary && selfGrantedTemporaryFeat(sys, feat);
     if (!temporaryFeatActive(sys, feat)) {
-      warnings.push(`${feat.name}: temporary feat expired; remove it or retain it as a record.`);
+      warnings.push(loc`${feat.name}: temporary feat expired; remove it or retain it as a record.`);
       continue;
     }
     if (
@@ -196,13 +197,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
       selectionCount = featSelectionCounts.get(selectionKey) ?? 0;
     featSelectionCounts.set(selectionKey, selectionCount + 1);
     if ((feat.system.ranks ?? 1) !== 1)
-      warnings.push(`${feat.name}: feats have no ranks; record each permitted selection separately.`);
+      warnings.push(loc`${feat.name}: feats have no ranks; record each permitted selection separately.`);
     if (
       count >= maximum ||
       (temporary && (selfTemporary ? (!repeatable || distinctFeatChoice(feat)) && selectionCount > 0 : count > 0))
     ) {
       warnings.push(
-        `${feat.name}: ${temporary && selectionCount > 0 ? "duplicate temporary selection" : `exceeds the maximum of ${maximum} selection(s)`}.`
+        `${feat.name}: ${temporary && selectionCount > 0 ? loc`duplicate temporary selection` : loc`exceeds the maximum of ${maximum} selection(s)`}.`
       );
       continue;
     }
@@ -210,7 +211,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
       (!feat.system.granted || feat.system.featKind === "temporary") &&
       (feat.system.acquiredAtLevel || 1) > (sys.progression?.length ?? 0)
     ) {
-      warnings.push(`${feat.name}: has not been acquired at this career level.`);
+      warnings.push(loc`${feat.name}: has not been acquired at this career level.`);
       continue;
     }
     legalFeatIds.add(feat.id);
@@ -247,7 +248,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     const ci = classById.get(entry.classId);
     classAtLevel.push(ci ?? null);
     if (!ci) {
-      warnings.push(`Unknown class "${entry.classId}" in level progression.`);
+      warnings.push(loc`Unknown class "${entry.classId}" in level progression.`);
       continue;
     }
     classLevels[entry.classId] = (classLevels[entry.classId] ?? 0) + 1;
@@ -275,7 +276,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     for (const g of GEAR) gearBase[g] += row[`gear${g}`] ?? 0;
     classesData[cid] = { levels: lvl, ...row };
     if (lvl > ci.system.table.length && ci.system.table.length)
-      warnings.push(`${ci.name} has a maximum of ${ci.system.table.length} levels.`);
+      warnings.push(loc`${ci.name} has a maximum of ${ci.system.table.length} levels.`);
   }
   // Origin increases to base Defense also count for base-Defense prerequisites.
   for (const origin of items.filter(i => i.type === "origin")) {
@@ -286,7 +287,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.base = base;
   for (const originType of ["talent", "specialty"]) {
     const count = items.filter(i => i.type === "origin" && i.system.originType === originType).length;
-    if (count > 1) warnings.push(`Multiple ${originType}s attached (${count}); only one is permitted.`);
+    if (count > 1) warnings.push(loc`Multiple ${originType}s attached (${count}); only one is permitted.`);
   }
   for (const originType of ["talent", "specialty"]) {
     if (!items.some(i => i.type === "origin" && i.system.originType === originType)) {
@@ -295,7 +296,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         always: true,
         tab: "main",
         browse: { type: "origin", originType },
-        text: `Choose a ${originType}.`
+        text: loc`Choose a ${originType}.`
       });
     }
   }
@@ -305,7 +306,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
       always: true,
       tab: "classes",
       browse: { type: "class", originType: "" },
-      text: "Take a first class level."
+      text: loc`Take a first class level.`
     });
 
   /* ---------------- Collect bonus sources ---------------- */
@@ -341,7 +342,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     });
   if ((classLevels.triggerman ?? 0) >= 8)
     sources.push({
-      name: "Eye of the Storm (all attackers)",
+      name: loc`Eye of the Storm (all attackers)`,
       rank: 1,
       bonuses: [{ target: "defense", value: "3", bonusType: "dodge" }]
     });
@@ -411,16 +412,16 @@ export function computeAgent(sys, items, cfg, options = {}) {
             todo.push({
               order: 21,
               tab: "classes",
-              text: `Scientist: choose the Ph.D. class skill earned at class level ${milestone}.`
+              text: loc`Scientist: choose the Ph.D. class skill earned at class level ${milestone}.`
             });
         }
       if (cid === "virtuoso") {
         const key = i.system.keySkill;
         if (cfg.skills[key]) {
           if (cfg.skills[key].focus && !i.system.keyFocus)
-            todo.push({ order: 21, tab: "classes", text: "Virtuoso: choose the key skill's focus." });
+            todo.push({ order: 21, tab: "classes", text: loc`Virtuoso: choose the key skill's focus.` });
           if (!i.system.professionFocus)
-            todo.push({ order: 21, tab: "classes", text: "Virtuoso: choose the related Profession focus." });
+            todo.push({ order: 21, tab: "classes", text: loc`Virtuoso: choose the related Profession focus.` });
           const bonuses = [
             { target: `skills.${key}.classSkill`, value: "1" },
             { target: `skills.${key}.misc`, value: "2", bonusType: "insight" },
@@ -445,12 +446,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
             fieldOfExpertise: true
           });
           if (lvl >= 6 && !i.system.classSkills?.includes(i.system.phdSkill))
-            todo.push({ order: 21, tab: "classes", text: "Virtuoso: choose the Ph.D. skill." });
+            todo.push({ order: 21, tab: "classes", text: loc`Virtuoso: choose the Ph.D. skill.` });
         } else
           todo.push({
             order: 21,
             tab: "classes",
-            text: "Virtuoso: choose the key skill, its focus if applicable, and the related Profession focus."
+            text: loc`Virtuoso: choose the key skill, its focus if applicable, and the related Profession focus.`
           });
       }
       sources.push({
@@ -483,11 +484,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
           const maximum = list.kind === "option" ? 1 : list.kind === "crossClass" ? (opt.maxSelections ?? 1) : Infinity;
           selectedOptions.set(key, taken + 1);
           if (taken >= maximum) {
-            warnings.push(`${i.name}: ${opt.name} may be selected only ${maximum} time(s).`);
+            warnings.push(loc`${i.name}: ${opt.name} may be selected only ${maximum} time(s).`);
             return;
           }
           if (list.kind === "crossClass" && (classLevels[opt.classId] ?? 0) >= opt.assumedClassLevel) {
-            warnings.push(`${i.name}: replace ${opt.name}; actual class levels already grant it.`);
+            warnings.push(loc`${i.name}: replace ${opt.name}; actual class levels already grant it.`);
             return;
           }
           sys.classOptionSelections.push({ classId: cid, name: opt.name, level: slot.level });
@@ -505,7 +506,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         todo.push({
           order: 20,
           tab: "classes",
-          text: `${i.name}: ${plural(unpicked, "class-ability choice")} to make.`
+          text: loc`${i.name}: ${plural(unpicked, "class-ability choice")} to make.`
         });
     }
   }
@@ -549,7 +550,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     );
   }
   sources.push({
-    name: "Armor Use (combined legacy grades)",
+    name: loc`Armor Use (combined legacy grades)`,
     rank: 1,
     bonuses: [
       { target: "defenseArmor", value: String(armorGrade) },
@@ -559,12 +560,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.fortunesOfWarActive = activeFortunesOfWar(sys);
   if (sys.fortunesOfWarActive)
     sources.push({
-      name: "Fortunes of War (one-full-round boost)",
+      name: loc`Fortunes of War (one-full-round boost)`,
       rank: 1,
       bonuses: [{ target: "naturalDR", value: String(warGrade) }]
     });
   sources.push({
-    name: "Fortunes of War (combined legacy grades)",
+    name: loc`Fortunes of War (combined legacy grades)`,
     rank: 1,
     bonuses: [{ target: "naturalDR", value: String(warGrade) }]
   });
@@ -597,7 +598,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   warnings.push(...sys.drunkRepositionState.warnings);
   sys.drunkPendingRepositions = sys.drunkRepositionState.rows.filter(r => ["pending", "moving"].includes(r.state));
   sys.drunkSleepState = fatigueRestStatus({ ...sys, fatigueRest: sys.drunkSleep }, { restKind: "drunk" });
-  if (sys.drunkSleepState?.needsReview) warnings.push("Drunk sleep: " + sys.drunkSleepState.warning);
+  if (sys.drunkSleepState?.needsReview) warnings.push(loc`Drunk sleep: ` + sys.drunkSleepState.warning);
   sys.fatigueRestState = fatigueRestStatus(sys);
   if (sys.fatigueRestState?.needsReview) warnings.push(sys.fatigueRestState.warning);
   sys.fatigueApplicationHistory = fatigueApplicationHistory(sys);
@@ -646,7 +647,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     a.cost = T.abilityScores.find(r => r.score === a.base)?.cost;
     if (a.base < 8 || a.base > 18 || typeof a.cost !== "number") {
       a.cost = 0;
-      warnings.push(`${k.toUpperCase()} ${a.base} is outside the creation point-buy range (8–18).`);
+      warnings.push(loc`${k.toUpperCase()} ${a.base} is outside the creation point-buy range (8–18).`);
     }
     pointCost += a.cost;
   }
@@ -659,16 +660,16 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const increasesDue = cfg.abilityIncreaseLevels.filter(l => l <= level);
   const increasesMissing = increasesDue.filter(l => !increaseAt(l)).length;
   if (increasesMissing)
-    todo.push({ order: 11, tab: "main", text: `${plural(increasesMissing, "attribute increase")} to assign.` });
+    todo.push({ order: 11, tab: "main", text: loc`${plural(increasesMissing, "attribute increase")} to assign.` });
   sys.pointBuy = { budget: sys.pointBuyBudget ?? cfg.pointBuy, spent: pointCost };
   sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
-  if (sys.pointBuy.remaining < 0) warnings.push(`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
+  if (sys.pointBuy.remaining < 0) warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
   if (sys.pointBuy.remaining > 0)
     todo.push({
       order: 10,
       always: true,
       tab: "main",
-      text: `${plural(sys.pointBuy.remaining, "attribute point")} left to spend.`
+      text: loc`${plural(sys.pointBuy.remaining, "attribute point")} left to spend.`
     });
   const abil = Object.fromEntries(
     ABILITIES.map(k => [k, { value: sys.abilities[k].value, mod: sys.abilities[k].mod }])
@@ -847,7 +848,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     for (const [key, raw] of Object.entries(entry.skills ?? {})) {
       const points = Number(raw);
       if (!cfg.skills[key] || !Number.isSafeInteger(points) || points < 0) {
-        const message = `Level ${idx + 1}: skill purchases require nonnegative whole points for an existing skill (${key}).`;
+        const message = loc`Level ${idx + 1}: skill purchases require nonnegative whole points for an existing skill (${key}).`;
         warnings.push(message);
         purchaseIssue("allocation", idx + 1, message, { skill: key });
       }
@@ -862,7 +863,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         discountedRanks: Math.max(0, discount - (skillRanks[sd.key] ?? 0))
       });
       if (!purchase.valid) {
-        const message = `Level ${idx + 1}: ${sd.name} cross-class ranks cost 2 skill points each; ${pts} is invalid.`;
+        const message = loc`Level ${idx + 1}: ${sd.name} cross-class ranks cost 2 skill points each; ${pts} is invalid.`;
         warnings.push(message);
         purchaseIssue("point-cost", idx + 1, message, { skill: sd.key });
       }
@@ -877,7 +878,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
       }
       const rankLimit = maximumRanksAt(sd.key, idx + 1);
       if (skillRanks[sd.key] > rankLimit) {
-        const message = `Level ${idx + 1}: ${sd.name} has ${skillRanks[sd.key]} ranks, exceeding the purchase-time maximum of ${rankLimit}.`;
+        const message = loc`Level ${idx + 1}: ${sd.name} has ${skillRanks[sd.key]} ranks, exceeding the purchase-time maximum of ${rankLimit}.`;
         warnings.push(message);
         purchaseIssue("rank-limit", idx + 1, message, { skill: sd.key });
       }
@@ -894,7 +895,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         const points = Number(raw);
         if (points === 0) continue;
         if (!cfg.skills[key] || !Number.isSafeInteger(points) || points < 0) {
-          const message = "Training: each allocation must be a nonnegative whole number for an existing skill.";
+          const message = loc`Training: each allocation must be a nonnegative whole number for an existing skill.`;
           warnings.push(message);
           purchaseIssue("training-allocation", idx + 1, message, { skill: key, sourceId: feat.id });
           continue;
@@ -904,7 +905,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         purchasedRanks[key] = (purchasedRanks[key] ?? 0) + points;
         const maximum = maximumRanksAt(key, idx + 1);
         if (skillRanks[key] > maximum) {
-          const message = `Training: ${cfg.skills[key].name} exceeds its acquisition-level rank limit of ${maximum}.`;
+          const message = loc`Training: ${cfg.skills[key].name} exceeds its acquisition-level rank limit of ${maximum}.`;
           warnings.push(message);
           purchaseIssue("training-rank-limit", idx + 1, message, { skill: key, sourceId: feat.id });
         }
@@ -914,7 +915,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         }
       }
       if (used > 5) {
-        const message = `Training: ${used - 5} of its 5 skill points overspent.`;
+        const message = loc`Training: ${used - 5} of its 5 skill points overspent.`;
         warnings.push(message);
         purchaseIssue("training-budget", idx + 1, message, { sourceId: feat.id });
       }
@@ -922,12 +923,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
         todo.push({
           order: 32,
           tab: "feats",
-          text: `Training (${feat.id}): ${5 - used} skill point(s) to allocate on its item sheet.`
+          text: loc`Training (${feat.id}): ${5 - used} skill point(s) to allocate on its item sheet.`
         });
     }
     for (const lock of unlocked.filter(lock => lock.career <= idx + 1))
       if ((skillRanks[lock.skill] ?? 0) < maximumRanksAt(lock.skill, idx + 1)) {
-        const message = `Level ${idx + 1}: Unlocked Potential requires ${cfg.skills[lock.skill].name} at its maximum rank (${maximumRanksAt(lock.skill, idx + 1)}) before spending points elsewhere.`;
+        const message = loc`Level ${idx + 1}: Unlocked Potential requires ${cfg.skills[lock.skill].name} at its maximum rank (${maximumRanksAt(lock.skill, idx + 1)}) before spending points elsewhere.`;
         warnings.push(message);
         purchaseIssue("unlocked-potential", idx + 1, message, { skill: lock.skill });
       }
@@ -991,7 +992,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.improvedFortune = improvedFortuneBonus(classLevels.pointman ?? 0, sys.fortuneTeammates ?? []);
   if (sys.improvedFortune.value)
     sources.push({
-      name: "Improved Fortune (team; maximum +3)",
+      name: loc`Improved Fortune (team; maximum +3)`,
       rank: 1,
       bonuses: [{ target: "actionDice.count", value: String(sys.improvedFortune.value) }]
     });
@@ -1130,7 +1131,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     Math.min(0, sys.armor?.defensePenalty ?? 0, sys.encumbrance.defense) + (sys.armor?.defenseBonus ?? 0);
   const armorCheck = Math.min(0, sys.armor?.check ?? 0, sys.encumbrance.check);
   const armorSpeed = sys.armor?.speed ?? 0;
-  if (sys.encumbrance.condition) warnings.push(`${sys.encumbrance.load} load: ${sys.encumbrance.condition}.`);
+  if (sys.encumbrance.condition) warnings.push(loc`${sys.encumbrance.load} load: ${sys.encumbrance.condition}.`);
 
   /* ---------------- Final totals ---------------- */
   sys.size = large ? "Large (1×1)" : small ? "Small" : "Medium";
@@ -1287,7 +1288,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.featBonuses = Object.fromEntries(B.map);
   if (small)
     warnings.push(
-      "Child: Small size; two-handed weapons cannot be used and one-handed weapons require both hands (p.349)."
+      loc`Child: Small size; two-handed weapons cannot be used and one-handed weapons require both hands (p.349).`
     );
   sys.knowledgeBonusEntries = B.entries.get("knowledge") ?? [];
   sys.knowledgePhdSkills = [
@@ -1331,7 +1332,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   if (sys.fleetSpeed.qualityIncrease)
     sys.bonusSources.speed = [
       ...(sys.bonusSources.speed ?? []),
-      { source: "Fleet (net benefit replacing identical class/gear Speed)", value: sys.fleetSpeed.qualityIncrease }
+      { source: loc`Fleet (net benefit replacing identical class/gear Speed)`, value: sys.fleetSpeed.qualityIncrease }
     ];
   for (const entry of sys.attributeCollapse.entries) warnings.push(`${entry.label} ${entry.score}: ${entry.text}`);
   sys.incapacitatedForMovement =
@@ -1361,7 +1362,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         ? null
         : Math.floor(ordinarySpeed * (speedHalves ? 0.5 : 1));
   if (sys.conditionSpeedReview)
-    warnings.push("Multiple conditions halve Speed: the combined multiplier requires the pending GC ruling.");
+    warnings.push(loc`Multiple conditions halve Speed: the combined multiplier requires the pending GC ruling.`);
   sys.canRun =
     sys.mentalLeapState.canRun &&
     !sys.incapacitatedForMovement &&
@@ -1406,7 +1407,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     vit += Math.max(1, roll + abil.con.mod);
   });
   if (vitMissing.length)
-    todo.push({ order: 15, tab: "classes", text: `Vitality not rolled for level ${vitMissing.join(", ")}.` });
+    todo.push({ order: 15, tab: "classes", text: loc`Vitality not rolled for level ${vitMissing.join(", ")}.` });
   sys.vitalityBreakdown = vitalityBreakdown;
   sys.vitality ??= { value: 0 };
   sys.vitality.max = Math.max(0, vit + B.get("vitality") + (misc.vitality ?? 0));
@@ -1422,7 +1423,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const title = cfg.tables.crossroads?.[sys.crossroadsTitle];
   const earnedTitle = title && level >= title.level ? title : null;
   sys.crossroads = earnedTitle ?? { actionDice: 0, xpPercent: 0 };
-  if (title && level < title.level) warnings.push(`${title.label}: the minimum Career Level is ${title.level}.`);
+  if (title && level < title.level) warnings.push(loc`${title.label}: the minimum Career Level is ${title.level}.`);
   sys.actionDice.max =
     (lr?.actionDice ?? 0) + B.get("actionDice.count") + (misc.actionDice ?? 0) + (earnedTitle?.actionDice ?? 0);
   sys.actionDice.die = lr?.actionDie ?? 4;
@@ -1511,18 +1512,18 @@ export function computeAgent(sys, items, cfg, options = {}) {
       maxRanks: skillMaxRanks,
       overMax: ranks > skillMaxRanks
     };
-    if (ranks > skillMaxRanks) warnings.push(`${sd.name}: ${ranks} ranks exceeds the maximum of ${skillMaxRanks}.`);
+    if (ranks > skillMaxRanks) warnings.push(loc`${sd.name}: ${ranks} ranks exceeds the maximum of ${skillMaxRanks}.`);
   }
   sys.skillTotals = derivedSkills;
   const overrides = skillDefs.filter(s => sys.skills?.[s.key]?.classSkill).length;
   sys.classSkillPicks = { available: B.get("classSkillPicks"), used: overrides };
   if (overrides > sys.classSkillPicks.available)
-    warnings.push(`Extra class skills: ${overrides - sys.classSkillPicks.available} over the available choices.`);
+    warnings.push(loc`Extra class skills: ${overrides - sys.classSkillPicks.available} over the available choices.`);
   if (sys.classSkillPicks.available > overrides) {
     todo.push({
       order: 31,
       tab: "skills",
-      text: `${plural(sys.classSkillPicks.available - overrides, "extra class skill")} to choose.`
+      text: loc`${plural(sys.classSkillPicks.available - overrides, "extra class skill")} to choose.`
     });
   }
 
@@ -1547,12 +1548,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
       sp.classGrantPoints;
     if (keySkillPoint && !(Number(progression[idx].skills?.[ci.system.keySkill]) >= 1))
       warnings.push(
-        `Level ${idx + 1}: the Virtuoso bonus skill point must be spent on ${cfg.skills[ci.system.keySkill].name}.`
+        loc`Level ${idx + 1}: the Virtuoso bonus skill point must be spent on ${cfg.skills[ci.system.keySkill].name}.`
       );
     sp.remaining = sp.available - sp.spent;
     sp.className = ci?.name ?? "?";
     if (sp.remaining < 0) {
-      const message = `Level ${idx + 1}: ${-sp.remaining} skill point(s) overspent.`;
+      const message = loc`Level ${idx + 1}: ${-sp.remaining} skill point(s) overspent.`;
       warnings.push(message);
       purchaseIssue("career-budget", idx + 1, message);
     }
@@ -1566,7 +1567,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
       order: 30,
       tab: "skills",
       skillLevel: spLeft[0].level,
-      text: `Skill points unspent: ${spLeft.map(sp => `level ${sp.level} (${sp.remaining})`).join(", ")}.`
+      text: loc`Skill points unspent: ${spLeft.map(sp => `level ${sp.level} (${sp.remaining})`).join(", ")}.`
     });
   }
 
@@ -1614,20 +1615,21 @@ export function computeAgent(sys, items, cfg, options = {}) {
   }
   for (const [t, s] of Object.entries(spent)) if (!(t in cfg.featTrees)) overflow += s;
   sys.feats = { any: { slots: slots.any, spent: overflow, remaining: slots.any - overflow }, trees, replacementGrants };
-  if (overflow > slots.any) warnings.push(`${overflow - slots.any} more feat(s) taken than available.`);
+  if (overflow > slots.any) warnings.push(loc`${overflow - slots.any} more feat(s) taken than available.`);
   const unusedTree = Object.entries(trees)
     .filter(([, v]) => v.slots > v.spent)
     .map(([t, v]) => `${v.slots - v.spent} ${cfg.featTrees[t]}`);
   sys.feats.unusedTreeSlots = unusedTree;
   if (sys.feats.any.remaining > 0)
-    todo.push({ order: 40, tab: "feats", text: `${plural(sys.feats.any.remaining, "feat slot")} open (any tree).` });
+    todo.push({ order: 40, tab: "feats", text: loc`${plural(sys.feats.any.remaining, "feat slot")} open (any tree).` });
   if (unusedTree.length)
-    todo.push({ order: 41, tab: "feats", text: `Bonus feat slots open: ${unusedTree.join(", ")}.` });
+    todo.push({ order: 41, tab: "feats", text: loc`Bonus feat slots open: ${unusedTree.join(", ")}.` });
 
   /* ---------------- Proficiencies, focuses, interests, contacts ---------------- */
   const firstClass = classAtLevel[0];
   const { available: profAvail, used: profUsed } = sys.proficiencyPicks;
-  if (profUsed > profAvail) warnings.push(`${profUsed - profAvail} more weapon proficiencies/fortes than available.`);
+  if (profUsed > profAvail)
+    warnings.push(loc`${profUsed - profAvail} more weapon proficiencies/fortes than available.`);
   if (profUsed < profAvail)
     todo.push({
       order: 50,
@@ -1655,7 +1657,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     .filter(([, value]) => value.remaining > 0)
     .map(([key, value]) => `${key} ${value.remaining}`);
   if (focusLeft.length)
-    todo.push({ order: 51, tab: "training", text: `Focuses/fortes to choose: ${focusLeft.join(", ")}.` });
+    todo.push({ order: 51, tab: "training", text: loc`Focuses/fortes to choose: ${focusLeft.join(", ")}.` });
 
   const interestList = String(sys.interests ?? "")
     .split(/[\n,;]+/)
@@ -1665,12 +1667,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
     available: Math.max(0, tb.interestBase + B.get("interests") - (sys.relinquishedInterests ?? 0)),
     used: new Set(interestList.map(norm)).size
   };
-  if (sys.interestPicks.used !== interestList.length) warnings.push("Interests must be distinct.");
+  if (sys.interestPicks.used !== interestList.length) warnings.push(loc`Interests must be distinct.`);
   sys.interestPicks.remaining = sys.interestPicks.available - sys.interestPicks.used;
   if (sys.interestPicks.remaining > 0)
-    todo.push({ order: 52, tab: "training", text: `${plural(sys.interestPicks.remaining, "interest")} to choose.` });
+    todo.push({ order: 52, tab: "training", text: loc`${plural(sys.interestPicks.remaining, "interest")} to choose.` });
 
-  if (sys.interestPicks.remaining < 0) warnings.push(`Interests: ${-sys.interestPicks.remaining} over the limit.`);
+  if (sys.interestPicks.remaining < 0) warnings.push(loc`Interests: ${-sys.interestPicks.remaining} over the limit.`);
   sys.contactFeatBindings = items
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id) && Object.hasOwn(CONTACT_FEATS, i.name))
     .map(i => ({
@@ -1687,7 +1689,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   for (const g of pendingContactGrants) todo.push({ order: 53, tab: "feats", text: g.name + ": " + g.reason });
   sys.networkingContactFeatGrants = networkingContactFeatGrants(sys);
   for (const g of sys.networkingContactFeatGrants.filter(g => !g.valid))
-    warnings.push((g.name || "Networking contact") + ": " + g.reason);
+    warnings.push((g.name || loc`Networking contact`) + ": " + g.reason);
   const contactsAvail =
     (level > 0 ? 1 : 0) +
     B.get("contacts") -
@@ -1698,7 +1700,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const contactsUsed = (sys.contacts ?? []).reduce((n, c) => n + (Number(c.rank) || 0), 0);
   sys.contactPicks = { available: contactsAvail, used: contactsUsed, remaining: contactsAvail - contactsUsed };
   if (contactsUsed > contactsAvail)
-    warnings.push(`Contacts: ${contactsUsed - contactsAvail} choice(s) over the limit.`);
+    warnings.push(loc`Contacts: ${contactsUsed - contactsAvail} choice(s) over the limit.`);
   if (contactsUsed < contactsAvail)
     todo.push({
       order: 53,
@@ -1719,12 +1721,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
     needsSubplot: subplotsInPlay < minimumSubplots
   };
   if (sys.subplotPicks.needsSubplot) {
-    warnings.push("Trouble Magnet: at least one unfinished Subplot must be in play (p.191).");
-    todo.push({ order: 54, tab: "training", text: "Trouble Magnet: keep at least one unfinished Subplot in play." });
+    warnings.push(loc`Trouble Magnet: at least one unfinished Subplot must be in play (p.191).`);
+    todo.push({ order: 54, tab: "training", text: loc`Trouble Magnet: keep at least one unfinished Subplot in play.` });
   }
   if (sys.subplotPicks.used > sys.subplotPicks.available)
     warnings.push(
-      `Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`
+      loc`Subplots: ${sys.subplotPicks.used - sys.subplotPicks.available} unfinished Subplot(s) over the limit.`
     );
 
   /* ---------------- Wealth & mission gear ---------------- */
@@ -1739,7 +1741,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     Possessions: possessionsRaw,
     "Spending Cash": cashRaw
   }))
-    if (value > 10) warnings.push(`${name}: maximum rank is 10.`);
+    if (value > 10) warnings.push(loc`${name}: maximum rank is 10.`);
   const lifestyle = clamp(lifestyleRaw, 1, 10),
     possessions = clamp(possessionsRaw, 1, 10),
     cash = clamp(cashRaw, 1, 10);
@@ -1760,9 +1762,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
   };
   sys.wealth.possessions.budget = possessionBudget(items, posRow?.picks, sys);
   warnings.push(...sys.wealth.possessions.budget.warnings);
-  if (allocated > wealthTotal) warnings.push(`Wealth overspent by ${allocated - wealthTotal}.`);
+  if (allocated > wealthTotal) warnings.push(loc`Wealth overspent by ${allocated - wealthTotal}.`);
   if (allocated < wealthTotal)
-    todo.push({ order: 60, tab: "gear", text: `${plural(wealthTotal - allocated, "wealth point")} to allocate.` });
+    todo.push({ order: 60, tab: "gear", text: loc`${plural(wealthTotal - allocated, "wealth point")} to allocate.` });
 
   const picks = {};
   for (const g of GEAR) picks[g] = { available: gearBase[g] + B.get(`gear.${g}`) + (misc[`gear${g}`] ?? 0), spent: 0 };
@@ -1775,7 +1777,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   for (const key of Object.keys(picks)) picks[key].spent += reservedAllocations[key] ?? 0;
   for (const [g, v] of Object.entries(picks)) {
     v.remaining = v.available - v.spent;
-    if (v.remaining < 0) warnings.push(`Mission gear: ${-v.remaining} ${g} pick(s) over the limit.`);
+    if (v.remaining < 0) warnings.push(loc`Mission gear: ${-v.remaining} ${g} pick(s) over the limit.`);
   }
   sys.gearPicks = picks;
   sys.armorGrantStatus = armorGrantStatus(sys, items);
@@ -1790,13 +1792,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const lost = sys.gearPickLosses ?? {};
   const lostTotal = GEAR.reduce((n, key) => n + (lost[key] ?? 0), 0);
   if (lostTotal !== penalty)
-    warnings.push(`Charisma requires removing ${penalty} mission gear pick(s); currently ${lostTotal} assigned.`);
+    warnings.push(loc`Charisma requires removing ${penalty} mission gear pick(s); currently ${lostTotal} assigned.`);
   for (const key of GEAR) {
     const value = lost[key] ?? 0;
-    if (value > gearBase[key]) warnings.push(`Charisma pick loss: ${key} may only lose class-granted picks.`);
+    if (value > gearBase[key]) warnings.push(loc`Charisma pick loss: ${key} may only lose class-granted picks.`);
     picks[key].available = Math.max(0, picks[key].available - value);
     picks[key].remaining = picks[key].available - picks[key].spent;
-    if (picks[key].remaining < 0) warnings.push(`After Charisma losses, ${key} gear picks are overspent.`);
+    if (picks[key].remaining < 0) warnings.push(loc`After Charisma losses, ${key} gear picks are overspent.`);
   }
   sys.ammunitionConfigurations = {};
   for (const item of items.filter(i => i.type === "weapon")) {
@@ -1809,7 +1811,9 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const reserveEntries = items.filter(i => ["weapon", "armor", "gear"].includes(i.type) && i.system.reserve);
   const activeReserves = currentReserves(sys);
   for (const item of items.filter(i => i.system?.reserveAcquisition && !managedAcquisition(sys, i)))
-    warnings.push(`${item.name}: its reserve-acquisition reference does not match a successful claimed transaction.`);
+    warnings.push(
+      loc`${item.name}: its reserve-acquisition reference does not match a successful claimed transaction.`
+    );
   sys.reserveUsed =
     reserveEntries.reduce((n, i) => n + (i.system.common ? (i.system.quantity ?? 1) : 1), 0) +
     (activeReserves ? activeReserves.common + Object.values(activeReserves.picks ?? {}).reduce((a, b) => a + b, 0) : 0);
@@ -1820,10 +1824,10 @@ export function computeAgent(sys, items, cfg, options = {}) {
       i.system.reserveAcquisition.epoch !== String(sys.usagePeriods?.mission ?? "initial")
   ))
     warnings.push(
-      `${item.name}: acquired during an earlier mission; review its disposition before using it in this mission.`
+      loc`${item.name}: acquired during an earlier mission; review its disposition before using it in this mission.`
     );
   if (sys.reserveUsed > sys.reserveCapacity)
-    warnings.push(`Reserve picks/items: ${sys.reserveUsed} exceeds Wisdom's maximum ${sys.reserveCapacity}.`);
+    warnings.push(loc`Reserve picks/items: ${sys.reserveUsed} exceeds Wisdom's maximum ${sys.reserveCapacity}.`);
   const charismaCategories = sys.affiliationType === "freelance" ? ["E", "S", "V", "W"] : ["G", "T", "V", "R"];
   for (const item of items.filter(item => ["weapon", "armor", "gear"].includes(item.type) && item.system.pick)) {
     const category = equipmentCategory(item),
@@ -1846,7 +1850,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         item.system.caliber <= activeReserves.caliber + 1;
       if (!exception && !missionCaliberMatches(sys, item))
         warnings.push(
-          `${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
+          loc`${item.name}: Caliber exceeds this mission’s recorded allowance; select a valid Big Stick exception or review another source-specific grant.`
         );
     }
 
@@ -1856,20 +1860,20 @@ export function computeAgent(sys, items, cfg, options = {}) {
         (managedAcquisition(sys, item) ? (item.system.reserveAcquisition?.bonusQuantity ?? 0) : 0)
     )
       warnings.push(
-        `${item.name}: quantity exceeds its paid mission-pick bundles; review pick count or a source-specific extra-quantity grant.`
+        loc`${item.name}: quantity exceeds its paid mission-pick bundles; review pick count or a source-specific extra-quantity grant.`
       );
     if (item.system.ammunitionOnly || ["Standard arrow", "Explosive arrow"].includes(item.name))
       warnings.push(
-        `${item.name}: ammunition stockpiles cost upgrades/Common Items and cannot be acquired with an ordinary mission weapon pick.`
+        loc`${item.name}: ammunition stockpiles cost upgrades/Common Items and cannot be acquired with an ordinary mission weapon pick.`
       );
     if (!GEAR.includes(category))
-      warnings.push(`${item.name}: choose a valid equipment category before using a mission gear pick.`);
+      warnings.push(loc`${item.name}: choose a valid equipment category before using a mission gear pick.`);
     else if (pick === "CHA" && !charismaCategories.includes(category))
       warnings.push(
-        `${item.name}: this category is not permitted for ${sys.affiliationType ?? "faction"} Charisma picks.`
+        loc`${item.name}: this category is not permitted for ${sys.affiliationType ?? "faction"} Charisma picks.`
       );
     else if (pick !== "CHA" && pick !== category)
-      warnings.push(`${item.name}: a ${pick} pick cannot buy ${category} gear.`);
+      warnings.push(loc`${item.name}: a ${pick} pick cannot buy ${category} gear.`);
   }
 
   for (const item of items.filter(i => i.type === "gear" && i.system.kitGrade && i.system.kitNonPortable)) {
@@ -1878,10 +1882,10 @@ export function computeAgent(sys, items, cfg, options = {}) {
         order: 61,
         always: true,
         tab: "gear",
-        text: `${item.name}: choose this non-portable kit's fixed location before using it.`
+        text: loc`${item.name}: choose this non-portable kit's fixed location before using it.`
       });
     if (item.system.carried)
-      warnings.push(`${item.name}: non-portable kit cannot be carried; use it at its recorded location.`);
+      warnings.push(loc`${item.name}: non-portable kit cannot be carried; use it at its recorded location.`);
   }
   sys.commonItems = { count: sys.abilities.wis.value, perMission: Math.max(1, Math.ceil(sys.abilities.wis.value / 3)) };
 
@@ -1892,7 +1896,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.burrowCapabilities = burrowCapabilities(sys);
   sys.assistantGroupStatuses = (sys.assistantGroups ?? []).map(group => assistantGroupStatus(sys, group));
   sys.recoveryRates = level <= 20 ? recoveryRatePlan(sys) : null;
-  if (level > 20) warnings.push("Review Career Level: recovery rates require a RAW level of 20 or lower.");
+  if (level > 20) warnings.push(loc`Review Career Level: recovery rates require a RAW level of 20 or lower.`);
 
   /* ---------------- Core abilities ---------------- */
   const firstExpertIdx = classAtLevel.findIndex(c => c?.system.expert);
@@ -1900,7 +1904,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
 
   const eagle = eagleEyeState(sys);
   sys.eagleEyeActive = eagle.active ? eagle : null;
-  if (eagle.review) warnings.push("Review the saved Eagle Eye die result and range modifier.");
+  if (eagle.review) warnings.push(loc`Review the saved Eagle Eye die result and range modifier.`);
 
   /* ---------------- Prerequisites ---------------- */
   const ctx = prerequisiteContext(sys, featNames, activeFeatTrees, skillRanks);
@@ -1963,7 +1967,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
         res = { ok: false, unmet: [error.message] };
       }
     sys.featStatus[f.id] = res;
-    if (!res.ok && !exempt) warnings.push(`${f.name}: prerequisites not met (${res.unmet.join("; ")}).`);
+    if (!res.ok && !exempt) warnings.push(loc`${f.name}: prerequisites not met (${res.unmet.join("; ")}).`);
   }
   const classQualificationSystem = featItems.some(f => f.system.featKind === "virtual")
     ? computeAgent(
@@ -2001,7 +2005,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
     const res = firstEntry?.expertEntry ?? checkPrerequisites(ci.system.requirements, classContext);
     if (!res.ok)
       warnings.push(
-        `${ci.name}: expert class requirements not met at ${firstEntry?.expertEntry ? "entry" : "current level (entry unknown)"} (${res.unmet.join("; ")}).`
+        loc`${ci.name}: expert class requirements not met at ${firstEntry?.expertEntry ? "entry" : loc`current level (entry unknown)`} (${res.unmet.join("; ")}).`
       );
   }
 
@@ -2021,7 +2025,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   if (!stable && (options.pass ?? 0) < featItems.length + 2) {
     return computeAgent(sys, allItems, cfg, { activeFeatIds: eligible, pass: (options.pass ?? 0) + 1 });
   }
-  if (!stable) warnings.push("Feat prerequisites did not converge; verify cyclic dependencies.");
+  if (!stable) warnings.push(loc`Feat prerequisites did not converge; verify cyclic dependencies.`);
   warnings.push(...sys.weaponSpecialist.warnings);
   for (const text of sys.weaponSpecialist.pending) todo.push({ order: 21, tab: "classes", text });
   sys.skillFeatRules = skillFeatRules(sys, items, cfg);

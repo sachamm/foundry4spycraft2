@@ -1,4 +1,5 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Table2.10 and Balance p.106; Equilibrium Basics/Mastery p.194. */
 export const BALANCE_SURFACES = {
   flat: { label: "Flat, normal surface", dc: 5, error: 0, mastery: false },
@@ -28,7 +29,7 @@ export function balanceSurfacePlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (balanceCircumstances === false) return empty;
   if (balanceCircumstances !== true || key !== "acrobatics" || check?.id !== "balance")
-    return reject("Declare these surface circumstances only for Acrobatics/Balance.");
+    return reject(loc`Declare these surface circumstances only for Acrobatics/Balance.`);
   if (
     balanceConfirmed !== true ||
     typeof balanceSurface !== "string" ||
@@ -40,15 +41,15 @@ export function balanceSurfacePlan(
     balanceDistanceFeet < 0
   )
     return reject(
-      "The GC must confirm the actual Balance table row, cumulative surface conditions and legal counted movement. Inclines above60° require Climb, not Balance."
+      loc`The GC must confirm the actual Balance table row, cumulative surface conditions and legal counted movement. Inclines above60° require Climb, not Balance.`
     );
   if (!Array.isArray(system?.activeFeatNames) || system.activeFeatNames.some(n => typeof n !== "string" || !n.trim()))
-    return reject("Review the character’s current qualified Equilibrium sources.");
+    return reject(loc`Review the character’s current qualified Equilibrium sources.`);
   const row = BALANCE_SURFACES[balanceSurface],
     moving = balanceDistanceFeet > 0,
     speed = moving ? system.speed : null;
   if (moving && (!Number.isFinite(speed) || speed <= 0 || balanceDistanceFeet > speed * 2))
-    return reject("Enter legal Balance movement up to double current Speed; other movement limits still apply.");
+    return reject(loc`Enter legal Balance movement up to double current Speed; other movement limits still apply.`);
   const normalHalfSpeed = moving ? Math.floor(speed / 2) : null,
     tableHalfSpeed = moving ? Math.ceil(speed / 2) : null;
   const normalChecks = moving && balanceDistanceFeet > normalHalfSpeed ? 2 : 1,
@@ -102,13 +103,13 @@ export function balanceSurfacePlan(
     errorIncrease,
     errorReduction,
     notes: [
-      `Balance: ${row.label}; DC${dc}, error +${errorIncrease}${mastery ? ", Equilibrium Mastery error −1 and Vision tag ignored" : ""}; ${requiredChecks} check(s) for this movement (pp.106,194).`,
+      loc`Balance: ${row.label}; DC${dc}, error +${errorIncrease}${mastery ? loc`, Equilibrium Mastery error −1 and Vision tag ignored` : ""}; ${requiredChecks} check(s) for this movement (pp.106,194).`,
       ...(basic
         ? [
-            "Equilibrium Basics replaces the ordinary two movement checks with one; it does not waive the check or expand permitted movement."
+            loc`Equilibrium Basics replaces the ordinary two movement checks with one; it does not waive the check or expand permitted movement.`
           ]
         : []),
-      "The GC confirms the applicable row at overlapping width boundaries, legal action/movement and other DC modifiers. This plans one check; resolve all required checks and their outcomes separately."
+      loc`The GC confirms the applicable row at overlapping width boundaries, legal action/movement and other DC modifiers. This plans one check; resolve all required checks and their outcomes separately.`
     ]
   };
 }
@@ -138,7 +139,9 @@ export function validateBalanceSurfaceProof(system, proof, { checkKind, skillKey
         : x
     );
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
-    throw Error("The Balance surface, movement, current Speed or qualified Equilibrium source changed before posting.");
+    throw Error(
+      loc`The Balance surface, movement, current Speed or qualified Equilibrium source changed before posting.`
+    );
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

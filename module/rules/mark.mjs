@@ -1,6 +1,7 @@
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 const text = (s, max = 200) => typeof s === "string" && !!s.trim() && s.length <= max;
 export function markSource(system) {
   const limit = system.activeFeatSelections?.filter(f => f.tree === "style").length ?? 0;
@@ -15,29 +16,29 @@ export function markPlan(
   { target = "", skills = [], lineOfSightConfirmed = false, freeActionConfirmed = false } = {}
 ) {
   const source = markSource(system);
-  if (!source) throw new Error("An earned Mark feat and active Style selections are required.");
+  if (!source) throw new Error(loc`An earned Mark feat and active Style selections are required.`);
   const blocked =
     restraintActionBlock(system, { free: true }) || attributeActionBlock(system, { kind: "mentalAbility" });
   if (blocked) throw new Error(blocked);
-  if (system.conditionContext?.blinded) throw new Error("Mark requires line of sight to the target.");
+  if (system.conditionContext?.blinded) throw new Error(loc`Mark requires line of sight to the target.`);
   if (combat?.started && (!validOwnCountClock(combat) || combat.turn !== combat.ownTurnIndex))
-    throw new Error("Take Mark’s free action during this character’s Initiative Count.");
+    throw new Error(loc`Take Mark’s free action during this character’s Initiative Count.`);
   if (
     combat?.started &&
     system.refreshAction?.state === "waiting" &&
     system.refreshAction.combatId === combat.id &&
     system.refreshAction.startRound === combat.round
   )
-    throw new Error("Refresh forfeited this round’s chance to act.");
+    throw new Error(loc`Refresh forfeited this round’s chance to act.`);
   if (!text(target) || lineOfSightConfirmed !== true || freeActionConfirmed !== true)
-    throw new Error("Name one character and confirm current line of sight and a legal free action.");
+    throw new Error(loc`Name one character and confirm current line of sight and a legal free action.`);
   if (
     !Array.isArray(skills) ||
     skills.length !== 3 ||
     new Set(skills).size !== 3 ||
     skills.some(k => !Object.hasOwn(cfg.skills, k))
   )
-    throw new Error("Name exactly three different skills.");
+    throw new Error(loc`Name exactly three different skills.`);
   return {
     version: 1,
     source: "Mark",
@@ -77,7 +78,7 @@ export function markRecordValid(r, cfg) {
 }
 export function markDisclosurePlan(record, cfg, { bonuses = {}, contexts = {}, confirmed = false } = {}) {
   if (!markRecordValid(record, cfg) || record.disclosure)
-    throw new Error("Choose a valid Mark observation awaiting its first GC disclosure.");
+    throw new Error(loc`Choose a valid Mark observation awaiting its first GC disclosure.`);
   if (
     confirmed !== true ||
     !bonuses ||
@@ -86,7 +87,7 @@ export function markDisclosurePlan(record, cfg, { bonuses = {}, contexts = {}, c
     Object.keys(bonuses).length !== 3 ||
     record.skills.some(k => !Object.hasOwn(bonuses, k) || !Number.isSafeInteger(bonuses[k]))
   )
-    throw new Error("The GC must confirm an actual whole-number total bonus for each of the three named skills.");
+    throw new Error(loc`The GC must confirm an actual whole-number total bonus for each of the three named skills.`);
   if (
     !contexts ||
     typeof contexts !== "object" ||
@@ -94,7 +95,7 @@ export function markDisclosurePlan(record, cfg, { bonuses = {}, contexts = {}, c
     Object.keys(contexts).some(k => !record.skills.includes(k)) ||
     Object.values(contexts).some(v => typeof v !== "string" || v.length > 500)
   )
-    throw new Error("Keep bonus context limited to the three named skills.");
+    throw new Error(loc`Keep bonus context limited to the three named skills.`);
   return {
     bonuses: Object.fromEntries(record.skills.map(k => [k, bonuses[k]])),
     contexts: Object.fromEntries(record.skills.map(k => [k, String(contexts[k] ?? "").trim()])),

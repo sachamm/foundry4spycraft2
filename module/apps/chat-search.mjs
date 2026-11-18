@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Search documents rather than the paged chat DOM. Never index private roll placeholders. */
 export const CHAT_ROLL_TYPES = [
   ["roll", "All rolls"],
@@ -127,7 +128,7 @@ function mountChatSearch(app, html) {
   for (const [value, label] of [["", "All types"], ...CHAT_ROLL_TYPES]) type.append(new Option(label, value));
   typeLabel.append(type);
   filters.append(characterLabel, typeLabel);
-  const status = make("p", "sc2-chat-search-status", "Search all readable chat history.");
+  const status = make("p", "sc2-chat-search-status", loc`Search all readable chat history.`);
   status.setAttribute("role", "status");
   panel.append(heading, textLabel, filters, status);
   const results = make("div", "sc2-chat-search-results");
@@ -187,13 +188,13 @@ function refreshChatSearch(state) {
   results.hidden = !active;
   results.replaceChildren();
   if (!active) {
-    status.textContent = "Search all readable chat history.";
+    status.textContent = loc`Search all readable chat history.`;
     return;
   }
   const matches = searchChatRecords(records, { character: character.value, type: type.value, text: text.value });
   const shown = matches.slice(0, state.limit);
-  status.textContent = `${matches.length} ${matches.length === 1 ? "match" : "matches"} · newest first${matches.length > shown.length ? ` · showing ${shown.length}` : ""}`;
-  if (!shown.length) results.append(make("p", "sc2-chat-search-empty", "No messages match these filters."));
+  status.textContent = loc`${matches.length} ${matches.length === 1 ? "match" : "matches"} · newest first${matches.length > shown.length ? loc` · showing ${shown.length}` : ""}`;
+  if (!shown.length) results.append(make("p", "sc2-chat-search-empty", loc`No messages match these filters.`));
   for (const record of shown) {
     const item = make("article", "sc2-chat-search-result");
     const title = make("div", "sc2-chat-result-title");

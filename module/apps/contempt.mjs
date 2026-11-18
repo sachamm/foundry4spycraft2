@@ -4,6 +4,7 @@ import { damageTargetChoices, resolveDamageTarget } from "./damage-target.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, finalWeaponReady, postFinalAttack } from "./final-attack.mjs";
+import { loc } from "../i18n.mjs";
 const targetData = t => ({ uuid: t.uuid, type: t.type, npcType: t.system.npcType });
 export async function takeContempt(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
@@ -27,19 +28,19 @@ export async function takeContempt(actor, options = {}) {
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Contempt final attack" },
+      window: { title: loc`Contempt final attack` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>Once per round, make one free final Standard Attack against a standard character. Your per-combat allowance equals your starting action-die count, including character options; this does not spend your dice. A new round does not refill the combat allowance. Special NPCs and player characters cannot qualify; the GC confirms an animal is standard.</p><label>Actual standard target <select name="targetUuid"><option value="">Choose target</option>${targets}</select></label><label>Your readied weapon <select name="weaponId">${weapons}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="targetStandardConfirmed" type="checkbox" /> The GC confirms this actual target is a standard character (including a standard animal)</label><label><input name="attackLegalConfirmed" type="checkbox" /> This is a legal final Standard Attack against that target now; action/position/target requirements are satisfied</label><p>Set Single-Shot mode first. No adjustments or other action combinations. For combined class declarations, use their normal controls and ask the GC to record the use in both round and combat counters.</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Once per round, make one free final Standard Attack against a standard character. Your per-combat allowance equals your starting action-die count, including character options; this does not spend your dice. A new round does not refill the combat allowance. Special NPCs and player characters cannot qualify; the GC confirms an animal is standard.`}</p><label>${loc`Actual standard target`} <select name="targetUuid"><option value="">${loc`Choose target`}</option>${targets}</select></label><label>${loc`Your readied weapon`} <select name="weaponId">${weapons}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="targetStandardConfirmed" type="checkbox" /> ${loc`The GC confirms this actual target is a standard character (including a standard animal)`}</label><label><input name="attackLegalConfirmed" type="checkbox" /> ${loc`This is a legal final Standard Attack against that target now; action/position/target requirements are satisfied`}</label><p>${loc`Set Single-Shot mode first. No adjustments or other action combinations. For combined class declarations, use their normal controls and ask the GC to record the use in both round and combat counters.`}</p></div>`
     });
     if (!input) return null;
   }
   if (JSON.stringify(expertiseCombatContext(actor)) !== clock)
-    throw new Error("The Initiative Count changed. Review Contempt again.");
+    throw new Error(loc`The Initiative Count changed. Review Contempt again.`);
   const currentTarget = async () => {
       if (!damageTargetChoices().actors.some(t => t.uuid === input.targetUuid))
-        throw new Error("The selected target is no longer available to this user.");
+        throw new Error(loc`The selected target is no longer available to this user.`);
       const target = await resolveDamageTarget(input.targetUuid);
-      if (!target || target.uuid === actor.uuid) throw new Error("Choose the actual standard target.");
+      if (!target || target.uuid === actor.uuid) throw new Error(loc`Choose the actual standard target.`);
       return target;
     },
     target = await currentTarget(),
@@ -52,7 +53,7 @@ export async function takeContempt(actor, options = {}) {
   if (!opts) return null;
   if (target.system.npcType === "animal") opts.targetAnimal = true;
   const item = actor.items.get(input.weaponId);
-  if (!finalWeaponReady(item)) throw new Error("Choose an owned readied weapon.");
+  if (!finalWeaponReady(item)) throw new Error(loc`Choose an owned readied weapon.`);
   const preview = actor.weaponAttack(item, opts);
   if (
     (preview.ranged && !Number.isFinite(opts.distanceFeet)) ||
@@ -60,7 +61,7 @@ export async function takeContempt(actor, options = {}) {
     (preview.firearm && preview.fireMode !== "single")
   )
     throw new Error(
-      preview.reason || "A ranged final Standard Attack requires measured distance and Single-Shot mode."
+      preview.reason || loc`A ranged final Standard Attack requires measured distance and Single-Shot mode.`
     );
   const signature = JSON.stringify(preview),
     receipt = { ...plan, id: foundry.utils.randomID(), weaponId: item.id, weaponUuid: item.uuid };
@@ -69,7 +70,7 @@ export async function takeContempt(actor, options = {}) {
     async status => {
       const validate = async () => {
         if (!actor.isOwner || JSON.stringify(expertiseCombatContext(actor)) !== clock)
-          throw new Error("The Initiative Count or ownership changed.");
+          throw new Error(loc`The Initiative Count or ownership changed.`);
         const fresh = contemptPlan(
             actor.system,
             expertiseCombatContext(actor),
@@ -87,7 +88,7 @@ export async function takeContempt(actor, options = {}) {
           used.contemptRound?.epoch !== `${plan.combatId}:${plan.round}` ||
           used.contemptRound.used !== 1
         )
-          throw new Error("The standard target, weapon or reserved round/combat allowances changed.");
+          throw new Error(loc`The standard target, weapon or reserved round/combat allowances changed.`);
       };
       // Resolve async target/permission checks before and after RNG through the normal root validator.
       return postFinalAttack(actor, input.weaponId, opts, { ...receipt, combatSequence: status.used + 1 }, validate);

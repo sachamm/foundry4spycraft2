@@ -1,12 +1,13 @@
 import { shakenRules } from "../rules/shaken.mjs";
 import { unrestrictedBonusPools } from "../rules/bonus-pools.mjs";
 import { actionDieBenefitQuote } from "../rules/benefit-payments.mjs";
+import { loc } from "../i18n.mjs";
 export function surchargeFundingControl(actor, { benefitCount = 1, perBenefit = false } = {}) {
   const rules = shakenRules(actor.actionDiceFundingSystem);
   if (!rules.extraDice || rules.spendingForbidden) return "";
   const esc = foundry.utils.escapeHTML,
     pools = unrestrictedBonusPools(actor.actionDiceFundingSystem, actor.usagePeriods).filter(p => p.available);
-  return `<p>Shaken adds ${perBenefit ? `${rules.extraDice} extra action dice for each distinct paid benefit selected here` : `${rules.extraDice * benefitCount} extra action dice to this activation`}. Surcharge dice do not increase its benefit.</p><label>Surcharge funding <select name="surchargeBonusPoolId"><option value="same">Same source as the benefit dice</option><option value="">Ordinary action dice</option>${unrestrictedBonusPools(
+  return `<p>${loc`Shaken adds ${perBenefit ? `${rules.extraDice} extra action dice for each distinct paid benefit selected here` : `${rules.extraDice * benefitCount} extra action dice to this activation`}. Surcharge dice do not increase its benefit.`}</p><label>${loc`Surcharge funding`} <select name="surchargeBonusPoolId"><option value="same">${loc`Same source as the benefit dice`}</option><option value="">${loc`Ordinary action dice`}</option>${unrestrictedBonusPools(
     actor.actionDiceFundingSystem,
     actor.usagePeriods
   )
@@ -32,9 +33,9 @@ export async function payActionDieBenefitLocked(
     surchargeAllocations
   } = {}
 ) {
-  if (!actor.isOwner) throw new Error("You must own the character spending action dice.");
+  if (!actor.isOwner) throw new Error(loc`You must own the character spending action dice.`);
   if (expectedShaken !== null && JSON.stringify(shakenRules(actor.actionDiceFundingSystem)) !== expectedShaken)
-    throw new Error("The Shaken condition changed. Confirm this activation and its current cost again.");
+    throw new Error(loc`The Shaken condition changed. Confirm this activation and its current cost again.`);
   const shakenSignature = JSON.stringify(shakenRules(actor.actionDiceFundingSystem));
   let quote;
   try {
@@ -86,7 +87,7 @@ export function surchargeFundingInput(input = {}) {
 export function unrolledPaymentFundingControl(actor) {
   const pools = unrestrictedBonusPools(actor.actionDiceFundingSystem, actor.usagePeriods).filter(p => p.available),
     esc = foundry.utils.escapeHTML;
-  return `<details><summary>Split the full unrolled payment</summary><p>Optional: enter contributions totalling the full base cost plus Shaken surcharge for the benefits selected. These replace both funding selectors. Leave split-surcharge contributions at zero when using this option. Payment dice are not rolled.</p><label>Ordinary action dice (${actor.system.actionDice?.value ?? 0}) <input type="number" name="unrolledPart__ordinary" min="0" step="1" value="0" /></label>${pools.map(p => `<label>${esc(p.label)} (${p.available}) <input type="number" name="unrolledPart__pool_${esc(p.id)}" min="0" step="1" value="0" /></label>`).join("")}</details>`;
+  return `<details><summary>${loc`Split the full unrolled payment`}</summary><p>${loc`Optional: enter contributions totalling the full base cost plus Shaken surcharge for the benefits selected. These replace both funding selectors. Leave split-surcharge contributions at zero when using this option. Payment dice are not rolled.`}</p><label>${loc`Ordinary action dice (${actor.system.actionDice?.value ?? 0})`} <input type="number" name="unrolledPart__ordinary" min="0" step="1" value="0" /></label>${pools.map(p => `<label>${esc(p.label)} (${p.available}) <input type="number" name="unrolledPart__pool_${esc(p.id)}" min="0" step="1" value="0" /></label>`).join("")}</details>`;
 }
 export function unrolledPaymentFundingInput(input = {}) {
   const entries = Object.entries(input).filter(([key]) => key.startsWith("unrolledPart__"));
@@ -111,5 +112,5 @@ export function unrolledPaymentFundingInput(input = {}) {
 export function splitSurchargeFundingControl(actor) {
   const pools = unrestrictedBonusPools(actor.actionDiceFundingSystem, actor.usagePeriods).filter(p => p.available),
     esc = foundry.utils.escapeHTML;
-  return `<details><summary>Split the surcharge across sources</summary><p>Optional: enter contributions totalling the surcharge. These replace the surcharge selector above; benefit dice still use their selected source.</p><label>Ordinary action dice (${actor.system.actionDice?.value ?? 0}) <input type="number" name="surchargePart__ordinary" min="0" step="1" value="0" /></label>${pools.map(p => `<label>${esc(p.label)} (${p.available}) <input type="number" name="surchargePart__pool_${esc(p.id)}" min="0" step="1" value="0" /></label>`).join("")}</details>`;
+  return `<details><summary>${loc`Split the surcharge across sources`}</summary><p>${loc`Optional: enter contributions totalling the surcharge. These replace the surcharge selector above; benefit dice still use their selected source.`}</p><label>${loc`Ordinary action dice (${actor.system.actionDice?.value ?? 0})`} <input type="number" name="surchargePart__ordinary" min="0" step="1" value="0" /></label>${pools.map(p => `<label>${esc(p.label)} (${p.available}) <input type="number" name="surchargePart__pool_${esc(p.id)}" min="0" step="1" value="0" /></label>`).join("")}</details>`;
 }

@@ -1,5 +1,6 @@
 import { resolveSkillResult } from "./checks.mjs";
 import { describeModifiers } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const skillCheck = check => ["skill", "knowledge"].includes(check.checkKind);
 const triumphCheck = check => skillCheck(check) || check.checkKind === "attack";
 /** A natural range is a candidate until success/failure is known, pp.96–97,329–330. */
@@ -34,15 +35,15 @@ export function errorDecisionPending(check) {
 export function adjudicateCheck(check, succeeded) {
   if (check.manualAdjustment && !succeeded)
     throw new Error(
-      "Manual Adjustment already reversed this failure. Review its recorded effect before changing the outcome."
+      loc`Manual Adjustment already reversed this failure. Review its recorded effect before changing the outcome.`
     );
-  if (typeof succeeded !== "boolean") throw new Error("Confirm whether the check succeeded or failed.");
+  if (typeof succeeded !== "boolean") throw new Error(loc`Confirm whether the check succeeded or failed.`);
   if (check.checkKind === "attack" && check.effectiveTotal >= 75 && !succeeded)
     throw new Error(
-      "An attack Triumph is a critical hit (pp.330–331). Correct the recorded result before marking it a miss."
+      loc`An attack Triumph is a critical hit (pp.330–331). Correct the recorded result before marking it a miss.`
     );
   if ((check.criticalFailure && succeeded) || (check.criticalSuccess && !succeeded))
-    throw new Error("Resolve the activated critical result before changing this outcome.");
+    throw new Error(loc`Resolve the activated critical result before changing this outcome.`);
   const cap = Object.hasOwn(check, "boostCap") ? check.boostCap : check.cap;
   const result = resolveSkillResult(check.rawTotal, check.naturalDie, {
     cap,
@@ -69,41 +70,41 @@ export function checkFlavor(check) {
     notes = [];
   if (check.twoWeaponFinalAttack)
     notes.push(
-      `Two-weapon final Standard Attack ${check.twoWeaponFinalAttack.sequence} of ${check.twoWeaponFinalAttack.extraAttacks}; least-used weapon confirmed.`
+      loc`Two-weapon final Standard Attack ${check.twoWeaponFinalAttack.sequence} of ${check.twoWeaponFinalAttack.extraAttacks}; least-used weapon confirmed.`
     );
   if (check.finalAttack?.source === "mobileOffense")
     notes.push(
-      `Mobile Offense: final Standard Attack at ${check.finalAttack.attackAtFeet} ft. along the ${check.finalAttack.moveDistanceFeet}-ft. counted Standard Move; one round use recorded.`
+      loc`Mobile Offense: final Standard Attack at ${check.finalAttack.attackAtFeet} ft. along the ${check.finalAttack.moveDistanceFeet}-ft. counted Standard Move; one round use recorded.`
     );
   if (check.finalAttack?.source === "contempt")
     notes.push(
-      `Contempt: final Standard Attack against the confirmed standard target; combat use ${check.finalAttack.combatSequence} of ${check.finalAttack.combatAllowance}.`
+      loc`Contempt: final Standard Attack against the confirmed standard target; combat use ${check.finalAttack.combatSequence} of ${check.finalAttack.combatAllowance}.`
     );
   if (check.finalAttack?.source === "missTrick")
     notes.push(
-      `${check.finalAttack.name}: immediate final Standard Attack with the same weapon against the original opponent; triggering miss recorded.`
+      loc`${check.finalAttack.name}: immediate final Standard Attack with the same weapon against the original opponent; triggering miss recorded.`
     );
   if (check.finalAttack?.source === "combatInstincts")
     notes.push(
-      `Combat Instincts: immediate final Standard Attack against the adjacent opponent after a miss by ${check.finalAttack.missMargin}; one round use recorded.`
+      loc`Combat Instincts: immediate final Standard Attack against the adjacent opponent after a miss by ${check.finalAttack.missMargin}; one round use recorded.`
     );
   if ((check.checkMethod ?? "roll") === "roll" && (check.threat > 0 || check.error > 0))
-    notes.push(`Error ${check.error ?? 0}; threat ${check.threat ?? 0}.`);
-  if (known) notes.push(check.successConfirmed ? "Succeeded." : "Failed.");
+    notes.push(loc`Error ${check.error ?? 0}; threat ${check.threat ?? 0}.`);
+  if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);
   if (check.cunningPlan)
     notes.push(
-      `Cunning Plan: free action; error range ${check.cunningPlan.originalError} → ${check.cunningPlan.error}; one scene use spent.`
+      loc`Cunning Plan: free action; error range ${check.cunningPlan.originalError} → ${check.cunningPlan.error}; one scene use spent.`
     );
   if (check.manualAdjustment) {
     const m = check.manualAdjustment;
     notes.push(
-      `Manual Adjustment: half action; failure reversed at the lowest positive grade against DC ${m.difficultyClass} (class level +20 = ${m.threshold}). Original roll retained; one session use spent.`
+      loc`Manual Adjustment: half action; failure reversed at the lowest positive grade against DC ${m.difficultyClass} (class level +20 = ${m.threshold}). Original roll retained; one session use spent.`
     );
   }
   const automatic = check.automaticSkillSuccess ?? check.flawlessSearch;
   if (automatic)
     notes.push(
-      `${String(automatic.name ?? "Flawless Search")
+      loc`${String(automatic.name ?? "Flawless Search")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(
@@ -111,28 +112,28 @@ export function checkFlavor(check) {
           "&gt;"
         )}: automatic success at the lowest positive grade against DC/opposing result ${automatic.difficultyClass} (class level +20 = ${automatic.threshold}). The rolled result is retained.`
     );
-  if (check.criticalFailure) notes.push("<strong>Critical failure.</strong>");
+  if (check.criticalFailure) notes.push(`<strong>${loc`Critical failure.`}</strong>`);
   else if (check.errorConfirmed) {
-    notes.push('<span class="spycraft2-error">Error.</span>');
+    notes.push(`<span class="spycraft2-error">${loc`Error.`}</span>`);
     if (check.criticalFailureCostIncrease)
-      notes.push(`Critical-failure activation costs +${check.criticalFailureCostIncrease} action dice.`);
+      notes.push(loc`Critical-failure activation costs +${check.criticalFailureCostIncrease} action dice.`);
   } else if (!known && candidates.error)
-    notes.push('<span class="spycraft2-error">Potential error; confirm the result.</span>');
-  if (check.criticalSuccess) notes.push("<strong>Critical success.</strong>");
-  else if (check.threatConfirmed) notes.push('<span class="spycraft2-threat">Threat.</span>');
+    notes.push(`<span class="spycraft2-error">${loc`Potential error; confirm the result.`}</span>`);
+  if (check.criticalSuccess) notes.push(`<strong>${loc`Critical success.`}</strong>`);
+  else if (check.threatConfirmed) notes.push(`<span class="spycraft2-threat">${loc`Threat.`}</span>`);
   else if (!known && candidates.threat)
-    notes.push('<span class="spycraft2-threat">Potential threat; success is still required.</span>');
+    notes.push(`<span class="spycraft2-threat">${loc`Potential threat; success is still required.`}</span>`);
   if (check.triumphed) {
-    notes.push("<strong>Triumph.</strong>");
+    notes.push(`<strong>${loc`Triumph.`}</strong>`);
     if (check.checkKind === "attack")
       notes.push(
-        "Includes a one-action-die critical hit; choose its effect before damage, spending only for higher results. At the table: once-per-mission team +10% XP; witnessing opponents suffer the applicable stress damage and make Morale checks (p.331)."
+        loc`Includes a one-action-die critical hit; choose its effect before damage, spending only for higher results. At the table: once-per-mission team +10% XP; witnessing opponents suffer the applicable stress damage and make Morale checks (p.331).`
       );
   } else if (!known && candidates.triumph)
     notes.push(
       check.checkKind === "attack"
-        ? "Attack Triumph: confirm the recorded result to choose its critical effect."
-        : "Potential Triumph; success is still required."
+        ? loc`Attack Triumph: confirm the recorded result to choose its critical effect.`
+        : loc`Potential Triumph; success is still required.`
     );
   if (check.criticalActivation) {
     const activation = check.criticalActivation;
@@ -143,60 +144,60 @@ export function checkFlavor(check) {
       .replaceAll('"', "&quot;");
     notes.push(escaped);
     notes.push(
-      `Activation cost ${activation.cost} action dice${activation.sources?.length ? ` (${activation.sources.join("; ")})` : ""}.`
+      loc`Activation cost ${activation.cost} action dice${activation.sources?.length ? ` (${activation.sources.join("; ")})` : ""}.`
     );
   }
   for (const payment of [check.preRollFunding, check.rerollFunding])
     if (payment?.surcharge)
       notes.push(
-        `Action-die payment: base ${payment.baseCost}, Shaken surcharge ${payment.surcharge}, total ${payment.count}.`
+        loc`Action-die payment: base ${payment.baseCost}, Shaken surcharge ${payment.surcharge}, total ${payment.count}.`
       );
   if (check.schoolOfHardKnocks)
     notes.push(
-      `School of Hard Knocks: gained ${check.schoolOfHardKnocks.units} bonus d${check.schoolOfHardKnocks.die} action ${check.schoolOfHardKnocks.units === 1 ? "die" : "dice"}; no award XP.`
+      loc`School of Hard Knocks: gained ${check.schoolOfHardKnocks.units} bonus d${check.schoolOfHardKnocks.die} action ${check.schoolOfHardKnocks.units === 1 ? "die" : "dice"}; no award XP.`
     );
   if (check.generousBoost)
     notes.push(
-      `Generous: donor rolled ${check.generousBoost.dice.join(" + ")} on d${check.generousBoost.die}, modifier ${check.generousBoost.bonusEach} per die; added +${check.generousBoost.added}${check.generousBoost.replaced ? " after the donor’s Calculating" : ""}.`
+      loc`Generous: donor rolled ${check.generousBoost.dice.join(" + ")} on d${check.generousBoost.die}, modifier ${check.generousBoost.bonusEach} per die; added +${check.generousBoost.added}${check.generousBoost.replaced ? loc` after the donor’s Calculating` : ""}.`
     );
   if (check.oldSchool)
     notes.push(
-      `Old School: +4 against ${esc(check.oldSchool.target)} (level ${check.oldSchool.targetLevel}; mission Threat Level ${check.oldSchool.missionThreatLevel}), ${esc(check.oldSchool.sharedClassAbility || check.oldSchool.sharedFeats.join(", "))} shared (p.209).`
+      loc`Old School: +4 against ${esc(check.oldSchool.target)} (level ${check.oldSchool.targetLevel}; mission Threat Level ${check.oldSchool.missionThreatLevel}), ${esc(check.oldSchool.sharedClassAbility || check.oldSchool.sharedFeats.join(", "))} shared (p.209).`
     );
   if (check.minimumAdjustment)
-    notes.push(`Practice Makes Perfect: natural ${check.naturalDie} becomes 10 (+${check.minimumAdjustment}).`);
+    notes.push(loc`Practice Makes Perfect: natural ${check.naturalDie} becomes 10 (+${check.minimumAdjustment}).`);
   if (check.requiredBonusPoolId && !check.requiredBonusSpent)
     notes.push(
       check.bonusTransferredTo
-        ? "The unspent class bonus die follows the replacement check."
+        ? loc`The unspent class bonus die follows the replacement check.`
         : check.criticalFailure || check.resolved || check.superseded
-          ? "The unused compulsory class bonus die is forfeited."
-          : "Compulsory class bonus die pending: spend it on this check before resolving."
+          ? loc`The unused compulsory class bonus die is forfeited.`
+          : loc`Compulsory class bonus die pending: spend it on this check before resolving.`
     );
   if (check.bonusBoosts?.length)
     notes.push(
       check.bonusBoosts
         .map(
           b =>
-            `Class bonus: ${String(b.label).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}, ${b.count} d${b.die} spent on this check only.`
+            loc`Class bonus: ${String(b.label).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}, ${b.count} d${b.die} spent on this check only.`
         )
         .join(" ")
     );
   if (check.resultSource === "masterThief")
     notes.push(
-      `Master Thief: opponent’s final result ${check.opponentResult} +1; no error or threat. No die rolled; action dice cannot boost this fixed result (pp.38,61).`
+      loc`Master Thief: opponent’s final result ${check.opponentResult} +1; no error or threat. No die rolled; action dice cannot boost this fixed result (pp.38,61).`
     );
   if (check.tenSecondSolution)
     notes.push(
-      "10-Second Solution: declared natural 20 on a standalone Intelligence skill or Knowledge check, outside Complex Tasks/Dramatic Conflicts. May become a critical success after confirming success; cannot be forcibly rerolled."
+      loc`10-Second Solution: declared natural 20 on a standalone Intelligence skill or Knowledge check, outside Complex Tasks/Dramatic Conflicts. May become a critical success after confirming success; cannot be forcibly rerolled.`
     );
   if (check.oneInAMillion)
     notes.push(
-      "One in a Million: declared natural 20; may be activated as a critical success after confirming success. This natural 20 cannot be forcibly rerolled."
+      loc`One in a Million: declared natural 20; may be activated as a critical success after confirming success. This natural 20 cannot be forcibly rerolled.`
     );
   if (check.alternatives)
     notes.push(
-      `${String(check.choiceSource ?? "Bright Idea")
+      loc`${String(check.choiceSource ?? "Bright Idea")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(
@@ -206,11 +207,11 @@ export function checkFlavor(check) {
     );
   if (check.capped || check.boostTotal || check.oldSchool || known)
     notes.push(
-      `<strong>Effective result: ${check.effectiveTotal}</strong>${check.boostTotal ? ` · action dice ${check.boostTotal >= 0 ? "+" : ""}${check.boostTotal}` : ""}`
+      `<strong>${loc`Effective result: ${check.effectiveTotal}`}</strong>${check.boostTotal ? loc` · action dice ${check.boostTotal >= 0 ? "+" : ""}${check.boostTotal}` : ""}`
     );
   const contributed = [...(check.planModifiers ?? []), ...(check.pipelineModifiers ?? [])];
   if (contributed.length) notes.push(`${esc(describeModifiers(contributed))}.`);
-  return `${check.baseFlavor ?? "Check"}${notes.length ? `<br>${notes.join(" ")}` : ""}`;
+  return `${check.baseFlavor ?? loc`Check`}${notes.length ? `<br>${notes.join(" ")}` : ""}`;
 }
 
 /** Decisions made in a dialog must still refer to the same roll when the transaction begins. */

@@ -5,6 +5,7 @@ import {
   refreshWorldSetting,
   recoverResourceTransaction
 } from "./transactions.mjs";
+import { loc } from "../i18n.mjs";
 /** Session-scoped Game Control action dice, pp.397–398. They have no fixed die type. */
 let queue = Promise.resolve();
 const serialize = work => {
@@ -13,7 +14,7 @@ const serialize = work => {
   return next;
 };
 const requireGC = () => {
-  if (!game.user?.isGM) throw new Error("Only the GC can manage this action-die pool.");
+  if (!game.user?.isGM) throw new Error(loc`Only the GC can manage this action-die pool.`);
 };
 const epoch = () => String(game.settings.get("spycraft2", "usagePeriods")?.session ?? "initial");
 export function gcDiceStatus() {
@@ -37,9 +38,9 @@ export function startingGCDice(playersPresent, caliber) {
     caliber < 1 ||
     caliber > 5
   )
-    throw new Error("Enter the number of player characters present and a mission Caliber from I to V.");
+    throw new Error(loc`Enter the number of player characters present and a mission Caliber from I to V.`);
   const value = playersPresent + 2 * caliber;
-  if (!Number.isSafeInteger(value)) throw new Error("The GC starting balance exceeds a safe whole number.");
+  if (!Number.isSafeInteger(value)) throw new Error(loc`The GC starting balance exceeds a safe whole number.`);
   return value;
 }
 const pendingSettlement = () => {
@@ -47,18 +48,19 @@ const pendingSettlement = () => {
   return stored?.needsReview ? stored : (game.spycraft2?.pendingGCDiceReview ?? stored);
 };
 const requireSettledGC = () => {
-  if (pendingSettlement()?.needsReview) throw new Error("Review the interrupted GC payment before changing the pool.");
+  if (pendingSettlement()?.needsReview)
+    throw new Error(loc`Review the interrupted GC payment before changing the pool.`);
 };
 const requireValidBalance = (pool, { allowAwardReview = false } = {}) => {
   requireSettledGC();
   const periodReview = game.settings.get("spycraft2", "usagePeriodReview");
   if (periodReview?.needsReview || game.spycraft2?.pendingUsagePeriodReview?.needsReview)
-    throw new Error("Review the interrupted start before changing the GC pool.");
+    throw new Error(loc`Review the interrupted start before changing the GC pool.`);
   if (!allowAwardReview && [...(game.actors ?? [])].some(a => a.flags?.spycraft2?.actionDieAwardReview?.needsReview))
-    throw new Error("Review the interrupted player award before changing the GC pool.");
+    throw new Error(loc`Review the interrupted player award before changing the GC pool.`);
   if (pool.counterReview)
     throw new Error(
-      "Review the saved GC action-die balance before spending, awarding or adjusting it. Explicit pool replacement can correct it."
+      loc`Review the saved GC action-die balance before spending, awarding or adjusting it. Explicit pool replacement can correct it.`
     );
 };
 const oldestActor = () =>
@@ -75,8 +77,8 @@ export function gcDiceController({ required = true } = {}) {
   if (!actor && required)
     throw new Error(
       id
-        ? "The GC resource bookkeeping actor was removed. Recover GC bookkeeping before spending."
-        : "Create a character before initializing tracked GC resources."
+        ? loc`The GC resource bookkeeping actor was removed. Recover GC bookkeeping before spending.`
+        : loc`Create a character before initializing tracked GC resources.`
     );
   return actor ?? null;
 }
@@ -87,12 +89,12 @@ export async function refreshGCDiceTransaction(controller, { allowRebind = false
   await refreshWorldSetting("spycraft2", "gcActionDice");
   const id = gcDiceStatus().controllerId;
   if (!allowRebind && id && controller && id !== controller.id)
-    throw new Error("GC resource bookkeeping changed; retry using the current controller.");
+    throw new Error(loc`GC resource bookkeeping changed; retry using the current controller.`);
 }
 async function guarded(work) {
   requireGC();
   if (game.ready && !nativeResourceTransactionsEnabled())
-    throw new Error("The GC resource transaction service is unavailable. Reload the world before spending.");
+    throw new Error(loc`The GC resource transaction service is unavailable. Reload the world before spending.`);
   if (!nativeResourceTransactionsEnabled()) return serialize(() => work(null));
   const controller = gcDiceController();
   return queueResourceScope(controller, GC_RESOURCE_LOCK_ID, async () => {
@@ -115,7 +117,7 @@ export function withGCDicePool(work, { allowAwardReview = false } = {}) {
   return guarded(async controller => {
     const pool = withController(gcDiceStatus(), controller);
     requireValidBalance(pool, { allowAwardReview });
-    if (!pool.current) throw new Error("Initialize the GC pool for this session before awarding dice.");
+    if (!pool.current) throw new Error(loc`Initialize the GC pool for this session before awarding dice.`);
     delete pool.current;
     return work(pool, controller);
   });
@@ -126,11 +128,11 @@ export function initializeGCDice({ playersPresent, caliber, replaceExisting = fa
     requireSettledGC();
     const periodReview = game.settings.get("spycraft2", "usagePeriodReview");
     if (periodReview?.needsReview || game.spycraft2?.pendingUsagePeriodReview?.needsReview)
-      throw new Error("Review the interrupted start before changing the GC pool.");
+      throw new Error(loc`Review the interrupted start before changing the GC pool.`);
     const before = gcDiceStatus();
     if (before.current && !replaceExisting)
       throw new Error(
-        "This session’s pool is already initialized. Explicitly replace it to correct the starting pool."
+        loc`This session’s pool is already initialized. Explicitly replace it to correct the starting pool.`
       );
     const value = startingGCDice(playersPresent, caliber),
       pool = withController(
@@ -145,11 +147,11 @@ export function adjustGCDice(amount, reason) {
   return guarded(async controller => {
     const before = gcDiceStatus();
     requireValidBalance(before);
-    if (!before.current) throw new Error("Initialize the GC pool for this session first.");
+    if (!before.current) throw new Error(loc`Initialize the GC pool for this session first.`);
     if (!Number.isSafeInteger(amount) || !amount || !String(reason ?? "").trim())
-      throw new Error("Enter a whole-number adjustment and its rules reason.");
-    if (before.value + amount < 0) throw new Error("Not enough GC action dice remain.");
-    if (!Number.isSafeInteger(before.value + amount)) throw new Error("The GC balance exceeds a safe whole number.");
+      throw new Error(loc`Enter a whole-number adjustment and its rules reason.`);
+    if (before.value + amount < 0) throw new Error(loc`Not enough GC action dice remain.`);
+    if (!Number.isSafeInteger(before.value + amount)) throw new Error(loc`The GC balance exceeds a safe whole number.`);
     const pool = withController(
       { ...before, value: before.value + amount, lastReason: String(reason).trim() },
       controller
@@ -174,16 +176,16 @@ async function holdPayment(review, reason) {
   try {
     await writePool({ ...rawPool(), settlementReview: held });
   } catch (error) {
-    globalThis.ui?.notifications?.warn("GC payment recovery could not be saved. Resolve it before reloading.");
+    globalThis.ui?.notifications?.warn(loc`GC payment recovery could not be saved. Resolve it before reloading.`);
   }
 }
 export function spendGCDice(count, perform, { purpose = "Critical activation", messageUuid = null } = {}) {
   return guarded(async controller => {
     const before = gcDiceStatus();
     requireValidBalance(before);
-    if (!before.current) throw new Error("Initialize the GC pool for this session first.");
+    if (!before.current) throw new Error(loc`Initialize the GC pool for this session first.`);
     if (!Number.isSafeInteger(count) || count < 1 || count > before.value)
-      throw new Error("Choose an available positive whole number of GC action dice.");
+      throw new Error(loc`Choose an available positive whole number of GC action dice.`);
     const original = structuredClone(rawPool());
     const id = globalThis.foundry?.utils?.randomID?.() ?? "gc-" + Date.now() + "-" + Math.random();
     const review = {
@@ -233,8 +235,8 @@ export function spendGCDice(count, perform, { purpose = "Critical activation", m
       try {
         await writePool(refund);
       } catch (refundError) {
-        await holdPayment(review, "Refund could not be confirmed: " + refundError.message);
-        throw new AggregateError([error, refundError], "GC payment needs review.");
+        await holdPayment(review, loc`Refund could not be confirmed: ` + refundError.message);
+        throw new AggregateError([error, refundError], loc`GC payment needs review.`);
       }
       throw error;
     }
@@ -245,15 +247,15 @@ export function spendGCDice(count, perform, { purpose = "Critical activation", m
       current.counterReview ||
       current.settlementReview?.id !== id
     ) {
-      await holdPayment(review, "Effect completed but payment evidence changed.");
-      throw new Error("The effect completed; review its GC payment before further activity.");
+      await holdPayment(review, loc`Effect completed but payment evidence changed.`);
+      throw new Error(loc`The effect completed; review its GC payment before further activity.`);
     }
     const settled = { ...current, settlementReview: { ...review, needsReview: false, outcome: "spent" } };
     delete settled.current;
     try {
       await writePool(settled);
     } catch (error) {
-      await holdPayment(review, "Effect completed but final payment record could not be confirmed.");
+      await holdPayment(review, loc`Effect completed but final payment record could not be confirmed.`);
       throw error;
     }
     return result;
@@ -265,17 +267,16 @@ export async function recordGCHint(options = {}) {
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Offer a helpful GC hint" },
+      window: { title: loc`Offer a helpful GC hint` },
       rejectClose: false,
-      content:
-        '<p>A helpful ordinary hint grants the GC one action die (p.398). Use the character’s free-hint response for origin or Intuition benefits instead.</p><label>Hint <textarea name="text"></textarea></label><label><input type="checkbox" name="helpfulConfirmed" /> The GC confirms this hint is helpful</label>'
+      content: `<p>${loc`A helpful ordinary hint grants the GC one action die (p.398). Use the character’s free-hint response for origin or Intuition benefits instead.`}</p><label>${loc`Hint`} <textarea name="text"></textarea></label><label><input type="checkbox" name="helpfulConfirmed" /> ${loc`The GC confirms this hint is helpful`}</label>`
     });
     if (!input) return null;
   }
   const text = String(input.text ?? "").trim();
-  if (!text || input.helpfulConfirmed !== true) throw new Error("Enter a helpful hint and confirm it.");
+  if (!text || input.helpfulConfirmed !== true) throw new Error(loc`Enter a helpful hint and confirm it.`);
   return withGCDicePool(async pool => {
-    if (!Number.isSafeInteger(pool.value + 1)) throw new Error("The GC balance exceeds a safe whole number.");
+    if (!Number.isSafeInteger(pool.value + 1)) throw new Error(loc`The GC balance exceeds a safe whole number.`);
     const original = structuredClone(rawPool()),
       id = foundry.utils.randomID?.() ?? "hint-" + Date.now() + "-" + Math.random();
     const receipt = {
@@ -329,8 +330,8 @@ export async function recordGCHint(options = {}) {
         try {
           await writePool(restored);
         } catch (rollback) {
-          await holdPayment(receipt, "Hint credit restoration could not be confirmed.");
-          throw new AggregateError([error, rollback], "The GC hint needs review.");
+          await holdPayment(receipt, loc`Hint credit restoration could not be confirmed.`);
+          throw new AggregateError([error, rollback], loc`The GC hint needs review.`);
         }
         throw error;
       }
@@ -344,9 +345,9 @@ export async function recordGCHint(options = {}) {
     ) {
       await holdPayment(
         { ...receipt, messageUuid: message.uuid ?? message.id },
-        "Hint was posted but its credit evidence changed."
+        loc`Hint was posted but its credit evidence changed.`
       );
-      throw new Error("The hint was posted; review its GC credit.");
+      throw new Error(loc`The hint was posted; review its GC credit.`);
     }
     const settled = {
       ...current,
@@ -358,7 +359,7 @@ export async function recordGCHint(options = {}) {
     } catch (error) {
       await holdPayment(
         { ...receipt, messageUuid: message.uuid ?? message.id },
-        "Hint was posted but its final credit record could not be confirmed."
+        loc`Hint was posted but its final credit record could not be confirmed.`
       );
       throw error;
     }
@@ -368,7 +369,7 @@ export async function recordGCHint(options = {}) {
 export function reviewGCDiceSettlement(options = {}) {
   return guarded(async () => {
     const review = structuredClone(pendingSettlement());
-    if (!review?.needsReview) throw new Error("There is no interrupted GC payment to review.");
+    if (!review?.needsReview) throw new Error(loc`There is no interrupted GC payment to review.`);
     const before = structuredClone(rawPool()),
       session = epoch(),
       message = () =>
@@ -382,9 +383,9 @@ export function reviewGCDiceSettlement(options = {}) {
     if (!Object.keys(input).length) {
       const esc = foundry.utils.escapeHTML;
       input = await foundry.applications.api.DialogV2.input({
-        window: { title: "Review interrupted GC payment" },
+        window: { title: loc`Review interrupted GC payment` },
         rejectClose: false,
-        content: `<p>${esc(String(review.purpose ?? "GC payment"))}: ${esc(String(review.reason ?? "Payment was interrupted."))}</p><p>Review the actual effect and current session pool. This sets the confirmed balance without adding a refund.</p><label>Confirmed current GC dice <input type="number" min="0" name="value" value="${Number.isSafeInteger(before.value) ? before.value : 0}" /></label><label>Resolution <input name="resolution" /></label><label><input type="checkbox" name="confirmed" /> The GC reviewed the effect, session and actual pool</label>`
+        content: `<p>${esc(String(review.purpose ?? loc`GC payment`))}: ${esc(String(review.reason ?? loc`Payment was interrupted.`))}</p><p>${loc`Review the actual effect and current session pool. This sets the confirmed balance without adding a refund.`}</p><label>${loc`Confirmed current GC dice`} <input type="number" min="0" name="value" value="${Number.isSafeInteger(before.value) ? before.value : 0}" /></label><label>${loc`Resolution`} <input name="resolution" /></label><label><input type="checkbox" name="confirmed" /> ${loc`The GC reviewed the effect, session and actual pool`}</label>`
       });
       if (!input) return null;
     }
@@ -395,7 +396,7 @@ export function reviewGCDiceSettlement(options = {}) {
       !same(message(), messageBefore) ||
       epoch() !== session
     )
-      throw new Error("GC payment evidence changed; reopen the review.");
+      throw new Error(loc`GC payment evidence changed; reopen the review.`);
     const value =
       typeof input.value === "number"
         ? input.value
@@ -403,7 +404,7 @@ export function reviewGCDiceSettlement(options = {}) {
           ? Number(input.value)
           : NaN;
     if (input.confirmed !== true || !Number.isSafeInteger(value) || value < 0 || !String(input.resolution ?? "").trim())
-      throw new Error("Confirm the reviewed whole-die balance and resolution.");
+      throw new Error(loc`Confirm the reviewed whole-die balance and resolution.`);
     const pool = {
       ...before,
       value,
@@ -424,10 +425,10 @@ export function reviewGCDiceSettlement(options = {}) {
 }
 export async function recoverGCBookkeeping({ confirmed = false } = {}) {
   requireGC();
-  if (!confirmed) throw new Error("Confirm that all GC resource actions have stopped before recovery.");
+  if (!confirmed) throw new Error(loc`Confirm that all GC resource actions have stopped before recovery.`);
   const previous = gcDiceController({ required: false }),
     controller = oldestActor();
-  if (!controller) throw new Error("Create a character before recovering GC bookkeeping.");
+  if (!controller) throw new Error(loc`Create a character before recovering GC bookkeeping.`);
   if (previous?.items.has(GC_RESOURCE_LOCK_ID))
     await recoverResourceTransaction(previous, { confirmed: true, scope: GC_RESOURCE_LOCK_ID });
   return queueResourceScope(controller, GC_RESOURCE_LOCK_ID, async () => {
@@ -443,18 +444,18 @@ export async function manageGCDice() {
   requireGC();
   const status = gcDiceStatus();
   const input = await foundry.applications.api.DialogV2.input({
-    window: { title: "Game Control action dice" },
+    window: { title: loc`Game Control action dice` },
     rejectClose: false,
     content: `
- <p>${pendingSettlement()?.needsReview ? "An interrupted GC payment needs review before further pool changes. " : ""}Current session: ${status.counterReview ? "saved balance needs review" : status.current ? status.value + " dice" : "pool not initialized"}. Starting dice = player characters present + twice mission Caliber (p.397).</p>
- <label>Action <select name="action"><option value="initialize">Initialize this session</option><option value="adjust">Adjust current pool</option><option value="hint">Offer a helpful hint</option><option value="review">Review interrupted GC payment</option><option value="recover">Recover interrupted GC bookkeeping</option></select></label>
- <label>Player characters present <input type="number" name="playersPresent" min="0" value="${status.playersPresent ?? 1}" /></label>
- <label>Mission Caliber <input type="number" name="caliber" min="1" max="5" value="${status.caliber ?? 1}" /></label>
- <label><input type="checkbox" name="replaceExisting" /> Replace an already initialized pool</label>
- <label>Adjustment (positive gain or negative spend) <input type="number" name="amount" value="1" /></label>
- <label>Adjustment reason <input name="reason" /></label>
- <label><input type="checkbox" name="confirmed" /> Recovery only: all GC resource actions have stopped</label>
- <p>Examples: helpful hint +1; a player action-die award +1; each mission Caliber increase +2. Record other Subplot, event or NPC costs from their rules. Starting a new session expires the old pool.</p>`
+ <p>${loc`${pendingSettlement()?.needsReview ? loc`An interrupted GC payment needs review before further pool changes. ` : ""}Current session: ${status.counterReview ? loc`saved balance needs review` : status.current ? status.value + " dice" : loc`pool not initialized`}. Starting dice = player characters present + twice mission Caliber (p.397).`}</p>
+ <label>${loc`Action`} <select name="action"><option value="initialize">${loc`Initialize this session`}</option><option value="adjust">${loc`Adjust current pool`}</option><option value="hint">${loc`Offer a helpful hint`}</option><option value="review">${loc`Review interrupted GC payment`}</option><option value="recover">${loc`Recover interrupted GC bookkeeping`}</option></select></label>
+ <label>${loc`Player characters present`} <input type="number" name="playersPresent" min="0" value="${status.playersPresent ?? 1}" /></label>
+ <label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="${status.caliber ?? 1}" /></label>
+ <label><input type="checkbox" name="replaceExisting" /> ${loc`Replace an already initialized pool`}</label>
+ <label>${loc`Adjustment (positive gain or negative spend)`} <input type="number" name="amount" value="1" /></label>
+ <label>${loc`Adjustment reason`} <input name="reason" /></label>
+ <label><input type="checkbox" name="confirmed" /> ${loc`Recovery only: all GC resource actions have stopped`}</label>
+ <p>${loc`Examples: helpful hint +1; a player action-die award +1; each mission Caliber increase +2. Record other Subplot, event or NPC costs from their rules. Starting a new session expires the old pool.`}</p>`
   });
   if (!input) return null;
   if (input.action === "hint") return recordGCHint();

@@ -1,6 +1,7 @@
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Tumble and Table2.13 p.109; Equilibrium Mastery p.194. Plans one rolled half action. */
 export function tumblePathPlan(
   system,
@@ -19,9 +20,9 @@ export function tumblePathPlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (tumbleCircumstances === false) return empty;
   if (tumbleCircumstances !== true || key !== "acrobatics" || check?.id !== "tumble")
-    return reject("Declare this movement path only for Acrobatics/Tumble.");
+    return reject(loc`Declare this movement path only for Acrobatics/Tumble.`);
   if (method !== "roll")
-    return reject("Use a rolled Tumble check for this path; this entry does not grant taking10/20 (p.109).");
+    return reject(loc`Use a rolled Tumble check for this path; this entry does not grant taking10/20 (p.109).`);
   if (
     tumbleRouteConfirmed !== true ||
     typeof tumbleDistanceFeet !== "number" ||
@@ -31,25 +32,25 @@ export function tumblePathPlan(
     tumbleAdjacentEnemySquares + tumbleOccupiedSquares === 0
   )
     return reject(
-      "The GC must confirm counted movement, actual enemy-occupied squares adjacent to/in the path (including suppressive-fire squares) and an otherwise legal half action ending in an unoccupied square."
+      loc`The GC must confirm counted movement, actual enemy-occupied squares adjacent to/in the path (including suppressive-fire squares) and an otherwise legal half action ending in an unoccupied square.`
     );
   if (!Array.isArray(system?.activeFeatNames) || system.activeFeatNames.some(n => typeof n !== "string" || !n.trim()))
-    return reject("Review the current qualified Tumble feat sources.");
+    return reject(loc`Review the current qualified Tumble feat sources.`);
   const speed = system.speed;
   if (!Number.isFinite(speed) || speed < 0 || system.conditionSpeedReview)
-    return reject("Review the character’s actual current Speed before Tumble movement.");
+    return reject(loc`Review the character’s actual current Speed before Tumble movement.`);
   if (system.conditionContext?.entangled || system.conditionContext?.bound)
-    return reject("Entangled/Bound prevents Tumble checks (p.341).");
+    return reject(loc`Entangled/Bound prevents Tumble checks (p.341).`);
   const incapacity = restraintActionBlock(system) || attributeActionBlock(system, { kind: "skill", ability: "dex" });
   if (incapacity || system.incapacitatedForMovement === true || system.wounds?.value < 0)
-    return reject(incapacity || "This character cannot make this Tumble movement now.");
+    return reject(incapacity || loc`This character cannot make this Tumble movement now.`);
   const sources = system.activeFeatNames.includes("Equilibrium Mastery") ? ["Equilibrium Mastery"] : [],
     normalMaximumFeet = sources.length ? speed : Math.max(0, speed - 10),
     threatMaximumFeet = Math.max(normalMaximumFeet, Math.max(0, speed - 5)),
     criticalMaximumFeet = speed;
   if (tumbleDistanceFeet > normalMaximumFeet)
     return reject(
-      `The declared Tumble distance exceeds the current ${normalMaximumFeet} ft. ordinary allowance; unconfirmed threat/critical outcomes do not grant extra movement in advance.`
+      loc`The declared Tumble distance exceeds the current ${normalMaximumFeet} ft. ordinary allowance; unconfirmed threat/critical outcomes do not grant extra movement in advance.`
     );
   const baseDC = tumbleOccupiedSquares ? 25 : 15,
     adjacentExtra = Math.max(0, tumbleAdjacentEnemySquares - 1),
@@ -59,7 +60,7 @@ export function tumblePathPlan(
     dc = baseDC + adjacentDC + occupiedDC,
     errorIncrease = (tumbleOccupiedSquares ? 1 : 0) + Math.min(4, occupiedExtra);
   if (!Number.isSafeInteger(dc))
-    return reject("Review the path counts; its calculated Tumble DC exceeds supported exact integer arithmetic.");
+    return reject(loc`Review the path counts; its calculated Tumble DC exceeds supported exact integer arithmetic.`);
   const evidence = {
     version: 1,
     skillKey: key,
@@ -86,9 +87,9 @@ export function tumblePathPlan(
     dc,
     errorIncrease,
     notes: [
-      `Tumble: ${tumbleDistanceFeet}/${normalMaximumFeet} counted ft.; DC${dc} (${baseDC} base +${adjacentDC} additional adjacent squares +${occupiedDC} additional occupied path squares); separate error +${errorIncrease} (Table2.13, p.109).`,
-      ...(sources.length ? ["Equilibrium Mastery permits full current Speed instead of Speed−10 (p.194)."] : []),
-      `Threat/critical movement allowances are ${threatMaximumFeet}/${criticalMaximumFeet} ft. only after their actual outcomes are resolved. Count enemy-occupied squares, not repeated adjacent path segments; enemy suppressive-fire squares count as occupied. The GC resolves token movement, outcomes and any lost Dexterity/sprawled/final attacks separately.`
+      loc`Tumble: ${tumbleDistanceFeet}/${normalMaximumFeet} counted ft.; DC${dc} (${baseDC} base +${adjacentDC} additional adjacent squares +${occupiedDC} additional occupied path squares); separate error +${errorIncrease} (Table2.13, p.109).`,
+      ...(sources.length ? [loc`Equilibrium Mastery permits full current Speed instead of Speed−10 (p.194).`] : []),
+      loc`Threat/critical movement allowances are ${threatMaximumFeet}/${criticalMaximumFeet} ft. only after their actual outcomes are resolved. Count enemy-occupied squares, not repeated adjacent path segments; enemy suppressive-fire squares count as occupied. The GC resolves token movement, outcomes and any lost Dexterity/sprawled/final attacks separately.`
     ]
   };
 }
@@ -119,7 +120,7 @@ export function validateTumblePathProof(system, proof, { checkKind, skillKey, ch
     );
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error(
-      "The Tumble path, current Speed, movement condition or qualified Equilibrium source changed before posting."
+      loc`The Tumble path, current Speed, movement condition or qualified Equilibrium source changed before posting.`
     );
 }
 

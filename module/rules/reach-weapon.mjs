@@ -1,6 +1,7 @@
 import { reachAttackPlan } from "./reach.mjs";
 import { ownedWeaponTraining, weaponSourceIdentity } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -48,7 +49,7 @@ export function validateReachWeaponProof(actor, proof, context = {}) {
     ((context.attackContext?.reachAdjacent ?? null) !== proof.adjacent ||
       (context.attackContext?.reachGeometryConfirmed === true) !== proof.geometryConfirmed)
   )
-    throw Error("The recorded Reach adjacency or geometry declaration changed.");
+    throw Error(loc`The recorded Reach adjacency or geometry declaration changed.`);
   const { weapon, trained, operatingProficiency } = ownedWeaponTraining(actor, proof, context),
     ranged = !["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged"].includes(operatingProficiency);
   if (context.rerollOf) {
@@ -64,7 +65,7 @@ export function validateReachWeaponProof(actor, proof, context = {}) {
       c.superseded ||
       stable(c.attackContext?.reach) !== stable(proof)
     )
-      throw Error("Use the actual owned unresolved Reach attack for its original replacement.");
+      throw Error(loc`Use the actual owned unresolved Reach attack for its original replacement.`);
     // Training/quality guards still apply normally; the earned feat waiver is temporal.
     const s = { ...actor.system, activeFeatNames: proof.polearmWaiver ? ["Polearm Basics"] : [] },
       p = reachWeaponPlan(s, weapon, {
@@ -76,7 +77,7 @@ export function validateReachWeaponProof(actor, proof, context = {}) {
         geometryConfirmed: proof.geometryConfirmed
       });
     if (p.blocked || stable(p.evidence) !== stable(proof))
-      throw Error("The original Reach weapon or actual training changed before replacement.");
+      throw Error(loc`The original Reach weapon or actual training changed before replacement.`);
     return;
   }
   const c = context.attackContext ?? {},
@@ -95,7 +96,7 @@ export function validateReachWeaponProof(actor, proof, context = {}) {
       (!p.evidence.geometryConfirmed || p.evidence.adjacent === null)) ||
     stable(p.evidence) !== stable(proof)
   )
-    throw Error("The actual Reach weapon, training, polearm feat or confirmed geometry changed before posting.");
+    throw Error(loc`The actual Reach weapon, training, polearm feat or confirmed geometry changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

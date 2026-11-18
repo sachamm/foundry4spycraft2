@@ -1,10 +1,11 @@
+import { loc } from "../i18n.mjs";
 /** Request-check exceptions: Veteran p.21, Geek p.23, Executive Decision p.77, Sources p.45. */
 export function requestSources(system, items = []) {
   const sources = [];
   if (system.activeFeatNames?.includes("Office Gossip"))
     sources.push({
       id: "requestOfficeGossip",
-      name: "Office Gossip: Request without action-die cost",
+      name: loc`Office Gossip: Request without action-die cost`,
       category: "",
       period: "mission",
       limit: (system.activeFeatSelections ?? []).filter(f => f.tree === "tradecraft").length,
@@ -25,7 +26,7 @@ export function requestSources(system, items = []) {
   if (sourcesGrade)
     sources.push({
       id: "requestSources",
-      name: `Sources ${["", "I", "II", "III"][sourcesGrade]}: outside-Faction Request`,
+      name: loc`Sources ${["", "I", "II", "III"][sourcesGrade]}: outside-Faction Request`,
       category: "R",
       hour: true,
       consultSources: true,
@@ -51,7 +52,7 @@ export function requestSources(system, items = []) {
   if (grade)
     sources.push({
       id: "requestBehindScenes",
-      name: `Behind the Scenes ${["", "I", "II", "III"][grade]}: automatic Request`,
+      name: loc`Behind the Scenes ${["", "I", "II", "III"][grade]}: automatic Request`,
       category: "",
       automatic: true,
       city: true,
@@ -69,7 +70,7 @@ export function requestSources(system, items = []) {
     if (items.some(i => i.type === "origin" && i.name === name && i.system?.originType === type))
       sources.push({
         id: `request${name}`,
-        name: `${name}: Request without action-die cost`,
+        name: loc`${name}: Request without action-die cost`,
         category,
         period: "session",
         limit: 1,
@@ -79,7 +80,7 @@ export function requestSources(system, items = []) {
   if ((system.classLevels?.politico ?? 0) >= 10)
     sources.push({
       id: "requestExecutiveDecision",
-      name: "Executive Decision: automatic Request without action-die cost",
+      name: loc`Executive Decision: automatic Request without action-die cost`,
       category: "",
       automatic: true,
       ignoreMissionCaliber: true,
@@ -114,7 +115,7 @@ export function localHeroRequestBonus(system, { homeTurf = false } = {}) {
     : [];
   return {
     bonus: feats.length,
-    sources: feats.length ? [{ name: "Local Hero (home turf)", value: feats.length }] : [],
+    sources: feats.length ? [{ name: loc`Local Hero (home turf)`, value: feats.length }] : [],
     feats,
     homeTurf: homeTurf === true
   };
@@ -124,7 +125,7 @@ export function localHeroRequestBonus(system, { homeTurf = false } = {}) {
 export function requestBenefitContext(system, id = "") {
   if (!id) return null;
   const source = system.limitedUses?.find(s => s.id === id && s.workflow === "requestBenefit");
-  if (!source) throw new Error("The selected Request benefit is no longer available.");
+  if (!source) throw new Error(loc`The selected Request benefit is no longer available.`);
   return {
     version: 1,
     id,

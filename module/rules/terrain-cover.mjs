@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Aquatic Training/Home Turf pp.206–207 improve actual partial cover, never create cover. */
 export function terrainCoverPlan(
   system,
@@ -11,22 +12,22 @@ export function terrainCoverPlan(
   } = {}
 ) {
   if (![personalCover, sceneryCover].every(n => Number.isSafeInteger(n) && n >= 0 && n <= 4))
-    throw new Error("Choose actual personal/scenery cover grades from0through4 before terrain feat adjustments.");
+    throw new Error(loc`Choose actual personal/scenery cover grades from0through4 before terrain feat adjustments.`);
   if ([homeTurfCover, partialSubmersionCover, terrainCoverConfirmed].some(v => typeof v !== "boolean"))
-    throw new Error("Declare the terrain cover circumstances with explicit boolean choices.");
+    throw new Error(loc`Declare the terrain cover circumstances with explicit boolean choices.`);
   if (!homeTurfCover && !partialSubmersionCover) return null;
   if (terrainCoverConfirmed !== true)
-    throw new Error("The GC must confirm actual cover and the declared home-turf/submersion circumstances.");
+    throw new Error(loc`The GC must confirm actual cover and the declared home-turf/submersion circumstances.`);
   if (homeTurfCover && !["personal", "scenery"].includes(homeTurfCoverSource))
-    throw new Error("Choose which actual cover source Home Turf improves.");
+    throw new Error(loc`Choose which actual cover source Home Turf improves.`);
   if (homeTurfCover && !system.activeFeatNames?.includes("Home Turf"))
-    throw new Error("Home Turf must be currently available.");
+    throw new Error(loc`Home Turf must be currently available.`);
   if (partialSubmersionCover && !system.activeFeatNames?.includes("Aquatic Training"))
-    throw new Error("Aquatic Training must be currently available.");
+    throw new Error(loc`Aquatic Training must be currently available.`);
   if (homeTurfCover && (homeTurfCoverSource === "personal" ? personalCover : sceneryCover) === 0)
-    throw new Error("Home Turf improves an existing cover source; it cannot create cover.");
+    throw new Error(loc`Home Turf improves an existing cover source; it cannot create cover.`);
   if (partialSubmersionCover && sceneryCover === 0)
-    throw new Error("Partially submerged cover requires an actual scenery cover source supplied by the water.");
+    throw new Error(loc`Partially submerged cover requires an actual scenery cover source supplied by the water.`);
   const context = {
       personalCover,
       sceneryCover,
@@ -73,5 +74,5 @@ export function validateTerrainCoverProof(system, proof) {
   if (!proof) return;
   const current = terrainCoverPlan(system, proof.context);
   if (proof.version !== 1 || !current || JSON.stringify(current) !== JSON.stringify(proof))
-    throw new Error("The terrain cover source, grades or circumstances changed.");
+    throw new Error(loc`The terrain cover source, grades or circumstances changed.`);
 }

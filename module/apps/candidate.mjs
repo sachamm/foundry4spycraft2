@@ -1,4 +1,5 @@
 import { CANDIDATE_KEYS, CANDIDATE_CHOICES, reviewedCandidateBasis } from "../rules/candidate.mjs";
+import { loc } from "../i18n.mjs";
 /** An explicit correction of missing/imported acquisition history, never a later free re-choice. */
 export async function reviewCandidate(item, options = {}) {
   if (
@@ -8,9 +9,9 @@ export async function reviewCandidate(item, options = {}) {
     item.name !== "Candidate" ||
     item.parent?.type !== "agent"
   )
-    throw new Error("Only an owning GC can correct Candidate attribute history.");
+    throw new Error(loc`Only an owning GC can correct Candidate attribute history.`);
   if ((item.system.acquiredAtLevel || 1) !== 1)
-    throw new Error("Candidate must have been acquired at the first career level.");
+    throw new Error(loc`Candidate must have been acquired at the first career level.`);
   const before = JSON.stringify([
       item.name,
       item.system.choice,
@@ -21,9 +22,9 @@ export async function reviewCandidate(item, options = {}) {
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review Candidate first-level attributes" },
+      window: { title: loc`Review Candidate first-level attributes` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>Use the original first-level scores before Candidate. This corrects acquisition history; later increases, temporary bonuses and damage do not allow a new choice.</p>${CANDIDATE_KEYS.map(key => `<label>${key.toUpperCase()} <input name="${key}" type="number" step="1" required value="${Number.isSafeInteger(item.system.candidateBasis?.scores?.[key]) ? item.system.candidateBasis.scores[key] : ""}" /></label>`).join("")}<label>Original selected pair <select name="choice">${Object.entries(
+      content: `<div class="spycraft2-roll-options"><p>${loc`Use the original first-level scores before Candidate. This corrects acquisition history; later increases, temporary bonuses and damage do not allow a new choice.`}</p>${CANDIDATE_KEYS.map(key => `<label>${key.toUpperCase()} <input name="${key}" type="number" step="1" required value="${Number.isSafeInteger(item.system.candidateBasis?.scores?.[key]) ? item.system.candidateBasis.scores[key] : ""}" /></label>`).join("")}<label>${loc`Original selected pair`} <select name="choice">${Object.entries(
         CANDIDATE_CHOICES
       )
         .map(
@@ -31,7 +32,7 @@ export async function reviewCandidate(item, options = {}) {
         )
         .join(
           ""
-        )}</select></label><label>Original source / reason for correction <input name="reason" maxlength="1000" required /></label><label><input name="confirmed" type="checkbox" /> These are the original scores and selection; I confirm this history correction</label></div>`
+        )}</select></label><label>${loc`Original source / reason for correction`} <input name="reason" maxlength="1000" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`These are the original scores and selection; I confirm this history correction`}</label></div>`
     });
     if (!input) return null;
   }
@@ -40,7 +41,7 @@ export async function reviewCandidate(item, options = {}) {
     !item.isOwner ||
     JSON.stringify([item.name, item.system.choice, item.system.candidateBasis, item.system.acquiredAtLevel]) !== before
   )
-    throw new Error("Candidate history or ownership changed during review.");
+    throw new Error(loc`Candidate history or ownership changed during review.`);
   const scores = Object.fromEntries(
       CANDIDATE_KEYS.map(key => [
         key,

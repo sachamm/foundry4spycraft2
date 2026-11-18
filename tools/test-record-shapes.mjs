@@ -47,19 +47,46 @@ test("every declared shape is well formed, and every field that uses one has it"
   for (const [name, shape] of Object.entries(RECORD_SHAPES)) assert.ok(validShape(shape), name);
   assert.equal(validShape({ id: "text" }), false);
   assert.equal(validShape(["number", "string"]), false);
-  const models = await readFile(new URL("../module/data/actor.mjs", import.meta.url), "utf8");
+  const models =
+    (await readFile(new URL("../module/data/actor.mjs", import.meta.url), "utf8")) +
+    (await readFile(new URL("../module/data/item.mjs", import.meta.url), "utf8"));
   const used = [...models.matchAll(/record(List)?\("(\w+)"/g)];
-  assert.ok(used.length >= 40);
+  assert.ok(used.length >= 70);
   for (const [, list, name] of used) {
     assert.ok(name in RECORD_SHAPES, `${name} has no declared shape`);
     assert.equal(Array.isArray(RECORD_SHAPES[name]), !!list, `${name}: list and record declarations must agree`);
   }
+  // No data model is left with a plain object field.
+  assert.doesNotMatch(models, /new ObjectField\(/);
+});
+
+test("compendium documents built from src/data fit the item shapes", async () => {
+  const { buildPacks } = await import("./lib/pack-docs.mjs");
+  const warn = console.warn;
+  console.warn = () => {};
+  let packs;
+  try {
+    packs = buildPacks().packs;
+  } finally {
+    console.warn = warn;
+  }
+  let checked = 0;
+  for (const [packName, pack] of Object.entries(packs)) {
+    for (const doc of pack.docs) {
+      for (const [field, value] of Object.entries(doc.system ?? {})) {
+        if (!(field in RECORD_SHAPES) || value === null) continue;
+        checked += 1;
+        assert.deepEqual(problems(RECORD_SHAPES[field], value), [], `${packName}: ${doc.name}.${field}`);
+      }
+    }
+  }
+  assert.ok(checked > 300, `only ${checked} compendium records checked`);
 });
 
 test("records the rules write fit their declared shapes", () => {
   const clock = { combatId: "c1", combatantId: "t1", startRound: 2, dueRound: 3 };
   assert.deepEqual(problems(RECORD_SHAPES.combatExpertise, { ...clock, penalty: 2 }), []);
-  assert.deepEqual(problems(RECORD_SHAPES.totalDefense, { ...clock, equilibrium: { feat: "Equilibrium Basics" } }), []);
+  assert.deepEqual(problems(RECORD_SHAPES.totalDefense, { ...clock, declaredBy: "anything else the rule stores" }), []);
   assert.deepEqual(problems(RECORD_SHAPES.combatExpertise, { ...clock, penalty: "2" }), [
     "penalty: expected number, found string"
   ]);

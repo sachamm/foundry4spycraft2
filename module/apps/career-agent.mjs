@@ -6,12 +6,13 @@ import {
   careerAgentReviewPlan
 } from "../rules/career-agent.mjs";
 import { queueResources } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const numberInput = value =>
   typeof value === "number" ? value : typeof value === "string" && value.trim() ? Number(value) : NaN;
 function requireGC(actor) {
   if (!game.user?.isGM || !actor.isOwner || actor.type !== "agent")
-    throw new Error("Only an owning GC may settle or correct this mission reward.");
+    throw new Error(loc`Only an owning GC may settle or correct this mission reward.`);
 }
 const state = actor => ({ ...actor.system, usagePeriods: actor.usagePeriods });
 async function holdReview(actor, transaction, error) {
@@ -29,18 +30,18 @@ async function holdReview(actor, transaction, error) {
     await actor.update({ "flags.spycraft2.careerAgentRewardReview": review });
   } catch {
     ui.notifications.warn(
-      "The reward review could not be saved. Keep this actor open and verify the balances with the GC before reloading."
+      loc`The reward review could not be saved. Keep this actor open and verify the balances with the GC before reloading.`
     );
   }
   ui.notifications.warn(
-    "The Career Agent reward needs GC review. Check the actual resource balances and mission receipt before retrying."
+    loc`The Career Agent reward needs GC review. Check the actual resource balances and mission receipt before retrying.`
   );
   return { needsReview: true, id: review.id };
 }
 export async function useCareerAgentReward(actor, options = {}) {
   requireGC(actor);
   if (getCareerAgentReview(actor).needsReview)
-    throw new Error("Review the interrupted Career Agent reward before granting another.");
+    throw new Error(loc`Review the interrupted Career Agent reward before granting another.`);
   const context = () => {
       const s = state(actor),
         source = careerAgentRewardSource(s),
@@ -52,17 +53,18 @@ export async function useCareerAgentReward(actor, options = {}) {
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Career Agent: mission-end reward" },
+      window: { title: loc`Career Agent: mission-end reward` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>Additional mission reward: ${source.field === "reputation" ? "+1 Reputation" : "+$50,000 Net Worth"}, determined by this character’s affiliation. This does not grant the ordinary mission reward or XP.</p><label><input name="missionCompleteConfirmed" type="checkbox" /> The mission has ended</label><label><input name="activeAtMissionEndConfirmed" type="checkbox" /> Career Agent was active when the mission ended</label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Additional mission reward: ${source.field === "reputation" ? loc`+1 Reputation` : loc`+$50,000 Net Worth`}, determined by this character’s affiliation. This does not grant the ordinary mission reward or XP.`}</p><label><input name="missionCompleteConfirmed" type="checkbox" /> ${loc`The mission has ended`}</label><label><input name="activeAtMissionEndConfirmed" type="checkbox" /> ${loc`Career Agent was active when the mission ended`}</label></div>`
     });
     if (!input) return null;
   }
   return queueResources([actor], async () => {
     requireGC(actor);
-    if (getCareerAgentReview(actor).needsReview) throw new Error("Review the interrupted Career Agent reward first.");
+    if (getCareerAgentReview(actor).needsReview)
+      throw new Error(loc`Review the interrupted Career Agent reward first.`);
     if (context() !== expected)
-      throw new Error("The affiliation, mission, source or balance changed while preparing this reward.");
+      throw new Error(loc`The affiliation, mission, source or balance changed while preparing this reward.`);
     const transaction = careerAgentRewardPlan(state(actor), {
         ...input,
         id: foundry.utils.randomID(),
@@ -79,11 +81,11 @@ export async function useCareerAgentReward(actor, options = {}) {
       }
     }
     if (!same(current(), record) || actor.system[field] !== after)
-      return holdReview(actor, transaction, new Error("The saved Career Agent grant is incomplete."));
+      return holdReview(actor, transaction, new Error(loc`The saved Career Agent grant is incomplete.`));
     try {
       return await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
-        content: `Career Agent: additional ${field === "reputation" ? "+1 Reputation" : "+$50,000 Net Worth"} for the completed mission. ${field === "reputation" ? "Reputation" : "Net Worth"}: ${before} → ${after}.`,
+        content: loc`Career Agent: additional ${field === "reputation" ? loc`+1 Reputation` : loc`+$50,000 Net Worth`} for the completed mission. ${field === "reputation" ? loc`Reputation` : loc`Net Worth`}: ${before} → ${after}.`,
         flags: {
           spycraft2: {
             actorUuid: actor.uuid,
@@ -106,7 +108,7 @@ export async function useCareerAgentReward(actor, options = {}) {
           return holdReview(
             actor,
             transaction,
-            new AggregateError([error, rollback], "The Career Agent reward could not be safely restored.")
+            new AggregateError([error, rollback], loc`The Career Agent reward could not be safely restored.`)
           );
       }
       throw error;
@@ -129,9 +131,9 @@ export async function reviewCareerAgentReward(actor, options = {}) {
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review Career Agent reward" },
+      window: { title: loc`Review Career Agent reward` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${esc(saved.reason)}</p><p>Review the actual balances and any posted receipt. Enter final balances; this control does not add the reward again.</p><label>Reputation <input name="reputation" type="number" step="1" value="${actor.system.reputation}" /></label><label>Net Worth <input name="netWorth" type="number" step="1" value="${actor.system.netWorth}" /></label><label>Mission reward <select name="retainReward"><option value="retain">Keep recorded: prevent another claim</option><option value="clear">Clear: allow a later claim</option></select></label><label>Resolution / source <input name="reason" maxlength="1000" required /></label><label><input name="confirmed" type="checkbox" /> I confirmed both actual balances and the mission reward disposition</label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${esc(saved.reason)}</p><p>${loc`Review the actual balances and any posted receipt. Enter final balances; this control does not add the reward again.`}</p><label>${loc`Reputation`} <input name="reputation" type="number" step="1" value="${actor.system.reputation}" /></label><label>${loc`Net Worth`} <input name="netWorth" type="number" step="1" value="${actor.system.netWorth}" /></label><label>${loc`Mission reward`} <select name="retainReward"><option value="retain">${loc`Keep recorded: prevent another claim`}</option><option value="clear">${loc`Clear: allow a later claim`}</option></select></label><label>${loc`Resolution / source`} <input name="reason" maxlength="1000" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`I confirmed both actual balances and the mission reward disposition`}</label></div>`
     });
     if (!input) return null;
     input = {
@@ -143,7 +145,7 @@ export async function reviewCareerAgentReward(actor, options = {}) {
   }
   return queueResources([actor], async () => {
     requireGC(actor);
-    if (snapshot() !== expected) throw new Error("The resource balances or reward history changed during review.");
+    if (snapshot() !== expected) throw new Error(loc`The resource balances or reward history changed during review.`);
     const plan = careerAgentReviewPlan(getCareerAgentReview(actor), input),
       reviewed = {
         ...saved,
@@ -182,7 +184,7 @@ export async function reviewCareerAgentReward(actor, options = {}) {
       }
     }
     if (!committed()) {
-      const error = new Error("The Career Agent review did not save all final balances and reward history.");
+      const error = new Error(loc`The Career Agent review did not save all final balances and reward history.`);
       await holdReview(actor, saved.transaction, error);
       throw error;
     }

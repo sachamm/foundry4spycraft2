@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "format": "prettier --write \"**/*.mjs\"",
     "format:check": "prettier --check \"**/*.mjs\"",
-    "check:schemas": "node tools/check-schemas.mjs"
+    "check:schemas": "node tools/check-schemas.mjs",
+    "strings": "node tools/extract-strings.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

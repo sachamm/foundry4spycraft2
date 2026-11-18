@@ -4,6 +4,7 @@
  * ±10 per round. Delay, Press and a triggered Ready change the Count at once.
  */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 const F = GC_DATA.core.fluidInitiative;
 const D = GC_DATA.core.dramaticScene;
@@ -18,14 +19,14 @@ const count = value => Number.isSafeInteger(value);
  */
 export function fluidModifier(id, { times = 1, amount = null, weapon = "", intBonus = 0 } = {}) {
   const event = eventById(id);
-  if (!event) throw new Error("Unknown fluid initiative event.");
-  if (!count(times) || times < 1) throw new Error("Enter how many times the event applies.");
+  if (!event) throw new Error(loc`Unknown fluid initiative event.`);
+  if (!count(times) || times < 1) throw new Error(loc`Enter how many times the event applies.`);
   let value;
   if (event.variable === "regroup") value = 5 + Math.max(0, count(intBonus) ? intBonus : 0);
   else if (event.variable === "diversion") {
-    if (!count(amount) || amount < 1 || amount > 8) throw new Error("Enter the rolled 1d4 (or 2d4) Count loss.");
+    if (!count(amount) || amount < 1 || amount > 8) throw new Error(loc`Enter the rolled 1d4 (or 2d4) Count loss.`);
     value = -amount;
-  } else if (event.setCount) throw new Error("A triggered Ready action sets the Count directly.");
+  } else if (event.setCount) throw new Error(loc`A triggered Ready action sets the Count directly.`);
   else value = event.amount * (event.oncePerRound ? 1 : times);
   return {
     id,
@@ -42,12 +43,12 @@ export function fluidModifier(id, { times = 1, amount = null, weapon = "", intBo
 export function addFluidModifier(list, modifier) {
   const current = [...(list ?? [])];
   if (modifier.oncePerRound && current.some(entry => entry.id === modifier.id))
-    return { list: current, added: false, reason: `${modifier.label} applies only once per round.` };
+    return { list: current, added: false, reason: loc`${modifier.label} applies only once per round.` };
   if (
     modifier.id === "unproficient" &&
     current.some(entry => entry.id === "unproficient" && (entry.weapon ?? "") === (modifier.weapon ?? ""))
   )
-    return { list: current, added: false, reason: "That weapon’s proficiency penalty already applied this round." };
+    return { list: current, added: false, reason: loc`That weapon’s proficiency penalty already applied this round.` };
   current.push(modifier);
   return { list: current, added: true };
 }
@@ -79,24 +80,24 @@ export function thresholds(value) {
 
 /** Delay: lower the Count by 1 per use, at most Initiative bonus + 10 times a round, never below 5. */
 export function delay(countNow, steps, { initiativeBonus = 0, usedThisRound = 0 } = {}) {
-  if (!count(steps) || steps < 1) throw new Error("Enter how many Counts to delay.");
+  if (!count(steps) || steps < 1) throw new Error(loc`Enter how many Counts to delay.`);
   const limit = Math.max(0, initiativeBonus + 10 - usedThisRound);
-  if (steps > limit) throw new Error(`Only ${limit} more Delay action(s) are available this round.`);
-  if (countNow - steps < F.delayFloor) throw new Error(`Delay cannot lower the Count below ${F.delayFloor}.`);
+  if (steps > limit) throw new Error(loc`Only ${limit} more Delay action(s) are available this round.`);
+  if (countNow - steps < F.delayFloor) throw new Error(loc`Delay cannot lower the Count below ${F.delayFloor}.`);
   return { count: countNow - steps, used: usedThisRound + steps };
 }
 
 /** Press: Count 25+, once per round, −20 for one extra half action now. */
 export function press(countNow, { pressedThisRound = false } = {}) {
-  if (pressedThisRound) throw new Error("A character may Press only once per round.");
+  if (pressedThisRound) throw new Error(loc`A character may Press only once per round.`);
   if (countNow < F.pressMinimumCount)
-    throw new Error(`Press needs an Initiative Count of ${F.pressMinimumCount} or higher.`);
+    throw new Error(loc`Press needs an Initiative Count of ${F.pressMinimumCount} or higher.`);
   return { count: countNow - F.pressCost };
 }
 
 /** Ready: when the trigger happens at a lower Count, the character drops to it; otherwise unchanged. */
 export function readyTrigger(countNow, triggerCount) {
-  if (!Number.isFinite(triggerCount)) throw new Error("Enter the Count at which the trigger occurred.");
+  if (!Number.isFinite(triggerCount)) throw new Error(loc`Enter the Count at which the trigger occurred.`);
   return { count: Math.min(countNow, triggerCount) };
 }
 
@@ -123,9 +124,10 @@ export function dramaticInitiative(countNow) {
 /** Surprise round (p.323): only members of the winning group act, with one free, half or full action that cannot be split. */
 export function surpriseRound({ groups, aware = "none", actingGroup = null }) {
   if (aware === "all")
-    return { occurs: false, winners: [], reason: "All groups are aware of each other: no surprise round." };
+    return { occurs: false, winners: [], reason: loc`All groups are aware of each other: no surprise round.` };
   const valid = (groups ?? []).filter(group => group?.id && Number.isFinite(group.result));
-  if (valid.length < 2) throw new Error("Enter an opposed Blend/Stealth or Sneak/Hide result for at least two groups.");
+  if (valid.length < 2)
+    throw new Error(loc`Enter an opposed Blend/Stealth or Sneak/Hide result for at least two groups.`);
   const best = Math.max(...valid.map(group => group.result)),
     top = valid.filter(group => group.result === best);
   if (top.length > 1)
@@ -133,13 +135,13 @@ export function surpriseRound({ groups, aware = "none", actingGroup = null }) {
       occurs: false,
       winners: [],
       tie: top.map(group => group.id),
-      reason: "The opposed check is tied: break the tie (p.91) and enter the results again."
+      reason: loc`The opposed check is tied: break the tie (p.91) and enter the results again.`
     };
   if (aware === "some") {
-    if (!actingGroup) throw new Error("Choose the group that is trying to conceal itself.");
+    if (!actingGroup) throw new Error(loc`Choose the group that is trying to conceal itself.`);
     return top[0].id === actingGroup
       ? { occurs: true, winners: [actingGroup] }
-      : { occurs: false, winners: [], reason: "The acting group lost the opposed check: no surprise round." };
+      : { occurs: false, winners: [], reason: loc`The acting group lost the opposed check: no surprise round.` };
   }
   return { occurs: true, winners: [top[0].id] };
 }

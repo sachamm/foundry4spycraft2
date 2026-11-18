@@ -1,17 +1,18 @@
+import { loc } from "../i18n.mjs";
 const validId = id =>
   typeof id === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(id) && !["constructor", "prototype", "__proto__"].includes(id);
 export function vitalitySource(actor, index) {
   if (!Number.isSafeInteger(index) || index < 1 || index >= (actor.system.progression?.length ?? 0))
-    throw new Error("Career Level 1 vitality is automatic maximum; choose an existing higher career level (p.60).");
+    throw new Error(loc`Career Level 1 vitality is automatic maximum; choose an existing higher career level (p.60).`);
   const entry = actor.system.progression[index],
     cls = actor.items.find(i => i.type === "class" && (i.system.identifier || i.name) === entry.classId),
     die = cls?.system.vitalityDie;
   if (!cls || !Number.isSafeInteger(die) || die < 2 || !Number.isSafeInteger(entry.vitality) || entry.vitality < 0)
-    throw new Error("Review this career level and its class vitality die.");
+    throw new Error(loc`Review this career level and its class vitality die.`);
   const levelId = entry.vitalityRollId ?? "",
     reviewId = entry.vitalityReviewId ?? "";
   if ((levelId && !validId(levelId)) || (reviewId && !validId(reviewId)))
-    throw new Error("Review this career level’s vitality references.");
+    throw new Error(loc`Review this career level’s vitality references.`);
   return {
     index,
     careerLevel: index + 1,
@@ -34,7 +35,7 @@ export function vitalityRollRecord(actor, source, roll, at) {
     roll.formula !== `1d${source.die}` ||
     !Number.isFinite(at)
   )
-    throw new Error("The actual raw vitality roll does not match its class die.");
+    throw new Error(loc`The actual raw vitality roll does not match its class die.`);
   return {
     version: 1,
     id: source.levelId,
@@ -81,9 +82,9 @@ export function vitalityReviewRecord(actor, source, { value, note, confirmed } =
     !Number.isFinite(at)
   )
     throw new Error(
-      "Confirm the actual raw die result (1–" +
+      loc`Confirm the actual raw die result (1–` +
         source.die +
-        ") and a bounded source/review note; Constitution and other bonuses apply separately."
+        loc`) and a bounded source/review note; Constitution and other bonuses apply separately.`
     );
   return {
     version: 1,

@@ -1,6 +1,7 @@
 import { terrainCoverPlan, validateTerrainCoverProof } from "./terrain-cover.mjs";
 import { validOwnCountClock, ownCountDurationActive } from "./own-count-duration.mjs";
 import { coverPlan } from "./cover.mjs";
+import { loc } from "../i18n.mjs";
 const validId = s => typeof s === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(s);
 function terrainRecordCover(system, r) {
   if (!r.terrainCover) return coverPlan({ personalCover: r.personalCover, sceneryCover: r.sceneryCover });
@@ -11,7 +12,7 @@ function terrainRecordCover(system, r) {
   if (c?.partialSubmersionCover === true) active.push("Aquatic Training");
   validateTerrainCoverProof({ ...system, activeFeatNames: active }, p);
   if (r.personalCover !== p.personalCover || r.sceneryCover !== p.sceneryCover || r.reflexBonus !== p.grade)
-    throw new Error("The saved terrain cover grades changed.");
+    throw new Error(loc`The saved terrain cover grades changed.`);
   const current = terrainCoverPlan(system, {
     ...c,
     homeTurfCover: c.homeTurfCover && system.activeFeatNames?.includes("Home Turf") === true,
@@ -43,13 +44,19 @@ export function superiorCoverState(system) {
       penalty: 0,
       dr: 0,
       needsReview: true,
-      reason: "Review the saved Superior Cover declaration before attack or skill checks."
+      reason: loc`Review the saved Superior Cover declaration before attack or skill checks.`
     };
   let cover;
   try {
     cover = terrainRecordCover(system, r);
   } catch {
-    return { active: false, penalty: 0, dr: 0, needsReview: true, reason: "Review the saved Superior Cover grades." };
+    return {
+      active: false,
+      penalty: 0,
+      dr: 0,
+      needsReview: true,
+      reason: loc`Review the saved Superior Cover grades.`
+    };
   }
   if ((!r.terrainCover && r.reflexBonus !== cover.reflexBonus) || (!r.coverLost && cover.reflexBonus === 0))
     return {
@@ -57,7 +64,7 @@ export function superiorCoverState(system) {
       penalty: 0,
       dr: 0,
       needsReview: true,
-      reason: "Review the saved Superior Cover Reflex bonus."
+      reason: loc`Review the saved Superior Cover Reflex bonus.`
     };
   const active = ownCountDurationActive(r, c);
   return {
@@ -83,9 +90,9 @@ export function superiorCoverPlan(
     terrainCoverConfirmed = false
   } = {}
 ) {
-  if (!system.activeFeatNames?.includes("Superior Cover")) throw new Error("Superior Cover has not been earned.");
+  if (!system.activeFeatNames?.includes("Superior Cover")) throw new Error(loc`Superior Cover has not been earned.`);
   if (!validOwnCountClock(combat) || combat.turn !== combat.ownTurnIndex)
-    throw new Error("Declare Superior Cover during this character’s Initiative Count in a started combat.");
+    throw new Error(loc`Declare Superior Cover during this character’s Initiative Count in a started combat.`);
   const cover = coverPlan({
     personalCover,
     sceneryCover,
@@ -95,11 +102,11 @@ export function superiorCoverPlan(
     partialSubmersionCover,
     terrainCoverConfirmed
   });
-  if (!cover.reflexBonus) throw new Error("Superior Cover requires actual cover.");
+  if (!cover.reflexBonus) throw new Error(loc`Superior Cover requires actual cover.`);
   if (confirmed !== true || typeof note !== "string" || !note.trim() || note.length > 300)
-    throw new Error("Confirm the current cover, its source and the full-round attack/skill penalty.");
+    throw new Error(loc`Confirm the current cover, its source and the full-round attack/skill penalty.`);
   if (superiorCoverState(system).needsReview)
-    throw new Error("Review the existing Superior Cover declaration before replacing it.");
+    throw new Error(loc`Review the existing Superior Cover declaration before replacing it.`);
   return {
     version: 1,
     combatId: combat.id,
@@ -129,9 +136,9 @@ export function superiorCoverReviewPlan(
 ) {
   const state = superiorCoverState(system);
   if (state.needsReview || !state.active)
-    throw new Error("Superior Cover is not an active valid full-round declaration.");
+    throw new Error(loc`Superior Cover is not an active valid full-round declaration.`);
   if (confirmed !== true || typeof note !== "string" || !note.trim() || note.length > 300)
-    throw new Error("Confirm the actual current cover and a source/review note.");
+    throw new Error(loc`Confirm the actual current cover and a source/review note.`);
   const cover = coverPlan({
     personalCover,
     sceneryCover,
@@ -142,7 +149,7 @@ export function superiorCoverReviewPlan(
     terrainCoverConfirmed
   });
   if (state.coverLost && cover.reflexBonus > 0)
-    throw new Error("Losing cover ended this DR benefit. A new declaration requires your Initiative Count.");
+    throw new Error(loc`Losing cover ended this DR benefit. A new declaration requires your Initiative Count.`);
   const { terrainCover: priorTerrainCover, ...prior } = system.superiorCover;
   return {
     ...prior,

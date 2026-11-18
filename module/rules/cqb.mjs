@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 const rangedProficiencies = new Set([
   "guided",
   "handgun",
@@ -29,7 +30,7 @@ export function cqbRangePlan(system, weapon, { distanceFeet, targetOpponentConfi
   if (!active) return empty;
   const range = system.cqbRange ?? 30;
   if (!Number.isFinite(range) || range < 0)
-    throw new Error("Resolve current CQB Range before using its feat benefits.");
+    throw new Error(loc`Resolve current CQB Range before using its feat benefits.`);
   const supplied =
       distanceFeet !== undefined &&
       distanceFeet !== null &&
@@ -41,8 +42,9 @@ export function cqbRangePlan(system, weapon, { distanceFeet, targetOpponentConfi
           ? Number(distanceFeet)
           : NaN;
   if (supplied && (!Number.isFinite(distance) || distance < 0))
-    throw new Error("Enter a finite nonnegative CQB target distance.");
-  if (typeof targetOpponentConfirmed !== "boolean") throw new Error("Confirm whether this attack targets an opponent.");
+    throw new Error(loc`Enter a finite nonnegative CQB target distance.`);
+  if (typeof targetOpponentConfirmed !== "boolean")
+    throw new Error(loc`Confirm whether this attack targets an opponent.`);
   const within = supplied && distance <= range,
     attackBonus = basics && within ? 1 : 0,
     damageBonus = attackBonus,
@@ -62,10 +64,10 @@ export function cqbRangePlan(system, weapon, { distanceFeet, targetOpponentConfi
     threatIncrease,
     notes: [
       !supplied
-        ? "CQB range not measured; resolve range-dependent benefits after confirming target distance."
+        ? loc`CQB range not measured; resolve range-dependent benefits after confirming target distance.`
         : within
-          ? `CQB Range: target ${distance} ft. within ${range} ft.${basics ? (kind === "damage" ? " CQB Basics: damage +1." : " CQB Basics: attack +1, damage +1 when resolved.") : ""}${threatIncrease ? " CQB Mastery: opponent threat range +1." : mastery && kind === "attack" ? " Confirm an opponent target before applying CQB Mastery’s threat benefit." : ""}`
-          : `CQB Range: target ${distance} ft. beyond ${range} ft.; no CQB range bonus.`
+          ? loc`CQB Range: target ${distance} ft. within ${range} ft.${basics ? (kind === "damage" ? loc` CQB Basics: damage +1.` : loc` CQB Basics: attack +1, damage +1 when resolved.`) : ""}${threatIncrease ? loc` CQB Mastery: opponent threat range +1.` : mastery && kind === "attack" ? loc` Confirm an opponent target before applying CQB Mastery’s threat benefit.` : ""}`
+          : loc`CQB Range: target ${distance} ft. beyond ${range} ft.; no CQB range bonus.`
     ]
   };
 }
@@ -75,7 +77,7 @@ export function meleeFirePlan(system, weapon, { firingOutOfMelee = false, firing
   const ranged = cqbRangedWeapon(weapon);
   if (!ranged) return { applies: false, attackPenalty: 0, errorIncrease: 0, notes: [] };
   if ([firingOutOfMelee, firingIntoMelee].some(v => typeof v !== "boolean"))
-    throw new Error("Declare into/out-of-melee firing with the actual checkboxes.");
+    throw new Error(loc`Declare into/out-of-melee firing with the actual checkboxes.`);
   const basics = system.activeFeatNames?.includes("CQB Basics") === true,
     mastery = system.activeFeatNames?.includes("CQB Mastery") === true,
     outPenalty = firingOutOfMelee && !basics,
@@ -93,15 +95,15 @@ export function meleeFirePlan(system, weapon, { firingOutOfMelee = false, firing
       ...(firingOutOfMelee
         ? [
             basics
-              ? "CQB Basics waives firing out of melee’s −4 attack/+2 error."
-              : "Firing out of melee: attack −4; error range +2."
+              ? loc`CQB Basics waives firing out of melee’s −4 attack/+2 error.`
+              : loc`Firing out of melee: attack −4; error range +2.`
           ]
         : []),
       ...(firingIntoMelee
         ? [
             mastery
-              ? "CQB Mastery waives firing into melee’s −4 attack/+2 error."
-              : "Firing into melee: attack −4; error range +2."
+              ? loc`CQB Mastery waives firing into melee’s −4 attack/+2 error.`
+              : loc`Firing into melee: attack −4; error range +2.`
           ]
         : [])
     ]

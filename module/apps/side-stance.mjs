@@ -3,6 +3,7 @@ import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   stable = v =>
@@ -36,7 +37,7 @@ export async function grantSideStanceFeint(actor, settlement, feint) {
 export function validateSideStanceSources(actor, proof) {
   const rows = sideStanceRows(actor.system).filter(r => proof.sourceMessages.includes(r.sourceMessage));
   if (rows.length !== proof.sourceMessages.length || !rows.some(r => r.targetUuid === proof.targetUuid))
-    throw Error("The recorded Side Stance Feint sources changed.");
+    throw Error(loc`The recorded Side Stance Feint sources changed.`);
   for (const r of rows) {
     const a = message(r.sourceMessage)?.flags?.spycraft2,
       d = message(r.defenderMessage)?.flags?.spycraft2,
@@ -65,7 +66,7 @@ export function validateSideStanceSources(actor, proof) {
       stable([rollEvidence(a), rollEvidence(d)]) !== stable(r.sourceEvidence) ||
       stable(s.sourceEvidence) !== stable(r.sourceEvidence)
     )
-      throw Error("The successful Feint made in Side Stance changed before the attack.");
+      throw Error(loc`The successful Feint made in Side Stance changed before the attack.`);
   }
   return rows;
 }
@@ -78,7 +79,7 @@ export function sideStanceAttackRoot(actor, proof, receipt, { replacing = false 
     (replacing && (first.resolved || first.superseded)) ||
     stable(first.attackContext?.sideStance) !== stable(proof)
   )
-    throw Error("Use the actual original Side Stance attack.");
+    throw Error(loc`Use the actual original Side Stance attack.`);
   const rows = validateSideStanceSources(actor, proof),
     wanted = new Set(rows.map(r => r.receiptUuid)),
     seen = new Set();
@@ -98,7 +99,7 @@ export function sideStanceAttackRoot(actor, proof, receipt, { replacing = false 
       break;
     current = previous;
   }
-  throw Error("The recorded Side Stance benefit does not belong to this attack.");
+  throw Error(loc`The recorded Side Stance benefit does not belong to this attack.`);
 }
 export function hasSideStanceLease(actor, proof, lease) {
   const p = lease && leases.get(lease);
@@ -111,7 +112,7 @@ export function validateSideStanceAttackProof(
 ) {
   if (!proof) return;
   if (checkKind !== "attack" || proof.targetUuid !== targetOf(attackContext, finalAttack))
-    throw Error("The Side Stance die must use its recorded opposing character.");
+    throw Error(loc`The Side Stance die must use its recorded opposing character.`);
   if (rerollOf) {
     const origin = message(rerollOf);
     if (proof.dice === 1) sideStanceAttackRoot(actor, proof, origin, { replacing: true });
@@ -125,7 +126,7 @@ export function validateSideStanceAttackProof(
         proof.dice !== 0 ||
         stable(c.attackContext?.sideStance) !== stable(proof)
       )
-        throw Error("Use the original attack for this Side Stance replacement.");
+        throw Error(loc`Use the original attack for this Side Stance replacement.`);
     }
     return;
   }
@@ -139,9 +140,9 @@ export function validateSideStanceAttackProof(
       !attackCharacterTargetChoices().some(a => a.uuid === proof.targetUuid) ||
       !hasSideStanceLease(actor, proof, lease)
     )
-      throw Error("Reserve the Side Stance die for the actual observed opponent through its attack.");
+      throw Error(loc`Reserve the Side Stance die for the actual observed opponent through its attack.`);
     const rows = validateSideStanceSources(actor, proof);
-    if (rows.some(r => r.usedBy !== proof.attemptId)) throw Error("This Side Stance die belongs to another attack.");
+    if (rows.some(r => r.usedBy !== proof.attemptId)) throw Error(loc`This Side Stance die belongs to another attack.`);
   }
 }
 export async function withSideStanceAttack(actor, proof, perform) {
@@ -149,7 +150,7 @@ export async function withSideStanceAttack(actor, proof, perform) {
   await queueRuleState(actor, async () => {
     assertSideStancePlan(actor.system, proof, { targetUuid: proof.targetUuid });
     const rows = validateSideStanceSources(actor, proof);
-    if (rows.some(r => r.usedBy != null)) throw Error("The pending Side Stance die was already consumed.");
+    if (rows.some(r => r.usedBy != null)) throw Error(loc`The pending Side Stance die was already consumed.`);
     await actor.update({
       "system.sideStanceFeints": sideStanceRows(actor.system).map(r =>
         proof.sourceMessages.includes(r.sourceMessage) ? { ...r, usedBy: proof.attemptId } : r
@@ -169,7 +170,7 @@ export async function withSideStanceAttack(actor, proof, perform) {
       queueRuleState(actor, async () => {
         const rows = sideStanceRows(actor.system);
         if (rows.filter(r => proof.sourceMessages.includes(r.sourceMessage)).some(r => r.usedBy !== proof.attemptId))
-          throw Error("The reserved Side Stance die changed; ask the GC to review it.");
+          throw Error(loc`The reserved Side Stance die changed; ask the GC to review it.`);
         await actor.update({
           "system.sideStanceFeints": rows.map(r =>
             proof.sourceMessages.includes(r.sourceMessage)
@@ -193,7 +194,7 @@ export async function withSideStanceAttack(actor, proof, perform) {
     } catch (cleanup) {
       throw new AggregateError(
         [error, cleanup],
-        "The Side Stance attack needs GC review; inspect its receipt before retrying."
+        loc`The Side Stance attack needs GC review; inspect its receipt before retrying.`
       );
     }
     if (receipt) return receipt;
@@ -205,8 +206,9 @@ export async function withSideStanceAttack(actor, proof, perform) {
 }
 export async function reviewSideStanceAttack(actor, { attemptId, confirmed = false } = {}) {
   if (!game.user.isGM || !actor.isOwner || confirmed !== true)
-    throw Error("The GC must confirm the interrupted Side Stance attack was reviewed.");
-  if (active.has(actor.uuid + ":" + attemptId)) throw Error("This client is still executing that Side Stance attack.");
+    throw Error(loc`The GC must confirm the interrupted Side Stance attack was reviewed.`);
+  if (active.has(actor.uuid + ":" + attemptId))
+    throw Error(loc`This client is still executing that Side Stance attack.`);
   return queueRuleState(actor, async () => {
     const rows = sideStanceRows(actor.system),
       pending = rows.filter(r => r.usedBy === attemptId && !r.receiptUuid);
@@ -217,14 +219,14 @@ export async function reviewSideStanceAttack(actor, { attemptId, confirmed = fal
         m.flags.spycraft2.checkKind === "attack" &&
         m.flags.spycraft2.attackContext?.sideStance?.attemptId === attemptId
     );
-    if (posted.length > 1) throw Error("Multiple Side Stance attack receipts require manual GC review.");
+    if (posted.length > 1) throw Error(loc`Multiple Side Stance attack receipts require manual GC review.`);
     const receipt = posted[0],
       bound = rows
         .filter(r => r.usedBy === attemptId)
         .map(r => r.sourceMessage)
         .sort();
     if (receipt && stable(receipt.flags.spycraft2.attackContext.sideStance.sourceMessages) !== stable(bound))
-      throw Error("The Side Stance attack does not match this interrupted die.");
+      throw Error(loc`The Side Stance attack does not match this interrupted die.`);
     await actor.update({
       "system.sideStanceFeints": rows.map(r =>
         r.usedBy === attemptId ? { ...r, usedBy: receipt ? attemptId : null, receiptUuid: receipt?.uuid ?? null } : r

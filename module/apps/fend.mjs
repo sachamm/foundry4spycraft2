@@ -2,6 +2,7 @@ import { validRecordedMeleeTrick } from "../rules/melee-tricks.mjs";
 import { fendTiming, fendMovementPlan, validFendTiming, sameFendTiming, stableFend as stable } from "../rules/fend.mjs";
 import { stanceMovementState } from "../rules/stance-movement.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
+import { loc } from "../i18n.mjs";
 const messages = () => [...(game.messages ?? [])],
   message = uuid => globalThis.fromUuidSync?.(uuid) ?? messages().find(m => m.uuid === uuid),
   visible = m => m && m.visible !== false && m.isContentVisible !== false && (!m.blind || game.user.isGM);
@@ -34,7 +35,7 @@ export function fendSource(actor, reference) {
     !validRecordedMeleeTrick(p, c.attackContext) ||
     c.attackContext.disarm?.active === true
   )
-    throw Error("Choose your actual readable, finished Standard Attack declared with Fend, hit or miss.");
+    throw Error(loc`Choose your actual readable, finished Standard Attack declared with Fend, hit or miss.`);
   const initial = stable(declaration(c)),
     seen = new Set();
   let root = m;
@@ -47,14 +48,14 @@ export function fendSource(actor, reference) {
       x?.actorUuid !== actor.uuid ||
       stable(declaration(x)) !== initial
     )
-      throw Error("The original Fend attack or its declaration changed.");
+      throw Error(loc`The original Fend attack or its declaration changed.`);
     if (!x.rerollOf) break;
     const previous = message(x.rerollOf);
     if (previous?.flags?.spycraft2?.superseded !== root.uuid)
-      throw Error("Use the actually adopted original Fend attack replacement.");
+      throw Error(loc`Use the actually adopted original Fend attack replacement.`);
     root = previous;
   }
-  if (!root || root.flags.spycraft2.rerollOf) throw Error("The original Fend attack is missing or cyclic.");
+  if (!root || root.flags.spycraft2.rerollOf) throw Error(loc`The original Fend attack is missing or cyclic.`);
   if (
     p.timing.combat
       ? c.rollCombat?.id !== p.timing.combat.id ||
@@ -62,7 +63,7 @@ export function fendSource(actor, reference) {
         c.rollCombat?.combatantId !== p.timing.combat.combatantId
       : c.rollCombat != null
   )
-    throw Error("The Fend declaration and actual attack combat source disagree.");
+    throw Error(loc`The Fend declaration and actual attack combat source disagree.`);
   return {
     message: m,
     facts: {
@@ -82,7 +83,7 @@ export function fendSource(actor, reference) {
 export function fendRows(actor) {
   const rows = actor.flags?.spycraft2?.fendMovements ?? [],
     roots = new Set();
-  if (!Array.isArray(rows)) throw Error("Review the completed Fend movement history.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the completed Fend movement history.`);
   for (const r of rows) {
     const p = r?.proof,
       m = p?.movement,
@@ -116,7 +117,7 @@ export function fendRows(actor) {
       m.movementCompleted !== true ||
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid))
     )
-      throw Error("Review the saved Fend source,5ft movement and completed round total.");
+      throw Error(loc`Review the saved Fend source,5ft movement and completed round total.`);
     roots.add(p.rootAttackUuid);
   }
   return rows;
@@ -128,7 +129,7 @@ function posted(actor, row) {
       m.flags.spycraft2.checkKind === "fendMovement" &&
       m.flags.spycraft2.fendMovement?.id === row.id
   );
-  if (all.length > 1) throw Error("Review duplicate Fend movement receipts.");
+  if (all.length > 1) throw Error(loc`Review duplicate Fend movement receipts.`);
   const m = all[0];
   if (
     m &&
@@ -140,20 +141,19 @@ function posted(actor, row) {
       stable(m.flags.spycraft2.fendMovement) !== stable({ id: row.id, ...row.proof }) ||
       (row.receiptUuid && row.receiptUuid !== m.uuid))
   )
-    throw Error("The original Fend movement receipt changed.");
+    throw Error(loc`The original Fend movement receipt changed.`);
   return m ?? null;
 }
 async function recordReceipt(actor, row) {
   let m = posted(actor, row);
-  if (!m && row.receiptUuid) throw Error("Review the missing original Fend movement receipt; do not move again.");
+  if (!m && row.receiptUuid) throw Error(loc`Review the missing original Fend movement receipt; do not move again.`);
   if (!m)
     try {
       m = await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
         blind: row.proof.visibility.blind,
         whisper: row.proof.visibility.whisper,
-        content:
-          "Fend (p.179): confirmed completed5ft movement immediately after the recorded Standard Attack. The completed round movement total is recorded once. This receipt does not move a token or grant another action.",
+        content: loc`Fend (p.179): confirmed completed5ft movement immediately after the recorded Standard Attack. The completed round movement total is recorded once. This receipt does not move a token or grant another action.`,
         flags: {
           spycraft2: {
             actorUuid: actor.uuid,
@@ -168,7 +168,7 @@ async function recordReceipt(actor, row) {
       if (!m) throw e;
     }
   if (!m || posted(actor, row)?.uuid !== m.uuid)
-    throw Error("The completed Fend movement needs its original receipt reviewed.");
+    throw Error(loc`The completed Fend movement needs its original receipt reviewed.`);
   if (row.receiptUuid !== m.uuid) {
     const rows = fendRows(actor);
     await actor.update({
@@ -191,24 +191,24 @@ export async function recordFendMovement(actor, input = {}) {
         }
       });
     if (!choices.length) {
-      ui.notifications.info?.("No finished attack declared with Fend is available.");
+      ui.notifications.info?.(loc`No finished attack declared with Fend is available.`);
       return null;
     }
     const timing = fendTiming(actor),
       state = stanceMovementState({ ...actor.system, worldTime: timing.worldTime }, timing.combat);
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Record Fend movement" },
+      window: { title: loc`Record Fend movement` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Finish the actual Standard Attack declared with Fend, hit or miss. Confirm its legal5ft move completed immediately afterward. First use Record round movement for all earlier movement this round. Resolve the route and move the token at the table first; this control records completed movement and does not grant an action or move again. Respect all current conditions and stance round limits. A Recorded source is review only: do not move again.</p><label>Recorded Fend attack <select name="sourceMessage">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Finish the actual Standard Attack declared with Fend, hit or miss. Confirm its legal5ft move completed immediately afterward. First use Record round movement for all earlier movement this round. Resolve the route and move the token at the table first; this control records completed movement and does not grant an action or move again. Respect all current conditions and stance round limits. A Recorded source is review only: do not move again.`}</p><label>${loc`Recorded Fend attack`} <select name="sourceMessage">` +
         choices
           .map(({ m, s }, i) => {
             const old = history.find(r => r.proof.rootAttackUuid === s.facts.rootAttackUuid),
               label = old
                 ? old.receiptUuid
-                  ? "Recorded — review only"
-                  : "Recorded — recover receipt"
-                : "New completed Fend move",
+                  ? loc`Recorded — review only`
+                  : loc`Recorded — recover receipt`
+                : loc`New completed Fend move`,
               weapon =
                 actor.items?.get?.(m.flags.spycraft2.attackContext.meleeTrick.weaponId)?.name ?? "Recorded polearm",
               when = s.facts.originalTiming.combat ? "round " + s.facts.originalTiming.combat.round : "outside combat";
@@ -221,11 +221,11 @@ export async function recordFendMovement(actor, input = {}) {
             );
           })
           .join("") +
-        "</select></label><p>Current recorded round movement " +
+        `</select></label><p>${loc`Current recorded round movement`} ` +
         state.feet +
-        'ft.</p><label>New total completed movement this round, including Fend (ft.) <input name="totalFeet" type="number" min="0" step="any" value="' +
+        `${loc`ft.`}</p><label>${loc`New total completed movement this round, including Fend (ft.)`} <input name="totalFeet" type="number" min="0" step="any" value="` +
         (state.feet + 5) +
-        '" /></label><label><input name="routeConfirmed" type="checkbox" /> The GC confirms this legal5ft route and its actual destination, terrain and posture</label><label><input name="movementCompleted" type="checkbox" /> This5ft move was completed exactly once as part of Fend</label><label><input name="immediateConfirmed" type="checkbox" /> It immediately followed that Standard Attack with no intervening action; a previously recorded move is only being reviewed</label></div>'
+        `" /></label><label><input name="routeConfirmed" type="checkbox" /> ${loc`The GC confirms this legal5ft route and its actual destination, terrain and posture`}</label><label><input name="movementCompleted" type="checkbox" /> ${loc`This5ft move was completed exactly once as part of Fend`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`It immediately followed that Standard Attack with no intervening action; a previously recorded move is only being reviewed`}</label></div>`
     });
     if (!input) return null;
   }
@@ -241,13 +241,13 @@ export async function recordFendMovement(actor, input = {}) {
     actor,
     async () => {
       const fresh = fendSource(actor, source.message);
-      if (stable(fresh.facts) !== expected) throw Error("The Fend attack changed while recording its movement.");
+      if (stable(fresh.facts) !== expected) throw Error(loc`The Fend attack changed while recording its movement.`);
       const rows = fendRows(actor),
         prior = rows.find(r => r.proof.rootAttackUuid === fresh.facts.rootAttackUuid);
       if (prior) {
         const { movement, ...facts } = prior.proof;
         if (stable(facts) !== expected)
-          throw Error("This original attack already has a different completed Fend source.");
+          throw Error(loc`This original attack already has a different completed Fend source.`);
         return recordReceipt(actor, prior);
       }
       const movement = fendMovementPlan(actor.system, {

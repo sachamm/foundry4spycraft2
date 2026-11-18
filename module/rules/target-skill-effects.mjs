@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Opposing target effects: Silver Tongue p.205; Zeroed p.196; Faceless p.195. */
 export function targetSkillEffectApplicable(system, key) {
   return (
@@ -22,18 +23,18 @@ export function targetSkillEffectPlan(
     !actorName.trim() ||
     confirmed !== true
   )
-    return reject("Choose an actual target character and confirm with the GC that this skill check targets them.");
+    return reject(loc`Choose an actual target character and confirm with the GC that this skill check targets them.`);
   if (!targetSystem || !targetSkillEffectApplicable(targetSystem, key))
-    return reject("The selected target no longer has an applicable target feat source for this skill.");
+    return reject(loc`The selected target no longer has an applicable target feat source for this skill.`);
   if (typeof purpose !== "string" || !["", "past", "location", "intentions", "motives"].includes(purpose))
-    return reject("Choose a listed information-gathering purpose.");
+    return reject(loc`Choose a listed information-gathering purpose.`);
   if (purpose && !targetSystem.activeFeatNames?.includes("Faceless"))
-    return reject("The selected target no longer has Faceless for this information-gathering check.");
+    return reject(loc`The selected target no longer has Faceless for this information-gathering check.`);
   const sources = [];
   if (purpose) sources.push({ source: "Faceless", purpose, timeMultiplier: 3 });
   if (key === "senseMotive" && targetSystem.activeFeatNames?.includes("Silver Tongue")) {
     const charismaModifier = targetSystem.abilities?.cha?.mod;
-    if (!Number.isSafeInteger(charismaModifier)) return reject("Review the target’s current Charisma modifier.");
+    if (!Number.isSafeInteger(charismaModifier)) return reject(loc`Review the target’s current Charisma modifier.`);
     sources.push({ source: "Silver Tongue", charismaModifier, errorIncrease: charismaModifier });
   }
   if (["analysis", "investigation"].includes(key) && targetSystem.activeFeatNames?.includes("Zeroed")) {
@@ -45,13 +46,13 @@ export function targetSkillEffectPlan(
       !covertFeats.some(f => f.name === "Zeroed") ||
       covertFeats.some(f => typeof f.name !== "string" || !f.name.trim() || typeof f.choice !== "string")
     )
-      return reject("Review the target’s active Covert feat selections, including Zeroed itself.");
+      return reject(loc`Review the target’s active Covert feat selections, including Zeroed itself.`);
     covertFeats.sort((a, b) => a.name.localeCompare(b.name) || a.choice.localeCompare(b.choice));
     sources.push({ source: "Zeroed", covertFeats, errorIncrease: covertFeats.length });
   }
   if (!sources.length)
     return reject(
-      "Choose the Faceless information-gathering purpose, or clear the selected target for an ordinary check."
+      loc`Choose the Faceless information-gathering purpose, or clear the selected target for an ordinary check.`
     );
   const errorIncrease = sources.reduce((n, s) => n + (s.errorIncrease ?? 0), 0),
     timeMultiplier = purpose ? 3 : 1;
@@ -71,7 +72,7 @@ export function targetSkillEffectPlan(
     timeMultiplier,
     blockedReason: "",
     notes: [
-      `${actorName.trim()}: ${sources.map(s => (s.source === "Faceless" ? `Faceless: time required to determine ${purpose === "past" ? "their past" : purpose} ×3` : `${s.source} error range ${s.errorIncrease >= 0 ? "+" : ""}${s.errorIncrease}`)).join("; ")}. Error modifiers precede the acting character’s error reductions. The check targets this GC-confirmed character.`
+      loc`${actorName.trim()}: ${sources.map(s => (s.source === "Faceless" ? loc`Faceless: time required to determine ${purpose === "past" ? "their past" : purpose} ×3` : `${s.source} error range ${s.errorIncrease >= 0 ? "+" : ""}${s.errorIncrease}`)).join("; ")}. Error modifiers precede the acting character’s error reductions. The check targets this GC-confirmed character.`
     ]
   };
 }
@@ -88,13 +89,12 @@ export function targetSkillTimingPlan(timing, target) {
   )
     return {
       ...timing,
-      blockedReason:
-        "Faceless combined with taking, Cross-Check or another timing effect requires the pending GC multiplier ruling. Use an ordinary rolled check with no time reduction for this implemented path."
+      blockedReason: loc`Faceless combined with taking, Cross-Check or another timing effect requires the pending GC multiplier ruling. Use an ordinary rolled check with no time reduction for this implemented path.`
     };
   return {
     ...timing,
     timeMultiplier: 3,
-    notes: `${timing.notes} Faceless triples the required information-gathering time (p.195).`.trim(),
+    notes: loc`${timing.notes} Faceless triples the required information-gathering time (p.195).`.trim(),
     blockedReason: ""
   };
 }

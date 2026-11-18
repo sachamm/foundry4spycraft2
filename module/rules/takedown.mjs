@@ -1,4 +1,5 @@
 import { rollEvidence } from "./outcomes.mjs";
+import { loc } from "../i18n.mjs";
 export const stableTakedown = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -30,19 +31,19 @@ export function takedownRollRoot(m, kind) {
       c.actorUuid !== m.flags.spycraft2.actorUuid ||
       c.weaponUuid !== m.flags.spycraft2.weaponUuid
     )
-      throw Error("Review the original takedown source roll chain.");
+      throw Error(loc`Review the original takedown source roll chain.`);
     if (!c.rerollOf) return current.uuid;
     const prior = takedownMessage(c.rerollOf);
     if (prior?.flags?.spycraft2?.superseded !== current.uuid)
-      throw Error("Use the actually adopted original takedown source replacement.");
+      throw Error(loc`Use the actually adopted original takedown source replacement.`);
     current = prior;
   }
-  throw Error("The original takedown source is missing or cyclic.");
+  throw Error(loc`The original takedown source is missing or cyclic.`);
 }
 export function takedownDC({ preDRDamage, netDamage, woundsLost, confirmed, targetConfirmed } = {}) {
   if (confirmed !== true || targetConfirmed !== true || typeof woundsLost !== "boolean")
     throw Error(
-      "The GC must confirm this actual character, applied damage before/after DR and whether the attack lost any wounds."
+      loc`The GC must confirm this actual character, applied damage before/after DR and whether the attack lost any wounds.`
     );
   if (
     !Number.isSafeInteger(preDRDamage) ||
@@ -52,7 +53,7 @@ export function takedownDC({ preDRDamage, netDamage, woundsLost, confirmed, targ
     !Number.isSafeInteger(preDRDamage + (woundsLost ? 10 : 0))
   )
     throw Error(
-      "Takedown requires positive whole damage actually sustained; enter its reviewed pre-DR and net amounts."
+      loc`Takedown requires positive whole damage actually sustained; enter its reviewed pre-DR and net amounts.`
     );
   return preDRDamage + (woundsLost ? 10 : 0);
 }
@@ -108,7 +109,7 @@ export function takedownSource(
     a.attackContext?.characterTarget?.characterType === "object"
   )
     throw Error(
-      "Choose the actual finished successful takedown attack and its finished positive damage result with the same weapon."
+      loc`Choose the actual finished successful takedown attack and its finished positive damage result with the same weapon.`
     );
   const target =
       a.attackContext?.targetActorUuid ||
@@ -123,7 +124,7 @@ export function takedownSource(
     (linked?.targetUuid && linked.targetUuid !== actor.uuid && linked.targetUuid !== "manual:" + actor.name) ||
     (linked?.attackUuid && linked.attackUuid !== attack.uuid)
   )
-    throw Error("Use the actual recorded takedown target and damage from this exact attack.");
+    throw Error(loc`Use the actual recorded takedown target and damage from this exact attack.`);
   const named =
     a.attackContext?.characterTarget?.source === "gcManual"
       ? a.attackContext.characterTarget.name
@@ -131,7 +132,7 @@ export function takedownSource(
         a.attackContext?.bullseye?.manualTargetName ??
         a.attackContext?.meleeTrick?.manualTargetName);
   if (!target && named && named !== actor.name)
-    throw Error("The recorded unrecorded target name must match this actual character.");
+    throw Error(loc`The recorded unrecorded target name must match this actual character.`);
   return {
     version: 1,
     targetUuid: actor.uuid,
@@ -155,7 +156,7 @@ export function takedownRows(actor) {
   const rows = actor.flags?.spycraft2?.takedownEvents ?? [],
     ids = new Set(),
     roots = new Set();
-  if (!Array.isArray(rows)) throw Error("Review the recorded takedown events.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the recorded takedown events.`);
   for (const r of rows) {
     if (
       r?.version !== 1 ||
@@ -186,7 +187,7 @@ export function takedownRows(actor) {
       roots.has(r.proof.damageRootUuid) ||
       (r.saveUuid != null && (typeof r.saveUuid !== "string" || !r.saveUuid))
     )
-      throw Error("Review the recorded takedown event references.");
+      throw Error(loc`Review the recorded takedown event references.`);
     ids.add(r.id);
     roots.add(r.proof.damageRootUuid);
   }
@@ -207,7 +208,7 @@ export function validateTakedownSource(actor, proof) {
     !receiptId ||
     stableTakedown(facts) !== stableTakedown(current)
   )
-    throw Error("The recorded takedown attack, damage, target or reviewed application facts changed.");
+    throw Error(loc`The recorded takedown attack, damage, target or reviewed application facts changed.`);
   return current;
 }
 export function currentTakedownSave(actor, row) {
@@ -220,17 +221,17 @@ export function currentTakedownSave(actor, row) {
       m.flags.spycraft2.takedown?.receiptId === row.proof.receiptId &&
       !m.flags.spycraft2.rerollOf
   );
-  if (roots.length > 1) throw Error("Multiple original takedown saves require GC review.");
+  if (roots.length > 1) throw Error(loc`Multiple original takedown saves require GC review.`);
   if (
     roots[0] &&
     (stableTakedown(roots[0].flags.spycraft2.takedown) !== stableTakedown(row.proof) ||
       (row.saveUuid && row.saveUuid !== roots[0].uuid))
   )
-    throw Error("The original takedown save receipt changed.");
+    throw Error(loc`The original takedown save receipt changed.`);
   let current = roots[0],
     seen = new Set();
   while (current?.flags.spycraft2.superseded) {
-    if (seen.has(current.uuid)) throw Error("Review the cyclic takedown save chain.");
+    if (seen.has(current.uuid)) throw Error(loc`Review the cyclic takedown save chain.`);
     seen.add(current.uuid);
     const next = takedownMessage(current.flags.spycraft2.superseded);
     if (
@@ -238,7 +239,7 @@ export function currentTakedownSave(actor, row) {
       next.flags.spycraft2.actorUuid !== actor.uuid ||
       stableTakedown(next.flags.spycraft2.takedown) !== stableTakedown(row.proof)
     )
-      throw Error("Review the actually adopted takedown save replacement.");
+      throw Error(loc`Review the actually adopted takedown save replacement.`);
     current = next;
   }
   return current ?? null;

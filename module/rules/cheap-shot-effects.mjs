@@ -1,4 +1,5 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const choices = ["str", "dex", "con", "int", "wis", "cha", "speed"];
 export const cheapShotScene = system => String(system.usagePeriods?.scene ?? "initial");
 export function cheapShotRecords(system) {
@@ -20,9 +21,9 @@ export function cheapShotRecords(system) {
         (r.lastSaveAt !== null && (!Number.isFinite(r.lastSaveAt) || r.lastSaveAt < r.madeAt))
     )
   )
-    throw Error("The GC must review malformed Cheap Shot history.");
+    throw Error(loc`The GC must review malformed Cheap Shot history.`);
   const current = rows.filter(r => r.scene === cheapShotScene(system));
-  if (current.length > 1) throw Error("The GC must review competing successful Cheap Shots in this scene.");
+  if (current.length > 1) throw Error(loc`The GC must review competing successful Cheap Shots in this scene.`);
   return current;
 }
 export function cheapShotPenalty(system, ability) {
@@ -49,16 +50,18 @@ export function cheapShotApplyPlan(system, check, { sourceMessage, now, scene } 
     !Number.isFinite(p.madeAt) ||
     p.madeAt > now
   )
-    throw Error("Use a resolved successful Cheap Shot from this current scene.");
+    throw Error(loc`Use a resolved successful Cheap Shot from this current scene.`);
   const rows = cheapShotRecords(system),
     prior = rows.find(r => r.sourceMessage === sourceMessage);
   if (prior) {
     if (prior.choice !== p.choice || prior.madeAt !== p.madeAt || prior.attackerUuid !== check.actorUuid)
-      throw Error("The applied Cheap Shot receipt changed; review its original target history.");
+      throw Error(loc`The applied Cheap Shot receipt changed; review its original target history.`);
     return { record: prior, existing: true };
   }
   if (rows.length)
-    throw Error("This combatant already suffered a successful Cheap Shot this scene, even if its penalty has ended.");
+    throw Error(
+      loc`This combatant already suffered a successful Cheap Shot this scene, even if its penalty has ended.`
+    );
   return {
     existing: false,
     record: {
@@ -76,11 +79,11 @@ export function cheapShotApplyPlan(system, check, { sourceMessage, now, scene } 
 }
 export function cheapShotRecoveryPlan(system, { sourceMessage, now } = {}) {
   const r = cheapShotRecords(system).find(r => r.sourceMessage === sourceMessage);
-  if (!r || r.recovered) throw Error("Choose an active Cheap Shot from the current scene.");
+  if (!r || r.recovered) throw Error(loc`Choose an active Cheap Shot from the current scene.`);
   if (r.attemptId && r.attemptResolved !== true)
-    throw Error("Resolve or review the previous reserved recovery attempt first.");
+    throw Error(loc`Resolve or review the previous reserved recovery attempt first.`);
   if (!Number.isFinite(now) || now < r.madeAt || (r.lastSaveAt !== null && now < r.lastSaveAt + 60))
-    throw Error("A Cheap Shot recovery save is available once per minute, available immediately at DC20.");
+    throw Error(loc`A Cheap Shot recovery save is available once per minute, available immediately at DC20.`);
   return {
     version: 1,
     sourceMessage,
@@ -117,7 +120,7 @@ export function validateCheapShotRecoveryProof(
     proof.version !== 1 ||
     proof.dc !== 20 - 2 * Math.floor((proof.at - r.madeAt) / 60)
   )
-    throw Error("The recorded Cheap Shot recovery source, attempt or Fortitude DC changed.");
+    throw Error(loc`The recorded Cheap Shot recovery source, attempt or Fortitude DC changed.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

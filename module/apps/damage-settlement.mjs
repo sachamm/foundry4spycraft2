@@ -4,6 +4,7 @@ import { damageSettlementPlan, validateDamageSettlement } from "../rules/damage-
 import { shakenApplicationSnapshot } from "../rules/shaken.mjs";
 import { applyShakenLocked } from "./shaken-application.mjs";
 import { queueResources } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 async function write(actor, patch, proof) {
   try {
@@ -11,7 +12,7 @@ async function write(actor, patch, proof) {
   } catch (error) {
     if (!proof()) throw error;
   }
-  if (!proof()) throw new Error("Review the actual damage-settlement receipt before retrying.");
+  if (!proof()) throw new Error(loc`Review the actual damage-settlement receipt before retrying.`);
 }
 export async function settlePendingDamageSave(actor, options = {}) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
@@ -20,16 +21,16 @@ export async function settlePendingDamageSave(actor, options = {}) {
   const record = pendingDamageSave(actor, options.eventId, { allowSettling: true });
   if (!record) return null;
   const message = currentDamageSaveMessage(actor, record, game.messages ?? []);
-  if (!message) throw new Error("Roll the pending save, confirm its outcome and finish it in chat first.");
-  if (message.blind && !game.user.isGM) throw new Error("The GC resolves this secret result.");
+  if (!message) throw new Error(loc`Roll the pending save, confirm its outcome and finish it in chat first.`);
+  if (message.blind && !game.user.isGM) throw new Error(loc`The GC resolves this secret result.`);
   const expected = damageLedgerSnapshot(actor);
   let input = options;
   if (input.confirmed !== true) {
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Settle next damage save" },
+      window: { title: loc`Settle next damage save` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${esc(record.source)}: ${record.kind === "stress" ? "Will" : "Fortitude"} DC${record.save.dc}. Confirm and finish this save in chat before continuing.</p><label><input name="selfInflicted" type="checkbox"${record.settlement?.selfInflicted ? " checked" : ""} /> This stress source was caused by the character's own action</label><label><input name="confirmed" type="checkbox" /> The GC confirmed the finished result and source. Settle success, or apply the failed stress save’s Shaken grade once</label><p>Accumulated damage remains until separately recovered. An interrupted settlement resumes its original recorded details. Knockout, Drained and unlisted critical outcomes remain pending for separate resolution.</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}. Confirm and finish this save in chat before continuing.`}</p><label><input name="selfInflicted" type="checkbox"${record.settlement?.selfInflicted ? " checked" : ""} /> ${loc`This stress source was caused by the character's own action`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirmed the finished result and source. Settle success, or apply the failed stress save’s Shaken grade once`}</label><p>${loc`Accumulated damage remains until separately recovered. An interrupted settlement resumes its original recorded details. Knockout, Drained and unlisted critical outcomes remain pending for separate resolution.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -37,20 +38,20 @@ export async function settlePendingDamageSave(actor, options = {}) {
   return queueResources(
     [actor],
     async () => {
-      if (!actor.isOwner) throw new Error("Ownership changed before damage settlement.");
+      if (!actor.isOwner) throw new Error(loc`Ownership changed before damage settlement.`);
       let current = actor.flags?.spycraft2?.damageEvents?.[record.id];
       if (current?.state === "settled") return current;
       if (!same(damageLedgerSnapshot(actor), expected))
-        throw new Error("The damage ledger changed before settlement. Review it again.");
+        throw new Error(loc`The damage ledger changed before settlement. Review it again.`);
       pendingDamageSave(actor, record.id, { allowSettling: true });
       const actual = currentDamageSaveMessage(actor, current, game.messages ?? []);
-      if (actual?.id !== message.id) throw new Error("The current damage-save result changed.");
+      if (actual?.id !== message.id) throw new Error(loc`The current damage-save result changed.`);
       let plan;
       if (current.state === "settling") {
         plan = validateDamageSettlement(current, actual, current.settlement);
         if (plan.grade && input.selfInflicted !== undefined && input.selfInflicted !== plan.selfInflicted)
           throw new Error(
-            "Resume the original settlement source details, or have the GC review them before changing them."
+            loc`Resume the original settlement source details, or have the GC review them before changing them.`
           );
       } else {
         plan = damageSettlementPlan(current, actual, input, foundry.utils.randomID(), game.time.worldTime);
@@ -72,7 +73,7 @@ export async function settlePendingDamageSave(actor, options = {}) {
       validateDamageSettlement(actor.flags.spycraft2.damageEvents[record.id], actual, plan);
       const ledger = actor.system.accumulatedDamage;
       if (ledger.pending[0] !== record.id || !Number.isSafeInteger(ledger.revision + 1))
-        throw new Error("Review the damage ledger before completing settlement.");
+        throw new Error(loc`Review the damage ledger before completing settlement.`);
       const completed = {
           ...current,
           state: "settled",

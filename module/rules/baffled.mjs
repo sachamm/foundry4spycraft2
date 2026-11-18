@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Incoming Baffled events, distinct from reviewing the current condition (p.340). */
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function baffledSourceSnapshot(actor) {
@@ -39,19 +40,19 @@ export function baffledApplicationPlan(current, expected, { id, source, confirme
     confirmed !== true ||
     !Number.isFinite(at)
   )
-    throw new Error("Confirm a new Baffled event with its unique reference and source.");
+    throw new Error(loc`Confirm a new Baffled event with its unique reference and source.`);
   const previous = Object.hasOwn(history, id) ? history[id] : null;
   if (previous) {
-    if (previous.source !== source.trim()) throw new Error("This Baffled reference already records another source.");
+    if (previous.source !== source.trim()) throw new Error(loc`This Baffled reference already records another source.`);
     return { duplicate: true, record: previous };
   }
   if (!same(current, expected))
-    throw new Error("Baffled sources changed. Review the current state before applying a new event.");
+    throw new Error(loc`Baffled sources changed. Review the current state before applying a new event.`);
   if (
     (current.baffled && !current.sources.some(s => s.statuses.includes("baffled"))) ||
     (current.incompetent && !current.sources.some(s => s.statuses.includes("incompetent")))
   )
-    throw new Error("Review the missing condition source before applying Baffled.");
+    throw new Error(loc`Review the missing condition source before applying Baffled.`);
   return {
     duplicate: false,
     record: {

@@ -3,6 +3,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export const COMBAT_STANCES = {
   striking: { name: "Striking Stance", feat: "Polearm Basics", page: 179, movementLimitFeet: 5 },
   whirling: { name: "Whirling Stance", feat: "Staff Basics", page: 179 },
@@ -64,7 +65,7 @@ export function validateCombatStanceProof(actor, proof, { checkKind, attackConte
       stable(c.attackContext?.combatStance) !== stable(proof) ||
       (proof.stance && (!s || proof.stance.feat !== s.feat || !actor.system.activeFeatNames?.includes(s.feat)))
     )
-      throw Error("The original owned combat-stance attack or its qualified source changed.");
+      throw Error(loc`The original owned combat-stance attack or its qualified source changed.`);
     return;
   }
   if (
@@ -72,7 +73,7 @@ export function validateCombatStanceProof(actor, proof, { checkKind, attackConte
     JSON.stringify(proof) !==
       JSON.stringify(combatStanceProof(actor.system, { ranged: attackContext?.ranged === true }))
   )
-    throw Error("The combat stance or its qualified source changed before posting.");
+    throw Error(loc`The combat stance or its qualified source changed before posting.`);
 }
 export function combatStanceDeclaration(
   system,
@@ -80,17 +81,17 @@ export function combatStanceDeclaration(
   { combat = null, halfActionConfirmed = false, legalConfirmed = false } = {}
 ) {
   if (!Object.hasOwn(COMBAT_STANCES, key) && key !== "normal")
-    throw Error("Choose a supported stance or normal stance.");
-  if (legalConfirmed !== true) throw Error("Confirm this stance action is legal now.");
+    throw Error(loc`Choose a supported stance or normal stance.`);
+  if (legalConfirmed !== true) throw Error(loc`Confirm this stance action is legal now.`);
   const block =
     attributeActionBlock(system, { purelyMental: false }) || restraintActionBlock(system, { free: key === "normal" });
   if (block) throw Error(block);
   if (key === "normal") return null;
   if (!(system.activeFeatNames ?? []).includes(COMBAT_STANCES[key].feat))
-    throw Error("The stance feat has not been earned.");
-  if (stanceForcedExit(system)) throw Error("Helpless, prone or sprawled characters must use normal stance.");
+    throw Error(loc`The stance feat has not been earned.`);
+  if (stanceForcedExit(system)) throw Error(loc`Helpless, prone or sprawled characters must use normal stance.`);
   if (halfActionConfirmed !== true || (combat && (!validOwnCountClock(combat) || combat.turn !== combat.ownTurnIndex)))
-    throw Error("Entering a stance requires one legal half action on your own Initiative Count.");
+    throw Error(loc`Entering a stance requires one legal half action on your own Initiative Count.`);
   return { version: 1, key };
 }
 export function stanceDamagePlan(check, { expectedKey = null } = {}) {
@@ -111,7 +112,7 @@ export function stanceDamagePlan(check, { expectedKey = null } = {}) {
     !p.id ||
     p.feat !== definition.feat
   )
-    throw Error("Choose a resolved successful melee attack made in " + name + ".");
+    throw Error(loc`Choose a resolved successful melee attack made in ` + name + ".");
   return { version: 1, stanceId: p.id, amount: 2, damageType: types[p.key], actionDiceAllowed: false };
 }
 export function punishingDamagePlan(check) {

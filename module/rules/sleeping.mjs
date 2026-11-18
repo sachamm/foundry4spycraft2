@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Sleeping p.342: wake only the sleep sources present at the triggering event. */
 export const SLEEP_STATUS_IDS = ["sleep", "sleeping", "asleep"];
 export function sleepingSourceSnapshot(actor) {
@@ -27,7 +28,7 @@ export function sleepingSourceSnapshot(actor) {
 }
 export function sleepWakePlan(current, event, { cause, confirmed = false, check = null } = {}) {
   if (!["newTouch", "damage", "awareness"].includes(cause) || confirmed !== true)
-    return { blocked: true, reason: "Confirm a new touch, damage, or successful Notice/Awareness event." };
+    return { blocked: true, reason: loc`Confirm a new touch, damage, or successful Notice/Awareness event.` };
   if (
     cause === "awareness" &&
     !(
@@ -38,18 +39,17 @@ export function sleepWakePlan(current, event, { cause, confirmed = false, check 
       !check.superseded
     )
   )
-    return { blocked: true, reason: "Waking requires a confirmed successful Notice/Awareness check." };
+    return { blocked: true, reason: loc`Waking requires a confirmed successful Notice/Awareness check.` };
   if (event?.state !== "sleeping" || typeof event.signature !== "string" || !event.signature)
     return {
       blocked: true,
-      reason: "The triggering event has no identifiable sleeping source. Review the current cause with the GC."
+      reason: loc`The triggering event has no identifiable sleeping source. Review the current cause with the GC.`
     };
   if (current.state === "awake") return { blocked: false, changed: false };
   if (current.state !== "sleeping" || current.signature !== event.signature)
     return {
       blocked: true,
-      reason:
-        "The sleeping sources changed after this event. Review the current cause; this old event cannot wake a new sleep."
+      reason: loc`The sleeping sources changed after this event. Review the current cause; this old event cannot wake a new sleep.`
     };
   return { blocked: false, changed: true };
 }

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Ghost Mastery/Supremacy p.195; current opponent-specific invisibility, p.342.
  * A read-only circumstance plan, not a hidden-state/round/attack lifecycle controller.
  */
@@ -19,7 +20,7 @@ export function ghostCoverPlan(
   if (declared === false) return null;
   if (declared !== true || confirmed !== true)
     throw new Error(
-      "Confirm the Ghost character’s current hidden state, scenery cover and uninterrupted invisibility circumstances with the GC."
+      loc`Confirm the Ghost character’s current hidden state, scenery cover and uninterrupted invisibility circumstances with the GC.`
     );
   const uuid = v => typeof v === "string" && /^Actor\.[A-Za-z0-9_-]+$/.test(v),
     name = v => typeof v === "string" && v.trim() && v.trim().length <= 200;
@@ -30,7 +31,7 @@ export function ghostCoverPlan(
     !name(actorName) ||
     !name(opponentName)
   )
-    throw new Error("Choose distinct actual Ghost and opponent characters.");
+    throw new Error(loc`Choose distinct actual Ghost and opponent characters.`);
   if (
     !system ||
     typeof system !== "object" ||
@@ -38,13 +39,13 @@ export function ghostCoverPlan(
     !Array.isArray(system.activeFeatNames) ||
     system.activeFeatNames.some(n => typeof n !== "string" || !n.trim())
   )
-    throw new Error("Review the Ghost character’s current qualified feat sources.");
+    throw new Error(loc`Review the Ghost character’s current qualified feat sources.`);
   const sources = ["Ghost Mastery", "Ghost Supremacy"].filter(n => system.activeFeatNames.includes(n));
-  if (!sources.length) throw new Error("The selected character needs current qualified Ghost Mastery or Supremacy.");
+  if (!sources.length) throw new Error(loc`The selected character needs current qualified Ghost Mastery or Supremacy.`);
   if (typeof hiddenFromOpponent !== "boolean")
-    throw new Error("Declare whether the Ghost character is currently hidden from this opponent.");
+    throw new Error(loc`Declare whether the Ghost character is currently hidden from this opponent.`);
   if (!Number.isSafeInteger(sceneryCover) || sceneryCover < 0 || sceneryCover > 4)
-    throw new Error("Choose the actual scenery cover grade from 0 to 4; personal cover does not count.");
+    throw new Error(loc`Choose the actual scenery cover grade from 0 to 4; personal cover does not count.`);
   if (
     typeof visibleMaterialPercent !== "number" ||
     !Number.isFinite(visibleMaterialPercent) ||
@@ -55,7 +56,7 @@ export function ghostCoverPlan(
     disturbingMovementFeet < 0
   )
     throw new Error(
-      "Enter actual visible-material coverage (0–100 percent) and nonnegative disturbing movement in feet."
+      loc`Enter actual visible-material coverage (0–100 percent) and nonnegative disturbing movement in feet.`
     );
   const requiredSceneryCover = sources.includes("Ghost Supremacy") ? 2 : 3;
   const lostToMaterial = visibleMaterialPercent >= 25,
@@ -82,12 +83,12 @@ export function ghostCoverPlan(
     lostToDisturbance,
     invisible,
     notes: [
-      `Ghost cover against ${context.opponentName}: ${invisible ? "invisible to this opponent" : "not invisible from this declaration"}; requires current hidden state and ${requiredSceneryCover}/4 scenery cover (p.195).`,
-      ...(lostToMaterial ? ["Invisibility is lost at 25% visible-material coverage (p.342)."] : []),
+      loc`Ghost cover against ${context.opponentName}: ${invisible ? loc`invisible to this opponent` : loc`not invisible from this declaration`}; requires current hidden state and ${requiredSceneryCover}/4 scenery cover (p.195).`,
+      ...(lostToMaterial ? [loc`Invisibility is lost at 25% visible-material coverage (p.342).`] : []),
       ...(lostToDisturbance
-        ? ["Invisibility is lost after more than 5 feet through a disturbing environment (p.342)."]
+        ? [loc`Invisibility is lost after more than 5 feet through a disturbing environment (p.342).`]
         : []),
-      "This preview confirms current circumstances only. Reestablishing hidden/invisible state, end-of-round hiding and loss of hidden state after an attack require their separate adjudication."
+      loc`This preview confirms current circumstances only. Reestablishing hidden/invisible state, end-of-round hiding and loss of hidden state after an attack require their separate adjudication.`
     ]
   };
 }
@@ -109,5 +110,5 @@ export function validateGhostCoverProof(system, proof, currentContext = proof?.c
     proof.context.declared !== true ||
     canonical(ghostCoverPlan(system, currentContext)) !== canonical(proof)
   )
-    throw new Error("The Ghost cover source or confirmed circumstances changed. Open the preview again.");
+    throw new Error(loc`The Ghost cover source or confirmed circumstances changed. Open the preview again.`);
 }

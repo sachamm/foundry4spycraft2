@@ -1,4 +1,5 @@
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 export function feintOutcomePlan(
   acting,
   defending,
@@ -26,7 +27,7 @@ export function feintOutcomePlan(
     q.opponentUuid !== attackerUuid
   )
     throw Error(
-      "Pair the actual acting Sleight of Hand and opposing Notice Feint receipts with reciprocal recorded opponents."
+      loc`Pair the actual acting Sleight of Hand and opposing Notice Feint receipts with reciprocal recorded opponents.`
     );
   for (const c of [acting, defending])
     if (
@@ -37,9 +38,11 @@ export function feintOutcomePlan(
       !Number.isFinite(c.effectiveTotal) ||
       !Number.isFinite(c.rollData?.total)
     )
-      throw Error("Confirm and resolve both original Feint checks in chat, including boosts and critical activation.");
+      throw Error(
+        loc`Confirm and resolve both original Feint checks in chat, including boosts and critical activation.`
+      );
   if (acting.successConfirmed === defending.successConfirmed)
-    throw Error("The opposed Feint must have one winner and one loser.");
+    throw Error(loc`The opposed Feint must have one winner and one loser.`);
   if (
     !validOwnCountClock(p.combat) ||
     !validOwnCountClock(q.combat) ||
@@ -54,14 +57,14 @@ export function feintOutcomePlan(
     combat.round !== p.combat.round ||
     combat.turn !== p.combat.turn
   )
-    throw Error("Resolve the paired Feint during its original combat round and Initiative Count.");
+    throw Error(loc`Resolve the paired Feint during its original combat round and Initiative Count.`);
   const delta = acting.effectiveTotal - defending.effectiveTotal,
     bonusDelta = acting.rollData.total - defending.rollData.total,
     expected = delta ? delta > 0 : bonusDelta ? bonusDelta > 0 : null;
   if (expected !== null && acting.successConfirmed !== expected)
-    throw Error("The declared Feint winner does not match the opposed totals (or the higher skill bonus on a tie).");
+    throw Error(loc`The declared Feint winner does not match the opposed totals (or the higher skill bonus on a tie).`);
   if (expected === null && tieResolvedConfirmed !== true)
-    throw Error("Equal results and skill bonuses require the GC’s random 1d20 tie-break confirmation (p.91).");
+    throw Error(loc`Equal results and skill bonuses require the GC’s random 1d20 tie-break confirmation (p.91).`);
   const attackerWon = acting.successConfirmed,
     winner = attackerWon ? acting : defending,
     loser = attackerWon ? defending : acting;
@@ -83,7 +86,7 @@ export function feintOutcomePlan(
 export function feintHistoryPlan(system, plan, { sourceMessage, defenderMessage } = {}) {
   if (!plan.attackerWon) return null;
   const rows = system.feintHistory ?? [];
-  if (!Array.isArray(rows)) throw Error("Review the target’s successful Feint history.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the target’s successful Feint history.`);
   for (const r of rows) {
     if (
       r?.version !== 1 ||
@@ -92,7 +95,7 @@ export function feintHistoryPlan(system, plan, { sourceMessage, defenderMessage 
       !Number.isSafeInteger(r.round) ||
       r.round < 1
     )
-      throw Error("Review the target’s successful Feint history.");
+      throw Error(loc`Review the target’s successful Feint history.`);
     if (r.sourceMessage === sourceMessage) {
       if (
         r.defenderMessage !== defenderMessage ||
@@ -100,14 +103,14 @@ export function feintHistoryPlan(system, plan, { sourceMessage, defenderMessage 
         r.combatId !== plan.combatId ||
         r.round !== plan.round
       )
-        throw Error("This Feint source is already recorded with a different outcome.");
+        throw Error(loc`This Feint source is already recorded with a different outcome.`);
       return { existing: true, record: r };
     }
     if (r.combatId === plan.combatId && r.round === plan.round)
-      throw Error("The target has already been successfully Feinted this round.");
+      throw Error(loc`The target has already been successfully Feinted this round.`);
   }
   if (typeof sourceMessage !== "string" || !sourceMessage || typeof defenderMessage !== "string" || !defenderMessage)
-    throw Error("Retain both actual Feint receipts.");
+    throw Error(loc`Retain both actual Feint receipts.`);
   return {
     existing: false,
     record: {

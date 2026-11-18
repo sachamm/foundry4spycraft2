@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /**
  * Roll pipeline: one registry that rule modules join instead of being wired into the Actor document by hand.
  *
@@ -34,22 +35,23 @@ export class RollPipeline {
 
   /** Add a contributor. Returns the pipeline so registrations can be chained. */
   register(spec) {
-    if (!spec || typeof spec !== "object") throw new TypeError("A roll contributor must be an object.");
+    if (!spec || typeof spec !== "object") throw new TypeError(loc`A roll contributor must be an object.`);
     const { id } = spec;
-    if (typeof id !== "string" || !id) throw new TypeError("A roll contributor needs a non-empty string id.");
-    if (this.#contributors.some(c => c.id === id)) throw new Error(`Roll contributor "${id}" is already registered.`);
+    if (typeof id !== "string" || !id) throw new TypeError(loc`A roll contributor needs a non-empty string id.`);
+    if (this.#contributors.some(c => c.id === id))
+      throw new Error(loc`Roll contributor "${id}" is already registered.`);
     if (spec.kinds !== undefined && !(Array.isArray(spec.kinds) && spec.kinds.every(k => typeof k === "string"))) {
-      throw new TypeError(`Roll contributor "${id}": kinds must be an array of check kinds.`);
+      throw new TypeError(loc`Roll contributor "${id}": kinds must be an array of check kinds.`);
     }
     if (spec.stage !== undefined && !["plan", "roll"].includes(spec.stage)) {
-      throw new TypeError(`Roll contributor "${id}": stage must be "plan" or "roll".`);
+      throw new TypeError(loc`Roll contributor "${id}": stage must be "plan" or "roll".`);
     }
     if (spec.order !== undefined && !Number.isFinite(spec.order)) {
-      throw new TypeError(`Roll contributor "${id}": order must be a finite number.`);
+      throw new TypeError(loc`Roll contributor "${id}": order must be a finite number.`);
     }
     for (const phase of PHASES) {
       if (spec[phase] !== undefined && typeof spec[phase] !== "function") {
-        throw new TypeError(`Roll contributor "${id}": ${phase} must be a function.`);
+        throw new TypeError(loc`Roll contributor "${id}": ${phase} must be a function.`);
       }
     }
     if (
@@ -57,17 +59,17 @@ export class RollPipeline {
       !(Array.isArray(spec.dialogs) && spec.dialogs.length && spec.dialogs.every(d => typeof d === "string"))
     ) {
       throw new TypeError(
-        `Roll contributor "${id}": dialog and read need a dialogs list naming the dialogs they join.`
+        loc`Roll contributor "${id}": dialog and read need a dialogs list naming the dialogs they join.`
       );
     }
     if (
       spec.record !== undefined &&
       !(Array.isArray(spec.record) && spec.record.every(k => typeof k === "string" && k))
     ) {
-      throw new TypeError(`Roll contributor "${id}": record must be an array of option names.`);
+      throw new TypeError(loc`Roll contributor "${id}": record must be an array of option names.`);
     }
     if (!PHASES.some(phase => typeof spec[phase] === "function") && !spec.record?.length) {
-      throw new TypeError(`Roll contributor "${id}" implements no phase.`);
+      throw new TypeError(loc`Roll contributor "${id}" implements no phase.`);
     }
     this.#contributors.push({ ...spec, order: spec.order ?? 0, sequence: this.#sequence++ });
     this.#contributors.sort((a, b) => a.order - b.order || a.sequence - b.sequence);
@@ -101,13 +103,13 @@ export class RollPipeline {
     let list = checks;
     for (const c of this.#active("skillChecks", ctx)) {
       list = c.skillChecks(ctx, list);
-      if (!Array.isArray(list)) throw new TypeError(`Roll contributor "${c.id}": skillChecks must return an array.`);
+      if (!Array.isArray(list)) throw new TypeError(loc`Roll contributor "${c.id}": skillChecks must return an array.`);
     }
     return list;
   }
 
   #inDialog(phase, ctx) {
-    if (typeof ctx?.dialog !== "string" || !ctx.dialog) throw new TypeError("A dialog context names its dialog.");
+    if (typeof ctx?.dialog !== "string" || !ctx.dialog) throw new TypeError(loc`A dialog context names its dialog.`);
     return this.#contributors.filter(c => typeof c[phase] === "function" && c.dialogs.includes(ctx.dialog));
   }
 
@@ -120,10 +122,10 @@ export class RollPipeline {
     for (const c of this.#inDialog("dialog", ctx)) {
       const result = c.dialog(ctx);
       if (result === undefined || result === null) continue;
-      if (!Array.isArray(result)) throw new TypeError(`Roll contributor "${c.id}": dialog must return an array.`);
+      if (!Array.isArray(result)) throw new TypeError(loc`Roll contributor "${c.id}": dialog must return an array.`);
       for (const piece of result) {
         if (!piece || !Number.isFinite(piece.at)) {
-          throw new TypeError(`Roll contributor "${c.id}": each dialog piece needs a numeric position.`);
+          throw new TypeError(loc`Roll contributor "${c.id}": each dialog piece needs a numeric position.`);
         }
         const html = piece.html === undefined || piece.html === null || piece.html === false ? "" : String(piece.html);
         if (html) pieces.push({ at: piece.at, html, sequence: pieces.length });
@@ -140,7 +142,7 @@ export class RollPipeline {
       const patch = c.read(ctx, current);
       if (patch === undefined || patch === null) continue;
       if (typeof patch !== "object" || Array.isArray(patch)) {
-        throw new TypeError(`Roll contributor "${c.id}": read must return an object of fields.`);
+        throw new TypeError(loc`Roll contributor "${c.id}": read must return an object of fields.`);
       }
       if (Object.keys(patch).length) current = { ...current, ...patch };
     }
@@ -156,7 +158,7 @@ export class RollPipeline {
       const pending = c.acquire(ctx);
       if (pending === undefined || pending === null || pending === false) continue;
       if (typeof pending !== "function")
-        throw new TypeError(`Roll contributor "${c.id}": acquire must return a function.`);
+        throw new TypeError(loc`Roll contributor "${c.id}": acquire must return a function.`);
       return pending;
     }
     return null;
@@ -185,10 +187,10 @@ export class RollPipeline {
       if ((c.stage ?? "roll") !== stage) continue;
       const result = c.modifiers(ctx);
       if (result === undefined || result === null) continue;
-      if (!Array.isArray(result)) throw new TypeError(`Roll contributor "${c.id}": modifiers must return an array.`);
+      if (!Array.isArray(result)) throw new TypeError(loc`Roll contributor "${c.id}": modifiers must return an array.`);
       for (const row of result) {
         if (!row || typeof row.label !== "string" || !row.label || !Number.isSafeInteger(row.value)) {
-          throw new TypeError(`Roll contributor "${c.id}": each modifier needs a label and a whole-number value.`);
+          throw new TypeError(loc`Roll contributor "${c.id}": each modifier needs a label and a whole-number value.`);
         }
         if (row.value !== 0) rows.push({ id: c.id, label: row.label, value: row.value });
       }
@@ -207,7 +209,7 @@ export class RollPipeline {
       const result = c.flags(ctx);
       if (result === undefined || result === null) continue;
       if (typeof result !== "object" || Array.isArray(result)) {
-        throw new TypeError(`Roll contributor "${c.id}": flags must return an object.`);
+        throw new TypeError(loc`Roll contributor "${c.id}": flags must return an object.`);
       }
       Object.assign(merged, result);
     }
@@ -220,10 +222,11 @@ export class RollPipeline {
     for (const c of this.#active("chatControls", ctx)) {
       const result = c.chatControls(ctx);
       if (result === undefined || result === null) continue;
-      if (!Array.isArray(result)) throw new TypeError(`Roll contributor "${c.id}": chatControls must return an array.`);
+      if (!Array.isArray(result))
+        throw new TypeError(loc`Roll contributor "${c.id}": chatControls must return an array.`);
       for (const control of result) {
         if (!control || typeof control.label !== "string" || !control.label || typeof control.run !== "function") {
-          throw new TypeError(`Roll contributor "${c.id}": each chat control needs a label and a run function.`);
+          throw new TypeError(loc`Roll contributor "${c.id}": each chat control needs a label and a run function.`);
         }
         controls.push({ id: c.id, label: control.label, run: control.run, placement: control.placement ?? "plain" });
       }
@@ -234,7 +237,7 @@ export class RollPipeline {
 
 /** Apply a pipeline modifier total to a roll formula without disturbing the formula recorded for rerolls. */
 export function formulaWithModifiers(formula, total) {
-  if (!Number.isSafeInteger(total)) throw new TypeError("A roll modifier total must be a whole number.");
+  if (!Number.isSafeInteger(total)) throw new TypeError(loc`A roll modifier total must be a whole number.`);
   if (total === 0) return formula;
   return `${formula} ${total < 0 ? "-" : "+"} ${Math.abs(total)}`;
 }

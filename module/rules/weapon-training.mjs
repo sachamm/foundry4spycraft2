@@ -1,4 +1,5 @@
 import { launcherOperationPlan } from "./firearms.mjs";
+import { loc } from "../i18n.mjs";
 /** Immutable owned source, distinct from a substituted operating proficiency. */
 export function weaponSourceIdentity(weapon, { operatingProficiency = weapon?.proficiency ?? null } = {}) {
   return {
@@ -24,7 +25,7 @@ export function ownedWeaponTraining(
     item?.type !== "weapon" ||
     (weaponUuid && item.uuid !== weaponUuid)
   )
-    throw Error("The owned attack weapon changed or is no longer present.");
+    throw Error(loc`The owned attack weapon changed or is no longer present.`);
   const weapon = { ...item.system, id: item.id ?? item._id },
     context = attackContext.launcherOperation,
     launcher = launcherOperationPlan(weapon, {
@@ -35,7 +36,7 @@ export function ownedWeaponTraining(
     }),
     operatingProficiency = launcher.applicable ? launcher.proficiency : weapon.proficiency;
   if (launcher.blocked || operatingProficiency !== weaponProficiency)
-    throw Error("The actual operating proficiency or launcher context changed before posting.");
+    throw Error(loc`The actual operating proficiency or launcher context changed before posting.`);
   const trained =
     actor.type !== "agent" ||
     (actor.system.proficiencyTotals ?? actor.system.proficiencies)?.[operatingProficiency]?.proficient === true;

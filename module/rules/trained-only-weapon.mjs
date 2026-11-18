@@ -1,6 +1,7 @@
 import { trainedOnlyAttackPlan } from "./trained-only.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export function trainedOnlyWeaponPlan(
   weapon,
   { trained = false, operatingProficiency = weapon?.proficiency ?? null } = {}
@@ -24,7 +25,7 @@ export function validateTrainedOnlyWeaponProof(actor, proof, context = {}) {
     current = trainedOnlyWeaponPlan(weapon, { trained, operatingProficiency });
   if (current.blocked || stable(current.evidence) !== stable(proof))
     throw Error(
-      "The Trained Only weapon quality or actual operating proficiency changed or no longer permits this attack."
+      loc`The Trained Only weapon quality or actual operating proficiency changed or no longer permits this attack.`
     );
 }
 

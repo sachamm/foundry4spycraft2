@@ -1,5 +1,6 @@
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Threaten p.361 is a combat action, separate from Coercion/Domination pp.134–135. */
 export function threatenSkillChecks(key, checks = []) {
   const role = key === "intimidate" ? "attacker" : key === "resolve" ? "defender" : null;
@@ -50,7 +51,7 @@ export function threatenCheckPlan(
     empty = { evidence: null, bonuses: [], blockedReason: "", notes: [] };
   if (!role) return empty;
   const reject = blockedReason => ({ ...empty, blockedReason });
-  if (method !== "roll") return reject("Threaten is opposed; taking10/20 is unavailable (p.91).");
+  if (method !== "roll") return reject(loc`Threaten is opposed; taking10/20 is unavailable (p.91).`);
   if (
     threatenOpponentConfirmed !== true ||
     threatenContextConfirmed !== true ||
@@ -58,22 +59,23 @@ export function threatenCheckPlan(
     !threatenOpponentName.trim() ||
     threatenOpponentName.trim().length > 200
   )
-    return reject("Name the opposing character and confirm the Threaten circumstances with the GC.");
+    return reject(loc`Name the opposing character and confirm the Threaten circumstances with the GC.`);
   if (
     role === "attacker" &&
     (!validOwnCountClock(threatenCombat) || threatenCombat.turn !== threatenCombat.ownTurnIndex)
   )
-    return reject("Take the Threaten attack action during your Initiative Count in a started combat.");
+    return reject(loc`Take the Threaten attack action during your Initiative Count in a started combat.`);
   if (role === "defender" && threatenIncomingLegalConfirmed !== true)
-    return reject("The GC must confirm this is the Resolve(Wis) response to a legal incoming Threaten action.");
+    return reject(loc`The GC must confirm this is the Resolve(Wis) response to a legal incoming Threaten action.`);
   const basics = system.activeFeatNames?.includes("CQB Basics") === true,
     mastery = system.activeFeatNames?.includes("CQB Mastery") === true,
     glint = system.activeFeatNames?.includes("Glint of Madness") === true,
     candidates = system.readiedRangedWeapons ?? [];
   if (typeof threatenWeaponId !== "string")
-    return reject("Choose a held/readied ranged weapon, or leave the selection empty.");
+    return reject(loc`Choose a held/readied ranged weapon, or leave the selection empty.`);
   const weapon = threatenWeaponId ? candidates.find(w => w.id === threatenWeaponId) : null;
-  if (threatenWeaponId && !weapon) return reject("The selected ranged weapon is no longer held/readied and available.");
+  if (threatenWeaponId && !weapon)
+    return reject(loc`The selected ranged weapon is no longer held/readied and available.`);
   let target = null;
   if (role === "attacker") {
     if (
@@ -83,15 +85,15 @@ export function threatenCheckPlan(
       system.cqbRange < 0 ||
       threatenDistanceFeet > system.cqbRange
     )
-      return reject("Confirm a nonnegative measured target distance within your current CQB Range.");
+      return reject(loc`Confirm a nonnegative measured target distance within your current CQB Range.`);
     if (![threatenVitalityLoss, threatenWoundLoss].every(n => Number.isSafeInteger(n) && n >= 0))
-      return reject("Enter nonnegative whole vitality/wound losses caused by your attacks.");
+      return reject(loc`Enter nonnegative whole vitality/wound losses caused by your attacks.`);
     const injuryQualified =
         threatenInjuryFromYourAttacksConfirmed === true && (threatenVitalityLoss >= 5 || threatenWoundLoss >= 1),
       injuryWaived = glint || (mastery && !!weapon);
     if (!injuryQualified && !injuryWaived)
       return reject(
-        "The target must have lost5vitality or1wound to your attacks, or have Glint of Madness, or hold a readied ranged weapon with CQB Mastery."
+        loc`The target must have lost5vitality or1wound to your attacks, or have Glint of Madness, or hold a readied ranged weapon with CQB Mastery.`
       );
     target = {
       distanceFeet: threatenDistanceFeet,
@@ -126,7 +128,7 @@ export function threatenCheckPlan(
     bonuses: gearBonus ? [{ source: "CQB Basics (Threaten)", type: "gear", value: 2 }] : [],
     blockedReason: "",
     notes: [
-      `Threaten: ${role === "attacker" ? "Intimidate(Wis), half attack action" : "Resolve(Wis), opposed response"}; Hearing/Language, error modifier+0. ${gearBonus ? "CQB Basics adds+2gear from the selected held/readied ranged weapon. " : ""}${target?.injuryWaived ? (glint ? "Glint of Madness waives the prior-injury requirement without requiring a weapon. " : "CQB Mastery waives the prior-injury requirement. ") : ""}Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).`
+      loc`Threaten: ${role === "attacker" ? loc`Intimidate(Wis), half attack action` : loc`Resolve(Wis), opposed response`}; Hearing/Language, error modifier+0. ${gearBonus ? loc`CQB Basics adds+2gear from the selected held/readied ranged weapon. ` : ""}${target?.injuryWaived ? (glint ? loc`Glint of Madness waives the prior-injury requirement without requiring a weapon. ` : loc`CQB Mastery waives the prior-injury requirement. `) : ""}Compare the opposed results and resolve stress, fright and next-attack effects with the GC (pp.180,361).`
     ]
   };
 }
@@ -165,7 +167,7 @@ export function validateThreatenProof(
     JSON.stringify(p.evidence) !== JSON.stringify(proof)
   )
     throw new Error(
-      p.blockedReason || "The Threaten participants, CQB source, weapon or Initiative Count changed before posting."
+      p.blockedReason || loc`The Threaten participants, CQB source, weapon or Initiative Count changed before posting.`
     );
 }
 

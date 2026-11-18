@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Armor types and training feats, pp.172,225,284. Helmets and miscellaneous protective gear are separate. */
 export const ARMOR_TYPES = { P: "Partial", M: "Moderate", F: "Full" };
 export function armorTypeChoice(value) {
@@ -75,12 +76,12 @@ export function armorTrainingAdjustments(item, training = {}, slot = "body") {
 /** Listed DR before armor piercing, damage-type exceptions and resistance. Keep armor bonuses inside the quality maximum. */
 export function armorTrainingDRForAttack(system, kind) {
   if (!["unarmed", "meleeWeapon", "hurledWeapon", "rangedWeapon", "other"].includes(kind))
-    throw new Error("Choose the incoming attack’s armor DR category.");
+    throw new Error(loc`Choose the incoming attack’s armor DR category.`);
   if (
     !system.damageReductionComponents ||
     !["natural", "class", "armorMelee", "armorOther"].every(k => Number.isFinite(system.damageReductionComponents[k]))
   )
-    throw new Error("Prepare the DR source components before applying armor training.");
+    throw new Error(loc`Prepare the DR source components before applying armor training.`);
   const first = ["unarmed", "meleeWeapon", "hurledWeapon"].includes(kind),
     components = system.damageReductionComponents,
     rules = system.armorFeatRules ?? {},
@@ -97,6 +98,6 @@ export function armorTrainingDRForAttack(system, kind) {
         : 0,
     armor = (first ? components.armorMelee : components.armorOther) + weapon + attack;
   const feat = components.feat ?? 0;
-  if (!Number.isSafeInteger(feat) || feat < 0) throw new Error("Review the independent feat DR component.");
+  if (!Number.isSafeInteger(feat) || feat < 0) throw new Error(loc`Review the independent feat DR component.`);
   return Math.max(components.natural, armor + components.class) + feat;
 }

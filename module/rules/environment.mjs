@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** General underwater checks p.349; Aquatic quality p.446. */
 export function hasAquaticQuality(system) {
   return (system.originEffects ?? []).some(effect => effect.qualityKey === "aquatic");
@@ -22,10 +23,10 @@ export function underwaterCheckPlan(
       declared && eligible
         ? [
             aquatic
-              ? "Aquatic quality: immune to underwater check penalties (pp.349,446)."
+              ? loc`Aquatic quality: immune to underwater check penalties (pp.349,446).`
               : swim
-                ? "Athletics/Swim is exempt from the general underwater check penalty (p.349)."
-                : `Underwater: ${penalty} check penalty with ${athleticsRanks} Athletics ranks (p.349).`
+                ? loc`Athletics/Swim is exempt from the general underwater check penalty (p.349).`
+                : loc`Underwater: ${penalty} check penalty with ${athleticsRanks} Athletics ranks (p.349).`
           ]
         : []
   };
@@ -63,11 +64,11 @@ export function burrowCapabilities(system) {
 }
 export function burrowMaterialPlan(system, { damageSaveBonus, action = "move", followerHasBurrow = false } = {}) {
   const capability = burrowCapabilities(system);
-  if (!capability) throw new Error("An active Burrow quality and valid Strength score are required.");
+  if (!capability) throw new Error(loc`An active Burrow quality and valid Strength score are required.`);
   if (!Number.isSafeInteger(damageSaveBonus))
-    throw new Error("Enter the material’s whole Damage save bonus at one-inch thickness.");
-  if (!["move", "run"].includes(action)) throw new Error("Choose movement or a Run action.");
-  if (typeof followerHasBurrow !== "boolean") throw new Error("Declare whether the follower possesses Burrow.");
+    throw new Error(loc`Enter the material’s whole Damage save bonus at one-inch thickness.`);
+  if (!["move", "run"].includes(action)) throw new Error(loc`Choose movement or a Run action.`);
+  if (typeof followerHasBurrow !== "boolean") throw new Error(loc`Declare whether the follower possesses Burrow.`);
   const materialAllowed = damageSaveBonus <= capability.maximumMaterialSave,
     allowed = materialAllowed && action !== "run",
     ordinaryFollowersBlocked = allowed && damageSaveBonus <= 6;
@@ -83,18 +84,18 @@ export function burrowMaterialPlan(system, { damageSaveBonus, action = "move", f
     reasons: [
       ...(!materialAllowed
         ? [
-            `One-inch material save +${damageSaveBonus} exceeds the Strength limit of +${capability.maximumMaterialSave}.`
+            loc`One-inch material save +${damageSaveBonus} exceeds the Strength limit of +${capability.maximumMaterialSave}.`
           ]
         : []),
-      ...(action === "run" ? ["Run actions are forbidden while burrowing."] : [])
+      ...(action === "run" ? [loc`Run actions are forbidden while burrowing.`] : [])
     ],
     notes: allowed
       ? [
           ordinaryFollowersBlocked
-            ? "Material fills in behind the burrower. Followers without Burrow cannot follow as it burrows."
-            : "This quality does not prohibit ordinary followers for this material; passage and movement conditions still apply.",
+            ? loc`Material fills in behind the burrower. Followers without Burrow cannot follow as it burrows.`
+            : loc`This quality does not prohibit ordinary followers for this material; passage and movement conditions still apply.`,
           ...(followerHasBurrow
-            ? ["A follower with Burrow must separately meet its own material and movement limits."]
+            ? [loc`A follower with Burrow must separately meet its own material and movement limits.`]
             : [])
         ]
       : []

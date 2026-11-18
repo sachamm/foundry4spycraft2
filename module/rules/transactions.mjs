@@ -1,5 +1,6 @@
 import { shakenRules } from "./shaken.mjs";
 import { GM_TOKEN_PREFIX, gmLockingActive, lockTable, requestLock } from "./gm-locks.mjs";
+import { loc } from "../i18n.mjs";
 /** v14 native embedded-document uniqueness serializes resource transactions across clients.
  * Uses the authenticated document API and existing ownership, without a privileged socket relay.
  */
@@ -17,7 +18,7 @@ function requireSettledPeriod(allow) {
   const stored = globalThis.game?.settings?.get?.("spycraft2", "usagePeriodReview"),
     review = stored?.needsReview ? stored : (globalThis.game?.spycraft2?.pendingUsagePeriodReview ?? stored);
   if (!allow && review?.needsReview)
-    throw new ResourceBusyError("The GC must review the interrupted start before further resource use.");
+    throw new ResourceBusyError(loc`The GC must review the interrupted start before further resource use.`);
 }
 
 /** One local barrier for every participant, acquired together to prevent reciprocal-queue deadlocks. */
@@ -31,7 +32,7 @@ export function queueResources(actors, work, { messages = [], allowPeriodReview 
       requireSettledPeriod(allowPeriodReview);
       const backend = globalThis.game?.spycraft2?.resourceLocks;
       if (globalThis.game?.ready && !backend)
-        throw new Error("The resource transaction service is unavailable. Reload the world before spending.");
+        throw new Error(loc`The resource transaction service is unavailable. Reload the world before spending.`);
       return backend ? backend.run(unique, work, { messages, allowPeriodReview }) : work();
     })
     .catch(error => {
@@ -47,16 +48,16 @@ export function queueResources(actors, work, { messages = [], allowPeriodReview 
 
 /** Call only inside queueResources with the paying actor included in its participants. */
 export async function payLockedActionDice(actor, count, perform) {
-  if (!actor.isOwner) throw new Error("You must own the paying character.");
+  if (!actor.isOwner) throw new Error(loc`You must own the paying character.`);
   const shaken = shakenRules(actor.system);
   if (shaken.needsReview || shaken.spendingForbidden)
     throw new Error(
       shaken.needsReview
-        ? "Review the paying character’s Shaken sources."
-        : "Shaken IV: no action dice may be spent at all (p.342)."
+        ? loc`Review the paying character’s Shaken sources.`
+        : loc`Shaken IV: no action dice may be spent at all (p.342).`
     );
   if (!Number.isSafeInteger(count) || count < 1 || count > (actor.system.actionDice?.value ?? 0))
-    throw new Error("Not enough action dice remain.");
+    throw new Error(loc`Not enough action dice remain.`);
   await actor.update({ "system.actionDice.value": actor.system.actionDice.value - count });
   try {
     return await perform();
@@ -68,7 +69,7 @@ export async function payLockedActionDice(actor, count, perform) {
 
 async function readDocument(doc) {
   const result = await doc.constructor.database.get(doc.constructor, { query: { _id: doc.id } });
-  if (result.length !== 1) throw new Error(`Cannot refresh ${doc.documentName} before its resource transaction.`);
+  if (result.length !== 1) throw new Error(loc`Cannot refresh ${doc.documentName} before its resource transaction.`);
   return result[0];
 }
 async function readActor(actor) {
@@ -77,24 +78,24 @@ async function readActor(actor) {
   const token = actor.token,
     scene = await readDocument(token.parent),
     fresh = scene.tokens.get(token.id)?.actor;
-  if (!fresh) throw new Error("The token was removed before its resource transaction.");
+  if (!fresh) throw new Error(loc`The token was removed before its resource transaction.`);
   return fresh;
 }
 async function refreshActor(actor) {
   const fresh = await readActor(actor);
   actor.updateSource(fresh.toObject(), { recursive: false });
-  if (!actor.isOwner) throw new Error("Ownership changed while starting this resource transaction.");
+  if (!actor.isOwner) throw new Error(loc`Ownership changed while starting this resource transaction.`);
   return actor;
 }
 async function acquire(actor, scope = RESOURCE_LOCK_ID) {
-  if (!actor.isOwner) throw new Error("You must own each character whose resources are being used.");
+  if (!actor.isOwner) throw new Error(loc`You must own each character whose resources are being used.`);
   const existing = actor.items.get(scope);
   if (existing) {
     if (isResourceLock(existing))
       throw new ResourceBusyError(
-        `${actor.name}: a resource transaction is in progress. Retry after it finishes; the GC can recover an interrupted transaction.`
+        loc`${actor.name}: a resource transaction is in progress. Retry after it finishes; the GC can recover an interrupted transaction.`
       );
-    throw new Error(`${actor.name}: the reserved resource-document ID is already used by another item.`);
+    throw new Error(loc`${actor.name}: the reserved resource-document ID is already used by another item.`);
   }
   // When the world asks the GC's client to arbitrate, the lock lives in that client's memory and nothing is written
   // to the character (module/rules/gm-locks.mjs). An unreachable GC falls back to the document lock below.
@@ -107,7 +108,7 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
     }
     if (!answer.unreachable)
       throw new ResourceBusyError(
-        `${actor.name}: a resource transaction is in progress. Retry after it finishes; the GC can recover an interrupted transaction.`
+        loc`${actor.name}: a resource transaction is in progress. Retry after it finishes; the GC can recover an interrupted transaction.`
       );
   }
   const token = foundry.utils.randomID(),
@@ -124,13 +125,13 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
   } catch (error) {
     if (/already exists/.test(error.message))
       throw new ResourceBusyError(
-        `${actor.name}: another client started a resource transaction. Retry after it finishes.`
+        loc`${actor.name}: another client started a resource transaction. Retry after it finishes.`
       );
     throw error;
   }
   const lock = docs[0];
   if (docs.length !== 1 || lock.id !== scope || lock.flags.spycraft2.resourceLock.token !== token)
-    throw new Error("The server did not create the expected resource transaction lock.");
+    throw new Error(loc`The server did not create the expected resource transaction lock.`);
   held.set(lockKey(actor, scope), token);
   return token;
 }
@@ -180,9 +181,9 @@ export async function runNativeResourceTransaction(actors, work, { messages = []
       const originalActor = message.flags?.spycraft2?.actorUuid,
         fresh = await readDocument(message);
       if (fresh.flags?.spycraft2?.actorUuid !== originalActor)
-        throw new Error("The roll’s acting character changed before this transaction.");
+        throw new Error(loc`The roll’s acting character changed before this transaction.`);
       message.updateSource(fresh.toObject(), { recursive: false });
-      if (message.blind && !game.user.isGM) throw new Error("The GC resolves secret results.");
+      if (message.blind && !game.user.isGM) throw new Error(loc`The GC resolves secret results.`);
     }
     result = await work();
   } finally {
@@ -197,14 +198,14 @@ export async function runNativeResourceTransaction(actors, work, { messages = []
     // Cleanup failure must not pretend a committed resource action failed and invite a duplicate retry.
     if (failures.length)
       ui.notifications.warn(
-        "Resource transaction finished, but its lock needs GC recovery. Check the recorded result before retrying."
+        loc`Resource transaction finished, but its lock needs GC recovery. Check the recorded result before retrying.`
       );
   }
   return result;
 }
 export async function recoverResourceTransaction(actor, { confirmed = false, scope = RESOURCE_LOCK_ID } = {}) {
-  if (!game.user.isGM) throw new Error("Only the GC can recover an interrupted resource transaction.");
-  if (held.has(lockKey(actor, scope))) throw new Error("This client is still executing that resource transaction.");
+  if (!game.user.isGM) throw new Error(loc`Only the GC can recover an interrupted resource transaction.`);
+  if (held.has(lockKey(actor, scope))) throw new Error(loc`This client is still executing that resource transaction.`);
   // A lock arbitrated by this GC's client is simply dropped; there is no document to remove.
   const arbitrated = lockTable.holder(lockKey(actor, scope));
   if (arbitrated) {
@@ -212,30 +213,31 @@ export async function recoverResourceTransaction(actor, { confirmed = false, sco
     const agreed =
       confirmed ||
       (await foundry.applications.api.DialogV2.confirm({
-        window: { title: "Recover interrupted resource transaction" },
+        window: { title: loc`Recover interrupted resource transaction` },
         rejectClose: false,
-        content: `<p>Check the recorded result and current resources before retrying. Make sure ${foundry.utils.escapeHTML(holder?.name ?? "the original user")} is no longer carrying out this action.</p>`
+        content: `<p>${loc`Check the recorded result and current resources before retrying. Make sure ${foundry.utils.escapeHTML(holder?.name ?? loc`the original user`)} is no longer carrying out this action.`}</p>`
       }));
     if (!agreed) return null;
     lockTable.clear(lockKey(actor, scope));
-    return ui.notifications.info("The interrupted resource transaction was cleared.");
+    return ui.notifications.info(loc`The interrupted resource transaction was cleared.`);
   }
   const fresh = await readActor(actor),
     lock = fresh.items.get(scope);
-  if (!isResourceLock(lock)) return ui.notifications.info("There is no interrupted resource transaction to recover.");
+  if (!isResourceLock(lock))
+    return ui.notifications.info(loc`There is no interrupted resource transaction to recover.`);
   if (!confirmed) {
     const user = game.users.get(lock.flags.spycraft2.resourceLock.userId),
       input = await foundry.applications.api.DialogV2.input({
-        window: { title: "Recover interrupted resource transaction" },
+        window: { title: loc`Recover interrupted resource transaction` },
         rejectClose: false,
-        content: `<p>Check the recorded result and current resources before retrying. Coordinate with ${foundry.utils.escapeHTML(user?.name ?? "the original user")} to ensure their action has stopped.</p><label><input type="checkbox" name="confirmed" /> No client is still executing this resource transaction</label>`
+        content: `<p>${loc`Check the recorded result and current resources before retrying. Coordinate with ${foundry.utils.escapeHTML(user?.name ?? loc`the original user`)} to ensure their action has stopped.`}</p><label><input type="checkbox" name="confirmed" /> ${loc`No client is still executing this resource transaction`}</label>`
       });
     if (!input?.confirmed) return null;
   }
   // Re-read after the declaration so a replacement transaction is never cleared accidentally.
   const current = await readActor(actor);
   if (current.items.get(scope)?.flags?.spycraft2?.resourceLock?.token !== lock.flags.spycraft2.resourceLock.token)
-    throw new Error("The resource transaction changed; it was not cleared.");
+    throw new Error(loc`The resource transaction changed; it was not cleared.`);
   if (scope === RESOURCE_LOCK_ID) actor.updateSource(current.toObject(), { recursive: false });
   else if (!actor.items.has(scope)) actor.updateSource({ items: current.toObject().items }, { recursive: false });
   return actor.deleteEmbeddedDocuments("Item", [scope], { render: false });
@@ -252,7 +254,7 @@ export async function refreshWorldSetting(namespace, key) {
   const doc = globalThis.game?.settings?.get?.(namespace, key, { document: true });
   if (!doc?.constructor?.database) return null;
   const matches = await doc.constructor.database.get(doc.constructor, { query: { key: `${namespace}.${key}` } });
-  if (matches.length > 1) throw new Error(`Ambiguous world setting ${namespace}.${key}.`);
+  if (matches.length > 1) throw new Error(loc`Ambiguous world setting ${namespace}.${key}.`);
   if (!matches.length) return null;
   const fresh = matches[0];
   if (doc.id === fresh.id) doc.updateSource(fresh.toObject(), { recursive: false });
@@ -288,7 +290,7 @@ export function queueResourceScope(actor, scope, work) {
           await release(actor, token, scope);
         } catch (error) {
           ui.notifications.warn(
-            "GC resource transaction finished, but its lock needs recovery. Check the result before retrying."
+            loc`GC resource transaction finished, but its lock needs recovery. Check the result before retrying.`
           );
         }
       }
@@ -310,19 +312,19 @@ export function queueResourceScope(actor, scope, work) {
 /** Refresh a rule-scope participant only while its native rule lock is held. */
 export async function refreshResourceActor(actor) {
   if (!held.has(lockKey(actor, RULE_RESOURCE_LOCK_ID)))
-    throw Error("Acquire the rule-state lock before refreshing this actor.");
+    throw Error(loc`Acquire the rule-state lock before refreshing this actor.`);
   return refreshActor(actor);
 }
 
 /** Read an actual source card from the server under the participant’s independent rule mutex. */
 export async function refreshRuleStateMessage(actor, message) {
   if (!held.has(lockKey(actor, RULE_RESOURCE_LOCK_ID)))
-    throw Error("Acquire the rule-state lock before refreshing its source message.");
+    throw Error(loc`Acquire the rule-state lock before refreshing its source message.`);
   const originalActor = message.flags?.spycraft2?.actorUuid,
     fresh = await readDocument(message);
   if (fresh.flags?.spycraft2?.actorUuid !== originalActor)
-    throw Error("The roll’s acting character changed before this rule-state transaction.");
+    throw Error(loc`The roll’s acting character changed before this rule-state transaction.`);
   message.updateSource(fresh.toObject(), { recursive: false });
-  if (message.blind && !game.user.isGM) throw Error("The GC resolves secret results.");
+  if (message.blind && !game.user.isGM) throw Error(loc`The GC resolves secret results.`);
   return message;
 }

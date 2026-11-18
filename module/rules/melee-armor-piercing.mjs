@@ -3,6 +3,7 @@ import { grantedMeleeQuality } from "./melee-tricks.mjs";
 import { finesseWeaponPlan } from "./finesse.mjs";
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -23,10 +24,10 @@ export function armorPiercingFloor(qualities = "", minimum = 2) {
       /\bAP\b/i.test(text.replace(/\bAP\b\s*\([^)]*\)/gi, "")) ||
       entries.some(m => !/^\s*(?:all|\d+)\s*$/i.test(m[1])))
   )
-    throw Error("Review the weapon’s existing armor-piercing quality before granting AP(2).");
+    throw Error(loc`Review the weapon’s existing armor-piercing quality before granting AP(2).`);
   const values = entries.map(m => (/^\s*all\s*$/i.test(m[1]) ? Infinity : Number(m[1])));
   if (values.some(v => v !== Infinity && !Number.isSafeInteger(v)))
-    throw Error("Review the weapon’s existing armor-piercing value.");
+    throw Error(loc`Review the weapon’s existing armor-piercing value.`);
   const intrinsic = values.length ? Math.max(...values) : 0;
   if (intrinsic >= minimum)
     return {
@@ -91,9 +92,9 @@ export function meleeArmorPiercingPlan(system, weapon, { grip } = {}) {
       },
       notes: [
         definition.feat +
-          ": this actual readied " +
+          loc`: this actual readied ` +
           weapon.meleeFamily +
-          " gains AP (2); preserve higher intrinsic AP and apply the effective quality to weapon damage (pp." +
+          loc` gains AP (2); preserve higher intrinsic AP and apply the effective quality to weapon damage (pp.` +
           definition.page +
           ",301,332)."
       ]
@@ -118,7 +119,7 @@ export function validateMeleeArmorPiercingProof(
     proof.armorPiercing !== 2 ||
     !["Axe Basics", "Hammer Basics"].includes(proof.feat)
   )
-    throw Error("The actual owned readied AP weapon changed.");
+    throw Error(loc`The actual owned readied AP weapon changed.`);
   if (rerollOf) {
     const c = globalThis.fromUuidSync?.(rerollOf)?.flags?.spycraft2,
       old = c?.meleeArmorPiercing;
@@ -131,7 +132,7 @@ export function validateMeleeArmorPiercingProof(
       stable(old) !== stable(proof) ||
       c.weaponQualities !== weaponQualities
     )
-      throw Error("Use the original owned unresolved AP result and its earned quality for replacement.");
+      throw Error(loc`Use the original owned unresolved AP result and its earned quality for replacement.`);
     return;
   }
   const qualities = finesseWeaponPlan(actor.system, item.system).effectiveQualities,
@@ -148,7 +149,7 @@ export function validateMeleeArmorPiercingProof(
         ? grantedMeleeQuality(current.effectiveQualities, attackContext?.meleeTrick?.grantedQuality)
         : current.effectiveQualities;
   if (grip.blocked || stable(current.evidence) !== stable(proof) || weaponQualities !== expectedQualities)
-    throw Error("The qualified feat, actual readied AP weapon or legal grip changed before posting.");
+    throw Error(loc`The qualified feat, actual readied AP weapon or legal grip changed before posting.`);
 }
 
 /** Historical card invariant; read-only recovery never asks for a new held weapon. */
@@ -169,7 +170,7 @@ export function validateRecordedMeleeArmorPiercing(check) {
         ? grantedMeleeQuality(p.effectiveQualities, check.attackContext?.meleeTrick?.grantedQuality)
         : p.effectiveQualities)
   )
-    throw Error("The posted result lost or changed its earned armor-piercing quality.");
+    throw Error(loc`The posted result lost or changed its earned armor-piercing quality.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

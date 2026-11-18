@@ -5,6 +5,7 @@ import { ownedWeaponTraining, weaponSourceIdentity } from "../rules/weapon-train
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Map(),
   stable = v =>
@@ -23,7 +24,7 @@ const message = id =>
 export function attackDamageUseRows(system) {
   const rows = system.attackDamageUses ?? [],
     seen = new Set();
-  if (!Array.isArray(rows)) throw Error("Review the recorded attack damage bonus uses.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the recorded attack damage bonus uses.`);
   for (const r of rows) {
     if (
       r?.version !== 1 ||
@@ -42,7 +43,7 @@ export function attackDamageUseRows(system) {
       !r.sourceEvidence ||
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid))
     )
-      throw Error("Review the recorded attack damage bonus uses.");
+      throw Error(loc`Review the recorded attack damage bonus uses.`);
     seen.add(r.rootAttackUuid);
   }
   return rows;
@@ -63,14 +64,14 @@ function attackRoot(actor, attack, proof) {
     seen.add(current.uuid);
     const c = current.flags?.spycraft2;
     if (c?.actorUuid !== actor.uuid || c.checkKind !== "attack" || stable(damageDeclaration(c)) !== stable(proof))
-      throw Error("The original earned attack bonus changed.");
+      throw Error(loc`The original earned attack bonus changed.`);
     if (!c.rerollOf) return current.uuid;
     const previous = message(c.rerollOf);
     if (previous?.flags?.spycraft2?.superseded !== current.uuid || previous.flags.spycraft2.weaponUuid !== c.weaponUuid)
-      throw Error("Use the actually adopted original attack replacement chain.");
+      throw Error(loc`Use the actually adopted original attack replacement chain.`);
     current = previous;
   }
-  throw Error("The original attack chain is missing or cyclic.");
+  throw Error(loc`The original attack chain is missing or cyclic.`);
 }
 /** Historical facts authorize bookkeeping, never a new roll or a substitute Item. */
 function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
@@ -98,7 +99,7 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
     (!validRecordedMeleeTrick(declaredTrick, c?.attackContext) ||
       (trade && declaredTrick.targetUuid !== trade.targetUuid))
   )
-    throw Error("The original zero-bonus melee trick declaration or target changed.");
+    throw Error(loc`The original zero-bonus melee trick declaration or target changed.`);
   if (
     c?.actorUuid !== actor.uuid ||
     c.checkKind !== "attack" ||
@@ -121,7 +122,7 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
         (p.firearm && c.attackContext.fireMode !== "single") ||
         (c.attackContext.fireMode ?? null) !== p.fireMode))
   )
-    throw Error("Choose a resolved successful recorded attack with this exact weapon and its earned damage bonus.");
+    throw Error(loc`Choose a resolved successful recorded attack with this exact weapon and its earned damage bonus.`);
   const named =
     c.attackContext.characterTarget?.source === "gcManual" ? c.attackContext.characterTarget.name : p.manualTargetName;
   if (
@@ -132,7 +133,7 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
       p.targetConfirmed !== true ||
       named !== p.manualTargetName)
   )
-    throw Error("Review the recorded GC-confirmed target name.");
+    throw Error(loc`Review the recorded GC-confirmed target name.`);
   if (
     trick &&
     stable({
@@ -142,7 +143,7 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
     }) !==
       stable({ targetUuid: p.targetUuid, manualTargetName: p.manualTargetName, targetConfirmed: p.targetConfirmed })
   )
-    throw Error("Use the same actual target for the melee trick and attack damage.");
+    throw Error(loc`Use the same actual target for the melee trick and attack damage.`);
   const actualTarget =
     c.attackContext.targetActorUuid ||
     c.attackContext.characterTarget?.actorUuid ||
@@ -151,7 +152,7 @@ function recordedAttackDamageFacts(actor, attack, { targetUuid } = {}) {
     c.finalAttack?.targetUuid ||
     (p.manualTargetName ? "manual:" + named : null);
   if (actualTarget !== p.targetUuid || (targetUuid && targetUuid !== p.targetUuid))
-    throw Error("Use the recorded attack’s actual target.");
+    throw Error(loc`Use the recorded attack’s actual target.`);
   const rootAttackUuid = attackRoot(actor, attack, damageDeclaration(c));
   return {
     version: 1,
@@ -182,10 +183,10 @@ export function attackDamageBenefitSource(actor, attack, item, { targetUuid, his
     c = attack.flags.spycraft2,
     p = attackTradeoffProof(c) ?? c.attackContext.meleeTrick,
     profile = c.attackContext.meleeTrick ?? (p.source === "Bullseye" ? p : null);
-  if (item?.uuid !== c.weaponUuid) throw Error("Choose the recorded attack’s exact weapon.");
+  if (item?.uuid !== c.weaponUuid) throw Error(loc`Choose the recorded attack’s exact weapon.`);
   const owned = actor.items?.get?.(item.id) ?? values(actor.items).find(i => i.id === item.id);
   if (!owned || owned.uuid !== c.weaponUuid || owned.type !== "weapon" || p.weaponId !== owned.id)
-    throw Error("Use the actual owned weapon and operating proficiency of the recorded attack.");
+    throw Error(loc`Use the actual owned weapon and operating proficiency of the recorded attack.`);
   const training = ownedWeaponTraining(actor, p, {
     checkKind: "attack",
     weaponUuid: c.weaponUuid,
@@ -199,7 +200,7 @@ export function attackDamageBenefitSource(actor, attack, item, { targetUuid, his
         weaponSourceIdentity({ ...owned.system, id: owned.id }, { operatingProficiency: training.operatingProficiency })
       )
     )
-      throw Error("The recorded attack weapon identity or operating proficiency changed.");
+      throw Error(loc`The recorded attack weapon identity or operating proficiency changed.`);
     if (!historical) {
       const ammo = owned.system.loadedAmmoId
           ? (actor.items?.get?.(owned.system.loadedAmmoId) ??
@@ -211,7 +212,7 @@ export function attackDamageBenefitSource(actor, attack, item, { targetUuid, his
         stable(bullseyeDamageSourceFacts({ ...owned.system, name: owned.name }, ammunition))
       )
         throw Error(
-          "The recorded attack weapon or ammunition damage profile changed. Use the original shot’s configuration."
+          loc`The recorded attack weapon or ammunition damage profile changed. Use the original shot’s configuration.`
         );
     }
   }
@@ -248,7 +249,7 @@ function validateSource(actor, proof, { historical = false } = {}) {
   const expected = attackDamageBenefitSource(actor, attack, item, { targetUuid: proof.targetUuid, historical }),
     { reservationId, ...facts } = proof;
   if (typeof reservationId !== "string" || !reservationId || stable(expected) !== stable(facts))
-    throw Error("The original recorded attack bonus hit, target or damage source changed.");
+    throw Error(loc`The original recorded attack bonus hit, target or damage source changed.`);
   return expected;
 }
 function originalDamage(actor, proof, rerollOf) {
@@ -261,7 +262,7 @@ function originalDamage(actor, proof, rerollOf) {
     c.superseded ||
     stable(c.attackDamageBenefit) !== stable(proof)
   )
-    throw Error("Use the actual original damage receipt to replace its recorded attack bonus die.");
+    throw Error(loc`Use the actual original damage receipt to replace its recorded attack bonus die.`);
   const use = attackDamageUseRows(actor.system).find(
       r => r.rootAttackUuid === proof.rootAttackUuid && r.reservationId === proof.reservationId
     ),
@@ -278,14 +279,14 @@ function originalDamage(actor, proof, rerollOf) {
       break;
     current = previous;
   }
-  throw Error("This damage receipt does not own the recorded recorded attack bonus use.");
+  throw Error(loc`This damage receipt does not own the recorded recorded attack bonus use.`);
 }
 /** A melee-trick sneak die exists only inside the damage of its own recorded hit. */
 export function validateTrickSneakSource(proof, sneakAttack) {
   const rows = (sneakAttack?.sources ?? []).filter(s => s.source === "Between the Ribs");
   if (!rows.length) return;
   if (rows.length !== 1 || rows[0].dice !== 1 || proof?.sneakDice !== 1 || proof.sneakSource !== "Between the Ribs")
-    throw Error("Between the Ribs sneak attack damage requires its exact recorded knife hit.");
+    throw Error(loc`Between the Ribs sneak attack damage requires its exact recorded knife hit.`);
 }
 export function validateAttackDamageProof(
   actor,
@@ -294,15 +295,15 @@ export function validateAttackDamageProof(
 ) {
   if (!proof) return;
   if (checkKind !== "damage" || weaponUuid !== proof.weaponUuid)
-    throw Error("The recorded attack bonus must augment its exact weapon’s damage.");
+    throw Error(loc`The recorded attack bonus must augment its exact weapon’s damage.`);
   if (proof.operatingProficiency && weaponProficiency !== proof.operatingProficiency)
-    throw Error("Use the recorded shot’s original operating proficiency for its damage.");
+    throw Error(loc`Use the recorded shot’s original operating proficiency for its damage.`);
   if (
     proof.grantedQuality &&
     (!/\bTKD\b/.test(weaponQualities ?? "") ||
       (rerollOf && message(rerollOf)?.flags?.spycraft2?.weaponQualities !== weaponQualities))
   )
-    throw Error("The earned takedown quality must remain on this exact recorded damage result.");
+    throw Error(loc`The earned takedown quality must remain on this exact recorded damage result.`);
   if (rerollOf) {
     originalDamage(actor, proof, rerollOf);
     validateSource(actor, proof, { historical: true });
@@ -315,7 +316,7 @@ export function validateAttackDamageProof(
       r => r.rootAttackUuid === proof.rootAttackUuid && r.reservationId === proof.reservationId && !r.receiptUuid
     )
   )
-    throw Error("Reserve this damage bonus through the original hit.");
+    throw Error(loc`Reserve this damage bonus through the original hit.`);
 }
 export async function withAttackDamageBenefit(actor, proof, perform) {
   const lease = {};
@@ -324,7 +325,7 @@ export async function withAttackDamageBenefit(actor, proof, perform) {
     const rows = attackDamageUseRows(actor.system);
     if (rows.some(r => r.rootAttackUuid === proof.rootAttackUuid))
       throw Error(
-        "This recorded attack bonus attack already has damage, or an interrupted damage use awaiting GC review."
+        loc`This recorded attack bonus attack already has damage, or an interrupted damage use awaiting GC review.`
       );
     await actor.update({
       "system.attackDamageUses": [
@@ -356,7 +357,7 @@ export async function withAttackDamageBenefit(actor, proof, perform) {
         const rows = attackDamageUseRows(actor.system),
           use = rows.find(r => r.rootAttackUuid === proof.rootAttackUuid);
         if (use?.reservationId !== proof.reservationId)
-          throw Error("The attack damage bonus reservation changed; ask the GC to review it.");
+          throw Error(loc`The attack damage bonus reservation changed; ask the GC to review it.`);
         await actor.update({
           "system.attackDamageUses": receipt
             ? rows.map(r => (r.rootAttackUuid === proof.rootAttackUuid ? { ...r, receiptUuid: receipt.uuid } : r))
@@ -378,7 +379,7 @@ export async function withAttackDamageBenefit(actor, proof, perform) {
     } catch (cleanup) {
       throw new AggregateError(
         [error, cleanup],
-        "The attack damage bonus needs GC review; inspect its receipt before retrying."
+        loc`The attack damage bonus needs GC review; inspect its receipt before retrying.`
       );
     }
     if (receipt) return receipt;
@@ -390,8 +391,8 @@ export async function withAttackDamageBenefit(actor, proof, perform) {
 }
 export async function reviewAttackDamageBenefit(actor, { reservationId, confirmed = false } = {}) {
   if (!game.user.isGM || !actor.isOwner || confirmed !== true)
-    throw Error("The GC must confirm the interrupted attack damage bonus was reviewed.");
-  if (active.has(actor.uuid + ":" + reservationId)) throw Error("This client is still executing that damage roll.");
+    throw Error(loc`The GC must confirm the interrupted attack damage bonus was reviewed.`);
+  if (active.has(actor.uuid + ":" + reservationId)) throw Error(loc`This client is still executing that damage roll.`);
   return queueRuleState(actor, async () => {
     const rows = attackDamageUseRows(actor.system),
       use = rows.find(r => r.reservationId === reservationId && !r.receiptUuid);
@@ -402,26 +403,26 @@ export async function reviewAttackDamageBenefit(actor, { reservationId, confirme
         m.flags.spycraft2.checkKind === "damage" &&
         m.flags.spycraft2.attackDamageBenefit?.reservationId === reservationId
     );
-    if (posted.length > 1) throw Error("Multiple damage receipts require manual GC review.");
+    if (posted.length > 1) throw Error(loc`Multiple damage receipts require manual GC review.`);
     const receipt = posted[0];
     if (receipt) validateRecordedMeleeArmorPiercing(receipt.flags.spycraft2);
     if (
       receipt?.flags.spycraft2.attackDamageBenefit.grantedQuality &&
       !/\bTKD\b/.test(receipt.flags.spycraft2.weaponQualities ?? "")
     )
-      throw Error("The posted damage lost its earned takedown quality.");
+      throw Error(loc`The posted damage lost its earned takedown quality.`);
     if (receipt) {
       const { reservationId: nonce, ...facts } = receipt.flags.spycraft2.attackDamageBenefit,
         expected = recordedAttackDamageFacts(actor, message(use.attackUuid), { targetUuid: use.targetUuid });
       if (nonce !== use.reservationId || stable(expected) !== stable(facts))
-        throw Error("The posted damage bonus or original recorded hit changed.");
+        throw Error(loc`The posted damage bonus or original recorded hit changed.`);
     }
     if (
       receipt &&
       (receipt.flags.spycraft2.attackDamageBenefit.rootAttackUuid !== use.rootAttackUuid ||
         receipt.flags.spycraft2.attackDamageBenefit.sourceEvidence !== use.sourceEvidence)
     )
-      throw Error("The posted damage does not match its interrupted recorded attack bonus hit.");
+      throw Error(loc`The posted damage does not match its interrupted recorded attack bonus hit.`);
     await actor.update({
       "system.attackDamageUses": receipt
         ? rows.map(r => (r.reservationId === reservationId ? { ...r, receiptUuid: receipt.uuid } : r))

@@ -5,6 +5,7 @@ import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { readiedDisarmWeapons } from "./disarm-response.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Ordinary Feint p.357. Alternative skills, free actions and outcomes are separate. */
 export function feintSkillChecks(key, checks = []) {
   const acting = key === "sleightOfHand",
@@ -51,10 +52,10 @@ export function feintCheckPlan(
     empty = { evidence: null, bonuses: [], blockedReason: "", notes: [] };
   if (!role) return empty;
   const reject = blockedReason => ({ ...empty, blockedReason });
-  if (method !== "roll") return reject("Feint is an opposed combat action; taking10/20 is unavailable (pp.91,352).");
+  if (method !== "roll") return reject(loc`Feint is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
   if (!validOwnCountClock(feintCombat) || (role === "attacker" && feintCombat.turn !== feintCombat.ownTurnIndex))
     return reject(
-      "Use a started combat with this participant; take the ordinary Feint half action during your Initiative Count."
+      loc`Use a started combat with this participant; take the ordinary Feint half action during your Initiative Count.`
     );
   if (
     typeof feintOpponentName !== "string" ||
@@ -63,7 +64,7 @@ export function feintCheckPlan(
     ![feintAdjacent, feintTargetEligibleConfirmed, feintLegalConfirmed].every(v => v === true)
   )
     return reject(
-      "Name the adjacent opponent and confirm the legal Feint and that its target has not already been targeted by a successful Feint this round (p.357)."
+      loc`Name the adjacent opponent and confirm the legal Feint and that its target has not already been targeted by a successful Feint this round (p.357).`
     );
   let fencingBasics, flailBasics;
   try {
@@ -76,13 +77,13 @@ export function feintCheckPlan(
         ready.blockedReason ||
         flailBasics.weapons.some(w => !ready.weapons.some(r => r.id === w.id && r.hands === w.hands))
       )
-        throw Error(ready?.blockedReason || "Review the actual held flail and legal grip.");
+        throw Error(ready?.blockedReason || loc`Review the actual held flail and legal grip.`);
     }
   } catch (error) {
     return reject(error.message);
   }
   if (typeof feintOpponentUuid !== "string" || feintOpponentUuid.length > 500)
-    return reject("Choose an actual opposing character.");
+    return reject(loc`Choose an actual opposing character.`);
   const evidence = {
     ...(feintOpponentUuid ? { opponentUuid: feintOpponentUuid, combatStance: combatStanceProof(system) } : {}),
     version: feintOpponentUuid ? 3 : 2,
@@ -107,16 +108,16 @@ export function feintCheckPlan(
     notes: [
       ...(flailBasics
         ? [
-            "Flail Basics: +2 gear with this Feint skill check while holding a reviewed readied flail; gear bonuses do not stack (p.178)."
+            loc`Flail Basics: +2 gear with this Feint skill check while holding a reviewed readied flail; gear bonuses do not stack (p.178).`
           ]
         : []),
-      `Feint: opposed ${role === "attacker" ? "Sleight of Hand(DEX), Hands-On and Vision; one half action" : "Notice(WIS), Vision; response to the incoming half action"}; base error1 plus action error+1 on both checks (pp.352,357).`,
+      loc`Feint: opposed ${role === "attacker" ? loc`Sleight of Hand(DEX), Hands-On and Vision; one half action` : loc`Notice(WIS), Vision; response to the incoming half action`}; base error1 plus action error+1 on both checks (pp.352,357).`,
       ...(fencingBasics
         ? [
-            "Fencing Basics: +2 gear with this Feint skill check while holding a readied one-handed FIN sword; gear bonuses do not stack (p.178)."
+            loc`Fencing Basics: +2 gear with this Feint skill check while holding a readied one-handed FIN sword; gear bonuses do not stack (p.178).`
           ]
         : []),
-      "The GC confirms that the Feint target has not been targeted by a successful Feint this round. The loser becomes flat-footed. A winning critical success or losing critical failure gives the winner +2 with the next attack against the loser, expiring at the end of the following round if unused. Resolve opposed results, critical activation, conditions, the target restriction and next-attack benefits separately."
+      loc`The GC confirms that the Feint target has not been targeted by a successful Feint this round. The loser becomes flat-footed. A winning critical success or losing critical failure gives the winner +2 with the next attack against the loser, expiring at the end of the following round if unused. Resolve opposed results, critical activation, conditions, the target restriction and next-attack benefits separately.`
     ]
   };
 }
@@ -169,7 +170,7 @@ export function validateFeintProof(
       attributeSubstitution.ability === "int" &&
       (actor.system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : base))
-    throw Error("The Feint key attribute or actual substitution source changed before posting.");
+    throw Error(loc`The Feint key attribute or actual substitution source changed before posting.`);
   const candidate = p.evidence ? structuredClone(p.evidence) : null;
   if (candidate && proof.version === 1) {
     candidate.version = 1;
@@ -177,7 +178,7 @@ export function validateFeintProof(
   }
   if (checkKind !== "skill" || p.blockedReason || !candidate || stable(candidate) !== stable(proof))
     throw Error(
-      "The Feint participants, eligibility declaration, Initiative Count or readied Feint gear source changed before posting."
+      loc`The Feint participants, eligibility declaration, Initiative Count or readied Feint gear source changed before posting.`
     );
 }
 

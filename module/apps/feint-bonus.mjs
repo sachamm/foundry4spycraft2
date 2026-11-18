@@ -3,6 +3,7 @@ import { feintBonusRows, feintBonusGrantPlan, assertFeintBonusPlan } from "../ru
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   activeAttempts = new Map(),
   stable = v =>
@@ -34,7 +35,7 @@ export async function grantFeintCriticalBonus(actor, settlement) {
 }
 function validateSources(actor, proof) {
   const rows = feintBonusRows(actor.system).filter(r => proof.sourceMessages.includes(r.sourceMessage));
-  if (rows.length !== proof.sourceMessages.length) throw Error("A recorded Feint bonus source was removed.");
+  if (rows.length !== proof.sourceMessages.length) throw Error(loc`A recorded Feint bonus source was removed.`);
   for (const r of rows) {
     const a = message(r.sourceMessage)?.flags?.spycraft2,
       d = message(r.defenderMessage)?.flags?.spycraft2,
@@ -56,7 +57,7 @@ function validateSources(actor, proof) {
       stable([rollEvidence(a), rollEvidence(d)]) !== stable(r.sourceEvidence) ||
       stable(s.sourceEvidence) !== stable(r.sourceEvidence)
     )
-      throw Error("The resolved critical Feint source changed before the attack.");
+      throw Error(loc`The resolved critical Feint source changed before the attack.`);
   }
   return rows;
 }
@@ -72,7 +73,7 @@ function replacement(actor, proof, rerollOf) {
     c.superseded ||
     stable(c.attackContext?.feintBonus) !== stable(proof)
   )
-    throw Error("Use the actual original attack to replace this recorded Feint benefit.");
+    throw Error(loc`Use the actual original attack to replace this recorded Feint benefit.`);
   const rows = validateSources(actor, proof),
     wanted = new Set(rows.map(r => r.receiptUuid)),
     seen = new Set();
@@ -81,7 +82,7 @@ function replacement(actor, proof, rerollOf) {
     if (wanted.has(original.uuid)) {
       const origin = original.flags?.spycraft2;
       if (origin?.rollCombat?.id !== proof.combatId || origin.rollCombat?.round !== proof.attackRound)
-        throw Error("The original Feint-benefit attack timing changed.");
+        throw Error(loc`The original Feint-benefit attack timing changed.`);
       wanted.delete(original.uuid);
       if (!wanted.size) return true;
     }
@@ -94,7 +95,7 @@ function replacement(actor, proof, rerollOf) {
       break;
     original = previous;
   }
-  throw Error("The original attack does not own this spent Feint bonus.");
+  throw Error(loc`The original attack does not own this spent Feint bonus.`);
 }
 export function hasFeintBonusLease(actor, proof, lease) {
   const p = lease && leases.get(lease);
@@ -107,7 +108,7 @@ export function validateFeintAttackBonusProof(
 ) {
   if (!proof) return;
   if (checkKind !== "attack" || proof.targetUuid !== targetOf(attackContext, finalAttack))
-    throw Error("The recorded Feint bonus must use its actual opposing character.");
+    throw Error(loc`The recorded Feint bonus must use its actual opposing character.`);
   if (rerollOf) {
     if (proof.attackBonus === 2) replacement(actor, proof, rerollOf);
     else {
@@ -120,7 +121,7 @@ export function validateFeintAttackBonusProof(
         stable(c.attackContext?.feintBonus) !== stable(proof) ||
         proof.attackBonus !== 0
       )
-        throw Error("Use the original recorded attack for this replacement.");
+        throw Error(loc`Use the original recorded attack for this replacement.`);
     }
     return;
   }
@@ -131,11 +132,11 @@ export function validateFeintAttackBonusProof(
   });
   if (proof.attackBonus === 2) {
     if (!attackCharacterTargetChoices().some(a => a.uuid === proof.targetUuid))
-      throw Error("The Feint bonus opponent is no longer an observed character.");
+      throw Error(loc`The Feint bonus opponent is no longer an observed character.`);
     if (!hasFeintBonusLease(actor, proof, lease))
-      throw Error("Reserve this next-attack Feint bonus through its attack workflow.");
+      throw Error(loc`Reserve this next-attack Feint bonus through its attack workflow.`);
     const rows = validateSources(actor, proof);
-    if (rows.some(r => r.usedBy !== proof.attemptId)) throw Error("This Feint bonus belongs to another attack.");
+    if (rows.some(r => r.usedBy !== proof.attemptId)) throw Error(loc`This Feint bonus belongs to another attack.`);
   }
 }
 export async function withFeintAttackBonus(actor, proof, perform) {
@@ -146,7 +147,7 @@ export async function withFeintAttackBonus(actor, proof, perform) {
       combat: actor.mentalLeapCombatContext()
     });
     const rows = validateSources(actor, proof);
-    if (rows.some(r => r.usedBy != null)) throw Error("This Feint bonus was already used by another attack.");
+    if (rows.some(r => r.usedBy != null)) throw Error(loc`This Feint bonus was already used by another attack.`);
     await actor.update({
       "system.feintBonuses": feintBonusRows(actor.system).map(r =>
         proof.sourceMessages.includes(r.sourceMessage) ? { ...r, usedBy: proof.attemptId } : r
@@ -166,7 +167,7 @@ export async function withFeintAttackBonus(actor, proof, perform) {
     queueRuleState(actor, async () => {
       const rows = feintBonusRows(actor.system);
       if (rows.filter(r => proof.sourceMessages.includes(r.sourceMessage)).some(r => r.usedBy !== proof.attemptId))
-        throw Error("The reserved Feint benefit changed; ask the GC to review its attack.");
+        throw Error(loc`The reserved Feint benefit changed; ask the GC to review its attack.`);
       await actor.update({
         "system.feintBonuses": rows.map(r =>
           proof.sourceMessages.includes(r.sourceMessage)
@@ -190,7 +191,7 @@ export async function withFeintAttackBonus(actor, proof, perform) {
     } catch (cleanup) {
       throw new AggregateError(
         [error, cleanup],
-        "The Feint next-attack benefit needs GC review; check the recorded attack before retrying."
+        loc`The Feint next-attack benefit needs GC review; check the recorded attack before retrying.`
       );
     }
     if (receipt) return receipt;
@@ -202,7 +203,7 @@ export async function withFeintAttackBonus(actor, proof, perform) {
 }
 
 export async function reviewFeintBonuses(actor, input = {}) {
-  if (!game.user.isGM || !actor.isOwner) throw Error("The GC must review an interrupted Feint attack benefit.");
+  if (!game.user.isGM || !actor.isOwner) throw Error(loc`The GC must review an interrupted Feint attack benefit.`);
   if (!Object.hasOwn(input, "attemptId")) {
     const esc = foundry.utils.escapeHTML,
       ids = [
@@ -212,26 +213,26 @@ export async function reviewFeintBonuses(actor, input = {}) {
             .map(r => r.usedBy)
         )
       ];
-    if (!ids.length) return ui.notifications.info("No interrupted Feint benefit is awaiting review.");
+    if (!ids.length) return ui.notifications.info(loc`No interrupted Feint benefit is awaiting review.`);
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review interrupted Feint attack" },
+      window: { title: loc`Review interrupted Feint attack` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>First recover any interrupted resource lock. Check the original Feint and attack receipts. A posted attack keeps its spent bonus. Only a confirmed missing attack releases the unused bonus, retaining its original opponent and expiry.</p><label>Interrupted attempt <select name="attemptId">${ids
+      content: `<div class="spycraft2-roll-options"><p>${loc`First recover any interrupted resource lock. Check the original Feint and attack receipts. A posted attack keeps its spent bonus. Only a confirmed missing attack releases the unused bonus, retaining its original opponent and expiry.`}</p><label>${loc`Interrupted attempt`} <select name="attemptId">${ids
         .map(id => {
           const r = feintBonusRows(actor.system).find(r => r.usedBy === id),
             name = attackCharacterTargetChoices().find(a => a.uuid === r.targetUuid)?.name ?? "Recorded opponent";
-          return `<option value="${esc(id)}">${esc(name)} · Feint round ${r.madeRound}</option>`;
+          return `<option value="${esc(id)}">${loc`${esc(name)} · Feint round ${r.madeRound}`}</option>`;
         })
         .join(
           ""
-        )}</select></label><label><input name="confirmed" type="checkbox" /> No client is still executing this attack; I reviewed its receipts and current resources</label></div>`
+        )}</select></label><label><input name="confirmed" type="checkbox" /> ${loc`No client is still executing this attack; I reviewed its receipts and current resources`}</label></div>`
     });
     if (!input) return null;
   }
   if (input.confirmed !== true)
-    throw Error("Confirm the interrupted attack is no longer executing and its receipts were reviewed.");
+    throw Error(loc`Confirm the interrupted attack is no longer executing and its receipts were reviewed.`);
   if (activeAttempts.has(actor.uuid + ":" + input.attemptId))
-    throw Error("This client is still executing that attack.");
+    throw Error(loc`This client is still executing that attack.`);
   return queueRuleState(actor, async () => {
     const rows = feintBonusRows(actor.system),
       pending = rows.filter(r => r.usedBy === input.attemptId && !r.receiptUuid);
@@ -242,14 +243,14 @@ export async function reviewFeintBonuses(actor, input = {}) {
         m.flags.spycraft2.checkKind === "attack" &&
         m.flags.spycraft2.attackContext?.feintBonus?.attemptId === input.attemptId
     );
-    if (posted.length > 1) throw Error("Multiple attack receipts need manual GC review.");
+    if (posted.length > 1) throw Error(loc`Multiple attack receipts need manual GC review.`);
     const receipt = posted[0],
       bound = rows
         .filter(r => r.usedBy === input.attemptId)
         .map(r => r.sourceMessage)
         .sort();
     if (receipt && stable(receipt.flags.spycraft2.attackContext.feintBonus.sourceMessages) !== stable(bound))
-      throw Error("The recorded attack does not match this interrupted benefit.");
+      throw Error(loc`The recorded attack does not match this interrupted benefit.`);
     await actor.update({
       "system.feintBonuses": rows.map(r =>
         r.usedBy === input.attemptId

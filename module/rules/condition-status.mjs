@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Change one explicitly reviewed condition, preserving independent effect data and item-owned sources. */
 export async function setConditionStatus(actor, id, active, { label = id, aliases = [], operationId = null } = {}) {
   if (
@@ -7,7 +8,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
     !Array.isArray(aliases) ||
     aliases.some(a => typeof a !== "string" || !a)
   )
-    throw new Error("Choose the condition state.");
+    throw new Error(loc`Choose the condition state.`);
   const ids = new Set([id, ...aliases]),
     hasStatus = effect => [...ids].some(key => effect.statuses?.has(key));
   const before = [...ids].some(key => actor.statuses?.has(key));
@@ -16,11 +17,11 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
     applied = actor.appliedEffects ?? own.filter(e => e.active ?? (!e.disabled && !e.isSuppressed));
   if (!active && applied.some(e => hasStatus(e) && !own.includes(e)))
     throw new Error(
-      label + " is still supplied by an item or another source. Review that source before clearing the condition."
+      label + loc` is still supplied by an item or another source. Review that source before clearing the condition.`
     );
   if (active) {
     const status = globalThis.CONFIG?.statusEffects?.find(e => e.id === id);
-    if (!status) throw new Error("This condition is not configured.");
+    if (!status) throw new Error(loc`This condition is not configured.`);
     const operation = operationId ?? globalThis.foundry?.utils?.randomID?.() ?? Math.random().toString(36).slice(2);
     try {
       const [effect] = await actor.createEmbeddedDocuments("ActiveEffect", [
@@ -31,7 +32,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
           flags: { spycraft2: { conditionOperation: operation } }
         }
       ]);
-      if (!effect || !actor.statuses?.has(id)) throw new Error("The condition was not applied.");
+      if (!effect || !actor.statuses?.has(id)) throw new Error(loc`The condition was not applied.`);
       return { active: true, changed: true, effectId: effect.id };
     } catch (error) {
       const created = [...(actor.effects ?? [])]
@@ -43,7 +44,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
         } catch (rollback) {
           throw new AggregateError(
             [error, rollback],
-            "Condition creation could not be rolled back; review its current status before retrying."
+            loc`Condition creation could not be rolled back; review its current status before retrying.`
           );
         }
       throw error;
@@ -51,7 +52,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
   }
   const matching = own.filter(e => (e.active ?? (!e.disabled && !e.isSuppressed)) && hasStatus(e));
   if (!matching.length)
-    throw new Error(label + " has no directly editable status source. Review its originating effect.");
+    throw new Error(label + loc` has no directly editable status source. Review its originating effect.`);
   const updates = [],
     removed = [];
   for (const effect of matching) {
@@ -72,7 +73,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
       deleted.push(data);
     }
     if ([...ids].some(key => actor.statuses?.has(key)))
-      throw new Error(label + " remains supplied by another active source. Review that source.");
+      throw new Error(label + loc` remains supplied by another active source. Review that source.`);
     return { active: false, changed: true };
   } catch (error) {
     const failures = [];
@@ -88,7 +89,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
             failures.push(e);
           }
         else if (JSON.stringify(now) !== JSON.stringify(row.before))
-          failures.push(new Error("The condition source changed again; preserve it for review."));
+          failures.push(new Error(loc`The condition source changed again; preserve it for review.`));
       }
     }
     // Also reconcile a deletion which committed before its caller reported failure.
@@ -104,7 +105,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
     if (failures.length)
       throw new AggregateError(
         [error, ...failures],
-        "Condition removal could not be fully restored; review its sources before retrying."
+        loc`Condition removal could not be fully restored; review its sources before retrying.`
       );
     throw error;
   }

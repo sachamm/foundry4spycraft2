@@ -81,6 +81,7 @@ import {
   npcIsSpecial,
   dispositionRows
 } from "../apps/gc/npc-play.mjs";
+import { loc } from "../i18n.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -164,7 +165,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       confirmRestraintEscapeMove(event, target) {
         const message = game.messages.get(target.dataset.messageId);
-        if (!message) return ui.notifications.warn("Load the original grapple message before confirming movement.");
+        if (!message) return ui.notifications.warn(loc`Load the original grapple message before confirming movement.`);
         return this.actor.confirmRestraintEscapeMove(message);
       },
       escapeRestraint() {
@@ -670,7 +671,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
           [game.i18n.localize("SPYCRAFT.Base"), 10],
           [classLabel, sys.defense.base],
           ["DEX", sys.defense.dexterity],
-          ["Vulnerable: dodge bonuses lost", -sys.defense.dodgeLost],
+          [loc`Vulnerable: dodge bonuses lost`, -sys.defense.dodgeLost],
           [armorLabel, sys.defense.armor],
           ["Size", sys.sizeModifier],
           [miscLabel, misc.defense]
@@ -778,7 +779,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         const skill = focusRule.choiceSkill;
         fields.push({
           key: "grantedFocus",
-          label: `Granted ${cfg.skills[skill].name} focus`,
+          label: loc`Granted ${cfg.skills[skill].name} focus`,
           value: choices.grantedFocus,
           text: skill === "profession",
           options:
@@ -788,8 +789,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         });
       }
       if (rule.attributes) {
-        fields.push({ key: "up", label: "+2 attribute", value: choices.up, options: context.abilityOptions });
-        fields.push({ key: "down", label: "−2 attribute", value: choices.down, options: context.abilityOptions });
+        fields.push({ key: "up", label: loc`+2 attribute`, value: choices.up, options: context.abilityOptions });
+        fields.push({ key: "down", label: loc`−2 attribute`, value: choices.down, options: context.abilityOptions });
       }
       const skillOptions = Object.fromEntries(Object.values(cfg.skills).map(s => [s.key, s.name]));
       for (const [kind, number, label] of [
@@ -810,7 +811,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       if (rule.threatSkill)
         fields.push({
           key: "threatSkill",
-          label: "Threat-range skill",
+          label: loc`Threat-range skill`,
           value: choices.threatSkill,
           options: skillOptions
         });
@@ -821,28 +822,28 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         for (let index = 0; index < rule.npcQualities; index++) {
           fields.push({
             key: `npcQuality${index}`,
-            label: `NPC quality ${index + 1} (GC approval)`,
+            label: loc`NPC quality ${index + 1} (GC approval)`,
             value: choices[`npcQuality${index}`],
             options
           });
           if (choices[`npcQuality${index}`] === "damageResistance")
             fields.push({
               key: `npcDetails${index}`,
-              label: `Quality ${index + 1} resisted damage type`,
+              label: loc`Quality ${index + 1} resisted damage type`,
               value: resistanceType(choices[`npcDetails${index}`]),
               options: RESISTANCE_TYPES
             });
           else if (choices[`npcQuality${index}`] === "camouflaged")
             fields.push({
               key: `npcDetails${index}`,
-              label: `Quality ${index + 1} camouflage terrain`,
+              label: loc`Quality ${index + 1} camouflage terrain`,
               value: camouflageTerrain(choices[`npcDetails${index}`]),
               options: CAMOUFLAGE_TERRAINS
             });
           else
             fields.push({
               key: `npcDetails${index}`,
-              label: `Quality ${index + 1} details / chosen item`,
+              label: loc`Quality ${index + 1} details / chosen item`,
               value: choices[`npcDetails${index}`],
               text: true
             });
@@ -1211,7 +1212,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     const careerPlan = this._pendingCareerForm;
     this._pendingCareerForm = null;
     if (Object.hasOwn(submitData, "system.progression") && !careerPlan)
-      throw new Error("Use the career form controls to edit progression.");
+      throw new Error(loc`Use the career form controls to edit progression.`);
     if (careerPlan && !careerPlan.edits.length) delete submitData["system.progression"];
     const resources = [
       "system.actionDice.value",
@@ -1250,13 +1251,13 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       ) {
         this.render();
         return ui.notifications.warn(
-          "Use each temporary Depth of Study source to spend its reserved focus/forte picks."
+          loc`Use each temporary Depth of Study source to spend its reserved focus/forte picks.`
         );
       }
     }
     const save = async () => {
       if (careerPlan?.edits.length) {
-        if (this.actor.isOwner !== true) throw new Error("You must own the character before editing its career.");
+        if (this.actor.isOwner !== true) throw new Error(loc`You must own the character before editing its career.`);
         mergeCareerForm(this.actor.system.progression, careerPlan);
       }
       if (itemUpdates.length) await this.actor.updateEmbeddedDocuments("Item", itemUpdates);
@@ -1277,7 +1278,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         !item.system.repeatable &&
         this.actor.items.some(i => i.type === "feat" && i.name.trim().toLowerCase() === item.name.trim().toLowerCase())
       ) {
-        return ui.notifications.warn(`${item.name} may only be selected once.`);
+        return ui.notifications.warn(loc`${item.name} may only be selected once.`);
       }
       const data = item.toObject?.() ?? foundry.utils.deepClone(item);
       delete data._id;
@@ -1407,7 +1408,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       if (picks.generic.reservedAvailable && picks[skill].remaining <= 0 && picks.generic.unscopedRemaining <= 0) {
         this.render();
         return ui.notifications.warn(
-          "Use the temporary Depth of Study control on Training to spend its source-scoped picks."
+          loc`Use the temporary Depth of Study control on Training to spend its source-scoped picks.`
         );
       }
       list.add(value);
@@ -1577,7 +1578,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         .filter(([key]) => !(result.type === "animal" && ["competence", "wealth"].includes(key)))
         .map(([key, label]) => ({
           key,
-          label: key === "health" ? (result.type === "special" ? "Vitality / wounds" : "Damage save") : label,
+          label: key === "health" ? (result.type === "special" ? loc`Vitality / wounds` : loc`Damage save`) : label,
           value: profile.grades[key],
           options: key === "wealth" ? { 0: "None", ...gradeOptions } : gradeOptions
         })),

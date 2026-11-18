@@ -1,4 +1,5 @@
 import { standardAttackContextInput } from "./standard-attack-context.mjs";
+import { loc } from "../i18n.mjs";
 export function finalAttackOptions(input) {
   for (const key of [
     "disarm",
@@ -12,7 +13,7 @@ export function finalAttackOptions(input) {
   ])
     if (input[key])
       throw new Error(
-        "This control resolves one final Standard Attack. Resolve combined class declarations through their normal controls and GC use-count review; other actions cannot be combined."
+        loc`This control resolves one final Standard Attack. Resolve combined class declarations through their normal controls and GC use-count review; other actions cannot be combined.`
       );
   return { ...standardAttackContextInput(input), attackAction: "standard", freeFinalAttack: true };
 }
@@ -31,10 +32,10 @@ export async function postFinalAttack(actor, weaponId, options, receipt, validat
       finalAttack: receipt,
       validateFinalAttack: validate
     });
-    if (!message) throw new Error("The final attack was cancelled before posting.");
+    if (!message) throw new Error(loc`The final attack was cancelled before posting.`);
     const recorded = posted();
     if (!message.uuid || !recorded || recorded.uuid !== message.uuid)
-      throw new Error("The final attack did not post an actual recorded result.");
+      throw new Error(loc`The final attack did not post an actual recorded result.`);
     return recorded;
   } catch (error) {
     const message = posted();

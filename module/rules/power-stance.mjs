@@ -1,4 +1,5 @@
 import { combatStanceState } from "./combat-stance.mjs";
+import { loc } from "../i18n.mjs";
 export const stablePower = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -25,11 +26,11 @@ export function powerStanceBonus(system) {
   if (combatStanceState(system)?.key !== "power") return 0;
   const score = system.abilities?.str?.value;
   if (!Number.isSafeInteger(score) || score < 1)
-    throw Error("Review the current Strength score before applying Power Stance to Initiative Count.");
+    throw Error(loc`Review the current Strength score before applying Power Stance to Initiative Count.`);
   return score;
 }
 export function powerStanceInitiativeMarker(system, initiative) {
-  if (initiative !== null && !countValid(initiative)) throw Error("Review the finite Initiative Count.");
+  if (initiative !== null && !countValid(initiative)) throw Error(loc`Review the finite Initiative Count.`);
   const bonus = initiative === null ? 0 : powerStanceBonus(system);
   return {
     version: 1,
@@ -52,7 +53,7 @@ export function powerStanceInitiativePlan(system, { initiative, record, untracke
     };
   }
   const review = reason => ({ needsReview: true, reason, initiative, record, delta: 0, changed: false });
-  if (!countValid(initiative)) return review("Review the finite Initiative Count.");
+  if (!countValid(initiative)) return review(loc`Review the finite Initiative Count.`);
   let bonus;
   try {
     bonus = powerStanceBonus(system);
@@ -60,7 +61,7 @@ export function powerStanceInitiativePlan(system, { initiative, record, untracke
     return review(error.message);
   }
   if (!record && !bonus && !untrackedExit) return { changed: false, initiative, record: null, delta: 0 };
-  if (record?.needsReview) return review(record.reason ?? "Review this Count’s included Power Stance bonus.");
+  if (record?.needsReview) return review(record.reason ?? loc`Review this Count’s included Power Stance bonus.`);
   if (
     record?.version !== 1 ||
     !countValid(record.count) ||
@@ -68,12 +69,12 @@ export function powerStanceInitiativePlan(system, { initiative, record, untracke
     record.includedBonus < 0 ||
     (record.includedBonus && !(typeof record.stanceId === "string" && record.stanceId))
   )
-    return review("This existing Count has no verified Power Stance component. Confirm the bonus already included.");
+    return review(loc`This existing Count has no verified Power Stance component. Confirm the bonus already included.`);
   if (record.count !== initiative)
-    return review("Initiative Count changed without its Power Stance record. Confirm its included bonus.");
+    return review(loc`Initiative Count changed without its Power Stance record. Confirm its included bonus.`);
   const delta = bonus - record.includedBonus,
     next = initiative + delta;
-  if (!countValid(next)) return review("The adjusted Initiative Count is unsafe.");
+  if (!countValid(next)) return review(loc`The adjusted Initiative Count is unsafe.`);
   const nextRecord = powerStanceInitiativeMarker(system, next);
   return {
     changed: delta !== 0 || stablePower(markerFacts(record)) !== stablePower(markerFacts(nextRecord)),
@@ -84,7 +85,7 @@ export function powerStanceInitiativePlan(system, { initiative, record, untracke
 }
 export function reviewedPowerStanceInitiativePlan(system, { initiative, record } = {}, includedBonus) {
   if (!Number.isSafeInteger(includedBonus) || includedBonus < 0)
-    throw Error("Confirm the whole nonnegative Power Stance bonus already included in this Count.");
+    throw Error(loc`Confirm the whole nonnegative Power Stance bonus already included in this Count.`);
   const p = powerStanceInitiativePlan(system, {
     initiative,
     record: {

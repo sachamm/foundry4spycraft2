@@ -2,6 +2,7 @@ import { tradeoffTarget } from "./melee-tradeoff.mjs";
 import { cqbRangedWeapon } from "./cqb.mjs";
 import { ownedWeaponTraining, weaponSourceIdentity } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -60,7 +61,7 @@ export function bullseyePlan(
 ) {
   if (penalty === 0) return null;
   if (!Number.isSafeInteger(penalty) || penalty < 0)
-    throw Error("Choose a nonnegative whole Bullseye penalty before rolling.");
+    throw Error(loc`Choose a nonnegative whole Bullseye penalty before rolling.`);
   const maximum = (system.abilities?.dex?.mod ?? NaN) + 2;
   if (
     !system.activeFeatNames?.includes("Bullseye") ||
@@ -73,10 +74,10 @@ export function bullseyePlan(
     (firing.firearm ? firing.fireMode !== "single" : !cqbRangedWeapon(weapon))
   )
     throw Error(
-      "Bullseye requires its earned feat and a ranged Standard Attack using exactly one shot; confirm that no burst or additional-shot trick applies."
+      loc`Bullseye requires its earned feat and a ranged Standard Attack using exactly one shot; confirm that no burst or additional-shot trick applies.`
     );
   if (!Number.isFinite(maximum) || penalty > maximum)
-    throw Error("The Bullseye penalty cannot exceed current Dexterity modifier +2.");
+    throw Error(loc`The Bullseye penalty cannot exceed current Dexterity modifier +2.`);
   return {
     version: 1,
     source: "Bullseye",
@@ -118,7 +119,7 @@ export function validateBullseyeProof(
   if (!proof) return;
   const item = actor.items?.get?.(proof.weaponId) ?? [...(actor.items ?? [])].find(i => i.id === proof.weaponId);
   if (checkKind !== "attack" || !item || item.type !== "weapon" || item.uuid !== weaponUuid)
-    throw Error("The actual Bullseye weapon changed.");
+    throw Error(loc`The actual Bullseye weapon changed.`);
   ownedWeaponTraining(actor, proof, { checkKind, weaponUuid, weaponProficiency, attackContext });
   if (rerollOf) {
     const c = globalThis.fromUuidSync?.(rerollOf)?.flags?.spycraft2;
@@ -130,7 +131,7 @@ export function validateBullseyeProof(
       c.superseded ||
       stable(c.attackContext?.bullseye) !== stable(proof)
     )
-      throw Error("Use the original owned Bullseye attack for its replacement.");
+      throw Error(loc`Use the original owned Bullseye attack for its replacement.`);
     return;
   }
   const preview = actor.weaponAttack(item, {
@@ -148,7 +149,7 @@ export function validateBullseyeProof(
   });
   if (preview.blocked || stable(preview.bullseye) !== stable(proof))
     throw Error(
-      "The Bullseye declaration, Dexterity, actual shot, recoil/grip, weapon or qualified source changed before posting."
+      loc`The Bullseye declaration, Dexterity, actual shot, recoil/grip, weapon or qualified source changed before posting.`
     );
 }
 

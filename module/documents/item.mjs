@@ -7,6 +7,7 @@ import {
   featAcquisitionValuesMatch,
   pendingFeatAcquisition
 } from "../rules/feat-acquisition.mjs";
+import { loc } from "../i18n.mjs";
 /**
  * Identifies this browser session. The same user can be logged in from several clients at once, so comparing user ids
  * is not enough to make sure only the client that made a change follows it up.
@@ -58,7 +59,7 @@ export class SpycraftItem extends Item {
         ) {
           changes["system.acquisitionCheck"] = pendingFeatAcquisition(
             next,
-            "This feat was added after its recorded acquisition; review prerequisite eligibility at that level."
+            loc`This feat was added after its recorded acquisition; review prerequisite eligibility at that level.`
           );
           changes["system.historicalPrerequisitesConfirmed"] = false;
         }

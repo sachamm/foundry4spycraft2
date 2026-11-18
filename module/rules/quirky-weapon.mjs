@@ -1,6 +1,7 @@
 import { quirkyAttackPlan } from "./quirky.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export function quirkyWeaponPlan(
   weapon,
   {
@@ -33,7 +34,7 @@ export function validateQuirkyWeaponProof(actor, proof, context = {}) {
     current = quirkyWeaponPlan(weapon, { trained, operatingProficiency, untrainedPenalty });
   if (stable(current) !== stable(proof))
     throw Error(
-      "The Quirky weapon source, actual operating proficiency or base untrained penalty changed before posting."
+      loc`The Quirky weapon source, actual operating proficiency or base untrained penalty changed before posting.`
     );
 }
 

@@ -6,6 +6,7 @@
 import { VEHICLE_RULES } from "./tables.mjs";
 import { SIZE_CODES, sizeCode } from "./vehicles.mjs";
 import { hasQuality, parseQualities, qualityNumber } from "./vehicle-play-rules.mjs";
+import { loc } from "../i18n.mjs";
 
 const sizeIndex = code => SIZE_CODES.indexOf(sizeCode(code));
 
@@ -26,15 +27,15 @@ export function movementMode(vehicleClass) {
 export function explosionPlan({ size, fuel, remainingHours = 0 }) {
   const table = VEHICLE_RULES.explosions,
     code = String(fuel ?? "").toUpperCase();
-  if (!code) return { explodes: false, reason: "It carries no fuel that can explode." };
+  if (!code) return { explodes: false, reason: loc`It carries no fuel that can explode.` };
   if (table.noExplosion.includes(code))
-    return { explodes: false, reason: "Diesel, oil, nuclear and battery power cannot explode." };
+    return { explodes: false, reason: loc`Diesel, oil, nuclear and battery power cannot explode.` };
   const column = table.columnByFuel[code];
-  if (!column) return { explodes: false, reason: "The GC decides whether this fuel can explode." };
+  if (!column) return { explodes: false, reason: loc`The GC decides whether this fuel can explode.` };
   const s = sizeCode(size),
     smallest = SIZE_CODES.indexOf("S");
   const row = table.bySize[s] ?? (sizeIndex(s) >= 0 && sizeIndex(s) < smallest ? table.bySize.S : null);
-  if (!row) return { explodes: false, reason: "Record the vehicle's Size first." };
+  if (!row) return { explodes: false, reason: loc`Record the vehicle's Size first.` };
   const entry = row[column],
     multiplier = Math.max(1, Math.floor(Number(remainingHours) || 0));
   return {
@@ -106,22 +107,22 @@ export function signatureDefense(system, sensor, { fasterThanCruising = false, r
   const qualities = system.qualitiesNow ?? system.qualities ?? "";
   const listed = signatureSizes(qualities)[sensor];
   let size = listed ?? sizeCode(system.size || system.sizeLabel);
-  let sizeLabel = `${listed ? "Signature" : "Actual"} Size ${size}`;
+  let sizeLabel = loc`${listed ? loc`Signature` : loc`Actual`} Size ${size}`;
   if (jamming && sensor === "radar" && hasQuality(qualities, "JAM")) {
     const steps = Math.floor(Math.max(0, qualityNumber(qualities, "JAM") ?? 0) / 2);
     const index = Math.min(SIZE_CODES.length - 1, sizeIndex(size) + steps);
     if (steps && sizeIndex(size) >= 0) {
       size = SIZE_CODES[index];
-      sizeLabel += `, jamming: as ${size}`;
+      sizeLabel += loc`, jamming: as ${size}`;
     }
   }
   const base = table.bySize[size];
   if (!Number.isSafeInteger(base))
-    return { sensor, size, value: null, rows: [], note: "No signature listed for this Size." };
+    return { sensor, size, value: null, rows: [], note: loc`No signature listed for this Size.` };
   const rows = [{ label: sizeLabel, value: base }];
-  if (fasterThanCruising) rows.push({ label: "Faster than cruising MPH", value: table.fasterThanCruising });
+  if (fasterThanCruising) rows.push({ label: loc`Faster than cruising MPH`, value: table.fasterThanCruising });
   if (room && Number.isSafeInteger(table.room[room]))
-    rows.push({ label: `Maneuvering Room ${room}`, value: table.room[room] });
+    rows.push({ label: loc`Maneuvering Room ${room}`, value: table.room[room] });
   return { sensor, size, value: rows.reduce((sum, row) => sum + row.value, 0), rows, listed: !!listed };
 }
 
@@ -218,7 +219,7 @@ export function vehicleHazards(system, choice = {}) {
       value = Math.min(0, value + 2);
       why.push("Stabilized");
     }
-    if (cell.blocked) out.blocked = `This vehicle cannot travel over ${row.label.toLowerCase()} ground.`;
+    if (cell.blocked) out.blocked = loc`This vehicle cannot travel over ${row.label.toLowerCase()} ground.`;
     if (cell.damage) out.damagePerRound = true;
     if (cell.speedCut) out.speedCut = true;
     out.modifier += value;
@@ -230,12 +231,12 @@ export function vehicleHazards(system, choice = {}) {
     const cut = speed => (Number.isSafeInteger(speed) ? speed - Math.floor(speed * 0.25) : null);
     out.cruiseMph = cut(system.condition?.cruiseMph ?? system.cruiseMph);
     out.topMph = cut(system.condition?.topMph ?? system.topMph);
-    out.notes.push("Cruising and top MPH each drop by a quarter.");
+    out.notes.push(loc`Cruising and top MPH each drop by a quarter.`);
   }
   if (out.damagePerRound)
-    out.notes.push("One Vehicle Damage result each round it travels faster than half its cruising MPH.");
-  if (out.errorIncrease) out.notes.push(`Maneuver error range +${out.errorIncrease}.`);
-  if (env && !ignored) out.notes.push("Environmental tolerance: choose the hazard it ignores.");
+    out.notes.push(loc`One Vehicle Damage result each round it travels faster than half its cruising MPH.`);
+  if (out.errorIncrease) out.notes.push(loc`Maneuver error range +${out.errorIncrease}.`);
+  if (env && !ignored) out.notes.push(loc`Environmental tolerance: choose the hazard it ignores.`);
   return out;
 }
 

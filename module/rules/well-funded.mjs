@@ -1,15 +1,16 @@
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
+import { loc } from "../i18n.mjs";
 /** p.198: additional cash, not a Spending Cash rank increase or a gear pick. */
 export function wellFundedPlan(system, { atHome = false, home = "" } = {}) {
-  if (!system.activeFeatNames?.includes("Well-Funded")) throw new Error("An active Well-Funded feat is required.");
+  if (!system.activeFeatNames?.includes("Well-Funded")) throw new Error(loc`An active Well-Funded feat is required.`);
   const blocked = attributeActionBlock(system, { kind: "gear", ability: "wis" }) || restraintActionBlock(system);
   if (blocked) throw new Error(blocked);
   if (atHome !== true || typeof home !== "string" || !home.trim() || home.length > 200)
-    throw new Error("Confirm that you are at your home and record that home.");
+    throw new Error(loc`Confirm that you are at your home and record that home.`);
   const wealth = system.wealth?.total;
   if (!Number.isSafeInteger(wealth) || wealth < 0 || !Number.isSafeInteger(wealth * 200))
-    throw new Error("Review the total Wealth used for this cash grant.");
+    throw new Error(loc`Review the total Wealth used for this cash grant.`);
   return {
     version: 1,
     source: "Well-Funded",

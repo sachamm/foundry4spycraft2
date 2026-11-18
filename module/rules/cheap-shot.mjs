@@ -6,6 +6,7 @@ import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { cheapShotScene } from "./cheap-shot-effects.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export const CHEAP_SHOT_CHOICES = ["str", "dex", "con", "int", "wis", "cha", "speed"];
 /** p.355 Standard Attack plus a free-action trick, not a separate attack action. */
 export function cheapShotPlan(
@@ -32,14 +33,14 @@ export function cheapShotPlan(
     (weapon.quantity ?? 1) < 1 ||
     weaponUnavailable(weapon)
   )
-    return reject("Cheap Shot requires the actual available readied attack weapon.");
-  if (fireMode !== null && fireMode !== "single") return reject("Cheap Shot uses a Single-Shot Standard Attack.");
+    return reject(loc`Cheap Shot requires the actual available readied attack weapon.`);
+  if (fireMode !== null && fireMode !== "single") return reject(loc`Cheap Shot uses a Single-Shot Standard Attack.`);
   if (action !== "standard" || disarm)
     return reject(
-      "Cheap Shot requires a Standard Attack with its trick; review combinations with other action workflows separately."
+      loc`Cheap Shot requires a Standard Attack with its trick; review combinations with other action workflows separately.`
     );
   if (!validOwnCountClock(combat) || (!freeFinalAttack && combat.turn !== combat.ownTurnIndex))
-    return reject("Take Cheap Shot during your Initiative Count in a started combat.");
+    return reject(loc`Take Cheap Shot during your Initiative Count in a started combat.`);
   if (
     !CHEAP_SHOT_CHOICES.includes(context.choice) ||
     typeof context.targetUuid !== "string" ||
@@ -52,7 +53,7 @@ export function cheapShotPlan(
     context.eligibleConfirmed !== true
   )
     return reject(
-      "Choose the actual opponent and one attribute or Speed before rolling; confirm a legal Standard Attack/free action and no previous successful Cheap Shot against this target this scene."
+      loc`Choose the actual opponent and one attribute or Speed before rolling; confirm a legal Standard Attack/free action and no previous successful Cheap Shot against this target this scene.`
     );
   let flailBasics = null;
   try {
@@ -65,7 +66,7 @@ export function cheapShotPlan(
           ready.blockedReason ||
           flailBasics.weapons.some(w => !ready.weapons.some(r => r.id === w.id && r.hands === w.hands))
         )
-          throw Error(ready?.blockedReason || "Review the actual held flail and grip.");
+          throw Error(ready?.blockedReason || loc`Review the actual held flail and grip.`);
       }
     }
   } catch (e) {
@@ -90,11 +91,11 @@ export function cheapShotPlan(
     attackBonus: -4 + (flailBasics ? 2 : 0),
     errorIncrease: 1,
     notes: [
-      `Cheap Shot: Standard Attack plus one free action; attack −4, action error+1; chosen ${context.choice} against ${context.targetName} (p.355).`,
+      loc`Cheap Shot: Standard Attack plus one free action; attack −4, action error+1; chosen ${context.choice} against ${context.targetName} (p.355).`,
       ...(flailBasics
-        ? ["Flail Basics: +2 gear with this melee Cheap Shot attack while holding a reviewed readied flail (p.178)."]
+        ? [loc`Flail Basics: +2 gear with this melee Cheap Shot attack while holding a reviewed readied flail (p.178).`]
         : []),
-      "On a miss, the attacker becomes flat-footed. On a hit, apply −2 to attack/skill checks keyed to the chosen attribute or −10 ft. Speed. The effect ends with the scene or a successful Fortitude save (DC20 −2 per minute since this attack; at most one attempt per minute). Only one successful Cheap Shot may affect a combatant per scene."
+      loc`On a miss, the attacker becomes flat-footed. On a hit, apply −2 to attack/skill checks keyed to the chosen attribute or −10 ft. Speed. The effect ends with the scene or a successful Fortitude save (DC20 −2 per minute since this attack; at most one attempt per minute). Only one successful Cheap Shot may affect a combatant per scene.`
     ]
   };
 }
@@ -116,7 +117,7 @@ export function validateCheapShotProof(
   if (!proof) return;
   const item = actor.items?.get?.(proof.weaponId) ?? actor.items?.find?.(i => i.id === proof.weaponId);
   if (checkKind !== "attack" || !item || item.type !== "weapon" || (weaponUuid && item.uuid !== weaponUuid))
-    throw Error("The Cheap Shot attack weapon changed.");
+    throw Error(loc`The Cheap Shot attack weapon changed.`);
   const trainedSource = ownedWeaponTraining(actor, proof, { checkKind, weaponUuid, weaponProficiency, attackContext });
   const items = readiedItemsForCheck(actor, { rerollOf, cheapShot: proof }),
     source = items.find(i => (i.id ?? i._id) === proof.weaponId) ?? item,
@@ -140,7 +141,9 @@ export function validateCheapShotProof(
       }
     );
   if (p.blocked || stable(p) !== stable(proof))
-    throw Error("The Cheap Shot choice, actual held flail, qualified feat or Initiative Count changed before posting.");
+    throw Error(
+      loc`The Cheap Shot choice, actual held flail, qualified feat or Initiative Count changed before posting.`
+    );
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

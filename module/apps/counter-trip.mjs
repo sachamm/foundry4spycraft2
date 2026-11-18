@@ -4,6 +4,7 @@ import { validOwnCountClock } from "../rules/own-count-duration.mjs";
 import { responseOwnSize, tripSizeIndex } from "../rules/trip.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Set(),
   stable = v =>
@@ -34,7 +35,7 @@ function source(actor, facts) {
       depth: 1
     };
   if (typeof facts?.id !== "string" || !facts.id || stable(facts) !== stable(expected))
-    throw Error("The earned counter-Trip source or reciprocal participants changed.");
+    throw Error(loc`The earned counter-Trip source or reciprocal participants changed.`);
   const use = row.defending.flags.spycraft2.tripCounterUse;
   if (
     !use ||
@@ -42,7 +43,7 @@ function source(actor, facts) {
     stable(use.counter) !== stable(facts) ||
     !["reserved", "posted"].includes(use.state)
   )
-    throw Error("Reserve this actual earned counter-Trip through its control.");
+    throw Error(loc`Reserve this actual earned counter-Trip through its control.`);
   return { ...row, use };
 }
 function timing(actor, row) {
@@ -56,12 +57,12 @@ function timing(actor, row) {
     c.combatantId !== q.combatantId ||
     tripActiveCombatantId(actor) !== p.combatantId
   )
-    throw Error("Take the free counter-Trip immediately during its original active participant’s Count.");
+    throw Error(loc`Take the free counter-Trip immediately during its original active participant’s Count.`);
 }
 export function validateTripCounterIntent(actor, facts, lease) {
   const row = source(actor, facts);
   if (!lease || leases.get(lease)?.actor !== actor || leases.get(lease)?.id !== facts.id)
-    throw Error("Use the earned counter-Trip control; a free-action declaration cannot create its source.");
+    throw Error(loc`Use the earned counter-Trip control; a free-action declaration cannot create its source.`);
   timing(actor, row);
   return row;
 }
@@ -75,7 +76,7 @@ export function validateCounterTripReceipt(actor, m) {
     p?.version !== 2 ||
     game.messages.get(m.id) !== m
   )
-    throw Error("Use the actual recorded counter-Trip receipt.");
+    throw Error(loc`Use the actual recorded counter-Trip receipt.`);
   const row = source(actor, p.counterTrip),
     roots = [...game.messages].filter(
       m =>
@@ -85,7 +86,7 @@ export function validateCounterTripReceipt(actor, m) {
         stable(m.flags.spycraft2.tripAttack?.counterTrip) === stable(p.counterTrip)
     );
   if (roots.length !== 1 || (row.use.messageUuid && row.use.messageUuid !== roots[0].uuid))
-    throw Error("The reserved counter-Trip original root needs GC review.");
+    throw Error(loc`The reserved counter-Trip original root needs GC review.`);
   let current = m;
   const seen = new Set();
   while (current && !seen.has(current.uuid)) {
@@ -95,7 +96,7 @@ export function validateCounterTripReceipt(actor, m) {
     if (current.uuid === roots[0].uuid) return row;
     current = message(x.rerollOf);
   }
-  throw Error("This check does not descend from the actual reserved counter-Trip.");
+  throw Error(loc`This check does not descend from the actual reserved counter-Trip.`);
 }
 export function validateTripCounterProof(actor, proof, { checkKind, skillKey, checkId, lease, rerollOf } = {}) {
   if (proof?.version !== 2) return;
@@ -105,12 +106,12 @@ export function validateTripCounterProof(actor, proof, { checkKind, skillKey, ch
     checkId !== "counter-trip" ||
     proof.opponentUuid !== proof.counterTrip?.targetUuid
   )
-    throw Error("The earned counter-Trip must use its actual opposed Acrobatics role and original opponent.");
+    throw Error(loc`The earned counter-Trip must use its actual opposed Acrobatics role and original opponent.`);
   if (rerollOf) {
     const m = message(rerollOf),
       c = m?.flags?.spycraft2;
     if (c?.resolved || c?.superseded || stable(c?.tripAttack) !== stable(proof))
-      throw Error("Replace the actual owned unresolved counter-Trip.");
+      throw Error(loc`Replace the actual owned unresolved counter-Trip.`);
     validateCounterTripReceipt(actor, m);
     return;
   }
@@ -141,10 +142,10 @@ export async function takeCounterTrip(actor, input = {}) {
           (!m.blind || game.user.isGM)
       );
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Earned free counter-Trip" },
+      window: { title: loc`Earned free counter-Trip` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Use the free Trip earned by a critical defensive win against the original attacker. This is a free action during the original participant’s Count, not a new half action. Ordinary adjacency, Size, Acrobatics/DEX, Armor Check Penalty and action error+1 still apply. The second Trip cannot grant a third Trip.</p><label>Settled critical defense <select name="sourceMessage">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Use the free Trip earned by a critical defensive win against the original attacker. This is a free action during the original participant’s Count, not a new half action. Ordinary adjacency, Size, Acrobatics/DEX, Armor Check Penalty and action error+1 still apply. The second Trip cannot grant a third Trip.`}</p><label>${loc`Settled critical defense`} <select name="sourceMessage">` +
         ms
           .map(
             m =>
@@ -160,11 +161,11 @@ export async function takeCounterTrip(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        '</select></label><label>My Size categories minus the original attacker’s <input name="tripAttackSizeDifference" type="number" min="-1" max="11" step="1" required /></label><label><input name="tripAttackAdjacent" type="checkbox" /> The original attacker is still adjacent</label><label><input name="tripAttackParticipantsConfirmed" type="checkbox" /> The GC confirms both actual Sizes and a legal free counter-Trip</label><label><input name="immediateConfirmed" type="checkbox" /> This immediately follows that Trip with no intervening action</label></div>'
+        `</select></label><label>${loc`My Size categories minus the original attacker’s`} <input name="tripAttackSizeDifference" type="number" min="-1" max="11" step="1" required /></label><label><input name="tripAttackAdjacent" type="checkbox" /> ${loc`The original attacker is still adjacent`}</label><label><input name="tripAttackParticipantsConfirmed" type="checkbox" /> ${loc`The GC confirms both actual Sizes and a legal free counter-Trip`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This immediately follows that Trip with no intervening action`}</label></div>`
     });
     if (!input) return null;
   }
-  if (input.immediateConfirmed !== true) throw Error("Confirm the immediate earned counter-Trip.");
+  if (input.immediateConfirmed !== true) throw Error(loc`Confirm the immediate earned counter-Trip.`);
   const row = counterTripSource(actor, message(input.sourceMessage)),
     expectedSource = stable(row.settlement),
     prepared = await change(actor, row, async () => {
@@ -173,11 +174,11 @@ export async function takeCounterTrip(actor, input = {}) {
       if (prior) return { existing: prior };
       if (stable(fresh.settlement) !== expectedSource)
         throw Error(
-          "The critical Trip source changed while preparing its free counter; confirm the current result again."
+          loc`The critical Trip source changed while preparing its free counter; confirm the current result again.`
         );
       timing(actor, fresh);
       const target = attackCharacterTargetChoices().find(a => a.uuid === fresh.settlement.attackerUuid);
-      if (!target) throw Error("The original attacker is no longer an observed opposing character.");
+      if (!target) throw Error(loc`The original attacker is no longer an observed opposing character.`);
       const own = tripSizeIndex(responseOwnSize(actor.system)),
         other = tripSizeIndex(responseOwnSize(target.system)),
         difference = input.tripAttackSizeDifference ?? (own >= 0 && other >= 0 ? own - other : null),
@@ -204,7 +205,7 @@ export async function takeCounterTrip(actor, input = {}) {
       validateCounterTripReceipt(actor, found[0]);
       return found[0];
     }
-    throw Error("This counter-Trip is already reserved or needs GC review; do not roll it again.");
+    throw Error(loc`This counter-Trip is already reserved or needs GC review; do not roll it again.`);
   }
   const { facts, difference } = prepared,
     target = { uuid: prepared.targetUuid, name: prepared.targetName },
@@ -226,7 +227,8 @@ export async function takeCounterTrip(actor, input = {}) {
     });
     const roots = posted(actor, facts.id),
       m = roots.length === 1 ? roots[0] : null;
-    if (!result || !m) throw Error("The earned counter-Trip was cancelled or did not post a unique original result.");
+    if (!result || !m)
+      throw Error(loc`The earned counter-Trip was cancelled or did not post a unique original result.`);
     try {
       await change(actor, row, async () => {
         source(actor, facts);
@@ -235,7 +237,7 @@ export async function takeCounterTrip(actor, input = {}) {
         });
       });
     } catch {
-      ui.notifications.warn("Counter-Trip posted; its source stamp needs GC review.");
+      ui.notifications.warn(loc`Counter-Trip posted; its source stamp needs GC review.`);
     }
     return m;
   } catch (error) {
@@ -247,7 +249,7 @@ export async function takeCounterTrip(actor, input = {}) {
           await row.defending.unsetFlag("spycraft2", "tripCounterUse");
       });
     } catch (cleanup) {
-      throw new AggregateError([error, cleanup], "The unused counter-Trip needs GC review.");
+      throw new AggregateError([error, cleanup], loc`The unused counter-Trip needs GC review.`);
     }
     throw error;
   } finally {
@@ -256,7 +258,7 @@ export async function takeCounterTrip(actor, input = {}) {
   }
 }
 export async function reviewCounterTrip(actor, input = {}) {
-  if (!actor.isOwner || game.user.isGM !== true) throw Error("The owning GC reviews an interrupted counter-Trip.");
+  if (!actor.isOwner || game.user.isGM !== true) throw Error(loc`The owning GC reviews an interrupted counter-Trip.`);
   if (!Object.hasOwn(input, "sourceMessage")) {
     const esc = foundry.utils.escapeHTML,
       ms = [...game.messages].filter(
@@ -267,10 +269,10 @@ export async function reviewCounterTrip(actor, input = {}) {
           m.isContentVisible !== false
       );
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review interrupted counter-Trip" },
+      window: { title: loc`Review interrupted counter-Trip` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Recover any interrupted resource lock first. Reattach a unique posted counter-Trip without rolling again. If no result exists, review its original skill-payment transaction. You may close the unused opportunity while preserving resource history and authorizing no new roll.</p><label>Original critical defense <select name="sourceMessage">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Recover any interrupted resource lock first. Reattach a unique posted counter-Trip without rolling again. If no result exists, review its original skill-payment transaction. You may close the unused opportunity while preserving resource history and authorizing no new roll.`}</p><label>${loc`Original critical defense`} <select name="sourceMessage">` +
         ms
           .map(
             m =>
@@ -286,18 +288,18 @@ export async function reviewCounterTrip(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        '</select></label><label><input name="confirmed" type="checkbox" /> No client is executing the attempt; I reviewed the original skill receipts and payments</label><label><input name="closeUnused" type="checkbox" /> If no result exists, close the unused opportunity without granting a new roll</label></div>'
+        `</select></label><label><input name="confirmed" type="checkbox" /> ${loc`No client is executing the attempt; I reviewed the original skill receipts and payments`}</label><label><input name="closeUnused" type="checkbox" /> ${loc`If no result exists, close the unused opportunity without granting a new roll`}</label></div>`
     });
     if (!input) return null;
   }
   if (input.confirmed !== true)
-    throw Error("The owning GC must review this inactive interrupted counter-Trip and its actual receipts.");
+    throw Error(loc`The owning GC must review this inactive interrupted counter-Trip and its actual receipts.`);
   const row = counterTripSource(actor, message(input.sourceMessage)),
     use = row.defending.flags.spycraft2.tripCounterUse;
-  if (!use || active.has(use.id)) throw Error("Choose an interrupted counter-Trip no client is executing.");
+  if (!use || active.has(use.id)) throw Error(loc`Choose an interrupted counter-Trip no client is executing.`);
   return change(actor, row, async () => {
     const current = counterTripSource(actor, row.defending).defending.flags.spycraft2.tripCounterUse;
-    if (current?.id !== use.id || active.has(use.id)) throw Error("The interrupted counter-Trip changed.");
+    if (current?.id !== use.id || active.has(use.id)) throw Error(loc`The interrupted counter-Trip changed.`);
     const roots = posted(actor, use.id);
     if (!roots.length && input.closeUnused === true) {
       await row.defending.update({ "flags.spycraft2.tripCounterUse": { ...use, state: "closed", gcReviewed: true } });
@@ -305,7 +307,7 @@ export async function reviewCounterTrip(actor, input = {}) {
     }
     if (roots.length !== 1)
       throw Error(
-        "No unique posted counter-Trip is proven; review its skill-payment transaction or explicitly close the unused opportunity before any new roll."
+        loc`No unique posted counter-Trip is proven; review its skill-payment transaction or explicitly close the unused opportunity before any new roll.`
       );
     validateCounterTripReceipt(actor, roots[0]);
     await row.defending.update({

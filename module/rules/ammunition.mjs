@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Ammunition codes and supplied stockpiles, pp.258,265,319–320. This configures a code; it does not grant or spend ammunition. */
 const CONTAINERS = {
   M: ["magazine", "magazines"],
@@ -35,7 +36,7 @@ export function parseAmmunitionCode(value) {
     shots,
     containerType: match[2],
     container,
-    label: `${canonical} — ${shots} shots (${loads} × ${capacities.join("+")}-round ${container})`
+    label: loc`${canonical} — ${shots} shots (${loads} × ${capacities.join("+")}-round ${container})`
   };
 }
 export function ammunitionConfiguration(weapon) {
@@ -58,7 +59,7 @@ export function ammunitionConfiguration(weapon) {
       ...empty,
       applicable: true,
       needsReview: true,
-      reason: "Review the source’s special or malformed ammunition-stockpile rule before choosing a supplied code."
+      reason: loc`Review the source’s special or malformed ammunition-stockpile rule before choosing a supplied code.`
     };
   if ((!raw || /^[—–-]+$/.test(raw) || /^\d+$/.test(raw)) && !explicit?.length) return empty;
   const values = Array.isArray(explicit) && explicit.length ? explicit : raw.split(/\s+or\s+/i),
@@ -68,7 +69,7 @@ export function ammunitionConfiguration(weapon) {
       ...empty,
       applicable: true,
       needsReview: true,
-      reason: "Review the source’s special or malformed ammunition-stockpile rule before choosing a supplied code."
+      reason: loc`Review the source’s special or malformed ammunition-stockpile rule before choosing a supplied code.`
     };
   const choice = weapon.ammoCodeChoice ?? "";
   if (typeof choice !== "string")
@@ -78,7 +79,7 @@ export function ammunitionConfiguration(weapon) {
       options: parsed,
       requiresChoice: true,
       needsReview: true,
-      reason: "Review the saved ammunition-code choice."
+      reason: loc`Review the saved ammunition-code choice.`
     };
   const normalized = choice ? parseAmmunitionCode(choice)?.code : "",
     selected = choice ? parsed.find(v => v.code === normalized) : parsed.length === 1 ? parsed[0] : null;
@@ -89,8 +90,7 @@ export function ammunitionConfiguration(weapon) {
       options: parsed,
       requiresChoice: true,
       needsReview: true,
-      reason:
-        "The saved ammunition code no longer matches this weapon’s supplied configurations. Choose a current source option."
+      reason: loc`The saved ammunition code no longer matches this weapon’s supplied configurations. Choose a current source option.`
     };
   return {
     ...empty,
@@ -99,7 +99,7 @@ export function ammunitionConfiguration(weapon) {
     selected: selected ?? null,
     selectedCode: selected?.code ?? "",
     requiresChoice: !selected,
-    reason: selected ? "" : "Choose one supplied ammunition configuration."
+    reason: selected ? "" : loc`Choose one supplied ammunition configuration.`
   };
 }
 
@@ -159,11 +159,11 @@ export function compatibleAmmunition(weapon, catalog) {
 /** Reference calculation for one weapon; entitlement, payment, inventory and effects use separate workflows. */
 export function ammunitionStockpilePlan(weapon, catalog, { ammunitionId, stockpiles = 1, initial = false } = {}) {
   if (!Number.isSafeInteger(stockpiles) || stockpiles < 1)
-    throw new Error("Choose a positive whole number of stockpiles.");
+    throw new Error(loc`Choose a positive whole number of stockpiles.`);
   const profile = ammunitionProfile(weapon),
     compatible = compatibleAmmunition(weapon, catalog),
     ammo = compatible.find(a => a.id === ammunitionId);
-  if (!ammo) throw new Error("Choose ammunition offered for this weapon category and projectile caliber/model.");
+  if (!ammo) throw new Error(loc`Choose ammunition offered for this weapon category and projectile caliber/model.`);
   if (
     !Number.isFinite(ammo.unitWeight) ||
     ammo.unitWeight <= 0 ||
@@ -172,15 +172,15 @@ export function ammunitionStockpilePlan(weapon, catalog, { ammunitionId, stockpi
     (ammo.commonItemCost !== null && (!Number.isSafeInteger(ammo.commonItemCost) || ammo.commonItemCost < 1)) ||
     typeof ammo.firstStockpile !== "boolean"
   )
-    throw new Error("Review the ammunition source’s weight and stockpile costs.");
-  if (initial !== true && initial !== false) throw new Error("Choose an explicit included-stockpile calculation.");
+    throw new Error(loc`Review the ammunition source’s weight and stockpile costs.`);
+  if (initial !== true && initial !== false) throw new Error(loc`Choose an explicit included-stockpile calculation.`);
   if (initial && (stockpiles !== 1 || !compatible.some(a => a.firstStockpile === true)))
-    throw new Error("An included-stockpile calculation requires one supplied first stockpile for this weapon.");
+    throw new Error(loc`An included-stockpile calculation requires one supplied first stockpile for this weapon.`);
   const configuration = ammunitionConfiguration(weapon),
     shotsPerStockpile = ammo.fixedStockpileSize ?? configuration.selected?.shots;
   if (!Number.isSafeInteger(shotsPerStockpile) || shotsPerStockpile < 1)
     throw new Error(
-      configuration.reason || "Choose a supplied ammunition configuration with a positive stockpile size."
+      configuration.reason || loc`Choose a supplied ammunition configuration with a positive stockpile size.`
     );
   const totalShots = shotsPerStockpile * stockpiles,
     unitUpgradeCost = profile.chamber === "bs1" ? shotsPerStockpile : ammo.upgradeCost;
@@ -201,7 +201,7 @@ export function ammunitionStockpilePlan(weapon, catalog, { ammunitionId, stockpi
     (commonItemCost !== null && !Number.isSafeInteger(commonItemCost)) ||
     !Number.isFinite(totalWeight)
   )
-    throw new Error("The stockpile calculation exceeds safe arithmetic.");
+    throw new Error(loc`The stockpile calculation exceeds safe arithmetic.`);
   return {
     ammunitionId: ammo.id,
     ammunitionName: ammo.name,

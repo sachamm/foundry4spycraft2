@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 export const characterTargetsEqual = (a, b) =>
   !!a && !!b && Object.keys(a).length === Object.keys(b).length && Object.entries(a).every(([k, v]) => b[k] === v);
 /** Conditional character type is a fact about this attack's actual target, never a guess. */
@@ -7,11 +8,11 @@ export function characterTargetPlan(target, { targetCharacterType = "", targetNa
     typeof targetName !== "string" ||
     targetName.length > 200
   )
-    throw new Error("Choose the GC-confirmed character type and keep the target name within200 characters.");
+    throw new Error(loc`Choose the GC-confirmed character type and keep the target name within200 characters.`);
   if (!target) {
     if (!targetCharacterType || !targetName.trim()) {
       const error = new Error(
-        "Choose an actual character target, or enter the GC-confirmed type and name of the unrecorded target."
+        loc`Choose an actual character target, or enter the GC-confirmed type and name of the unrecorded target.`
       );
       error.code = "NEED_CHARACTER_TARGET";
       throw error;
@@ -25,21 +26,21 @@ export function characterTargetPlan(target, { targetCharacterType = "", targetNa
     };
   }
   if (target.createdTime !== undefined && target.createdTime !== null && !Number.isFinite(target.createdTime))
-    throw new Error("Review the actual target identity.");
+    throw new Error(loc`Review the actual target identity.`);
   if (
     typeof target.uuid !== "string" ||
     !target.uuid ||
     !["agent", "npc"].includes(target.type) ||
     (target.type === "npc" && !["standard", "special", "animal"].includes(target.npcType))
   )
-    throw new Error("Review the actual target’s character type.");
+    throw new Error(loc`Review the actual target’s character type.`);
   const known = target.type === "agent" ? "special" : target.npcType === "animal" ? null : target.npcType;
   if (known && targetCharacterType && targetCharacterType !== "object" && known !== targetCharacterType)
     throw new Error(
-      "The declared target type conflicts with its actual character sheet. Correct the source before attacking."
+      loc`The declared target type conflicts with its actual character sheet. Correct the source before attacking.`
     );
   if (!known && !targetCharacterType) {
-    const error = new Error("The GC must classify this actual animal as standard or special.");
+    const error = new Error(loc`The GC must classify this actual animal as standard or special.`);
     error.code = "NEED_CHARACTER_TARGET";
     throw error;
   }

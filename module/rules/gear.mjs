@@ -40,6 +40,7 @@ import {
 } from "./firearms.mjs";
 import { specialistApplies } from "./weapon-specialist.mjs";
 import { planTotal } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Actual equipment category, separate from the pick used to acquire it. Legacy typed items have known categories. */
 export function equipmentCategory(item) {
   const system = item?.system ?? {},
@@ -91,7 +92,9 @@ export function armorTotals(
       (slot === "helmet" && selected.some(i => i.system.sealed)) ||
       (item.system.sealed && slots.has("helmet"))
     ) {
-      warnings.push(`${item.name}: another equipped item occupies its ${slot} slot (sealed suits include a helmet).`);
+      warnings.push(
+        loc`${item.name}: another equipped item occupies its ${slot} slot (sealed suits include a helmet).`
+      );
       continue;
     }
     slots.add(slot);
@@ -194,13 +197,13 @@ export function weaponGrip(system, weapon, { hands = weapon.useHands ?? 0 } = {}
   const small = size === "Small" || system.aging?.small;
   const unarmed = weapon.proficiency === "unarmed";
   const actual = Number(hands) || (!unarmed && small && required === 1 ? 2 : required);
-  let reason = weapon.destroyed ? "This weapon was destroyed and cannot be used." : "";
-  if (!unarmed && small && required === 2) reason = "A Small character cannot use a two-handed weapon (p.349).";
+  let reason = weapon.destroyed ? loc`This weapon was destroyed and cannot be used.` : "";
+  if (!unarmed && small && required === 2) reason = loc`A Small character cannot use a two-handed weapon (p.349).`;
   else if (!unarmed && small && required === 1 && actual !== 2)
-    reason = "A Small character must use both hands with a one-handed weapon (p.349).";
+    reason = loc`A Small character must use both hands with a one-handed weapon (p.349).`;
   const supported = ["Medium", "Large", "Huge", "Gargantuan", "Colossal", "Enormous", "Vast"].includes(size);
   if (!unarmed && required === 2 && actual === 1 && !supported)
-    reason = "Using a two-handed weapon in one hand requires Medium or larger size (p.347).";
+    reason = loc`Using a two-handed weapon in one hand requires Medium or larger size (p.347).`;
   const grippingOneHand = !unarmed && required === 2 && actual === 1 && combatStanceState(system)?.key === "gripping";
   const rockOneHand =
     required === 2 &&
@@ -226,11 +229,12 @@ export function projectileContext(weapon, ammunition) {
     ?.toLowerCase();
   if (!kind) return { error: 0, damage: null, explosive: false, reason: "" };
   if (!ammunition || !(ammunition.ammunitionOnly || ["Standard arrow", "Explosive arrow"].includes(ammunition.name)))
-    return { error: 0, reason: `Choose an owned ${kind} ammunition stockpile for this launcher.` };
+    return { error: 0, reason: loc`Choose an owned ${kind} ammunition stockpile for this launcher.` };
   const actual = ammunition.ammunitionKind || (/bolt/i.test(ammunition.name ?? "") ? "bolt" : "arrow");
-  if (actual !== kind) return { error: 0, reason: `This launcher uses ${kind}s; ${actual}s are not interchangeable.` };
+  if (actual !== kind)
+    return { error: 0, reason: loc`This launcher uses ${kind}s; ${actual}s are not interchangeable.` };
   if (ammunition.reserve || ammunition.destroyed || ammunition.quantity === 0)
-    return { error: 0, reason: "The selected ammunition is unavailable." };
+    return { error: 0, reason: loc`The selected ammunition is unavailable.` };
   const error = Number(
     String(ammunition.errorThreat ?? "")
       .split("/")[0]
@@ -248,11 +252,11 @@ export function projectileContext(weapon, ammunition) {
 export function weaponUnavailable(weapon) {
   const possessionReason = possessionUnavailable(weapon);
   if (possessionReason) return possessionReason;
-  if (weapon.destroyed) return "A destroyed weapon cannot be used until it is replaced.";
-  if (weapon.reserve) return "Unassigned or reserved gear is not available for an attack.";
-  if (weapon.quantity === 0) return "No copies of this weapon remain.";
+  if (weapon.destroyed) return loc`A destroyed weapon cannot be used until it is replaced.`;
+  if (weapon.reserve) return loc`Unassigned or reserved gear is not available for an attack.`;
+  if (weapon.quantity === 0) return loc`No copies of this weapon remain.`;
   if (weapon.ammunitionOnly || ["Standard arrow", "Explosive arrow"].includes(weapon.name))
-    return "This is ammunition. Use it with a matching bow or crossbow; it cannot make an independent attack.";
+    return loc`This is ammunition. Use it with a matching bow or crossbow; it cannot make an independent attack.`;
   return "";
 }
 /** Wheelman Gunnery, p.51: only the firing operation, not Aim, Brace or reload. */
@@ -260,9 +264,13 @@ export function vehicleWeaponOperationPlan(system, { vehicleMounted = false, wea
   const times = { half: "1 half action", full: "1 full action", twoHalf: "2 half actions" };
   if (!weaponOperationTime) return { blocked: false, baseTime: null, requiredTime: null, gunnery: false, notes: [] };
   if (!Object.hasOwn(times, weaponOperationTime))
-    return { blocked: true, reason: "Choose the weapon’s normal firing operation time.", notes: [] };
+    return { blocked: true, reason: loc`Choose the weapon’s normal firing operation time.`, notes: [] };
   if (!vehicleMounted)
-    return { blocked: true, reason: "A vehicle-weapon operation time requires a vehicle-mounted weapon.", notes: [] };
+    return {
+      blocked: true,
+      reason: loc`A vehicle-weapon operation time requires a vehicle-mounted weapon.`,
+      notes: []
+    };
   const gunnery =
     weaponOperationTime !== "half" &&
     (system.classOptionSelections ?? []).some(e => e.classId === "wheelman" && e.name === "Gunnery");
@@ -274,8 +282,8 @@ export function vehicleWeaponOperationPlan(system, { vehicleMounted = false, wea
     gunnery,
     notes: [
       gunnery
-        ? `Gunnery: fire in 1 half action instead of ${times[weaponOperationTime]} (p.51).`
-        : `Vehicle weapon firing operation: ${requiredTime}.`
+        ? loc`Gunnery: fire in 1 half action instead of ${times[weaponOperationTime]} (p.51).`
+        : loc`Vehicle weapon firing operation: ${requiredTime}.`
     ]
   };
 }
@@ -318,7 +326,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       weaponUnavailable(weapon) ||
       projectile.reason ||
       (system.encumbrance?.immobile && ["hurled", "exoticHurled"].includes(weapon.proficiency)
-        ? "An overloaded character cannot make a hurled attack (p.218)."
+        ? loc`An overloaded character cannot make a hurled attack (p.218).`
         : "");
   const baseFiring = firearmContext(system, weapon, options);
   const operation = vehicleWeaponOperationPlan(system, options);
@@ -398,7 +406,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
   try {
     const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
     if (manual && options.allOutTargetName?.trim() && manual.name !== options.allOutTargetName.trim())
-      throw Error("Use the same named target for this attack’s classification and All-out Attack.");
+      throw Error(loc`Use the same named target for this attack’s classification and All-out Attack.`);
     meleeTradeoff = meleeTradeoffPlan(system, weapon, {
       penalty: options.allOutPenalty ?? 0,
       ranged,
@@ -415,7 +423,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
   try {
     const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
     if (manual && options.bullseyeTargetName?.trim() && manual.name !== options.bullseyeTargetName.trim())
-      throw Error("Use the same named target for this attack’s classification and Bullseye.");
+      throw Error(loc`Use the same named target for this attack’s classification and Bullseye.`);
     bullseye = bullseyePlan(system, weapon, {
       sourceWeapon,
       penalty: options.bullseyePenalty ?? 0,
@@ -440,10 +448,10 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     meleeTrickReview = "";
   try {
     if (options.meleeTrick && options.meleeFeatTrick && options.meleeFeatTrick !== options.meleeTrick)
-      throw Error("Only one Melee/Unarmed Combat feat trick may apply to this action.");
+      throw Error(loc`Only one Melee/Unarmed Combat feat trick may apply to this action.`);
     const manual = options.characterTarget?.source === "gcManual" ? options.characterTarget : null;
     if (manual && options.meleeTrickTargetName?.trim() && manual.name !== options.meleeTrickTargetName.trim())
-      throw Error("Use the same named target for this attack and melee trick.");
+      throw Error(loc`Use the same named target for this attack and melee trick.`);
     meleeTrick = meleeTrickPlan(system, sourceWeapon, {
       trick: options.meleeTrick,
       ranged,
@@ -466,7 +474,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       fendTiming: options.fendTiming
     });
     if (meleeTrick && meleeTradeoff && meleeTrick.targetUuid !== meleeTradeoff.targetUuid)
-      throw Error("Use the same actual target for this melee feat trick and All-out Attack.");
+      throw Error(loc`Use the same actual target for this melee feat trick and All-out Attack.`);
   } catch (error) {
     meleeTrickReview = error.message;
   }
@@ -637,36 +645,36 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       conditionAbilityPenalty(system, ability),
     // The attack bonus as labelled parts; plan-stage roll contributors add theirs (module/rules/roll-pipeline.mjs).
     ...planTotal("attack", { system, weapon, options, actorType: type }, [
-      ["Reach weapon", reach?.evidence.attackPenalty ?? 0],
-      ["Melee trick", meleeTrick?.attackBonus ?? 0],
-      ["Bullseye", bullseye?.attackPenalty ?? 0],
-      ["Melee trade-off", meleeTradeoff?.attackPenalty ?? 0],
-      ["Feint", feintBonus.attackBonus],
-      ["Cheap Shot received", cheapShotPenalty(system, ability)],
-      ["Cheap Shot", cheapShot.attackBonus],
-      ["Firing in melee", meleeFire.attackPenalty],
-      ["Close quarters range", cqbRange.attackBonus],
-      ["Disarm", disarm.attackBonus],
-      ["Pinned target", pinnedTargetBonus],
-      ["Target posture", targetPosturePenalty],
-      ["Conditions and two-weapon fighting", conditionRollPenalties(system).attack + twoWeaponWaiver],
-      ["Conditions (melee)", !ranged ? conditionRollPenalties(system).meleeAttack : 0],
-      ["Condition ability penalty", conditionAbilityPenalty(system, ability)],
-      ["Base attack bonus", system.bab ?? 0],
-      ["Attribute", system.abilities[ability]?.mod ?? 0],
-      ["Forte", forte],
-      ["Size", system.sizeModifier ?? 0],
-      ["Quirky weapon", quirky?.attackPenalty ?? 0],
-      ["Inaccurate weapon", inaccurate],
-      ["Grip", grip.attackPenalty],
-      ["Massive weapon", massive.attackPenalty],
-      ["Improvised weapon", improvisedPenalty],
-      ["Recoil", firing.recoilPenalty],
-      ["Range", distance.rangePenalty],
-      ["Aim", stance.aimBonus],
-      ["Brace", stance.braceBonus],
-      ["Sniper", sniper.attackBonus],
-      ["Flanking", flanking.attackBonus]
+      [loc`Reach weapon`, reach?.evidence.attackPenalty ?? 0],
+      [loc`Melee trick`, meleeTrick?.attackBonus ?? 0],
+      [loc`Bullseye`, bullseye?.attackPenalty ?? 0],
+      [loc`Melee trade-off`, meleeTradeoff?.attackPenalty ?? 0],
+      [loc`Feint`, feintBonus.attackBonus],
+      [loc`Cheap Shot received`, cheapShotPenalty(system, ability)],
+      [loc`Cheap Shot`, cheapShot.attackBonus],
+      [loc`Firing in melee`, meleeFire.attackPenalty],
+      [loc`Close quarters range`, cqbRange.attackBonus],
+      [loc`Disarm`, disarm.attackBonus],
+      [loc`Pinned target`, pinnedTargetBonus],
+      [loc`Target posture`, targetPosturePenalty],
+      [loc`Conditions and two-weapon fighting`, conditionRollPenalties(system).attack + twoWeaponWaiver],
+      [loc`Conditions (melee)`, !ranged ? conditionRollPenalties(system).meleeAttack : 0],
+      [loc`Condition ability penalty`, conditionAbilityPenalty(system, ability)],
+      [loc`Base attack bonus`, system.bab ?? 0],
+      [loc`Attribute`, system.abilities[ability]?.mod ?? 0],
+      [loc`Forte`, forte],
+      [loc`Size`, system.sizeModifier ?? 0],
+      [loc`Quirky weapon`, quirky?.attackPenalty ?? 0],
+      [loc`Inaccurate weapon`, inaccurate],
+      [loc`Grip`, grip.attackPenalty],
+      [loc`Massive weapon`, massive.attackPenalty],
+      [loc`Improvised weapon`, improvisedPenalty],
+      [loc`Recoil`, firing.recoilPenalty],
+      [loc`Range`, distance.rangePenalty],
+      [loc`Aim`, stance.aimBonus],
+      [loc`Brace`, stance.braceBonus],
+      [loc`Sniper`, sniper.attackBonus],
+      [loc`Flanking`, flanking.attackBonus]
     ]),
     error: Math.max(
       0,
@@ -693,95 +701,101 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       ...meleeArmorPiercing.notes,
       ...(!ranged && options.disarm?.role !== "defender" && combatStanceState(system)?.key === "menacing"
         ? [
-            "Menacing Stance: on a successful melee hit, record its separate fixed 2 stress component through Stance damage (p.176)."
+            loc`Menacing Stance: on a successful melee hit, record its separate fixed 2 stress component through Stance damage (p.176).`
           ]
         : []),
       ...(!ranged && options.disarm?.role !== "defender" && combatStanceState(system)?.key === "circling"
         ? [
-            "Circling Stance: with an empty square next to you, this target’s dodge bonus to Defense is halved (rounded up) against this melee attack; select yourself in the target’s Incoming attack preview. Following this attack you automatically move into an unoccupied adjacent square of your choice (p.179)."
+            loc`Circling Stance: with an empty square next to you, this target’s dodge bonus to Defense is halved (rounded up) against this melee attack; select yourself in the target’s Incoming attack preview. Following this attack you automatically move into an unoccupied adjacent square of your choice (p.179).`
           ]
         : []),
       ...(meleeTrick
         ? [
             meleeTrick.key === "betweenRibs"
-              ? "Between the Ribs: full-action Standard Attack with this readied knife. A hit inflicts 1 die of sneak attack damage: roll damage from this recorded hit and include its sneak attack die. The general sneak attack conditions still apply (p.179)."
+              ? loc`Between the Ribs: full-action Standard Attack with this readied knife. A hit inflicts 1 die of sneak attack damage: roll damage from this recorded hit and include its sneak attack die. The general sneak attack conditions still apply (p.179).`
               : meleeTrick.key === "threadNeedle"
-                ? "Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond5ft ends this hold (p.180)."
+                ? loc`Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond5ft ends this hold (p.180).`
                 : meleeTrick.key === "fend"
-                  ? "Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179)."
-                  : ` ${meleeTrick.source}: full-action Standard Attack; ${meleeTrick.attackBonus >= 0 ? "+" : ""}${meleeTrick.attackBonus} attack, +${meleeTrick.damageBonus} recorded-hit damage${meleeTrick.threatIncrease ? `, +${meleeTrick.threatIncrease} threat range` : ""}${meleeTrick.grantedQuality ? ", takedown quality" : ""} (pp.176,179).`
+                  ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
+                  : loc` ${meleeTrick.source}: full-action Standard Attack; ${meleeTrick.attackBonus >= 0 ? "+" : ""}${meleeTrick.attackBonus} attack, +${meleeTrick.damageBonus} recorded-hit damage${meleeTrick.threatIncrease ? `, +${meleeTrick.threatIncrease} threat range` : ""}${meleeTrick.grantedQuality ? ", takedown quality" : ""} (pp.176,179).`
           ]
         : []),
       ...(bullseye
         ? [
-            `Bullseye: single-shot ranged Standard Attack −${bullseye.penalty}, this attack’s damage +${bullseye.damageBonus}; a miss makes you flat-footed (p.180).`
+            loc`Bullseye: single-shot ranged Standard Attack −${bullseye.penalty}, this attack’s damage +${bullseye.damageBonus}; a miss makes you flat-footed (p.180).`
           ]
         : []),
       ...(meleeTradeoff
         ? [
-            `All-out Attack: attack −${meleeTradeoff.penalty}, this attack’s damage +${meleeTradeoff.damageBonus}; a miss makes you flat-footed (p.176).`
+            loc`All-out Attack: attack −${meleeTradeoff.penalty}, this attack’s damage +${meleeTradeoff.damageBonus}; a miss makes you flat-footed (p.176).`
           ]
         : []),
       ...(combatStanceState(system)?.key === "gripping" && !ranged && grip.required === 2 && grip.hands === 1
-        ? ["Gripping Stance: using this two-handed weapon with one hand; attack penalty −2 (p.179)."]
+        ? [loc`Gripping Stance: using this two-handed weapon with one hand; attack penalty −2 (p.179).`]
         : []),
       ...(sideStance.dice
         ? [
-            "Side Stance: the next attack against a successfully Feinted opponent uses the one pending sneak die; it is spent even if this attack misses. Apply it only with a qualifying successful Standard Attack’s damage (pp.178,339)."
+            loc`Side Stance: the next attack against a successfully Feinted opponent uses the one pending sneak die; it is spent even if this attack misses. Apply it only with a qualifying successful Standard Attack’s damage (pp.178,339).`
           ]
         : []),
-      ...(feintBonus.attackBonus ? ["Feint: +2 with this next attack against the recorded opponent (p.357)."] : []),
+      ...(feintBonus.attackBonus ? [loc`Feint: +2 with this next attack against the recorded opponent (p.357).`] : []),
       ...cheapShot.notes,
       ...(quirky?.quirky && !quirky.trained
         ? [
-            `Quirky (QKY): base untrained attack penalty ${quirky.baseUntrainedPenalty}, additional −4, total ${quirky.attackPenalty} (p.302).`
+            loc`Quirky (QKY): base untrained attack penalty ${quirky.baseUntrainedPenalty}, additional −4, total ${quirky.attackPenalty} (p.302).`
           ]
         : []),
       ...(superiorAccuracy?.threatIncrease
-        ? ["Superior Accuracy (SPA): trained, aimed and braced attack, threat range +1 (p.302)."]
+        ? [loc`Superior Accuracy (SPA): trained, aimed and braced attack, threat range +1 (p.302).`]
         : []),
       ...(trainedOnly?.evidence.trainedOnly
-        ? ["Trained Only (TRO): this attack requires its actual operating proficiency (p.302)."]
+        ? [loc`Trained Only (TRO): this attack requires its actual operating proficiency (p.302).`]
         : []),
-      ...(accurized?.threatIncrease ? ["Accurized (ACC): trained and aimed attack, threat range +1 (p.301)."] : []),
+      ...(accurized?.threatIncrease ? [loc`Accurized (ACC): trained and aimed attack, threat range +1 (p.301).`] : []),
       ...(cleave.threatIncrease
-        ? ["Cleave Mastery: melee threat range +1 against this confirmed standard character (p.177)."]
+        ? [loc`Cleave Mastery: melee threat range +1 against this confirmed standard character (p.177).`]
         : []),
       ...(dartingStyleState(system).active
-        ? [`Darting Weapon: attack/skill penalty −${dartingStyleState(system).penalty}.`]
+        ? [loc`Darting Weapon: attack/skill penalty −${dartingStyleState(system).penalty}.`]
         : []),
       ...massive.notes,
       ...(finesseBasic.granted
-        ? ["Finesse Basics: optional FIN quality granted; trained use may choose Dexterity damage (p.178)."]
+        ? [loc`Finesse Basics: optional FIN quality granted; trained use may choose Dexterity damage (p.178).`]
         : []),
-      ...(finesseThreat ? [`Finesse feats: melee threat range +${finesseThreat} (p.178).`] : []),
+      ...(finesseThreat ? [loc`Finesse feats: melee threat range +${finesseThreat} (p.178).`] : []),
       ...meleeFire.notes,
       ...cqbRange.notes,
       ...disarm.notes,
       ...(twoWeaponStyleState(system).active
-        ? [`Two-weapon style: base attack penalty −${twoWeaponStyleState(system).penalty}.`]
+        ? [loc`Two-weapon style: base attack penalty −${twoWeaponStyleState(system).penalty}.`]
         : []),
-      ...(twoWeaponWaiver ? [`Both Guns Blazing: two-weapon handgun penalty −${twoWeaponWaiver} waived (p.84).`] : []),
-      ...(pinnedTargetBonus ? ["Pinned target: adjacent unarmed/melee attack +4 (p.342)."] : []),
+      ...(twoWeaponWaiver
+        ? [loc`Both Guns Blazing: two-weapon handgun penalty −${twoWeaponWaiver} waived (p.84).`]
+        : []),
+      ...(pinnedTargetBonus ? [loc`Pinned target: adjacent unarmed/melee attack +4 (p.342).`] : []),
       ...(conditionRollPenalties(system).sprawled ? ["Sprawled: attack checks −2 (p.342)."] : []),
       ...(!ranged && conditionRollPenalties(system).prone ? ["Prone: melee attack −2 (p.342)."] : []),
       ...(targetPosturePenalty
-        ? [`Posture target modifier: non-adjacent ranged attack ${targetPosturePenalty} (pp.340,342).`]
+        ? [loc`Posture target modifier: non-adjacent ranged attack ${targetPosturePenalty} (pp.340,342).`]
         : []),
-      ...(conditionAbilityPenalty(system, ability) ? ["Drunk: Dexterity-/Wisdom-based attack check −2 (p.341)."] : []),
+      ...(conditionAbilityPenalty(system, ability)
+        ? [loc`Drunk: Dexterity-/Wisdom-based attack check −2 (p.341).`]
+        : []),
       ...sensoryConditions.notes,
       ...(conditionRollPenalties(system).sickened ? ["Sickened: attack checks −2."] : []),
       ...(distance.rangePenaltyPerIncrement === 3
-        ? ["Mortar/rocket launcher range penalty: −3 per increment beyond the first (p.315)."]
+        ? [loc`Mortar/rocket launcher range penalty: −3 per increment beyond the first (p.315).`]
         : []),
       ...(distance.improvedVisionReduction
-        ? [`Improved vision: range penalty ${distance.rangePenaltyBase} → ${distance.rangePenalty}, minimum 0 (p.448).`]
+        ? [
+            loc`Improved vision: range penalty ${distance.rangePenaltyBase} → ${distance.rangePenalty}, minimum 0 (p.448).`
+          ]
         : []),
       ...(distance.sensoryTarget?.nightTrainingException
-        ? ["Night Training: not considered blinded when targeting this character within 10 ft. while able to hear."]
+        ? [loc`Night Training: not considered blinded when targeting this character within 10 ft. while able to hear.`]
         : []),
       ...flanking.notes,
-      ...(gameHunter.threatIncrease ? ["Game Hunter: threat range +3 against this animal (p.43)."] : []),
+      ...(gameHunter.threatIncrease ? [loc`Game Hunter: threat range +3 against this animal (p.43).`] : []),
       ...mortarOperation.notes,
       ...launcherOperation.notes,
       ...light.notes,
@@ -791,23 +805,23 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       ...rangeEffects.notes,
       ...stance.notes,
       /\bCLS\b/.test(weapon.qualities ?? "") && weapon.stockExtended
-        ? "Stock extended: recoil –2; observers gain +2 Notice/Search to spot this weapon."
+        ? loc`Stock extended: recoil –2; observers gain +2 Notice/Search to spot this weapon.`
         : "",
       distance.rangeKnown
-        ? `Distance ${distance.distanceFeet} ft.; increment ${distance.rangeIncrement} ft.; range penalty ${distance.rangePenalty}; maximum ${distance.maximumRange} ft.`
+        ? loc`Distance ${distance.distanceFeet} ft.; increment ${distance.rangeIncrement} ft.; range penalty ${distance.rangePenalty}; maximum ${distance.maximumRange} ft.`
         : effectiveRange > 0
-          ? "Range not measured; this quick roll has no distance modifier."
+          ? loc`Range not measured; this quick roll has no distance modifier.`
           : "",
-      !trained ? "Untrained attack: Initiative Count –4; apply in combat." : "",
+      !trained ? loc`Untrained attack: Initiative Count –4; apply in combat.` : "",
       firing.firearm
-        ? `${firing.fireModeLabel}; recoil ${firing.recoil} vs Strength ${firing.recoilStrength}: ${firing.recoilPenalty} attack.`
+        ? loc`${firing.fireModeLabel}; recoil ${firing.recoil} vs Strength ${firing.recoilStrength}: ${firing.recoilPenalty} attack.`
         : "",
-      firing.legacyModeReview ? "Review this imported weapon’s fire-mode category." : "",
+      firing.legacyModeReview ? loc`Review this imported weapon’s fire-mode category.` : "",
       projectile.name
         ? `Ammunition: ${projectile.name}; error modifier ${projectile.error >= 0 ? "+" : ""}${projectile.error}.`
         : "",
-      grip.initiativeLoss ? `Initiative Count –${grip.initiativeLoss} per attack; apply in combat.` : "",
-      weapon.improvised ? "Any error destroys the improvised weapon." : ""
+      grip.initiativeLoss ? loc`Initiative Count –${grip.initiativeLoss} per attack; apply in combat.` : "",
+      weapon.improvised ? loc`Any error destroys the improvised weapon.` : ""
     ]
       .filter(Boolean)
       .join(" "),
@@ -842,7 +856,7 @@ export function weaponDamage(
   if (parsed.componentReview)
     return {
       blocked: true,
-      blockedReason: "Resolve the separately listed damage components before rolling this weapon’s damage.",
+      blockedReason: loc`Resolve the separately listed damage components before rolling this weapon’s damage.`,
       damageText: text,
       expression: parsed.expression,
       componentReview: true
@@ -928,9 +942,9 @@ export function possessionBudget(items, allowance = "", system = {}) {
     unfunded = 0;
   for (const item of gear.filter(i => i.system.possessionSource)) {
     if (!item.system.possessionApproved)
-      warnings.push(`${item.name}: the GC must approve this Possession before it enters play.`);
+      warnings.push(loc`${item.name}: the GC must approve this Possession before it enters play.`);
     if (item.system.pick || item.system.reserveAcquisition)
-      warnings.push(`${item.name}: a Possession cannot also be charged as mission or field-acquired gear.`);
+      warnings.push(loc`${item.name}: a Possession cannot also be charged as mission or field-acquired gear.`);
   }
   for (const item of selected) {
     const caliber = Number(item.system.caliber),
@@ -943,12 +957,12 @@ export function possessionBudget(items, allowance = "", system = {}) {
       item.system.ammunitionOnly
     ) {
       warnings.push(
-        `${item.name}: choose an ordinary Caliber I–V gear pick; Common Items/ammunition require their separate accounting.`
+        loc`${item.name}: choose an ordinary Caliber I–V gear pick; Common Items/ammunition require their separate accounting.`
       );
       continue;
     }
     if (!Number.isSafeInteger(count) || count < 1) {
-      warnings.push(`${item.name}: choose a positive whole number of Possessions picks.`);
+      warnings.push(loc`${item.name}: choose a positive whole number of Possessions picks.`);
       continue;
     }
     spent += count;
@@ -966,10 +980,10 @@ export function possessionBudget(items, allowance = "", system = {}) {
     unfunded += need;
     if (need)
       warnings.push(
-        `${item.name}: ${need} Caliber-${caliber} Possessions pick(s) exceed the available Wealth allowance.`
+        loc`${item.name}: ${need} Caliber-${caliber} Possessions pick(s) exceed the available Wealth allowance.`
       );
     if ((item.system.quantity ?? 1) > (item.system.bundleSize ?? 1) * count)
-      warnings.push(`${item.name}: quantity exceeds its paid Possessions bundles.`);
+      warnings.push(loc`${item.name}: quantity exceeds its paid Possessions bundles.`);
   }
   return {
     available,
@@ -994,9 +1008,9 @@ export function possessionBudget(items, allowance = "", system = {}) {
 
 export function possessionUnavailable(gear) {
   if (gear.possessionSource && !gear.possessionApproved)
-    return "The GC must approve this Possession before it enters play (p.216).";
+    return loc`The GC must approve this Possession before it enters play (p.216).`;
   if (gear.possessionSource && (gear.pick || gear.reserveAcquisition))
-    return "Review this item’s conflicting personal and mission acquisition records.";
+    return loc`Review this item’s conflicting personal and mission acquisition records.`;
   return "";
 }
 
@@ -1021,7 +1035,7 @@ export function armorGrantStatus(system, items = []) {
     const item = items.find(i => i.id === record.itemId);
     if (!item)
       warnings.push(
-        "Armor Use: this mission’s armor was already selected, but the item is missing; review its disposition with the GC."
+        loc`Armor Use: this mission’s armor was already selected, but the item is missing; review its disposition with the GC.`
       );
     else if (
       item.type !== "armor" ||
@@ -1037,16 +1051,16 @@ export function armorGrantStatus(system, items = []) {
       (item.system.quantity ?? 1) > 1
     )
       warnings.push(
-        `${item.name}: review its Armor Use grant, current grade, quantity and conflicting acquisition records.`
+        loc`${item.name}: review its Armor Use grant, current grade, quantity and conflicting acquisition records.`
       );
   }
   for (const item of items.filter(i => i.system?.armorMissionGrant)) {
     if (item.system.armorMissionGrant.epoch !== epoch)
       warnings.push(
-        `${item.name}: Armor Use gear from an earlier mission; review its disposition before using it this mission.`
+        loc`${item.name}: Armor Use gear from an earlier mission; review its disposition before using it this mission.`
       );
     else if (!armorGrantMatches(system, item))
-      warnings.push(`${item.name}: Armor Use provenance does not match this mission’s recorded selection.`);
+      warnings.push(loc`${item.name}: Armor Use provenance does not match this mission’s recorded selection.`);
   }
   return { caliber: cap, used: !!record, itemId: record?.itemId ?? "", warnings };
 }
@@ -1058,9 +1072,9 @@ export function armorGrantMatches(system, item) {
 }
 export function armorGrantPlan(system, items, { itemId, intelConfirmed = false } = {}) {
   const status = armorGrantStatus(system, items);
-  if (!intelConfirmed) throw new Error("Confirm that this armor was selected during the Intel Phase.");
-  if (!status.caliber) throw new Error("An earned Armor Use grade is required.");
-  if (status.used) throw new Error("Armor Use armor has already been selected for this mission.");
+  if (!intelConfirmed) throw new Error(loc`Confirm that this armor was selected during the Intel Phase.`);
+  if (!status.caliber) throw new Error(loc`An earned Armor Use grade is required.`);
+  if (status.used) throw new Error(loc`Armor Use armor has already been selected for this mission.`);
   const item = items.find(i => i.id === itemId),
     gear = item?.system;
   if (
@@ -1069,7 +1083,7 @@ export function armorGrantPlan(system, items, { itemId, intelConfirmed = false }
     gear.caliber < 1 ||
     gear.caliber > status.caliber
   )
-    throw new Error(`Choose owned Caliber I–${status.caliber} armor.`);
+    throw new Error(loc`Choose owned Caliber I–${status.caliber} armor.`);
   if (
     gear.pick ||
     gear.possessionSource ||
@@ -1079,9 +1093,9 @@ export function armorGrantPlan(system, items, { itemId, intelConfirmed = false }
     gear.missionCaliberGrant?.epoch === String(system.usagePeriods?.mission ?? "initial") ||
     gear.armorMissionGrant?.epoch === String(system.usagePeriods?.mission ?? "initial")
   )
-    throw new Error("Choose unassigned armor with no personal, mission, reserve or current grant record.");
+    throw new Error(loc`Choose unassigned armor with no personal, mission, reserve or current grant record.`);
   if ((gear.quantity ?? 1) !== 1 || (gear.pickCount ?? 1) !== 1)
-    throw new Error("Armor Use grants exactly one piece of armor.");
+    throw new Error(loc`Armor Use grants exactly one piece of armor.`);
   const epoch = String(system.usagePeriods?.mission ?? "initial");
   return {
     record: { epoch, itemId, caliber: gear.caliber, grade: status.caliber },
@@ -1098,7 +1112,7 @@ export function bigStickStatus(system, items = []) {
   const warnings = [];
   if (record) {
     const item = items.find(i => i.id === record.itemId);
-    if (!item) warnings.push("Big Stick: the selected mission weapon is missing; its exception remains used.");
+    if (!item) warnings.push(loc`Big Stick: the selected mission weapon is missing; its exception remains used.`);
     else if (
       !active ||
       !bigStickMatches(system, item) ||
@@ -1108,15 +1122,15 @@ export function bigStickStatus(system, items = []) {
       item.system.caliber > record.missionCaliber + 1 ||
       !bigStickWeapon(system, item)
     )
-      warnings.push(`${item.name}: review its Big Stick selection, proficiency, Caliber and paid mission pick.`);
+      warnings.push(loc`${item.name}: review its Big Stick selection, proficiency, Caliber and paid mission pick.`);
   }
   for (const item of items.filter(i => i.system?.bigStickMissionPick)) {
     if (item.system.bigStickMissionPick.epoch !== epoch)
       warnings.push(
-        `${item.name}: Big Stick selection belongs to an earlier mission; review this mission’s acquisition.`
+        loc`${item.name}: Big Stick selection belongs to an earlier mission; review this mission’s acquisition.`
       );
     else if (!bigStickMatches(system, item))
-      warnings.push(`${item.name}: Big Stick provenance does not match the recorded selection.`);
+      warnings.push(loc`${item.name}: Big Stick provenance does not match the recorded selection.`);
   }
   return {
     active,
@@ -1156,15 +1170,17 @@ export function bigStickMatches(system, item) {
 }
 export function bigStickPlan(system, items, { itemId, intelConfirmed = false } = {}) {
   const status = bigStickStatus(system, items);
-  if (!intelConfirmed) throw new Error("Confirm that this weapon was chosen as mission gear during Intel.");
-  if (!status.active) throw new Error("An earned Big Stick selection is required.");
+  if (!intelConfirmed) throw new Error(loc`Confirm that this weapon was chosen as mission gear during Intel.`);
+  if (!status.active) throw new Error(loc`An earned Big Stick selection is required.`);
   if (!status.caliber)
-    throw new Error("Record this mission’s Caliber using the mission-reserve setup first; zero reserves are allowed.");
+    throw new Error(
+      loc`Record this mission’s Caliber using the mission-reserve setup first; zero reserves are allowed.`
+    );
   if (status.caliber === 5)
     throw new Error(
-      "At Caliber V Big Stick grants starting-action-dice extra upgrades instead of raising a weapon’s Caliber. Upgrade purchasing is still adjudicated separately."
+      loc`At Caliber V Big Stick grants starting-action-dice extra upgrades instead of raising a weapon’s Caliber. Upgrade purchasing is still adjudicated separately.`
     );
-  if (status.used) throw new Error("Big Stick’s higher-Caliber weapon has already been selected for this mission.");
+  if (status.used) throw new Error(loc`Big Stick’s higher-Caliber weapon has already been selected for this mission.`);
   const item = items.find(i => i.id === itemId);
   if (
     !bigStickWeapon(system, item) ||
@@ -1172,12 +1188,12 @@ export function bigStickPlan(system, items, { itemId, intelConfirmed = false } =
     item.system.caliber > status.maximumCaliber
   )
     throw new Error(
-      "Choose one paid mission Weapon pick covered by your specialist proficiencies, at most one Caliber above the mission."
+      loc`Choose one paid mission Weapon pick covered by your specialist proficiencies, at most one Caliber above the mission.`
     );
   if ((item.system.quantity ?? 1) < 1 || (item.system.quantity ?? 1) > (item.system.bundleSize ?? 1))
-    throw new Error("Choose one available paid weapon bundle.");
+    throw new Error(loc`Choose one available paid weapon bundle.`);
   const epoch = String(system.usagePeriods?.mission ?? "initial");
   if (item.system.bigStickMissionPick?.epoch === epoch || item.system.missionCaliberGrant?.epoch === epoch)
-    throw new Error("Review this item’s existing Big Stick provenance with the GC.");
+    throw new Error(loc`Review this item’s existing Big Stick provenance with the GC.`);
   return { record: { epoch, itemId, missionCaliber: status.caliber }, stamp: { epoch, source: "Big Stick" } };
 }

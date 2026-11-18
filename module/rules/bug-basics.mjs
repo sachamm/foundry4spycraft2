@@ -1,4 +1,5 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Bug Basics p.208: only the two named Stash Item checks made to conceal bugs. */
 export function bugConcealmentPlan(
   system,
@@ -9,9 +10,12 @@ export function bugConcealmentPlan(
   const empty = { evidence: null, bonuses: [], blockedReason: "", notes: [] };
   if (!["sleightOfHand", "sneak"].includes(key) || check.id !== "stash-item" || concealingBug !== true) return empty;
   if (!system.activeFeatNames?.includes("Bug Basics"))
-    return { ...empty, blockedReason: "Bug Basics must be currently available." };
+    return { ...empty, blockedReason: loc`Bug Basics must be currently available.` };
   if (bugConcealmentConfirmed !== true || typeof bugName !== "string" || !bugName.trim() || bugName.trim().length > 200)
-    return { ...empty, blockedReason: "Name the bug and confirm with the GC that this Stash Item check conceals it." };
+    return {
+      ...empty,
+      blockedReason: loc`Name the bug and confirm with the GC that this Stash Item check conceals it.`
+    };
   const evidence = {
     version: 1,
     source: "Bug Basics",
@@ -27,7 +31,7 @@ export function bugConcealmentPlan(
     bonuses: [{ source: evidence.source, ...evidence.bonus }],
     blockedReason: "",
     notes: [
-      `Bug Basics: +2 gear on Stash Item to conceal bug “${evidence.bugName}”; normal gear bonus stacking applies (p.208).`
+      loc`Bug Basics: +2 gear on Stash Item to conceal bug “${evidence.bugName}”; normal gear bonus stacking applies (p.208).`
     ]
   };
 }
@@ -41,7 +45,7 @@ export function validateBugConcealmentProof(system, proof, { checkKind, skillKey
     !current.evidence ||
     JSON.stringify(current.evidence) !== JSON.stringify(proof)
   )
-    throw new Error("The Bug Basics source or declared bug concealment changed before posting.");
+    throw new Error(loc`The Bug Basics source or declared bug concealment changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

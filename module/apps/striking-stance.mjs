@@ -14,6 +14,7 @@ import { attackCharacterTargetChoices, completeCharacterTarget } from "./charact
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, finalWeaponReady, postFinalAttack } from "./final-attack.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Set(),
   messages = () => [...(game.messages ?? [])],
@@ -24,12 +25,12 @@ const leases = new WeakMap(),
   textId = v => typeof v === "string" && !!v && v.length <= 500;
 function actualOwner(actor) {
   if (actor?.type !== "agent" || !actor.isOwner || !attackCharacterTargetChoices().includes(actor))
-    throw Error("Use this actual owned combat character for its Striking reaction.");
+    throw Error(loc`Use this actual owned combat character for its Striking reaction.`);
 }
 export function strikingRows(actor) {
   const rows = actor.flags?.spycraft2?.strikingReactions ?? [],
     ids = new Set();
-  if (!Array.isArray(rows)) throw Error("Review the Striking reaction history.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the Striking reaction history.`);
   for (const r of rows) {
     const p = r?.proof,
       t = p?.trigger,
@@ -85,22 +86,24 @@ export function strikingRows(actor) {
       (r.messageUuid != null && !textId(r.messageUuid)) ||
       (r.state === "posted" && !textId(r.messageUuid))
     )
-      throw Error("Review the saved Striking stance, movement entry, actual participants and original final attack.");
+      throw Error(
+        loc`Review the saved Striking stance, movement entry, actual participants and original final attack.`
+      );
     ids.add(r.id);
   }
   return rows;
 }
 function source(actor, proof) {
-  if (!actor.isOwner) throw Error("Only the owner may use this Striking source.");
+  if (!actor.isOwner) throw Error(loc`Only the owner may use this Striking source.`);
   const r = strikingRows(actor).find(r => r.id === proof?.id);
   if (!r || !["reserved", "posted"].includes(r.state) || stable(r.proof) !== stable(proof))
-    throw Error("The original Striking reaction source changed or is closed.");
+    throw Error(loc`The original Striking reaction source changed or is closed.`);
   return r;
 }
 function opponent(proof) {
   const a = attackCharacterTargetChoices().find(a => a.uuid === proof.opponentUuid);
   if (!a || stable(identity(a)) !== stable(proof.opponentIdentity))
-    throw Error("The actual original Striking opponent changed or is no longer observed.");
+    throw Error(loc`The actual original Striking opponent changed or is no longer observed.`);
   return a;
 }
 function validateLive(actor, proof, held) {
@@ -115,7 +118,7 @@ function validateLive(actor, proof, held) {
     stable(strikingActorStats(actor.system)) !== held.stats
   )
     throw Error(
-      "The Striking stance, immediate entry, active participant, round movement or acting character changed."
+      loc`The Striking stance, immediate entry, active participant, round movement or acting character changed.`
     );
   const use = actor.system.resourceUses?.strikingStance,
     w = actor.items.get(proof.weaponId);
@@ -125,10 +128,10 @@ function validateLive(actor, proof, held) {
     w.uuid !== proof.weaponUuid ||
     (w._stats?.createdTime ?? null) !== proof.weaponCreatedTime
   )
-    throw Error("The actual readied melee weapon or reserved Striking round use changed.");
+    throw Error(loc`The actual readied melee weapon or reserved Striking round use changed.`);
   const preview = actor.weaponAttack(w, held.options);
   if (preview.blocked || preview.ranged)
-    throw Error(preview.reason || "Striking Stance requires a legal melee final Standard Attack.");
+    throw Error(preview.reason || loc`Striking Stance requires a legal melee final Standard Attack.`);
 }
 function originals(actor, row) {
   return messages().filter(
@@ -144,7 +147,7 @@ export function currentStrikingAttack(actor, row) {
   const roots = originals(actor, row);
   if (!roots.length) return null;
   if (roots.length !== 1 || (row.messageUuid && row.messageUuid !== roots[0].uuid))
-    throw Error("Review the unique original Striking final attack.");
+    throw Error(loc`Review the unique original Striking final attack.`);
   let m = roots[0];
   const seen = new Set();
   while (m && !seen.has(m.uuid)) {
@@ -162,14 +165,14 @@ export function currentStrikingAttack(actor, row) {
       c.formula !== "1d20 + @total" ||
       c.rollData?.total !== row.proof.attackSnapshot.total
     )
-      throw Error("The posted Striking attack or its actual weapon, opponent or original modifiers changed.");
+      throw Error(loc`The posted Striking attack or its actual weapon, opponent or original modifiers changed.`);
     if (!c.superseded) return { root: roots[0], current: m };
     const next = message(c.superseded);
     if (next?.flags?.spycraft2?.rerollOf !== m.uuid)
-      throw Error("Use the actually adopted original Striking replacement chain.");
+      throw Error(loc`Use the actually adopted original Striking replacement chain.`);
     m = next;
   }
-  throw Error("The original Striking final attack chain is missing or cyclic.");
+  throw Error(loc`The original Striking final attack chain is missing or cyclic.`);
 }
 export function validateStrikingAttackProof(
   actor,
@@ -189,45 +192,45 @@ export function validateStrikingAttackProof(
     data?.total !== proof.attackSnapshot.total
   )
     throw Error(
-      "Use the reserved Striking melee Standard Attack, its actual weapon, opponent and original prepared modifiers."
+      loc`Use the reserved Striking melee Standard Attack, its actual weapon, opponent and original prepared modifiers.`
     );
   if (rerollOf) {
     const old = message(rerollOf),
       posted = currentStrikingAttack(actor, row);
     if (!posted || posted.current !== old || old.flags.spycraft2.resolved || old.flags.spycraft2.superseded)
-      throw Error("Replace the actual owned unresolved adopted Striking attack.");
+      throw Error(loc`Replace the actual owned unresolved adopted Striking attack.`);
     actualOwner(actor);
     opponent(proof);
     const w = actor.items.get(proof.weaponId);
     if (!w || w.uuid !== proof.weaponUuid)
-      throw Error("A new original replacement still requires its actual owned weapon.");
+      throw Error(loc`A new original replacement still requires its actual owned weapon.`);
     return;
   }
   const held = lease && leases.get(lease);
   if (!held || held.actor !== actor || held.id !== proof.id || row.state !== "reserved")
-    throw Error("Use the Striking reaction control; copied final metadata cannot create a new roll.");
+    throw Error(loc`Use the Striking reaction control; copied final metadata cannot create a new roll.`);
   validateLive(actor, proof, held);
 }
 function prepared(actor, input, options) {
   actualOwner(actor);
   const timing = fendTiming(actor),
     target = attackCharacterTargetChoices().find(a => a.uuid === input.opponentUuid && a.uuid !== actor.uuid);
-  if (!target) throw Error("Choose the actual observed opponent who just entered adjacency.");
+  if (!target) throw Error(loc`Choose the actual observed opponent who just entered adjacency.`);
   if (
     (input.targetActorUuid && input.targetActorUuid !== target.uuid) ||
     options.characterTarget?.characterType === "object"
   )
-    throw Error("Striking must target that same actual character opponent.");
+    throw Error(loc`Striking must target that same actual character opponent.`);
   const trigger = strikingTriggerPlan(actor.system, timing.combat, {
       ...input,
       activeCombatantId: timing.activeCombatantId
     }),
     w = actor.items.get(input.weaponId);
-  if (!finalWeaponReady(w)) throw Error("Choose an actual owned readied melee weapon.");
+  if (!finalWeaponReady(w)) throw Error(loc`Choose an actual owned readied melee weapon.`);
   const preview = actor.weaponAttack(w, options);
   if (preview.blocked || preview.ranged)
     throw Error(
-      preview.reason || "Striking Stance grants a melee final Standard Attack, using any legal melee weapon."
+      preview.reason || loc`Striking Stance grants a melee final Standard Attack, using any legal melee weapon.`
     );
   return {
     trigger,
@@ -244,7 +247,7 @@ async function writeState(actor, id, change) {
   return queueRuleState(actor, async () => {
     const rows = strikingRows(actor),
       row = rows.find(r => r.id === id);
-    if (!row) throw Error("The original Striking reaction record is missing.");
+    if (!row) throw Error(loc`The original Striking reaction record is missing.`);
     const next = await change(row);
     await actor.update({ "flags.spycraft2.strikingReactions": rows.map(r => (r.id === id ? next : r)) });
     return next;
@@ -254,23 +257,23 @@ export async function takeStrikingAttack(actor, input = {}) {
   actualOwner(actor);
   if (input.reactionId) {
     const row = strikingRows(actor).find(r => r.id === input.reactionId);
-    if (!row) throw Error("Choose the original recorded Striking reaction.");
+    if (!row) throw Error(loc`Choose the original recorded Striking reaction.`);
     const posted = currentStrikingAttack(actor, row);
     if (posted) return posted.current;
-    throw Error("This Striking reaction is already reserved or needs GC review; do not attack again.");
+    throw Error(loc`This Striking reaction is already reserved or needs GC review; do not attack again.`);
   }
   if (!Object.hasOwn(input, "entryConfirmed")) {
     const esc = foundry.utils.escapeHTML,
       history = strikingRows(actor);
     if (!history.length && combatStanceState(actor.system)?.key !== "striking") {
-      ui.notifications.info?.("Enter Striking Stance before an opponent enters adjacency.");
+      ui.notifications.info?.(loc`Enter Striking Stance before an opponent enters adjacency.`);
       return null;
     }
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Striking Stance — adjacent entry" },
+      window: { title: loc`Striking Stance — adjacent entry` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><label>New entry or recorded reaction <select name="reactionId"><option value="">New adjacent entry</option>' +
+        `<div class="spycraft2-roll-options"><label>${loc`New entry or recorded reaction`} <select name="reactionId"><option value="">${loc`New adjacent entry`}</option>` +
         history
           .map(
             r =>
@@ -278,7 +281,7 @@ export async function takeStrikingAttack(actor, input = {}) {
               esc(r.id) +
               '">' +
               esc(
-                "Recorded — review only · round " +
+                loc`Recorded — review only · round ` +
                   r.proof.trigger.combat.round +
                   " · " +
                   (attackCharacterTargetChoices().find(a => a.uuid === r.proof.opponentUuid)?.name ??
@@ -287,26 +290,26 @@ export async function takeStrikingAttack(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        '</select></label><p>A Recorded selection only returns its original attack; it does not grant another entry or roll.</p><p>While already in Striking Stance, once per round you may make one immediate melee final Standard Attack when an opponent moves from a nonadjacent square into an adjacent square. Any legal melee weapon may be used. The GC confirms the actual movement and geometry; this control does not move tokens or infer a trigger.</p><p>First record all earlier completed round movement. Striking Stance permits no more than5ft during any round. This attack also uses the shared final-attack allowance, including Nauseated.</p><label>Actual opponent who just entered adjacency <select name="opponentUuid">' +
+        `</select></label><p>${loc`A Recorded selection only returns its original attack; it does not grant another entry or roll.`}</p><p>${loc`While already in Striking Stance, once per round you may make one immediate melee final Standard Attack when an opponent moves from a nonadjacent square into an adjacent square. Any legal melee weapon may be used. The GC confirms the actual movement and geometry; this control does not move tokens or infer a trigger.`}</p><p>${loc`First record all earlier completed round movement. Striking Stance permits no more than5ft during any round. This attack also uses the shared final-attack allowance, including Nauseated.`}</p><label>${loc`Actual opponent who just entered adjacency`} <select name="opponentUuid">` +
         attackCharacterTargetChoices()
           .filter(a => a.uuid !== actor.uuid)
           .map(a => '<option value="' + esc(a.uuid) + '">' + esc(a.name) + "</option>")
           .join("") +
-        '</select></label><label>Entry description (optional) <input name="entryDescription" maxlength="300" /></label><label>Your actual readied melee weapon <select name="weaponId">' +
+        `</select></label><label>${loc`Entry description (optional)`} <input name="entryDescription" maxlength="300" /></label><label>${loc`Your actual readied melee weapon`} <select name="weaponId">` +
         actor.items
           .filter(w => w.type === "weapon" && finalWeaponReady(w))
           .map(w => '<option value="' + esc(w.id) + '">' + esc(w.name) + "</option>")
           .join("") +
         "</select></label>" +
         standardAttackContextContent(actor, { includeCharacterTarget: false }) +
-        '<label><input name="entryConfirmed" type="checkbox" /> The GC confirms this opponent just moved from nonadjacent into an adjacent square</label><label><input name="alreadyInStanceConfirmed" type="checkbox" /> I was already in this same Striking Stance when that entry occurred</label><label><input name="roundMovementConfirmed" type="checkbox" /> My recorded total includes all actual movement this round and is no greater than5ft</label><label><input name="immediateConfirmed" type="checkbox" /> This immediately follows that entry, with no intervening action</label><label><input name="attackLegalConfirmed" type="checkbox" /> The GC confirms this melee final Standard Attack is legal against that actual opponent now</label></div>'
+        `<label><input name="entryConfirmed" type="checkbox" /> ${loc`The GC confirms this opponent just moved from nonadjacent into an adjacent square`}</label><label><input name="alreadyInStanceConfirmed" type="checkbox" /> ${loc`I was already in this same Striking Stance when that entry occurred`}</label><label><input name="roundMovementConfirmed" type="checkbox" /> ${loc`My recorded total includes all actual movement this round and is no greater than5ft`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This immediately follows that entry, with no intervening action`}</label><label><input name="attackLegalConfirmed" type="checkbox" /> ${loc`The GC confirms this melee final Standard Attack is legal against that actual opponent now`}</label></div>`
     });
     if (!input) return null;
   }
   if (input.reactionId) return takeStrikingAttack(actor, { reactionId: input.reactionId });
   let options = finalAttackOptions(input);
   const target = attackCharacterTargetChoices().find(a => a.uuid === input.opponentUuid);
-  if (!target) throw Error("Choose the actual observed opponent who entered adjacency.");
+  if (!target) throw Error(loc`Choose the actual observed opponent who entered adjacency.`);
   options = await completeCharacterTarget(
     actor,
     actor.items.get(input.weaponId)?.system,
@@ -320,7 +323,7 @@ export async function takeStrikingAttack(actor, input = {}) {
     async status => {
       const fresh = prepared(actor, input, options);
       if (stable(fresh) !== stable(plan))
-        throw Error("The Striking entry, stance, character or prepared melee attack changed before reservation.");
+        throw Error(loc`The Striking entry, stance, character or prepared melee attack changed before reservation.`);
       const id = foundry.utils.randomID(),
         proof = {
           version: 1,
@@ -340,7 +343,7 @@ export async function takeStrikingAttack(actor, input = {}) {
         lease = {};
       await queueRuleState(actor, async () => {
         if (stable(prepared(actor, input, options)) !== stable(plan))
-          throw Error("The actual Striking source changed under its rule lock.");
+          throw Error(loc`The actual Striking source changed under its rule lock.`);
         const rows = strikingRows(actor);
         await actor.update({
           "flags.spycraft2.strikingReactions": [
@@ -363,11 +366,11 @@ export async function takeStrikingAttack(actor, input = {}) {
             }),
           _result = await postFinalAttack(actor, proof.weaponId, { ...options, strikingLease: lease }, proof, validate),
           recorded = currentStrikingAttack(actor, source(actor, proof));
-        if (!recorded) throw Error("The Striking final attack did not post its actual recorded result.");
+        if (!recorded) throw Error(loc`The Striking final attack did not post its actual recorded result.`);
         try {
           await writeState(actor, id, row => ({ ...row, state: "posted", messageUuid: recorded.root.uuid }));
         } catch {
-          ui.notifications.warn("Striking final attack posted; its source stamp needs GC review.");
+          ui.notifications.warn(loc`Striking final attack posted; its source stamp needs GC review.`);
         }
         return recorded.current;
       } catch (error) {
@@ -377,7 +380,7 @@ export async function takeStrikingAttack(actor, input = {}) {
         try {
           await writeState(actor, id, row => ({ ...row, state: "closed", unpublished: true }));
         } catch (cleanup) {
-          throw new AggregateError([error, cleanup], "The unposted Striking reaction needs owning-GC review.");
+          throw new AggregateError([error, cleanup], loc`The unposted Striking reaction needs owning-GC review.`);
         }
         throw error;
       } finally {
@@ -390,15 +393,15 @@ export async function takeStrikingAttack(actor, input = {}) {
 }
 export async function reviewStrikingAttack(actor, input = {}) {
   actualOwner(actor);
-  if (game.user.isGM !== true) throw Error("The owning GC reviews an interrupted Striking reaction.");
+  if (game.user.isGM !== true) throw Error(loc`The owning GC reviews an interrupted Striking reaction.`);
   if (!Object.hasOwn(input, "reactionId")) {
     const esc = foundry.utils.escapeHTML,
       rows = strikingRows(actor);
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review Striking final attack" },
+      window: { title: loc`Review Striking final attack` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Recover any interrupted resource lock first. Reattach the exact posted Striking attack without another roll. Missing-result closure preserves its current round-use history and grants no new attack.</p><label>Original reaction <select name="reactionId">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Recover any interrupted resource lock first. Reattach the exact posted Striking attack without another roll. Missing-result closure preserves its current round-use history and grants no new attack.`}</p><label>${loc`Original reaction`} <select name="reactionId">` +
         rows
           .map(
             r =>
@@ -415,20 +418,21 @@ export async function reviewStrikingAttack(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        '</select></label><label><input name="confirmed" type="checkbox" /> No client is executing this attempt; I reviewed its actual receipts and resource history</label><label><input name="closeUnused" type="checkbox" /> If no result exists, close the unused source without granting a new roll</label></div>'
+        `</select></label><label><input name="confirmed" type="checkbox" /> ${loc`No client is executing this attempt; I reviewed its actual receipts and resource history`}</label><label><input name="closeUnused" type="checkbox" /> ${loc`If no result exists, close the unused source without granting a new roll`}</label></div>`
     });
     if (!input) return null;
   }
-  if (input.confirmed !== true) throw Error("The owning GC must confirm this inactive Striking attempt was reviewed.");
-  if (active.has(input.reactionId)) throw Error("A client is still executing this Striking reaction.");
+  if (input.confirmed !== true)
+    throw Error(loc`The owning GC must confirm this inactive Striking attempt was reviewed.`);
+  if (active.has(input.reactionId)) throw Error(loc`A client is still executing this Striking reaction.`);
   return queueResources([actor], () =>
     writeState(actor, input.reactionId, row => {
-      if (active.has(row.id)) throw Error("A client is still executing this Striking reaction.");
+      if (active.has(row.id)) throw Error(loc`A client is still executing this Striking reaction.`);
       const posted = currentStrikingAttack(actor, row);
       if (posted) return { ...row, state: "posted", messageUuid: posted.root.uuid, gcReviewed: true };
       if (input.closeUnused !== true)
         throw Error(
-          "No unique posted Striking attack is proven; review its resource history and explicitly close the missing-result source."
+          loc`No unique posted Striking attack is proven; review its resource history and explicitly close the missing-result source.`
         );
       return { ...row, state: "closed", gcReviewed: true, newRollAuthorized: false };
     })

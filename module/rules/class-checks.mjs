@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Reviewed conditional class options, pp.36,38,42,46–48,52. */
 export function classCheckEffects(
   system,
@@ -45,14 +46,14 @@ export function classCheckEffects(
     (has("scientist", "Elbow Grease") || has("wheelman", "Elbow Grease"))
   ) {
     result.bonuses.push({ value: 4, type: "gear" });
-    result.notes.push("Elbow Grease: +4 gear bonus to repair.");
+    result.notes.push(loc`Elbow Grease: +4 gear bonus to repair.`);
   }
   if (
     (gearCategory === "E" && has("scientist", "No Worries")) ||
     (gearCategory === "T" && has("snoop", "No Worries"))
   ) {
     result.errorReductionZero = 2;
-    result.notes.push("No Worries: error range –2, minimum 0, for the gear being used.");
+    result.notes.push(loc`No Worries: error range –2, minimum 0, for the gear being used.`);
   }
   if (
     skill === "investigation" &&
@@ -64,7 +65,7 @@ export function classCheckEffects(
     result.timeSource = "Intelligence Analysis";
     result.minimumTimeSeconds = 60;
     result.timeRounding = "up";
-    result.notes.push("Intelligence Analysis: half standard time, rounded up, minimum 1 minute.");
+    result.notes.push(loc`Intelligence Analysis: half standard time, rounded up, minimum 1 minute.`);
   }
   if (
     has("intruder", "Booby Trap") &&
@@ -75,11 +76,11 @@ export function classCheckEffects(
     result.timeSource = "Booby Trap";
     result.minimumTimeSeconds = 3;
     result.timeRounding = "down";
-    result.notes.push("Booby Trap: half standard time, rounded down, minimum 1 half action.");
+    result.notes.push(loc`Booby Trap: half standard time, rounded down, minimum 1 half action.`);
   }
   if (surprise && has("sleuth", "Alertness")) {
     result.bonuses.push({ value: 4, type: "" });
-    result.notes.push("Alertness: +4 to determine surprise.");
+    result.notes.push(loc`Alertness: +4 to determine surprise.`);
   }
   return result;
 }
@@ -115,15 +116,15 @@ export function masterThiefPlan(
     declaredBeforeRolling = false
   } = {}
 ) {
-  if (!hasMasterThief(system)) throw new Error("An earned Intruder Master Thief option is required.");
+  if (!hasMasterThief(system)) throw new Error(loc`An earned Intruder Master Thief option is required.`);
   if (
     !(cfg.classFeatures?.intruder?.classSkills ?? []).includes(skillKey) ||
     (system.skillTotals?.[skillKey]?.ranks ?? 0) < 4
   )
-    throw new Error("Choose an Intruder class skill in which you possess at least four ranks.");
+    throw new Error(loc`Choose an Intruder class skill in which you possess at least four ranks.`);
   if (opposedConfirmed !== true || opponentFinalConfirmed !== true || declaredBeforeRolling !== true)
     throw new Error(
-      "Declare Master Thief instead of rolling an opposed check and confirm the opponent’s final result."
+      loc`Declare Master Thief instead of rolling an opposed check and confirm the opponent’s final result.`
     );
   const opponent = Number(opponentResult),
     total = opponent + 1;
@@ -133,7 +134,7 @@ export function masterThiefPlan(
     !Number.isSafeInteger(opponent) ||
     !Number.isSafeInteger(total)
   )
-    throw new Error("Enter the opponent’s final whole-number result.");
+    throw new Error(loc`Enter the opponent’s final whole-number result.`);
   return {
     skillKey,
     focus: String(focus).trim(),
@@ -209,7 +210,7 @@ export function automaticSkillSuccessPlan(system, check, { difficultyClass } = {
     !Number.isSafeInteger(dc)
   )
     throw new Error(
-      `Enter the GC-confirmed DC or final opposing result to check ${sources.map(s => s.name).join(" / ")}.`
+      loc`Enter the GC-confirmed DC or final opposing result to check ${sources.map(s => s.name).join(" / ")}.`
     );
   const source = sources.sort((a, b) => b.level - a.level).find(s => dc <= s.level + 20);
   return source
@@ -264,7 +265,7 @@ export function manualAdjustmentPlan(
 ) {
   const source = manualAdjustmentSource(system);
   if (!source || check?.checkKind !== "skill" || !source.skills.includes(check.skillKey))
-    throw new Error("Manual Adjustment is not available for this skill.");
+    throw new Error(loc`Manual Adjustment is not available for this skill.`);
   if (
     check.resolved ||
     check.superseded ||
@@ -273,9 +274,9 @@ export function manualAdjustmentPlan(
     check.criticalSuccess ||
     check.successConfirmed !== false
   )
-    throw new Error("Choose a confirmed failed check before any critical activation, resolution or replacement.");
+    throw new Error(loc`Choose a confirmed failed check before any critical activation, resolution or replacement.`);
   if (!retryConfirmed || !halfActionConfirmed || !whackConfirmed || !String(device).trim())
-    throw new Error("Confirm the check may be retried, spend a half action, and identify the device being whacked.");
+    throw new Error(loc`Confirm the check may be retried, spend a half action, and identify the device being whacked.`);
   const dc = Number(difficultyClass);
   if (
     !["number", "string"].includes(typeof difficultyClass) ||
@@ -283,7 +284,7 @@ export function manualAdjustmentPlan(
     !Number.isSafeInteger(dc) ||
     dc > source.threshold
   )
-    throw new Error("The GC-confirmed DC must not exceed effective class level +20.");
+    throw new Error(loc`The GC-confirmed DC must not exceed effective class level +20.`);
   return {
     name: source.name,
     level: source.level,
@@ -323,8 +324,9 @@ export function tenSecondSolutionEligible(
 export function cunningPlanEffect(system, error) {
   const reduction = system.abilities?.int?.mod;
   if ((system.classLevels?.schemer ?? 0) < 2 || !Number.isSafeInteger(reduction) || reduction <= 0)
-    throw new Error("Cunning Plan requires Schemer 2 and a positive Intelligence modifier.");
-  if (!Number.isSafeInteger(error) || error <= 0) throw new Error("This check has no positive error range to reduce.");
+    throw new Error(loc`Cunning Plan requires Schemer 2 and a positive Intelligence modifier.`);
+  if (!Number.isSafeInteger(error) || error <= 0)
+    throw new Error(loc`This check has no positive error range to reduce.`);
   return { source: "Cunning Plan", reduction, originalError: error, error: Math.max(0, error - reduction) };
 }
 export function cunningPlanCheck(system, check) {
@@ -339,7 +341,7 @@ export function cunningPlanCheck(system, check) {
     check.cannotError ||
     check.cunningPlan
   )
-    throw new Error("Cunning Plan cannot change this resolved, activated, replaced or already modified check.");
+    throw new Error(loc`Cunning Plan cannot change this resolved, activated, replaced or already modified check.`);
   const effect = cunningPlanEffect(system, check.error);
   return { ...check, error: effect.error, cunningPlan: effect };
 }
@@ -367,7 +369,7 @@ export function flankingAttackEffects(
       attackBonus: 0,
       threatIncrease: 0,
       blocked: true,
-      reason: "This lower-level attacker cannot flank the actual opponent in Whirling Stance (p.179).",
+      reason: loc`This lower-level attacker cannot flank the actual opponent in Whirling Stance (p.179).`,
       notes: []
     };
   const has = name =>
@@ -392,11 +394,11 @@ export function flankingAttackEffects(
     attackBonus: baseBonus + wolfpackBonus,
     threatIncrease,
     blocked,
-    reason: blocked ? "A ranged flanking opponent must be within CQB range (p.341)." : "",
+    reason: blocked ? loc`A ranged flanking opponent must be within CQB range (p.341).` : "",
     geometryConfirmed: true,
     notes: [
-      `Flanking: +${baseBonus + wolfpackBonus} attack (${ranged ? "ranged +1" : "unarmed/melee +2"}${wolfpackBonus ? ", Wolfpack Basics +2" : ""}). Confirm applicable opposite-side/adjacency and ready-weapon conditions (pp.176,341).`,
-      ...(threatIncrease ? ["Wolfpack Supremacy: threat range +1 against this flanked opponent."] : [])
+      loc`Flanking: +${baseBonus + wolfpackBonus} attack (${ranged ? loc`ranged +1` : loc`unarmed/melee +2`}${wolfpackBonus ? loc`, Wolfpack Basics +2` : ""}). Confirm applicable opposite-side/adjacency and ready-weapon conditions (pp.176,341).`,
+      ...(threatIncrease ? [loc`Wolfpack Supremacy: threat range +1 against this flanked opponent.`] : [])
     ]
   };
 }

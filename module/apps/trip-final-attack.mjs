@@ -10,6 +10,7 @@ import {
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { finalAttackOptions, postFinalAttack, finalWeaponReady } from "./final-attack.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const leases = new WeakMap(),
   active = new Set(),
   stable = v =>
@@ -44,10 +45,10 @@ function source(actor, proof) {
         started: true
       })
   )
-    throw Error("The actual critical Trip opportunity changed.");
+    throw Error(loc`The actual critical Trip opportunity changed.`);
   const use = row.acting.flags.spycraft2.tripFinalUse;
   if (!["reserved", "posted"].includes(use?.state) || use?.id !== proof.id || stable(use.proof) !== stable(proof))
-    throw Error("This critical Trip final attack is not reserved for that actual source.");
+    throw Error(loc`This critical Trip final attack is not reserved for that actual source.`);
   return { ...row, use };
 }
 function currentTiming(actor, proof) {
@@ -59,7 +60,7 @@ function currentTiming(actor, proof) {
     c.combatantId !== proof.combat.combatantId ||
     (proof.activeCombatantId ? tripActiveCombatantId(actor) !== proof.activeCombatantId : c.turn !== c.ownTurnIndex)
   )
-    throw Error("Take the earned Trip final attack immediately during its original Initiative Count.");
+    throw Error(loc`Take the earned Trip final attack immediately during its original Initiative Count.`);
 }
 export function validateTripFinalAttackProof(
   actor,
@@ -75,7 +76,7 @@ export function validateTripFinalAttackProof(
     attackContext?.disarm?.active ||
     (attackContext?.targetActorUuid || attackContext?.characterTarget?.actorUuid) !== proof.opponentUuid
   )
-    throw Error("The Trip final attack must use its actual weapon and recorded opponent as a Standard Attack.");
+    throw Error(loc`The Trip final attack must use its actual weapon and recorded opponent as a Standard Attack.`);
   if (rerollOf) {
     const roots = [...game.messages].filter(
       m =>
@@ -85,7 +86,7 @@ export function validateTripFinalAttackProof(
         stable(m.flags.spycraft2.finalAttack) === stable(proof)
     );
     if (roots.length !== 1 || (row.use.messageUuid && row.use.messageUuid !== roots[0].uuid))
-      throw Error("The original reserved Trip attack root needs GC review.");
+      throw Error(loc`The original reserved Trip attack root needs GC review.`);
     let m = message(rerollOf),
       c = m?.flags?.spycraft2;
     const seen = new Set();
@@ -96,7 +97,7 @@ export function validateTripFinalAttackProof(
       c.superseded ||
       stable(c.finalAttack) !== stable(proof)
     )
-      throw Error("Replace the actual owned unresolved Trip final attack.");
+      throw Error(loc`Replace the actual owned unresolved Trip final attack.`);
     while (m && !seen.has(m.uuid)) {
       seen.add(m.uuid);
       c = m.flags?.spycraft2;
@@ -107,15 +108,15 @@ export function validateTripFinalAttackProof(
       }
       m = message(c.rerollOf);
     }
-    throw Error("This replacement does not descend from the reserved Trip final attack.");
+    throw Error(loc`This replacement does not descend from the reserved Trip final attack.`);
   }
   if (!lease || leases.get(lease)?.actor !== actor || leases.get(lease)?.id !== proof.id)
-    throw Error("Use the earned Trip final-attack control to reserve its opportunity.");
+    throw Error(loc`Use the earned Trip final-attack control to reserve its opportunity.`);
   currentTiming(actor, proof);
   if (!finalWeaponReady([...actor.items].find(w => w.uuid === proof.weaponUuid)))
-    throw Error("The actual Trip final-attack weapon is no longer readied.");
+    throw Error(loc`The actual Trip final-attack weapon is no longer readied.`);
   if (!attackCharacterTargetChoices().some(a => a.uuid === proof.opponentUuid))
-    throw Error("The actual Trip opponent is no longer observed.");
+    throw Error(loc`The actual Trip opponent is no longer observed.`);
 }
 export async function takeTripFinalAttack(actor, input = {}) {
   if (!actor.isOwner || actor.type !== "agent") return null;
@@ -135,10 +136,10 @@ export async function takeTripFinalAttack(actor, input = {}) {
       ),
       weapons = [...actor.items].filter(finalWeaponReady);
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Critical Trip final attack" },
+      window: { title: loc`Critical Trip final attack` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Use one earned winning Trip opportunity immediately against its original opponent. This final Standard Attack suffers−4 and uses the shared final-attack allowance, including Nauseated. Choose an actual owned readied weapon and confirm current range, line of sight and action legality.</p><label>Settled critical Trip <select name="sourceMessage">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Use one earned winning Trip opportunity immediately against its original opponent. This final Standard Attack suffers−4 and uses the shared final-attack allowance, including Nauseated. Choose an actual owned readied weapon and confirm current range, line of sight and action legality.`}</p><label>${loc`Settled critical Trip`} <select name="sourceMessage">` +
         ms
           .map(
             m =>
@@ -154,22 +155,22 @@ export async function takeTripFinalAttack(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        '</select></label><label>Actual weapon <select name="weaponId">' +
+        `</select></label><label>${loc`Actual weapon`} <select name="weaponId">` +
         weapons.map(w => '<option value="' + esc(w.id) + '">' + esc(w.name) + "</option>").join("") +
         "</select></label>" +
         standardAttackContextContent(actor, { includeCharacterTarget: false }) +
-        '<label><input name="immediateConfirmed" type="checkbox" /> This immediately follows that Trip with no intervening action</label><label><input name="attackLegalConfirmed" type="checkbox" /> This Standard Attack against the original opponent is legal now</label></div>'
+        `<label><input name="immediateConfirmed" type="checkbox" /> ${loc`This immediately follows that Trip with no intervening action`}</label><label><input name="attackLegalConfirmed" type="checkbox" /> ${loc`This Standard Attack against the original opponent is legal now`}</label></div>`
     });
     if (!input) return null;
   }
   if (input.immediateConfirmed !== true || input.attackLegalConfirmed !== true)
-    throw Error("Confirm the immediate legal final attack against the original Trip opponent.");
+    throw Error(loc`Confirm the immediate legal final attack against the original Trip opponent.`);
   const row = tripFinalSource(actor, message(input.sourceMessage)),
     s = row.settlement,
     used = row.acting.flags.spycraft2.tripFinalUse;
   if (used) {
     if (used.state === "closed")
-      throw Error("This Trip final attack is reserved or interrupted; the GC closed its unused opportunity.");
+      throw Error(loc`This Trip final attack is reserved or interrupted; the GC closed its unused opportunity.`);
     source(actor, used.proof);
     const posted = [...game.messages].find(
       m =>
@@ -180,17 +181,17 @@ export async function takeTripFinalAttack(actor, input = {}) {
     );
     if (posted) {
       if (stable(posted.flags.spycraft2.finalAttack) !== stable(used.proof))
-        throw Error("The posted Trip attack proof changed; ask the GC to review it.");
+        throw Error(loc`The posted Trip attack proof changed; ask the GC to review it.`);
       return posted;
     }
     throw Error(
-      "This Trip final attack is reserved or interrupted; the GC must review its existing receipts before another roll."
+      loc`This Trip final attack is reserved or interrupted; the GC must review its existing receipts before another roll.`
     );
   }
   const weapon = actor.items.get(input.weaponId);
-  if (!finalWeaponReady(weapon)) throw Error("Choose an actual owned readied weapon.");
+  if (!finalWeaponReady(weapon)) throw Error(loc`Choose an actual owned readied weapon.`);
   const target = attackCharacterTargetChoices().find(a => a.uuid === s.defenderUuid);
-  if (!target) throw Error("The original Trip opponent is no longer observed.");
+  if (!target) throw Error(loc`The original Trip opponent is no longer observed.`);
   const clock = row.acting.flags.spycraft2.tripAttack.combat,
     proof = {
       version: 1,
@@ -223,7 +224,8 @@ export async function takeTripFinalAttack(actor, input = {}) {
   return actor.useLimitedAbility(
     "tripFinalAttack",
     async () => {
-      if (row.acting.flags.spycraft2.tripFinalUse) throw Error("This critical Trip opportunity was already reserved.");
+      if (row.acting.flags.spycraft2.tripFinalUse)
+        throw Error(loc`This critical Trip opportunity was already reserved.`);
       tripFinalSource(actor, row.acting);
       currentTiming(actor, proof);
       const lease = {};
@@ -248,7 +250,7 @@ export async function takeTripFinalAttack(actor, input = {}) {
             "flags.spycraft2.tripFinalUse": { id: proof.id, state: "posted", proof, messageUuid: result.uuid }
           });
         } catch {
-          ui.notifications.warn("Trip final attack posted; its source stamp needs GC review.");
+          ui.notifications.warn(loc`Trip final attack posted; its source stamp needs GC review.`);
         }
         return result;
       } catch (error) {
@@ -258,7 +260,7 @@ export async function takeTripFinalAttack(actor, input = {}) {
           if (row.acting.flags.spycraft2.tripFinalUse?.id === proof.id)
             await row.acting.unsetFlag("spycraft2", "tripFinalUse");
         } catch (cleanup) {
-          throw new AggregateError([error, cleanup], "The unused Trip final attack needs GC review.");
+          throw new AggregateError([error, cleanup], loc`The unused Trip final attack needs GC review.`);
         }
         throw error;
       } finally {
@@ -270,7 +272,8 @@ export async function takeTripFinalAttack(actor, input = {}) {
   );
 }
 export async function reviewTripFinalAttack(actor, input = {}) {
-  if (!actor.isOwner || game.user.isGM !== true) throw Error("The owning GC reviews interrupted Trip final attacks.");
+  if (!actor.isOwner || game.user.isGM !== true)
+    throw Error(loc`The owning GC reviews interrupted Trip final attacks.`);
   if (!Object.hasOwn(input, "sourceMessage")) {
     const esc = foundry.utils.escapeHTML,
       ms = [...game.messages].filter(
@@ -281,10 +284,10 @@ export async function reviewTripFinalAttack(actor, input = {}) {
           m.isContentVisible !== false
       );
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review interrupted Trip final attack" },
+      window: { title: loc`Review interrupted Trip final attack` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Recover any interrupted resource lock first. A posted attack retains its spent opportunity and shared final-attack count. If no attack exists, closing the unused opportunity preserves its current resource history and authorizes no new roll.</p><label>Critical Trip <select name="sourceMessage">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Recover any interrupted resource lock first. A posted attack retains its spent opportunity and shared final-attack count. If no attack exists, closing the unused opportunity preserves its current resource history and authorizes no new roll.`}</p><label>${loc`Critical Trip`} <select name="sourceMessage">` +
         ms
           .map(
             m =>
@@ -300,20 +303,20 @@ export async function reviewTripFinalAttack(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        '</select></label><label><input name="confirmed" type="checkbox" /> No client is executing this attempt; I reviewed its actual receipts and resource history</label><label><input name="closeUnused" type="checkbox" /> If no attack exists, close the unused opportunity without releasing a new roll</label></div>'
+        `</select></label><label><input name="confirmed" type="checkbox" /> ${loc`No client is executing this attempt; I reviewed its actual receipts and resource history`}</label><label><input name="closeUnused" type="checkbox" /> ${loc`If no attack exists, close the unused opportunity without releasing a new roll`}</label></div>`
     });
     if (!input) return null;
   }
   if (input.confirmed !== true)
-    throw Error("The owning GC must confirm that no client is still executing this interrupted Trip final attack.");
+    throw Error(loc`The owning GC must confirm that no client is still executing this interrupted Trip final attack.`);
   const row = tripFinalSource(actor, message(input.sourceMessage)),
     use = row.acting.flags.spycraft2.tripFinalUse;
-  if (!use || active.has(use.id)) throw Error("Choose an interrupted, inactive Trip final attack.");
+  if (!use || active.has(use.id)) throw Error(loc`Choose an interrupted, inactive Trip final attack.`);
   return queueResources(
     [actor],
     async () => {
       const current = tripFinalSource(actor, row.acting).acting.flags.spycraft2.tripFinalUse;
-      if (current?.id !== use.id || active.has(use.id)) throw Error("The interrupted Trip attempt changed.");
+      if (current?.id !== use.id || active.has(use.id)) throw Error(loc`The interrupted Trip attempt changed.`);
       const posted = [...game.messages].filter(
         m =>
           m.flags?.spycraft2?.actorUuid === actor.uuid &&
@@ -321,10 +324,10 @@ export async function reviewTripFinalAttack(actor, input = {}) {
           m.flags.spycraft2.finalAttack.id === use.id &&
           !m.flags.spycraft2.rerollOf
       );
-      if (posted.length > 1) throw Error("Multiple Trip attack receipts require GC review.");
+      if (posted.length > 1) throw Error(loc`Multiple Trip attack receipts require GC review.`);
       if (posted[0]) {
         if (stable(posted[0].flags.spycraft2.finalAttack) !== stable(use.proof))
-          throw Error("The posted Trip final attack does not match its reserved proof.");
+          throw Error(loc`The posted Trip final attack does not match its reserved proof.`);
         await row.acting.update({
           "flags.spycraft2.tripFinalUse": { ...use, state: "posted", messageUuid: posted[0].uuid }
         });
@@ -332,7 +335,7 @@ export async function reviewTripFinalAttack(actor, input = {}) {
       }
       if (input.closeUnused !== true)
         throw Error(
-          "No posted attack is proven. Explicitly close this unused opportunity after reviewing its resource history; no new roll was authorized."
+          loc`No posted attack is proven. Explicitly close this unused opportunity after reviewing its resource history; no new roll was authorized.`
         );
       await row.acting.update({ "flags.spycraft2.tripFinalUse": { ...use, state: "closed", gcReviewed: true } });
       return { closed: true, newRollAuthorized: false };

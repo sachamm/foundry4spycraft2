@@ -9,6 +9,7 @@ import { skillBonusCondition, skillConditionEntries, skillConditionCheckPenalty 
 import { attributeActionBlock } from "./attributes.mjs";
 import { underwaterCheckPlan } from "./environment.mjs";
 import { tenSecondSolutionEligible, cunningPlanEffect } from "./class-checks.mjs";
+import { loc } from "../i18n.mjs";
 const normal = value =>
   String(value ?? "")
     .trim()
@@ -48,7 +49,10 @@ export function resolveKnowledgeCheck(
 ) {
   const related = system.skillTotals?.[skill];
   if (!related)
-    return { blocked: true, blockedReason: "Choose the one skill the GC considers relevant to the Knowledge check." };
+    return {
+      blocked: true,
+      blockedReason: loc`Choose the one skill the GC considers relevant to the Knowledge check.`
+    };
   const cardShark = cardSharkKnowledgePlan(system, { gamblingKnowledge, topic });
   active = active === true || cardShark.active;
   const photo = system.activeFeatNames?.includes("Photographic Memory"),
@@ -58,9 +62,9 @@ export function resolveKnowledgeCheck(
   if (dartingStyleState(system).needsReview) reasons.push(dartingStyleState(system).reason);
   if (twoWeaponStyleState(system).needsReview) reasons.push(twoWeaponStyleState(system).reason);
   if (shakenRules(system).fixedResultsForbidden && taking)
-    reasons.push("Shaken: taking 10 or 20 is unavailable (p.342).");
+    reasons.push(loc`Shaken: taking 10 or 20 is unavailable (p.342).`);
   if (system.baffledApplicationReview?.needsReview)
-    reasons.push("The GC must review the interrupted Baffled event before Knowledge checks.");
+    reasons.push(loc`The GC must review the interrupted Baffled event before Knowledge checks.`);
   const restraint = restraintActionBlock(system, {
     passive: !active && !taking && method === "roll" && !cunningPlan && !tenSecondSolution,
     free: !active && !taking && method === "roll" && cunningPlan && !tenSecondSolution
@@ -71,10 +75,10 @@ export function resolveKnowledgeCheck(
     passiveAction: !active && !taking && method === "roll" && !cunningPlan && !tenSecondSolution
   });
   if (incapacity) reasons.push(incapacity);
-  if (!["roll", "take10", "take20"].includes(method)) reasons.push("Unknown Knowledge check method.");
+  if (!["roll", "take10", "take20"].includes(method)) reasons.push(loc`Unknown Knowledge check method.`);
   if ((taking || (active && !cardShark.active)) && !photo)
-    reasons.push("Active Knowledge checks and taking 10/20 require Photographic Memory.");
-  if (taking && !safeToTake) reasons.push("Taking 10/20 requires being neither distracted nor endangered.");
+    reasons.push(loc`Active Knowledge checks and taking 10/20 require Photographic Memory.`);
+  if (taking && !safeToTake) reasons.push(loc`Taking 10/20 requires being neither distracted nor endangered.`);
   if (
     tenSecondSolution &&
     !tenSecondSolutionEligible(system, {
@@ -87,7 +91,7 @@ export function resolveKnowledgeCheck(
     })
   )
     reasons.push(
-      "10-Second Solution requires Scientist 14, a rolled Knowledge check and confirmation it is outside Complex Tasks and Dramatic Conflicts."
+      loc`10-Second Solution requires Scientist 14, a rolled Knowledge check and confirmation it is outside Complex Tasks and Dramatic Conflicts.`
     );
   let cunning = null;
   if (cunningPlan)
@@ -160,6 +164,6 @@ export function resolveKnowledgeCheck(
     timeRounding: tenSecondSolution ? "down" : null,
     actionDiceAllowed: !taking && active,
     rollMode: active ? undefined : "blindroll",
-    notes: `${cardShark.active ? "Card Shark: this confirmed gambling Knowledge question is active (pp.201–202). " : ""}${dartingStyleState(system).active ? `Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? "Superior Cover: attack/skill check penalty −2. " : ""}${twoWeaponSkillNote(system)}${combatExpertiseState(system).active ? `Combat Expertise: skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? `${condition.state === "baffled" ? "Baffled" : "Incompetent"}: Knowledge bonus ${condition.normal} → ${condition.total}; synergy/check modifiers remain. ` : ""}${underwaterContext.notes.length ? underwaterContext.notes.join(" ") + " " : ""}${cunning ? `Cunning Plan: free action; error range 1 → ${cunning.error}. ` : ""}${tenSecondSolution ? "10-Second Solution: half standard time, rounded down, minimum 1 full action" : method === "take10" ? "1 round" : method === "take20" ? "1 minute" : "Free action"}. ${active ? "Active" : "Passive"}. Related skill: ${related.name ?? skill}; synergy +${synergy}${owned ? "" : "; no rank synergy without the applicable focus"}. Rules p.99.`
+    notes: loc`${cardShark.active ? loc`Card Shark: this confirmed gambling Knowledge question is active (pp.201–202). ` : ""}${dartingStyleState(system).active ? loc`Darting Weapon: attack/skill check penalty −${dartingStyleState(system).penalty}. ` : ""}${superiorCoverState(system).active ? loc`Superior Cover: attack/skill check penalty −2. ` : ""}${twoWeaponSkillNote(system)}${combatExpertiseState(system).active ? loc`Combat Expertise: skill check penalty −${combatExpertiseState(system).penalty}. ` : ""}${condition.state ? loc`${condition.state === "baffled" ? loc`Baffled` : loc`Incompetent`}: Knowledge bonus ${condition.normal} → ${condition.total}; synergy/check modifiers remain. ` : ""}${underwaterContext.notes.length ? underwaterContext.notes.join(" ") + " " : ""}${cunning ? loc`Cunning Plan: free action; error range 1 → ${cunning.error}. ` : ""}${tenSecondSolution ? loc`10-Second Solution: half standard time, rounded down, minimum 1 full action` : method === "take10" ? loc`1 round` : method === "take20" ? loc`1 minute` : loc`Free action`}. ${active ? loc`Active` : loc`Passive`}. Related skill: ${related.name ?? skill}; synergy +${synergy}${owned ? "" : loc`; no rank synergy without the applicable focus`}. Rules p.99.`
   };
 }

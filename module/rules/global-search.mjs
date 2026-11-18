@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Sleuth Global Search, p.46. The GC supplies the target's location; this computes the legal search effort. */
 export function globalSearchSource(system) {
   const level = system.classLevels?.sleuth ?? 0;
@@ -8,7 +9,7 @@ export function globalSearchPlan(
   { target = "", targetLevel, hoursCompleted, specialCharacterConfirmed = false, onlyFreeActionsConfirmed = false } = {}
 ) {
   const source = globalSearchSource(system);
-  if (!source) throw new Error("Global Search requires earned Sleuth level 10.");
+  if (!source) throw new Error(loc`Global Search requires earned Sleuth level 10.`);
   const level =
       ["number", "string"].includes(typeof targetLevel) && String(targetLevel).trim() ? Number(targetLevel) : NaN,
     hours =
@@ -16,7 +17,7 @@ export function globalSearchPlan(
         ? Number(hoursCompleted)
         : NaN;
   if (!String(target).trim() || specialCharacterConfirmed !== true || !Number.isSafeInteger(level) || level < 1)
-    throw new Error("Name the special character and confirm the GC-supplied positive whole target level.");
+    throw new Error(loc`Name the special character and confirm the GC-supplied positive whole target level.`);
   const requiredHours = level * source.hoursPerLevel;
   if (
     !Number.isSafeInteger(requiredHours) ||
@@ -24,7 +25,7 @@ export function globalSearchPlan(
     hours < requiredHours ||
     onlyFreeActionsConfirmed !== true
   )
-    throw new Error(`Complete ${requiredHours} hours of search, taking no other non-free actions.`);
+    throw new Error(loc`Complete ${requiredHours} hours of search, taking no other non-free actions.`);
   return {
     target: String(target).trim(),
     targetLevel: level,

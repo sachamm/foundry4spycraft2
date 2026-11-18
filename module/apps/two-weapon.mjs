@@ -4,6 +4,7 @@ import { twoWeaponDeclarationPlan, twoWeaponFinalAttackPlan } from "../rules/two
 import { twoWeaponStyleState } from "../rules/two-weapon-state.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { queueResources } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const isMap = v => v !== null && typeof v === "object" && !Array.isArray(v);
 const roundKey = c => `${encodeURIComponent(c.id).replaceAll(".", "%2E")}:${c.round}`;
 const matches = (a, b) =>
@@ -23,17 +24,17 @@ export async function declareTwoWeapon(actor, options = {}) {
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)} (${esc(i.system.sizeHands ?? "")})</option>`)
         .join("");
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Declare two-weapon combat" },
+      window: { title: loc`Declare two-weapon combat` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>At the start of your Initiative Count, choose the full-round tradeoff. Mark the two actual one-handed weapons equipped and carried on Gear first. Each final attack is one free-action Standard Attack; tricks may apply, but adjustments and action combinations do not (p.329). Use Main to take each final attack; the GC counts attacks to determine the least-used weapon.</p><label>First weapon <select name="firstWeaponId">${choices}</select></label><label>Second weapon <select name="secondWeaponId">${choices}</select></label><label>Choice <select name="extraAttacks"><option value="1">Basics: 1 final attack; −2 attack/skill checks</option><option value="2">Mastery: 2 final attacks; −4 attack/skill checks</option></select></label><label><input name="atStartOfInitiative" type="checkbox" /> This is the start of my Initiative Count</label><label><input name="armedConfirmed" type="checkbox" /> The GC confirms both weapons are actually readied in separate hands</label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`At the start of your Initiative Count, choose the full-round tradeoff. Mark the two actual one-handed weapons equipped and carried on Gear first. Each final attack is one free-action Standard Attack; tricks may apply, but adjustments and action combinations do not (p.329). Use Main to take each final attack; the GC counts attacks to determine the least-used weapon.`}</p><label>${loc`First weapon`} <select name="firstWeaponId">${choices}</select></label><label>${loc`Second weapon`} <select name="secondWeaponId">${choices}</select></label><label>${loc`Choice`} <select name="extraAttacks"><option value="1">${loc`Basics: 1 final attack; −2 attack/skill checks`}</option><option value="2">${loc`Mastery: 2 final attacks; −4 attack/skill checks`}</option></select></label><label><input name="atStartOfInitiative" type="checkbox" /> ${loc`This is the start of my Initiative Count`}</label><label><input name="armedConfirmed" type="checkbox" /> ${loc`The GC confirms both weapons are actually readied in separate hands`}</label></div>`
     });
     if (!input) return null;
   }
   return queueResources([actor], async () => {
-    if (!actor.isOwner) throw new Error("You must own the character.");
+    if (!actor.isOwner) throw new Error(loc`You must own the character.`);
     const combat = expertiseCombatContext(actor);
     if (JSON.stringify(combat) !== expected)
-      throw new Error("The Initiative Count changed. Declare the two-weapon choice again.");
+      throw new Error(loc`The Initiative Count changed. Declare the two-weapon choice again.`);
     const extraAttacks =
       typeof input.extraAttacks === "string" && input.extraAttacks.trim()
         ? Number(input.extraAttacks)
@@ -51,14 +52,14 @@ export async function declareTwoWeapon(actor, options = {}) {
       !isMap(history) ||
       (actor.flags?.spycraft2?.twoWeaponReviews !== undefined && !isMap(actor.flags.spycraft2.twoWeaponReviews))
     )
-      throw new Error("The GC must review the saved two-weapon declaration history.");
+      throw new Error(loc`The GC must review the saved two-weapon declaration history.`);
     if (
       Object.hasOwn(history, key) ||
       Object.values(actor.flags?.spycraft2?.twoWeaponReviews ?? {}).some(
         r => r?.combatRound === key || r?.blockedRounds?.includes(key)
       )
     )
-      throw new Error("A two-weapon declaration has already been recorded for this combat round.");
+      throw new Error(loc`A two-weapon declaration has already been recorded for this combat round.`);
     const record = {
         ...plan,
         id: foundry.utils.randomID(),
@@ -79,12 +80,12 @@ export async function declareTwoWeapon(actor, options = {}) {
     } catch (error) {
       if (!settled()) throw error;
     }
-    if (!settled()) throw new Error("The two-weapon declaration needs GC review.");
+    if (!settled()) throw new Error(loc`The two-weapon declaration needs GC review.`);
     const state = twoWeaponStyleState(actor.system);
     try {
       await ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
-        content: `Two-weapon declaration: ${record.extraAttacks} final Standard Attack(s), using the least-used of the two declared weapons (choose in a tie). Attack/skill penalty −${record.penalty} until the start of own Count in round ${record.dueRound}.${state.handgunSkillWaiver ? " Both Guns Blazing waives the two-weapon skill penalty and the penalty on handgun attacks." : ""} Main tracks the granted final attacks; confirm normal action requirements and least-used weapon at the table.`,
+        content: loc`Two-weapon declaration: ${record.extraAttacks} final Standard Attack(s), using the least-used of the two declared weapons (choose in a tie). Attack/skill penalty −${record.penalty} until the start of own Count in round ${record.dueRound}.${state.handgunSkillWaiver ? loc` Both Guns Blazing waives the two-weapon skill penalty and the penalty on handgun attacks.` : ""} Main tracks the granted final attacks; confirm normal action requirements and least-used weapon at the table.`,
         flags: {
           spycraft2: {
             actorUuid: actor.uuid,
@@ -96,14 +97,14 @@ export async function declareTwoWeapon(actor, options = {}) {
       });
     } catch (error) {
       ui.notifications.warn(
-        "The two-weapon tradeoff is active, but its chat notice could not be confirmed. Review Main before declaring another use."
+        loc`The two-weapon tradeoff is active, but its chat notice could not be confirmed. Review Main before declaring another use.`
       );
     }
     return record;
   });
 }
 export async function reviewTwoWeapon(actor, options = {}) {
-  if (!game.user.isGM || !actor.isOwner) throw new Error("Only an owning GC can review a two-weapon tradeoff.");
+  if (!game.user.isGM || !actor.isOwner) throw new Error(loc`Only an owning GC can review a two-weapon tradeoff.`);
   const snapshot = () =>
       JSON.stringify({
         record: actor.system.twoWeaponStyle,
@@ -116,23 +117,22 @@ export async function reviewTwoWeapon(actor, options = {}) {
   let input = options;
   if (!Object.hasOwn(input, "confirmed")) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review two-weapon tradeoff" },
+      window: { title: loc`Review two-weapon tradeoff` },
       rejectClose: false,
-      content:
-        '<div class="spycraft2-roll-options"><p>Review the actual remaining penalty and final attacks at the table before clearing this declaration. Clearing preserves the declared round’s use and never grants more final attacks. A new round’s legitimate choice remains separate.</p><label>Resolution <input name="resolution" /></label><label><input name="confirmed" type="checkbox" /> The GC has resolved the remaining tradeoff and confirms clearing this saved record</label></div>'
+      content: `<div class="spycraft2-roll-options"><p>${loc`Review the actual remaining penalty and final attacks at the table before clearing this declaration. Clearing preserves the declared round’s use and never grants more final attacks. A new round’s legitimate choice remains separate.`}</p><label>${loc`Resolution`} <input name="resolution" /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC has resolved the remaining tradeoff and confirms clearing this saved record`}</label></div>`
     });
     if (!input) return null;
   }
   return queueResources([actor], async () => {
-    if (!game.user.isGM || !actor.isOwner) throw new Error("Only an owning GC can clear this record.");
-    if (snapshot() !== before) throw new Error("The tradeoff or Count changed. Review it again.");
+    if (!game.user.isGM || !actor.isOwner) throw new Error(loc`Only an owning GC can clear this record.`);
+    if (snapshot() !== before) throw new Error(loc`The tradeoff or Count changed. Review it again.`);
     if (
       input.confirmed !== true ||
       typeof input.resolution !== "string" ||
       !input.resolution.trim() ||
       input.resolution.length > 500
     )
-      throw new Error("Confirm the GC resolution before clearing a tradeoff.");
+      throw new Error(loc`Confirm the GC resolution before clearing a tradeoff.`);
     const id = foundry.utils.randomID(),
       previous = structuredClone(actor.system.twoWeaponStyle ?? null),
       combat = expertiseCombatContext(actor),
@@ -186,14 +186,14 @@ export async function reviewTwoWeapon(actor, options = {}) {
     } catch (error) {
       if (!settled()) throw error;
     }
-    if (!settled()) throw new Error("The two-weapon review needs confirmation of its saved history.");
+    if (!settled()) throw new Error(loc`The two-weapon review needs confirmation of its saved history.`);
     return audit;
   });
 }
 
 export async function takeTwoWeaponFinalAttack(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
-  if (options.disarm) throw new Error("A final attack cannot combine with a Disarm action.");
+  if (options.disarm) throw new Error(loc`A final attack cannot combine with a Disarm action.`);
   for (const key of [
     "oneInAMillion",
     "millionDollarSkill",
@@ -205,7 +205,7 @@ export async function takeTwoWeaponFinalAttack(actor, options = {}) {
   ])
     if (options[key])
       throw new Error(
-        "Resolve combined class declarations through their normal attack controls, then ask the GC to update this final-attack counter."
+        loc`Resolve combined class declarations through their normal attack controls, then ask the GC to update this final-attack counter.`
       );
   const before = JSON.stringify({ record: actor.system.twoWeaponStyle, combat: expertiseCombatContext(actor) });
   let input = options;
@@ -217,14 +217,14 @@ export async function takeTwoWeaponFinalAttack(actor, options = {}) {
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Two-weapon final attack" },
+      window: { title: loc`Two-weapon final attack` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>One free-action Standard Attack. The GC counts all attacks this round and confirms the least-used original weapon (choose in a tie). Set Single-Shot mode beforehand. Tricks and normal Standard Attack benefits apply; adjustments and action combinations do not. Use other class attack controls and GC counter review for combined class declarations.</p><label>Weapon <select name="weaponId">${choices}</select></label>${standardAttackContextContent(actor)}<label><input name="leastUsedConfirmed" type="checkbox" /> The GC confirms this is the least-used weapon and this free final attack is legal now</label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`One free-action Standard Attack. The GC counts all attacks this round and confirms the least-used original weapon (choose in a tie). Set Single-Shot mode beforehand. Tricks and normal Standard Attack benefits apply; adjustments and action combinations do not. Use other class attack controls and GC counter review for combined class declarations.`}</p><label>${loc`Weapon`} <select name="weaponId">${choices}</select></label>${standardAttackContextContent(actor)}<label><input name="leastUsedConfirmed" type="checkbox" /> ${loc`The GC confirms this is the least-used weapon and this free final attack is legal now`}</label></div>`
     });
     if (!input) return null;
   }
   if (JSON.stringify({ record: actor.system.twoWeaponStyle, combat: expertiseCombatContext(actor) }) !== before)
-    throw new Error("The declaration or Initiative Count changed. Review the final attack again.");
+    throw new Error(loc`The declaration or Initiative Count changed. Review the final attack again.`);
   const attackOptions = await completeCharacterTarget(actor, actor.items.get(input.weaponId)?.system, {
     ...standardAttackContextInput(input),
     attackAction: "standard",
@@ -235,27 +235,27 @@ export async function takeTwoWeaponFinalAttack(actor, options = {}) {
     weapon = actor.items.get(plan.weaponId),
     preview = actor.weaponAttack(weapon, attackOptions);
   if (preview.ranged && !Number.isFinite(attackOptions.distanceFeet))
-    throw new Error("Enter the actual target distance for the final ranged attack.");
+    throw new Error(loc`Enter the actual target distance for the final ranged attack.`);
   if (preview.blocked || (preview.firearm && preview.fireMode !== "single"))
-    throw new Error(preview.reason || "A final Standard Attack requires Single-Shot mode.");
+    throw new Error(preview.reason || loc`A final Standard Attack requires Single-Shot mode.`);
   const signature = JSON.stringify(preview),
     receipt = { ...plan, id: foundry.utils.randomID() };
   return actor.useLimitedAbility(
     "twoWeaponFinalAttack",
     async status => {
       const validate = () => {
-        if (!actor.isOwner) throw new Error("You must own the character.");
+        if (!actor.isOwner) throw new Error(loc`You must own the character.`);
         const fresh = twoWeaponFinalAttackPlan(actor.system, expertiseCombatContext(actor), actor.items, input),
           counter = actor.system.resourceUses?.twoWeaponFinalAttack,
           current = actor.items.get(plan.weaponId);
-        if (JSON.stringify(fresh) !== JSON.stringify(plan)) throw new Error("The final attack declaration changed.");
+        if (JSON.stringify(fresh) !== JSON.stringify(plan)) throw new Error(loc`The final attack declaration changed.`);
         if (
           JSON.stringify(actor.system.twoWeaponStyle) !== JSON.stringify(JSON.parse(before).record) ||
           counter?.epoch !== plan.declarationId ||
           counter.used !== status.used + 1 ||
           JSON.stringify(actor.weaponAttack(current, attackOptions)) !== signature
         )
-          throw new Error("The final attack or its reserved use changed. Review it again.");
+          throw new Error(loc`The final attack or its reserved use changed. Review it again.`);
       };
       validate();
       const posted = () =>
@@ -268,7 +268,7 @@ export async function takeTwoWeaponFinalAttack(actor, options = {}) {
           twoWeaponFinalAttack: { ...receipt, sequence: status.used + 1 },
           validateFinalAttack: validate
         });
-        if (!message) throw new Error("The final attack was cancelled before posting.");
+        if (!message) throw new Error(loc`The final attack was cancelled before posting.`);
         return message;
       } catch (error) {
         const message = posted();

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Keep saved array indices stable while processing/displaying milestones in chronological order. */
 export const orderedClassChoices = item =>
   (item.system.choiceSchedule ?? [])
@@ -71,24 +72,24 @@ export function resolveClassSkillSelections(items, progression, cfg, isClassSkil
       const skill = item.system.skillChoices?.[field.key],
         career = careers[field.level - 1];
       if (!skill) {
-        pending.push(`${item.name}: choose a skill for ${field.name} at class level ${field.level}.`);
+        pending.push(loc`${item.name}: choose a skill for ${field.name} at class level ${field.level}.`);
         continue;
       }
       if (!cfg.skills[skill]) {
-        warnings.push(`${item.name}: ${field.name} has an unknown skill selection.`);
+        warnings.push(loc`${item.name}: ${field.name} has an unknown skill selection.`);
         continue;
       }
       if (field.versatility && isClassSkill(skill, career, item)) {
-        warnings.push(`${item.name}: Versatility must select a cross-class skill at acquisition.`);
+        warnings.push(loc`${item.name}: Versatility must select a cross-class skill at acquisition.`);
         continue;
       }
       if (!field.anySkill && !isClassSkill(skill, career, item)) {
-        warnings.push(`${item.name}: ${field.name} requires one of that class's skills at acquisition.`);
+        warnings.push(loc`${item.name}: ${field.name} requires one of that class's skills at acquisition.`);
         continue;
       }
       const seen = selected.get(field.name) ?? new Set();
       if (seen.has(skill)) {
-        warnings.push(`${item.name}: ${field.name} cannot select ${cfg.skills[skill].name} more than once.`);
+        warnings.push(loc`${item.name}: ${field.name} cannot select ${cfg.skills[skill].name} more than once.`);
         continue;
       }
       seen.add(skill);

@@ -27,6 +27,7 @@ import {
 import { batteryState, gadgetState, repairPlan } from "../rules/gear-play-rules.mjs";
 import { parseStandingCost } from "../rules/standing.mjs";
 import { qualityReference } from "../rules/vehicle-play-rules.mjs";
+import { loc } from "../i18n.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
@@ -173,14 +174,14 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     });
 
     if (sys.ammunitionOnly) {
-      context.calibers = { ...cfg.calibers, 0: "Ammunition stockpile (no Caliber pick)" };
-      context.pickOptions = { "": "— (upgrade/Common Item stockpile)" };
+      context.calibers = { ...cfg.calibers, 0: loc`Ammunition stockpile (no Caliber pick)` };
+      context.pickOptions = { "": loc`— (upgrade/Common Item stockpile)` };
       if (sys.pick) context.pickOptions[sys.pick] = `${sys.pick} — review legacy ammunition pick`;
     }
     if (sys.fireMode && !Object.hasOwn(context.fireModeOptions, sys.fireMode))
-      context.fireModeOptions[sys.fireMode] = "Unavailable mode — review choice";
+      context.fireModeOptions[sys.fireMode] = loc`Unavailable mode — review choice`;
     if (sys.loadedAmmoId && !Object.hasOwn(context.ammunitionOptions, sys.loadedAmmoId))
-      context.ammunitionOptions[sys.loadedAmmoId] = "Missing ammunition — review link";
+      context.ammunitionOptions[sys.loadedAmmoId] = loc`Missing ammunition — review link`;
     if (["weapon", "armor", "gear"].includes(item.type)) {
       const category = equipmentCategory(item);
       if (category)
@@ -266,7 +267,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       )
         context.choiceOptions = {
           ...context.choiceOptions,
-          [sys.choice]: sys.choice + " — existing choice; review its type"
+          [sys.choice]: sys.choice + loc` — existing choice; review its type`
         };
       context.historicalReview = !!item.actor && (!sys.acquisitionCheck?.ok || !historicalFeatEligibility(sys).ok);
       context.featKinds = { permanent: "Permanent", temporary: "Temporary", virtual: "Virtual" };

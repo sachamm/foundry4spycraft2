@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Selective catalog refresh. Build selections and earned actor resources are not catalog fields. */
 export const REFRESH_FIELDS = {
   gear: ["kitType", "kitGrade", "kitSize", "kitNonPortable", "caliber", "weight", "source"],
@@ -110,12 +111,12 @@ const assignUpdate = (update, path, value) => {
 };
 const readPath = (item, path) => (path === "name" ? item.name : item.system[path.slice(7)]);
 export async function applyRulesRefresh(actor, changes) {
-  if (!actor.isOwner) throw new Error("You must own this character to refresh its rules.");
+  if (!actor.isOwner) throw new Error(loc`You must own this character to refresh its rules.`);
   const updates = new Map();
   for (const change of changes) {
     const item = actor.items.get(change.itemId);
     if (!item || !equivalent(readPath(item, change.path), change.before))
-      throw new Error(`${change.itemName}: the document changed after the preview; reopen the review.`);
+      throw new Error(loc`${change.itemName}: the document changed after the preview; reopen the review.`);
     const update = updates.get(change.itemId) ?? { _id: change.itemId };
     assignUpdate(update, change.path, change.after);
     updates.set(change.itemId, update);

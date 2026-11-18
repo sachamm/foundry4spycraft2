@@ -1,5 +1,6 @@
 import { equipmentCategory } from "./gear.mjs";
 import { currentReserves, missionEpoch } from "./gear-acquisition.mjs";
+import { loc } from "../i18n.mjs";
 /** Reviewed mission-pick exceptions. Upgrade buying/effects at Caliber V remain separate. */
 export const MISSION_CALIBER_SOURCES = {
   heavilyArmed: {
@@ -113,12 +114,13 @@ export function missionCaliberOptions(system, items = []) {
         used = selected >= limit;
       if (current) {
         if (!ids.length || ids.length > limit || new Set(ids).size !== ids.length)
-          warnings.push(`${source.name}: review the recorded number of selected picks against its current limit.`);
+          warnings.push(loc`${source.name}: review the recorded number of selected picks against its current limit.`);
         for (const id of ids) {
           const item = items.find(i => i.id === id);
-          if (!item) warnings.push(`${source.name}: a selected mission item is missing; its exception remains used.`);
+          if (!item)
+            warnings.push(loc`${source.name}: a selected mission item is missing; its exception remains used.`);
           else if (!missionCaliberMatches(system, item))
-            warnings.push(`${item.name}: review its ${source.name} selection and paid mission pick.`);
+            warnings.push(loc`${item.name}: review its ${source.name} selection and paid mission pick.`);
         }
       }
       return {
@@ -136,11 +138,11 @@ export function missionCaliberOptions(system, items = []) {
   for (const item of items.filter(i => i.system?.missionCaliberGrant)) {
     if (item.system.missionCaliberGrant.epoch !== epoch)
       warnings.push(
-        `${item.name}: its mission-Caliber exception belongs to an earlier mission; review its acquisition.`
+        loc`${item.name}: its mission-Caliber exception belongs to an earlier mission; review its acquisition.`
       );
     else if (!missionCaliberMatches(system, item))
       warnings.push(
-        `${item.name}: its mission-Caliber exception is no longer valid; review source, provenance, category and Caliber.`
+        loc`${item.name}: its mission-Caliber exception is no longer valid; review source, provenance, category and Caliber.`
       );
   }
   return { options, warnings };
@@ -149,12 +151,13 @@ export function missionCaliberPlan(system, items, { source: key, itemId, intelCo
   const source = MISSION_CALIBER_SOURCES[key],
     mission = currentReserves(system),
     epoch = missionEpoch(system);
-  if (!source || !missionCaliberSourceActive(system, key)) throw new Error("Choose an earned mission-Caliber ability.");
-  if (!intelConfirmed) throw new Error("Confirm this item was chosen as mission gear during Intel.");
-  if (!mission) throw new Error("Record mission Caliber in reserve setup first; zero reserves are allowed.");
+  if (!source || !missionCaliberSourceActive(system, key))
+    throw new Error(loc`Choose an earned mission-Caliber ability.`);
+  if (!intelConfirmed) throw new Error(loc`Confirm this item was chosen as mission gear during Intel.`);
+  if (!mission) throw new Error(loc`Record mission Caliber in reserve setup first; zero reserves are allowed.`);
   if (mission.caliber === 5)
     throw new Error(
-      `${source.name} grants extra upgrades at Caliber V instead; upgrade purchasing and effects require separate adjudication.`
+      loc`${source.name} grants extra upgrades at Caliber V instead; upgrade purchasing and effects require separate adjudication.`
     );
   const previous = system.missionCaliberPicks?.[key]?.epoch === epoch ? system.missionCaliberPicks[key] : null,
     ids = recordItemIds(previous);
@@ -164,19 +167,19 @@ export function missionCaliberPlan(system, items, { source: key, itemId, intelCo
       (previous.additionalItemIds !== undefined && !Array.isArray(previous.additionalItemIds)) ||
       previous.missionCaliber !== mission.caliber)
   )
-    throw new Error("Review the existing mission selection before assigning another pick.");
+    throw new Error(loc`Review the existing mission selection before assigning another pick.`);
   if (previous && ids.length >= missionCaliberLimit(system, key))
-    throw new Error(`${source.name} has already been selected this mission.`);
-  if (ids.includes(itemId)) throw new Error("This pick has already been selected for this ability.");
+    throw new Error(loc`${source.name} has already been selected this mission.`);
+  if (ids.includes(itemId)) throw new Error(loc`This pick has already been selected for this ability.`);
   const item = items.find(i => i.id === itemId);
   if (!eligibleItem(system, item, source) || item.system.caliber > mission.caliber + 1)
     throw new Error(
-      `Choose one paid ${source.category === "*" ? "matching-category" : source.category} mission pick at most one Caliber above the mission.`
+      loc`Choose one paid ${source.category === "*" ? "matching-category" : source.category} mission pick at most one Caliber above the mission.`
     );
   if ((item.system.quantity ?? 1) < 1 || (item.system.quantity ?? 1) > (item.system.bundleSize ?? 1))
-    throw new Error("Choose one available paid mission bundle.");
+    throw new Error(loc`Choose one available paid mission bundle.`);
   if (item.system.missionCaliberGrant?.epoch === epoch || item.system.bigStickMissionPick?.epoch === epoch)
-    throw new Error("An item cannot combine mission-Caliber exceptions.");
+    throw new Error(loc`An item cannot combine mission-Caliber exceptions.`);
   return {
     key,
     record: {

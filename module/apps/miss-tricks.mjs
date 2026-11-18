@@ -8,12 +8,13 @@ import {
   knownCharacterTargetInput
 } from "./character-target.mjs";
 import { postFinalAttack, finalWeaponReady, finalAttackOptions } from "./final-attack.mjs";
+import { loc } from "../i18n.mjs";
 export async function takeMissTrick(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   if (!validOwnCountClock(actor.mentalLeapCombatContext()))
-    throw Error("Use an immediate miss trick in this character’s started combat.");
+    throw Error(loc`Use an immediate miss trick in this character’s started combat.`);
   if (!actor.system.activeFeatNames?.some(n => ["Flail Basics", "Fencing Basics"].includes(n)))
-    throw Error("Neither Flail Basics nor Fencing Basics currently qualifies.");
+    throw Error(loc`Neither Flail Basics nor Fencing Basics currently qualifies.`);
   finalAttackOptions(options);
   let input = options;
   if (!Object.hasOwn(input, "immediateConfirmed")) {
@@ -35,21 +36,21 @@ export async function takeMissTrick(actor, options = {}) {
           !m.flags.spycraft2.missTrickUse
       );
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Immediate miss trick: Double Twirl / Remiss" },
+      window: { title: loc`Immediate miss trick: Double Twirl / Remiss` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>A resolved Standard Attack miss without an error permits one immediate final attack with the same actual weapon against the same opponent. This uses the shared final-attack allowance; it does not spend an action die.</p><label>Recorded miss <select name="messageId"><option value="">Choose actual miss</option>${messages.map(m => `<option value="${esc(m.id)}">${esc(m.flags.spycraft2.baseFlavor ?? m.id)}</option>`).join("")}</select></label><label>Trick <select name="trick">${Object.entries(
+      content: `<div class="spycraft2-roll-options"><p>${loc`A resolved Standard Attack miss without an error permits one immediate final attack with the same actual weapon against the same opponent. This uses the shared final-attack allowance; it does not spend an action die.`}</p><label>${loc`Recorded miss`} <select name="messageId"><option value="">${loc`Choose actual miss`}</option>${messages.map(m => `<option value="${esc(m.id)}">${esc(m.flags.spycraft2.baseFlavor ?? m.id)}</option>`).join("")}</select></label><label>${loc`Trick`} <select name="trick">${Object.entries(
         MISS_TRICKS
       )
         .filter(([, v]) => actor.system.activeFeatNames?.includes(v.feat))
         .map(([key, v]) => `<option value="${key}">${v.name} (${v.feat})</option>`)
         .join(
           ""
-        )}</select></label><label>Same actual opponent <select name="opponentUuid"><option value="">Choose opponent</option>${attackCharacterTargetChoices()
+        )}</select></label><label>${loc`Same actual opponent`} <select name="opponentUuid"><option value="">${loc`Choose opponent`}</option>${attackCharacterTargetChoices()
         .filter(a => a.uuid !== actor.uuid)
         .map(a => `<option value="${esc(a.uuid)}">${esc(a.name)}</option>`)
         .join(
           ""
-        )}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="sameTargetConfirmed" type="checkbox" /> The GC confirms this was the original opponent</label><label><input name="immediateConfirmed" type="checkbox" /> This is the immediate reaction to that miss, with no intervening action</label><label><input name="attackLegalConfirmed" type="checkbox" /> This same-weapon final Standard Attack is legal now, including Reach and line of sight</label><label><input name="legacySourceConfirmed" type="checkbox" /> Older receipt only: the GC confirms this was a Standard Attack and the feat/exact readied weapon qualified at the original miss</label></div>`
+        )}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="sameTargetConfirmed" type="checkbox" /> ${loc`The GC confirms this was the original opponent`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This is the immediate reaction to that miss, with no intervening action`}</label><label><input name="attackLegalConfirmed" type="checkbox" /> ${loc`This same-weapon final Standard Attack is legal now, including Reach and line of sight`}</label><label><input name="legacySourceConfirmed" type="checkbox" /> ${loc`Older receipt only: the GC confirms this was a Standard Attack and the feat/exact readied weapon qualified at the original miss`}</label></div>`
     });
     if (!input) return null;
   }
@@ -62,7 +63,7 @@ export async function takeMissTrick(actor, options = {}) {
     (message.blind && !game.user.isGM) ||
     c?.actorUuid !== actor.uuid
   )
-    throw Error("Choose your visible actual attack receipt.");
+    throw Error(loc`Choose your visible actual attack receipt.`);
   const used = c.missTrickUse;
   if (used) {
     const posted = [...game.messages].find(
@@ -72,15 +73,15 @@ export async function takeMissTrick(actor, options = {}) {
         m.flags.spycraft2.finalAttack.triggerMessageUuid === message.uuid
     );
     if (posted) return posted;
-    throw Error("This miss trick is already reserved or needs GC review; do not roll it again.");
+    throw Error(loc`This miss trick is already reserved or needs GC review; do not roll it again.`);
   }
   const item = actor.items.find(i => i.type === "weapon" && i.uuid === c.weaponUuid);
-  if (!finalWeaponReady(item)) throw Error("The original attack weapon is no longer owned/readied.");
+  if (!finalWeaponReady(item)) throw Error(loc`The original attack weapon is no longer owned/readied.`);
   const target = attackCharacterTargetChoices().find(a => a.uuid === input.opponentUuid);
-  if (!target || target.uuid === actor.uuid) throw Error("Choose the actual observed opposing character.");
+  if (!target || target.uuid === actor.uuid) throw Error(loc`Choose the actual observed opposing character.`);
   const event = () => {
     const current = actor.items.get(item.id);
-    if (!finalWeaponReady(current)) throw Error("The original weapon is no longer readied.");
+    if (!finalWeaponReady(current)) throw Error(loc`The original weapon is no longer readied.`);
     return missTrickPlan(
       actor.system,
       actor.mentalLeapCombatContext(),
@@ -104,7 +105,7 @@ export async function takeMissTrick(actor, options = {}) {
   if (!opts) return null;
   const preview = actor.weaponAttack(item, opts);
   if (preview.blocked || preview.ranged || preview.firearm)
-    throw Error(preview.reason || "This miss trick uses its actual melee weapon.");
+    throw Error(preview.reason || loc`This miss trick uses its actual melee weapon.`);
   const signature = JSON.stringify(preview),
     receipt = {
       ...plan,
@@ -116,7 +117,7 @@ export async function takeMissTrick(actor, options = {}) {
   return actor.useLimitedAbility(
     "missTrick",
     async status => {
-      if (message.flags.spycraft2.missTrickUse) throw Error("This miss has already supplied its final attack.");
+      if (message.flags.spycraft2.missTrickUse) throw Error(loc`This miss has already supplied its final attack.`);
       const reservation = { id: receipt.id, state: "reserved", trick: input.trick };
       const validate = () => {
         if (
@@ -130,7 +131,7 @@ export async function takeMissTrick(actor, options = {}) {
           actor.system.resourceUses.missTrick.used !== status.used + 1
         )
           throw Error(
-            "The triggering miss, original weapon, opponent, immediate timing or reserved final attack changed."
+            loc`The triggering miss, original weapon, opponent, immediate timing or reserved final attack changed.`
           );
       };
       try {
@@ -146,7 +147,7 @@ export async function takeMissTrick(actor, options = {}) {
             }
           });
         } catch (error) {
-          ui.notifications.warn("Final attack posted; the original miss receipt needs review.");
+          ui.notifications.warn(loc`Final attack posted; the original miss receipt needs review.`);
         }
         return result;
       } catch (error) {
@@ -156,7 +157,7 @@ export async function takeMissTrick(actor, options = {}) {
           if (message.flags.spycraft2.missTrickUse?.id === receipt.id)
             await message.unsetFlag("spycraft2", "missTrickUse");
         } catch (cleanup) {
-          throw new AggregateError([error, cleanup], "The unused miss-trick reservation needs GC review.");
+          throw new AggregateError([error, cleanup], loc`The unused miss-trick reservation needs GC review.`);
         }
         throw error;
       }

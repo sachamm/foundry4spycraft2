@@ -1,5 +1,6 @@
 import { subdualDefensePlan } from "./subdual-defense.mjs";
 import { stressDefensePlan } from "./stress-defense.mjs";
+import { loc } from "../i18n.mjs";
 const bands = [
   { tier: 1, dc: 12, stress: "Shaken I", knockout: "1 round" },
   { tier: 2, dc: 16, stress: "Shaken II", knockout: "1 minute" },
@@ -12,20 +13,20 @@ export function accumulatedDamagePlan(
   system,
   { kind, currentDamage, newDamage, criticalHit = false, confirmed = false } = {}
 ) {
-  if (!["stress", "subdual"].includes(kind)) throw new Error("Choose stress or subdual damage.");
+  if (!["stress", "subdual"].includes(kind)) throw new Error(loc`Choose stress or subdual damage.`);
   if (confirmed !== true || typeof criticalHit !== "boolean")
     throw new Error(
-      "The GC must confirm the existing total, new damage after all defenses, and whether this is a critical hit."
+      loc`The GC must confirm the existing total, new damage after all defenses, and whether this is a critical hit.`
     );
   if (
     ![currentDamage, newDamage].every(n => Number.isSafeInteger(n) && n >= 0) ||
     !Number.isSafeInteger(currentDamage + newDamage)
   )
-    throw new Error("Enter safe nonnegative whole accumulated and new damage totals.");
+    throw new Error(loc`Enter safe nonnegative whole accumulated and new damage totals.`);
   const ability = kind === "stress" ? "wis" : "con",
     threshold = system[kind + "Threshold"] ?? system.abilities?.[ability]?.value;
   if (!Number.isSafeInteger(threshold) || threshold < 0 || !Number.isSafeInteger(threshold * 5))
-    throw new Error("Prepare a valid current " + kind + " threshold before calculating its saves.");
+    throw new Error(loc`Prepare a valid current ` + kind + loc` threshold before calculating its saves.`);
   const total = currentDamage + newDamage,
     rows = bands.map(row => ({ ...row, thresholdValue: threshold * row.tier })),
     band = rows.findLast(row => total > row.thresholdValue) ?? null,
@@ -70,7 +71,7 @@ export function validateDamageLedger(ledger) {
     ledger.pending.some(id => !eventId(id)) ||
     new Set(ledger.pending).size !== ledger.pending.length
   )
-    throw new Error("The GC must initialize or review the accumulated-damage ledger.");
+    throw new Error(loc`The GC must initialize or review the accumulated-damage ledger.`);
   return ledger;
 }
 export function damageLedgerSnapshot(actor) {
@@ -80,18 +81,18 @@ export function damageLedgerSnapshot(actor) {
   };
 }
 function assertSnapshot(current, expected) {
-  if (!same(current, expected)) throw new Error("The accumulated-damage ledger changed. Review it again.");
+  if (!same(current, expected)) throw new Error(loc`The accumulated-damage ledger changed. Review it again.`);
 }
 function nextRevision(ledger) {
   const n = (ledger?.revision ?? 0) + 1;
-  if (!Number.isSafeInteger(n)) throw new Error("The damage-ledger revision is unsafe.");
+  if (!Number.isSafeInteger(n)) throw new Error(loc`The damage-ledger revision is unsafe.`);
   return n;
 }
 export function reviewDamageLedgerPlan(current, expected, { stress, subdual, note, confirmed } = {}, id, reviewer, at) {
   assertSnapshot(current, expected);
   if (current.ledger) validateDamageLedger(current.ledger);
   if (current.ledger?.pending.length)
-    throw new Error("Resolve the pending damage saves before correcting accumulated totals.");
+    throw new Error(loc`Resolve the pending damage saves before correcting accumulated totals.`);
   if (
     !whole(stress) ||
     !whole(subdual) ||
@@ -104,7 +105,7 @@ export function reviewDamageLedgerPlan(current, expected, { stress, subdual, not
     !reviewer ||
     !Number.isFinite(at)
   )
-    throw new Error("Confirm actual whole stress/subdual totals and a bounded GC review note.");
+    throw new Error(loc`Confirm actual whole stress/subdual totals and a bounded GC review note.`);
   const review = {
       id,
       reviewer,
@@ -137,21 +138,21 @@ export function damageLedgerEventPlan(
 ) {
   const ledger = validateDamageLedger(current.ledger);
   if (typeof source !== "string" || !source.trim() || source.length > 300 || !eventId(id) || !Number.isFinite(at))
-    throw new Error("Name this unique damage event with a bounded source reference.");
+    throw new Error(loc`Name this unique damage event with a bounded source reference.`);
   if (!current.events || typeof current.events !== "object" || Array.isArray(current.events))
-    throw new Error("Review the damage-event receipt history.");
+    throw new Error(loc`Review the damage-event receipt history.`);
   const records = Object.values(current.events);
   if (records.some(r => !r || r.version !== 1 || !eventId(r.id) || typeof r.source !== "string"))
-    throw new Error("Review the damage-event receipt history.");
+    throw new Error(loc`Review the damage-event receipt history.`);
   for (const pending of ledger.pending)
     if (!current.events[pending] || current.events[pending].state !== "pending")
-      throw new Error("Review the pending damage-save receipts.");
+      throw new Error(loc`Review the pending damage-save receipts.`);
   if (
     !["net", "stressBeforeResistance", "fireStressBeforeDefenses", "subdualBeforeDefenses"].includes(damageMode) ||
     (["stressBeforeResistance", "fireStressBeforeDefenses"].includes(damageMode) && kind !== "stress") ||
     (damageMode === "subdualBeforeDefenses" && kind !== "subdual")
   )
-    throw new Error("Choose resolved net damage or the matching stress/subdual defense calculation.");
+    throw new Error(loc`Choose resolved net damage or the matching stress/subdual defense calculation.`);
   const request = {
     kind,
     newDamage,
@@ -175,11 +176,11 @@ export function damageLedgerEventPlan(
       ) ||
       confirmed !== true
     )
-      throw new Error("This source reference already records different damage.");
+      throw new Error(loc`This source reference already records different damage.`);
     return { duplicate: true, record: previous, ledger };
   }
   assertSnapshot(current, expected);
-  if (Object.hasOwn(current.events, id)) throw new Error("The damage-event reference is already in use.");
+  if (Object.hasOwn(current.events, id)) throw new Error(loc`The damage-event reference is already in use.`);
   const defenseContext = ["stressBeforeResistance", "fireStressBeforeDefenses"].includes(damageMode)
     ? stressDefensePlan(system, newDamage, { fromFire: damageMode === "fireStressBeforeDefenses" })
     : damageMode === "subdualBeforeDefenses"
@@ -187,7 +188,7 @@ export function damageLedgerEventPlan(
       : null;
   if (defenseContext?.criticalBruisingReview)
     throw new Error(
-      "The GC must resolve whether this critical hit’s bruising retains the critical save before it can be recorded automatically."
+      loc`The GC must resolve whether this critical hit’s bruising retains the critical save before it can be recorded automatically.`
     );
   const appliedDamage = defenseContext?.netDamage ?? newDamage;
   const plan = accumulatedDamagePlan(system, {

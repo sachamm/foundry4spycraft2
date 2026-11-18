@@ -1,4 +1,5 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Survival/Tracking p.167 Table 2.48; Tracking feats p.207; Trail Signs pp.44,47. */
 export const TRACKING_SURFACES = {
   verySoft: { label: "Very soft (sand, mud, snow)", dc: 15, error: 0 },
@@ -29,7 +30,7 @@ export function trackingSkillPlan(
   const bonuses = insight ? [{ type: "insight", value: insightBonus }] : [],
     notes = insight
       ? [
-          `Tracking Mastery: +${insightBonus} insight to determine surprise while following this physical trail${woodcraft ? " (Woodcraft +1)" : ""}${feats.has("Unfair Advantage") ? " (Unfair Advantage +1)" : ""} (pp.44,201,207).`
+          loc`Tracking Mastery: +${insightBonus} insight to determine surprise while following this physical trail${woodcraft ? loc` (Woodcraft +1)` : ""}${feats.has("Unfair Advantage") ? loc` (Unfair Advantage +1)` : ""} (pp.44,201,207).`
         ]
       : [];
   if (key !== "survival" || check.id !== "tracking")
@@ -48,10 +49,10 @@ export function trackingSkillPlan(
     s => ["scout", "sleuth"].includes(s.classId) && s.name === "Trail Signs"
   );
   if (!["half", "full", "faster"].includes(trackingPace))
-    throw new Error("Choose half Speed, full Speed or faster than full Speed while tracking.");
+    throw new Error(loc`Choose half Speed, full Speed or faster than full Speed while tracking.`);
   const hours = (value, label) => {
     if (!["number", "string"].includes(typeof value) || !Number.isFinite(Number(value)) || Number(value) < 0)
-      throw new Error(`Enter nonnegative ${label} hours.`);
+      throw new Error(loc`Enter nonnegative ${label} hours.`);
     return Number(value);
   };
   const ageHours = hours(trackingAgeHours, "trail age"),
@@ -61,25 +62,25 @@ export function trackingSkillPlan(
     largeGroup = trackingLargeGroup === true;
   const surface = Object.hasOwn(TRACKING_SURFACES, trackingSurface) ? TRACKING_SURFACES[trackingSurface] : null,
     speedIncrease = trackingPace === "faster" || (trackingPace === "full" && !trailSigns) ? 2 : 0;
-  if (trackingSurface && !surface) throw new Error("Choose a listed Tracking surface.");
+  if (trackingSurface && !surface) throw new Error(loc`Choose a listed Tracking surface.`);
   const tableIncrease = Math.max(0, (surface?.error ?? 0) + ageSteps + weatherSteps - (largeGroup ? 1 : 0)),
     errorIncrease = tableIncrease + speedIncrease;
   if (surface)
     notes.push(
-      `Tracking: ${surface.label}, base terrain DC ${surface.dc}; trail age DC +${5 * ageSteps}, rain/snow DC +${5 * weatherSteps}${largeGroup ? "; target group >3: DC –5 (minimum 15), error increase –1 (minimum +0)" : ""}. Apply the largest target’s size modifier (Table 5.13) and any opposed Falsify/Cover Up result when adjudicating the DC. Table error increase +${tableIncrease}; pace increase +${speedIncrease}. ${trackingPace === "half" ? "Follow at no more than half Speed." : trackingPace === "full" && trailSigns ? "Trail Signs removes the error penalty at up to full Speed." : "Faster tracking retains its +2 error increase."} Track once per mile outdoors or 300 ft. indoors/vessels; also check when the trail becomes harder (p.167).`
+      loc`Tracking: ${surface.label}, base terrain DC ${surface.dc}; trail age DC +${5 * ageSteps}, rain/snow DC +${5 * weatherSteps}${largeGroup ? loc`; target group >3: DC –5 (minimum 15), error increase –1 (minimum +0)` : ""}. Apply the largest target’s size modifier (Table 5.13) and any opposed Falsify/Cover Up result when adjudicating the DC. Table error increase +${tableIncrease}; pace increase +${speedIncrease}. ${trackingPace === "half" ? loc`Follow at no more than half Speed.` : trackingPace === "full" && trailSigns ? loc`Trail Signs removes the error penalty at up to full Speed.` : loc`Faster tracking retains its +2 error increase.`} Track once per mile outdoors or 300 ft. indoors/vessels; also check when the trail becomes harder (p.167).`
     );
   if (basics)
     notes.push(
-      "Tracking Basics permits normal-time take 10 and adds Analysis as an eligible Tracking synergy. Success also reveals whether the trail-maker lost vitality/wounds and their conditions when the trail was made (p.207)."
+      loc`Tracking Basics permits normal-time take 10 and adds Analysis as an eligible Tracking synergy. Success also reveals whether the trail-maker lost vitality/wounds and their conditions when the trail was made (p.207).`
     );
   if (mastery)
     notes.push(
-      "Tracking Mastery permits take 20 even when the error range exceeds 1. Its complex Forensics challenge reduction executes when declaring or selecting the recorded Forensics task scope (p.207)."
+      loc`Tracking Mastery permits take 20 even when the error range exceeds 1. Its complex Forensics challenge reduction executes when declaring or selecting the recorded Forensics task scope (p.207).`
     );
   return {
     applicable: true,
     surface: trackingSurface,
-    blockedReason: surface ? "" : "Choose the Tracking surface to calculate its error range before rolling.",
+    blockedReason: surface ? "" : loc`Choose the Tracking surface to calculate its error range before rolling.`,
     ageHours,
     weatherHours,
     ageSteps,
@@ -148,7 +149,7 @@ export function validateTrackingFeatProof(system, proof, { checkKind, skillKey, 
     !current ||
     JSON.stringify(current) !== JSON.stringify(proof)
   )
-    throw new Error("The Tracking feat, trail/surprise context or supporting source changed before posting.");
+    throw new Error(loc`The Tracking feat, trail/surprise context or supporting source changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

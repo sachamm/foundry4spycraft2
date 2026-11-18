@@ -1,6 +1,7 @@
 import { restraintActionBlock } from "./restraints.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { computeAgent } from "./engine.mjs";
+import { loc } from "../i18n.mjs";
 /** I Can Swim p.200: only current-level points can still be deferred legally. */
 export function deferredSkillPools(system, items) {
   if (
@@ -47,19 +48,19 @@ export function deferredSkillPlan(
     restraintActionBlock(system, { free: true }) || attributeActionBlock(system, { kind: "mentalAbility" });
   if (incapacity) throw new Error(incapacity);
   const pools = deferredSkillPools(system, items);
-  if (!pools) throw new Error("An eligible I Can Swim feat is required.");
-  if (level !== system.level) throw new Error("The career level changed while choosing deferred points.");
+  if (!pools) throw new Error(loc`An eligible I Can Swim feat is required.`);
+  if (level !== system.level) throw new Error(loc`The career level changed while choosing deferred points.`);
   if (freeActionConfirmed !== true || beforeSkillCheckConfirmed !== true)
-    throw new Error("Declare the free action before this skill check.");
-  if (!Object.hasOwn(cfg.skills, key)) throw new Error("Choose an existing skill.");
+    throw new Error(loc`Declare the free action before this skill check.`);
+  if (!Object.hasOwn(cfg.skills, key)) throw new Error(loc`Choose an existing skill.`);
   const priority = (system.skillPurchaseIssues ?? []).find(
     i => i.code === "unlocked-potential" && i.level === level && i.skill !== key
   );
   if (priority) throw new Error(priority.message);
   if (!Number.isSafeInteger(points) || points < 0 || points > pools.careerPoints)
-    throw new Error("Choose available whole current-level skill points.");
+    throw new Error(loc`Choose available whole current-level skill points.`);
   if (!trainingPoints || typeof trainingPoints !== "object" || Array.isArray(trainingPoints))
-    throw new Error("Review the Training point allocations.");
+    throw new Error(loc`Review the Training point allocations.`);
   const progression = structuredClone(system.progression),
     updates = [];
   let totalPoints = points;
@@ -71,7 +72,7 @@ export function deferredSkillPlan(
   for (const [id, amount] of Object.entries(trainingPoints)) {
     const pool = pools.training.find(p => p.id === id);
     if (!pool || !Number.isSafeInteger(amount) || amount < 0 || amount > pool.remaining)
-      throw new Error("Choose available whole points from a current-level Training source.");
+      throw new Error(loc`Choose available whole points from a current-level Training source.`);
     if (!amount) continue;
     const feat = items.find(i => i.id === id);
     updates.push({
@@ -83,7 +84,7 @@ export function deferredSkillPlan(
     });
     totalPoints += amount;
   }
-  if (!totalPoints) throw new Error("Choose at least one deferred skill point.");
+  if (!totalPoints) throw new Error(loc`Choose at least one deferred skill point.`);
   const candidate = structuredClone(system);
   candidate.progression = progression;
   const data = items.map(i => ({
@@ -96,15 +97,16 @@ export function deferredSkillPlan(
     }
   }));
   computeAgent(candidate, data, cfg);
-  if (candidate.skillPoints.at(-1).remaining < 0) throw new Error("These purchases exceed current-level skill points.");
+  if (candidate.skillPoints.at(-1).remaining < 0)
+    throw new Error(loc`These purchases exceed current-level skill points.`);
   if (candidate.warnings.some(w => w.startsWith(`Level ${level}: ${cfg.skills[key].name} cross-class ranks cost`)))
-    throw new Error("Spend whole-rank point costs; cross-class ranks ordinarily cost two points each.");
+    throw new Error(loc`Spend whole-rank point costs; cross-class ranks ordinarily cost two points each.`);
   for (const [skill, total] of Object.entries(candidate.skillTotals))
     if (total.ranks > (system.skillTotals?.[skill]?.ranks ?? 0) && total.ranks > total.maxRanks)
-      throw new Error(`The purchase exceeds ${cfg.skills[skill].name}’s current maximum rank.`);
+      throw new Error(loc`The purchase exceeds ${cfg.skills[skill].name}’s current maximum rank.`);
   const ranks = candidate.skillTotals[key].ranks - system.skillTotals[key].ranks;
   if (!Number.isSafeInteger(ranks) || ranks < 1)
-    throw new Error("These points must purchase at least one whole rank in the skill being checked.");
+    throw new Error(loc`These points must purchase at least one whole rank in the skill being checked.`);
   return {
     level,
     skill: key,

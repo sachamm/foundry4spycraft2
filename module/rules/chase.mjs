@@ -4,6 +4,7 @@
  */
 import { VEHICLE_RULES } from "./tables.mjs";
 import { SIZE_CODES, sizeCode, vehicleCondition } from "./vehicles.mjs";
+import { loc } from "../i18n.mjs";
 
 /** Table 6.1 (p.364): chase speed factor, top-MPH bonus and Crisis DC for each Maneuvering Room grade. */
 export const MANEUVERING_ROOM = Object.freeze({
@@ -16,7 +17,7 @@ export const FOOT_LEAD_FEET = 20;
 
 const room = key => {
   const r = MANEUVERING_ROOM[key];
-  if (!r) throw new Error("Choose the Maneuvering Room: Open, Close, Crowded or Tight.");
+  if (!r) throw new Error(loc`Choose the Maneuvering Room: Open, Close, Crowded or Tight.`);
   return r;
 };
 
@@ -122,16 +123,16 @@ export function smashAfterWin(smash, winner) {
  */
 export function spendSmash(smash, lead) {
   const now = smashState(smash);
-  if (!now) throw new Error("Nobody holds Smash points.");
+  if (!now) throw new Error(loc`Nobody holds Smash points.`);
   const { predatorLeadCut, preyDefenseBonus } = VEHICLE_RULES.smash;
   const after = smashState({ side: now.side, points: now.points - 1 });
   return now.side === "predator"
-    ? { smash: after, lead: lead - predatorLeadCut, note: `Smash spent: Lead −${predatorLeadCut}.` }
+    ? { smash: after, lead: lead - predatorLeadCut, note: loc`Smash spent: Lead −${predatorLeadCut}.` }
     : {
         smash: after,
         lead,
         defenseBonus: preyDefenseBonus,
-        note: `Smash spent: +${preyDefenseBonus} Defense until the start of the Prey's next Initiative Count.`
+        note: loc`Smash spent: +${preyDefenseBonus} Defense until the start of the Prey's next Initiative Count.`
       };
 }
 

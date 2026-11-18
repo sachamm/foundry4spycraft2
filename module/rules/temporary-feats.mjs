@@ -1,4 +1,5 @@
 import { armorTypeChoice } from "./armor-training.mjs";
+import { loc } from "../i18n.mjs";
 /** Session-scoped shared feats, pp.41–43,171. No virtual feat may be shared. */
 export const SHARE_ABILITIES = {
   professor: { classId: "scientist", tree: "basicSkill", name: "Professor" },
@@ -21,12 +22,12 @@ export function temporarySharePlan(
 ) {
   const definition = SHARE_ABILITIES[ability];
   if (!definition || !system.coreClassIds?.includes(definition.classId))
-    throw new Error("The source actor does not have this core ability.");
-  if (!atSessionStart) throw new Error("Choose shared feats at the start of the session.");
+    throw new Error(loc`The source actor does not have this core ability.`);
+  if (!atSessionStart) throw new Error(loc`Choose shared feats at the start of the session.`);
   if (system.temporaryShares?.[ability]?.epoch === epoch)
-    throw new Error("These feats have already been chosen for this session.");
+    throw new Error(loc`These feats have already been chosen for this session.`);
   if (new Set(featIds).size !== featIds.length || !featIds.length || featIds.length > (system.actionDice?.max ?? 0))
-    throw new Error("Choose distinct feats, up to starting action dice.");
+    throw new Error(loc`Choose distinct feats, up to starting action dice.`);
   const feats = featIds.map(id => items.find(item => item.id === id));
   const names = new Set();
   for (const feat of feats) {
@@ -37,8 +38,8 @@ export function temporarySharePlan(
       ["virtual", "temporary"].includes(feat.system.featKind) ||
       !system.featStatus?.[feat.id]?.ok
     )
-      throw new Error("Share only possessed, usable permanent feats of the specified tree.");
-    if (names.has(feat.name)) throw new Error("A shared feat cannot give duplicate benefits.");
+      throw new Error(loc`Share only possessed, usable permanent feats of the specified tree.`);
+    if (names.has(feat.name)) throw new Error(loc`A shared feat cannot give duplicate benefits.`);
     names.add(feat.name);
   }
   return feats.map(feat => ({
@@ -61,16 +62,16 @@ export function temporarySharePlan(
 
 /** Schemer 3/7, p.79: one temporary Basic Skill feat per use, ending with the mission. */
 export function renaissanceManPlan(system, items, feat, { epoch = "initial", sourceActorUuid = "" } = {}) {
-  if ((system.classLevels?.schemer ?? 0) < 3) throw new Error("Renaissance Man requires Schemer 3.");
+  if ((system.classLevels?.schemer ?? 0) < 3) throw new Error(loc`Renaissance Man requires Schemer 3.`);
   if (!feat || feat.type !== "feat" || feat.system.tree !== "basicSkill")
-    throw new Error("Choose a Basic Skill feat from the system compendium.");
+    throw new Error(loc`Choose a Basic Skill feat from the system compendium.`);
   const same = items.some(
     i =>
       i.type === "feat" &&
       i.name.trim().toLowerCase() === feat.name.trim().toLowerCase() &&
       temporaryFeatActive(system, i)
   );
-  if (same) throw new Error("This feat is already possessed or active. Choose another Basic Skill feat.");
+  if (same) throw new Error(loc`This feat is already possessed or active. Choose another Basic Skill feat.`);
   return {
     name: feat.name,
     type: "feat",
@@ -128,25 +129,25 @@ export function intelTemporaryFeatPlan(
   { cfg, epoch = "initial", sourceActorUuid = "", intelPhaseConfirmed = false, featChoices = [] } = {}
 ) {
   const source = intelTemporaryFeatSource(system, ability);
-  if (!source) throw new Error("This Intel-phase temporary-feat ability is not currently earned.");
+  if (!source) throw new Error(loc`This Intel-phase temporary-feat ability is not currently earned.`);
   if (intelPhaseConfirmed !== true)
-    throw new Error("Choose these temporary feats during the current mission’s Intel Phase.");
+    throw new Error(loc`Choose these temporary feats during the current mission’s Intel Phase.`);
   if (!Array.isArray(feats) || feats.length !== source.count)
-    throw new Error(`Choose exactly ${source.count} temporary feat(s) for ${source.name}, in acquisition order.`);
-  if (!Array.isArray(featChoices)) throw new Error("Review the chosen feat options.");
+    throw new Error(loc`Choose exactly ${source.count} temporary feat(s) for ${source.name}, in acquisition order.`);
+  if (!Array.isArray(featChoices)) throw new Error(loc`Review the chosen feat options.`);
   const planned = [];
   for (const [index, feat] of feats.entries()) {
     if (!feat || feat.type !== "feat" || feat.system.tree !== source.tree)
-      throw new Error(`Choose only ${source.tree} feats from the system compendium.`);
+      throw new Error(loc`Choose only ${source.tree} feats from the system compendium.`);
     const armorChoice = ["Armor Basics", "Armor Mastery"].includes(feat.name),
       choice = armorChoice
         ? armorTypeChoice(featChoices[index])
         : feat.name === "Weapon Focus"
           ? (featChoices[index] ?? "")
           : "";
-    if (armorChoice && !choice) throw new Error(`${feat.name}: choose partial, moderate or full armor.`);
+    if (armorChoice && !choice) throw new Error(loc`${feat.name}: choose partial, moderate or full armor.`);
     if (feat.name === "Weapon Focus" && (!Object.hasOwn(cfg.proficiencies, choice) || choice === "unarmed"))
-      throw new Error("Weapon Focus needs a possessed proficiency other than Unarmed.");
+      throw new Error(loc`Weapon Focus needs a possessed proficiency other than Unarmed.`);
     const data = {
       name: feat.name,
       type: "feat",
@@ -174,7 +175,9 @@ export function intelTemporaryFeatPlan(
       }
     };
     if ([...items.filter(i => temporaryFeatActive(system, i)), ...planned].some(i => sameFeatSelection(data, i, cfg)))
-      throw new Error("This feat selection is already possessed or chosen; repeatable feats require distinct choices.");
+      throw new Error(
+        loc`This feat selection is already possessed or chosen; repeatable feats require distinct choices.`
+      );
     planned.push(data);
   }
   return planned;
@@ -186,9 +189,9 @@ export function anyTimeAnyPlaceSource(system) {
   return Number.isSafeInteger(level) && level >= 4 && level <= 10 ? { limit: level >= 8 ? 2 : 1 } : null;
 }
 export function anyTimeAnyPlacePlan(system, items, feat, { epoch = "initial", sourceActorUuid = "" } = {}) {
-  if (!anyTimeAnyPlaceSource(system)) throw new Error("Any Time, Any Place requires Guide level 4.");
+  if (!anyTimeAnyPlaceSource(system)) throw new Error(loc`Any Time, Any Place requires Guide level 4.`);
   if (!feat || feat.type !== "feat" || feat.system.tree !== "terrain")
-    throw new Error("Choose a Terrain feat from the system compendium.");
+    throw new Error(loc`Choose a Terrain feat from the system compendium.`);
   if (
     items.some(
       i =>
@@ -197,7 +200,7 @@ export function anyTimeAnyPlacePlan(system, items, feat, { epoch = "initial", so
         temporaryFeatActive(system, i)
     )
   )
-    throw new Error("This Terrain feat is already possessed or active.");
+    throw new Error(loc`This Terrain feat is already possessed or active.`);
   return {
     name: feat.name,
     type: "feat",
@@ -283,28 +286,30 @@ export function knowItAllPlan(
   feats,
   { cfg, epoch = "initial", sourceActorUuid = "", featChoices = [], trainingSkills = [] } = {}
 ) {
-  if (!knowItAllSource(system)) throw new Error("Know It All requires Scientist level 10.");
+  if (!knowItAllSource(system)) throw new Error(loc`Know It All requires Scientist level 10.`);
   if (!Array.isArray(feats) || feats.length !== 2)
-    throw new Error("Choose exactly two Advanced Skill feats in acquisition order.");
+    throw new Error(loc`Choose exactly two Advanced Skill feats in acquisition order.`);
   if (!Array.isArray(featChoices) || !Array.isArray(trainingSkills))
-    throw new Error("Review the Advanced Skill feat choices.");
+    throw new Error(loc`Review the Advanced Skill feat choices.`);
   const planned = [];
   for (const [index, feat] of feats.entries()) {
     if (!feat || feat.type !== "feat" || feat.system.tree !== "advancedSkill")
-      throw new Error("Choose Advanced Skill feats from the system compendium.");
+      throw new Error(loc`Choose Advanced Skill feats from the system compendium.`);
     const descriptor = knowItAllChoiceOptions(system, feat, cfg),
       choice = ["basicSkill", "skill"].includes(descriptor.kind) ? (featChoices[index] ?? "") : "",
       allocation = {};
     if (["basicSkill", "skill"].includes(descriptor.kind) && !Object.hasOwn(descriptor.options, choice))
-      throw new Error(`${feat.name}: choose a valid ${descriptor.kind === "skill" ? "skill" : "Basic Skill feat"}.`);
+      throw new Error(
+        loc`${feat.name}: choose a valid ${descriptor.kind === "skill" ? "skill" : loc`Basic Skill feat`}.`
+      );
     if (descriptor.kind === "training") {
       const input = trainingSkills[index] ?? {};
       if (!input || typeof input !== "object" || Array.isArray(input))
-        throw new Error("Training needs five allocated rank points.");
+        throw new Error(loc`Training needs five allocated rank points.`);
       let total = 0;
       for (const [key, points] of Object.entries(input)) {
         if (!Object.hasOwn(cfg.skills, key) || !Number.isSafeInteger(points) || points < 0)
-          throw new Error("Training allocations require nonnegative whole points for existing skills.");
+          throw new Error(loc`Training allocations require nonnegative whole points for existing skills.`);
         if (points) {
           allocation[key] = points;
           total += points;
@@ -312,7 +317,7 @@ export function knowItAllPlan(
       }
       const canDefer = system.activeFeatNames?.includes("I Can Swim") || planned.some(f => f.name === "I Can Swim");
       if (total > 5 || (total < 5 && !canDefer))
-        throw new Error("Allocate exactly five Training rank points, unless I Can Swim permits unspent points.");
+        throw new Error(loc`Allocate exactly five Training rank points, unless I Can Swim permits unspent points.`);
     }
     const data = {
       name: feat.name,
@@ -343,7 +348,7 @@ export function knowItAllPlan(
     };
     if ([...items.filter(i => temporaryFeatActive(system, i)), ...planned].some(i => sameFeatSelection(data, i, cfg)))
       throw new Error(
-        "This feat selection is already possessed or chosen; distinct-target feats require different choices."
+        loc`This feat selection is already possessed or chosen; distinct-target feats require different choices.`
       );
     planned.push(data);
   }
@@ -358,9 +363,9 @@ export function everydayGeniusSource(system) {
   return Number.isSafeInteger(limit) && limit > 0 ? { limit } : null;
 }
 export function everydayGeniusPlan(system, items, feat, { epoch = "initial", sourceActorUuid = "" } = {}) {
-  if (!everydayGeniusSource(system)) throw new Error("An eligible Everyday Genius feat is required.");
+  if (!everydayGeniusSource(system)) throw new Error(loc`An eligible Everyday Genius feat is required.`);
   if (!feat || feat.type !== "feat" || feat.system.tree !== "basicSkill" || feat.system.featKind === "virtual")
-    throw new Error("Choose a non-virtual Basic Skill feat from the system compendium.");
+    throw new Error(loc`Choose a non-virtual Basic Skill feat from the system compendium.`);
   if (
     items.some(
       i =>
@@ -370,7 +375,7 @@ export function everydayGeniusPlan(system, items, feat, { epoch = "initial", sou
     ) ||
     (system.virtualFeats ?? []).some(f => f.name.trim().toLowerCase() === feat.name.trim().toLowerCase())
   )
-    throw new Error("This Basic Skill feat is already possessed or active.");
+    throw new Error(loc`This Basic Skill feat is already possessed or active.`);
   return {
     name: feat.name,
     type: "feat",

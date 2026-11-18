@@ -1,4 +1,5 @@
 import { actionDiceGain } from "./action-dice.mjs";
+import { loc } from "../i18n.mjs";
 /** Free hints: origins pp.21,23,25; Snoop Intuition p.47. */
 export function hintSources(system, items = []) {
   const sources = [];
@@ -44,15 +45,15 @@ export function hintResponsePlan(
   { source, outcome, text = "", minuteConfirmed = false, careerDie = 4 } = {}
 ) {
   const spec = hintSources(system, items).find(entry => entry.id === source);
-  if (!spec) throw new Error("This free-hint source is not currently available.");
+  if (!spec) throw new Error(loc`This free-hint source is not currently available.`);
   if (!["provided", "refused"].includes(outcome))
-    throw new Error("Choose whether the GC provides or refuses the hint.");
-  if (spec.minute && !minuteConfirmed) throw new Error("Intuition requires a one-minute action.");
+    throw new Error(loc`Choose whether the GC provides or refuses the hint.`);
+  if (spec.minute && !minuteConfirmed) throw new Error(loc`Intuition requires a one-minute action.`);
   const detail = String(text).trim();
-  if (outcome === "provided" && !detail) throw new Error("Enter the hint provided by the GC.");
+  if (outcome === "provided" && !detail) throw new Error(loc`Enter the hint provided by the GC.`);
   const gain = outcome === "refused" ? actionDiceGain(system, careerDie, spec.refusalDice) : { units: 0, die: null };
   const value = (system.actionDice?.value ?? 0) + gain.units;
   if (!Number.isSafeInteger(value) || value < 0)
-    throw new Error("The bonus action-die balance must be a safe whole number.");
+    throw new Error(loc`The bonus action-die balance must be a safe whole number.`);
   return { spec, outcome, text: detail, ...gain, value };
 }

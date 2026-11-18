@@ -4,6 +4,7 @@ import { getReserveReview } from "./reserve-transactions.mjs";
 import { getBaffledReview } from "./baffled.mjs";
 import { queueResources, periodResourceActors } from "./transactions.mjs";
 import { withGCPeriodLock } from "./gc-dice.mjs";
+import { loc } from "../i18n.mjs";
 const clone = structuredClone,
   same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const periodState = () => game.settings.get("spycraft2", "usagePeriods") ?? {};
@@ -17,7 +18,7 @@ const snapshot = (actor, field) => {
 };
 function flagPatch(actor, field, state) {
   if (!["sessionDiceReset", "startingDiceCreation"].includes(field))
-    throw new Error("Review the starting-dice record source.");
+    throw new Error(loc`Review the starting-dice record source.`);
   if (!state.present) return { ["flags.spycraft2.-=" + field]: null };
   const path = "flags.spycraft2." + field,
     patch = { [path]: clone(state.value) },
@@ -51,7 +52,7 @@ export function sessionDicePlan(actors) {
       const starting = actor.system.actionDice?.max,
         before = actor.system.actionDice?.value;
       if (!Number.isSafeInteger(starting) || starting < 0 || !Number.isSafeInteger(before) || before < 0)
-        throw new Error(actor.name + ": review the starting/current action-die count before starting a session.");
+        throw new Error(actor.name + loc`: review the starting/current action-die count before starting a session.`);
       const deferred =
         actor.system.level === 0 && before === 0 && actor.flags?.spycraft2?.startingDiceCreation?.claimed === false;
       return {
@@ -73,34 +74,34 @@ async function markReview(journal, error) {
     await game.settings.set("spycraft2", "usagePeriodReview", review);
   } catch {}
   ui.notifications.warn(
-    "The interrupted start needs GC review before further resource use. Review starting dice and counters."
+    loc`The interrupted start needs GC review before further resource use. Review starting dice and counters.`
   );
   return review;
 }
 export async function startUsagePeriod(period) {
-  if (!game.user?.isGM) throw new Error("Only the GC can start a new usage period.");
-  if (!["scene", "session", "mission", "round"].includes(period)) throw new Error("Unknown usage period.");
+  if (!game.user?.isGM) throw new Error(loc`Only the GC can start a new usage period.`);
+  if (!["scene", "session", "mission", "round"].includes(period)) throw new Error(loc`Unknown usage period.`);
   if (getUsagePeriodReview().needsReview)
-    throw new Error("Review the interrupted start before starting another scene or session.");
+    throw new Error(loc`Review the interrupted start before starting another scene or session.`);
   const actors = tracked(),
     expectedPeriods = clone(periodState()),
     expectedRoster = roster(actors);
   return queueResources(actors, () =>
     withGCPeriodLock(async () => {
-      if (!game.user?.isGM) throw new Error("Only the GC can start a new usage period.");
+      if (!game.user?.isGM) throw new Error(loc`Only the GC can start a new usage period.`);
       if (!same(periodState(), expectedPeriods) || !same(roster(tracked()), expectedRoster))
         throw new Error(
-          "The counters or participating characters changed. Review the current state before starting again."
+          loc`The counters or participating characters changed. Review the current state before starting again.`
         );
       if (actors.some(individualReview))
-        throw new Error("Resolve interrupted character resources before starting another period.");
+        throw new Error(loc`Resolve interrupted character resources before starting another period.`);
       const beforePeriods = clone(periodState()),
         id = foundry.utils.randomID(),
         afterPeriods = { ...beforePeriods, [period]: id };
       if (period === "scene") {
         const n = afterPeriods.sceneSequence ?? 0;
         if (!Number.isSafeInteger(n) || n < 0 || !Number.isSafeInteger(n + 1))
-          throw new Error("Review the scene sequence before starting a new scene.");
+          throw new Error(loc`Review the scene sequence before starting a new scene.`);
         afterPeriods.sceneSequence = n + 1;
       }
       const plans = period === "session" ? sessionDicePlan(actors) : [],
@@ -147,7 +148,7 @@ export async function startUsagePeriod(period) {
             p.actor.system.level !== p.level ||
             !same(snapshot(p.actor, p.field), p.beforeRecord)
           )
-            throw new Error(p.actor.name + ": starting dice changed during preparation.");
+            throw new Error(p.actor.name + loc`: starting dice changed during preparation.`);
           attempted.push(p);
           try {
             await p.actor.update({
@@ -166,7 +167,7 @@ export async function startUsagePeriod(period) {
           !same(periodState(), beforePeriods) ||
           plans.some(p => p.actor.system.actionDice.max !== p.starting || p.actor.system.level !== p.level)
         )
-          throw new Error("Starting counts or counters changed during the start.");
+          throw new Error(loc`Starting counts or counters changed during the start.`);
         try {
           await game.settings.set("spycraft2", "usagePeriods", afterPeriods);
         } catch (error) {
@@ -178,12 +179,12 @@ export async function startUsagePeriod(period) {
           const current = snapshot(p.actor, p.field);
           if (same(current, p.beforeRecord)) continue;
           if (!same(current, { present: true, value: p.record })) {
-            failures.push(new Error(p.actor.name + ": the starting-dice record changed again."));
+            failures.push(new Error(p.actor.name + loc`: the starting-dice record changed again.`));
             continue;
           }
           const restored = p.actor.system.actionDice.value + p.before - p.value;
           if (!Number.isSafeInteger(restored) || restored < 0) {
-            failures.push(new Error(p.actor.name + ": later dice changes need review."));
+            failures.push(new Error(p.actor.name + loc`: later dice changes need review.`));
             continue;
           }
           try {
@@ -199,7 +200,7 @@ export async function startUsagePeriod(period) {
         if (failures.length || !same(periodState(), beforePeriods))
           await markReview(
             journal,
-            new AggregateError([error, ...failures], "Starting dice or counters could not be safely restored.")
+            new AggregateError([error, ...failures], loc`Starting dice or counters could not be safely restored.`)
           );
         throw error;
       }
@@ -207,14 +208,16 @@ export async function startUsagePeriod(period) {
         try {
           actor.sheet?.render(false);
         } catch {
-          ui.notifications.warn("The new period is already recorded. Reopen a character sheet if it did not refresh.");
+          ui.notifications.warn(
+            loc`The new period is already recorded. Reopen a character sheet if it did not refresh.`
+          );
         }
       return afterPeriods;
     })
   );
 }
 export async function reviewUsagePeriod(options = {}) {
-  if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted start.");
+  if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted start.`);
   const saved = clone(getUsagePeriodReview());
   if (!saved.needsReview) return null;
   if (
@@ -239,7 +242,7 @@ export async function reviewUsagePeriod(options = {}) {
         e.starting < 0
     )
   )
-    throw new Error("Review the saved starting-dice sources.");
+    throw new Error(loc`Review the saved starting-dice sources.`);
   const actors = tracked(),
     agents = actors.filter(a => a.type === "agent").sort((a, b) => a.uuid.localeCompare(b.uuid)),
     byId = new Map(agents.map(a => [a.uuid, a])),
@@ -288,7 +291,7 @@ export async function reviewUsagePeriod(options = {}) {
           a.system.actionDice.max +
           "; now " +
           a.system.actionDice.value +
-          '.</p><label>Confirmed current dice <input name="dice_' +
+          `.</p><label>${loc`Confirmed current dice`} <input name="dice_` +
           i +
           '" type="number" min="0" step="1" value="' +
           a.system.actionDice.value +
@@ -298,24 +301,24 @@ export async function reviewUsagePeriod(options = {}) {
               i +
               '" type="checkbox" ' +
               (entered ? "checked" : "") +
-              " /> This character has entered play with starting dice</label>"
+              ` ${loc`/> This character has entered play with starting dice`}</label>`
             : "")
         );
       })
       .join("");
     const content =
       '<div class="spycraft2-roll-options"><p>' +
-      esc(saved.reason ?? "Interrupted start") +
-      '</p><p>A new session discards old ordinary dice. Account for starting pools and any later changes. This review sets confirmed balances and counters; it does not add dice.</p><label>Counters <select name="mode"><option value="new">Retain the requested new start</option><option value="old">Cancel it and restore previous counters</option><option value="current">Keep the currently recorded counters</option></select></label>' +
+      esc(saved.reason ?? loc`Interrupted start`) +
+      `</p><p>${loc`A new session discards old ordinary dice. Account for starting pools and any later changes. This review sets confirmed balances and counters; it does not add dice.`}</p><label>${loc`Counters`} <select name="mode"><option value="new">${loc`Retain the requested new start`}</option><option value="old">${loc`Cancel it and restore previous counters`}</option><option value="current">${loc`Keep the currently recorded counters`}</option></select></label>` +
       rowHTML +
       (missing.length
-        ? "<p>Missing participants: " +
+        ? `<p>${loc`Missing participants:`} ` +
           missing.map(e => esc(e.name)).join(", ") +
-          '.</p><label><input name="missingReviewed" type="checkbox" /> The GC confirms these participants were removed from play</label>'
+          `.</p><label><input name="missingReviewed" type="checkbox" /> ${loc`The GC confirms these participants were removed from play`}</label>`
         : "") +
-      '<label>Resolution <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> The GC reviewed actual starting dice, counters and actions during the interruption</label></div>';
+      `<label>${loc`Resolution`} <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC reviewed actual starting dice, counters and actions during the interruption`}</label></div>`;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review interrupted start" },
+      window: { title: loc`Review interrupted start` },
       rejectClose: false,
       content
     });
@@ -325,9 +328,9 @@ export async function reviewUsagePeriod(options = {}) {
     actors,
     () =>
       withGCPeriodLock(async () => {
-        if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted start.");
+        if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted start.`);
         if (state() !== expected)
-          throw new Error("Starting dice, characters or counters changed. Review the current state again.");
+          throw new Error(loc`Starting dice, characters or counters changed. Review the current state again.`);
         const mode = input.mode ?? (typeof input.keepStart === "boolean" ? (input.keepStart ? "new" : "old") : null);
         if (
           input.confirmed !== true ||
@@ -336,7 +339,7 @@ export async function reviewUsagePeriod(options = {}) {
           !input.resolution.trim() ||
           (missing.length && input.missingReviewed !== true)
         )
-          throw new Error("Confirm the counter choice, actual balances, missing participants and resolution.");
+          throw new Error(loc`Confirm the counter choice, actual balances, missing participants and resolution.`);
         const target = clone(
             mode === "new" ? saved.afterPeriods : mode === "old" ? saved.beforePeriods : periodState()
           ),
@@ -347,11 +350,12 @@ export async function reviewUsagePeriod(options = {}) {
               : (input.balances?.[r.actor.uuid] ?? input["dice_" + i]),
             balance = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
           if (!Number.isSafeInteger(balance) || balance < 0)
-            throw new Error("Confirm a whole nonnegative balance for " + r.actor.name + ".");
+            throw new Error(loc`Confirm a whole nonnegative balance for ` + r.actor.name + ".");
           const optional = !r.entry || r.entry.deferred,
             entered = optional ? (input.entered?.[r.actor.uuid] ?? input["entered_" + i] === true) : true,
             patch = { "system.actionDice.value": balance };
-          if (typeof entered !== "boolean") throw new Error("Confirm whether " + r.actor.name + " has entered play.");
+          if (typeof entered !== "boolean")
+            throw new Error(loc`Confirm whether ` + r.actor.name + loc` has entered play.`);
           const knownCreation = r.creation ?? (r.entry?.deferred ? r.entry.beforeRecord.value : null);
           if (optional && !entered) {
             if (
@@ -360,7 +364,7 @@ export async function reviewUsagePeriod(options = {}) {
               !knownCreation ||
               knownCreation.claimed !== false
             )
-              throw new Error("Account for " + r.actor.name + " entering play before retaining a dice balance.");
+              throw new Error(loc`Account for ` + r.actor.name + loc` entering play before retaining a dice balance.`);
             Object.assign(
               patch,
               flagPatch(r.actor, "startingDiceCreation", { present: true, value: { ...knownCreation, session } })
@@ -467,6 +471,6 @@ export function refreshUsagePeriodActors() {
       actor.reset?.();
       actor.sheet?.render(false);
     } catch (error) {
-      globalThis.ui?.notifications?.warn("Usage periods changed. Reopen any character sheet that did not refresh.");
+      globalThis.ui?.notifications?.warn(loc`Usage periods changed. Reopen any character sheet that did not refresh.`);
     }
 }

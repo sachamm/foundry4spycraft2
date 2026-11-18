@@ -7,6 +7,7 @@ import { coverPlan } from "./cover.mjs";
 import { circlingDefensePlan } from "./knife-basics.mjs";
 import { knownSneakAttackImmunity } from "./sneak-attack.mjs";
 import { attributeCollapsePlan, attributeDefensePlan } from "./attributes.mjs";
+import { loc } from "../i18n.mjs";
 /** pp.29,33,37–38,84: combine legacy grades, capped by the highest class offering. */
 export function uncannyDodgePlan(system) {
   const sources = [];
@@ -36,7 +37,7 @@ export function uncannyDodgePlan(system) {
 export function initiativeLossPlan(system, { loss, selfInflicted = false } = {}) {
   if (!Number.isSafeInteger(loss) || loss < 0 || typeof selfInflicted !== "boolean")
     throw new Error(
-      "Enter a nonnegative whole Initiative Count loss and declare whether it comes from your own action."
+      loc`Enter a nonnegative whole Initiative Count loss and declare whether it comes from your own action.`
     );
   const uncanny = uncannyDodgePlan(system),
     halved = uncanny.halveIncomingInitiative && !selfInflicted;
@@ -73,16 +74,16 @@ export function incomingDefensePlan(system, options = {}) {
       coupDeGraceException
     ].some(v => typeof v !== "boolean")
   )
-    throw new Error("Declare each incoming-attack circumstance.");
+    throw new Error(loc`Declare each incoming-attack circumstance.`);
   if (
     coupDeGraceException &&
     (typeof coupDeGraceExceptionSource !== "string" ||
       !coupDeGraceExceptionSource.trim() ||
       coupDeGraceExceptionSource.length > 500)
   )
-    throw new Error("Name the actual character option permitting Coup de Grace without helplessness.");
+    throw new Error(loc`Name the actual character option permitting Coup de Grace without helplessness.`);
   if (!Number.isFinite(system.defense?.total) || !Number.isFinite(system.abilities?.dex?.mod))
-    throw new Error("Prepare the character Defense before checking an attack.");
+    throw new Error(loc`Prepare the character Defense before checking an attack.`);
   const uncanny = uncannyDodgePlan(system),
     manual = system.conditionContext ?? {},
     collapse = system.attributeCollapse ?? attributeCollapsePlan(system);
@@ -175,39 +176,39 @@ export function incomingDefensePlan(system, options = {}) {
     notes: [
       ...(whirling.stance
         ? [
-            `Whirling Stance: career level ${whirling.defenderLevel}; ${whirling.declared ? "this attacker level " + whirling.attackerLevel + (whirling.prevented ? " cannot flank you." : " retains ordinary flanking eligibility.") : "review the actual attacker’s career level if flanking is declared."} No unconditional Defense bonus (p.179).`
+            loc`Whirling Stance: career level ${whirling.defenderLevel}; ${whirling.declared ? loc`this attacker level ` + whirling.attackerLevel + (whirling.prevented ? loc` cannot flank you.` : loc` retains ordinary flanking eligibility.`) : loc`review the actual attacker’s career level if flanking is declared.`} No unconditional Defense bonus (p.179).`
           ]
         : []),
       ...(circling.stance
         ? [
             circling.active
-              ? `Circling Stance: this melee attacker has an unoccupied adjacent square, so your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up, against this attack (p.179).`
-              : `Circling Stance: no reduction (${circling.unoccupiedAdjacentConfirmed ? "no positive dodge bonus applies to this attack" : "no unoccupied square adjacent to the attacker was confirmed"}) (p.179).`
+              ? loc`Circling Stance: this melee attacker has an unoccupied adjacent square, so your dodge bonus to Defense +${circling.originalDodgeBonus} becomes +${circling.retainedDodgeBonus}, rounded up, against this attack (p.179).`
+              : loc`Circling Stance: no reduction (${circling.unoccupiedAdjacentConfirmed ? loc`no positive dodge bonus applies to this attack` : loc`no unoccupied square adjacent to the attacker was confirmed`}) (p.179).`
           ]
         : []),
       ...(sharpshooter.active
         ? [
-            `Sharpshooter Basics: target Size Defense bonus +${sharpshooter.originalSizeBonus} becomes +${sharpshooter.retainedSizeBonus}, rounded down, against this ranged attack (p.182).`
+            loc`Sharpshooter Basics: target Size Defense bonus +${sharpshooter.originalSizeBonus} becomes +${sharpshooter.retainedSizeBonus}, rounded down, against this ranged attack (p.182).`
           ]
         : []),
       ...(guard.bonus
         ? [
-            `Guard (GAR): +${guard.bonus} Defense against this melee/unarmed attack from ${guard.weapons.map(w => w.name + " (+" + w.bonus + ")").join(", ")}; both readied weapons stack with actual appropriate proficiency (p.301). This is separate from gear and dodge bonuses.`
+            loc`Guard (GAR): +${guard.bonus} Defense against this melee/unarmed attack from ${guard.weapons.map(w => w.name + " (+" + w.bonus + ")").join(", ")}; both readied weapons stack with actual appropriate proficiency (p.301). This is separate from gear and dodge bonuses.`
           ]
         : []),
       ...(greatSword.source
         ? [
-            `Great Sword Basics: +2 gear Defense against this melee attack; existing gear bonus +${greatSword.existingGearBonus}, additional Defense +${greatSword.increment} (pp.179,329). This is not a dodge bonus.`
+            loc`Great Sword Basics: +2 gear Defense against this melee attack; existing gear bonus +${greatSword.existingGearBonus}, additional Defense +${greatSword.increment} (pp.179,329). This is not a dodge bonus.`
           ]
         : []),
-      "Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).",
-      "The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.",
+      loc`Pinned grants adjacent unarmed/melee attackers +4; Held alone grants no such bonus (p.342).`,
+      loc`The helpless-target +4 applies only within Melee Range. Coup de Grace normally requires an adjacent helpless opponent and its normal full action/shot; other character options require their actual exceptions. This check does not resolve the attack.`,
       ...(system.armorFeatRules?.coupDeGraceRequiresHelpless
         ? [
-            "Armor Mastery prevents other character options from permitting Coup de Grace against a non-helpless wearer."
+            loc`Armor Mastery prevents other character options from permitting Coup de Grace against a non-helpless wearer.`
           ]
         : []),
-      "Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation."
+      loc`Invisible-attacker blindness also affects vision checks and other attack effects; those are separate from this Defense calculation.`
     ]
   };
 }
@@ -236,7 +237,7 @@ export function evasionPlan(system) {
 }
 export function evasionSaveContext(system, { flatFooted = false, reflexReducesDamage = false } = {}) {
   if (typeof flatFooted !== "boolean" || typeof reflexReducesDamage !== "boolean")
-    throw new Error("Declare flat-footedness and whether this Reflex save can reduce damage.");
+    throw new Error(loc`Declare flat-footedness and whether this Reflex save can reduce damage.`);
   return {
     version: 1,
     grade: evasionPlan(system).grade,
@@ -263,11 +264,11 @@ export function reflexDamagePlan(
     typeof context.flatFooted !== "boolean" ||
     typeof context.reflexReducesDamage !== "boolean"
   )
-    throw new Error("Choose an original Reflex save with its recorded Evasion context.");
+    throw new Error(loc`Choose an original Reflex save with its recorded Evasion context.`);
   if (confirmed !== true || typeof succeeded !== "boolean")
-    throw new Error("The GC must confirm the source damage, ordinary successful-save damage and outcome.");
+    throw new Error(loc`The GC must confirm the source damage, ordinary successful-save damage and outcome.`);
   if (typeof check.successConfirmed === "boolean" && succeeded !== check.successConfirmed)
-    throw new Error("The save outcome changed; use its currently confirmed outcome.");
+    throw new Error(loc`The save outcome changed; use its currently confirmed outcome.`);
   if (
     !Number.isSafeInteger(damage) ||
     damage < 0 ||
@@ -276,7 +277,7 @@ export function reflexDamagePlan(
     normalSuccessDamage > damage
   )
     throw new Error(
-      "Enter whole source damage and ordinary successful-save damage between zero and the source damage."
+      loc`Enter whole source damage and ordinary successful-save damage between zero and the source damage.`
     );
   const ordinary = succeeded ? normalSuccessDamage : damage,
     eligible = context.reflexReducesDamage && !context.flatFooted && context.grade >= 1;

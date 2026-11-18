@@ -3,6 +3,7 @@
  * Damage accumulates through the scene until a save fails; DC = 10 + half the accumulated damage.
  */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 const R = GC_DATA.core.npcDamageSave;
 const whole = value => Number.isSafeInteger(value) && value >= 0;
@@ -34,7 +35,7 @@ export function damageSaveAdjustment({ wounds = 0, vitality = 0 } = {}) {
 }
 
 export function damageSaveDC(accumulated) {
-  if (!whole(accumulated)) throw new Error("Enter the damage as a whole number.");
+  if (!whole(accumulated)) throw new Error(loc`Enter the damage as a whole number.`);
   return R.baseDC + Math.floor(accumulated / 2);
 }
 
@@ -50,13 +51,14 @@ export function resolveDamageSave(
   track,
   { damage, kind = "lethal", bonus, roll, blast = false, criticalDice = 0, tough = 0 }
 ) {
-  if (!whole(damage) || damage < 1) throw new Error("A Damage save needs at least 1 point of damage.");
-  if (!["lethal", "subdual", "stress"].includes(kind)) throw new Error("Choose lethal, subdual or stress damage.");
+  if (!whole(damage) || damage < 1) throw new Error(loc`A Damage save needs at least 1 point of damage.`);
+  if (!["lethal", "subdual", "stress"].includes(kind)) throw new Error(loc`Choose lethal, subdual or stress damage.`);
   if (!Number.isSafeInteger(bonus) || !Number.isSafeInteger(roll) || roll < 1 || roll > 20)
-    throw new Error("Enter the Damage save bonus and a d20 roll.");
-  if (!whole(criticalDice) || !whole(tough)) throw new Error("Enter whole numbers for critical dice and tough grades.");
+    throw new Error(loc`Enter the Damage save bonus and a d20 roll.`);
+  if (!whole(criticalDice) || !whole(tough))
+    throw new Error(loc`Enter whole numbers for critical dice and tough grades.`);
   if (track.state !== "active")
-    throw new Error("This NPC is already out of the fight. Reset its Damage save track first.");
+    throw new Error(loc`This NPC is already out of the fight. Reset its Damage save track first.`);
   const accumulated = track.accumulated + damage,
     dc = damageSaveDC(accumulated),
     total = roll + bonus;
@@ -95,6 +97,6 @@ export function resolveDamageSave(
 
 /** Standard characters heal by reducing accumulated damage by the action die result (p.333). */
 export function healDamageTrack(track, amount) {
-  if (!whole(amount)) throw new Error("Enter the healing as a whole number.");
+  if (!whole(amount)) throw new Error(loc`Enter the healing as a whole number.`);
   return { ...track, accumulated: Math.max(0, track.accumulated - amount) };
 }

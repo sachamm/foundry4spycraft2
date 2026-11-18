@@ -9,8 +9,10 @@
   (world setting, on by default; display only).
 - Optional resource locking arbitrated by the Game Control's client (world setting, off by default).
 - World data now carries a schema version, with a migration runner for future changes.
-- Sheet and application templates, chat buttons and the new settings take their text from `lang/en.json`.
-- Open record fields on agents and NPCs declare their shapes; a value that does not fit is reported in the console.
+- Translatable text throughout: templates, chat buttons, settings, and the JavaScript's dialogs, notes, notifications
+  and error messages (written in place with the `loc` tag; `npm run strings` collects them into `lang/en.json`).
+- Every open record field on the actor and item models declares its shape; a value that does not fit is reported in
+  the console.
 - Development: Prettier and ESLint with CI checks; tests discovered by pattern; engine fixtures no longer need built
   packs; `npm run check:schemas`; batch ledgers moved to `docs/archive/`.
 

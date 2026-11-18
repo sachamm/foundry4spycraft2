@@ -1,6 +1,7 @@
 import { actionDieBoostResult } from "../rules/action-dice.mjs";
 import { rollEvidence, checkFlavor } from "../rules/outcomes.mjs";
 import { boostPaymentQuote, boostPaymentSignature } from "../rules/boost-payments.mjs";
+import { loc } from "../i18n.mjs";
 /** Caller owns the actor/result transaction. Only plan.rolls dice contribute; surcharge dice are payment only. */
 export async function applyPaidCheckBoost(actor, message, { check, expected, input, plan, roll, quote }) {
   const fresh = boostPaymentQuote(actor, message, { ...input, count: plan.count });
@@ -8,7 +9,7 @@ export async function applyPaidCheckBoost(actor, message, { check, expected, inp
     boostPaymentSignature(fresh) !== boostPaymentSignature(quote) ||
     rollEvidence(message.flags?.spycraft2) !== expected
   )
-    throw new Error("The condition, surcharge, funding or original result changed. Review this boost again.");
+    throw new Error(loc`The condition, surcharge, funding or original result changed. Review this boost again.`);
   const result = actionDieBoostResult(
     check,
     plan,
@@ -18,7 +19,7 @@ export async function applyPaidCheckBoost(actor, message, { check, expected, inp
     quote.allocations,
     async payment => {
       if (rollEvidence(message.flags?.spycraft2) !== expected)
-        throw new Error("The original result changed before its boost was applied.");
+        throw new Error(loc`The original result changed before its boost was applied.`);
       const boostPayment = {
         id: payment.id,
         bonusPoolId: plan.bonusPoolId ?? "",
@@ -64,7 +65,7 @@ export async function applyPaidCheckBoost(actor, message, { check, expected, inp
           try {
             await restoreWeapon?.();
           } catch (rollback) {
-            const failure = new AggregateError([error, rollback], "The boosted effect needs GC review.");
+            const failure = new AggregateError([error, rollback], loc`The boosted effect needs GC review.`);
             failure.actionDiceSettlementReview = {
               purpose: "Check boost effect",
               messageUuid: message.uuid ?? message.id
@@ -91,11 +92,11 @@ export async function applyPaidCheckBoost(actor, message, { check, expected, inp
   try {
     await roll.toMessage({
       speaker: ChatMessage.getSpeaker({ actor }),
-      flavor: `Spent ${quote.cost} action dice: ${plan.count} boosting ${plan.count === 1 ? "die" : "dice"} and ${quote.surcharge} Shaken surcharge ${quote.surcharge === 1 ? "die" : "dice"}. Rolled ${plan.rolls}; added +${result.added} after modifiers${result.replaced ? " and Calculating" : ""}.`
+      flavor: loc`Spent ${quote.cost} action dice: ${plan.count} boosting ${plan.count === 1 ? "die" : "dice"} and ${quote.surcharge} Shaken surcharge ${quote.surcharge === 1 ? "die" : "dice"}. Rolled ${plan.rolls}; added +${result.added} after modifiers${result.replaced ? loc` and Calculating` : ""}.`
     });
   } catch {
     ui.notifications.warn(
-      "The original result contains the paid boost. Its supplementary chat message could not be posted; check the original result before retrying."
+      loc`The original result contains the paid boost. Its supplementary chat message could not be posted; check the original result before retrying.`
     );
   }
   return applied;

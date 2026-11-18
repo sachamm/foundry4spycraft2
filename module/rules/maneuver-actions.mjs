@@ -1,4 +1,5 @@
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 export const MANEUVER_SKILLS = ["acrobatics", "athletics", "drive", "survival", "tactics"];
 export function oneHandManeuverSource(system) {
   return system.activeFeatNames?.includes("One Hand on the Wheel")
@@ -29,30 +30,30 @@ export function oneHandManeuverPlan(
     notes: ""
   });
   if (typeof wheelFreeManeuver !== "boolean")
-    return reject("Choose whether to use the One Hand on the Wheel free Maneuver.");
+    return reject(loc`Choose whether to use the One Hand on the Wheel free Maneuver.`);
   if (!wheelFreeManeuver) return { selected: false, blockedReason: "", evidence: null, timeChoice: null, notes: "" };
   const source = oneHandManeuverSource(system);
   if (!source || source.limit < 1)
-    return reject("An active One Hand on the Wheel feat and Chase feat allowance are required.");
+    return reject(loc`An active One Hand on the Wheel feat and Chase feat allowance are required.`);
   if (check.id !== "maneuver" || !MANEUVER_SKILLS.includes(key))
-    return reject("One Hand on the Wheel converts only a named Maneuver check.");
+    return reject(loc`One Hand on the Wheel converts only a named Maneuver check.`);
   if (wheelFreeActionConfirmed !== true)
-    return reject("Confirm this is a legal Maneuver and a free action you may take now.");
+    return reject(loc`Confirm this is a legal Maneuver and a free action you may take now.`);
   if (
     maneuverCombat !== null &&
     (!validOwnCountClock(maneuverCombat) || maneuverCombat.turn !== maneuverCombat.ownTurnIndex)
   )
-    return reject("Take this free Maneuver during this character’s Initiative Count in a started combat.");
+    return reject(loc`Take this free Maneuver during this character’s Initiative Count in a started combat.`);
   if (
     maneuverCombat &&
     system.refreshAction?.state === "waiting" &&
     system.refreshAction.combatId === maneuverCombat.id &&
     system.refreshAction.startRound === maneuverCombat.round
   )
-    return reject("Refresh forfeited this round’s chance to act.");
+    return reject(loc`Refresh forfeited this round’s chance to act.`);
   if (tenSecondSolution || !["auto", "oneHandManeuver"].includes(timingReduction))
     return reject(
-      "Choose the free Maneuver as the single time reduction; it cannot be combined with another selected timing option."
+      loc`Choose the free Maneuver as the single time reduction; it cannot be combined with another selected timing option.`
     );
   return {
     selected: true,
@@ -70,7 +71,7 @@ export function oneHandManeuverPlan(
       rounding: null,
       automatic: false
     },
-    notes: "One Hand on the Wheel: this legal Maneuver is a free action; one scene use is spent (p.193)."
+    notes: loc`One Hand on the Wheel: this legal Maneuver is a free action; one scene use is spent (p.193).`
   };
 }
 /** Lazily capture after all class/feat reservations, including declared-natural-20 wrappers. */
@@ -84,6 +85,6 @@ export function oneHandManeuverUseProof(system, evidence, previous = null) {
     use.used > evidence.limit ||
     (previous && JSON.stringify(previous) !== JSON.stringify(use))
   )
-    throw new Error("The reserved free Maneuver use changed before posting.");
+    throw new Error(loc`The reserved free Maneuver use changed before posting.`);
   return structuredClone(use);
 }

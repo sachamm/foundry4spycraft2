@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Gorgeous / The Look p.203. Named check modifiers stay separate from the skill bonus. */
 export function appearanceCheckPlan(system, key, check, { manhuntPrey = false } = {}) {
   const gorgeous = system.activeFeatNames?.includes("Gorgeous") === true,
@@ -61,10 +62,10 @@ export function appearanceCheckPlan(system, key, check, { manhuntPrey = false } 
     ],
     errorIncrease,
     notes: [
-      ...(ugly ? ["Too Ugly to Die: synergy penalty −4 with all Blend/Networking checks (p.205)."] : []),
+      ...(ugly ? [loc`Too Ugly to Die: synergy penalty −4 with all Blend/Networking checks (p.205).`] : []),
       ...(appearanceApplicable
         ? [
-            `${source}: ${synergy ? `synergy ${synergy > 0 ? "+" : ""}${synergy}` : "appearance +1 included in skill bonus"}${errorIncrease ? "; error range +1" : ""}${irresistible ? "; replaces The Look skill modifiers" : look && gorgeous ? "; replaces Gorgeous skill modifiers" : ""}${criticalFailureDiscount ? "; opponent error activation cost −1 (minimum1)" : ""} (p.${irresistible ? 205 : 203}).`
+            `${source}: ${synergy ? `synergy ${synergy > 0 ? "+" : ""}${synergy}` : loc`appearance +1 included in skill bonus`}${errorIncrease ? loc`; error range +1` : ""}${irresistible ? loc`; replaces The Look skill modifiers` : look && gorgeous ? loc`; replaces Gorgeous skill modifiers` : ""}${criticalFailureDiscount ? loc`; opponent error activation cost −1 (minimum1)` : ""} (p.${irresistible ? 205 : 203}).`
           ]
         : [])
     ]
@@ -85,23 +86,23 @@ export function bloodstainDefensePlan(system, { appearance, wornArmor = [] } = {
     reason: ""
   };
   if (!earned) return result;
-  if (!dressed) return { ...result, reason: "Declare that you are dressed according to your Lifestyle." };
-  if (!Number.isFinite(appearance)) return { ...result, reason: "Review your Lifestyle Appearance modifier." };
+  if (!dressed) return { ...result, reason: loc`Declare that you are dressed according to your Lifestyle.` };
+  if (!Number.isFinite(appearance)) return { ...result, reason: loc`Review your Lifestyle Appearance modifier.` };
   for (const armor of wornArmor) {
     const notice = String(armor.system?.notice ?? "").trim();
     if (/\bobvious\b/i.test(notice)) result.obviousArmor.push(armor.name ?? armor.id);
     else if (!notice) result.unknownArmor.push(armor.name ?? armor.id);
   }
   if (result.obviousArmor.length)
-    return { ...result, reason: "Bloodstain Resistant is unavailable while wearing obvious armor (p.201)." };
+    return { ...result, reason: loc`Bloodstain Resistant is unavailable while wearing obvious armor (p.201).` };
   if (result.unknownArmor.length)
     return {
       ...result,
-      reason: "Review the Notice/Search DC of the worn armor before receiving Bloodstain Resistant."
+      reason: loc`Review the Notice/Search DC of the worn armor before receiving Bloodstain Resistant.`
     };
   return {
     ...result,
     bonus: Math.max(0, appearance),
-    reason: appearance > 0 ? "" : "Your Appearance modifier is not positive."
+    reason: appearance > 0 ? "" : loc`Your Appearance modifier is not positive.`
   };
 }

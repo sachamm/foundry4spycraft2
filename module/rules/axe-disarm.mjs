@@ -1,4 +1,5 @@
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
+import { loc } from "../i18n.mjs";
 /** Axe Basics p.176: gear +1 with melee Disarm attacks while holding a readied axe.
  * It need not be the attacking weapon. Ranged attacks get no bonus.
  */
@@ -25,5 +26,5 @@ export function validateAxeDisarmProof(system, disarm, { checkKind, weaponProfic
     !["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged"].includes(weaponProficiency) ||
     stable(axeDisarmPlan(system)) !== stable(disarm.axeBasics)
   )
-    throw Error("The readied axe, Axe Basics source or melee Disarm attack changed before posting.");
+    throw Error(loc`The readied axe, Axe Basics source or melee Disarm attack changed before posting.`);
 }

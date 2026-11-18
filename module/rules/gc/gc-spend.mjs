@@ -3,6 +3,7 @@
  * The pool itself is managed by module/rules/gc-dice.mjs.
  */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 const G = GC_DATA.core.gcDice;
 export const GC_SPENDS = G.spends;
@@ -40,10 +41,11 @@ export function gcDieType(profile) {
  */
 export function planSpend(id, context = {}) {
   const spend = G.spends.find(entry => entry.id === id);
-  if (!spend) throw new Error("Unknown GC action die use.");
+  if (!spend) throw new Error(loc`Unknown GC action die use.`);
   const { npc = null, dramatic = false } = context;
-  if (spend.needsNpc && !npc) throw new Error("Choose the NPC this applies to.");
-  if (spend.dramaticOnly && !dramatic) throw new Error("This use is only available during a dramatic scene (p.424).");
+  if (spend.needsNpc && !npc) throw new Error(loc`Choose the NPC this applies to.`);
+  if (spend.dramaticOnly && !dramatic)
+    throw new Error(loc`This use is only available during a dramatic scene (p.424).`);
   let cost = spend.cost,
     die = spend.rolls === "d12" ? G.dcBoostDie : spend.rolls === "npc" ? gcDieType(npc) : null,
     notes = [];
@@ -52,7 +54,7 @@ export function planSpend(id, context = {}) {
       const limit = dramatic ? G.dramaticDcBoostLimit : G.dcBoostLimit;
       if ((context.alreadyBoostedDC ?? 0) >= limit)
         throw new Error(
-          `Only ${limit} action di${limit === 1 ? "e" : "ce"} may boost one DC${dramatic ? " in a dramatic scene" : ""}.`
+          loc`Only ${limit} action di${limit === 1 ? "e" : "ce"} may boost one DC${dramatic ? loc` in a dramatic scene` : ""}.`
         );
       break;
     }
@@ -61,7 +63,7 @@ export function planSpend(id, context = {}) {
       // p.452: a standard NPC's criticals cannot be activated without treacherous (attacks) or prodigy (skills).
       if (npc.type !== "special" && !(kind === "attack" ? npc.treacherous : npc.prodigy))
         throw new Error(
-          `A standard NPC needs the ${kind === "attack" ? "treacherous" : "prodigy"} quality before the GC may activate its ${kind === "attack" ? "critical hits" : "critical successes"} (p.452).`
+          loc`A standard NPC needs the ${kind === "attack" ? "treacherous" : "prodigy"} quality before the GC may activate its ${kind === "attack" ? loc`critical hits` : loc`critical successes`} (p.452).`
         );
       cost = whole(context.dice, 1) ? context.dice : 1;
       break;
@@ -71,27 +73,27 @@ export function planSpend(id, context = {}) {
       break;
     case "promote":
       if (npc.baseType !== "standard" || npc.promoted)
-        throw new Error("Only a standard NPC that is not already promoted can be promoted.");
+        throw new Error(loc`Only a standard NPC that is not already promoted can be promoted.`);
       notes.push(
-        "Special for the rest of the mission; if defeated, XP is 300 per scene as a ‘full’ special NPC (p.452)."
+        loc`Special for the rest of the mission; if defeated, XP is 300 per scene as a ‘full’ special NPC (p.452).`
       );
       break;
     case "saveNpc":
-      if (npc.type !== "special") throw new Error("Only a special NPC can be saved from death or capture.");
+      if (npc.type !== "special") throw new Error(loc`Only a special NPC can be saved from death or capture.`);
       if (dramatic && context.fromDeath !== false)
-        throw new Error("A character who dies in a dramatic scene cannot be saved (p.424).");
+        throw new Error(loc`A character who dies in a dramatic scene cannot be saved (p.424).`);
       cost = Math.max(0, spend.cost - (G.saveDiscount[npc.role] ?? 0));
-      notes.push("XP is awarded as if the NPC were defeated; the NPC may not return this mission.");
+      notes.push(loc`XP is awarded as if the NPC were defeated; the NPC may not return this mission.`);
       break;
     case "campaignQuality":
       if (!whole(context.qualityCost, 1))
-        throw new Error("This campaign quality lists no die cost, so it cannot be bought mid-mission.");
+        throw new Error(loc`This campaign quality lists no die cost, so it cannot be bought mid-mission.`);
       cost = context.qualityCost;
-      notes.push("Stays for the rest of the mission; XP reward unchanged.");
+      notes.push(loc`Stays for the rest of the mission; XP reward unchanged.`);
       break;
     case "dramaticScene":
-      if (dramatic) throw new Error("The current scene is already dramatic.");
-      notes.push("Does not change the mission XP reward.");
+      if (dramatic) throw new Error(loc`The current scene is already dramatic.`);
+      notes.push(loc`Does not change the mission XP reward.`);
       break;
     case "event": {
       if (context.free) {
@@ -99,24 +101,24 @@ export function planSpend(id, context = {}) {
         break;
       } // prompted by a Subplot or another rule
       if (!whole(context.eventCost, 1) || context.eventCost > 4)
-        throw new Error("Choose an event intensity from 1 to 4 dice.");
+        throw new Error(loc`Choose an event intensity from 1 to 4 dice.`);
       cost = Math.max(0, context.eventCost - (context.triggered ? 1 : 0));
       break;
     }
     case "knowsNothing":
-      if (npc.role === "mastermind") throw new Error("A mastermind always knows something valuable.");
+      if (npc.role === "mastermind") throw new Error(loc`A mastermind always knows something valuable.`);
       cost = npc.type === "special" || npc.role === "henchman" ? 2 : 1;
       break;
     case "healNpc":
       notes.push(
         npc.type === "special"
-          ? "Restores vitality equal to the die result, or 2 wounds."
-          : "Reduces accumulated damage by the die result."
+          ? loc`Restores vitality equal to the die result, or 2 wounds.`
+          : loc`Reduces accumulated damage by the die result.`
       );
-      if (context.inCombat) notes.push("In combat this needs a Refresh action and only 1 die.");
+      if (context.inCombat) notes.push(loc`In combat this needs a Refresh action and only 1 die.`);
       break;
     case "boostDefense":
-      notes.push("+2 Defense; rounds = die result; only one such boost at once.");
+      notes.push(loc`+2 Defense; rounds = die result; only one such boost at once.`);
       break;
     default:
   }
@@ -131,7 +133,7 @@ export function actionDieTotal(faces, rolls, { explodeLow = false } = {}) {
   let total = 0,
     used = 0;
   for (const roll of rolls) {
-    if (!whole(roll, 1) || roll > faces) throw new Error("Invalid action die result.");
+    if (!whole(roll, 1) || roll > faces) throw new Error(loc`Invalid action die result.`);
     total += roll;
     used += 1;
     if (!(roll === faces || (explodeLow && roll === 1))) return { total, used, complete: true };

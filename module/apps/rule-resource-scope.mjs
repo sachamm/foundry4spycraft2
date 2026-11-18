@@ -5,6 +5,7 @@ import {
   refreshResourceActor,
   refreshRuleStateMessage
 } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const queues = new Map();
 /** A short, independent actor rule-state lock. Never call base resource queues inside it. */
 export function queueRuleState(actor, work, { messages = [] } = {}) {
@@ -18,7 +19,7 @@ export function queueRuleState(actor, work, { messages = [] } = {}) {
     pending = previous
       .catch(() => {})
       .then(() => {
-        if (!actor.isOwner) throw Error("Only an owner may change this character’s rule state.");
+        if (!actor.isOwner) throw Error(loc`Only an owner may change this character’s rule state.`);
         return work();
       });
   queues.set(

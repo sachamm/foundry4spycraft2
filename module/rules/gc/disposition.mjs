@@ -1,5 +1,6 @@
 /** NPC disposition (pp.457–458, Table 7.14). */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 const D = GC_DATA.core.disposition;
 export const DISPOSITIONS = D.grades;
@@ -22,13 +23,13 @@ export function shiftDisposition(
   steps,
   { mission = "initial", automatic = false, villain = false } = {}
 ) {
-  if (villain) throw new Error("Villains are immune to disposition effects (p.457).");
-  if (!Number.isSafeInteger(steps) || steps === 0) throw new Error("Enter a whole number of grades to shift.");
+  if (villain) throw new Error(loc`Villains are immune to disposition effects (p.457).`);
+  if (!Number.isSafeInteger(steps) || steps === 0) throw new Error(loc`Enter a whole number of grades to shift.`);
   const current = record?.toward?.[targetId] ?? {};
   const sameMission = current.mission === mission;
   const shifted = sameMission ? (current.shifted ?? 0) : 0;
   if (automatic && sameMission && current.automatic)
-    throw new Error("Only one ability per mission may automatically shift this NPC’s disposition.");
+    throw new Error(loc`Only one ability per mission may automatically shift this NPC’s disposition.`);
   // Higher on the table is friendlier, so a positive shift lowers the index.
   const allowed = Math.max(-D.maxShiftPerMission - shifted, Math.min(D.maxShiftPerMission - shifted, steps));
   const from = index(dispositionToward(record, targetId));
@@ -77,7 +78,7 @@ export function loyaltyDecision(candidates, rolls, { foil = 0 } = {}) {
     }
     const roll = rolls[i];
     if (!Number.isSafeInteger(roll) || roll < 1 || roll > 20)
-      throw new Error("Enter a d20 result for each loyalty check.");
+      throw new Error(loc`Enter a d20 result for each loyalty check.`);
     const target = dispositionGrade(ordered[i].grade).loyalty,
       total = roll + foil,
       success = total <= target;
@@ -92,7 +93,7 @@ const strength = gradeId => -index(gradeId);
 
 /** When a fight starts in sight or hearing: the NPC joins the side it feels strongest about on a d20 at or under the number. */
 export function joinsCombat(gradeId, roll, { foil = 0 } = {}) {
-  if (!Number.isSafeInteger(roll) || roll < 1 || roll > 20) throw new Error("Enter a d20 result.");
+  if (!Number.isSafeInteger(roll) || roll < 1 || roll > 20) throw new Error(loc`Enter a d20 result.`);
   const grade = dispositionGrade(gradeId),
     total = roll + foil;
   return {

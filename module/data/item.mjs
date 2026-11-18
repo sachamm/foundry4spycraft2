@@ -1,6 +1,7 @@
 import { weaponDamageExpression } from "../rules/weapon-damage-expression.mjs";
 import { vehicleStatFields } from "./vehicle-fields.mjs";
-const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
+import { record, recordList } from "./record-field.mjs";
+const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 const int = (initial = 0, opts = {}) =>
   new NumberField({ required: true, nullable: false, integer: true, initial, ...opts });
@@ -44,18 +45,18 @@ export class ClassData extends BaseItemData {
       coreAbility: new SchemaField({ name: str(), description: str() }),
       classSkills: new ArrayField(new StringField()),
       /** Per-level progression: [{ level, bab, fort, ref, will, defense, initiative, wealth, gearR … gearE }] */
-      table: new ArrayField(new ObjectField()),
+      table: recordList("table"),
       /** Class abilities by level; descriptions may contain [[formula]] placeholders. */
       abilities: new ArrayField(new SchemaField({ level: int(1), name: str(), description: str() })),
       /** Selectable ability lists: [{ key, name, options: [{ index, name, description, bonuses }] }] */
-      choiceLists: new ArrayField(new ObjectField()),
+      choiceLists: recordList("choiceLists"),
       /** When choices are gained: [{ level, list }] */
       choiceSchedule: new ArrayField(new SchemaField({ level: int(1), list: str() })),
       /** The owning agent's selections: { "<scheduleIndex>": optionIndex } */
-      choices: new ObjectField(),
-      inheritedChoices: new ObjectField(),
-      skillChoices: new ObjectField(),
-      weaponSpecialist: new ObjectField(),
+      choices: record("choices"),
+      inheritedChoices: record("inheritedChoices"),
+      skillChoices: record("skillChoices"),
+      weaponSpecialist: record("weaponSpecialist"),
       keySkill: str(),
       keyFocus: str(),
       professionFocus: str(),
@@ -64,7 +65,7 @@ export class ClassData extends BaseItemData {
       phdSkill2: str(),
       bonuses: bonusField(),
       featGrants: new ArrayField(new SchemaField({ level: int(1), feat: str(), choice: str() })),
-      requirements: new ObjectField({ nullable: true, initial: null })
+      requirements: record("requirements", { nullable: true, initial: null })
     };
   }
 
@@ -85,7 +86,7 @@ export class OriginData extends BaseItemData {
       ...super.defineSchema(),
       originType: str("talent", { choices: ["talent", "specialty"] }),
       /** Creation choices: attributes, class skills, threat skill and rank-limit skills. */
-      originChoices: new ObjectField(),
+      originChoices: record("originChoices"),
       bonuses: bonusField(),
       /** Names of feats granted by this origin. */
       grants: new ArrayField(new StringField())
@@ -98,21 +99,21 @@ export class FeatData extends BaseItemData {
     return {
       ...super.defineSchema(),
       tree: str(),
-      prerequisites: new ObjectField({ nullable: true, initial: null }),
+      prerequisites: record("prerequisites", { nullable: true, initial: null }),
       prerequisitesNotChecked: new BooleanField(),
       /** Legacy field: each feat selection is now a separate item. */
       ranks: int(1, { min: 1 }),
       repeatable: new BooleanField(),
       maxSelections: int(0, { min: 0 }),
-      temporaryGrant: new ObjectField({ nullable: true, initial: null }),
+      temporaryGrant: record("temporaryGrant", { nullable: true, initial: null }),
       featKind: str("permanent", { choices: ["permanent", "temporary", "virtual"] }),
-      candidateBasis: new ObjectField({ nullable: true, initial: null }),
+      candidateBasis: record("candidateBasis", { nullable: true, initial: null }),
       choice: str(),
       contactGrantMode: str("associate", { choices: ["associate", "improve"] }),
       contactTheme: str(),
       contactThemeConfirmed: new BooleanField(),
       restrictions: str(),
-      trainingSkills: new ObjectField(),
+      trainingSkills: record("trainingSkills"),
       focusChoices: new ArrayField(
         new SchemaField({
           kind: str("focus", { choices: ["focus", "forte"] }),
@@ -124,7 +125,7 @@ export class FeatData extends BaseItemData {
       manualPrerequisitesConfirmed: new BooleanField(),
       /** Career level when feat was acquired; 0 means legacy/unknown. */
       acquisitionSource: str(),
-      acquisitionCheck: new ObjectField({ nullable: true, initial: null }),
+      acquisitionCheck: record("acquisitionCheck", { nullable: true, initial: null }),
       historicalPrerequisitesConfirmed: new BooleanField(),
       acquiredAtLevel: int(0, { min: 0, max: 20 }),
       /** Granted by an origin or class (does not use a feat slot). */
@@ -158,11 +159,11 @@ export class GearData extends BaseItemData {
       kitNonPortable: new BooleanField(),
       kitLocation: str(),
       reserve: new BooleanField(),
-      reserveAcquisition: new ObjectField({ nullable: true, initial: null }),
-      armorMissionGrant: new ObjectField({ nullable: true, initial: null }),
-      bigStickMissionPick: new ObjectField({ nullable: true, initial: null }),
-      missionCaliberGrant: new ObjectField({ nullable: true, initial: null }),
-      classGearGrant: new ObjectField({ nullable: true, initial: null }),
+      reserveAcquisition: record("reserveAcquisition", { nullable: true, initial: null }),
+      armorMissionGrant: record("armorMissionGrant", { nullable: true, initial: null }),
+      bigStickMissionPick: record("bigStickMissionPick", { nullable: true, initial: null }),
+      missionCaliberGrant: record("missionCaliberGrant", { nullable: true, initial: null }),
+      classGearGrant: record("classGearGrant", { nullable: true, initial: null }),
       common: new BooleanField(),
       /** Gear table columns (pp.226–235), kept as the printed labels. */
       powerRating: str(),

@@ -1,5 +1,6 @@
 import { shakenActionDieCost } from "./shaken.mjs";
 import { multipartActionDicePlan, paymentIdValid } from "./action-die-payments.mjs";
+import { loc } from "../i18n.mjs";
 /** Actor receipts, rather than editable counters on the roll, prove this check's previously paid surcharge. */
 export function paidBoostSurcharge(actor, message) {
   let paid = 0;
@@ -36,11 +37,11 @@ export function paidBoostSurcharge(actor, message) {
       parts.filter(p => p.scope === "boost").reduce((n, p) => n + p.count, 0) !== base ||
       row.count !== base + fee
     )
-      throw new Error("Review this check’s saved boost-payment evidence.");
+      throw new Error(loc`Review this check’s saved boost-payment evidence.`);
     paid += fee;
   }
   if (!Number.isSafeInteger(paid) || paid > 2)
-    throw new Error("Review the previously paid boost surcharge for this check.");
+    throw new Error(loc`Review the previously paid boost surcharge for this check.`);
   return paid;
 }
 export function boostPaymentQuote(
@@ -78,7 +79,7 @@ export const boostPaymentSignature = quote =>
 export function generousSurchargeQuote(actor, message, { surchargeBonusPoolId = "", surchargeAllocations } = {}) {
   const system = actor.actionDiceFundingSystem;
   if (system.actionDiceSettlementReview?.needsReview || system.actionDieAwardReview?.needsReview)
-    throw new Error("Resolve the teammate’s interrupted action-die records before Generous.");
+    throw new Error(loc`Resolve the teammate’s interrupted action-die records before Generous.`);
   const cost = shakenActionDieCost(system, { baseCost: 0, surchargePaid: paidBoostSurcharge(actor, message) });
   if (cost.blocked) throw new Error(cost.reason);
   const allocations = boostSurchargeAllocations(cost.surcharge, { surchargeBonusPoolId, surchargeAllocations });
@@ -95,14 +96,14 @@ export function generousSurchargeQuote(actor, message, { surchargeBonusPoolId = 
 
 function boostSurchargeAllocations(fee, { surchargeBonusPoolId = "", surchargeAllocations } = {}) {
   if (surchargeAllocations !== undefined && !Array.isArray(surchargeAllocations))
-    throw new Error("Choose valid split surcharge contributions.");
+    throw new Error(loc`Choose valid split surcharge contributions.`);
   if (surchargeAllocations?.length) {
     if (
       surchargeAllocations.length > 32 ||
       surchargeAllocations.some(p => !Number.isSafeInteger(p?.count) || p.count < 1) ||
       surchargeAllocations.reduce((n, p) => n + p.count, 0) !== fee
     )
-      throw new Error(`Surcharge contributions must total the remaining ${fee}-die check fee.`);
+      throw new Error(loc`Surcharge contributions must total the remaining ${fee}-die check fee.`);
     return surchargeAllocations.map(p => ({ bonusPoolId: p.bonusPoolId ?? "", count: p.count, scope: "surcharge" }));
   }
   return fee ? [{ bonusPoolId: surchargeBonusPoolId, count: fee, scope: "surcharge" }] : [];

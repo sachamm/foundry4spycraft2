@@ -7,6 +7,7 @@ import {
   damageSaveSourceSnapshot
 } from "../rules/damage-saves.mjs";
 import { queueResources } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export async function rollPendingDamageSave(actor, options = {}) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
@@ -15,14 +16,14 @@ export async function rollPendingDamageSave(actor, options = {}) {
   if (!record) return null;
   const existing = currentDamageSaveMessage(actor, record, game.messages ?? []);
   if (existing) {
-    if (existing.blind && !game.user.isGM) throw new Error("The GC resolves this secret save.");
+    if (existing.blind && !game.user.isGM) throw new Error(loc`The GC resolves this secret save.`);
     if (options.confirmed !== true) {
       const esc = foundry.utils.escapeHTML,
         c = existing.flags.spycraft2;
       await foundry.applications.api.DialogV2.input({
-        window: { title: "Pending damage save" },
+        window: { title: loc`Pending damage save` },
         rejectClose: false,
-        content: `<div class="spycraft2-roll-options"><p>${esc(record.source)}: ${record.kind === "stress" ? "Will" : "Fortitude"} DC${record.save.dc}.</p><p>Current recorded result ${esc(c.effectiveTotal ?? c.rawTotal ?? "unavailable")}. Outcome: ${typeof c.successConfirmed === "boolean" ? (c.successConfirmed ? "success" : "failure") : "not confirmed"}.</p><p>This event already has a save. Use its chat result for eligible boosts, rerolls and outcome confirmation. Damage settlement remains separate.</p></div>`
+        content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}.`}</p><p>${loc`Current recorded result ${esc(c.effectiveTotal ?? c.rawTotal ?? "unavailable")}. Outcome: ${typeof c.successConfirmed === "boolean" ? (c.successConfirmed ? "success" : "failure") : loc`not confirmed`}.`}</p><p>${loc`This event already has a save. Use its chat result for eligible boosts, rerolls and outcome confirmation. Damage settlement remains separate.`}</p></div>`
       });
     }
     return existing;
@@ -31,24 +32,24 @@ export async function rollPendingDamageSave(actor, options = {}) {
   if (input.confirmed !== true) {
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Resolve next damage save" },
+      window: { title: loc`Resolve next damage save` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${esc(record.source)}: ${record.kind === "stress" ? "Will" : "Fortitude"} DC${record.save.dc}.</p><label><input name="confirmed" type="checkbox" /> The GC confirms this save is being resolved in its correct damage-event context, including earlier pending results; the current save modifiers and conditions apply</label><p>The recorded DC remains fixed. The actual save keeps its normal eligible options. This rolls the save without settling its outcome or applying conditions.</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(record.source)}: ${record.kind === "stress" ? loc`Will` : loc`Fortitude`} DC${record.save.dc}.`}</p><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this save is being resolved in its correct damage-event context, including earlier pending results; the current save modifiers and conditions apply`}</label><p>${loc`The recorded DC remains fixed. The actual save keeps its normal eligible options. This rolls the save without settling its outcome or applying conditions.`}</p></div>`
     });
     if (!input) return null;
   }
   if (input.confirmed !== true) return null;
   return queueResources([actor], async () => {
-    if (!actor.isOwner) throw new Error("Ownership changed before the damage save.");
+    if (!actor.isOwner) throw new Error(loc`Ownership changed before the damage save.`);
     const current = pendingDamageSave(actor, options.eventId);
-    if (!current || current.id !== record.id) throw new Error("The pending damage save changed.");
+    if (!current || current.id !== record.id) throw new Error(loc`The pending damage save changed.`);
     const already = currentDamageSaveMessage(actor, current, game.messages ?? []);
     if (already) {
-      if (already.blind && !game.user.isGM) throw new Error("The GC resolves this secret save.");
+      if (already.blind && !game.user.isGM) throw new Error(loc`The GC resolves this secret save.`);
       return already;
     }
     if (!same(damageLedgerSnapshot(actor), expected))
-      throw new Error("The damage ledger changed while the save was prepared.");
+      throw new Error(loc`The damage ledger changed while the save was prepared.`);
     const source = damageSaveSourceSnapshot(actor, record.save.key),
       validate = () => {
         if (
@@ -56,13 +57,13 @@ export async function rollPendingDamageSave(actor, options = {}) {
           !same(damageLedgerSnapshot(actor), expected) ||
           damageSaveSourceSnapshot(actor, record.save.key) !== source
         )
-          throw new Error("The pending event or current save context changed. Review it before rolling.");
+          throw new Error(loc`The pending event or current save context changed. Review it before rolling.`);
       };
     const roots = () =>
       [...(game.messages ?? [])].filter(m => damageSaveMessageMatches(m, actor, record) && !m.flags.spycraft2.rerollOf);
     let root;
     const prior = roots();
-    if (prior.length > 1) throw new Error("Multiple original damage saves require GC review.");
+    if (prior.length > 1) throw new Error(loc`Multiple original damage saves require GC review.`);
     root = prior[0];
     if (!root) {
       const context = damageSaveContext(record, foundry.utils.randomID(), game.time.worldTime);
@@ -80,10 +81,10 @@ export async function rollPendingDamageSave(actor, options = {}) {
       if (!root) return null;
     }
     if (!damageSaveMessageMatches(root, actor, record))
-      throw new Error("The actual save has no matching damage-event receipt.");
+      throw new Error(loc`The actual save has no matching damage-event receipt.`);
     if (!actor.isOwner || !same(damageLedgerSnapshot(actor), expected))
-      throw new Error("The damage event changed after the save was posted. Preserve that result for review.");
-    if (root.blind && !game.user.isGM) throw new Error("The GC resolves this secret save.");
+      throw new Error(loc`The damage event changed after the save was posted. Preserve that result for review.`);
+    if (root.blind && !game.user.isGM) throw new Error(loc`The GC resolves this secret save.`);
     const updated = { ...record, saveMessageId: root.id, saveReceiptId: root.flags.spycraft2.damageSave.receiptId };
     try {
       await actor.update({ ["flags.spycraft2.damageEvents." + record.id]: updated });
@@ -91,7 +92,7 @@ export async function rollPendingDamageSave(actor, options = {}) {
       if (!same(actor.flags?.spycraft2?.damageEvents?.[record.id], updated)) throw error;
     }
     if (!same(actor.flags?.spycraft2?.damageEvents?.[record.id], updated))
-      throw new Error("Review the posted save and its event binding before retrying.");
+      throw new Error(loc`Review the posted save and its event binding before retrying.`);
     return currentDamageSaveMessage(actor, updated, game.messages ?? []);
   });
 }

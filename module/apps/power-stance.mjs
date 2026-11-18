@@ -8,6 +8,7 @@ import {
 import { assertShakenInitiativeCountReady, changeInitiativeCountPreservingShaken } from "./shaken-initiative.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { isResourceLock, periodResourceActors } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const localReviews = new WeakMap(),
   jobs = new Map(),
   combatants = actor =>
@@ -25,7 +26,7 @@ function record(c) {
 }
 const exits = actor => {
   const rows = actor.flags?.spycraft2?.powerStanceUntrackedExits ?? [];
-  if (!Array.isArray(rows)) throw Error("Review the untracked Power Stance exits.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the untracked Power Stance exits.`);
   return rows;
 };
 const untracked = c => !record(c) && exits(c.actor).some(r => r.combatId === c.parent.id && r.combatantId === c.id);
@@ -52,8 +53,7 @@ function planFor(c) {
   )
     return {
       needsReview: true,
-      reason:
-        "Remove this combatant from its shared Initiative group before adjudicating its individual Power Stance Count."
+      reason: loc`Remove this combatant from its shared Initiative group before adjudicating its individual Power Stance Count.`
     };
   return p;
 }
@@ -123,7 +123,7 @@ async function write(c, p, expected) {
     throw error;
   }
   if (c.initiative !== p.initiative || !markerMatches(c.flags?.spycraft2?.powerStanceInitiative, next))
-    throw Error("The Power Stance Count did not settle. Review its included bonus.");
+    throw Error(loc`The Power Stance Count did not settle. Review its included bonus.`);
   return p;
 }
 /** Local coordination has no base resource dependency; actual shared Count writes use the independent rule lock. */
@@ -132,7 +132,7 @@ function serial(actor, work) {
     pending = old
       .catch(() => {})
       .then(() => {
-        if (!actor.isOwner) throw Error("Only an owner may change this character’s Power Stance Count.");
+        if (!actor.isOwner) throw Error(loc`Only an owner may change this character’s Power Stance Count.`);
         return work();
       });
   jobs.set(
@@ -154,7 +154,7 @@ export function reconcilePowerStanceInitiative(actor) {
       try {
         await write(c, p, expected);
       } catch (error) {
-        await saveHeld(c, "The Power Stance Count update could not be verified: " + error.message);
+        await saveHeld(c, loc`The Power Stance Count update could not be verified: ` + error.message);
         throw error;
       }
     }
@@ -173,15 +173,15 @@ export function preparePowerStanceEntry(actor, input) {
     for (const c of combatants(actor)) {
       if (c.initiative === null) continue;
       if (c.group && Number.isFinite(c.group.initiative))
-        throw Error("Remove the combatant from its shared Initiative group before entering Power Stance.");
+        throw Error(loc`Remove the combatant from its shared Initiative group before entering Power Stance.`);
       assertShakenInitiativeCountReady(c);
       const expected = powerStanceInitiativeEvidence(c);
       if (!record(c)) {
         if (actor.system.combatStance?.key === "power" || untracked(c))
-          throw Error("Review the existing Power Stance Count before entering again.");
+          throw Error(loc`Review the existing Power Stance Count before entering again.`);
         if (input.powerCountConfirmed !== true)
           throw Error(
-            "The GC must confirm this existing Count does not already include Power Stance before first entry."
+            loc`The GC must confirm this existing Count does not already include Power Stance before first entry.`
           );
         await write(
           c,
@@ -214,25 +214,25 @@ export function powerStanceExitPatch(actor) {
 }
 export async function reviewPowerStanceInitiative(actor, combatId, combatantId, input = {}) {
   if (!actor.isOwner || !game.user.isGM)
-    throw Error("The owning GC must review the included Power Stance Count bonus.");
+    throw Error(loc`The owning GC must review the included Power Stance Count bonus.`);
   const c = game.combats.get(combatId)?.combatants.get(combatantId);
-  if (c?.actor?.uuid !== actor.uuid) throw Error("Choose this character’s actual combatant.");
+  if (c?.actor?.uuid !== actor.uuid) throw Error(loc`Choose this character’s actual combatant.`);
   if (c.group && Number.isFinite(c.group.initiative))
-    throw Error("Remove the combatant from its shared Initiative group first.");
+    throw Error(loc`Remove the combatant from its shared Initiative group first.`);
   const expected = powerStanceInitiativeEvidence(c);
   if (!Object.hasOwn(input, "includedBonus")) {
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review Power Stance Initiative Count" },
+      window: { title: loc`Review Power Stance Initiative Count` },
       rejectClose: false,
       content:
         '<div class="spycraft2-roll-options"><p>' +
         esc(actor.name) +
-        ": current Count " +
+        loc`: current Count ` +
         Number(c.initiative) +
         ". " +
-        esc(planFor(c).reason ?? "Confirm the stance component already included.") +
-        '</p><p>Enter the Power Stance bonus already included in this current Count, using the earlier Strength score if it changed. Use zero only when it contains none. Reconciliation changes only that component and preserves other Count gains/losses.</p><label>Included Power Stance bonus <input name="includedBonus" type="number" min="0" step="1" required /></label><label>Review note <input name="resolution" maxlength="500" required /></label></div>'
+        esc(planFor(c).reason ?? loc`Confirm the stance component already included.`) +
+        `</p><p>${loc`Enter the Power Stance bonus already included in this current Count, using the earlier Strength score if it changed. Use zero only when it contains none. Reconciliation changes only that component and preserves other Count gains/losses.`}</p><label>${loc`Included Power Stance bonus`} <input name="includedBonus" type="number" min="0" step="1" required /></label><label>${loc`Review note`} <input name="resolution" maxlength="500" required /></label></div>`
     });
     if (!input) return null;
   }
@@ -247,26 +247,26 @@ export async function reviewPowerStanceInitiative(actor, combatId, combatantId, 
     !input.resolution.trim() ||
     input.resolution.length > 500
   )
-    throw Error("Confirm the included whole nonnegative stance bonus and record a review note.");
+    throw Error(loc`Confirm the included whole nonnegative stance bonus and record a review note.`);
   return serial(actor, async () => {
     if (powerStanceInitiativeEvidence(c) !== expected)
-      throw Error("The Count, Strength, stance or inclusion record changed. Review them again.");
+      throw Error(loc`The Count, Strength, stance or inclusion record changed. Review them again.`);
     const p = reviewed(actor.system, { initiative: c.initiative, record: record(c) }, included);
     p.record.review = { by: game.user.id, note: input.resolution.trim(), includedBonus: included };
     return write(c, p, expected);
   });
 }
 export async function managePowerStanceInitiative(actor, input = {}) {
-  if (!game.user.isGM || !actor.isOwner) throw Error("The owning GC reviews Power Stance Counts.");
+  if (!game.user.isGM || !actor.isOwner) throw Error(loc`The owning GC reviews Power Stance Counts.`);
   if (!input.combatant) {
     const pending = powerStanceInitiativeReviews(actor),
       esc = foundry.utils.escapeHTML;
-    if (!pending.length) return ui.notifications.info("No Power Stance Count needs review.");
+    if (!pending.length) return ui.notifications.info(loc`No Power Stance Count needs review.`);
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review Power Stance Count" },
+      window: { title: loc`Review Power Stance Count` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><label>Combatant Count <select name="combatant">' +
+        `<div class="spycraft2-roll-options"><label>${loc`Combatant Count`} <select name="combatant">` +
         pending
           .map(
             p =>
@@ -277,12 +277,12 @@ export async function managePowerStanceInitiative(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        "</select></label><p>Confirm the Power Stance component already included in that Count in the next dialog.</p></div>"
+        `</select></label><p>${loc`Confirm the Power Stance component already included in that Count in the next dialog.`}</p></div>`
     });
     if (!input) return null;
   }
   const [combatId, combatantId, ...extra] = String(input.combatant).split("|");
-  if (extra.length) throw Error("Choose a listed combatant.");
+  if (extra.length) throw Error(loc`Choose a listed combatant.`);
   return reviewPowerStanceInitiative(actor, combatId, combatantId, input);
 }
 export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {
@@ -290,7 +290,7 @@ export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {
   const own = options.spycraft2PowerStanceInitiative;
   if (own) {
     if (powerStanceInitiativeEvidence(c) !== own.expected)
-      throw Error("The Count, Power Stance or Strength changed before its update.");
+      throw Error(loc`The Count, Power Stance or Strength changed before its update.`);
     changed["flags.spycraft2.powerStanceInitiative"] = own.marker;
     return;
   }
@@ -315,7 +315,7 @@ export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {
       includedBonus: null,
       stanceId: null,
       needsReview: true,
-      reason: "The combatant identity or shared Initiative group changed. Review its included Power Stance component."
+      reason: loc`The combatant identity or shared Initiative group changed. Review its included Power Stance component.`
     };
     return;
   }
@@ -333,7 +333,7 @@ export function guardPowerStanceInitiativeUpdate(c, changed, options = {}) {
         includedBonus: null,
         stanceId: null,
         needsReview: true,
-        reason: "Review this Count’s included Power Stance component after the other Count adjustment."
+        reason: loc`Review this Count’s included Power Stance component after the other Count adjustment.`
       };
       return;
     }
@@ -367,7 +367,7 @@ export function installPowerStanceInitiativeHooks() {
           await reconcilePowerStanceInitiative(actor);
         } while (state.again);
       })
-      .catch(error => ui.notifications.warn("Power Stance Count needs review: " + error.message))
+      .catch(error => ui.notifications.warn(loc`Power Stance Count needs review: ` + error.message))
       .finally(() => pending.delete(actor));
   };
   Hooks.on("preCreateCombatant", c => {

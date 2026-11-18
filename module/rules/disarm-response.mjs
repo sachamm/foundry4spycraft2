@@ -6,6 +6,7 @@ import { axeDisarmPlan } from "./axe-disarm.mjs";
 import { readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Actual held personal weapons; training is not required for Sure Grip. */
 export function readiedDisarmWeapons(system, items = []) {
   const weapons = [];
@@ -29,7 +30,7 @@ export function readiedDisarmWeapons(system, items = []) {
       return {
         version: 1,
         weapons: [],
-        blockedReason: "Review the actual readied weapon identity and qualities before resisting Disarm."
+        blockedReason: loc`Review the actual readied weapon identity and qualities before resisting Disarm.`
       };
     weapons.push({
       id,
@@ -45,7 +46,7 @@ export function readiedDisarmWeapons(system, items = []) {
   }
   const blockedReason =
     weapons.reduce((n, w) => n + w.hands, 0) > 2 || new Set(weapons.map(w => w.id)).size !== weapons.length
-      ? "Review which weapons are actually held: use legal grips within two hands, not every equipped inventory entry."
+      ? loc`Review which weapons are actually held: use legal grips within two hands, not every equipped inventory entry.`
       : "";
   return { version: 1, weapons: weapons.sort((a, b) => a.id.localeCompare(b.id)), blockedReason };
 }
@@ -61,7 +62,7 @@ export function disarmResponsePlan(
   if (context?.role !== "defender") return empty;
   const reject = reason => ({ ...empty, active: true, blocked: true, reason });
   if (action !== "standard" || typeof trained !== "boolean" || typeof ranged !== "boolean")
-    return reject("Resist Disarm uses the actual opposed Standard Attack check.");
+    return reject(loc`Resist Disarm uses the actual opposed Standard Attack check.`);
   if (
     context.confirmed !== true ||
     context.lineOfSightConfirmed !== true ||
@@ -73,11 +74,11 @@ export function disarmResponsePlan(
     context.opponentLabel.trim().length > 160
   )
     return reject(
-      "Name the attacker and confirm a legal incoming Disarm, its ranged/melee mode, line of sight and attacker Reach/CQB range."
+      loc`Name the attacker and confirm a legal incoming Disarm, its ranged/melee mode, line of sight and attacker Reach/CQB range.`
     );
   const state = system.disarmWeapons;
   if (!state || state.version !== 1 || !Array.isArray(state.weapons) || state.blockedReason)
-    return reject(state?.blockedReason || "Prepare the actual held weapons before resisting Disarm.");
+    return reject(state?.blockedReason || loc`Prepare the actual held weapons before resisting Disarm.`);
   const target = state.weapons.find(w => w.id === weapon.id),
     ownSize = disarmWeaponSize(system, weapon);
   if (
@@ -89,14 +90,14 @@ export function disarmResponsePlan(
     target.requiredHands !== grip?.required
   )
     return reject(
-      "Choose the exact owned, readied weapon targeted by this Disarm; an unarmed character cannot be disarmed."
+      loc`Choose the exact owned, readied weapon targeted by this Disarm; an unarmed character cannot be disarmed.`
     );
   let opponentSize = DISARM_SIZES.indexOf(context.opponentWeaponSize);
   if (context.opponentWeaponSize === "Unarmed") {
     const body = DISARM_SIZES.indexOf(context.opponentCharacterSize);
-    if (body < 0 || context.incomingRanged) return reject("Confirm the actual Size of an unarmed melee attacker.");
+    if (body < 0 || context.incomingRanged) return reject(loc`Confirm the actual Size of an unarmed melee attacker.`);
     opponentSize = body - 2;
-  } else if (opponentSize < 0) return reject("Confirm the incoming attacker’s actual weapon Size.");
+  } else if (opponentSize < 0) return reject(loc`Confirm the incoming attacker’s actual weapon Size.`);
   let axeBasics, fencingBasics;
   try {
     axeBasics = axeDisarmPlan(system, { ranged });
@@ -142,29 +143,29 @@ export function disarmResponsePlan(
     sizeBonus,
     attackBonus: gearBonus + expertBonus + twoHandBonus + sizeBonus,
     errorIncrease,
-    actionCost: "Opposed response to incoming Disarm; resolve the attacker’s action costs separately",
+    actionCost: loc`Opposed response to incoming Disarm; resolve the attacker’s action costs separately`,
     shots: 0,
     requiresOpposedStandardAttack: true,
     loseFlatFooted: false,
     loseBonusDisarm: false,
     loseFinalAttackStillPossible: false,
     notes: [
-      `Resist Disarm: targeted weapon ${target.name}; opposed Standard Attack, +${twoHandBonus} two-hand grip, +${sizeBonus} weapon Size, +${expertBonus} Expert Disarm; action error +${errorIncrease} (pp.352,356).`,
+      loc`Resist Disarm: targeted weapon ${target.name}; opposed Standard Attack, +${twoHandBonus} two-hand grip, +${sizeBonus} weapon Size, +${expertBonus} Expert Disarm; action error +${errorIncrease} (pp.352,356).`,
       ...(sureGrip
         ? [
-            "Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302)."
+            loc`Sure Grip (SUR): +3 gear only when this exact readied weapon is targeted; applies only when this weapon is targeted (p.302).`
           ]
         : []),
       ...(fencingBasics?.gearBonus
         ? [
-            "Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178)."
+            loc`Fencing Basics: +2 gear with the melee opposed Disarm check while holding a readied one-handed FIN sword (p.178).`
           ]
         : []),
-      ...(gearBonus ? ["Disarm gear bonuses use the highest applicable bonus; they do not stack."] : []),
+      ...(gearBonus ? [loc`Disarm gear bonuses use the highest applicable bonus; they do not stack.`] : []),
       context.incomingRanged
-        ? "Incoming ranged Disarm: neither participant receives a weapon-Size bonus."
-        : "Weapon Size includes an unarmed attacker’s Size minus two categories.",
-      "The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition."
+        ? loc`Incoming ranged Disarm: neither participant receives a weapon-Size bonus.`
+        : loc`Weapon Size includes an unarmed attacker’s Size minus two categories.`,
+      loc`The GC compares opposed results and resolves weapon landing/transfer, flat-footed, counter-Disarm and final attacks separately. This response does not initiate a Disarm or spend ammunition.`
     ]
   };
 }
@@ -198,7 +199,7 @@ export function validateDisarmResponseProof(actor, proof, context = {}) {
     });
   if (p.blocked || !p.active || stable(p) !== stable(proof))
     throw Error(
-      "The targeted readied weapon, Sure Grip, Disarm response or current attack sources changed before posting."
+      loc`The targeted readied weapon, Sure Grip, Disarm response or current attack sources changed before posting.`
     );
 }
 

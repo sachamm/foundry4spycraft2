@@ -1,6 +1,7 @@
 import { combatStanceState } from "./combat-stance.mjs";
 import { weaponUnavailable } from "./gear.mjs";
 import { meleeFamilyProficiency } from "./readied-weapons.mjs";
+import { loc } from "../i18n.mjs";
 /**
  * Knife Basics, p.179.
  *
@@ -45,7 +46,7 @@ export function knifeBasicsPlan(system, items = []) {
     knives,
     notes: active
       ? [
-          "Knife Basics: drawing a knife is a free action and any knife you carry counts as readied (p.179). This does not spend Quick Draw uses and does not place the knife in a hand; attacking still requires a free hand."
+          loc`Knife Basics: drawing a knife is a free action and any knife you carry counts as readied (p.179). This does not spend Quick Draw uses and does not place the knife in a hand; attacking still requires a free hand.`
         ]
       : []
   };
@@ -65,13 +66,13 @@ export function circlingDefensePlan({
   if (!attackerSystem) return { active: false, dodgeReduction: 0 };
   if (typeof ranged !== "boolean" || typeof unoccupiedAdjacentConfirmed !== "boolean")
     throw Error(
-      "Declare whether this is a ranged attack and whether a square adjacent to the Circling Stance attacker is unoccupied."
+      loc`Declare whether this is a ranged attack and whether a square adjacent to the Circling Stance attacker is unoccupied.`
     );
   if (combatStanceState(attackerSystem)?.key !== "circling")
-    throw Error("The selected attacker is not in Circling Stance.");
-  if (ranged) throw Error("Circling Stance applies only to the attacker’s melee attacks.");
+    throw Error(loc`The selected attacker is not in Circling Stance.`);
+  if (ranged) throw Error(loc`Circling Stance applies only to the attacker’s melee attacks.`);
   if (!Number.isFinite(dodgeBonus))
-    throw Error("Prepare the target’s dodge bonus to Defense before applying Circling Stance.");
+    throw Error(loc`Prepare the target’s dodge bonus to Defense before applying Circling Stance.`);
   if (!unoccupiedAdjacentConfirmed || dodgeBonus <= 0)
     return {
       version: 1,

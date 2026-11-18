@@ -5,6 +5,7 @@
  */
 import { checkRecord } from "../rules/record-check.mjs";
 import { RECORD_SHAPES } from "./record-shapes.mjs";
+import { loc } from "../i18n.mjs";
 
 const reported = new Set();
 
@@ -39,7 +40,7 @@ function recordFieldClass() {
       const problems = reportRecord(this.recordName, this.shape, value);
       if (problems.length && globalThis.CONFIG?.debug?.spycraft2Records) {
         throw new Error(
-          `record "${this.recordName}" does not fit its shape: ${problems[0].path || "value"} ${problems[0].problem}`
+          loc`record "${this.recordName}" does not fit its shape: ${problems[0].path || "value"} ${problems[0].problem}`
         );
       }
       return result;
@@ -51,13 +52,13 @@ function recordFieldClass() {
 /** An object field holding the named record. */
 export function record(name, options = {}) {
   const shape = RECORD_SHAPES[name];
-  if (shape === undefined) throw new Error(`No record shape is declared for "${name}".`);
+  if (shape === undefined) throw new Error(loc`No record shape is declared for "${name}".`);
   return new (recordFieldClass())(name, shape, options);
 }
 
 /** A list field whose entries are the named record (the catalog holds the shape as a one-element list). */
 export function recordList(name) {
   const shape = RECORD_SHAPES[name];
-  if (!Array.isArray(shape)) throw new Error(`No list shape is declared for "${name}".`);
+  if (!Array.isArray(shape)) throw new Error(loc`No list shape is declared for "${name}".`);
   return new foundry.data.fields.ArrayField(new (recordFieldClass())(name, shape[0], {}));
 }

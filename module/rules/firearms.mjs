@@ -1,5 +1,6 @@
 import { improvedVisionRangePlan } from "./senses.mjs";
 import { sniperWeapon, eagleEyeState } from "./sniper.mjs";
+import { loc } from "../i18n.mjs";
 /** Weapon Basics Table 4.77, p.299; recoil table key, p.225. */
 export const FIRE_MODES = { single: "Single-Shot", burst: "Burst", auto: "Full Auto" };
 export const FIREARM_CATEGORIES = {
@@ -100,7 +101,7 @@ export function firearmContext(system, weapon, { fireMode = weapon.fireMode, rec
     recoilStrength: strength,
     recoilPenalty: gap ? (mode === "single" ? -1 : -gap) : 0,
     blocked,
-    reason: blocked ? "Choose one of this weapon’s currently available fire modes." : "",
+    reason: blocked ? loc`Choose one of this weapon’s currently available fire modes.` : "",
     legacyModeReview: !weapon.weaponCategory
   };
 }
@@ -122,7 +123,7 @@ export function rangedAttackContext(
       rangeKnown: true,
       rangePenalty: 0,
       rangeBlocked: true,
-      rangeReason: "Enter a nonnegative distance for a weapon with a positive range increment."
+      rangeReason: loc`Enter a nonnegative distance for a weapon with a positive range increment.`
     };
   const base = Number(weapon.maxRangeIncrements) || category?.maxIncrements;
   if (!base)
@@ -130,7 +131,7 @@ export function rangedAttackContext(
       rangeKnown: true,
       rangePenalty: 0,
       rangeBlocked: true,
-      rangeReason: "Set this weapon’s source category or base maximum range increments before measuring its attack."
+      rangeReason: loc`Set this weapon’s source category or base maximum range increments before measuring its attack.`
     };
   const hurled = ["hurled", "exoticHurled"].includes(weapon.proficiency),
     maximum = hurled ? Math.min(10, base + Math.max(0, system.abilities?.str?.mod ?? 0)) : base;
@@ -149,7 +150,7 @@ export function rangedAttackContext(
       distanceFeet
     }),
     rangeBlocked: blocked,
-    rangeReason: blocked ? "The target is beyond this weapon’s maximum range." : ""
+    rangeReason: blocked ? loc`The target is beyond this weapon’s maximum range.` : ""
   };
 }
 
@@ -166,31 +167,31 @@ export function weaponRangeEffects(system, weapon, { firearm = false, loadPenalt
     flat = grenadeBonus + eagleBonus;
   let errorReduction = grenadeBonus ? 2 : 0,
     roundToFive = false;
-  if (grenadeBonus) notes.push("Grenade Basics: range increment +5 ft.; error –2, minimum 1.");
+  if (grenadeBonus) notes.push(loc`Grenade Basics: range increment +5 ft.; error –2, minimum 1.`);
   if (eagleBonus)
     notes.push(
-      `Eagle Eye: range increment ${eagleBonus >= 0 ? "+" : ""}${eagleBonus} ft. for this scene, before range multipliers (p.80).`
+      loc`Eagle Eye: range increment ${eagleBonus >= 0 ? "+" : ""}${eagleBonus} ft. for this scene, before range multipliers (p.80).`
     );
   if (feats.has("Marksmanship Supremacy")) {
     if (firearm) factors.push(2);
     else if (hurled) factors.push(3);
-    if (firearm || hurled) notes.push("Marksmanship Supremacy replaces Mastery’s range benefit.");
+    if (firearm || hurled) notes.push(loc`Marksmanship Supremacy replaces Mastery’s range benefit.`);
   } else if (feats.has("Marksmanship Mastery")) {
     if (firearm) {
       factors.push(1.5);
       roundToFive = true;
     } else if (hurled) factors.push(2);
-    if (firearm || hurled) notes.push("Marksmanship Mastery range benefit.");
+    if (firearm || hurled) notes.push(loc`Marksmanship Mastery range benefit.`);
   }
   if (weapon.proficiency === "indirectFire" && feats.has("Bombard")) {
     factors.push(2);
     errorReduction++;
-    notes.push("Bombard: range increment doubled; error –1, minimum 1.");
+    notes.push(loc`Bombard: range increment doubled; error –1, minimum 1.`);
   }
   if (weapon.proficiency === "guided" && feats.has("Guided Weapon Basics")) {
     factors.push(2);
     errorReduction++;
-    notes.push("Guided Weapon Basics: range increment doubled; error –1, minimum 1.");
+    notes.push(loc`Guided Weapon Basics: range increment doubled; error –1, minimum 1.`);
   }
   const multiplier = factors.length ? 1 + factors.reduce((n, f) => n + f - 1, 0) : 1;
   let increment = ((Number(weapon.range) || 0) + flat) * multiplier;
@@ -232,38 +233,38 @@ export function aimBraceContext(
     threatIncrease: 0,
     notes: []
   });
-  if (!["standard", "autofire", "other"].includes(attackAction)) return reject("Choose a supported attack action.");
-  if ((aimed || braced) && !ranged) return reject("Aim and Brace here apply to ranged attacks.");
+  if (!["standard", "autofire", "other"].includes(attackAction)) return reject(loc`Choose a supported attack action.`);
+  if ((aimed || braced) && !ranged) return reject(loc`Aim and Brace here apply to ranged attacks.`);
   if (braced && !firearm)
     return reject(
-      "This Brace workflow requires a firearm or heavy weapon; special hurled-weapon bracing remains for table resolution."
+      loc`This Brace workflow requires a firearm or heavy weapon; special hurled-weapon bracing remains for table resolution.`
     );
   if (braced && !stableSurface && !feats.has("Marksmanship Basics"))
-    return reject("Brace requires a stable surface or Marksmanship Basics.");
+    return reject(loc`Brace requires a stable surface or Marksmanship Basics.`);
   const aimBonus = aimed && attackAction === "standard" ? (feats.has("Marksmanship Mastery") ? 2 : 1) : 0;
   const braceBonus = braced && ["standard", "autofire"].includes(attackAction) ? 1 : 0;
   let threatIncrease = 0;
   if (braced && feats.has("Sharpshooter Mastery")) threatIncrease++;
   if (aimed && feats.has("Sharpshooter Supremacy")) threatIncrease += 2;
   if (aimed && !trained)
-    notes.push("Untrained Aim takes a full action (Proficiency tag, p.352); its time cannot be reduced.");
+    notes.push(loc`Untrained Aim takes a full action (Proficiency tag, p.352); its time cannot be reduced.`);
   if (aimed)
     notes.push(
-      `Aim remains valid for this target (no movement over 5 ft.): attack +${aimBonus}; Initiative Count +1 when Aim was taken.`
+      loc`Aim remains valid for this target (no movement over 5 ft.): attack +${aimBonus}; Initiative Count +1 when Aim was taken.`
     );
   if (braced)
     notes.push(
-      `Brace remains valid: attacker has not moved and target is in the chosen 90-degree cone; recoil Strength +2; attack +${braceBonus}; Reflex ${bracedReflexPenalty(system)}; Initiative Count +1 when Brace was taken.`
+      loc`Brace remains valid: attacker has not moved and target is in the chosen 90-degree cone; recoil Strength +2; attack +${braceBonus}; Reflex ${bracedReflexPenalty(system)}; Initiative Count +1 when Brace was taken.`
     );
   if (braced && system.conditionContext?.prone === true)
-    notes.push("Prone: Brace may be taken as a free action (p.342).");
+    notes.push(loc`Prone: Brace may be taken as a free action (p.342).`);
   if (aimed && braced)
     notes.push(
       system.conditionContext?.prone === true
-        ? "Prone permits free Brace; Aim uses its normal action."
+        ? loc`Prone permits free Brace; Aim uses its normal action.`
         : feats.has("Marksmanship Basics")
-          ? "Marksmanship Basics permits free Brace with Aim."
-          : "Aim and Brace require separate actions."
+          ? loc`Marksmanship Basics permits free Brace with Aim.`
+          : loc`Aim and Brace require separate actions.`
     );
   return {
     blocked: false,
@@ -300,15 +301,15 @@ export function launcherOperationPlan(
     indirect = indirectFire === true;
   let reason = "";
   if (!["", "underbarrel", "optionalUnderbarrel", "tripodOrVehicle"].includes(requirement))
-    reason = "Review this launcher’s firing-mount requirement.";
+    reason = loc`Review this launcher’s firing-mount requirement.`;
   else if (underbarrel && !["underbarrel", "optionalUnderbarrel"].includes(requirement))
-    reason = "This catalog entry does not provide an underbarrel version.";
+    reason = loc`This catalog entry does not provide an underbarrel version.`;
   else if (tripod && requirement !== "tripodOrVehicle")
-    reason = "This launcher does not provide the automatic launcher’s integral tripod.";
+    reason = loc`This launcher does not provide the automatic launcher’s integral tripod.`;
   else if (requirement === "underbarrel" && !underbarrel)
-    reason = "This launcher may fire only while attached to a compatible rifle’s underbarrel upgrade location (p.270).";
+    reason = loc`This launcher may fire only while attached to a compatible rifle’s underbarrel upgrade location (p.270).`;
   else if (requirement === "tripodOrVehicle" && !tripod && !vehicle)
-    reason = "This automatic grenade launcher requires its integral tripod or attachment to a vehicle (p.270).";
+    reason = loc`This automatic grenade launcher requires its integral tripod or attachment to a vehicle (p.270).`;
   const proficiency = indirect ? "indirectFire" : "tactical",
     ability = indirect ? "int" : "dex",
     untrainedPenalty = indirect ? -10 : -6;
@@ -325,11 +326,11 @@ export function launcherOperationPlan(
     usingIntegralTripod: tripod,
     vehicleMounted: vehicle,
     notes: [
-      `Grenade launcher: ${indirect ? "out-of-sight indirect fire, Indirect/INT, untrained −10" : "direct fire within line of sight, Tactical/DEX, untrained −6"} (p.299).`,
+      loc`Grenade launcher: ${indirect ? loc`out-of-sight indirect fire, Indirect/INT, untrained −10` : loc`direct fire within line of sight, Tactical/DEX, untrained −6`} (p.299).`,
       ...(underbarrel
-        ? ["Compatible rifle underbarrel attachment confirmed; apply the host rifle’s recoil reduction separately."]
+        ? [loc`Compatible rifle underbarrel attachment confirmed; apply the host rifle’s recoil reduction separately.`]
         : []),
-      ...(tripod ? ["Integral tripod in use."] : [])
+      ...(tripod ? [loc`Integral tripod in use.`] : [])
     ]
   };
 }
@@ -340,9 +341,9 @@ export function mortarOperationPlan(weapon, { mortarSpaceConfirmed = false } = {
   const disassembled = weapon.disassembled === true,
     space = mortarSpaceConfirmed === true;
   const reason = disassembled
-    ? "This mortar cannot fire while disassembled (p.315)."
+    ? loc`This mortar cannot fire while disassembled (p.315).`
     : !space
-      ? "Confirm outdoor use or a very large indoor area suitable for the mortar’s high-arc trajectory (p.315)."
+      ? loc`Confirm outdoor use or a very large indoor area suitable for the mortar’s high-arc trajectory (p.315).`
       : "";
   return {
     applicable: true,
@@ -351,6 +352,6 @@ export function mortarOperationPlan(weapon, { mortarSpaceConfirmed = false } = {
     disassembled,
     mortarSpaceConfirmed: space,
     assemblyHalfActions: weapon.assemblyHalfActions ?? 0,
-    notes: ["Mortar: indirect fire; outdoor or very large indoor firing space confirmed (p.315)."]
+    notes: [loc`Mortar: indirect fire; outdoor or very large indoor firing space confirmed (p.315).`]
   };
 }

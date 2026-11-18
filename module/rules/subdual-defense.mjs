@@ -1,5 +1,6 @@
 import { preparedResistanceSource } from "./resistances.mjs";
 import { armorTrainingDRForAttack } from "./armor-training.mjs";
+import { loc } from "../i18n.mjs";
 export const SUBDUAL_ATTACK_KINDS = {
   unarmed: "Unarmed attack",
   meleeWeapon: "Melee weapon",
@@ -9,10 +10,10 @@ export const SUBDUAL_ATTACK_KINDS = {
 };
 export function subdualDefenseSource(system, attackKind) {
   if (!Object.hasOwn(SUBDUAL_ATTACK_KINDS, attackKind))
-    throw new Error("Choose the actual incoming attack’s DR category.");
+    throw new Error(loc`Choose the actual incoming attack’s DR category.`);
   const dr = system.armorDRByAttack?.[attackKind];
   if (!Number.isSafeInteger(dr) || dr < 0 || dr !== armorTrainingDRForAttack(system, attackKind))
-    throw new Error("Prepare and review the listed DR for this attack category.");
+    throw new Error(loc`Prepare and review the listed DR for this attack category.`);
   return {
     attackKind,
     listedDR: dr,
@@ -36,11 +37,11 @@ export function subdualDefensePlan(
     typeof armorPiercingAll !== "boolean" ||
     typeof criticalHit !== "boolean"
   )
-    throw new Error("Confirm whole subdual damage/AP and the actual AP(all)/critical checkboxes.");
+    throw new Error(loc`Confirm whole subdual damage/AP and the actual AP(all)/critical checkboxes.`);
   const source = subdualDefenseSource(system, attackKind),
     temporaryDR = armorPiercingAll ? 0 : Math.max(0, source.listedDR - armorPiercing),
     effectiveDR = temporaryDR * 2;
-  if (!Number.isSafeInteger(effectiveDR)) throw new Error("The doubled subdual DR cannot be represented safely.");
+  if (!Number.isSafeInteger(effectiveDR)) throw new Error(loc`The doubled subdual DR cannot be represented safely.`);
   const afterDR = Math.max(0, rawDamage - effectiveDR),
     bruising = rawDamage > 0 && temporaryDR > 0 && afterDR === 0 ? 1 : 0,
     beforeResistance = afterDR + bruising,

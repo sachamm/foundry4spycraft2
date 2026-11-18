@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Nauseated p.342: the one-final-attack allowance is shared across sources. */
 export const FINAL_ATTACK_WORKFLOWS = new Set([
   "twoWeaponFinalAttack",
@@ -42,7 +43,7 @@ export function validateFinalRoundReservation(actor, reservation) {
     !Number.isSafeInteger(reservation.record?.used) ||
     reservation.record.used < 1
   )
-    throw new Error("Use the final-attack control to reserve the shared round allowance.");
+    throw new Error(loc`Use the final-attack control to reserve the shared round allowance.`);
   const current = actor.system.resourceUses?.finalAttackRound,
     epoch = String(actor.usagePeriods?.round ?? "initial");
   if (
@@ -53,7 +54,7 @@ export function validateFinalRoundReservation(actor, reservation) {
     (reservation.nauseated && current.used > 1)
   )
     throw new Error(
-      "The shared final-attack count, round or Nauseated condition changed. Review the current round before retrying."
+      loc`The shared final-attack count, round or Nauseated condition changed. Review the current round before retrying.`
     );
 }
 export async function withFinalRoundReservation(actor, reservation, perform) {

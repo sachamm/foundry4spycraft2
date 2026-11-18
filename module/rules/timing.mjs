@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** p.102: at most one time-reducing option/effect; p.101 Cross-Check triples required time. */
 export function skillTimingPlan({
   method = "roll",
@@ -50,7 +51,7 @@ export function skillTimingPlan({
     reduction === "auto"
       ? choices.filter(c => c.automatic !== false).sort(compare)[0]
       : choices.find(c => c.id === reduction);
-  if (!selected) throw new Error("The selected time reduction is not available for this check and method.");
+  if (!selected) throw new Error(loc`The selected time reduction is not available for this check and method.`);
   const cross = crossCheck ? 3 : 1,
     minimum = Math.max(selected.minimum, minimumRequired) * cross;
   const minimumTime =
@@ -77,6 +78,6 @@ export function skillTimingPlan({
     notes:
       selected.id === "none"
         ? ""
-        : `${selected.name}: the single applied time reduction (p.102); ${selected.multiplier}× listed time${crossCheck ? " before Cross-Check" : ""}.${selected.errorIncrease ? ` Error range +${selected.errorIncrease}.` : ""}${selected.rounding ? ` Round ${selected.rounding}${crossCheck ? " before tripling for Cross-Check" : ""}.` : ""}${seconds === null && reduction === "auto" ? " Variable time: automatic selection compares multipliers and minima; choose a source explicitly if its minimum would make another option faster." : ""}`
+        : loc`${selected.name}: the single applied time reduction (p.102); ${selected.multiplier}× listed time${crossCheck ? loc` before Cross-Check` : ""}.${selected.errorIncrease ? loc` Error range +${selected.errorIncrease}.` : ""}${selected.rounding ? loc` Round ${selected.rounding}${crossCheck ? loc` before tripling for Cross-Check` : ""}.` : ""}${seconds === null && reduction === "auto" ? loc` Variable time: automatic selection compares multipliers and minima; choose a source explicitly if its minimum would make another option faster.` : ""}`
   };
 }

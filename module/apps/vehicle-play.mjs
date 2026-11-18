@@ -26,6 +26,7 @@ import { gadgetDamage, gadgetState } from "../rules/gear-play-rules.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { explosionPlan } from "../rules/vehicle-environment.mjs";
 import { VEHICLE_STAT_KEYS, vehicleStats } from "../data/vehicle-fields.mjs";
+import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const speakerFor = doc => ChatMessage.getSpeaker({ actor: doc.documentName === "Actor" ? doc : doc.parent });
@@ -61,16 +62,16 @@ async function damageInput(title, { vehicle = false, flammable = false } = {}) {
   const input = await ask(
     title,
     `
-      <label>Lethal damage suffered <input name="damage" type="number" min="1" step="1" required autofocus /></label>
-      <label>Armor-piercing <input name="armorPiercing" type="number" min="0" step="1" value="0" /></label>
-      <label><input name="blast" type="checkbox" /> The damage has a blast increment</label>
-      <label><input name="fire" type="checkbox" /> Fire damage${flammable ? " (Flammable: −5 to the save, damage doubled)" : ""}</label>
-      <label><input name="critical" type="checkbox" /> An activated critical hit${vehicle ? " (also rolls a Vehicle Damage result)" : ""}</label>`
+      <label>${loc`Lethal damage suffered`} <input name="damage" type="number" min="1" step="1" required autofocus /></label>
+      <label>${loc`Armor-piercing`} <input name="armorPiercing" type="number" min="0" step="1" value="0" /></label>
+      <label><input name="blast" type="checkbox" /> ${loc`The damage has a blast increment`}</label>
+      <label><input name="fire" type="checkbox" /> ${loc`Fire damage${flammable ? loc` (Flammable: −5 to the save, damage doubled)` : ""}`}</label>
+      <label><input name="critical" type="checkbox" /> ${loc`An activated critical hit${vehicle ? loc` (also rolls a Vehicle Damage result)` : ""}`}</label>`
   );
   if (!input) return null;
   const damage = Number(input.damage);
   if (!Number.isSafeInteger(damage) || damage < 1) {
-    ui.notifications.warn("Enter the whole number of lethal damage points suffered.");
+    ui.notifications.warn(loc`Enter the whole number of lethal damage points suffered.`);
     return null;
   }
   return {
@@ -88,7 +89,7 @@ async function damageInput(title, { vehicle = false, flammable = false } = {}) {
  */
 export async function rollObjectDamageSave(doc, options = {}) {
   const bonus0 = saveBonusOf(doc);
-  if (!Number.isSafeInteger(bonus0)) return ui.notifications.warn(`${doc.name} has no Damage save bonus recorded.`);
+  if (!Number.isSafeInteger(bonus0)) return ui.notifications.warn(loc`${doc.name} has no Damage save bonus recorded.`);
   const vehicle = isVehicleActor(doc),
     qualities = vehicle ? doc.system.qualitiesNow : "";
   const flammable = vehicle && hasQuality(qualities, "FLM");
@@ -110,21 +111,21 @@ export async function rollObjectDamageSave(doc, options = {}) {
     state = breakState(size, after);
 
   const lines = [
-    `<strong>${esc(doc.name)}</strong> — Damage save, DC ${dc} (${damage} damage${fireDoubled ? ", fire doubled" : ""}${input.blast ? ", blast" : ""}${input.critical ? ", critical hit" : ""})`
+    `<strong>${esc(doc.name)}</strong> ${loc`— Damage save, DC ${dc} (${damage} damage${fireDoubled ? ", fire doubled" : ""}${input.blast ? ", blast" : ""}${input.critical ? ", critical hit" : ""})`}`
   ];
   if (vehicle && bonus !== doc.system.damageSave)
     lines.push(
-      `Save bonus +${bonus}${hasQuality(qualities, "RGD") ? " (Rugged included)" : ""}${input.fire && flammable ? " (Flammable −5)" : ""}.`
+      loc`Save bonus +${bonus}${hasQuality(qualities, "RGD") ? loc` (Rugged included)` : ""}${input.fire && flammable ? loc` (Flammable −5)` : ""}.`
     );
-  if (!failed) lines.push("Saved.");
+  if (!failed) lines.push(loc`Saved.`);
   else
     lines.push(
-      `Failed ${failed} save${failed === 1 ? "" : "s"}: ${after} of ${state.brokenAt} to break, ${state.destroyedAt} to destroy. Now <strong>${state.state}</strong>.`
+      `${loc`Failed ${failed} save${failed === 1 ? "" : "s"}: ${after} of ${state.brokenAt} to break, ${state.destroyedAt} to destroy. Now`} <strong>${state.state}</strong>.`
     );
   if (input.critical) {
     const dice = criticalDiceForSize(size) + (vehicle ? heavyArmorDice(qualities) : 0);
     lines.push(
-      `Activating this critical hit costs the attacker ${dice} action di${dice === 1 ? "e" : "ce"}${vehicle && heavyArmorDice(qualities) ? " (Heavy Armor included)" : ""}.`
+      loc`Activating this critical hit costs the attacker ${dice} action di${dice === 1 ? "e" : "ce"}${vehicle && heavyArmorDice(qualities) ? loc` (Heavy Armor included)` : ""}.`
     );
   }
 
@@ -133,7 +134,7 @@ export async function rollObjectDamageSave(doc, options = {}) {
   if (failed && mechanisms.length) {
     const result = gadgetDamage({ mechanisms }, failed);
     lines[lines.length - (input.critical ? 2 : 1)] =
-      `Failed ${failed} save${failed === 1 ? "" : "s"}: loses ${result.lost.map(m => esc(m.name)).join(", ")}.${result.destroyed ? " Its last mechanism is gone: the housing is <strong>destroyed</strong>." : ""}`;
+      `Failed ${failed} save${failed === 1 ? "" : "s"}: loses ${result.lost.map(m => esc(m.name)).join(", ")}.${result.destroyed ? ` ${loc`Its last mechanism is gone: the housing is`} <strong>${loc`destroyed`}</strong>.` : ""}`;
     const message = await roll.toMessage({
       speaker: speakerFor(doc),
       flavor: lines.join("<br>"),
@@ -182,7 +183,7 @@ export async function rollVehicleDamageResult(
   { failed = 1, damage = null, armorPiercing = 0, fire = false } = {}
 ) {
   if (!actor.system.vehicleClass)
-    return ui.notifications.warn("Choose this vehicle's category before rolling a Vehicle Damage result.");
+    return ui.notifications.warn(loc`Choose this vehicle's category before rolling a Vehicle Damage result.`);
   let roll,
     location,
     rerolls = 0;
@@ -193,15 +194,15 @@ export async function rollVehicleDamageResult(
   const counter = COUNTER_BY_LOCATION[location.code];
   const saveBonus = actor.system.damageSaveNow ?? actor.system.damageSave ?? 0;
   const lines = [
-    `<strong>${esc(actor.name)}</strong> — Vehicle Damage result: <strong>${esc(location.label)}</strong> ×${failed} (p.${VEHICLE_RULES.damagePage})${rerolls ? ` after ${rerolls} reroll${rerolls === 1 ? "" : "s"}` : ""}`
+    `<strong>${esc(actor.name)}</strong> ${loc`— Vehicle Damage result:`} <strong>${esc(location.label)}</strong> ${loc`×${failed} (p.${VEHICLE_RULES.damagePage})${rerolls ? ` after ${rerolls} reroll${rerolls === 1 ? "" : "s"}` : ""}`}`
   ];
   const passOn = (min = 1) =>
     Number.isSafeInteger(damage) ? secondaryDamage({ damage, saveBonus, armorPiercing, minimum: min }) : null;
-  if (counter) lines.push("Recorded on the vehicle; its current ratings are updated.");
+  if (counter) lines.push(loc`Recorded on the vehicle; its current ratings are updated.`);
   else if (location.code === "Tract") {
     const half = hasQuality(actor.system.qualitiesNow, "TRK");
     lines.push(
-      `A tyre${half ? " (tracks: against half damage)" : ""} must make its own Damage save${damage ? ` against ${half ? Math.floor(damage / 2) : damage} damage` : ""} (bonus +${tractionSaveBonus(objectSize(actor))}). Use “Tyre save” on the vehicle sheet.`
+      loc`A tyre${half ? loc` (tracks: against half damage)` : ""} must make its own Damage save${damage ? loc` against ${half ? Math.floor(damage / 2) : damage} damage` : ""} (bonus +${tractionSaveBonus(objectSize(actor))}). Use “Tyre save” on the vehicle sheet.`
     );
   } else if (["Cargo", "W/G", "Occ", "Animal"].includes(location.code)) {
     const amount = passOn(location.code === "Animal" ? 0 : 1);
@@ -215,36 +216,36 @@ export async function rollVehicleDamageResult(
       const aboard = occupantsOf(actor),
         victim = aboard.length ? aboard[Math.floor(Math.random() * aboard.length)] : null;
       lines.push(
-        `${victim ? `<strong>${esc(victim.name)}</strong>` : what} takes ${amount ?? "the attack's damage minus the vehicle's Damage save bonus"}${amount !== null ? " damage" : ""}${victim ? "" : " (no occupants listed on the vehicle)"}.`
+        loc`${victim ? `<strong>${esc(victim.name)}</strong>` : what} takes ${amount ?? loc`the attack's damage minus the vehicle's Damage save bonus`}${amount !== null ? " damage" : ""}${victim ? "" : loc` (no occupants listed on the vehicle)`}.`
       );
     } else
       lines.push(
-        `${what} takes ${amount ?? "the attack's damage minus the vehicle's Damage save bonus"}${amount !== null ? " damage" : ""}.`
+        loc`${what} takes ${amount ?? loc`the attack's damage minus the vehicle's Damage save bonus`}${amount !== null ? " damage" : ""}.`
       );
   } else if (location.code === "Rotors") {
     const amount = passOn(1);
     if (amount === null)
       lines.push(
-        "The rotors make a Damage save against the attack's damage minus the vehicle's Damage save bonus; failure crashes the aircraft (p.365)."
+        loc`The rotors make a Damage save against the attack's damage minus the vehicle's Damage save bonus; failure crashes the aircraft (p.365).`
       );
     else {
       const dc = damageSaveDC(amount),
         save = await new Roll("1d20 + @bonus", { bonus: saveBonus }).evaluate();
       lines.push(
-        `Rotor Damage save against ${amount}: ${save.total} vs DC ${dc} — ${save.total >= dc ? "the rotors hold" : "<strong>the rotors shatter and the aircraft crashes</strong> (p.365)"}.`
+        loc`Rotor Damage save against ${amount}: ${save.total} vs DC ${dc} — ${save.total >= dc ? loc`the rotors hold` : `<strong>${loc`the rotors shatter and the aircraft crashes`}</strong> (p.365)`}.`
       );
     }
-  } else lines.push("Resolve this result from the page above; nothing is recorded automatically.");
+  } else lines.push(loc`Resolve this result from the page above; nothing is recorded automatically.`);
   for (const [code, label] of [
     ["HOT", "Hot"],
     ["LUX", "Luxury"]
   ])
     if (hasQuality(actor.system.qualitiesNow, code))
-      lines.push(`${label} may be lost to this critical hit (p.294); restore it with a Mechanics/Repair check.`);
+      lines.push(loc`${label} may be lost to this critical hit (p.294); restore it with a Mechanics/Repair check.`);
   const burning = location.code === "Fuel" && (fire || actor.system.onFire);
   if (burning)
     lines.push(
-      `The vehicle ${actor.system.onFire ? "is" : "catches"} on fire: its remaining fuel explodes (Table ${VEHICLE_RULES.explosions.table}).`
+      loc`The vehicle ${actor.system.onFire ? "is" : "catches"} on fire: its remaining fuel explodes (Table ${VEHICLE_RULES.explosions.table}).`
     );
   const message = await roll.toMessage({ speaker: speakerFor(actor), flavor: lines.join("<br>") });
   if (counter && actor.isOwner)
@@ -266,12 +267,12 @@ export async function rollFuelExplosion(actor) {
   if (!plan.explodes)
     return ChatMessage.create({
       speaker: speakerFor(actor),
-      content: `<strong>${esc(actor.name)}</strong> — no fuel explosion. ${esc(plan.reason)}`
+      content: `<strong>${esc(actor.name)}</strong> ${loc`— no fuel explosion. ${esc(plan.reason)}`}`
     });
   const roll = await new Roll(plan.formula).evaluate();
   return roll.toMessage({
     speaker: speakerFor(actor),
-    flavor: `<strong>${esc(actor.name)}</strong> — fuel explosion (Table ${VEHICLE_RULES.explosions.table}, p.${plan.page}): ${plan.dice} explosive fire × ${plan.multiplier} hour${plan.multiplier === 1 ? "" : "s"} of fuel, blast increment ${plan.blast} square${plan.blast === 1 ? "" : "s"}, AP ${plan.ap}.${plan.houseRule ? ` ${esc(plan.houseRule)}` : ""}`,
+    flavor: `<strong>${esc(actor.name)}</strong> ${loc`— fuel explosion (Table ${VEHICLE_RULES.explosions.table}, p.${plan.page}): ${plan.dice} explosive fire × ${plan.multiplier} hour${plan.multiplier === 1 ? "" : "s"} of fuel, blast increment ${plan.blast} square${plan.blast === 1 ? "" : "s"}, AP ${plan.ap}.${plan.houseRule ? ` ${esc(plan.houseRule)}` : ""}`}`,
     flags: {
       spycraft2: { fuelExplosion: { uuid: actor.uuid, total: roll.total, blast: plan.blast, armorPiercing: plan.ap } }
     }
@@ -283,14 +284,14 @@ export async function rollTyreSave(actor, options = {}) {
   let damage = options.damage;
   if (!Number.isSafeInteger(damage)) {
     const input = await ask(
-      `${actor.name}: tyre Damage save`,
-      '<label>Damage of the attack that hit the tyre <input name="damage" type="number" min="1" step="1" required autofocus /></label>'
+      loc`${actor.name}: tyre Damage save`,
+      `<label>${loc`Damage of the attack that hit the tyre`} <input name="damage" type="number" min="1" step="1" required autofocus /></label>`
     );
     if (!input) return null;
     damage = Number(input.damage);
   }
   if (!Number.isSafeInteger(damage) || damage < 1)
-    return ui.notifications.warn("Enter the whole number of damage points.");
+    return ui.notifications.warn(loc`Enter the whole number of damage points.`);
   const tracked = hasQuality(actor.system.qualitiesNow ?? actor.system.qualities, "TRK"),
     against = tracked ? Math.max(1, Math.floor(damage / 2)) : damage;
   const size = sizeCode(objectSize(actor)),
@@ -301,7 +302,7 @@ export async function rollTyreSave(actor, options = {}) {
     punctured = roll.total < dc;
   const message = await roll.toMessage({
     speaker: speakerFor(actor),
-    flavor: `<strong>${esc(actor.name)}</strong> — tyre Damage save, DC ${dc}${tracked ? " (tracks: half damage)" : ""} (bonus +${bonus}${houseRule ? ", house rule" : ""})<br>${punctured ? "Punctured: recorded on the vehicle." : "The tyre holds."}`
+    flavor: `<strong>${esc(actor.name)}</strong> ${loc`— tyre Damage save, DC ${dc}${tracked ? loc` (tracks: half damage)` : ""} (bonus +${bonus}${houseRule ? loc`, house rule` : ""})`}<br>${punctured ? loc`Punctured: recorded on the vehicle.` : loc`The tyre holds.`}`
   });
   if (punctured && actor.isOwner)
     await actor.update({ "system.damage.traction": (actor.system.damage?.traction ?? 0) + 1 });
@@ -322,14 +323,14 @@ export function repairVehicle(actor) {
 
 /** Record hours of travel (double above cruising speed) or combat/chase rounds (a minute each). */
 export async function spendFuel(actor, { hours = null, rounds = 0, aboveCruising = false } = {}) {
-  if (!actor.system.fuel) return ui.notifications.warn(`${actor.name} has no fuel range to track.`);
+  if (!actor.system.fuel) return ui.notifications.warn(loc`${actor.name} has no fuel range to track.`);
   if (hours === null && !rounds) {
     const input = await ask(
-      `${actor.name}: fuel used`,
+      loc`${actor.name}: fuel used`,
       `
-      <label>Hours of travel <input name="hours" type="number" min="0" step="any" value="1" /></label>
-      <label><input name="aboveCruising" type="checkbox"${actor.system.aboveCruising ? " checked" : ""} /> Above cruising speed (uses fuel twice as fast)</label>
-      <label>Combat or chase rounds (a minute each) <input name="rounds" type="number" min="0" step="1" value="0" /></label>`
+      <label>${loc`Hours of travel`} <input name="hours" type="number" min="0" step="any" value="1" /></label>
+      <label><input name="aboveCruising" type="checkbox"${actor.system.aboveCruising ? " checked" : ""} /> ${loc`Above cruising speed (uses fuel twice as fast)`}</label>
+      <label>${loc`Combat or chase rounds (a minute each)`} <input name="rounds" type="number" min="0" step="1" value="0" /></label>`
     );
     if (!input) return null;
     ({ hours, rounds, aboveCruising } = {
@@ -345,7 +346,7 @@ export async function spendFuel(actor, { hours = null, rounds = 0, aboveCruising
   if (left?.empty)
     await ChatMessage.create({
       speaker: speakerFor(actor),
-      content: `<strong>${esc(actor.name)}</strong> is out of fuel.${actor.system.vehicleClass && ["PSA", "PFA", "SVA", "RWA"].includes(actor.system.vehicleClass) && actor.system.moving ? " A moving aircraft out of fuel needs a Maneuver check to land (p.291)." : ""}`
+      content: `<strong>${esc(actor.name)}</strong> ${loc`is out of fuel.${actor.system.vehicleClass && ["PSA", "PFA", "SVA", "RWA"].includes(actor.system.vehicleClass) && actor.system.moving ? loc` A moving aircraft out of fuel needs a Maneuver check to land (p.291).` : ""}`}`
     });
   return used;
 }
@@ -361,7 +362,7 @@ export async function boardVehicle(actor, character, { role = null } = {}) {
   if (!character?.uuid || character.type === "vehicle") return null;
   const s = actor.system,
     aboard = s.occupants.some(o => o.uuid === character.uuid) || s.driver === character.uuid;
-  if (aboard) return ui.notifications.info(`${character.name} is already aboard.`);
+  if (aboard) return ui.notifications.info(loc`${character.name} is already aboard.`);
   // A mount whose statistics say "NPC" takes the dropped NPC as its animal when none is linked yet.
   if (!role && character.type === "npc" && s.vehicleClass === "M/AD" && !s.mountNpc && s.defenseSave === "NPC")
     return actor.update({ "system.mountNpc": character.uuid });
@@ -380,14 +381,14 @@ export const setOccupantRole = (actor, index, role) =>
 /** Reflex save to bail out (DC 15, ejection seats +6 for crew): rolled by the occupant, reported with the DC. */
 export async function bailOutOf(actor, uuid) {
   const occupant = fromUuidSync(uuid);
-  if (!occupant) return ui.notifications.warn("That occupant no longer exists.");
-  if (!occupant.isOwner) return ui.notifications.warn(`Only ${occupant.name}'s owner or the GC can roll this save.`);
+  if (!occupant) return ui.notifications.warn(loc`That occupant no longer exists.`);
+  if (!occupant.isOwner) return ui.notifications.warn(loc`Only ${occupant.name}'s owner or the GC can roll this save.`);
   const role =
     uuid === actor.system.driver ? "crew" : (actor.system.occupants.find(o => o.uuid === uuid)?.role ?? "passenger");
   const plan = bailOut(actor.system, { role });
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: occupant }),
-    content: `<strong>${esc(occupant.name)}</strong> bails out of ${esc(actor.name)}: Reflex save DC ${plan.dc}${plan.bonus ? `, +${plan.bonus} from the ejection seat` : ""}. Pass or fail, it uses the next bonus 5-ft. step.`
+    content: `<strong>${esc(occupant.name)}</strong> ${loc`bails out of ${esc(actor.name)}: Reflex save DC ${plan.dc}${plan.bonus ? loc`, +${plan.bonus} from the ejection seat` : ""}. Pass or fail, it uses the next bonus 5-ft. step.`}`
   });
   return occupant.rollSave?.("ref", { askContext: true });
 }
@@ -406,22 +407,22 @@ export function skeletonCrewFor(actor, teamSize) {
 /** The driver makes a Maneuver check with the vehicle's skill, Drive focus, untrained penalty and error increases. */
 export async function rollControlCheck(actor, { modifier = null, topMphBonus = false } = {}) {
   const driver = actor.system.driver ? fromUuidSync(actor.system.driver) : null;
-  if (!driver) return ui.notifications.warn("Drop a character on the vehicle sheet to set the driver first.");
-  if (!driver.isOwner) return ui.notifications.warn(`Only ${driver.name}'s owner or the GC can roll this check.`);
+  if (!driver) return ui.notifications.warn(loc`Drop a character on the vehicle sheet to set the driver first.`);
+  if (!driver.isOwner) return ui.notifications.warn(loc`Only ${driver.name}'s owner or the GC can roll this check.`);
   if (typeof driver.rollSkill !== "function")
-    return ui.notifications.warn(`${driver.name} cannot make skill checks here.`);
+    return ui.notifications.warn(loc`${driver.name} cannot make skill checks here.`);
   const hazards = actor.system.hazardEffect ?? null;
   const plan = controlCheckPlan(actor.system, driver.system, { hazards });
   if (plan.blocked) return ui.notifications.warn(plan.blocked);
   const hazardNote = hazards?.rows?.length ? actor.system.hazardSummary : "";
   if (modifier === null) {
     const input = await ask(
-      `${actor.name}: control check (${plan.skillName}/Maneuver)`,
+      loc`${actor.name}: control check (${plan.skillName}/Maneuver)`,
       `
       <p>${esc(plan.note)}</p>${hazardNote ? `<p>${esc(hazardNote)}</p>` : ""}
-      <label>Other modifier (Strategy, situation) <input name="modifier" type="number" step="1" value="0" /></label>
-      <label><input name="topMphBonus" type="checkbox" /> Chase: this vehicle has the fastest top MPH (Maneuvering Room bonus)</label>
-      <label>Chase Maneuvering Room <select name="room"><option value="0">—</option><option value="6">Open +6</option><option value="4">Close +4</option><option value="2">Crowded +2</option><option value="0">Tight +0</option></select></label>`
+      <label>${loc`Other modifier (Strategy, situation)`} <input name="modifier" type="number" step="1" value="0" /></label>
+      <label><input name="topMphBonus" type="checkbox" /> ${loc`Chase: this vehicle has the fastest top MPH (Maneuvering Room bonus)`}</label>
+      <label>${loc`Chase Maneuvering Room`} <select name="room"><option value="0">—</option><option value="6">${loc`Open +6`}</option><option value="4">${loc`Close +4`}</option><option value="2">${loc`Crowded +2`}</option><option value="0">${loc`Tight +0`}</option></select></label>`
     );
     if (!input) return null;
     modifier = (Number(input.modifier) || 0) + (input.topMphBonus ? Number(input.room) || 0 : 0);
@@ -436,7 +437,7 @@ export async function rollControlCheck(actor, { modifier = null, topMphBonus = f
     vehicleErrorIncrease: plan.errorIncrease,
     vehicleControl: {
       vehicleUuid: actor.uuid,
-      note: `${plan.note}${hazardNote ? ` ${hazardNote}` : ""}${topMphBonus ? " Fastest vehicle in the chase." : ""}`
+      note: `${plan.note}${hazardNote ? ` ${hazardNote}` : ""}${topMphBonus ? loc` Fastest vehicle in the chase.` : ""}`
     }
   });
 }
@@ -449,19 +450,19 @@ export async function rollControlCheck(actor, { modifier = null, topMphBonus = f
 export async function fireMountedWeapon(actor, itemId, gunnerUuid = null) {
   const weapon = actor.items.get(itemId);
   if (!weapon || weapon.type !== "weapon")
-    return ui.notifications.warn("That is not a weapon installed on this vehicle.");
+    return ui.notifications.warn(loc`That is not a weapon installed on this vehicle.`);
   const aboard = occupantsOf(actor);
   let gunner = gunnerUuid ? fromUuidSync(gunnerUuid) : aboard.length === 1 ? aboard[0] : null;
   if (!gunner) {
-    if (!aboard.length) return ui.notifications.warn("Nobody is aboard to fire this weapon.");
+    if (!aboard.length) return ui.notifications.warn(loc`Nobody is aboard to fire this weapon.`);
     const input = await ask(
-      `${weapon.name}: gunner`,
-      `<label>Gunner <select name="gunner">${aboard.map(a => `<option value="${a.uuid}">${esc(a.name)}</option>`).join("")}</select></label>`
+      loc`${weapon.name}: gunner`,
+      `<label>${loc`Gunner`} <select name="gunner">${aboard.map(a => `<option value="${a.uuid}">${esc(a.name)}</option>`).join("")}</select></label>`
     );
     if (!input) return null;
     gunner = fromUuidSync(input.gunner);
   }
-  if (!gunner?.isOwner) return ui.notifications.warn("Only the gunner's owner or the GC can fire this weapon.");
+  if (!gunner?.isOwner) return ui.notifications.warn(loc`Only the gunner's owner or the GC can fire this weapon.`);
   let copy = gunner.items.find(i => i.getFlag("spycraft2", "mountedOn")?.itemUuid === weapon.uuid);
   if (!copy) {
     const data = weapon.toObject();
@@ -519,7 +520,7 @@ export function installVehicleCombatHooks(hooks = globalThis.Hooks) {
         await ChatMessage.create({
           speaker: speakerFor(vehicle),
           whisper: ChatMessage.getWhisperRecipients("GM").map(u => u.id),
-          content: `<strong>${esc(vehicle.name)}</strong>: if it is going faster than half its cruising MPH over this ground, roll one Vehicle Damage result this round.`
+          content: `<strong>${esc(vehicle.name)}</strong>${loc`: if it is going faster than half its cruising MPH over this ground, roll one Vehicle Damage result this round.`}`
         });
     }
   });
@@ -534,7 +535,7 @@ installVehicleCombatHooks();
 export async function deployVehicle(item) {
   if (item.type !== "vehicle") return null;
   if (!game.user.can("ACTOR_CREATE"))
-    return ui.notifications.warn("You do not have permission to create actors; ask the GC to place this vehicle.");
+    return ui.notifications.warn(loc`You do not have permission to create actors; ask the GC to place this vehicle.`);
   const actor = await Actor.implementation.create({
     name: item.name,
     type: "vehicle",

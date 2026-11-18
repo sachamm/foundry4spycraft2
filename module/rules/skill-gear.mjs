@@ -1,4 +1,5 @@
 import { toolShedKitState } from "./tool-shed.mjs";
+import { loc } from "../i18n.mjs";
 const normalize = value =>
   String(value ?? "")
     .trim()
@@ -22,7 +23,7 @@ export function skillGearPlan(
   if (!tags.length) return { required: false, bonuses: [], capIncrease: 0, blockedReason: "", notes: [] };
   const allowed = ["available", "missing", "unknown"],
     reasons = [];
-  if (!allowed.includes(gearStatus)) reasons.push("Choose whether all required gear is available.");
+  if (!allowed.includes(gearStatus)) reasons.push(loc`Choose whether all required gear is available.`);
   const tool = toolShedKitState(system, gearItem);
   if (tool.applicable && tool.blockedReason) reasons.push(tool.blockedReason);
   const s = gearItem?.system ?? {},
@@ -44,13 +45,13 @@ export function skillGearPlan(
     grade = matching?.grade;
   const inferred = gearStatus === "unknown" && kit && tags.length === 1 ? "available" : gearStatus;
   if (inferred === "unknown")
-    reasons.push("Confirm whether all gear required by this named check is available before rolling.");
+    reasons.push(loc`Confirm whether all gear required by this named check is available before rolling.`);
   if (inferred === "missing" && tags.some(t => t.only))
-    reasons.push("Gear Only: this check automatically fails without all required gear (p.101); no roll is made.");
+    reasons.push(loc`Gear Only: this check automatically fails without all required gear (p.101); no roll is made.`);
   if (kit && (!Number.isSafeInteger(grade) || grade < 1 || grade > 3))
-    reasons.push("Review the selected kit’s grade before using it.");
+    reasons.push(loc`Review the selected kit’s grade before using it.`);
   if (kit && s.kitNonPortable && (!String(s.kitLocation ?? "").trim() || kitAtLocation !== true))
-    reasons.push("Use the non-portable kit at its recorded location and confirm that location.");
+    reasons.push(loc`Use the non-portable kit at its recorded location and confirm that location.`);
   const useKit = !!kit && inferred === "available" && !reasons.length,
     bonuses =
       inferred === "missing" && !tags.some(t => t.only)
@@ -60,7 +61,7 @@ export function skillGearPlan(
   const capIncrease = useKit && grade === 3 ? 5 : 0,
     requirements = tags.map(t => t.requirement),
     notes = [
-      `Required gear: ${requirements.join("; ")}; ${inferred}.${inferred === "missing" && !tags.some(t => t.only) ? " Missing gear: −4 gear penalty." : ""}${useKit ? ` ${kit.name}: Grade ${grade}${grade >= 2 ? ", +1 gear bonus" : ""}${capIncrease ? ", cap +5" : ""}${s.kitNonPortable ? " at " + s.kitLocation : ""}.` : ""}`
+      loc`Required gear: ${requirements.join("; ")}; ${inferred}.${inferred === "missing" && !tags.some(t => t.only) ? loc` Missing gear: −4 gear penalty.` : ""}${useKit ? loc` ${kit.name}: Grade ${grade}${grade >= 2 ? loc`, +1 gear bonus` : ""}${capIncrease ? loc`, cap +5` : ""}${s.kitNonPortable ? " at " + s.kitLocation : ""}.` : ""}`
     ];
   return {
     toolShedKit: useKit && tool.valid ? tool.evidence : null,

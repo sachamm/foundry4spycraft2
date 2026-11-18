@@ -1,4 +1,5 @@
 import { toolShedKitState } from "./tool-shed.mjs";
+import { loc } from "../i18n.mjs";
 /** Intruder Criminal Mind: Improvisation, p.38. Generated objects do not spend foresight reserves. */
 export function hasImprovisation(system) {
   return (system.classOptionSelections ?? []).some(e => e.classId === "intruder" && e.name === "Improvisation");
@@ -15,15 +16,15 @@ export function improvisationPlan(
     at = 0
   } = {}
 ) {
-  if (!hasImprovisation(system)) throw new Error("An earned Intruder Improvisation option is required.");
+  if (!hasImprovisation(system)) throw new Error(loc`An earned Intruder Improvisation option is required.`);
   if (commonConfirmed !== true || fullActionConfirmed !== true)
-    throw new Error("Confirm this is a Common Item and spend the required full action.");
+    throw new Error(loc`Confirm this is a Common Item and spend the required full action.`);
   name = String(name).trim();
   weight = Number(weight);
   if (!name || !Number.isFinite(weight) || weight < 0)
-    throw new Error("Name the Common Item and enter its nonnegative weight in pounds.");
+    throw new Error(loc`Name the Common Item and enter its nonnegative weight in pounds.`);
   if (!/^[A-Za-z0-9_-]+$/.test(id) || system.classGearGrants?.[id])
-    throw new Error("A new unique grant identifier is required.");
+    throw new Error(loc`A new unique grant identifier is required.`);
   const epoch = String(system.usagePeriods?.mission ?? "initial");
   return {
     id,
@@ -68,13 +69,13 @@ export function classGearWarnings(system, items) {
     }
     if (!managedClassGearGrant(system, item))
       warnings.push(
-        `${item.name}: review its class-granted Common Item provenance and conflicting acquisition fields.`
+        loc`${item.name}: review its class-granted Common Item provenance and conflicting acquisition fields.`
       );
     if ((item.system.quantity ?? 1) > 1)
-      warnings.push(`${item.name}: Improvisation grants one object; review its excess quantity.`);
+      warnings.push(loc`${item.name}: Improvisation grants one object; review its excess quantity.`);
     if (item.system.classGearGrant.epoch !== epoch)
       warnings.push(
-        `${item.name}: improvised during an earlier mission; review its disposition before the next mission.`
+        loc`${item.name}: improvised during an earlier mission; review its disposition before the next mission.`
       );
   }
   return warnings;

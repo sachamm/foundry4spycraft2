@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Sniper p.80: firearm and hurled categories are narrower than the shared heavy-weapon firing workflow. */
 export function sniperWeapon(weapon) {
   return (
@@ -6,7 +7,7 @@ export function sniperWeapon(weapon) {
   );
 }
 export function eagleEyeDiePlan(system) {
-  if (!system.coreClassIds?.includes("sniper")) throw new Error("Eagle Eye requires the Sniper core ability.");
+  if (!system.coreClassIds?.includes("sniper")) throw new Error(loc`Eagle Eye requires the Sniper core ability.`);
   const ad = system.actionDice ?? {},
     die = ad.die,
     explodeAt = ad.explodeAt ?? die,
@@ -18,7 +19,7 @@ export function eagleEyeDiePlan(system) {
     explodeAt > die ||
     !Number.isSafeInteger(bonus)
   )
-    throw new Error("Review the default action die before using Eagle Eye.");
+    throw new Error(loc`Review the default action die before using Eagle Eye.`);
   return { die, explodeAt, bonus, formula: `1d${die}x>=${explodeAt} + ${bonus}` };
 }
 export function eagleEyeRecord(system, plan, roll, { scene = "initial" } = {}) {
@@ -32,7 +33,7 @@ export function eagleEyeRecord(system, plan, roll, { scene = "initial" } = {}) {
     result !== rolled + plan.bonus ||
     !Number.isSafeInteger(rangeIncrease)
   )
-    throw new Error("The Eagle Eye die result or range modifier is invalid.");
+    throw new Error(loc`The Eagle Eye die result or range modifier is invalid.`);
   return {
     source: "eagleEye",
     scene: String(scene),
@@ -86,9 +87,9 @@ export function sniperAttackEffects(system, weapon, { targetFlatFooted = false }
     threatIncrease,
     errorReduction,
     notes: [
-      ...(attackBonus ? [`Magic Touch: +${attackBonus} attack with this 2-handed firearm/hurled weapon.`] : []),
-      ...(threatIncrease ? [`Surprise Shot: threat range +${threatIncrease} against this flat-footed target.`] : []),
-      ...(errorReduction ? ["One Shot: error range –2, minimum 0."] : [])
+      ...(attackBonus ? [loc`Magic Touch: +${attackBonus} attack with this 2-handed firearm/hurled weapon.`] : []),
+      ...(threatIncrease ? [loc`Surprise Shot: threat range +${threatIncrease} against this flat-footed target.`] : []),
+      ...(errorReduction ? [loc`One Shot: error range –2, minimum 0.`] : [])
     ]
   };
 }
@@ -96,10 +97,10 @@ export function sniperAttackEffects(system, weapon, { targetFlatFooted = false }
 /** Sniper 10, p.80: choose either of two attack rolls against a vulnerable target, once/round. */
 export function millionDollarSkillPlan(system, weapon, { targetVulnerable = false } = {}) {
   if ((system.classLevels?.sniper ?? 0) < 10)
-    return { blocked: true, reason: "Million Dollar Skill requires Sniper 10." };
+    return { blocked: true, reason: loc`Million Dollar Skill requires Sniper 10.` };
   if (!sniperWeapon(weapon))
-    return { blocked: true, reason: "Million Dollar Skill requires a two-handed firearm or hurled weapon." };
+    return { blocked: true, reason: loc`Million Dollar Skill requires a two-handed firearm or hurled weapon.` };
   if (targetVulnerable !== true)
-    return { blocked: true, reason: "Confirm this opponent is vulnerable against this attack." };
+    return { blocked: true, reason: loc`Confirm this opponent is vulnerable against this attack.` };
   return { blocked: false };
 }

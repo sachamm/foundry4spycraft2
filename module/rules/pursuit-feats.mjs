@@ -1,9 +1,10 @@
+import { loc } from "../i18n.mjs";
 /** Terrain feats, p.206. The declared role describes this check, not a persistent combat stance. */
 export function pursuitSkillPlan(system, key, check, { manhuntRole = "", chaseRole = "", manhuntPrey = false } = {}) {
   if (!["", "predator", "prey"].includes(manhuntRole) || !["", "predator", "prey"].includes(chaseRole))
-    throw new Error("Choose a listed manhunt or chase role.");
+    throw new Error(loc`Choose a listed manhunt or chase role.`);
   if (manhuntPrey === true && manhuntRole === "predator")
-    throw new Error("A manhunt check cannot be both Predator and Prey.");
+    throw new Error(loc`A manhunt check cannot be both Predator and Prey.`);
   const role = manhuntPrey === true ? "prey" : manhuntRole,
     feats = new Set(system.activeFeatNames ?? []),
     source =
@@ -58,7 +59,7 @@ export function pursuitSkillPlan(system, key, check, { manhuntRole = "", chaseRo
       featSynergy: bonuses.length ? 3 : 0
     },
     notes: [
-      `${[source, chaseSource].filter((n, i, a) => n && a.indexOf(n) === i).join("; ")}: ${source ? `declared ${role} in a manhunt; maximum synergy +${maximum}. ` : ""}${chaseSource ? `declared ${chaseRole} Maneuver in a chase. ` : ""}Named synergy bonuses compete; skill-derived synergy is unavailable for passive checks (pp.92,96,206). Conflict actions and outcomes are resolved separately.`
+      loc`${[source, chaseSource].filter((n, i, a) => n && a.indexOf(n) === i).join("; ")}: ${source ? loc`declared ${role} in a manhunt; maximum synergy +${maximum}. ` : ""}${chaseSource ? loc`declared ${chaseRole} Maneuver in a chase. ` : ""}Named synergy bonuses compete; skill-derived synergy is unavailable for passive checks (pp.92,96,206). Conflict actions and outcomes are resolved separately.`
     ]
   };
 }

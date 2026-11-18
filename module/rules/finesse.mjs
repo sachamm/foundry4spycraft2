@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Finesse Mastery/Supremacy p.178. Melee scope includes unarmed, never hurled attacks. */
 const meleeProficiencies = new Set(["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged"]);
 export const finesseMeleeWeapon = weapon => meleeProficiencies.has(weapon?.proficiency);
@@ -41,7 +42,7 @@ export function massiveWeaponPlan(system, weapon) {
     return { active: false, attackPenalty: 0, listedInitiativeLoss: 0, initiativeLoss: 0, waived: false, notes: [] };
   const strength = system.abilities?.str;
   if (!Number.isSafeInteger(strength?.value) || !Number.isSafeInteger(strength?.mod))
-    throw new Error("Review the actual Strength score and modifier before using a Massive weapon.");
+    throw new Error(loc`Review the actual Strength score and modifier before using a Massive weapon.`);
   const required = Number(String(weapon.sizeHands ?? "").match(/\/\s*([12])h/i)?.[1] ?? 0),
     waived =
       finesseMeleeWeapon(weapon) &&
@@ -60,10 +61,10 @@ export function massiveWeaponPlan(system, weapon) {
     initiativeLoss,
     waived,
     notes: [
-      ...(attackPenalty ? ["Massive: Strength14 or lower, attack −4 (p.302)."] : []),
+      ...(attackPenalty ? [loc`Massive: Strength14 or lower, attack −4 (p.302).`] : []),
       waived
-        ? "Finesse Basics: Massive Initiative loss waived for this two-handed melee weapon (p.178)."
-        : `Massive: Initiative Count −${initiativeLoss} for this attack; apply the loss in combat (p.302).`
+        ? loc`Finesse Basics: Massive Initiative loss waived for this two-handed melee weapon (p.178).`
+        : loc`Massive: Initiative Count −${initiativeLoss} for this attack; apply the loss in combat (p.302).`
     ]
   };
 }

@@ -1,6 +1,7 @@
 import { COMBAT_STANCES, stanceDamagePlan } from "../rules/combat-stance.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
+import { loc } from "../i18n.mjs";
 const jobs = new Map(),
   stable = v =>
     JSON.stringify(v, (_k, x) =>
@@ -53,19 +54,19 @@ function root(actor, m) {
       c.attackContext?.ranged !== false ||
       stable(c.attackContext?.combatStance) !== stance
     )
-      throw Error("The original stance attack or earned stance changed.");
+      throw Error(loc`The original stance attack or earned stance changed.`);
     if (!c.rerollOf) return current.uuid;
     const previous = message(c.rerollOf);
     if (previous?.flags?.spycraft2?.superseded !== current.uuid)
-      throw Error("Use the actually adopted original stance attack replacement.");
+      throw Error(loc`Use the actually adopted original stance attack replacement.`);
     current = previous;
   }
-  throw Error("The original stance attack is missing or cyclic.");
+  throw Error(loc`The original stance attack is missing or cyclic.`);
 }
 export function stanceDamageUseRows(actor) {
   const rows = actor.flags?.spycraft2?.stanceDamageUses ?? [],
     roots = new Set();
-  if (!Array.isArray(rows)) throw Error("Review the recorded stance damage uses.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the recorded stance damage uses.`);
   for (const r of rows) {
     const p = r?.proof;
     if (
@@ -86,7 +87,7 @@ export function stanceDamageUseRows(actor) {
       !p.sourceEvidence ||
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid))
     )
-      throw Error("Review the recorded stance damage references.");
+      throw Error(loc`Review the recorded stance damage references.`);
     roots.add(r.rootAttackUuid);
   }
   return rows;
@@ -95,7 +96,7 @@ export function stanceDamageSource(actor, reference, { expectedKey = null } = {}
   const m = message(typeof reference === "string" ? reference : reference?.uuid),
     c = m?.flags?.spycraft2;
   if (!actor.isOwner || c?.actorUuid !== actor.uuid || !visible(m))
-    throw Error("Choose your own readable recorded stance attack; the GC resolves secret results.");
+    throw Error(loc`Choose your own readable recorded stance attack; the GC resolves secret results.`);
   const plan = stanceDamagePlan(c, { expectedKey }),
     stanceKey = c.attackContext.combatStance.stance.key,
     whisper = [...(m.whisper ?? [])].map(u => (typeof u === "string" ? u : u.id)).sort();
@@ -114,7 +115,7 @@ function sourceForProof(actor, p) {
   const current = stanceDamageSource(actor, p.sourceMessage, { expectedKey: p.stanceKey }),
     { reservationId, ...facts } = p;
   if (typeof reservationId !== "string" || !reservationId || stable(current) !== stable(facts))
-    throw Error("The original stance hit or component changed.");
+    throw Error(loc`The original stance hit or component changed.`);
   return current;
 }
 async function write(actor, rows) {
@@ -124,7 +125,7 @@ async function write(actor, rows) {
     if (stable(actor.flags?.spycraft2?.stanceDamageUses) !== stable(rows)) throw e;
   }
   if (stable(actor.flags?.spycraft2?.stanceDamageUses) !== stable(rows))
-    throw Error("Review the saved stance damage use before retrying.");
+    throw Error(loc`Review the saved stance damage use before retrying.`);
 }
 function validAlias(actor, m, facts) {
   const p = m.flags?.spycraft2?.[alias(facts.stanceKey)],
@@ -159,37 +160,38 @@ function recorded(actor, facts) {
       }
       return false;
     });
-  if (found.length > 1) throw Error("Multiple stance damage receipts for this attack require GC review.");
+  if (found.length > 1) throw Error(loc`Multiple stance damage receipts for this attack require GC review.`);
   const receipt = found[0];
   if (receipt && !validAlias(actor, receipt, facts))
-    throw Error("The existing stance component does not match its actual recorded attack.");
+    throw Error(loc`The existing stance component does not match its actual recorded attack.`);
   return receipt ?? null;
 }
 function validateReceipt(actor, m, p) {
   if (!m || stable(m.flags?.spycraft2?.stanceDamage) !== stable(p) || !validAlias(actor, m, p))
-    throw Error("The posted stance component does not match its reserved original attack.");
+    throw Error(loc`The posted stance component does not match its reserved original attack.`);
 }
 async function perform(actor, facts, input) {
   const reserved = await queueRuleState(actor, async () => {
     const fresh = stanceDamageSource(actor, facts.sourceMessage, { expectedKey: facts.stanceKey });
     if (stable(fresh) !== stable(facts))
-      throw Error("The original stance hit changed before its component was recorded.");
+      throw Error(loc`The original stance hit changed before its component was recorded.`);
     const rows = stanceDamageUseRows(actor),
       use = rows.find(r => r.rootAttackUuid === facts.rootAttackUuid),
       existing = recorded(actor, facts);
     if (use) {
       const { reservationId, ...old } = use.proof;
-      if (stable(old) !== stable(facts)) throw Error("This attack already has a different recorded stance component.");
+      if (stable(old) !== stable(facts))
+        throw Error(loc`This attack already has a different recorded stance component.`);
       if (use.receiptUuid) {
         const m = message(use.receiptUuid);
         validateReceipt(actor, m, use.proof);
         return { existing: m };
       }
-      throw Error("An interrupted stance component awaits GC review.");
+      throw Error(loc`An interrupted stance component awaits GC review.`);
     }
     if (existing) return { existing };
     if (input.damageConfirmed !== true)
-      throw Error("Confirm this hit and resolve its separate damage component after the target’s defenses.");
+      throw Error(loc`Confirm this hit and resolve its separate damage component after the target’s defenses.`);
     const reservationId = foundry.utils.randomID(),
       proof = { ...facts, reservationId };
     await write(actor, [
@@ -206,7 +208,7 @@ async function perform(actor, facts, input) {
           m.flags?.spycraft2?.actorUuid === actor.uuid &&
           m.flags.spycraft2.stanceDamage?.reservationId === p.reservationId
       );
-      if (matches.length > 1) throw Error("Multiple posted stance components require GC review.");
+      if (matches.length > 1) throw Error(loc`Multiple posted stance components require GC review.`);
       if (matches[0]) validateReceipt(actor, matches[0], p);
       return matches[0] ?? null;
     },
@@ -214,7 +216,7 @@ async function perform(actor, facts, input) {
       queueRuleState(actor, async () => {
         const rows = stanceDamageUseRows(actor),
           use = rows.find(r => r.rootAttackUuid === p.rootAttackUuid);
-        if (use?.reservationId !== p.reservationId) throw Error("The stance component reservation changed.");
+        if (use?.reservationId !== p.reservationId) throw Error(loc`The stance component reservation changed.`);
         await write(
           actor,
           receipt
@@ -235,13 +237,13 @@ async function perform(actor, facts, input) {
           definition.name +
           ": <strong>2 " +
           p.damageType +
-          " damage</strong> in addition to the melee attack’s other damage (p." +
+          ` ${loc`damage`}</strong> ${loc`in addition to the melee attack’s other damage (p.`}` +
           definition.page +
           "). " +
           (p.damageType === "stress"
-            ? "Stress ignores DR; apply stress resistance and other applicable defenses separately. "
-            : "Apply the target’s applicable defenses and health effect separately. ") +
-          "This fixed component is separate from the weapon damage roll and cannot be boosted with action dice.",
+            ? loc`Stress ignores DR; apply stress resistance and other applicable defenses separately. `
+            : loc`Apply the target’s applicable defenses and health effect separately. `) +
+          loc`This fixed component is separate from the weapon damage roll and cannot be boosted with action dice.`,
         flags: {
           spycraft2: {
             actorUuid: actor.uuid,
@@ -267,7 +269,7 @@ async function perform(actor, facts, input) {
     } catch (cleanup) {
       throw new AggregateError(
         [error, cleanup],
-        "The stance component needs GC review; inspect its posted receipt before retrying."
+        loc`The stance component needs GC review; inspect its posted receipt before retrying.`
       );
     }
     if (receipt) return receipt;
@@ -280,7 +282,7 @@ export async function settleStanceDamage(actor, reference, input = {}, options =
     current = jobs.get(id);
   if (current) {
     if (current.actor !== actor || stable(current.facts) !== stable(facts))
-      throw Error("The in-progress stance component source changed.");
+      throw Error(loc`The in-progress stance component source changed.`);
     return current.promise;
   }
   const entry = { actor, facts, promise: null };
@@ -299,12 +301,14 @@ export function settleMenacingDamage(actor, message, input = {}) {
 }
 export async function reviewStanceDamage(actor, { reservationId, confirmed = false } = {}) {
   if (!actor.isOwner || game.user.isGM !== true || confirmed !== true)
-    throw Error("The owning GC must review the actual stance component and check every client for a posted receipt.");
+    throw Error(
+      loc`The owning GC must review the actual stance component and check every client for a posted receipt.`
+    );
   return queueRuleState(actor, async () => {
     const rows = stanceDamageUseRows(actor),
       use = rows.find(r => r.reservationId === reservationId && !r.receiptUuid);
-    if (!use) throw Error("Choose a pending stance component.");
-    if (jobs.has(key(actor, use.rootAttackUuid))) throw Error("This client is still recording that component.");
+    if (!use) throw Error(loc`Choose a pending stance component.`);
+    if (jobs.has(key(actor, use.rootAttackUuid))) throw Error(loc`This client is still recording that component.`);
     sourceForProof(actor, use.proof);
     const receipt = recorded(actor, use.proof);
     if (receipt) validateReceipt(actor, receipt, use.proof);
@@ -335,13 +339,13 @@ export async function manageStanceDamage(actor, input = {}, options = {}) {
       ),
       esc = foundry.utils.escapeHTML;
     if (!eligible.length && !pending.length)
-      return ui.notifications.info("No resolved stance hit or interrupted component is available.");
-    const title = options.expectedKey ? COMBAT_STANCES[options.expectedKey].name + " damage" : "Stance damage";
+      return ui.notifications.info(loc`No resolved stance hit or interrupted component is available.`);
+    const title = options.expectedKey ? COMBAT_STANCES[options.expectedKey].name + " damage" : loc`Stance damage`;
     input = await foundry.applications.api.DialogV2.input({
       window: { title },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Confirm and finish the actual melee hit in chat first. Record its additional fixed 2 damage once. Resolve the component’s defenses and health separately; stress ignores DR but retains applicable stress resistance. No action die can increase this fixed component.</p><label>Operation <select name="operation">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Confirm and finish the actual melee hit in chat first. Record its additional fixed 2 damage once. Resolve the component’s defenses and health separately; stress ignores DR but retains applicable stress resistance. No action die can increase this fixed component.`}</p><label>${loc`Operation`} <select name="operation">` +
         eligible
           .map(
             ({ m, p }, i) =>
@@ -371,15 +375,15 @@ export async function manageStanceDamage(actor, input = {}, options = {}) {
               )
               .join("")
           : "") +
-        '</select></label><label><input name="damageConfirmed" type="checkbox" /> The GC confirms this hit’s separate component; for review, no client is still recording it and I checked for a posted receipt</label></div>'
+        `</select></label><label><input name="damageConfirmed" type="checkbox" /> ${loc`The GC confirms this hit’s separate component; for review, no client is still recording it and I checked for a posted receipt`}</label></div>`
     });
     if (!input) return null;
   }
   if (Object.hasOwn(input, "sourceMessage")) return settleStanceDamage(actor, input.sourceMessage, input, options);
-  if (typeof input.operation !== "string") throw Error("Choose a recorded stance hit or component review.");
+  if (typeof input.operation !== "string") throw Error(loc`Choose a recorded stance hit or component review.`);
   const [kind, id] = input.operation.split("|");
   if (kind === "attack") return settleStanceDamage(actor, id, input, options);
   if (kind === "review")
     return reviewStanceDamage(actor, { reservationId: id, confirmed: input.damageConfirmed === true });
-  throw Error("Choose a listed stance damage operation.");
+  throw Error(loc`Choose a listed stance damage operation.`);
 }

@@ -50,6 +50,7 @@ import {
   noFearPlan
 } from "../../rules/health.mjs";
 import { actionDieAwardPlan, missionXPPlan } from "../../rules/action-dice.mjs";
+import { loc } from "../../i18n.mjs";
 
 export const ActorActionDice = Base =>
   class ActorActionDice extends Base {
@@ -92,7 +93,7 @@ export const ActorActionDice = Base =>
       const pools = unrestrictedBonusPools(this.actionDiceFundingSystem, this.usagePeriods).filter(p => p.available),
         esc = foundry.utils.escapeHTML,
         selected = (this.system.actionDice?.value ?? 0) > 0 ? "" : (pools[0]?.id ?? "");
-      return `<label>Funding <select name="bonusPoolId"><option value=""${selected ? "" : " selected"}>Ordinary action dice (${this.system.actionDice?.value ?? 0})</option>${pools.map(p => `<option value="${esc(p.id)}"${selected === p.id ? " selected" : ""}>${esc(p.label)}: ${p.available} d${p.die}, until ${p.expiryLabel}</option>`).join("")}</select></label>`;
+      return `<label>${loc`Funding`} <select name="bonusPoolId"><option value=""${selected ? "" : " selected"}>${loc`Ordinary action dice (${this.system.actionDice?.value ?? 0})`}</option>${pools.map(p => `<option value="${esc(p.id)}"${selected === p.id ? " selected" : ""}>${loc`${esc(p.label)}: ${p.available} d${p.die}, until ${p.expiryLabel}`}</option>`).join("")}</select></label>`;
     }
 
     actorRecordValue(path) {
@@ -201,7 +202,7 @@ export const ActorActionDice = Base =>
               }
             }
           },
-          text = `${kind === "refresh" ? "Refresh completed. " : ""}Spent ${payment.count} action dice${payment.surcharge ? ` (${payment.surcharge} surcharge; ${fresh.cost} benefit dice)` : ""}; recovered ${result.healedVitality} vitality and ${result.healedWounds} wounds.`;
+          text = loc`${kind === "refresh" ? loc`Refresh completed. ` : ""}Spent ${payment.count} action dice${payment.surcharge ? loc` (${payment.surcharge} surcharge; ${fresh.cost} benefit dice)` : ""}; recovered ${result.healedVitality} vitality and ${result.healedWounds} wounds.`;
         if (roll) await roll.toMessage({ ...message, flavor: text });
         else await ChatMessage.create({ ...message, content: text });
         return result;
@@ -238,7 +239,7 @@ export const ActorActionDice = Base =>
             });
           } catch (rollback) {
             if (!previousMatches() || !same(now(), restored) || !extrasMatch(beforeExtras)) {
-              const failure = new AggregateError([error, rollback], "Healing could not be safely restored.");
+              const failure = new AggregateError([error, rollback], loc`Healing could not be safely restored.`);
               failure.actionDiceSettlementReview = {
                 purpose: kind,
                 before,
@@ -270,9 +271,9 @@ export const ActorActionDice = Base =>
       const expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem));
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
-          window: { title: "Heal outside combat with action dice" },
+          window: { title: loc`Heal outside combat with action dice` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Choose all healing benefit dice for this use. The Shaken surcharge is paid once for this healing use and restores no health.</p><label>Benefit dice for vitality <input type="number" name="vitalityDice" min="0" value="1" /></label><label>Benefit dice for wounds (2 points each) <input type="number" name="woundDice" min="0" value="0" /></label>${mixedHealingFundingControl(this)}<p>Vitality dice explode normally. Healing cannot exceed the current maximum. Combat healing requires Refresh.</p></div>`
+          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>${loc`Choose all healing benefit dice for this use. The Shaken surcharge is paid once for this healing use and restores no health.`}</p><label>${loc`Benefit dice for vitality`} <input type="number" name="vitalityDice" min="0" value="1" /></label><label>${loc`Benefit dice for wounds (2 points each)`} <input type="number" name="woundDice" min="0" value="0" /></label>${mixedHealingFundingControl(this)}<p>${loc`Vitality dice explode normally. Healing cannot exceed the current maximum. Combat healing requires Refresh.`}</p></div>`
         });
         if (!input) return null;
       }
@@ -297,7 +298,7 @@ export const ActorActionDice = Base =>
         async payment => {
           const eligibility = () =>
               JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken
-                ? { blocked: true, reason: "The Shaken condition changed while resolving healing." }
+                ? { blocked: true, reason: loc`The Shaken condition changed while resolving healing.` }
                 : healingPlan({ ...this.system, actionDice: payment.system.actionDice }, context()),
             fresh = eligibility();
           if (fresh.blocked) throw new Error(fresh.reason);
@@ -320,15 +321,15 @@ export const ActorActionDice = Base =>
       if (!Object.keys(input).length) {
         const waiting = this.system.refreshAction?.state === "waiting";
         input = await systemDialog.input({
-          window: { title: "Refresh: full round, then wait until next initiative" },
+          window: { title: loc`Refresh: full round, then wait until next initiative` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Payment occurs only when you complete Refresh.</p>
-        <label>Step <select name="phase"><option value="start" ${waiting ? "" : "selected"}>Begin Refresh</option><option value="complete" ${waiting ? "selected" : ""}>Complete at next initiative</option><option value="targeted">Record an attack during the wait</option><option value="cancel">Cancel pending Refresh</option></select></label>
-        <label><input type="checkbox" name="forfeitActions" /> Beginning: forfeit this round’s chance to act</label>
-        <label><input type="checkbox" name="atStartOfInitiative" /> Completing: this is the start of my next initiative</label>
-        <label><input type="checkbox" name="notTargeted" /> Completing: no attack targeted me since Refresh began, including misses</label>
-        <label>Recover <select name="resource"><option value="vitality">One action die’s result in vitality</option><option value="wounds">2 wounds</option></select></label>
-        <p>Begin with no conditions. Complete at the start of your next initiative. The GC confirms action timing. Attack targeting is confirmed manually, including attacks made outside this system.</p></div>`
+          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>${loc`Payment occurs only when you complete Refresh.`}</p>
+        <label>${loc`Step`} <select name="phase"><option value="start" ${waiting ? "" : "selected"}>${loc`Begin Refresh`}</option><option value="complete" ${waiting ? "selected" : ""}>${loc`Complete at next initiative`}</option><option value="targeted">${loc`Record an attack during the wait`}</option><option value="cancel">${loc`Cancel pending Refresh`}</option></select></label>
+        <label><input type="checkbox" name="forfeitActions" /> ${loc`Beginning: forfeit this round’s chance to act`}</label>
+        <label><input type="checkbox" name="atStartOfInitiative" /> ${loc`Completing: this is the start of my next initiative`}</label>
+        <label><input type="checkbox" name="notTargeted" /> ${loc`Completing: no attack targeted me since Refresh began, including misses`}</label>
+        <label>${loc`Recover`} <select name="resource"><option value="vitality">${loc`One action die’s result in vitality`}</option><option value="wounds">${loc`2 wounds`}</option></select></label>
+        <p>${loc`Begin with no conditions. Complete at the start of your next initiative. The GC confirms action timing. Attack targeting is confirmed manually, including attacks made outside this system.`}</p></div>`
         });
         if (!input) return null;
       }
@@ -352,7 +353,7 @@ export const ActorActionDice = Base =>
       if (["targeted", "cancel"].includes(input.phase)) {
         const work = async () => {
           const record = this.system.refreshAction;
-          if (record?.state !== "waiting") return ui.notifications.warn("There is no pending Refresh.");
+          if (record?.state !== "waiting") return ui.notifications.warn(loc`There is no pending Refresh.`);
           return this.update(
             input.phase === "targeted"
               ? { "system.refreshAction.targeted": true }
@@ -384,7 +385,7 @@ export const ActorActionDice = Base =>
         async payment => {
           const eligibility = () => {
               if (JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken)
-                return { blocked: true, reason: "The Shaken condition changed while completing Refresh." };
+                return { blocked: true, reason: loc`The Shaken condition changed while completing Refresh.` };
               const current = context();
               return refreshPlan(
                 { ...this.system, actionDice: payment.system.actionDice },
@@ -438,7 +439,7 @@ export const ActorActionDice = Base =>
           try {
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `No Fear II: stress damage resistance ${plan.record.resistance} for ${plan.record.rounds} rounds, until own initiative in round ${plan.record.dueRound}. One session use spent.`,
+              content: loc`No Fear II: stress damage resistance ${plan.record.resistance} for ${plan.record.rounds} rounds, until own initiative in round ${plan.record.dueRound}. One session use spent.`,
               flags: {
                 spycraft2: { actorUuid: this.uuid, checkKind: "noFear", actionDiceAllowed: false, ...plan.record }
               }
@@ -482,7 +483,7 @@ export const ActorActionDice = Base =>
           try {
             await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `Fortunes of War: double only its own DR until the start of this character’s initiative in round ${plan.record.dueRound}. One session use spent; no action die spent.`,
+              content: loc`Fortunes of War: double only its own DR until the start of this character’s initiative in round ${plan.record.dueRound}. One session use spent; no action die spent.`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -513,9 +514,9 @@ export const ActorActionDice = Base =>
         expectedRound = roundSignature();
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
-          window: { title: "Boost Defense for rolled rounds" },
+          window: { title: loc`Boost Defense for rolled rounds` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>Spend one benefit die for +2 Defense. The selected die's result determines duration in rounds.</p><label><input name="atStartOfRound" type="checkbox" /> This is the start of the combat round</label><label><input name="replaceExisting" type="checkbox" /> Replace any existing action-die Defense boost</label>${this.system.coreClassIds?.includes("transporter") ? "<p>Watchful Initiative is resolved by the GC while its roll interpretation is pending.</p>" : ""}</div>`
+          content: `<div class="spycraft2-roll-options">${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl()}<p>${loc`Spend one benefit die for +2 Defense. The selected die's result determines duration in rounds.`}</p><label><input name="atStartOfRound" type="checkbox" /> ${loc`This is the start of the combat round`}</label><label><input name="replaceExisting" type="checkbox" /> ${loc`Replace any existing action-die Defense boost`}</label>${this.system.coreClassIds?.includes("transporter") ? `<p>${loc`Watchful Initiative is resolved by the GC while its roll interpretation is pending.`}</p>` : ""}</div>`
         });
         if (!input) return null;
       }
@@ -539,7 +540,7 @@ export const ActorActionDice = Base =>
         async payment => {
           if (roundSignature() !== expectedRound)
             throw new Error(
-              "The Defense declaration belongs to an earlier combat round. Confirm the current round start."
+              loc`The Defense declaration belongs to an earlier combat round. Confirm the current round start.`
             );
           const now = context(),
             fresh = defenseBoostPlan(
@@ -550,10 +551,10 @@ export const ActorActionDice = Base =>
           if (fresh.blocked) throw new Error(fresh.reason);
           const roll = await new Roll(fresh.formula).evaluate();
           if (JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken)
-            throw new Error("The Shaken condition changed while resolving Defense.");
+            throw new Error(loc`The Shaken condition changed while resolving Defense.`);
           const rounds = Math.max(0, Math.trunc(roll.total));
           if (!Number.isSafeInteger(rounds) || !Number.isSafeInteger(now.combat.round + rounds))
-            throw new Error("Review the rolled Defense duration before applying it.");
+            throw new Error(loc`Review the rolled Defense duration before applying it.`);
           const before = structuredClone(this.system.defenseBoost ?? null),
             receiptId =
               globalThis.foundry?.utils?.randomID?.() ??
@@ -585,7 +586,7 @@ export const ActorActionDice = Base =>
             writeCompleted = true;
             await roll.toMessage({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              flavor: `Spent ${payment.count} action ${payment.count === 1 ? "die" : "dice"}${payment.surcharge ? ` (${payment.surcharge} surcharge; one benefit die rolled)` : ""}: +2 Defense for ${rounds} rounds (through round ${boost.expiresAtRound - 1}).`,
+              flavor: loc`Spent ${payment.count} action ${payment.count === 1 ? "die" : "dice"}${payment.surcharge ? loc` (${payment.surcharge} surcharge; one benefit die rolled)` : ""}: +2 Defense for ${rounds} rounds (through round ${boost.expiresAtRound - 1}).`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -611,7 +612,7 @@ export const ActorActionDice = Base =>
                 await this.update(this.actorRecordRestorePatch("system.defenseBoost", before));
               } catch (rollback) {
                 if (!same(current(), before)) {
-                  const failure = new AggregateError([error, rollback], "Defense could not be safely restored.");
+                  const failure = new AggregateError([error, rollback], loc`Defense could not be safely restored.`);
                   failure.actionDiceSettlementReview = {
                     purpose: "Defense boost",
                     beforeBoost: before,
@@ -645,7 +646,7 @@ export const ActorActionDice = Base =>
     async refundActionDicePayment(payment) {
       if (payment.payments) {
         if (!paymentRecordMatches(this, payment) || payment.state !== "reserved")
-          throw new Error("Review the original payment reservation before refunding.");
+          throw new Error(loc`Review the original payment reservation before refunding.`);
         const patch = multipartRefundPatch(this.actionDiceFundingSystem, payment),
           expected = patch["flags.spycraft2.actionDiePayments." + payment.id];
         try {
@@ -671,7 +672,7 @@ export const ActorActionDice = Base =>
     }
 
     async reviewActionDiceSettlement(options = {}) {
-      if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted action-die settlement.");
+      if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted action-die settlement.`);
       if (this.type !== "agent" || !this.isOwner) return null;
       const saved = getActionDieSettlementReview(this);
       if (!saved?.needsReview) return null;
@@ -686,7 +687,7 @@ export const ActorActionDice = Base =>
             ? "system.bonusActionDice." + source.bonusPoolId + ".remaining"
             : "system.actionDice.value")
       )
-        throw new Error("Review the saved payment source before reconciling action dice.");
+        throw new Error(loc`Review the saved payment source before reconciling action dice.`);
       const state = () => {
           const r = getActionDieSettlementReview(this),
             p = r?.payment,
@@ -711,16 +712,16 @@ export const ActorActionDice = Base =>
         const esc = foundry.utils.escapeHTML,
           current = state();
         input = await systemDialog.input({
-          window: { title: "Review interrupted action-die use" },
+          window: { title: loc`Review interrupted action-die use` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${esc(saved.payment.label)}; current health ${current.vitality} vitality / ${current.wounds} wounds. If health needs correction, close this dialog, correct health on Main, and reopen this review before confirming.</p><p>${esc(saved.reason)}</p><label>Confirmed action-die balance <input name="balance" type="number" min="0" step="1" value="${current.balance ?? 0}" /></label>${saved.limitedUseSettlement?.length ? '<label><input name="restoreLimitedUses" type="checkbox" /> No replacement result or other activation effect remains; restore this activation’s recorded limited uses</label>' : ""}<label>Resolution <input name="resolution" required /></label><label><input name="healthReviewed" type="checkbox" /> The GC reviewed actual health, action state and action-die balances and completed any required corrections</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`${esc(saved.payment.label)}; current health ${current.vitality} vitality / ${current.wounds} wounds. If health needs correction, close this dialog, correct health on Main, and reopen this review before confirming.`}</p><p>${esc(saved.reason)}</p><label>${loc`Confirmed action-die balance`} <input name="balance" type="number" min="0" step="1" value="${current.balance ?? 0}" /></label>${saved.limitedUseSettlement?.length ? `<label><input name="restoreLimitedUses" type="checkbox" /> ${loc`No replacement result or other activation effect remains; restore this activation’s recorded limited uses`}</label>` : ""}<label>${loc`Resolution`} <input name="resolution" required /></label><label><input name="healthReviewed" type="checkbox" /> ${loc`The GC reviewed actual health, action state and action-die balances and completed any required corrections`}</label></div>`
         });
         if (!input) return null;
       }
       return queueResources([this], async () => {
-        if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted action-die settlement.");
+        if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted action-die settlement.`);
         if (JSON.stringify(state()) !== expected)
-          throw new Error("Health, dice or the saved review changed. Review the current values again.");
+          throw new Error(loc`Health, dice or the saved review changed. Review the current values again.`);
         const review = getActionDieSettlementReview(this),
           p = review.payment,
           pool = p.bonusPoolId ? this.system.bonusActionDice?.[p.bonusPoolId] : null,
@@ -732,14 +733,14 @@ export const ActorActionDice = Base =>
           !Number.isSafeInteger(balance) ||
           balance < 0
         )
-          throw new Error("The GC must confirm the corrected whole-die balance and record the resolution.");
+          throw new Error(loc`The GC must confirm the corrected whole-die balance and record the resolution.`);
         if (p.bonusPoolId && (actionDicePoolFingerprint(pool) !== p.poolFingerprint || balance > pool.granted))
-          throw new Error("The original bonus grant changed or the confirmed balance exceeds its grant.");
+          throw new Error(loc`The original bonus grant changed or the confirmed balance exceeds its grant.`);
         const useUpdates = {};
         if (input.restoreLimitedUses === true) {
           const rows = review.limitedUseSettlement;
           if (!Array.isArray(rows) || !rows.length || new Set(rows.map(r => r.id)).size !== rows.length)
-            throw new Error("Review the recorded limited-use sources.");
+            throw new Error(loc`Review the recorded limited-use sources.`);
           for (const row of rows) {
             const valid = v => v && typeof v.epoch === "string" && Number.isSafeInteger(v.used) && v.used >= 0;
             if (
@@ -751,7 +752,7 @@ export const ActorActionDice = Base =>
               JSON.stringify(this.system.resourceUses?.[row.id]) !== JSON.stringify(row.reserved)
             )
               throw new Error(
-                "The limited-use source changed or its saved restoration is invalid. Review its current count."
+                loc`The limited-use source changed or its saved restoration is invalid. Review its current count.`
               );
             Object.assign(
               useUpdates,
@@ -817,8 +818,8 @@ export const ActorActionDice = Base =>
       } catch {}
       ui.notifications.warn(
         details.grantReview
-          ? "The bonus-die grant needs GC review. Its mission use remains spent; review the grant and receipt."
-          : "The action-die settlement needs GC review. Its reserved dice remain spent; review health and the selected balance before retrying."
+          ? loc`The bonus-die grant needs GC review. Its mission use remains spent; review the grant and receipt.`
+          : loc`The action-die settlement needs GC review. Its reserved dice remain spent; review health and the selected balance before retrying.`
       );
       return review;
     }
@@ -849,7 +850,7 @@ export const ActorActionDice = Base =>
 
     /** Caller must already hold this actor's resource transaction. */
     async payActionDiceLocked(count, perform, { bonusPoolId = "" } = {}) {
-      if (!this.isOwner) throw new Error("You must own the actor spending action dice.");
+      if (!this.isOwner) throw new Error(loc`You must own the actor spending action dice.`);
       const payment = actionDicePaymentPlan(this.actionDiceFundingSystem, {
         count,
         bonusPoolId,
@@ -867,7 +868,7 @@ export const ActorActionDice = Base =>
             await this.refundActionDicePayment(payment);
           } catch (rollback) {
             await this.markActionDiceSettlementReview(payment, rollback, { purpose: "payment reservation" });
-            throw new AggregateError([error, rollback], "Review the interrupted payment reservation.");
+            throw new AggregateError([error, rollback], loc`Review the interrupted payment reservation.`);
           }
         else if (balance !== payment.balance)
           await this.markActionDiceSettlementReview(payment, error, { purpose: "payment reservation" });
@@ -884,7 +885,7 @@ export const ActorActionDice = Base =>
           await this.refundActionDicePayment(payment);
         } catch (rollback) {
           await this.markActionDiceSettlementReview(payment, rollback, { purpose: "payment refund" });
-          throw new AggregateError([error, rollback], "The selected action-die balance needs review.");
+          throw new AggregateError([error, rollback], loc`The selected action-die balance needs review.`);
         }
         throw error;
       }
@@ -901,38 +902,37 @@ export const ActorActionDice = Base =>
         await this.update(this.actorRecordRestorePatch("flags.spycraft2.actionDieAwardReview", review));
       } catch {}
       ui.notifications.warn(
-        "The award needs GC review before awarding or spending more dice. Check player dice, the award ledger and the GC pool."
+        loc`The award needs GC review before awarding or spending more dice. Check player dice, the award ledger and the GC pool.`
       );
       return review;
     }
 
     async awardActionDice(options = {}) {
-      if (!game.user?.isGM) throw new Error("Only the GC can award action dice.");
+      if (!game.user?.isGM) throw new Error(loc`Only the GC can award action dice.`);
       if (this.type !== "agent" || !this.isOwner) return null;
       if (this.startingDiceEntry?.blocked === false)
-        throw new Error("Begin this character’s first session with starting dice before recording awards.");
+        throw new Error(loc`Begin this character’s first session with starting dice before recording awards.`);
       if (this.flags?.spycraft2?.missionXPReview?.needsReview)
-        throw new Error("Review the interrupted mission XP settlement before recording more awards.");
+        throw new Error(loc`Review the interrupted mission XP settlement before recording more awards.`);
       if (this.flags?.spycraft2?.actionDieAwardReview?.needsReview)
-        throw new Error("Review the interrupted award before adding another award.");
+        throw new Error(loc`Review the interrupted award before adding another award.`);
       let input = options;
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
-          window: { title: "Award roleplay action dice" },
+          window: { title: loc`Award roleplay action dice` },
           rejectClose: false,
-          content:
-            '<p>Ordinary GC awards add player dice, one GC die per awarded die, and counts for mission XP settlement. Bonus dice from abilities use their own rules.</p><label>Dice awarded <input name="count" type="number" min="1" step="1" value="1" required /></label><label>Reason <input name="reason" required /></label>'
+          content: `<p>${loc`Ordinary GC awards add player dice, one GC die per awarded die, and counts for mission XP settlement. Bonus dice from abilities use their own rules.`}</p><label>${loc`Dice awarded`} <input name="count" type="number" min="1" step="1" value="1" required /></label><label>${loc`Reason`} <input name="reason" required /></label>`
         });
         if (!input) return null;
       }
       return queueResources([this], () =>
         withGCDicePool(async pool => {
           if (this.startingDiceEntry?.blocked === false)
-            throw new Error("Begin this character’s first session with starting dice before recording awards.");
+            throw new Error(loc`Begin this character’s first session with starting dice before recording awards.`);
           if (this.flags?.spycraft2?.missionXPReview?.needsReview)
-            throw new Error("Review the interrupted mission XP settlement before recording more awards.");
+            throw new Error(loc`Review the interrupted mission XP settlement before recording more awards.`);
           if (!game.user?.isGM || this.flags?.spycraft2?.actionDieAwardReview?.needsReview)
-            throw new Error("Only the GC may award dice after resolving any interrupted award.");
+            throw new Error(loc`Only the GC may award dice after resolving any interrupted award.`);
           const id = foundry.utils.randomID(),
             periods = this.usagePeriods,
             plan = actionDieAwardPlan(this.system, {
@@ -945,10 +945,10 @@ export const ActorActionDice = Base =>
               at: Date.now()
             }),
             value = pool.value + plan.gcGain;
-          if (!Number.isSafeInteger(value)) throw new Error("The GC balance exceeds a safe whole number.");
+          if (!Number.isSafeInteger(value)) throw new Error(loc`The GC balance exceeds a safe whole number.`);
           const beforeLedger = structuredClone(this.system.actionDieAwards?.[plan.key] ?? null),
             beforeBalance = this.system.actionDice.value,
-            next = { ...pool, value, lastReason: "Player action-die award: " + this.name },
+            next = { ...pool, value, lastReason: loc`Player action-die award: ` + this.name },
             transaction = {
               id,
               key: plan.key,
@@ -987,7 +987,7 @@ export const ActorActionDice = Base =>
             try {
               await ChatMessage.create({
                 speaker: ChatMessage.getSpeaker({ actor: this }),
-                content: `${foundry.utils.escapeHTML(this.name)} receives ${plan.units} d${plan.die} action dice from ${plan.count} GC awards; GC pool +${plan.gcGain}. ${foundry.utils.escapeHTML(String(input.reason).trim())} Award count recorded for mission XP settlement.`,
+                content: loc`${foundry.utils.escapeHTML(this.name)} receives ${plan.units} d${plan.die} action dice from ${plan.count} GC awards; GC pool +${plan.gcGain}. ${foundry.utils.escapeHTML(String(input.reason).trim())} Award count recorded for mission XP settlement.`,
                 flags: {
                   spycraft2: {
                     actorUuid: this.uuid,
@@ -1032,7 +1032,7 @@ export const ActorActionDice = Base =>
             } catch (rollback) {
               if (this.system.actionDice.value !== balance || !same(ledger(), beforeLedger)) {
                 await this.markActionDieAwardReview(transaction, rollback);
-                throw new AggregateError([error, rollback], "The player award could not be safely restored.");
+                throw new AggregateError([error, rollback], loc`The player award could not be safely restored.`);
               }
             }
             if (same(gc(), next))
@@ -1041,7 +1041,7 @@ export const ActorActionDice = Base =>
               } catch (rollback) {
                 if (!same(gc(), pool)) {
                   await this.markActionDieAwardReview(transaction, rollback);
-                  throw new AggregateError([error, rollback], "The GC award could not be safely restored.");
+                  throw new AggregateError([error, rollback], loc`The GC award could not be safely restored.`);
                 }
               }
             throw error;
@@ -1051,7 +1051,7 @@ export const ActorActionDice = Base =>
     }
 
     async reviewActionDieAward(options = {}) {
-      if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted award.");
+      if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted award.`);
       if (this.type !== "agent" || !this.isOwner) return null;
       const saved = this.flags?.spycraft2?.actionDieAwardReview;
       if (!saved?.needsReview) return null;
@@ -1068,7 +1068,7 @@ export const ActorActionDice = Base =>
         !Number.isSafeInteger(tx.afterLedger.count) ||
         tx.afterLedger.count < 1
       )
-        throw new Error("Review the saved award source before reconciling it.");
+        throw new Error(loc`Review the saved award source before reconciling it.`);
       const state = () => ({
           review: this.flags?.spycraft2?.actionDieAwardReview,
           player: this.system.actionDice.value,
@@ -1081,9 +1081,9 @@ export const ActorActionDice = Base =>
         const current = state(),
           esc = foundry.utils.escapeHTML;
         input = await systemDialog.input({
-          window: { title: "Review interrupted award" },
+          window: { title: loc`Review interrupted award` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${esc(saved.reason)}</p><p>Review the actual player dice, recorded award, GC pool and any posted receipt. Initialize this session’s GC pool first if the session changed.</p><label>Award <select name="retainAward"><option value="retain">Retain this award in the mission XP ledger</option><option value="cancel">Cancel this award in the mission XP ledger</option></select></label><label>Confirmed player dice <input name="playerBalance" type="number" min="0" step="1" value="${current.player}" /></label><label>Confirmed GC dice <input name="gcBalance" type="number" min="0" step="1" value="${current.gc?.value ?? 0}" /></label><label>Resolution <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> The GC reviewed the award, actual balances and receipt</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${esc(saved.reason)}</p><p>${loc`Review the actual player dice, recorded award, GC pool and any posted receipt. Initialize this session’s GC pool first if the session changed.`}</p><label>${loc`Award`} <select name="retainAward"><option value="retain">${loc`Retain this award in the mission XP ledger`}</option><option value="cancel">${loc`Cancel this award in the mission XP ledger`}</option></select></label><label>${loc`Confirmed player dice`} <input name="playerBalance" type="number" min="0" step="1" value="${current.player}" /></label><label>${loc`Confirmed GC dice`} <input name="gcBalance" type="number" min="0" step="1" value="${current.gc?.value ?? 0}" /></label><label>${loc`Resolution`} <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC reviewed the award, actual balances and receipt`}</label></div>`
         });
         if (!input) return null;
         input = {
@@ -1094,9 +1094,9 @@ export const ActorActionDice = Base =>
       return queueResources([this], () =>
         withGCDicePool(
           async pool => {
-            if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted award.");
+            if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted award.`);
             if (JSON.stringify(state()) !== expected)
-              throw new Error("The award or balances changed. Review the current values again.");
+              throw new Error(loc`The award or balances changed. Review the current values again.`);
             const number = v => (typeof v === "string" && !v.trim() ? NaN : Number(v)),
               playerBalance = number(input.playerBalance),
               gcBalance = number(input.gcBalance);
@@ -1107,11 +1107,11 @@ export const ActorActionDice = Base =>
               typeof input.resolution !== "string" ||
               !input.resolution.trim()
             )
-              throw new Error("Confirm the award disposition, whole-die balances and resolution.");
+              throw new Error(loc`Confirm the award disposition, whole-die balances and resolution.`);
             const current = this.system.actionDieAwards?.[key] ?? null;
             if (!same(current, tx.beforeLedger) && !same(current, tx.afterLedger))
               throw new Error(
-                "The mission award ledger changed; review its other entries before restoring this award."
+                loc`The mission award ledger changed; review its other entries before restoring this award.`
               );
             await this.update({
               "system.actionDice.value": playerBalance,
@@ -1150,10 +1150,10 @@ export const ActorActionDice = Base =>
 
     async settleMissionXP(options = {}) {
       if (this.flags?.spycraft2?.missionXPReview?.needsReview)
-        throw new Error("Review the interrupted mission XP settlement before settling again.");
+        throw new Error(loc`Review the interrupted mission XP settlement before settling again.`);
       if (this.flags?.spycraft2?.actionDieAwardReview?.needsReview)
-        throw new Error("Review the interrupted award before settling mission XP.");
-      if (!game.user?.isGM) throw new Error("Only the GC can settle mission XP.");
+        throw new Error(loc`Review the interrupted award before settling mission XP.`);
+      if (!game.user?.isGM) throw new Error(loc`Only the GC can settle mission XP.`);
       if (this.type !== "agent" || !this.isOwner) return null;
       const settlementContext = () => {
           const mission = String(this.usagePeriods.mission ?? "initial"),
@@ -1170,21 +1170,21 @@ export const ActorActionDice = Base =>
       let input = options;
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
-          window: { title: "Settle mission XP — p.440" },
+          window: { title: loc`Settle mission XP — p.440` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.</p><label>Base mission XP before action-die awards <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>Team Threat Level <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label>Additional post-multiplier XP <input type="number" name="additionalXP" min="0" value="0" /></label><label>Source of additional XP <input name="modifierReason" placeholder="GC-calculated Crossroads, Triumph or other bonus" /></label><p>Crossroads and Triumph percentages are not calculated by this control. Review their eligibility and rounding, then enter their final XP contribution above. A Crossroads Title first earned this mission starts its benefits next mission.</p><label><input type="checkbox" name="missionCompleteConfirmed" /> The mission has ended; all post-multiplier modifiers were reviewed and included</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Base mission XP gains 25 per awarded action die, capped at 25 × Career Level. Multiply that combined base by the lower of Career Level and Threat Level. Current award count: ${this.system.actionDieAwardSummary?.count ?? 0}.`}</p><label>${loc`Base mission XP before action-die awards`} <input type="number" name="baseXP" min="0" value="${missionSettlementDefaults().baseXP}" required /></label><label>${loc`Team Threat Level`} <input type="number" name="threatLevel" min="1" value="${missionSettlementDefaults().threatLevel ?? Math.max(1, this.system.level)}" required /></label><label>${loc`Additional post-multiplier XP`} <input type="number" name="additionalXP" min="0" value="0" /></label><label>${loc`Source of additional XP`} <input name="modifierReason" placeholder="${loc`GC-calculated Crossroads, Triumph or other bonus`}" /></label><p>${loc`Crossroads and Triumph percentages are not calculated by this control. Review their eligibility and rounding, then enter their final XP contribution above. A Crossroads Title first earned this mission starts its benefits next mission.`}</p><label><input type="checkbox" name="missionCompleteConfirmed" /> ${loc`The mission has ended; all post-multiplier modifiers were reviewed and included`}</label></div>`
         });
         if (!input) return null;
       }
       return queueResources([this], async () => {
-        if (!game.user?.isGM) throw new Error("Only the GC can settle mission XP.");
+        if (!game.user?.isGM) throw new Error(loc`Only the GC can settle mission XP.`);
         if (this.flags?.spycraft2?.missionXPReview?.needsReview)
-          throw new Error("Review the interrupted mission XP settlement before settling again.");
+          throw new Error(loc`Review the interrupted mission XP settlement before settling again.`);
         if (this.flags?.spycraft2?.actionDieAwardReview?.needsReview)
-          throw new Error("Review the interrupted award before settling mission XP.");
+          throw new Error(loc`Review the interrupted award before settling mission XP.`);
         if (settlementContext() !== expectedContext)
           throw new Error(
-            "Mission, level, XP or award counts changed while settlement was being prepared. Review the current mission."
+            loc`Mission, level, XP or award counts changed while settlement was being prepared. Review the current mission.`
           );
         const mission = this.usagePeriods.mission ?? "initial",
           plan = missionXPPlan(this.system, {
@@ -1214,7 +1214,7 @@ export const ActorActionDice = Base =>
             );
           } catch {}
           ui.notifications.warn(
-            "The mission XP settlement needs GC review. Check actual XP and the recorded mission reward before retrying."
+            loc`The mission XP settlement needs GC review. Check actual XP and the recorded mission reward before retrying.`
           );
         };
         try {
@@ -1231,7 +1231,7 @@ export const ActorActionDice = Base =>
         try {
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: `Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier} + ${plan.record.additionalXP} declared post-multiplier XP = ${plan.record.totalXP} XP. ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
+            content: loc`Mission XP: (${plan.record.baseXP} base + ${plan.record.awardBaseBonus} action-die award base XP) × ${plan.record.multiplier} + ${plan.record.additionalXP} declared post-multiplier XP = ${plan.record.totalXP} XP. ${foundry.utils.escapeHTML(plan.record.modifierReason)}`,
             flags: { spycraft2: { actorUuid: this.uuid, checkKind: "missionXP", ...record, actionDiceAllowed: false } }
           });
         } catch (error) {
@@ -1254,7 +1254,7 @@ export const ActorActionDice = Base =>
           } catch (rollback) {
             if (this.system.xp !== restoredXP || current() !== null) {
               await markReview(rollback);
-              throw new AggregateError([error, rollback], "The mission XP could not be safely restored.");
+              throw new AggregateError([error, rollback], loc`The mission XP could not be safely restored.`);
             }
           }
           throw error;
@@ -1264,7 +1264,7 @@ export const ActorActionDice = Base =>
     }
 
     async reviewMissionXP(options = {}) {
-      if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted XP settlement.");
+      if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted XP settlement.`);
       if (this.type !== "agent" || !this.isOwner) return null;
       const saved = this.flags?.spycraft2?.missionXPReview;
       if (!saved?.needsReview) return null;
@@ -1280,7 +1280,7 @@ export const ActorActionDice = Base =>
         !Number.isSafeInteger(tx.record.totalXP) ||
         tx.record.totalXP < 0
       )
-        throw new Error("Review the saved mission XP source before reconciling it.");
+        throw new Error(loc`Review the saved mission XP source before reconciling it.`);
       const r = tx.record,
         whole = v => Number.isSafeInteger(v) && v >= 0,
         baseBonus = 25 * Math.min(r.awardedDice, r.level),
@@ -1299,7 +1299,7 @@ export const ActorActionDice = Base =>
         r.totalXP !== r.coreXP + r.additionalXP ||
         r.source !== "p.440 (user-confirmed)"
       )
-        throw new Error("The saved mission XP formula is invalid; review its source before restoring it.");
+        throw new Error(loc`The saved mission XP formula is invalid; review its source before restoring it.`);
       const state = () => ({
           review: this.flags?.spycraft2?.missionXPReview,
           xp: this.system.xp,
@@ -1309,9 +1309,9 @@ export const ActorActionDice = Base =>
       let input = options;
       if (input.confirmed === undefined) {
         input = await systemDialog.input({
-          window: { title: "Review interrupted mission XP" },
+          window: { title: loc`Review interrupted mission XP` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>${foundry.utils.escapeHTML(saved.reason)}</p><label>Mission reward <select name="retainSettlement"><option value="retain">Retain the recorded mission settlement</option><option value="cancel">Cancel this settlement</option></select></label><label>Confirmed total XP <input name="xp" type="number" min="0" step="1" value="${this.system.xp}" /></label><label>Resolution <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> The GC reviewed actual XP, mission reward and any posted receipt</label><p>This sets the confirmed XP balance; it does not add the reward again.</p></div>`
+          content: `<div class="spycraft2-roll-options"><p>${foundry.utils.escapeHTML(saved.reason)}</p><label>${loc`Mission reward`} <select name="retainSettlement"><option value="retain">${loc`Retain the recorded mission settlement`}</option><option value="cancel">${loc`Cancel this settlement`}</option></select></label><label>${loc`Confirmed total XP`} <input name="xp" type="number" min="0" step="1" value="${this.system.xp}" /></label><label>${loc`Resolution`} <input name="resolution" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC reviewed actual XP, mission reward and any posted receipt`}</label><p>${loc`This sets the confirmed XP balance; it does not add the reward again.`}</p></div>`
         });
         if (!input) return null;
         input = {
@@ -1321,9 +1321,9 @@ export const ActorActionDice = Base =>
         };
       }
       return queueResources([this], async () => {
-        if (!game.user?.isGM) throw new Error("Only the GC may review an interrupted XP settlement.");
+        if (!game.user?.isGM) throw new Error(loc`Only the GC may review an interrupted XP settlement.`);
         if (JSON.stringify(state()) !== expected)
-          throw new Error("XP or the saved mission settlement changed. Review the current values.");
+          throw new Error(loc`XP or the saved mission settlement changed. Review the current values.`);
         const xp = typeof input.xp === "string" && !input.xp.trim() ? NaN : Number(input.xp);
         if (
           input.confirmed !== true ||
@@ -1333,10 +1333,10 @@ export const ActorActionDice = Base =>
           typeof input.resolution !== "string" ||
           !input.resolution.trim()
         )
-          throw new Error("Confirm the whole XP balance, settlement disposition and resolution.");
+          throw new Error(loc`Confirm the whole XP balance, settlement disposition and resolution.`);
         const current = this.system.missionXPRewards?.[key] ?? null;
         if (current !== null && !same(current, tx.record))
-          throw new Error("The mission reward changed; preserve it for review.");
+          throw new Error(loc`The mission reward changed; preserve it for review.`);
         const completed = {
             ...saved,
             needsReview: false,
@@ -1376,7 +1376,7 @@ export const ActorActionDice = Base =>
     initializeStartingDice() {
       if (this.type !== "agent" || !this.isOwner) return null;
       return queueResources([this], async () => {
-        if (!this.isOwner) throw new Error("Choose an owned character.");
+        if (!this.isOwner) throw new Error(loc`Choose an owned character.`);
         const plan = this.startingDiceEntry;
         if (plan.blocked) return ui.notifications.warn(plan.reason);
         const receiptId = foundry.utils.randomID(),
@@ -1401,7 +1401,7 @@ export const ActorActionDice = Base =>
     }
 
     resetActionDice() {
-      throw new Error("Starting action dice refresh when the GC starts a new session. Use the new-session control.");
+      throw new Error(loc`Starting action dice refresh when the GC starts a new session. Use the new-session control.`);
     }
 
     recoverResourceTransaction() {

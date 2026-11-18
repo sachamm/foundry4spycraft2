@@ -13,6 +13,7 @@ import { activeDefenseBoost, activeFortunesOfWar, activeNoFear } from "../rules/
 import { superiorCoverState } from "../rules/superior-cover.mjs";
 import { totalDefenseState } from "../rules/total-defense.mjs";
 import { twoWeaponStyleState } from "../rules/two-weapon-state.mjs";
+import { loc } from "../i18n.mjs";
 
 const ICON = "icons/svg/aura.svg";
 
@@ -55,7 +56,7 @@ export const ROUND_STATES = Object.freeze([
     key: "defenseBoost",
     field: "defenseBoost",
     read: activeDefenseBoost,
-    label: () => "Defense boost (action die)",
+    label: () => loc`Defense boost (action die)`,
     rounds: 1
   },
   {
@@ -130,7 +131,7 @@ export async function syncRoundStateEffects(actor, { states = ROUND_STATES } = {
         name: state.label,
         img: ICON,
         origin: actor.uuid,
-        description: "<p>Shown for reference. The character sheet holds the recorded state and ends it.</p>",
+        description: `<p>${loc`Shown for reference. The character sheet holds the recorded state and ends it.`}</p>`,
         ...(state.rounds ? { duration: { value: state.rounds, units: "rounds" } } : {}),
         flags: { spycraft2: { roundState: state.key } }
       }))

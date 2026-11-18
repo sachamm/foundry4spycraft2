@@ -1,4 +1,5 @@
 import { ownCountDurationActive } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 const empty = () => ({
   active: false,
   needsReview: false,
@@ -33,7 +34,8 @@ export function twoWeaponStyleState(system) {
     r.weaponProficiencies.every(v => typeof v === "string" && v) &&
     r.atStartOfInitiative === true &&
     r.armedConfirmed === true;
-  if (!valid) return { ...empty(), needsReview: true, reason: "The GC must review the saved two-weapon declaration." };
+  if (!valid)
+    return { ...empty(), needsReview: true, reason: loc`The GC must review the saved two-weapon declaration.` };
   if (!ownCountDurationActive(r, system.twoWeaponCombatContext)) return empty();
   const capstone = system.classLevels?.triggerman === 10,
     handguns = r.weaponProficiencies.filter(p => p === "handgun").length,
@@ -50,7 +52,7 @@ export function twoWeaponStyleState(system) {
     handgunSkillWaiver,
     dueRound: r.dueRound,
     needsReview: mixedPending,
-    reason: mixedPending ? "Resolve Both Guns Blazing’s mixed handgun/melee two-weapon scope before checks." : ""
+    reason: mixedPending ? loc`Resolve Both Guns Blazing’s mixed handgun/melee two-weapon scope before checks.` : ""
   };
 }
 /** Only the accepted two-weapon attack penalty is waived; unrelated conditions/recoil remain separate. */
@@ -65,7 +67,7 @@ export function twoWeaponSkillNote(system) {
   const s = twoWeaponStyleState(system);
   return s.active
     ? s.skillPenalty
-      ? `Two-weapon style: skill check penalty −${s.skillPenalty}. `
-      : "Both Guns Blazing: two-weapon skill penalty waived. "
+      ? loc`Two-weapon style: skill check penalty −${s.skillPenalty}. `
+      : loc`Both Guns Blazing: two-weapon skill penalty waived. `
     : "";
 }

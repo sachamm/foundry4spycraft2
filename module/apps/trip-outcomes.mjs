@@ -6,6 +6,7 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { endCombatStance } from "./combat-stance.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
+import { loc } from "../i18n.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -24,7 +25,7 @@ function participants(actor, a, d) {
     d?.flags?.spycraft2?.actorUuid !== opponent.uuid ||
     ![a, d].every(m => visible(m) && game.messages.get(m.id) === m)
   )
-    throw Error("An owner of both actual Trip participants must choose their visible recorded checks.");
+    throw Error(loc`An owner of both actual Trip participants must choose their visible recorded checks.`);
   return opponent;
 }
 function savedOutcome(a, d) {
@@ -40,7 +41,7 @@ function savedOutcome(a, d) {
       r.defenderMessage !== d.uuid ||
       stable(r.sourceEvidence) !== stable(evidence(a, d))
     )
-      throw Error("This Trip receipt is already bound to another pair or changed evidence; ask the GC to review.");
+      throw Error(loc`This Trip receipt is already bound to another pair or changed evidence; ask the GC to review.`);
   for (const r of rows) {
     const plan = tripOutcomePlan(a.flags.spycraft2, d.flags.spycraft2, {
       attackerUuid: a.flags.spycraft2.actorUuid,
@@ -57,7 +58,7 @@ function savedOutcome(a, d) {
       typeof r.operationId !== "string" ||
       !r.operationId
     )
-      throw Error("The saved Trip outcome fields are malformed; ask the GC to review.");
+      throw Error(loc`The saved Trip outcome fields are malformed; ask the GC to review.`);
   }
   const core = r => {
     const c = { ...r };
@@ -65,7 +66,7 @@ function savedOutcome(a, d) {
     return c;
   };
   if (rows.length === 2 && stable(core(x)) !== stable(core(y)))
-    throw Error("The saved Trip pair has conflicting outcome records.");
+    throw Error(loc`The saved Trip pair has conflicting outcome records.`);
   return rows.find(r => r.state === "applied") ?? rows[0];
 }
 async function finishSprawledExit(actor) {
@@ -75,7 +76,7 @@ async function finishSprawledExit(actor) {
 }
 async function stamp(a, d, prepared, result = {}) {
   if (stable(prepared.sourceEvidence) !== stable(evidence(a, d)))
-    throw Error("Trip receipts changed during settlement; retain the condition for GC review.");
+    throw Error(loc`Trip receipts changed during settlement; retain the condition for GC review.`);
   const final = { ...prepared, ...result, state: "applied" };
   for (const m of [a, d]) await m.update({ "flags.spycraft2.tripSettlement": final });
   return final;
@@ -83,7 +84,7 @@ async function stamp(a, d, prepared, result = {}) {
 export async function settleTripOutcome(actor, a, d, input = {}) {
   const opponent = participants(actor, a, d);
   if (a.flags.spycraft2.tripAttack?.version === 2) validateCounterTripReceipt(actor, a);
-  if (input.opposedConfirmed !== true) throw Error("Confirm these checks belong to the same ordinary opposed Trip.");
+  if (input.opposedConfirmed !== true) throw Error(loc`Confirm these checks belong to the same ordinary opposed Trip.`);
   return queueResources(
     [actor, opponent],
     async () => {
@@ -99,7 +100,7 @@ export async function settleTripOutcome(actor, a, d, input = {}) {
           );
         if (!saved.wasCondition && !effect)
           throw Error(
-            "The interrupted Trip condition needs explicit GC review; it may already have ended. Do not refresh it automatically."
+            loc`The interrupted Trip condition needs explicit GC review; it may already have ended. Do not refresh it automatically.`
           );
         if (saved.condition === "sprawled") await finishSprawledExit(t);
         return stamp(a, d, saved, { recovered: true });
@@ -127,7 +128,7 @@ export async function settleTripOutcome(actor, a, d, input = {}) {
       // Persist both reservations before the external effect. An uncertain interrupted effect requires GC review.
       for (const m of [a, d]) await m.update({ "flags.spycraft2.tripSettlement": prepared });
       const effect = await setConditionStatus(t, plan.condition, true, {
-        label: plan.condition === "sprawled" ? "Sprawled" : "Flat-footed",
+        label: plan.condition === "sprawled" ? loc`Sprawled` : loc`Flat-footed`,
         aliases: plan.condition === "flat-footed" ? ["flatFooted"] : [],
         operationId: prepared.operationId
       });
@@ -144,7 +145,7 @@ export async function reviewTripOutcome(actor, a, d, { confirmed = false, resolu
   const opponent = participants(actor, a, d);
   if (game.user.isGM !== true || confirmed !== true || !["alreadyApplied", "applyPending"].includes(resolution))
     throw Error(
-      "The owning GC must review the interrupted Trip and choose whether its condition already occurred or is still pending."
+      loc`The owning GC must review the interrupted Trip and choose whether its condition already occurred or is still pending.`
     );
   return queueResources(
     [actor, opponent],
@@ -152,7 +153,7 @@ export async function reviewTripOutcome(actor, a, d, { confirmed = false, resolu
       participants(actor, a, d);
       if (a.flags.spycraft2.tripAttack?.version === 2) validateCounterTripReceipt(actor, a);
       const saved = savedOutcome(a, d);
-      if (!saved || saved.state !== "prepared") throw Error("Choose a matching interrupted prepared Trip pair.");
+      if (!saved || saved.state !== "prepared") throw Error(loc`Choose a matching interrupted prepared Trip pair.`);
       const t = saved.conditionActorUuid === actor.uuid ? actor : opponent;
       let effect = { changed: false };
       if (resolution === "applyPending")
@@ -206,16 +207,16 @@ export async function manageTripOutcomes(actor, input = {}) {
           })
           .join("");
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Trip outcome" },
+      window: { title: loc`Trip outcome` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Finish both opposed checks in chat and mark one winner and one loser. Ordinary settlement applies sprawled to a losing defender or flat-footed to a losing attacker. Select actual reciprocal participant cards. A winning attacker’s critical success or losing defender’s critical failure earns one Trip final attack at−4 after settlement. Use Trip final attack immediately. A critical defensive win earns one free counter-Trip through Main’s Counter-Trip control. The second Trip cannot grant a third; its winning attacking critical may still earn one final attack. Weapon TRP remains separate.</p><label>Attacking Trip <select name="actingMessage">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Finish both opposed checks in chat and mark one winner and one loser. Ordinary settlement applies sprawled to a losing defender or flat-footed to a losing attacker. Select actual reciprocal participant cards. A winning attacker’s critical success or losing defender’s critical failure earns one Trip final attack at−4 after settlement. Use Trip final attack immediately. A critical defensive win earns one free counter-Trip through Main’s Counter-Trip control. The second Trip cannot grant a third; its winning attacking critical may still earn one final attack. Weapon TRP remains separate.`}</p><label>${loc`Attacking Trip`} <select name="actingMessage">` +
         options(acting) +
-        '</select></label><label>Resist Trip <select name="defendingMessage">' +
+        `</select></label><label>${loc`Resist Trip`} <select name="defendingMessage">` +
         options(defending) +
-        '</select></label><label><input type="checkbox" name="opposedConfirmed" /> These are the same opposed Trip or earned counter-Trip</label><label><input type="checkbox" name="tieResolvedConfirmed" /> Equal totals and skill bonuses: the GC used the p.91 random 1d20 tie-break</label>' +
+        `</select></label><label><input type="checkbox" name="opposedConfirmed" /> ${loc`These are the same opposed Trip or earned counter-Trip`}</label><label><input type="checkbox" name="tieResolvedConfirmed" /> ${loc`Equal totals and skill bonuses: the GC used the p.91 random 1d20 tie-break`}</label>` +
         (game.user.isGM
-          ? '<label>Interrupted outcome review <select name="reviewResolution"><option value="">Normal settlement / recovery</option><option value="alreadyApplied">Condition already occurred; preserve any later recovery</option><option value="applyPending">Condition still needs to be applied</option></select></label><label><input type="checkbox" name="reviewConfirmed" /> I reviewed the actual condition history and interrupted paired receipts</label>'
+          ? `<label>${loc`Interrupted outcome review`} <select name="reviewResolution"><option value="">${loc`Normal settlement / recovery`}</option><option value="alreadyApplied">${loc`Condition already occurred; preserve any later recovery`}</option><option value="applyPending">${loc`Condition still needs to be applied`}</option></select></label><label><input type="checkbox" name="reviewConfirmed" /> ${loc`I reviewed the actual condition history and interrupted paired receipts`}</label>`
           : "") +
         "</div>"
     });
@@ -238,7 +239,7 @@ export function tripFinalSource(actor, message) {
     a?.flags?.spycraft2?.actorUuid !== actor.uuid ||
     ![a, d].every(m => visible(m) && game.messages.get(m.id) === m)
   )
-    throw Error("Choose your actual visible critical Trip pair.");
+    throw Error(loc`Choose your actual visible critical Trip pair.`);
   const saved = savedOutcome(a, d);
   if (
     saved?.state !== "applied" ||
@@ -247,7 +248,7 @@ export function tripFinalSource(actor, message) {
     saved.attackerUuid !== actor.uuid ||
     saved.finalAttackPenalty !== 4
   )
-    throw Error("Settle the actual winning critical Trip before taking its final attack.");
+    throw Error(loc`Settle the actual winning critical Trip before taking its final attack.`);
   return { acting: a, defending: d, settlement: saved };
 }
 
@@ -258,7 +259,7 @@ export function counterTripSource(actor, defending) {
     defending?.flags?.spycraft2?.actorUuid !== actor.uuid ||
     ![acting, defending].every(m => visible(m) && game.messages.get(m.id) === m)
   )
-    throw Error("Choose your actual visible settled critical Trip defense.");
+    throw Error(loc`Choose your actual visible settled critical Trip defense.`);
   const saved = savedOutcome(acting, defending);
   if (
     saved?.state !== "applied" ||
@@ -268,7 +269,7 @@ export function counterTripSource(actor, defending) {
     saved.defenderUuid !== actor.uuid
   )
     throw Error(
-      "Only the original critical defender win earns a free counter-Trip; the second Trip never grants a third."
+      loc`Only the original critical defender win earns a free counter-Trip; the second Trip never grants a third.`
     );
   return { acting, defending, settlement: saved };
 }

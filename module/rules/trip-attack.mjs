@@ -3,6 +3,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { responseOwnSize, tripSizeIndex } from "./trip.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export { TRIP_SIZES } from "./trip.mjs";
 /** Ordinary half-action Trip p.361. Weapon qualities, free actions and settlement are separate. */
 export function tripAttackSkillChecks(key, checks = []) {
@@ -62,14 +63,14 @@ export function tripAttackPlan(
       ) ||
       tripCounter.targetUuid !== tripAttackOpponentUuid
     )
-      return reject("An actual earned counter-Trip source and its original opponent are required.");
-  } else if (tripCounter) return reject("Use the earned Counter-Trip control for that free action.");
-  if (method !== "roll") return reject("Trip is an opposed combat action; taking10/20 is unavailable (pp.91,352).");
+      return reject(loc`An actual earned counter-Trip source and its original opponent are required.`);
+  } else if (tripCounter) return reject(loc`Use the earned Counter-Trip control for that free action.`);
+  if (method !== "roll") return reject(loc`Trip is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
   if (!validOwnCountClock(tripAttackCombat) || (!counter && tripAttackCombat.turn !== tripAttackCombat.ownTurnIndex))
     return reject(
       counter
-        ? "Take the earned free counter-Trip in its started combat during the original participant’s Count."
-        : "Take the ordinary Trip half action during your Initiative Count in a started combat."
+        ? loc`Take the earned free counter-Trip in its started combat during the original participant’s Count.`
+        : loc`Take the ordinary Trip half action during your Initiative Count in a started combat.`
     );
   const unavailable = attributeActionBlock(system, { kind: "skill", ability: "dex" }) || restraintActionBlock(system);
   if (unavailable) return reject(unavailable);
@@ -87,11 +88,11 @@ export function tripAttackPlan(
   )
     return reject(
       counter
-        ? "Confirm the actual adjacent original attacker, both Sizes and a legal earned free reaction."
-        : "Name the actual adjacent opposing character and confirm the participants, actual Size difference and available half action."
+        ? loc`Confirm the actual adjacent original attacker, both Sizes and a legal earned free reaction.`
+        : loc`Name the actual adjacent opposing character and confirm the participants, actual Size difference and available half action.`
     );
   if (tripAttackSizeDifference < -1)
-    return reject("An ordinary Trip cannot target an opponent more than one Size category larger than you (p.361).");
+    return reject(loc`An ordinary Trip cannot target an opponent more than one Size category larger than you (p.361).`);
   let ownSize;
   try {
     ownSize = responseOwnSize(system);
@@ -104,11 +105,11 @@ export function tripAttackPlan(
       !tripAttackOpponentSize.trim() ||
       tripAttackOpponentSize.length > 200)
   )
-    return reject("Review the opponent’s actual current Size.");
+    return reject(loc`Review the opponent’s actual current Size.`);
   const ownIndex = tripSizeIndex(ownSize),
     opponentIndex = tripSizeIndex(tripAttackOpponentSize);
   if (ownIndex >= 0 && opponentIndex >= 0 && ownIndex - opponentIndex !== tripAttackSizeDifference)
-    return reject("The reviewed Size difference does not match these characters’ known current Sizes.");
+    return reject(loc`The reviewed Size difference does not match these characters’ known current Sizes.`);
   const sizeBonus = 4 * Math.max(0, tripAttackSizeDifference),
     evidence = {
       version: counter ? 2 : 1,
@@ -132,8 +133,8 @@ export function tripAttackPlan(
     evidence,
     sizeBonus,
     notes: [
-      `${counter ? "Earned free counter-Trip" : "Trip"} against ${tripAttackOpponentName.trim()}: ${counter ? "one earned free action" : "one half action"}, opposed Acrobatics(DEX), Armor Check Penalty, base error1 plus action error+1; only the larger participant gains+4per Size category. Your Size bonus +${sizeBonus} (pp.352,361).`,
-      "For reciprocal recorded characters, finish both checks in chat and use Main’s Trip outcomes, then Trip final attack for an earned winning critical follow-up at−4. An original critical defensive win earns Main’s Counter-Trip; the second Trip never grants a third. Unrecorded opponents and weapon-quality variants remain separate."
+      loc`${counter ? loc`Earned free counter-Trip` : loc`Trip`} against ${tripAttackOpponentName.trim()}: ${counter ? loc`one earned free action` : loc`one half action`}, opposed Acrobatics(DEX), Armor Check Penalty, base error1 plus action error+1; only the larger participant gains+4per Size category. Your Size bonus +${sizeBonus} (pp.352,361).`,
+      loc`For reciprocal recorded characters, finish both checks in chat and use Main’s Trip outcomes, then Trip final attack for an earned winning critical follow-up at−4. An original critical defensive win earns Main’s Counter-Trip; the second Trip never grants a third. Unrecorded opponents and weapon-quality variants remain separate.`
     ]
   };
 }
@@ -176,10 +177,10 @@ export function validateTripAttackProof(
       attributeSubstitution.ability === "int" &&
       (system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "dex"))
-    throw Error("The Trip attacker attribute or actual substitution source changed before posting.");
+    throw Error(loc`The Trip attacker attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
     throw Error(
-      "The Trip attacker, actual opponent, adjacency, Size or legal Trip action context changed before posting."
+      loc`The Trip attacker, actual opponent, adjacency, Size or legal Trip action context changed before posting.`
     );
 }
 

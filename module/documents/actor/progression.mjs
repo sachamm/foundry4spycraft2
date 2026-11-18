@@ -7,6 +7,7 @@ import { featAcquisition, captureFeatAcquisition } from "../../rules/feat-acquis
 import { checkPrerequisites } from "../../rules/prerequisites.mjs";
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
 import { FEAT_PACK } from "./shared.mjs";
+import { loc } from "../../i18n.mjs";
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
@@ -38,12 +39,12 @@ export const ActorProgression = Base =>
       const sys = this.system;
       if (sys.skillPurchaseIssues?.length)
         return ui.notifications.warn(
-          `Repair invalid skill-purchase history before gaining a level: ${sys.skillPurchaseIssues.map(issue => issue.message).join("; ")}`
+          loc`Repair invalid skill-purchase history before gaining a level: ${sys.skillPurchaseIssues.map(issue => issue.message).join("; ")}`
         );
       const deferred = deferredSkillDeadline(sys, [...this.items]);
       if (deferred.length)
         return ui.notifications.warn(
-          `Spend all deferred skill points before gaining another level (I Can Swim, p.200): ${deferred.join("; ")}.`
+          loc`Spend all deferred skill points before gaining another level (I Can Swim, p.200): ${deferred.join("; ")}.`
         );
       if (sys.progression.length >= 20) return ui.notifications.warn(game.i18n.localize("SPYCRAFT.Class.MaxLevel"));
       const ident = classData.system?.identifier || classData.name;
@@ -57,7 +58,9 @@ export const ActorProgression = Base =>
           ? this.checkPrerequisites(definition.requirements, { classEntry: true })
           : null;
       if (expertEntry && !expertEntry.ok)
-        return ui.notifications.warn(`Expert-class entry requirements are not met: ${expertEntry.unmet.join("; ")}.`);
+        return ui.notifications.warn(
+          loc`Expert-class entry requirements are not met: ${expertEntry.unmet.join("; ")}.`
+        );
       if (!cls) {
         const data = classData.toObject?.() ?? foundry.utils.deepClone(classData);
         delete data._id;
@@ -129,12 +132,12 @@ export const ActorProgression = Base =>
       if (!this.isOwner || this.type !== "agent") return null;
       if (this.system.resourcesInitialized)
         return ui.notifications.warn(
-          "Starting resources have already been initialized; current earnings are preserved."
+          loc`Starting resources have already been initialized; current earnings are preserved.`
         );
       if (keepCurrent) return this.update({ "system.resourcesInitialized": true });
       if (![0, 2].includes(this.system.reputation) || ![0, 100000].includes(this.system.netWorth))
         return ui.notifications.warn(
-          "These values contain existing earnings. Use 'Keep current resources' to preserve them."
+          loc`These values contain existing earnings. Use 'Keep current resources' to preserve them.`
         );
       const freelance = this.system.affiliationType === "freelance";
       return this.update({

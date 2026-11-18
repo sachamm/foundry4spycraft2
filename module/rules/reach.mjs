@@ -1,15 +1,16 @@
+import { loc } from "../i18n.mjs";
 /** Reach (RCH), p.302. Quality distances are feet; prepared character Reach
  * uses squares. Keep the weapon's added distance separate from that base. */
 export function reachIncreaseFeet(qualities = "") {
-  if (typeof qualities !== "string") throw Error("Review the actual Reach weapon qualities.");
+  if (typeof qualities !== "string") throw Error(loc`Review the actual Reach weapon qualities.`);
   if (!/\bRCH\b/i.test(qualities)) return 0;
   const entries = [...qualities.matchAll(/\bRCH\b\s*\(([^)]*)\)/gi)],
     rest = qualities.replace(/\bRCH\b\s*\([^)]*\)/gi, "");
   if (!entries.length || /\bRCH\b/i.test(rest) || entries.some(m => !/^\s*\+?\d+\s*ft\.?\s*$/i.test(m[1])))
-    throw Error("Review the Reach quality’s positive distance in feet.");
+    throw Error(loc`Review the Reach quality’s positive distance in feet.`);
   const values = entries.map(m => Number(m[1].match(/\d+/)[0]));
   if (values.some(n => !Number.isSafeInteger(n) || n <= 0) || new Set(values).size !== 1)
-    throw Error("Review the weapon’s single Reach distance.");
+    throw Error(loc`Review the weapon’s single Reach distance.`);
   return values[0];
 }
 export function reachAttackPlan(
@@ -27,7 +28,7 @@ export function reachAttackPlan(
     [trained, ranged, geometryConfirmed, polearmBasics, defensive].some(v => typeof v !== "boolean") ||
     (adjacent !== null && typeof adjacent !== "boolean")
   )
-    throw Error("Review actual Reach training, adjacency and geometry declarations.");
+    throw Error(loc`Review actual Reach training, adjacency and geometry declarations.`);
   const listedFeet = reachIncreaseFeet(weapon?.qualities ?? ""),
     polearm = weapon?.meleeFamily === "polearm" && weapon?.proficiency === "exoticEdged" && !ranged,
     waiver = !defensive && !!listedFeet && polearm && polearmBasics;
@@ -48,21 +49,21 @@ export function reachAttackPlan(
     evidence,
     blocked: pending,
     blockedReason: pending
-      ? "Untrained Reach against an adjacent target needs the pending p.302 ruling; no adjacent penalty has been assumed."
+      ? loc`Untrained Reach against an adjacent target needs the pending p.302 ruling; no adjacent penalty has been assumed.`
       : "",
     notes:
       listedFeet && !defensive
         ? [
-            `Reach (RCH): ${trained ? "+" + listedFeet + " ft. with this trained attack" : "no extra Reach with this untrained attack"}.`,
+            loc`Reach (RCH): ${trained ? "+" + listedFeet + loc` ft. with this trained attack` : loc`no extra Reach with this untrained attack`}.`,
             ...(adjacent === null
-              ? ["Confirm actual adjacency and legal Reach geometry before rolling."]
+              ? [loc`Confirm actual adjacency and legal Reach geometry before rolling.`]
               : !geometryConfirmed
-                ? ["The GC must confirm the actual target and legal Reach geometry."]
+                ? [loc`The GC must confirm the actual target and legal Reach geometry.`]
                 : []),
             ...(waiver && adjacent === true
-              ? ["Polearm Basics: this actual polearm ignores the adjacent-target −5 penalty (p.179)."]
+              ? [loc`Polearm Basics: this actual polearm ignores the adjacent-target −5 penalty (p.179).`]
               : evidence.attackPenalty
-                ? ["Reach: adjacent target, attack −5 (p.302)."]
+                ? [loc`Reach: adjacent target, attack −5 (p.302).`]
                 : [])
           ]
         : []

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 const epoch = system => String(system.usagePeriods?.mission ?? "initial");
 export function toolShedSource(system) {
   const feats = (system.activeFeatSelections ?? []).filter(f => f.name === "Tool Shed" && f.tree === "gear");
@@ -44,9 +45,9 @@ export function toolShedKitState(system, item) {
     valid,
     expired,
     blockedReason: !valid
-      ? "Review the selected Tool Shed kit’s grant and unchanged specifications."
+      ? loc`Review the selected Tool Shed kit’s grant and unchanged specifications.`
       : expired
-        ? "This Tool Shed kit was lost at the end of its mission; choose available gear."
+        ? loc`This Tool Shed kit was lost at the end of its mission; choose available gear.`
         : "",
     evidence: valid ? { id: ref.id, epoch: ref.epoch, itemId: item.id, fingerprint: r.fingerprint } : null
   };
@@ -57,13 +58,13 @@ export function toolShedPlan(
   { atHome = false, hourCompletedConfirmed = false, home = "", id = "", at = 0 } = {}
 ) {
   const source = toolShedSource(system);
-  if (!source) throw new Error("An active Tool Shed selection and Home Sweet Home are required.");
+  if (!source) throw new Error(loc`An active Tool Shed selection and Home Sweet Home are required.`);
   if (atHome !== true || hourCompletedConfirmed !== true)
-    throw new Error("Complete one full hour as an action inside your home before claiming this kit.");
+    throw new Error(loc`Complete one full hour as an action inside your home before claiming this kit.`);
   if (typeof home !== "string" || !home.trim() || home.length > 200)
-    throw new Error("Record the home where this kit was found.");
+    throw new Error(loc`Record the home where this kit was found.`);
   if (!/^[A-Za-z0-9_-]+$/.test(id) || system.classGearGrants?.[id])
-    throw new Error("A unique Tool Shed grant identifier is required.");
+    throw new Error(loc`A unique Tool Shed grant identifier is required.`);
   if (
     kit?.type !== "gear" ||
     kit.system?.kitGrade !== 3 ||
@@ -71,7 +72,7 @@ export function toolShedPlan(
     !Number.isFinite(kit.system.weight) ||
     kit.system.weight < 0
   )
-    throw new Error("Choose a source-listed Grade III kit.");
+    throw new Error(loc`Choose a source-listed Grade III kit.`);
   const data = kit.toObject?.() ?? structuredClone(kit);
   delete data._id;
   delete data.id;

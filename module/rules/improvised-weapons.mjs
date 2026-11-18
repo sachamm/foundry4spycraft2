@@ -1,6 +1,7 @@
 import { gearCheckPlan } from "./gear-checks.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
+import { loc } from "../i18n.mjs";
 /** Table5.12 p.347. A player may choose a listed weapon from this row or any lower row. */
 export const IMPROVISED_WEAPON_ROWS = [
   { minimum: 1, weapons: ["light club", "knife"] },
@@ -11,7 +12,7 @@ export const IMPROVISED_WEAPON_ROWS = [
 ];
 export function improvisedWeaponOptions(result) {
   if (typeof result !== "number" || !Number.isSafeInteger(result))
-    throw new Error("Review the final whole-number Gear check result.");
+    throw new Error(loc`Review the final whole-number Gear check result.`);
   return IMPROVISED_WEAPON_ROWS.filter(row => row.minimum <= result).flatMap(row => row.weapons);
 }
 /** A separate durable allowance for each combat prevents switching encounters from refreshing an old use. */
@@ -25,7 +26,7 @@ export function improvisedMasterySpec(system, combatId) {
     return null;
   return {
     id: "improvisedWeaponMastery_" + combatId,
-    name: "Improvised Weapon Mastery (waive one search payment)",
+    name: loc`Improvised Weapon Mastery (waive one search payment)`,
     period: "combat",
     limit: 1,
     cost: 0,
@@ -42,16 +43,16 @@ export function improvisedSearchPlan(
   const blocked = attributeActionBlock(system, { kind: "gear", ability: "wis" }) || restraintActionBlock(system);
   if (blocked) throw new Error(blocked);
   if (nonBarrenConfirmed !== true)
-    throw new Error("Confirm that this location is not barren before searching for an improvised weapon.");
-  if (!Number.isSafeInteger(system.gearCheck)) throw new Error("Review the character’s Gear check bonus.");
-  if (typeof useMastery !== "boolean") throw new Error("Choose whether to use the Mastery payment waiver.");
+    throw new Error(loc`Confirm that this location is not barren before searching for an improvised weapon.`);
+  if (!Number.isSafeInteger(system.gearCheck)) throw new Error(loc`Review the character’s Gear check bonus.`);
+  if (typeof useMastery !== "boolean") throw new Error(loc`Choose whether to use the Mastery payment waiver.`);
   const gearCheckContext = gearCheckPlan(system, { atHome });
   const basics = system.activeFeatNames?.includes("Improvised Weapon Basics") === true,
     mastery = basics && system.activeFeatNames?.includes("Improvised Weapon Mastery") === true,
     bonus = gearCheckContext.bonus + (basics ? 3 : 0);
   if (useMastery && !improvisedMasterySpec(system, combatId))
-    throw new Error("The Mastery waiver requires an active feat and a participating combat.");
-  if (!Number.isSafeInteger(bonus)) throw new Error("Review the improvised-weapon Gear check bonus.");
+    throw new Error(loc`The Mastery waiver requires an active feat and a participating combat.`);
+  if (!Number.isSafeInteger(bonus)) throw new Error(loc`Review the improvised-weapon Gear check bonus.`);
   return {
     version: 3,
     nonBarrenConfirmed: true,

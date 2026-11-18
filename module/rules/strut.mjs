@@ -2,6 +2,7 @@ import { restraintActionBlock } from "./restraints.mjs";
 import { actionDiceGain } from "./action-dice.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export const hasStrut = system =>
   (system.classLevels?.brawler ?? 0) >= 3 &&
   (system.classOptionSelections ?? []).some(s => s.classId === "brawler" && s.name === "Strut");
@@ -12,8 +13,8 @@ export function strutGainPlan(
   { actorUuid, messageUuid, combat, careerDie, nextHalfActionConfirmed = false } = {}
 ) {
   if (system.actionDiceSettlementReview?.needsReview)
-    throw new Error("Review the interrupted action-die settlement before granting Strut dice.");
-  if (!hasStrut(system)) throw new Error("Choose the Brawler Strut ploy before using it.");
+    throw new Error(loc`Review the interrupted action-die settlement before granting Strut dice.`);
+  if (!hasStrut(system)) throw new Error(loc`Choose the Brawler Strut ploy before using it.`);
   if (
     check?.actorUuid !== actorUuid ||
     check.checkKind !== "attack" ||
@@ -21,10 +22,10 @@ export function strutGainPlan(
     check.criticalFailure ||
     !(check.threatConfirmed === true || check.criticalSuccess === true)
   )
-    throw new Error("Strut requires this character’s confirmed attack threat or critical hit.");
+    throw new Error(loc`Strut requires this character’s confirmed attack threat or critical hit.`);
   const melee =
     check.unarmed === true || check.weaponProficiency === "unarmed" || check.attackContext?.ranged === false;
-  if (!melee) throw new Error("Strut requires an unarmed or melee attack.");
+  if (!melee) throw new Error(loc`Strut requires an unarmed or melee attack.`);
   if (
     !combat?.started ||
     !combat.id ||
@@ -36,7 +37,7 @@ export function strutGainPlan(
     combat.turn !== combat.ownTurnIndex ||
     !combat.combatantId
   )
-    throw new Error("Spend the next half action posturing during this character’s initiative in the same combat.");
+    throw new Error(loc`Spend the next half action posturing during this character’s initiative in the same combat.`);
   if (
     check.rollCombat?.id !== combat.id ||
     check.rollCombat?.combatantId !== combat.combatantId ||
@@ -44,22 +45,22 @@ export function strutGainPlan(
     check.rollCombat.round < 1 ||
     check.rollCombat.round > combat.round
   )
-    throw new Error("The eligible attack must be recorded in this combat.");
+    throw new Error(loc`The eligible attack must be recorded in this combat.`);
   if (
     check.strutPoolId ||
     Object.values(system.bonusActionDice ?? {}).some(p => p.source === "strut" && p.messageUuid === messageUuid)
   )
-    throw new Error("This attack already supplied its Strut grant.");
+    throw new Error(loc`This attack already supplied its Strut grant.`);
   if (nextHalfActionConfirmed !== true)
-    throw new Error("The GC must confirm that the next half action after this attack was spent posturing.");
+    throw new Error(loc`The GC must confirm that the next half action after this attack was spent posturing.`);
   const blocked = restraintActionBlock(system) || attributeActionBlock(system, { kind: "ability" });
   if (blocked) throw new Error(blocked);
   if (system.conditionContext?.held || system.conditionContext?.pinned)
-    throw new Error("Held/Pinned: this non-free posturing action is unavailable.");
+    throw new Error(loc`Held/Pinned: this non-free posturing action is unavailable.`);
   return {
     ...actionDiceGain(system, careerDie),
     source: "strut",
-    label: "Strut",
+    label: loc`Strut`,
     baseDie: careerDie,
     baseCount: 1,
     bold: system.activeFeatNames?.includes("Fortune Favors the Bold") === true
@@ -77,11 +78,11 @@ export function strutPool(system, gain, { id, messageUuid, combat, periods = sys
     !combat.combatantId ||
     !Number.isFinite(system.worldTime)
   )
-    throw new Error("Review the Strut grant source and receipt.");
+    throw new Error(loc`Review the Strut grant source and receipt.`);
   return {
     id,
     source: "strut",
-    label: "Strut",
+    label: loc`Strut`,
     unrestricted: true,
     baseDie: gain.baseDie,
     baseCount: 1,
@@ -111,6 +112,6 @@ rollPipeline.register({
     if (!hasStrut(actor.system) || check.superseded || check.strutPoolId) return null;
     if (!(check.threatConfirmed || check.criticalSuccess) || !check.rollCombat?.id) return null;
     if (!(check.unarmed || check.weaponProficiency === "unarmed" || check.attackContext?.ranged === false)) return null;
-    return [{ label: "Strut: posture next half action", run: () => actor.useStrut(message) }];
+    return [{ label: loc`Strut: posture next half action`, run: () => actor.useStrut(message) }];
   }
 });

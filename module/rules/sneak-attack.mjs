@@ -1,4 +1,5 @@
 import { sniperWeapon } from "./sniper.mjs";
+import { loc } from "../i18n.mjs";
 const has = (system, name) =>
   (system.activeFeatNames ?? []).some(
     n => n.toLowerCase().replace(/\s/g, "") === name.toLowerCase().replace(/\s/g, "")
@@ -22,7 +23,7 @@ export function sneakAttackSources(
   if (sideStanceDie === true) add("Side Stance", 1);
   if (trickSneak) {
     if (trickSneak.source !== "Between the Ribs" || trickSneak.dice !== 1 || unarmed(weapon) || !melee(weapon))
-      throw new Error("Review the recorded melee trick sneak attack die.");
+      throw new Error(loc`Review the recorded melee trick sneak attack die.`);
     add(trickSneak.source, trickSneak.dice);
   }
   for (const name of ["Ambush Basics", "Ambush Supremacy"]) if (has(system, name)) add(name, 1);
@@ -65,32 +66,33 @@ export function sneakAttackDamagePlan(
     typeof targetSneakAttackImmune !== "boolean" ||
     typeof sideStanceDie !== "boolean"
   )
-    throw new Error("Confirm whether sneak attack damage and target immunity apply.");
+    throw new Error(loc`Confirm whether sneak attack damage and target immunity apply.`);
   if (!includeSneakAttack) return { active: false, dice: 0 };
   if (whirlingFlankingProof?.prevented) targetFlanked = false;
   if (targetSneakAttackImmune || knownSneakAttackImmunity(targetSystem ?? {}).immune)
-    throw new Error("The target is immune to sneak attack damage.");
-  if (successfulStandardAttack !== true) throw new Error("Sneak attack damage requires a successful Standard Attack.");
-  if (targetCharacter !== true) throw new Error("Sneak attack damage affects characters, not objects.");
+    throw new Error(loc`The target is immune to sneak attack damage.`);
+  if (successfulStandardAttack !== true)
+    throw new Error(loc`Sneak attack damage requires a successful Standard Attack.`);
+  if (targetCharacter !== true) throw new Error(loc`Sneak attack damage affects characters, not objects.`);
   if (![targetFlanked, targetHelpless, targetVulnerable].some(v => v === true))
-    throw new Error("Confirm this target is flanked, helpless or vulnerable.");
+    throw new Error(loc`Confirm this target is flanked, helpless or vulnerable.`);
   if (targetVitalsConfirmed !== true)
     throw new Error(
-      "Confirm the target is not immune to critical hits, is not hidden to you and has reachable vitals."
+      loc`Confirm the target is not immune to critical hits, is not hidden to you and has reachable vitals.`
     );
   if (
     !["none", "lethalToSubdual", "subdualToLethal"].includes(damageConversion) ||
     !["lethal", "subdual"].includes(damageType)
   )
-    throw new Error("Review the damage type and conversion.");
+    throw new Error(loc`Review the damage type and conversion.`);
   if (
     damageConversion !== "none" &&
     !(damageConversion === "lethalToSubdual" && has(system, "Bludgeon") && damageType === "subdual")
   )
-    throw new Error("Converted damage cannot include sneak attack damage, except lethal to subdual with Bludgeon.");
+    throw new Error(loc`Converted damage cannot include sneak attack damage, except lethal to subdual with Bludgeon.`);
   const sources = sneakAttackSources(system, weapon, { targetFlanked, braced, sideStanceDie, trickSneak }),
     dice = sources.reduce((n, s) => n + s.dice, 0);
-  if (!dice) throw new Error("This weapon and declared circumstances have no earned sneak attack dice.");
+  if (!dice) throw new Error(loc`This weapon and declared circumstances have no earned sneak attack dice.`);
   let rangeLimit = null,
     extendedRange = false;
   if (!melee(weapon)) {
@@ -103,17 +105,17 @@ export function sneakAttackDamagePlan(
       !Number.isFinite(distance) ||
       distance < 0
     )
-      throw new Error("Enter the target distance for ranged sneak attack damage.");
+      throw new Error(loc`Enter the target distance for ranged sneak attack damage.`);
     rangeLimit = system.cqbRange ?? 30;
     if (targetFlanked === true && distance > rangeLimit)
       throw new Error(
-        "A ranged flanking opponent must be within CQB; Sniper range does not extend flanking positions (p.341)."
+        loc`A ranged flanking opponent must be within CQB; Sniper range does not extend flanking positions (p.341).`
       );
     if (sniper >= 4 && sniperWeapon(weapon) && Number.isFinite(increment) && increment > 0) {
       rangeLimit = Math.max(rangeLimit, sniper * increment);
       extendedRange = distance > (system.cqbRange ?? 30);
     }
-    if (distance > rangeLimit) throw new Error("This target is beyond your sneak attack range.");
+    if (distance > rangeLimit) throw new Error(loc`This target is beyond your sneak attack range.`);
   }
   const bonusPerDie =
       (has(system, "Deadly Precision") ? 1 : 0) + (damageType === "subdual" && has(system, "Whack") ? 1 : 0),
@@ -138,7 +140,7 @@ export function sneakAttackDamagePlan(
     targetCharacter: true,
     targetVitalsConfirmed: true,
     successfulStandardAttack: true,
-    notes: `Sneak attack: +${dice}d6${bonus ? ` + ${bonus}` : ""} ${damageType} damage, combined with the attack; apply 1 stress damage to the target. Action dice may boost only the base attack damage, never these sneak attack dice. ${extendedRange ? "Sniper extended sneak attack range applies. " : ""}Known target immunity is checked when a target sheet is supplied; confirm other immunities, damage resistance, damage conversion and health application at the table (pp.80,193–196,339).`
+    notes: loc`Sneak attack: +${dice}d6${bonus ? ` + ${bonus}` : ""} ${damageType} damage, combined with the attack; apply 1 stress damage to the target. Action dice may boost only the base attack damage, never these sneak attack dice. ${extendedRange ? loc`Sniper extended sneak attack range applies. ` : ""}Known target immunity is checked when a target sheet is supplied; confirm other immunities, damage resistance, damage conversion and health application at the table (pp.80,193–196,339).`
   };
 }
 

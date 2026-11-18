@@ -6,6 +6,7 @@ import {
   getPendingRestraintMoves
 } from "../rules/restraints.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   clone = structuredClone;
 const effectById = (actor, id) => [...(actor.effects ?? [])].find(e => e.id === id),
@@ -24,7 +25,7 @@ async function annotate(message, receipt) {
     });
   } catch {
     ui.notifications.warn(
-      "The grapple benefit is recorded on the character; its chat annotation needs refresh. Do not apply it again."
+      loc`The grapple benefit is recorded on the character; its chat annotation needs refresh. Do not apply it again.`
     );
   }
 }
@@ -37,7 +38,7 @@ async function cleanEmpty(actor, rows) {
       await actor.deleteEmbeddedDocuments("ActiveEffect", [effect.id]);
     } catch {
       if (effectById(actor, effect.id))
-        ui.notifications.warn("The grapple benefit is complete; an empty condition effect remains for GC cleanup.");
+        ui.notifications.warn(loc`The grapple benefit is complete; an empty condition effect remains for GC cleanup.`);
     }
   }
 }
@@ -47,12 +48,12 @@ async function restore(actor, rows) {
     const effect = effectById(actor, row.id),
       now = statuses(effect);
     if (!effect) {
-      failures.push(new Error("A restraint source was removed meanwhile."));
+      failures.push(new Error(loc`A restraint source was removed meanwhile.`));
       continue;
     }
     if (same(now, row.before)) continue;
     if (!same(now, row.after)) {
-      failures.push(new Error("A restraint source changed again."));
+      failures.push(new Error(loc`A restraint source changed again.`));
       continue;
     }
     try {
@@ -80,39 +81,39 @@ function priorReceipt(actor, message) {
     receipt.actorUuid !== actor.uuid ||
     !rollEvidenceMatches(receipt.evidence, message.flags.spycraft2)
   )
-    throw new Error("The recorded grapple benefit or its roll changed. Ask the GC to review it.");
+    throw new Error(loc`The recorded grapple benefit or its roll changed. Ask the GC to review it.`);
   return receipt;
 }
 export async function applyRestraintEscape(actor, message, options = {}) {
   if (!actor.isOwner || message.flags?.spycraft2?.actorUuid !== actor.uuid) return null;
-  if (message.blind && !game.user.isGM) throw new Error("The GC resolves secret grapple results.");
+  if (message.blind && !game.user.isGM) throw new Error(loc`The GC resolves secret grapple results.`);
   const previous = priorReceipt(actor, message);
   if (previous) return previous;
   const expected = rollEvidence(message.flags.spycraft2),
     check = message.flags.spycraft2;
   let input = options;
   if (check.resolved !== true || check.successConfirmed !== true || check.superseded || check.criticalFailure)
-    throw new Error("Confirm the successful opposed result and finish the check first.");
+    throw new Error(loc`Confirm the successful opposed result and finish the check first.`);
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Apply grapple escape benefit" },
+      window: { title: loc`Apply grapple escape benefit` },
       rejectClose: false,
-      content: `<p>The successful opposed check grants one benefit, or two with a critical success/opponent critical failure. Breaking a pin leaves the character Held. Escaping a hold requires an immediate Standard Move of at least 5 ft., up to Speed (p.357).</p><label>Benefit <select name="benefit">${check.restraintEscape?.condition === "pinned" ? '<option value="breakPin">Break Pin: remain Held</option><option value="breakPinAndEscapeHold">Break Pin and Escape Hold: requires two benefits</option>' : '<option value="escapeHold">Escape Hold</option>'}</select></label><label><input name="opponentCriticalFailureConfirmed" type="checkbox" /> The GC confirms the opponent suffered a critical failure in this opposed check</label><label><input name="confirmed" type="checkbox" /> The GC confirms the final opposed result and selected benefit</label>`
+      content: `<p>${loc`The successful opposed check grants one benefit, or two with a critical success/opponent critical failure. Breaking a pin leaves the character Held. Escaping a hold requires an immediate Standard Move of at least 5 ft., up to Speed (p.357).`}</p><label>${loc`Benefit`} <select name="benefit">${check.restraintEscape?.condition === "pinned" ? `<option value="breakPin">${loc`Break Pin: remain Held`}</option><option value="breakPinAndEscapeHold">${loc`Break Pin and Escape Hold: requires two benefits`}</option>` : `<option value="escapeHold">${loc`Escape Hold`}</option>`}</select></label><label><input name="opponentCriticalFailureConfirmed" type="checkbox" /> ${loc`The GC confirms the opponent suffered a critical failure in this opposed check`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms the final opposed result and selected benefit`}</label>`
     });
     if (!input) return null;
   }
   return queueResources(
     [actor],
     async () => {
-      if (!actor.isOwner || (message.blind && !game.user.isGM)) throw new Error("The grapple authority changed.");
+      if (!actor.isOwner || (message.blind && !game.user.isGM)) throw new Error(loc`The grapple authority changed.`);
       const previous = priorReceipt(actor, message);
       if (previous) return previous;
       if (getRestraintReleaseReview(actor).needsReview)
-        throw new Error("The GC must review the interrupted grapple release first.");
+        throw new Error(loc`The GC must review the interrupted grapple release first.`);
       if (getPendingRestraintMoves(actor).length)
-        throw new Error("Complete the required movement from the previous Escape Hold first.");
+        throw new Error(loc`Complete the required movement from the previous Escape Hold first.`);
       if (rollEvidence(message.flags.spycraft2) !== expected)
-        throw new Error("The opposed result changed while choosing its benefit.");
+        throw new Error(loc`The opposed result changed while choosing its benefit.`);
       const plan = restraintReleasePlan(actor, message, input),
         rows = plan.updates.map(row => ({
           ...row,
@@ -130,10 +131,10 @@ export async function applyRestraintEscape(actor, message, options = {}) {
           if (!rows.every(row => same(statuses(effectById(actor, row.id)), row.after))) throw error;
         }
         if (!same({ held: actor.statuses.has("held"), pinned: actor.statuses.has("pinned") }, plan.after))
-          throw new Error("The current restraint sources changed during release.");
+          throw new Error(loc`The current restraint sources changed during release.`);
         if (plan.requiredMove && Number.isFinite(actor.system.speed) && actor.system.speed < 5)
           throw new Error(
-            "Escape Hold requires a legal Standard Move of at least 5 ft.; resolve the current immobility first."
+            loc`Escape Hold requires a legal Standard Move of at least 5 ft.; resolve the current immobility first.`
           );
         for (const row of rows) row.afterData = clone(effectById(actor, row.id).toObject());
         record = {
@@ -170,10 +171,12 @@ export async function applyRestraintEscape(actor, message, options = {}) {
             evidence: expected,
             plan: clone(plan),
             needsReview: true,
-            reason:
-              "The interrupted grapple release could not be fully restored. Review its actual condition sources and any required movement."
+            reason: loc`The interrupted grapple release could not be fully restored. Review its actual condition sources and any required movement.`
           });
-          throw new AggregateError([error, ...failures], "The grapple release needs GC review before further actions.");
+          throw new AggregateError(
+            [error, ...failures],
+            loc`The grapple release needs GC review before further actions.`
+          );
         }
         throw error;
       }
@@ -185,18 +188,18 @@ export async function applyRestraintEscape(actor, message, options = {}) {
   );
 }
 export async function reviewRestraintRelease(actor, message, options = {}) {
-  if (!game.user.isGM || !actor.isOwner) throw new Error("Only the GC can review the interrupted grapple release.");
+  if (!game.user.isGM || !actor.isOwner) throw new Error(loc`Only the GC can review the interrupted grapple release.`);
   const review = clone(getRestraintReleaseReview(actor));
   if (!review.needsReview) return null;
   if (message.id !== review.id || message.flags?.spycraft2?.actorUuid !== actor.uuid)
-    throw new Error("Choose the original grapple message.");
+    throw new Error(loc`Choose the original grapple message.`);
   const expected = restraintSourceSnapshot(actor);
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review grapple release" },
+      window: { title: loc`Review grapple release` },
       rejectClose: false,
-      content: `<p>Current Held: ${expected.held ? "yes" : "no"}; Pinned: ${expected.pinned ? "yes" : "no"}. Correct actual condition sources with Main's state controls first. Then record whether this benefit stands; this review does not change effects or move a token.</p><label>Disposition <select name="disposition"><option value="keep">Keep the reviewed benefit</option><option value="cancel">Cancel the benefit</option></select></label><label>GC explanation <input name="resolution" /></label><label><input name="movementResolvedConfirmed" type="checkbox" /> I separately resolved any required Escape Hold movement</label><label><input name="confirmed" type="checkbox" /> I confirm the actual sources and disposition</label>`
+      content: `<p>${loc`Current Held: ${expected.held ? "yes" : "no"}; Pinned: ${expected.pinned ? "yes" : "no"}. Correct actual condition sources with Main's state controls first. Then record whether this benefit stands; this review does not change effects or move a token.`}</p><label>${loc`Disposition`} <select name="disposition"><option value="keep">${loc`Keep the reviewed benefit`}</option><option value="cancel">${loc`Cancel the benefit`}</option></select></label><label>${loc`GC explanation`} <input name="resolution" /></label><label><input name="movementResolvedConfirmed" type="checkbox" /> ${loc`I separately resolved any required Escape Hold movement`}</label><label><input name="confirmed" type="checkbox" /> ${loc`I confirm the actual sources and disposition`}</label>`
     });
     if (!input) return null;
   }
@@ -207,7 +210,7 @@ export async function reviewRestraintRelease(actor, message, options = {}) {
     !input.resolution.trim() ||
     (input.disposition === "keep" && review.plan.requiredMove && input.movementResolvedConfirmed !== true)
   )
-    throw new Error("Confirm the reviewed sources, movement and GC explanation.");
+    throw new Error(loc`Confirm the reviewed sources, movement and GC explanation.`);
   return queueResources(
     [actor],
     async () => {
@@ -218,7 +221,7 @@ export async function reviewRestraintRelease(actor, message, options = {}) {
         !same(restraintSourceSnapshot(actor), expected) ||
         !rollEvidenceMatches(review.evidence, message.flags.spycraft2)
       )
-        throw new Error("The grapple review or its sources changed. Open it again.");
+        throw new Error(loc`The grapple review or its sources changed. Open it again.`);
       const record = {
           id: message.id,
           actorUuid: actor.uuid,
@@ -254,15 +257,15 @@ export async function reviewRestraintRelease(actor, message, options = {}) {
 }
 export async function confirmRestraintEscapeMove(actor, message, options = {}) {
   if (!actor.isOwner || message.flags?.spycraft2?.actorUuid !== actor.uuid || (message.blind && !game.user.isGM))
-    throw new Error("Choose an owned grapple movement record; the GC handles secret results.");
+    throw new Error(loc`Choose an owned grapple movement record; the GC handles secret results.`);
   const record = clone(priorReceipt(actor, message));
   if (record?.movement?.state !== "required") return record;
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Confirm Escape Hold movement" },
+      window: { title: loc`Confirm Escape Hold movement` },
       rejectClose: false,
-      content: `<p>Escape Hold requires an immediate Standard Move of 5 ft. or more, up to Speed. Confirm the actual move after resolving its path and hazards with the GC. This control does not move a token.</p><label>Actual distance (ft.) <input name="distance" type="number" min="5" value="5" /></label>${record.movement.maximum === null ? '<label>GC-reviewed maximum distance (ft.) <input name="approvedMaximum" type="number" min="5" /></label><label>Capacity review explanation <input name="resolution" /></label>' : `<p>Recorded maximum ${record.movement.maximum} ft.</p>`}<label><input name="confirmed" type="checkbox" /> The GC confirms the immediate Standard Move actually occurred within the allowed distance</label>`
+      content: `<p>${loc`Escape Hold requires an immediate Standard Move of 5 ft. or more, up to Speed. Confirm the actual move after resolving its path and hazards with the GC. This control does not move a token.`}</p><label>${loc`Actual distance (ft.)`} <input name="distance" type="number" min="5" value="5" /></label>${record.movement.maximum === null ? `<label>${loc`GC-reviewed maximum distance (ft.)`} <input name="approvedMaximum" type="number" min="5" /></label><label>${loc`Capacity review explanation`} <input name="resolution" /></label>` : `<p>${loc`Recorded maximum ${record.movement.maximum} ft.`}</p>`}<label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms the immediate Standard Move actually occurred within the allowed distance`}</label>`
     });
     if (!input) return null;
     const number = value =>
@@ -281,7 +284,7 @@ export async function confirmRestraintEscapeMove(actor, message, options = {}) {
       (!game.user.isGM || typeof input.resolution !== "string" || !input.resolution.trim()))
   )
     throw new Error(
-      "Confirm the actual 5-ft.-or-longer move within the allowed Speed; unresolved capacity requires a GC explanation."
+      loc`Confirm the actual 5-ft.-or-longer move within the allowed Speed; unresolved capacity requires a GC explanation.`
     );
   return queueResources(
     [actor],
@@ -295,7 +298,7 @@ export async function confirmRestraintEscapeMove(actor, message, options = {}) {
         getRestraintReleaseReview(actor).needsReview ||
         (record.movement.maximum === null && !game.user.isGM)
       )
-        throw new Error("The grapple movement record or authority changed.");
+        throw new Error(loc`The grapple movement record or authority changed.`);
       const next = {
         ...record,
         movement: {

@@ -1,5 +1,6 @@
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Readied melee feat skill benefits, pp.176,179–180. Other benefits remain separate. */
 const definitions = [
   { name: "Axe Basics", family: "axe", scopes: ["trip"], bonus: 1 },
@@ -45,7 +46,7 @@ export function meleeSkillFeatPlan(system, key, check) {
     bonuses: sources.map(s => ({ source: s.feat, type: "gear", value: s.bonus })),
     notes: sources.map(
       s =>
-        `${s.feat}: +${s.bonus} gear with this ${scope} skill check while holding a readied ${s.family}; gear bonuses do not stack (pp.176,179–180,329).`
+        loc`${s.feat}: +${s.bonus} gear with this ${scope} skill check while holding a readied ${s.family}; gear bonuses do not stack (pp.176,179–180,329).`
     )
   };
 }
@@ -63,7 +64,7 @@ export function validateMeleeSkillFeatProof(system, proof, { checkKind, skillKey
   if (!proof) return;
   const p = meleeSkillFeatPlan(system, skillKey, { id: checkId });
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
-    throw Error("The readied melee weapon, qualified feat or named skill use changed before posting.");
+    throw Error(loc`The readied melee weapon, qualified feat or named skill use changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

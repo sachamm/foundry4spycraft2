@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Shaken grades and numerical effects, p.342. Sources add grades; no effects beyond IV are invented. */
 const ROMAN = { i: 1, ii: 2, iii: 3, iv: 4 };
 const statusGrade = id => {
@@ -17,7 +18,11 @@ function state(totalGrade, sources = [], warnings = [], sourceKind = "context") 
     sources,
     needsReview: !valid,
     warnings,
-    label: valid ? (grade ? "Shaken " + ["", "I", "II", "III", "IV"][grade] : "") : "Shaken — source review required"
+    label: valid
+      ? grade
+        ? loc`Shaken ` + ["", "I", "II", "III", "IV"][grade]
+        : ""
+      : loc`Shaken — source review required`
   };
 }
 export function shakenStateFromActor(actor) {
@@ -41,7 +46,7 @@ export function shakenStateFromActor(actor) {
       grade < 1 ||
       (grades.length && Math.min(4, grade) !== grades[0])
     ) {
-      warnings.push("Review the Shaken grade for " + (effect.name ?? effect.id ?? "an active source") + ".");
+      warnings.push(loc`Review the Shaken grade for ` + (effect.name ?? effect.id ?? loc`an active source`) + ".");
       grade = null;
     }
     const metadata = effect.flags?.spycraft2 ?? {},
@@ -58,15 +63,15 @@ export function shakenStateFromActor(actor) {
     if (grade !== null) total += grade;
   }
   if (!sources.length && [...(actor?.statuses ?? [])].some(id => statusGrade(id) !== null))
-    warnings.push("Shaken has no identified active effect source.");
+    warnings.push(loc`Shaken has no identified active effect source.`);
   if (actor && getShakenApplicationReview(actor).needsReview)
-    warnings.push("Review the interrupted Shaken application before using its current grade.");
-  if (!Number.isSafeInteger(total)) warnings.push("The accumulated Shaken grade is unsafe.");
+    warnings.push(loc`Review the interrupted Shaken application before using its current grade.`);
+  if (!Number.isSafeInteger(total)) warnings.push(loc`The accumulated Shaken grade is unsafe.`);
   return state(total, sources, warnings, "effects");
 }
 export function shakenStateFromContext(context = {}) {
   const value = context.shakenGrade ?? (context.shaken === true ? 1 : 0);
-  return state(value, [], Number.isSafeInteger(value) && value >= 0 ? [] : ["Review the current Shaken grade."]);
+  return state(value, [], Number.isSafeInteger(value) && value >= 0 ? [] : [loc`Review the current Shaken grade.`]);
 }
 export function shakenRules(system) {
   const current =
@@ -92,7 +97,7 @@ export const shakenSkillPenalty = (system, ability) =>
 export function shakenActionDieCost(system, { baseCost = 0, benefitCount = 1, surchargePaid = 0, payer = true } = {}) {
   const rules = shakenRules(system);
   if (rules.needsReview)
-    return { blocked: true, reason: "Review the current Shaken sources before action-die spending." };
+    return { blocked: true, reason: loc`Review the current Shaken sources before action-die spending.` };
   if (
     !Number.isSafeInteger(baseCost) ||
     baseCost < 0 ||
@@ -104,13 +109,13 @@ export function shakenActionDieCost(system, { baseCost = 0, benefitCount = 1, su
     surchargePaid > 2 * benefitCount ||
     typeof payer !== "boolean"
   )
-    return { blocked: true, reason: "Review the whole-die cost, benefit count and previously paid surcharge." };
+    return { blocked: true, reason: loc`Review the whole-die cost, benefit count and previously paid surcharge.` };
   const requiredSurcharge = benefitCount * rules.extraDice,
     surcharge = Math.max(0, requiredSurcharge - surchargePaid),
     cost = baseCost + surcharge;
-  if (!Number.isSafeInteger(cost)) return { blocked: true, reason: "The action-die cost is unsafe." };
+  if (!Number.isSafeInteger(cost)) return { blocked: true, reason: loc`The action-die cost is unsafe.` };
   if (payer && rules.spendingForbidden && cost > 0)
-    return { blocked: true, reason: "Shaken IV: no action dice may be spent at all (p.342)." };
+    return { blocked: true, reason: loc`Shaken IV: no action dice may be spent at all (p.342).` };
   return {
     blocked: false,
     baseCost,
@@ -154,8 +159,7 @@ export function getShakenApplicationReview(actor) {
       source: tag.source,
       record: { ...tag, effectId: effect.id },
       needsReview: true,
-      reason:
-        "A Shaken source has no matching completed application receipt. Review its actual effect before applying another event."
+      reason: loc`A Shaken source has no matching completed application receipt. Review its actual effect before applying another event.`
     };
   }
   return saved ?? {};
@@ -198,9 +202,9 @@ export function shakenApplicationPlan(
     confirmed !== true ||
     !Number.isFinite(at)
   )
-    throw new Error("Confirm a new Shaken event with its unique reference, source and grade I–IV.");
+    throw new Error(loc`Confirm a new Shaken event with its unique reference, source and grade I–IV.`);
   if (selfInflicted !== undefined && typeof selfInflicted !== "boolean")
-    throw new Error("Declare whether this new source is caused by the character’s own action.");
+    throw new Error(loc`Declare whether this new source is caused by the character’s own action.`);
   const previous = Object.hasOwn(history, id) ? history[id] : null;
   if (previous) {
     if (
@@ -210,14 +214,15 @@ export function shakenApplicationPlan(
         typeof previous.selfInflicted === "boolean" &&
         previous.selfInflicted !== selfInflicted)
     )
-      throw new Error("This Shaken reference already records another event.");
+      throw new Error(loc`This Shaken reference already records another event.`);
     return { duplicate: true, record: previous };
   }
   if (JSON.stringify(current) !== JSON.stringify(expected))
-    throw new Error("Shaken sources changed. Review them before applying this event.");
-  if (current.state.needsReview) throw new Error("Review the existing Shaken sources before applying another event.");
+    throw new Error(loc`Shaken sources changed. Review them before applying this event.`);
+  if (current.state.needsReview)
+    throw new Error(loc`Review the existing Shaken sources before applying another event.`);
   const total = current.state.totalGrade + grade;
-  if (!Number.isSafeInteger(total)) throw new Error("The accumulated Shaken grade is unsafe.");
+  if (!Number.isSafeInteger(total)) throw new Error(loc`The accumulated Shaken grade is unsafe.`);
   return {
     duplicate: false,
     record: {

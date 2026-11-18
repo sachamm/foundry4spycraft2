@@ -1,4 +1,5 @@
 import { combatStanceState } from "./combat-stance.mjs";
+import { loc } from "../i18n.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -11,7 +12,7 @@ const stable = v =>
   );
 export function sideStanceRows(system) {
   const rows = system.sideStanceFeints ?? [];
-  if (!Array.isArray(rows)) throw Error("Review the recorded Side Stance benefits.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the recorded Side Stance benefits.`);
   const seen = new Set();
   for (const r of rows) {
     if (
@@ -32,7 +33,7 @@ export function sideStanceRows(system) {
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid)) ||
       (r.receiptUuid && !r.usedBy)
     )
-      throw Error("Review the recorded Side Stance benefits.");
+      throw Error(loc`Review the recorded Side Stance benefits.`);
     seen.add(r.sourceMessage);
   }
   return rows;
@@ -66,7 +67,7 @@ export function sideStanceGrantPlan(system, settlement, feint) {
     const { usedBy, receiptUuid, ...facts } = existing,
       { usedBy: _u, receiptUuid: _r, ...expected } = record;
     if (stable(facts) !== stable(expected))
-      throw Error("The recorded Side Stance Feint changed; ask the GC to review its source.");
+      throw Error(loc`The recorded Side Stance Feint changed; ask the GC to review its source.`);
     return { existing: true, record: existing };
   }
   sideStanceRows({ sideStanceFeints: [record] });
@@ -97,7 +98,7 @@ export function assertSideStancePlan(system, proof, context) {
     (proof.dice === 1 && (typeof attemptId !== "string" || !attemptId)) ||
     stable(facts) !== stable(expected)
   )
-    throw Error("The Side Stance die, successful Feints or actual opponent changed before posting.");
+    throw Error(loc`The Side Stance die, successful Feints or actual opponent changed before posting.`);
 }
 export function sideStanceDefensePenalty(system) {
   return combatStanceState(system)?.key === "side" ? -1 : 0;

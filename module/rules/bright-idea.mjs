@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 const epoch = periods => String(periods?.session ?? "initial");
 const safeKey = value => encodeURIComponent(value).replaceAll(".", "%2E");
 /** p.29: same-named non-legacy abilities have separate source-class use pools. */
@@ -61,11 +62,11 @@ export function brightIdeaMigrationPlan(system, periods, allocations, { at = 0, 
   const status = brightIdeaPoolStatus(system, periods);
   if (!status.pending) return null;
   if (status.legacyUsed === null)
-    throw new Error("The old combined Bright Idea count is malformed; the GC must review its original history.");
+    throw new Error(loc`The old combined Bright Idea count is malformed; the GC must review its original history.`);
   if (allocations === undefined) {
     if (!status.automatic)
       throw new Error(
-        "Ask the GC to allocate the old combined Bright Idea uses to their source pools on Classes before using this ability."
+        loc`Ask the GC to allocate the old combined Bright Idea uses to their source pools on Classes before using this ability.`
       );
     allocations = { [status.sources[0].id]: status.legacyUsed };
   }
@@ -78,7 +79,7 @@ export function brightIdeaMigrationPlan(system, periods, allocations, { at = 0, 
     Array.isArray(allocations) ||
     Object.keys(allocations).some(id => !allowed.has(id))
   )
-    throw new Error("Allocate only to currently available Bright Idea sources.");
+    throw new Error(loc`Allocate only to currently available Bright Idea sources.`);
   let total = 0;
   const updates = {},
     record = {};
@@ -86,13 +87,13 @@ export function brightIdeaMigrationPlan(system, periods, allocations, { at = 0, 
     const count = allocations[spec.id] ?? 0,
       used = currentUsed(system.resourceUses?.[spec.id], session);
     if (!Number.isSafeInteger(count) || count < 0 || used === null || used + count > spec.limit)
-      throw new Error("Allocate whole-number past uses within each source’s remaining allowance.");
+      throw new Error(loc`Allocate whole-number past uses within each source’s remaining allowance.`);
     total += count;
     record[spec.id] = count;
     if (count) updates[`system.resourceUses.${spec.id}`] = { epoch: session, used: used + count };
   }
   if (total !== status.legacyUsed)
-    throw new Error("Allocated past uses must equal the old combined Bright Idea count.");
+    throw new Error(loc`Allocated past uses must equal the old combined Bright Idea count.`);
   const before = system.resourceUses?.brightIdeaLegacyMigration?.history ?? [];
   updates["system.resourceUses.brightIdeaLegacyMigration"] = {
     history: [...before, { epoch: session, used: status.legacyUsed, allocations: record, at, reviewedBy }]
@@ -107,7 +108,7 @@ export function brightIdeaLegacyReviewSpec(system, periods = system.usagePeriods
   return status.pending && status.legacyUsed === null
     ? {
         id: "brightIdea",
-        name: "Legacy combined Bright Idea count (before source allocation)",
+        name: loc`Legacy combined Bright Idea count (before source allocation)`,
         period: "session",
         limit: status.sources.reduce((n, s) => n + s.limit, 0),
         cost: 0,

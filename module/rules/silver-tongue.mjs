@@ -1,9 +1,10 @@
 import { attributeDamagePlan, attributeDamageState } from "./attribute-damage.mjs";
+import { loc } from "../i18n.mjs";
 const string = v => typeof v === "string" && v.trim() === v && v.length > 0 && v.length <= 200,
   actorId = v => typeof v === "string" && /^Actor\.[A-Za-z0-9_-]+$/.test(v);
 export function silverVictoryKey(mission, conflictId) {
   if (!string(mission) || !string(conflictId))
-    throw new Error("Choose a stable named seduction Conflict identifier in the current mission.");
+    throw new Error(loc`Choose a stable named seduction Conflict identifier in the current mission.`);
   return "silver_" + encodeURIComponent(JSON.stringify([mission, conflictId])).replaceAll(".", "%2E");
 }
 export function silverVictoryRecordValid(record, key = record?.id) {
@@ -83,7 +84,7 @@ export function silverVictoryPlan(
     !confirmedBy
   )
     throw new Error(
-      "Confirm an actual opposing character, a won seduction Conflict, and Silver Tongue active at that victory."
+      loc`Confirm an actual opposing character, a won seduction Conflict, and Silver Tongue active at that victory.`
     );
   if (
     !records ||
@@ -91,24 +92,24 @@ export function silverVictoryPlan(
     Array.isArray(records) ||
     Object.entries(records).some(([key, r]) => !silverVictoryRecordValid(r, key))
   )
-    throw new Error("Review the saved Silver Tongue victory history.");
+    throw new Error(loc`Review the saved Silver Tongue victory history.`);
   const existing = records[id];
   if (existing) {
     if (existing.sourceActorUuid !== sourceActorUuid || existing.targetActorUuid !== targetActorUuid)
-      throw new Error("This seduction Conflict already belongs to a different target.");
+      throw new Error(loc`This seduction Conflict already belongs to a different target.`);
     return { record: structuredClone(existing), alreadyRecorded: true };
   }
   if (Object.values(records).some(r => ["pending", "cancelling"].includes(r.status)))
-    throw new Error("Resolve the interrupted Silver Tongue victory before recording another.");
+    throw new Error(loc`Resolve the interrupted Silver Tongue victory before recording another.`);
   if (!sourceSystem.activeFeatNames?.includes("Silver Tongue"))
-    throw new Error("The character must currently have a qualified Silver Tongue source.");
+    throw new Error(loc`The character must currently have a qualified Silver Tongue source.`);
   if ((targetSystem.usagePeriods?.mission ?? "initial") !== missionId)
-    throw new Error("The source and target must share the actual current mission.");
+    throw new Error(loc`The source and target must share the actual current mission.`);
   const damage = attributeDamagePlan(targetSystem, {
     id: `Silver Tongue:${sourceActorUuid}:${id}`,
     ability: "wis",
     amount: 1,
-    source: `Silver Tongue: ${sourceActorUuid}; seduction Conflict ${conflictId}`,
+    source: loc`Silver Tongue: ${sourceActorUuid}; seduction Conflict ${conflictId}`,
     floor: 6,
     confirmed: true,
     worldTime
@@ -127,6 +128,6 @@ export function silverVictoryPlan(
     confirmedBy,
     at: worldTime
   };
-  if (!silverVictoryRecordValid(record, id)) throw new Error("Review the prepared Silver Tongue victory record.");
+  if (!silverVictoryRecordValid(record, id)) throw new Error(loc`Review the prepared Silver Tongue victory record.`);
   return { record, damage, alreadyRecorded: false };
 }

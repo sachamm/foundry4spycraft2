@@ -1,9 +1,10 @@
+import { loc } from "../i18n.mjs";
 export const careerAgentMissionKey = system =>
   "mission_" + encodeURIComponent(String(system.usagePeriods?.mission ?? "initial")).replaceAll(".", "%2E");
 export function careerAgentRewardSource(system) {
-  if (!system.activeFeatNames?.includes("Career Agent")) throw new Error("An active Career Agent feat is required.");
+  if (!system.activeFeatNames?.includes("Career Agent")) throw new Error(loc`An active Career Agent feat is required.`);
   if (!["faction", "freelance"].includes(system.affiliationType))
-    throw new Error("Choose the character’s actual Faction or Freelance affiliation.");
+    throw new Error(loc`Choose the character’s actual Faction or Freelance affiliation.`);
   const freelance = system.affiliationType === "freelance";
   return {
     source: "Career Agent",
@@ -20,14 +21,14 @@ export function careerAgentRewardPlan(
   const source = careerAgentRewardSource(system),
     key = careerAgentMissionKey(system);
   if (missionCompleteConfirmed !== true || activeAtMissionEndConfirmed !== true)
-    throw new Error("Confirm the mission has ended and Career Agent was active at its end.");
+    throw new Error(loc`Confirm the mission has ended and Career Agent was active at its end.`);
   if (system.careerAgentRewards?.[key])
-    throw new Error("The Career Agent reward for this mission is already recorded.");
-  if (!/^[A-Za-z0-9_-]{1,80}$/.test(id)) throw new Error("A unique Career Agent reward receipt is required.");
+    throw new Error(loc`The Career Agent reward for this mission is already recorded.`);
+  if (!/^[A-Za-z0-9_-]{1,80}$/.test(id)) throw new Error(loc`A unique Career Agent reward receipt is required.`);
   const before = system[source.field],
     after = before + source.amount;
   if (!Number.isSafeInteger(before) || !Number.isSafeInteger(after))
-    throw new Error("Review the resource balance before granting the mission reward.");
+    throw new Error(loc`Review the resource balance before granting the mission reward.`);
   return {
     key,
     field: source.field,
@@ -77,7 +78,7 @@ export function careerAgentReviewPlan(
     !Number.isSafeInteger(t.after) ||
     t.after !== t.before + r.amount
   )
-    throw new Error("The Career Agent review has no valid mission transaction.");
+    throw new Error(loc`The Career Agent review has no valid mission transaction.`);
   if (
     confirmed !== true ||
     typeof retainReward !== "boolean" ||
@@ -87,7 +88,7 @@ export function careerAgentReviewPlan(
     !reason.trim() ||
     reason.length > 1000
   )
-    throw new Error("Confirm both actual resource balances, the reward disposition and a reason.");
+    throw new Error(loc`Confirm both actual resource balances, the reward disposition and a reason.`);
   return {
     key: t.key,
     record: retainReward ? { ...r, reviewReason: reason.trim() } : null,

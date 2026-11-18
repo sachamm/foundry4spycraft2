@@ -3,11 +3,12 @@ import { activeNoFear } from "./health.mjs";
 import { RESISTANCE_TYPES, qualityResistances } from "./resistances.mjs";
 import { stackedBonuses } from "./knowledge.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Terrain training, pp.206–207. Darkness is not a terrain type (p.206). */
 /** Active-character daily fluids, p.349; Desert Training halves the requirement everywhere, p.206. */
 export function dailyWaterRequirements(system, { temperatureF = null } = {}) {
   if (temperatureF !== null && (typeof temperatureF !== "number" || !Number.isFinite(temperatureF)))
-    throw new Error("Enter a finite Fahrenheit temperature.");
+    throw new Error(loc`Enter a finite Fahrenheit temperature.`);
   const desertTraining = system.activeFeatNames?.includes("Desert Training") === true,
     multiplier = desertTraining ? 0.5 : 1;
   return {
@@ -30,7 +31,7 @@ export function homeTurfSkillPlan(system, key, { homeTurf = false } = {}) {
     criticalSuccessDiscount: eligible ? 1 : 0,
     notes: eligible
       ? [
-          "Home Turf: result cap +5; critical-success cost −1 (minimum 0). Confirmed within five urban blocks or one wilderness mile of home (p.207)."
+          loc`Home Turf: result cap +5; critical-success cost −1 (minimum 0). Confirmed within five urban blocks or one wilderness mile of home (p.207).`
         ]
       : []
   };
@@ -75,13 +76,13 @@ export function terrainSkillPlan(
   } = {}
 ) {
   if (terrain && !Object.hasOwn(TERRAIN_TYPES, terrain))
-    throw new Error("Choose a listed terrain; darkness is not a terrain type.");
+    throw new Error(loc`Choose a listed terrain; darkness is not a terrain type.`);
   if (
     !["number", "string"].includes(typeof cityPopulation) ||
     !Number.isSafeInteger(Number(cityPopulation)) ||
     Number(cityPopulation) < 0
   )
-    throw new Error("Enter a nonnegative whole city population, or zero outside a city.");
+    throw new Error(loc`Enter a nonnegative whole city population, or zero outside a city.`);
   const population = Number(cityPopulation),
     feats = new Set(system.activeFeatNames ?? []),
     matched = Object.entries(TRAINING)
@@ -135,15 +136,15 @@ export function terrainSkillPlan(
   const notes = [...home.notes];
   if (bonuses.length)
     notes.push(
-      `Terrain training: +${insightValue} insight (${matched.join(", ")})${woodcraft ? "; Woodcraft +1 included" : ""}${unfair ? "; Unfair Advantage +1 included" : ""}. Matching insight bonuses compete normally (pp.206–207).`
+      loc`Terrain training: +${insightValue} insight (${matched.join(", ")})${woodcraft ? loc`; Woodcraft +1 included` : ""}${unfair ? loc`; Unfair Advantage +1 included` : ""}. Matching insight bonuses compete normally (pp.206–207).`
     );
   if (synergySources.length)
     notes.push(
-      `Terrain feat synergy available: ${synergySources.map(s => s.source + " → " + s.skill).join("; ")}. Normal rank, mode and one-best-synergy rules apply.`
+      loc`Terrain feat synergy available: ${synergySources.map(s => s.source + " → " + s.skill).join("; ")}. Normal rank, mode and one-best-synergy rules apply.`
     );
   if (opponentSurprisePenalty)
     notes.push(
-      `Ambush: opponents’ checks to determine surprise suffer ${opponentSurprisePenalty} (${ambushSources.join(", ")}). Apply this to the opposition when adjudicating the ambush, not to this preparation check.`
+      loc`Ambush: opponents’ checks to determine surprise suffer ${opponentSurprisePenalty} (${ambushSources.join(", ")}). Apply this to the opposition when adjudicating the ambush, not to this preparation check.`
     );
   return {
     homeTurf: home.confirmed,
@@ -180,7 +181,7 @@ export function terrainSkillChecks(system, key, checks) {
       mode: "Active/Secret",
       tags: "",
       error: 1,
-      time: "Opposed check; GC adjudicates timing",
+      time: loc`Opposed check; GC adjudicates timing`,
       page: 207,
       synergies: [],
       synergyText: "None."
@@ -196,14 +197,16 @@ export function localHeroOppositionPlan(
   if (key !== "networking" || check.id !== "local-hero-opposition")
     return { applicable: false, blockedReason: "", notes: [] };
   const reasons = [];
-  if (!system.activeFeatNames?.includes("Local Hero")) reasons.push("Local Hero must be currently available.");
+  if (!system.activeFeatNames?.includes("Local Hero")) reasons.push(loc`Local Hero must be currently available.`);
   if (homeTurf !== true)
-    reasons.push("Local Hero opposition requires being within your five-block urban or one-mile wilderness home turf.");
+    reasons.push(
+      loc`Local Hero opposition requires being within your five-block urban or one-mile wilderness home turf.`
+    );
   if (!LOCAL_HERO_OPPOSITION_SKILLS.includes(opposingSkill) || targetingYou !== true)
     reasons.push(
-      "Confirm an Investigation, Notice, Sneak, Streetwise or Survival check targeting you. Search is not included."
+      loc`Confirm an Investigation, Notice, Sneak, Streetwise or Survival check targeting you. Search is not included.`
     );
-  if (method !== "roll") reasons.push("Opposed checks cannot take 10 or take 20 (p.91).");
+  if (method !== "roll") reasons.push(loc`Opposed checks cannot take 10 or take 20 (p.91).`);
   return {
     applicable: true,
     opposingSkill,
@@ -211,7 +214,7 @@ export function localHeroOppositionPlan(
     homeTurf: homeTurf === true,
     blockedReason: reasons.join(" "),
     notes: [
-      "Local Hero: oppose the declared check targeting you using Networking. Use the GC-selected relevant key attribute; normal opposed-result and tie rules apply (pp.87,91,207)."
+      loc`Local Hero: oppose the declared check targeting you using Networking. Use the GC-selected relevant key attribute; normal opposed-result and tie rules apply (pp.87,91,207).`
     ]
   };
 }
@@ -244,7 +247,7 @@ export function terrainSavePlan(
     adjustment,
     notes: bonuses.length
       ? [
-          `${bonuses.some(b => b.type === "") ? "Conditional save bonuses" : "Conditional save insight"}: ${bonuses.map(b => b.source + " +" + b.value).join("; ")}; net adjustment ${adjustment} after typed stacking.`
+          loc`${bonuses.some(b => b.type === "") ? loc`Conditional save bonuses` : loc`Conditional save insight`}: ${bonuses.map(b => b.source + " +" + b.value).join("; ")}; net adjustment ${adjustment} after typed stacking.`
         ]
       : []
   };
@@ -330,7 +333,7 @@ export function validateTerrainSaveSource(system, source, { checkKind, checkId }
     !source.plan?.bonuses?.length ||
     JSON.stringify(terrainSavePlan(system, checkId, source.plan)) !== JSON.stringify(source.plan)
   )
-    throw new Error("The conditional save feat or insight source changed before posting.");
+    throw new Error(loc`The conditional save feat or insight source changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

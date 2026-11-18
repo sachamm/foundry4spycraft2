@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 const epoch = (s, key) => String(s.usagePeriods?.[key] ?? "initial");
 const text = (value, max = 200) => typeof value === "string" && !!value.trim() && value.length <= max;
 const idValid = id => typeof id === "string" && /^house_[A-Za-z0-9_-]+$/.test(id);
@@ -16,21 +17,21 @@ export function safeHouseDeclarationPlan(
 ) {
   const source = safeHouseSource(system);
   if (!source)
-    throw new Error("An active Safe House feat, Lifestyle 3+ and an active Tradecraft selection are required.");
+    throw new Error(loc`An active Safe House feat, Lifestyle 3+ and an active Tradecraft selection are required.`);
   if (atSceneStartConfirmed !== true || locationConfirmed !== true)
     throw new Error(
-      "Confirm this is the scene-opening declaration and the GC-confirmed current location and population."
+      loc`Confirm this is the scene-opening declaration and the GC-confirmed current location and population.`
     );
   if (!text(currentLocation) || !Number.isSafeInteger(population) || population < 0)
-    throw new Error("Record the current location and its whole-number city population (0 outside a city).");
+    throw new Error(loc`Record the current location and its whole-number city population (0 outside a city).`);
   const records = Object.entries(system.safeHouses ?? {}),
     current = records.filter(([, r]) => r?.epoch === source.mission);
   if (records.some(([, r]) => !r || typeof r.epoch !== "string"))
-    throw new Error("The GC must correct the unknown Safe House history before another declaration.");
+    throw new Error(loc`The GC must correct the unknown Safe House history before another declaration.`);
   if (current.length >= source.limit)
-    throw new Error("All Safe House declarations available this mission are already recorded.");
+    throw new Error(loc`All Safe House declarations available this mission are already recorded.`);
   if (current.some(([, r]) => r.scene === source.scene))
-    throw new Error("A Safe House was already declared at this scene’s start.");
+    throw new Error(loc`A Safe House was already declared at this scene’s start.`);
   return {
     source,
     record: {
@@ -60,7 +61,7 @@ export function safeHouseGrant(plan, { id, missionUse, sceneUse, at = 0 } = {}) 
     sceneUse?.epoch !== plan.source.scene ||
     sceneUse.used !== 1
   )
-    throw new Error("The Safe House declaration has no valid reserved mission and scene use.");
+    throw new Error(loc`The Safe House declaration has no valid reserved mission and scene use.`);
   return {
     id,
     ...structuredClone(plan.record),
@@ -118,9 +119,9 @@ export function safeHouseState(system, record, cfg) {
     placed: !!r?.placement && placementValid,
     reason:
       !valid || !placementValid
-        ? "Review this Safe House declaration and its saved use/location history."
+        ? loc`Review this Safe House declaration and its saved use/location history.`
         : expired
-          ? "Lost at the end of its mission."
+          ? loc`Lost at the end of its mission.`
           : ""
   };
 }
@@ -146,9 +147,9 @@ export function safeHousePlacementPlan(
     !idValid(record.id) ||
     !["withinTenMiles", "nearestCity"].includes(record.route)
   )
-    throw new Error("Choose a recorded Safe House declaration.");
+    throw new Error(loc`Choose a recorded Safe House declaration.`);
   if (!allowExpired && record.epoch !== epoch(system, "mission"))
-    throw new Error("This Safe House was lost at the end of its mission.");
+    throw new Error(loc`This Safe House was lost at the end of its mission.`);
   if (
     gcConfirmed !== true ||
     natureConfirmed !== true ||
@@ -159,12 +160,12 @@ export function safeHousePlacementPlan(
     cityPopulation < 10000
   )
     throw new Error(
-      "The GC must confirm the city of at least 10,000, exact location, and home description matching its Lifestyle tier."
+      loc`The GC must confirm the city of at least 10,000, exact location, and home description matching its Lifestyle tier.`
     );
   if (record.route === "withinTenMiles" && (currentCityConfirmed !== true || withinTenMilesConfirmed !== true))
-    throw new Error("This house must be in the declaration’s current city and within 10 miles.");
+    throw new Error(loc`This house must be in the declaration’s current city and within 10 miles.`);
   if (record.route === "nearestCity" && nearestCityConfirmed !== true)
-    throw new Error("The GC must choose the nearest city with at least 10,000 people.");
+    throw new Error(loc`The GC must choose the nearest city with at least 10,000 people.`);
   return {
     city: city.trim(),
     cityPopulation,
@@ -184,6 +185,6 @@ export function safeHouseRows(system, cfg) {
     state:
       record?.id === key
         ? safeHouseState(system, record, cfg)
-        : { valid: false, active: false, canPlace: false, reason: "Review the Safe House declaration identifier." }
+        : { valid: false, active: false, canPlace: false, reason: loc`Review the Safe House declaration identifier.` }
   }));
 }

@@ -1,6 +1,7 @@
 import { superiorAccuracyAttackPlan } from "./superior-accuracy.mjs";
 import { weaponSourceIdentity, ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export function superiorAccuracyWeaponPlan(
   weapon,
   { trained = false, aimed = false, braced = false, operatingProficiency = weapon?.proficiency ?? null } = {}
@@ -31,7 +32,7 @@ export function validateSuperiorAccuracyWeaponProof(actor, proof, context = {}) 
     });
   if (stable(current) !== stable(proof))
     throw Error(
-      "The Superior Accuracy weapon source, actual operating proficiency, valid Aim or valid Brace changed before posting."
+      loc`The Superior Accuracy weapon source, actual operating proficiency, valid Aim or valid Brace changed before posting.`
     );
 }
 

@@ -14,6 +14,7 @@ import {
   signalDC
 } from "../rules/gear-play-rules.mjs";
 import { sizeCode } from "../rules/vehicles.mjs";
+import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 
@@ -24,12 +25,12 @@ const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
  */
 export async function issueToTeam(item) {
   if (!item?.system?.perTeamMember) return null;
-  if (!game.user.isGM) return ui.notifications.warn("Ask the GC to issue this pick to the team.");
+  if (!game.user.isGM) return ui.notifications.warn(loc`Ask the GC to issue this pick to the team.`);
   const owner = item.parent;
   const team = teamActors(getMission()).filter(actor => actor !== owner);
   if (!team.length)
     return ui.notifications.warn(
-      "No other team members found. List the team in the GC console, or give players their agents."
+      loc`No other team members found. List the team in the GC console, or give players their agents.`
     );
   const issued = [],
     skipped = [];
@@ -46,34 +47,36 @@ export async function issueToTeam(item) {
     issued.push(actor.name);
   }
   const lines = [
-    `<strong>${esc(item.name)}</strong> issued to the team${owner ? ` from ${esc(owner.name)}'s pick` : ""}.`
+    `<strong>${esc(item.name)}</strong> ${loc`issued to the team${owner ? ` from ${esc(owner.name)}'s pick` : ""}.`}`
   ];
-  if (issued.length) lines.push(`Issued to: ${issued.map(esc).join(", ")}.`);
-  if (skipped.length) lines.push(`Already held: ${skipped.map(esc).join(", ")}.`);
+  if (issued.length) lines.push(loc`Issued to: ${issued.map(esc).join(", ")}.`);
+  if (skipped.length) lines.push(loc`Already held: ${skipped.map(esc).join(", ")}.`);
   await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: owner }), content: lines.join("<br>") });
   return issued;
 }
 
 const money = n => `$${Number(n).toLocaleString("en-US")}`;
 const costText = (currency, amount) =>
-  currency === "reputation" ? `${amount} Reputation` : `${money(amount)} Net Worth`;
+  currency === "reputation" ? loc`${amount} Reputation` : loc`${money(amount)} Net Worth`;
 
 /** Charge a standing-only pick's Reputation or Net Worth cost to the character holding it, once. */
 export async function chargeStandingCost(item, { currency = null } = {}) {
   const actor = item?.parent,
     cost = parseStandingCost(item?.system?.standingCost);
   if (!actor || !cost)
-    return ui.notifications.warn("This entry has no Reputation or Net Worth cost to charge, or no character holds it.");
-  if (!actor.isOwner) return ui.notifications.warn("Only the character's owner or the GC can pay this cost.");
+    return ui.notifications.warn(
+      loc`This entry has no Reputation or Net Worth cost to charge, or no character holds it.`
+    );
+  if (!actor.isOwner) return ui.notifications.warn(loc`Only the character's owner or the GC can pay this cost.`);
   if (item.getFlag("spycraft2", "standingCharge"))
-    return ui.notifications.warn(`${item.name} has already been paid for.`);
+    return ui.notifications.warn(loc`${item.name} has already been paid for.`);
   if (!currency) {
     const input = await foundry.applications.api.DialogV2.input({
-      window: { title: `${item.name}: pay the request cost` },
+      window: { title: loc`${item.name}: pay the request cost` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>Requested with Reputation or Net Worth only.</p>
-        <label><input type="radio" name="currency" value="reputation" checked /> ${costText("reputation", cost.reputation)} (you have ${actor.system.reputation ?? 0})</label>
-        <label><input type="radio" name="currency" value="netWorth" /> ${costText("netWorth", cost.netWorth)} (you have ${money(actor.system.netWorth ?? 0)})</label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Requested with Reputation or Net Worth only.`}</p>
+        <label><input type="radio" name="currency" value="reputation" checked /> ${loc`${costText("reputation", cost.reputation)} (you have ${actor.system.reputation ?? 0})`}</label>
+        <label><input type="radio" name="currency" value="netWorth" /> ${loc`${costText("netWorth", cost.netWorth)} (you have ${money(actor.system.netWorth ?? 0)})`}</label></div>`
     });
     if (!input) return null;
     currency = input.currency;
@@ -90,7 +93,7 @@ export async function chargeStandingCost(item, { currency = null } = {}) {
   const now = currency === "reputation" ? `Reputation now ${payment.after}` : `Net Worth now ${money(payment.after)}`;
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
-    content: `<strong>${esc(item.name)}</strong> requested for ${costText(currency, payment.amount)}. ${now}.`
+    content: `<strong>${esc(item.name)}</strong> ${loc`requested for ${costText(currency, payment.amount)}. ${now}.`}`
   });
   return payment;
 }
@@ -113,13 +116,13 @@ const speaker = item => ChatMessage.getSpeaker({ actor: item.parent });
  */
 export async function useBattery(item, { amount = null } = {}) {
   const state = batteryState(item.system.battery, item.system.charge);
-  if (!state) return ui.notifications.warn(`${item.name} has no battery life to track.`);
-  if (state.dry) return ui.notifications.warn(`${item.name} has run dry; recharge it first.`);
+  if (!state) return ui.notifications.warn(loc`${item.name} has no battery life to track.`);
+  if (state.dry) return ui.notifications.warn(loc`${item.name} has run dry; recharge it first.`);
   if (amount === null) {
     const unit = state.kind === "time" ? "hours" : "uses";
     const input = await ask(
-      `${item.name}: use`,
-      `<label>${unit === "hours" ? "Hours of use" : "Uses"} <input name="amount" type="number" min="0" step="${unit === "hours" ? "any" : "1"}" value="1" /></label>`
+      loc`${item.name}: use`,
+      `<label>${unit === "hours" ? loc`Hours of use` : loc`Uses`} <input name="amount" type="number" min="0" step="${unit === "hours" ? "any" : "1"}" value="1" /></label>`
     );
     if (!input) return null;
     amount = Number(input.amount) || 0;
@@ -131,7 +134,7 @@ export async function useBattery(item, { amount = null } = {}) {
     if (used >= state.capacity)
       await ChatMessage.create({
         speaker: speaker(item),
-        content: `<strong>${esc(item.name)}</strong> reaches the end of its battery life (${esc(state.label)}). Further use risks it running dry.`
+        content: `<strong>${esc(item.name)}</strong> ${loc`reaches the end of its battery life (${esc(state.label)}). Further use risks it running dry.`}`
       });
     return { used };
   }
@@ -141,7 +144,7 @@ export async function useBattery(item, { amount = null } = {}) {
   await item.update({ "system.charge.depletedUses": check.count, "system.charge.dry": check.dry });
   await roll.toMessage({
     speaker: speaker(item),
-    flavor: `<strong>${esc(item.name)}</strong> used past its battery life: ${check.dry ? `runs <strong>dry</strong> (${roll.total} ≤ ${check.threshold}); the use fails` : `keeps going (${roll.total} > ${check.threshold})`}.`
+    flavor: `<strong>${esc(item.name)}</strong> ${loc`used past its battery life: ${check.dry ? `${loc`runs`} <strong>${loc`dry`}</strong> ${loc`(${roll.total} ≤ ${check.threshold}); the use fails`}` : loc`keeps going (${roll.total} > ${check.threshold})`}.`}`
   });
   return check;
 }
@@ -158,7 +161,7 @@ export async function rechargeItem(item) {
   await item.update({ "system.charge.used": 0, "system.charge.depletedUses": 0, "system.charge.dry": false });
   await ChatMessage.create({
     speaker: speaker(item),
-    content: `<strong>${esc(item.name)}</strong> recharged. Cost: ${esc(cost.label)}`
+    content: `<strong>${esc(item.name)}</strong> ${loc`recharged. Cost: ${esc(cost.label)}`}`
   });
   return cost;
 }
@@ -174,10 +177,10 @@ export async function addMechanism(item, mechanismItem) {
     mechanisms: [...item.system.gadget.mechanisms]
   };
   if (mechanismItem.system?.gearCategory !== "G" || /^Gadget housing/.test(mechanismItem.name))
-    return ui.notifications.warn("Drop a gadget mechanism from the Gear pack (Gadgets).");
+    return ui.notifications.warn(loc`Drop a gadget mechanism from the Gear pack (Gadgets).`);
   // Every Gadget pick except the housing sizes is a mechanism, and a mechanism cannot house another (p.278).
   if (item.system.gearCategory === "G" && !/^Gadget housing/.test(item.name))
-    return ui.notifications.warn("A gadget mechanism cannot be the housing for another gadget.");
+    return ui.notifications.warn(loc`A gadget mechanism cannot be the housing for another gadget.`);
   const mechanism = {
     name: mechanismItem.name,
     caliber: mechanismItem.system.caliber ?? 0,
@@ -189,8 +192,8 @@ export async function addMechanism(item, mechanismItem) {
   if (!ok.ok) return ui.notifications.warn(ok.reason);
   if (/^Skill (check|boost)/.test(mechanism.name)) {
     const input = await ask(
-      `${mechanism.name}: skill`,
-      `<label>Skill or named check this mechanism serves <input name="skill" placeholder="e.g. Security/Disable" /></label>`
+      loc`${mechanism.name}: skill`,
+      `<label>${loc`Skill or named check this mechanism serves`} <input name="skill" placeholder="${loc`e.g. Security/Disable`}" /></label>`
     );
     mechanism.skill = input?.skill ?? "";
   }
@@ -214,7 +217,7 @@ export async function rollGadgetSkillCheck(item, index) {
   const roll = await new Roll("1d20 + @bonus", { bonus }).evaluate();
   return roll.toMessage({
     speaker: speaker(item),
-    flavor: `<strong>${esc(item.name)}</strong> — ${esc(mechanism.skill || "gadget skill check")} (Skill check mechanism, PR ${esc(mechanism.powerRating)}): +${bonus}, no result cap. Gear tags are ignored.`
+    flavor: `<strong>${esc(item.name)}</strong> ${loc`— ${esc(mechanism.skill || loc`gadget skill check`)} (Skill check mechanism, PR ${esc(mechanism.powerRating)}): +${bonus}, no result cap. Gear tags are ignored.`}`
   });
 }
 
@@ -227,7 +230,7 @@ export async function repairItem(item) {
   const plan = repairPlan(item);
   if (!plan.possible) return ui.notifications.warn(plan.reason);
   const actor = item.parent;
-  if (!actor?.rollSkill) return ui.notifications.warn("Only a character holding the item can repair it.");
+  if (!actor?.rollSkill) return ui.notifications.warn(loc`Only a character holding the item can repair it.`);
   const message = await actor.rollSkill(plan.skillKey, null, {
     check: "repair",
     gearStatus: "available",
@@ -240,12 +243,12 @@ export async function repairItem(item) {
     await item.update({ "system.failedSaves": 0 });
     await ChatMessage.create({
       speaker: speaker(item),
-      content: `<strong>${esc(item.name)}</strong> repaired (${total} vs Complexity DC ${plan.dc}).`
+      content: `<strong>${esc(item.name)}</strong> ${loc`repaired (${total} vs Complexity DC ${plan.dc}).`}`
     });
   } else
     await ChatMessage.create({
       speaker: speaker(item),
-      content: `<strong>${esc(item.name)}</strong> is still broken (${total} vs Complexity DC ${plan.dc}).`
+      content: `<strong>${esc(item.name)}</strong> ${loc`is still broken (${total} vs Complexity DC ${plan.dc}).`}`
     });
   return message;
 }
@@ -253,12 +256,12 @@ export async function repairItem(item) {
 /** The Electronics DC to pick up this item's signal at a distance, after any jamming (Tables 4.64–4.65). */
 export async function signalCheck(item) {
   const pr = Number(item.system.powerRating);
-  if (!Number.isFinite(pr) || pr <= 0) return ui.notifications.warn(`${item.name} has no signal Power Rating.`);
+  if (!Number.isFinite(pr) || pr <= 0) return ui.notifications.warn(loc`${item.name} has no signal Power Rating.`);
   const input = await ask(
-    `${item.name}: picking up the signal`,
+    loc`${item.name}: picking up the signal`,
     `
-    <label>Range increments between signal and receiver <input name="increments" type="number" min="1" max="20" step="1" value="6" /></label>
-    <label>Jamming Power Rating at that point (jammer PR minus its range increments) <input name="jamming" type="number" min="0" step="1" value="0" /></label>`
+    <label>${loc`Range increments between signal and receiver`} <input name="increments" type="number" min="1" max="20" step="1" value="6" /></label>
+    <label>${loc`Jamming Power Rating at that point (jammer PR minus its range increments)`} <input name="jamming" type="number" min="0" step="1" value="0" /></label>`
   );
   if (!input) return null;
   const result = signalDC({
@@ -269,11 +272,11 @@ export async function signalCheck(item) {
   const text = !result.received
     ? result.reason
     : result.automatic
-      ? "Picked up automatically (5 increments or fewer)."
-      : `Electronics (Int) check DC ${result.dc} to pick it up (signal PR ${result.effectivePR}; Hearing/Vision tags).`;
+      ? loc`Picked up automatically (5 increments or fewer).`
+      : loc`Electronics (Int) check DC ${result.dc} to pick it up (signal PR ${result.effectivePR}; Hearing/Vision tags).`;
   await ChatMessage.create({
     speaker: speaker(item),
-    content: `<strong>${esc(item.name)}</strong> signal at ${input.increments} increments: ${esc(text)}`
+    content: `<strong>${esc(item.name)}</strong> ${loc`signal at ${input.increments} increments: ${esc(text)}`}`
   });
   return result;
 }
@@ -283,12 +286,12 @@ export async function refundStandingCost(item) {
   const actor = item?.parent,
     charge = item?.getFlag("spycraft2", "standingCharge");
   if (!actor || !charge) return null;
-  if (!game.user.isGM) return ui.notifications.warn("Ask the GC to refund this cost.");
+  if (!game.user.isGM) return ui.notifications.warn(loc`Ask the GC to refund this cost.`);
   await actor.update({ [`system.${charge.currency}`]: (actor.system[charge.currency] ?? 0) + charge.amount });
   await item.unsetFlag("spycraft2", "standingCharge");
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
-    content: `<strong>${esc(item.name)}</strong>: ${costText(charge.currency, charge.amount)} refunded.`
+    content: `<strong>${esc(item.name)}</strong>${loc`: ${costText(charge.currency, charge.amount)} refunded.`}`
   });
   return charge;
 }

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Drunk p.341; 1d8 Deviation Diagram p.346. Direction 1 uses the top of the scene. */
 export const DEVIATION_DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
 const finite = n => Number.isFinite(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER;
@@ -62,13 +63,13 @@ export function drunkRepositionHistory(system) {
               r.appliedAt >= r.at &&
               r.appliedAt <= system.worldTime))));
     if (!status) {
-      warnings.push("Review malformed, duplicate or future Drunk reposition history.");
+      warnings.push(loc`Review malformed, duplicate or future Drunk reposition history.`);
       continue;
     }
     seen.add(r.id);
     rows.push(r);
     if (r.state === "awaitingRoll" || r.needsReview === true)
-      warnings.push("A Drunk reposition roll needs GC review; do not roll it again.");
+      warnings.push(loc`A Drunk reposition roll needs GC review; do not roll it again.`);
   }
   return { rows, warnings };
 }
@@ -82,14 +83,14 @@ export function drunkRepositionPlan(system, combat, { standing, roundStartConfir
     combat.round < 1 ||
     !finite(system.worldTime)
   )
-    throw new Error("An active Drunk condition and a started participating combat round are required.");
+    throw new Error(loc`An active Drunk condition and a started participating combat round are required.`);
   const history = drunkRepositionHistory(system);
   if (history.warnings.length) throw new Error(history.warnings.join(" "));
   const id = combat.id + ":" + combat.round,
     existing = history.rows.find(r => r.id === id);
   if (existing) return { reused: true, record: existing };
   if (typeof standing !== "boolean" || roundStartConfirmed !== true)
-    throw new Error("The GC must confirm round start and whether the character was standing then.");
+    throw new Error(loc`The GC must confirm round start and whether the character was standing then.`);
   return {
     reused: false,
     record: {
@@ -122,7 +123,7 @@ export function freezeDrunkReposition(record, { die, rollJSON } = {}) {
     typeof rollJSON !== "string" ||
     !validRoll(rollJSON, die)
   )
-    throw new Error("Freeze the original d8 result for the pending Drunk reposition.");
+    throw new Error(loc`Freeze the original d8 result for the pending Drunk reposition.`);
   return { ...record, state: "pending", die, direction: DEVIATION_DIRECTIONS[die - 1], rollJSON };
 }
 export function drunkRepositionCompletion(
@@ -133,13 +134,13 @@ export function drunkRepositionCompletion(
   if (history.warnings.length) throw new Error(history.warnings.join(" "));
   const record = history.rows.find(r => r.id === id);
   if (!record || !["pending", "moving", "applied"].includes(record.state))
-    throw new Error("Choose a frozen pending Drunk reposition.");
+    throw new Error(loc`Choose a frozen pending Drunk reposition.`);
   if (record.state === "applied") return { record, reused: true };
   if (record.state === "moving" && interruptedMovementReviewed !== true)
-    throw new Error("The GC must review the interrupted token movement before confirming its actual resolution.");
+    throw new Error(loc`The GC must review the interrupted token movement before confirming its actual resolution.`);
   if (movementConfirmed !== true)
     throw new Error(
-      "The GC must confirm the recorded five-foot reposition actually occurred, without reducing allowed movement."
+      loc`The GC must confirm the recorded five-foot reposition actually occurred, without reducing allowed movement.`
     );
   return {
     record: {
@@ -187,7 +188,7 @@ function tokenDestination(token, die) {
     g.distance <= 0
   )
     throw new Error(
-      "Automatic reposition requires a square grid measured in feet. Use the GC-confirmed manual reposition for this scene."
+      loc`Automatic reposition requires a square grid measured in feet. Use the GC-confirmed manual reposition for this scene.`
     );
   if (
     ![token.x, token.y, token.width, token.height, rect?.x, rect?.y, rect?.width, rect?.height].every(finite) ||
@@ -196,11 +197,11 @@ function tokenDestination(token, die) {
     rect.width <= 0 ||
     rect.height <= 0
   )
-    throw new Error("Review the token size, position and scene bounds.");
+    throw new Error(loc`Review the token size, position and scene bounds.`);
   const step = (g.size * 5) / g.distance;
   if (!Number.isSafeInteger(step) || step < 1)
     throw new Error(
-      "This grid cannot represent exactly five feet at whole-pixel positions. Use the manual reposition."
+      loc`This grid cannot represent exactly five feet at whole-pixel positions. Use the manual reposition.`
     );
   const [dx, dy] = directionOffsets[die - 1] ?? [],
     to = { x: token.x + dx * step, y: token.y + dy * step },
@@ -210,7 +211,7 @@ function tokenDestination(token, die) {
       p.x + token.width * g.size <= rect.x + rect.width &&
       p.y + token.height * g.size <= rect.y + rect.height;
   if (!fits(token) || !fits(to))
-    throw new Error("The five-foot reposition crosses the scene boundary. The GC must resolve it manually.");
+    throw new Error(loc`The five-foot reposition crosses the scene boundary. The GC must resolve it manually.`);
   return to;
 }
 function validMovementPlan(record, now) {
@@ -239,10 +240,10 @@ export function drunkTokenMovementPlan(system, combat, { id, token, routeConfirm
   if (history.warnings.length) throw new Error(history.warnings.join(" "));
   const record = history.rows.find(r => r.id === id);
   if (!record || !["pending", "moving", "applied"].includes(record.state))
-    throw new Error("Choose a frozen Drunk reposition requiring actual movement.");
+    throw new Error(loc`Choose a frozen Drunk reposition requiring actual movement.`);
   if (record.state === "applied") return { record, reused: true, moveRequired: false };
   if (routeConfirmed !== true)
-    throw new Error("The GC must confirm the forced movement path, obstacles and hazards before moving this token.");
+    throw new Error(loc`The GC must confirm the forced movement path, obstacles and hazards before moving this token.`);
   if (
     !token ||
     token.isOwner !== true ||
@@ -250,7 +251,7 @@ export function drunkTokenMovementPlan(system, combat, { id, token, routeConfirm
     typeof token.uuid !== "string" ||
     !token.uuid
   )
-    throw new Error("Choose an owned token for this character.");
+    throw new Error(loc`Choose an owned token for this character.`);
   const currentRound =
     system.conditionContext?.drunk === true &&
     combat?.started &&
@@ -259,22 +260,22 @@ export function drunkTokenMovementPlan(system, combat, { id, token, routeConfirm
   if (record.state === "moving") {
     const p = record.movementPlan;
     if (token.uuid !== p.tokenUuid || token.actorUuid !== p.actorUuid)
-      throw new Error("Resume the original token movement; a different token cannot inherit it.");
+      throw new Error(loc`Resume the original token movement; a different token cannot inherit it.`);
     if (token.x === p.to.x && token.y === p.to.y)
       return { record, reused: false, moveRequired: false, movementPlan: p };
     if (token.x !== p.from.x || token.y !== p.from.y)
       throw new Error(
-        "The token moved to another position. Preserve it and ask the GC to review the pending reposition."
+        loc`The token moved to another position. Preserve it and ask the GC to review the pending reposition.`
       );
     if (JSON.stringify(movementFrame(token)) !== JSON.stringify(p.frame))
-      throw new Error("The token size or scene grid changed. Review the original movement plan.");
+      throw new Error(loc`The token size or scene grid changed. Review the original movement plan.`);
     if (!currentRound)
-      throw new Error("This pending move belongs to an earlier round. The GC must resolve it manually.");
+      throw new Error(loc`This pending move belongs to an earlier round. The GC must resolve it manually.`);
     return { record, reused: false, moveRequired: true, movementPlan: p };
   }
   if (!currentRound)
     throw new Error(
-      "Automatic movement requires the current Drunk combat round. Confirm older actual movement manually."
+      loc`Automatic movement requires the current Drunk combat round. Confirm older actual movement manually.`
     );
   const p = {
     tokenUuid: token.uuid,

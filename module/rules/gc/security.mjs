@@ -3,6 +3,7 @@
  * The printed cells are formulas in PR; this module turns them into numbers for one device.
  */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 export const SECURITY_DEVICES = GC_DATA.tables.security;
 export const securityDevice = id => SECURITY_DEVICES.find(device => device.id === id) ?? null;
@@ -11,7 +12,7 @@ export const securityDevice = id => SECURITY_DEVICES.find(device => device.id ==
 export function evaluatePR(formula, pr) {
   if (formula === null || formula === undefined || formula === "") return null;
   if (typeof formula === "number") return formula;
-  if (!Number.isSafeInteger(pr) || pr < 1) throw new Error("Choose a Power Rating of 1 or more.");
+  if (!Number.isSafeInteger(pr) || pr < 1) throw new Error(loc`Choose a Power Rating of 1 or more.`);
   const text = String(formula)
     .replaceAll("PR", String(pr))
     .replaceAll("×", "*")
@@ -29,13 +30,13 @@ export function evaluatePR(formula, pr) {
       at++;
       const value = sum();
       skip();
-      if (text[at] !== ")") throw new Error("Unbalanced formula.");
+      if (text[at] !== ")") throw new Error(loc`Unbalanced formula.`);
       at++;
       return value;
     }
     const start = at;
     while (/\d/.test(text[at] ?? "")) at++;
-    if (start === at) throw new Error("Malformed formula.");
+    if (start === at) throw new Error(loc`Malformed formula.`);
     return Number(text.slice(start, at));
   };
   const product = () => {
@@ -75,7 +76,7 @@ export function fillPR(text, pr) {
 /** One device at a given Power Rating, with every scalable number resolved. */
 export function resolveDevice(id, pr) {
   const device = securityDevice(id);
-  if (!device) throw new Error("Unknown security device.");
+  if (!device) throw new Error(loc`Unknown security device.`);
   const number = key => evaluatePR(device[key], pr);
   const detectDC = number("detectDC");
   return {
@@ -111,7 +112,7 @@ export function resolveDevice(id, pr) {
 
 /** A sensor's Awareness check against the intruder's opposed result; no result cap applies. */
 export function sensorCheck(device, roll, opposedResult) {
-  if (device.kind !== "sensor") throw new Error("Only sensors make Awareness checks.");
+  if (device.kind !== "sensor") throw new Error(loc`Only sensors make Awareness checks.`);
   if (device.autoTrigger) return { triggered: true, automatic: true };
   if (device.awareness === null) return { triggered: null, manual: device.opposedBy };
   const total = roll + device.awareness;
@@ -120,7 +121,7 @@ export function sensorCheck(device, roll, opposedResult) {
 
 /** A trap either attacks (error 1, threat 20) or forces a Reflex save for half damage, rounded down. */
 export function trapOutcome(device, { roll = null, defense = null, saveResult = null, damage = null } = {}) {
-  if (device.kind !== "trap") throw new Error("Only traps attack.");
+  if (device.kind !== "trap") throw new Error(loc`Only traps attack.`);
   if (device.attack !== null) {
     const total = roll + device.attack;
     return {

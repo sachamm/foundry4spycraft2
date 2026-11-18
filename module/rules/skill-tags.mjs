@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Hands-On/Language p.101; transmitting Innuendo p.158; Two-Weapon Basics p.176; Bound p.340. */
 export function skillTagPlan(
   system,
@@ -31,22 +32,23 @@ export function skillTagPlan(
     capAdjustment = language && noSharedLanguage === true ? (silverTongueLanguage ? -5 : -20) : 0,
     blockedReason = [
       ...(nauseated && concentration
-        ? ["Nauseated: skill checks with the Concentration tag are unavailable (p.342)."]
+        ? [loc`Nauseated: skill checks with the Concentration tag are unavailable (p.342).`]
         : []),
       ...(bound === true && (handsOn || grasp)
-        ? ["Bound: actions with the Grasp or Hands-On tags are unavailable (p.340)."]
+        ? [loc`Bound: actions with the Grasp or Hands-On tags are unavailable (p.340).`]
         : []),
-      ...(mute && language ? ["Mute: skill checks with the Language tag are unavailable (p.342)."] : [])
+      ...(mute && language ? [loc`Mute: skill checks with the Language tag are unavailable (p.342).`] : [])
     ].join(" ");
   const notes = [];
-  if (wheelWaiver) notes.push("One Hand on the Wheel: no one-handed penalty with this vehicle Maneuver.");
-  if (addedHandsOn) notes.push("Transmitting Innuendo adds the Hands-On tag (p.158).");
-  if (handPenalty) notes.push(`Hands-On with one hand: ${handPenalty}${twoWeapon ? " (Two-Weapon Basics)" : ""}.`);
+  if (wheelWaiver) notes.push(loc`One Hand on the Wheel: no one-handed penalty with this vehicle Maneuver.`);
+  if (addedHandsOn) notes.push(loc`Transmitting Innuendo adds the Hands-On tag (p.158).`);
+  if (handPenalty)
+    notes.push(loc`Hands-On with one hand: ${handPenalty}${twoWeapon ? loc` (Two-Weapon Basics)` : ""}.`);
   if (capAdjustment)
     notes.push(
       silverTongueLanguage
-        ? "Silver Tongue: no shared language reduces the Impress/Persuasion result cap by5instead of20(p.205)."
-        : "No shared language or relevant local tongue: Language-tag result cap −20 (p.101)."
+        ? loc`Silver Tongue: no shared language reduces the Impress/Persuasion result cap by5instead of20(p.205).`
+        : loc`No shared language or relevant local tongue: Language-tag result cap −20 (p.101).`
     );
   return {
     ...(silverTongueLanguage ? { silverTongueLanguage: true } : {}),

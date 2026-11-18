@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Polyglot p.204: automatic Cultures synergy, including targets outside owned regions. */
 export function polyglotSkillPlan(system, key) {
   if (!["impress", "networking"].includes(key) || !system.activeFeatNames?.includes("Polyglot")) return null;
@@ -8,6 +9,6 @@ export function polyglotSkillPlan(system, key) {
     evidence: { version: 1, source: "Polyglot", culturesRanks: ranks, synergy, focusException: true },
     bonuses: [{ source: "Polyglot", type: "synergy", value: synergy }],
     synergies: [{ skill: "cultures", focusSkill: false, focus: "", condition: "" }],
-    blockedReason: valid ? "" : "Review Cultures ranks before applying Polyglot."
+    blockedReason: valid ? "" : loc`Review Cultures ranks before applying Polyglot.`
   };
 }

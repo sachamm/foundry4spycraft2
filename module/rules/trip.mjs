@@ -3,6 +3,7 @@ import { stillStandingResistancePlan } from "./still-standing.mjs";
 import { attributeDefensePlan } from "./attributes.mjs";
 import { uncannyDodgePlan } from "./defense.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export const TRIP_SIZES = Object.freeze([
   "Nuisance",
   "Fine",
@@ -22,7 +23,7 @@ export function responseOwnSize(system) {
   const size = system?.size;
   if (size === undefined) return null;
   if (typeof size !== "string" || !size.trim() || size.trim().length > 200)
-    throw Error("Review the character’s actual current Size before this response.");
+    throw Error(loc`Review the character’s actual current Size before this response.`);
   return size.trim();
 }
 /** p.361 opposed response; p.352 action error +1 applies to every check in the action. */
@@ -65,7 +66,7 @@ export function tripDefensePlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (key !== "acrobatics" || check?.id !== "resist-trip") return empty;
   if (method !== "roll")
-    return reject("Trip is opposed and part of a combat action; taking10/20 is unavailable (pp.91,352).");
+    return reject(loc`Trip is opposed and part of a combat action; taking10/20 is unavailable (pp.91,352).`);
   if (
     typeof tripOpponentName !== "string" ||
     !tripOpponentName.trim() ||
@@ -76,15 +77,15 @@ export function tripDefensePlan(
     Math.abs(tripSizeDifference) > 11
   )
     return reject(
-      "Name the actual adjacent opponent and confirm a legal incoming Trip and your Size-category difference (your Size minus the attacker’s)."
+      loc`Name the actual adjacent opponent and confirm a legal incoming Trip and your Size-category difference (your Size minus the attacker’s).`
     );
   if (tripSizeDifference > 1)
     return reject(
-      "An ordinary Trip cannot target a character more than one Size category larger than its attacker (p.361); review any actual exception separately."
+      loc`An ordinary Trip cannot target a character more than one Size category larger than its attacker (p.361); review any actual exception separately.`
     );
   const names = system?.activeFeatNames;
   if (!Array.isArray(names) || names.some(n => typeof n !== "string" || !n.trim()))
-    return reject("Review the current qualified Trip-defense feat sources.");
+    return reject(loc`Review the current qualified Trip-defense feat sources.`);
   let stillStanding, ownSize;
   try {
     stillStanding = stillStandingResistancePlan(system, "trip");
@@ -93,19 +94,19 @@ export function tripDefensePlan(
     return reject(error.message);
   }
   if (typeof tripOpponentUuid !== "string" || tripOpponentUuid.length > 500)
-    return reject("Choose the actual opposing character for this Trip response.");
+    return reject(loc`Choose the actual opposing character for this Trip response.`);
   if (tripOpponentUuid) {
     if (!validOwnCountClock(tripDefenseCombat))
-      return reject("Record the actual incoming Trip response in a started combat.");
+      return reject(loc`Record the actual incoming Trip response in a started combat.`);
     if (
       tripOpponentSize !== null &&
       (typeof tripOpponentSize !== "string" || !tripOpponentSize.trim() || tripOpponentSize.length > 200)
     )
-      return reject("Review the actual Trip attacker Size.");
+      return reject(loc`Review the actual Trip attacker Size.`);
     const own = tripSizeIndex(ownSize),
       other = tripSizeIndex(tripOpponentSize);
     if (own >= 0 && other >= 0 && own - other !== tripSizeDifference)
-      return reject("The reviewed Size difference does not match these characters’ known current Sizes.");
+      return reject(loc`The reviewed Size difference does not match these characters’ known current Sizes.`);
   }
   const mastery = names.includes("Equilibrium Mastery");
   let covertFeats = [],
@@ -115,7 +116,7 @@ export function tripDefensePlan(
       !Array.isArray(system.activeFeatSelections) ||
       system.activeFeatSelections.some(f => !f || typeof f !== "object")
     )
-      return reject("Review the current Covert feat selections for Equilibrium Mastery.");
+      return reject(loc`Review the current Covert feat selections for Equilibrium Mastery.`);
     covertFeats = system.activeFeatSelections
       .filter(f => f.tree === "covert")
       .map(f => ({ name: f.name, choice: f.choice ?? "" }))
@@ -124,7 +125,7 @@ export function tripDefensePlan(
       !covertFeats.some(f => f.name === "Equilibrium Mastery") ||
       covertFeats.some(f => typeof f.name !== "string" || !f.name.trim() || typeof f.choice !== "string")
     )
-      return reject("Review the qualified Equilibrium Mastery and Covert feat selections.");
+      return reject(loc`Review the qualified Equilibrium Mastery and Covert feat selections.`);
     vulnerable = attributeDefensePlan({ ...system, uncannyDodge: uncannyDodgePlan(system) }).vulnerable;
   }
   const normalDodge = covertFeats.length,
@@ -159,21 +160,21 @@ export function tripDefensePlan(
     ...empty,
     evidence,
     bonuses: [
-      ...(dodgeBonus ? [{ source: "Equilibrium Mastery (resist Trip)", type: "dodge", value: dodgeBonus }] : []),
+      ...(dodgeBonus ? [{ source: loc`Equilibrium Mastery (resist Trip)`, type: "dodge", value: dodgeBonus }] : []),
       ...(stillStanding.bonus ? [{ source: "Still Standing", type: "", value: stillStanding.bonus }] : [])
     ],
     sizeBonus,
     notes: [
-      `Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier+1; larger participant +4 per Size category (pp.352,361). Your Size bonus +${sizeBonus}.`,
+      loc`Resist Trip: opposed Acrobatics(DEX), Armor Check Penalty; action error modifier+1; larger participant +4 per Size category (pp.352,361). Your Size bonus +${sizeBonus}.`,
       ...(mastery
         ? [
-            `Equilibrium Mastery: ${normalDodge} current Covert feats; dodge bonus +${dodgeBonus}${vulnerable ? " (lost while vulnerable, p.328)" : ""}. Dodge bonuses stack; this is not a general Defense bonus (p.194).`
+            loc`Equilibrium Mastery: ${normalDodge} current Covert feats; dodge bonus +${dodgeBonus}${vulnerable ? loc` (lost while vulnerable, p.328)` : ""}. Dodge bonuses stack; this is not a general Defense bonus (p.194).`
           ]
         : []),
       ...(stillStanding.source
-        ? ["Still Standing: +4 unnamed bonus to this skill check resisting Trip (p.66); this is not a dodge bonus."]
+        ? [loc`Still Standing: +4 unnamed bonus to this skill check resisting Trip (p.66); this is not a dodge bonus.`]
         : []),
-      "Finish reciprocal recorded checks in chat, then use Main’s Trip outcomes and any earned Trip final attack at−4. An original critical defensive win earns Main’s Counter-Trip; the second Trip never grants a third. Unrecorded opponents and weapon-quality variants remain for separate adjudication."
+      loc`Finish reciprocal recorded checks in chat, then use Main’s Trip outcomes and any earned Trip final attack at−4. An original critical defensive win earns Main’s Counter-Trip; the second Trip never grants a third. Unrecorded opponents and weapon-quality variants remain for separate adjudication.`
     ]
   };
 }
@@ -214,12 +215,12 @@ export function validateTripDefenseProof(
     attributeSubstitution.ability === "int" &&
     (system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "dex"))
-    throw Error("The Trip response key attribute or actual substitution source changed before posting.");
+    throw Error(loc`The Trip response key attribute or actual substitution source changed before posting.`);
   const candidate = proof.version === 1 && p.evidence ? { ...p.evidence, version: 1 } : p.evidence;
   if (proof.version === 1 && candidate) delete candidate.ownSize;
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(candidate) !== stable(proof))
     throw Error(
-      "The Trip-defense circumstances, vulnerability or qualified Covert feat sources changed before posting."
+      loc`The Trip-defense circumstances, vulnerability or qualified Covert feat sources changed before posting.`
     );
 }
 

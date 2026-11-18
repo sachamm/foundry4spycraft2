@@ -1,5 +1,6 @@
 import { ownCountDurationActive, validOwnCountClock } from "./own-count-duration.mjs";
 import { combatMovementPlan } from "./combat-movement.mjs";
+import { loc } from "../i18n.mjs";
 /** Total Defense p.361; action cost remains a confirmed table declaration. */
 /** Equilibrium Basics p.194: an additional, normally stacking dodge bonus. */
 export function equilibriumTotalDefenseBonus(system) {
@@ -8,7 +9,7 @@ export function equilibriumTotalDefenseBonus(system) {
     return {
       bonus: 0,
       evidence: null,
-      blockedReason: "Review the active Covert feat selections for Equilibrium Basics."
+      blockedReason: loc`Review the active Covert feat selections for Equilibrium Basics.`
     };
   const selections = system.activeFeatSelections
     .filter(f => f.tree === "covert")
@@ -20,7 +21,7 @@ export function equilibriumTotalDefenseBonus(system) {
     return {
       bonus: 0,
       evidence: null,
-      blockedReason: "Review the active Covert feat selections for Equilibrium Basics."
+      blockedReason: loc`Review the active Covert feat selections for Equilibrium Basics.`
     };
   selections.sort((a, b) => a.name.localeCompare(b.name) || a.choice.localeCompare(b.choice));
   return {
@@ -46,7 +47,7 @@ export function totalDefenseState(system) {
   let equilibrium = { bonus: 0, evidence: null, blockedReason: "" };
   if (active && proof) {
     if (!validEquilibriumDeclaration(proof))
-      equilibrium.blockedReason = "Review the Equilibrium Basics source recorded for this Total Defense declaration.";
+      equilibrium.blockedReason = loc`Review the Equilibrium Basics source recorded for this Total Defense declaration.`;
     else equilibrium = equilibriumTotalDefenseBonus(system);
   }
   return {
@@ -59,13 +60,13 @@ export function totalDefenseState(system) {
 }
 export function totalDefensePlan(system, combat, options = {}) {
   if (!validOwnCountClock(combat) || combat.turn !== combat.ownTurnIndex)
-    throw new Error("Take Total Defense during this character’s Initiative Count in a started combat.");
-  if (options.actionConfirmed !== true) throw new Error("Confirm spending the full action for Total Defense.");
+    throw new Error(loc`Take Total Defense during this character’s Initiative Count in a started combat.`);
+  if (options.actionConfirmed !== true) throw new Error(loc`Confirm spending the full action for Total Defense.`);
   const refresh = system.refreshAction;
   if (refresh?.state === "waiting" && refresh.combatId === combat.id && refresh.startRound === combat.round)
-    throw new Error("Refresh forfeited this round’s chance to act.");
+    throw new Error(loc`Refresh forfeited this round’s chance to act.`);
   if (totalDefenseState({ ...system, totalDefenseCombatContext: combat }).active)
-    throw new Error("Total Defense is already active for this full round.");
+    throw new Error(loc`Total Defense is already active for this full round.`);
   const equilibrium = equilibriumTotalDefenseBonus(system);
   if (equilibrium.blockedReason) throw new Error(equilibrium.blockedReason);
   const movement = combatMovementPlan(system, { ...options, action: "totalDefense" });

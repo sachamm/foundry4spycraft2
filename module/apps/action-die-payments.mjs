@@ -15,6 +15,7 @@ import {
   paymentLockToken,
   paymentIdValid
 } from "../rules/action-die-payments.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   clone = structuredClone;
 const wholeInput = v => (typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v) : NaN);
@@ -64,7 +65,7 @@ export async function markMultipartActionDieReview(actor, payment, error, detail
     await actor.update(actor.actorRecordRestorePatch("flags.spycraft2.actionDiceSettlementReview", review));
   } catch {}
   ui.notifications.warn(
-    "The action-die payment needs GC review. Check the recorded benefit and each selected balance before retrying."
+    loc`The action-die payment needs GC review. Check the recorded benefit and each selected balance before retrying.`
   );
   return review;
 }
@@ -75,11 +76,11 @@ export async function payMultipartActionDiceLocked(
   perform,
   { id = foundry.utils.randomID(), message = null, purpose = "Action-die use", details = {} } = {}
 ) {
-  if (!actor.isOwner) throw new Error("You must own the character spending action dice.");
+  if (!actor.isOwner) throw new Error(loc`You must own the character spending action dice.`);
   if (getActionDieSettlementReview(actor).needsReview)
-    throw new Error("Resolve the interrupted action-die payment before spending.");
+    throw new Error(loc`Resolve the interrupted action-die payment before spending.`);
   if (actor.flags?.spycraft2?.actionDiePayments?.[id])
-    throw new Error("This payment reference already exists. Inspect its recorded result before retrying.");
+    throw new Error(loc`This payment reference already exists. Inspect its recorded result before retrying.`);
   const plan = multipartActionDicePlan(currentSystem(actor), allocations, {
       id,
       actorUuid: actor.uuid,
@@ -110,7 +111,7 @@ export async function payMultipartActionDiceLocked(
       }
     }
     if (!paymentRecordMatches(actor, record)) {
-      const error = new Error("The payment reservation receipt is missing.");
+      const error = new Error(loc`The payment reservation receipt is missing.`);
       await markMultipartActionDieReview(actor, record, error, details);
       throw error;
     }
@@ -124,7 +125,7 @@ export async function payMultipartActionDiceLocked(
       }
       try {
         if (!paymentRecordMatches(actor, record))
-          throw new Error("The original payment reservation changed before refund.");
+          throw new Error(loc`The original payment reservation changed before refund.`);
         const patch = multipartRefundPatch(actor.actionDiceFundingSystem, record),
           refunded = patch["flags.spycraft2.actionDiePayments." + id];
         try {
@@ -132,10 +133,10 @@ export async function payMultipartActionDiceLocked(
         } catch (rollback) {
           if (!paymentRecordMatches(actor, refunded)) throw rollback;
         }
-        if (!paymentRecordMatches(actor, refunded)) throw new Error("The refund receipt is missing.");
+        if (!paymentRecordMatches(actor, refunded)) throw new Error(loc`The refund receipt is missing.`);
       } catch (rollback) {
         await markMultipartActionDieReview(actor, record, rollback, { ...details, purpose: "Payment refund" });
-        throw new AggregateError([error, rollback], "The selected action-die balances need GC review.");
+        throw new AggregateError([error, rollback], loc`The selected action-die balances need GC review.`);
       }
       throw error;
     }
@@ -146,7 +147,7 @@ export async function payMultipartActionDiceLocked(
     };
     try {
       await actor.update({ ["flags.spycraft2.actionDiePayments." + id]: spent });
-      if (!paymentRecordMatches(actor, spent)) throw new Error("The final payment receipt is missing.");
+      if (!paymentRecordMatches(actor, spent)) throw new Error(loc`The final payment receipt is missing.`);
     } catch (error) {
       if (!paymentRecordMatches(actor, spent))
         await markMultipartActionDieReview(actor, record, error, {
@@ -175,7 +176,7 @@ function validateRows(review) {
     !review.payments.length ||
     new Set(review.payments.map(p => p.paymentPath)).size !== review.payments.length
   )
-    throw new Error("Review the saved payment sources.");
+    throw new Error(loc`Review the saved payment sources.`);
   for (const row of review.payments)
     if (
       typeof row.bonusPoolId !== "string" ||
@@ -183,7 +184,7 @@ function validateRows(review) {
       row.paymentPath !==
         (row.bonusPoolId ? "system.bonusActionDice." + row.bonusPoolId + ".remaining" : "system.actionDice.value")
     )
-      throw new Error("Review the original payment paths.");
+      throw new Error(loc`Review the original payment paths.`);
 }
 function relatedPaymentState(review, actorUuid) {
   const messages = game.messages ? [...game.messages.values()] : [],
@@ -237,7 +238,7 @@ function relatedPaymentState(review, actorUuid) {
   };
 }
 export async function reviewMultipartActionDice(actor, options = {}) {
-  if (!game.user.isGM || !actor.isOwner) throw new Error("Only the GC may review the selected action-die balances.");
+  if (!game.user.isGM || !actor.isOwner) throw new Error(loc`Only the GC may review the selected action-die balances.`);
   const review = clone(getActionDieSettlementReview(actor));
   if (!review.needsReview) return null;
   validateRows(review);
@@ -257,17 +258,17 @@ export async function reviewMultipartActionDice(actor, options = {}) {
   if (input.healthReviewed === undefined) {
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review action-die payment" },
+      window: { title: loc`Review action-die payment` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${esc(review.reason)} Review the actual benefit, health and action state first.</p><p>${esc(review.purpose ?? "Action-die payment")}${review.attemptId ? `; Request recipient ${esc(review.recipientActorUuid)}, attempt ${esc(review.attemptId)}` : ""}</p>${Array.isArray(review.abilities) && review.abilities.length ? `<p>Ability uses: ${review.abilities.map(id => esc(String(actor.system.limitedUses?.find(s => s.id === id)?.name ?? id))).join("; ")}.</p>` : ""}${review.payments
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(review.reason)} Review the actual benefit, health and action state first.`}</p><p>${esc(review.purpose ?? loc`Action-die payment`)}${review.attemptId ? loc`; Request recipient ${esc(review.recipientActorUuid)}, attempt ${esc(review.attemptId)}` : ""}</p>${Array.isArray(review.abilities) && review.abilities.length ? `<p>${loc`Ability uses: ${review.abilities.map(id => esc(String(actor.system.limitedUses?.find(s => s.id === id)?.name ?? id))).join("; ")}.`}</p>` : ""}${review.payments
         .map((p, i) => {
           const current = expected.balances[i],
             unavailable = !!p.bonusPoolId && current.fingerprint !== p.poolFingerprint;
-          return `<label>${esc(p.label)} final balance <input name="balance_${i}" type="number" min="0" step="1" value="${current.balance ?? 0}" /></label>${unavailable ? `<label><input name="unavailable_${i}" type="checkbox" /> The original grant is unavailable or replaced; leave its current source untouched</label>` : ""}`;
+          return `<label>${loc`${esc(p.label)} final balance`} <input name="balance_${i}" type="number" min="0" step="1" value="${current.balance ?? 0}" /></label>${unavailable ? `<label><input name="unavailable_${i}" type="checkbox" /> ${loc`The original grant is unavailable or replaced; leave its current source untouched`}</label>` : ""}`;
         })
         .join(
           ""
-        )}<label>Benefit <select name="benefitRemains"><option value="true">The activation was applied; keep its benefit/use recorded</option><option value="false">The activation was cancelled; no result or benefit was retained</option></select></label>${review.limitedUseSettlement?.length ? '<p>An effect ending normally does not cancel its activation.</p><label><input name="restoreLimitedUses" type="checkbox" /> Restore this cancelled activation’s recorded limited uses; no roll or benefit was used or retained</label>' : ""}<label>GC explanation <input name="resolution" /></label><label><input name="healthReviewed" type="checkbox" /> I reviewed actual health, action state, benefit and all selected balances</label></div>`
+        )}<label>${loc`Benefit`} <select name="benefitRemains"><option value="true">${loc`The activation was applied; keep its benefit/use recorded`}</option><option value="false">${loc`The activation was cancelled; no result or benefit was retained`}</option></select></label>${review.limitedUseSettlement?.length ? `<p>${loc`An effect ending normally does not cancel its activation.`}</p><label><input name="restoreLimitedUses" type="checkbox" /> ${loc`Restore this cancelled activation’s recorded limited uses; no roll or benefit was used or retained`}</label>` : ""}<label>${loc`GC explanation`} <input name="resolution" /></label><label><input name="healthReviewed" type="checkbox" /> ${loc`I reviewed actual health, action state, benefit and all selected balances`}</label></div>`
     });
     if (!input) return null;
     const number = v => (typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v) : NaN);
@@ -295,10 +296,10 @@ export async function reviewMultipartActionDice(actor, options = {}) {
     typeof input.benefitRemains !== "boolean" ||
     (input.restoreLimitedUses === true && input.benefitRemains)
   )
-    throw new Error("Confirm each final balance, the benefit disposition and the GC explanation.");
+    throw new Error(loc`Confirm each final balance, the benefit disposition and the GC explanation.`);
   return queueResources([actor], async () => {
     if (!game.user.isGM || !actor.isOwner || !same(snapshot(), expected))
-      throw new Error("The saved payment, balances or related action state changed. Review them again.");
+      throw new Error(loc`The saved payment, balances or related action state changed. Review them again.`);
     const patch = {},
       settled = [];
     for (const [i, row] of review.payments.entries()) {
@@ -306,12 +307,12 @@ export async function reviewMultipartActionDice(actor, options = {}) {
         unavailable = !!row.bonusPoolId && current.fingerprint !== row.poolFingerprint,
         value = input.balances[i];
       if (unavailable) {
-        if (input.unavailable?.[i] !== true) throw new Error("Confirm that the changed grant is left untouched.");
+        if (input.unavailable?.[i] !== true) throw new Error(loc`Confirm that the changed grant is left untouched.`);
         settled.push(null);
         continue;
       }
       if (!Number.isSafeInteger(value) || value < 0 || (row.bonusPoolId && value > current.granted))
-        throw new Error("Choose valid whole-die balances within the original grants.");
+        throw new Error(loc`Choose valid whole-die balances within the original grants.`);
       patch[row.paymentPath] = value;
       if (review.grantReview && row.bonusPoolId)
         patch["system.bonusActionDice." + row.bonusPoolId + ".needsReview"] = false;
@@ -320,7 +321,7 @@ export async function reviewMultipartActionDice(actor, options = {}) {
     if (input.restoreLimitedUses === true) {
       const rows = review.limitedUseSettlement;
       if (!Array.isArray(rows) || !rows.length || new Set(rows.map(r => r.id)).size !== rows.length)
-        throw new Error("Review the recorded limited uses.");
+        throw new Error(loc`Review the recorded limited uses.`);
       for (const row of rows) {
         const valid = v => v && typeof v.epoch === "string" && Number.isSafeInteger(v.used) && v.used >= 0;
         const invalid =
@@ -334,7 +335,8 @@ export async function reviewMultipartActionDice(actor, options = {}) {
           valid(row.before) && valid(row.reserved) && row.before.epoch === row.reserved.epoch
             ? row.reserved.used !== row.before.used + 1
             : row.reserved?.used !== 1;
-        if (invalid || wrongIncrement) throw new Error("A limited-use source changed or has invalid restoration data.");
+        if (invalid || wrongIncrement)
+          throw new Error(loc`A limited-use source changed or has invalid restoration data.`);
         Object.assign(
           patch,
           actor.actorRecordRestorePatch("system.resourceUses." + row.id, row.before === null ? undefined : row.before)

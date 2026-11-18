@@ -21,6 +21,7 @@ import {
 import { HAZARD_GROUPS, hazardOptions } from "../rules/vehicle-environment.mjs";
 import { hasQuality, parseQualities } from "../rules/vehicle-play-rules.mjs";
 import { getMission, teamActors } from "../apps/gc/state.mjs";
+import { loc } from "../i18n.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -60,8 +61,8 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
       },
       async repair() {
         const confirmed = await systemDialog.confirm({
-          window: { title: `${this.actor.name}: repairs` },
-          content: "<p>Clear every failed Damage save and Vehicle Damage result recorded on this vehicle?</p>",
+          window: { title: loc`${this.actor.name}: repairs` },
+          content: `<p>${loc`Clear every failed Damage save and Vehicle Damage result recorded on this vehicle?`}</p>`,
           rejectClose: false
         });
         return confirmed ? repairVehicle(this.actor) : null;
@@ -217,7 +218,7 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
 
   static async #onOpenSource() {
     const item = this.actor.system.sourceItem ? await fromUuid(this.actor.system.sourceItem) : null;
-    if (!item) return ui.notifications.warn("The gear pick this vehicle came from is no longer available.");
+    if (!item) return ui.notifications.warn(loc`The gear pick this vehicle came from is no longer available.`);
     return item.sheet.render(true);
   }
 }

@@ -46,7 +46,7 @@ import {
   vehicleSignatures
 } from "../rules/vehicle-environment.mjs";
 
-const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
+const { ArrayField, BooleanField, HTMLField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 const int = (initial = 0, opts = {}) =>
   new NumberField({ required: true, nullable: false, integer: true, initial, ...opts });
@@ -95,7 +95,7 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
       }),
       feintBonuses: recordList("feintBonuses"),
       feintHistory: recordList("feintHistory"),
-      cheapShots: new ArrayField(new ObjectField()),
+      cheapShots: recordList("cheapShots"),
       biography: new HTMLField()
     };
   }
@@ -175,14 +175,14 @@ export class NpcData extends BaseActorData {
       ...super.defineSchema(),
       threatLevel: int(1, { min: 1 }),
       followMission: new BooleanField(),
-      promotion: new ObjectField({ nullable: true, initial: null }),
+      promotion: record("promotion", { nullable: true, initial: null }),
       manualDamageSave: int(0),
       damageSaveAdjust: int(0),
-      damageTrack: new ObjectField({ nullable: true, initial: null }),
+      damageTrack: record("damageTrack", { nullable: true, initial: null }),
       disposition: record("disposition", { initial: () => ({ base: "neutral", toward: {} }) }),
       manualRole: new StringField({ initial: "", blank: true, choices: ["", "minion", "henchman", "mastermind"] }),
       npcType: new StringField({ initial: "standard", choices: ["standard", "special", "villain", "animal"] }),
-      npcProfile: new ObjectField({ initial: () => defaultNpcProfile() })
+      npcProfile: record("npcProfile", { initial: () => defaultNpcProfile() })
     };
   }
 }
@@ -254,9 +254,9 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           /** INT modifier when points were earned; null reconstructs legacy history. */
           intelligenceModifier: new NumberField({ nullable: true, initial: null, integer: true }),
           /** Expert-class entry qualification at the time the level was taken. */
-          expertEntry: new ObjectField({ nullable: true, initial: null }),
+          expertEntry: record("expertEntry", { nullable: true, initial: null }),
           /** Skill points spent at this level: { skillKey: points } */
-          skills: new ObjectField()
+          skills: record("progressionSkills")
         })
       ),
 
@@ -291,7 +291,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       superiorCover: record("superiorCover", { nullable: true, initial: null }),
       defenseBoost: record("defenseBoost", { nullable: true, initial: null }),
       noFearBoost: record("noFearBoost", { nullable: true, initial: null }),
-      attributeDamage: new ObjectField({ nullable: true, initial: null }),
+      attributeDamage: record("attributeDamage", { nullable: true, initial: null }),
       mentalLeaps: recordList("mentalLeaps"),
       fatigueRest: record("fatigueRest", { nullable: true, initial: null }),
       drunkSleep: record("drunkSleep", { nullable: true, initial: null }),
@@ -341,11 +341,11 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         })
       ),
       subplots: new ArrayField(new SchemaField({ name: str(), notes: str(), complete: new BooleanField() })),
-      gearPickLosses: new ObjectField(),
+      gearPickLosses: record("gearPickLosses"),
       missionReserves: record("missionReserves", { nullable: true, initial: null }),
-      armorMissionGrant: new ObjectField({ nullable: true, initial: null }),
-      bigStickMissionPick: new ObjectField({ nullable: true, initial: null }),
-      missionCaliberPicks: new ObjectField({ initial: {} }),
+      armorMissionGrant: record("armorMissionGrant", { nullable: true, initial: null }),
+      bigStickMissionPick: record("bigStickMissionPick", { nullable: true, initial: null }),
+      missionCaliberPicks: record("missionCaliberPicks", { initial: {} }),
       classGearGrants: record("classGearGrants", { initial: {} }),
       bonusActionDice: record("bonusActionDice", { initial: {} }),
       missionReserveHistory: recordList("missionReserveHistory"),
@@ -359,7 +359,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       misc: new SchemaField(misc),
       feintBonuses: recordList("feintBonuses"),
       feintHistory: recordList("feintHistory"),
-      cheapShots: new ArrayField(new ObjectField()),
+      cheapShots: recordList("cheapShots"),
       biography: new HTMLField()
     };
   }

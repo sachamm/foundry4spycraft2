@@ -8,6 +8,7 @@ import { ownedWeaponTraining } from "./weapon-training.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export const MISS_TRICKS = {
   doubleTwirl: { name: "Double Twirl", feat: "Flail Basics", family: "flail" },
   remiss: { name: "Remiss", feat: "Fencing Basics", family: "oneHandedSword" }
@@ -108,7 +109,7 @@ export function validateMissTrickSources(
     });
   const candidate = sourceVersion(proof, fresh);
   if (stable(proof) !== stable(candidate))
-    throw Error("The readied miss-trick weapon, feat, FIN source, grip or Initiative Count changed before posting.");
+    throw Error(loc`The readied miss-trick weapon, feat, FIN source, grip or Initiative Count changed before posting.`);
 }
 export function missTrickPlan(
   system,
@@ -132,7 +133,7 @@ export function missTrickPlan(
         [undefined, "other"].includes(check?.attackContext?.attackAction));
   const definition = MISS_TRICKS[trick];
   if (!definition || !system.activeFeatNames?.includes(definition.feat) || !current?.sources?.includes(trick))
-    throw Error("Choose a qualified miss trick with its actual readied weapon.");
+    throw Error(loc`Choose a qualified miss trick with its actual readied weapon.`);
   if (
     !validOwnCountClock(combat) ||
     !check ||
@@ -157,7 +158,7 @@ export function missTrickPlan(
     check.rollCombat?.id !== combat.id ||
     check.rollCombat?.round !== combat.round
   )
-    throw Error("Choose this combat round’s resolved Standard Attack miss without an error.");
+    throw Error(loc`Choose this combat round’s resolved Standard Attack miss without an error.`);
   if (
     typeof opponentUuid !== "string" ||
     !opponentUuid ||
@@ -165,7 +166,7 @@ export function missTrickPlan(
     sameTargetConfirmed !== true ||
     attackLegalConfirmed !== true
   )
-    throw Error("Confirm the same actual opponent and immediate reaction to this miss.");
+    throw Error(loc`Confirm the same actual opponent and immediate reaction to this miss.`);
   const knownTarget =
     check.attackContext?.targetActorUuid ||
     check.attackContext?.cheapShot?.targetUuid ||
@@ -173,9 +174,9 @@ export function missTrickPlan(
     check.finalAttack?.opponentUuid ||
     check.finalAttack?.targetUuid;
   if (knownTarget && knownTarget !== opponentUuid)
-    throw Error("This trick must attack the recorded original opponent.");
+    throw Error(loc`This trick must attack the recorded original opponent.`);
   if (check.attackContext?.meleeFeatTrick && check.attackContext?.meleeFeatTrick !== trick)
-    throw Error("Only one Melee/Unarmed Combat feat trick may apply to this action (p.177).");
+    throw Error(loc`Only one Melee/Unarmed Combat feat trick may apply to this action (p.177).`);
   if (original) {
     if (
       !original.sources.includes(trick) ||
@@ -183,20 +184,20 @@ export function missTrickPlan(
       stable(original.combat) !== stable(combat)
     )
       throw Error(
-        "The weapon/feat did not qualify at the miss, or its source or immediate Initiative context changed."
+        loc`The weapon/feat did not qualify at the miss, or its source or immediate Initiative context changed.`
       );
   } else if (legacySourceConfirmed !== true)
     throw Error(
-      "This older receipt needs GC confirmation of the qualified/readied weapon and feat at the original miss."
+      loc`This older receipt needs GC confirmation of the qualified/readied weapon and feat at the original miss.`
     );
   if (
     system.refreshAction?.state === "waiting" &&
     system.refreshAction.combatId === combat.id &&
     system.refreshAction.startRound === combat.round
   )
-    throw Error("Refresh forfeited this round’s chance to act.");
+    throw Error(loc`Refresh forfeited this round’s chance to act.`);
   const block = restraintActionBlock(system, { free: true }) || attributeActionBlock(system, { kind: "attack" });
-  if (block || system.wounds?.value < 0) throw Error(block || "This character cannot take the final attack.");
+  if (block || system.wounds?.value < 0) throw Error(block || loc`This character cannot take the final attack.`);
   return {
     version: 1,
     source: "missTrick",

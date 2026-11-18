@@ -1,6 +1,7 @@
 import { TABLES } from "./tables.mjs";
 import { stepLookup } from "./formula.mjs";
 import { NPC_RULES } from "./npc-tables.mjs";
+import { loc } from "../i18n.mjs";
 export { NPC_RULES };
 export const NPC_STATS = {
   initiative: "Initiative",
@@ -63,11 +64,11 @@ export function npcEquipmentCost(profile, type, rules = NPC_RULES) {
   for (const category of NPC_CATEGORIES) {
     const picks = profile.equipment?.[category];
     if (!Array.isArray(picks) || picks.some(c => !integer(c, 1, 5))) {
-      warnings.push(`${category}: every pick needs a Caliber from I to V.`);
+      warnings.push(loc`${category}: every pick needs a Caliber from I to V.`);
       continue;
     }
     if (type === "animal" && picks.length)
-      warnings.push("Animals gain equipment through Augmented, not ordinary picks.");
+      warnings.push(loc`Animals gain equipment through Augmented, not ordinary picks.`);
     const starting = rules.equipment.starting[type][category];
     const removed = Math.max(0, starting - picks.length);
     const added = Math.max(0, picks.length - starting);
@@ -80,10 +81,10 @@ export function npcEquipmentCost(profile, type, rules = NPC_RULES) {
     total += xp;
   }
   if (!integer(profile.extraAmmoPairs ?? 0, 0, 100))
-    warnings.push("Additional ammunition must be entered in pairs of stockpiles.");
+    warnings.push(loc`Additional ammunition must be entered in pairs of stockpiles.`);
   else {
     total += profile.extraAmmoPairs ?? 0;
-    rows.push({ label: "Additional ammunition", xp: profile.extraAmmoPairs ?? 0 });
+    rows.push({ label: loc`Additional ammunition`, xp: profile.extraAmmoPairs ?? 0 });
   }
   return { total, rows, warnings };
 }
@@ -94,27 +95,27 @@ export function computeNpcProfile(profile, type = "standard", threatLevel = 1, a
     manual = [],
     breakdown = [];
   if (!["standard", "special", "animal"].includes(type))
-    return { warnings: ["Unknown NPC type."], complete: false, xp: null };
-  if (!integer(threatLevel, 1, 20)) warnings.push("Threat Level must be from 1 to 20.");
-  if (!integer(profile.tier, 1, 5)) warnings.push("NPC Tier must be from I to V.");
+    return { warnings: [loc`Unknown NPC type.`], complete: false, xp: null };
+  if (!integer(threatLevel, 1, 20)) warnings.push(loc`Threat Level must be from 1 to 20.`);
+  if (!integer(profile.tier, 1, 5)) warnings.push(loc`NPC Tier must be from I to V.`);
   const effectiveLevel = clamp((Number(threatLevel) || 1) + ((Number(profile.tier) || 3) - 3) * 2, 1, 20);
   if (profile.tier !== 3)
-    manual.push("Tier III is the mission-design default; use other Tiers only when a rule specifies them (p.452).");
+    manual.push(loc`Tier III is the mission-design default; use other Tiers only when a rule specifies them (p.452).`);
   const grades = profile.grades ?? {};
   for (const key of Object.keys(NPC_STATS)) {
     if (type === "animal" && ["competence", "wealth"].includes(key)) continue;
     if (key === "wealth" && grades[key] === 0) continue;
-    if (!integer(grades[key], 1, 10)) warnings.push(`${NPC_STATS[key]} needs a grade from I to X.`);
+    if (!integer(grades[key], 1, 10)) warnings.push(loc`${NPC_STATS[key]} needs a grade from I to X.`);
   }
   const baseXP = Object.entries(grades)
     .filter(([key]) => Object.hasOwn(NPC_STATS, key) && !(type === "animal" && ["competence", "wealth"].includes(key)))
     .reduce((n, [, g]) => n + (Number(g) || 0), 0);
-  breakdown.push({ label: "Statistic grades (including Wealth)", xp: baseXP });
+  breakdown.push({ label: loc`Statistic grades (including Wealth)`, xp: baseXP });
   const equipment = npcEquipmentCost(profile, type, rules);
   warnings.push(...equipment.warnings);
   const skills = profile.skills ?? [];
   if (type !== "animal" && skills.length > (type === "special" ? 5 : 3))
-    warnings.push(`Skilled permits at most ${type === "special" ? 5 : 3} listed skills for this NPC type.`);
+    warnings.push(loc`Skilled permits at most ${type === "special" ? 5 : 3} listed skills for this NPC type.`);
   const seen = new Set();
   const animalSkills = [
     "acrobatics",
@@ -130,23 +131,23 @@ export function computeNpcProfile(profile, type = "standard", threatLevel = 1, a
     "tactics"
   ];
   for (const s of skills) {
-    if (!s.key || seen.has(s.key)) warnings.push("Listed skills must be distinct and named.");
+    if (!s.key || seen.has(s.key)) warnings.push(loc`Listed skills must be distinct and named.`);
     if (type === "animal" && !animalSkills.includes(s.key))
-      warnings.push(`${s.key}: not an allowed animal skill (p.445).`);
+      warnings.push(loc`${s.key}: not an allowed animal skill (p.445).`);
     seen.add(s.key);
-    if (!integer(s.grade, 1, 10)) warnings.push(`${s.key}: invalid skill grade.`);
+    if (!integer(s.grade, 1, 10)) warnings.push(loc`${s.key}: invalid skill grade.`);
   }
   let qualityXP = skills.reduce((n, s) => n + (Number(s.grade) || 0), 0);
-  breakdown.push({ label: "Skilled qualities", xp: qualityXP });
+  breakdown.push({ label: loc`Skilled qualities`, xp: qualityXP });
   // Attribute differences are quality purchases; do not also add a quality row.
   for (const [key, value] of Object.entries(abilities)) {
     const score = Number(value?.value ?? value),
       base = type === "animal" && key === "int" ? 2 : 10;
     if (!integer(score, 2, type === "animal" && key === "int" ? 6 : 30))
-      warnings.push(`${key.toUpperCase()}: attribute outside NPC quality limits.`);
+      warnings.push(loc`${key.toUpperCase()}: attribute outside NPC quality limits.`);
     const delta = score - base;
     qualityXP += delta;
-    if (delta) breakdown.push({ label: `${key.toUpperCase()} attribute quality`, xp: delta });
+    if (delta) breakdown.push({ label: loc`${key.toUpperCase()} attribute quality`, xp: delta });
   }
   const selections = profile.qualities ?? [],
     counts = new Map();
@@ -155,35 +156,35 @@ export function computeNpcProfile(profile, type = "standard", threatLevel = 1, a
     const q = rules.qualities.find(q => q.id === entry.id),
       cost = npcQualityCost(entry, rules.qualities);
     if (!q || cost === null) {
-      warnings.push(`Unresolved quality cost: ${entry.id}.`);
+      warnings.push(loc`Unresolved quality cost: ${entry.id}.`);
       continue;
     }
-    if (!q.types.includes(type)) warnings.push(`${q.name} is not available to ${type} NPCs.`);
-    if (q.requires && !ids.has(q.requires)) warnings.push(`${q.name} requires ${q.requires}.`);
-    if (q.groupOnly && !profile.group) warnings.push(`${q.name} requires an NPC group.`);
+    if (!q.types.includes(type)) warnings.push(loc`${q.name} is not available to ${type} NPCs.`);
+    if (q.requires && !ids.has(q.requires)) warnings.push(loc`${q.name} requires ${q.requires}.`);
+    if (q.groupOnly && !profile.group) warnings.push(loc`${q.name} requires an NPC group.`);
     const count = (counts.get(q.id) ?? 0) + (entry.units ?? 1);
     counts.set(q.id, count);
     let max = q.max ?? (q.repeatable ? Infinity : 1);
     if (q.id === "feat") max = ids.has("mastermind") ? 15 : ids.has("henchman") || ids.has("foil") ? 10 : 5;
     if (q.id === "class-ability") max = type === "special" ? 10 : 5;
-    if (count > max) warnings.push(`${q.name}: maximum ${max} application(s).`);
-    if (q.id === "flight" && (entry.units ?? 1) > 5) warnings.push("Flight is limited to 100 ft.");
+    if (count > max) warnings.push(loc`${q.name}: maximum ${max} application(s).`);
+    if (q.id === "flight" && (entry.units ?? 1) > 5) warnings.push(loc`Flight is limited to 100 ft.`);
     if (q.mode === "linked")
       manual.push(
-        "Removable Quality replaces the linked quality cost. Record its effect here; do not charge it a second time."
+        loc`Removable Quality replaces the linked quality cost. Record its effect here; do not charge it a second time.`
       );
     if (q.id === "class-ability")
-      manual.push("Class Ability: GC must check ability eligibility and its lowest granting class level (p.446).");
-    if (q.id === "feat") manual.push("Feat: GC must check feat prerequisites that require other feats (p.447).");
-    manual.push(`${q.name}: apply its play effects from p.${q.page}${entry.details ? ` (${entry.details})` : ""}.`);
+      manual.push(loc`Class Ability: GC must check ability eligibility and its lowest granting class level (p.446).`);
+    if (q.id === "feat") manual.push(loc`Feat: GC must check feat prerequisites that require other feats (p.447).`);
+    manual.push(loc`${q.name}: apply its play effects from p.${q.page}${entry.details ? ` (${entry.details})` : ""}.`);
     qualityXP += cost;
     breakdown.push({ label: q.name, xp: cost });
   }
   if (["minion", "henchman", "mastermind"].filter(id => ids.has(id)).length > 1)
-    warnings.push("Minion, henchman and mastermind are mutually exclusive.");
+    warnings.push(loc`Minion, henchman and mastermind are mutually exclusive.`);
   const floor = Math.ceil(baseXP * rules.qualityFloorFraction);
   const afterQualities = Math.max(floor, baseXP + qualityXP);
-  breakdown.push({ label: "Quality floor adjustment", xp: afterQualities - baseXP - qualityXP });
+  breakdown.push({ label: loc`Quality floor adjustment`, xp: afterQualities - baseXP - qualityXP });
   breakdown.push(...equipment.rows);
   const reward = Math.max(0, afterQualities + equipment.total);
   const multiplier = type === "special" ? rules.specialMultiplier : 1;
@@ -199,11 +200,11 @@ export function computeNpcProfile(profile, type = "standard", threatLevel = 1, a
     ((grades.health === 1 && effectiveLevel === 12) || (grades.health === 5 && effectiveLevel === 9))
   )
     manual.push(
-      "This health cell is anomalous in both supplied PDFs (I/TL12: 26/14; V/TL9: 45/10). Value preserved as printed; GC ruling may be needed."
+      loc`This health cell is anomalous in both supplied PDFs (I/TL12: 26/14; V/TL9: 45/10). Value preserved as printed; GC ruling may be needed.`
     );
   if (type === "animal")
     manual.push(
-      "Animal permitted actions, trained commands and skill-check restrictions require GC adjudication (p.445)."
+      loc`Animal permitted actions, trained commands and skill-check restrictions require GC adjudication (p.445).`
     );
   const attributes = {
     str: 10,

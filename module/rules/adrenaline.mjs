@@ -1,4 +1,5 @@
 import { actionDiceGain } from "./action-dice.mjs";
+import { loc } from "../i18n.mjs";
 export function adrenalineSource(system) {
   return system.coreClassIds?.includes("stuntman") &&
     Number.isSafeInteger(system.classLevels?.stuntman) &&
@@ -6,7 +7,7 @@ export function adrenalineSource(system) {
     system.classLevels.stuntman <= 10
     ? {
         id: "adrenalineJunkie",
-        name: "Adrenaline Junkie (confirmed wound-loss events)",
+        name: loc`Adrenaline Junkie (confirmed wound-loss events)`,
         period: "session",
         limit: system.actionDice?.max,
         cost: 0,
@@ -17,7 +18,7 @@ export function adrenalineSource(system) {
 export function woundEventKey(eventRef) {
   if (typeof eventRef !== "string" || !/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/.test(eventRef))
     throw new Error(
-      "Enter a unique attack, fall or damage-event reference (letters, numbers, dot, colon, dash or underscore)."
+      loc`Enter a unique attack, fall or damage-event reference (letters, numbers, dot, colon, dash or underscore).`
     );
   return encodeURIComponent(eventRef).replaceAll(".", "%2E");
 }
@@ -35,10 +36,10 @@ export function recordedWoundEvent(record, { actorUuid, eventRef, loss, cause, o
     ["attack", "fall", "explosion", "other"].includes(record.cause) &&
     typeof record.opponentAttack === "boolean" &&
     typeof record.granted === "boolean";
-  if (!valid) throw new Error("The saved wound event needs GC review before it can be used again.");
+  if (!valid) throw new Error(loc`The saved wound event needs GC review before it can be used again.`);
   if (record.loss !== loss || record.cause !== cause || record.opponentAttack !== opponentAttack)
     throw new Error(
-      "This event reference already records different wound loss. Use the actual unique event reference."
+      loc`This event reference already records different wound loss. Use the actual unique event reference.`
     );
   return record;
 }
@@ -51,7 +52,7 @@ export function adrenalineWoundPlan(
   const source = adrenalineSource(system),
     key = woundEventKey(eventRef),
     before = system.wounds?.value;
-  if (!source) throw new Error("This character does not have the Stuntman Adrenaline Junkie core ability.");
+  if (!source) throw new Error(loc`This character does not have the Stuntman Adrenaline Junkie core ability.`);
   if (
     confirmed !== true ||
     !["attack", "fall", "explosion", "other"].includes(cause) ||
@@ -59,9 +60,9 @@ export function adrenalineWoundPlan(
     !Number.isSafeInteger(loss) ||
     loss < 1
   )
-    throw new Error("Confirm one actual event and its final positive whole wound loss after defenses.");
+    throw new Error(loc`Confirm one actual event and its final positive whole wound loss after defenses.`);
   if (!Number.isSafeInteger(before) || !Number.isSafeInteger(before - loss))
-    throw new Error("Review the character’s actual wound balance.");
+    throw new Error(loc`Review the character’s actual wound balance.`);
   const session = String(periods?.session ?? "initial");
   if (
     !Number.isSafeInteger(source.limit) ||
@@ -71,9 +72,9 @@ export function adrenalineWoundPlan(
     !Number.isSafeInteger(status?.used) ||
     status.used < 0
   )
-    throw new Error("Review Adrenaline Junkie’s saved session count and starting-dice limit.");
+    throw new Error(loc`Review Adrenaline Junkie’s saved session count and starting-dice limit.`);
   if (![4, 6, 8, 10].includes(careerDie))
-    throw new Error("Review this unsupported default career die before granting Adrenaline dice.");
+    throw new Error(loc`Review this unsupported default career die before granting Adrenaline dice.`);
   const eligible = cause === "fall" || cause === "explosion" || (cause === "attack" && opponentAttack),
     granted = eligible && status.used < source.limit,
     gain = granted ? actionDiceGain(system, careerDie) : null;
@@ -98,12 +99,12 @@ export function adrenalineWoundPlan(
     at: system.worldTime
   };
   if (!Number.isFinite(record.at) || typeof actorUuid !== "string" || !actorUuid)
-    throw new Error("Review the wound event’s actor and time.");
+    throw new Error(loc`Review the wound event’s actor and time.`);
   const pool = granted
     ? {
         id,
         source: "adrenalineJunkie",
-        label: "Adrenaline Junkie",
+        label: loc`Adrenaline Junkie`,
         unrestricted: true,
         baseDie: careerDie,
         baseCount: 1,
@@ -120,6 +121,6 @@ export function adrenalineWoundPlan(
       }
     : null;
   if (pool && (typeof id !== "string" || !/^[A-Za-z0-9_-]+$/.test(id) || system.bonusActionDice?.[id]))
-    throw new Error("Review the new Adrenaline grant identifier.");
+    throw new Error(loc`Review the new Adrenaline grant identifier.`);
   return { record, pool, counter: granted ? { epoch: session, used: record.usedAfter } : null };
 }

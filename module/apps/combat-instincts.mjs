@@ -4,6 +4,7 @@ import { combatInstinctsPlan } from "../rules/combat-instincts.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { standardAttackContextContent, standardAttackContextInput } from "./standard-attack-context.mjs";
+import { loc } from "../i18n.mjs";
 export async function takeCombatInstincts(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   for (const key of [
@@ -16,7 +17,7 @@ export async function takeCombatInstincts(actor, options = {}) {
   ])
     if (options[key])
       throw new Error(
-        "This control resolves one Standard Attack; use normal class controls and GC use-count review for combined class declarations."
+        loc`This control resolves one Standard Attack; use normal class controls and GC use-count review for combined class declarations.`
       );
   const combat = expertiseCombatContext(actor),
     clock = JSON.stringify(combat);
@@ -48,9 +49,9 @@ export async function takeCombatInstincts(actor, options = {}) {
         .map(i => `<option value="${esc(i.id)}">${esc(i.name)}</option>`)
         .join("");
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Combat Instincts immediate final attack" },
+      window: { title: loc`Combat Instincts immediate final attack` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>Once per round, immediately attack the adjacent opponent who just missed you by at least5 while you were not flat-footed. First resolve that actual attack as a miss in chat. The GC confirms the victim, adjacency and timing; this does not infer token geometry.</p><label>Recorded missed attack <select name="messageId"><option value="">Choose the actual attack</option>${choices}</select></label><label>Your actual incoming Defense for that attack <input name="defenseTotal" type="number" step="any" required /></label><label>Your readied weapon <select name="weaponId">${weapons}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="triggerConfirmed" type="checkbox" /> The GC confirms the selected attack targeted this character</label><label><input name="adjacentConfirmed" type="checkbox" /> That opponent is adjacent</label><label><input name="notFlatFootedConfirmed" type="checkbox" /> I was not flat-footed when that attack missed</label><label><input name="immediateConfirmed" type="checkbox" /> This is the immediate reaction to that miss against that same opponent</label>${game.user.isGM ? '<label>GC timing resolution (required if a recorded flat-footed source now conflicts) <input name="gcTimingResolution" maxlength="500" /></label>' : ""}<p>One free-action Standard Attack, including outside own Count; set Single-Shot mode first. No adjustments or other action combinations. Other class attack controls may be used with GC review of the feat counter.</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Once per round, immediately attack the adjacent opponent who just missed you by at least5 while you were not flat-footed. First resolve that actual attack as a miss in chat. The GC confirms the victim, adjacency and timing; this does not infer token geometry.`}</p><label>${loc`Recorded missed attack`} <select name="messageId"><option value="">${loc`Choose the actual attack`}</option>${choices}</select></label><label>${loc`Your actual incoming Defense for that attack`} <input name="defenseTotal" type="number" step="any" required /></label><label>${loc`Your readied weapon`} <select name="weaponId">${weapons}</select></label>${standardAttackContextContent(actor, { includeCharacterTarget: false })}<label><input name="triggerConfirmed" type="checkbox" /> ${loc`The GC confirms the selected attack targeted this character`}</label><label><input name="adjacentConfirmed" type="checkbox" /> ${loc`That opponent is adjacent`}</label><label><input name="notFlatFootedConfirmed" type="checkbox" /> ${loc`I was not flat-footed when that attack missed`}</label><label><input name="immediateConfirmed" type="checkbox" /> ${loc`This is the immediate reaction to that miss against that same opponent`}</label>${game.user.isGM ? `<label>${loc`GC timing resolution (required if a recorded flat-footed source now conflicts)`} <input name="gcTimingResolution" maxlength="500" /></label>` : ""}<p>${loc`One free-action Standard Attack, including outside own Count; set Single-Shot mode first. No adjustments or other action combinations. Other class attack controls may be used with GC review of the feat counter.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -61,7 +62,7 @@ export async function takeCombatInstincts(actor, options = {}) {
           ? Number(input.defenseTotal)
           : NaN,
     timing = game.user.isGM && typeof input.gcTimingResolution === "string" ? input.gcTimingResolution.trim() : "";
-  if (timing.length > 500) throw new Error("Keep the GC timing resolution within500 characters.");
+  if (timing.length > 500) throw new Error(loc`Keep the GC timing resolution within500 characters.`);
   const event = () => {
     const message = game.messages.get(input.messageId),
       check = message?.flags?.spycraft2,
@@ -76,14 +77,14 @@ export async function takeCombatInstincts(actor, options = {}) {
         t => t.id === check?.rollCombat?.combatantId && t.actor?.uuid === check.actorUuid
       )
     )
-      throw new Error("Choose the visible actual opponent’s attack from this combat.");
+      throw new Error(loc`Choose the visible actual opponent’s attack from this combat.`);
     return {
       message,
       plan: combatInstinctsPlan(actor.system, now, check, { ...input, defenseTotal, gcTimingResolution: timing })
     };
   };
   if (JSON.stringify(expertiseCombatContext(actor)) !== clock)
-    throw new Error("The Initiative Count changed. Review the immediate reaction again.");
+    throw new Error(loc`The Initiative Count changed. Review the immediate reaction again.`);
   const original = event(),
     evidence = rollEvidence(original.message.flags.spycraft2),
     targetInput = knownCharacterTargetInput(original.plan.opponentUuid, {
@@ -102,7 +103,7 @@ export async function takeCombatInstincts(actor, options = {}) {
     item = actor.items.get(input.weaponId),
     ready = w => w?.type === "weapon" && w.system.equipped === true && w.system.carried !== false && !w.system.reserve;
   if (!opts) return null;
-  if (!ready(item)) throw new Error("Choose an owned readied weapon for the final attack.");
+  if (!ready(item)) throw new Error(loc`Choose an owned readied weapon for the final attack.`);
   const preview = actor.weaponAttack(item, opts);
   if (
     (preview.ranged && !Number.isFinite(opts.distanceFeet)) ||
@@ -110,7 +111,7 @@ export async function takeCombatInstincts(actor, options = {}) {
     (preview.firearm && preview.fireMode !== "single")
   )
     throw new Error(
-      preview.reason || "A ranged final Standard Attack requires measured distance and Single-Shot mode."
+      preview.reason || loc`A ranged final Standard Attack requires measured distance and Single-Shot mode.`
     );
   const signature = JSON.stringify(preview),
     receipt = {
@@ -126,7 +127,7 @@ export async function takeCombatInstincts(actor, options = {}) {
     async status => {
       const validate = () => {
         if (!actor.isOwner || JSON.stringify(expertiseCombatContext(actor)) !== clock || (timing && !game.user.isGM))
-          throw new Error("The immediate reaction, ownership or GC timing review changed.");
+          throw new Error(loc`The immediate reaction, ownership or GC timing review changed.`);
         const fresh = event(),
           w = actor.items.get(input.weaponId),
           counter = actor.system.resourceUses?.combatInstincts;
@@ -138,7 +139,7 @@ export async function takeCombatInstincts(actor, options = {}) {
           counter?.epoch !== status.epoch ||
           counter.used !== status.used + 1
         )
-          throw new Error("The triggering miss, weapon or reserved reaction changed. Review it again.");
+          throw new Error(loc`The triggering miss, weapon or reserved reaction changed. Review it again.`);
       };
       return postFinalAttack(actor, input.weaponId, opts, receipt, validate);
     },

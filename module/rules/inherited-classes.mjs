@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Cross-class ability choices, pp.40–41; assumed-level clarification in Second Printing p.40. */
 const menus = {
   "Advocate:Networks": "network",
@@ -74,7 +75,7 @@ export function inheritedClassFeatures(items, progression, cfg) {
           selection.option == null || selection.option === ""
             ? null
             : menu.options.find(o => o.index === Number(selection.option));
-        if (!selected) result.pending.push(`${owner.name}: choose an option for ${option.name}.`);
+        if (!selected) result.pending.push(loc`${owner.name}: choose an option for ${option.name}.`);
         else {
           entry.selectedName = selected.name;
           bonuses.push(...(selected.bonuses ?? []));
@@ -84,10 +85,10 @@ export function inheritedClassFeatures(items, progression, cfg) {
             entry.skillOptions = template.classSkills;
             if (!cfg.skills[selection.skill])
               result.pending.push(
-                `${owner.name}: choose the ${template.name} class skill for inherited Skill Mastery.`
+                loc`${owner.name}: choose the ${template.name} class skill for inherited Skill Mastery.`
               );
             else if (!template.classSkills.includes(selection.skill))
-              result.warnings.push(`${owner.name}: inherited Skill Mastery must use an emulated class skill.`);
+              result.warnings.push(loc`${owner.name}: inherited Skill Mastery must use an emulated class skill.`);
             else addSkill(selection.skill, "Skill Mastery", false);
           }
           for (const bonus of selected.bonuses ?? []) {
@@ -112,7 +113,7 @@ export function inheritedClassFeatures(items, progression, cfg) {
         entry.skillOptions = option.classId === "scientist" ? (template?.classSkills ?? []) : Object.keys(cfg.skills);
         if (!cfg.skills[selection.skill]) result.pending.push(`${owner.name}: choose a skill for ${option.name}.`);
         else if (!entry.skillOptions.includes(selection.skill))
-          result.warnings.push(`${owner.name}: inherited Ph.D. must choose a Scientist class skill.`);
+          result.warnings.push(loc`${owner.name}: inherited Ph.D. must choose a Scientist class skill.`);
         else if (option.classId === "scientist")
           bonuses.push({ target: `skills.${selection.skill}.maxRanks`, value: "5" });
         else addSkill(selection.skill, "By Any Means", true);

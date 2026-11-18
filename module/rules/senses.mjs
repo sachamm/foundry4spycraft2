@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Ambient light, pp.350–351, Table 5.14. Blank means circumstances were not supplied. */
 export const AMBIENT_LIGHT = {
   none: { label: "None (pitch black)", visual: null, skill: -8, defense: 8 },
@@ -17,7 +18,7 @@ export function lowLightVisionSources(system) {
 export function ambientLightPlan(system, { ambientLight = "", visionCheck = false } = {}) {
   if (!ambientLight) return { specified: false, skillModifier: 0, targetDefenseBonus: 0, notes: [] };
   const row = Object.hasOwn(AMBIENT_LIGHT, ambientLight) ? AMBIENT_LIGHT[ambientLight] : null;
-  if (!row) throw new Error("Choose a listed ambient-light condition.");
+  if (!row) throw new Error(loc`Choose a listed ambient-light condition.`);
   const sources = lowLightVisionSources(system),
     ignored = sources.length > 0 && ["faint", "dim"].includes(ambientLight);
   const nightTraining =
@@ -37,7 +38,7 @@ export function ambientLightPlan(system, { ambientLight = "", visionCheck = fals
     blinded,
     nightTraining,
     notes: [
-      `Ambient light: ${row.label}.${ignored ? ` ${sources.join(" / ")} ignores low ambient-light penalties.` : ""}${nightTraining ? " Night Training halves the visual-range penalty; tagged-skill and target Defense modifiers remain." : ""}${visionCheck ? ` Vision-tag check ${skillModifier >= 0 ? "+" : ""}${skillModifier}.` : ""}${blinded ? " No visual range: do not attempt a check requiring eyesight or eye-hand coordination without a specific exception. A Vision tag alone does not establish that eyesight is required." : ""} Target Defense ${targetDefenseBonus >= 0 ? "+" : ""}${targetDefenseBonus} from this illumination (pp.350–351); apply when resolving the target’s Defense. Other sensory conditions and equipment remain separate.`
+      loc`Ambient light: ${row.label}.${ignored ? loc` ${sources.join(" / ")} ignores low ambient-light penalties.` : ""}${nightTraining ? loc` Night Training halves the visual-range penalty; tagged-skill and target Defense modifiers remain.` : ""}${visionCheck ? loc` Vision-tag check ${skillModifier >= 0 ? "+" : ""}${skillModifier}.` : ""}${blinded ? loc` No visual range: do not attempt a check requiring eyesight or eye-hand coordination without a specific exception. A Vision tag alone does not establish that eyesight is required.` : ""} Target Defense ${targetDefenseBonus >= 0 ? "+" : ""}${targetDefenseBonus} from this illumination (pp.350–351); apply when resolving the target’s Defense. Other sensory conditions and equipment remain separate.`
     ]
   };
 }
@@ -66,9 +67,9 @@ export function sensorySkillEffects(
     deafened: deafened === true,
     bonuses: hearing || scent ? [{ type: "unnamed", value: 6 }] : [],
     notes: hearing
-      ? ["Improved hearing: +6 to this surprise Awareness/Perception check (p.448)."]
+      ? [loc`Improved hearing: +6 to this surprise Awareness/Perception check (p.448).`]
       : scent
-        ? ["Improved scent: +6 to Tracking while relying on scent (p.448)."]
+        ? [loc`Improved scent: +6 to Tracking while relying on scent (p.448).`]
         : []
   };
 }
@@ -156,7 +157,7 @@ export function fogSmokePlan(system, { obscurant = "", obscurantDensity = "", vi
   if (!obscurant && !obscurantDensity)
     return { specified: false, skillModifier: 0, targetDefenseBonus: 0, visualDelta: 0, notes: [] };
   if (!["fog", "smoke"].includes(obscurant) || !Object.hasOwn(FOG_SMOKE, obscurantDensity))
-    throw new Error("Choose fog or smoke and its listed density together.");
+    throw new Error(loc`Choose fog or smoke and its listed density together.`);
   const row = FOG_SMOKE[obscurantDensity],
     firefighter = obscurant === "smoke" && system.activeFeatNames?.includes("Firefighter Training") === true,
     visualDelta = firefighter ? -Math.floor(Math.abs(row.visual) / 2) : row.visual,
@@ -170,7 +171,7 @@ export function fogSmokePlan(system, { obscurant = "", obscurantDensity = "", vi
     skillModifier,
     targetDefenseBonus: row.defense,
     notes: [
-      `${row.label} ${obscurant}: visual increment ${visualDelta} ft.${firefighter ? " (Firefighter Training halves the smoke range penalty)" : ""}${visionCheck ? `; Vision-tag skill ${skillModifier}` : ""}; target Defense +${row.defense}. Apply that Defense modifier when adjudicating the target, separately from the attack bonus. Firefighter Training does not reduce the tagged-skill or Defense modifiers (pp.206,351).`
+      loc`${row.label} ${obscurant}: visual increment ${visualDelta} ft.${firefighter ? loc` (Firefighter Training halves the smoke range penalty)` : ""}${visionCheck ? loc`; Vision-tag skill ${skillModifier}` : ""}; target Defense +${row.defense}. Apply that Defense modifier when adjudicating the target, separately from the attack bonus. Firefighter Training does not reduce the tagged-skill or Defense modifiers (pp.206,351).`
     ]
   };
 }
@@ -191,9 +192,9 @@ export function sensorySkillConditionPlan(system, check, options = {}) {
     skillModifier = (visionAffected ? -8 : 0) + (hearingAffected ? -8 : 0);
   const blockedReasons = [];
   if (target.blinded && options.requiresEyesight === true)
-    blockedReasons.push("Blinded: this check requires eyesight or eye-hand coordination (p.351).");
+    blockedReasons.push(loc`Blinded: this check requires eyesight or eye-hand coordination (p.351).`);
   if (deafened && options.requiresHearing === true)
-    blockedReasons.push("Deafened: this check requires hearing (p.351).");
+    blockedReasons.push(loc`Deafened: this check requires hearing (p.351).`);
   return {
     blinded: target.blinded,
     deafened,
@@ -203,11 +204,11 @@ export function sensorySkillConditionPlan(system, check, options = {}) {
     skillModifier,
     blockedReason: blockedReasons.join(" "),
     notes: [
-      ...(visionAffected ? ["Blinded: Vision check −8; result cap −20 (pp.340,351)."] : []),
-      ...(hearingAffected ? ["Deafened: Hearing check −8; result cap −10 (pp.340,351)."] : []),
-      ...(languageAffected ? ["Deafened target: Language check result cap −20 (p.340)."] : []),
+      ...(visionAffected ? [loc`Blinded: Vision check −8; result cap −20 (pp.340,351).`] : []),
+      ...(hearingAffected ? [loc`Deafened: Hearing check −8; result cap −10 (pp.340,351).`] : []),
+      ...(languageAffected ? [loc`Deafened target: Language check result cap −20 (p.340).`] : []),
       ...(target.nightTrainingException
-        ? ["Night Training: not blinded when targeting this character within 10 ft. while able to hear."]
+        ? [loc`Night Training: not blinded when targeting this character within 10 ft. while able to hear.`]
         : [])
     ]
   };
@@ -220,9 +221,9 @@ export function sensoryAttackConditionPlan(system, options = {}) {
     ...target,
     targetDefenseBonus: target.blinded ? 8 : 0,
     notes: target.blinded
-      ? ["Blinded: target Defense +8 (pp.340,351); resolve target Defense separately from this attack bonus."]
+      ? [loc`Blinded: target Defense +8 (pp.340,351); resolve target Defense separately from this attack bonus.`]
       : target.nightTrainingException
-        ? ["Night Training: not blinded when targeting this character within 10 ft. while able to hear."]
+        ? [loc`Night Training: not blinded when targeting this character within 10 ft. while able to hear.`]
         : []
   };
 }

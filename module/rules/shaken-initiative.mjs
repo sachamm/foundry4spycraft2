@@ -1,5 +1,6 @@
 import { shakenRules } from "./shaken.mjs";
 import { uncannyDodgePlan, initiativeLossPlan } from "./defense.mjs";
+import { loc } from "../i18n.mjs";
 const countValid = n => typeof n === "number" && Number.isFinite(n) && Math.abs(n) <= Number.MAX_SAFE_INTEGER;
 const penaltyValid = n => n === 0 || n === -2 || n === -4;
 const sourceProof = rules =>
@@ -24,8 +25,8 @@ export function shakenInitiativeMarker(system, initiative) {
       reason: null,
       id: null
     };
-  if (!countValid(initiative)) throw new Error("Review the finite Initiative Count.");
-  if (rules.needsReview) throw new Error("Review the Shaken sources before setting Initiative.");
+  if (!countValid(initiative)) throw new Error(loc`Review the finite Initiative Count.`);
+  if (rules.needsReview) throw new Error(loc`Review the Shaken sources before setting Initiative.`);
   return {
     version: 1,
     count: initiative,
@@ -47,23 +48,23 @@ export function shakenInitiativePlan(system, { initiative, record } = {}, { self
       delta: 0
     };
   const review = reason => ({ needsReview: true, reason, initiative, record, delta: 0, changed: false });
-  if (!countValid(initiative)) return review("Review the finite Initiative Count.");
+  if (!countValid(initiative)) return review(loc`Review the finite Initiative Count.`);
   const rules = shakenRules(system);
-  if (rules.needsReview) return review("Review the current Shaken sources before adjusting Initiative Count.");
-  if (record?.needsReview) return review(record.reason ?? "Review this Initiative Count’s included Shaken penalty.");
+  if (rules.needsReview) return review(loc`Review the current Shaken sources before adjusting Initiative Count.`);
+  if (record?.needsReview) return review(record.reason ?? loc`Review this Initiative Count’s included Shaken penalty.`);
   if (record?.version !== 1 || !penaltyValid(record.includedPenalty) || !countValid(record.count))
     return review(
-      "This existing Initiative Count has no verified Shaken component. Confirm its included full or protected penalty."
+      loc`This existing Initiative Count has no verified Shaken component. Confirm its included full or protected penalty.`
     );
   if (record.count !== initiative)
-    return review("Initiative Count changed without its Shaken record. Confirm its included penalty.");
+    return review(loc`Initiative Count changed without its Shaken record. Confirm its included penalty.`);
   if (
     rules.initiativePenalty &&
     uncannyDodgePlan(system).halveIncomingInitiative &&
     !Array.isArray(record.shakenSources)
   )
     return review(
-      "Review this older Count component against Uncanny Dodge IV; it may include a full check penalty or an incoming effect loss."
+      loc`Review this older Count component against Uncanny Dodge IV; it may include a full check penalty or an incoming effect loss.`
     );
   const sources = sourceProof(rules);
   let component = rules.initiativePenalty ? record.includedPenalty || -4 : 0;
@@ -73,7 +74,7 @@ export function shakenInitiativePlan(system, { initiative, record } = {}, { self
     uncannyDodgePlan(system).halveIncomingInitiative
   ) {
     if (selfInflicted !== undefined && typeof selfInflicted !== "boolean")
-      return review("Confirm whether this Count loss is caused by the character’s own action.");
+      return review(loc`Confirm whether this Count loss is caused by the character’s own action.`);
     let own = selfInflicted;
     if (own === undefined) {
       const old = Array.isArray(record.shakenSources) ? record.shakenSources : [],
@@ -87,13 +88,13 @@ export function shakenInitiativePlan(system, { initiative, record } = {}, { self
     }
     if (typeof own !== "boolean")
       return review(
-        "Uncanny Dodge IV: confirm whether the new Shaken Count loss came from an incoming attack/effect or the character’s own action."
+        loc`Uncanny Dodge IV: confirm whether the new Shaken Count loss came from an incoming attack/effect or the character’s own action.`
       );
     component = -initiativeLossPlan(system, { loss: 4, selfInflicted: own }).loss;
   }
   const delta = component - record.includedPenalty,
     next = initiative + delta;
-  if (!countValid(next)) return review("The adjusted Initiative Count is unsafe.");
+  if (!countValid(next)) return review(loc`The adjusted Initiative Count is unsafe.`);
   const nextRecord = { ...shakenInitiativeMarker(system, next), includedPenalty: component };
   return {
     changed: delta !== 0 || JSON.stringify(record.shakenSources) !== JSON.stringify(sources),
@@ -110,7 +111,7 @@ export function reviewedShakenInitiativePlan(
 ) {
   if (!penaltyValid(includedPenalty))
     throw new Error(
-      "Confirm whether the current Count includes no penalty, the protected −2 or the full −4 Shaken penalty."
+      loc`Confirm whether the current Count includes no penalty, the protected −2 or the full −4 Shaken penalty.`
     );
   const plan = shakenInitiativePlan(
     system,

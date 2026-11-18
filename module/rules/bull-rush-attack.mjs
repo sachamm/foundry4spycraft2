@@ -3,6 +3,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { responseOwnSize } from "./trip.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** p.354 on-foot Bull Rush, chosen-target adjacency exception follows the user-confirmed p.326/p.354 ruling. */
 export function bullRushAttackSkillChecks(key, checks = []) {
   if (key !== "athletics") return checks;
@@ -10,7 +11,7 @@ export function bullRushAttackSkillChecks(key, checks = []) {
     ...checks.filter(c => c.id !== "bull-rush"),
     {
       id: "bull-rush",
-      name: "Bull Rush (on foot)",
+      name: loc`Bull Rush (on foot)`,
       attributes: ["str"],
       mode: "Active",
       tags: "Armor Check Penalty",
@@ -46,9 +47,9 @@ export function bullRushAttackPlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (key !== "athletics" || check?.id !== "bull-rush") return empty;
   if (method !== "roll")
-    return reject("Bull Rush is an opposed combat action; taking10/20 is unavailable (pp.91,352).");
+    return reject(loc`Bull Rush is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
   if (!validOwnCountClock(bullRushAttackCombat) || bullRushAttackCombat.turn !== bullRushAttackCombat.ownTurnIndex)
-    return reject("Take this normal full-action Bull Rush during your Initiative Count in a started combat.");
+    return reject(loc`Take this normal full-action Bull Rush during your Initiative Count in a started combat.`);
   if (
     typeof bullRushAttackOpponentName !== "string" ||
     !bullRushAttackOpponentName.trim() ||
@@ -66,14 +67,14 @@ export function bullRushAttackPlan(
     Math.abs(bullRushAttackSizeDifference) > 11
   )
     return reject(
-      "The GC must confirm the actual on-foot opponent, straight legal route/contact, full action, threatening adjacency and actual Size difference (your Size minus the target’s)."
+      loc`The GC must confirm the actual on-foot opponent, straight legal route/contact, full action, threatening adjacency and actual Size difference (your Size minus the target’s).`
     );
   if (bullRushAttackOtherThreatAdjacency || bullRushAttackPassesOtherThreat)
     return reject(
-      "Another threatening opponent prevents this ordinary movement route (p.326); review an actual movement exception separately."
+      loc`Another threatening opponent prevents this ordinary movement route (p.326); review an actual movement exception separately.`
     );
   if (bullRushAttackSizeDifference < -1)
-    return reject("The ordinary Bull Rush target cannot be more than one Size category larger than you (p.354).");
+    return reject(loc`The ordinary Bull Rush target cannot be more than one Size category larger than you (p.354).`);
   const blocked = restraintActionBlock(system) || attributeActionBlock(system, { kind: "skill", ability: "str" });
   if (
     blocked ||
@@ -82,10 +83,10 @@ export function bullRushAttackPlan(
     system.encumbrance?.immobile === true ||
     system.wounds?.value < 0
   )
-    return reject(blocked || "The current posture, condition or immobility prevents Bull Rush movement.");
+    return reject(blocked || loc`The current posture, condition or immobility prevents Bull Rush movement.`);
   const speed = system.speed;
   if (!Number.isFinite(speed) || speed <= 0 || system.conditionSpeedReview)
-    return reject("Review current Speed before this Bull Rush movement.");
+    return reject(loc`Review current Speed before this Bull Rush movement.`);
   if (
     typeof bullRushAttackDistanceFeet !== "number" ||
     !Number.isFinite(bullRushAttackDistanceFeet) ||
@@ -93,7 +94,7 @@ export function bullRushAttackPlan(
     bullRushAttackDistanceFeet > speed
   )
     return reject(
-      "Enter positive counted direct movement no greater than current Speed; this full action does not use the Run or Total Defense allowance."
+      loc`Enter positive counted direct movement no greater than current Speed; this full action does not use the Run or Total Defense allowance.`
     );
   let ownSize;
   try {
@@ -129,8 +130,8 @@ export function bullRushAttackPlan(
     evidence,
     sizeBonus,
     notes: [
-      `Bull Rush: one full action, opposed Athletics(STR), Armor Check Penalty and action error+0; ${bullRushAttackDistanceFeet}/${speed} counted ft. directly toward the target; your Size bonus +${sizeBonus} (p.354).`,
-      "Still Standing applies to resistance, not this attacking check. The chosen target’s threatening adjacency does not stop this Bull Rush; other threatening opponents still do. Take the legal full action and resolve movement, opposed result, pushing, obstructions, damage, conditions and final attacks separately."
+      loc`Bull Rush: one full action, opposed Athletics(STR), Armor Check Penalty and action error+0; ${bullRushAttackDistanceFeet}/${speed} counted ft. directly toward the target; your Size bonus +${sizeBonus} (p.354).`,
+      loc`Still Standing applies to resistance, not this attacking check. The chosen target’s threatening adjacency does not stop this Bull Rush; other threatening opponents still do. Take the legal full action and resolve movement, opposed result, pushing, obstructions, damage, conditions and final attacks separately.`
     ]
   };
 }
@@ -175,9 +176,11 @@ export function validateBullRushAttackProof(
       attributeSubstitution.ability === "int" &&
       (system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "str"))
-    throw Error("The Bull Rush attacker attribute or actual substitution source changed before posting.");
+    throw Error(loc`The Bull Rush attacker attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
-    throw Error("The Bull Rush attack route, current Size/Speed, posture or Initiative Count changed before posting.");
+    throw Error(
+      loc`The Bull Rush attack route, current Size/Speed, posture or Initiative Count changed before posting.`
+    );
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Soldier Weapon Specialist, pp.49–50. At 6 gain both; later gain one or the other. */
 export function weaponSpecialist(system, items, cfg) {
   const result = { fields: [], proficiencies: [], abilities: [], pending: [], warnings: [] };
@@ -21,15 +22,16 @@ export function weaponSpecialist(system, items, cfg) {
     };
     result.fields.push(field);
     if (!["both", "ability", "proficiency"].includes(mode) || (at !== 6 && mode === "both")) {
-      result.warnings.push(`Weapon Specialist ${at}: invalid selection mode.`);
+      result.warnings.push(loc`Weapon Specialist ${at}: invalid selection mode.`);
       continue;
     }
     if (field.needsProficiency) {
       const key = selection.proficiency;
-      if (!key) result.pending.push(`Weapon Specialist ${at}: choose a possessed proficiency.`);
+      if (!key) result.pending.push(loc`Weapon Specialist ${at}: choose a possessed proficiency.`);
       else if (!cfg.proficiencies[key] || !system.proficiencyTotals?.[key]?.proficient)
-        result.warnings.push(`Weapon Specialist ${at}: the selected proficiency must be possessed.`);
-      else if (proficiencies.has(key)) result.warnings.push(`Weapon Specialist ${at}: choose a different proficiency.`);
+        result.warnings.push(loc`Weapon Specialist ${at}: the selected proficiency must be possessed.`);
+      else if (proficiencies.has(key))
+        result.warnings.push(loc`Weapon Specialist ${at}: choose a different proficiency.`);
       else proficiencies.add(key);
     }
     if (mode !== "proficiency") {
@@ -38,9 +40,9 @@ export function weaponSpecialist(system, items, cfg) {
       );
       const value = soldier.system.choices?.[index],
         option = value == null || value === "" ? null : list?.options.find(option => option.index === Number(value));
-      if (!option) result.pending.push(`Weapon Specialist ${at}: choose an ability.`);
+      if (!option) result.pending.push(loc`Weapon Specialist ${at}: choose an ability.`);
       else if (selected.has(option.name))
-        result.warnings.push(`Weapon Specialist ${at}: each ability may be chosen only once.`);
+        result.warnings.push(loc`Weapon Specialist ${at}: each ability may be chosen only once.`);
       else selected.add(option.name);
     }
   }

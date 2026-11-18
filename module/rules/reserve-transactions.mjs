@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export const reserveValue = (actor, path) => path.split(".").reduce((o, key) => o?.[key], actor);
 export function getReserveReview(actor) {
@@ -18,7 +19,7 @@ export function reserveTransaction(actor, plan, before, attempt, beforeUse) {
       if (value !== old)
         fields.push({
           path: `system.missionReserves.${key}.${category}`,
-          label: `${category} ${key === "picks" ? "Reserve remaining" : key === "spent" ? "Reserve spent" : "Charisma category remaining"}`,
+          label: `${category} ${key === "picks" ? loc`Reserve remaining` : key === "spent" ? loc`Reserve spent` : loc`Charisma category remaining`}`,
           before: old,
           reserved: value
         });
@@ -27,7 +28,7 @@ export function reserveTransaction(actor, plan, before, attempt, beforeUse) {
     if (plan.record[key] !== before[key])
       fields.push({
         path: `system.missionReserves.${key}`,
-        label: key === "common" ? "Common Items remaining" : "Common Items spent",
+        label: key === "common" ? loc`Common Items remaining` : loc`Common Items spent`,
         before: before[key] ?? 0,
         reserved: plan.record[key] ?? 0
       });
@@ -36,7 +37,7 @@ export function reserveTransaction(actor, plan, before, attempt, beforeUse) {
       f => !Number.isSafeInteger(f.before) || f.before < 0 || !Number.isSafeInteger(f.reserved) || f.reserved < 0
     )
   )
-    throw new Error("Review the whole-number Reserve balances before reserving another acquisition.");
+    throw new Error(loc`Review the whole-number Reserve balances before reserving another acquisition.`);
   const abilityId = plan.abilityId ?? plan.requestAbility;
   return {
     id: attempt.id,
@@ -81,19 +82,19 @@ export function reserveRollbackPatch(actor, event) {
     actor.system.missionReserves?.epoch !== event.epoch ||
     !same(actor.system.missionReserves.attempts?.[event.id], event.attempt)
   )
-    throw new Error("The reserved acquisition changed. Review its sources before restoring it.");
+    throw new Error(loc`The reserved acquisition changed. Review its sources before restoring it.`);
   const patch = {};
   for (const f of event.fields) {
     const current = reserveValue(actor, f.path),
       value = current + f.before - f.reserved;
     if (!Number.isSafeInteger(current) || !Number.isSafeInteger(value) || value < 0)
-      throw new Error("The Reserve balance needs GC review.");
+      throw new Error(loc`The Reserve balance needs GC review.`);
     patch[f.path] = value;
   }
   if (event.ability) {
     const a = event.ability;
     if (!same(actor.system.resourceUses?.[a.id], a.reserved))
-      throw new Error("The Request ability use changed. Preserve it for GC review.");
+      throw new Error(loc`The Request ability use changed. Preserve it for GC review.`);
     if (a.before.present) {
       patch[`system.resourceUses.${a.id}`] = a.before.value;
       if (a.before.value && typeof a.before.value === "object")

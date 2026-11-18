@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -17,7 +18,7 @@ export function groupBuildTasks(tasks = []) {
       task.count > 1 && task.text.includes("choose a skill for Versatility")
         ? task.text.replace("choose a skill for Versatility", `choose ${task.count} more skills for Versatility`)
         : task.count > 1
-          ? `${task.text} (${task.count} choices)`
+          ? loc`${task.text} (${task.count} choices)`
           : task.text
   }));
 }
@@ -80,20 +81,20 @@ export function focusSetupTask(element, { tab, order } = {}) {
     classes:
       Number(order) === 15
         ? '[data-action="rollVitality"]'
-        : '[name^="choice."], [name^="classSkillChoice."], [name^="inheritedChoice."], [name^="specialistChoice."], [name^="classField."]',
+        : loc`[name^="choice."], [name^="classSkillChoice."], [name^="inheritedChoice."], [name^="specialistChoice."], [name^="classField."]`,
     skills: '[name^="skillpts."]',
     feats: Number(order) === 42 ? '[data-action="itemEdit"]' : '[data-action="browse"][data-type="feat"]',
     training:
       {
         50: '[name^="system.proficiencies."]',
-        51: '[data-action="toggleFocus"], [name="professionText"], [name="fortesText"]',
+        51: loc`[data-action="toggleFocus"], [name="professionText"], [name="fortesText"]`,
         52: '[name="system.interests"]',
-        53: '[name^="contacts."][name$=".name"], [data-action="addRow"][data-list="contacts"]',
-        54: '[name^="subplots."][name$=".name"], [data-action="addRow"][data-list="subplots"]'
-      }[Number(order)] ?? "input:not([disabled]), select:not([disabled]), textarea:not([disabled])",
+        53: loc`[name^="contacts."][name$=".name"], [data-action="addRow"][data-list="contacts"]`,
+        54: loc`[name^="subplots."][name$=".name"], [data-action="addRow"][data-list="subplots"]`
+      }[Number(order)] ?? loc`input:not([disabled]), select:not([disabled]), textarea:not([disabled])`,
     gear: Number(order) === 60 ? '[name^="system.wealthAllocation."]' : '[data-action="itemEdit"]'
   };
-  const candidates = [...section.querySelectorAll(selectors[tab] ?? "input, select, textarea, button")].filter(
+  const candidates = [...section.querySelectorAll(selectors[tab] ?? loc`input, select, textarea, button`)].filter(
     control => !control.disabled
   );
   const field = candidates.find(control => control.tagName === "SELECT" && !control.value) ?? candidates[0];
@@ -223,7 +224,7 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
           !row.dataset.skillName.toLocaleLowerCase().includes(query) ||
           (trained.checked && row.dataset.trained !== "true");
       element.querySelector(".skill-count").textContent =
-        `${rows.filter(row => !row.hidden).length} of ${rows.length} skills`;
+        loc`${rows.filter(row => !row.hidden).length} of ${rows.length} skills`;
     };
     search.addEventListener("input", filter);
     trained.addEventListener("change", filter);

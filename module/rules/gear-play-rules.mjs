@@ -4,6 +4,7 @@
  */
 import { GEAR_RULES } from "./tables.mjs";
 import { breakState, sizeCode } from "./vehicles.mjs";
+import { loc } from "../i18n.mjs";
 
 /* ---------------------------------------------------------------------- */
 /*  Battery life (p.223)                                                   */
@@ -70,7 +71,7 @@ export function rechargeCost({ rechargeable = false, streetValue = "", battery =
     const time = b?.kind === "time" ? b.hours / 4 : null;
     return {
       free: true,
-      label: `Free from a ready power source${time !== null ? `; takes ${formatHours(Math.ceil(time * 60) / 60)}` : ""}.`
+      label: loc`Free from a ready power source${time !== null ? loc`; takes ${formatHours(Math.ceil(time * 60) / 60)}` : ""}.`
     };
   }
   const value = Number(
@@ -80,9 +81,9 @@ export function rechargeCost({ rechargeable = false, streetValue = "", battery =
       .match(/^\d+/)?.[0]
   );
   if (Number.isFinite(value) && value > 0)
-    return { free: false, label: `1 Common Item or $${Math.ceil(value / 100).toLocaleString("en-US")}.` };
+    return { free: false, label: loc`1 Common Item or $${Math.ceil(value / 100).toLocaleString("en-US")}.` };
   const roman = ["I", "II", "III", "IV", "V"][Math.max(1, (caliber || 1) - 1) - 1];
-  return { free: false, label: `3 Common Items or 1 Caliber ${roman} gear pick.` };
+  return { free: false, label: loc`3 Common Items or 1 Caliber ${roman} gear pick.` };
 }
 const formatHours = h => (h >= 1 ? `${Math.round(h * 10) / 10} hr.` : `${Math.round(h * 60)} min.`);
 
@@ -115,7 +116,7 @@ const mechanismPR = (gadget, name) =>
 export function gadgetState(gadget, { itemDamageSave = null } = {}) {
   const size = sizeCode(gadget?.housingSize) || gadget?.housingSize || "";
   const housing = GEAR_RULES.housings.find(h => h.size === SIZE_NAMES[size]);
-  if (!housing) return { valid: false, reason: "Choose a housing Size of Nuisance or larger." };
+  if (!housing) return { valid: false, reason: loc`Choose a housing Size of Nuisance or larger.` };
   const count = gadget.mechanisms.length;
   const knowledgeDC = housing.knowledgeDC - 2 * Math.max(0, count - 1) + mechanismPR(gadget, "Disguised gadget");
   const baseSave = Number.isSafeInteger(itemDamageSave) ? itemDamageSave : housing.damageSave;
@@ -146,9 +147,9 @@ export function canAddMechanism(gadget, mechanism) {
   if (state.full)
     return {
       ok: false,
-      reason: `A ${state.sizeName} housing holds at most ${state.max} mechanism${state.max === 1 ? "" : "s"}.`
+      reason: loc`A ${state.sizeName} housing holds at most ${state.max} mechanism${state.max === 1 ? "" : "s"}.`
     };
-  if (!mechanism?.name) return { ok: false, reason: "Drop a gadget mechanism from the Gear pack." };
+  if (!mechanism?.name) return { ok: false, reason: loc`Drop a gadget mechanism from the Gear pack.` };
   return { ok: true };
 }
 
@@ -190,16 +191,16 @@ export function gearUsePlan(skillKey, checkId, item) {
   if (state.state !== "intact")
     return {
       ...none,
-      blockedReason: `${item.name} is ${state.state}${state.state === "broken" ? " and must be repaired before use" : ""}.`
+      blockedReason: loc`${item.name} is ${state.state}${state.state === "broken" ? loc` and must be repaired before use` : ""}.`
     };
-  if (s.charge?.dry) return { ...none, blockedReason: `${item.name} has run dry; recharge it first.` };
+  if (s.charge?.dry) return { ...none, blockedReason: loc`${item.name} has run dry; recharge it first.` };
   if (!use) return none;
   const supports = use.checks.includes(`${skillKey}/${checkId}`) || use.checks.includes(`${skillKey}/*`);
-  if (!supports) return { ...none, notes: [`${item.name} does not help with this check.`] };
+  if (!supports) return { ...none, notes: [loc`${item.name} does not help with this check.`] };
   const capIncrease = signedNumber(s.resultCap),
     bonus = use.gearBonus ?? 0;
   const notes = [
-    `${item.name}:${bonus ? ` +${bonus} gear bonus` : ""}${capIncrease ? `${bonus ? "," : ""} result cap ${capIncrease > 0 ? "+" : ""}${capIncrease}` : ""}${use.note ? ` (${use.note})` : ""}.`
+    `${item.name}:${bonus ? loc` +${bonus} gear bonus` : ""}${capIncrease ? loc`${bonus ? "," : ""} result cap ${capIncrease > 0 ? "+" : ""}${capIncrease}` : ""}${use.note ? ` (${use.note})` : ""}.`
   ];
   return {
     applies: true,
@@ -219,8 +220,8 @@ export function repairPlan(item) {
   const s = item?.system ?? {};
   const state = breakState(s.size || sizeCode(s.sizeHands) || "M", s.failedSaves ?? 0);
   if (state.state === "destroyed")
-    return { possible: false, reason: `${item.name} is destroyed and cannot be repaired.` };
-  if (state.state === "intact") return { possible: false, reason: `${item.name} is not broken.` };
+    return { possible: false, reason: loc`${item.name} is destroyed and cannot be repaired.` };
+  if (state.state === "intact") return { possible: false, reason: loc`${item.name} is not broken.` };
   const skillKey =
     ["E", "G"].includes(s.gearCategory) || /computer|radio|bug|sensor|scanner|camera|recorder/i.test(item.name)
       ? "electronics"
@@ -232,9 +233,10 @@ export function repairPlan(item) {
 /** Signal reception beyond 5 range increments: DC by increments (Table 4.64) less twice the signal's PR (p.276). */
 export function signalDC({ increments, powerRating, jamming = 0 }) {
   const pr = Math.max(0, (Number(powerRating) || 0) - Math.max(0, Number(jamming) || 0));
-  if (pr <= 0) return { received: false, reason: "Jamming drowns the signal out." };
+  if (pr <= 0) return { received: false, reason: loc`Jamming drowns the signal out.` };
   if (increments <= 5) return { received: true, automatic: true, dc: null };
-  if (increments > 10) return { received: false, reason: "Beyond 10 range increments the signal cannot be picked up." };
+  if (increments > 10)
+    return { received: false, reason: loc`Beyond 10 range increments the signal cannot be picked up.` };
   const base = { 6: 30, 7: 35, 8: 40, 9: 50, 10: 60 }[increments];
   return { received: true, automatic: false, dc: base - 2 * pr, effectivePR: pr };
 }

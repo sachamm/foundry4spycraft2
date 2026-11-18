@@ -3,6 +3,7 @@
  * Pure functions; the Foundry state lives in module/apps/gc/state.mjs.
  */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 const M = GC_DATA.core.mission;
 const whole = (value, min, max) => Number.isSafeInteger(value) && value >= min && value <= max;
@@ -96,7 +97,7 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
 
   for (const objective of mission.objectives ?? []) {
     if (!whole(objective.grade, 1, 5)) {
-      warnings.push(`${objective.name || "Objective"}: choose a grade from 1 to 5.`);
+      warnings.push(loc`${objective.name || loc`Objective`}: choose a grade from 1 to 5.`);
       continue;
     }
     const scenes = Math.max(1, count(objective.scenes ?? 1));
@@ -132,11 +133,11 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
       // Entries may carry their own resolved XP (security devices scale with a Power Rating).
       const found = Number.isFinite(entry.xp) ? { name: entry.name || entry.id, xp: entry.xp } : find?.(entry.id);
       if (!found) {
-        warnings.push(`Unknown ${noun}: ${entry.id}.`);
+        warnings.push(loc`Unknown ${noun}: ${entry.id}.`);
         continue;
       }
       if (!Number.isFinite(found.xp)) {
-        warnings.push(`${found.name}: enter its XP value by hand (formula in the rules).`);
+        warnings.push(loc`${found.name}: enter its XP value by hand (formula in the rules).`);
         continue;
       }
       const times = Math.max(1, count(entry.count ?? 1));
@@ -167,7 +168,7 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
 
   for (const pick of mission.bundle ?? []) {
     if (!whole(pick.caliber, 1, 5)) {
-      warnings.push(`${pick.name || "Bundle pick"}: choose a Caliber from I to V.`);
+      warnings.push(loc`${pick.name || loc`Bundle pick`}: choose a Caliber from I to V.`);
       continue;
     }
     const times = Math.max(1, count(pick.count ?? 1));
@@ -186,7 +187,7 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
 
   const seen = new Set();
   for (const npc of mission.antagonists ?? []) {
-    const label = npc.name || "Antagonist";
+    const label = npc.name || loc`Antagonist`;
     if (!planned && !npc.encountered) continue;
     if (npc.full || npc.promoted) {
       // p.452 'full' special NPCs and p.398 promoted standard NPCs: 300 XP per scene in which they appear.
@@ -199,7 +200,7 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
       continue;
     }
     if (!Number.isFinite(npc.xp) || npc.xp < 0) {
-      warnings.push(`${label}: finish the NPC's XP reward.`);
+      warnings.push(loc`${label}: finish the NPC's XP reward.`);
       continue;
     }
     const key = npc.typeKey || npc.uuid || label;
@@ -217,7 +218,7 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
   const scenes = Math.max(count(mission.scenesPlayed), 0);
   if (scenes && total / scenes > M.sceneXPMaximum)
     warnings.push(
-      `This is more than ${M.sceneXPMaximum} base XP per scene (p.440 recommends about ${M.sceneXPTarget}).`
+      loc`This is more than ${M.sceneXPMaximum} base XP per scene (p.440 recommends about ${M.sceneXPTarget}).`
     );
   return { rows, total: Math.max(0, total), rawTotal: total, warnings };
 }
@@ -225,7 +226,7 @@ export function missionBaseXP(mission, lookup = {}, { planned = false } = {}) {
 /** p.440: (base + 25 per awarded die, capped at 25 × level) × the lower of career level and Threat Level. */
 export function characterMissionXP({ baseXP, awards = 0, level, threatLevel: tl }) {
   if (!Number.isFinite(baseXP) || baseXP < 0 || !whole(level, 1, 20) || !whole(tl, 1, 20) || !whole(awards, 0, 10000))
-    throw new Error("Enter the base XP, award count, career level and Threat Level.");
+    throw new Error(loc`Enter the base XP, award count, career level and Threat Level.`);
   const awardXP = Math.min(awards * M.actionDieAwardXP, level * M.actionDieAwardXP);
   const multiplier = Math.min(level, tl);
   return { awardXP, multiplier, total: (Math.trunc(baseXP) + awardXP) * multiplier };

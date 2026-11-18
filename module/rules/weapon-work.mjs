@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Weapon Focus p.176 changes the DC, not the check result or its cap. */
 const norm = v =>
   String(v ?? "")
@@ -20,9 +21,9 @@ export function weaponFocusWorkPlan(
   const inactive = { applicable: false, blockedReason: "", notes: "" };
   if (weaponWork === false) return inactive;
   if (weaponWork !== true)
-    return { ...inactive, blockedReason: "Declare whether Weapon Focus applies to weapon work." };
+    return { ...inactive, blockedReason: loc`Declare whether Weapon Focus applies to weapon work.` };
   if (!["electronics", "mechanics"].includes(key) || !["build", "modify", "repair"].includes(check?.id))
-    return { ...inactive, blockedReason: "Weapon Focus reduces only weapon Build, Modify and Repair DCs." };
+    return { ...inactive, blockedReason: loc`Weapon Focus reduces only weapon Build, Modify and Repair DCs.` };
   const selected = weaponWorkItem?.type === "weapon" ? weaponWorkItem.system?.proficiency : weaponWorkProficiency,
     name = weaponWorkItem?.type === "weapon" ? weaponWorkItem.name : weaponWorkName;
   if (
@@ -35,7 +36,7 @@ export function weaponFocusWorkPlan(
     name.length > 200 ||
     weaponWorkConfirmed !== true
   )
-    return { ...inactive, blockedReason: "Confirm the actual target weapon/model and its covered proficiency." };
+    return { ...inactive, blockedReason: loc`Confirm the actual target weapon/model and its covered proficiency.` };
   const choices = new Set(
     (system.activeFeatSelections ?? [])
       .filter(f => f.name === "Weapon Focus")
@@ -49,12 +50,11 @@ export function weaponFocusWorkPlan(
   if (!choices.has(selected))
     return {
       ...inactive,
-      blockedReason:
-        "An active Weapon Focus for the target weapon proficiency is required; an ordinary forte does not grant this DC reduction."
+      blockedReason: loc`An active Weapon Focus for the target weapon proficiency is required; an ordinary forte does not grant this DC reduction.`
     };
   const baseDC = typeof weaponWorkDC === "string" && weaponWorkDC.trim() ? Number(weaponWorkDC) : weaponWorkDC;
   if (!Number.isSafeInteger(baseDC) || baseDC < 0)
-    return { ...inactive, blockedReason: "Enter the GC-confirmed nonnegative whole DC before Weapon Focus." };
+    return { ...inactive, blockedReason: loc`Enter the GC-confirmed nonnegative whole DC before Weapon Focus.` };
   const effectiveDC = Math.min(baseDC, Math.max(5, baseDC - 10));
   return {
     applicable: true,
@@ -67,6 +67,6 @@ export function weaponFocusWorkPlan(
     effectiveDC,
     reduction: baseDC - effectiveDC,
     minimum: 5,
-    notes: `Weapon Focus (${name.trim()}): DC ${baseDC} → ${effectiveDC}, reduction ${baseDC - effectiveDC}; minimum 5 without raising an already lower DC. No bonus is added to the check result (p.176).`
+    notes: loc`Weapon Focus (${name.trim()}): DC ${baseDC} → ${effectiveDC}, reduction ${baseDC - effectiveDC}; minimum 5 without raising an already lower DC. No bonus is added to the check result (p.176).`
   };
 }

@@ -1,19 +1,21 @@
 import { COMBAT_STANCES, combatStanceState } from "./combat-stance.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 export function stanceMovementRoundKey(system, combat = null) {
   if (combat !== null) {
-    if (!validOwnCountClock(combat)) throw Error("Review the current combat round before recording stance movement.");
+    if (!validOwnCountClock(combat))
+      throw Error(loc`Review the current combat round before recording stance movement.`);
     return combat.id + ":" + combat.round;
   }
   if (!Number.isFinite(system.worldTime))
-    throw Error("Review the current world time before recording out-of-combat movement.");
+    throw Error(loc`Review the current world time before recording out-of-combat movement.`);
   return "world:" + Math.floor(system.worldTime / 6);
 }
 export function stanceMovementState(system, combat = null) {
   const key = stanceMovementRoundKey(system, combat),
     r = system.stanceRoundMovement;
   if (r != null && (r.version !== 1 || typeof r.key !== "string" || !r.key || !Number.isFinite(r.feet) || r.feet < 0))
-    throw Error("Review the recorded round movement total.");
+    throw Error(loc`Review the recorded round movement total.`);
   const feet = r?.key === key ? r.feet : 0,
     stance = combatStanceState(system),
     limitFeet = COMBAT_STANCES[stance?.key]?.movementLimitFeet ?? 20;
@@ -33,19 +35,19 @@ export function stanceMovementReviewPlan(
   system,
   { combat = null, totalFeet, confirmed = false, enteringSide = false, enteringStance = null } = {}
 ) {
-  if (confirmed !== true) throw Error("The GC must confirm the total distance already moved this round.");
+  if (confirmed !== true) throw Error(loc`The GC must confirm the total distance already moved this round.`);
   const current = stanceMovementState(system, combat);
   if (!Number.isFinite(totalFeet) || totalFeet < current.feet)
-    throw Error("Enter a finite round total at least as large as the recorded movement; it cannot go backwards.");
+    throw Error(loc`Enter a finite round total at least as large as the recorded movement; it cannot go backwards.`);
   const limit =
     COMBAT_STANCES[enteringStance]?.movementLimitFeet ??
     (enteringSide ? 20 : current.cappedActive ? current.limitFeet : null);
   if (limit !== null && totalFeet > limit)
     throw Error(
-      (COMBAT_STANCES[enteringStance]?.name ?? (enteringSide ? "Side Stance" : current.stanceName)) +
-        " permits no more than " +
+      (COMBAT_STANCES[enteringStance]?.name ?? (enteringSide ? loc`Side Stance` : current.stanceName)) +
+        loc` permits no more than ` +
         limit +
-        " ft. of movement during any round."
+        loc` ft. of movement during any round.`
     );
   return { version: 1, key: current.key, feet: totalFeet };
 }
@@ -54,16 +56,16 @@ export function stanceMovementRoutePlan(system, { combat = null, distanceFeet } 
   if (!COMBAT_STANCES[stance?.key]?.movementLimitFeet) return null;
   const current = stanceMovementState(system, combat);
   if (!Number.isFinite(distanceFeet) || distanceFeet < 0)
-    throw Error("Enter the actual distance this route adds toward the stance’s round limit.");
+    throw Error(loc`Enter the actual distance this route adds toward the stance’s round limit.`);
   if (current.feet + distanceFeet > current.limitFeet)
     throw Error(
-      "This route would exceed " +
+      loc`This route would exceed ` +
         stance.name +
         "’s " +
         current.limitFeet +
-        " ft. round limit; only " +
+        loc` ft. round limit; only ` +
         current.remainingFeet +
-        " ft. remains."
+        loc` ft. remains.`
     );
   return {
     version: 1,

@@ -1,6 +1,7 @@
 import { shakenRules } from "./shaken.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { attributeCollapsePlan, attributeActionBlock } from "./attributes.mjs";
+import { loc } from "../i18n.mjs";
 /** Player/special character thresholds, p.331 and Table 5.13, p.349. Death is based on –10, not Constitution. */
 export function deathThreshold(size = "Medium") {
   return size === "Small" ? -7 : String(size).startsWith("Large") ? -15 : -10;
@@ -8,20 +9,20 @@ export function deathThreshold(size = "Medium") {
 export function healingPlan(system, { vitalityDice = 0, woundDice = 0, inCombat = false, dead = false } = {}) {
   const cost = vitalityDice + woundDice;
   if (![vitalityDice, woundDice].every(value => Number.isSafeInteger(value) && value >= 0) || cost < 1)
-    return { blocked: true, reason: "Choose a positive whole number of dice to heal vitality and/or wounds." };
-  if (inCombat) return { blocked: true, reason: "Use the Refresh action to heal during combat (p.359)." };
+    return { blocked: true, reason: loc`Choose a positive whole number of dice to heal vitality and/or wounds.` };
+  if (inCombat) return { blocked: true, reason: loc`Use the Refresh action to heal during combat (p.359).` };
   if (
     dead ||
     attributeCollapsePlan(system).dead ||
     (system.wounds?.value ?? 0) <= (system.deathThreshold ?? deathThreshold(system.size))
   )
-    return { blocked: true, reason: "A dead character must be saved from death before this healing can be used." };
-  if (cost > (system.actionDice?.value ?? 0)) return { blocked: true, reason: "Not enough action dice remain." };
+    return { blocked: true, reason: loc`A dead character must be saved from death before this healing can be used.` };
+  if (cost > (system.actionDice?.value ?? 0)) return { blocked: true, reason: loc`Not enough action dice remain.` };
   if (
     (!vitalityDice || (system.vitality?.value ?? 0) >= (system.vitality?.max ?? 0)) &&
     (!woundDice || (system.wounds?.value ?? 0) >= (system.wounds?.max ?? 0))
   )
-    return { blocked: true, reason: "The selected health resources are already full." };
+    return { blocked: true, reason: loc`The selected health resources are already full.` };
   const die = system.actionDice?.die ?? 4,
     explodeAt = system.actionDice?.explodeAt ?? die,
     bonus = system.actionDice?.bonus ?? 0;
@@ -40,13 +41,13 @@ export function healingPlan(system, { vitalityDice = 0, woundDice = 0, inCombat 
 }
 export function healingResult(system, plan, dieResults = []) {
   if (dieResults.length !== plan.vitalityDice || dieResults.some(value => !Number.isFinite(value)))
-    throw new Error("One result is required for each vitality healing die.");
+    throw new Error(loc`One result is required for each vitality healing die.`);
   const bonuses = plan.vitalityBonuses;
   if (
     bonuses !== undefined &&
     (!Array.isArray(bonuses) || bonuses.length !== dieResults.length || bonuses.some(n => !Number.isFinite(n)))
   )
-    throw new Error("One modifier is required for each selected vitality healing die.");
+    throw new Error(loc`One modifier is required for each selected vitality healing die.`);
   const vitalityGain = Math.max(
       0,
       dieResults.reduce((sum, value, i) => sum + value + (bonuses?.[i] ?? plan.bonus), 0)
@@ -82,7 +83,7 @@ export function defenseBoostPlan(
   const inability =
     restraintActionBlock(system, { free: true }) || attributeActionBlock(system, { kind: "mentalAbility" });
   if (inability || system.conditionContext?.sleeping || system.wounds?.value < 0)
-    return { blocked: true, reason: inability || "This character cannot take the free action to boost Defense." };
+    return { blocked: true, reason: inability || loc`This character cannot take the free action to boost Defense.` };
   if (
     system.refreshAction?.state === "waiting" &&
     system.refreshAction.combatId === combat?.id &&
@@ -90,18 +91,18 @@ export function defenseBoostPlan(
   )
     return {
       blocked: true,
-      reason: "Refresh forfeited this round’s chance to act; a Defense free action is unavailable."
+      reason: loc`Refresh forfeited this round’s chance to act; a Defense free action is unavailable.`
     };
   if (!combat?.started || combat.round < 1 || !combatant)
-    return { blocked: true, reason: "Defense may be boosted during a combat in which this character participates." };
+    return { blocked: true, reason: loc`Defense may be boosted during a combat in which this character participates.` };
   if (!atStartOfRound)
-    return { blocked: true, reason: "A Defense boost must be declared at the start of a combat round (p.62)." };
+    return { blocked: true, reason: loc`A Defense boost must be declared at the start of a combat round (p.62).` };
   if (activeDefenseBoost({ ...system, combatContext: combat }) && !replaceExisting)
     return {
       blocked: true,
-      reason: "An action-die Defense boost is already active. Replace it rather than stack another."
+      reason: loc`An action-die Defense boost is already active. Replace it rather than stack another.`
     };
-  if ((system.actionDice?.value ?? 0) < 1) return { blocked: true, reason: "Not enough action dice remain." };
+  if ((system.actionDice?.value ?? 0) < 1) return { blocked: true, reason: loc`Not enough action dice remain.` };
   const die = system.actionDice?.die ?? 4,
     explodeAt = system.actionDice?.explodeAt ?? die,
     bonus = system.actionDice?.bonus ?? 0;
@@ -125,7 +126,7 @@ export function refreshPlan(
   } = {}
 ) {
   const collapse = attributeCollapsePlan(system);
-  if (dead || collapse.dead) return { blocked: true, reason: "A dead character cannot use Refresh." };
+  if (dead || collapse.dead) return { blocked: true, reason: loc`A dead character cannot use Refresh.` };
   conditions = [
     ...conditions,
     ...(system.conditionContext?.entangled || system.conditionContext?.bound ? ["Entangled/Bound"] : []),
@@ -137,19 +138,19 @@ export function refreshPlan(
   if (!combat?.started || combat.round < 1 || !combatantId || currentCombatantId !== combatantId)
     return {
       blocked: true,
-      reason: "Refresh must be declared or completed at this character’s initiative in a started combat."
+      reason: loc`Refresh must be declared or completed at this character’s initiative in a started combat.`
     };
   const record = system.refreshAction;
   if (phase === "start") {
     const shaken = shakenRules(system);
     if (shaken.needsReview)
-      return { blocked: true, reason: "Review the current Shaken sources before beginning Refresh." };
+      return { blocked: true, reason: loc`Review the current Shaken sources before beginning Refresh.` };
     if (shaken.grade > 0) conditions.push(shaken.label);
     if (conditions.length)
-      return { blocked: true, reason: "A character suffering from any condition cannot begin Refresh (p.359)." };
-    if (!forfeitActions) return { blocked: true, reason: "Refresh forfeits this round’s chance to act." };
+      return { blocked: true, reason: loc`A character suffering from any condition cannot begin Refresh (p.359).` };
+    if (!forfeitActions) return { blocked: true, reason: loc`Refresh forfeits this round’s chance to act.` };
     if (record?.combatId === combat.id && record.startRound === combat.round)
-      return { blocked: true, reason: "This round’s Refresh has already been declared." };
+      return { blocked: true, reason: loc`This round’s Refresh has already been declared.` };
     return {
       blocked: false,
       record: {
@@ -169,24 +170,23 @@ export function refreshPlan(
     record.combatantId !== combatantId ||
     record.state !== "waiting"
   )
-    return { blocked: true, reason: "There is no pending Refresh for this combatant." };
+    return { blocked: true, reason: loc`There is no pending Refresh for this combatant.` };
   if (combat.round !== record.dueRound)
     return {
       blocked: true,
       reason:
         combat.round < record.dueRound
-          ? "Wait until the start of this character’s next initiative."
-          : "The opportunity to complete this Refresh has passed."
+          ? loc`Wait until the start of this character’s next initiative.`
+          : loc`The opportunity to complete this Refresh has passed.`
     };
   if (!atStartOfInitiative)
-    return { blocked: true, reason: "Complete Refresh at the start of this character’s next initiative." };
+    return { blocked: true, reason: loc`Complete Refresh at the start of this character’s next initiative.` };
   if (record.targeted || !notTargeted)
     return {
       blocked: true,
-      reason:
-        "Refresh permits healing only if no attack targeted the character during the entire wait, including attacks that missed."
+      reason: loc`Refresh permits healing only if no attack targeted the character during the entire wait, including attacks that missed.`
     };
-  if (!["vitality", "wounds"].includes(resource)) return { blocked: true, reason: "Choose vitality or wounds." };
+  if (!["vitality", "wounds"].includes(resource)) return { blocked: true, reason: loc`Choose vitality or wounds.` };
   const healing = healingPlan(system, {
     vitalityDice: resource === "vitality" ? 1 : 0,
     woundDice: resource === "wounds" ? 1 : 0,
@@ -224,14 +224,14 @@ export function activeFortunesOfWar(system) {
 }
 export function fortunesOfWarPlan(system, combat) {
   if (!(system.legacyAbilities?.fortunesOfWar?.grade > 0))
-    return { blocked: true, reason: "Fortunes of War has not been earned." };
+    return { blocked: true, reason: loc`Fortunes of War has not been earned.` };
   if (!combat?.started || combat.round < 1 || !combat.combatantId || combat.ownTurnIndex < 0)
     return {
       blocked: true,
-      reason: "Use the tracked Fortunes of War boost in a started combat containing this character."
+      reason: loc`Use the tracked Fortunes of War boost in a started combat containing this character.`
     };
   if (activeFortunesOfWar({ ...system, fortunesCombatContext: combat }))
-    return { blocked: true, reason: "Fortunes of War is already doubled; additional uses cannot stack." };
+    return { blocked: true, reason: loc`Fortunes of War is already doubled; additional uses cannot stack.` };
   return {
     blocked: false,
     record: {
@@ -286,7 +286,7 @@ export function activeNoFear(system) {
 }
 export function noFearPlan(system, combat) {
   const source = noFearSource(system);
-  if (!source) return { blocked: true, reason: "No Fear II requires Stuntman level 7." };
+  if (!source) return { blocked: true, reason: loc`No Fear II requires Stuntman level 7.` };
   if (
     !Number.isSafeInteger(source.rounds) ||
     !combat?.started ||
@@ -299,9 +299,9 @@ export function noFearPlan(system, combat) {
     !Number.isSafeInteger(combat.turn) ||
     combat.turn !== combat.ownTurnIndex
   )
-    return { blocked: true, reason: "Activate No Fear II during this character’s initiative in a started combat." };
+    return { blocked: true, reason: loc`Activate No Fear II during this character’s initiative in a started combat.` };
   if (activeNoFear({ ...system, noFearCombatContext: combat }))
-    return { blocked: true, reason: "No Fear II is already active." };
+    return { blocked: true, reason: loc`No Fear II is already active.` };
   return {
     blocked: false,
     record: {
@@ -319,16 +319,16 @@ export function noFearPlan(system, combat) {
 export function recoveryRatePlan(system, { treatment = "none", interest = false, poorForaging = false } = {}) {
   const treatmentRates = { none: 1, success: 2, threat: 3, criticalSuccess: 5, error: 0 };
   if (typeof treatment !== "string" || !Object.hasOwn(treatmentRates, treatment))
-    throw new Error("Choose a resolved Treatment outcome for the current day.");
+    throw new Error(loc`Choose a resolved Treatment outcome for the current day.`);
   if (interest !== true && interest !== false)
-    throw new Error("Confirm whether at least one hour is spent indulging in Interests.");
+    throw new Error(loc`Confirm whether at least one hour is spent indulging in Interests.`);
   if (poorForaging !== true && poorForaging !== false)
-    throw new Error("Confirm the current day’s failed Foraging outcome.");
+    throw new Error(loc`Confirm the current day’s failed Foraging outcome.`);
   const quickHealer = system.activeFeatNames?.includes("Quick Healer") === true,
     timeMultiplier = quickHealer ? 0.5 : 1;
   const level = system.level ?? 0;
   if (!Number.isSafeInteger(level) || level < 0 || level > 20)
-    throw new Error("Review the character’s Career Level before calculating recovery rates.");
+    throw new Error(loc`Review the character’s Career Level before calculating recovery rates.`);
   const fastHealing = (system.originEffects ?? []).some(e => e.qualityKey === "fastHealing");
   const naturalMultiplier =
       treatment === "error" ? 0 : treatmentRates[treatment] + (fastHealing ? 1 : 0) - (poorForaging ? 0.5 : 0),
@@ -338,7 +338,7 @@ export function recoveryRatePlan(system, { treatment = "none", interest = false,
     subdualBase = system.subdualThreshold ?? system.abilities?.con?.value ?? null;
   const intervals = [
     { threshold: 1, label: "minute", seconds: 60 },
-    { threshold: 2, label: "10 minutes", seconds: 600 },
+    { threshold: 2, label: loc`10 minutes`, seconds: 600 },
     { threshold: 3, label: "hour", seconds: 3600 },
     { threshold: 4, label: "day", seconds: 86400 },
     { threshold: 5, label: "week", seconds: 604800 }

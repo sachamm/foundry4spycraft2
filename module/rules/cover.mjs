@@ -1,12 +1,13 @@
 import { terrainCoverPlan } from "./terrain-cover.mjs";
 import { cqbRangedWeapon } from "./cqb.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 export const COVER_GRADES = ["None", "One-quarter (1/4)", "One-half (1/2)", "Three-quarters (3/4)", "Total"];
 /** Counter-Terrorist p.69: second grade replaces the first; no weapon or range restriction. */
 export function precisionTakedownGrade(system) {
   const level = system?.classLevels?.counterterrorist ?? 0;
   if (!Number.isSafeInteger(level) || level < 0 || level > 10)
-    throw new Error("Review the actual Counter-Terrorist class level before reducing cover.");
+    throw new Error(loc`Review the actual Counter-Terrorist class level before reducing cover.`);
   return level >= 7 ? 2 : level >= 2 ? 1 : 0;
 }
 /** Table 5.10 p.345. Inputs are the best personal/scenery grades, after other adjudicated grade adjustments. */
@@ -28,7 +29,7 @@ export function coverPlan({
   terrainCoverConfirmed = false
 } = {}) {
   if (![personalCover, sceneryCover].every(n => Number.isSafeInteger(n) && n >= 0 && n <= 4))
-    throw new Error("Choose a cover grade from none through total for each source.");
+    throw new Error(loc`Choose a cover grade from none through total for each source.`);
   const terrainCover = terrainCoverPlan(defenderSystem ?? {}, {
     personalCover,
     sceneryCover,
@@ -42,7 +43,7 @@ export function coverPlan({
     sceneryCover = terrainCover.sceneryCover;
   }
   if (typeof ranged !== "boolean" || typeof opponentConfirmed !== "boolean")
-    throw new Error("Declare ranged attack and opponent eligibility with their checkboxes.");
+    throw new Error(loc`Declare ranged attack and opponent eligibility with their checkboxes.`);
   const baseGrade = Math.min(4, personalCover + sceneryCover),
     supremacy = attackerSystem?.activeFeatNames?.includes("CQB Supremacy") === true;
   let within = false;
@@ -55,9 +56,9 @@ export function coverPlan({
       !Number.isFinite(distanceFeet) ||
       distanceFeet < 0
     )
-      throw new Error("Confirm finite nonnegative target distance and current CQB Range for the selected attacker.");
+      throw new Error(loc`Confirm finite nonnegative target distance and current CQB Range for the selected attacker.`);
     if (!ranged || !attackerWeapon || !cqbRangedWeapon(attackerWeapon))
-      throw new Error("CQB Supremacy cover reduction requires the selected ranged weapon and a ranged attack.");
+      throw new Error(loc`CQB Supremacy cover reduction requires the selected ranged weapon and a ranged attack.`);
     within = distanceFeet <= range;
   }
   const precisionGrade = precisionTakedownGrade(precisionAttackerSystem ?? attackerSystem),
@@ -67,7 +68,7 @@ export function coverPlan({
       supremacy && within && opponentConfirmed && partial ? Math.min(1, baseGrade - precisionReduction) : 0,
     sharpshooter = attackerSystem?.activeFeatNames?.includes("Sharpshooter Basics") === true;
   if (sharpshooter && (!ranged || !attackerWeapon || !cqbRangedWeapon(attackerWeapon)))
-    throw Error("Sharpshooter Basics cover reduction requires the selected ranged weapon and a ranged attack.");
+    throw Error(loc`Sharpshooter Basics cover reduction requires the selected ranged weapon and a ranged attack.`);
   const sharpshooterReduction =
       sharpshooter && opponentConfirmed && partial
         ? Math.min(1, baseGrade - precisionReduction - supremacyReduction)
@@ -82,10 +83,12 @@ export function coverPlan({
     typeof humanShieldConfirmed !== "boolean"
   )
     throw new Error(
-      "Review the remaining human-shield Defense component after grade reductions; it cannot exceed personal or total remaining cover Defense."
+      loc`Review the remaining human-shield Defense component after grade reductions; it cannot exceed personal or total remaining cover Defense.`
     );
   if (humanShieldDefense > 0 && !humanShieldConfirmed)
-    throw new Error("The GC must confirm the actual remaining human-shield Defense component after grade reductions.");
+    throw new Error(
+      loc`The GC must confirm the actual remaining human-shield Defense component after grade reductions.`
+    );
   const humanShieldEffective = safeAttack ? Math.floor(humanShieldDefense / 2) : humanShieldDefense,
     safeAttackReduction = humanShieldDefense - humanShieldEffective;
   return {
@@ -115,30 +118,30 @@ export function coverPlan({
       ...(terrainCover
         ? terrainCover.sources
             .filter(s => s.increase)
-            .map(s => `${s.source}: +1quarter ${s.kind} cover before attacker reductions.`)
+            .map(s => loc`${s.source}: +1quarter ${s.kind} cover before attacker reductions.`)
         : []),
       ...(safeAttackReduction
         ? [
-            `Safe Attack: the GC-confirmed remaining human-shield Defense component +${humanShieldDefense} is halved, rounded down, to +${humanShieldEffective}. Other cover Defense remains unchanged.`
+            loc`Safe Attack: the GC-confirmed remaining human-shield Defense component +${humanShieldDefense} is halved, rounded down, to +${humanShieldEffective}. Other cover Defense remains unchanged.`
           ]
         : []),
       ...(precisionReduction
         ? [
-            `Precision Takedown ${precisionGrade === 2 ? "II" : "I"}: opponent loses ${precisionReduction} cover grade${precisionReduction === 1 ? "" : "s"} against this attack.`
+            loc`Precision Takedown ${precisionGrade === 2 ? "II" : "I"}: opponent loses ${precisionReduction} cover grade${precisionReduction === 1 ? "" : "s"} against this attack.`
           ]
         : []),
       ...(sharpshooterReduction
-        ? ["Sharpshooter Basics: opponent loses one quarter cover against this ranged attack (p.182)."]
+        ? [loc`Sharpshooter Basics: opponent loses one quarter cover against this ranged attack (p.182).`]
         : []),
       ...(supremacyReduction
-        ? ["CQB Supremacy: opponent within CQB Range loses one quarter cover against this ranged attack."]
+        ? [loc`CQB Supremacy: opponent within CQB Range loses one quarter cover against this ranged attack.`]
         : []),
       ...(grade === 4
-        ? ["Total cover: the shot has to get through the cover first; Defense alone does not permit a direct hit."]
+        ? [loc`Total cover: the shot has to get through the cover first; Defense alone does not permit a direct hit.`]
         : []),
       ...(grade
         ? [
-            "An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit."
+            loc`An attack that would hit without the cover Defense bonus hits the cover instead. The GC resolves cover Damage saves, penetration and which combined cover is hit.`
           ]
         : [])
     ]
@@ -162,10 +165,10 @@ export function saveCoverPlan(
     if (value === undefined) return 0;
     if (typeof value === "string" && /^[0-4]$/.test(value)) return Number(value);
     if (typeof value === "number" && Number.isSafeInteger(value) && value >= 0 && value <= 4) return value;
-    throw new Error("Choose a listed personal/scenery cover grade for this Reflex save.");
+    throw new Error(loc`Choose a listed personal/scenery cover grade for this Reflex save.`);
   };
   if (effectBeyondCover !== undefined && typeof effectBeyondCover !== "boolean")
-    throw new Error("Confirm whether this effect originates beyond the cover.");
+    throw new Error(loc`Confirm whether this effect originates beyond the cover.`);
   const cover = coverPlan({
       homeTurfCover: terrainOptions.homeTurfCover ?? false,
       homeTurfCoverSource: terrainOptions.homeTurfCoverSource ?? "scenery",
@@ -196,7 +199,7 @@ export function validateCoverSaveSource(system, proof, { checkKind, checkId } = 
     system
   );
   if (checkKind !== "save" || checkId !== "ref" || JSON.stringify(current) !== JSON.stringify(proof))
-    throw new Error("The terrain cover save source, grades or circumstances changed before posting.");
+    throw new Error(loc`The terrain cover save source, grades or circumstances changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

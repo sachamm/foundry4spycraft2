@@ -1,10 +1,11 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Complex Analysis challenge counts: Forensic Genius p.209 and Tracking Mastery p.207. */
 export function analysisChallengeCount(system, base, { forensics = false } = {}) {
   const raw = typeof base === "string" && base.trim() ? Number(base) : base;
   if (!Number.isSafeInteger(raw) || raw < 2)
     throw new Error(
-      "Enter the GC’s whole unmodified Complex Analysis Task Challenge count: at least2(pp.99–100). Feat reductions may lower the required count to1."
+      loc`Enter the GC’s whole unmodified Complex Analysis Task Challenge count: at least2(pp.99–100). Feat reductions may lower the required count to1.`
     );
   const forensicGenius = system.activeFeatNames?.includes("Forensic Genius") === true,
     trackingMastery = forensics === true && system.activeFeatNames?.includes("Tracking Mastery") === true,
@@ -69,8 +70,8 @@ export function forensicGeniusPlan(
     blockedReason: "",
     notes: [
       task
-        ? `${[...(genius ? [source] : []), ...(tracking ? ["Tracking Mastery"] : [])].join(" + ")}: this declared ${tracking ? "Analysis/Forensics" : "Complex Analysis"} Task requires ${counts.required} Challenges instead of ${counts.base} (−${counts.reduction}, minimum1); resolve task progress separately (pp.207,209).`
-        : `${source}: Analysis synergy is available for this Search check; use the normal highest synergy (p.209).`
+        ? loc`${[...(genius ? [source] : []), ...(tracking ? ["Tracking Mastery"] : [])].join(" + ")}: this declared ${tracking ? loc`Analysis/Forensics` : loc`Complex Analysis`} Task requires ${counts.required} Challenges instead of ${counts.base} (−${counts.reduction}, minimum1); resolve task progress separately (pp.207,209).`
+        : loc`${source}: Analysis synergy is available for this Search check; use the normal highest synergy (p.209).`
     ]
   };
 }
@@ -89,7 +90,7 @@ export function validateTrackingTaskProof(system, proof, { checkKind, skillKey, 
     !expected ||
     JSON.stringify(expected) !== JSON.stringify(proof)
   )
-    throw new Error("The Tracking Mastery Forensics task source or challenge count changed before posting.");
+    throw new Error(loc`The Tracking Mastery Forensics task source or challenge count changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

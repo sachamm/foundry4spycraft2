@@ -1,6 +1,7 @@
 import { camouflageTerrain } from "./quality-checks.mjs";
 import { resistanceType } from "./resistances.mjs";
 import { evaluate } from "./formula.mjs";
+import { loc } from "../i18n.mjs";
 
 const KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 
@@ -41,12 +42,12 @@ export function resolveOriginChoices(item, system, items, cfg) {
       const extreme = high === null ? null : (high ? Math.max : Math.min)(...Object.values(bases));
       if (extreme !== null && bases[selected] !== extreme) {
         warnings.push(
-          `${item.name}: ${selected.toUpperCase()} must be ${high ? "a highest" : "a lowest"} creation attribute.`
+          loc`${item.name}: ${selected.toUpperCase()} must be ${high ? loc`a highest` : loc`a lowest`} creation attribute.`
         );
         continue;
       }
       if (rule.maxAttribute && sign > 0 && bases[selected] + sign > rule.maxAttribute) {
-        warnings.push(`${item.name}: the attribute increase may not exceed ${rule.maxAttribute}.`);
+        warnings.push(loc`${item.name}: the attribute increase may not exceed ${rule.maxAttribute}.`);
         continue;
       }
       bonuses.push({ target: `abilities.${selected}`, value: String(sign) });
@@ -64,7 +65,7 @@ export function resolveOriginChoices(item, system, items, cfg) {
         continue;
       }
       if (selected.has(skill)) {
-        warnings.push(`${item.name}: choose different ${kind} skills.`);
+        warnings.push(loc`${item.name}: choose different ${kind} skills.`);
         continue;
       }
       selected.add(skill);
@@ -87,19 +88,19 @@ export function resolveOriginChoices(item, system, items, cfg) {
       const key = choices[`npcQuality${index}`];
       const quality = cfg.tables.testSubjectQualities?.[key];
       if (!quality) {
-        pending.push(`choose NPC quality ${index + 1} (GC approval required)`);
+        pending.push(loc`choose NPC quality ${index + 1} (GC approval required)`);
         continue;
       }
       // General NPC-quality rules allow repeated applications only when specified.
       if (selected.has(key) && !quality.repeatable) {
-        warnings.push(`${item.name}: ${quality.label} may only be chosen once.`);
+        warnings.push(loc`${item.name}: ${quality.label} may only be chosen once.`);
         continue;
       }
       selected.add(key);
       const terrain = key === "camouflaged" ? camouflageTerrain(choices[`npcDetails${index}`]) : null;
       if (key === "camouflaged" && !terrain) pending.push(`choose the terrain for quality ${index + 1}`);
       if (terrain && camouflageSelections.has(terrain)) {
-        warnings.push(`${item.name}: Camouflaged must select different terrain types.`);
+        warnings.push(loc`${item.name}: Camouflaged must select different terrain types.`);
         continue;
       }
       if (terrain) camouflageSelections.add(terrain);

@@ -1,6 +1,7 @@
 import { responseOwnSize } from "./trip.mjs";
 import { stillStandingResistancePlan } from "./still-standing.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** Ordinary target's on-foot Bull Rush response, p.354; action modifier+0, p.352. */
 export function bullRushDefenseSkillChecks(key, checks = []) {
   if (key !== "athletics") return checks;
@@ -8,7 +9,7 @@ export function bullRushDefenseSkillChecks(key, checks = []) {
     ...checks.filter(c => c.id !== "resist-bull-rush"),
     {
       id: "resist-bull-rush",
-      name: "Resist Bull Rush (on foot)",
+      name: loc`Resist Bull Rush (on foot)`,
       attributes: ["str"],
       mode: "Active",
       tags: "Armor Check Penalty",
@@ -38,7 +39,7 @@ export function bullRushDefensePlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (key !== "athletics" || check?.id !== "resist-bull-rush") return empty;
   if (method !== "roll")
-    return reject("Bull Rush is opposed and part of a combat action; taking10/20 is unavailable (pp.91,352).");
+    return reject(loc`Bull Rush is opposed and part of a combat action; taking10/20 is unavailable (pp.91,352).`);
   if (
     typeof bullRushOpponentName !== "string" ||
     !bullRushOpponentName.trim() ||
@@ -50,11 +51,11 @@ export function bullRushDefensePlan(
     Math.abs(bullRushSizeDifference) > 11
   )
     return reject(
-      "Name the actual rushing opponent and confirm a legal on-foot targeted Bull Rush, contact in your square and actual Size difference (your Size minus the attacker’s). Mounted/vehicle and intervening-character checks use separate rules."
+      loc`Name the actual rushing opponent and confirm a legal on-foot targeted Bull Rush, contact in your square and actual Size difference (your Size minus the attacker’s). Mounted/vehicle and intervening-character checks use separate rules.`
     );
   if (bullRushSizeDifference > 1)
     return reject(
-      "An ordinary Bull Rush cannot target someone more than one Size category larger than the rushing character (p.354); review actual exceptions separately."
+      loc`An ordinary Bull Rush cannot target someone more than one Size category larger than the rushing character (p.354); review actual exceptions separately.`
     );
   let stillStanding, ownSize;
   try {
@@ -84,13 +85,13 @@ export function bullRushDefensePlan(
     sizeBonus,
     bonuses: stillStanding.bonus ? [{ source: "Still Standing", type: "", value: stillStanding.bonus }] : [],
     notes: [
-      `Resist Bull Rush: opposed Athletics(STR), Armor Check Penalty, action error modifier+0; larger participant +4 per Size category. Your Size bonus +${sizeBonus} (pp.352,354).`,
+      loc`Resist Bull Rush: opposed Athletics(STR), Armor Check Penalty, action error modifier+0; larger participant +4 per Size category. Your Size bonus +${sizeBonus} (pp.352,354).`,
       ...(stillStanding.source
         ? [
-            "Still Standing: +4 unnamed bonus to this skill check resisting Bull Rush (p.66); this is not a dodge bonus."
+            loc`Still Standing: +4 unnamed bonus to this skill check resisting Bull Rush (p.66); this is not a dodge bonus.`
           ]
         : []),
-      "This is the ordinary targeted response with both characters on foot. The GC resolves the opposed result, pushed distance, obstructions, damage, sprawled/final attacks and other consequences separately."
+      loc`This is the ordinary targeted response with both characters on foot. The GC resolves the opposed result, pushed distance, obstructions, damage, sprawled/final attacks and other consequences separately.`
     ]
   };
 }
@@ -129,9 +130,9 @@ export function validateBullRushDefenseProof(
       attributeSubstitution.ability === "int" &&
       (system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : "str"))
-    throw Error("The Bull Rush response attribute or actual substitution source changed before posting.");
+    throw Error(loc`The Bull Rush response attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
-    throw Error("The Bull Rush response, actual Size or Still Standing source changed before posting.");
+    throw Error(loc`The Bull Rush response, actual Size or Still Standing source changed before posting.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

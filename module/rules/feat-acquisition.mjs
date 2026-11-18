@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Explicit class bonus-feat sources, including Scientist Intense Study (p.42). */
 export function classFeatSources(items, progression) {
   const sources = [];
@@ -37,18 +38,19 @@ export function featAcquisition(feat, sources, items, { preview = false } = {}) 
   if (!key || feat.system.granted) return { ok: true, levelAllowance: 0 };
   const source = sources.find(s => s.id === key),
     career = feat.system.acquiredAtLevel || 1;
-  if (!source) return { ok: false, levelAllowance: 0, reason: "The selected class bonus-feat source is unavailable." };
+  if (!source)
+    return { ok: false, levelAllowance: 0, reason: loc`The selected class bonus-feat source is unavailable.` };
   if (source.tree !== "any" && source.tree !== feat.system.tree)
     return {
       ok: false,
       levelAllowance: 0,
-      reason: "The feat tree does not match its selected class bonus-feat source."
+      reason: loc`The feat tree does not match its selected class bonus-feat source.`
     };
   if (career < source.career)
     return {
       ok: false,
       levelAllowance: 0,
-      reason: "The selected class bonus feat had not been earned at acquisition."
+      reason: loc`The selected class bonus feat had not been earned at acquisition.`
     };
   const claimed = items.filter(i => i.type === "feat" && !i.system.granted && i.system.acquisitionSource === key);
   const winner = preview ? claimed.find(i => i.id !== feat.id) : claimed[0];
@@ -56,7 +58,7 @@ export function featAcquisition(feat, sources, items, { preview = false } = {}) 
     return {
       ok: false,
       levelAllowance: 0,
-      reason: "This class bonus-feat source is already assigned to another feat."
+      reason: loc`This class bonus-feat source is already assigned to another feat.`
     };
   return { ok: true, source, levelAllowance: source.levelAllowance, effectiveLevel: career + source.levelAllowance };
 }
@@ -106,7 +108,7 @@ export function captureFeatAcquisition(actor, system, excludeFeatId = null) {
 /** Newly edited or added past selections are not unrecorded legacy imports. */
 export function pendingFeatAcquisition(
   system,
-  reason = "Review prerequisite eligibility at the recorded acquisition level after changing acquisition details."
+  reason = loc`Review prerequisite eligibility at the recorded acquisition level after changing acquisition details.`
 ) {
   return {
     ok: false,
@@ -125,7 +127,7 @@ export function historicalFeatEligibility(system) {
   )
     return {
       ok: false,
-      reason: "The historical acquisition check no longer matches this feat's level, source or prerequisites."
+      reason: loc`The historical acquisition check no longer matches this feat's level, source or prerequisites.`
     };
   if (snapshot.needsReview === true)
     return {
@@ -133,9 +135,9 @@ export function historicalFeatEligibility(system) {
       reason:
         Array.isArray(snapshot.unmet) && snapshot.unmet.length
           ? snapshot.unmet.join("; ")
-          : "Review recorded feat acquisition eligibility."
+          : loc`Review recorded feat acquisition eligibility.`
     };
   return snapshot.ok
     ? { ok: true }
-    : { ok: false, reason: `Prerequisites were not met at acquisition: ${(snapshot.unmet ?? []).join("; ")}` };
+    : { ok: false, reason: loc`Prerequisites were not met at acquisition: ${(snapshot.unmet ?? []).join("; ")}` };
 }

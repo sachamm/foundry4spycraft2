@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -33,7 +34,7 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
   const advanced = doc.createElement("details");
   advanced.className = "sc2-advanced-options";
   const summary = doc.createElement("summary");
-  summary.textContent = "Advanced options";
+  summary.textContent = loc`Advanced options`;
   advanced.append(summary);
   const sections = [...root.children].filter(el => el.tagName === "DETAILS");
   root.insertBefore(advanced, sections[0] ?? null);
@@ -66,7 +67,7 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
     const method = root.querySelector('[name="method"]')?.value ?? "roll";
     if (submit)
       submit.textContent =
-        method === "take10" ? `Take 10: ${name}` : method === "take20" ? `Take 20: ${name}` : `Roll ${name}`;
+        method === "take10" ? loc`Take 10: ${name}` : method === "take20" ? loc`Take 20: ${name}` : loc`Roll ${name}`;
   }
   check.addEventListener("change", update);
   root.querySelector('[name="method"]')?.addEventListener("change", update);

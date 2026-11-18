@@ -1,6 +1,7 @@
 import { candidatePlan } from "./candidate.mjs";
 import { armorTypeChoice } from "./armor-training.mjs";
 import { evaluate } from "./formula.mjs";
+import { loc } from "../i18n.mjs";
 const normal = value =>
   String(value ?? "")
     .trim()
@@ -77,7 +78,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
       )
       .some(i => i.type === "feat" && i.name === name && normal(i.system.choice) === normal(choice) && active.has(i.id))
   )
-    return { bonuses, pending, warnings: [`${name}: choose a different target for each selection.`], linkedSkills };
+    return { bonuses, pending, warnings: [loc`${name}: choose a different target for each selection.`], linkedSkills };
   const mastery = {
     "Advanced Skill Mastery": [3, 18],
     "Grand Skill Mastery": [4, 17],
@@ -91,7 +92,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
     else {
       const skills = pairs[basic];
       if (name !== "Talented" && !activeFeat(basic) && !(basic === "Field of Expertise" && virtuoso))
-        warnings.push(`${name}: the chosen Basic Skill feat (${basic}) must be possessed and usable.`);
+        warnings.push(loc`${name}: the chosen Basic Skill feat (${basic}) must be possessed and usable.`);
       else if (name === "Talented") {
         for (const key of skills) {
           add(`skills.${key}.classSkill`, 1);
@@ -106,7 +107,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
               ? "Grand Skill Mastery"
               : null;
         if (previous && !hasChosen(previous, basic))
-          warnings.push(`${name}: choose the same Basic Skill feat as its prerequisite mastery.`);
+          warnings.push(loc`${name}: choose the same Basic Skill feat as its prerequisite mastery.`);
         else
           for (const key of skills) {
             add(`skills.${key}.misc`, mastery[name][0], "insight");
@@ -114,27 +115,27 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
           }
       } else if (name === "Mark of a Professional") {
         if (!hasChosen("False Start", basic))
-          warnings.push(`${name}: choose the same Basic Skill feat as a possessed False Start selection.`);
+          warnings.push(loc`${name}: choose the same Basic Skill feat as a possessed False Start selection.`);
         else
           for (const key of skills) {
             add(`skills.${key}.errorReduction`, 1);
             add(`skills.${key}.errorFloor`, 1);
           }
       } else if (name === "Practice Makes Perfect" && !hasChosen("Mark of a Professional", basic))
-        warnings.push(`${name}: choose the same Basic Skill feat as a possessed Mark of a Professional selection.`);
+        warnings.push(loc`${name}: choose the same Basic Skill feat as a possessed Mark of a Professional selection.`);
     }
   }
   if (["Armor Basics", "Armor Mastery"].includes(name) && !activeFeat("Armor Supremacy")) {
     const type = armorTypeChoice(choice);
-    if (!type) pending.push("choose an armor type: partial, moderate or full");
+    if (!type) pending.push(loc`choose an armor type: partial, moderate or full`);
     else if (name === "Armor Mastery" && armorTypeChoice(activeFeat("Armor Basics")?.system.choice) === type)
-      warnings.push("Armor Mastery: choose an additional armor type different from Armor Basics.");
+      warnings.push(loc`Armor Mastery: choose an additional armor type different from Armor Basics.`);
   }
   if (name === "Extra Gear") {
     const key = extraGearCategory(choice);
     if (!key)
       pending.push(
-        "choose an Extra Gear category: Electronics, Gadgets, Resources, Security, Tradecraft, Vehicles or Weapons"
+        loc`choose an Extra Gear category: Electronics, Gadgets, Resources, Security, Tradecraft, Vehicles or Weapons`
       );
     else if (
       items.some(
@@ -146,7 +147,7 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
           extraGearCategory(other.system.choice) === key
       )
     )
-      warnings.push("Extra Gear: each selection must choose a new category.");
+      warnings.push(loc`Extra Gear: each selection must choose a new category.`);
     else add(`gear.${key}`, 1);
   }
   if (name === "Unlocked Potential") {
@@ -169,12 +170,12 @@ export function resolveFeatChoices(feat, system, items, cfg, active) {
           i.system.bonuses?.some(b => b.target === `prof.${key}` && evaluate(b.value, { level: system.level }) > 0)
       )
     )
-      warnings.push(`Weapon Focus: ${choice} proficiency is required.`);
+      warnings.push(loc`Weapon Focus: ${choice} proficiency is required.`);
     else add(`forte.${key}`, 1);
   }
   if (name === "Martial Arts") {
     const key = ["str", "dex", "con", "int", "wis", "cha"].includes(choice) ? choice : null;
-    if (!key) pending.push("choose an attribute (str, dex, con, int, wis or cha)");
+    if (!key) pending.push(loc`choose an attribute (str, dex, con, int, wis or cha)`);
     else {
       add("unarmedDie", 6);
       add("unarmedBaseThreat", 19);

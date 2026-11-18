@@ -3,6 +3,7 @@ import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { DISARM_SIZES } from "./disarm.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 /** p.354; user-confirmed ruling: borrow only Maneuver's skill/attribute, not its named-check benefits. */
 export const CONVEYANCE_BULL_RUSH_PROFILES = {
   acrobatics: { kind: "personalVehicle", label: "personal vehicle", ability: "dex" },
@@ -62,14 +63,14 @@ export function conveyanceBullRushPlan(
     reject = blockedReason => ({ ...empty, blockedReason });
   if (check?.id !== "conveyance-bull-rush") return empty;
   const profile = CONVEYANCE_BULL_RUSH_PROFILES[key];
-  if (!profile) return reject("Choose the appropriate Acrobatics, Drive, Survival or Tactics operator skill.");
+  if (!profile) return reject(loc`Choose the appropriate Acrobatics, Drive, Survival or Tactics operator skill.`);
   if (method !== "roll")
-    return reject("Bull Rush is an opposed combat action; taking10/20 is unavailable (pp.91,352).");
+    return reject(loc`Bull Rush is an opposed combat action; taking10/20 is unavailable (pp.91,352).`);
   if (
     !validOwnCountClock(conveyanceBullRushCombat) ||
     conveyanceBullRushCombat.turn !== conveyanceBullRushCombat.ownTurnIndex
   )
-    return reject("Take this full-action conveyance Bull Rush during your Initiative Count in a started combat.");
+    return reject(loc`Take this full-action conveyance Bull Rush during your Initiative Count in a started combat.`);
   const named = v => typeof v === "string" && v.trim() && v.trim().length <= 200;
   if (
     !named(conveyanceBullRushName) ||
@@ -89,22 +90,22 @@ export function conveyanceBullRushPlan(
     ].every(v => typeof v === "boolean")
   )
     return reject(
-      "The GC must confirm this actual conveyance/mount, appropriate controlling skill/focus, current Sizes/action allowance, direct legal route/contact and available full action."
+      loc`The GC must confirm this actual conveyance/mount, appropriate controlling skill/focus, current Sizes/action allowance, direct legal route/contact and available full action.`
     );
   if (conveyanceBullRushOtherThreatAdjacency || conveyanceBullRushPassesOtherThreat)
     return reject(
-      "Other threatening opponents stop this Bull Rush; the chosen-target exception does not waive their movement restrictions."
+      loc`Other threatening opponents stop this Bull Rush; the chosen-target exception does not waive their movement restrictions.`
     );
   const ownIndex = DISARM_SIZES.indexOf(conveyanceBullRushSize),
     targetIndex = DISARM_SIZES.indexOf(conveyanceBullRushTargetSize);
   if (ownIndex < 0 || targetIndex < 0)
-    return reject("Choose the actual rushing conveyance/mount and target Size categories.");
+    return reject(loc`Choose the actual rushing conveyance/mount and target Size categories.`);
   const sizeDifference = ownIndex - targetIndex;
   if (sizeDifference < -1)
-    return reject("The target cannot be more than one Size category larger than the rushing conveyance/mount.");
+    return reject(loc`The target cannot be more than one Size category larger than the rushing conveyance/mount.`);
   if (typeof focus !== "string" || focus.trim().length > 200 || (profile.focusRequired && !focus.trim()))
     return reject(
-      "Choose the appropriate Drive focus for this actual vehicle; normal unowned-focus rules still apply."
+      loc`Choose the appropriate Drive focus for this actual vehicle; normal unowned-focus rules still apply.`
     );
   if (
     typeof conveyanceBullRushAllowanceFeet !== "number" ||
@@ -116,13 +117,13 @@ export function conveyanceBullRushPlan(
     conveyanceBullRushDistanceFeet > conveyanceBullRushAllowanceFeet
   )
     return reject(
-      "Enter the GC-confirmed current full-action conveyance movement allowance and a positive counted direct distance within it, in feet. Do not substitute the operator’s foot Speed."
+      loc`Enter the GC-confirmed current full-action conveyance movement allowance and a positive counted direct distance within it, in feet. Do not substitute the operator’s foot Speed.`
     );
   const blocked =
     restraintActionBlock(system) ||
     attributeActionBlock(system, { kind: "skill", ability: profile.ability, purelyMentalConfirmed });
   if (blocked || system.conditionContext?.prone || system.conditionContext?.sprawled || system.wounds?.value < 0)
-    return reject(blocked || "The operator’s current condition prevents this full-action Bull Rush.");
+    return reject(blocked || loc`The operator’s current condition prevents this full-action Bull Rush.`);
   const sizeBonus = 4 * Math.max(0, sizeDifference),
     evidence = {
       version: 1,
@@ -158,9 +159,9 @@ export function conveyanceBullRushPlan(
     evidence,
     sizeBonus,
     notes: [
-      `Bull Rush with ${evidence.conveyanceName}: ${key.toUpperCase()}(${profile.ability.toUpperCase()}), full action; ${evidence.distanceFeet}/${evidence.allowanceFeet} GC-confirmed counted ft.; rushing Size ${evidence.conveyanceSize}, target ${evidence.targetSize}, Size bonus +${sizeBonus} (p.354).`,
-      "Only the controlling skill and attribute are borrowed. Armor Check Penalty has no effect; Maneuver-only bonuses, synergies, tags, taking permissions and free-action benefits do not apply. Generic applicable skill/focus benefits still apply.",
-      "The GC supplies current conveyance facts and resolves movement, opposed outcome, pushing, obstructions, damage and other consequences. This does not model vehicle statistics or move a token."
+      loc`Bull Rush with ${evidence.conveyanceName}: ${key.toUpperCase()}(${profile.ability.toUpperCase()}), full action; ${evidence.distanceFeet}/${evidence.allowanceFeet} GC-confirmed counted ft.; rushing Size ${evidence.conveyanceSize}, target ${evidence.targetSize}, Size bonus +${sizeBonus} (p.354).`,
+      loc`Only the controlling skill and attribute are borrowed. Armor Check Penalty has no effect; Maneuver-only bonuses, synergies, tags, taking permissions and free-action benefits do not apply. Generic applicable skill/focus benefits still apply.`,
+      loc`The GC supplies current conveyance facts and resolves movement, opposed outcome, pushing, obstructions, damage and other consequences. This does not model vehicle statistics or move a token.`
     ]
   };
 }
@@ -212,9 +213,11 @@ export function validateConveyanceBullRushProof(
       attributeSubstitution.ability === "int" &&
       (system.classLevels?.schemer ?? 0) >= 4;
   if (ability !== undefined && ability !== (substituted ? "int" : base))
-    throw Error("The conveyance Bull Rush attribute or actual substitution source changed before posting.");
+    throw Error(loc`The conveyance Bull Rush attribute or actual substitution source changed before posting.`);
   if (checkKind !== "skill" || p.blockedReason || !p.evidence || stable(p.evidence) !== stable(proof))
-    throw Error("The conveyance Bull Rush declaration, operator condition or Initiative Count changed before posting.");
+    throw Error(
+      loc`The conveyance Bull Rush declaration, operator condition or Initiative Count changed before posting.`
+    );
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

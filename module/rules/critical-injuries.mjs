@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Table 5.5 p.332; injury rolls p.331; Guts p.174. Higher totals have no printed row. */
 const rows = [
   [35, "bleeding", "Bleeding", 20, "1 scene", "Gain 1d8 stress damage; heals when the scene ends."],
@@ -60,7 +61,7 @@ export function criticalInjuryRollPlan(system, { id, damage, source = "", confir
     confirmed !== true
   )
     throw new Error(
-      "Confirm the actual Table of Ouch trigger, event reference, source and nonnegative whole damage suffered."
+      loc`Confirm the actual Table of Ouch trigger, event reference, source and nonnegative whole damage suffered.`
     );
   const die = system.activeFeatNames?.includes("Guts") ? 10 : 20;
   return { id, damage, source: source.trim(), die, formula: `1d${die} + ${damage}` };
@@ -76,7 +77,7 @@ export function criticalInjuryResult(plan, dieResult) {
     dieResult < 1 ||
     dieResult > plan.die
   )
-    throw new Error("Use the actual original injury die within its frozen range.");
+    throw new Error(loc`Use the actual original injury die within its frozen range.`);
   const total = plan.damage + dieResult,
     row = rows.find(r => total <= r[0]);
   return {
@@ -84,12 +85,12 @@ export function criticalInjuryResult(plan, dieResult) {
     dieResult,
     listed: !!row,
     injuryId: row?.[1] ?? null,
-    name: row?.[2] ?? "Unlisted result — GC adjudication required",
+    name: row?.[2] ?? loc`Unlisted result — GC adjudication required`,
     surgeryDC: row?.[3] ?? null,
     healingTime: row?.[4] ?? null,
     notes:
       row?.[5] ??
-      "The printed table ends at 70. This total is preserved without assigning an invented or capped injury."
+      loc`The printed table ends at 70. This total is preserved without assigning an invented or capped injury.`
   };
 }
 export function validateCriticalInjuryRecord(record) {
@@ -98,14 +99,14 @@ export function validateCriticalInjuryRecord(record) {
     { ...record, confirmed: true }
   );
   if (record.formula !== plan.formula || !["awaitingRoll", "rolled"].includes(record.state))
-    throw new Error("Review the saved critical injury record.");
+    throw new Error(loc`Review the saved critical injury record.`);
   if (record.state === "awaitingRoll") return { plan, result: null };
   const result = criticalInjuryResult(plan, record.dieResult);
   let data;
   try {
     data = JSON.parse(record.rollJSON);
   } catch {
-    throw new Error("Review the saved original injury roll.");
+    throw new Error(loc`Review the saved original injury roll.`);
   }
   const [die, operator, damage] = data.terms ?? [];
   if (
@@ -130,7 +131,7 @@ export function validateCriticalInjuryRecord(record) {
     damage.number !== plan.damage ||
     JSON.stringify(record.result) !== JSON.stringify(result)
   )
-    throw new Error("The original injury roll and recorded result disagree.");
+    throw new Error(loc`The original injury roll and recorded result disagree.`);
   return { plan, result };
 }
 export function recoveredInjuryRollJSON(plan, dieResult) {

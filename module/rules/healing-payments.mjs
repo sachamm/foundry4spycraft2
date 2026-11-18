@@ -2,6 +2,7 @@ import { healingPlan } from "./health.mjs";
 import { actionDiceFundingContext } from "./bonus-pools.mjs";
 import { actionDieBenefitQuote } from "./benefit-payments.mjs";
 import { multipartActionDicePlan } from "./action-die-payments.mjs";
+import { loc } from "../i18n.mjs";
 /** One healing benefit; each contribution retains its own dietype and unrolled wound count. */
 export function mixedHealingQuote(
   actor,
@@ -9,7 +10,7 @@ export function mixedHealingQuote(
   context = {}
 ) {
   if (!Array.isArray(healingAllocations) || !healingAllocations.length || healingAllocations.length > 32)
-    throw new Error("Choose healing benefit contributions from valid sources.");
+    throw new Error(loc`Choose healing benefit contributions from valid sources.`);
   const groups = new Map();
   let vitalityDice = 0,
     woundDice = 0;
@@ -21,7 +22,7 @@ export function mixedHealingQuote(
       !Number.isSafeInteger(v + w) ||
       v + w < 1
     )
-      throw new Error("Choose whole nonnegative vitality/wound dice and at least one benefit die per source.");
+      throw new Error(loc`Choose whole nonnegative vitality/wound dice and at least one benefit die per source.`);
     const old = groups.get(bonusPoolId) ?? { bonusPoolId, vitalityDice: 0, woundDice: 0 };
     old.vitalityDice += v;
     old.woundDice += w;
@@ -30,7 +31,7 @@ export function mixedHealingQuote(
     woundDice += w;
   }
   const baseCost = vitalityDice + woundDice;
-  if (!Number.isSafeInteger(baseCost)) throw new Error("The healing cost is unsafe.");
+  if (!Number.isSafeInteger(baseCost)) throw new Error(loc`The healing cost is unsafe.`);
   const system = actor.actionDiceFundingSystem,
     fee = actionDieBenefitQuote(actor, {
       baseCost: 0,
@@ -70,7 +71,7 @@ export function mixedHealingQuote(
       explodeAt > die ||
       !Number.isFinite(bonus)
     )
-      throw new Error("Review the selected healing die type and modifiers.");
+      throw new Error(loc`Review the selected healing die type and modifiers.`);
     return { ...row, die, explodeAt, bonus, label: funding.label };
   });
   const terms = healingSources.flatMap(p =>

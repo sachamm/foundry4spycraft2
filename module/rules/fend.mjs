@@ -2,6 +2,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
 import { stanceMovementState, stanceMovementReviewPlan } from "./stance-movement.mjs";
+import { loc } from "../i18n.mjs";
 export const stableFend = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -30,7 +31,7 @@ export function fendTiming(actor) {
       activeCombatantId,
       worldTime: combat ? null : (globalThis.game?.time?.worldTime ?? actor.system.worldTime)
     };
-  if (!validFendTiming(p)) throw Error("Review the actual active participant or world time before declaring Fend.");
+  if (!validFendTiming(p)) throw Error(loc`Review the actual active participant or world time before declaring Fend.`);
   return p;
 }
 export function sameFendTiming(original, current) {
@@ -65,7 +66,7 @@ export function fendMovementPlan(
     !sameFendTiming(originalTiming, timing)
   )
     throw Error(
-      "Confirm Fend’s legal5ft move completed immediately after this actual Standard Attack, during the same active participant’s Count."
+      loc`Confirm Fend’s legal5ft move completed immediately after this actual Standard Attack, during the same active participant’s Count.`
     );
   const block = attributeActionBlock(system, { purelyMental: false }) || restraintActionBlock(system);
   if (
@@ -75,11 +76,11 @@ export function fendMovementPlan(
     system.postureMovement?.bonusStep === false ||
     system.wounds?.value < 0
   )
-    throw Error(block || "The current posture, condition or immobility prevents Fend movement.");
+    throw Error(block || loc`The current posture, condition or immobility prevents Fend movement.`);
   const state = stanceMovementState({ ...system, worldTime: timing.worldTime }, timing.combat);
   if (!Number.isFinite(totalFeet) || totalFeet !== state.feet + 5)
     throw Error(
-      "The new completed round total must add exactly5ft to its current recorded total; do not repeat the move."
+      loc`The new completed round total must add exactly5ft to its current recorded total; do not repeat the move.`
     );
   const record = stanceMovementReviewPlan(
     { ...system, worldTime: timing.worldTime },

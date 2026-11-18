@@ -15,6 +15,7 @@ import {
   surpriseRound
 } from "../../rules/gc/fluid-initiative.mjs";
 import { setConditionStatus } from "../../rules/condition-status.mjs";
+import { loc } from "../../i18n.mjs";
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
@@ -56,7 +57,7 @@ async function condition(actor, id, label) {
   try {
     await setConditionStatus(actor, id, true, { label });
   } catch (error) {
-    console.warn(`Spycraft 2.0 | ${label} not applied to ${actor.name}`, error);
+    console.warn(loc`Spycraft 2.0 | ${label} not applied to ${actor.name}`, error);
   }
 }
 
@@ -74,12 +75,12 @@ export function fluidCombatClass(Base) {
 
 /** Record one Table 5.2 event against a combatant for the current round; immediate ones change the Count now. */
 export async function recordFluidEvent(combatant, id, input = {}) {
-  if (!combatant?.isOwner) throw new Error("You do not control that combatant.");
+  if (!combatant?.isOwner) throw new Error(loc`You do not control that combatant.`);
   const combat = combatant.parent,
     round = combat.round,
     state = fluidForRound(combatant, round);
   const count = combatant.initiative;
-  if (!Number.isFinite(count)) throw new Error("Roll Initiative first.");
+  if (!Number.isFinite(count)) throw new Error(loc`Roll Initiative first.`);
   if (id === "delay") {
     const result = delay(count, Number(input.times) || 1, {
       initiativeBonus: bonusOf(combatant),
@@ -91,7 +92,7 @@ export async function recordFluidEvent(combatant, id, input = {}) {
   if (id === "press") {
     const result = press(count, { pressedThisRound: state.pressed });
     await combatant.update({ initiative: result.count, "flags.spycraft2.fluid": { ...state, pressed: true } });
-    return { count: result.count, note: "Gains 1 extra half action now; other actions happen at the new Count." };
+    return { count: result.count, note: loc`Gains 1 extra half action now; other actions happen at the new Count.` };
   }
   if (id === "ready") {
     const result = readyTrigger(count, Number(input.triggerCount));
@@ -112,9 +113,9 @@ export async function recordFluidEvent(combatant, id, input = {}) {
 
 /** Dialog: choose a combatant and an event. */
 export async function fluidEventDialog(combat = game.combat, preset = null) {
-  if (!combat?.started) return ui.notifications.warn("Start the combat first.");
+  if (!combat?.started) return ui.notifications.warn(loc`Start the combat first.`);
   const mine = combat.combatants.filter(combatant => combatant.isOwner);
-  if (!mine.length) return ui.notifications.warn("You control no combatant in this fight.");
+  if (!mine.length) return ui.notifications.warn(loc`You control no combatant in this fight.`);
   const rows = mine.map(combatant => {
     const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0);
     return [
@@ -130,15 +131,15 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     )
     .join("");
   const input = await ask(
-    "Fluid initiative — Table 5.2",
+    loc`Fluid initiative — Table 5.2`,
     `
-    <p>Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.</p>
-    <label>Combatant <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
-    <label>Event <select name="id">${eventOptions}</select></label>
-    <label>Times it applies (attacks, dice spent, damage points, Counts delayed) <input type="number" name="times" min="1" value="1" /></label>
-    <label>Rolled Count loss (Diversion only) <input type="number" name="amount" min="1" max="8" /></label>
-    <label>Weapon (proficiency penalty only) <input name="weapon" /></label>
-    <label>Count at which the Ready trigger occurred <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`
+    <p>${loc`Recorded modifiers apply when the round ends, limited to ±10 in a round. Delay, Press and a triggered Ready change the Count at once.`}</p>
+    <label>${loc`Combatant`} <select name="combatantId">${options(rows, preset?.id ?? combat.combatant?.id)}</select></label>
+    <label>${loc`Event`} <select name="id">${eventOptions}</select></label>
+    <label>${loc`Times it applies (attacks, dice spent, damage points, Counts delayed)`} <input type="number" name="times" min="1" value="1" /></label>
+    <label>${loc`Rolled Count loss (Diversion only)`} <input type="number" name="amount" min="1" max="8" /></label>
+    <label>${loc`Weapon (proficiency penalty only)`} <input name="weapon" /></label>
+    <label>${loc`Count at which the Ready trigger occurred`} <input type="number" name="triggerCount" value="${combat.combatant?.initiative ?? 0}" /></label>`
   );
   if (!input) return null;
   const combatant = combat.combatants.get(input.combatantId);
@@ -146,7 +147,7 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     const result = await recordFluidEvent(combatant, input.id, input);
     const label = FLUID_EVENTS.find(event => event.id === input.id).label;
     await say(
-      `${esc(combatant.name)}: ${esc(label)} — ${result.pending === undefined ? `Initiative Count is now <b>${result.count}</b>.` : `${result.pending > 0 ? "+" : ""}${result.pending} pending at the end of the round.`}${result.note ? ` ${esc(result.note)}` : ""}`
+      `${esc(combatant.name)}: ${esc(label)} — ${result.pending === undefined ? `${loc`Initiative Count is now`} <b>${result.count}</b>.` : loc`${result.pending > 0 ? "+" : ""}${result.pending} pending at the end of the round.`}${result.note ? ` ${esc(result.note)}` : ""}`
     );
     return result;
   } catch (error) {
@@ -177,10 +178,10 @@ export async function applyEndOfRound(combat, endedRound) {
       await condition(combatant.actor, "flat-footed", "Flat-footed");
     }
     lines.push(
-      `${esc(combatant.name)}: ${combatant.initiative}${pieces.length ? ` (${esc(pieces.join(", "))}${result.capped ? "; limited to ±10" : ""})` : ""}${result.reeling ? " — <b>reeling and flat-footed</b>: Count was 0 or less, +20" : ""}${result.mustPress ? " — <b>must Press</b> as the first action (Count 50+)" : ""}`
+      `${esc(combatant.name)}: ${combatant.initiative}${pieces.length ? ` (${esc(pieces.join(", "))}${result.capped ? loc`; limited to ±10` : ""})` : ""}${result.reeling ? ` — <b>${loc`reeling and flat-footed`}</b>${loc`: Count was 0 or less, +20`}` : ""}${result.mustPress ? ` — <b>${loc`must Press`}</b> ${loc`as the first action (Count 50+)`}` : ""}`
     );
   }
-  if (lines.length) await say(`<b>Fluid initiative — end of round ${endedRound}</b><br>${lines.join("<br>")}`);
+  if (lines.length) await say(`<b>${loc`Fluid initiative — end of round ${endedRound}`}</b><br>${lines.join("<br>")}`);
   return lines;
 }
 
@@ -212,7 +213,7 @@ export async function rollTiebreaks(combat = game.combat) {
 /** One Initiative check for a set of NPCs (p.323): by default every unrolled non-player combatant, grouped by actor. */
 export async function rollGroupInitiative(combat = game.combat, { single = false } = {}) {
   if (!game.user.isGM) return null;
-  if (!combat) return ui.notifications.warn("There is no active combat.");
+  if (!combat) return ui.notifications.warn(loc`There is no active combat.`);
   const pending = combat.combatants.filter(
     combatant => !combatant.hasPlayerOwner && combatant.initiative === null && combatant.actor
   );
@@ -231,29 +232,29 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
     for (const combatant of members) await combatant.update({ initiative: roll.total + bonusOf(combatant) });
     lines.push(`${esc(members.map(member => member.name).join(", "))}: d20 ${roll.total}`);
   }
-  if (lines.length) await say(`<b>Group Initiative</b><br>${lines.join("<br>")}`, { whisper: true });
+  if (lines.length) await say(`<b>${loc`Group Initiative`}</b><br>${lines.join("<br>")}`, { whisper: true });
   return lines.length;
 }
 
 /** Surprise round (p.323): enter each group's opposed result; winners are flagged and announced. */
 export async function surpriseRoundDialog(combat = game.combat) {
   if (!game.user.isGM) return null;
-  if (!combat) return ui.notifications.warn("Create the combat first.");
+  if (!combat) return ui.notifications.warn(loc`Create the combat first.`);
   const input = await ask(
-    "Surprise round — p.323",
+    loc`Surprise round — p.323`,
     `
-    <p>Enter each side's opposed team Blend/Stealth or Sneak/Hide result. The winners get a single free, half or full action in Initiative order (no splitting a full action, one free action at most).</p>
-    <label>Awareness <select name="aware">${options(
+    <p>${loc`Enter each side's opposed team Blend/Stealth or Sneak/Hide result. The winners get a single free, half or full action in Initiative order (no splitting a full action, one free action at most).`}</p>
+    <label>${loc`Awareness`} <select name="aware">${options(
       [
         ["none", "Neither side knows the other is there"],
         ["some", "One group is concealing itself"],
-        ["all", "Everyone is aware (no surprise round)"]
+        ["all", loc`Everyone is aware (no surprise round)`]
       ],
       "none"
     )}</select></label>
-    <label>Player characters’ result <input type="number" name="players" value="0" /></label>
-    <label>Opponents’ result <input type="number" name="opponents" value="0" /></label>
-    <label>Concealing group <select name="actingGroup">${options(
+    <label>${loc`Player characters’ result`} <input type="number" name="players" value="0" /></label>
+    <label>${loc`Opponents’ result`} <input type="number" name="opponents" value="0" /></label>
+    <label>${loc`Concealing group`} <select name="actingGroup">${options(
       [
         ["players", "Player characters"],
         ["opponents", "Opponents"]
@@ -280,8 +281,8 @@ export async function surpriseRoundDialog(combat = game.combat) {
   });
   await say(
     result.occurs
-      ? `<b>Surprise round:</b> ${result.winners[0] === "players" ? "the player characters" : "the opponents"} act — 1 free, half or full action each, in Initiative order. Everyone else waits for round 1.`
-      : `<b>No surprise round.</b> ${esc(result.reason)}`
+      ? `<b>${loc`Surprise round:`}</b> ${loc`${result.winners[0] === "players" ? "the player characters" : "the opponents"} act — 1 free, half or full action each, in Initiative order. Everyone else waits for round 1.`}`
+      : `<b>${loc`No surprise round.`}</b> ${esc(result.reason)}`
   );
   return result;
 }
@@ -306,7 +307,7 @@ export function installFluidInitiativeHooks() {
       }
       ui.combat?.render();
     } catch (error) {
-      ui.notifications.warn(`Fluid initiative needs review: ${error.message}`);
+      ui.notifications.warn(loc`Fluid initiative needs review: ${error.message}`);
     }
   });
   Hooks.on("updateCombatant", (combatant, changed) => {

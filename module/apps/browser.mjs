@@ -1,5 +1,6 @@
 import { describe } from "../rules/prerequisites.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
+import { loc } from "../i18n.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -180,12 +181,12 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
         case "gear":
           if (s.kitGrade) {
             group = `kit:${s.kitType}`;
-            groupLabel = `Kit — ${s.kitType}`;
+            groupLabel = loc`Kit — ${s.kitType}`;
             extra = `Grade ${s.kitGrade} · Caliber ${cfg.calibers[s.caliber]} · ${s.kitSize} · ${s.kitNonPortable ? "Non-portable" : s.weight + " lbs."}`;
           } else {
             const upgrade = /^Table 4\.2[89]$/.test(s.sourceTable ?? "");
             group = upgrade ? "vehicleUpgrade" : s.gearCategory || "other";
-            groupLabel = upgrade ? "Vehicle upgrades" : (cfg.gearPicks[s.gearCategory] ?? "Other gear");
+            groupLabel = upgrade ? loc`Vehicle upgrades` : (cfg.gearPicks[s.gearCategory] ?? loc`Other gear`);
             extra = [
               s.standingOnly
                 ? `Reputation/Net Worth${s.standingCost ? ` ${s.standingCost}` : ""}`
@@ -219,7 +220,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
         }
         case "armor":
           group = String(s.caliber);
-          groupLabel = `Caliber ${cfg.calibers[s.caliber]}`;
+          groupLabel = loc`Caliber ${cfg.calibers[s.caliber]}`;
           extra = `DR ${s.damageReduction}/${s.damageReductionSubdual} · Def ${s.defensePenalty} · ACP ${s.armorCheck}`;
           break;
       }

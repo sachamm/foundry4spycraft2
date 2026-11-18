@@ -1,4 +1,5 @@
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 /** p.361 paired ordinary/counter outcomes. Weapon TRP variants remain separate. */
 export function tripOutcomePlan(
   a,
@@ -36,7 +37,7 @@ export function tripOutcomePlan(
     q.opponentUuid !== attackerUuid
   )
     throw Error(
-      "Pair actual attacking and defending ordinary Trip receipts with reciprocal recorded character identities; name-only responses require manual adjudication."
+      loc`Pair actual attacking and defending ordinary Trip receipts with reciprocal recorded character identities; name-only responses require manual adjudication.`
     );
   if (
     counter &&
@@ -46,7 +47,7 @@ export function tripOutcomePlan(
       p.counterTrip.targetUuid !== defenderUuid ||
       p.counterTrip.activeCombatantId !== q.combat?.combatantId)
   )
-    throw Error("The counter-Trip must retain its actual reciprocal parent participants and one-step chain.");
+    throw Error(loc`The counter-Trip must retain its actual reciprocal parent participants and one-step chain.`);
   for (const c of [a, d])
     if (
       c.resolved !== true ||
@@ -56,17 +57,17 @@ export function tripOutcomePlan(
       !Number.isFinite(c.effectiveTotal) ||
       !Number.isFinite(c.rollData?.total)
     )
-      throw Error("Confirm and finish both adopted Trip checks, including boosts and critical activation.");
+      throw Error(loc`Confirm and finish both adopted Trip checks, including boosts and critical activation.`);
   for (const c of [a, d])
     if ((c.criticalSuccess && c.successConfirmed !== true) || (c.criticalFailure && c.successConfirmed !== false))
-      throw Error("The activated critical Trip must agree with its confirmed winner or loser.");
+      throw Error(loc`The activated critical Trip must agree with its confirmed winner or loser.`);
   const criticalFinal = a.successConfirmed === true && (a.criticalSuccess === true || d.criticalFailure === true),
     criticalCounter = a.successConfirmed === false && (d.criticalSuccess === true || a.criticalFailure === true);
   if ((criticalFinal && allowCriticalAttackerWin !== true) || (criticalCounter && allowCriticalCounter !== true))
     throw Error(
-      "This critical Trip needs its final-attack or counter-Trip sequence adjudicated separately; ordinary settlement is unavailable."
+      loc`This critical Trip needs its final-attack or counter-Trip sequence adjudicated separately; ordinary settlement is unavailable.`
     );
-  if (a.successConfirmed === d.successConfirmed) throw Error("The opposed Trip must have one winner and one loser.");
+  if (a.successConfirmed === d.successConfirmed) throw Error(loc`The opposed Trip must have one winner and one loser.`);
   if (
     !validOwnCountClock(p.combat) ||
     !validOwnCountClock(q.combat) ||
@@ -82,7 +83,7 @@ export function tripOutcomePlan(
     combat.round !== p.combat.round ||
     combat.turn !== p.combat.turn
   )
-    throw Error("Settle the ordinary Trip during the actual original round and attacking Initiative Count.");
+    throw Error(loc`Settle the ordinary Trip during the actual original round and attacking Initiative Count.`);
   if (
     p.adjacent !== true ||
     q.adjacent !== true ||
@@ -98,14 +99,14 @@ export function tripOutcomePlan(
     p.sizeBonus !== 4 * Math.max(0, p.sizeDifference) ||
     q.sizeBonus !== 4 * Math.max(0, q.sizeDifference)
   )
-    throw Error("The recorded participants, adjacency or reciprocal Trip Size declarations disagree.");
+    throw Error(loc`The recorded participants, adjacency or reciprocal Trip Size declarations disagree.`);
   const delta = a.effectiveTotal - d.effectiveTotal,
     bonus = a.rollData.total - d.rollData.total,
     expected = delta ? delta > 0 : bonus ? bonus > 0 : null;
   if (expected !== null && a.successConfirmed !== expected)
-    throw Error("The declared Trip winner disagrees with the opposed totals or higher skill bonus on a tie.");
+    throw Error(loc`The declared Trip winner disagrees with the opposed totals or higher skill bonus on a tie.`);
   if (expected === null && tieResolvedConfirmed !== true)
-    throw Error("Equal totals and skill bonuses require confirmation of the GC’s p.91 random 1d20 tie-break.");
+    throw Error(loc`Equal totals and skill bonuses require confirmation of the GC’s p.91 random 1d20 tie-break.`);
   return {
     version: counter ? 4 : criticalFinal ? 2 : criticalCounter ? 3 : 1,
     ...(counter

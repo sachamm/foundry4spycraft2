@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /**
  * Mark of Conflict / Strife / Turmoil (Chance feats, p.190).
  *
@@ -35,7 +36,7 @@ export function markDamagePlan(system = {}, weapon = {}) {
     source,
     category,
     bonus: source ? 1 : 0,
-    note: source ? `${source}: +1 ${MARKS[source].label} damage.` : "",
+    note: source ? loc`${source}: +1 ${MARKS[source].label} damage.` : "",
     drawback: source ? markDrawback(source) : ""
   };
 }
@@ -53,5 +54,5 @@ export function markDrawback(name) {
   const tree = { rangedCombat: "Ranged Combat", unarmedCombat: "Unarmed Combat", meleeCombat: "Melee Combat" }[
     mark.tree
   ];
-  return `${name}: starting disposition of any character with 2 or more ${tree} feats worsens by 2 grades (GC applies).`;
+  return loc`${name}: starting disposition of any character with 2 or more ${tree} feats worsens by 2 grades (GC applies).`;
 }

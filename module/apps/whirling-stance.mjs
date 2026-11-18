@@ -3,6 +3,7 @@ import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { characterCareerLevel, whirlingStancePlan } from "../rules/whirling-stance.mjs";
 import { combatStanceState } from "../rules/combat-stance.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const stable = v =>
   JSON.stringify(v, (_k, x) =>
     x && typeof x === "object" && !Array.isArray(x)
@@ -14,7 +15,7 @@ export function whirlingAttackProof(actor, input = {}) {
   const targetUuid = input.characterTarget?.actorUuid || input.targetActorUuid;
   if (!targetUuid) return null;
   const target = attackCharacterTargetChoices().find(a => a.uuid === targetUuid && a.uuid !== actor.uuid);
-  if (!target) throw Error("Choose the current observed flanking target.");
+  if (!target) throw Error(loc`Choose the current observed flanking target.`);
   const attackerLevel = characterCareerLevel(actor.type, actor.system),
     defender = {
       ...target.system,
@@ -34,7 +35,7 @@ export function validateWhirlingAttackProof(
     attackContext.targetFlanked !== true ||
     proof.targetUuid !== (attackContext.characterTarget?.actorUuid || attackContext.targetActorUuid)
   )
-    throw Error("The Whirling flanking proof belongs to its actual attack and target.");
+    throw Error(loc`The Whirling flanking proof belongs to its actual attack and target.`);
   if (rerollOf) {
     const original = globalThis.fromUuidSync?.(rerollOf),
       c = original?.flags?.spycraft2;
@@ -45,7 +46,7 @@ export function validateWhirlingAttackProof(
       c.superseded ||
       stable(checkKind === "attack" ? c.attackContext?.flanking?.whirling : c.sneakAttack?.whirling) !== stable(proof)
     )
-      throw Error("Use the original owned unresolved flanking attack for its replacement.");
+      throw Error(loc`Use the original owned unresolved flanking attack for its replacement.`);
     return;
   }
   const current = whirlingAttackProof(actor, attackContext);
@@ -53,16 +54,18 @@ export function validateWhirlingAttackProof(
     stable(current) !== stable(proof) ||
     (current?.prevented && (checkKind === "attack" || sneakAttack?.targetFlanked !== false))
   )
-    throw Error("The actual target’s Whirling Stance or the characters’ career levels changed. Review flanking again.");
+    throw Error(
+      loc`The actual target’s Whirling Stance or the characters’ career levels changed. Review flanking again.`
+    );
 }
 export function whirlingDefenseContent(actor) {
   const esc = foundry.utils.escapeHTML;
-  return `<details><summary>Whirling Stance — flanking attacker</summary><p>While in Whirling Stance, characters with a lower career level cannot flank you. For this incoming attack, choose its actual attacker; the GC still confirms all ordinary flanking geometry and other participants. NPC career level uses current Threat Level, not its Tier-adjusted statistics (pp.179,452).</p><label>Actual attacker <select name="whirlingAttackerUuid"><option value="">Unrecorded attacker; GC level below</option>${attackCharacterTargetChoices()
+  return `<details><summary>${loc`Whirling Stance — flanking attacker`}</summary><p>${loc`While in Whirling Stance, characters with a lower career level cannot flank you. For this incoming attack, choose its actual attacker; the GC still confirms all ordinary flanking geometry and other participants. NPC career level uses current Threat Level, not its Tier-adjusted statistics (pp.179,452).`}</p><label>${loc`Actual attacker`} <select name="whirlingAttackerUuid"><option value="">${loc`Unrecorded attacker; GC level below`}</option>${attackCharacterTargetChoices()
     .filter(a => a.uuid !== actor.uuid)
     .map(a => '<option value="' + esc(a.uuid) + '">' + esc(a.name) + "</option>")
     .join(
       ""
-    )}</select></label><label>Career level of unrecorded flanking attacker <input name="whirlingAttackerLevel" type="number" min="1" max="20" step="1" /></label><label><input name="whirlingLevelConfirmed" type="checkbox" /> The GC confirms the unrecorded attacker’s actual career level</label></details>`;
+    )}</select></label><label>${loc`Career level of unrecorded flanking attacker`} <input name="whirlingAttackerLevel" type="number" min="1" max="20" step="1" /></label><label><input name="whirlingLevelConfirmed" type="checkbox" /> ${loc`The GC confirms the unrecorded attacker’s actual career level`}</label></details>`;
 }
 export function whirlingDefensePreview(actor, input = {}) {
   const active = combatStanceState(actor.system)?.key === "whirling",
@@ -74,7 +77,7 @@ export function whirlingDefensePreview(actor, input = {}) {
       attacker = attackCharacterTargetChoices().find(
         a => a.uuid === input.whirlingAttackerUuid && a.uuid !== actor.uuid
       );
-      if (!attacker) throw Error("Choose the actual observed flanking attacker.");
+      if (!attacker) throw Error(loc`Choose the actual observed flanking attacker.`);
       level = characterCareerLevel(attacker.type, attacker.system);
     } else {
       level =
@@ -84,7 +87,7 @@ export function whirlingDefensePreview(actor, input = {}) {
             ? Number(input.whirlingAttackerLevel)
             : null;
       if (input.whirlingLevelConfirmed !== true)
-        throw Error("The GC must confirm an unrecorded flanking attacker’s actual career level.");
+        throw Error(loc`The GC must confirm an unrecorded flanking attacker’s actual career level.`);
     }
   }
   return {
@@ -96,7 +99,7 @@ export function whirlingDefensePreview(actor, input = {}) {
 export function validateWhirlingDefensePreview(actor, input, proof) {
   if (stable(whirlingDefensePreview(actor, input)) !== stable(proof))
     throw Error(
-      "Whirling Stance, its qualified feat or the actual flanking attacker’s career level changed. Reopen the Defense preview."
+      loc`Whirling Stance, its qualified feat or the actual flanking attacker’s career level changed. Reopen the Defense preview.`
     );
 }
 export function validateWhirlingIncomingIdentity(proof, otherAttackerUuids = []) {
@@ -104,7 +107,7 @@ export function validateWhirlingIncomingIdentity(proof, otherAttackerUuids = [])
   for (const uuid of otherAttackerUuids.filter(Boolean))
     if (uuid !== proof.attackerUuid)
       throw Error(
-        "Whirling Stance, cover and invisibility must refer to the same actual incoming attacker; select that observed character for its career level."
+        loc`Whirling Stance, cover and invisibility must refer to the same actual incoming attacker; select that observed character for its career level.`
       );
 }
 

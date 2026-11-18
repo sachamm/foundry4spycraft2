@@ -45,37 +45,38 @@ import {
 } from "../../rules/outcomes.mjs";
 import { rerollEligibility } from "../../rules/limited-uses.mjs";
 import { actionDieBoostPlan, actionDieBoostResult, generousBoostPlan } from "../../rules/action-dice.mjs";
+import { loc } from "../../i18n.mjs";
 
 export const ActorOutcomes = Base =>
   class ActorOutcomes extends Base {
     /** Spend action dice on a recorded result, preserving the original roll and its cap. */
     boostCheck(message, options = {}) {
       const work = async () => {
-        if (!this.isOwner) return ui.notifications.warn("You must own the actor spending action dice.");
+        if (!this.isOwner) return ui.notifications.warn(loc`You must own the actor spending action dice.`);
         let check = message.flags?.spycraft2;
         if (!check || check.actorUuid !== this.uuid)
-          return ui.notifications.warn("Choose a recorded roll made by this actor.");
-        if (message.blind && !game.user?.isGM) return ui.notifications.warn("The GC resolves secret results.");
+          return ui.notifications.warn(loc`Choose a recorded roll made by this actor.`);
+        if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
         const expected = rollEvidence(check);
         const currentShaken = shakenRules(this.actionDiceFundingSystem);
         if (currentShaken.needsReview || currentShaken.spendingForbidden)
           return ui.notifications.warn(
             currentShaken.needsReview
-              ? "Review the current Shaken sources before boosting."
-              : "Shaken IV: no action dice may be spent at all (p.342)."
+              ? loc`Review the current Shaken sources before boosting.`
+              : loc`Shaken IV: no action dice may be spent at all (p.342).`
           );
         let input = options;
         if (!Object.keys(input).length || input.askOptions) {
           const pools = availableCheckBonusPools(this.system, message, this.usagePeriods),
             esc = foundry.utils.escapeHTML;
           input = await systemDialog.input({
-            window: { title: "Boost result before its outcome is described" },
+            window: { title: loc`Boost result before its outcome is described` },
             rejectClose: false,
             content: `<div class="spycraft2-roll-options">
-          <label>Funding <select name="bonusPoolId"><option value="" ${!input.bonusPoolId ? "selected" : ""} ${check.actionDiceAllowed === false ? "disabled" : ""}>Ordinary action dice</option>${pools.map(pool => `<option value="${pool.id}" ${input.bonusPoolId === pool.id ? "selected" : ""}>${esc(pool.label)}: ${pool.remaining} d${pool.die}${pool.unrestricted ? ", until scene end" : ", this check only"}</option>`).join("")}</select></label>
+          <label>${loc`Funding`} <select name="bonusPoolId"><option value="" ${!input.bonusPoolId ? "selected" : ""} ${check.actionDiceAllowed === false ? "disabled" : ""}>${loc`Ordinary action dice`}</option>${pools.map(pool => `<option value="${pool.id}" ${input.bonusPoolId === pool.id ? "selected" : ""}>${esc(pool.label)}: ${pool.remaining} d${pool.die}${pool.unrestricted ? ", until scene end" : ", this check only"}</option>`).join("")}</select></label>
           ${
             currentShaken.extraDice
-              ? `<p>Shaken surcharge: ${Math.max(0, currentShaken.extraDice - paidBoostSurcharge(this, message))} extra action dice for this check. Surcharge dice do not add to the result; later boosts of this check pay only any remaining surcharge.</p><label>Surcharge funding <select name="surchargeBonusPoolId"><option value="same">Boost source if unrestricted, otherwise ordinary dice</option><option value="">Ordinary action dice</option>${unrestrictedBonusPools(
+              ? `<p>${loc`Shaken surcharge: ${Math.max(0, currentShaken.extraDice - paidBoostSurcharge(this, message))} extra action dice for this check. Surcharge dice do not add to the result; later boosts of this check pay only any remaining surcharge.`}</p><label>${loc`Surcharge funding`} <select name="surchargeBonusPoolId"><option value="same">${loc`Boost source if unrestricted, otherwise ordinary dice`}</option><option value="">${loc`Ordinary action dice`}</option>${unrestrictedBonusPools(
                   this.actionDiceFundingSystem,
                   this.usagePeriods
                 )
@@ -86,26 +87,25 @@ export const ActorOutcomes = Base =>
                   )}</select></label>${currentShaken.extraDice > paidBoostSurcharge(this, message) ? splitSurchargeFundingControl(this) : ""}`
               : ""
           }
-          <label>Boosting dice (excluding surcharge) <input type="number" name="count" min="1" value="1" /></label>
-          <label><input type="checkbox" name="openingRound" /> Surprise round or first standard combat round</label>
-          ${errorDecisionPending(check) ? `<label><input type="checkbox" name="errorDeclined" /> Opponents declined to activate this error as a critical failure</label>` : ""}
-          <label><input type="checkbox" name="calculating" /> Use Calculating if replacing the lowest action die improves the result</label></div>`
+          <label>${loc`Boosting dice (excluding surcharge)`} <input type="number" name="count" min="1" value="1" /></label>
+          <label><input type="checkbox" name="openingRound" /> ${loc`Surprise round or first standard combat round`}</label>
+          ${errorDecisionPending(check) ? `<label><input type="checkbox" name="errorDeclined" /> ${loc`Opponents declined to activate this error as a critical failure`}</label>` : ""}
+          <label><input type="checkbox" name="calculating" /> ${loc`Use Calculating if replacing the lowest action die improves the result`}</label></div>`
           });
           if (!input) return null;
         }
         check = message.flags?.spycraft2;
         if (input.bonusPoolId && errorDecisionPending(check) && input.errorDeclined === undefined) {
           const decision = await systemDialog.input({
-            window: { title: "Decide the error before spending the bonus" },
+            window: { title: loc`Decide the error before spending the bonus` },
             rejectClose: false,
-            content:
-              '<p>Opponents decide whether to activate this error first. Close this dialog to resolve a critical failure.</p><label><input type="checkbox" name="errorDeclined" /> Opponents declined to activate the error</label>'
+            content: `<p>${loc`Opponents decide whether to activate this error first. Close this dialog to resolve a critical failure.`}</p><label><input type="checkbox" name="errorDeclined" /> ${loc`Opponents declined to activate the error`}</label>`
           });
           if (!decision) return null;
           input = { ...input, errorDeclined: !!decision.errorDeclined };
         }
         if (rollEvidence(check) !== expected)
-          throw new Error("This result changed while the boost was being prepared. Review the current result.");
+          throw new Error(loc`This result changed while the boost was being prepared. Review the current result.`);
         const plan = input.bonusPoolId
           ? checkBonusBoostPlan(this.system, message, {
               ...input,
@@ -121,9 +121,9 @@ export const ActorOutcomes = Base =>
             : null;
         const roll = await new Roll(plan.formula).evaluate();
         if (shakenRules(this.actionDiceFundingSystem).grade !== currentShaken.grade)
-          throw new Error("The Shaken grade changed while preparing this boost. Review it again.");
+          throw new Error(loc`The Shaken grade changed while preparing this boost. Review it again.`);
         if (rollEvidence(message.flags?.spycraft2) !== expected)
-          throw new Error("The result changed during the action-die roll. Review it before retrying.");
+          throw new Error(loc`The result changed during the action-die roll. Review it before retrying.`);
         const fresh = plan.bonusPoolId
           ? checkBonusBoostPlan(this.actionDiceFundingSystem, message, {
               ...input,
@@ -140,7 +140,7 @@ export const ActorOutcomes = Base =>
             (fresh.pool?.remaining !== plan.pool.remaining ||
               actionDicePoolFingerprint(fresh.pool) !== actionDicePoolFingerprint(plan.pool)))
         )
-          throw new Error(fresh.reason || "The action-die source changed before payment. Review the current grant.");
+          throw new Error(fresh.reason || loc`The action-die source changed before payment. Review the current grant.`);
         if (boostQuote)
           return applyPaidCheckBoost(this, message, { check, expected, input, plan, roll, quote: boostQuote });
         const result = actionDieBoostResult(
@@ -159,7 +159,7 @@ export const ActorOutcomes = Base =>
             afterBalance: balance - plan.count,
             paymentPath,
             die: plan.die,
-            label: plan.pool?.label ?? "Ordinary action dice",
+            label: plan.pool?.label ?? loc`Ordinary action dice`,
             poolFingerprint: plan.bonusPoolId ? actionDicePoolFingerprint(plan.pool) : null
           },
           paymentReceiptId =
@@ -177,7 +177,7 @@ export const ActorOutcomes = Base =>
               await this.refundActionDicePayment(payment);
             } catch (rollback) {
               await this.markActionDiceSettlementReview(payment, rollback, reviewDetails);
-              throw new AggregateError([error, rollback], "The interrupted boost payment needs GC review.");
+              throw new AggregateError([error, rollback], loc`The interrupted boost payment needs GC review.`);
             }
           else if (observed !== balance) await this.markActionDiceSettlementReview(payment, error, reviewDetails);
           throw error;
@@ -224,13 +224,13 @@ export const ActorOutcomes = Base =>
               await restoreWeapon?.();
             } catch (rollback) {
               await this.markActionDiceSettlementReview(payment, rollback, reviewDetails);
-              throw new AggregateError([error, rollback], "The boosted effect needs GC review.");
+              throw new AggregateError([error, rollback], loc`The boosted effect needs GC review.`);
             }
             try {
               await this.refundActionDicePayment(payment);
             } catch (rollback) {
               await this.markActionDiceSettlementReview(payment, rollback, reviewDetails);
-              throw new AggregateError([error, rollback], "The selected boost balance needs GC review.");
+              throw new AggregateError([error, rollback], loc`The selected boost balance needs GC review.`);
             }
             throw error;
           }
@@ -239,11 +239,11 @@ export const ActorOutcomes = Base =>
         try {
           await roll.toMessage({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            flavor: `Spent ${plan.count} ${plan.bonusPoolId ? "bonus " : ""}action ${plan.count === 1 ? "die" : "dice"}${plan.bonusPoolId ? ` from ${foundry.utils.escapeHTML(plan.pool.label)}` : ""}; rolled ${plan.rolls}. Added +${result.added} after modifiers${result.replaced ? " and Calculating" : ""}.`
+            flavor: loc`Spent ${plan.count} ${plan.bonusPoolId ? "bonus " : ""}action ${plan.count === 1 ? "die" : "dice"}${plan.bonusPoolId ? ` from ${foundry.utils.escapeHTML(plan.pool.label)}` : ""}; rolled ${plan.rolls}. Added +${result.added} after modifiers${result.replaced ? loc` and Calculating` : ""}.`
           });
         } catch (error) {
           ui.notifications.warn(
-            "The boost was applied to the original result, but its supplementary chat message could not be posted. The dice remain spent; check the original result before retrying."
+            loc`The boost was applied to the original result, but its supplementary chat message could not be posted. The dice remain spent; check the original result before retrying.`
           );
         }
         return result;
@@ -253,12 +253,12 @@ export const ActorOutcomes = Base =>
 
     async boostWithGenerous(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn("The GC resolves secret results.");
+      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2),
         expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem)),
         expectedPaid = paidBoostSurcharge(this, message);
       if (getActionDieSettlementReview(this).needsReview)
-        return ui.notifications.warn("Resolve this teammate’s interrupted payment before Generous.");
+        return ui.notifications.warn(loc`Resolve this teammate’s interrupted payment before Generous.`);
       let input = options;
       if (!Object.keys(input).length) {
         const donors = [...(game.actors ?? [])].filter(
@@ -276,40 +276,49 @@ export const ActorOutcomes = Base =>
           )
           .join("");
         input = await systemDialog.input({
-          window: { title: "Generous: one teammate action die" },
+          window: { title: loc`Generous: one teammate action die` },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options">
-        ${shakenRules(this.actionDiceFundingSystem).extraDice ? `<p>The receiving teammate must pay ${Math.max(0, shakenRules(this.actionDiceFundingSystem).extraDice - expectedPaid)} remaining Shaken surcharge dice. Only the Pointman's one die is rolled; the fee is once per check.</p>${this.actionDiceFundingControl().replace('name="bonusPoolId"', 'name="surchargeBonusPoolId"').replace("<label>Funding", "<label>Teammate surcharge funding")}${shakenRules(this.actionDiceFundingSystem).extraDice > expectedPaid ? splitSurchargeFundingControl(this) : ""}` : ""}
-        <label>Donor <select name="donorId">${donors.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
-        <label>Funding from the donor <select name="funding"><option value="">Ordinary action dice</option>${pools}</select></label>
-        <label><input type="checkbox" name="teammate" /> Donor is a teammate</label>
-        <label><input type="checkbox" name="perceivedAtRoll" /> The acting character could see or hear the donor when this roll was made</label>
-        ${errorDecisionPending(message.flags.spycraft2) ? '<label><input type="checkbox" name="errorDeclined" /> Opponents declined error activation before this boost</label>' : ""}
-        <label><input type="checkbox" name="calculating" /> Use the donor’s Calculating if applicable</label>
-        <p>Only one Generous die may benefit a roll. The donor uses their own die and modifiers. The GC can resolve donations from other players’ actors.</p></div>`
+        ${
+          shakenRules(this.actionDiceFundingSystem).extraDice
+            ? `<p>${loc`The receiving teammate must pay ${Math.max(0, shakenRules(this.actionDiceFundingSystem).extraDice - expectedPaid)} remaining Shaken surcharge dice. Only the Pointman's one die is rolled; the fee is once per check.`}</p>${this.actionDiceFundingControl()
+                .replace('name="bonusPoolId"', 'name="surchargeBonusPoolId"')
+                .replace(
+                  `<label>${loc`Funding`}`,
+                  `<label>${loc`Teammate surcharge funding`}`
+                )}${shakenRules(this.actionDiceFundingSystem).extraDice > expectedPaid ? splitSurchargeFundingControl(this) : ""}`
+            : ""
+        }
+        <label>${loc`Donor`} <select name="donorId">${donors.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
+        <label>${loc`Funding from the donor`} <select name="funding"><option value="">${loc`Ordinary action dice`}</option>${pools}</select></label>
+        <label><input type="checkbox" name="teammate" /> ${loc`Donor is a teammate`}</label>
+        <label><input type="checkbox" name="perceivedAtRoll" /> ${loc`The acting character could see or hear the donor when this roll was made`}</label>
+        ${errorDecisionPending(message.flags.spycraft2) ? `<label><input type="checkbox" name="errorDeclined" /> ${loc`Opponents declined error activation before this boost`}</label>` : ""}
+        <label><input type="checkbox" name="calculating" /> ${loc`Use the donor’s Calculating if applicable`}</label>
+        <p>${loc`Only one Generous die may benefit a roll. The donor uses their own die and modifiers. The GC can resolve donations from other players’ actors.`}</p></div>`
         });
         if (!input) return null;
       }
       const donor = input.donor ?? game.actors?.get(input.donorId);
       if (donor?.type !== "agent" || !donor.isOwner)
-        return ui.notifications.warn("Choose an owned donor or ask the GC to resolve the donation.");
+        return ui.notifications.warn(loc`Choose an owned donor or ask the GC to resolve the donation.`);
       let bonusPoolId = input.bonusPoolId ?? "";
       if (input.funding) {
         const [uuid, id, ...extra] = String(input.funding).split("|");
         if (uuid !== donor.uuid || !id || extra.length)
-          return ui.notifications.warn("Choose funding belonging to the selected donor.");
+          return ui.notifications.warn(loc`Choose funding belonging to the selected donor.`);
         bonusPoolId = id;
       }
       const work = async () => {
         if (rollEvidence(message.flags.spycraft2) !== expected)
           return ui.notifications.warn(
-            "This result changed while Generous was being prepared. Review the current result."
+            loc`This result changed while Generous was being prepared. Review the current result.`
           );
         if (
           JSON.stringify(shakenRules(this.actionDiceFundingSystem)) !== expectedShaken ||
           paidBoostSurcharge(this, message) !== expectedPaid
         )
-          throw new Error("The teammate’s condition or previously paid surcharge changed. Confirm Generous again.");
+          throw new Error(loc`The teammate’s condition or previously paid surcharge changed. Confirm Generous again.`);
         let surcharge;
         try {
           surcharge = generousSurchargeQuote(this, message, {
@@ -344,10 +353,10 @@ export const ActorOutcomes = Base =>
                 )
               )
                 throw new Error(
-                  "The receiving teammate’s condition or surcharge source changed during the donor roll."
+                  loc`The receiving teammate’s condition or surcharge source changed during the donor roll.`
                 );
               if (rollEvidence(message.flags.spycraft2) !== expected)
-                throw new Error("The target result changed during the donor roll. Review it before retrying.");
+                throw new Error(loc`The target result changed during the donor roll. Review it before retrying.`);
               let currentFunding = {
                 ...donor.actionDiceFundingSystem,
                 actionDice: { ...donor.system.actionDice, value: 1 }
@@ -355,7 +364,7 @@ export const ActorOutcomes = Base =>
               if (bonusPoolId) {
                 const pool = donor.system.bonusActionDice?.[bonusPoolId];
                 if (actionDicePoolFingerprint(pool) !== payment.poolFingerprint)
-                  throw new Error("The donor bonus grant changed during its roll.");
+                  throw new Error(loc`The donor bonus grant changed during its roll.`);
                 const fresh = actionDiceFundingContext(
                   {
                     ...donor.actionDiceFundingSystem,
@@ -379,7 +388,7 @@ export const ActorOutcomes = Base =>
                 stillValid.explodeAt !== plan.explodeAt ||
                 stillValid.bonusEach !== plan.bonusEach
               )
-                throw new Error(stillValid.reason ?? "The donor benefit changed during its roll.");
+                throw new Error(stillValid.reason ?? loc`The donor benefit changed during its roll.`);
               const dice = roll.dice.map(d => d.total),
                 result = actionDieBoostResult(check, plan, dice),
                 paymentReceiptId =
@@ -420,7 +429,7 @@ export const ActorOutcomes = Base =>
                 try {
                   await restoreWeapon?.();
                 } catch (rollback) {
-                  const failure = new AggregateError([error, rollback], "The donated boost needs GC review.");
+                  const failure = new AggregateError([error, rollback], loc`The donated boost needs GC review.`);
                   failure.actionDiceSettlementReview = {
                     purpose: "Generous",
                     targetActorUuid: this.uuid,
@@ -434,7 +443,7 @@ export const ActorOutcomes = Base =>
             },
             { bonusPoolId }
           );
-          if (!donorCallbackStarted) throw new Error("The donor payment changed before Generous.");
+          if (!donorCallbackStarted) throw new Error(loc`The donor payment changed before Generous.`);
           return donated;
         };
         if (!surcharge.surcharge) return donate();
@@ -490,7 +499,7 @@ export const ActorOutcomes = Base =>
 
     async useCunningPlan(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn("The GC resolves secret results.");
+      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       try {
         cunningPlanCheck(this.system, message.flags.spycraft2);
@@ -499,10 +508,9 @@ export const ActorOutcomes = Base =>
       }
       if (!options.freeActionConfirmed) {
         const input = await systemDialog.input({
-          window: { title: "Cunning Plan" },
+          window: { title: loc`Cunning Plan` },
           rejectClose: false,
-          content:
-            '<p>Reduce this check’s error range by your Intelligence modifier (minimum zero). Its rolled result is retained; a negative result still operates like an error.</p><label><input type="checkbox" name="freeActionConfirmed" /> I spend the required free action before this check is resolved or a critical is activated</label>'
+          content: `<p>${loc`Reduce this check’s error range by your Intelligence modifier (minimum zero). Its rolled result is retained; a negative result still operates like an error.`}</p><label><input type="checkbox" name="freeActionConfirmed" /> ${loc`I spend the required free action before this check is resolved or a critical is activated`}</label>`
         });
         if (!input?.freeActionConfirmed) return null;
       }
@@ -511,7 +519,7 @@ export const ActorOutcomes = Base =>
         async () => {
           const check = message.flags.spycraft2;
           if (rollEvidence(check) !== expected)
-            throw new Error("This roll changed before Cunning Plan. Review its current result.");
+            throw new Error(loc`This roll changed before Cunning Plan. Review its current result.`);
           const next = cunningPlanCheck(this.system, check);
           if (typeof check.successConfirmed === "boolean")
             Object.assign(next, adjudicateCheck(next, check.successConfirmed));
@@ -531,19 +539,19 @@ export const ActorOutcomes = Base =>
 
     async confirmCheckOutcome(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn("The GC resolves secret results.");
+      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let succeeded = options.succeeded,
         difficultyClass = options.difficultyClass;
       if (typeof succeeded !== "boolean") {
         const input = await systemDialog.input({
-          window: { title: "Confirm the check's outcome" },
+          window: { title: loc`Confirm the check's outcome` },
           rejectClose: false,
-          content: `${message.flags.spycraft2.damageSave ? `<p>Recorded damage-event save DC${Number(message.flags.spycraft2.damageSave.dc)}; final result ${Number(message.flags.spycraft2.effectiveTotal)}.</p>` : ""}<label>GC-confirmed result <select name="outcome" required><option value="">Choose…</option><option value="success">Succeeded</option><option value="failure">Failed</option></select></label>${automaticSkillSuccessSources(this.system, message.flags.spycraft2).length > 0 ? '<label>GC-confirmed DC / final opposing result (required for a class automatic-success fallback) <input type="number" name="difficultyClass" step="1" /></label>' : ""}<p>A natural range is not an automatic success or failure. Negative skill, Knowledge and attack results operate like errors (pp.96–97,330).</p>`
+          content: `${message.flags.spycraft2.damageSave ? `<p>${loc`Recorded damage-event save DC${Number(message.flags.spycraft2.damageSave.dc)}; final result ${Number(message.flags.spycraft2.effectiveTotal)}.`}</p>` : ""}<label>${loc`GC-confirmed result`} <select name="outcome" required><option value="">${loc`Choose…`}</option><option value="success">${loc`Succeeded`}</option><option value="failure">${loc`Failed`}</option></select></label>${automaticSkillSuccessSources(this.system, message.flags.spycraft2).length > 0 ? `<label>${loc`GC-confirmed DC / final opposing result (required for a class automatic-success fallback)`} <input type="number" name="difficultyClass" step="1" /></label>` : ""}<p>${loc`A natural range is not an automatic success or failure. Negative skill, Knowledge and attack results operate like errors (pp.96–97,330).`}</p>`
         });
         if (!input) return null;
         if (!["success", "failure"].includes(input.outcome)) {
-          ui.notifications.warn("Choose the GC-confirmed outcome.");
+          ui.notifications.warn(loc`Choose the GC-confirmed outcome.`);
           return null;
         }
         succeeded = input.outcome === "success";
@@ -551,26 +559,28 @@ export const ActorOutcomes = Base =>
       }
       const work = async () => {
         const check = message.flags?.spycraft2;
-        if (!Number.isFinite(check?.rawTotal)) return ui.notifications.warn("Choose a recorded check result.");
+        if (!Number.isFinite(check?.rawTotal)) return ui.notifications.warn(loc`Choose a recorded check result.`);
         if (check.resolved || check.superseded)
-          return ui.notifications.warn("This check has already been resolved or replaced.");
+          return ui.notifications.warn(loc`This check has already been resolved or replaced.`);
         if (rollEvidence(check) !== expected)
           return ui.notifications.warn(
-            "This roll changed while its outcome was being confirmed. Review the current result."
+            loc`This roll changed while its outcome was being confirmed. Review the current result.`
           );
         if (check.takedown && succeeded !== check.effectiveTotal >= check.takedown.dc)
           return ui.notifications.warn(
-            "The confirmed takedown outcome must match its final result and fixed Fortitude DC."
+            loc`The confirmed takedown outcome must match its final result and fixed Fortitude DC.`
           );
         validateDamageSaveRoll(this, check.damageSave, check.checkKind, check.checkId);
         if (
           check.analysisTask?.stage === "pressure" &&
           succeeded !== check.effectiveTotal >= check.analysisTask.challengeDC
         )
-          return ui.notifications.warn("The pressure outcome must match its final result and recorded Challenge DC.");
+          return ui.notifications.warn(
+            loc`The pressure outcome must match its final result and recorded Challenge DC.`
+          );
         if (check.damageSave && succeeded !== check.effectiveTotal >= check.damageSave.dc)
           return ui.notifications.warn(
-            "The confirmed outcome must match this damage save’s final result and recorded DC."
+            loc`The confirmed outcome must match this damage save’s final result and recorded DC.`
           );
         let next = {
           ...check,
@@ -611,7 +621,7 @@ export const ActorOutcomes = Base =>
             next = { ...next, sleepWake: wake };
             await message.update({ "flags.spycraft2.sleepWake": wake });
           } catch (error) {
-            ui.notifications.warn("Awareness outcome recorded; waking needs review or retry: " + error.message);
+            ui.notifications.warn(loc`Awareness outcome recorded; waking needs review or retry: ` + error.message);
           }
         }
         return next;
@@ -622,7 +632,7 @@ export const ActorOutcomes = Base =>
     /** The GC can resolve an owned opponent's payment; cross-client authority remains a separate workflow. */
     async activateCritical(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn("The GC resolves secret results.");
+      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let input = options;
       if (!Object.keys(input).length) {
@@ -641,19 +651,19 @@ export const ActorOutcomes = Base =>
             )
             .join("");
         input = await systemDialog.input({
-          window: { title: "Activate a confirmed critical result" },
+          window: { title: loc`Activate a confirmed critical result` },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options">
-        <label>Result <select name="kind">${check.threatConfirmed ? '<option value="success">Own critical success / hit</option>' : ""}${check.errorConfirmed ? '<option value="failure">Opponent activates critical failure / miss</option>' : ""}</select></label>
-        ${message.flags.spycraft2.checkKind === "attack" && typeof message.flags.spycraft2.attackContext?.vehicleMounted !== "boolean" && (this.system.classOptionSelections ?? []).some(e => e.classId === "wheelman" && e.name === "Most Lethal") ? '<label><input type="checkbox" name="vehicleMountedConfirmed" /> Unrecorded attack platform: confirm this weapon was vehicle-mounted when the attack was rolled (Most Lethal)</label>' : ""}
-        ${cleaveLegacyTargetEligible(this.system, check) ? '<label><input type="checkbox" name="legacyStandardTargetConfirmed" /> Unrecorded original target: the GC confirms this melee attack was against a standard character (Cleave Supremacy)</label>' : ""}
-        <label>Opponent paying for a failure <select name="payerId"><option value="">Choose opponent…</option>${game.user?.isGM ? '<option value="gc">GC action-die pool</option>' : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
-        <label>Funding from the paying character <select name="funding"><option value="">Ordinary action dice / GC pool</option>${poolOptions}</select></label>
-        <label>Shaken surcharge funding <select name="feeFunding"><option value="same">Same source as the base cost</option><option value="">Paying character's ordinary dice</option>${poolOptions}</select></label>
-        <details><summary>Split the entire payment across this payer's wallets (optional)</summary><p>If any contribution is entered, these fields replace both source selectors. Total the final cost after automatic reductions and the payer's Shaken surcharge; only the selected payer may contribute.</p>${fundingActors
+        <label>${loc`Result`} <select name="kind">${check.threatConfirmed ? `<option value="success">${loc`Own critical success / hit`}</option>` : ""}${check.errorConfirmed ? `<option value="failure">${loc`Opponent activates critical failure / miss`}</option>` : ""}</select></label>
+        ${message.flags.spycraft2.checkKind === "attack" && typeof message.flags.spycraft2.attackContext?.vehicleMounted !== "boolean" && (this.system.classOptionSelections ?? []).some(e => e.classId === "wheelman" && e.name === "Most Lethal") ? `<label><input type="checkbox" name="vehicleMountedConfirmed" /> ${loc`Unrecorded attack platform: confirm this weapon was vehicle-mounted when the attack was rolled (Most Lethal)`}</label>` : ""}
+        ${cleaveLegacyTargetEligible(this.system, check) ? `<label><input type="checkbox" name="legacyStandardTargetConfirmed" /> ${loc`Unrecorded original target: the GC confirms this melee attack was against a standard character (Cleave Supremacy)`}</label>` : ""}
+        <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc">${loc`GC action-die pool`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
+        <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC pool`}</option>${poolOptions}</select></label>
+        <label>${loc`Shaken surcharge funding`} <select name="feeFunding"><option value="same">${loc`Same source as the base cost`}</option><option value="">${loc`Paying character's ordinary dice`}</option>${poolOptions}</select></label>
+        <details><summary>${loc`Split the entire payment across this payer's wallets (optional)`}</summary><p>${loc`If any contribution is entered, these fields replace both source selectors. Total the final cost after automatic reductions and the payer's Shaken surcharge; only the selected payer may contribute.`}</p>${fundingActors
           .map(
             a =>
-              `<label>${esc(a.name)}: ordinary dice (${a.system.actionDice?.value ?? 0}) <input name="criticalFund_${a.id}" type="number" min="0" value="0" /></label>${unrestrictedBonusPools(
+              `<label>${loc`${esc(a.name)}: ordinary dice (${a.system.actionDice?.value ?? 0})`} <input name="criticalFund_${a.id}" type="number" min="0" value="0" /></label>${unrestrictedBonusPools(
                 a.actionDiceFundingSystem,
                 a.usagePeriods
               )
@@ -665,14 +675,14 @@ export const ActorOutcomes = Base =>
                 .join("")}`
           )
           .join("")}</details>
-        <label><input type="checkbox" name="jinx" /> Use the paying opponent’s earned Jinx (−1cost, minimum0; one Chance-based session use)</label>
-        <label>Base action-die cost from the applicable effect <input type="number" name="baseCost" min="1" value="1" /></label>
-        <label>Critical effect <textarea name="effect" required></textarea></label>
-        <label><input type="checkbox" name="effectConfirmed" /> The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below</label>
-        <label><input type="checkbox" name="beforeDamage" /> Critical hit: damage has not been rolled</label>
-        <label><input type="checkbox" name="opponent" /> Failure payer is an opponent</label>
-        <label><input type="checkbox" name="lineOfSight" /> Failure payer has line of sight to the acting character</label>
-        <p>Attack Triumph, Cleave Supremacy, Finesse Supremacy, Grand Skill Mastery, Most Lethal, Sharpshooter Supremacy, Most Deadly, Overkill, Driven, Practice Makes Perfect, Simply Irresistible, Clean and Polished, Dependable and Unreliable adjust the base cost automatically. Selected Jinx reduces the paying opponent’s adjusted cost by1(minimum0), using its own session allowance. The paying character adds the Shaken II/III surcharge after those adjustments, even if the base cost becomes zero. Surcharge dice are not rolled. Apply the recorded effect at the table. The GC can handle payments from other players’ actors; the GC may also use the session’s separate pool.</p></div>`
+        <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1cost, minimum0; one Chance-based session use)`}</label>
+        <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
+        <label>${loc`Critical effect`} <textarea name="effect" required></textarea></label>
+        <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
+        <label><input type="checkbox" name="beforeDamage" /> ${loc`Critical hit: damage has not been rolled`}</label>
+        <label><input type="checkbox" name="opponent" /> ${loc`Failure payer is an opponent`}</label>
+        <label><input type="checkbox" name="lineOfSight" /> ${loc`Failure payer has line of sight to the acting character`}</label>
+        <p>${loc`Attack Triumph, Cleave Supremacy, Finesse Supremacy, Grand Skill Mastery, Most Lethal, Sharpshooter Supremacy, Most Deadly, Overkill, Driven, Practice Makes Perfect, Simply Irresistible, Clean and Polished, Dependable and Unreliable adjust the base cost automatically. Selected Jinx reduces the paying opponent’s adjusted cost by1(minimum0), using its own session allowance. The paying character adds the Shaken II/III surcharge after those adjustments, even if the base cost becomes zero. Surcharge dice are not rolled. Apply the recorded effect at the table. The GC can handle payments from other players’ actors; the GC may also use the session’s separate pool.`}</p></div>`
         });
         if (!input) return null;
         input.splitFunding = fundingActors
@@ -689,47 +699,49 @@ export const ActorOutcomes = Base =>
           .filter(p => p.count);
       }
       const useGC = input.kind === "failure" && (input.payerId === "gc" || input.payer === "gc");
-      if (useGC && !game.user?.isGM) return ui.notifications.warn("Only the GC can spend the GC pool.");
+      if (useGC && !game.user?.isGM) return ui.notifications.warn(loc`Only the GC can spend the GC pool.`);
       const controller = useGC ? gcDiceController({ required: false }) : null;
       const payer = useGC ? null : input.kind === "failure" ? (input.payer ?? game.actors?.get(input.payerId)) : this;
       if (!useGC && (payer?.type !== "agent" || !payer.isOwner))
-        return ui.notifications.warn("Choose a paying character you can update, or ask the GC to resolve the payment.");
+        return ui.notifications.warn(
+          loc`Choose a paying character you can update, or ask the GC to resolve the payment.`
+        );
       let bonusPoolId = input.bonusPoolId ?? "";
       if (input.funding) {
         const [payerUuid, id, ...extra] = String(input.funding).split("|");
         if (useGC || payerUuid !== payer.uuid || !id || extra.length)
-          return ui.notifications.warn("Choose a bonus pool belonging to the paying character.");
+          return ui.notifications.warn(loc`Choose a bonus pool belonging to the paying character.`);
         bonusPoolId = id;
       }
-      if (useGC && bonusPoolId) return ui.notifications.warn("The GC pool cannot spend a character bonus grant.");
+      if (useGC && bonusPoolId) return ui.notifications.warn(loc`The GC pool cannot spend a character bonus grant.`);
       let surchargeBonusPoolId = input.surchargeBonusPoolId ?? "same";
       if (input.feeFunding !== undefined && input.feeFunding !== "same") {
         if (input.feeFunding === "") surchargeBonusPoolId = "";
         else {
           const [uuid, id, ...extra] = String(input.feeFunding).split("|");
           if (useGC || uuid !== payer.uuid || !id || extra.length)
-            return ui.notifications.warn("Choose surcharge funding belonging to the paying character.");
+            return ui.notifications.warn(loc`Choose surcharge funding belonging to the paying character.`);
           surchargeBonusPoolId = id;
         }
       }
       if (input.splitFunding !== undefined && !Array.isArray(input.splitFunding))
-        return ui.notifications.warn("Choose valid split contributions for the paying character.");
+        return ui.notifications.warn(loc`Choose valid split contributions for the paying character.`);
       if (input.splitFunding?.some(p => useGC || p.actorUuid !== payer.uuid))
-        return ui.notifications.warn("Split contributions must belong to the selected paying character.");
+        return ui.notifications.warn(loc`Split contributions must belong to the selected paying character.`);
       const allocations = input.splitFunding?.length
         ? input.splitFunding.map(({ bonusPoolId, count }) => ({ bonusPoolId, count }))
         : input.paymentAllocations;
       if (useGC && allocations?.length)
-        return ui.notifications.warn("The GC pool uses one GC payment, not character wallets.");
+        return ui.notifications.warn(loc`The GC pool uses one GC payment, not character wallets.`);
       const expectedShaken = useGC ? null : JSON.stringify(shakenRules(payer.actionDiceFundingSystem));
       const work = async () => {
         if (getActionDieSettlementReview(this).needsReview)
           return ui.notifications.warn(
-            "Review this character’s interrupted action-die settlement before activating another critical result."
+            loc`Review this character’s interrupted action-die settlement before activating another critical result.`
           );
         if (rollEvidence(message.flags.spycraft2) !== expected)
           return ui.notifications.warn(
-            "This result changed while its critical activation was being prepared. Review the current result."
+            loc`This result changed while its critical activation was being prepared. Review the current result.`
           );
         if (useGC) await refreshGCDiceTransaction(controller);
         const check = message.flags.spycraft2,
@@ -750,7 +762,7 @@ export const ActorOutcomes = Base =>
             jinxOptions
           );
           if (JSON.stringify(fresh) !== JSON.stringify(plan))
-            throw new Error("The critical effect cost or Jinx source changed before activation.");
+            throw new Error(loc`The critical effect cost or Jinx source changed before activation.`);
         };
         if (plan.cost && !allocations?.length) {
           const funding = useGC
@@ -759,7 +771,7 @@ export const ActorOutcomes = Base =>
           if (funding.blocked) return ui.notifications.warn(funding.reason);
           if (plan.jinx) {
             if (plan.cost > funding.balance)
-              return ui.notifications.warn("Not enough action dice remain in the paying character’s pool.");
+              return ui.notifications.warn(loc`Not enough action dice remain in the paying character’s pool.`);
           } else {
             plan = criticalPlan(this.system, check, { ...base, available: funding.balance });
             if (plan.blocked) return ui.notifications.warn(plan.reason);
@@ -872,7 +884,7 @@ export const ActorOutcomes = Base =>
             if (gained) {
               const balance = this.system.actionDice.value - gain.units;
               if (!same(currentCredit(), credit) || !Number.isSafeInteger(balance) || balance < 0)
-                failures.push(new Error("The School of Hard Knocks credit changed before restoration."));
+                failures.push(new Error(loc`The School of Hard Knocks credit changed before restoration.`));
               else
                 try {
                   await this.update({
@@ -887,11 +899,11 @@ export const ActorOutcomes = Base =>
               creditAttempted &&
               (!same(currentCredit(), previousCredit) || this.system.actionDice.value !== beforeDice)
             )
-              failures.push(new Error("The class die credit could not be confirmed."));
+              failures.push(new Error(loc`The class die credit could not be confirmed.`));
             if (failures.length) {
               const failure = new AggregateError(
                 [error, ...failures],
-                "The critical effect could not be safely restored."
+                loc`The critical effect could not be safely restored.`
               );
               failure.actionDiceSettlementReview = {
                 purpose: "critical activation",
@@ -905,7 +917,7 @@ export const ActorOutcomes = Base =>
                     paymentPath: "system.actionDice.value",
                     bonusPoolId: "",
                     die: gain.die,
-                    label: "School of Hard Knocks credit"
+                    label: loc`School of Hard Knocks credit`
                   },
                   failure,
                   { purpose: "School of Hard Knocks credit", messageUuid: message.uuid ?? message.id }
@@ -958,14 +970,14 @@ export const ActorOutcomes = Base =>
 
     async finishCheck(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn("The GC resolves secret results.");
+      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
       const check = message.flags.spycraft2;
       if (check.gearAttempt) return finishGearAcquisition(this, message);
       if (
         check.requiredBonusPoolId &&
         bonusPoolForCheck(this.system, check.requiredBonusPoolId, message, { periods: this.usagePeriods }).available
       )
-        return ui.notifications.warn("Spend the required class bonus die before resolving this check.");
+        return ui.notifications.warn(loc`Spend the required class bonus die before resolving this check.`);
       const candidates = checkCandidates(check);
       if (
         typeof check.successConfirmed !== "boolean" &&
@@ -985,15 +997,17 @@ export const ActorOutcomes = Base =>
         async () => {
           const current = message.flags.spycraft2;
           if (current.resolved || current.superseded)
-            return ui.notifications.warn("This result is already resolved or replaced.");
+            return ui.notifications.warn(loc`This result is already resolved or replaced.`);
           if (rollEvidence(current) !== expected)
-            return ui.notifications.warn("This roll changed before resolution. Review and confirm its current result.");
+            return ui.notifications.warn(
+              loc`This roll changed before resolution. Review and confirm its current result.`
+            );
           if (
             current.requiredBonusPoolId &&
             bonusPoolForCheck(this.system, current.requiredBonusPoolId, message, { periods: this.usagePeriods })
               .available
           )
-            return ui.notifications.warn("Spend the required class bonus die before resolving this check.");
+            return ui.notifications.warn(loc`Spend the required class bonus die before resolving this check.`);
           const result = await message.update({
             "flags.spycraft2.resolved": true,
             flavor: checkFlavor({ ...current, resolved: true })
@@ -1016,7 +1030,7 @@ export const ActorOutcomes = Base =>
         });
       } catch (error) {
         ui.notifications.warn(
-          "The check is already resolved or replaced, but its unused bonus bookkeeping needs GC review. Do not retry the resolved check."
+          loc`The check is already resolved or replaced, but its unused bonus bookkeeping needs GC review. Do not retry the resolved check.`
         );
       }
     }
@@ -1027,16 +1041,16 @@ export const ActorOutcomes = Base =>
       if (!status.pending) return null;
       let allocations = options.allocations;
       if (allocations !== undefined && !game.user?.isGM)
-        throw new Error("The GC reviews allocations of past combined Bright Idea uses.");
+        throw new Error(loc`The GC reviews allocations of past combined Bright Idea uses.`);
       if (allocations === undefined && !status.automatic) {
-        if (!game.user?.isGM) throw new Error("Ask the GC to allocate past combined Bright Idea uses.");
+        if (!game.user?.isGM) throw new Error(loc`Ask the GC to allocate past combined Bright Idea uses.`);
         if (status.legacyUsed === null)
-          throw new Error("Review the malformed old Bright Idea counter before allocation.");
+          throw new Error(loc`Review the malformed old Bright Idea counter before allocation.`);
         const esc = foundry.utils.escapeHTML,
           input = await systemDialog.input({
-            window: { title: "Allocate past Bright Idea uses" },
+            window: { title: loc`Allocate past Bright Idea uses` },
             rejectClose: false,
-            content: `<div class="spycraft2-roll-options"><p>The old combined pool records ${status.legacyUsed} uses this session. Confirm which class supplied each use; the allocated total must match. This preserves past use and grants no dice.</p>${status.sources.map((s, index) => `<label>${esc(s.name)} (${s.remaining} allowance remaining) <input type="number" name="source_${index}" value="0" min="0" max="${s.remaining}" /></label>`).join("")}</div>`
+            content: `<div class="spycraft2-roll-options"><p>${loc`The old combined pool records ${status.legacyUsed} uses this session. Confirm which class supplied each use; the allocated total must match. This preserves past use and grants no dice.`}</p>${status.sources.map((s, index) => `<label>${loc`${esc(s.name)} (${s.remaining} allowance remaining)`} <input type="number" name="source_${index}" value="0" min="0" max="${s.remaining}" /></label>`).join("")}</div>`
           });
         if (!input) return null;
         allocations = Object.fromEntries(
@@ -1045,7 +1059,7 @@ export const ActorOutcomes = Base =>
       }
       return queueResources([this], async () => {
         if (allocations !== undefined && !game.user?.isGM)
-          throw new Error("Only the GC may allocate the old combined uses.");
+          throw new Error(loc`Only the GC may allocate the old combined uses.`);
         const plan = brightIdeaMigrationPlan(this.system, this.usagePeriods, allocations, {
           at: Date.now(),
           reviewedBy: game.user?.id ?? "automatic single source"
@@ -1057,15 +1071,15 @@ export const ActorOutcomes = Base =>
 
     async useManualAdjustment(message, options = {}) {
       if (this.type !== "agent" || !this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) throw new Error("The GC resolves Manual Adjustment for a secret check.");
+      if (message.blind && !game.user?.isGM)
+        throw new Error(loc`The GC resolves Manual Adjustment for a secret check.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let input = options;
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
-          window: { title: "Manual Adjustment: reverse a failed check" },
+          window: { title: loc`Manual Adjustment: reverse a failed check` },
           rejectClose: false,
-          content:
-            '<div class="spycraft2-roll-options"><p>Use after a failed eligible check, before any critical failure is activated. One half action reverses a retryable failure within effective class level +20, at the lowest positive grade. No action die is spent; one session use is consumed.</p><label>GC-confirmed DC <input type="number" name="difficultyClass" step="1" required /></label><label>Target device <input name="device" required /></label><label><input type="checkbox" name="retryConfirmed" /> The GC confirms this check may be retried</label><label><input type="checkbox" name="halfActionConfirmed" /> Spend one half action</label><label><input type="checkbox" name="whackConfirmed" /> Give the target device a whack</label></div>'
+          content: `<div class="spycraft2-roll-options"><p>${loc`Use after a failed eligible check, before any critical failure is activated. One half action reverses a retryable failure within effective class level +20, at the lowest positive grade. No action die is spent; one session use is consumed.`}</p><label>${loc`GC-confirmed DC`} <input type="number" name="difficultyClass" step="1" required /></label><label>${loc`Target device`} <input name="device" required /></label><label><input type="checkbox" name="retryConfirmed" /> ${loc`The GC confirms this check may be retried`}</label><label><input type="checkbox" name="halfActionConfirmed" /> ${loc`Spend one half action`}</label><label><input type="checkbox" name="whackConfirmed" /> ${loc`Give the target device a whack`}</label></div>`
         });
         if (!input) return null;
       }
@@ -1076,7 +1090,7 @@ export const ActorOutcomes = Base =>
           const check = message.flags.spycraft2;
           if (rollEvidence(check) !== expected)
             throw new Error(
-              "This result changed while Manual Adjustment was being declared. Review the current check."
+              loc`This result changed while Manual Adjustment was being declared. Review the current check.`
             );
           const plan = manualAdjustmentPlan(this.system, check, input),
             safe = { ...check, cannotError: true };
@@ -1102,15 +1116,15 @@ export const ActorOutcomes = Base =>
 
     async recordHintResponse(options = {}) {
       if (this.type !== "agent" || !this.isOwner || !game.user?.isGM)
-        throw new Error("The GC records the hint response for an owned agent.");
+        throw new Error(loc`The GC records the hint response for an owned agent.`);
       let input = options;
       if (!input.outcome) {
         const esc = foundry.utils.escapeHTML,
           sources = hintSources(this.system, [...this.items]);
         input = await systemDialog.input({
-          window: { title: "Record free-hint response" },
+          window: { title: loc`Record free-hint response` },
           rejectClose: false,
-          content: `<div class="spycraft2-roll-options"><p>Record one request after the GC provides or refuses the hint. No action die is charged and the GC gains no die. A refusal grants the source’s bonus dice, without award XP.</p><label>Source <select name="source">${sources.map(spec => `<option value="${esc(spec.id)}" ${options.source === spec.id ? "selected" : ""}>${esc(spec.name)} (${spec.refusalDice} refusal dice)</option>`).join("")}</select></label><label>GC response <select name="outcome"><option value="provided">Hint provided</option><option value="refused">Hint refused</option></select></label><label>Hint / refusal note <textarea name="text"></textarea></label><label><input type="checkbox" name="minuteConfirmed" /> The agent spends one minute (required for Intuition)</label></div>`
+          content: `<div class="spycraft2-roll-options"><p>${loc`Record one request after the GC provides or refuses the hint. No action die is charged and the GC gains no die. A refusal grants the source’s bonus dice, without award XP.`}</p><label>${loc`Source`} <select name="source">${sources.map(spec => `<option value="${esc(spec.id)}" ${options.source === spec.id ? "selected" : ""}>${loc`${esc(spec.name)} (${spec.refusalDice} refusal dice)`}</option>`).join("")}</select></label><label>${loc`GC response`} <select name="outcome"><option value="provided">${loc`Hint provided`}</option><option value="refused">${loc`Hint refused`}</option></select></label><label>${loc`Hint / refusal note`} <textarea name="text"></textarea></label><label><input type="checkbox" name="minuteConfirmed" /> ${loc`The agent spends one minute (required for Intuition)`}</label></div>`
         });
         if (!input) return null;
       }
@@ -1123,9 +1137,9 @@ export const ActorOutcomes = Base =>
       return this.useLimitedAbility(
         input.source,
         async () => {
-          if (!game.user?.isGM) throw new Error("Only the GC may record a hint response.");
+          if (!game.user?.isGM) throw new Error(loc`Only the GC may record a hint response.`);
           if (getActionDieSettlementReview(this).needsReview)
-            throw new Error("Review the interrupted action-die settlement before recording another hint.");
+            throw new Error(loc`Review the interrupted action-die settlement before recording another hint.`);
           const current = plan(),
             esc = foundry.utils.escapeHTML,
             id =
@@ -1154,7 +1168,7 @@ export const ActorOutcomes = Base =>
             }
             return await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
-              content: `<p>${esc(current.spec.name)}: ${current.outcome === "provided" ? "hint provided" : `hint refused; gain ${current.units}d${current.die}`}.</p>${current.text ? `<p>${esc(current.text)}</p>` : ""}`,
+              content: `<p>${esc(current.spec.name)}: ${current.outcome === "provided" ? loc`hint provided` : loc`hint refused; gain ${current.units}d${current.die}`}.</p>${current.text ? `<p>${esc(current.text)}</p>` : ""}`,
               flags: {
                 spycraft2: {
                   actorUuid: this.uuid,
@@ -1198,7 +1212,7 @@ export const ActorOutcomes = Base =>
             if (uncertain) {
               const failure = new AggregateError(
                 [error, ...(rollbackError ? [rollbackError] : [])],
-                "The hint credit needs GC review."
+                loc`The hint credit needs GC review.`
               );
               await this.markActionDiceSettlementReview(
                 {
@@ -1223,7 +1237,7 @@ export const ActorOutcomes = Base =>
 
     async rerollCheck(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn("The GC resolves secret results.");
+      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let input = options;
       const esc = foundry.utils.escapeHTML;
@@ -1237,14 +1251,14 @@ export const ActorOutcomes = Base =>
               criticalFailure: !!message.flags.spycraft2.criticalFailure
             })
         );
-        if (!available.length) return ui.notifications.warn("No available reroll ability applies to this check.");
+        if (!available.length) return ui.notifications.warn(loc`No available reroll ability applies to this check.`);
         input = await systemDialog.input({
-          window: { title: "Reroll check" },
+          window: { title: loc`Reroll check` },
           rejectClose: false,
           content: `<div class="spycraft2-roll-options">
-        ${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl({ perBenefit: true, unrolled: true })}<label>Ability <select name="resource">${available.map(spec => `<option value="${esc(spec.id)}">${esc(spec.name)} (${spec.remaining}/${spec.limit}, ${spec.cost} action dice)</option>`).join("")}</select></label>
-        <label><input type="checkbox" name="failed" /> The GC confirmed this check failed</label>
-        <label><input type="checkbox" name="criticalFailure" /> This is an activated critical failure</label></div>`
+        ${this.actionDiceFundingControl()}${this.actionDiceSurchargeControl({ perBenefit: true, unrolled: true })}<label>${loc`Ability`} <select name="resource">${available.map(spec => `<option value="${esc(spec.id)}">${loc`${esc(spec.name)} (${spec.remaining}/${spec.limit}, ${spec.cost} action dice)`}</option>`).join("")}</select></label>
+        <label><input type="checkbox" name="failed" /> ${loc`The GC confirmed this check failed`}</label>
+        <label><input type="checkbox" name="criticalFailure" /> ${loc`This is an activated critical failure`}</label></div>`
         });
         if (!input) return null;
       }
@@ -1255,10 +1269,10 @@ export const ActorOutcomes = Base =>
           const check = message.flags?.spycraft2,
             spec = this.system.limitedUses.find(entry => entry.id === input.resource);
           if (rollEvidence(check) !== expected)
-            throw new Error("This roll changed while the reroll was being prepared. Review the current result.");
+            throw new Error(loc`This roll changed while the reroll was being prepared. Review the current result.`);
           validateAttributeDamageProof(this.system, check.attributeDamage ?? null, { checkKind: check.checkKind });
           if (!rerollEligibility(spec, check, input))
-            throw new Error("This ability cannot reroll the selected check in its current state.");
+            throw new Error(loc`This ability cannot reroll the selected check in its current state.`);
           const {
               epoch: sourceEpoch,
               used: reservedUsed,
@@ -1284,7 +1298,9 @@ export const ActorOutcomes = Base =>
               rollEvidence(message.flags?.spycraft2) !== expected ||
               !rerollEligibility(live, message.flags?.spycraft2, input)
             )
-              throw new Error("The reroll source, period or original check changed before the replacement was posted.");
+              throw new Error(
+                loc`The reroll source, period or original check changed before the replacement was posted.`
+              );
           };
           const pending = transferableCheckBonusPool(this.system, message, this.usagePeriods);
           const resources = [...(check.rerollResources ?? []), spec.id];
@@ -1302,7 +1318,7 @@ export const ActorOutcomes = Base =>
               rerollReceiptId,
               rerollOf: message.uuid ?? message.id,
               shakenContext: check.shakenContext ?? null,
-              flavor: `${check.baseFlavor ?? "Check"} — ${spec.name} reroll`,
+              flavor: loc`${check.baseFlavor ?? loc`Check`} — ${spec.name} reroll`,
               requiredBonusPoolId: pending?.id ?? null,
               oneInAMillion: false,
               millionCommitted: false,
@@ -1330,7 +1346,7 @@ export const ActorOutcomes = Base =>
           let transferred = false;
           try {
             if (rollEvidence(message.flags.spycraft2) !== expected)
-              throw new Error("The original result changed during the replacement roll. Review it before retrying.");
+              throw new Error(loc`The original result changed during the replacement roll. Review it before retrying.`);
             if (pending) {
               await this.update({
                 [`system.bonusActionDice.${pending.id}.messageUuid`]: replacement.uuid ?? replacement.id
@@ -1397,7 +1413,7 @@ export const ActorOutcomes = Base =>
             if (failures.length) {
               const failure = new AggregateError(
                 [error, ...failures],
-                "The replacement result needs GC review before retrying."
+                loc`The replacement result needs GC review before retrying.`
               );
               failure.actionDiceSettlementReview = {
                 purpose: "class reroll",

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** A form changes only its intended career fields, never an old copy of vitality/history. */
 const shape = rows => JSON.stringify(rows.map(p => [p.classId, p.careerEntryId ?? ""]));
 const skillKey = k =>
@@ -7,18 +8,18 @@ function read(row, edit) {
 }
 function validate(edit) {
   if (!Number.isSafeInteger(edit.index) || edit.index < 0 || !["skill", "intelligenceModifier"].includes(edit.field))
-    throw new Error("Review the career form field.");
+    throw new Error(loc`Review the career form field.`);
   if (edit.field === "skill" && (!skillKey(edit.key) || !Number.isSafeInteger(edit.value) || edit.value < 0))
-    throw new Error("Skill points must be nonnegative whole numbers.");
+    throw new Error(loc`Skill points must be nonnegative whole numbers.`);
   if (edit.field === "intelligenceModifier" && edit.value !== null && !Number.isSafeInteger(edit.value))
-    throw new Error("The historical Intelligence modifier must be a whole number or blank.");
+    throw new Error(loc`The historical Intelligence modifier must be a whole number or blank.`);
 }
 export function careerFormPlan(rows, requests) {
   const edits = [];
   for (const request of requests) {
     validate(request);
     const row = rows[request.index];
-    if (!row) throw new Error("This career level no longer exists. Reopen the sheet.");
+    if (!row) throw new Error(loc`This career level no longer exists. Reopen the sheet.`);
     const before = read(row, request);
     if (before !== request.value) edits.push({ ...request, before });
   }
@@ -26,15 +27,15 @@ export function careerFormPlan(rows, requests) {
 }
 export function mergeCareerForm(rows, plan) {
   if (plan?.version !== 1 || !Array.isArray(plan.edits) || shape(rows) !== plan.shape)
-    throw new Error("The career progression changed while the form was pending. Reopen the sheet.");
+    throw new Error(loc`The career progression changed while the form was pending. Reopen the sheet.`);
   const result = rows.map(p => ({ ...p, skills: { ...p.skills } }));
   for (const edit of plan.edits) {
     validate(edit);
     const row = result[edit.index];
-    if (!row) throw new Error("The edited career level no longer exists.");
+    if (!row) throw new Error(loc`The edited career level no longer exists.`);
     const current = read(row, edit);
     if (current !== edit.before && current !== edit.value)
-      throw new Error("This career field changed while the form was pending. Reopen the sheet before replacing it.");
+      throw new Error(loc`This career field changed while the form was pending. Reopen the sheet before replacing it.`);
     if (edit.field === "skill") {
       if (edit.value) row.skills[edit.key] = edit.value;
       else delete row.skills[edit.key];

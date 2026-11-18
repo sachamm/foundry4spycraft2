@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Noncumulative Table 1.17 aging modifiers, printed p.61. */
 export function agingEffects(value) {
   const text = String(value ?? "").trim();
@@ -7,7 +8,7 @@ export function agingEffects(value) {
       category: "Invalid",
       modifiers: {},
       small: false,
-      warning: "Age must be a positive whole number of years for aging modifiers."
+      warning: loc`Age must be a positive whole number of years for aging modifiers.`
     };
   const age = Number(text),
     category =

@@ -1,4 +1,5 @@
 import { ownCountDurationActive } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 const empty = () => ({ active: false, needsReview: false, penalty: 0, extraAttacks: 0 });
 export function dartingStyleState(system) {
   const r = system.dartingStyle;
@@ -19,7 +20,7 @@ export function dartingStyleState(system) {
     r.atStartOfInitiative !== true ||
     r.confirmed !== true
   )
-    return { ...empty(), needsReview: true, reason: "The GC must review the saved Darting Weapon tradeoff." };
+    return { ...empty(), needsReview: true, reason: loc`The GC must review the saved Darting Weapon tradeoff.` };
   if (!ownCountDurationActive(r, system.dartingCombatContext)) return empty();
   return {
     active: true,

@@ -1,5 +1,6 @@
 import { fencingDisarmPlan } from "./fencing-disarm.mjs";
 import { axeDisarmPlan } from "./axe-disarm.mjs";
+import { loc } from "../i18n.mjs";
 /** Disarm pp.352,356 and Expert Disarm p.174. Opposed results and weapon landing are adjudicated at the table. */
 export const DISARM_SIZES = [
   "Nuisance",
@@ -34,18 +35,18 @@ export function disarmAttackPlan(
 ) {
   if (!context) return { active: false, attackBonus: 0, errorIncrease: 0, notes: [] };
   const reject = reason => ({ active: true, blocked: true, reason, attackBonus: 0, errorIncrease: 0, notes: [] });
-  if (action !== "standard") return reject("Disarm uses an opposed Standard Attack check.");
+  if (action !== "standard") return reject(loc`Disarm uses an opposed Standard Attack check.`);
   if (
     context.confirmed !== true ||
     context.lineOfSightConfirmed !== true ||
     context.rangeConfirmed !== true ||
     context.opponentArmedConfirmed !== true
   )
-    return reject("The GC must confirm the armed opponent, line of sight, and Reach/CQB range for this Disarm.");
+    return reject(loc`The GC must confirm the armed opponent, line of sight, and Reach/CQB range for this Disarm.`);
   const opponentSize = DISARM_SIZES.indexOf(context.opponentWeaponSize),
     ownSize = disarmWeaponSize(system, weapon);
   if (opponentSize < 0 || ownSize === null)
-    return reject("Confirm both actual weapon Sizes before making the Disarm check.");
+    return reject(loc`Confirm both actual weapon Sizes before making the Disarm check.`);
   let axeBasics, fencingBasics;
   try {
     axeBasics = axeDisarmPlan(system, { ranged });
@@ -72,7 +73,7 @@ export function disarmAttackPlan(
     attackBonus:
       expertBonus + twoHandBonus + sizeBonus + Math.max(axeBasics?.gearBonus ?? 0, fencingBasics?.gearBonus ?? 0),
     errorIncrease,
-    actionCost: trained ? "1 half action" : "1 full action; Proficiency time cannot be reduced",
+    actionCost: trained ? "1 half action" : loc`1 full action; Proficiency time cannot be reduced`,
     shots: 1,
     requiresOpposedStandardAttack: true,
     loseFlatFooted: !expert,
@@ -81,22 +82,22 @@ export function disarmAttackPlan(
     notes: [
       ...(fencingBasics?.gearBonus
         ? [
-            "Fencing Basics: +2 gear with this melee Disarm attack while holding a readied one-handed FIN sword; competes with other gear bonuses (p.178)."
+            loc`Fencing Basics: +2 gear with this melee Disarm attack while holding a readied one-handed FIN sword; competes with other gear bonuses (p.178).`
           ]
         : []),
       ...(axeBasics?.gearBonus
-        ? ["Axe Basics: +1 gear with this melee Disarm attack while holding a readied axe (p.176)."]
+        ? [loc`Axe Basics: +1 gear with this melee Disarm attack while holding a readied axe (p.176).`]
         : []),
-      `Disarm: opposed Standard Attack; +${twoHandBonus} two-hand grip, +${sizeBonus} melee weapon Size, +${expertBonus} Expert Disarm; error range +${errorIncrease}.`,
+      loc`Disarm: opposed Standard Attack; +${twoHandBonus} two-hand grip, +${sizeBonus} melee weapon Size, +${expertBonus} Expert Disarm; error range +${errorIncrease}.`,
       trained
-        ? "Disarm costs 1 half action and 1 shot for ammunition weapons."
-        : "Untrained Proficiency: 1 full action, time cannot be reduced; error increase includes the additional +2 (p.352).",
+        ? loc`Disarm costs 1 half action and 1 shot for ammunition weapons.`
+        : loc`Untrained Proficiency: 1 full action, time cannot be reduced; error increase includes the additional +2 (p.352).`,
       ...(expert
         ? [
-            "Expert Disarm: losing this check does not make you flat-footed or grant the opponent a bonus Disarm. A loss with critical success/failure may still grant the opponent a final attack."
+            loc`Expert Disarm: losing this check does not make you flat-footed or grant the opponent a bonus Disarm. A loss with critical success/failure may still grant the opponent a final attack.`
           ]
         : []),
-      "GC resolves the opposed check, landing/deviation, critical effects, weapon transfer and any final attack at the table."
+      loc`GC resolves the opposed check, landing/deviation, critical effects, weapon transfer and any final attack at the table.`
     ]
   };
 }

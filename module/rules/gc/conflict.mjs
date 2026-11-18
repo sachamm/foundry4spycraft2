@@ -5,6 +5,7 @@
  * reported for the GC to apply.
  */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 const C = GC_DATA.conflicts;
 export const CONFLICT_TYPES = C.types;
@@ -13,7 +14,7 @@ const other = side => (side === "predator" ? "prey" : "predator");
 const whole = value => Number.isSafeInteger(value);
 const type = id => {
   const found = C.types[id];
-  if (!found) throw new Error("Unknown Dramatic Conflict type.");
+  if (!found) throw new Error(loc`Unknown Dramatic Conflict type.`);
   return found;
 };
 
@@ -22,9 +23,9 @@ export function startConflict(typeId, { lead = null, predator = {}, prey = {}, n
   const rules = type(typeId);
   const start = lead ?? rules.startingLead?.default;
   if (start === null || start === undefined)
-    throw new Error(`Enter the starting Lead: ${rules.startingLead?.summary ?? "see the Conflict description"}`);
+    throw new Error(loc`Enter the starting Lead: ${rules.startingLead?.summary ?? loc`see the Conflict description`}`);
   if (!whole(start) || start <= C.leadMin || start >= C.leadMax)
-    throw new Error(`The starting Lead must be from ${C.leadMin + 1} to ${C.leadMax - 1}.`);
+    throw new Error(loc`The starting Lead must be from ${C.leadMin + 1} to ${C.leadMax - 1}.`);
   const side = data => ({
     name: data.name ?? "",
     actorUuid: data.actorUuid ?? null,
@@ -50,16 +51,16 @@ export function startConflict(typeId, { lead = null, predator = {}, prey = {}, n
 
 /** Strategies a side may choose now. Requirements the tracker cannot verify are returned as `other` for the GC. */
 export function availableStrategies(conflict, side) {
-  if (!SIDES.includes(side)) throw new Error("Choose Predator or Prey.");
+  if (!SIDES.includes(side)) throw new Error(loc`Choose Predator or Prey.`);
   const rules = type(conflict.type),
     ratings = conflict[side].ratings ?? {};
   return rules.strategies
     .filter(strategy => strategy.side === "general" || strategy.side === side)
     .map(strategy => {
       const reasons = [];
-      if (strategy.leadMin !== null && conflict.lead < strategy.leadMin) reasons.push(`Lead ${strategy.leadMin}+`);
+      if (strategy.leadMin !== null && conflict.lead < strategy.leadMin) reasons.push(loc`Lead ${strategy.leadMin}+`);
       if (strategy.leadMax !== null && conflict.lead > strategy.leadMax)
-        reasons.push(`Lead ${strategy.leadMax} or less`);
+        reasons.push(loc`Lead ${strategy.leadMax} or less`);
       const needs = strategy.ratings ?? [];
       if (needs.length) {
         const met = needs.map(need => (ratings[need.rating] ?? 0) >= need.min);
@@ -75,13 +76,13 @@ export function availableStrategies(conflict, side) {
 
 /** Step 1: each side secretly commits one Strategy; there is no backing out once chosen. */
 export function chooseStrategy(conflict, side, strategyId, { confirmOther = false } = {}) {
-  if (conflict.winner) throw new Error("This conflict is over.");
-  if (conflict.step !== "strategies") throw new Error("Strategies are chosen at the start of the Conflict round.");
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
+  if (conflict.step !== "strategies") throw new Error(loc`Strategies are chosen at the start of the Conflict round.`);
   const choice = availableStrategies(conflict, side).find(strategy => strategy.id === strategyId);
-  if (!choice) throw new Error("That Strategy is not open to this side.");
-  if (!choice.available) throw new Error(`${choice.name} requires ${choice.reasons.join("; ")}.`);
-  if (choice.confirm && !confirmOther) throw new Error(`${choice.name}: the GC must confirm “${choice.confirm}”.`);
-  if (conflict[side].strategy) throw new Error("A chosen Strategy cannot be changed.");
+  if (!choice) throw new Error(loc`That Strategy is not open to this side.`);
+  if (!choice.available) throw new Error(loc`${choice.name} requires ${choice.reasons.join("; ")}.`);
+  if (choice.confirm && !confirmOther) throw new Error(loc`${choice.name}: the GC must confirm “${choice.confirm}”.`);
+  if (conflict[side].strategy) throw new Error(loc`A chosen Strategy cannot be changed.`);
   const next = structuredClone(conflict);
   next[side].strategy = strategyId;
   if (SIDES.every(key => next[key].strategy)) next.step = "check";
@@ -101,11 +102,12 @@ export function strategyModifier(conflict, side) {
  * A tie is broken as any opposed check (p.91): pass `tieWinner`.
  */
 export function resolveCheck(conflict, { predator, prey, tieWinner = null }) {
-  if (conflict.step !== "check") throw new Error("Both sides must choose a Strategy first.");
+  if (conflict.step !== "check") throw new Error(loc`Both sides must choose a Strategy first.`);
   for (const [side, entry] of Object.entries({ predator, prey }))
-    if (!Number.isFinite(entry?.result)) throw new Error(`Enter the ${side}'s check result.`);
+    if (!Number.isFinite(entry?.result)) throw new Error(loc`Enter the ${side}'s check result.`);
   let winner = predator.result > prey.result ? "predator" : prey.result > predator.result ? "prey" : tieWinner;
-  if (!SIDES.includes(winner)) throw new Error("The opposed check is tied: break the tie (p.91) and name the winner.");
+  if (!SIDES.includes(winner))
+    throw new Error(loc`The opposed check is tied: break the tie (p.91) and name the winner.`);
   const loser = other(winner),
     results = { predator, prey };
   const margin = Math.abs(predator.result - prey.result);
@@ -141,14 +143,14 @@ export function advantageOptions(conflict) {
  * `leadShift` overrides the computed Lead change when an Advantage's repeat rule needs the GC's count.
  */
 export function chooseAdvantages(conflict, picks, { leadShift = null } = {}) {
-  if (conflict.step !== "advantages" || !conflict.pending) throw new Error("Resolve the opposed check first.");
+  if (conflict.step !== "advantages" || !conflict.pending) throw new Error(loc`Resolve the opposed check first.`);
   const options = advantageOptions(conflict),
     { winner, advantages: allowed } = conflict.pending;
   if (!Array.isArray(picks) || picks.length < 1 || picks.length > allowed)
-    throw new Error(`Choose 1 to ${allowed} Advantage(s).`);
+    throw new Error(loc`Choose 1 to ${allowed} Advantage(s).`);
   const chosen = picks.map(id => {
     const found = options.find(option => option.id === id);
-    if (!found) throw new Error("That Advantage is not listed with the winning Strategy.");
+    if (!found) throw new Error(loc`That Advantage is not listed with the winning Strategy.`);
     return found;
   });
   const counts = {};
@@ -162,7 +164,7 @@ export function chooseAdvantages(conflict, picks, { leadShift = null } = {}) {
     );
   }, 0);
   const shift = leadShift === null ? computed : leadShift;
-  if (!whole(shift) || shift < 0) throw new Error("Enter the Lead change as a whole number.");
+  if (!whole(shift) || shift < 0) throw new Error(loc`Enter the Lead change as a whole number.`);
   let next = structuredClone(conflict);
   next.lead = moveLead(next.lead, winner, shift);
   const victory = chosen.some(advantage => advantage.victory);
@@ -219,8 +221,8 @@ function finish(conflict) {
 
 /** Step 4 done: begin the next Conflict round with fresh Strategies. */
 export function nextRound(conflict) {
-  if (conflict.winner) throw new Error("This conflict is over.");
-  if (conflict.step !== "outside") throw new Error("Finish the current Conflict round first.");
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
+  if (conflict.step !== "outside") throw new Error(loc`Finish the current Conflict round first.`);
   const next = structuredClone(conflict);
   next.round += 1;
   next.step = "strategies";
@@ -230,15 +232,15 @@ export function nextRound(conflict) {
 
 /** A side may concede at any time: the opponent applies its Victory result. */
 export function concede(conflict, side) {
-  if (!SIDES.includes(side)) throw new Error("Choose Predator or Prey.");
-  if (conflict.winner) throw new Error("This conflict is over.");
+  if (!SIDES.includes(side)) throw new Error(loc`Choose Predator or Prey.`);
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
   return { ...structuredClone(conflict), winner: other(side), step: "ended", conceded: side };
 }
 
 /** GC correction or an outside effect that moves the Lead directly. */
 export function adjustLead(conflict, lead) {
-  if (!whole(lead)) throw new Error("Enter the Lead as a whole number.");
-  if (conflict.winner) throw new Error("This conflict is over.");
+  if (!whole(lead)) throw new Error(loc`Enter the Lead as a whole number.`);
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
   return finish({ ...structuredClone(conflict), lead });
 }
 

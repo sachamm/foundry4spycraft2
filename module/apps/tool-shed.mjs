@@ -1,20 +1,21 @@
 import { toolShedSource, toolShedPlan, toolShedKitState } from "../rules/tool-shed.mjs";
 import { attributeActionBlock } from "../rules/attributes.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
+import { loc } from "../i18n.mjs";
 export async function useToolShed(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   const source = toolShedSource({ ...actor.system, usagePeriods: actor.usagePeriods });
-  if (!source) throw new Error("An active Tool Shed selection is required.");
+  if (!source) throw new Error(loc`An active Tool Shed selection is required.`);
   const pack = game.packs.get("spycraft2.kits");
-  if (!pack) throw new Error("The kit catalog is unavailable.");
+  if (!pack) throw new Error(loc`The kit catalog is unavailable.`);
   let input = options;
   if (!Object.keys(input).length) {
     const kits = (await pack.getDocuments()).filter(k => k.type === "gear" && k.system.kitGrade === 3),
       esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Tool Shed: find one Grade III kit" },
+      window: { title: loc`Tool Shed: find one Grade III kit` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><label>Kit <select name="kitId">${kits.map(k => `<option value="${esc(k.id)}">${esc(k.name)}${k.system.kitNonPortable ? " (fixed location)" : ""}</option>`).join("")}</select></label><label>Home / fixed kit location <input name="home" maxlength="200" /></label><label><input name="atHome" type="checkbox" /> I am inside my home</label><label><input name="hourCompletedConfirmed" type="checkbox" /> I have completed the one-hour action to find this one kit</label><p>The kit is found at home and initially left there. It is lost at the end of this mission. No gear pick, Reserve or action die is spent.</p></div>`
+      content: `<div class="spycraft2-roll-options"><label>${loc`Kit`} <select name="kitId">${kits.map(k => `<option value="${esc(k.id)}">${esc(k.name)}${k.system.kitNonPortable ? " (fixed location)" : ""}</option>`).join("")}</select></label><label>${loc`Home / fixed kit location`} <input name="home" maxlength="200" /></label><label><input name="atHome" type="checkbox" /> ${loc`I am inside my home`}</label><label><input name="hourCompletedConfirmed" type="checkbox" /> ${loc`I have completed the one-hour action to find this one kit`}</label><p>${loc`The kit is found at home and initially left there. It is lost at the end of this mission. No gear pick, Reserve or action die is spent.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -30,7 +31,7 @@ export async function useToolShed(actor, options = {}) {
             attributeActionBlock(actor.system, { kind: "gear", ability: "wis" }) || restraintActionBlock(actor.system);
           if (block) throw new Error(block);
           if (JSON.stringify(toolShedSource(state())) !== JSON.stringify(source))
-            throw new Error("The Tool Shed source or mission changed before this grant completed.");
+            throw new Error(loc`The Tool Shed source or mission changed before this grant completed.`);
         };
       guard();
       const plan = toolShedPlan(state(), kit, { ...input, id, at: game.time?.worldTime ?? 0 }),
@@ -38,14 +39,14 @@ export async function useToolShed(actor, options = {}) {
       let item;
       try {
         [item] = await actor.createEmbeddedDocuments("Item", [plan.data]);
-        if (!item) throw new Error("The kit was not created.");
+        if (!item) throw new Error(loc`The kit was not created.`);
         guard();
         await actor.update({ ["system.classGearGrants." + id]: { ...plan.record, itemId: item.id } });
         guard();
-        if (!toolShedKitState(state(), item).valid) throw new Error("The introduced kit does not match its grant.");
+        if (!toolShedKitState(state(), item).valid) throw new Error(loc`The introduced kit does not match its grant.`);
         await ChatMessage.create({
           speaker: ChatMessage.getSpeaker({ actor }),
-          content: `Tool Shed: ${esc(item.name)} found at ${esc(plan.record.home)} after the declared one-hour action. Initially left at home; lost at mission end. No action die, Reserve or gear pick spent.`,
+          content: loc`Tool Shed: ${esc(item.name)} found at ${esc(plan.record.home)} after the declared one-hour action. Initially left at home; lost at mission end. No action die, Reserve or gear pick spent.`,
           flags: {
             spycraft2: {
               actorUuid: actor.uuid,
@@ -70,7 +71,7 @@ export async function useToolShed(actor, options = {}) {
             await actor.deleteEmbeddedDocuments("Item", [item.id]);
           } catch {
             ui.notifications.warn(
-              "The Tool Shed kit may still exist. Its use remains spent; review or remove the partial kit before correcting the saved use count."
+              loc`The Tool Shed kit may still exist. Its use remains spent; review or remove the partial kit before correcting the saved use count.`
             );
             return item;
           }

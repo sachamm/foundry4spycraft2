@@ -4,6 +4,7 @@ import { finesseCriticalEligible } from "./finesse.mjs";
 import { homeTurfSkillPlan } from "./terrain.mjs";
 import { appliesToSkill } from "./limited-uses.mjs";
 import { specialistApplies } from "./weapon-specialist.mjs";
+import { loc } from "../i18n.mjs";
 /** Activation resources, pp.62,96–97,329–330. Effect and its table cost are adjudicated by the GC. */
 export function criticalPlan(
   system,
@@ -24,7 +25,7 @@ export function criticalPlan(
 ) {
   const reject = reason => ({ blocked: true, reason });
   if (!check || check.resolved || check.superseded || check.criticalSuccess || check.criticalFailure)
-    return reject("This result has already been resolved, replaced or activated.");
+    return reject(loc`This result has already been resolved, replaced or activated.`);
   if (
     check.checkKind === "save" &&
     !(
@@ -36,25 +37,26 @@ export function criticalPlan(
     )
   )
     return reject(
-      "Saving throws cannot cause threats, errors or critical results, except the explicit One in a Million Fortitude threat (pp.50,347)."
+      loc`Saving throws cannot cause threats, errors or critical results, except the explicit One in a Million Fortitude threat (pp.50,347).`
     );
-  if (!["success", "failure"].includes(kind)) return reject("Choose a critical success or failure.");
-  if (kind === "success" && !check.threatConfirmed) return reject("Confirm a successful threat before activating it.");
-  if (kind === "failure" && !check.errorConfirmed) return reject("Confirm an error before activating it.");
+  if (!["success", "failure"].includes(kind)) return reject(loc`Choose a critical success or failure.`);
+  if (kind === "success" && !check.threatConfirmed)
+    return reject(loc`Confirm a successful threat before activating it.`);
+  if (kind === "failure" && !check.errorConfirmed) return reject(loc`Confirm an error before activating it.`);
   if (kind === "success" && !samePayer)
-    return reject("A character must pay for their own critical success unless a specific rule allows otherwise.");
+    return reject(loc`A character must pay for their own critical success unless a specific rule allows otherwise.`);
   if (kind === "failure" && (samePayer || !opponent || !lineOfSight))
-    return reject("An opponent within line of sight must pay to activate this error (p.62).");
+    return reject(loc`An opponent within line of sight must pay to activate this error (p.62).`);
   if (kind === "failure" && check.boostSpent > 0)
-    return reject("Error activation must be decided before the acting character boosts the result.");
+    return reject(loc`Error activation must be decided before the acting character boosts the result.`);
   if (!Number.isSafeInteger(baseCost) || baseCost < 1 || (check.checkKind === "attack" && baseCost > 4))
-    return reject("Choose the effect’s whole-number table cost (1–4 for attack results).");
+    return reject(loc`Choose the effect’s whole-number table cost (1–4 for attack results).`);
   if (!effectConfirmed || !String(effect).trim())
     return reject(
-      "Confirm the GC’s applicable critical effect and its base cost. No dice are spent when no critical effect is possible."
+      loc`Confirm the GC’s applicable critical effect and its base cost. No dice are spent when no critical effect is possible.`
     );
   if (kind === "success" && check.checkKind === "attack" && !beforeDamage)
-    return reject("A critical hit must be activated before damage is rolled (p.62).");
+    return reject(loc`A critical hit must be activated before damage is rolled (p.62).`);
   const recordedMount = check.attackContext?.vehicleMounted,
     vehicleMountDeclared =
       kind === "success" &&
@@ -117,7 +119,7 @@ export function criticalPlan(
     }
     if (check.triumphed && check.successConfirmed === true && check.effectiveTotal >= 75) {
       adjustment--;
-      sources.push("Attack Triumph: one-die critical hit included");
+      sources.push(loc`Attack Triumph: one-die critical hit included`);
     }
     if (
       system.activeFeatNames?.includes("Sharpshooter Supremacy") &&
@@ -192,7 +194,7 @@ export function criticalPlan(
     }
   }
   const cost = Math.max(minimum, baseCost + adjustment);
-  if (cost > available) return reject("Not enough action dice remain in the paying character’s pool.");
+  if (cost > available) return reject(loc`Not enough action dice remain in the paying character’s pool.`);
   return {
     blocked: false,
     cost,

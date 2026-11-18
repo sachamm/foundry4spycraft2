@@ -14,6 +14,7 @@ import {
 import { npcSpendProfile } from "../../rules/gc/gc-spend.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
+import { loc } from "../../i18n.mjs";
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
@@ -76,26 +77,26 @@ export async function rollNpcSkill(actor, input = null) {
       game.i18n.localize(label)
     ]);
     input = await ask(
-      `${actor.name}: skill check`,
+      loc`${actor.name}: skill check`,
       `
-      <p>An NPC uses the higher of Competence and its skilled bonus, which also sets the result cap (p.452). The key attribute modifier is added.</p>
-      <label>Skill <select name="key">${options(skillRows)}</select></label>
-      <label>Attribute <select name="ability">${options([["", "First listed for the skill"], ...abilityRows], "")}</select></label>
-      ${graded ? "" : '<label>Skill bonus (manual stat block) <input type="number" name="manualBonus" value="0" /></label>'}
-      <label>Situational modifier <input type="number" name="modifier" value="0" /></label>
-      <label>Error range <input type="number" name="error" min="0" max="19" value="1" /></label>
-      <label><input type="checkbox" name="secret" /> Secret (GC only)</label>`
+      <p>${loc`An NPC uses the higher of Competence and its skilled bonus, which also sets the result cap (p.452). The key attribute modifier is added.`}</p>
+      <label>${loc`Skill`} <select name="key">${options(skillRows)}</select></label>
+      <label>${loc`Attribute`} <select name="ability">${options([["", "First listed for the skill"], ...abilityRows], "")}</select></label>
+      ${graded ? "" : `<label>${loc`Skill bonus (manual stat block)`} <input type="number" name="manualBonus" value="0" /></label>`}
+      <label>${loc`Situational modifier`} <input type="number" name="modifier" value="0" /></label>
+      <label>${loc`Error range`} <input type="number" name="error" min="0" max="19" value="1" /></label>
+      <label><input type="checkbox" name="secret" /> ${loc`Secret (GC only)`}</label>`
     );
     if (!input) return null;
   }
   const skill = SKILLS.find(entry => entry.key === input.key);
-  if (!skill) return ui.notifications.warn("Choose a skill.");
+  if (!skill) return ui.notifications.warn(loc`Choose a skill.`);
   if (
     actor.system.npcType === "animal" &&
     graded &&
     !actor.system.npcBuild?.skills?.some(entry => entry.key === skill.key)
   )
-    ui.notifications.info("Animals have no Competence: only their listed skills carry a bonus (p.445).");
+    ui.notifications.info(loc`Animals have no Competence: only their listed skills carry a bonus (p.445).`);
   const plan = graded
     ? npcSkillPlan(actor, skill.key)
     : { bonus: Number(input.manualBonus) || 0, cap: stepLookup(TABLES.skillCap, Number(input.manualBonus) || 0) };
@@ -108,7 +109,7 @@ export async function rollNpcSkill(actor, input = null) {
     "1d20 + @total",
     { total },
     {
-      flavor: `${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}`,
+      flavor: loc`${skill.name} (${ability.toUpperCase()}) — NPC bonus ${signed(plan.bonus)}, result cap ${plan.cap}`,
       ability,
       cap: plan.cap,
       error: Math.max(0, Number(input.error) || 0),
@@ -137,20 +138,20 @@ export async function npcDamageSave(actor, input = null) {
   if (!actor.isOwner) return null;
   if (npcIsSpecial(actor))
     return ui.notifications.warn(
-      "Special NPCs lose vitality and wounds like player characters; Damage saves are for standard NPCs and animals (p.452)."
+      loc`Special NPCs lose vitality and wounds like player characters; Damage saves are for standard NPCs and animals (p.452).`
     );
   const state = damageSaveState(actor);
   if (state.track.state !== "active")
     return ui.notifications.warn(
-      `${actor.name} is already ${state.track.state}. Reset the Damage save track to bring the NPC back.`
+      loc`${actor.name} is already ${state.track.state}. Reset the Damage save track to bring the NPC back.`
     );
   if (!input) {
     input = await ask(
-      `${actor.name}: Damage save`,
+      loc`${actor.name}: Damage save`,
       `
-      <p>DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? `; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction.</p>
-      <label>Damage suffered <input type="number" name="damage" min="1" value="1" required /></label>
-      <label>Type <select name="kind">${options(
+      <p>${loc`DC 10 + half of all damage suffered this scene (now ${state.track.accumulated}). Save bonus ${signed(state.bonus)}${state.tough ? loc`; tough ${state.tough} (ignored so far: ${state.track.ignored})` : ""}. Enter damage after Damage Reduction.`}</p>
+      <label>${loc`Damage suffered`} <input type="number" name="damage" min="1" value="1" required /></label>
+      <label>${loc`Type`} <select name="kind">${options(
         [
           ["lethal", "Lethal"],
           ["subdual", "Subdual"],
@@ -158,9 +159,9 @@ export async function npcDamageSave(actor, input = null) {
         ],
         "lethal"
       )}</select></label>
-      <label><input type="checkbox" name="blast" /> The damage has a blast increment (+1 failed save per 10 the save misses by)</label>
-      <label>Action dice spent to activate a critical hit (each is an automatic failed save) <input type="number" name="criticalDice" min="0" value="0" /></label>
-      <label>Save bonus <input type="number" name="bonus" value="${state.bonus}" /></label>`
+      <label><input type="checkbox" name="blast" /> ${loc`The damage has a blast increment (+1 failed save per 10 the save misses by)`}</label>
+      <label>${loc`Action dice spent to activate a critical hit (each is an automatic failed save)`} <input type="number" name="criticalDice" min="0" value="0" /></label>
+      <label>${loc`Save bonus`} <input type="number" name="bonus" value="${state.bonus}" /></label>`
     );
     if (!input) return null;
   }
@@ -186,11 +187,11 @@ export async function npcDamageSave(actor, input = null) {
       : result.state === "unconscious"
         ? "fails and falls unconscious"
         : result.failures
-          ? `fails ${result.failures} save(s), all ignored by tough`
-          : "succeeds: no mechanical effect, the damage lingers";
+          ? loc`fails ${result.failures} save(s), all ignored by tough`
+          : loc`succeeds: no mechanical effect, the damage lingers`;
   await roll.toMessage({
     speaker: ChatMessage.getSpeaker({ actor }),
-    flavor: `Damage save DC ${result.dc} (${input.damage} ${esc(input.kind)}; ${result.track.accumulated || state.track.accumulated + Number(input.damage)} accumulated): ${signed(result.bonus)} → <b>${result.total}</b>. ${esc(actor.name)} ${outcome}.`
+    flavor: `${loc`Damage save DC ${result.dc} (${input.damage} ${esc(input.kind)}; ${result.track.accumulated || state.track.accumulated + Number(input.damage)} accumulated): ${signed(result.bonus)} →`} <b>${result.total}</b>. ${esc(actor.name)} ${outcome}.`
   });
   if (result.state !== "active") {
     try {
@@ -199,7 +200,7 @@ export async function npcDamageSave(actor, input = null) {
         overlay: result.state === "dead"
       });
     } catch (error) {
-      console.warn("Spycraft 2.0 | status not applied", error);
+      console.warn(loc`Spycraft 2.0 | status not applied`, error);
     }
     for (const combat of game.combats ?? [])
       for (const combatant of combat.combatants)
@@ -242,7 +243,7 @@ export function dispositionRows(actor) {
 
 /** Set, shift or roll against an NPC's disposition toward a character (or its general attitude). */
 export async function manageDisposition(actor) {
-  if (!game.user.isGM) return ui.notifications.warn("The GC manages NPC dispositions.");
+  if (!game.user.isGM) return ui.notifications.warn(loc`The GC manages NPC dispositions.`);
   const record = dispositionRecord(actor),
     villain = isVillain(actor),
     mission = String(actor.system.usagePeriods?.mission ?? "initial");
@@ -255,28 +256,28 @@ export async function manageDisposition(actor) {
   ];
   const D = GC_DATA.core.disposition;
   const input = await ask(
-    `${actor.name}: disposition`,
+    loc`${actor.name}: disposition`,
     `
-    ${villain ? '<p class="bad">Villains are immune to disposition effects (p.457); this record is for reference only.</p>' : ""}
-    <p>No NPC shifts more than ${D.maxShiftPerMission} grades either way in one mission. Intimacy checks: ${esc(D.intimacyChecks.join(", "))}. Fondness checks: ${esc(D.fondnessChecks.join(", "))}.</p>
-    <label>Toward <select name="target">${options(targets, "")}</select></label>
-    <label>Action <select name="action">${options(
+    ${villain ? `<p class="bad">${loc`Villains are immune to disposition effects (p.457); this record is for reference only.`}</p>` : ""}
+    <p>${loc`No NPC shifts more than ${D.maxShiftPerMission} grades either way in one mission. Intimacy checks: ${esc(D.intimacyChecks.join(", "))}. Fondness checks: ${esc(D.fondnessChecks.join(", "))}.`}</p>
+    <label>${loc`Toward`} <select name="target">${options(targets, "")}</select></label>
+    <label>${loc`Action`} <select name="action">${options(
       [
         ["show", "Show check modifiers"],
         ["shift", "Shift by grades"],
-        ["set", "Set a grade (GC ruling)"],
+        ["set", loc`Set a grade (GC ruling)`],
         ["loyalty", "Roll a Loyalty decision"],
         ["combat", "Roll whether the NPC joins a fight"]
       ],
       "show"
     )}</select></label>
-    <label>Shift (positive is friendlier) <input type="number" name="steps" value="1" /></label>
-    <label><input type="checkbox" name="automatic" /> The shift comes from an ability that shifts disposition automatically (once per mission)</label>
-    <label>Grade to set <select name="grade">${options(
+    <label>${loc`Shift (positive is friendlier)`} <input type="number" name="steps" value="1" /></label>
+    <label><input type="checkbox" name="automatic" /> ${loc`The shift comes from an ability that shifts disposition automatically (once per mission)`}</label>
+    <label>${loc`Grade to set`} <select name="grade">${options(
       DISPOSITIONS.map(grade => [grade.id, grade.name]),
       "neutral"
     )}</select></label>
-    <label>Foil decision modifier (−5 to +5) <input type="number" name="foil" min="-5" max="5" value="0" /></label>`
+    <label>${loc`Foil decision modifier (−5 to +5)`} <input type="number" name="foil" min="-5" max="5" value="0" /></label>`
   );
   if (!input) return null;
   const targetId = input.target || "",
@@ -299,7 +300,7 @@ export async function manageDisposition(actor) {
       await actor.update(update);
       return say(
         actor,
-        `${esc(actor.name)} is now <b>${esc(dispositionGrade(next.grade).name)}</b> toward ${esc(name)}${next.limited ? " (limited to 2 grades per mission)" : ""}.`,
+        `${loc`${esc(actor.name)} is now`} <b>${esc(dispositionGrade(next.grade).name)}</b> ${loc`toward ${esc(name)}${next.limited ? loc` (limited to 2 grades per mission)` : ""}.`}`,
         { whisper: true }
       );
     }
@@ -312,7 +313,7 @@ export async function manageDisposition(actor) {
       return roll.toMessage(
         {
           speaker: ChatMessage.getSpeaker({ actor }),
-          flavor: `Loyalty (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${step.total} against ${step.target} — ${step.success ? "sides with them" : "sides against them"}.`
+          flavor: loc`Loyalty (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${step.total} against ${step.target} — ${step.success ? loc`sides with them` : loc`sides against them`}.`
         },
         { rollMode: "gmroll" }
       );
@@ -323,7 +324,7 @@ export async function manageDisposition(actor) {
       return roll.toMessage(
         {
           speaker: ChatMessage.getSpeaker({ actor }),
-          flavor: `Joins the fight? (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${result.total} against ${result.target} — ${result.joins ? (result.hostile ? "enters the fight against them" : "enters the fight on their side") : "stays out"}. A side may instead try Impress/Persuasion once per combat (DC ${dispositionGrade(gradeNow).joinDC ?? "Triumph only"}).`
+          flavor: loc`Joins the fight? (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${result.total} against ${result.target} — ${result.joins ? (result.hostile ? loc`enters the fight against them` : loc`enters the fight on their side`) : loc`stays out`}. A side may instead try Impress/Persuasion once per combat (DC ${dispositionGrade(gradeNow).joinDC ?? loc`Triumph only`}).`
         },
         { rollMode: "gmroll" }
       );
@@ -333,7 +334,7 @@ export async function manageDisposition(actor) {
       grade = dispositionGrade(gradeNow);
     return say(
       actor,
-      `<b>${esc(actor.name)}</b> is ${esc(grade.name)} toward ${esc(name)}.<br>Intimacy checks ${signed(intimacy.modifier)}${intimacy.error ? `, error range +${intimacy.error}` : ""}.<br>Fondness checks ${signed(fondness.modifier)}${fondness.threat ? `, threat range +${fondness.threat}` : ""}${fondness.error ? `, error range +${fondness.error}` : ""}.<br>Loyalty ${grade.loyalty}; joins combat on ${grade.joinRoll} or less; time for Disposition-tagged checks ×${grade.priority}.`,
+      `<b>${esc(actor.name)}</b> ${loc`is ${esc(grade.name)} toward ${esc(name)}.`}<br>${loc`Intimacy checks ${signed(intimacy.modifier)}${intimacy.error ? `, error range +${intimacy.error}` : ""}.`}<br>${loc`Fondness checks ${signed(fondness.modifier)}${fondness.threat ? `, threat range +${fondness.threat}` : ""}${fondness.error ? `, error range +${fondness.error}` : ""}.`}<br>${loc`Loyalty ${grade.loyalty}; joins combat on ${grade.joinRoll} or less; time for Disposition-tagged checks ×${grade.priority}.`}`,
       { whisper: true }
     );
   } catch (error) {

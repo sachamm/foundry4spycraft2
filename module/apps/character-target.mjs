@@ -1,5 +1,6 @@
 import { characterTargetPlan, characterTargetsEqual } from "../rules/character-target.mjs";
 import { finesseMeleeWeapon } from "../rules/finesse.mjs";
+import { loc } from "../i18n.mjs";
 const canRead = a =>
   !!a &&
   (a.isOwner === true ||
@@ -35,15 +36,15 @@ export function characterTargetContent(actor, input = {}, { fixedTargetUuid, fix
   const fixed = fixedTargetUuid !== undefined,
     chosen = attackCharacterTargetChoices().find(a => a.uuid === fixedTargetUuid),
     picker = fixed
-      ? `<input name="targetActorUuid" type="hidden" value="${esc(fixedTargetUuid)}" /><p>Original opponent: ${esc(chosen?.name ?? fixedTargetName ?? "The attacking opponent")}</p>`
-      : `<label>Actual target <select name="targetActorUuid"><option value="">Unrecorded target</option>${attackCharacterTargetChoices()
+      ? `<input name="targetActorUuid" type="hidden" value="${esc(fixedTargetUuid)}" /><p>${loc`Original opponent: ${esc(chosen?.name ?? fixedTargetName ?? "The attacking opponent")}`}</p>`
+      : `<label>${loc`Actual target`} <select name="targetActorUuid"><option value="">${loc`Unrecorded target`}</option>${attackCharacterTargetChoices()
           .map(a => `<option value="${esc(a.uuid)}"${a.uuid === selected ? " selected" : ""}>${esc(a.name)}</option>`)
           .join("")}</select></label>`;
-  return `<fieldset class="spycraft2-character-target"><legend>Target for Cleave bonuses</legend><p>Melee threat and critical-cost benefits require a standard character. An observed character sheet supplies its type. For an unrecorded target or animal, enter the GC’s classification. Use Object / non-character for environmental targets.</p>${picker}<label>GC classification for unrecorded target, animal or object <select name="targetCharacterType"><option value="">Use the selected sheet</option><option value="standard"${input.targetCharacterType === "standard" ? " selected" : ""}>Standard character</option><option value="special"${input.targetCharacterType === "special" ? " selected" : ""}>Special character</option><option value="object"${input.targetCharacterType === "object" ? " selected" : ""}>Object / non-character</option></select></label><label>Unrecorded target name <input name="targetName" maxlength="200" value="${esc(fixedTargetName ?? input.targetName ?? "")}"${fixed ? " readonly" : ""} /></label></fieldset>`;
+  return `<fieldset class="spycraft2-character-target"><legend>${loc`Target for Cleave bonuses`}</legend><p>${loc`Melee threat and critical-cost benefits require a standard character. An observed character sheet supplies its type. For an unrecorded target or animal, enter the GC’s classification. Use Object / non-character for environmental targets.`}</p>${picker}<label>${loc`GC classification for unrecorded target, animal or object`} <select name="targetCharacterType"><option value="">${loc`Use the selected sheet`}</option><option value="standard"${input.targetCharacterType === "standard" ? " selected" : ""}>${loc`Standard character`}</option><option value="special"${input.targetCharacterType === "special" ? " selected" : ""}>${loc`Special character`}</option><option value="object"${input.targetCharacterType === "object" ? " selected" : ""}>${loc`Object / non-character`}</option></select></label><label>${loc`Unrecorded target name`} <input name="targetName" maxlength="200" value="${esc(fixedTargetName ?? input.targetName ?? "")}"${fixed ? " readonly" : ""} /></label></fieldset>`;
 }
 async function resolve(input) {
   const uuid = input.targetActorUuid ?? "";
-  if (typeof uuid !== "string") throw new Error("Choose the actual target.");
+  if (typeof uuid !== "string") throw new Error(loc`Choose the actual target.`);
   if (!uuid) return characterTargetPlan(null, input);
   const a = await fromUuid(uuid);
   if (
@@ -53,7 +54,7 @@ async function resolve(input) {
     !attackCharacterTargetChoices().some(t => t.uuid === a.uuid)
   )
     throw new Error(
-      "The selected target is no longer an observed character. Confirm its current source or use the GC’s unrecorded-target classification."
+      loc`The selected target is no longer an observed character. Confirm its current source or use the GC’s unrecorded-target classification.`
     );
   return characterTargetPlan(data(a), input);
 }
@@ -73,7 +74,7 @@ export async function completeCharacterTarget(
   try {
     const target = await resolve(raw);
     if (raw.characterTarget && !characterTargetsEqual(raw.characterTarget, target))
-      throw new Error("The prepared character target changed. Confirm its current source again.");
+      throw new Error(loc`The prepared character target changed. Confirm its current source again.`);
     return {
       ...raw,
       ...(target.source === "actor" && target.npcType === "animal" && target.characterType !== "object"
@@ -85,7 +86,7 @@ export async function completeCharacterTarget(
     if (error.code !== "NEED_CHARACTER_TARGET" || !prompt) throw error;
   }
   const answer = await foundry.applications.api.DialogV2.input({
-    window: { title: "Cleave character target" },
+    window: { title: loc`Cleave character target` },
     rejectClose: false,
     content: `<div class="spycraft2-roll-options">${characterTargetContent(actor, raw, { fixedTargetUuid, fixedTargetName })}</div>`
   });
@@ -109,7 +110,7 @@ export async function validateCharacterTarget(target) {
     targetName: ""
   });
   if (!characterTargetsEqual(fresh, target))
-    throw new Error("The actual target classification changed during the attack. Confirm it again.");
+    throw new Error(loc`The actual target classification changed during the attack. Confirm it again.`);
 }
 
 export function knownCharacterTargetInput(uuid, input = {}, characterType = "") {
@@ -130,5 +131,5 @@ export function observedAttackTargetContent(actor, input = {}) {
       input.targetActorUuid ??
       (values(game.user?.targets).length === 1 ? values(game.user.targets)[0].actor?.uuid : "") ??
       "";
-  return `<label>Actual opponent (optional; retain in the attack receipt) <select name="targetActorUuid"><option value="">Unrecorded / GC-confirmed target</option>${targets.map(a => `<option value="${esc(a.uuid)}"${a.uuid === selected ? " selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>`;
+  return `<label>${loc`Actual opponent (optional; retain in the attack receipt)`} <select name="targetActorUuid"><option value="">${loc`Unrecorded / GC-confirmed target`}</option>${targets.map(a => `<option value="${esc(a.uuid)}"${a.uuid === selected ? " selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>`;
 }

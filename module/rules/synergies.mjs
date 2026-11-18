@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 const normal = value =>
   String(value ?? "")
     .trim()
@@ -31,22 +32,22 @@ export function skillSynergy(
     return available.sort((a, b) => b.value - a.value)[0] ?? { value: 0 };
   }
   const skill = system.skillTotals?.[synergySkill];
-  if (!skill) return { value: 0, reason: "Choose an existing skill for synergy." };
+  if (!skill) return { value: 0, reason: loc`Choose an existing skill for synergy.` };
   const matches = rows.filter(row => row.skill === synergySkill);
   if (!matches.length && !gcApprovedSynergy)
-    return { value: 0, reason: "This synergy is not listed for the chosen use; GC approval is required (p.92)." };
+    return { value: 0, reason: loc`This synergy is not listed for the chosen use; GC approval is required (p.92).` };
   const candidates = matches.length ? matches : [{ skill: synergySkill, focusSkill: skill.focus, condition: "" }];
   const row = candidates.find(eligible);
   if (!row)
     return {
       value: 0,
-      reason: `The chosen synergy needs its listed circumstances and an owned applicable focus: ${
+      reason: loc`The chosen synergy needs its listed circumstances and an owned applicable focus: ${
         matches
           .map(row => [row.focus, row.condition].filter(Boolean).join(" — "))
           .filter(Boolean)
           .join("; ") ||
         synergyFocus ||
-        "select the applicable focus"
+        loc`select the applicable focus`
       }.`
     };
   return {

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /**
  * World data migrations.
  *
@@ -29,10 +30,10 @@ export function pendingMigrations(from, migrations = MIGRATIONS, to = SCHEMA_VER
   const list = migrations.filter(m => m.version > current && m.version <= to).sort((a, b) => a.version - b.version);
   for (const migration of list) {
     if (!Number.isSafeInteger(migration.version) || migration.version < 1) {
-      throw new Error("A migration needs a whole-number version of 1 or more.");
+      throw new Error(loc`A migration needs a whole-number version of 1 or more.`);
     }
   }
-  if (new Set(list.map(m => m.version)).size !== list.length) throw new Error("Two migrations share a version.");
+  if (new Set(list.map(m => m.version)).size !== list.length) throw new Error(loc`Two migrations share a version.`);
   return list;
 }
 
@@ -68,7 +69,8 @@ export function documentUpdate(kind, source, parentSource, migrations) {
   for (const migration of migrations) {
     const update = migration[kind]?.(working, parentSource);
     if (update === undefined || update === null) continue;
-    if (!isPlainObject(update)) throw new Error(`Migration ${migration.version} returned an invalid ${kind} update.`);
+    if (!isPlainObject(update))
+      throw new Error(loc`Migration ${migration.version} returned an invalid ${kind} update.`);
     if (!Object.keys(update).length) continue;
     Object.assign(combined, update);
     working = applyUpdate(working, update);
@@ -89,7 +91,7 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
   if (from >= to) return { ...report, to: from };
   if (list.length) {
     world.notify?.(
-      `Updating world data for Spycraft 2.0 (${list.map(m => m.label ?? `version ${m.version}`).join("; ")}).`
+      loc`Updating world data for Spycraft 2.0 (${list.map(m => m.label ?? `version ${m.version}`).join("; ")}).`
     );
     const migrate = async (kind, document, parentSource) => {
       try {
@@ -112,7 +114,9 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
   // A run with failures keeps the old version, so the same migrations are tried again next time.
   if (!report.failed) await world.setVersion(to);
   else
-    world.notify?.(`${report.failed} document(s) could not be updated; see the console. The update will be retried.`);
+    world.notify?.(
+      loc`${report.failed} document(s) could not be updated; see the console. The update will be retried.`
+    );
   return report;
 }
 

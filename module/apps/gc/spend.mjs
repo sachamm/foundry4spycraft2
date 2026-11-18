@@ -14,6 +14,7 @@ import {
   qualitiesInForce
 } from "./state.mjs";
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
+import { loc } from "../../i18n.mjs";
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
@@ -56,7 +57,7 @@ const npcActors = () => {
 export async function spendGCDice(input = {}) {
   requireGC();
   const status = gcDiceStatus();
-  if (!status.current) return ui.notifications.warn("Initialize the GC action dice for this session first.");
+  if (!status.current) return ui.notifications.warn(loc`Initialize the GC action dice for this session first.`);
   const dramatic = isDramaticScene(),
     scene = getSceneState();
   if (!input.id) {
@@ -70,33 +71,33 @@ export async function spendGCDice(input = {}) {
       .map(quality => [quality.id, `${quality.name} (${quality.gcDice})`]);
     const eventRows = GC_DATA.tables.events.map(event => [event.id, event.name]);
     const picked = await ask(
-      `GC action dice — ${status.value} left${dramatic ? " · dramatic scene" : ""}`,
+      loc`GC action dice — ${status.value} left${dramatic ? loc` · dramatic scene` : ""}`,
       `
-      <label>Use <select name="id">${options(uses)}</select></label>
-      <label>NPC <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
-      <label>Threat scored with <select name="checkKind">${options(
+      <label>${loc`Use`} <select name="id">${options(uses)}</select></label>
+      <label>${loc`NPC`} <select name="actorId">${options([["", "—"], ...actors.map(actor => [actor.uuid, actor.name])], actors[0]?.uuid ?? "")}</select></label>
+      <label>${loc`Threat scored with`} <select name="checkKind">${options(
         [
           ["attack", "an attack"],
           ["skill", "a skill check"]
         ],
         "attack"
       )}</select></label>
-      <label>Dice for a variable cost (critical activation) <input type="number" name="dice" min="1" value="1" /></label>
-      <label>Event <select name="eventId">${options(eventRows)}</select></label>
-      <label>Event intensity (1–4 dice) <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
-      <label><input type="checkbox" name="triggered" /> One of the event's listed triggers has occurred (−1 die)</label>
-      <label><input type="checkbox" name="free" /> Prompted by a Subplot or another rule (no cost)</label>
-      <label>Campaign quality <select name="qualityId">${options(qualityRows)}</select></label>
-      <label><input type="checkbox" name="fromCapture" /> Saving the NPC from capture rather than death</label>
-      <label><input type="checkbox" name="public" /> Show the result to the players</label>`
+      <label>${loc`Dice for a variable cost (critical activation)`} <input type="number" name="dice" min="1" value="1" /></label>
+      <label>${loc`Event`} <select name="eventId">${options(eventRows)}</select></label>
+      <label>${loc`Event intensity (1–4 dice)`} <input type="number" name="eventCost" min="1" max="4" value="1" /></label>
+      <label><input type="checkbox" name="triggered" /> ${loc`One of the event's listed triggers has occurred (−1 die)`}</label>
+      <label><input type="checkbox" name="free" /> ${loc`Prompted by a Subplot or another rule (no cost)`}</label>
+      <label>${loc`Campaign quality`} <select name="qualityId">${options(qualityRows)}</select></label>
+      <label><input type="checkbox" name="fromCapture" /> ${loc`Saving the NPC from capture rather than death`}</label>
+      <label><input type="checkbox" name="public" /> ${loc`Show the result to the players`}</label>`
     );
     if (!picked) return null;
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };
   }
   const spend = GC_SPENDS.find(entry => entry.id === input.id);
-  if (!spend) return ui.notifications.warn("Choose a use for the action dice.");
+  if (!spend) return ui.notifications.warn(loc`Choose a use for the action dice.`);
   const actor = spend.needsNpc ? input.actor : null;
-  if (spend.needsNpc && actor?.type !== "npc") return ui.notifications.warn("Choose the NPC this applies to.");
+  if (spend.needsNpc && actor?.type !== "npc") return ui.notifications.warn(loc`Choose the NPC this applies to.`);
   const quality = input.id === "campaignQuality" ? campaignQuality(input.qualityId) : null;
   let plan;
   try {
@@ -118,7 +119,7 @@ export async function spendGCDice(input = {}) {
     return ui.notifications.warn(error.message);
   }
   if (plan.cost > status.value)
-    return ui.notifications.warn(`That costs ${plan.cost} action dice; the GC has ${status.value}.`);
+    return ui.notifications.warn(loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`);
 
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;
@@ -133,11 +134,11 @@ export async function spendGCDice(input = {}) {
   const die = plan.die ? await rollGCDie(plan.die, { explodeLow: plan.explodeLow }) : null;
   const lines = [
     `<b>${esc(reason)}</b>`,
-    `Cost: ${plan.cost} GC action di${plan.cost === 1 ? "e" : "ce"} (p.${plan.page}).`
+    loc`Cost: ${plan.cost} GC action di${plan.cost === 1 ? "e" : "ce"} (p.${plan.page}).`
   ];
   if (die)
     lines.push(
-      `d${die.faces}${plan.explodeLow ? " (explodes on 1 and maximum)" : ""}: ${die.rolls.join(" + ")} = <b>${die.total}</b>`
+      `d${die.faces}${plan.explodeLow ? loc` (explodes on 1 and maximum)` : ""}: ${die.rolls.join(" + ")} = <b>${die.total}</b>`
     );
   lines.push(...plan.notes.map(esc));
 
@@ -147,7 +148,7 @@ export async function spendGCDice(input = {}) {
       case "dramaticScene":
         await setSceneState({ dramatic: true, source: "spent" });
         lines.push(
-          "The scene is now dramatic: GC dice explode on 1 and maximum, opponents’ Initiative doubles (maximum 50), and up to 3 dice may boost one DC."
+          loc`The scene is now dramatic: GC dice explode on 1 and maximum, opponents’ Initiative doubles (maximum 50), and up to 3 dice may boost one DC.`
         );
         break;
       case "campaignQuality":
@@ -162,10 +163,10 @@ export async function spendGCDice(input = {}) {
         });
         break;
       case "healNpc": {
-        if (npcIsSpecial(actor)) lines.push(`Restore ${die.total} vitality or 2 wounds on the sheet.`);
+        if (npcIsSpecial(actor)) lines.push(loc`Restore ${die.total} vitality or 2 wounds on the sheet.`);
         else {
           await resetDamageTrack(actor, { heal: die.total });
-          lines.push(`Accumulated damage is now ${damageSaveState(actor).track.accumulated}.`);
+          lines.push(loc`Accumulated damage is now ${damageSaveState(actor).track.accumulated}.`);
         }
         break;
       }
@@ -173,18 +174,18 @@ export async function spendGCDice(input = {}) {
         const combatant = game.combat?.combatants.find(entry => entry.actor === actor);
         if (combatant && Number.isFinite(combatant.initiative)) {
           await combatant.update({ initiative: combatant.initiative + die.total });
-          lines.push(`Initiative Count ${combatant.initiative}.`);
+          lines.push(loc`Initiative Count ${combatant.initiative}.`);
         }
         break;
       }
       case "boostDefense":
-        lines.push(`+2 Defense for ${die.total} round(s).`);
+        lines.push(loc`+2 Defense for ${die.total} round(s).`);
         break;
       case "boostDefenseAfterHit":
-        lines.push(`+${die.total} Defense against that attack only; it may now miss.`);
+        lines.push(loc`+${die.total} Defense against that attack only; it may now miss.`);
         break;
       case "boostDC":
-        lines.push(`The DC rises by ${die.total}.`);
+        lines.push(loc`The DC rises by ${die.total}.`);
         break;
       case "event":
         if (event) lines.push(esc(event.summary));
@@ -192,7 +193,7 @@ export async function spendGCDice(input = {}) {
       default:
     }
   } catch (error) {
-    lines.push(`<span class="bad">Not applied automatically: ${esc(error.message)}</span>`);
+    lines.push(`<span class="bad">${loc`Not applied automatically: ${esc(error.message)}`}</span>`);
   }
   await ChatMessage.create({
     speaker: { alias: "Game Control" },
@@ -212,8 +213,9 @@ export async function setDramaticScene(dramatic, { source = "scripted" } = {}) {
 /** Dramatic scene: double each opponent's current Initiative Count, to at most 50 (p.424). Each combatant is doubled once per combat. */
 export async function doubleOpponentInitiative(combat = game.combat) {
   requireGC();
-  if (!combat) return ui.notifications.warn("There is no active combat.");
-  if (!isDramaticScene()) return ui.notifications.warn("Only a dramatic scene doubles opponents’ Initiative (p.424).");
+  if (!combat) return ui.notifications.warn(loc`There is no active combat.`);
+  if (!isDramaticScene())
+    return ui.notifications.warn(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
   const changed = [];
   for (const combatant of combat.combatants) {
     if (
@@ -229,7 +231,7 @@ export async function doubleOpponentInitiative(combat = game.combat) {
   if (changed.length)
     await ChatMessage.create({
       speaker: { alias: "Game Control" },
-      content: `Dramatic scene — opponents’ Initiative Counts doubled (maximum 50).<br>${changed.map(esc).join("<br>")}`,
+      content: `${loc`Dramatic scene — opponents’ Initiative Counts doubled (maximum 50).`}<br>${changed.map(esc).join("<br>")}`,
       whisper: gmWhisper()
     });
   return changed;
@@ -240,7 +242,7 @@ export async function recordCaliberIncrease(caliber) {
   requireGC();
   const mission = getMission();
   if (!Number.isSafeInteger(caliber) || caliber <= mission.caliber || caliber > 5)
-    return ui.notifications.warn("Choose a higher Caliber, up to V.");
+    return ui.notifications.warn(loc`Choose a higher Caliber, up to V.`);
   const steps = caliber - mission.caliber;
   if (gcDiceStatus().current) await adjustGCDice(2 * steps, `Mission Caliber increased to ${caliber}`);
   await updateMission({ caliber });

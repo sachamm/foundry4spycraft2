@@ -3,6 +3,7 @@
  * Each has an XP modifier when scripted and, for some, a GC action die cost to add mid-mission.
  */
 import { GC_DATA } from "../gc-tables.mjs";
+import { loc } from "../../i18n.mjs";
 
 export const CAMPAIGN_QUALITIES = GC_DATA.campaignQualities;
 export const campaignQuality = id => CAMPAIGN_QUALITIES.find(quality => quality.id === id) ?? null;
@@ -29,17 +30,17 @@ export function activeQualities(season = [], mission = []) {
 /** Can this quality be added to the list, and at what cost? */
 export function qualityAddition(id, { scope, active = [] }) {
   const quality = campaignQuality(id);
-  if (!quality) throw new Error("Unknown campaign quality.");
-  if (active.some(entry => entry.id === id)) throw new Error(`${quality.name} is already in force.`);
+  if (!quality) throw new Error(loc`Unknown campaign quality.`);
+  if (active.some(entry => entry.id === id)) throw new Error(loc`${quality.name} is already in force.`);
   if (scope === "season") return { quality, cost: 0, xp: quality.xp };
-  if (quality.seasonOnly) throw new Error(`${quality.name} can only be applied to a whole season.`);
+  if (quality.seasonOnly) throw new Error(loc`${quality.name} can only be applied to a whole season.`);
   if (scope === "scripted") return { quality, cost: 0, xp: quality.xp };
   if (scope === "spend") {
     if (!Number.isSafeInteger(quality.gcDice) || quality.gcDice < 1)
-      throw new Error(`${quality.name} has no action die cost, so it cannot be added once a mission is under way.`);
+      throw new Error(loc`${quality.name} has no action die cost, so it cannot be added once a mission is under way.`);
     return { quality, cost: quality.gcDice, xp: 0 }; // added in play: no XP change (p.398)
   }
-  throw new Error("Choose season, scripted or spend.");
+  throw new Error(loc`Choose season, scripted or spend.`);
 }
 
 /** XP the scripted qualities add to (or take from) each mission's base reward. */

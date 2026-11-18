@@ -4,6 +4,7 @@ import { superiorCoverState } from "./superior-cover.mjs";
 import { twoWeaponStyleState } from "./two-weapon-state.mjs";
 import { combatExpertiseState } from "./combat-expertise.mjs";
 import { shakenRules, shakenSkillPenalty } from "./shaken.mjs";
+import { loc } from "../i18n.mjs";
 /** Attribute collapse p.15. Negative scores are legal damage results; do not silently clamp to zero. */
 const COLLAPSE = {
   str: {
@@ -62,16 +63,16 @@ export function wisdomCollapseEpisode(
   system,
   { choiceDie, durationDice, sleeping = false, stunned = false, unconscious = false } = {}
 ) {
-  if (!attributeCollapsePlan(system).wisdomEpisode) throw new Error("Wisdom must currently be zero or lower.");
+  if (!attributeCollapsePlan(system).wisdomEpisode) throw new Error(loc`Wisdom must currently be zero or lower.`);
   if (
     ![1, 2].includes(choiceDie) ||
     !Array.isArray(durationDice) ||
     durationDice.length !== 2 ||
     durationDice.some(d => !Number.isSafeInteger(d) || d < 1 || d > 10)
   )
-    throw new Error("Use one d2 and exactly two d10 results.");
+    throw new Error(loc`Use one d2 and exactly two d10 results.`);
   if ([sleeping, stunned, unconscious].some(v => typeof v !== "boolean"))
-    throw new Error("Declare the applicable condition states.");
+    throw new Error(loc`Declare the applicable condition states.`);
   const collapsed = attributeCollapsePlan(system),
     doubleDuration =
       sleeping ||
@@ -97,11 +98,12 @@ export function attributeActionBlock(
 ) {
   const damage = attributeDamageState(system);
   if (damage.needsReview) return damage.reason;
-  if (shakenRules(system).needsReview) return "The GC must review the current Shaken sources before checks or actions.";
+  if (shakenRules(system).needsReview)
+    return loc`The GC must review the current Shaken sources before checks or actions.`;
   if (system.restraintReleaseReview?.needsReview)
-    return "The GC must review the interrupted grapple release before further actions.";
+    return loc`The GC must review the interrupted grapple release before further actions.`;
   if ((system.pendingRestraintMoves ?? []).length && passiveAction !== true)
-    return "Complete the immediate Standard Move required by Escape Hold first.";
+    return loc`Complete the immediate Standard Move required by Escape Hold first.`;
   const collapse = attributeCollapsePlan(system),
     manual = system.conditionContext ?? {},
     conditions = new Set([
@@ -112,15 +114,15 @@ export function attributeActionBlock(
       ...(manual.dead ? ["Dead"] : [])
     ]);
   const unable = ["Dead", "Unconscious", "Stunned", "Dazed"].find(c => conditions.has(c));
-  if (unable) return `${unable}: this character may take no actions.`;
+  if (unable) return loc`${unable}: this character may take no actions.`;
   if (manual.sleeping === true && passiveAction !== true)
-    return "Sleeping: only passive actions are available (p.342).";
+    return loc`Sleeping: only passive actions are available (p.342).`;
   if (collapse.conditions.includes("Paralyzed") || manual.paralyzed) {
     if (kind === "knowledge" || kind === "mentalAbility") return "";
     if (kind === "attack" || ["str", "dex"].includes(ability))
-      return "Paralyzed: no attacks or Strength-/Dexterity-based checks; only purely mental actions are available.";
+      return loc`Paralyzed: no attacks or Strength-/Dexterity-based checks; only purely mental actions are available.`;
     if (purelyMentalConfirmed !== true)
-      return "Paralyzed: the GC must confirm this skill check is a purely mental action.";
+      return loc`Paralyzed: the GC must confirm this skill check is a purely mental action.`;
   }
   return "";
 }

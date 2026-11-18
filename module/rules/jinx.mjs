@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Jinx, p.190: the opponent paying to activate an error owns this limited discount. */
 export function jinxSource(system) {
   const limit = system.activeFeatSelections?.filter(f => f.tree === "chance").length ?? 0;
@@ -10,7 +11,7 @@ export function jinxUseSpec(system) {
   return source
     ? {
         id: "jinx",
-        name: "Jinx (opponent error activation discount)",
+        name: loc`Jinx (opponent error activation discount)`,
         period: "session",
         limit: source.limit,
         cost: 0,
@@ -22,10 +23,10 @@ export function jinxUseSpec(system) {
 }
 /** Apply payer scope after the acting character's ordinary effect-cost modifiers; Shaken is quoted later. */
 export function jinxCostPlan(payerSystem, critical, { jinx = false, payerUuid = "", actingActorUuid = "" } = {}) {
-  if (typeof jinx !== "boolean") throw new Error("Select Jinx with an explicit boolean choice.");
+  if (typeof jinx !== "boolean") throw new Error(loc`Select Jinx with an explicit boolean choice.`);
   if (!jinx) return structuredClone(critical);
   const source = jinxSource(payerSystem);
-  if (!source) throw new Error("The paying opponent must currently possess Jinx and active Chance feats.");
+  if (!source) throw new Error(loc`The paying opponent must currently possess Jinx and active Chance feats.`);
   if (
     !critical ||
     critical.blocked !== false ||
@@ -33,7 +34,7 @@ export function jinxCostPlan(payerSystem, critical, { jinx = false, payerUuid = 
     !Number.isSafeInteger(critical.cost) ||
     critical.cost < 1
   )
-    throw new Error("Jinx requires a valid opponent error activation with a positive cost before its discount.");
+    throw new Error(loc`Jinx requires a valid opponent error activation with a positive cost before its discount.`);
   if (
     typeof payerUuid !== "string" ||
     !payerUuid.startsWith("Actor.") ||
@@ -41,7 +42,7 @@ export function jinxCostPlan(payerSystem, critical, { jinx = false, payerUuid = 
     !actingActorUuid.startsWith("Actor.") ||
     payerUuid === actingActorUuid
   )
-    throw new Error("Jinx belongs to a distinct paying character, not the acting character or the GC pool.");
+    throw new Error(loc`Jinx belongs to a distinct paying character, not the acting character or the GC pool.`);
   return {
     ...structuredClone(critical),
     cost: critical.cost - 1,
@@ -59,7 +60,7 @@ export function jinxCostPlan(payerSystem, critical, { jinx = false, payerUuid = 
 }
 /** Call only after reserving the one session use in the payer's existing resource transaction. */
 export function jinxUseProof(system, context, expectedUse = null) {
-  if (!context || context.version !== 1) throw new Error("A recorded Jinx activation is required.");
+  if (!context || context.version !== 1) throw new Error(loc`A recorded Jinx activation is required.`);
   const source = jinxSource(system),
     use = system.resourceUses?.jinx;
   if (
@@ -72,6 +73,6 @@ export function jinxUseProof(system, context, expectedUse = null) {
     use.used > source.limit ||
     (expectedUse && JSON.stringify(expectedUse) !== JSON.stringify(use))
   )
-    throw new Error("The Jinx source, session or reserved use changed before activation.");
+    throw new Error(loc`The Jinx source, session or reserved use changed before activation.`);
   return structuredClone(use);
 }

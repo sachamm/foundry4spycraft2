@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Card Shark pp.201–202; normal rank synergy p.92, active Knowledge exception p.99. */
 export function cardSharkProfessionPlan(system, key) {
   if (key !== "profession" || !system.activeFeatNames?.includes("Card Shark")) return null;
@@ -7,7 +8,7 @@ export function cardSharkProfessionPlan(system, key) {
 export function cardSharkKnowledgePlan(system, { gamblingKnowledge = "", topic = "" } = {}) {
   if (!gamblingKnowledge) return { active: false, blockedReason: "" };
   if (!system.activeFeatNames?.includes("Card Shark"))
-    return { active: false, blockedReason: "Gambling Knowledge requires Card Shark." };
+    return { active: false, blockedReason: loc`Gambling Knowledge requires Card Shark.` };
   if (
     !["rules", "people", "locations"].includes(gamblingKnowledge) ||
     typeof topic !== "string" ||
@@ -16,7 +17,7 @@ export function cardSharkKnowledgePlan(system, { gamblingKnowledge = "", topic =
   )
     return {
       active: false,
-      blockedReason: "Choose a listed gambling Knowledge category and enter the specific question."
+      blockedReason: loc`Choose a listed gambling Knowledge category and enter the specific question.`
     };
   return {
     active: true,

@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** pp.201–205: each feat's initial themed associate, not every contact of that theme. */
 export const CONTACT_FEATS = {
   "Academic Contacts": "academic or scholastic",
@@ -31,22 +32,22 @@ export function contactFeatGrants(system) {
       networkingAssociate = networking.some(g => g.valid && norm(g.name) === norm(b.primaryName));
     const minimumGrade = newCount ? credits : (networkingAssociate ? 2 : 1) + credits;
     if (!norm(b.primaryName) || b.primaryName.length > 200 || matches.length !== 1)
-      reason = "Choose one uniquely named primary contact in the feat’s Choice / target field.";
+      reason = loc`Choose one uniquely named primary contact in the feat’s Choice / target field.`;
     else if (!same.every(g => ["associate", "improve"].includes(g.mode ?? "associate")))
-      reason = "Choose a new associate or a one-grade Favored Contacts improvement.";
+      reason = loc`Choose a new associate or a one-grade Favored Contacts improvement.`;
     else if (new Set(same.map(g => g.name)).size !== same.length || new Set(same.map(g => g.id)).size !== same.length)
-      reason = "Each contact feat grant may be spent only once.";
+      reason = loc`Each contact feat grant may be spent only once.`;
     else if (newCount > 1)
-      reason = "One contact cannot receive multiple new-associate grants; use an improvement for an existing contact.";
+      reason = loc`One contact cannot receive multiple new-associate grants; use an improvement for an existing contact.`;
     else if (
       minimumGrade > 4 ||
       !Number.isSafeInteger(matches[0].rank) ||
       matches[0].rank < minimumGrade ||
       matches[0].rank > 4
     )
-      reason = "Record the full granted grade increase, up to partner grade; otherwise assign a different contact.";
+      reason = loc`Record the full granted grade increase, up to partner grade; otherwise assign a different contact.`;
     else if (typeof b.theme !== "string" || !b.theme.trim() || b.theme.length > 200 || b.themeConfirmed !== true)
-      reason = "Describe the contact’s matching theme and obtain GC confirmation of the selected grant mode.";
+      reason = loc`Describe the contact’s matching theme and obtain GC confirmation of the selected grant mode.`;
     return {
       ...b,
       mode,
@@ -67,10 +68,10 @@ export const CONTACT_GRADES = {
 };
 export function contactTimeLabel(seconds) {
   return seconds % 3600 === 0
-    ? `${seconds / 3600} Hours`
+    ? loc`${seconds / 3600} Hours`
     : seconds % 60 === 0
-      ? `${seconds / 60} Minutes`
-      : `${seconds} Seconds`;
+      ? loc`${seconds / 60} Minutes`
+      : loc`${seconds} Seconds`;
 }
 /** Table 2.35 p.144 supplies the ordinary check, before any contact feat benefit. */
 export function contactFeatCheckPlan(system, key, check, { contactName = "", contactThreatLevel = null } = {}) {
@@ -84,10 +85,10 @@ export function contactFeatCheckPlan(system, key, check, { contactName = "", con
   };
   if (key !== "networking" || check?.id !== "contact" || !contactName) return empty;
   if (typeof contactName !== "string" || contactName.length > 200)
-    return { ...empty, blockedReason: "Choose one recorded contact." };
+    return { ...empty, blockedReason: loc`Choose one recorded contact.` };
   const contacts = (system.contacts ?? []).filter(c => norm(c.name) === norm(contactName));
   if (contacts.length !== 1)
-    return { ...empty, blockedReason: "Choose one uniquely named contact recorded in Training." };
+    return { ...empty, blockedReason: loc`Choose one uniquely named contact recorded in Training.` };
   const contact = contacts[0],
     grade = CONTACT_GRADES[contact.rank],
     career = system.level,
@@ -98,7 +99,7 @@ export function contactFeatCheckPlan(system, key, check, { contactName = "", con
           ? Number(contactThreatLevel)
           : NaN;
   if (!Number.isSafeInteger(contact.rank) || !grade)
-    return { ...empty, blockedReason: "Review the selected contact’s grade." };
+    return { ...empty, blockedReason: loc`Review the selected contact’s grade.` };
   if (
     !Number.isSafeInteger(career) ||
     career < 1 ||
@@ -107,7 +108,7 @@ export function contactFeatCheckPlan(system, key, check, { contactName = "", con
     threat < 1 ||
     threat > 20
   )
-    return { ...empty, blockedReason: "Enter the current mission Threat Level (1–20) for this Contact check." };
+    return { ...empty, blockedReason: loc`Enter the current mission Threat Level (1–20) for this Contact check.` };
   const lower = threat < career,
     higher = threat > career,
     mission = lower ? "lower" : higher ? "higher" : "equal",
@@ -156,7 +157,7 @@ export function contactFeatCheckPlan(system, key, check, { contactName = "", con
     .sort((a, b) => a.name.localeCompare(b.name) || String(a.id).localeCompare(String(b.id)));
   if (!grants.length) return result;
   const invalid = grants.find(g => !g.valid);
-  if (invalid) return { ...result, blockedReason: invalid.reason || "Review the contact’s feat grant." };
+  if (invalid) return { ...result, blockedReason: invalid.reason || loc`Review the contact’s feat grant.` };
   const g = grants[0],
     source = grants.map(g => g.name).join(" + "),
     sources = grants.map(g => ({ id: g.id, name: g.name, theme: g.theme.trim(), mode: g.mode, credit: g.credit }));
@@ -192,9 +193,9 @@ export function networkingContactFeatGrants(system) {
         earned = (system.skillPoints ?? []).find(s => (s.skills?.networking?.purchasedRanks ?? 0) >= milestone)?.level;
       let reason = "";
       if (!norm(c.name) || contacts.filter(r => norm(r.name) === norm(c.name)).length !== 1)
-        reason = "Give this new Networking contact a unique name.";
+        reason = loc`Give this new Networking contact a unique name.`;
       else if (!source || !Object.hasOwn(CONTACT_FEATS, c.networkingFeat))
-        reason = "Choose an earned contact feat for this Networking upgrade.";
+        reason = loc`Choose an earned contact feat for this Networking upgrade.`;
       else if (
         !Number.isSafeInteger(ranks) ||
         ranks < 0 ||
@@ -204,11 +205,11 @@ export function networkingContactFeatGrants(system) {
         milestone > ranks ||
         !earned
       )
-        reason = "Choose an earned four-purchased-rank Networking milestone.";
+        reason = loc`Choose an earned four-purchased-rank Networking milestone.`;
       else if (contacts.filter(r => r.networkingMilestone === milestone).length !== 1)
-        reason = "Each Networking milestone can grant only one new contact or improvement.";
+        reason = loc`Each Networking milestone can grant only one new contact or improvement.`;
       else if ((source.acquiredAtLevel ?? 0) > earned)
-        reason = "This Networking contact was earned before the selected contact feat.";
+        reason = loc`This Networking contact was earned before the selected contact feat.`;
       else if (
         bindings.some(
           b =>
@@ -216,8 +217,7 @@ export function networkingContactFeatGrants(system) {
             (b.name === c.networkingFeat || (b.mode ?? "associate") !== "improve")
         )
       )
-        reason =
-          "A new Networking contact cannot also receive the same feat’s primary grant or another new-associate grant.";
+        reason = loc`A new Networking contact cannot also receive the same feat’s primary grant or another new-associate grant.`;
       else if (
         bindings.some(
           b =>
@@ -227,22 +227,22 @@ export function networkingContactFeatGrants(system) {
             b.acquiredAtLevel < earned
         )
       )
-        reason = "The selected Favored Contacts improvement predates this new Networking contact.";
+        reason = loc`The selected Favored Contacts improvement predates this new Networking contact.`;
       else if (
         (system.skillPurchaseIssues ?? []).some(
           i => (i.skill === "networking" || ["career-budget", "training-budget"].includes(i.code)) && i.level <= earned
         )
       )
-        reason = "Review the Networking purchases that earned this contact.";
+        reason = loc`Review the Networking purchases that earned this contact.`;
       else if (!Number.isSafeInteger(c.rank) || c.rank < 2 || c.rank > 4)
-        reason = "Record this new contact at associate grade or better.";
+        reason = loc`Record this new contact at associate grade or better.`;
       else if (
         typeof c.networkingTheme !== "string" ||
         !c.networkingTheme.trim() ||
         c.networkingTheme.length > 200 ||
         c.networkingFeatConfirmed !== true
       )
-        reason = "The GC must confirm a new contact gained after taking the feat, with its matching theme.";
+        reason = loc`The GC must confirm a new contact gained after taking the feat, with its matching theme.`;
       return {
         name: c.name,
         source: c.networkingFeat,

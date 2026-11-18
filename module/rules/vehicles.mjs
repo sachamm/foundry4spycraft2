@@ -3,11 +3,12 @@
  * Numbers come from src/data/gear.json and src/data/vehicles.json through the generated tables.
  */
 import { GEAR_RULES, VEHICLE_RULES } from "./tables.mjs";
+import { loc } from "../i18n.mjs";
 
 export const SIZE_CODES = Object.freeze(["N", "F", "D", "T", "S", "M", "L", "H", "G", "C", "E", "V"]);
 
 const wholeNumber = (value, label) => {
-  if (!Number.isSafeInteger(value) || value < 0) throw new Error(`${label} must be a whole number of 0 or more.`);
+  if (!Number.isSafeInteger(value) || value < 0) throw new Error(loc`${label} must be a whole number of 0 or more.`);
   return value;
 };
 
@@ -23,7 +24,7 @@ export function sizeCode(label) {
 /** DC of a Damage save against an amount of lethal damage (p.224). */
 export function damageSaveDC(damage) {
   wholeNumber(damage, "Damage");
-  if (damage < 1) throw new Error("A Damage save is only made against 1 or more points of damage.");
+  if (damage < 1) throw new Error(loc`A Damage save is only made against 1 or more points of damage.`);
   return GEAR_RULES.damageSaves.baseDC + Math.floor(damage / 2);
 }
 
@@ -33,7 +34,7 @@ export function damageSaveDC(damage) {
  */
 export function failedDamageSaves({ total, dc, blast = false, critical = false }) {
   if (!Number.isSafeInteger(total) || !Number.isSafeInteger(dc))
-    throw new Error("The save result and DC must be whole numbers.");
+    throw new Error(loc`The save result and DC must be whole numbers.`);
   if (total >= dc) return 0;
   const { blastStep, criticalMultiplier } = GEAR_RULES.damageSaves;
   const failed = 1 + (blast ? Math.floor((dc - total) / blastStep) : 0);
@@ -66,8 +67,9 @@ export function vehicleClass(code) {
 /** Table 4.72 result for a class and a d20 roll: {code, label}. */
 export function vehicleDamageLocation(classCode, roll) {
   const entry = vehicleClass(classCode);
-  if (!entry) throw new Error("Choose the vehicle's category before rolling a Vehicle Damage result.");
-  if (!Number.isSafeInteger(roll) || roll < 1 || roll > 20) throw new Error("A Vehicle Damage roll is a d20 result.");
+  if (!entry) throw new Error(loc`Choose the vehicle's category before rolling a Vehicle Damage result.`);
+  if (!Number.isSafeInteger(roll) || roll < 1 || roll > 20)
+    throw new Error(loc`A Vehicle Damage roll is a d20 result.`);
   const code = entry.damageLocations[roll - 1];
   return { code, label: VEHICLE_RULES.damageLocations[code] ?? code };
 }
@@ -143,9 +145,9 @@ export function vehicleDefense({
   attacker = null
 }) {
   if (!Number.isSafeInteger(defense)) return null;
-  const rows = [{ label: "Base Defense", value: defense }];
+  const rows = [{ label: loc`Base Defense`, value: defense }];
   if (moving && Number.isSafeInteger(driverDexMod) && driverDexMod !== 0)
-    rows.push({ label: "Driver Dexterity", value: driverDexMod });
+    rows.push({ label: loc`Driver Dexterity`, value: driverDexMod });
   if (attacker) {
     for (const [key, label, own] of [
       ["acceleration", "Acceleration lead", acceleration],

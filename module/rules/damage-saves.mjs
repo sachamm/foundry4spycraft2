@@ -1,11 +1,12 @@
 import { validateDamageLedger, accumulatedDamagePlan } from "./accumulated-damage.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function pendingDamageSave(actor, eventId, { allowSettling = false } = {}) {
   const ledger = validateDamageLedger(actor.system.accumulatedDamage),
     id = ledger.pending[0];
   if (!id) return null;
-  if (eventId && eventId !== id) throw new Error("Resolve accumulated-damage saves in their recorded order.");
+  if (eventId && eventId !== id) throw new Error(loc`Resolve accumulated-damage saves in their recorded order.`);
   const record = actor.flags?.spycraft2?.damageEvents?.[id],
     save = record?.save;
   if (
@@ -19,7 +20,7 @@ export function pendingDamageSave(actor, eventId, { allowSettling = false } = {}
     save.dc > 32 ||
     !Number.isFinite(record.at)
   )
-    throw new Error("Review the pending damage-save receipt before rolling.");
+    throw new Error(loc`Review the pending damage-save receipt before rolling.`);
   const expected = accumulatedDamagePlan(
     { [record.kind + "Threshold"]: save.threshold },
     {
@@ -36,7 +37,7 @@ export function pendingDamageSave(actor, eventId, { allowSettling = false } = {}
     expected.tier !== save.tier ||
     expected.total !== record.total
   )
-    throw new Error("The pending save no longer matches its recorded damage calculation.");
+    throw new Error(loc`The pending save no longer matches its recorded damage calculation.`);
   return record;
 }
 export function damageSaveContext(record, receiptId, at) {
@@ -46,7 +47,7 @@ export function damageSaveContext(record, receiptId, at) {
     !Number.isFinite(at) ||
     at < record.at
   )
-    throw new Error("Review the damage-event timing and save receipt.");
+    throw new Error(loc`Review the damage-event timing and save receipt.`);
   return {
     version: 1,
     eventId: record.id,
@@ -85,16 +86,16 @@ export function currentDamageSaveMessage(actor, record, messages) {
       !damageSaveMessageMatches(message, actor, record) ||
       message.flags.spycraft2.damageSave.receiptId !== record.saveReceiptId
     )
-      throw new Error("Review the recorded damage-save result chain.");
+      throw new Error(loc`Review the recorded damage-save result chain.`);
     seen.add(message.id);
     const next = message.flags.spycraft2.superseded;
     if (!next) return message;
     const replacement = find(next);
     if (!replacement || replacement.flags?.spycraft2?.rerollOf !== (message.uuid ?? message.id))
-      throw new Error("Review the replacement damage-save result.");
+      throw new Error(loc`Review the replacement damage-save result.`);
     message = replacement;
   }
-  throw new Error("The recorded damage save is unavailable. Review it before rolling again.");
+  throw new Error(loc`The recorded damage save is unavailable. Review it before rolling again.`);
 }
 export function damageSaveSourceSnapshot(actor, key) {
   return JSON.stringify({
@@ -117,7 +118,7 @@ export function validateDamageSaveRoll(actor, context, kind, key) {
     key !== record.save.key ||
     !same(context, damageSaveContext(record, context.receiptId, context.contextAt))
   )
-    throw new Error("The check does not match the next pending damage save.");
+    throw new Error(loc`The check does not match the next pending damage save.`);
 }
 
 // Roll pipeline: how this rule takes part in a roll (see module/rules/roll-pipeline.mjs).

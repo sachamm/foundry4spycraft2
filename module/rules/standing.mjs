@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /**
  * Reputation and Net Worth costs of standing-only gear picks. Pure functions: no Foundry access.
  *
@@ -24,14 +25,14 @@ export function parseStandingCost(label) {
  * Neither Reputation nor Net Worth may be spent below 0.
  */
 export function standingPayment(system, cost, currency) {
-  if (!cost || !["reputation", "netWorth"].includes(currency)) return { ok: false, reason: "No cost to pay." };
+  if (!cost || !["reputation", "netWorth"].includes(currency)) return { ok: false, reason: loc`No cost to pay.` };
   const balance = Number(system?.[currency] ?? 0),
     amount = cost[currency];
-  if (!Number.isSafeInteger(amount) || amount <= 0) return { ok: false, reason: "No cost to pay." };
+  if (!Number.isSafeInteger(amount) || amount <= 0) return { ok: false, reason: loc`No cost to pay.` };
   if (balance < amount)
     return {
       ok: false,
-      reason: `Not enough ${currency === "reputation" ? "Reputation" : "Net Worth"}: ${balance} of ${amount}.`,
+      reason: loc`Not enough ${currency === "reputation" ? loc`Reputation` : loc`Net Worth`}: ${balance} of ${amount}.`,
       amount,
       balance
     };

@@ -2,6 +2,7 @@ import { threadNeedleAttackFacts, threadNeedleEndPlan } from "../rules/thread-ne
 import { queueResources } from "../rules/transactions.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
+import { loc } from "../i18n.mjs";
 const active = new Set();
 const stable = v =>
     JSON.stringify(v, (_k, x) =>
@@ -32,7 +33,7 @@ export function threadNeedleSource(actor, input) {
     !target?.isOwner ||
     target === actor
   )
-    throw Error("An owner of both actual Thread the Needle participants must review this hold.");
+    throw Error(loc`An owner of both actual Thread the Needle participants must review this hold.`);
   const chain = [],
     seen = new Set();
   let current = attack;
@@ -47,16 +48,16 @@ export function threadNeedleSource(actor, input) {
       stable(f.attackContext?.meleeTrick) !== stable(facts.trick) ||
       (f.attackContext?.targetActorUuid || f.attackContext?.characterTarget?.actorUuid) !== target.uuid
     )
-      throw Error("The original Thread the Needle source or participants changed.");
+      throw Error(loc`The original Thread the Needle source or participants changed.`);
     chain.push({ uuid: current.uuid, evidence: JSON.parse(rollEvidence(f)) });
     if (!f.rerollOf) break;
     const previous = message(f.rerollOf);
     if (previous?.flags?.spycraft2?.superseded !== current.uuid)
-      throw Error("Use only the actually adopted original Thread the Needle replacement.");
+      throw Error(loc`Use only the actually adopted original Thread the Needle replacement.`);
     current = previous;
   }
   if (!current || current.flags.spycraft2.rerollOf || chain.length !== seen.size)
-    throw Error("The original Thread the Needle attack chain is missing or cyclic.");
+    throw Error(loc`The original Thread the Needle attack chain is missing or cyclic.`);
   return {
     actor,
     attack,
@@ -85,7 +86,7 @@ function saved(src) {
     (r.state === "active" && !r.effectId) ||
     (r.state === "ended" && !["release", "movedBeyond", "escape", "gcAlreadyEnded"].includes(r.end?.reason))
   )
-    throw Error("Review the saved Thread the Needle hold and its original hit.");
+    throw Error(loc`Review the saved Thread the Needle hold and its original hit.`);
   return r;
 }
 function ownedEffects(src, r) {
@@ -103,10 +104,10 @@ function ownedEffects(src, r) {
       !e.statuses.has("held") ||
       (e.changes ?? []).length
     )
-      throw Error("Review the modified Thread the Needle effect before changing it.");
+      throw Error(loc`Review the modified Thread the Needle effect before changing it.`);
   }
   if (rows.length > 1 || (r.state === "active" && rows.length && rows[0].id !== r.effectId))
-    throw Error("Review duplicate or changed Thread the Needle effect sources.");
+    throw Error(loc`Review duplicate or changed Thread the Needle effect sources.`);
   return rows;
 }
 async function stamp(src, row) {
@@ -116,18 +117,18 @@ async function stamp(src, row) {
       (previous.operationId !== row.operationId || (previous.state === "ended" && stable(previous) !== stable(row)))) ||
     (!previous && row.state !== "prepared")
   )
-    throw Error("The original Thread the Needle hold history changed during its outcome.");
+    throw Error(loc`The original Thread the Needle hold history changed during its outcome.`);
   if (stable(threadNeedleSource(src.actor, src.attack).proof) !== stable(src.proof))
-    throw Error("The Thread the Needle source changed during its outcome.");
+    throw Error(loc`The Thread the Needle source changed during its outcome.`);
   await src.root.update({ "flags.spycraft2.threadNeedleHold": row });
   return row;
 }
 async function createHold(src, r) {
   const definition = CONFIG.statusEffects.find(s => s.id === "held");
-  if (!definition) throw Error("Held is not configured.");
+  if (!definition) throw Error(loc`Held is not configured.`);
   const [e] = await src.target.createEmbeddedDocuments("ActiveEffect", [
     {
-      name: "Thread the Needle — Held",
+      name: loc`Thread the Needle — Held`,
       img: definition.img,
       statuses: ["held"],
       origin: src.root.uuid,
@@ -145,13 +146,13 @@ async function createHold(src, r) {
     }
   ]);
   if (!e || !ownedEffects(src, r).some(x => x.id === e.id) || e.disabled || !src.target.statuses.has("held"))
-    throw Error("Review the interrupted Thread the Needle effect; do not apply another hold.");
+    throw Error(loc`Review the interrupted Thread the Needle effect; do not apply another hold.`);
   return e;
 }
 export async function applyThreadNeedle(actor, input, options = {}) {
   const before = threadNeedleSource(actor, input);
   if (options.confirmed !== true)
-    throw Error("Confirm the actual Thread the Needle hit and source-specific Held outcome.");
+    throw Error(loc`Confirm the actual Thread the Needle hit and source-specific Held outcome.`);
   return queueResources(
     [actor, before.target],
     async () => {
@@ -159,7 +160,8 @@ export async function applyThreadNeedle(actor, input, options = {}) {
       active.add(key);
       try {
         const src = threadNeedleSource(actor, input);
-        if (stable(src.proof) !== stable(before.proof)) throw Error("The original hold hit or actual target changed.");
+        if (stable(src.proof) !== stable(before.proof))
+          throw Error(loc`The original hold hit or actual target changed.`);
         const r = saved(src);
         if (r?.state === "ended") return r;
         if (r?.state === "active") {
@@ -170,7 +172,7 @@ export async function applyThreadNeedle(actor, input, options = {}) {
           const e = ownedEffects(src, r)[0];
           if (!e || e.disabled)
             throw Error(
-              "The interrupted hold may have already ended; owning-GC review is required before any reapplication."
+              loc`The interrupted hold may have already ended; owning-GC review is required before any reapplication.`
             );
           return await stamp(src, { ...r, state: "active", effectId: e.id, recovered: true });
         }
@@ -228,7 +230,9 @@ function completedEscape(src, r, end) {
       e => e.flags?.spycraft2?.threadNeedleHold?.operationId === r.operationId && e.statuses?.has("held")
     )
   )
-    throw Error("Finish this target’s actual opposed grapple escape and its required move before closing this hold.");
+    throw Error(
+      loc`Finish this target’s actual opposed grapple escape and its required move before closing this hold.`
+    );
   return { ...end, escapeEvidence: rollEvidence(c) };
 }
 export async function endThreadNeedle(actor, input, options = {}) {
@@ -238,9 +242,9 @@ export async function endThreadNeedle(actor, input, options = {}) {
     async () => {
       const src = threadNeedleSource(actor, input),
         r = saved(src);
-      if (!r) throw Error("Apply or review this actual recorded hold first.");
+      if (!r) throw Error(loc`Apply or review this actual recorded hold first.`);
       if (r.state === "ended") return r;
-      if (r.state !== "active") throw Error("The interrupted hold needs owning-GC review first.");
+      if (r.state !== "active") throw Error(loc`The interrupted hold needs owning-GC review first.`);
       let end = threadNeedleEndPlan(options);
       if (end.reason === "escape") end = completedEscape(src, r, end);
       else {
@@ -254,25 +258,26 @@ export async function endThreadNeedle(actor, input, options = {}) {
 }
 export async function reviewThreadNeedle(actor, input, { confirmed = false, resolution } = {}) {
   if (game.user.isGM !== true || confirmed !== true || !["applyPending", "alreadyEnded"].includes(resolution))
-    throw Error("The owning GC must review whether the interrupted hold is still pending or already ended.");
+    throw Error(loc`The owning GC must review whether the interrupted hold is still pending or already ended.`);
   const before = threadNeedleSource(actor, input);
   if (active.has(actor.uuid + ":" + before.root.uuid))
-    throw Error("This client is still applying the original Thread the Needle hold.");
+    throw Error(loc`This client is still applying the original Thread the Needle hold.`);
   return queueResources(
     [actor, before.target],
     async () => {
       const src = threadNeedleSource(actor, input),
         r = saved(src);
-      if (!r) throw Error("Choose the original recorded hold.");
+      if (!r) throw Error(loc`Choose the original recorded hold.`);
       if (r.state === "ended") return r;
       const e = ownedEffects(src, r)[0];
       if (resolution === "alreadyEnded") {
-        if (e) throw Error("End or separately correct the actual source effect before recording it as already ended.");
+        if (e)
+          throw Error(loc`End or separately correct the actual source effect before recording it as already ended.`);
         return stamp(src, { ...r, state: "ended", gcReviewed: true, end: { reason: "gcAlreadyEnded" } });
       }
-      if (r.state !== "prepared") throw Error("A previously active hold cannot be refreshed after it ended.");
+      if (r.state !== "prepared") throw Error(loc`A previously active hold cannot be refreshed after it ended.`);
       const effect = e ?? (await createHold(src, r));
-      if (effect.disabled) throw Error("The old hold effect is inactive; review it separately.");
+      if (effect.disabled) throw Error(loc`The old hold effect is inactive; review it separately.`);
       return stamp(src, { ...r, state: "active", effectId: effect.id, gcReviewed: true });
     },
     { messages: [before.attack, before.root] }
@@ -290,12 +295,12 @@ export async function manageThreadNeedle(actor, input = {}) {
           return [];
         }
       });
-    if (!choices.length) return ui.notifications.info("No visible finished Thread the Needle hit is available.");
+    if (!choices.length) return ui.notifications.info(loc`No visible finished Thread the Needle hit is available.`);
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Thread the Needle — hold outcome" },
+      window: { title: loc`Thread the Needle — hold outcome` },
       rejectClose: false,
       content:
-        '<div class="spycraft2-roll-options"><p>Standard weapon damage is resolved normally. Apply only this hit’s Held source; release removes only that source and preserves independent holds or pins. The trick does not start a Grapple or make its user vulnerable. Actual geometry and action costs remain with the GC.</p><label>Actual hit or recorded hold <select name="sourceMessage">' +
+        `<div class="spycraft2-roll-options"><p>${loc`Standard weapon damage is resolved normally. Apply only this hit’s Held source; release removes only that source and preserves independent holds or pins. The trick does not start a Grapple or make its user vulnerable. Actual geometry and action costs remain with the GC.`}</p><label>${loc`Actual hit or recorded hold`} <select name="sourceMessage">` +
         choices
           .map(
             ({ s, row }) =>
@@ -306,11 +311,11 @@ export async function manageThreadNeedle(actor, input = {}) {
               "</option>"
           )
           .join("") +
-        '</select></label><label>Operation <select name="operation"><option value="apply">Apply / recover original hold</option><option value="escape">Record target’s completed escape and required move</option><option value="release">I released this target</option><option value="movedBeyond">Holder moved farther than5ft from this target</option>' +
+        `</select></label><label>${loc`Operation`} <select name="operation"><option value="apply">${loc`Apply / recover original hold`}</option><option value="escape">${loc`Record target’s completed escape and required move`}</option><option value="release">${loc`I released this target`}</option><option value="movedBeyond">${loc`Holder moved farther than5ft from this target`}</option>` +
         (game.user.isGM
-          ? '<option value="reviewPending">GC: interrupted hold still needs application</option><option value="reviewEnded">GC: original hold already ended</option>'
+          ? `<option value="reviewPending">${loc`GC: interrupted hold still needs application`}</option><option value="reviewEnded">${loc`GC: original hold already ended`}</option>`
           : "") +
-        '</select></label><label>Target’s escape result UUID (for completed escape) <input name="escapeMessage" /></label><label>Resulting separation (ft.; for holder movement beyond5ft) <input name="separationFeet" type="number" min="0" step="any" /></label><label><input name="holderMovedConfirmed" type="checkbox" /> The holder actually completed the reviewed legal movement; this is resulting separation, not distance traveled</label><label><input name="confirmed" type="checkbox" /> The GC confirms this original hit, actual participants and selected outcome; no client is still applying it</label><p>On the target’s Skills tab, use the usual opposed Athletics (STR) grapple escape, apply its earned Escape Hold benefit and confirm the required immediate Standard Move. Then record that completed escape here. This does not impose grapple restrictions on the staff user. A completed or ended original hold never grants another application.</p></div>'
+        `</select></label><label>${loc`Target’s escape result UUID (for completed escape)`} <input name="escapeMessage" /></label><label>${loc`Resulting separation (ft.; for holder movement beyond5ft)`} <input name="separationFeet" type="number" min="0" step="any" /></label><label><input name="holderMovedConfirmed" type="checkbox" /> ${loc`The holder actually completed the reviewed legal movement; this is resulting separation, not distance traveled`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this original hit, actual participants and selected outcome; no client is still applying it`}</label><p>${loc`On the target’s Skills tab, use the usual opposed Athletics (STR) grapple escape, apply its earned Escape Hold benefit and confirm the required immediate Standard Move. Then record that completed escape here. This does not impose grapple restrictions on the staff user. A completed or ended original hold never grants another application.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -334,6 +339,6 @@ export async function manageThreadNeedle(actor, input = {}) {
       confirmed: input.confirmed,
       resolution: input.operation === "reviewPending" ? "applyPending" : "alreadyEnded"
     });
-  if (input.operation && input.operation !== "apply") throw Error("Choose a listed Thread the Needle operation.");
+  if (input.operation && input.operation !== "apply") throw Error(loc`Choose a listed Thread the Needle operation.`);
   return applyThreadNeedle(actor, input.sourceMessage, { confirmed: input.confirmed });
 }

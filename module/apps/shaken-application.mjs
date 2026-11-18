@@ -1,5 +1,6 @@
 import { getShakenApplicationReview, shakenApplicationSnapshot, shakenApplicationPlan } from "../rules/shaken.mjs";
 import { queueResources } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   clone = structuredClone;
 const matches = (actual, expected) =>
@@ -18,10 +19,9 @@ export async function applyShaken(actor, options = {}) {
   let input = options;
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Apply a new Shaken source" },
+      window: { title: loc`Apply a new Shaken source` },
       rejectClose: false,
-      content:
-        '<div class="spycraft2-roll-options"><p>Grades from separate Shaken applications add together (p.342). This records a direct condition after its required saves and immunities have been resolved. It does not add stress damage or schedule stress recovery.</p><label>Event reference <input name="id" /></label><label>Source <input name="source" /></label><label>Incoming grade <select name="grade"><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option></select></label><label><input name="selfInflicted" type="checkbox" /> This condition is caused by my own action (Uncanny Dodge IV does not halve its Count penalty)</label><label><input name="confirmed" type="checkbox" /> The GC confirms this new condition applies after all saves and immunities</label></div>'
+      content: `<div class="spycraft2-roll-options"><p>${loc`Grades from separate Shaken applications add together (p.342). This records a direct condition after its required saves and immunities have been resolved. It does not add stress damage or schedule stress recovery.`}</p><label>${loc`Event reference`} <input name="id" /></label><label>${loc`Source`} <input name="source" /></label><label>${loc`Incoming grade`} <select name="grade"><option value="1">I</option><option value="2">${loc`II`}</option><option value="3">${loc`III`}</option><option value="4">${loc`IV`}</option></select></label><label><input name="selfInflicted" type="checkbox" /> ${loc`This condition is caused by my own action (Uncanny Dodge IV does not halve its Count penalty)`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this new condition applies after all saves and immunities`}</label></div>`
     });
     if (!input) return null;
     input = { ...input, grade: Number(input.grade) };
@@ -31,15 +31,15 @@ export async function applyShaken(actor, options = {}) {
 }
 /** Call only inside queueResources with this actor already locked. */
 export async function applyShakenLocked(actor, expected, input) {
-  if (!actor.isOwner) throw new Error("Ownership changed.");
+  if (!actor.isOwner) throw new Error(loc`Ownership changed.`);
   if (
     actor.type === "npc" &&
     actor.system.npcProfile?.enabled &&
     actor.system.npcProfile.qualities?.some(q => q.id === "construct")
   )
-    throw new Error("Constructs never gain Shaken.");
+    throw new Error(loc`Constructs never gain Shaken.`);
   if (getShakenApplicationReview(actor).needsReview)
-    throw new Error("The GC must review the interrupted Shaken application first.");
+    throw new Error(loc`The GC must review the interrupted Shaken application first.`);
   const plan = shakenApplicationPlan(
     shakenApplicationSnapshot(actor),
     expected,
@@ -72,7 +72,7 @@ export async function applyShakenLocked(actor, expected, input) {
         }
       }
     ]);
-    if (!effect) throw new Error("The new Shaken source was not created.");
+    if (!effect) throw new Error(loc`The new Shaken source was not created.`);
     record.effectId = effect.id;
     const data = effect.toObject(),
       status = "shaken-" + record.grade;
@@ -87,7 +87,7 @@ export async function applyShakenLocked(actor, expected, input) {
       ) ||
       [data.duration?.seconds, data.duration?.rounds, data.duration?.turns].some(n => n != null && n !== 0)
     )
-      throw new Error("Preserve independent data added to the new Shaken source for review.");
+      throw new Error(loc`Preserve independent data added to the new Shaken source for review.`);
     created = clone(data);
     await actor.update({ ["flags.spycraft2.shakenApplications." + record.id]: record });
     return record;
@@ -96,7 +96,7 @@ export async function applyShakenLocked(actor, expected, input) {
     const failures = [];
     for (const effect of tagged(actor, record.id)) {
       if (!created || !same(effect.toObject(), created)) {
-        failures.push(new Error("Preserve the changed or unproved new Shaken source for review."));
+        failures.push(new Error(loc`Preserve the changed or unproved new Shaken source for review.`));
         continue;
       }
       try {
@@ -111,20 +111,19 @@ export async function applyShakenLocked(actor, expected, input) {
         source: record.source,
         record,
         needsReview: true,
-        reason:
-          "The interrupted Shaken event could not be fully restored. Review its actual source before resolving it."
+        reason: loc`The interrupted Shaken event could not be fully restored. Review its actual source before resolving it.`
       };
       hold(actor, review);
       try {
         await actor.update({ "flags.spycraft2.shakenApplicationReview": review });
       } catch {}
-      throw new AggregateError([error, ...failures], "Shaken application needs GC review.");
+      throw new AggregateError([error, ...failures], loc`Shaken application needs GC review.`);
     }
     throw error;
   }
 }
 export async function reviewShakenApplication(actor, options = {}) {
-  if (!game.user.isGM || !actor.isOwner) throw new Error("Only the GC can resolve an interrupted Shaken event.");
+  if (!game.user.isGM || !actor.isOwner) throw new Error(loc`Only the GC can resolve an interrupted Shaken event.`);
   const review = clone(getShakenApplicationReview(actor)),
     expected = shakenApplicationSnapshot(actor);
   if (!review.needsReview) return null;
@@ -132,9 +131,9 @@ export async function reviewShakenApplication(actor, options = {}) {
   if (!Object.keys(input).length) {
     const esc = foundry.utils.escapeHTML;
     input = await foundry.applications.api.DialogV2.input({
-      window: { title: "Review interrupted Shaken application" },
+      window: { title: loc`Review interrupted Shaken application` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${esc(review.source ?? "Unknown source")}. Review and correct the actual source effects first. Keeping the event records its receipt; cancelling it requires ending its active Shaken source first. Neither choice removes independent effects.</p><label>Disposition <select name="disposition"><option value="keep">Record the event as resolved</option><option value="cancel">Cancel the event</option></select></label><label>Review note <input name="resolution" /></label><label><input name="confirmed" type="checkbox" /> I reviewed the actual source effects</label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`${esc(review.source ?? loc`Unknown source`)}. Review and correct the actual source effects first. Keeping the event records its receipt; cancelling it requires ending its active Shaken source first. Neither choice removes independent effects.`}</p><label>${loc`Disposition`} <select name="disposition"><option value="keep">${loc`Record the event as resolved`}</option><option value="cancel">${loc`Cancel the event`}</option></select></label><label>${loc`Review note`} <input name="resolution" /></label><label><input name="confirmed" type="checkbox" /> ${loc`I reviewed the actual source effects`}</label></div>`
     });
     if (!input) return null;
   }
@@ -145,7 +144,7 @@ export async function reviewShakenApplication(actor, options = {}) {
     !input.resolution.trim() ||
     input.resolution.length > 500
   )
-    throw new Error("Confirm the source review and record a bounded explanation.");
+    throw new Error(loc`Confirm the source review and record a bounded explanation.`);
   return queueResources([actor], async () => {
     if (
       !game.user.isGM ||
@@ -153,7 +152,7 @@ export async function reviewShakenApplication(actor, options = {}) {
       !same(getShakenApplicationReview(actor), review) ||
       !same(shakenApplicationSnapshot(actor), expected)
     )
-      throw new Error("The Shaken review or its sources changed. Open it again.");
+      throw new Error(loc`The Shaken review or its sources changed. Open it again.`);
     // Validate the recovered event identity before using it in a document update path.
     shakenApplicationPlan(
       { state: { totalGrade: 0 } },
@@ -174,10 +173,10 @@ export async function reviewShakenApplication(actor, options = {}) {
           [...e.statuses].some(s => /^shaken(?:[-_]?(?:[1-4]|iv|iii|ii|i))?$/i.test(s))
       )
     )
-      throw new Error("End this event’s active Shaken source before cancelling its receipt.");
+      throw new Error(loc`End this event’s active Shaken source before cancelling its receipt.`);
     const actualSources = tagged(actor, review.id);
     if (actualSources.length > 1)
-      throw new Error("Remove duplicated event tags or extra sources before resolving this application.");
+      throw new Error(loc`Remove duplicated event tags or extra sources before resolving this application.`);
     const record = {
         ...review.record,
         effectId: actualSources[0]?.id ?? review.record.effectId,

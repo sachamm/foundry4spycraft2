@@ -24,6 +24,7 @@ import {
   getCampaign,
   setCampaign
 } from "./state.mjs";
+import { loc } from "../../i18n.mjs";
 
 const T = GC_DATA.tables;
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
@@ -54,25 +55,25 @@ export async function editMission() {
   const team = agents
     .map(
       actor =>
-        `<label><input type="checkbox" name="team-${actor.id}" ${mission.team.includes(actor.id) || (!mission.team.length && actor.hasPlayerOwner) ? "checked" : ""} /> ${esc(actor.name)} (level ${actor.system.level ?? "?"})</label>`
+        `<label><input type="checkbox" name="team-${actor.id}" ${mission.team.includes(actor.id) || (!mission.team.length && actor.hasPlayerOwner) ? "checked" : ""} /> ${loc`${esc(actor.name)} (level ${actor.system.level ?? "?"})`}</label>`
     )
     .join("");
   const input = await ask(
-    "Mission record",
+    loc`Mission record`,
     `
-    <label>Mission name <input name="name" value="${esc(mission.name)}" /></label>
-    <label>Caliber <select name="caliber">${options(
+    <label>${loc`Mission name`} <input name="name" value="${esc(mission.name)}" /></label>
+    <label>${loc`Caliber`} <select name="caliber">${options(
       [1, 2, 3, 4, 5].map(n => [n, ["I", "II", "III", "IV", "V"][n - 1]]),
       mission.caliber
     )}</select></label>
-    <label>Threat Level adjustment (home campaigns, −2 to +2) <input type="number" name="threatAdjust" min="-2" max="2" value="${mission.threatAdjust}" /></label>
-    <label>Fixed Threat Level (published missions; blank to calculate) <input type="number" name="threatOverride" min="1" max="20" value="${mission.threatOverride ?? ""}" /></label>
-    <label>Scripted dramatic scenes (1 is free; each extra +100 XP; none −50 XP) <input type="number" name="dramaticScenes" min="0" value="${mission.dramaticScenes}" /></label>
-    <label><input type="checkbox" name="timeLimit" ${mission.timeLimit ? "checked" : ""} /> Time limit complication (+50 XP)</label>
-    <label>Common Items in the mission bundle (−1 XP each) <input type="number" name="bundleCommonItems" min="0" value="${mission.bundleCommonItems}" /></label>
-    <label>Scenes played so far <input type="number" name="scenesPlayed" min="0" value="${mission.scenesPlayed}" /></label>
-    <fieldset><legend>Team (Threat Level = sum of career levels ÷ 5, rounded up)</legend>${team || "<p>No agents exist yet.</p>"}</fieldset>
-    <label>Notes <input name="notes" value="${esc(mission.notes)}" /></label>`
+    <label>${loc`Threat Level adjustment (home campaigns, −2 to +2)`} <input type="number" name="threatAdjust" min="-2" max="2" value="${mission.threatAdjust}" /></label>
+    <label>${loc`Fixed Threat Level (published missions; blank to calculate)`} <input type="number" name="threatOverride" min="1" max="20" value="${mission.threatOverride ?? ""}" /></label>
+    <label>${loc`Scripted dramatic scenes (1 is free; each extra +100 XP; none −50 XP)`} <input type="number" name="dramaticScenes" min="0" value="${mission.dramaticScenes}" /></label>
+    <label><input type="checkbox" name="timeLimit" ${mission.timeLimit ? "checked" : ""} /> ${loc`Time limit complication (+50 XP)`}</label>
+    <label>${loc`Common Items in the mission bundle (−1 XP each)`} <input type="number" name="bundleCommonItems" min="0" value="${mission.bundleCommonItems}" /></label>
+    <label>${loc`Scenes played so far`} <input type="number" name="scenesPlayed" min="0" value="${mission.scenesPlayed}" /></label>
+    <fieldset><legend>${loc`Team (Threat Level = sum of career levels ÷ 5, rounded up)`}</legend>${team || `<p>${loc`No agents exist yet.`}</p>`}</fieldset>
+    <label>${loc`Notes`} <input name="notes" value="${esc(mission.notes)}" /></label>`
   );
   if (!input) return null;
   const override = Number(input.threatOverride);
@@ -99,7 +100,7 @@ export async function startMission() {
     mission = getMission(),
     standing = missionStanding(mission);
   await say(
-    `<b>Mission ${esc(mission.name || "")} begins.</b> Threat Level <b>${tl.value}</b>${tl.override ? " (fixed)" : ` (${tl.base}${tl.adjust ? ` ${signed(tl.adjust)}` : ""})`}, Caliber ${mission.caliber}.${tl.bonusDice ? ` Each player character starts each session with ${tl.bonusDice} extra action di${tl.bonusDice === 1 ? "e" : "ce"} (p.61).` : ""} Base standing reward: Reputation ${standing.reputation} or Net Worth ${money(standing.netWorth)}. GC starting dice: ${teamActors(mission).length} + ${2 * mission.caliber}.`
+    `<b>${loc`Mission ${esc(mission.name || "")} begins.`}</b> ${loc`Threat Level`} <b>${tl.value}</b>${loc`${tl.override ? " (fixed)" : ` (${tl.base}${tl.adjust ? ` ${signed(tl.adjust)}` : ""})`}, Caliber ${mission.caliber}.${tl.bonusDice ? loc` Each player character starts each session with ${tl.bonusDice} extra action di${tl.bonusDice === 1 ? "e" : "ce"} (p.61).` : ""} Base standing reward: Reputation ${standing.reputation} or Net Worth ${money(standing.netWorth)}. GC starting dice: ${teamActors(mission).length} + ${2 * mission.caliber}.`}`
   );
   return tl;
 }
@@ -120,12 +121,12 @@ export async function addObjective() {
     )
     .join("");
   const input = await ask(
-    "Add an objective — grade × 25 XP (p.431)",
+    loc`Add an objective — grade × 25 XP (p.431)`,
     `
-    <label>Sample (Table 7.6) <select name="sample"><option value="">Custom</option>${samples}</select></label>
-    <label>Name (state exactly how it is completed) <input name="name" /></label>
-    <label>Grade for a custom objective <input type="number" name="grade" min="1" max="5" value="1" /></label>
-    <label><input type="checkbox" name="critical" /> Critical objective (failing it causes exposure)</label>`
+    <label>${loc`Sample (Table 7.6)`} <select name="sample"><option value="">${loc`Custom`}</option>${samples}</select></label>
+    <label>${loc`Name (state exactly how it is completed)`} <input name="name" /></label>
+    <label>${loc`Grade for a custom objective`} <input type="number" name="grade" min="1" max="5" value="1" /></label>
+    <label><input type="checkbox" name="critical" /> ${loc`Critical objective (failing it causes exposure)`}</label>`
   );
   if (!input) return null;
   const [sampleName, sampleGrade] = String(input.sample || "").split("|");
@@ -144,13 +145,13 @@ export async function addAntagonist() {
   requireGC();
   const npcs = [...game.actors].filter(actor => actor.type === "npc");
   const input = await ask(
-    "Add an antagonist (p.452)",
+    loc`Add an antagonist (p.452)`,
     `
-    <p>Each NPC type counts once per mission however many appear; a special NPC counts four times its reward; a ‘full’ special NPC built with the character rules earns 300 XP per scene instead.</p>
-    <label>NPC <select name="uuid"><option value="">Not an existing actor</option>${options(npcs.map(actor => [actor.uuid, `${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : " (enter XP)"}`]))}</select></label>
-    <label>Name <input name="name" /></label>
-    <label>XP reward if not read from the actor <input type="number" name="xp" min="0" value="0" /></label>
-    <label>Type <select name="type">${options(
+    <p>${loc`Each NPC type counts once per mission however many appear; a special NPC counts four times its reward; a ‘full’ special NPC built with the character rules earns 300 XP per scene instead.`}</p>
+    <label>${loc`NPC`} <select name="uuid"><option value="">${loc`Not an existing actor`}</option>${options(npcs.map(actor => [actor.uuid, `${actor.name}${Number.isFinite(actor.system.npcBuild?.xp) ? ` (${actor.system.npcBuild.xp} XP)` : " (enter XP)"}`]))}</select></label>
+    <label>${loc`Name`} <input name="name" /></label>
+    <label>${loc`XP reward if not read from the actor`} <input type="number" name="xp" min="0" value="0" /></label>
+    <label>${loc`Type`} <select name="type">${options(
       [
         ["", "From the actor"],
         ["standard", "Standard or animal"],
@@ -158,8 +159,8 @@ export async function addAntagonist() {
       ],
       ""
     )}</select></label>
-    <label><input type="checkbox" name="full" /> ‘Full’ special NPC (300 XP per scene)</label>
-    <label>Scenes a full or promoted NPC appears in <input type="number" name="scenes" min="1" value="1" /></label>`
+    <label><input type="checkbox" name="full" /> ${loc`‘Full’ special NPC (300 XP per scene)`}</label>
+    <label>${loc`Scenes a full or promoted NPC appears in`} <input type="number" name="scenes" min="1" value="1" /></label>`
   );
   if (!input) return null;
   const actor = input.uuid ? await fromUuid(input.uuid) : null;
@@ -184,10 +185,10 @@ export async function addComplication() {
     .filter(quality => !quality.seasonOnly)
     .map(quality => [quality.id, `${quality.name} (${signed(quality.xp)} XP)`]);
   const input = await ask(
-    "Add a complication (pp.435–439)",
+    loc`Add a complication (pp.435–439)`,
     `
-    <p>Complications raise the base XP reward only when they actually stand in the team's way; one that is ignored is worth half.</p>
-    <label>Kind <select name="kind">${options(
+    <p>${loc`Complications raise the base XP reward only when they actually stand in the team's way; one that is ignored is worth half.`}</p>
+    <label>${loc`Kind`} <select name="kind">${options(
       [
         ["quality", "Campaign quality scripted into the mission"],
         ["security", "Security device"],
@@ -198,16 +199,16 @@ export async function addComplication() {
       ],
       "security"
     )}</select></label>
-    <label>Campaign quality <select name="quality">${options(qualityRows)}</select></label>
-    <label>Security device <select name="security">${options(SECURITY_DEVICES.map(device => [device.id, `${device.name} (${device.kind}; XP ${device.xp})`]))}</select></label>
-    <label>Device Power Rating <input type="number" name="pr" min="1" value="${Math.max(1, mission.threatLevel ?? 1)}" /></label>
-    <label>Device XP if the table gives no plain formula <input type="number" name="deviceXP" min="0" /></label>
-    <label>Gear restriction <select name="gear">${options(T.gearRestrictions.map(entry => [entry.id, `${entry.name} (${signed(entry.xp)} XP)`]))}</select></label>
-    <label>Exposure objective <select name="exposure">${options(T.exposure.map(entry => [entry.id, `${entry.objective} (${entry.xpPrinted ?? signed(entry.xp)} XP)`]))}</select></label>
-    <label>Bundle pick or other complication name <input name="name" /></label>
-    <label>Bundle pick Caliber (−10 XP per Caliber) <input type="number" name="caliber" min="1" max="5" value="1" /></label>
-    <label>Other complication XP <input type="number" name="xp" value="0" /></label>
-    <label>How many <input type="number" name="count" min="1" value="1" /></label>`
+    <label>${loc`Campaign quality`} <select name="quality">${options(qualityRows)}</select></label>
+    <label>${loc`Security device`} <select name="security">${options(SECURITY_DEVICES.map(device => [device.id, `${device.name} (${device.kind}; XP ${device.xp})`]))}</select></label>
+    <label>${loc`Device Power Rating`} <input type="number" name="pr" min="1" value="${Math.max(1, mission.threatLevel ?? 1)}" /></label>
+    <label>${loc`Device XP if the table gives no plain formula`} <input type="number" name="deviceXP" min="0" /></label>
+    <label>${loc`Gear restriction`} <select name="gear">${options(T.gearRestrictions.map(entry => [entry.id, `${entry.name} (${signed(entry.xp)} XP)`]))}</select></label>
+    <label>${loc`Exposure objective`} <select name="exposure">${options(T.exposure.map(entry => [entry.id, `${entry.objective} (${entry.xpPrinted ?? signed(entry.xp)} XP)`]))}</select></label>
+    <label>${loc`Bundle pick or other complication name`} <input name="name" /></label>
+    <label>${loc`Bundle pick Caliber (−10 XP per Caliber)`} <input type="number" name="caliber" min="1" max="5" value="1" /></label>
+    <label>${loc`Other complication XP`} <input type="number" name="xp" value="0" /></label>
+    <label>${loc`How many`} <input type="number" name="count" min="1" value="1" /></label>`
   );
   if (!input) return null;
   const count = Math.max(1, Number(input.count) || 1),
@@ -221,7 +222,7 @@ export async function addComplication() {
         const device = resolveDevice(input.security, Number(input.pr));
         const xp = device.xp ?? (input.deviceXP === "" || input.deviceXP === null ? null : Number(input.deviceXP));
         if (!Number.isFinite(xp))
-          throw new Error(`${device.name}: its XP is printed as “${device.xpPrinted}”; enter the XP by hand.`);
+          throw new Error(loc`${device.name}: its XP is printed as “${device.xpPrinted}”; enter the XP by hand.`);
         return updateMission(m => ({
           security: [
             ...m.security,
@@ -295,26 +296,26 @@ export async function recordInfraction() {
   const { effects } = currentCampaignEffects(),
     rules = effects.gearRules;
   const input = await ask(
-    "Record an exposure infraction — Table 7.7",
+    loc`Record an exposure infraction — Table 7.7`,
     `
-    ${active.length ? "" : '<p class="bad">No exposure objective is scripted into this mission; showing every row of Table 7.7.</p>'}
-    <label>Character <select name="actor">${options(team.map(actor => [actor.id, actor.name]))}</select></label>
-    <label>Infraction <select name="infraction">${options(rows)}</select></label>
-    <label>Paid in <select name="currency">${options(
+    ${active.length ? "" : `<p class="bad">${loc`No exposure objective is scripted into this mission; showing every row of Table 7.7.`}</p>`}
+    <label>${loc`Character`} <select name="actor">${options(team.map(actor => [actor.id, actor.name]))}</select></label>
+    <label>${loc`Infraction`} <select name="infraction">${options(rows)}</select></label>
+    <label>${loc`Paid in`} <select name="currency">${options(
       [
         ["reputation", "Reputation (Faction)"],
         ["netWorth", "Net Worth (Freelance)"]
       ],
       rules === "freelance" ? "netWorth" : "reputation"
     )}</select></label>
-    <label><input type="checkbox" name="preventing" /> Committed to prevent an equal or worse infraction (half, rounded up)</label>
-    <label><input type="checkbox" name="honor" /> Honor-code violation under the Corrupt campaign quality (half, rounded down)</label>`
+    <label><input type="checkbox" name="preventing" /> ${loc`Committed to prevent an equal or worse infraction (half, rounded up)`}</label>
+    <label><input type="checkbox" name="honor" /> ${loc`Honor-code violation under the Corrupt campaign quality (half, rounded down)`}</label>`
   );
   if (!input) return null;
   const actor = game.actors.get(input.actor),
     [objectiveId, index] = String(input.infraction).split("|");
   const infraction = T.exposure.find(row => row.id === objectiveId)?.infractions[Number(index)];
-  if (!actor || !infraction) return ui.notifications.warn("Choose a character and an infraction.");
+  if (!actor || !infraction) return ui.notifications.warn(loc`Choose a character and an infraction.`);
   const penalty = exposurePenalty(infraction, { preventing: !!input.preventing, halve: !!input.honor })[input.currency];
   const path = `system.${input.currency}`,
     before = actor.system[input.currency] ?? 0;
@@ -328,7 +329,7 @@ export async function recordInfraction() {
   const after = before + penalty,
     burned = after < 0;
   await say(
-    `<b>Exposure:</b> ${esc(actor.name)} — ${esc(infraction.name)}. ${input.currency === "reputation" ? `Reputation ${before} → <b>${after}</b>` : `Net Worth ${money(before)} → <b>${after < 0 ? "−" : ""}${money(after)}</b>`}.${burned ? " <b>Negative standing: see p.439 for the consequences.</b>" : ""}`
+    `<b>${loc`Exposure:`}</b> ${esc(actor.name)} — ${esc(infraction.name)}. ${input.currency === "reputation" ? `${loc`Reputation ${before} →`} <b>${after}</b>` : `${loc`Net Worth ${money(before)} →`} <b>${after < 0 ? "−" : ""}${money(after)}</b>`}.${burned ? ` <b>${loc`Negative standing: see p.439 for the consequences.`}</b>` : ""}`
   );
   return penalty;
 }
@@ -343,11 +344,11 @@ export async function applySessionDiceAdjustments() {
   const bonus = mission.active && mission.threatLevel ? threatBonusActionDice(mission.threatLevel, levels) : 0,
     delta = bonus + (effects.startingActionDice ?? 0);
   if (!delta)
-    return ui.notifications.info("No Threat Level or campaign-quality change to starting action dice applies.");
+    return ui.notifications.info(loc`No Threat Level or campaign-quality change to starting action dice applies.`);
   const lines = [];
   for (const actor of teamActors(mission)) {
     if (actor.flags?.spycraft2?.sessionDiceAdjusted === session) {
-      lines.push(`${esc(actor.name)}: already adjusted this session`);
+      lines.push(loc`${esc(actor.name)}: already adjusted this session`);
       continue;
     }
     const starting = actor.system.actionDice?.max ?? 0,
@@ -358,7 +359,7 @@ export async function applySessionDiceAdjustments() {
     lines.push(`${esc(actor.name)}: ${signed(change)} → ${value}`);
   }
   await say(
-    `<b>Starting action dice adjusted</b> (Threat Level bonus ${signed(bonus)}; campaign qualities ${signed(effects.startingActionDice ?? 0)}).<br>${lines.join("<br>")}`
+    `<b>${loc`Starting action dice adjusted`}</b> ${loc`(Threat Level bonus ${signed(bonus)}; campaign qualities ${signed(effects.startingActionDice ?? 0)}).`}<br>${lines.join("<br>")}`
   );
   return delta;
 }
@@ -388,12 +389,12 @@ export async function missionReport({ planned = false, whisper = true } = {}) {
         const result = characterMissionXP({ baseXP: xp.total, awards, level, threatLevel: tl });
         return `${esc(actor.name)}: (${xp.total} + ${result.awardXP}) × ${result.multiplier} = <b>${result.total}</b>`;
       } catch {
-        return `${esc(actor.name)}: finish the character's level first`;
+        return loc`${esc(actor.name)}: finish the character's level first`;
       }
     })
     .join("<br>");
   await say(
-    `<b>${planned ? "Planned" : "Earned"} mission XP — ${esc(mission.name || "mission")}</b> (Threat Level ${tl}, Caliber ${mission.caliber})<br>${table || "Nothing recorded yet."}<br><b>Base reward: ${xp.total}</b>${xp.warnings.length ? `<br><span class="bad">${xp.warnings.map(esc).join("<br>")}</span>` : ""}<br><br><b>Per character</b> (p.440)<br>${characters}<br><br>Standing: Reputation ${signed(standing?.reputation ?? 0)} or Net Worth +${money(standing?.netWorth ?? 0)} each. Settle XP from each agent's Classes tab; the dialog is pre-filled from this record.`,
+    `<b>${loc`${planned ? "Planned" : "Earned"} mission XP — ${esc(mission.name || "mission")}`}</b> ${loc`(Threat Level ${tl}, Caliber ${mission.caliber})`}<br>${table || "Nothing recorded yet."}<br><b>${loc`Base reward: ${xp.total}`}</b>${xp.warnings.length ? `<br><span class="bad">${xp.warnings.map(esc).join("<br>")}</span>` : ""}<br><br><b>${loc`Per character`}</b> (p.440)<br>${characters}<br><br>${loc`Standing: Reputation ${signed(standing?.reputation ?? 0)} or Net Worth +${money(standing?.netWorth ?? 0)} each. Settle XP from each agent's Classes tab; the dialog is pre-filled from this record.`}`,
     whisper
   );
   return xp;
@@ -406,10 +407,10 @@ export async function awardStanding() {
     standing = missionStanding(mission),
     { effects } = currentCampaignEffects();
   const input = await ask(
-    "Award Reputation or Net Worth — Table 7.10",
+    loc`Award Reputation or Net Worth — Table 7.10`,
     `
-    <p>Each character earns this for completing the mission whether or not it succeeded; failed critical objectives are exposure infractions recorded separately. A Profession/Accomplishment check may raise it.</p>
-    <label>Paid in <select name="currency">${options(
+    <p>${loc`Each character earns this for completing the mission whether or not it succeeded; failed critical objectives are exposure infractions recorded separately. A Profession/Accomplishment check may raise it.`}</p>
+    <label>${loc`Paid in`} <select name="currency">${options(
       [
         ["reputation", `Reputation ${signed(standing.reputation)}`],
         ["netWorth", `Net Worth +${money(standing.netWorth)}`]
@@ -422,7 +423,7 @@ export async function awardStanding() {
   for (const actor of teamActors(mission))
     await actor.update({ [`system.${input.currency}`]: (actor.system[input.currency] ?? 0) + amount });
   await say(
-    `Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(
+    loc`Mission standing awarded: ${input.currency === "reputation" ? `Reputation ${signed(amount)}` : `Net Worth +${money(amount)}`} to ${esc(
       teamActors(mission)
         .map(actor => actor.name)
         .join(", ")
@@ -440,12 +441,12 @@ export async function editSeasonQualities() {
   const boxes = GC_DATA.campaignQualities
     .map(
       quality =>
-        `<label title="${esc(quality.summary)}"><input type="checkbox" name="q-${quality.id}" ${current.has(quality.id) ? "checked" : ""} /> ${esc(quality.name)} (${signed(quality.xp)} XP${quality.seasonOnly ? "; seasons only" : ""}) — ${esc(quality.summary)}</label>`
+        `<label title="${esc(quality.summary)}"><input type="checkbox" name="q-${quality.id}" ${current.has(quality.id) ? "checked" : ""} /> ${loc`${esc(quality.name)} (${signed(quality.xp)} XP${quality.seasonOnly ? "; seasons only" : ""}) — ${esc(quality.summary)}`}</label>`
     )
     .join("");
   const input = await ask(
-    "Season campaign qualities — pp.405–408",
-    `<p>These apply to every mission of the season and modify each mission's base XP reward.</p><div style="max-height:60vh;overflow:auto">${boxes}</div>`
+    loc`Season campaign qualities — pp.405–408`,
+    `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward.`}</p><div style="max-height:60vh;overflow:auto">${boxes}</div>`
   );
   if (!input) return null;
   await setCampaign({

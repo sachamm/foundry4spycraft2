@@ -1,6 +1,7 @@
 import { shakenRules } from "./shaken.mjs";
 import { errorDecisionPending } from "./outcomes.mjs";
 import { resolveSkillResult } from "./checks.mjs";
+import { loc } from "../i18n.mjs";
 /** Doubled-die abilities never exceed two dice per die spent (pp.29,62), including Card Shark p.202. */
 export function actionDieBoostPlan(
   system,
@@ -12,30 +13,33 @@ export function actionDieBoostPlan(
     return {
       blocked: true,
       reason: shaken.needsReview
-        ? "Review the paying character’s Shaken sources before boosting."
-        : "Shaken IV: no action dice may be spent at all (p.342)."
+        ? loc`Review the paying character’s Shaken sources before boosting.`
+        : loc`Shaken IV: no action dice may be spent at all (p.342).`
     };
   if (system.actionDieAwardReview?.needsReview)
-    return { blocked: true, reason: "The GC must review the interrupted award before spending more action dice." };
+    return { blocked: true, reason: loc`The GC must review the interrupted award before spending more action dice.` };
   if (system.actionDiceSettlementReview?.needsReview)
     return {
       blocked: true,
-      reason: "The GC must review the interrupted action-die settlement before further spending."
+      reason: loc`The GC must review the interrupted action-die settlement before further spending.`
     };
   const core = new Set(system.coreClassIds ?? []),
     kind = check.checkKind ?? "check",
     skillLike = ["skill", "knowledge"].includes(kind);
   if (!Number.isSafeInteger(count) || count < 1)
-    return { blocked: true, reason: "Spend a positive whole number of action dice." };
-  if (count > (system.actionDice?.value ?? 0)) return { blocked: true, reason: "Not enough action dice remain." };
+    return { blocked: true, reason: loc`Spend a positive whole number of action dice.` };
+  if (count > (system.actionDice?.value ?? 0)) return { blocked: true, reason: loc`Not enough action dice remain.` };
   if (check.criticalFailure)
-    return { blocked: true, reason: "An activated critical failure cannot be boosted (p.62)." };
+    return { blocked: true, reason: loc`An activated critical failure cannot be boosted (p.62).` };
   if (errorDecisionPending(check) && !errorDeclined)
-    return { blocked: true, reason: "Opponents must decide whether to activate the error before you boost it (p.62)." };
+    return {
+      blocked: true,
+      reason: loc`Opponents must decide whether to activate the error before you boost it (p.62).`
+    };
   if (check.actionDiceAllowed === false || check.resolved)
-    return { blocked: true, reason: "This result cannot be boosted, or its outcome has already been resolved." };
+    return { blocked: true, reason: loc`This result cannot be boosted, or its outcome has already been resolved.` };
   if (kind === "damage" && count + (check.boostSpent ?? 0) > 1)
-    return { blocked: true, reason: "Only one action die may be spent to boost each damage result (p.61)." };
+    return { blocked: true, reason: loc`Only one action die may be spent to boost each damage result (p.61).` };
   const doubled =
     (system.activeFeatNames?.includes("Card Shark") &&
       kind === "skill" &&
@@ -78,7 +82,7 @@ export function actionDieBoostPlan(
 export function actionDieBoostResult(check, plan, dieResults) {
   const values = dieResults.map(Number);
   if (values.length !== plan.rolls || values.some(value => !Number.isFinite(value)))
-    throw new Error("One result is required for each action die rolled.");
+    throw new Error(loc`One result is required for each action die rolled.`);
   let replaced = false;
   if (plan.calculating) {
     const lowest = Math.min(...values);
@@ -117,13 +121,13 @@ export function generousBoostPlan(
   { teammate = false, perceivedAtRoll = false, errorDeclined = false, calculating = false, sameActor = false } = {}
 ) {
   if (!donor.coreClassIds?.includes("pointman"))
-    return { blocked: true, reason: "The donor must possess the Generous core ability." };
+    return { blocked: true, reason: loc`The donor must possess the Generous core ability.` };
   if (sameActor || !teammate || !perceivedAtRoll)
-    return { blocked: true, reason: "Choose a teammate who could see or hear the donor when this roll was made." };
+    return { blocked: true, reason: loc`Choose a teammate who could see or hear the donor when this roll was made.` };
   if (check.generousBoost)
     return {
       blocked: true,
-      reason: "This roll has already benefited from Generous, even if another Pointman offers a die."
+      reason: loc`This roll has already benefited from Generous, even if another Pointman offers a die.`
     };
   const plan = actionDieBoostPlan(donor, check, { count: 1, errorDeclined, calculating });
   if (plan.blocked) return plan;
@@ -158,11 +162,11 @@ export function improvedFortuneBonus(ownLevel = 0, teammates = []) {
 /** p.189: apply Fortune Favors the Bold once at the time dice are gained. */
 export function actionDiceGain(system, baseDie, count = 1) {
   if (![4, 6, 8, 10, 12].includes(baseDie) || !Number.isSafeInteger(count) || count < 1)
-    throw new Error("Choose a valid action-die type and positive whole-number count.");
+    throw new Error(loc`Choose a valid action-die type and positive whole-number count.`);
   const bold = system.activeFeatNames?.includes("Fortune Favors the Bold"),
     die = bold ? (baseDie === 12 ? 6 : baseDie + 2) : baseDie,
     units = count * (bold && baseDie === 12 ? 2 : 1);
-  if (!Number.isSafeInteger(units)) throw new Error("The gained dice exceed a safe whole number.");
+  if (!Number.isSafeInteger(units)) throw new Error(loc`The gained dice exceed a safe whole number.`);
   return { die, units };
 }
 
@@ -178,17 +182,19 @@ export function actionDieAwardPlan(
     !String(reason).trim() ||
     !id
   )
-    throw new Error("Enter a positive whole number of ordinary award dice and their reason.");
+    throw new Error(loc`Enter a positive whole number of ordinary award dice and their reason.`);
   const { die, units } = actionDiceGain(system, careerDie, count);
   const value = (system.actionDice?.value ?? 0) + units;
-  if (!Number.isSafeInteger(value)) throw new Error("The awarded action-die balance exceeds a safe whole number.");
+  if (!Number.isSafeInteger(value)) throw new Error(loc`The awarded action-die balance exceeds a safe whole number.`);
   const key = encodeURIComponent(String(mission)).replaceAll(".", "%2E"),
     before = system.actionDieAwards?.[key];
   if (system.missionXPRewards?.[key])
-    throw new Error("This mission’s XP was already settled. Start the next mission before recording further awards.");
-  if (before && before.mission !== String(mission)) throw new Error("The award ledger does not match this mission.");
+    throw new Error(
+      loc`This mission’s XP was already settled. Start the next mission before recording further awards.`
+    );
+  if (before && before.mission !== String(mission)) throw new Error(loc`The award ledger does not match this mission.`);
   const awarded = (before?.count ?? 0) + count;
-  if (!Number.isSafeInteger(awarded)) throw new Error("The award count exceeds a safe whole number.");
+  if (!Number.isSafeInteger(awarded)) throw new Error(loc`The award count exceeds a safe whole number.`);
   const event = {
     id,
     count,
@@ -238,21 +244,21 @@ export function missionXPPlan(
 ) {
   const level = system.level ?? 0;
   if (!Number.isSafeInteger(level) || level < 1 || level > 20)
-    throw new Error("Complete a Career Level 1–20 character before settling mission XP.");
+    throw new Error(loc`Complete a Career Level 1–20 character before settling mission XP.`);
   if (
     ![baseXP, additionalXP].every(n => Number.isSafeInteger(n) && n >= 0) ||
     !Number.isSafeInteger(threatLevel) ||
     threatLevel < 1
   )
-    throw new Error("Enter nonnegative whole-number XP and a positive whole-number Threat Level.");
+    throw new Error(loc`Enter nonnegative whole-number XP and a positive whole-number Threat Level.`);
   if (!missionCompleteConfirmed)
-    throw new Error("Confirm the mission has ended and all post-multiplier XP modifiers were reviewed.");
+    throw new Error(loc`Confirm the mission has ended and all post-multiplier XP modifiers were reviewed.`);
   if (additionalXP && !String(modifierReason).trim())
-    throw new Error("Record the source of additional post-multiplier XP.");
+    throw new Error(loc`Record the source of additional post-multiplier XP.`);
   const key = encodeURIComponent(String(mission)).replaceAll(".", "%2E");
-  if (system.missionXPRewards?.[key]) throw new Error("This mission’s XP was already settled.");
+  if (system.missionXPRewards?.[key]) throw new Error(loc`This mission’s XP was already settled.`);
   const count = system.actionDieAwards?.[key]?.count ?? 0;
-  if (!Number.isSafeInteger(count) || count < 0) throw new Error("Review the mission’s action-die award ledger.");
+  if (!Number.isSafeInteger(count) || count < 0) throw new Error(loc`Review the mission’s action-die award ledger.`);
   const awardBaseBonus = 25 * Math.min(count, level),
     combinedBase = baseXP + awardBaseBonus,
     multiplier = Math.min(level, threatLevel),
@@ -260,7 +266,7 @@ export function missionXPPlan(
     totalXP = coreXP + additionalXP,
     xp = (system.xp ?? 0) + totalXP;
   if (![combinedBase, coreXP, totalXP, xp].every(Number.isSafeInteger))
-    throw new Error("The mission reward exceeds a safe whole number.");
+    throw new Error(loc`The mission reward exceeds a safe whole number.`);
   return {
     key,
     xp,

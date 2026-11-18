@@ -1,15 +1,21 @@
 import { shakenRules } from "./shaken.mjs";
 import { actionDiceGain, actionDieBoostPlan } from "./action-dice.mjs";
+import { loc } from "../i18n.mjs";
 const epoch = (periods, key) => String(periods?.[key] ?? "initial");
 /** Stuntman 8, p.81: one compulsory d10, confined to its STR/DEX check, once per scene. */
 export function difficultSkillBonusPlan(system, result, { dc } = {}) {
-  if ((system.classLevels?.stuntman ?? 0) < 8) throw new Error("This bonus requires Stuntman level 8.");
+  if ((system.classLevels?.stuntman ?? 0) < 8) throw new Error(loc`This bonus requires Stuntman level 8.`);
   if (result?.method !== "roll" || !["str", "dex"].includes(result.ability))
-    throw new Error("This bonus requires a rolled Strength- or Dexterity-based skill check.");
+    throw new Error(loc`This bonus requires a rolled Strength- or Dexterity-based skill check.`);
   const target = Number(dc);
   if (!Number.isSafeInteger(target) || target <= (system.level ?? 0) + 20)
-    throw new Error("The DC must be more than 20 above Career Level.");
-  return { ...actionDiceGain(system, 10), source: "iKnowWhatDoing", label: "…I Know What I’m Doing.", mandatory: true };
+    throw new Error(loc`The DC must be more than 20 above Career Level.`);
+  return {
+    ...actionDiceGain(system, 10),
+    source: "iKnowWhatDoing",
+    label: loc`…I Know What I’m Doing.`,
+    mandatory: true
+  };
 }
 export function checkBonusPool(
   system,
@@ -17,7 +23,7 @@ export function checkBonusPool(
   { id, messageUuid, skillKey, ability, periods = system.usagePeriods } = {}
 ) {
   if (!/^[A-Za-z0-9_-]+$/.test(id) || !messageUuid || system.bonusActionDice?.[id])
-    throw new Error("A new bonus-pool identifier and its recorded check are required.");
+    throw new Error(loc`A new bonus-pool identifier and its recorded check are required.`);
   return {
     id,
     source: gain.source,
@@ -41,7 +47,7 @@ export function bonusPoolForCheck(system, id, message, { periods = system.usageP
     check = message?.flags?.spycraft2;
   const remaining = Number.isSafeInteger(pool?.remaining) ? Math.max(0, pool.remaining) : 0;
   let reason = "";
-  if (!pool || pool.id !== id || pool.source !== "iKnowWhatDoing") reason = "This bonus pool is unavailable.";
+  if (!pool || pool.id !== id || pool.source !== "iKnowWhatDoing") reason = loc`This bonus pool is unavailable.`;
   else if (
     ![4, 6, 8, 10, 12].includes(pool.die) ||
     !Number.isSafeInteger(pool.granted) ||
@@ -50,9 +56,9 @@ export function bonusPoolForCheck(system, id, message, { periods = system.usageP
     pool.remaining < 0 ||
     pool.remaining > pool.granted
   )
-    reason = "Review this bonus pool’s recorded dice.";
+    reason = loc`Review this bonus pool’s recorded dice.`;
   else if (pool.forfeited || pool.session !== epoch(periods, "session"))
-    reason = "This bonus die was forfeited or expired with its session.";
+    reason = loc`This bonus die was forfeited or expired with its session.`;
   else if (
     pool.messageUuid !== (message?.uuid ?? message?.id) ||
     check?.requiredBonusPoolId !== id ||
@@ -60,11 +66,11 @@ export function bonusPoolForCheck(system, id, message, { periods = system.usageP
     check?.skillKey !== pool.skillKey ||
     check?.ability !== pool.ability
   )
-    reason = "This bonus die belongs only to its original skill check.";
+    reason = loc`This bonus die belongs only to its original skill check.`;
   else if (check.checkMethod !== "roll" || check.resolved || check.superseded)
-    reason = "This check has been resolved or replaced.";
-  else if (check.criticalFailure) reason = "An activated critical failure cannot be boosted.";
-  else if (!remaining) reason = "This bonus pool is already spent.";
+    reason = loc`This check has been resolved or replaced.`;
+  else if (check.criticalFailure) reason = loc`An activated critical failure cannot be boosted.`;
+  else if (!remaining) reason = loc`This bonus pool is already spent.`;
   return { ...pool, remaining, available: reason ? 0 : remaining, reason };
 }
 export function checkBonusBoostPlan(
@@ -105,7 +111,7 @@ export function hardKnocksGainPlan(system, check, { kind, careerDie = 4 } = {}) 
     return null;
   const gain = actionDiceGain(system, careerDie),
     value = (system.actionDice?.value ?? 0) + gain.units;
-  if (!Number.isSafeInteger(value)) throw new Error("The bonus action-die balance exceeds a safe whole number.");
+  if (!Number.isSafeInteger(value)) throw new Error(loc`The bonus action-die balance exceeds a safe whole number.`);
   return { ...gain, value, source: "School of Hard Knocks" };
 }
 
@@ -125,16 +131,16 @@ export function transferableCheckBonusPool(system, message, periods = system.usa
 
 /** Schemer 8, p.79: fixed d4 bonus dice, one mission use, lost at scene end. */
 export function masterPlanGainPlan(system) {
-  if ((system.classLevels?.schemer ?? 0) < 8) throw new Error("Master Plan requires Schemer level 8.");
+  if ((system.classLevels?.schemer ?? 0) < 8) throw new Error(loc`Master Plan requires Schemer level 8.`);
   const modifier = system.abilities?.int?.mod;
   if (!Number.isSafeInteger(modifier) || modifier < 1)
-    throw new Error("Master Plan requires a positive current Intelligence modifier to grant bonus dice.");
+    throw new Error(loc`Master Plan requires a positive current Intelligence modifier to grant bonus dice.`);
   return {
     ...actionDiceGain(system, 4, modifier),
     intelligenceModifier: modifier,
     baseDie: 4,
     source: "masterPlan",
-    label: "Master Plan"
+    label: loc`Master Plan`
   };
 }
 export function masterPlanPool(system, gain, { id, periods = system.usagePeriods } = {}) {
@@ -149,11 +155,11 @@ export function masterPlanPool(system, gain, { id, periods = system.usagePeriods
     ![4, 6].includes(gain.die) ||
     !Number.isFinite(system.worldTime)
   )
-    throw new Error("Review the new Master Plan bonus-die grant and its identifier.");
+    throw new Error(loc`Review the new Master Plan bonus-die grant and its identifier.`);
   return {
     id,
     source: "masterPlan",
-    label: "Master Plan",
+    label: loc`Master Plan`,
     unrestricted: true,
     baseDie: 4,
     baseCount: gain.intelligenceModifier,
@@ -219,25 +225,25 @@ export function unrestrictedBonusPoolStatus(system, id, { periods = system.usage
     /^[A-Za-z0-9_%:-]+$/.test(pool.woundEventKey);
   const valid = common && (master || strut || adrenaline);
   if (!valid || pool.needsReview || system.actionDiceSettlementReview?.needsReview) {
-    reason = "Review this bonus-die grant before spending it.";
+    reason = loc`Review this bonus-die grant before spending it.`;
     needsReview = true;
   } else if (
     pool.session !== epoch(periods, "session") ||
     ((master || adrenaline) && pool.scene !== epoch(periods, "scene"))
   )
-    reason = "These bonus dice expired at scene or session end.";
+    reason = loc`These bonus dice expired at scene or session end.`;
   else if (
     strut &&
     (system.bonusPoolCombats?.[pool.combatId]?.started !== true ||
       !Number.isSafeInteger(system.bonusPoolCombats[pool.combatId].round) ||
       system.bonusPoolCombats[pool.combatId].round < pool.combatRound)
   )
-    reason = "These bonus dice expired when their combat ended.";
-  else if (!pool.remaining) reason = "These bonus dice are already spent.";
+    reason = loc`These bonus dice expired when their combat ended.`;
+  else if (!pool.remaining) reason = loc`These bonus dice are already spent.`;
   return {
     ...pool,
     id,
-    label: pool?.label ?? "Bonus dice",
+    label: pool?.label ?? loc`Bonus dice`,
     expiryLabel: pool?.source === "strut" ? "combat end" : "scene end",
     needsReview,
     available: reason ? 0 : pool.remaining,
@@ -257,7 +263,7 @@ export function unrestrictedBonusPoolForCheck(system, id, message, { periods = s
       check.actionDiceAllowed === false ||
       ["take10", "take20"].includes(check.checkMethod))
   )
-    reason = "This check cannot receive these bonus action dice.";
+    reason = loc`This check cannot receive these bonus action dice.`;
   return { ...pool, available: reason ? 0 : pool.available, reason };
 }
 export function unrestrictedBonusPools(system, periods = system.usagePeriods) {
@@ -301,22 +307,22 @@ export function actionDicePoolFingerprint(pool) {
 }
 export function actionDiceFundingContext(system, { bonusPoolId = "", periods = system.usagePeriods } = {}) {
   if (system.actionDieAwardReview?.needsReview)
-    return { blocked: true, reason: "The GC must review the interrupted award before spending more action dice." };
+    return { blocked: true, reason: loc`The GC must review the interrupted award before spending more action dice.` };
   if (system.actionDiceSettlementReview?.needsReview)
     return {
       blocked: true,
-      reason: "The GC must review the interrupted action-die settlement before further spending."
+      reason: loc`The GC must review the interrupted action-die settlement before further spending.`
     };
   const ad = system.actionDice ?? {};
   if (!bonusPoolId) {
     const balance = ad.value ?? 0,
       die = ad.die ?? 4;
     if (!Number.isSafeInteger(balance) || balance < 0 || ![4, 6, 8, 10, 12].includes(die))
-      return { blocked: true, reason: "Review the ordinary action-die balance and die type." };
+      return { blocked: true, reason: loc`Review the ordinary action-die balance and die type.` };
     return {
       blocked: false,
       bonusPoolId: "",
-      label: "Ordinary action dice",
+      label: loc`Ordinary action dice`,
       paymentPath: "system.actionDice.value",
       balance,
       die,
@@ -344,14 +350,14 @@ export function actionDicePaymentPlan(system, { count, bonusPoolId = "", periods
     return {
       blocked: true,
       reason: shaken.needsReview
-        ? "Review the current Shaken sources before spending action dice."
-        : "Shaken IV: no action dice may be spent at all (p.342)."
+        ? loc`Review the current Shaken sources before spending action dice.`
+        : loc`Shaken IV: no action dice may be spent at all (p.342).`
     };
-  if (!Number.isSafeInteger(count) || count < 1) throw new Error("Spend a positive whole number of action dice.");
+  if (!Number.isSafeInteger(count) || count < 1) throw new Error(loc`Spend a positive whole number of action dice.`);
   const funding = actionDiceFundingContext(system, { bonusPoolId, periods });
   if (funding.blocked) return funding;
   if (count > funding.balance)
-    return { blocked: true, reason: "Not enough dice remain in the selected action-die balance." };
+    return { blocked: true, reason: loc`Not enough dice remain in the selected action-die balance.` };
   return { ...funding, count, afterBalance: funding.balance - count };
 }
 export function actionDicePaymentRefund(system, payment) {
@@ -364,11 +370,11 @@ export function actionDicePaymentRefund(system, payment) {
     payment.paymentPath !==
       (payment.bonusPoolId ? "system.bonusActionDice." + payment.bonusPoolId + ".remaining" : "system.actionDice.value")
   )
-    throw new Error("Review the original action-die payment source.");
+    throw new Error(loc`Review the original action-die payment source.`);
   const current = payment.bonusPoolId ? system.bonusActionDice?.[payment.bonusPoolId] : null,
     balance = payment.bonusPoolId ? current?.remaining : system.actionDice?.value;
   if (payment.bonusPoolId && actionDicePoolFingerprint(current) !== payment.poolFingerprint)
-    throw new Error("The bonus grant changed; do not refund a different source.");
+    throw new Error(loc`The bonus grant changed; do not refund a different source.`);
   const restored = balance + payment.count;
   if (
     !Number.isSafeInteger(balance) ||
@@ -377,17 +383,17 @@ export function actionDicePaymentRefund(system, payment) {
     restored < 0 ||
     (payment.bonusPoolId && restored > current.granted)
   )
-    throw new Error("The selected action-die balance cannot be safely restored.");
+    throw new Error(loc`The selected action-die balance cannot be safely restored.`);
   return { [payment.paymentPath]: restored };
 }
 
 /** p.189: possessed dice include valid unspent temporary grants, not expired/forfeited balances. */
 export function possessedActionDice(system, { periods = system.usagePeriods } = {}) {
   if (system.actionDieAwardReview?.needsReview || system.actionDiceSettlementReview?.needsReview)
-    throw new Error("Review the interrupted action-die balance before applying The Dice are Hot.");
+    throw new Error(loc`Review the interrupted action-die balance before applying The Dice are Hot.`);
   const ordinary = system.actionDice?.value ?? 0;
   if (!Number.isSafeInteger(ordinary) || ordinary < 0)
-    throw new Error("Review the ordinary action-die count before applying The Dice are Hot.");
+    throw new Error(loc`Review the ordinary action-die count before applying The Dice are Hot.`);
   const sources = [];
   for (const [id, pool] of Object.entries(system.bonusActionDice ?? {})) {
     if (pool?.remaining === 0) continue;
@@ -406,24 +412,24 @@ export function possessedActionDice(system, { periods = system.usagePeriods } = 
         !Number.isSafeInteger(pool.remaining) ||
         pool.remaining < 0
       )
-        throw new Error("Review the compulsory bonus-die balance before applying The Dice are Hot.");
+        throw new Error(loc`Review the compulsory bonus-die balance before applying The Dice are Hot.`);
       if (pool.forfeited || pool.session !== epoch(periods, "session")) continue;
       const message = system.bonusPoolChecks?.[pool.messageUuid],
         check = message?.flags?.spycraft2;
       if (!check)
-        throw new Error("Review the missing check for a compulsory bonus die before applying The Dice are Hot.");
+        throw new Error(loc`Review the missing check for a compulsory bonus die before applying The Dice are Hot.`);
       if (system.actorUuid && check.actorUuid !== system.actorUuid)
-        throw new Error("Review the owner of the compulsory bonus die.");
+        throw new Error(loc`Review the owner of the compulsory bonus die.`);
       if (check.resolved || check.superseded || check.criticalFailure) continue;
       const status = bonusPoolForCheck(system, id, message, { periods });
       if (!status.available) throw new Error(status.reason);
       sources.push({ id, source: pool.source, label: pool.label, die: pool.die, count: status.available });
       continue;
     }
-    throw new Error("Review an unrecognized bonus-die balance before applying The Dice are Hot.");
+    throw new Error(loc`Review an unrecognized bonus-die balance before applying The Dice are Hot.`);
   }
   const bonus = sources.reduce((n, s) => n + s.count, 0),
     total = ordinary + bonus;
-  if (!Number.isSafeInteger(total)) throw new Error("The possessed action-die count exceeds a safe whole number.");
+  if (!Number.isSafeInteger(total)) throw new Error(loc`The possessed action-die count exceeds a safe whole number.`);
   return { ordinary, bonus, total, sources };
 }

@@ -5,6 +5,7 @@ import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { attributeActionBlock } from "../rules/attributes.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
 import { queueResources } from "../rules/transactions.mjs";
+import { loc } from "../i18n.mjs";
 const stable = value =>
   JSON.stringify(value, (_key, v) =>
     v && typeof v === "object" && !Array.isArray(v)
@@ -29,9 +30,9 @@ async function inputFor(actor, review) {
     r = actor.system.superiorCover,
     grades = r?.terrainCover?.context ?? r;
   return foundry.applications.api.DialogV2.input({
-    window: { title: review ? "Review Superior Cover" : "Declare Superior Cover" },
+    window: { title: review ? loc`Review Superior Cover` : loc`Declare Superior Cover` },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${review ? "Confirm changed cover. No cover ends the DR benefit immediately; regaining cover cannot restore that declaration." : "During your Initiative Count, accept −2 to all attack and skill checks for one full round. DR equals the ordinary cover Reflex bonus while that cover remains."} The penalty lasts until the start of your next Initiative Count, even if cover is lost. The GC confirms geometry; this control does not detect movement or line of sight.</p><label>Best personal cover <select name="personalCover">${options(review ? (grades?.personalCover ?? 0) : 0)}</select></label><label>Best scenery cover <select name="sceneryCover">${options(review ? (grades?.sceneryCover ?? 0) : 0)}</select></label>${terrainCoverContent(actor.system, review ? (r?.terrainCover?.context ?? {}) : {})}<label>Actual cover/source note <input name="note" maxlength="300" required /></label><label><input name="confirmed" type="checkbox" /> The GC confirms the actual current cover${review ? "" : " and I accept the full-round penalty"}</label></div>`
+    content: `<div class="spycraft2-roll-options"><p>${loc`${review ? loc`Confirm changed cover. No cover ends the DR benefit immediately; regaining cover cannot restore that declaration.` : loc`During your Initiative Count, accept −2 to all attack and skill checks for one full round. DR equals the ordinary cover Reflex bonus while that cover remains.`} The penalty lasts until the start of your next Initiative Count, even if cover is lost. The GC confirms geometry; this control does not detect movement or line of sight.`}</p><label>${loc`Best personal cover`} <select name="personalCover">${options(review ? (grades?.personalCover ?? 0) : 0)}</select></label><label>${loc`Best scenery cover`} <select name="sceneryCover">${options(review ? (grades?.sceneryCover ?? 0) : 0)}</select></label>${terrainCoverContent(actor.system, review ? (r?.terrainCover?.context ?? {}) : {})}<label>${loc`Actual cover/source note`} <input name="note" maxlength="300" required /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms the actual current cover${review ? "" : loc` and I accept the full-round penalty`}`}</label></div>`
   });
 }
 async function save(actor, patch, proof) {
@@ -42,7 +43,7 @@ async function save(actor, patch, proof) {
   } catch (error) {
     if (!proof()) throw error;
   }
-  if (!proof()) throw new Error("Review the Superior Cover transaction before retrying.");
+  if (!proof()) throw new Error(loc`Review the Superior Cover transaction before retrying.`);
 }
 export async function declareSuperiorCover(actor, options = {}) {
   if (actor.type !== "agent" || actor.isOwner !== true) return null;
@@ -51,7 +52,7 @@ export async function declareSuperiorCover(actor, options = {}) {
   if (!input || input.confirmed !== true) return null;
   return queueResources([actor], async () => {
     if (!actor.isOwner || snapshot(actor) !== expected)
-      throw new Error("The Superior Cover source or Initiative Count changed. Open the declaration again.");
+      throw new Error(loc`The Superior Cover source or Initiative Count changed. Open the declaration again.`);
     const combat = expertiseCombatContext(actor),
       block =
         restraintActionBlock(actor.system, { free: true }) || attributeActionBlock(actor.system, { kind: "attack" });
@@ -61,10 +62,10 @@ export async function declareSuperiorCover(actor, options = {}) {
       actor.system.wounds?.value < 0 ||
       actor.system.mentalLeapState?.unconscious
     )
-      throw new Error(block || "This character cannot declare Superior Cover.");
+      throw new Error(block || loc`This character cannot declare Superior Cover.`);
     const refresh = actor.system.refreshAction;
     if (refresh?.state === "waiting" && refresh.combatId === combat?.id && refresh.startRound === combat?.round)
-      throw new Error("Refresh forfeited this round’s chance to act.");
+      throw new Error(loc`Refresh forfeited this round’s chance to act.`);
     const record = {
       ...superiorCoverPlan(actor.system, combat, {
         ...input,
@@ -92,7 +93,7 @@ export async function reviewSuperiorCover(actor, options = {}) {
   if (!input || input.confirmed !== true) return null;
   return queueResources([actor], async () => {
     if (!actor.isOwner || snapshot(actor) !== expected)
-      throw new Error("The Superior Cover source or Initiative Count changed. Open the review again.");
+      throw new Error(loc`The Superior Cover source or Initiative Count changed. Open the review again.`);
     const combat = expertiseCombatContext(actor),
       record = superiorCoverReviewPlan(
         { ...actor.system, superiorCoverCombatContext: combat },

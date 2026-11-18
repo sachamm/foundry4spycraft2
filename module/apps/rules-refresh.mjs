@@ -1,4 +1,5 @@
 import { rulesRefreshChanges, applyRulesRefresh, equivalent } from "../rules/refresh.mjs";
+import { loc } from "../i18n.mjs";
 const PACKS = { gear: "kits", class: "classes", origin: "origins", feat: "feats", weapon: "weapons", armor: "armor" };
 const normal = value =>
   String(value ?? "")
@@ -29,11 +30,11 @@ export async function actorRulesRefreshPreview(actor) {
       if (matches.length === 1) canonical = await pack.getDocument(matches[0]._id);
     }
     if (!canonical) {
-      unmatched.push(`${item.name}: no unique matching catalog entry; kept unchanged.`);
+      unmatched.push(loc`${item.name}: no unique matching catalog entry; kept unchanged.`);
       continue;
     }
     if (item.type === "class" && item.system.identifier !== canonical.system.identifier) {
-      unmatched.push(`${item.name}: class identifiers differ; kept unchanged to preserve progression references.`);
+      unmatched.push(loc`${item.name}: class identifiers differ; kept unchanged to preserve progression references.`);
       continue;
     }
     changes.push(...rulesRefreshChanges(item, canonical));
@@ -41,13 +42,13 @@ export async function actorRulesRefreshPreview(actor) {
   return { changes, unmatched };
 }
 export async function reviewActorRules(actor, { restore = false } = {}) {
-  if (!actor?.isOwner) return ui.notifications.warn("You must own this character.");
+  if (!actor?.isOwner) return ui.notifications.warn(loc`You must own this character.`);
   const esc = foundry.utils.escapeHTML;
   let changes,
     unmatched = [];
   if (restore) {
     const backup = actor.getFlag("spycraft2", "rulesRefreshBackup");
-    if (!backup) return ui.notifications.info("No previous rules refresh is available.");
+    if (!backup) return ui.notifications.info(loc`No previous rules refresh is available.`);
     changes = backup.changes.flatMap(change => {
       const item = actor.items.get(change.itemId);
       if (!item) return [];
@@ -57,18 +58,18 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
         : [{ ...change, before: structuredClone(current), after: structuredClone(change.before) }];
     });
   } else ({ changes, unmatched } = await actorRulesRefreshPreview(actor));
-  if (!changes.length) return ui.notifications.info(unmatched.join("\n") || "No catalog changes to apply.");
+  if (!changes.length) return ui.notifications.info(unmatched.join("\n") || loc`No catalog changes to apply.`);
   const rows = changes
     .map(
       (change, index) =>
-        `<details><summary><label><input type="checkbox" name="change${index}" checked /> ${esc(change.itemName)} — ${esc(change.path)}</label></summary><div><b>Current</b><pre>${esc(JSON.stringify(change.before, null, 1) ?? "Not set")}</pre><b>Proposed</b><pre>${esc(JSON.stringify(change.after, null, 1) ?? "Not set")}</pre></div></details>`
+        `<details><summary><label><input type="checkbox" name="change${index}" checked /> ${esc(change.itemName)} — ${esc(change.path)}</label></summary><div><b>${loc`Current`}</b><pre>${esc(JSON.stringify(change.before, null, 1) ?? "Not set")}</pre><b>${loc`Proposed`}</b><pre>${esc(JSON.stringify(change.after, null, 1) ?? "Not set")}</pre></div></details>`
     )
     .join("");
   const input = await foundry.applications.api.DialogV2.input({
-    window: { title: restore ? "Review previous rules refresh rollback" : "Review catalog rules updates" },
+    window: { title: restore ? loc`Review previous rules refresh rollback` : loc`Review catalog rules updates` },
     rejectClose: false,
     content: `
-  <p>Select the changes to apply. Build choices, quantities, equipped state, current HP, XP and earned resources are preserved. Grant synchronization may add or remove rule-granted feats. A full character JSON backup downloads before applying changes, and a backup of selected fields is stored on the character for quick rollback.</p>
+  <p>${loc`Select the changes to apply. Build choices, quantities, equipped state, current HP, XP and earned resources are preserved. Grant synchronization may add or remove rule-granted feats. A full character JSON backup downloads before applying changes, and a backup of selected fields is stored on the character for quick rollback.`}</p>
   <div style="max-height:55vh;overflow:auto">${rows}</div>${unmatched.length ? `<p>${unmatched.map(esc).join("<br>")}</p>` : ""}`
   });
   if (!input) return null;

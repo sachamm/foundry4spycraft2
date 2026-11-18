@@ -1,3 +1,4 @@
+import { loc } from "../i18n.mjs";
 /** Armor codes p.225 and damage types pp.333–340. AC in Table 4.13 denotes the same acid type as AD. */
 export const RESISTANCE_TYPES = {
   AD: "Acid",
@@ -41,20 +42,20 @@ export function qualityResistances(system) {
 
 /** Read the actual prepared aggregate and its audit without adding nonstacking sources again. */
 export function preparedResistanceSource(system, kind) {
-  if (!Object.hasOwn(RESISTANCE_TYPES, kind)) throw new Error("Choose a known prepared resistance type.");
+  if (!Object.hasOwn(RESISTANCE_TYPES, kind)) throw new Error(loc`Choose a known prepared resistance type.`);
   const stats = system.survivalStats;
   if (!stats || !stats.resistances || typeof stats.resistances !== "object" || Array.isArray(stats.resistances))
-    throw new Error("Prepare the character’s current " + kind + " resistance before applying it.");
+    throw new Error(loc`Prepare the character’s current ` + kind + loc` resistance before applying it.`);
   const valid = value => value === "all" || (Number.isSafeInteger(value) && value >= 0),
     value = Object.hasOwn(stats.resistances, kind) ? stats.resistances[kind] : 0,
     armor = system.armor?.resistances?.[kind] ?? 0;
-  if (!valid(value) || !valid(armor)) throw new Error("Review the prepared " + kind + " resistance.");
+  if (!valid(value) || !valid(armor)) throw new Error(loc`Review the prepared ` + kind + " resistance.");
   const all = stats.resistanceSources ?? [];
-  if (!Array.isArray(all)) throw new Error("Review the resistance source details.");
+  if (!Array.isArray(all)) throw new Error(loc`Review the resistance source details.`);
   const sources = all
     .filter(r => r.key === kind)
     .map(r => {
-      if (typeof r.source !== "string" || !valid(r.value)) throw new Error("Review the resistance source details.");
+      if (typeof r.source !== "string" || !valid(r.value)) throw new Error(loc`Review the resistance source details.`);
       return { source: r.source, value: r.value };
     })
     .sort((a, b) => a.source.localeCompare(b.source) || String(a.value).localeCompare(String(b.value)));

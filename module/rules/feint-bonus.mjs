@@ -9,9 +9,10 @@ const stable = v =>
       : x
   );
 import { validOwnCountClock } from "./own-count-duration.mjs";
+import { loc } from "../i18n.mjs";
 export function feintBonusRows(system) {
   const rows = system.feintBonuses ?? [];
-  if (!Array.isArray(rows)) throw Error("Review the recorded Feint attack bonuses.");
+  if (!Array.isArray(rows)) throw Error(loc`Review the recorded Feint attack bonuses.`);
   const seen = new Set();
   for (const r of rows) {
     if (
@@ -36,7 +37,7 @@ export function feintBonusRows(system) {
       (r.receiptUuid != null && (typeof r.receiptUuid !== "string" || !r.receiptUuid)) ||
       (r.receiptUuid && !r.usedBy)
     )
-      throw Error("Review the recorded Feint attack bonuses.");
+      throw Error(loc`Review the recorded Feint attack bonuses.`);
     seen.add(r.sourceMessage);
   }
   return rows;
@@ -61,7 +62,7 @@ export function feintBonusGrantPlan(system, settlement) {
     const { usedBy, receiptUuid, ...facts } = existing,
       { usedBy: _u, receiptUuid: _r, ...expected } = record;
     if (stable(facts) !== stable(expected))
-      throw Error("The recorded Feint attack bonus changed; ask the GC to review its source.");
+      throw Error(loc`The recorded Feint attack bonus changed; ask the GC to review its source.`);
     return { existing: true, record: existing };
   }
   feintBonusRows({ feintBonuses: [record] });
@@ -98,7 +99,7 @@ export function assertFeintBonusPlan(system, proof, context) {
     (proof.attackBonus === 2 && (typeof proof.attemptId !== "string" || !proof.attemptId)) ||
     stable(expected) !== stable(feintBonusProofFacts(proof))
   )
-    throw Error("The Feint next-attack bonus, opponent or round changed before posting.");
+    throw Error(loc`The Feint next-attack bonus, opponent or round changed before posting.`);
 }
 
 export const feintAttackTarget = options =>
