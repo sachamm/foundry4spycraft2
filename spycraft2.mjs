@@ -1,3 +1,4 @@
+import { registerGCTableSetup, setupGCTables, inputRollTableClass } from "./module/gc-table-setup.mjs";
 import { registerSoundtrackSetup, setupSoundtrack } from "./module/soundtrack.mjs";
 import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-scenes.mjs";
 import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
@@ -136,6 +137,8 @@ Hooks.once("init", () => {
   });
   registerGCSettings();
   registerGCConsoleTab();
+  registerGCTableSetup();
+  CONFIG.RollTable.documentClass = inputRollTableClass(CONFIG.RollTable.documentClass);
   registerSampleSceneSetup();
   registerSoundtrackSetup();
   registerMigrationSettings();
@@ -256,6 +259,7 @@ function refreshCombatActorData() {
 Hooks.once("i18nInit", () => localizeConfig(CONFIG.SPYCRAFT));
 Hooks.once("ready", refreshCombatActorData);
 Hooks.once("ready", setupSampleScenes);
+Hooks.once("ready", setupGCTables);
 // Bring stored world data up to this build's schema version (module/migrations/index.mjs).
 Hooks.once("ready", () => {
   runWorldMigrations().catch(error => {

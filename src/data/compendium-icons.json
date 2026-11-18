@@ -10283,6 +10283,166 @@
         "id": "J4iD2Ig709yUmD4Q",
         "name": "Random Possessions: Mastermind",
         "icon": "briefcase"
+      },
+      {
+        "id": "XU7X0bHlhGKblkvn",
+        "name": "Random Age: Standard",
+        "icon": "dossier"
+      },
+      {
+        "id": "E2z3a0QPzy2xQk4V",
+        "name": "Random Age: Broad",
+        "icon": "dossier"
+      },
+      {
+        "id": "1DFc4zQMqB7ZBgAH",
+        "name": "Random Height and Weight: Male",
+        "icon": "crowd"
+      },
+      {
+        "id": "n4ECFzlnGII6tGFJ",
+        "name": "Random Height and Weight: Female",
+        "icon": "crowd"
+      },
+      {
+        "id": "R3q5SFZeZM72S7AO",
+        "name": "Bag Full of Guns: Caliber I",
+        "icon": "assault-rifle"
+      },
+      {
+        "id": "g2GvbR4pRh9EaPg8",
+        "name": "Bag Full of Guns: Caliber II",
+        "icon": "assault-rifle"
+      },
+      {
+        "id": "EHEM7068BKgJsWKM",
+        "name": "Bag Full of Guns: Caliber III",
+        "icon": "assault-rifle"
+      },
+      {
+        "id": "EPwiD6wgGAZXtAe2",
+        "name": "Bag Full of Guns: Caliber IV",
+        "icon": "assault-rifle"
+      },
+      {
+        "id": "ZADuwgbhixmCboBF",
+        "name": "Bag Full of Guns: Caliber V",
+        "icon": "assault-rifle"
+      },
+      {
+        "id": "OGYXP1CXMHJ6v64r",
+        "name": "Vehicle Damage: Personal Ground Vehicles",
+        "icon": "gears"
+      },
+      {
+        "id": "vMtPnP7uv4v6sOHO",
+        "name": "Vehicle Damage: Standard Ground Vehicles",
+        "icon": "gears"
+      },
+      {
+        "id": "NSeq3SdUN81qOQ2I",
+        "name": "Vehicle Damage: Heavy Ground Vehicles",
+        "icon": "gears"
+      },
+      {
+        "id": "IQNvsRlhwJpFF5D4",
+        "name": "Vehicle Damage: Mounts and Animal-Drawn Vehicles",
+        "icon": "gears"
+      },
+      {
+        "id": "YqeQV9ZNkVbDAJ4f",
+        "name": "Vehicle Damage: Personal Aircraft",
+        "icon": "gears"
+      },
+      {
+        "id": "eq4bjJCE8ujQOcYh",
+        "name": "Vehicle Damage: Performance Aircraft",
+        "icon": "gears"
+      },
+      {
+        "id": "3XIW6jtWut5NiTjN",
+        "name": "Vehicle Damage: Service Aircraft",
+        "icon": "gears"
+      },
+      {
+        "id": "GNASUnGQxQAcwE9x",
+        "name": "Vehicle Damage: Rotary-Wing Aircraft",
+        "icon": "gears"
+      },
+      {
+        "id": "1D1hIXD5r71Bo0jy",
+        "name": "Vehicle Damage: Personal Watercraft",
+        "icon": "gears"
+      },
+      {
+        "id": "bqLiVlUVcZT3e3KY",
+        "name": "Vehicle Damage: Standard Watercraft",
+        "icon": "gears"
+      },
+      {
+        "id": "y8T1U5HSw3lgXKyG",
+        "name": "Vehicle Damage: Ships",
+        "icon": "gears"
+      },
+      {
+        "id": "mMTYxeEFAQo5MEo9",
+        "name": "Vehicle Damage: Submarines",
+        "icon": "gears"
+      },
+      {
+        "id": "49KVYQiDHZYdj5ma",
+        "name": "Base Encounter Distance: Aquatic, Plains or Desert",
+        "icon": "map"
+      },
+      {
+        "id": "w0nmDw2gWXfPNERF",
+        "name": "Base Encounter Distance: Arctic, Forest or Outdoor Urban",
+        "icon": "map"
+      },
+      {
+        "id": "0YA29Oh7hdJKdMdt",
+        "name": "Base Encounter Distance: Jungle or Swamp",
+        "icon": "map"
+      },
+      {
+        "id": "BRcnpGmDYURckvNM",
+        "name": "Base Encounter Distance: Mountains or Underwater",
+        "icon": "map"
+      },
+      {
+        "id": "lXpbdPTHQ64q2bOa",
+        "name": "Deviation Distance: 1\u20132 Range Increments",
+        "icon": "arrow"
+      },
+      {
+        "id": "xUquT3rEjEMk4Lv3",
+        "name": "Deviation Distance: 3\u20134 Range Increments",
+        "icon": "arrow"
+      },
+      {
+        "id": "Snsn0YKB6a1izzAO",
+        "name": "Deviation Distance: 5\u20136 Range Increments",
+        "icon": "arrow"
+      },
+      {
+        "id": "4I5RYuigNkkm1bVN",
+        "name": "Deviation Distance: 7\u20138 Range Increments",
+        "icon": "arrow"
+      },
+      {
+        "id": "JHzpQwjTIVMVBcCx",
+        "name": "Deviation Distance: 9\u201310 Range Increments",
+        "icon": "arrow"
+      },
+      {
+        "id": "s2fZdAx0In74VIyQ",
+        "name": "Deviation Direction",
+        "icon": "compass"
+      },
+      {
+        "id": "5vOHWnoMuB0x1pnh",
+        "name": "The Table of Ouch",
+        "icon": "medical"
       }
     ]
   },

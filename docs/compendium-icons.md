@@ -1,6 +1,6 @@
 # Compendium icons
 
-All 1,921 catalog Item entries and the four GC possession tables have explicit icon assignments in `src/data/compendium-icons.json`. Related models, Caliber variants and feat progressions share artwork. The registry contains 157 original icon subjects. Each published icon is a 128 × 128 opaque WebP, encoded at quality 82 with a maximum size of 16 KiB. The images use simple cream and brass shapes on dark teal for small-list readability.
+All 1,921 catalog Item entries and all 36 GC roll tables have explicit icon assignments in `src/data/compendium-icons.json`. Related models, Caliber variants and feat progressions share artwork. The registry contains 157 original icon subjects. Each published icon is a 128 × 128 opaque WebP, encoded at quality 82 with a maximum size of 16 KiB. The images use simple cream and brass shapes on dark teal for small-list readability.
 
 The artwork was created with the built-in OpenAI image generator. `assets/icons/generation-prompts.json` records the prompts, hashes and final file sizes. The selected generated images were resized and compressed with Pillow's WebP encoder. The high-resolution generation outputs are not needed by Foundry and are not bundled with the module.
 

@@ -86,7 +86,7 @@ try {
   foundry.data.operators = await load("data/operators.mjs");
   foundry.packages = await load("packages/_module.mjs");
   foundry.documents = await load("documents/_module.mjs");
-  for (const kind of ["Actor", "Item", "ActiveEffect", "Folder", "Token"])
+  for (const kind of ["Actor", "Item", "ActiveEffect", "Folder", "Token", "RollTable", "TableResult"])
     CONFIG[kind] = { documentClass: foundry.documents[`Base${kind}`], dataModels: models[kind.toLowerCase()] ?? {} };
   globalThis.game = {
     system: { id: "spycraft2", documentTypes: { Actor: ["npc"], Item: Object.keys(models.item) } },
@@ -113,6 +113,22 @@ try {
     }
   }
   console.log("Validated native Foundry package replacement and fixed-loadout restoration for all 20 templates.");
+  game.model.TableResult = Object.fromEntries(Object.values(CONST.TABLE_RESULT_TYPES).map(type => [type, {}]));
+  let tableResults = 0;
+  for (const { embedded, ...source } of built.packs["gc-tables"].docs) {
+    const table = new foundry.documents.BaseRollTable({ ...source, results: embedded.results });
+    assert.equal(table.formula, source.formula);
+    assert.equal(table.results.size, embedded.results.length);
+    assert.deepEqual(table.ownership, { default: 0 });
+    for (const result of table.results) {
+      const expected = embedded.results.find(row => row._id === result.id);
+      assert.deepEqual(result.range, expected.range);
+      assert.equal(result.weight, expected.weight);
+      assert.equal(result.description, expected.description);
+      tableResults++;
+    }
+  }
+  console.log(`Validated ${built.packs["gc-tables"].docs.length} native RollTables and ${tableResults} TableResults.`);
 } catch (error) {
   failed += 1;
   console.error(`Native package replacement: ${error.stack}`);

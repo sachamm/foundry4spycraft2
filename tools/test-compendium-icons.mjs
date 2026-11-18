@@ -27,7 +27,7 @@ test("every catalog item and GC table has an explicit, defined compressed icon",
     }
   }
   assert.equal(items, 1921);
-  assert.equal(tables, 4);
+  assert.equal(tables, 36);
 });
 
 test("related models share icons while distinct item families remain distinguishable", () => {
