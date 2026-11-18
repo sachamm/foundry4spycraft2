@@ -52,3 +52,40 @@ test("Autofire Supremacy: an extra hit per 3 points over Defense, and +1 per str
     [true, false, false]
   );
 });
+
+test("Flamethrower Basics: half the shots, rounded up, and the shots left count double", () => {
+  const flame = (feats, extra = {}) => ({ ...facts(feats, "auto"), flamethrower: true, ...extra });
+  const plan = fireActionPlan(flame(["Flamethrower Basics"]), { action: "autofire", volleys: 3, shotsRemaining: 5 });
+  assert.deepEqual([plan.blocked, plan.shots], [false, 5], "9 shots become 5; 5 left allow 3 volleys");
+  assert.match(plan.notes.at(-1), /Flamethrower Basics/);
+  assert.ok(fireActionPlan(flame([]), { action: "autofire", volleys: 3, shotsRemaining: 5 }).blocked);
+  assert.equal(
+    fireActionPlan(flame(["Flamethrower Basics"], { fireMode: "burst" }), { action: "burst", shotsRemaining: 2 }).shots,
+    2
+  );
+  assert.equal(
+    fireActionPlan({ ...facts(["Flamethrower Basics"], "burst") }, { action: "burst", shotsRemaining: 3 }).shots,
+    3,
+    "other firearms are unchanged"
+  );
+});
+
+test("Steel Rain: hurled weapons without a blast increment take Burst, Cover Fire and Suppressive Fire", async () => {
+  const { steelRainWeapon } = await import("../module/rules/combat-actions.mjs");
+  const { fireActionContent } = await import("../module/apps/combat-actions.mjs");
+  const rain = { activeFeatNames: ["Steel Rain"] };
+  assert.ok(steelRainWeapon(rain, { proficiency: "hurled", qualities: "" }));
+  assert.equal(steelRainWeapon(rain, { proficiency: "hurled", qualities: "BLS (10 ft.)" }), false);
+  assert.equal(steelRainWeapon(rain, { proficiency: "edged" }), false);
+  assert.equal(steelRainWeapon({ activeFeatNames: [] }, { proficiency: "hurled" }), false);
+  const html = fireActionContent({ firearm: false }, { system: { proficiency: "hurled" } }, { system: rain });
+  assert.match(html, /Steel Rain/);
+  assert.match(html, /value="coverFire"/);
+  assert.doesNotMatch(html, /value="autofire"/);
+  assert.equal(fireActionContent({ firearm: false }, { system: { proficiency: "hurled" } }, { system: {} }), "");
+  const plan = fireActionPlan(
+    { firearm: true, fireMode: "burst", attackAction: "standard", feats: ["Steel Rain"] },
+    { action: "burst", shotsRemaining: 3 }
+  );
+  assert.deepEqual([plan.blocked, plan.shots], [false, 3]);
+});

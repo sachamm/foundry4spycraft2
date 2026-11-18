@@ -532,6 +532,7 @@ const EXPECTED_ORDER = [
   "unarmedTrickAttackTerm",
   "duelingReachAttackTerm",
   "noQuarterAttackTerm",
+  "explosiveBasicsAttackTerm",
   "stalkingStanceSkillTerm",
   "feintSkillTerm",
   "meleeSkillFeatsSkillTerm",

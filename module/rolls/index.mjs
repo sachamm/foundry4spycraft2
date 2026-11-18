@@ -63,6 +63,7 @@ import "../rules/disarm-response.mjs";
 import "../rules/documentation.mjs";
 import "../rules/dueling-basics.mjs";
 import "../rules/environment.mjs";
+import "../rules/explosive-basics.mjs";
 import "../rules/fall-distance.mjs";
 import "../rules/feat-reminders.mjs";
 import "../rules/feint-bonus.mjs";

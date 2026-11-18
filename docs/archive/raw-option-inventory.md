@@ -265,7 +265,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Containment Mastery | 172 | No | Covered (batch 393): once per round, Diversion or Taunt as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Containment Supremacy | 174 | No | Manual/descriptive | — |
 | Contempt | 174 | No | One counted final Standard Attack per round and starting-dice uses per combat execute with actual standard/animal target checks; geometry, ammunition and damage remain table-managed | — |
-| Explosive Basics | 174 | No | Manual/descriptive | — |
+| Explosive Basics | 174 | No | Partial (batch 407): an Explosives-proficiency attack (setting a charge or mine) has its error range reduced by 2, never below 1; the posted check records the +2 Reflex DC and +4 locate DC for the GC to apply | Native Foundry QA not claimed |
 | Fire-Team Basics | 174 | No | Covered (batch 393): once per round, Cover Fire as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Fire-Team Mastery | 174 | No | Covered (batch 393): once per round, a Medicine/Stabilize check as a free action with a GC-confirmed 2-to-1 advantage; bringing injured and dead teammates along when leaving combat is narrative | Native Foundry QA not claimed |
 | Fire-Team Supremacy | 174 | No | Covered (batch 402): once per round, a free final attack with a GC-confirmed 2-to-1 advantage, through the shared final-attack workflow | Native Foundry QA not claimed |
@@ -327,7 +327,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | CQB Basics | 180 | No | Implemented: measured-range ranged attack/damage+1, held/readied ranged-weapon Threaten skill+2gear and out-of-melee penalty/error waiver | Batches195–197,277; ordinary/class/final/damage controls, both opposed Threaten roles, gear stacking, source/Count/evidence guards and native persistence verified |
 | CQB Mastery | 180 | No | Within-CQB opponent ranged threat, into-melee waiver and held/readied ranged-weapon Threaten uninjured-target permission execute | Batch277 adds exact Threaten action/response checks and source/Count/evidence guards; failure/critical-failure next-attack bonus suppression and shared Threaten outcome settlement remain open |
 | CQB Supremacy | 181 | No | +5 Initiative from actual readied/carried available ranged weapons executes once with Size/grip/source checks; incoming Defense preview reduces partial cover one quarter for an actual available ranged Supremacy attack against an opponent within CQB Range; penetration and failed-Threaten reaction remain open | — |
-| Flamethrower Basics | 181 | No | Manual/descriptive | — |
+| Flamethrower Basics | 181 | No | Partial (batch 407): flamethrower fire actions use half the shots, rounded up, and the shots-left check counts accordingly; Imprecise has no automated effect to ignore, and the Bounce trick is not modelled | Native Foundry QA not claimed |
 | Follow-up Shot | 181 | No | Covered (batch 398): a start-of-Count declaration grants 1 final attack with a firearm or heavy weapon and −2 to attack and skill checks for 1 full round (shared Darting Weapon tradeoff; one such declaration per round) | Native Foundry QA not claimed |
 | Hail of Fire | 182 | No | Covered (batch 398): the Follow-Up Shot declaration may grant 2 final attacks at −4 | Native Foundry QA not claimed |
 | Grenade Basics | 181 | No | Partial: thrown range/error and field-request extra grenade; Intel acquisition remains open | — |
@@ -342,7 +342,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Sharpshooter Mastery | 182 | No | Partial: braced threat; Called Shot reduction open | — |
 | Sharpshooter Supremacy | 182 | No | Partial: aimed threat and ranged critical cost | — |
 | Snap Shot | 182 | No | Covered (batch 377): the ranged counterpart of Cleave Basics, through the same control | Native Foundry QA not claimed |
-| Steel Rain | 182 | No | Manual/descriptive | — |
+| Steel Rain | 182 | No | Partial (batch 407): a hurled weapon without a blast increment offers the Burst trick, Cover Fire and Suppressive Fire in the ranged attack dialog, each weapon thrown counting as a shot; free draw, always-readied and the +4 Stash Item bonus stay with the GC | Native Foundry QA not claimed |
 | Style Over Caliber | 183 | No | Covered (batch 385): a pistol’s damage roll may replace its standard damage with 1d10+2, keeping other damage, qualities and effects | Native Foundry QA not claimed |
 | This… is my Boomstick | 183 | No | Manual/descriptive | — |
 | Trick Shot | 183 | No | Manual/descriptive | — |

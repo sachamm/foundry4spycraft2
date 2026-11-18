@@ -23,6 +23,14 @@ export const FIRE_ACTIONS = {
   strafe: { mode: "auto", minimumShots: 9, shotsEach: 3, most: 10, error: 2 },
   suppressiveFinal: { shots: 1, error: 1, attack: -4 }
 };
+/**
+ * Steel Rain, p.182: a hurled weapon (not one with a blast increment, nor firing blast ammunition) may be used for the
+ * Burst trick, Cover Fire and Suppressive Fire. Shots are the hurled weapons thrown.
+ */
+export const steelRainWeapon = (system, weapon) =>
+  system?.activeFeatNames?.includes("Steel Rain") === true &&
+  ["hurled", "exoticHurled"].includes(weapon?.proficiency) &&
+  !/\bBLS\b/.test(weapon?.qualities ?? "");
 export const COVER_FIRE = { shots: 5, base: 10, penalty: -4, finalAttackMargin: 5 };
 export const SUPPRESSIVE_FIRE = { shots: 5, penalty: -4 };
 const count = value => (Number.isSafeInteger(value) ? value : NaN);
@@ -40,10 +48,23 @@ export function fireActionLimit(action, shotsRemaining) {
  * @param {object} declared { action, volleys, squares, shotsRemaining }
  * @returns {object|null} null when no fire action is declared
  */
-export function fireActionPlan(
-  facts = {},
-  { action = "", volleys = null, squares = null, shotsRemaining = null } = {}
-) {
+export function fireActionPlan(facts = {}, declared = {}) {
+  // Flamethrower Basics, p.181: a flamethrower attack uses half the usual shots, rounded up. Each shot left in the
+  // weapon covers two of the action's shots, so the base checks see twice the shots left.
+  const halved = facts.flamethrower === true && (facts.feats ?? []).includes("Flamethrower Basics");
+  if (!halved) return baseFireActionPlan(facts, declared);
+  const left = declared.shotsRemaining,
+    doubled = left === null || left === "" || left === undefined ? left : Number(left) * 2,
+    plan = baseFireActionPlan(facts, { ...declared, shotsRemaining: doubled });
+  if (!plan || plan.blocked) return plan;
+  const shots = Math.ceil(plan.shots / 2);
+  return {
+    ...plan,
+    shots,
+    notes: [...plan.notes, loc`Flamethrower Basics: this uses ${shots} shot(s) instead of ${plan.shots} (p.181).`]
+  };
+}
+function baseFireActionPlan(facts = {}, { action = "", volleys = null, squares = null, shotsRemaining = null } = {}) {
   if (!action) return null;
   const rule = FIRE_ACTIONS[action];
   const stop = reason => ({ action, blocked: true, reason, attack: 0, extraRecoil: 0, error: 0, shots: 0, notes: [] });
@@ -364,8 +385,9 @@ rollPipeline.register({
   terms({ system, weapon, options, firing, stance }) {
     const plan = fireActionPlan(
       {
-        firearm: firing.firearm,
-        fireMode: firing.fireMode,
+        firearm: firing.firearm || steelRainWeapon(system, weapon),
+        flamethrower: weapon.weaponCategory === "flamethrower",
+        fireMode: firing.firearm ? firing.fireMode : "burst",
         attackAction: stance.attackAction,
         feats: system.activeFeatNames ?? [],
         recoilPenalty: firing.recoilPenalty

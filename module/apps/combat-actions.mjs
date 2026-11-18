@@ -5,6 +5,7 @@ import {
   FIRE_ACTIONS,
   GRAPPLE_BENEFITS,
   SUPPRESSIVE_FIRE,
+  steelRainWeapon,
   autofireHits,
   blastIncrementFeet,
   blastProfile,
@@ -37,11 +38,18 @@ const whole = value => (value === "" || value === null || value === undefined ? 
 
 /** The ranged attack dialog's fire action section, for firearms that can fire more than one shot. */
 export function fireActionContent(preview, item, actor = null) {
+  if (!preview?.firearm && steelRainWeapon(actor?.system, item?.system)) return steelRainContent();
   if (!preview?.firearm) return "";
   const modes = preview.modes ?? [],
     capacity = parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "";
   const option = (value, label, show = true) => (show ? `<option value="${value}">${label}</option>` : "");
   return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("twoShotBurst", loc`Two-Shot Burst — Single-Shot or Burst mode, 2 shots, at most 2 hits (Autofire Basics)`, (modes.includes("single") || modes.includes("burst")) && actor?.system?.activeFeatNames?.includes("Autofire Basics") === true)}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="10" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}" /></label><p class="hint">${loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
+}
+
+/** Steel Rain's hurled-weapon fire actions: the Burst trick, Cover Fire and Suppressive Fire. */
+function steelRainContent() {
+  const option = (value, label) => `<option value="${value}">${label}</option>`;
+  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action (Steel Rain)`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — 3 hurled weapons, error +1 (a Standard Attack)`)}${option("coverFire", loc`Cover Fire — 5 hurled weapons, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 hurled weapons at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 hurled weapon, –4`)}</select></label><label>${loc`Hurled weapons of this kind on you`} <input type="number" name="shotsRemaining" min="0" step="1" /></label><p class="hint">${loc`Each “shot” is one hurled weapon thrown. They are not deducted for you (p.182).`}</p></fieldset>`;
 }
 
 /** What the section's fields mean for the roll. */
