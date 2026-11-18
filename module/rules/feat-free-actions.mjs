@@ -37,6 +37,17 @@ export const ROUND_ACTION_FEATS = Object.freeze({
     advantage: true
   },
   autofireBasics: { feat: "Autofire Basics", actions: ["Cover Fire"], perRound: 1, cost: "half" },
+  // Tac-Squad Basics, p.175: a free Threaten, or an Intimidate/Coercion check as a half action (2-to-1).
+  tacSquadBasics: {
+    feat: "Tac-Squad Basics",
+    actions: ["Threaten", "Intimidate/Coercion check"],
+    costs: { "Intimidate/Coercion check": "half" },
+    perRound: 1,
+    cost: "free",
+    advantage: true
+  },
+  // Horde Mastery, p.174: a Pummel as a half action (2-to-1).
+  hordeMastery: { feat: "Horde Mastery", actions: ["Pummel"], perRound: 1, cost: "half", advantage: true },
   merciless: { feat: "Merciless", actions: ["Coup de Grace against a helpless character"], perRound: 1, cost: "free" },
   spiritBasics: {
     feat: "Spirit Basics",
@@ -110,7 +121,7 @@ function roundActionPlan(
     resourceId: source,
     action,
     description: description.trim(),
-    actionCost: d.cost,
+    actionCost: d.costs?.[action] ?? d.cost,
     combatId: combat.id,
     combatantId: combat.combatantId,
     round: combat.round,

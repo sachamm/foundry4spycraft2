@@ -268,21 +268,21 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Explosive Basics | 174 | No | Manual/descriptive | — |
 | Fire-Team Basics | 174 | No | Covered (batch 393): once per round, Cover Fire as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Fire-Team Mastery | 174 | No | Covered (batch 393): once per round, a Medicine/Stabilize check as a free action with a GC-confirmed 2-to-1 advantage; bringing injured and dead teammates along when leaving combat is narrative | Native Foundry QA not claimed |
-| Fire-Team Supremacy | 174 | No | Manual/descriptive | — |
+| Fire-Team Supremacy | 174 | No | Covered (batch 402): once per round, a free final attack with a GC-confirmed 2-to-1 advantage, through the shared final-attack workflow | Native Foundry QA not claimed |
 | Great Fortitude | 174 | No | Complete: +3 maximum wounds and +3 base Fortitude; the base increase correctly feeds current Toughness | — |
 | Guts | 174 | No | Three named Athletics bonuses and Fatigued penalty exemption execute without negating escalation/recovery; durable Table of Ouch d10 executes; injury application and Revolving Door remain manual | — |
 | Quick Healer | 175 | No | Halves already-modified natural/stress/subdual recovery intervals after rate/rounding calculations, per user ruling; actual time/healing settlement remains manual | — |
-| Horde Basics | 174 | No | Manual/descriptive | — |
-| Horde Mastery | 174 | No | Manual/descriptive | — |
-| Horde Supremacy | 174 | No | Manual/descriptive | — |
+| Horde Basics | 174 | No | Covered (batch 402): the Incoming attack preview’s Horde Basics advantage raises personal cover to at least 1/4 (2-to-1) or 1/2 (3-to-1 or more) | Native Foundry QA not claimed |
+| Horde Mastery | 174 | No | Partial (batch 402): Pummel as a half action once per round with a GC-confirmed 2-to-1 advantage; its +1 to Grapple skill checks is an Athletics reminder | Native Foundry QA not claimed |
+| Horde Supremacy | 174 | No | Partial (batch 402): +2 morale damage within CQB Range as a GC-confirmed damage-roll declaration; the halved Initiative Count increases of opponents in sight are stated for the GC | Native Foundry QA not claimed |
 | Iron Will | 174 | No | Complete: +3 base Will and +3 to Constitution/Wisdom for subdual/stress thresholds only; actual ability scores stay unchanged | — |
 | Lightning Reflexes | 174 | No | +3 base Reflex and native two-roll preferred Initiative choice execute; both original rolls are saved and stale choices rejected | — |
 | Quick Draw | 175 | No | Partial: all four free-action declarations share two uses per round; ordinary weapon handling/ammunition settlement remains manual | Batch232; native UI, limits, counters and persisted action receipts |
 | Snake Strike | 175 | No | Manual/descriptive | — |
 | Surge of Speed | 175 | No | Partial: confirmed non-attack half-action conversion, once per round and starting-dice session allowance; chosen action settlement remains manual | Batch232; concurrent calls, refunds, source loss, visible counters and native persistence |
-| Tac-Squad Basics | 175 | No | Manual/descriptive | — |
+| Tac-Squad Basics | 175 | No | Covered (batch 402): once per round, a free Threaten or a half-action Intimidate/Coercion check with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Tac-Squad Mastery | 175 | No | Covered (batch 393): once per round, Suppressive Fire as a half action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
-| Tac-Squad Supremacy | 175 | No | Manual/descriptive | — |
+| Tac-Squad Supremacy | 175 | No | Covered (batch 402): the damage roll reminds that, with a 2-to-1 advantage, opponents within CQB Range and sight count as flanked, alongside the existing GC-confirmed flanking declaration | Native Foundry QA not claimed |
 | Tactical Advantage | 175 | No | GC-confirmed roster counting enforces teammate scope, nonstacking and higher-source precedence; Joint Action DC ruling and half-action leadership remain open | — |
 | Toughness | 176 | Yes | Complete: current base Fortitude adds maximum vitality once per selection, capped at three; Great Fortitude and source changes recalculate it | — |
 | Two-Weapon Basics | 176 | No | One-hand Hands-On rule, paired-weapon declaration, timed −2 tradeoff and one counted final Standard Attack execute; GC confirms least-used weapon and prior/manual uses | — |
@@ -1821,3 +1821,15 @@ Source: rules reference p.188 (local markdown edition; original PDF page not vis
 - Warrior’s Grace leaves `feat-reminders.json` (tables regenerated).
 
 Verification: 3432 of 3433 Node tests (1 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 49 manual / 61 partial / 204 other; at least 110 of 314 explicitly unfinished; 86 whole-feat closures.
+
+## Residual implementation batch 402 — team-advantage feats
+
+Source: rules reference pp.172–175 (local markdown edition; original PDF pages not visually re-checked).
+
+- Round actions (per-action costs are now allowed): Tac-Squad Basics (free Threaten, or Intimidate/Coercion as a half action) and Horde Mastery (Pummel as a half action), each with a GC-confirmed 2-to-1 advantage.
+- `module/rules/team-feats.mjs`. Horde Basics: the Incoming attack preview offers the side’s advantage and raises the personal cover grade to that floor. Horde Supremacy: a damage-roll declaration adds +2 morale damage within CQB Range; the halved Initiative Count increases of opponents in sight are stated. Tac-Squad Supremacy: the damage roll reminds that opponents within CQB Range and sight count as flanked, next to the existing flanking declaration.
+- Fire-Team Supremacy: a Main-tab free final attack once per round with the advantage confirmed, through the shared final-attack workflow (`module/apps/team-final-attack.mjs`).
+- Containment Basics and Supremacy stay manual: they change Ambush benefit duration and opponents’ Speed, which the system does not track.
+- Reminders: Fire-Team Supremacy, Horde Supremacy and Tac-Squad Basics and Supremacy leave the list; Horde Mastery now points at Athletics. The reminder data test’s floor is lowered to 25, as the list shrinks while feats are automated.
+
+Verification: 3435 of 3436 Node tests (4 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 43 manual / 63 partial / 208 other; at least 106 of 314 explicitly unfinished; 90 whole-feat closures.

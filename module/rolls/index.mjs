@@ -111,6 +111,7 @@ import "../rules/superior-accuracy-weapon.mjs";
 import "../rules/sword-basics.mjs";
 import "../rules/target-skill-effects.mjs";
 import "../rules/task-pressure.mjs";
+import "../rules/team-feats.mjs";
 import "../rules/terrain.mjs";
 import "../rules/threaten.mjs";
 import "../rules/tracking.mjs";

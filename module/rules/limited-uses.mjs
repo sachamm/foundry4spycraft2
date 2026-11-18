@@ -12,6 +12,7 @@ import { blackCatSpec } from "./black-cat.mjs";
 import { berserkerSpec } from "./berserker.mjs";
 import { gunslingerSpec } from "./gunslinger.mjs";
 import { chanceReactionSpecs } from "./chance-reactions.mjs";
+import { fireTeamSupremacySpec } from "./team-feats.mjs";
 import { roundActionSpecs } from "./feat-free-actions.mjs";
 import { openStanceSpec } from "./wrestling.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
@@ -256,6 +257,8 @@ export function limitedUseAbilities(system, items, cfg) {
         hidden: true
       });
   for (const spec of chanceReactionSpecs(system)) add(spec);
+  const fireTeam = fireTeamSupremacySpec(system);
+  if (fireTeam) add(fireTeam);
   const gunslinger = gunslingerSpec(system);
   if (gunslinger) add(gunslinger);
   const rage = berserkerSpec(system);

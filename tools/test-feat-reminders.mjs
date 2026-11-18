@@ -162,7 +162,7 @@ test("the shipped reminder data names real feats, valid rolls and has a summary 
     summaries = data("summaries.json").feats,
     skills = Object.keys(cfg.skills);
   // Feats the system comes to carry out leave this list, so it shrinks over time.
-  assert.ok(Object.keys(reminders).length >= 40);
+  assert.ok(Object.keys(reminders).length >= 25);
   for (const [name, rolls] of Object.entries(reminders)) {
     assert.ok(feats.has(name), `${name} is a feat`);
     assert.ok(rolls.length, `${name} names a roll`);

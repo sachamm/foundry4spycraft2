@@ -11364,10 +11364,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:impress",
   "text": "Use Impress for Diversion and Feint, and as a full action affect every opponent in range."
  },
- "Fire-Team Supremacy": {
-  "rolls": "attack",
-  "text": "With a 2-to-1 advantage, make one free final attack each round."
- },
  "Flamethrower Basics": {
   "rolls": "attack",
   "text": "Flamethrowers ignore imprecise, use half the shots, and can use the Bounce trick."
@@ -11383,10 +11379,6 @@ export const FEAT_REMINDERS = {
  "Horde Mastery": {
   "rolls": "skill:athletics",
   "text": "With a 2-to-1 advantage, you and teammates can Pummel as a half action and gain +1 to Grapple skill checks."
- },
- "Horde Supremacy": {
-  "rolls": "damage",
-  "text": "With a 2-to-1 advantage, your team gets +2 damage within CQB Range and enemy Initiative Count gains are halved."
  },
  "Kicking Basics": {
   "rolls": "attack",
@@ -11455,14 +11447,6 @@ export const FEAT_REMINDERS = {
  "Submission Supremacy": {
   "rolls": "attack",
   "text": "Cheap Shot a foe repeatedly (different penalty each time) and gain lethal grapple tricks."
- },
- "Tac-Squad Basics": {
-  "rolls": "skill:intimidate",
-  "text": "With a 2-to-1 advantage, once per round Threaten for free or roll Intimidate/Coercion with a half action."
- },
- "Tac-Squad Supremacy": {
-  "rolls": "attack",
-  "text": "With a 2-to-1 advantage, every opponent you can see within CQB Range counts as flanked."
  },
  "This… is my Boomstick": {
   "rolls": "attack",

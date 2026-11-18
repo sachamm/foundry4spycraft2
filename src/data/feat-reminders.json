@@ -33,9 +33,6 @@
     "Fan Service": [
       "skill:impress"
     ],
-    "Fire-Team Supremacy": [
-      "attack"
-    ],
     "Flamethrower Basics": [
       "attack"
     ],
@@ -47,9 +44,6 @@
     ],
     "Horde Mastery": [
       "skill:athletics"
-    ],
-    "Horde Supremacy": [
-      "damage"
     ],
     "Kicking Basics": [
       "attack"
@@ -101,12 +95,6 @@
       "attack"
     ],
     "Submission Supremacy": [
-      "attack"
-    ],
-    "Tac-Squad Basics": [
-      "skill:intimidate"
-    ],
-    "Tac-Squad Supremacy": [
       "attack"
     ],
     "This… is my Boomstick": [

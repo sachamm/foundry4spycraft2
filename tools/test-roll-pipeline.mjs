@@ -396,6 +396,7 @@ const EXPECTED_ORDER = [
   "impaleDefenseContent:damage",
   "styleOverCaliberContent:damage",
   "closedStanceContent:damage",
+  "teamFeatContent:damage",
   "bullseyeInput",
   "sideStanceDamageLease",
   "meleeTrickInput",
