@@ -290,3 +290,44 @@ Situations, and spreading fire or gas across squares.
 To check in Foundry (Foundry was running, so these were covered by unit tests only): the new sheet links and
 dialogs, a hazard save card's "Apply this save's result" for each new kind, the Anticipate box in the incoming
 Defense check, the ready-made effects in the critical activation dialog, and the GC console button.
+
+## The main loop joined up (2026-11-18)
+
+Attacks, damage, ammunition, healing and opposed checks each worked alone; the numbers were carried between them by
+hand. They are now linked. Rules are in `module/rules/damage-application.mjs` and `module/rules/ammunition-use.mjs`;
+the Foundry side is in `module/apps/damage-application.mjs`, `healing.mjs`, `opposed-checks.mjs` and
+`ammunition-use.mjs`.
+
+- [x] **Hit or miss.** "Resolve against Defense" on an attack card reads the target's Defense from its sheet (or takes
+      one typed in, for cover and declared defenses), counts the shots of a Burst or Autofire that land, confirms the
+      check's outcome and ends the target's flat-footedness on a hit. A Strafe keeps its own counter.
+- [x] **Damage onto the target.** A hit offers "Roll damage", which carries the target and the attack. "Apply damage
+      to a target" on a damage card takes lethal damage off a special character's vitality and wounds after damage
+      reduction and armor-piercing (a critical hit goes to wounds while vitality remains), sets fatigued, unconscious,
+      dying or dead, reports bruising and the Fortitude save for a hit of 25 or more, sends stress and subdual damage
+      to an agent's ledger, rolls a standard NPC's Damage save with the critical dice and blast, and rolls a vehicle's
+      Damage save. Whoever applies damage must own the target: the GC, or the target's own player.
+- [x] **Ammunition.** A weapon with an ammunition code counts shots loaded and in reserve (`shotsLoaded`,
+      `shotsSpare`; empty means the printed supply). Attacks, bursts, autofire, Cover Fire and Suppressive Fire spend
+      them, an attack the weapon cannot feed is refused, and "Reload" on the sheets refills from the reserve (3 shots
+      at a time for an internal supply). World setting "Count ammunition", on by default.
+- [x] **Conditions.** Stunned, dazed, helpless, vulnerable, paralyzed, dying, bleeding, fixated, frightened,
+      terrified, frenzied and hidden are token statuses; the ones the rules engine already understood now reach it.
+      An opening grapple check sets Held on the opponent, or Sprawled or Flat-footed on the loser, when you own them.
+- [x] **Healing.** "Rest and recover" applies the natural rates (with Treatment and failed Foraging) for the hours and
+      days entered and lifts fatigue after 8 hours. A successful First Aid check offers "Apply First Aid to the
+      patient" (once per patient per scene; DC 20 also stops bleeding), and Stabilize stops a dying patient at 0
+      wounds. "Dying: roll to stabilize" makes the end-of-round d% roll.
+- [x] **Opposed checks.** "Compare with an opposing check" on a rolled skill check lists the recent results in chat
+      (or takes a typed one), settles ties by bonus and then a roll-off, and confirms both checks when you own both.
+      The grapple and Dramatic Conflict dialogs show the latest results beside their typed totals.
+
+Not done: the Fortitude save and critical injury for a massive hit are reported, not rolled; a special NPC's stress
+and subdual damage is compared with its thresholds by hand (only agents keep a ledger); special damage types still go
+through "Other damage types"; damage is applied to one target at a time, so a blast is applied target by target; a
+player cannot apply damage to a character they do not own; grapple benefits after the opening check (Pin, Sprawl)
+are still set by hand; stress and subdual recovery over time is not applied by "Rest and recover".
+
+To check in Foundry (Foundry was running, so these were covered by unit tests only): each new chat button on a live
+card, the reload line on the agent and NPC sheets, the shot fields on the weapon sheet, the new token statuses, and a
+player without ownership of the target being refused.

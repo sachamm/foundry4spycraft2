@@ -36,6 +36,7 @@ import { styleOverCaliberEligible, styleOverCaliberWeapon } from "../../rules/st
 import { kickDamageWeapon, unarmedWeapon } from "../../rules/kick.mjs";
 import { inClosedStance } from "../../rules/boxing.mjs";
 import { halvesSneakDamage } from "../../rules/unarmed-tricks.mjs";
+import { spendWeaponShots, weaponAmmunition } from "../../apps/ammunition-use.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorAttackRolls = Base =>
@@ -120,6 +121,9 @@ export const ActorAttackRolls = Base =>
         sideStanceProof = null;
       const feintContext = () => ({ ...options, feintBonusProof, sideStanceProof });
       const w = item.system;
+      // Shots are counted: a fire action is limited by what the weapon holds, and the attack spends its shots.
+      const ammunition = weaponAmmunition(item);
+      if (ammunition) options = { ...options, shotsRemaining: ammunition.loaded };
       const atk = this.weaponAttack(item, feintContext());
       feintBonusProof = atk.feintBonus.attackBonus
         ? { ...atk.feintBonus, attemptId: foundry.utils.randomID() }
@@ -128,6 +132,11 @@ export const ActorAttackRolls = Base =>
         ? { ...atk.sideStance, attemptId: foundry.utils.randomID() }
         : atk.sideStance;
       if (atk.blocked) return ui.notifications.warn(atk.reason);
+      const shotsFired = ammunition ? (atk.fireAction?.shots ?? 1) : 0;
+      if (shotsFired > (ammunition?.loaded ?? 0))
+        return ui.notifications.warn(
+          loc`${item.name} holds ${ammunition.loaded} shot(s) and this attack takes ${shotsFired}. Reload first.`
+        );
       if (
         options.attackAction === "standard" &&
         atk.firearm &&
@@ -368,6 +377,7 @@ export const ActorAttackRolls = Base =>
           improvised: !!item.system.improvised
         }
       );
+      if (message && shotsFired) await spendWeaponShots(item, shotsFired);
       return message;
     }
 
@@ -407,6 +417,8 @@ export const ActorAttackRolls = Base =>
         if (!input) return null;
       }
       input = rollPipeline.read({ dialog: "rangedAttack", actor: this, item }, input);
+      const ammunition = weaponAmmunition(item);
+      if (ammunition) input = { ...input, shotsRemaining: ammunition.loaded };
       // Cover Fire and Suppressive Fire take the action without an attack check.
       if (input.fireAction === "coverFire") return coverFire(this, item, input);
       if (input.fireAction === "suppressiveFire") return suppressiveFire(this, item, input);
@@ -711,6 +723,7 @@ export const ActorAttackRolls = Base =>
       if (opportunistDamage) formula = halvedFormula(formula);
       return this.rollCheck(formula, this.getRollData(), {
         featReminders: options.featReminders,
+        sourceAttack: options.sourceAttack ?? null,
         pummelDamage: pummel,
         styleOverCaliber: options.styleOverCaliber === true,
         kick: options.kick === true,

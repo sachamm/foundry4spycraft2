@@ -75,13 +75,23 @@ test("an open check offers boosting and resolution, in one row under the card", 
   assert.deepEqual(labels(message({})), [
     "card:Boost before outcome",
     "card:Generous teammate die",
+    "card:Compare with an opposing check",
     "card:Outcome resolved"
   ]);
   assert.deepEqual(labels(message({ generousBoost: { id: "g" } })), [
     "card:Boost before outcome",
+    "card:Compare with an opposing check",
     "card:Outcome resolved"
   ]);
-  assert.deepEqual(labels(message({ actionDiceAllowed: false })), ["card:Outcome resolved"]);
+  assert.deepEqual(labels(message({ actionDiceAllowed: false })), [
+    "card:Compare with an opposing check",
+    "card:Outcome resolved"
+  ]);
+  // Taking 10 or 20 is not allowed on an opposed check, and a settled comparison is not offered again.
+  assert.deepEqual(labels(message({ actionDiceAllowed: false, checkMethod: "take10" })), ["card:Outcome resolved"]);
+  assert.deepEqual(labels(message({ actionDiceAllowed: false, opposed: { outcome: "won", total: 12 } })), [
+    "card:Outcome resolved"
+  ]);
 });
 
 test("confirmation, critical activation and a required bonus die appear in their fixed positions", () => {
@@ -92,6 +102,7 @@ test("confirmation, critical activation and a required bonus die appear in their
     "card:Activate critical",
     "card:Boost before outcome",
     "card:Generous teammate die",
+    "card:Compare with an opposing check",
     "card:Confirm result",
     "card:Outcome resolved"
   ]);
@@ -119,7 +130,7 @@ test("a reroll is offered only for a rolled check with an eligible ability left"
 test("someone who neither rolled the check nor runs the game gets none of the outcome buttons", () => {
   actor = makeActor();
   assert.deepEqual(labels(message({}, { isAuthor: false })), []);
-  assert.equal(labels(message({}, { isAuthor: false }), { isGM: true }).length, 3);
+  assert.equal(labels(message({}, { isAuthor: false }), { isGM: true }).length, 4);
   assert.deepEqual(labels(message({ rawTotal: undefined })), []);
 });
 
@@ -162,13 +173,13 @@ test("the chat hook lays buttons out by placement and runs them once per click",
   assert.equal(row.className, "spycraft2 roll-controls");
   assert.deepEqual(
     row.children.map(b => b.textContent),
-    ["Boost before outcome", "Generous teammate die", "Outcome resolved"]
+    ["Boost before outcome", "Generous teammate die", "Compare with an opposing check", "Outcome resolved"]
   );
   assert.deepEqual(
     row.children.map(b => b.dataset.rollControl),
-    ["boostControl", "generousControl", "finishControl"]
+    ["boostControl", "generousControl", "opposedCheckControl", "finishControl"]
   );
-  const finish = row.children[2];
+  const finish = row.children[3];
   await finish.listeners.click();
   assert.deepEqual(actor.calls, [["finishCheck", msg]]);
   assert.equal(finish.disabled, false);
