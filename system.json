@@ -251,6 +251,18 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "core-npcs",
+      "label": "Core NPC Templates",
+      "path": "packs/core-npcs",
+      "type": "Actor",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "NONE",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -282,7 +294,8 @@
         "contagions",
         "gc-tables",
         "sample-scenes",
-        "soundtrack"
+        "soundtrack",
+        "core-npcs"
       ]
     }
   ]

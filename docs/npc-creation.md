@@ -28,3 +28,30 @@ The builder resolves the creation tables, base statistics and cost accounting. A
 Animal command/action restrictions, complex movement modes, Removable Quality linkage, and feat/class eligibility require GC review. Full special NPCs built with PC rules and their 300-XP-per-scene rule are outside the graded builder. Combat automation, NPC critical activation rules, mission encounter accounting and automatic rest/healing are separate work.
 
 Verification includes numeric comparison against both supplied PDFs, pure calculator tests, mocked sheet/model persistence tests and an isolated browser render of the actual Handlebars partial. A live Foundry world playtest is still needed; an isolated browser render does not exercise Foundry's complete document/form lifecycle.
+
+## Core NPC Templates
+The **Core NPC Templates** Actor compendium contains twenty original campaign starting points. Import or duplicate one, then change its name, faction and circumstances. Each starts as a standard NPC at Tier III and follows the active mission’s Threat Level; its fallback Threat Level is 1.
+Equipment is embedded from the existing item catalogs. The graded allowance matches each included pick, and a group’s vehicle is shared. One primary weapon is equipped; other carried weapons can be readied when needed. Ammunition entitlements are recorded by the NPC profile; the GC can assign stockpile documents for tracked ammunition.
+The pack does not populate a world automatically. A newly added compendium becomes available after the world is relaunched.
+| Template | Category |
+| --- | --- |
+| Security Guard | Security & Law Enforcement |
+| Police Officer | Security & Law Enforcement |
+| Detective | Security & Law Enforcement |
+| Bodyguard | Security & Law Enforcement |
+| Soldier | Military & Field Operations |
+| Commando | Military & Field Operations |
+| Mercenary | Military & Field Operations |
+| Street Tough | Crime & Intrusion |
+| Criminal Enforcer | Crime & Intrusion |
+| Burglar | Crime & Intrusion |
+| Contract Killer | Crime & Intrusion |
+| Enemy Agent | Intelligence & Technical |
+| Analyst | Intelligence & Technical |
+| Hacker | Intelligence & Technical |
+| Scientist | Civilian & Professional |
+| Medic | Civilian & Professional |
+| Driver | Civilian & Professional |
+| Executive | Civilian & Professional |
+| Journalist | Civilian & Professional |
+| Ordinary Civilian | Civilian & Professional |

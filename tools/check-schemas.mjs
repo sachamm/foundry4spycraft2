@@ -48,4 +48,23 @@ for (const [kind, set] of Object.entries({ Actor: models.actor, Item: models.ite
     }
   }
 }
+const { buildPacks } = await import("./lib/pack-docs.mjs");
+const npcTemplates = buildPacks().packs["core-npcs"].docs;
+for (const doc of npcTemplates) {
+  for (const [kind, type, data, label] of [
+    ["Actor", doc.type, doc.system, doc.name],
+    ...doc.embedded.items.map(item => ["Item", item.type, item.system, `${doc.name}: ${item.name}`])
+  ]) {
+    try {
+      const schema = (kind === "Actor" ? models.actor : models.item)[type].schema;
+      const clean = schema.clean(structuredClone(data), {});
+      const failure = schema.validate(clean, {});
+      if (failure) throw new Error(String(failure));
+    } catch (error) {
+      failed += 1;
+      console.error(`${label}: ${error.message}`);
+    }
+  }
+}
+console.log(`Validated ${npcTemplates.length} NPC template systems and their embedded item systems.`);
 process.exitCode = failed ? 1 : 0;

@@ -195,6 +195,8 @@ CI runs `lint`, `format:check`, the build, `npm test` and `npm run test:packs`.
 
 ## NPC creation
 
+The **Core NPC Templates** compendium supplies 20 nameless starting actors: guards, police, soldiers, criminals, agents and civilian specialists. Import a copy and customize it for the campaign. Equipment is included and profiles follow the active mission’s Threat Level.
+
 NPC actors now offer opt-in graded creation, source-backed core tables, equipment allowances, quality cost controls, Tier resolution and an XP breakdown. Existing NPC stat blocks keep manual mode. See [NPC creation and implementation boundaries](docs/npc-creation.md).
 
 ## Game Control tools
