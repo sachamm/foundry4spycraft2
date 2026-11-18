@@ -21,3 +21,10 @@ test("Living Cipher: the Decipher card states the counted Power Rating", async (
   assert.match(plan.notes[0], /Power Rating 3/);
   assert.deepEqual(livingCipherPlan({ activeFeatNames: [] }, "analysis", { id: "decipher" }).notes, []);
 });
+
+test("Containment Basics: the Ambush card states the extended benefits", async () => {
+  const { containmentAmbushPlan } = await import("../module/rules/containment.mjs");
+  const owner = { activeFeatNames: ["Containment Basics"] };
+  assert.match(containmentAmbushPlan(owner, "tactics", { id: "ambush" }).notes[0], /first 3 rounds/);
+  assert.deepEqual(containmentAmbushPlan(owner, "tactics", { id: "other" }).notes, []);
+});

@@ -53,6 +53,7 @@ import "../rules/closed-course.mjs";
 import "../rules/combat-actions.mjs";
 import "../rules/combat-stance.mjs";
 import "../rules/contact-feats.mjs";
+import "../rules/containment.mjs";
 import "../rules/conveyance-bull-rush.mjs";
 import "../rules/cooperative.mjs";
 import "../rules/cover.mjs";

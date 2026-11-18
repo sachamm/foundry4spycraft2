@@ -543,6 +543,7 @@ const EXPECTED_ORDER = [
   "stashFeatsSkillTerm",
   "livingCipherSkillTerm",
   "spiderSkillTerm",
+  "containmentSkillTerm",
   "conveyanceBullRushSkillTerm",
   "bullRushAttackSkillTerm",
   "bullRushDefenseSkillTerm",

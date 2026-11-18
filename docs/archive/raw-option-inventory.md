@@ -261,7 +261,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Combat Mobility | 172 | No | Declared route checker enforces adjacency departure, doubled Total Defense movement and Dexterity-bounded Run turns; actual token/action settlement remains manual | — |
 | Mobile Defense | 175 | No | Movement checker suppresses Run flat-footedness; Count-for-dodge option remains open | — |
 | Mobile Offense | 175 | No | One counted final Standard Attack during a GC-confirmed Standard Move executes with route/attack-point/current-Speed checks and an already recorded Total Defense move; actual token movement/action budgets remain manual | — |
-| Containment Basics | 172 | No | Manual/descriptive | — |
+| Containment Basics | 172 | No | Partial (batch 416): the Tactics/Ambush card states that with a 2-to-1 advantage the Ambush benefits last through the surprise round and the first 3 rounds; the GC confirms the advantage and tracks the rounds | Native Foundry QA not claimed |
 | Containment Mastery | 172 | No | Covered (batch 393): once per round, Diversion or Taunt as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Containment Supremacy | 174 | No | Manual/descriptive | — |
 | Contempt | 174 | No | One counted final Standard Attack per round and starting-dice uses per combat execute with actual standard/animal target checks; geometry, ammunition and damage remain table-managed | — |
