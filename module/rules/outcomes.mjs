@@ -208,7 +208,8 @@ export function checkFlavor(check) {
     notes.push(
       `<strong>Effective result: ${check.effectiveTotal}</strong>${check.boostTotal ? ` · action dice ${check.boostTotal >= 0 ? "+" : ""}${check.boostTotal}` : ""}`
     );
-  if (check.pipelineModifiers?.length) notes.push(`${esc(describeModifiers(check.pipelineModifiers))}.`);
+  const contributed = [...(check.planModifiers ?? []), ...(check.pipelineModifiers ?? [])];
+  if (contributed.length) notes.push(`${esc(describeModifiers(contributed))}.`);
   return `${check.baseFlavor ?? "Check"}${notes.length ? `<br>${notes.join(" ")}` : ""}`;
 }
 

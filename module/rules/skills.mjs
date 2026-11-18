@@ -55,6 +55,7 @@ import { forensicGeniusPlan } from "./forensic-genius.mjs";
 import { closedCoursePlan } from "./closed-course.mjs";
 import { skillSynergy } from "./synergies.mjs";
 import { stackedBonuses as stacked } from "./knowledge.mjs";
+import { planTotal } from "./roll-pipeline.mjs";
 /** Rules common to the 100 named checks (pp.87–169). Context tags remain explicit. */
 export function resolveSkillCheck(
   system,
@@ -1208,7 +1209,11 @@ export function resolveSkillCheck(
     ability: selected,
     synergy: synergy.value,
     synergySkill: synergy.skill,
-    total: condition.total + synergyExtra + checkAdjustment,
+    ...planTotal("skill", { system, skillKey: key, check, ability: selected, method }, [
+      ["Skill bonus", condition.total],
+      ["Synergy", synergyExtra],
+      ["Check adjustments", checkAdjustment]
+    ]),
     armor,
     missingFocus: !!missingFocus,
     threat: taking ? 0 : conditionalThreat ? Math.max(1, conditionalThreat - ambush.threatIncrease) : 0,

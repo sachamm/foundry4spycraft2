@@ -14,6 +14,7 @@
  *     acquire(ctx),                  // return run => … to reserve something before the roll, or nothing
  *     validate(ctx),                 // throw to stop the roll; runs before and after the dice (ctx.phase)
  *     modifiers(ctx),                // return [{label, value}] added to the roll
+ *     stage: 'plan',                 // when `modifiers` applies: 'plan' (part of the previewed total) or 'roll' (default)
  *     flags(ctx),                    // return an object merged into the chat message's check record
  *     record: ['takedown'],          // roll options copied onto that record as they are (null when absent)
  *     chatControls(ctx)              // return [{label, run, placement?}] buttons for a posted check
@@ -39,6 +40,9 @@ export class RollPipeline {
     if (this.#contributors.some(c => c.id === id)) throw new Error(`Roll contributor "${id}" is already registered.`);
     if (spec.kinds !== undefined && !(Array.isArray(spec.kinds) && spec.kinds.every(k => typeof k === "string"))) {
       throw new TypeError(`Roll contributor "${id}": kinds must be an array of check kinds.`);
+    }
+    if (spec.stage !== undefined && !["plan", "roll"].includes(spec.stage)) {
+      throw new TypeError(`Roll contributor "${id}": stage must be "plan" or "roll".`);
     }
     if (spec.order !== undefined && !Number.isFinite(spec.order)) {
       throw new TypeError(`Roll contributor "${id}": order must be a finite number.`);
@@ -169,10 +173,16 @@ export class RollPipeline {
     }
   }
 
-  /** Numeric adjustments to the roll: {total, rows: [{id, label, value}]}. Zero-value rows are dropped. */
+  /**
+   * Numeric adjustments from contributors: {total, rows: [{id, label, value}]}. Zero-value rows are dropped.
+   * `ctx.stage` selects which contributors answer: "plan" while a total is being worked out (so previews and the
+   * roll agree), "roll" when the dice are thrown. A contributor belongs to exactly one stage, so nothing counts twice.
+   */
   modifiers(ctx) {
+    const stage = ctx?.stage ?? "roll";
     const rows = [];
     for (const c of this.#active("modifiers", ctx)) {
+      if ((c.stage ?? "roll") !== stage) continue;
       const result = c.modifiers(ctx);
       if (result === undefined || result === null) continue;
       if (!Array.isArray(result)) throw new TypeError(`Roll contributor "${c.id}": modifiers must return an array.`);
@@ -236,3 +246,22 @@ export function describeModifiers(rows = []) {
 
 /** The pipeline every roll on this system goes through. */
 export const rollPipeline = new RollPipeline();
+
+/**
+ * Work out a roll's bonus from labelled parts, then let plan-stage contributors add theirs.
+ * @param {string} kind       check kind ("attack", "skill", "save", …)
+ * @param {object} context    what a contributor may need (system, weapon, skillKey, options, …)
+ * @param {Array<[string, number]>} entries  the rule's own [label, value] parts
+ * @returns {{total: number, modifiers: object[], planModifiers: object[]}} the sum, its non-zero rows, and the
+ *   rows contributors added (recorded on the posted check)
+ */
+export function planTotal(kind, context, entries, pipeline = rollPipeline) {
+  let total = 0;
+  const modifiers = [];
+  for (const [label, value] of entries) {
+    total += value;
+    if (value) modifiers.push({ label, value });
+  }
+  const added = pipeline.modifiers({ ...context, checkKind: kind, stage: "plan" });
+  return { total: total + added.total, modifiers: [...modifiers, ...added.rows], planModifiers: added.rows };
+}

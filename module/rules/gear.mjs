@@ -39,6 +39,7 @@ import {
   mortarOperationPlan
 } from "./firearms.mjs";
 import { specialistApplies } from "./weapon-specialist.mjs";
+import { planTotal } from "./roll-pipeline.mjs";
 /** Actual equipment category, separate from the pick used to acquire it. Legacy typed items have known categories. */
 export function equipmentCategory(item) {
   const system = item?.system ?? {},
@@ -634,37 +635,39 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       twoWeaponWaiver +
       (!ranged ? conditionRollPenalties(system).meleeAttack : 0) +
       conditionAbilityPenalty(system, ability),
-    total:
-      (reach?.evidence.attackPenalty ?? 0) +
-      (meleeTrick?.attackBonus ?? 0) +
-      (bullseye?.attackPenalty ?? 0) +
-      (meleeTradeoff?.attackPenalty ?? 0) +
-      feintBonus.attackBonus +
-      cheapShotPenalty(system, ability) +
-      cheapShot.attackBonus +
-      meleeFire.attackPenalty +
-      cqbRange.attackBonus +
-      disarm.attackBonus +
-      pinnedTargetBonus +
-      targetPosturePenalty +
-      (conditionRollPenalties(system).attack + twoWeaponWaiver) +
-      (!ranged ? conditionRollPenalties(system).meleeAttack : 0) +
-      conditionAbilityPenalty(system, ability) +
-      (system.bab ?? 0) +
-      (system.abilities[ability]?.mod ?? 0) +
-      forte +
-      (system.sizeModifier ?? 0) +
-      (quirky?.attackPenalty ?? 0) +
-      inaccurate +
-      grip.attackPenalty +
-      massive.attackPenalty +
-      improvisedPenalty +
-      firing.recoilPenalty +
-      distance.rangePenalty +
-      stance.aimBonus +
-      stance.braceBonus +
-      sniper.attackBonus +
-      flanking.attackBonus,
+    // The attack bonus as labelled parts; plan-stage roll contributors add theirs (module/rules/roll-pipeline.mjs).
+    ...planTotal("attack", { system, weapon, options, actorType: type }, [
+      ["Reach weapon", reach?.evidence.attackPenalty ?? 0],
+      ["Melee trick", meleeTrick?.attackBonus ?? 0],
+      ["Bullseye", bullseye?.attackPenalty ?? 0],
+      ["Melee trade-off", meleeTradeoff?.attackPenalty ?? 0],
+      ["Feint", feintBonus.attackBonus],
+      ["Cheap Shot received", cheapShotPenalty(system, ability)],
+      ["Cheap Shot", cheapShot.attackBonus],
+      ["Firing in melee", meleeFire.attackPenalty],
+      ["Close quarters range", cqbRange.attackBonus],
+      ["Disarm", disarm.attackBonus],
+      ["Pinned target", pinnedTargetBonus],
+      ["Target posture", targetPosturePenalty],
+      ["Conditions and two-weapon fighting", conditionRollPenalties(system).attack + twoWeaponWaiver],
+      ["Conditions (melee)", !ranged ? conditionRollPenalties(system).meleeAttack : 0],
+      ["Condition ability penalty", conditionAbilityPenalty(system, ability)],
+      ["Base attack bonus", system.bab ?? 0],
+      ["Attribute", system.abilities[ability]?.mod ?? 0],
+      ["Forte", forte],
+      ["Size", system.sizeModifier ?? 0],
+      ["Quirky weapon", quirky?.attackPenalty ?? 0],
+      ["Inaccurate weapon", inaccurate],
+      ["Grip", grip.attackPenalty],
+      ["Massive weapon", massive.attackPenalty],
+      ["Improvised weapon", improvisedPenalty],
+      ["Recoil", firing.recoilPenalty],
+      ["Range", distance.rangePenalty],
+      ["Aim", stance.aimBonus],
+      ["Brace", stance.braceBonus],
+      ["Sniper", sniper.attackBonus],
+      ["Flanking", flanking.attackBonus]
+    ]),
     error: Math.max(
       0,
       reducedError - (specialistApplies(system, weapon, "No Worries") ? 2 : 0) - sniper.errorReduction

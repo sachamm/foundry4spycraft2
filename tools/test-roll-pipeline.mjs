@@ -579,3 +579,80 @@ test("a reservation contributor makes the roll re-enter with its lease before an
     rollPipeline.unregister("testLease");
   }
 });
+
+test("plan-stage contributors change the previewed total once, are recorded, and never count again at the roll", async () => {
+  const { planTotal } = await import("../module/rules/roll-pipeline.mjs");
+  const pipeline = new RollPipeline();
+  pipeline.register({
+    id: "plan",
+    kinds: ["attack"],
+    stage: "plan",
+    modifiers: () => [{ label: "High ground", value: 1 }]
+  });
+  pipeline.register({ id: "roll", kinds: ["attack"], modifiers: () => [{ label: "Smoke", value: -2 }] });
+  assert.throws(() => pipeline.register({ id: "bad", stage: "later", modifiers: () => [] }), /stage must be/);
+  assert.deepEqual(
+    pipeline.modifiers({ checkKind: "attack", stage: "plan" }).rows.map(r => r.id),
+    ["plan"]
+  );
+  assert.deepEqual(
+    pipeline.modifiers({ checkKind: "attack" }).rows.map(r => r.id),
+    ["roll"]
+  );
+  const planned = planTotal(
+    "attack",
+    {},
+    [
+      ["Base attack bonus", 5],
+      ["Range", -2],
+      ["Unused", 0]
+    ],
+    pipeline
+  );
+  assert.equal(planned.total, 4);
+  assert.deepEqual(
+    planned.modifiers.map(r => `${r.label} ${r.value}`),
+    ["Base attack bonus 5", "Range -2", "High ground 1"]
+  );
+  assert.deepEqual(planned.planModifiers, [{ id: "plan", label: "High ground", value: 1 }]);
+  assert.equal(planTotal("save", {}, [["Save bonus", 3]], pipeline).total, 3);
+
+  // Through the real documents: the weapon's previewed total and the posted roll agree.
+  const { weaponAttack } = await import("../module/rules/gear.mjs");
+  const system = { ...new SpycraftActor().system, bab: 4, proficiencies: { edged: { proficient: true } } };
+  const sword = {
+    proficiency: "edged",
+    damage: "1d8",
+    error: 1,
+    threat: 20,
+    qualities: "",
+    quantity: 1,
+    carried: true,
+    equipped: true
+  };
+  const before = weaponAttack(system, sword, cfg);
+  rollPipeline.register({
+    id: "testPlanAttack",
+    kinds: ["attack"],
+    stage: "plan",
+    modifiers: ({ weapon }) => (weapon.proficiency === "edged" ? [{ label: "Test edge", value: 2 }] : [])
+  });
+  try {
+    const after = weaponAttack(system, sword, cfg);
+    assert.equal(after.total, before.total + 2);
+    assert.deepEqual(after.planModifiers, [{ id: "testPlanAttack", label: "Test edge", value: 2 }]);
+    assert.ok(after.modifiers.some(r => r.label === "Base attack bonus" && r.value === 4));
+    rolled.length = 0;
+    const actor = new SpycraftActor();
+    const message = await actor.rollCheck(
+      "1d20 + @total",
+      { total: after.total },
+      { checkKind: "attack", flavor: "Attack", planModifiers: after.planModifiers }
+    );
+    assert.deepEqual(rolled, ["1d20 + @total"]);
+    assert.deepEqual(message.flags.spycraft2.planModifiers, after.planModifiers);
+    assert.match(message.flavor, /Test edge \+2\./);
+  } finally {
+    rollPipeline.unregister("testPlanAttack");
+  }
+});

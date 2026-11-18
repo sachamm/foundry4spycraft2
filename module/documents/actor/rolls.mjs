@@ -1,7 +1,7 @@
 /** Checks a character rolls: skills, Knowledge, saves, attacks, damage and action dice. */
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
-import { formulaWithModifiers } from "../../rules/roll-pipeline.mjs";
+import { formulaWithModifiers, planTotal } from "../../rules/roll-pipeline.mjs";
 import { enhanceSkillDialog } from "../../apps/skill-dialog-ux.mjs";
 import { reachIncreaseFeet } from "../../rules/reach.mjs";
 import { reachContextContent, reachContextInput } from "../../apps/reach.mjs";
@@ -373,6 +373,8 @@ export const ActorRolls = Base =>
       const check = {
         ...rollPipeline.flags(rollContext),
         ...(pipelineModifiers.rows.length ? { pipelineModifiers: pipelineModifiers.rows } : {}),
+        // Rows contributors added while the total was planned are already inside the total; they are recorded only.
+        ...(options.planModifiers?.length ? { planModifiers: options.planModifiers } : {}),
         attributeDamage,
         oldSchool,
         analysisTask: options.analysisTask
@@ -600,21 +602,23 @@ export const ActorRolls = Base =>
           : null;
       const securityBonus =
         key === "ref" && input.securityDevice === true ? uncannyDodgePlan(this.system).securityBonus : 0;
-      const total =
-        (this.system.saves?.[key]?.total ?? 0) +
-        (stillStandingSave?.bonus ?? 0) +
-        (stoneCold?.bonus ?? 0) +
-        penalty +
-        terrainSave.adjustment +
-        underwaterContext.penalty +
-        fatigueBonus +
-        securityBonus +
-        baffledSaveBonus +
-        (coverSave?.bonus ?? 0);
+      const { total, planModifiers } = planTotal("save", { actor: this, system: this.system, saveKey: key, input }, [
+        ["Save bonus", this.system.saves?.[key]?.total ?? 0],
+        ["Still Standing", stillStandingSave?.bonus ?? 0],
+        ["Stone Cold", stoneCold?.bonus ?? 0],
+        ["Brace", penalty],
+        ["Terrain", terrainSave.adjustment],
+        ["Underwater", underwaterContext.penalty],
+        ["Fatigue resistance", fatigueBonus],
+        ["Security device", securityBonus],
+        ["Baffled resistance", baffledSaveBonus],
+        ["Cover", coverSave?.bonus ?? 0]
+      ]);
       return this.rollCheck(
         "1d20 + @total",
         { total },
         {
+          planModifiers,
           flavor:
             game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label) +
             (checkMethod === "take10" ? " — Evasion III: take 10" : "") +
@@ -937,6 +941,7 @@ export const ActorRolls = Base =>
           fresh.fixedDie ? `${fresh.fixedDie} + @total` : "1d20 + @total",
           { total: fresh.total },
           {
+            planModifiers: fresh.planModifiers,
             flavor: `${esc(skill.name)} / ${esc(check.name)} (${fresh.ability.toUpperCase()})<br><small>${esc(fresh.notes)}</small>`,
             ...(Object.hasOwn(input, "oldSchool") ? { oldSchool: input.oldSchool } : {}),
             solutionCommitted,
@@ -1503,6 +1508,7 @@ export const ActorRolls = Base =>
           fresh.fixedDie ? `${fresh.fixedDie} + @total` : "1d20 + @total",
           { total: fresh.total },
           {
+            planModifiers: fresh.planModifiers,
             photographicMemory: fresh.photographicMemory,
             cardSharkKnowledge: fresh.cardSharkKnowledge,
             validateSkillContext:
@@ -1789,6 +1795,7 @@ export const ActorRolls = Base =>
         "1d20 + @total",
         { total: atk.total - tripPenalty },
         {
+          planModifiers: atk.planModifiers,
           flavor: `${game.i18n.localize("SPYCRAFT.Attack")}: ${foundry.utils.escapeHTML(item.name)}${tripPenalty ? " — Trip final attack −4" : ""}${atk.trained ? "" : ` — ${game.i18n.localize("SPYCRAFT.Weapon.Untrained")}`}${atk.notes ? `<br><small>${foundry.utils.escapeHTML(atk.notes)}</small>` : ""}`,
           strikingLease: options.strikingLease,
           tripFinalLease: options.tripFinalLease,
