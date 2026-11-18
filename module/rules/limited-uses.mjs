@@ -11,6 +11,7 @@ import { allOrNothingSpec } from "./all-or-nothing.mjs";
 import { blackCatSpec } from "./black-cat.mjs";
 import { berserkerSpec } from "./berserker.mjs";
 import { gunslingerSpec } from "./gunslinger.mjs";
+import { chanceReactionSpecs } from "./chance-reactions.mjs";
 import { roundActionSpecs } from "./feat-free-actions.mjs";
 import { openStanceSpec } from "./wrestling.mjs";
 import { dartingStyleState } from "./darting-state.mjs";
@@ -254,6 +255,7 @@ export function limitedUseAbilities(system, items, cfg) {
         manualReviewable: true,
         hidden: true
       });
+  for (const spec of chanceReactionSpecs(system)) add(spec);
   const gunslinger = gunslingerSpec(system);
   if (gunslinger) add(gunslinger);
   const rage = berserkerSpec(system);

@@ -606,6 +606,7 @@ const EXPECTED_ORDER = [
   "kickControls",
   "wrestlingControls",
   "autofireMasteryControl",
+  "chanceReactionControls",
   "sneakAttackRecord",
   "targetSkillEffectsRecord",
   "blastMapControl",

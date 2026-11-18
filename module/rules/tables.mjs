@@ -11376,10 +11376,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "When your Initiative Count begins, take an extra firearm or heavy-weapon final attack at –2 to all checks for the round."
  },
- "Fortune's Fool": {
-  "rolls": "attack, skill",
-  "text": "When an opponent's action die would turn your error into a critical failure, you may swap one of your dice for theirs."
- },
  "Get Radical!": {
   "rolls": "skill:drive",
   "text": "Stunts are easier (–5 DC, –1 error), vehicle jumps go 50% farther, and your vehicle takes half falling damage."
@@ -11415,10 +11411,6 @@ export const FEAT_REMINDERS = {
  "Mingling Supremacy": {
   "rolls": "skill:blend",
   "text": "No Stealth penalties for moving or speaking, smaller team/terrain penalties, and invisible in crowds of 50+."
- },
- "Misfortune": {
-  "rolls": "attack, skill",
-  "text": "When you score an unused threat against a special character, pay 1 action die to force them to discard one."
  },
  "Need for Speed": {
   "rolls": "skill:drive",

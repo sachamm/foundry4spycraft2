@@ -382,7 +382,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Wrestling Supremacy | 189 | No | Partial: static numerical effects | — |
 | All or Nothing | 189 | No | Covered (batch 381): once per session, a rolled skill, Knowledge or attack check declared on its dialog widens error and threat ranges by 5; its error stays open to activation on a success, which then becomes a failure | Native Foundry QA not claimed |
 | Better Luck Next Time | 189 | No | Covered (batch 380): a single boosting die on a skill check or save that rolls a natural 1 is returned once when the check is resolved (ordinary dice, or a still-live unrestricted bonus pool) | Native Foundry QA not claimed |
-| Fortune's Fool | 189 | No | Manual/descriptive | — |
+| Fortune's Fool | 189 | No | Covered (batch 400): on the owner’s activated critical failure, a GC control returns 1 action die to the paying opponent (or the GC pool); the owner keeps their count, holding a die of the spent type | Native Foundry QA not claimed |
 | Black Cat | 189 | No | Covered (batch 382): once per scene the GC marks up to one opponent per Chance feat (GC confirms line of sight); a marked character’s checks carry +2 error range until the scene changes; no character carries two | Native Foundry QA not claimed |
 | Jinx | 190 | No | Implemented: selected paying-opponent critical-failure discount, Chance-based session allowance and combined payment recovery | Batches269–270; Shaken-after-waiver fees, concurrent/source/counter guards, actual GC review and native persistence verified |
 | Tough Luck | 191 | No | Covered (batch 382): recorded with the Black Cat mark; each threat a marked opponent activates costs 1 more action die | Native Foundry QA not claimed |
@@ -390,9 +390,9 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Fortunate | 189 | No | Covered (batch 379): the GC grants the requested d4 as a scene-long unrestricted bonus die (Fortune Favors the Bold applies); the matching d4 goes to the GC pool or is noted for a chosen opponent; uses per session equal the Chance feats held | Native Foundry QA not claimed |
 | Fortune Favors the Bold | 189 | No | Partial: chosen/roll effects | — |
 | Lady Luck's Smile | 190 | No | Verified complete: action dice explode on their highest two natural faces | Batch231; ordinary/bonus die types, boost/Generous/healing/Defense, prerequisites and persisted native formula verified |
-| Lucky Break | 190 | No | Manual/descriptive | — |
-| Misfortune | 190 | No | Manual/descriptive | — |
-| Peculiar Dodge | 190 | No | Manual/descriptive | — |
+| Lucky Break | 190 | No | Partial (batch 400): a GC control turns a resolved hit on the owner into a miss once per scene after the GC confirms the margin of 1 or less; skill checks targeting the owner are not recorded with a target, so those stay at the table | Native Foundry QA not claimed |
+| Misfortune | 190 | No | Covered (batch 400): a GC control on the owner’s unactivated threat against a recorded character spends 1 of the owner’s action dice and removes 1 from the target (the GC pool for an NPC); uses per session equal Chance feats | Native Foundry QA not claimed |
+| Peculiar Dodge | 190 | No | Covered (batch 400): a GC control on a resolved, unactivated hit against the owner spends 1 action die and rolls it without exploding; an odd face turns the hit into a miss; uses per session equal Chance feats; once per hit | Native Foundry QA not claimed |
 | Mark of Conflict | 190 | No | Implemented: +1 on every ranged weapon damage roll; BAB and career level count 3 higher for Ranged Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Ranged Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
 | Mark of Strife | 190 | No | Implemented: +1 on every unarmed weapon damage roll; BAB and career level count 3 higher for Unarmed Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Unarmed Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
 | Mark of Turmoil | 190 | No | Implemented: +1 on every melee weapon damage roll; BAB and career level count 3 higher for Melee Combat feat prerequisites only; disposition drawback (2 grades, characters with 2+ Melee Combat feats) is reported for the GC | Batch373; all proficiencies/trees, real engine feat evaluation and catalog chain covered by automated tests; native Foundry QA not run in the cloud session |
@@ -1799,3 +1799,16 @@ Source: rules reference p.182 (local markdown edition; original PDF page not vis
 - Uses per session equal the owner’s Ranged Combat feats. The actor keeps a per-mission list of characters already sized up and refuses a second reading of the same one.
 
 Verification: 3426 of 3427 Node tests (2 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 55 manual / 60 partial / 199 other; at least 115 of 314 explicitly unfinished; 81 whole-feat closures.
+
+## Residual implementation batch 400 — Lucky Break, Peculiar Dodge, Misfortune and Fortune’s Fool
+
+Source: rules reference pp.189–191 (local markdown edition; original PDF pages not visually re-checked).
+
+- `module/rules/chance-reactions.mjs`, `module/apps/chance-reactions.mjs`. These feats change another character’s attack card or dice, so they are GC controls on resolved attack cards with a recorded target.
+- **Lucky Break:** on a hit against the owner, the GC confirms the margin of 1 or less and spends the owner’s scene use; the card becomes a miss and records `luckyBreak`. Partial: skill checks are not recorded with a target.
+- **Peculiar Dodge:** on a hit before any threat is activated, it spends one of the owner’s action dice through the normal payment and rolls the die without exploding. An odd face turns the card into a miss; the result is recorded either way, once per hit.
+- **Misfortune:** on the owner’s confirmed but unactivated threat, it spends one of the owner’s action dice and makes an agent target lose one die, or takes one from the GC pool for an NPC.
+- **Fortune’s Fool:** on the owner’s activated critical failure, the paying opponent (or the GC pool) gets one die back. The owner keeps their count; the card says they now hold a die of the spent type.
+- Peculiar Dodge’s session uses and Misfortune’s equal the owner’s Chance feats. Misfortune and Fortune’s Fool leave `feat-reminders.json` (tables regenerated).
+
+Verification: 3430 of 3431 Node tests (4 new). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 51 manual / 61 partial / 202 other; at least 112 of 314 explicitly unfinished; 84 whole-feat closures.
