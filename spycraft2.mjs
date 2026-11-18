@@ -1,3 +1,4 @@
+import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-scenes.mjs";
 import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
@@ -33,7 +34,7 @@ import {
   currentCampaignEffects,
   missionXP
 } from "./module/apps/gc/state.mjs";
-import { openGCConsole } from "./module/apps/gc/console.mjs";
+import { openGCConsole, registerGCConsoleTab } from "./module/apps/gc/console.mjs";
 import {
   installFluidInitiativeHooks,
   fluidCombatClass,
@@ -130,6 +131,8 @@ Hooks.once("init", () => {
     }
   });
   registerGCSettings();
+  registerGCConsoleTab();
+  registerSampleSceneSetup();
   registerMigrationSettings();
   registerGmLocks();
   installRoundStateEffects();
@@ -244,6 +247,7 @@ function refreshCombatActorData() {
     }
 }
 Hooks.once("ready", refreshCombatActorData);
+Hooks.once("ready", setupSampleScenes);
 // Bring stored world data up to this build's schema version (module/migrations/index.mjs).
 Hooks.once("ready", () => {
   runWorldMigrations().catch(error => {
@@ -303,18 +307,6 @@ for (const event of ["createItem", "updateItem", "deleteItem"])
     if (item.type === "class" && item.parent?.documentName === "Actor") refreshFortuneRecipients(item.parent);
   });
 
-// Game Control console: a button at the top of the Actors sidebar for the GC, plus game.spycraft2.gc.open().
-Hooks.on("renderActorDirectory", (app, html) => {
-  if (!game.user.isGM) return;
-  const root = html instanceof HTMLElement ? html : html?.[0];
-  if (!root || root.querySelector(".spycraft2-gc-console-button")) return;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "spycraft2-gc-console-button";
-  button.innerHTML = '<i class="fa-solid fa-user-secret"></i> GC Console';
-  button.addEventListener("click", () => openGCConsole());
-  (root.querySelector(".header-actions") ?? root.querySelector(".directory-header") ?? root).append(button);
-});
 // A mission's Threat Level and campaign qualities affect derived numbers; refresh sheets when a scene or session starts.
 Hooks.on("updateSetting", setting => {
   if (setting.key === "spycraft2.usagePeriods") game.spycraft2?.gc?.console?.render(false);

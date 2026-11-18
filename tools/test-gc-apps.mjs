@@ -76,6 +76,18 @@ globalThis.foundry = {
     randomID: () => `id${++idCounter}`
   },
   applications: {
+    sidebar: {
+      AbstractSidebarTab: class {
+        async _prepareContext() {
+          return {};
+        }
+        _canRender() {}
+        async _onFirstRender() {}
+        render() {
+          return this;
+        }
+      }
+    },
     api: {
       DialogV2: {
         input: async () => {
@@ -154,7 +166,8 @@ const spend = await import("../module/apps/gc/spend.mjs");
 const combat = await import("../module/apps/gc/combat.mjs");
 const conflicts = await import("../module/apps/gc/conflicts.mjs");
 const tables = await import("../module/apps/gc/tables.mjs");
-const { consoleContext } = await import("../module/apps/gc/console.mjs");
+const { consoleContext, GCConsole, registerGCConsoleTab, openGCConsole } =
+  await import("../module/apps/gc/console.mjs");
 const { initializeGCDice, gcDiceStatus } = await import("../module/rules/gc-dice.mjs");
 const { missionSettlementDefaults } = await import("../module/apps/gc/mission-defaults.mjs");
 
@@ -536,4 +549,41 @@ test("a new scene returns to standard; players cannot change GC state", async ()
   game.user.isGM = false;
   await assert.rejects(() => state.setMission({}), /Only the GC/);
   game.user.isGM = true;
+});
+
+test("GC console registers a GM-only sidebar tab and opens the shared sidebar instance", async () => {
+  const previousUI = CONFIG.ui;
+  CONFIG.ui = {
+    sidebar: class {
+      static TABS = { chat: {}, combat: {}, scenes: { gmOnly: true } };
+    }
+  };
+  try {
+    registerGCConsoleTab();
+    registerGCConsoleTab();
+    assert.equal(CONFIG.ui.gc, GCConsole);
+    assert.deepEqual(Object.keys(CONFIG.ui.sidebar.TABS), ["gc", "chat", "combat", "scenes"]);
+    assert.equal(CONFIG.ui.sidebar.TABS.gc.gmOnly, true);
+    const calls = [];
+    ui.gc = {
+      async render(options) {
+        calls.push(["render", options]);
+      },
+      activate() {
+        calls.push(["activate"]);
+      }
+    };
+    assert.equal(await openGCConsole(), ui.gc);
+    assert.equal(game.spycraft2.gc.console, ui.gc);
+    assert.deepEqual(calls, [["render", { force: true }], ["activate"]]);
+    game.user.isGM = false;
+    assert.equal(GCConsole.prototype._canRender({}), false);
+    await openGCConsole();
+    assert.equal(calls.length, 2, "player requests cannot open the console");
+  } finally {
+    CONFIG.ui = previousUI;
+    game.user.isGM = true;
+    delete ui.gc;
+    game.spycraft2.gc.console = null;
+  }
 });
