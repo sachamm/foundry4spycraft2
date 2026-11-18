@@ -292,6 +292,8 @@ export const ActorAttackRolls = Base =>
             duelingReach: atk.duelingReach ?? null,
             noQuarter: atk.noQuarter ?? null,
             tauntBonus: atk.tauntBonus ?? null,
+            calledShot: atk.calledShot ?? null,
+            bounce: atk.bounce ?? null,
             meleeTradeoff: atk.meleeTradeoff,
             grippingStance: grippingAttackProof(
               this.system,

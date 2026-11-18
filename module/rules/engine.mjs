@@ -13,6 +13,7 @@ import { duelingAllDodge } from "./dueling-basics.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
 import { notTheFaceDR } from "./not-the-face.mjs";
 import { underminedState } from "./taunt.mjs";
+import { intenseStanceState } from "./intense-stance.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -1263,6 +1264,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   if (sys.combatExpertiseState.active)
     B.add("defense", sys.combatExpertiseState.dodgeBonus, "Combat Expertise", "dodge");
   sys.fightDefensivelyState = fightDefensivelyState(sys);
+  sys.intenseStanceState = intenseStanceState(sys);
   if (sys.fightDefensivelyState.active) {
     B.add("defense", sys.fightDefensivelyState.dodgeBonus, "Fight Defensively", "dodge");
     if (sys.fightDefensivelyState.equilibrium)

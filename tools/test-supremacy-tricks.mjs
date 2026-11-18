@@ -78,3 +78,23 @@ test("Spirit and Rolling Supremacy defend; Back Breaker joins the grapple tricks
   assert.equal(handOfGodSpec(spirit).period, "round");
   assert.match(grappleTrickLines(owner(["Wrestling Supremacy"]))[0], /Back Breaker/);
 });
+
+test("Intense Stance: a round without attacks, then +2 melee attack and damage", async () => {
+  const { intenseStanceState, intenseStancePlan, intenseDamage } = await import("../module/rules/intense-stance.mjs");
+  const ctx = (round, turn) => ({ id: "c", started: true, round, turn, combatantId: "own", ownTurnIndex: 1 });
+  const stance = { ...owner(["Whip Basics"]), combatStance: { version: 1, id: "s", key: "intense" } };
+  const record = intenseStancePlan(stance, ctx(2, 1), { confirmed: true });
+  assert.throws(
+    () => intenseStancePlan(owner(["Whip Basics"]), ctx(2, 1), { confirmed: true }),
+    /Enter Intense Stance/
+  );
+  const at = (round, turn) => intenseStanceState({ intenseStance: record, intenseCombatContext: ctx(round, turn) });
+  assert.equal(at(2, 1).holding, true);
+  assert.equal(at(3, 0).holding, true);
+  assert.equal(at(3, 1).bonus, 2);
+  assert.equal(at(4, 0).bonus, 2);
+  assert.deepEqual([at(4, 1).bonus, at(4, 1).holding], [0, false]);
+  const sys = { intenseStance: record, intenseCombatContext: ctx(3, 2) };
+  assert.equal(intenseDamage(sys, { proficiency: "exoticBlunt", range: 0 }), 2);
+  assert.equal(intenseDamage(sys, { proficiency: "rifle", range: 100 }), 0);
+});

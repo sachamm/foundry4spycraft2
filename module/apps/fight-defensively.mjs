@@ -1,5 +1,6 @@
 /** Declare Fight Defensively from the sheet (p.357). */
 import { fightDefensivelyPlan } from "../rules/fight-defensively.mjs";
+import { intenseStancePlan } from "../rules/intense-stance.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
 import { loc } from "../i18n.mjs";
@@ -37,5 +38,30 @@ export async function declareFightDefensively(actor, options = {}) {
         (extra.length ? ` (${extra.join("; ")})` : "")
     ),
     flags: { spycraft2: { actorUuid: actor.uuid, checkKind: "fightDefensively", fightDefensively: record } }
+  });
+}
+
+/** Intense Stance (Whip Basics, p.180): give up attacks for 1 full round for +2 melee attack and damage the next. */
+export async function declareIntenseStance(actor, options = {}) {
+  if (!actor.isOwner) return null;
+  let input = options;
+  if (!Object.hasOwn(input, "confirmed")) {
+    input = await foundry.applications.api.DialogV2.input({
+      window: { title: loc`Intense Stance` },
+      rejectClose: false,
+      content: `<div class="spycraft2-roll-options"><p>${loc`Make no attack checks for 1 full round; during the following full round your melee attacks gain +2 to the attack check and damage (p.180).`}</p><label><input name="confirmed" type="checkbox" /> ${loc`I make no attack checks until my next Initiative Count`}</label></div>`
+    });
+    if (!input) return null;
+  }
+  const record = {
+    ...intenseStancePlan(actor.system, expertiseCombatContext(actor), { confirmed: input.confirmed === true }),
+    id: foundry.utils.randomID()
+  };
+  await actor.update({ "system.intenseStance": record });
+  return ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor }),
+    content: foundry.utils.escapeHTML(
+      loc`Intense Stance: no attacks until the start of own Initiative Count in round ${record.startRound + 1}; then +2 melee attack and damage until round ${record.startRound + 2}.`
+    )
   });
 }

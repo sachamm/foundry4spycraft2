@@ -48,6 +48,8 @@ export const ROUND_ACTION_FEATS = Object.freeze({
   },
   // Horde Mastery, p.174: a Pummel as a half action (2-to-1).
   hordeMastery: { feat: "Horde Mastery", actions: ["Pummel"], perRound: 1, cost: "half", advantage: true },
+  // Revolver Basics, p.182: once per round, a full reload of a revolver as a free action.
+  revolverBasics: { feat: "Revolver Basics", actions: ["Reload a revolver completely"], perRound: 1, cost: "free" },
   merciless: { feat: "Merciless", actions: ["Coup de Grace against a helpless character"], perRound: 1, cost: "free" },
   spiritBasics: {
     feat: "Spirit Basics",

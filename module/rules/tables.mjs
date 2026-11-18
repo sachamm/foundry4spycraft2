@@ -11352,10 +11352,6 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:impress",
   "text": "Use Impress for Diversion and Feint, and as a full action affect every opponent in range."
  },
- "Flamethrower Basics": {
-  "rolls": "attack",
-  "text": "Flamethrowers ignore imprecise, use half the shots, and can use the Bounce trick."
- },
  "Follow-up Shot": {
   "rolls": "attack",
   "text": "When your Initiative Count begins, take an extra firearm or heavy-weapon final attack at –2 to all checks for the round."

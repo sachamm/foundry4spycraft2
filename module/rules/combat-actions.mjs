@@ -35,9 +35,16 @@ export const COVER_FIRE = { shots: 5, base: 10, penalty: -4, finalAttackMargin: 
 export const SUPPRESSIVE_FIRE = { shots: 5, penalty: -4 };
 const count = value => (Number.isSafeInteger(value) ? value : NaN);
 
+/** Rock and Roll!: 2 shots a volley, and as many volleys as half the shots left (rounded down). */
+export const rockAndRollRule = rule => ({
+  ...rule,
+  shotsEach: 2,
+  minimumShots: (rule.minimumShots / rule.shotsEach) * 2,
+  most: Number.MAX_SAFE_INTEGER
+});
+
 /** How many volleys or squares the shots left in a weapon allow. */
-export function fireActionLimit(action, shotsRemaining) {
-  const rule = FIRE_ACTIONS[action];
+export function fireActionLimit(action, shotsRemaining, rule = FIRE_ACTIONS[action]) {
   if (!rule?.shotsEach || !Number.isSafeInteger(shotsRemaining)) return 0;
   return shotsRemaining < rule.minimumShots ? 0 : Math.min(rule.most, Math.floor(shotsRemaining / rule.shotsEach));
 }
@@ -66,7 +73,9 @@ export function fireActionPlan(facts = {}, declared = {}) {
 }
 function baseFireActionPlan(facts = {}, { action = "", volleys = null, squares = null, shotsRemaining = null } = {}) {
   if (!action) return null;
-  const rule = FIRE_ACTIONS[action];
+  // Rock and Roll!, p.182: Autofire and Strafe volleys take 2 shots each, up to half the shots left.
+  const rock = (facts.feats ?? []).includes("Rock and Roll") && ["autofire", "strafe"].includes(action);
+  const rule = rock ? rockAndRollRule(FIRE_ACTIONS[action]) : FIRE_ACTIONS[action];
   const stop = reason => ({ action, blocked: true, reason, attack: 0, extraRecoil: 0, error: 0, shots: 0, notes: [] });
   if (!rule) return stop(loc`Choose a listed fire action.`);
   if (!facts.firearm) return stop(loc`This action needs a firearm.`);
@@ -127,19 +136,19 @@ function baseFireActionPlan(facts = {}, { action = "", volleys = null, squares =
     };
   }
   if (remaining === null) return stop(loc`Enter the shots left in the weapon.`);
-  const limit = fireActionLimit(action, remaining);
+  const limit = fireActionLimit(action, remaining, rule);
   if (!limit)
     return stop(
       action === "autofire"
-        ? loc`Autofire needs 6 or more shots in the weapon.`
-        : loc`Strafe needs 9 or more shots in the weapon.`
+        ? loc`Autofire needs ${rule.minimumShots} or more shots in the weapon.`
+        : loc`Strafe needs ${rule.minimumShots} or more shots in the weapon.`
     );
   const chosen = count(Number(action === "autofire" ? volleys : squares));
   if (!Number.isSafeInteger(chosen) || chosen < 1 || chosen > limit)
     return stop(
       action === "autofire"
-        ? loc`Choose 1 to ${limit} volleys (3 shots each, 10 at most).`
-        : loc`Choose 1 to ${limit} squares (3 shots each, 10 at most).`
+        ? loc`Choose 1 to ${limit} volleys (${rule.shotsEach} shots each${rock ? "" : loc`, 10 at most`}).`
+        : loc`Choose 1 to ${limit} squares (${rule.shotsEach} shots each${rock ? "" : loc`, 10 at most`}).`
     );
   if (action === "autofire")
     return {

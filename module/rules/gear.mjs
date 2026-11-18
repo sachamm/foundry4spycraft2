@@ -2,6 +2,7 @@ import { kickDamageBonus, unarmedWeapon } from "./kick.mjs";
 import { inClosedStance, CLOSED_STANCE_DAMAGE, doubleJabFormula } from "./boxing.mjs";
 import { unarmedTrickDamageBonus } from "./unarmed-tricks.mjs";
 import { hordeSupremacyDamage } from "./team-feats.mjs";
+import { intenseDamage } from "./intense-stance.mjs";
 import { signatureBonus } from "./favored-gear.mjs";
 import { markDamagePlan } from "./marks.mjs";
 import { reachWeaponPlan } from "./reach-weapon.mjs";
@@ -765,7 +766,7 @@ export function weaponDamage(
     closedDamage =
       weapon.closedStanceTarget === true && unarmedWeapon(weapon) && inClosedStance(system) ? CLOSED_STANCE_DAMAGE : 0,
     trickDamage = unarmedWeapon(weapon) ? unarmedTrickDamageBonus(weapon.unarmedTrick) : 0,
-    hordeDamage = hordeSupremacyDamage(system, weapon);
+    hordeDamage = hordeSupremacyDamage(system, weapon) + intenseDamage(system, weapon);
   bonus +=
     conditionDamagePenalty +
     cqbRange.damageBonus +

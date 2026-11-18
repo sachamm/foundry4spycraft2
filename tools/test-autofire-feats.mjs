@@ -89,3 +89,70 @@ test("Steel Rain: hurled weapons without a blast increment take Burst, Cover Fir
   );
   assert.deepEqual([plan.blocked, plan.shots], [false, 3]);
 });
+
+test("Rock and Roll!: 2 shots a volley, up to half the shots left", () => {
+  const rock = fireActionPlan(facts(["Rock and Roll"], "auto"), {
+    action: "autofire",
+    volleys: 12,
+    shotsRemaining: 25
+  });
+  assert.deepEqual([rock.blocked, rock.shots], [false, 24]);
+  assert.ok(
+    fireActionPlan(facts(["Rock and Roll"], "auto"), { action: "autofire", volleys: 13, shotsRemaining: 25 }).blocked
+  );
+  assert.equal(
+    fireActionPlan(facts(["Rock and Roll"], "auto"), { action: "autofire", volleys: 2, shotsRemaining: 4 }).blocked,
+    false
+  );
+  assert.ok(
+    fireActionPlan(facts([], "auto"), { action: "autofire", volleys: 12, shotsRemaining: 40 }).blocked,
+    "10 at most"
+  );
+});
+
+test("Called Shot: armor penalty, Sharpshooter Mastery reduction and its requirements", async () => {
+  const { calledShotPlan } = await import("../module/rules/called-shot.mjs");
+  const ranged = { calledShot: "moderate", calledShotHelmet: true, ranged: true, aimed: true };
+  assert.equal(calledShotPlan({ activeFeatNames: [] }, ranged).attackPenalty, -7);
+  assert.equal(calledShotPlan({ activeFeatNames: ["Sharpshooter Mastery"] }, ranged).attackPenalty, -4);
+  assert.equal(
+    calledShotPlan(
+      { activeFeatNames: ["Sharpshooter Mastery"] },
+      { ...ranged, calledShot: "partial", calledShotHelmet: false }
+    ).attackPenalty,
+    -0
+  );
+  assert.match(calledShotPlan({}, { ...ranged, aimed: false }).reason, /Aim/);
+  assert.match(calledShotPlan({}, { calledShot: "full", ranged: false }).reason, /adjacent/);
+  assert.match(calledShotPlan({}, { ...ranged, attackAction: "autofire" }).reason, /Standard Attack/);
+  assert.equal(calledShotPlan({}, ranged).countCost, 5);
+});
+
+test("Revolver Basics: +4 Intimidate with one shot left, and a free full reload each round", async () => {
+  const { revolverIntimidatePlan } = await import("../module/rules/revolver-intimidate.mjs");
+  const owner = { activeFeatNames: ["Revolver Basics"] };
+  assert.equal(revolverIntimidatePlan(owner, "intimidate", { revolverOneShot: true }).bonuses[0].value, 4);
+  assert.deepEqual(revolverIntimidatePlan(owner, "intimidate", {}).bonuses, []);
+  const spec = roundActionSpecs(owner).find(s => s.id === "revolverBasics");
+  assert.deepEqual([spec.limit, spec.period], [1, "round"]);
+});
+
+test("Bounce: −2 and error +1 a surface, up to Dexterity; Grenade Basics and Flamethrower Basics", async () => {
+  const { bouncePlan } = await import("../module/rules/bounce.mjs");
+  const sys = feats => ({
+    activeFeatNames: feats,
+    abilities: { dex: { mod: 3 } },
+    proficiencyTotals: { hurled: { proficient: true } }
+  });
+  const knife = { proficiency: "hurled", name: "Throwing knife" };
+  assert.deepEqual(
+    [bouncePlan(sys([]), knife, { bounceSurfaces: 2 }).attack, bouncePlan(sys([]), knife, { bounceSurfaces: 2 }).error],
+    [-4, 2]
+  );
+  assert.ok(bouncePlan(sys([]), knife, { bounceSurfaces: 4 }).blocked);
+  const grenade = { proficiency: "hurled", name: "Frag grenade" };
+  assert.equal(bouncePlan(sys(["Grenade Basics"]), grenade, { bounceSurfaces: 2 }).attack, -2);
+  const flame = { proficiency: "tactical", weaponCategory: "flamethrower", name: "Flamethrower" };
+  assert.ok(bouncePlan(sys([]), flame, { bounceSurfaces: 1 }).blocked);
+  assert.equal(bouncePlan(sys(["Flamethrower Basics"]), flame, { bounceSurfaces: 1 }).blocked, false);
+});

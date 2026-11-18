@@ -320,6 +320,14 @@ export const RECORD_SHAPES = {
     tier: "string",
     version: "number"
   },
+  intenseStance: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    id: "string",
+    startRound: "number",
+    version: "number"
+  },
   fightDefensively: {
     $also: "null",
     combatId: "string",

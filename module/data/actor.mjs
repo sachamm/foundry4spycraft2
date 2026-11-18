@@ -308,6 +308,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       berserkerRage: record("berserkerRage", { nullable: true, initial: null }),
       duelingBasics: record("duelingBasics", { nullable: true, initial: null }),
       fightDefensively: record("fightDefensively", { nullable: true, initial: null }),
+      intenseStance: record("intenseStance", { nullable: true, initial: null }),
       twoWeaponStyle: record("twoWeaponStyle", { nullable: true, initial: null }),
       dartingStyle: record("dartingStyle", { nullable: true, initial: null }),
       totalDefense: record("totalDefense", { nullable: true, initial: null }),
@@ -483,6 +484,24 @@ export class AgentData extends foundry.abstract.TypeDataModel {
         c.actor?.uuid === this.parent.uuid &&
         (!this.fightDefensively?.combatantId || c.id === this.fightDefensively.combatantId)
     );
+    const intenseCombat = this.intenseStance?.combatId
+      ? globalThis.game?.combats?.get?.(this.intenseStance.combatId)
+      : this.parent.participatingCombat;
+    const intenseOwn = intenseCombat?.turns?.find(
+      c =>
+        c.actor?.uuid === this.parent.uuid &&
+        (!this.intenseStance?.combatantId || c.id === this.intenseStance.combatantId)
+    );
+    this.intenseCombatContext = intenseCombat
+      ? {
+          id: intenseCombat.id,
+          started: intenseCombat.started,
+          round: intenseCombat.round,
+          turn: intenseCombat.turn,
+          combatantId: intenseOwn?.id,
+          ownTurnIndex: intenseCombat.turns?.findIndex(c => c.id === intenseOwn?.id) ?? -1
+        }
+      : null;
     this.fightDefensivelyCombatContext = fightCombat
       ? {
           id: fightCombat.id,
