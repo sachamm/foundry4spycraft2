@@ -50,9 +50,11 @@ export const MELEE_SKILL_FAMILIES = [
   "oneHandedSword",
   "polearm",
   "flail",
-  "knife"
+  "knife",
+  "club"
 ];
 const familyProficiencies = {
+  club: ["blunt", "exoticBlunt"],
   knife: ["edged", "exoticEdged", "hurled", "exoticHurled"],
   flail: ["exoticBlunt"],
   polearm: ["exoticEdged"],

@@ -101,7 +101,7 @@ test("knife is a GC-reviewed family limited to Edged and Hurled proficiencies an
       key
     );
   const { readFile } = await import("node:fs/promises");
-  assert.match(await readFile(new URL("../module/data/item.mjs", import.meta.url), "utf8"), /"flail",\s*"knife"\s*\]/);
+  assert.match(await readFile(new URL("../module/data/item.mjs", import.meta.url), "utf8"), /"flail",\s*"knife"[,\s]/);
   assert.match(
     await readFile(new URL("../module/sheets/item-sheet.mjs", import.meta.url), "utf8"),
     /knife:\s*(?:"Knife"|loc`Knife`)/

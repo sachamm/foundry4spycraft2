@@ -276,6 +276,7 @@ export const ActorAttackRolls = Base =>
             bullseye: atk.bullseye,
             fireAction: atk.fireAction ?? null,
             pummel: atk.pummel ?? null,
+            damageConversion: atk.damageConversion ?? null,
             meleeTradeoff: atk.meleeTradeoff,
             grippingStance: grippingAttackProof(
               this.system,

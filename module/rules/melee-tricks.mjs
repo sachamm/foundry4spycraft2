@@ -48,7 +48,8 @@ export const MELEE_ATTACK_TRICKS = Object.freeze(
         weaponLabel: "spear",
         attackBonus: -2,
         damageBonus: 3,
-        threatIncrease: 3
+        threatIncrease: 3,
+        page: 179
       },
       hack: {
         source: "Hack!",
@@ -57,7 +58,8 @@ export const MELEE_ATTACK_TRICKS = Object.freeze(
         weaponLabel: "two-handed sword",
         attackBonus: 1,
         damageBonus: 4,
-        threatIncrease: 1
+        threatIncrease: 1,
+        page: 179
       },
       chop: {
         source: "Chop!",
@@ -67,7 +69,8 @@ export const MELEE_ATTACK_TRICKS = Object.freeze(
         attackBonus: 3,
         damageBonus: 3,
         threatIncrease: 0,
-        grantedQuality: "TKD"
+        grantedQuality: "TKD",
+        page: 176
       },
       crush: {
         source: "Crush!",
@@ -76,7 +79,8 @@ export const MELEE_ATTACK_TRICKS = Object.freeze(
         weaponLabel: "hammer",
         attackBonus: 2,
         damageBonus: 5,
-        threatIncrease: 0
+        threatIncrease: 0,
+        page: 179
       },
       betweenRibs: {
         source: "Between the Ribs",
@@ -87,6 +91,16 @@ export const MELEE_ATTACK_TRICKS = Object.freeze(
         damageBonus: 0,
         threatIncrease: 0,
         sneakDice: 1
+      },
+      outOfThePark: {
+        source: "Out of the Park",
+        feat: "Club Basics",
+        family: "club",
+        weaponLabel: "club",
+        attackBonus: 2,
+        damageBonus: 2,
+        threatIncrease: 2,
+        page: 177
       }
     }).map(([k, v]) => [k, Object.freeze(v)])
   )
@@ -351,7 +365,7 @@ rollPipeline.register({
                 ? loc`Thread the Needle: standard weapon damage on a hit; use Main’s Thread the Needle outcome to apply its source-specific Held condition. Escape, release or holder movement beyond5ft ends this hold (p.180).`
                 : plan.key === "fend"
                   ? loc`Fend: after this Standard Attack, hit or miss, you may immediately move5ft. Record the completed move through Main’s Fend movement; this declaration does not move tokens or spend an additional action (p.179).`
-                  : loc` ${plan.source}: full-action Standard Attack; ${plan.attackBonus >= 0 ? "+" : ""}${plan.attackBonus} attack, +${plan.damageBonus} recorded-hit damage${plan.threatIncrease ? `, +${plan.threatIncrease} threat range` : ""}${plan.grantedQuality ? ", takedown quality" : ""} (pp.176,179).`
+                  : loc` ${plan.source}: full-action Standard Attack; ${plan.attackBonus >= 0 ? "+" : ""}${plan.attackBonus} attack, +${plan.damageBonus} recorded-hit damage${plan.threatIncrease ? `, +${plan.threatIncrease} threat range` : ""}${plan.grantedQuality ? ", takedown quality" : ""} (p.${MELEE_ATTACK_TRICKS[plan.key].page}).`
           ]
         : []
     };

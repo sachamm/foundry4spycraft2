@@ -164,7 +164,8 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         oneHandedSword: loc`One-handed sword`,
         polearm: loc`Polearm`,
         flail: loc`Flail`,
-        knife: loc`Knife`
+        knife: loc`Knife`,
+        club: loc`Club`
       },
       gripOptions: { 0: loc`Normal required grip`, 1: loc`One hand`, 2: loc`Both hands` },
       pickOptions: Object.fromEntries([

@@ -3,6 +3,7 @@ import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-sce
 import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
+import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
 import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
 import { rollPipeline } from "./module/rolls/index.mjs";
@@ -148,6 +149,7 @@ Hooks.once("init", () => {
   installShakenInitiativeHooks();
   installCombatStanceHooks();
   installPowerStanceInitiativeHooks();
+  installFuriousStanceHooks();
   CONFIG.Actor.documentClass = SpycraftActor;
   CONFIG.Item.documentClass = SpycraftItem;
   Object.assign(CONFIG.Actor.dataModels, dataModels.actor);

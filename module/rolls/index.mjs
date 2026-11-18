@@ -47,6 +47,7 @@ import "../rules/conveyance-bull-rush.mjs";
 import "../rules/cooperative.mjs";
 import "../rules/cover.mjs";
 import "../rules/cqb.mjs";
+import "../rules/damage-conversion.mjs";
 import "../rules/damage-saves.mjs";
 import "../rules/defense.mjs";
 import "../rules/detection-observer.mjs";

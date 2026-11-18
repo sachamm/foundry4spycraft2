@@ -271,7 +271,8 @@ export class WeaponData extends GearData {
           "oneHandedSword",
           "polearm",
           "flail",
-          "knife"
+          "knife",
+          "club"
         ]
       }),
       weaponCategory: str(),

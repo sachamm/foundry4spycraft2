@@ -297,7 +297,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Cleave Basics | 177 | No | Manual/descriptive | — |
 | Cleave Mastery | 177 | No | Partial: +1 melee threat versus confirmed standard characters; reaction attacks remain open | Batch217; typed target/source evidence |
 | Cleave Supremacy | 177 | No | Partial: melee critical cost −1 versus confirmed standard characters; cleave movement remains open | Batch217; frozen target and legacy GC confirmation |
-| Club Basics | 177 | No | Manual/descriptive | — |
+| Club Basics | 177 | No | Covered (batch 375): readied reviewed club waives the −4 lethal/subdual conversion penalty; improvised clubs take no improvised penalty; Furious Stance raises the Count at round end by the round’s melee attacks; Out of the Park +2 attack/+2 damage/+2 threat | Native Foundry QA not claimed |
 | Darting Weapon | 178 | No | Start-of-own-Count −2 timed attack/skill tradeoff and one counted final melee/unarmed/hurled Standard Attack execute; current weapon/Count/receipt validated. Shared Nauseated final-attack allowance now executes across the five implemented final-attack controls | — |
 | Flashing Weapon | 178 | No | Earned two-attack/−4 Darting choice executes with durable declaration-scoped counters and own-next-Count expiry; shared Nauseated final-attack limit executes | — |
 | Dueling Basics | 178 | No | Manual/descriptive | — |
@@ -316,7 +316,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Knife Basics | 179 | No | Implemented: GC-reviewed knife family; every carried knife is considered readied without occupying a hand or spending Quick Draw; Circling Stance halves the target’s dodge bonus (round up) in the Incoming attack preview; Between the Ribs full-action knife attack supplies 1 sneak die inside its recorded hit’s damage | Batch374; automated tests and 112 layout fixtures; automatic adjacent-square move and free-hand check are GC-confirmed; sneak-condition ruling pending; native Foundry QA not run in the cloud session |
 | Polearm Basics | 179 | No | Implemented: readied reviewed polearm +1 gear Defense, adjacent-target penalty waiver, Fend completed5ft movement and Striking Stance adjacent-entry reaction | Batches320/367–369; actual attacking family/source, shared limits, stance caps, adopted source/replay/recovery and native controls/reload verified |
 | Spear Basics | 179 | No | Implemented: readied spear actual Bull Rush/Trip skill+2gear, including supported defense/counter/conveyance scopes, Gripping Stance and Spear Charge | Batches317/348/360/364/365/371; actual source/total held capacity, completed route/current Speed/stance caps, recorded-hit damage/recovery, native controls and printed-benefit audit verified |
-| Staff Basics | 179 | No | Partial: readied reviewed staff +3 gear with Jump, Whirling lower-level flanking protection, Thread the Needle hit/hold/release, holder movement ending and accepted opposed Athletics escape with required move execute | Batches317/366/370/372; actual sources, independent restraint effects, recovery and native reload verified; whole-feat source audit remains |
+| Staff Basics | 179 | No | Covered: readied reviewed staff +3 gear with Acrobatics/Jump (317), Whirling Stance lower-level flanking protection (366), Thread the Needle hit, hold, release, holder movement ending (370) and opposed Athletics escape (372) | Whole-feat source audit in batch 375; native reload verified in the earlier batches |
 | Sword Basics | 180 | No | Manual/descriptive | — |
 | Whip Basics | 180 | No | Partial: readied reviewed whip +2gear with Jump and ordinary attacking/defending Trip skill checks; Intense Stance, Entwine and other Trip variants remain open | Batches317/360; actual family/readiness/grip/source proof; attacking scope automated tests, native response verified in317 |
 | Autofire Basics | 180 | No | Manual/descriptive | — |
@@ -424,7 +424,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Ambush Basics | 193 | No | Sneak die and role-scoped Cross-Check implemented; outcome rewards remain manual | — |
 | Ambush Mastery | 193 | No | Quick-ambush time/error tradeoff and threat implemented; source synergy checked | — |
 | Ambush Supremacy | 193 | No | Sneak die, approved slow-ambush timing and scoped critical discount implemented; rewards remain manual | — |
-| Bludgeon | 193 | No | Sneak damage conversion exception implemented; attack conversion remains manual | — |
+| Bludgeon | 193 | No | Sneak damage conversion exception implemented; the −4 attack conversion penalty is waived (batch 375) | — |
 | Whack | 196 | No | Subdual sneak bonus implemented; flat-footed persistence remains manual | — |
 | Concealed Carry | 193 | No | Manual/descriptive | — |
 | Deadly Precision | 194 | No | Sneak damage bonus per die implemented | — |
@@ -1526,3 +1526,18 @@ Source: rules reference p.179 (extracted text; original PDF page not visually re
 Interpretations to confirm: (1) following the existing Dirty Fighting/Side Stance precedent, the trick die is an earned sneak die still subject to the general p.339 conditions (target flanked, helpless or vulnerable; reachable vitals; characters only) — **new unanswered ruling**; (2) like Chop!/Hack!/Crush!, the trick is limited to melee Standard Attacks, so a thrown knife does not use it; (3) Knife Basics alone does not count as “ability to inflict sneak attack damage” for prerequisites.
 
 Verification: 513 legacy assertions, 3067 Node tests (1412+1655) including 17 new Knife tests, 6 cold pack checks and 112 browser layout fixtures passed (layout run used the container’s Chromium via an explicit executable path). Native Foundry QA is **not claimed**. Inventory: 113 manual / 54 partial / 147 other; at least 167 of 314 explicitly unfinished. Audit: `qa/implementation-374.json`.
+
+## Residual implementation batch 375 — Staff Basics closure and Club Basics
+
+Source: rules reference pp.177, 179, 193 and 345 (text read from the user’s local markdown edition; original PDF pages were not visually re-checked).
+
+- **Staff Basics audit.** Every printed benefit maps to existing work: the +3 gear bonus with Acrobatics/Jump while holding a readied staff (317), Whirling Stance (366), and Thread the Needle’s hit, hold and three endings: escape (372), release and holder movement beyond 5 ft. (370). No code change; the feat is closed on that evidence.
+- **Damage conversion (p.345).** Not implemented before. `module/rules/damage-conversion.mjs` adds an attack declaration for unarmed, melee and hurled weapons that deals subdual instead of lethal damage, or the reverse, at −4 attack. The attack and ranged-attack dialogs offer it (the ranged dialog only for hurled weapons). The attack card records `damageConversion` with its direction and any waiver. Bludgeon waives the penalty for any eligible attack.
+- **Club Basics.** `club` is a GC-reviewed melee family (Blunt, Exotic Blunt).
+  - Conversion: an attack made with the character’s actual readied club takes no conversion penalty. Interpretation: “while holding a readied club” is read as the attacking weapon being that club, not any held club.
+  - Improvised clubs: an improvised weapon the GC classes as a club takes no −2 improvised penalty.
+  - Furious Stance: joins the shared stance lifecycle. When a started combat advances a round, the GC’s client counts the character’s original melee attack records from the round that ended (rerolls and the defender’s side of a Disarm excluded) and raises the Initiative Count by that number. The combatant records the last counted round, so a round is never counted twice and a rewound round is skipped. A GC-only chat note reports each change.
+  - Out of the Park: a full-action club trick, +2 attack, +2 recorded-hit damage, +2 threat range.
+- Trick notes now cite each trick’s own page instead of a shared “pp.176,179”.
+
+Verification: 513 legacy assertions, 3324 Node tests (10 new Club Basics tests), 8 pack checks. Layout fixtures were not re-run (no template change). Native Foundry QA is **not claimed**. Inventory: 112 manual / 53 partial / 149 other; at least 165 of 314 explicitly unfinished; 31 whole-feat closures (Staff Basics, Club Basics).

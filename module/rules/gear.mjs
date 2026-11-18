@@ -432,7 +432,13 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
       .replace(/[–−]/g, "-")
       .match(/INA\s*\(([+-]?\d+)\)/)?.[1] ?? 0
   );
-  const improvisedPenalty = weapon.improvised && !system.activeFeatNames?.includes("Improvised Weapon Basics") ? -2 : 0;
+  // Club Basics (p.177): an improvised weapon the GC classed as a club carries no improvised penalty.
+  const improvisedPenalty =
+    weapon.improvised &&
+    !system.activeFeatNames?.includes("Improvised Weapon Basics") &&
+    !(weapon.meleeFamily === "club" && system.activeFeatNames?.includes("Club Basics"))
+      ? -2
+      : 0;
   // Whether the attack can be made, and the first reason it cannot: the weapon's own checks and the terms', in order.
   const blocks = terms
     .merge("blocked", [
