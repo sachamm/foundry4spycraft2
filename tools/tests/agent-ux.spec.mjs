@@ -169,3 +169,68 @@ for (const width of [560, 820])
     ).toBeGreaterThanOrEqual(34);
     expect(await page.locator(".window-content").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   });
+
+const dialogUX = readFileSync(new URL("../../module/apps/dialog-theme.mjs", import.meta.url), "utf8");
+
+for (const height of [600, 800])
+  test(`system dialogs keep the dossier theme and confirmation reachable with expanded content at ${height}px`, async ({
+    page
+  }) => {
+    await page.setViewportSize({ width: 1000, height });
+    await page.setContent(`<style>*{box-sizing:border-box}body{margin:0}.application{display:flex;flex-direction:column;position:fixed;left:20px;top:20px;width:560px;padding:0;margin:0}.window-header{padding:8px}.window-content{padding:12px}.standard-form{display:flex;flex-direction:column;gap:12px}footer{display:flex}input,button{font:16px sans-serif}${css}</style>
+  <dialog open class="application dialog" id="system-dialog"><header class="window-header">Skill check</header><div class="window-content"><form class="dialog-form standard-form"><div class="dialog-content"><div class="spycraft2-roll-options"><label>Modifier <input name="modifier" value="2"></label><input name="unavailable" value="ignored" disabled><details><summary>Advanced options</summary><div style="height:900px">Long options</div><label>Last option <input name="last" value="unchanged"></label></details></div></div><footer class="form-footer"><button type="button" data-action="ok">Roll selected check</button></footer></form></div></dialog>
+  <div class="application dialog" id="unrelated" style="left:650px;width:250px"><div class="window-content">Unrelated Foundry dialog</div></div>`);
+    await load(page, dialogUX, "themeSystemDialog");
+    const before = await page.locator("form").evaluate(form => Object.fromEntries(new FormData(form)));
+    await page.evaluate(() => {
+      window.themeSystemDialog({ element: document.querySelector("#system-dialog") });
+      window.themeSystemDialog({ element: document.querySelector("#unrelated") });
+    });
+    await expect(page.locator("#system-dialog")).toHaveClass(/sc2-dialog/);
+    await expect(page.locator("#unrelated")).not.toHaveClass(/spycraft2/);
+    await page.getByText("Advanced options", { exact: true }).click();
+    await page.getByLabel("Last option").scrollIntoViewIfNeeded();
+    await expect(page.getByLabel("Last option")).toBeInViewport();
+    await expect(page.getByRole("button", { name: "Roll selected check" })).toBeInViewport();
+    expect(await page.locator("form").evaluate(form => Object.fromEntries(new FormData(form)))).toEqual(before);
+  });
+
+test("inventory and toolbar controls have contextual labels and retain the original item action targets", async ({
+  page
+}) => {
+  await page.setContent(`<style>${css}</style><div class="spycraft2 application sheet agent" style="width:560px"><section class="tab gear">
+    <h3>Gear <span class="controls"><a data-action="browse" data-type="gear"><i aria-hidden="true"></i></a><a data-action="createItem" data-type="gear"><i aria-hidden="true"></i></a></span></h3>
+    <ul class="inventory-weapons"><li class="inventory-weapon" data-item-id="weapon"><div class="inventory-title"><a class="inventory-name" data-action="itemEdit">A very long weapon name ${"Descriptive ".repeat(12)}</a><span class="equipment-state">Equipped</span></div><div class="inventory-rolls"><a data-action="rollAttack" class="sc2-primary-action">Attack +3</a><a data-action="rollDamage">Damage 1d10+1</a></div><dl class="inventory-stats"><div><dt>Fire mode</dt><dd>Single-Shot</dd></div><div><dt>Range increment</dt><dd>25 ft</dd></div></dl><details class="inventory-details" data-key="weapon-weapon"><summary>Equipment and ammunition</summary><p>Printed ammunition stockpile: 52 shots.</p><span class="controls"><a data-action="itemEquip"><i aria-hidden="true"></i></a><a data-action="itemDelete"><i aria-hidden="true"></i></a></span></details></li></ul>
+    <div class="inventory-table-wrap"><table class="inventory-table"><tr><td>Armor information in a wide table</td></tr></table></div>
+  </section></div>`);
+  await load(page, sheetUX, "enhanceAgentSheet");
+  await page.evaluate(() => {
+    window.enhanceAgentSheet(
+      document.querySelector(".agent"),
+      {
+        editMode: false,
+        actor: { items: { contents: [{ id: "weapon", name: "Reviewed weapon", system: { equipped: true } }] } }
+      },
+      {}
+    );
+    window.clicked = null;
+    document.querySelector(".agent").addEventListener("click", event => {
+      const action = event.target.closest("[data-action]");
+      if (action)
+        window.clicked = { action: action.dataset.action, item: action.closest("[data-item-id]")?.dataset.itemId };
+    });
+  });
+  await expect(page.getByRole("button", { name: "Browse gear" })).toHaveText("Browse gear");
+  await expect(page.getByRole("button", { name: "Add gear" })).toHaveText("Add gear");
+  await page.getByText("Equipment and ammunition", { exact: true }).click();
+  const remove = page.getByRole("button", { name: "Remove Reviewed weapon" });
+  await expect(remove).toHaveText("Remove");
+  await expect(page.getByRole("button", { name: "Unequip Reviewed weapon" })).toHaveAttribute(
+    "title",
+    "Unequip Reviewed weapon"
+  );
+  await remove.locator("span").click();
+  expect(await page.evaluate(() => window.clicked)).toEqual({ action: "itemDelete", item: "weapon" });
+  expect(await page.locator(".gear").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  expect(await page.locator(".inventory-table-wrap").evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
+});

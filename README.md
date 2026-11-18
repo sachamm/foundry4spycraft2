@@ -197,3 +197,14 @@ reminders by tab. **Continue setup** opens the relevant tab or choice browser,
 selects the reminder's skill level where applicable, and focuses the matching
 build controls. The checklist reports outstanding reminders, not a completion
 percentage; character-building warnings remain separate.
+
+Weapons on Gear use individual cards: attack and damage controls come first,
+followed by firing mode, error/threat and range. **Equipment & ammunition** holds
+ammunition planning and equip/remove controls. Printed stockpile sizes are labelled
+separately from ammunition remaining. Armor, gear and vehicles retain tables with
+clear action labels, empty-state guidance and contained scrolling at narrow widths.
+
+Spycraft roll and character dialogs use the dossier palette, readable inputs and
+a confirmation footer outside the scrolling options. Unrelated Foundry dialogs
+keep their normal appearance. Toolbars include visible action labels, and compact
+icon controls have contextual names and tooltips.

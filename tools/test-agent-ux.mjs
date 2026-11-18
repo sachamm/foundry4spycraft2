@@ -10,6 +10,54 @@ import {
   activeConditionLabels
 } from "../module/sheets/agent-ux.mjs";
 import { COMBAT_STANCES } from "../module/rules/combat-stance.mjs";
+import { systemDialog } from "../module/apps/dialog-theme.mjs";
+
+test("the dialog skin preserves caller options, callbacks, cancellation and rejected operations", async () => {
+  const previous = globalThis.foundry,
+    render = () => {},
+    options = {
+      classes: ["custom"],
+      content: '<input name="amount" value="2">',
+      render,
+      window: { title: "Review" },
+      rejectClose: false
+    };
+  const captured = [];
+  globalThis.foundry = {
+    applications: {
+      api: {
+        DialogV2: {
+          input: async opts => {
+            captured.push(opts);
+            return null;
+          },
+          confirm: async opts => {
+            captured.push(opts);
+            return false;
+          }
+        }
+      }
+    }
+  };
+  try {
+    assert.equal(await systemDialog.input(options), null);
+    assert.equal(await systemDialog.confirm(options), false);
+    for (const result of captured) {
+      assert.equal(result.content, options.content);
+      assert.equal(result.render, render);
+      assert.equal(result.window, options.window);
+      assert.equal(result.rejectClose, false);
+      assert.deepEqual(result.classes, ["custom", "spycraft2", "sc2-dialog"]);
+    }
+    assert.deepEqual(options.classes, ["custom"]);
+    foundry.applications.api.DialogV2.input = async () => {
+      throw new Error("Rejected operation");
+    };
+    await assert.rejects(systemDialog.input(options), /Rejected operation/);
+  } finally {
+    globalThis.foundry = previous;
+  }
+});
 
 test("repeated build choices are counted without merging different destinations or changing engine data", () => {
   const task = { tab: "classes", text: "Pointman: choose a skill for Versatility at class level 1." };
