@@ -1173,7 +1173,13 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.qualityNaturalDR = B.get("qualityNaturalDR");
   const classDR = B.get("naturalDR");
   sys.naturalDR = Math.max(classDR, sys.qualityNaturalDR);
-  const independentFeatDR = sys.superiorCoverState.dr + (sys.activeFeatNames.includes("Too Ugly to Die") ? 2 : 0);
+  // Death Ride, p.192: DR equal to the Chase feats while driving a vehicle or riding a mount.
+  sys.deathRideDR =
+    sys.activeFeatNames.includes("Death Ride") && sys.operatingVehicle === true
+      ? sys.activeFeatSelections.filter(f => f.tree === "chase").length
+      : 0;
+  const independentFeatDR =
+    sys.superiorCoverState.dr + (sys.activeFeatNames.includes("Too Ugly to Die") ? 2 : 0) + sys.deathRideDR;
   sys.dr = {
     melee: Math.max(sys.qualityNaturalDR, (sys.armor?.dr ?? 0) + classDR) + independentFeatDR,
     other: Math.max(sys.qualityNaturalDR, (sys.armor?.drRanged ?? 0) + classDR) + independentFeatDR

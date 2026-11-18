@@ -272,6 +272,21 @@ export function limitedUseAbilities(system, items, cfg) {
   if (allOrNothing) add(allOrNothing);
   const fortunate = fortunateSpec(system);
   if (fortunate) add(fortunate);
+  // Scene-limited feat uses settled at the table; the sheet's Use button spends them and posts the use.
+  for (const [id, feat, name] of [
+    ["babyIt", "Baby It", loc`Baby It (a vehicle you operate ignores a critical hit until the scene ends, p.191)`],
+    [
+      "crewDog",
+      "Crew Dog",
+      loc`Crew Dog (an extra d6 action die in a crewed vehicle, for vehicle-related results only, p.191)`
+    ],
+    [
+      "venomousDialogue",
+      "Venomous Dialogue",
+      loc`Venomous Dialogue (after a successful Taunt, the target makes no attacks until attacked or the scene ends, p.205)`
+    ]
+  ])
+    if (system.activeFeatNames?.includes(feat)) add({ id, name, period: "scene", limit: 1, workflow: "manual" });
   if (system.activeFeatNames?.includes("Opportunist"))
     add({
       id: "opportunist",

@@ -454,6 +454,10 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           ownTurnIndex: duelingCombat.turns?.findIndex(c => c.id === duelingOwn?.id) ?? -1
         }
       : null;
+    // Death Ride: whether this character is driving a vehicle or riding a mount (its recorded driver).
+    this.operatingVehicle = [...(globalThis.game?.actors ?? [])].some(
+      a => a.type === "vehicle" && a.system?.driver === this.parent.uuid
+    );
     // Fight Defensively lasts 1 full round from the character's own Count.
     const fightCombat = this.fightDefensively?.combatId
       ? globalThis.game?.combats?.get?.(this.fightDefensively.combatId)

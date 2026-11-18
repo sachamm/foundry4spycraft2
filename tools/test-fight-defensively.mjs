@@ -13,7 +13,14 @@ import { activeRoundStates } from "../module/apps/round-state-effects.mjs";
 const context = () => ({ id: "combat", started: true, round: 2, turn: 1, combatantId: "own", ownTurnIndex: 1 });
 const record = () => ({ version: 1, combatId: "combat", combatantId: "own", startRound: 2, dueRound: 3 });
 
-function calculate({ declared = false, feats = [], specialty = null, combat = context() } = {}) {
+function calculate({
+  declared = false,
+  feats = [],
+  specialty = null,
+  combat = context(),
+  extra = {},
+  tree = null
+} = {}) {
   const cls = {
     id: "test",
     type: "class",
@@ -35,7 +42,7 @@ function calculate({ declared = false, feats = [], specialty = null, combat = co
       system: {
         granted: true,
         bonuses: [],
-        tree: name.startsWith("Equilibrium") || name === "Covert X" ? "covert" : ""
+        tree: tree?.(name) ?? (name.startsWith("Equilibrium") || name === "Covert X" ? "covert" : "")
       }
     })),
     ...(specialty
@@ -52,7 +59,8 @@ function calculate({ declared = false, feats = [], specialty = null, combat = co
       misc: {},
       conditionContext: {},
       fightDefensivelyCombatContext: combat,
-      fightDefensively: declared ? record() : null
+      fightDefensively: declared ? record() : null,
+      ...extra
     },
     items,
     cfg
@@ -140,4 +148,15 @@ test("Not the Face: Charisma-modifier DR against melee and unarmed attacks only 
   assert.equal(s.armorDRByAttack.meleeWeapon, plain.armorDRByAttack.meleeWeapon + 2);
   assert.equal(s.armorDRByAttack.rangedWeapon, plain.armorDRByAttack.rangedWeapon);
   assert.equal(s.armorDRByAttack.hurledWeapon, plain.armorDRByAttack.hurledWeapon);
+});
+
+test("Death Ride: DR equal to the Chase feats only while operating a vehicle", () => {
+  const feats = ["Death Ride", "Daredevil", "Demolition Derby"],
+    tree = () => "chase";
+  const off = calculate({ feats, tree }),
+    on = calculate({ feats, tree, extra: { operatingVehicle: true } });
+  assert.equal(off.deathRideDR, 0);
+  assert.equal(on.deathRideDR, 3);
+  assert.equal(on.dr.melee, off.dr.melee + 3);
+  assert.equal(on.armorDRByAttack.rangedWeapon, off.armorDRByAttack.rangedWeapon + 3);
 });
