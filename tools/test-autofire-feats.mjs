@@ -156,3 +156,18 @@ test("Bounce: −2 and error +1 a surface, up to Dexterity; Grenade Basics and F
   assert.ok(bouncePlan(sys([]), flame, { bounceSurfaces: 1 }).blocked);
   assert.equal(bouncePlan(sys(["Flamethrower Basics"]), flame, { bounceSurfaces: 1 }).blocked, false);
 });
+
+test("Steel Rain: a carried hurled weapon counts as readied", async () => {
+  const { readiedRangedWeapons } = await import("../module/rules/readied-weapons.mjs");
+  const knife = {
+    id: "k",
+    type: "weapon",
+    name: "Throwing knife",
+    system: { proficiency: "hurled", equipped: false, carried: true, quantity: 1, range: 10, sizeHands: "T/1h" }
+  };
+  const sys = feats => ({ activeFeatNames: feats, abilities: { str: { mod: 0 } } });
+  const ready = readiedRangedWeapons(sys(["Steel Rain"]), [knife]);
+  const not = readiedRangedWeapons(sys([]), [knife]);
+  assert.equal(ready.length, 1);
+  assert.equal(not.length, 0);
+});

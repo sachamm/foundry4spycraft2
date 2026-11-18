@@ -5,6 +5,11 @@ import { loc } from "../i18n.mjs";
 /** Gear represents a physically held/readied personal weapon with equipped+carried flags.
  * Ammunition and proficiency are not prerequisites for merely holding the weapon.
  */
+const steelRainReadied = (system, w) =>
+  system?.activeFeatNames?.includes("Steel Rain") === true &&
+  ["hurled", "exoticHurled"].includes(w.proficiency) &&
+  !/\bBLS\b/.test(w.qualities ?? "") &&
+  w.carried !== false;
 export function readiedRangedWeapons(system, items = []) {
   const ready = [];
   for (const item of items) {
@@ -14,7 +19,8 @@ export function readiedRangedWeapons(system, items = []) {
       item.type !== "weapon" ||
       typeof id !== "string" ||
       !id ||
-      w.equipped !== true ||
+      // Steel Rain (p.182): any hurled weapon on the character's person counts as readied.
+      (w.equipped !== true && !steelRainReadied(system, w)) ||
       w.carried === false ||
       !Number.isSafeInteger(w.quantity ?? 1) ||
       (w.quantity ?? 1) < 1 ||
