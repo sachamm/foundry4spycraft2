@@ -262,12 +262,12 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Mobile Defense | 175 | No | Movement checker suppresses Run flat-footedness; Count-for-dodge option remains open | — |
 | Mobile Offense | 175 | No | One counted final Standard Attack during a GC-confirmed Standard Move executes with route/attack-point/current-Speed checks and an already recorded Total Defense move; actual token movement/action budgets remain manual | — |
 | Containment Basics | 172 | No | Manual/descriptive | — |
-| Containment Mastery | 172 | No | Manual/descriptive | — |
+| Containment Mastery | 172 | No | Covered (batch 393): once per round, Diversion or Taunt as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Containment Supremacy | 174 | No | Manual/descriptive | — |
 | Contempt | 174 | No | One counted final Standard Attack per round and starting-dice uses per combat execute with actual standard/animal target checks; geometry, ammunition and damage remain table-managed | — |
 | Explosive Basics | 174 | No | Manual/descriptive | — |
-| Fire-Team Basics | 174 | No | Manual/descriptive | — |
-| Fire-Team Mastery | 174 | No | Manual/descriptive | — |
+| Fire-Team Basics | 174 | No | Covered (batch 393): once per round, Cover Fire as a free action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
+| Fire-Team Mastery | 174 | No | Covered (batch 393): once per round, a Medicine/Stabilize check as a free action with a GC-confirmed 2-to-1 advantage; bringing injured and dead teammates along when leaving combat is narrative | Native Foundry QA not claimed |
 | Fire-Team Supremacy | 174 | No | Manual/descriptive | — |
 | Great Fortitude | 174 | No | Complete: +3 maximum wounds and +3 base Fortitude; the base increase correctly feeds current Toughness | — |
 | Guts | 174 | No | Three named Athletics bonuses and Fatigued penalty exemption execute without negating escalation/recovery; durable Table of Ouch d10 executes; injury application and Revolving Door remain manual | — |
@@ -281,7 +281,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Snake Strike | 175 | No | Manual/descriptive | — |
 | Surge of Speed | 175 | No | Partial: confirmed non-attack half-action conversion, once per round and starting-dice session allowance; chosen action settlement remains manual | Batch232; concurrent calls, refunds, source loss, visible counters and native persistence |
 | Tac-Squad Basics | 175 | No | Manual/descriptive | — |
-| Tac-Squad Mastery | 175 | No | Manual/descriptive | — |
+| Tac-Squad Mastery | 175 | No | Covered (batch 393): once per round, Suppressive Fire as a half action with a GC-confirmed 2-to-1 advantage | Native Foundry QA not claimed |
 | Tac-Squad Supremacy | 175 | No | Manual/descriptive | — |
 | Tactical Advantage | 175 | No | GC-confirmed roster counting enforces teammate scope, nonstacking and higher-source precedence; Joint Action DC ruling and half-action leadership remain open | — |
 | Toughness | 176 | Yes | Complete: current base Fortitude adds maximum vitality once per selection, capped at three; Great Fortitude and source changes recalculate it | — |
@@ -350,7 +350,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Berserker Mastery | 183 | No | Covered (batch 386): free entry, 3d4+3 rounds, Strength and Constitution +5 | Native Foundry QA not claimed |
 | Berserker Supremacy | 184 | No | Partial (batch 386): free ending, 4d4+4 rounds, fatigued instead of exhausted; the +4 to resist becoming frenzied is a save reminder, since saves do not record what they resist | Native Foundry QA not claimed |
 | Boxing Basics | 184 | No | Covered (batch 392): +2 wound points; Closed Stance (+2 unarmed damage against an opponent the damage roll confirms shares the square; DR 2/— against them and their lost bonus 5-ft. steps are card reminders, as DR is applied at the table); Double Jab (unarmed Standard Attacks at −2, damage −2 per die, minimum 1) | Native Foundry QA not claimed |
-| Boxing Moves | 185 | No | Manual/descriptive | — |
+| Boxing Moves | 185 | No | Covered (batch 393): Knock Out and Wallop on unarmed Standard Attacks (their damage roll states whether damage beat the known target’s Constitution, or the Reflex DC 10 + damage); Weather the Storm as two free Tire actions per round during Total Defense; one unarmed trick per action | Native Foundry QA not claimed |
 | Boxing Supremacy | 185 | No | Partial: static numerical effects | — |
 | Brawling Basics | 185 | No | Partial: static numerical effects | — |
 | Brawling Moves | 185 | No | Manual/descriptive | — |
@@ -434,7 +434,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Equilibrium Mastery | 194 | No | Partial: narrow/uneven Balance DC−5, error−1 and Vision tag ignored | Batches301/305/307; all three normal declared benefits verified: Balance surfaces, ordinary Resist Trip dodge and full-Speed Tumble; source/count/Speed/condition/evidence guards, Skills UI and native receipts; broader combinations, physical action sequencing and outcomes remain open |
 | Equilibrium Supremacy | 194 | No | Manual/descriptive | — |
 | Executioner | 194 | No | Numeric sneak-dice prerequisite implemented; effects remain manual | — |
-| Merciless | 195 | No | Manual/descriptive | — |
+| Merciless | 195 | No | Covered (batch 393): once per round, a Coup de Grace against a helpless character as a free action | Native Foundry QA not claimed |
 | Faceless | 195 | No | Partial: automatic Sneak rank synergy on all Blend checks and declared standalone information-gathering skill time×3 | Batches283,285; passive/manual distinction, typed stacking, actual target/purpose/source/rank/evidence guards and native persistence verified; timing combinations await p.329 ruling; whole tasks/conflicts, class abilities, Requests and other options remain open |
 | Traceless | 196 | No | Partial: automatic Blend rank synergy on all Falsify checks | Batch283; all named uses, typed stacking, source/rank/evidence guards and native persistence verified; opponent DC/Tracking gate and Analysis task count increase remain open |
 | Zeroed | 196 | No | Partial: active Covert feat count increases opposing Analysis/Investigation error ranges | Batch284; actual readable selected target, all named uses, pre-reduction order, source/count/evidence guards and native persistence verified; physical-evidence threat/critical-success gate remains open |
@@ -1724,3 +1724,13 @@ Source: rules reference p.184 (local markdown edition; original PDF page not vis
 - Kicking Moves leaves `feat-reminders.json` (tables regenerated).
 
 Verification: 513 legacy assertions, 3401 of 3402 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 77 manual / 56 partial / 181 other; at least 133 of 314 explicitly unfinished; 63 whole-feat closures.
+
+## Residual implementation batch 393 — Boxing Moves and the round-action feats
+
+Source: rules reference pp.172–175, 185, 195 (local markdown edition; original PDF pages not visually re-checked).
+
+- **Round actions** (`ROUND_ACTION_FEATS` in `module/rules/feat-free-actions.mjs`). The existing Quick Draw / Surge of Speed free-action workflow now also converts the actions of Containment Mastery (Diversion or Taunt), Fire-Team Basics (Cover Fire), Fire-Team Mastery (Medicine/Stabilize), Tac-Squad Mastery (Suppressive Fire as a half action) and Merciless (Coup de Grace). Each has its own per-round use with GC review and a “Use now” link on the Feats tab. The team feats require the GC to confirm a 2-to-1 or greater advantage; the action itself is resolved at the table.
+- **Boxing Moves:** Weather the Storm is a round action too: two free Tire actions per round, at any Count, only while Total Defense is active. Knock Out and Wallop are unarmed Standard Attack tricks (`BOXING_TRICKS`). A resolved hit’s card offers its damage roll, then posts the effect: Knock Out compares the damage to the target sheet’s Constitution when the target is known, and Wallop gives the Reflex DC (10 + damage). Double Jab, Boxing Moves and Kicking Moves tricks cannot combine on one action.
+- Boxing Moves, Merciless, Fire-Team Basics and Tac-Squad Mastery leave `feat-reminders.json` (tables regenerated).
+
+Verification: 513 legacy assertions, 3406 of 3407 Node tests (5 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 71 manual / 56 partial / 187 other; at least 127 of 314 explicitly unfinished; 69 whole-feat closures.

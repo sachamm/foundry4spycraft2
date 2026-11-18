@@ -64,3 +64,25 @@ test("Closed Stance adds +2 unarmed damage only against an opponent sharing the 
   });
   assert.match(html, /name="closedStanceTarget"/);
 });
+
+test("Boxing Moves: Knock Out and Wallop ride an unarmed Standard Attack; one unarmed trick per action", async () => {
+  const { boxingTrickPlan, boxingTrickDamageNote } = await import("../module/rules/boxing.mjs");
+  const owner = { activeFeatNames: ["Boxing Moves", "Boxing Basics", "Kicking Moves"] };
+  assert.equal(boxingTrickPlan(owner, fists, { trick: "wallop" }).name, "Wallop");
+  assert.ok(boxingTrickPlan({ activeFeatNames: [] }, fists, { trick: "wallop" }).blocked);
+  assert.ok(boxingTrickPlan(owner, fists, { trick: "knockOut", attackAction: "other" }).blocked);
+  assert.match(boxingTrickDamageNote("wallop", 7), /DC 17/);
+  assert.match(
+    boxingTrickDamageNote("knockOut", 13, { system: { abilities: { con: { value: 12 } } } }),
+    /exceeds .* 12; .*unconscious/
+  );
+  assert.match(
+    boxingTrickDamageNote("knockOut", 12, { system: { abilities: { con: { value: 12 } } } }),
+    /does not exceed/
+  );
+  assert.match(boxingTrickDamageNote("knockOut", 9), /if 9 damage exceeds/);
+  const { unarmedTrickClash } = await import("../module/rules/boxing.mjs");
+  assert.match(unarmedTrickClash({ doubleJab: true, boxingTrick: "wallop" }), /Only one/);
+  assert.match(unarmedTrickClash({ kickTrick: "backFlip", boxingTrick: "wallop" }), /Only one/);
+  assert.equal(unarmedTrickClash({ boxingTrick: "wallop" }), "");
+});

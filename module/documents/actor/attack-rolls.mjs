@@ -285,6 +285,7 @@ export const ActorAttackRolls = Base =>
             kick: atk.kick ?? null,
             kickTrick: atk.kickTrick ?? null,
             doubleJab: atk.doubleJab ?? null,
+            boxingTrick: atk.boxingTrick ?? null,
             meleeTradeoff: atk.meleeTradeoff,
             grippingStance: grippingAttackProof(
               this.system,

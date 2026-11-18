@@ -16,9 +16,6 @@
     "Berserker Supremacy": [
       "save"
     ],
-    "Boxing Moves": [
-      "attack"
-    ],
     "Brawling Moves": [
       "attack"
     ],
@@ -46,9 +43,6 @@
     ],
     "Fan Service": [
       "skill:impress"
-    ],
-    "Fire-Team Basics": [
-      "attack"
     ],
     "Fire-Team Supremacy": [
       "attack"
@@ -83,9 +77,6 @@
     ],
     "Living Cipher": [
       "skill:analysis"
-    ],
-    "Merciless": [
-      "attack"
     ],
     "Mingling Basics": [
       "skill:blend"
@@ -145,9 +136,6 @@
     ],
     "Tac-Squad Basics": [
       "skill:intimidate"
-    ],
-    "Tac-Squad Mastery": [
-      "attack"
     ],
     "Tac-Squad Supremacy": [
       "attack"

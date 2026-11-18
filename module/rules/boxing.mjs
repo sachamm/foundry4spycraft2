@@ -99,3 +99,83 @@ rollPipeline.register({
   ],
   read: (context, input) => (input?.closedStanceTarget === true ? { closedStanceTarget: true } : null)
 });
+
+/**
+ * Boxing Moves, p.185: Knock Out (an unarmed Standard Attack whose damage exceeds a standard character’s
+ * Constitution score leaves them unconscious for 1d4 minutes) and Wallop (a successful unarmed Standard Attack forces
+ * a Reflex save, DC 10 + the damage, or the target is drunk for 1d4 rounds). Weather the Storm is a round action
+ * (module/rules/feat-free-actions.mjs).
+ */
+/** Only one unarmed feat trick applies to an action. */
+export function unarmedTrickClash(options = {}) {
+  const tricks = [options.doubleJab === true, !!options.boxingTrick, !!options.kickTrick].filter(Boolean).length;
+  return tricks > 1 ? loc`Only one Unarmed Combat feat trick may apply to this action.` : "";
+}
+
+export const BOXING_TRICKS = Object.freeze({ knockOut: "Knock Out", wallop: "Wallop" });
+
+export function boxingTrickPlan(system, weapon, { trick = "", attackAction = "standard" } = {}) {
+  if (!trick) return null;
+  if (!Object.hasOwn(BOXING_TRICKS, trick) || !system?.activeFeatNames?.includes("Boxing Moves"))
+    return { blocked: true, reason: loc`That trick needs Boxing Moves.` };
+  if (!unarmedWeapon(weapon) || attackAction !== "standard")
+    return { blocked: true, reason: loc`${BOXING_TRICKS[trick]} is made with an unarmed Standard Attack.` };
+  return { blocked: false, version: 1, key: trick, name: BOXING_TRICKS[trick] };
+}
+
+/** The damage card’s line for a Boxing Moves hit, given the damage dealt and the target, if known. */
+export function boxingTrickDamageNote(trick, damage, target = null) {
+  if (trick === "wallop")
+    return loc`Wallop: the target makes a Reflex save, DC ${10 + damage}, or is drunk for 1d4 rounds (p.185).`;
+  if (trick !== "knockOut") return "";
+  const con = target?.system?.abilities?.con?.value;
+  return Number.isFinite(con)
+    ? damage > con
+      ? loc`Knock Out: ${damage} damage exceeds the target’s Constitution ${con}; a standard character falls unconscious for 1d4 minutes (p.185).`
+      : loc`Knock Out: ${damage} damage does not exceed the target’s Constitution ${con} (p.185).`
+    : loc`Knock Out: if ${damage} damage exceeds a standard character’s Constitution score, they fall unconscious for 1d4 minutes (p.185).`;
+}
+
+rollPipeline.register({
+  id: "boxingMovesContent:attack",
+  dialogs: ["attack"],
+  order: 71,
+  dialog: ({ item, actor }) => [
+    {
+      at: 61,
+      html:
+        unarmedWeapon(item?.system) && actor?.system?.activeFeatNames?.includes("Boxing Moves")
+          ? `<label>${loc`Boxing Moves trick`} <select name="boxingTrick"><option value="">${loc`None`}</option>${Object.entries(
+              BOXING_TRICKS
+            )
+              .map(([k, n]) => `<option value="${k}">${n}</option>`)
+              .join("")}</select></label>`
+          : ""
+    }
+  ],
+  read: ({ entered }) => (entered?.boxingTrick ? { boxingTrick: String(entered.boxingTrick) } : null)
+});
+
+rollPipeline.register({
+  id: "boxingMovesAttackTerm",
+  kinds: ["attack"],
+  order: 9181,
+  terms({ system, weapon, options }) {
+    const plan = boxingTrickPlan(system, weapon, {
+        trick: options.boxingTrick ?? "",
+        attackAction: options.attackAction ?? "standard"
+      }),
+      clash = unarmedTrickClash(options);
+    return {
+      key: "boxingTrick",
+      plan: plan && !plan.blocked ? plan : null,
+      blockAt: 199,
+      blocked: clash || (plan?.blocked ? plan.reason : ""),
+      noteAt: 499,
+      notes:
+        plan && !plan.blocked
+          ? [loc`${plan.name}: roll this hit’s damage from the card to see its effect (p.185).`]
+          : []
+    };
+  }
+});

@@ -11344,10 +11344,6 @@ export const FEAT_REMINDERS = {
   "rolls": "save",
   "text": "End rage freely; rages last 4d4+4 rounds, +4 to resist frenzy, and you're only fatigued afterwards."
  },
- "Boxing Moves": {
-  "rolls": "attack",
-  "text": "Gain boxing tricks that can knock out or daze standard characters."
- },
  "Brawling Moves": {
   "rolls": "attack",
   "text": "Gain brawling tricks such as body slams and feints that boost your Defense."
@@ -11383,10 +11379,6 @@ export const FEAT_REMINDERS = {
  "Fan Service": {
   "rolls": "skill:impress",
   "text": "Use Impress for Diversion and Feint, and as a full action affect every opponent in range."
- },
- "Fire-Team Basics": {
-  "rolls": "attack",
-  "text": "With a 2-to-1 advantage, take Cover Fire as a free action once per round."
  },
  "Fire-Team Supremacy": {
   "rolls": "attack",
@@ -11431,10 +11423,6 @@ export const FEAT_REMINDERS = {
  "Living Cipher": {
   "rolls": "skill:analysis",
   "text": "Work codes in your head as if using a computer, and computers you use count as 1 Power Rating higher."
- },
- "Merciless": {
-  "rolls": "attack",
-  "text": "Once per round, Coup de Grace a helpless character as a free action."
  },
  "Mingling Basics": {
   "rolls": "skill:blend",
@@ -11511,10 +11499,6 @@ export const FEAT_REMINDERS = {
  "Tac-Squad Basics": {
   "rolls": "skill:intimidate",
   "text": "With a 2-to-1 advantage, once per round Threaten for free or roll Intimidate/Coercion with a half action."
- },
- "Tac-Squad Mastery": {
-  "rolls": "attack",
-  "text": "With a 2-to-1 advantage, take Suppressive Fire as a half action once per round."
  },
  "Tac-Squad Supremacy": {
   "rolls": "attack",

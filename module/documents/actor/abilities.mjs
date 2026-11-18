@@ -3,7 +3,12 @@ import { ruleName } from "../../rules/rule-name.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { useMark, discloseMark, correctMark } from "../../apps/mark.mjs";
 import { improvisedMasterySpec } from "../../rules/improvised-weapons.mjs";
-import { featFreeActionPlan, FREE_ACTION_FEATS, QUICK_DRAW_ACTIONS } from "../../rules/feat-free-actions.mjs";
+import {
+  featFreeActionPlan,
+  FREE_ACTION_FEATS,
+  QUICK_DRAW_ACTIONS,
+  ROUND_ACTION_FEATS
+} from "../../rules/feat-free-actions.mjs";
 import { FINAL_ATTACK_WORKFLOWS, withFinalRoundReservation } from "../../rules/final-round.mjs";
 import { actionDieBenefitQuote } from "../../rules/benefit-payments.mjs";
 import { surchargeFundingInput, unrolledPaymentFundingInput } from "../../apps/action-die-benefits.mjs";
@@ -298,6 +303,21 @@ export const ActorAbilities = Base =>
       if (!Object.hasOwn(FREE_ACTION_FEATS, source)) throw new Error(loc`Choose a supported free-action feat.`);
       let input = options;
       const esc = foundry.utils.escapeHTML;
+      const round = ROUND_ACTION_FEATS[source];
+      if (round && !Object.keys(input).length) {
+        input = await systemDialog.input({
+          window: { title: FREE_ACTION_FEATS[source] },
+          rejectClose: false,
+          content: `<div class="spycraft2-roll-options"><p>${loc`${round.perRound} per round: take the action below as a ${round.cost} action. Resolve the action itself normally at the table.`}</p><label>${loc`Action`} <select name="action">${round.actions
+            .map(a => `<option value="${esc(a)}">${esc(a)}</option>`)
+            .join("")}</select></label>${
+            round.advantage
+              ? `<label><input type="checkbox" name="advantageConfirmed" /> ${loc`The GC confirms your side has a 2-to-1 or greater advantage`}</label>`
+              : ""
+          }<label>${loc`Target and circumstances`} <textarea name="description" maxlength="1000" required></textarea></label><label><input type="checkbox" name="confirmed" /> ${loc`GC confirms this action is otherwise legal now`}</label></div>`
+        });
+        if (!input) return null;
+      }
       if (!Object.keys(input).length) {
         input = await systemDialog.input({
           window: { title: FREE_ACTION_FEATS[source] },
@@ -325,7 +345,9 @@ export const ActorAbilities = Base =>
             return await ChatMessage.create({
               speaker: ChatMessage.getSpeaker({ actor: this }),
               content: esc(
-                loc`${this.name}: ${fresh.source} — ${fresh.action} as a free action. ${fresh.description} Resolve the ordinary action and its remaining requirements at the table.`
+                fresh.actionCost === "half"
+                  ? loc`${this.name}: ${fresh.source} — ${fresh.action} as a half action. ${fresh.description} Resolve the ordinary action and its remaining requirements at the table.`
+                  : loc`${this.name}: ${fresh.source} — ${fresh.action} as a free action. ${fresh.description} Resolve the ordinary action and its remaining requirements at the table.`
               ),
               flags: {
                 spycraft2: {
