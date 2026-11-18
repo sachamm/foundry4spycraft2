@@ -3,6 +3,7 @@
  * control checks, mounted weapons and placing a vehicle pick on a scene. The arithmetic lives in
  * module/rules/vehicles.mjs and module/rules/vehicle-play-rules.mjs.
  */
+import { motherHenItem, motherHenTransfer, MOTHER_HEN_SAVE } from "../rules/mother-hen.mjs";
 import {
   VEHICLE_DAMAGE_COUNTERS,
   breakState,
@@ -53,12 +54,14 @@ const saveBonusOf = doc => {
   const gadget = doc.system?.gadget;
   if (gadget?.mechanisms?.length) {
     const state = gadgetState(gadget, { itemDamageSave: doc.system.damageSave });
-    if (state.valid) return state.damageSave;
+    if (state.valid) return state.damageSave + (motherHenItem(doc, doc.parent) ? MOTHER_HEN_SAVE : 0);
   }
-  return doc.system?.damageSave;
+  const own = doc.system?.damageSave;
+  // Mother Hen: an owner's Possessions save at +4 (p.197).
+  return Number.isSafeInteger(own) && motherHenItem(doc, doc.parent) ? own + MOTHER_HEN_SAVE : own;
 };
 
-async function damageInput(title, { vehicle = false, flammable = false } = {}) {
+async function damageInput(title, { vehicle = false, flammable = false, motherHen = false } = {}) {
   const input = await ask(
     title,
     `
@@ -66,7 +69,8 @@ async function damageInput(title, { vehicle = false, flammable = false } = {}) {
       <label>${loc`Armor-piercing`} <input name="armorPiercing" type="number" min="0" step="1" value="0" /></label>
       <label><input name="blast" type="checkbox" /> ${loc`The damage has a blast increment`}</label>
       <label><input name="fire" type="checkbox" /> ${loc`Fire damage${flammable ? loc` (Flammable: −5 to the save, damage doubled)` : ""}`}</label>
-      <label><input name="critical" type="checkbox" /> ${loc`An activated critical hit${vehicle ? loc` (also rolls a Vehicle Damage result)` : ""}`}</label>`
+      <label><input name="critical" type="checkbox" /> ${loc`An activated critical hit${vehicle ? loc` (also rolls a Vehicle Damage result)` : ""}`}</label>
+      ${motherHen ? `<label><input name="motherHen" type="checkbox" /> ${loc`Mother Hen: the owner is touching it and makes a Reflex save (DC = the damage) to take half (p.197)`}</label>` : ""}`
   );
   if (!input) return null;
   const damage = Number(input.damage);
@@ -79,7 +83,8 @@ async function damageInput(title, { vehicle = false, flammable = false } = {}) {
     armorPiercing: Math.max(0, Number(input.armorPiercing) || 0),
     blast: input.blast === true,
     fire: input.fire === true,
-    critical: input.critical === true
+    critical: input.critical === true,
+    motherHen: input.motherHen === true
   };
 }
 
@@ -95,8 +100,24 @@ export async function rollObjectDamageSave(doc, options = {}) {
   const flammable = vehicle && hasQuality(qualities, "FLM");
   const input = Number.isSafeInteger(options.damage)
     ? { blast: false, critical: false, fire: false, armorPiercing: 0, ...options }
-    : await damageInput(`${doc.name}: Damage save`, { vehicle, flammable });
+    : await damageInput(`${doc.name}: Damage save`, { vehicle, flammable, motherHen: motherHenItem(doc, doc.parent) });
   if (!input) return null;
+  // Mother Hen: the owner's Reflex save decides how much of the damage the item still takes.
+  if (input.motherHen && motherHenItem(doc, doc.parent)) {
+    const owner = doc.parent,
+      reflex = await new Roll("1d20 + @bonus", { bonus: owner.system.saves?.ref?.total ?? 0 }).evaluate(),
+      split = motherHenTransfer(input.damage, reflex.total);
+    await reflex.toMessage({
+      speaker: ChatMessage.getSpeaker({ actor: owner }),
+      flavor: esc(
+        split.saved
+          ? loc`Mother Hen: Reflex ${reflex.total} vs DC ${input.damage} — ${owner.name} takes ${split.toOwner} of the damage (DR applies unless it is worn armor); ${doc.name} takes ${split.toItem}.`
+          : loc`Mother Hen: Reflex ${reflex.total} vs DC ${input.damage} — failed; ${doc.name} takes all ${input.damage}.`
+      )
+    });
+    if (!split.toItem) return null;
+    input.damage = split.toItem;
+  }
 
   // Flammable vehicles take double fire damage and save at −5 against it (p.293); armor-piercing lowers the bonus (p.224).
   const fireDoubled = input.fire && flammable,

@@ -448,14 +448,14 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Spider Mastery | 196 | No | Manual/descriptive | — |
 | Spider Supremacy | 196 | No | Manual/descriptive | — |
 | Clean and Polished | 197 | No | Conditional personal-gear error cost; maintenance declared | — |
-| Mother Hen | 197 | No | Manual/descriptive | — |
+| Mother Hen | 197 | No | Covered (batch 389): +4 to Damage saves of the owner’s approved Possessions; the item’s Damage save offers the owner’s Reflex save (DC = damage) to take half, rounded up, before the item saves against the rest | Native Foundry QA not claimed |
 | Extra Gear | 197 | Yes | Partial: chosen/roll effects | — |
 | Electronic Warrior | 197 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
 | Micro-miniaturized | 197 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
 | Trap Master | 198 | No | Exact category/focus prerequisite implemented; effects remain manual | — |
-| Favored Gear | 197 | Yes | Manual/descriptive | — |
-| Signature Gear | 197 | Yes | Manual/descriptive | — |
-| Trademark Gear | 197 | No | Manual/descriptive | — |
+| Favored Gear | 197 | Yes | Partial (batch 389): one extra Possession marked “Favored Gear”, not charged to Wealth, Caliber up to a third of career level (rounded up); the per-session action dice against mission Caliber are left to the GC | Native Foundry QA not claimed |
+| Signature Gear | 197 | Yes | Covered (batch 389): a favored item marked Signature gives +1 morale to skill checks and damage rolls made with it, once per feat selection; non-improvised items are never destroyed by critical failures | Native Foundry QA not claimed |
+| Trademark Gear | 197 | No | Covered (batch 389): the signature item marked Trademark gives +2 morale in all, and boosts on those rolls roll 2 dice per action die | Native Foundry QA not claimed |
 | Home Sweet Home | 197 | No | Verified complete: Lifestyle +2, maximum10 | Batch225; all rank boundaries, allocations, duplicate/source removal and cached native item verified |
 | Tool Shed | 197 | Yes | Implemented: one Grade III kit per selection per mission after one hour at home; mission-end loss | Batch249; all16kit choices, provenance, zero-resource acquisition, source/delete guards, expiry, counter and native persistence verified |
 | Pack Rat | 197 | No | Verified complete: Possessions +2, maximum10 | Batch225; all rank boundaries, allocations, duplicate/source removal and cached native item verified |
@@ -1683,3 +1683,13 @@ Source: rules reference p.204 (local markdown edition; original PDF page not vis
 - As with every Request, one matching Reserve pick is consumed and the mission Caliber limit applies. Interpretation: the feats waive the check and the action dice, not the pick.
 
 Verification: 3389 of 3390 Node tests (1 new; the Request suite’s 85 pass). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 83 manual / 55 partial / 176 other; at least 138 of 314 explicitly unfinished; 58 whole-feat closures.
+
+## Residual implementation batch 389 — Mother Hen and the Favored Gear chain
+
+Source: rules reference p.197 (local markdown edition; original PDF page not visually re-checked).
+
+- **Mother Hen** (`module/rules/mother-hen.mjs`). An approved Possession (Wealth, GC grant or Favored Gear) of an owner with the feat saves at +4, including a gadget’s housing save. Its Damage save dialog offers “the owner is touching it”. The owner rolls Reflex (their prepared Reflex total, DC = the damage). On a success they take half, rounded up, posted for the GC to apply with DR unless it is worn armor, and the item saves against the rest; if nothing is left, the item makes no save.
+- **Favored Gear** (`module/rules/favored-gear.mjs`): a new Possession source, “Favored Gear”, on gear, weapon and armor sheets. These items are not charged to the Wealth allowance. The engine warns when there are more favored items than Favored Gear selections, or one is above a third of career level (rounded up). Partial: the session-start action dice gained or discarded against mission Caliber need a die pool restricted to one item, so they stay with the GC.
+- **Signature / Trademark Gear**: a favored item’s sheet sets Signature (1) or Trademark (2). Valid marks (no more than the Signature selections, one Trademark item) add +1 or +2 morale to damage with the item (`weaponDamage`) and to skill checks naming it as gear in use. Trademark boosts on those skill checks and damage rolls roll 2 dice per die (`actionDieBoostPlan`). The system destroys only improvised weapons on errors, so a signature item is never destroyed by a critical failure.
+
+Verification: 513 legacy assertions, 3394 of 3395 Node tests (5 new), schema check clean, 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 79 manual / 56 partial / 179 other; at least 135 of 314 explicitly unfinished; 61 whole-feat closures.

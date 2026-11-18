@@ -1,3 +1,4 @@
+import { signatureBonus } from "./favored-gear.mjs";
 import { markDamagePlan } from "./marks.mjs";
 import { reachWeaponPlan } from "./reach-weapon.mjs";
 import { meleeArmorPiercingPlan } from "./melee-armor-piercing.mjs";
@@ -754,7 +755,14 @@ export function weaponDamage(
   const cqbRange = cqbRangePlan(system, weapon, options, "damage");
   const markDamage = markDamagePlan(system, weapon);
   const conditionDamagePenalty = conditionRollPenalties(system).damage;
-  bonus += conditionDamagePenalty + cqbRange.damageBonus + markDamage.bonus + (options.attackDamageBonus ?? 0);
+  // Signature / Trademark Gear, p.197: +1 or +2 morale to damage with the item.
+  const signatureDamage = signatureBonus(system, weapon.id);
+  bonus +=
+    conditionDamagePenalty +
+    cqbRange.damageBonus +
+    markDamage.bonus +
+    signatureDamage +
+    (options.attackDamageBonus ?? 0);
   const min = parsed.minimum;
   return {
     markDamage,
@@ -873,7 +881,7 @@ export function possessionUnavailable(gear) {
 export function cleanAndPolishedApplies(system, gear) {
   return (
     !!gear &&
-    ["wealth", "gcGrant"].includes(gear.possessionSource) &&
+    ["wealth", "gcGrant", "favoredGear"].includes(gear.possessionSource) &&
     !possessionUnavailable(gear) &&
     !!gear.cleanAndPolishedReady &&
     system.activeFeatNames?.includes("Clean and Polished") === true

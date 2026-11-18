@@ -2,6 +2,7 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { errorDecisionPending } from "./outcomes.mjs";
 import { resolveSkillResult } from "./checks.mjs";
+import { trademarkBoost } from "./favored-gear.mjs";
 import { loc } from "../i18n.mjs";
 /** Doubled-die abilities never exceed two dice per die spent (pp.29,62), including Card Shark p.202. */
 export function actionDieBoostPlan(
@@ -54,7 +55,10 @@ export function actionDieBoostPlan(
       kind === "skill" &&
       (check.checkId === "maneuver" || (check.skillKey === "mechanics" && check.checkId === "repair"))) ||
     (core.has("brawler") && kind === "damage" && (check.unarmed || check.improvised)) ||
-    (core.has("counterterrorist") && openingRound && ["attack", "skill", "knowledge", "damage", "save"].includes(kind));
+    (core.has("counterterrorist") &&
+      openingRound &&
+      ["attack", "skill", "knowledge", "damage", "save"].includes(kind)) ||
+    trademarkBoost(system, check);
   const rolls = count * (doubled ? 2 : 1),
     die = system.actionDice?.die ?? 4,
     explodeAt = system.actionDice?.explodeAt ?? die;

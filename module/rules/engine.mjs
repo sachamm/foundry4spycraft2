@@ -8,6 +8,7 @@ import { polearmDefensePlan } from "./polearm-defense.mjs";
 import { knifeBasicsPlan } from "./knife-basics.mjs";
 import { swordBasicsPlan } from "./sword-basics.mjs";
 import { berserkerRageState } from "./berserker.mjs";
+import { favoredGearState } from "./favored-gear.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -1205,6 +1206,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.disarmWeapons = readiedDisarmWeapons(sys, items);
   sys.knifeBasics = knifeBasicsPlan(sys, items);
   sys.swordBasics = swordBasicsPlan(sys, items);
+  sys.favoredGear = favoredGearState(sys, items);
+  warnings.push(...sys.favoredGear.warnings);
   const heldReview = sys.guardWeapons.blockedReason || sys.disarmWeapons.blockedReason;
   if (heldReview) {
     warnings.push(heldReview);

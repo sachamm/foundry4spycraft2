@@ -11476,10 +11476,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "Gain acrobatic tricks to reposition around and through enemies when attacking."
  },
- "Signature Gear": {
-  "rolls": "attack, damage, skill",
-  "text": "One Favored Gear item grants +1 to checks and damage and can't be destroyed by a critical failure."
- },
  "Spider Basics": {
   "rolls": "skill:athletics",
   "text": "No penalties while climbing (including without a kit), foes get no bonus against climbing you, and Initiative bonus when combat starts on a wall."
@@ -11531,10 +11527,6 @@ export const FEAT_REMINDERS = {
  "This… is my Boomstick": {
   "rolls": "attack",
   "text": "Club foes with a readied shotgun, fire it one-handed at –2, raise its save DCs by 4, and knock targets back 5 ft. on a hit."
- },
- "Trademark Gear": {
-  "rolls": "attack, skill",
-  "text": "Your Signature Gear item's bonus rises to +2, and action dice spent on it roll twice."
  },
  "Trick Shot": {
   "rolls": "attack, damage",

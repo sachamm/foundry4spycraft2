@@ -119,11 +119,6 @@
     "Rolling Moves": [
       "attack"
     ],
-    "Signature Gear": [
-      "attack",
-      "damage",
-      "skill"
-    ],
     "Spider Basics": [
       "skill:athletics"
     ],
@@ -162,10 +157,6 @@
     ],
     "This… is my Boomstick": [
       "attack"
-    ],
-    "Trademark Gear": [
-      "attack",
-      "skill"
     ],
     "Trick Shot": [
       "attack",

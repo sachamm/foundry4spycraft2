@@ -1,3 +1,4 @@
+import { signatureBonus } from "./favored-gear.mjs";
 import { tripAttackSkillChecks, tripCounterSkillCheck } from "./trip-attack.mjs";
 import "./stalking-stance.mjs";
 import "./melee-skill-feats.mjs";
@@ -460,7 +461,16 @@ export function resolveSkillCheck(system, key, check, input = {}) {
     [100, pursuit.bonuses],
     [110, appearancePlan.bonuses],
     [150, qualityChecks.bonuses],
-    [160, [...skillGear.bonuses, ...gearUse.bonuses]],
+    [
+      160,
+      [
+        ...skillGear.bonuses,
+        ...gearUse.bonuses,
+        ...(signatureBonus(system, gearItem?.id)
+          ? [{ type: "morale", value: signatureBonus(system, gearItem.id), source: gearItem.name }]
+          : [])
+      ]
+    ],
     [170, terrainPlan.bonuses],
     [180, senses.bonuses],
     [190, tracking.bonuses]
