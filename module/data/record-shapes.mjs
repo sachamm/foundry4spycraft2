@@ -318,6 +318,15 @@ export const RECORD_SHAPES = {
     tier: "string",
     version: "number"
   },
+  fightDefensively: {
+    $also: "null",
+    combatId: "string",
+    combatantId: "string",
+    dueRound: "number",
+    id: "string",
+    startRound: "number",
+    version: "number"
+  },
   duelingBasics: {
     $also: "null",
     combatId: "string",

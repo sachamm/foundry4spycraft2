@@ -64,6 +64,7 @@ import { enterBerserkerRage, endBerserkerRage } from "../apps/berserker.mjs";
 import { useGunslingersEye } from "../apps/gunslinger.mjs";
 import { takeFireTeamSupremacy } from "../apps/team-final-attack.mjs";
 import { declareDuelingBasics } from "../apps/dueling-basics.mjs";
+import { declareFightDefensively } from "../apps/fight-defensively.mjs";
 import { rollDisarmResponse } from "../apps/disarm-response.mjs";
 import { takeMissTrick } from "../apps/miss-tricks.mjs";
 import { rollCheapShot } from "../apps/cheap-shot.mjs";
@@ -258,6 +259,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       declareDuelingBasics() {
         return declareDuelingBasics(this.actor);
+      },
+      declareFightDefensively() {
+        return declareFightDefensively(this.actor);
       },
       endBerserkerRage() {
         return endBerserkerRage(this.actor);

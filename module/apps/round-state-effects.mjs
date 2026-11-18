@@ -7,6 +7,7 @@
  * Only the active GM's client writes, so two clients never create the same effect.
  */
 import { combatExpertiseState } from "../rules/combat-expertise.mjs";
+import { fightDefensivelyState } from "../rules/fight-defensively.mjs";
 import { combatStanceState } from "../rules/combat-stance.mjs";
 import { dartingStyleState } from "../rules/darting-state.mjs";
 import { activeDefenseBoost, activeFortunesOfWar, activeNoFear } from "../rules/health.mjs";
@@ -41,6 +42,13 @@ export const ROUND_STATES = Object.freeze([
     field: "combatExpertise",
     read: combatExpertiseState,
     label: state => `Combat Expertise −${state.penalty}`,
+    rounds: 1
+  },
+  {
+    key: "fightDefensively",
+    field: "fightDefensively",
+    read: fightDefensivelyState,
+    label: () => "Fighting Defensively",
     rounds: 1
   },
   { key: "superiorCover", field: "superiorCover", read: superiorCoverState, label: () => "Superior Cover", rounds: 1 },

@@ -294,6 +294,7 @@ export class AgentData extends foundry.abstract.TypeDataModel {
       combatStance: record("combatStance", { nullable: true, initial: null }),
       berserkerRage: record("berserkerRage", { nullable: true, initial: null }),
       duelingBasics: record("duelingBasics", { nullable: true, initial: null }),
+      fightDefensively: record("fightDefensively", { nullable: true, initial: null }),
       twoWeaponStyle: record("twoWeaponStyle", { nullable: true, initial: null }),
       dartingStyle: record("dartingStyle", { nullable: true, initial: null }),
       totalDefense: record("totalDefense", { nullable: true, initial: null }),
@@ -451,6 +452,25 @@ export class AgentData extends foundry.abstract.TypeDataModel {
           turn: duelingCombat.turn,
           combatantId: duelingOwn?.id,
           ownTurnIndex: duelingCombat.turns?.findIndex(c => c.id === duelingOwn?.id) ?? -1
+        }
+      : null;
+    // Fight Defensively lasts 1 full round from the character's own Count.
+    const fightCombat = this.fightDefensively?.combatId
+      ? globalThis.game?.combats?.get?.(this.fightDefensively.combatId)
+      : this.parent.participatingCombat;
+    const fightOwn = fightCombat?.turns?.find(
+      c =>
+        c.actor?.uuid === this.parent.uuid &&
+        (!this.fightDefensively?.combatantId || c.id === this.fightDefensively.combatantId)
+    );
+    this.fightDefensivelyCombatContext = fightCombat
+      ? {
+          id: fightCombat.id,
+          started: fightCombat.started,
+          round: fightCombat.round,
+          turn: fightCombat.turn,
+          combatantId: fightOwn?.id,
+          ownTurnIndex: fightCombat.turns?.findIndex(c => c.id === fightOwn?.id) ?? -1
         }
       : null;
     this.totalDefenseCombatContext = totalDefenseCombat

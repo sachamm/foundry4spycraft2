@@ -10,6 +10,7 @@ import { swordBasicsPlan } from "./sword-basics.mjs";
 import { berserkerRageState } from "./berserker.mjs";
 import { favoredGearState } from "./favored-gear.mjs";
 import { duelingAllDodge } from "./dueling-basics.mjs";
+import { fightDefensivelyState } from "./fight-defensively.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -240,6 +241,7 @@ export function computeAgent(sys, items, cfg, options = {}) {
   const progression = sys.progression ?? [];
   const level = progression.length;
   sys.level = level;
+  sys.specialtyName = items.find(i => i.type === "origin" && i.system?.originType === "specialty")?.name ?? "";
   sys.activeFeatSelections = items
     .filter(i => i.type === "feat" && activeFeatIds.has(i.id))
     .map(i => ({ name: ruleName(i), choice: i.system.choice ?? "", tree: i.system.tree ?? "" }));
@@ -1252,6 +1254,14 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.combatExpertiseState = combatExpertiseState(sys);
   if (sys.combatExpertiseState.active)
     B.add("defense", sys.combatExpertiseState.dodgeBonus, "Combat Expertise", "dodge");
+  sys.fightDefensivelyState = fightDefensivelyState(sys);
+  if (sys.fightDefensivelyState.active) {
+    B.add("defense", sys.fightDefensivelyState.dodgeBonus, "Fight Defensively", "dodge");
+    if (sys.fightDefensivelyState.equilibrium)
+      B.add("defense", sys.fightDefensivelyState.equilibrium, "Equilibrium Supremacy", "dodge");
+    if (sys.fightDefensivelyState.tribesman)
+      B.add("defense", sys.fightDefensivelyState.tribesman, "Tribesman (Fight Defensively)");
+  }
   const sideStanceDefense = sideStanceDefensePenalty(sys);
   if (sideStanceDefense) B.add("defense", sideStanceDefense, "Side Stance");
   sys.bonusSources.defense = B.sources.get("defense") ?? [];

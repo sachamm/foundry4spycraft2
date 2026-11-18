@@ -71,7 +71,7 @@ This is an index into the reference pass, not a certificate of complete automati
 | Test Subject | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 | Thrill Seeker | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 | Tradesman | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
-| Tribesman | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
+| Tribesman | specialties | Permanent numerical effects, choices and milestones; the Fight Defensively Defense bonus (+1, rising at Career Levels 5/10/15/20) applies while the declaration lasts (batch 405); the mission melee weapon remains manual |
 | Wanderer | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 | Warrior | specialties | Permanent numerical effects, choices and milestones; conditional benefits remain manual where stated |
 
@@ -432,7 +432,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Crippling Strike | 194 | No | Numeric sneak-dice prerequisite implemented; effects remain manual | — |
 | Equilibrium Basics | 194 | No | Partial: declaration-earned Covert-count dodge bonus with timed Total Defense | Batches290/301/303; timed dodge, declared Balance one-check movement and Falling damage-distance−20 verified, including additive soft landing, source/Speed/evidence guards, Skills UI and native receipts; full movement/landing/damage settlement remains separate |
 | Equilibrium Mastery | 194 | No | Partial: narrow/uneven Balance DC−5, error−1 and Vision tag ignored | Batches301/305/307; all three normal declared benefits verified: Balance surfaces, ordinary Resist Trip dodge and full-Speed Tumble; source/count/Speed/condition/evidence guards, Skills UI and native receipts; broader combinations, physical action sequencing and outcomes remain open |
-| Equilibrium Supremacy | 194 | No | Manual/descriptive | — |
+| Equilibrium Supremacy | 194 | No | Partial (batch 405): while Fighting Defensively (now a sheet declaration for every character: −4 attack/skill checks, +2 dodge for 1 full round, p.357) the character gains dodge equal to half their Covert feats, rounded up; moving through and ending in opponents’ squares, and the flanking it causes, stay with the GC | Native Foundry QA not claimed |
 | Executioner | 194 | No | Numeric sneak-dice prerequisite implemented; effects remain manual | — |
 | Merciless | 195 | No | Covered (batch 393): once per round, a Coup de Grace against a helpless character as a free action | Native Foundry QA not claimed |
 | Faceless | 195 | No | Partial: automatic Sneak rank synergy on all Blend checks and declared standalone information-gathering skill time×3 | Batches283,285; passive/manual distinction, typed stacking, actual target/purpose/source/rank/evidence guards and native persistence verified; timing combinations await p.329 ruling; whole tasks/conflicts, class abilities, Requests and other options remain open |

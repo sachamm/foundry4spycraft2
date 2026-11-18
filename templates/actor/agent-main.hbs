@@ -66,6 +66,7 @@
     <details class="combat-tool-group" data-key="combat-defense">
       <summary><span>{{localize "SPYCRAFT.Template.ActorAgentMain.DefenseDamage"}}</span><small>{{localize "SPYCRAFT.Template.ActorAgentMain.IncomingAttacksSavesAndInjuries"}}</small></summary>
       <p class="tool-hint">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewAnIncomingAttackOrA"}}</p>
+      <p><a data-action="declareFightDefensively">{{localize "SPYCRAFT.Template.ActorAgentMain.FightDefensively"}}</a>{{#if system.fightDefensivelyState.active}} {{localize "SPYCRAFT.Template.ActorAgentMain.AttackSkillPenalty"}}{{system.fightDefensivelyState.penalty}}{{localize "SPYCRAFT.Template.ActorAgentMain.Dodge2"}}{{system.fightDefensivelyState.dodgeBonus}} {{localize "SPYCRAFT.Template.ActorAgentMain.UntilOwnCountInRound"}} {{system.fightDefensivelyState.dueRound}}{{/if}}</p>
       {{#if combatTools.expertise}}
       <p><a data-action="activateCombatExpertise">{{localize "SPYCRAFT.Template.ActorAgentMain.CombatExpertise"}}</a>{{#if system.combatExpertiseState.active}} {{localize "SPYCRAFT.Template.ActorAgentMain.AttackSkillPenalty"}}{{system.combatExpertiseState.penalty}}{{localize "SPYCRAFT.Template.ActorAgentMain.Dodge2"}}{{system.combatExpertiseState.dodgeBonus}} {{localize "SPYCRAFT.Template.ActorAgentMain.UntilOwnCountInRound"}} {{system.combatExpertiseState.dueRound}}{{/if}}</p>
       {{/if}}
