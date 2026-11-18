@@ -162,7 +162,7 @@ NPC actors now offer opt-in graded creation, source-backed core tables, equipmen
 
 ## Game Control tools
 
-The GC Console (button in the Actors sidebar) covers the mission record and XP, GC action dice, dramatic scenes, fluid initiative, standard NPC Damage saves, disposition, Dramatic Conflicts, campaign qualities and the security, hazard and possession tables. See [Game Control tools](docs/gc-tools.md) for what each does and what remains manual.
+The GC Console (the first sidebar tab, marked with a spy icon) covers the mission record and XP, GC action dice, dramatic scenes, fluid initiative, standard NPC Damage saves, disposition, Dramatic Conflicts, campaign qualities and the security, hazard and possession tables. See [Game Control tools](docs/gc-tools.md) for what each does and what remains manual.
 
 ## Character sheet views
 
@@ -208,3 +208,9 @@ Spycraft roll and character dialogs use the dossier palette, readable inputs and
 a confirmation footer outside the scrolling options. Unrelated Foundry dialogs
 keep their normal appearance. Toolbars include visible action labels, and compact
 icon controls have contextual names and tooltips.
+
+### Sample scenes
+
+The system includes a **Sample Scenes** compendium with Warehouse Breach, Night Infiltration and Embassy Reception. Import any of them into your world for backgrounds with walls, doors and lighting already configured. Add your own actors and tokens. See [scene notes](assets/scenes/README.md) for setup details and art provenance.
+
+New empty worlds receive these three scenes automatically on the first GM launch. Setup runs once, so deleted samples stay deleted. Existing worlds are left as they are; import samples from the compendium when wanted. Interrupted setup resumes on the next GM launch.

@@ -1,5 +1,5 @@
 import { systemDialog } from "../dialog-theme.mjs";
-/** The GC Console: one window for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
+/** The GC Console: sidebar tools for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
 import { gcDiceStatus, manageGCDice } from "../../rules/gc-dice.mjs";
 import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
@@ -21,7 +21,8 @@ import * as combat from "./combat.mjs";
 import * as conflicts from "./conflicts.mjs";
 import * as tables from "./tables.mjs";
 
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const { HandlebarsApplicationMixin } = foundry.applications.api;
+const { AbstractSidebarTab } = foundry.applications.sidebar;
 const ROMAN = ["I", "II", "III", "IV", "V"];
 const signed = value => (value >= 0 ? `+${value}` : `${value}`);
 const guard = work =>
@@ -34,9 +35,10 @@ const guard = work =>
     this.render();
   };
 
-export class GCConsole extends HandlebarsApplicationMixin(ApplicationV2) {
+export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
+  static tabName = "gc";
+
   static DEFAULT_OPTIONS = {
-    id: "spycraft2-gc-console",
     classes: ["spycraft2", "gc-console"],
     position: { width: 720, height: 800 },
     window: { title: "Game Control console", resizable: true },
@@ -89,8 +91,18 @@ export class GCConsole extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static PARTS = { main: { template: "systems/spycraft2/templates/apps/gc-console.hbs", scrollable: [""] } };
 
-  async _prepareContext() {
-    return consoleContext();
+  _canRender(options) {
+    if (!game.user.isGM) return false;
+    return super._canRender(options);
+  }
+
+  async _prepareContext(options) {
+    return { ...(await super._prepareContext(options)), ...consoleContext() };
+  }
+
+  async _onFirstRender(context, options) {
+    await super._onFirstRender(context, options);
+    if (!this.isPopout) game.spycraft2.gc.console = this;
   }
 }
 
@@ -186,10 +198,20 @@ export function consoleContext() {
   };
 }
 
-let instance = null;
-export function openGCConsole() {
+/** Register before Foundry constructs its sidebar applications. */
+export function registerGCConsoleTab() {
+  CONFIG.ui.gc = GCConsole;
+  const Sidebar = CONFIG.ui.sidebar;
+  const tabs = Object.entries(Sidebar.TABS).filter(([name]) => name !== "gc");
+  tabs.unshift(["gc", { tooltip: "GC Console", icon: "fa-solid fa-user-secret", gmOnly: true }]);
+  Sidebar.TABS = Object.fromEntries(tabs);
+}
+
+export async function openGCConsole() {
   if (!game.user.isGM) return ui.notifications.warn("The GC Console is for the Game Control.");
-  instance ??= new GCConsole();
+  const instance = ui.gc;
   game.spycraft2.gc.console = instance;
-  return instance.render(true);
+  await instance.render({ force: true });
+  instance.activate();
+  return instance;
 }

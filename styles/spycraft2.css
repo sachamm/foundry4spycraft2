@@ -238,4 +238,12 @@
 .gc-console-body ul { margin: 0.2em 0; padding-left: 1.2em; }
 .gc-console-body .tag { font-size: 0.6em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 3px; padding: 0 0.4em; vertical-align: middle; }
 .gc-console-body .muted { opacity: 0.65; }
-.spycraft2-gc-console-button { margin: 0.25em 0; }
+/* The sidebar owns the viewport; its console body supplies the scrolling content. */
+.spycraft2.gc-console.sidebar-tab { min-width: 0; min-height: 0; overflow: hidden; }
+.spycraft2.gc-console.sidebar-tab:not(.sidebar-popout) { padding: 0; }
+.spycraft2.gc-console.sidebar-tab.active:not(.sidebar-popout) { display: flex; flex-direction: column; }
+.gc-console-body { flex: 1; min-width: 0; min-height: 0; overflow-y: auto; overflow-wrap: anywhere; padding: 0 0.6rem 0.75rem; }
+.gc-console-body .controls button { max-width: 100%; min-width: 0; height: auto; white-space: normal; line-height: 1.4; padding: 0.35em 0.5em; }
+.gc-console-body h2 { font-size: 1.2em; }
+.gc-console-body h3 { flex-wrap: wrap; }
+.gc-console-body .controls { margin: 0.5em 0; }

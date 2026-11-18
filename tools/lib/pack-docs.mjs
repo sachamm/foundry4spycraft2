@@ -941,5 +941,17 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
     });
   }
 
+  // Sample scenes contain environment assets only; actor documents and tokens are intentionally absent.
+  packs["sample-scenes"] = { label: "Sample Scenes", type: "Scene", collection: "scenes", folders: [], docs: [] };
+  for (const slug of ["warehouse-breach", "night-infiltration", "embassy-reception"]) {
+    const scene = JSON.parse(readFileSync(join(ROOT, "src/scenes", `${slug}.json`), "utf8"));
+    const embedded = {};
+    for (const key of ["levels", "walls", "lights", "tokens", "drawings", "tiles", "notes", "sounds", "regions"]) {
+      embedded[key] = scene[key] ?? [];
+      scene[key] = embedded[key].map(d => d._id);
+    }
+    packs["sample-scenes"].docs.push({ ...scene, _stats: stats, embedded });
+  }
+
   return { packs, generated, system };
 }
