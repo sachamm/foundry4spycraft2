@@ -5900,6 +5900,7 @@
    "SoftOrYieldingLandingSurface_19iqeq5": "Soft or yielding landing surface",
    "SomeKnowItAllFeatsMay_06oeisj": "Some Know It All feats may remain after cleanup failed. The mission use remains spent; review the granted feats before retrying.",
    "SomeTemporaryFeatsMayRemainAfter_1ex0su3": "Some temporary feats may remain after cleanup failed. The mission use remains spent; review the granted feats before retrying.",
+   "SoundtrackSetupCouldNotFinishIt_1aa0u1a": "Soundtrack setup could not finish. It will retry on the next GM launch; you can also import the album from the Soundtrack compendium.",
    "SourceAllowingStandardMoveOutsideOwn_1jviwme": "Source allowing Standard Move outside own Count (if applicable)",
    "SourceConfirmedTrigger_1gzc3vg": "Source / confirmed trigger",
    "SourceDamageBeforeThisSavingThrow_1nuu5ka": "Source damage before this saving-throw adjustment",

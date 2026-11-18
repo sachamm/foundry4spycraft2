@@ -953,5 +953,15 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
     packs["sample-scenes"].docs.push({ ...scene, _stats: stats, embedded });
   }
 
+  const soundtrack = read("soundtrack.json");
+  const sounds = soundtrack.sounds;
+  packs.soundtrack = {
+    label: "Soundtrack",
+    type: "Playlist",
+    collection: "playlists",
+    folders: [],
+    docs: [{ ...soundtrack, sounds: sounds.map(sound => sound._id), _stats: stats, embedded: { sounds } }]
+  };
+
   return { packs, generated, system };
 }

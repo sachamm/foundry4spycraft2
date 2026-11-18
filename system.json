@@ -239,6 +239,18 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "soundtrack",
+      "label": "Soundtrack",
+      "path": "packs/soundtrack",
+      "type": "Playlist",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -269,7 +281,8 @@
         "equipment-upgrades",
         "contagions",
         "gc-tables",
-        "sample-scenes"
+        "sample-scenes",
+        "soundtrack"
       ]
     }
   ]
