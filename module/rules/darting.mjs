@@ -3,6 +3,7 @@ import { validOwnCountClock } from "./own-count-duration.mjs";
 import { weaponGrip, possessionUnavailable } from "./gear.mjs";
 import { attributeActionBlock } from "./attributes.mjs";
 import { restraintActionBlock } from "./restraints.mjs";
+import { unarmedWeapon } from "./kick.mjs";
 import { loc } from "../i18n.mjs";
 export const dartingWeaponEligible = w =>
   ["unarmed", "blunt", "exoticBlunt", "edged", "exoticEdged", "hurled", "exoticHurled"].includes(w?.proficiency);
@@ -11,7 +12,9 @@ export const followUpWeaponEligible = w =>
   ["handgun", "rifle", "shotgun", "submachineGun", "tactical", "guided", "indirectFire"].includes(w?.proficiency);
 export const FINAL_ATTACK_TRADEOFFS = Object.freeze({
   darting: { feat: "Darting Weapon", double: "Flashing Weapon", eligible: dartingWeaponEligible },
-  followUp: { feat: "Follow-Up Shot", double: "Hail of Fire", eligible: followUpWeaponEligible }
+  followUp: { feat: "Follow-Up Shot", double: "Hail of Fire", eligible: followUpWeaponEligible },
+  // Two-Hit Combo / Warrior's Grace, p.188: the same tradeoff with unarmed attacks.
+  twoHit: { feat: "Two-Hit Combo", double: "Warrior's Grace", eligible: w => unarmedWeapon(w) }
 });
 function canAct(system, combat) {
   const block = restraintActionBlock(system, { free: true }) || attributeActionBlock(system, { kind: "attack" });
@@ -55,7 +58,7 @@ export function dartingDeclarationPlan(
     extraAttacks,
     atStartOfInitiative: true,
     confirmed: true,
-    ...(kind === "followUp" ? { kind } : {})
+    ...(kind !== "darting" ? { kind } : {})
   };
 }
 export function dartingFinalAttackPlan(system, combat, items, { weaponId, confirmed = false } = {}) {
@@ -83,7 +86,9 @@ export function dartingFinalAttackPlan(system, combat, items, { weaponId, confir
     throw new Error(
       state.kind === "followUp"
         ? loc`Choose an owned, readied and usable firearm or heavy weapon.`
-        : loc`Choose an owned, readied and usable melee or hurled weapon.`
+        : state.kind === "twoHit"
+          ? loc`Choose an unarmed attack.`
+          : loc`Choose an owned, readied and usable melee or hurled weapon.`
     );
   const grip = weaponGrip(system, w);
   if (grip.blocked) throw new Error(grip.reason || loc`The current weapon grip is unavailable.`);

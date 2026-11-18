@@ -344,6 +344,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       declareFollowUp() {
         return declareDarting(this.actor, { kind: "followUp" });
       },
+      declareTwoHit() {
+        return declareDarting(this.actor, { kind: "twoHit" });
+      },
       takeDartingFinalAttack() {
         return takeDartingFinalAttack(this.actor);
       },

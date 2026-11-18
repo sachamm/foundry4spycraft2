@@ -45,3 +45,27 @@ test("Follow-Up Shot's final attacks need a firearm or heavy weapon", () => {
     /firearm or heavy weapon/
   );
 });
+
+test("Two-Hit Combo and Warrior's Grace use the same tradeoff with unarmed attacks", () => {
+  const two = declare(["Two-Hit Combo", "Warrior's Grace"], 2, "twoHit");
+  assert.deepEqual([two.kind, two.extraAttacks, two.penalty], ["twoHit", 2, 4]);
+  assert.throws(() => declare(["Two-Hit Combo"], 2, "twoHit"), /Warrior's Grace/);
+  const record = { ...declare(["Two-Hit Combo"], 1, "twoHit"), id: "d2" };
+  const system = { ...sys(["Two-Hit Combo"]), dartingStyle: record, abilities: { str: { mod: 0 } }, size: "Medium" };
+  const items = [
+    {
+      id: "fists",
+      type: "weapon",
+      system: { proficiency: "unarmed", equipped: true, carried: true, quantity: 1, sizeHands: "-/1h" }
+    },
+    {
+      id: "gun",
+      type: "weapon",
+      system: { proficiency: "handgun", equipped: true, carried: true, quantity: 1, sizeHands: "S/1h" }
+    }
+  ];
+  assert.throws(
+    () => dartingFinalAttackPlan(system, combat, items, { weaponId: "gun", confirmed: true }),
+    /unarmed attack/
+  );
+});

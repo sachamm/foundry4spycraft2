@@ -19,7 +19,7 @@ export function dartingStyleState(system) {
     r.penalty !== 2 * r.extraAttacks ||
     r.atStartOfInitiative !== true ||
     r.confirmed !== true ||
-    ![undefined, "followUp"].includes(r.kind)
+    ![undefined, "followUp", "twoHit"].includes(r.kind)
   )
     return { ...empty(), needsReview: true, reason: loc`The GC must review the saved Darting Weapon tradeoff.` };
   if (!ownCountDurationActive(r, system.dartingCombatContext)) return empty();

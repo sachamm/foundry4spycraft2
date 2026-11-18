@@ -11476,10 +11476,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "When your Initiative Count begins, take an extra unarmed final attack at –2 to all checks for the round."
  },
- "Warrior's Grace": {
-  "rolls": "attack",
-  "text": "With Two-hit Combo, accept –4 instead to gain a second extra unarmed final attack."
- },
  "Wind Rider": {
   "rolls": "skill:notice, skill:drive",
   "text": "Halved visual-range Notice penalty, better gliding, and air vehicles treat maneuvering room as wider with +2 on Crisis Advantage checks."

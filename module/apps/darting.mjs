@@ -13,8 +13,17 @@ const map = v => v !== null && typeof v === "object" && !Array.isArray(v),
 export async function declareDarting(actor, options = {}) {
   if (actor.type !== "agent" || !actor.isOwner) return null;
   const before = snapshot(actor),
-    kind = options.kind === "followUp" ? "followUp" : "darting";
+    kind = ["followUp", "twoHit"].includes(options.kind) ? options.kind : "darting";
   let input = options;
+  if (!Object.hasOwn(input, "extraAttacks") && kind === "twoHit") {
+    input = await foundry.applications.api.DialogV2.input({
+      window: { title: loc`Two-Hit Combo / Warrior’s Grace` },
+      rejectClose: false,
+      content: `<div class="spycraft2-roll-options"><p>${loc`At the start of your Initiative Count, gain final unarmed attacks and accept the attack/skill penalty until the start of your next Initiative Count (p.188). One such declaration per round, shared with Darting Weapon and Follow-Up Shot.`}</p><label>${loc`Choice`} <select name="extraAttacks"><option value="1">${loc`Two-Hit Combo: 1 final unarmed attack; −2 attack/skill checks`}</option><option value="2">${loc`Warrior’s Grace: 2 final unarmed attacks; −4 attack/skill checks`}</option></select></label><label><input name="atStartOfInitiative" type="checkbox" /> ${loc`The GC confirms the start of my Initiative Count`}</label><label><input name="confirmed" type="checkbox" /> ${loc`I accept this penalty for the full round`}</label></div>`
+    });
+    if (!input) return null;
+    input = { ...input, kind };
+  }
   if (!Object.hasOwn(input, "extraAttacks") && kind === "followUp") {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Follow-Up Shot / Hail of Fire` },
@@ -105,7 +114,7 @@ export async function takeDartingFinalAttack(actor, options = {}) {
     receipt = {
       ...plan,
       id: foundry.utils.randomID(),
-      source: actor.system.dartingStyle?.kind === "followUp" ? "followUpShot" : "dartingWeapon"
+      source: { followUp: "followUpShot", twoHit: "twoHitCombo" }[actor.system.dartingStyle?.kind] ?? "dartingWeapon"
     };
   return actor.useLimitedAbility(
     "dartingFinalAttack",

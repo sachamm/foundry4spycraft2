@@ -372,8 +372,8 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Submission Basics | 188 | No | Partial (batch 396): Prone Stance survives being prone and waives the prone attack penalty; its +1 to Grapple skill checks, sprawled-to-prone conversion, the doubled Cheap Shot penalties and Snap! are not yet carried out | Native Foundry QA not claimed |
 | Submission Moves | 188 | No | Manual/descriptive | — |
 | Submission Supremacy | 188 | No | Manual/descriptive | — |
-| Two-hit Combo | 188 | No | Manual/descriptive | — |
-| Warrior's Grace | 189 | No | Manual/descriptive | — |
+| Two-hit Combo | 188 | No | Covered (batch 401): a start-of-Count declaration grants 1 final unarmed attack and −2 to attack and skill checks for 1 full round (the shared final-attack tradeoff; one such declaration per round) | Native Foundry QA not claimed |
+| Warrior's Grace | 189 | No | Covered (batch 401): the Two-Hit Combo declaration may grant 2 final unarmed attacks at −4 | Native Foundry QA not claimed |
 | Vital Points Basics | 188 | No | Sneak-attack resistance 6 executes; stance/trick remain manual | — |
 | Vital Points Moves | 188 | No | Covered (batch 395): Nerve Jam (−4, threat +1, stunned on a threat or critical hit), One Finger (−4, threat +4, flat-footed target confirmed) and Spike (threat +1) on unarmed Standard Attacks | Native Foundry QA not claimed |
 | Vital Points Supremacy | 188 | No | Unarmed sneak die implemented; tricks remain manual | — |
@@ -1812,3 +1812,12 @@ Source: rules reference pp.189–191 (local markdown edition; original PDF pages
 - Peculiar Dodge’s session uses and Misfortune’s equal the owner’s Chance feats. Misfortune and Fortune’s Fool leave `feat-reminders.json` (tables regenerated).
 
 Verification: 3430 of 3431 Node tests (4 new). The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 51 manual / 61 partial / 202 other; at least 112 of 314 explicitly unfinished; 84 whole-feat closures.
+
+## Residual implementation batch 401 — Two-Hit Combo and Warrior’s Grace
+
+Source: rules reference p.188 (local markdown edition; original PDF page not visually re-checked).
+
+- Same benefit as Darting Weapon and Follow-Up Shot, for unarmed attacks: the shared final-attack tradeoff gains `kind: "twoHit"`, with Warrior’s Grace playing Flashing Weapon’s part (2 final unarmed attacks at −4). The Main tab offers the declaration; its final attacks accept unarmed attacks only. One such declaration per round across the three feats.
+- Warrior’s Grace leaves `feat-reminders.json` (tables regenerated).
+
+Verification: 3432 of 3433 Node tests (1 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 49 manual / 61 partial / 204 other; at least 110 of 314 explicitly unfinished; 86 whole-feat closures.
