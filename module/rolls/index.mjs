@@ -11,6 +11,7 @@ import "../apps/driving-stance.mjs";
 import "../apps/feint-bonus.mjs";
 import "../apps/feint.mjs";
 import "../apps/old-school.mjs";
+import "../apps/opportunist.mjs";
 import "../apps/side-stance-damage.mjs";
 import "../apps/side-stance.mjs";
 import "../apps/striking-stance.mjs";

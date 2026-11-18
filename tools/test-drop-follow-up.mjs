@@ -124,74 +124,9 @@ test("the attack card names the extra attack, and the Main tab offers both contr
 });
 
 test("the Cleave control posts one extra attack with the same weapon and spends the round use once", async () => {
-  await import("./fixtures/fatigue-actor.mjs");
-  const { SpycraftActor } = await import("../module/documents/actor.mjs");
-  const { weaponAttack } = await import("../module/rules/gear.mjs");
-  const { sword, prep } = await import("./fixtures/feint.mjs");
+  const { finalAttackActor } = await import("./fixtures/final-attack-actor.mjs");
   const { takeDropFollowUp } = await import("../module/apps/drop-follow-up.mjs");
-  let seq = 0;
-  foundry.utils.escapeHTML = String;
-  foundry.utils.randomID = () => "drop" + ++seq;
-  globalThis.ChatMessage = { getSpeaker: () => ({}) };
-  game.user = { id: "gc", isGM: true };
-  const messages = [];
-  messages.get = id => messages.find(m => m.id === id);
-  game.messages = messages;
-  const w = sword({ qualities: "", damage: "1d6" }),
-    a = {
-      uuid: "Actor.feint",
-      type: "agent",
-      isOwner: true,
-      flags: {},
-      system: {
-        size: "Medium",
-        bab: 3,
-        activeFeatNames: ["Cleave Basics"],
-        classLevels: {},
-        abilities: { str: { value: 14, mod: 2 }, dex: { value: 14, mod: 2 } },
-        proficiencyTotals: { edged: { proficient: true } },
-        conditionContext: {},
-        wounds: { value: 4 },
-        vitality: { value: 4 },
-        actionDice: { value: 0 },
-        resourceUses: {}
-      },
-      items: [w],
-      usagePeriods: { round: "Combat.feint:3", combat: "Combat.feint", scene: "scene" },
-      async update(patch) {
-        for (const [path, value] of Object.entries(patch)) {
-          const keys = path.split(".");
-          let o = this;
-          for (const key of keys.slice(0, -1)) o = o[key] ??= {};
-          o[keys.at(-1)] = structuredClone(value);
-        }
-      }
-    };
-  a.items.get = id => a.items.find(i => i.id === id);
-  a.participatingCombat = {
-    id: clock().id,
-    started: true,
-    round: 3,
-    turn: 0,
-    turns: [{ id: clock().combatantId, actor: a }]
-  };
-  a.mentalLeapCombatContext = () => ({ ...clock() });
-  a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
-  a.actionDiceFundingSystem = a.system;
-  a.weaponAttack = (item, o = {}) =>
-    weaponAttack(prep(a.system, a.items), { ...item.system, id: item.id }, cfg, "agent", o);
-  a.useLimitedAbility = SpycraftActor.prototype.useLimitedAbility;
-  a.rollAttack = (item, o) => SpycraftActor.prototype.rollAttack.call(a, item, o);
-  a.rollCheck = async (formula, data, opts) => {
-    await opts.validateFinalAttack?.();
-    const m = {
-      id: "posted" + ++seq,
-      uuid: "ChatMessage.posted" + seq,
-      flags: { spycraft2: { ...opts, actorUuid: a.uuid } }
-    };
-    messages.push(m);
-    return m;
-  };
+  const { a, w, messages } = finalAttackActor(["Cleave Basics"]);
   messages.push({
     id: "trigger",
     uuid: "ChatMessage.trigger",

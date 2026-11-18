@@ -257,7 +257,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Combat Expertise | 172 | No | Own-Count declaration, bounded attack/skill penalty, matching vulnerable-aware dodge bonus and own-next-Count expiry execute | — |
 | Expert Disarm | 174 | No | Opposed Disarm check executes grip/Size/error rules and +2 feat bonus; critical discount executes and loss exceptions are frozen for adjudication; opposition/weapon transfer/conditions remain table-managed | — |
 | Combat Instincts | 172 | No | Recorded current-round miss by5+, GC adjacency/timing/non-flat-footed confirmation and one counted immediate final Standard Attack execute; actual target geometry and other action settlement remain manual | — |
-| Opportunist | 175 | No | Manual/descriptive | — |
+| Opportunist | 175 | No | Covered (batch 378): once per round, a GC-confirmed free final attack against an opponent after a second opponent both can see is stunned or falls below 0 wounds; its hit rolls half damage, rounded up, once from the attack card | Native Foundry QA not claimed |
 | Combat Mobility | 172 | No | Declared route checker enforces adjacency departure, doubled Total Defense movement and Dexterity-bounded Run turns; actual token/action settlement remains manual | — |
 | Mobile Defense | 175 | No | Movement checker suppresses Run flat-footedness; Count-for-dodge option remains open | — |
 | Mobile Offense | 175 | No | One counted final Standard Attack during a GC-confirmed Standard Move executes with route/attack-point/current-Speed checks and an already recorded Total Defense move; actual token movement/action budgets remain manual | — |
@@ -1563,3 +1563,14 @@ Source: rules reference pp.177 and 182 (local markdown edition; original PDF pag
 - **Interpretation.** The rules call these “cleave” and “snap shot” attacks, not final attacks. They are treated as final attacks: they share the Nauseated one-final-attack allowance and cannot carry a full-action trick.
 
 Verification: 513 legacy assertions, 3342 of 3343 Node tests (6 new, including the posted Cleave attack and a refused second use in the same round), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 109 manual / 53 partial / 152 other; at least 162 of 314 explicitly unfinished; 34 whole-feat closures.
+
+## Residual implementation batch 378 — Opportunist
+
+Source: rules reference p.175 (local markdown edition; original PDF page not visually re-checked).
+
+- **Trigger.** Sight lines, stunning and wound totals are settled at the table, so the GC confirms all three: a second opponent just became stunned or fell below 0 wound points, the character and the target opponent can both see them, and the attack follows at once. An optional short description is recorded on the receipt.
+- **Attack.** A Main-tab control (`module/apps/opportunist.mjs`) posts one free final Standard Attack with a chosen readied weapon through the shared final-attack workflow. It counts toward the Nauseated final-attack allowance and has its own once-per-round use with GC counter review.
+- **Half damage.** A resolved Opportunist hit shows “Roll Opportunist damage (half)” on its card. The roll halves the whole damage formula, rounded up (`ceil((formula) / 2)`), and records `opportunistDamage` with the attack. The hit must be the character’s own, resolved, successful, unsuperseded, and made with the same weapon. A second damage roll from the same hit is refused (a replacement roll of the damage is allowed). An ordinary damage roll is not intercepted; the attack card tells the table to use the halved roll.
+- Test support: `tools/fixtures/final-attack-actor.mjs` is a shared actor for posting real final attacks and damage; the Cleave/Snap Shot test now uses it.
+
+Verification: 513 legacy assertions, 3347 of 3348 Node tests (5 new, including a real halved damage roll and a refused second roll), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world; pack checks are deferred to the end. Native Foundry QA is **not claimed**. Inventory: 108 manual / 53 partial / 153 other; at least 161 of 314 explicitly unfinished; 35 whole-feat closures.

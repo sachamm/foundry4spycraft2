@@ -244,6 +244,17 @@ export function limitedUseAbilities(system, items, cfg) {
         manualReviewable: true,
         hidden: true
       });
+  if (system.activeFeatNames?.includes("Opportunist"))
+    add({
+      id: "opportunist",
+      name: loc`Opportunist (final attack after another opponent drops)`,
+      period: "round",
+      limit: 1,
+      workflow: "opportunist",
+      combatScoped: true,
+      manualReviewable: true,
+      hidden: true
+    });
   if (system.activeFeatNames?.includes("Combat Instincts"))
     add({
       id: "combatInstincts",

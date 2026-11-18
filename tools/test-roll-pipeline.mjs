@@ -580,6 +580,8 @@ const EXPECTED_ORDER = [
   "skillConditionsRecord",
   "skillFeatTermsRecord",
   "fireActionControl",
+  "opportunistDamageControl",
+  "opportunistRecord",
   "skillGearRecord",
   "skillTagsRecord",
   "blastControl",

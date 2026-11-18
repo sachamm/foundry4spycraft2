@@ -11,7 +11,8 @@ export const FINAL_ATTACK_WORKFLOWS = new Set([
   "tripFinalAttack",
   "strikingStance",
   "cleaveBasics",
-  "snapShot"
+  "snapShot",
+  "opportunist"
 ]);
 export function finalAttackRoundSpec(system) {
   const nauseated = system.conditionContext?.nauseated === true,

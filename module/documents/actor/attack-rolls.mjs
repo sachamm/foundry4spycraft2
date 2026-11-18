@@ -30,6 +30,7 @@ import { askFollowUp } from "../../rolls/dialogs/follow-ups.mjs";
 import { measureInto } from "../../apps/map.mjs";
 import { coverFire, suppressiveFire } from "../../apps/combat-actions.mjs";
 import { featReminders } from "../../rules/feat-reminders.mjs";
+import { opportunistDamageSource, halvedFormula } from "../../rules/opportunist.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorAttackRolls = Base =>
@@ -641,16 +642,27 @@ export const ActorAttackRolls = Base =>
         (item.system.proficiency === "unarmed" || /\bNKL\b/.test(item.system.qualities ?? ""));
       if (options.pummel === true && !pummel) return ui.notifications.warn(loc`Pummel is an unarmed attack.`);
       if (pummel) formula = `(${formula}) * 2`;
+      // Opportunist: a hit from its final attack deals half standard damage, rounded up (p.175).
+      const opportunistDamage = options.opportunistAttackUuid
+        ? opportunistDamageSource(fromUuidSync(options.opportunistAttackUuid), {
+            actorUuid: this.uuid,
+            weaponUuid: item.uuid,
+            messages: game.messages ?? [],
+            rerollOf: options.rerollOf
+          })
+        : null;
+      if (opportunistDamage) formula = halvedFormula(formula);
       return this.rollCheck(formula, this.getRollData(), {
         featReminders: options.featReminders,
         pummelDamage: pummel,
+        opportunistDamage,
         meleeArmorPiercing: damage.meleeArmorPiercing.evidence,
         attackDamageBenefit,
         sideStanceDamage,
         finesseDamage,
         validateAttackContext: validateFinesseDamage,
         weaponQualities: damage.effectiveQualities,
-        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}`,
+        flavor: `${game.i18n.localize("SPYCRAFT.Damage")}: ${foundry.utils.escapeHTML(item.name)} (${foundry.utils.escapeHTML(damage.damageText ?? item.system.damage)})${damage.ammunition ? ` — ${foundry.utils.escapeHTML(damage.ammunition)}` : ""}${damage.meleeArmorPiercing.evidence ? `<br><small>${foundry.utils.escapeHTML(damage.meleeArmorPiercing.notes.join(" "))}</small>` : ""}${attackDamageBenefit ? `<br><small>${loc`${foundry.utils.escapeHTML(attackDamageBenefit.source)}: recorded attack damage +${attackDamageBenefit.bonus}, once against ${foundry.utils.escapeHTML(attackDamageBenefit.manualTargetName ?? loc`the recorded target`)}.${attackDamageBenefit.sneakDice ? loc` ${attackDamageBenefit.sneakSource}: its hit supplies ${attackDamageBenefit.sneakDice} die of sneak attack damage when the sneak attack conditions are met.` : ""}${attackDamageBenefit.grantedQuality === "TKD" ? loc` Takedown: if a character suffers damage, resolve Fortitude at pre-DR damage (+10 DC if wounds were lost); failure causes sprawled.` : ""}`}</small>` : ""}${sneak.active ? `<br><small>${foundry.utils.escapeHTML(sneak.notes)}</small>` : ""}${damage.cqbRange?.active ? `<br><small>${foundry.utils.escapeHTML(damage.cqbRange.notes.join(" "))}</small>` : ""}${damage.markDamage?.active ? `<br><small>${foundry.utils.escapeHTML(damage.markDamage.note)}</small>` : ""}${pummel ? loc` — Pummel: double subdual damage, never lethal` : ""}${opportunistDamage ? loc` — Opportunist: half damage, rounded up` : ""}`,
         validateCQBRange,
         cqbRange: damage.cqbRange?.active ? damage.cqbRange : null,
         mortarOperation: damage.mortarOperation?.applicable ? damage.mortarOperation : null,
