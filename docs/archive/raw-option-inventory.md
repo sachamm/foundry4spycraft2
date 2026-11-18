@@ -342,7 +342,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Sharpshooter Mastery | 182 | No | Partial: braced threat; Called Shot reduction open | — |
 | Sharpshooter Supremacy | 182 | No | Partial: aimed threat and ranged critical cost | — |
 | Snap Shot | 182 | No | Covered (batch 377): the ranged counterpart of Cleave Basics, through the same control | Native Foundry QA not claimed |
-| Steel Rain | 182 | No | Partial (batch 407): a hurled weapon without a blast increment offers the Burst trick, Cover Fire and Suppressive Fire in the ranged attack dialog, each weapon thrown counting as a shot; free draw, always-readied and the +4 Stash Item bonus stay with the GC | Native Foundry QA not claimed |
+| Steel Rain | 182 | No | Partial (batch 407): a hurled weapon without a blast increment offers the Burst trick, Cover Fire and Suppressive Fire in the ranged attack dialog, each weapon thrown counting as a shot; the +4 Stash Item bonus is a Stash Item dialog declaration (batch 414); free draw and always-readied stay with the GC | Native Foundry QA not claimed |
 | Style Over Caliber | 183 | No | Covered (batch 385): a pistol’s damage roll may replace its standard damage with 1d10+2, keeping other damage, qualities and effects | Native Foundry QA not claimed |
 | This… is my Boomstick | 183 | No | Manual/descriptive | — |
 | Trick Shot | 183 | No | Covered (batch 412): a hit with a non-grenade hurled weapon offers a control that rolls the damage as the escape DC and states the target is held instead of damaged; the GC records the held condition and combines several Trick Shots in a round | Native Foundry QA not claimed |
@@ -426,7 +426,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Ambush Supremacy | 193 | No | Sneak die, approved slow-ambush timing and scoped critical discount implemented; rewards remain manual | — |
 | Bludgeon | 193 | No | Sneak damage conversion exception implemented; the −4 attack conversion penalty is waived (batch 375) | — |
 | Whack | 196 | No | Subdual sneak bonus implemented; flat-footed persistence remains manual | — |
-| Concealed Carry | 193 | No | Manual/descriptive | — |
+| Concealed Carry | 193 | No | Partial (batch 414): Sleight of Hand/Stash Item states that frisked items count as 2 Size categories smaller; item Size is not itemised by the dialog, so the GC applies it | Native Foundry QA not claimed |
 | Deadly Precision | 194 | No | Sneak damage bonus per die implemented | — |
 | No Quarter | 195 | No | Covered (batch 404): an attack-dialog choice gives up 1 or more of the weapon’s earned sneak attack dice for an equal threat range increase; the hit’s damage roll from the card rolls that many fewer | Native Foundry QA not claimed |
 | Crippling Strike | 194 | No | Numeric sneak-dice prerequisite implemented; effects remain manual | — |
@@ -557,7 +557,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Flawless Identity | 209 | No | Manual/descriptive | — |
 | Forensic Genius | 209 | No | Partial: Analysis synergy on all Search uses and declared Complex Analysis challenge count−2(minimum1) execute | Batches260–271; synergy/counts, normal/critical progress, deadlines, GC error-decline, pressure/stress/save and combined Tracking Mastery Forensics scopes execute with recovery; cross-skill/shared tasks and source/history corrections remain open |
 | Hold Out | 209 | No | Covered (batch 387): interrogation or brainwashing Prey: starting Lead +1; any Prey Strategy regardless of requirements; a per-round declaration doubles the round’s duration for +1 error range on the Prey’s check | Native Foundry QA not claimed |
-| Living Cipher | 209 | No | Manual/descriptive | — |
+| Living Cipher | 209 | No | Partial (batch 414): Analysis/Decipher states the counted computer Power Rating (Intelligence modifier without a computer, +1 with one, maximum 10); computer Power Rating is not otherwise modelled on the check | Native Foundry QA not claimed |
 | Old School | 209 | No | Implemented: +4to qualifying Charisma-based checks with named GC-confirmed shared-source and level evidence | Batch266; all final-attribute paths, caps/fixed/rerolls, source/mission guards, actual dialog and native persistence verified |
 | Poison Basics | 209 | No | Partial: declared poison resistance saves gain+2untyped, stacking with Swamp insight | Batch274; all saves, source/evidence guards and native controls/persistence verified; personal injector, extra requested dose and accidental poisoning prevention remain open |
 | Safe House | 209 | No | Implemented: scene-opening declarations, Tradecraft-based mission allowance, city/nearest-city GC placement, Lifestyle−2home quality and mission-end loss | Batch257; all8tiers,10000threshold, dual counters, source/refund/history guards and native persistence verified |
