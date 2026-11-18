@@ -3,6 +3,7 @@ import { shiftCount } from "./dueling.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { boxingTrickDamageNote } from "../rules/boxing.mjs";
+import { UNARMED_TRICKS, unarmedTrickDamageNote } from "../rules/unarmed-tricks.mjs";
 import { loc } from "../i18n.mjs";
 
 rollPipeline.register({
@@ -13,9 +14,39 @@ rollPipeline.register({
     const kick = check.attackContext?.kick,
       trick = check.attackContext?.kickTrick,
       jab = check.attackContext?.doubleJab,
-      boxing = check.attackContext?.boxingTrick;
-    if ((!kick && !trick && !jab && !boxing) || check.superseded) return null;
+      boxing = check.attackContext?.boxingTrick,
+      unarmed = check.attackContext?.unarmedTrick;
+    if ((!kick && !trick && !jab && !boxing && !unarmed) || check.superseded) return null;
     const controls = [];
+    // Unarmed tricks with a save on a hit, or Clothesline's takedown: roll the damage from the hit.
+    const unarmedWeaponItem = unarmed && check.weaponUuid ? fromUuidSync(check.weaponUuid) : null;
+    if (
+      unarmed &&
+      check.successConfirmed === true &&
+      unarmedWeaponItem &&
+      !check.unarmedTrickDamage &&
+      (UNARMED_TRICKS[unarmed.key]?.hitSave || unarmed.key === "clothesline")
+    )
+      controls.push({
+        label: loc`Roll ${unarmed.name} damage`,
+        run: async () => {
+          const rolled = await actor.rollDamage(unarmedWeaponItem, {
+            unarmedTrick: unarmed.key,
+            kick: !!kick,
+            includeSneakAttack: false
+          });
+          if (!rolled) return rolled;
+          await message.update({ "flags.spycraft2.unarmedTrickDamage": rolled.uuid ?? true });
+          const total = rolled.rolls?.[0]?.total ?? rolled.flags?.spycraft2?.effectiveTotal,
+            note = unarmedTrickDamageNote(unarmed.key, total);
+          return note
+            ? ChatMessage.create({
+                speaker: ChatMessage.getSpeaker({ actor }),
+                content: foundry.utils.escapeHTML(note)
+              })
+            : rolled;
+        }
+      });
     // Back Flip: a miss leaves the character flat-footed.
     if (trick?.key === "backFlip" && check.successConfirmed === false && !check.backFlipMiss)
       controls.push({

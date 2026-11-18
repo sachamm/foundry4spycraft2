@@ -112,7 +112,8 @@ export function unarmedTrickClash(options = {}) {
     options.doubleJab === true,
     !!options.boxingTrick,
     !!options.kickTrick,
-    options.brush === true
+    options.brush === true,
+    !!options.unarmedTrick
   ].filter(Boolean).length;
   return tricks > 1 ? loc`Only one Unarmed Combat feat trick may apply to this action.` : "";
 }

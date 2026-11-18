@@ -117,6 +117,7 @@ import "../rules/trip-attack.mjs";
 import "../rules/trip.mjs";
 import "../rules/tumble.mjs";
 import "../rules/two-weapon-state.mjs";
+import "../rules/unarmed-tricks.mjs";
 import "../rules/unnerving.mjs";
 import "../rules/weapon-specialist.mjs";
 import "../rules/weapon-work.mjs";

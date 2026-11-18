@@ -11345,7 +11345,7 @@ export const FEAT_REMINDERS = {
   "text": "End rage freely; rages last 4d4+4 rounds, +4 to resist frenzy, and you're only fatigued afterwards."
  },
  "Brawling Moves": {
-  "rolls": "attack",
+  "rolls": "skill:acrobatics, skill:sleightOfHand",
   "text": "Gain brawling tricks such as body slams and feints that boost your Defense."
  },
  "Brawling Supremacy": {
@@ -11360,12 +11360,8 @@ export const FEAT_REMINDERS = {
   "rolls": "skill:analysis",
   "text": "Treat codes as 2 Power Rating lower when breaking, writing or requesting them."
  },
- "Dirty Fighting Basics": {
-  "rolls": "attack",
-  "text": "Sneak attack damage against you is halved; gain a dirty-fighting stance and trick."
- },
  "Dirty Fighting Moves": {
-  "rolls": "attack",
+  "rolls": "skill:sleightOfHand",
   "text": "Gain underhanded tricks such as blinding eye gouges and improved feints."
  },
  "Dueling Basics": {
@@ -11456,10 +11452,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "Stand Up is free and safe; gain a rolling stance and trick."
  },
- "Rolling Moves": {
-  "rolls": "attack",
-  "text": "Gain acrobatic tricks to reposition around and through enemies when attacking."
- },
  "Spider Basics": {
   "rolls": "skill:athletics",
   "text": "No penalties while climbing (including without a kit), foes get no bonus against climbing you, and Initiative bonus when combat starts on a wall."
@@ -11516,10 +11508,6 @@ export const FEAT_REMINDERS = {
   "rolls": "attack",
   "text": "When your Initiative Count begins, take an extra unarmed final attack at –2 to all checks for the round."
  },
- "Vital Points Moves": {
-  "rolls": "attack",
-  "text": "Gain pressure-point tricks that can stun or exploit flat-footed foes."
- },
  "Warrior's Grace": {
   "rolls": "attack",
   "text": "With Two-hit Combo, accept –4 instead to gain a second extra unarmed final attack."
@@ -11529,7 +11517,7 @@ export const FEAT_REMINDERS = {
   "text": "Halved visual-range Notice penalty, better gliding, and air vehicles treat maneuvering room as wider with +2 on Crisis Advantage checks."
  },
  "Wrestling Moves": {
-  "rolls": "attack",
+  "rolls": "skill:acrobatics, skill:athletics",
   "text": "Gain takedown tricks like clotheslines and hip tosses."
  }
 };

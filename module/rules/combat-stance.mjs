@@ -19,7 +19,8 @@ export const COMBAT_STANCES = {
   unbeatable: { name: "Unbeatable Stance", feat: "Sword Basics", page: 180 },
   shifting: { name: "Shifting Stance", feat: "Kicking Basics", page: 186 },
   closed: { name: "Closed Stance", feat: "Boxing Basics", page: 184 },
-  open: { name: "Open Stance", feat: "Wrestling Basics", page: 189 }
+  open: { name: "Open Stance", feat: "Wrestling Basics", page: 189 },
+  ready: { name: "Ready Stance", feat: "Dirty Fighting Basics", page: 185 }
 };
 export function stanceForcedExit(system) {
   const c = conditionRollPenalties(system);

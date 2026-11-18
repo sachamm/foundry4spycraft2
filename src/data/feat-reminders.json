@@ -17,7 +17,8 @@
       "save"
     ],
     "Brawling Moves": [
-      "attack"
+      "skill:acrobatics",
+      "skill:sleightOfHand"
     ],
     "Brawling Supremacy": [
       "attack",
@@ -29,11 +30,8 @@
     "Cryptographer": [
       "skill:analysis"
     ],
-    "Dirty Fighting Basics": [
-      "attack"
-    ],
     "Dirty Fighting Moves": [
-      "attack"
+      "skill:sleightOfHand"
     ],
     "Dueling Basics": [
       "attack"
@@ -104,9 +102,6 @@
     "Rolling Basics": [
       "attack"
     ],
-    "Rolling Moves": [
-      "attack"
-    ],
     "Spider Basics": [
       "skill:athletics"
     ],
@@ -150,9 +145,6 @@
     "Two-hit Combo": [
       "attack"
     ],
-    "Vital Points Moves": [
-      "attack"
-    ],
     "Warrior's Grace": [
       "attack"
     ],
@@ -161,7 +153,8 @@
       "skill:drive"
     ],
     "Wrestling Moves": [
-      "attack"
+      "skill:acrobatics",
+      "skill:athletics"
     ]
   }
 }

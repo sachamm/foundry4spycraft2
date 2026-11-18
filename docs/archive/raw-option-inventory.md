@@ -353,10 +353,10 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Boxing Moves | 185 | No | Covered (batch 393): Knock Out and Wallop on unarmed Standard Attacks (their damage roll states whether damage beat the known target’s Constitution, or the Reflex DC 10 + damage); Weather the Storm as two free Tire actions per round during Total Defense; one unarmed trick per action | Native Foundry QA not claimed |
 | Boxing Supremacy | 185 | No | Partial: static numerical effects | — |
 | Brawling Basics | 185 | No | Partial: static numerical effects | — |
-| Brawling Moves | 185 | No | Manual/descriptive | — |
+| Brawling Moves | 185 | No | Partial (batch 395): Haymaker (Fortitude DC 10 + damage or nauseated) on unarmed Standard Attacks; Body Slam (Trip) and Fake Out (Feint) are skill reminders | Native Foundry QA not claimed |
 | Brawling Supremacy | 185 | No | Manual/descriptive | — |
-| Dirty Fighting Basics | 185 | No | Manual/descriptive | — |
-| Dirty Fighting Moves | 185 | No | Manual/descriptive | — |
+| Dirty Fighting Basics | 185 | No | Covered (batch 395): sneak attack damage the owner suffers is halved, rounded up, when an attacker’s damage roll names them as target; Ready Stance (−2 to the hit target’s attacks this round, on the card); Low Blow (Fortitude DC 10 + damage or sickened, from the hit’s damage roll) | Native Foundry QA not claimed |
+| Dirty Fighting Moves | 185 | No | Partial (batch 395): Eye Gouge (Reflex DC 10 + damage or blinded) and Rabbit Punch (−4, threat +1, nauseated on a threat) on unarmed Standard Attacks; Mud in Your Eye is a Feint reminder | Native Foundry QA not claimed |
 | Dirty Fighting Supremacy | 185 | No | Unarmed sneak die implemented; tricks remain manual | — |
 | Kicking Basics | 186 | No | Partial (batch 390): a Kick costs no Initiative Count; Shifting Stance halves the target’s dodge bonus against unarmed attacks (Incoming attack preview) and reminds of the far-side move on a threat or critical hit. Sweep (no flat-footed on a lost Trip) is not yet carried out | Native Foundry QA not claimed |
 | Kicking Moves | 186 | No | Covered (batch 391): Back Flip (Kick or unarmed Standard Attack; hit reminder for the 5 ft. move and +1 dodge, a miss control applies flat-footed), Guillotine Kick (Kick, −4 attack, +1 threat, Fortitude DC 10 + damage or reeling noted on the damage roll) and Power Kick (Kick damage with armor-piercing (2) and takedown) | Native Foundry QA not claimed |
@@ -364,7 +364,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Martial Arts | 186 | No | Partial: chosen/roll effects | — |
 | Master's Art | 187 | No | Partial: chosen/roll effects | — |
 | Rolling Basics | 187 | No | Manual/descriptive | — |
-| Rolling Moves | 187 | No | Manual/descriptive | — |
+| Rolling Moves | 187 | No | Covered (batch 395): Circle, Leap and Sway on a Kick or unarmed Standard Attack, with their movement and +1 dodge stated on the card for the table | Native Foundry QA not claimed |
 | Rolling Supremacy | 187 | No | Partial: static numerical effects | — |
 | Spirit Basics | 187 | No | Manual/descriptive | — |
 | Spirit Moves | 187 | No | Manual/descriptive | — |
@@ -375,10 +375,10 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Two-hit Combo | 188 | No | Manual/descriptive | — |
 | Warrior's Grace | 189 | No | Manual/descriptive | — |
 | Vital Points Basics | 188 | No | Sneak-attack resistance 6 executes; stance/trick remain manual | — |
-| Vital Points Moves | 188 | No | Manual/descriptive | — |
+| Vital Points Moves | 188 | No | Covered (batch 395): Nerve Jam (−4, threat +1, stunned on a threat or critical hit), One Finger (−4, threat +4, flat-footed target confirmed) and Spike (threat +1) on unarmed Standard Attacks | Native Foundry QA not claimed |
 | Vital Points Supremacy | 188 | No | Unarmed sneak die implemented; tricks remain manual | — |
 | Wrestling Basics | 189 | No | Covered (batch 394): +1 Defense against an adjacent opponent (Incoming attack preview); Open Stance (no Run actions; once per round the GC offers its pull-in and free Grapple or Trip on a resolved miss against the owner); Brush (unarmed Standard Attack for 1d6 subdual whose damage lowers the target’s Initiative Count) | Native Foundry QA not claimed |
-| Wrestling Moves | 189 | No | Manual/descriptive | — |
+| Wrestling Moves | 189 | No | Partial (batch 395): Clothesline (unarmed Standard Attack with takedown, its DC 4 higher, carried onto the damage roll); Hip Toss (Trip) and Fling (grapple) are skill reminders | Native Foundry QA not claimed |
 | Wrestling Supremacy | 189 | No | Partial: static numerical effects | — |
 | All or Nothing | 189 | No | Covered (batch 381): once per session, a rolled skill, Knowledge or attack check declared on its dialog widens error and threat ranges by 5; its error stays open to activation on a success, which then becomes a failure | Native Foundry QA not claimed |
 | Better Luck Next Time | 189 | No | Covered (batch 380): a single boosting die on a skill check or save that rolls a natural 1 is returned once when the check is resolved (ordinary dice, or a still-live unrestricted bonus pool) | Native Foundry QA not claimed |
@@ -1745,3 +1745,14 @@ Source: rules reference p.189 (local markdown edition; original PDF page not vis
 - Wrestling Basics leaves `feat-reminders.json` (tables regenerated).
 
 Verification: 513 legacy assertions, 3409 of 3410 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 70 manual / 56 partial / 188 other; at least 126 of 314 explicitly unfinished; 70 whole-feat closures.
+
+## Residual implementation batch 395 — the shared unarmed-trick table
+
+Source: rules reference pp.185–189 (local markdown edition; original PDF pages not visually re-checked).
+
+- `UNARMED_TRICKS` in `module/rules/unarmed-tricks.mjs`: Unarmed Combat feat tricks that ride an unarmed Standard Attack or a Kick. The attack dialog lists the ones whose feat the character has. Each trick carries its attack modifier, threat range increase, takedown (Clothesline) and the effect it states on a hit or threat. One Finger needs the target confirmed flat-footed. It is the action’s one unarmed trick (`unarmedTrickClash`).
+- Tricks with a save on a hit (Low Blow, Eye Gouge, Haymaker) and Clothesline offer their damage roll on the hit’s card. Clothesline’s damage keeps takedown; the save tricks post the save at DC 10 + the damage. Conditions are applied by the GC.
+- **Dirty Fighting Basics:** Ready Stance joins the stance lifecycle, with its −2 on the card. When an attacker’s damage roll names a target with the feat, the sneak attack part of the formula is halved, rounded up, and the card says so.
+- Tricks riding a Trip, Feint or grapple (Hip Toss, Fling, Body Slam, Fake Out, Mud in Your Eye) stay as skill reminders. The reminders of Wrestling, Brawling and Dirty Fighting Moves now point at those skills; Rolling Moves, Vital Points Moves and Dirty Fighting Basics leave the list (tables regenerated).
+
+Verification: 513 legacy assertions, 3412 of 3413 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 64 manual / 59 partial / 191 other; at least 123 of 314 explicitly unfinished; 73 whole-feat closures.
