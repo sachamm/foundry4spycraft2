@@ -1,3 +1,4 @@
+import { registerSoundtrackSetup, setupSoundtrack } from "./module/soundtrack.mjs";
 import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-scenes.mjs";
 import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
@@ -136,6 +137,7 @@ Hooks.once("init", () => {
   registerGCSettings();
   registerGCConsoleTab();
   registerSampleSceneSetup();
+  registerSoundtrackSetup();
   registerMigrationSettings();
   registerGmLocks();
   registerMapSettings();
@@ -317,3 +319,5 @@ for (const event of ["createItem", "updateItem", "deleteItem"])
 Hooks.on("updateSetting", setting => {
   if (setting.key === "spycraft2.usagePeriods") game.spycraft2?.gc?.console?.render(false);
 });
+
+Hooks.once("ready", setupSoundtrack);

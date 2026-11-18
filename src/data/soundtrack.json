@@ -1,0 +1,141 @@
+{
+  "_id": "a02e5b57d0397ca6",
+  "name": "Where the Trains Run Under",
+  "description": "An eleven-track Spycraft soundtrack, sequenced from the opening title through Run It Quiet.",
+  "mode": 1,
+  "sorting": "m",
+  "playing": false,
+  "fade": 1000,
+  "folder": null,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "spycraft2": {
+      "soundtrack": "where-the-trains-run-under"
+    }
+  },
+  "sounds": [
+    {
+      "_id": "e90fd1b7bcdb7f81",
+      "name": "01. Where the Trains Run Under",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/01-where-the-trains-run-under.ogg",
+      "sort": 100000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "b57ea11d5aa1468f",
+      "name": "02. Tremolo Lounge",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/02-tremolo-lounge.ogg",
+      "sort": 200000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "8f635d3e68b06949",
+      "name": "03. Muted Brass",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/03-muted-brass.ogg",
+      "sort": 300000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "d32e92b70592db0f",
+      "name": "04. Shadowed Motif",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/04-shadowed-motif.ogg",
+      "sort": 400000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "443f56ea826ae622",
+      "name": "05. Clipped Minor Motif",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/05-clipped-minor-motif.ogg",
+      "sort": 500000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "6b4573ad0489c887",
+      "name": "06. Ticking Motif",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/06-ticking-motif.ogg",
+      "sort": 600000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "17d0e66d53d5d4c2",
+      "name": "07. Shadowy Ticking",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/07-shadowy-ticking.ogg",
+      "sort": 700000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "98674ebde377e8e1",
+      "name": "08. Ticking Shadows",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/08-ticking-shadows.ogg",
+      "sort": 800000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "d0e9fc620182df20",
+      "name": "09. Clipped Tremolo",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/09-clipped-tremolo.ogg",
+      "sort": 900000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "559a46d409eabeca",
+      "name": "10. Shadow Pulse",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/10-shadow-pulse.ogg",
+      "sort": 1000000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    },
+    {
+      "_id": "6130c1e1f6ff476f",
+      "name": "11. Run It Quiet",
+      "path": "systems/spycraft2/assets/audio/where-the-trains-run-under/11-run-it-quiet.ogg",
+      "sort": 1100000,
+      "repeat": false,
+      "volume": 0.5,
+      "playing": false,
+      "pausedTime": null,
+      "fade": 1000
+    }
+  ]
+}
