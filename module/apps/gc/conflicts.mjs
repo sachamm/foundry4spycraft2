@@ -15,7 +15,11 @@ import {
   CONFLICT_FEATS,
   photoFinish,
   useConflictFeat,
-  declarePace
+  declarePace,
+  guessStrategy,
+  instinctPenalty,
+  roomFeatFor,
+  easedRoom
 } from "../../rules/gc/conflict.mjs";
 import { requireGC, getConflicts, saveConflict } from "./state.mjs";
 import {
@@ -104,7 +108,21 @@ const chaseLine = (conflict, state) => {
   const smashText = smash
     ? ` ${loc`· ${esc(sideName(conflict, smash.side))} holds`} <b>${loc`${smash.points} Smash`}</b> ${loc`(attacks on them use Lead ${smashRangeLead(conflict.lead, smash)} for range)`}`
     : "";
-  return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${distance !== null ? loc` · ${distance.toLocaleString("en-US")} ft. apart (${r.leadFeet} ft. per Lead)` : ""}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ""}${r.fastest ? loc` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ""}${r.mismatched ? ` · <b>${loc`mismatched scales: settle with one opposed check`}</b>` : ""}${smashText}`;
+  const eased = ["predator", "prey"]
+    .map(side => {
+      const source = state[side],
+        feat = roomFeatFor(
+          conflict[side]?.feats ?? [],
+          source && { kind: source.kind, vehicleClass: source.system?.vehicleClass }
+        ),
+        key = conflict.chase?.room,
+        room = MANEUVERING_ROOM[easedRoom(key)];
+      return feat
+        ? loc` · ${esc(sideName(conflict, side))} (${esc(feat)}) treats it as ${room.label}${easedRoom(key) !== key ? loc` (Crisis DC ${room.crisisDC})` : ""} and has +2 on checks and saves from a Crisis Advantage`
+        : "";
+    })
+    .join("");
+  return `Maneuvering Room ${r.room.label} (Crisis DC ${r.crisisDC})${eased}${distance !== null ? loc` · ${distance.toLocaleString("en-US")} ft. apart (${r.leadFeet} ft. per Lead)` : ""}${r.speedMph !== null ? ` · chase speed ${r.speedMph} MPH` : ""}${r.fastest ? loc` · ${esc(sideName(conflict, r.fastest))} has the fastest vehicle (+${r.topMphBonus})` : ""}${r.mismatched ? ` · <b>${loc`mismatched scales: settle with one opposed check`}</b>` : ""}${smashText}`;
 };
 
 export function conflictRows() {
@@ -229,6 +247,11 @@ export async function advanceConflict(id) {
         await say(
           `<b>${esc(conflict.name)}</b> ${loc`— round ${next.round}, Lead ${next.lead}. Strategies revealed: ${esc(sideName(next, "predator"))}`} <b>${esc(strategy(next, "predator").name)}</b> (${signed(strategyModifier(next, "predator"))}); ${esc(sideName(next, "prey"))} <b>${esc(strategy(next, "prey").name)}</b> ${loc`(${signed(strategyModifier(next, "prey"))}). Make the opposed check.`}`
         );
+      for (const target of ["predator", "prey"])
+        if (instinctPenalty(next, target))
+          await say(
+            `<b>${esc(conflict.name)}</b>: ${loc`Driving Instincts — the guess was right; ${esc(sideName(next, target))} takes −${instinctPenalty(next, target)} on this check (included above).`}`
+          );
       return next;
     }
     if (conflict.step === "check") {
@@ -356,6 +379,9 @@ async function announceEnd(id, conflict) {
   return conflict;
 }
 
+const SIDES_WITH_INSTINCTS = conflict =>
+  ["predator", "prey"].some(side => (conflict[side].feats ?? []).includes("Driving Instincts"));
+
 /** Concede, correct the Lead, or delete the record. */
 export async function manageConflict(id) {
   requireGC();
@@ -392,6 +418,14 @@ export async function manageConflict(id) {
                     ]
                   ]
                 : []),
+              ...((conflict[side].feats ?? []).includes("Driving Instincts") && conflict.step === "strategies"
+                ? [
+                    [
+                      `instinct-${side}`,
+                      loc`${sideName(conflict, side)}: Driving Instincts (guess the opponent’s Strategy)`
+                    ]
+                  ]
+                : []),
               ...["Defensive Driving", "Offensive Driving"]
                 .filter(
                   feat => (conflict[side].feats ?? []).includes(feat) && !conflict.featUses?.[side]?.includes(feat)
@@ -417,6 +451,14 @@ export async function manageConflict(id) {
       "lead"
     )}</select></label>
     <label>${loc`Lead`} <input type="number" name="lead" value="${conflict.lead}" /></label>
+    ${
+      conflict.type === "chase" && SIDES_WITH_INSTINCTS(conflict)
+        ? `<fieldset><legend>${loc`Driving Instincts (p.192)`}</legend><label>${loc`Guessed Strategy`} <select name="instinctGuess">${options(
+            CONFLICT_TYPES[conflict.type].strategies.map(entry => [entry.id, entry.name]),
+            ""
+          )}</select></label><label>${loc`Guessing side’s Chase feats`} <input type="number" name="instinctFeats" min="1" step="1" value="1" /></label></fieldset>`
+        : ""
+    }
     ${
       conflict.chase
         ? `<label>${loc`Maneuvering Room`} <select name="room">${options(roomRows(), conflict.chase.room)}</select></label>
@@ -451,6 +493,14 @@ export async function manageConflict(id) {
         { next, note } = declarePace(conflict, side);
       await saveConflict(id, next);
       return say(`<b>${esc(conflict.name)}</b>: ${esc(sideName(conflict, side))} — ${esc(note)}`);
+    }
+    if (input.action.startsWith("instinct-")) {
+      const side = input.action.slice("instinct-".length),
+        next = guessStrategy(conflict, side, input.instinctGuess, Number(input.instinctFeats));
+      await saveConflict(id, next);
+      return say(
+        `<b>${esc(conflict.name)}</b>: ${esc(sideName(conflict, side))} ${loc`— Driving Instincts guess recorded; it is checked when the Strategies are revealed.`}`
+      );
     }
     if (input.action.startsWith("feat-")) {
       const [, side, ...rest] = input.action.split("-"),

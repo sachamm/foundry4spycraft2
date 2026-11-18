@@ -400,19 +400,19 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Baby It | 191 | No | Manual/descriptive | — |
 | Demolition Derby | 192 | No | Partial (batch 384): +2 to Damage saves of a vehicle the character drives; reduced collision damage needs a collision workflow, which does not exist yet | Native Foundry QA not claimed |
 | Death Ride | 192 | No | Manual/descriptive | — |
-| Bail Out! | 191 | No | Manual/descriptive | — |
+| Bail Out! | 191 | No | Partial (batch 409): the chase tracker opens Long Gone to a Prey with the feat whatever its ratings, with the end-of-round crash for the GC to confirm; reduced crash damage stays with the GC | Native Foundry QA not claimed |
 | Daredevil | 192 | No | Covered (batch 383): Strategy rating requirements are checked with Acceleration and Turning +2; Stunt needs no GC confirmation | Native Foundry QA not claimed |
 | Crew Dog | 191 | No | Manual/descriptive | — |
-| Lane Dancer | 192 | No | Manual/descriptive | — |
-| Mount Up | 192 | No | Manual/descriptive | — |
+| Lane Dancer | 192 | No | Covered: in a ground vehicle the chase tracker shows the side treating Tight room as Close or Close as Open, with its Crisis DC, and the +2 on checks and saves from a Crisis Advantage (batch 409); outside chases the room grade stays with the GC | Native Foundry QA not claimed |
+| Mount Up | 192 | No | Partial: on a mount the chase tracker shows the side treating Tight room as Close or Close as Open, with its Crisis DC, and the +2 on checks and saves from a Crisis Advantage (batch 409); the mount’s Defense and Reflex matching the rider’s stay with the GC | Native Foundry QA not claimed |
 | Photo Finish | 193 | No | Covered (batch 383): every participant’s Acceleration and Turning drop by 2 per use, kept through rating refreshes | Native Foundry QA not claimed |
 | Wave Runner | 193 | No | Breath allowance executes; vehicle maneuvering/Crisis benefits manual | — |
-| Wind Rider | 193 | No | Manual/descriptive | — |
-| Dash | 192 | No | Manual/descriptive | — |
+| Wind Rider | 193 | No | Partial: in an aircraft the chase tracker shows the side treating Tight room as Close or Close as Open, with its Crisis DC, and the +2 on checks and saves from a Crisis Advantage (batch 409); the Notice visual-range halving and gliding distance stay with the GC | Native Foundry QA not claimed |
+| Dash | 192 | No | Partial: a Run covers Speed × 5 (× 3 in full body armor); on foot the chase tracker shows the side treating Tight room as Close or Close as Open, with its Crisis DC, and the +2 on checks and saves from a Crisis Advantage (batch 409); the running-jump increase stays with the GC | Native Foundry QA not claimed |
 | Sprint | 193 | No | Verified complete: +10 ft. Speed with earned Dash prerequisite | Batch229; duplicate/source removal, single halving and independent Fleet/class interaction verified; Dash effects remain separately open |
 | Defensive Driving | 192 | No | Covered (batch 383): Prey Strategy penalties halved (rounded down); once-per-chase forced Crisis recorded for the GC | Native Foundry QA not claimed |
 | Jackrabbit Start | 192 | No | Covered (batch 383): chase or manhunt Prey: starting Lead +2; every won Strategy offers the Lead Advantage | Native Foundry QA not claimed |
-| Driving Instincts | 192 | No | Manual/descriptive | — |
+| Driving Instincts | 192 | No | Covered (batch 409): the chase tracker records the side’s guess before the reveal; a right guess subtracts the side’s Chase feats from the opponent’s Strategy modifier for that check | Native Foundry QA not claimed |
 | Professional Driver - Closed Course | 193 | No | Implemented: Impress synergy on all five Maneuvers; Acrobatics or Drive synergy on all Impress uses when the target sees both you and your vehicle | Batch259; all named uses, rank thresholds/cap, typed stacking, source guards, actual dialog and native persistence verified |
 | Duct Tape and Bubblegum | 192 | No | Covered (batch 384): a vehicle gains the best half-Mechanics-ranks (rounded up) Damage save bonus among its driver and occupants with the feat | Native Foundry QA not claimed |
 | Get Radical! | 192 | No | Manual/descriptive | — |

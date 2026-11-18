@@ -38,8 +38,31 @@ export const CONFLICT_FEATS = Object.freeze([
   "Offensive Driving",
   "Photo Finish",
   "Breaking Points",
-  "Hold Out"
+  "Hold Out",
+  "Bail Out!",
+  "Driving Instincts",
+  "Dash",
+  "Lane Dancer",
+  "Mount Up",
+  "Wind Rider"
 ]);
+
+/**
+ * Chase feats that let one side treat Tight Maneuvering Room as Close, or Close as Open, and give +2 on checks and
+ * saves made because of a Crisis Advantage (pp.192–193), each for one way of moving: on foot (Dash), ground vehicles
+ * (Lane Dancer), mounts (Mount Up) or aircraft (Wind Rider).
+ */
+export const ROOM_FEATS = Object.freeze({
+  Dash: mover => mover?.kind === "foot",
+  "Lane Dancer": mover => mover?.kind === "vehicle" && ["PGV", "SGV", "HGV"].includes(mover.vehicleClass),
+  "Mount Up": mover => mover?.kind === "vehicle" && mover.vehicleClass === "M/AD",
+  "Wind Rider": mover => mover?.kind === "vehicle" && ["PSA", "PFA", "SVA", "RWA"].includes(mover.vehicleClass)
+});
+/** The room-easing feat that applies to a side, if any. */
+export const roomFeatFor = (feats = [], mover) =>
+  Object.keys(ROOM_FEATS).find(feat => feats.includes(feat) && ROOM_FEATS[feat](mover)) ?? "";
+/** Tight is treated as Close and Close as Open; other grades are unchanged. */
+export const easedRoom = key => ({ tight: "close", close: "open" })[key] ?? key;
 const has = (conflict, side, feat) => (conflict[side]?.feats ?? []).includes(feat);
 const LEAD_FEATS = { prey: "Jackrabbit Start", predator: "Relentless Pursuit" };
 const leadFeat = (conflict, side) =>
@@ -124,6 +147,21 @@ export function availableStrategies(conflict, side) {
             needs.map(need => `${need.rating} ${need.min}+`).join(strategy.ratingsMode === "all" ? " and " : " or ")
           );
       }
+      // Bail Out!: the Prey may attempt Long Gone at any time, and crashes at the end of the round.
+      if (
+        conflict.type === "chase" &&
+        side === "prey" &&
+        strategy.id === "long-gone" &&
+        has(conflict, side, "Bail Out!")
+      ) {
+        reasons.length = 0;
+        return {
+          ...strategy,
+          available: true,
+          reasons,
+          confirm: loc`Bail Out!: the Prey automatically crashes at the end of this Conflict round`
+        };
+      }
       // Daredevil supplies the Stunt Strategy's feat requirement.
       let confirm = daredevil && strategy.id === "stunt" ? "" : strategy.other || "";
       // Breaking Points and Hold Out open every Strategy of the side's own list, whatever it requires.
@@ -150,6 +188,34 @@ export function chooseStrategy(conflict, side, strategyId, { confirmOther = fals
   return next;
 }
 
+/**
+ * Driving Instincts, p.192: after both Strategies are chosen and before they are revealed, the side guesses the
+ * opponent's. A correct guess gives the opponent a penalty on this round's check equal to the side's Chase feats.
+ */
+export function guessStrategy(conflict, side, strategyId, chaseFeats) {
+  if (!SIDES.includes(side)) throw new Error(loc`Choose Predator or Prey.`);
+  if (conflict.winner) throw new Error(loc`This conflict is over.`);
+  if (conflict.type !== "chase" || !has(conflict, side, "Driving Instincts"))
+    throw new Error(loc`Driving Instincts needs a chase participant with the feat.`);
+  if (conflict.step !== "strategies") throw new Error(loc`Guess before the Strategies are revealed.`);
+  if (conflict.instinct?.round === conflict.round && conflict.instinct.side === side)
+    throw new Error(loc`Already guessed this round.`);
+  if (!Number.isSafeInteger(chaseFeats) || chaseFeats < 1)
+    throw new Error(loc`Enter the side’s number of Chase feats.`);
+  if (!type(conflict.type).strategies.some(entry => entry.id === strategyId)) throw new Error(loc`Choose a Strategy.`);
+  return {
+    ...structuredClone(conflict),
+    instinct: { round: conflict.round, side, guess: strategyId, penalty: chaseFeats }
+  };
+}
+/** The Driving Instincts penalty on a side's check this round, once both Strategies are known. */
+export function instinctPenalty(conflict, side) {
+  const i = conflict.instinct;
+  return i && i.round === conflict.round && i.side === other(side) && conflict[side]?.strategy === i.guess
+    ? i.penalty
+    : 0;
+}
+
 /** The Strategy's printed modifier to that side's opposed skill check, after Defensive or Offensive Driving. */
 export function strategyModifier(conflict, side) {
   const strategy = type(conflict.type).strategies.find(entry => entry.id === conflict[side].strategy),
@@ -159,7 +225,7 @@ export function strategyModifier(conflict, side) {
     printed < 0 &&
     ((strategy.side === "prey" && has(conflict, side, "Defensive Driving")) ||
       (strategy.side === "predator" && has(conflict, side, "Offensive Driving")));
-  return halves ? -Math.floor(-printed / 2) : printed;
+  return (halves ? -Math.floor(-printed / 2) : printed) - instinctPenalty(conflict, side);
 }
 
 /**

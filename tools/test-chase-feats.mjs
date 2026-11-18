@@ -10,7 +10,11 @@ import {
   conflictRatings,
   photoFinish,
   useConflictFeat,
-  CONFLICT_FEATS
+  CONFLICT_FEATS,
+  guessStrategy,
+  instinctPenalty,
+  roomFeatFor,
+  easedRoom
 } from "../module/rules/gc/conflict.mjs";
 
 const chase = (pFeats = [], qFeats = [], lead = 5, ratings = { Acceleration: 5, Turning: 5 }) =>
@@ -23,7 +27,7 @@ const strategies = (c, side) => Object.fromEntries(availableStrategies(c, side).
 
 test("only the tracked chase feats are kept on a side", () => {
   assert.deepEqual(chase(["Daredevil", "Quick Draw"]).predator.feats, ["Daredevil"]);
-  assert.equal(CONFLICT_FEATS.length, 8);
+  assert.equal(CONFLICT_FEATS.length, 14);
 });
 
 test("Jackrabbit Start and Relentless Pursuit move the starting Lead by 2, inside the track", () => {
@@ -139,4 +143,48 @@ test("Breaking Points and Hold Out: interrogation or brainwashing Lead ±1 and a
   assert.match(declarePace(paced.next, "prey").note, /twice its usual time/);
   assert.throws(() => declarePace(paced.next, "predator"), /Already declared/);
   assert.throws(() => declarePace(talk(), "predator"), /cannot change/);
+});
+
+test("Bail Out! opens Long Gone to the Prey whatever its ratings, with the crash to confirm", () => {
+  assert.equal(strategies(chase(), "prey")["long-gone"].available, false);
+  const open = strategies(chase([], ["Bail Out!"]), "prey")["long-gone"];
+  assert.equal(open.available, true);
+  assert.match(open.confirm, /crashes at the end of this Conflict round/);
+  assert.throws(() => chooseStrategy(chase([], ["Bail Out!"]), "prey", "long-gone"), /must confirm/);
+  assert.equal(
+    chooseStrategy(chase([], ["Bail Out!"]), "prey", "long-gone", { confirmOther: true }).prey.strategy,
+    "long-gone"
+  );
+});
+
+test("Driving Instincts: a right guess costs the opponent the guesser's Chase feats on this check", () => {
+  let c = chase(["Driving Instincts"]);
+  const preyPick = Object.values(strategies(c, "prey")).find(s => s.available && !s.confirm).id;
+  c = guessStrategy(c, "predator", preyPick, 3);
+  assert.throws(() => guessStrategy(c, "predator", preyPick, 3), /Already/);
+  assert.throws(() => guessStrategy(chase(), "predator", preyPick, 3), /needs a chase participant/);
+  const before = strategyModifier(c, "prey");
+  const predatorPick = Object.values(strategies(c, "predator")).find(s => s.available && !s.confirm).id;
+  c = chooseStrategy(chooseStrategy(c, "prey", preyPick), "predator", predatorPick);
+  assert.equal(instinctPenalty(c, "prey"), 3);
+  assert.equal(instinctPenalty(c, "predator"), 0);
+  assert.equal(strategyModifier(c, "prey"), strategyModifier({ ...c, instinct: null }, "prey") - 3);
+  assert.ok(Number.isFinite(before));
+  assert.throws(() => guessStrategy(c, "predator", preyPick, 3), /before the Strategies are revealed/);
+});
+
+test("Dash, Lane Dancer, Mount Up and Wind Rider ease the room for their own way of moving", () => {
+  assert.equal(roomFeatFor(["Dash"], { kind: "foot" }), "Dash");
+  assert.equal(roomFeatFor(["Dash"], { kind: "vehicle", vehicleClass: "SGV" }), "");
+  assert.equal(roomFeatFor(["Lane Dancer"], { kind: "vehicle", vehicleClass: "SGV" }), "Lane Dancer");
+  assert.equal(roomFeatFor(["Lane Dancer"], { kind: "vehicle", vehicleClass: "RWA" }), "");
+  assert.equal(roomFeatFor(["Wind Rider"], { kind: "vehicle", vehicleClass: "RWA" }), "Wind Rider");
+  assert.equal(roomFeatFor(["Mount Up"], { kind: "vehicle", vehicleClass: "M/AD" }), "Mount Up");
+  assert.deepEqual(["tight", "close", "crowded", "open"].map(easedRoom), ["close", "open", "crowded", "open"]);
+});
+
+test("Dash: a Run covers Speed × 5", async () => {
+  const { combatMovementRules } = await import("../module/rules/combat-movement.mjs");
+  assert.equal(combatMovementRules({ speed: 30, activeFeatNames: ["Dash"] }).runFeet, 150);
+  assert.equal(combatMovementRules({ speed: 30, activeFeatNames: [] }).runFeet, 120);
 });

@@ -9,6 +9,8 @@ export function combatMovementRules(system) {
     mobileDefense = system.activeFeatNames?.includes("Mobile Defense") === true;
   const fullArmor = (system.armor?.adjustments ?? []).some(row => row.slot === "body" && row.type === "F");
   const speed = Number.isFinite(system.speed) && system.speed >= 0 ? system.speed : null;
+  // Dash, p.192: a Run covers up to Speed × 5 instead of × 4 (full body armor still limits it to × 3).
+  const run = fullArmor ? 3 : system.activeFeatNames?.includes("Dash") ? 5 : 4;
   return {
     mobility,
     mobileDefense,
@@ -16,8 +18,8 @@ export function combatMovementRules(system) {
     speed,
     standardMoveFeet: speed,
     totalDefenseMoveFeet: speed === null ? null : speed * (mobility ? 2 : 1),
-    runMultiplier: fullArmor ? 3 : 4,
-    runFeet: speed === null ? null : speed * (fullArmor ? 3 : 4),
+    runMultiplier: run,
+    runFeet: speed === null ? null : speed * run,
     maximumRunTurns: mobility ? Math.max(1, system.abilities?.dex?.mod ?? 0) : 0,
     maximumRunTurnDegrees: mobility ? 90 : 0,
     runFlatFooted: !mobileDefense && system.uncannyDodge?.cannotBeFlatFooted !== true
