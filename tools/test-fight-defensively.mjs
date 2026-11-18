@@ -120,3 +120,24 @@ test("Equilibrium Supremacy adds half the Covert feats as dodge; Tribesman adds 
   assert.equal(tribe.defense.total, calculate({ specialty: "Tribesman" }).defense.total + 3);
   assert.equal(normal.fightDefensivelyState.active, false);
 });
+
+test("Not the Face: Charisma-modifier DR against melee and unarmed attacks only while defending", async () => {
+  const { notTheFaceDR } = await import("../module/rules/not-the-face.mjs");
+  const owner = (fd, td) => ({
+    activeFeatNames: ["Not the Face"],
+    fightDefensivelyState: { active: fd },
+    totalDefenseState: { active: td }
+  });
+  assert.equal(notTheFaceDR(owner(true, false), 3), 3);
+  assert.equal(notTheFaceDR(owner(false, true), 3), 3);
+  assert.equal(notTheFaceDR(owner(false, false), 3), 0);
+  assert.equal(notTheFaceDR(owner(true, false), -1), 0);
+  assert.equal(notTheFaceDR({ ...owner(true, true), activeFeatNames: [] }, 3), 0);
+  const plain = calculate({ feats: ["Not the Face"] }),
+    s = calculate({ declared: true, feats: ["Not the Face"] });
+  assert.equal(s.notTheFaceDR, 2, "Charisma 14");
+  assert.equal(s.armorDRByAttack.unarmed, plain.armorDRByAttack.unarmed + 2);
+  assert.equal(s.armorDRByAttack.meleeWeapon, plain.armorDRByAttack.meleeWeapon + 2);
+  assert.equal(s.armorDRByAttack.rangedWeapon, plain.armorDRByAttack.rangedWeapon);
+  assert.equal(s.armorDRByAttack.hurledWeapon, plain.armorDRByAttack.hurledWeapon);
+});

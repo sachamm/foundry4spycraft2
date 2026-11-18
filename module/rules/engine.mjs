@@ -11,6 +11,7 @@ import { berserkerRageState } from "./berserker.mjs";
 import { favoredGearState } from "./favored-gear.mjs";
 import { duelingAllDodge } from "./dueling-basics.mjs";
 import { fightDefensivelyState } from "./fight-defensively.mjs";
+import { notTheFaceDR } from "./not-the-face.mjs";
 import { attributeDamageState } from "./attribute-damage.mjs";
 import { candidatePlan } from "./candidate.mjs";
 import { toolShedKitState } from "./tool-shed.mjs";
@@ -1261,6 +1262,12 @@ export function computeAgent(sys, items, cfg, options = {}) {
       B.add("defense", sys.fightDefensivelyState.equilibrium, "Equilibrium Supremacy", "dodge");
     if (sys.fightDefensivelyState.tribesman)
       B.add("defense", sys.fightDefensivelyState.tribesman, "Tribesman (Fight Defensively)");
+  }
+  // Not the Face: DR against melee and unarmed attacks while either defensive declaration lasts.
+  sys.notTheFaceDR = notTheFaceDR(sys, abil.cha.mod);
+  if (sys.notTheFaceDR) {
+    sys.armorDRByAttack.unarmed += sys.notTheFaceDR;
+    sys.armorDRByAttack.meleeWeapon += sys.notTheFaceDR;
   }
   const sideStanceDefense = sideStanceDefensePenalty(sys);
   if (sideStanceDefense) B.add("defense", sideStanceDefense, "Side Stance");
