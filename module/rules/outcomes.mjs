@@ -1,3 +1,4 @@
+import { attackResolutionNote, opposedNote } from "./damage-application.mjs";
 import { dropFollowUpNote } from "./drop-follow-up.mjs";
 import { opportunistNote } from "./opportunist.mjs";
 import { allOrNothingNote } from "./all-or-nothing.mjs";
@@ -111,6 +112,8 @@ export function checkFlavor(check) {
   if (blackCatNote(check)) notes.push(esc(blackCatNote(check)));
   if (check.featReminders?.length) notes.push(esc(reminderNote(check.featReminders)) + ".");
   notes.push(...cooperativeNotes(check).map(esc));
+  if (attackResolutionNote(check)) notes.push(esc(attackResolutionNote(check)));
+  if (opposedNote(check)) notes.push(esc(opposedNote(check)));
   if ((check.checkMethod ?? "roll") === "roll" && (check.threat > 0 || check.error > 0))
     notes.push(loc`Error ${check.error ?? 0}; threat ${check.threat ?? 0}.`);
   if (known) notes.push(check.successConfirmed ? loc`Succeeded.` : loc`Failed.`);

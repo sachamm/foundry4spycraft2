@@ -6,6 +6,7 @@ import { CONTACT_FEATS } from "../rules/contact-feats.mjs";
 import { armorTrainingAdjustments } from "../rules/armor-training.mjs";
 import { planAmmunitionStockpile } from "../apps/ammunition-planner.mjs";
 import { ammunitionConfiguration, compatibleAmmunition } from "../rules/ammunition.mjs";
+import { ammunitionState } from "../rules/ammunition-use.mjs";
 import { FIRE_MODES, FIREARM_CATEGORIES, weaponFireModes } from "../rules/firearms.mjs";
 import { equipmentCategory, armorSlot } from "../rules/gear.mjs";
 import { describe as describePrereq } from "../rules/prerequisites.mjs";
@@ -132,6 +133,13 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
       calibers: cfg.calibers,
       canPlanAmmunition: compatibleAmmunition(sys, cfg.tables?.ammunitionCatalog ?? []).length > 0,
       ammunitionConfiguration: ammunitionConfiguration(sys),
+      shotCount: ammunitionState(sys).tracked
+        ? {
+            state: ammunitionState(sys),
+            loaded: loc`Shots loaded (empty: full)`,
+            spare: loc`Shots in reserve (empty: the printed supply)`
+          }
+        : null,
       ammunitionCodeOptions: Object.fromEntries(
         ammunitionConfiguration(sys).options.map(option => [option.code, option.label])
       ),

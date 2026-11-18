@@ -20,6 +20,9 @@ import { parseAmmunitionCode } from "../rules/ammunition.mjs";
 import { grappleTrickLines } from "../rules/grapple-tricks.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { spendWeaponShots, weaponAmmunition } from "./ammunition-use.mjs";
+import { recentResultsHint } from "./opposed-checks.mjs";
+import { setConditionStatus } from "../rules/condition-status.mjs";
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -42,9 +45,10 @@ export function fireActionContent(preview, item, actor = null) {
   if (!preview?.firearm && steelRainWeapon(actor?.system, item?.system)) return steelRainContent();
   if (!preview?.firearm) return "";
   const modes = preview.modes ?? [],
-    capacity = parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "";
+    counted = weaponAmmunition(item),
+    capacity = counted ? counted.loaded : (parseAmmunitionCode(item?.system?.ammo)?.capacity ?? "");
   const option = (value, label, show = true) => (show ? `<option value="${value}">${label}</option>` : "");
-  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("twoShotBurst", loc`Two-Shot Burst — Single-Shot or Burst mode, 2 shots, at most 2 hits (Autofire Basics)`, (modes.includes("single") || modes.includes("burst")) && actor?.system?.activeFeatNames?.includes("Autofire Basics") === true)}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="100" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}" /></label><p class="hint">${loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
+  return `<fieldset class="spycraft2-fire-action"><legend>${loc`Fire action`}</legend><label>${loc`Action`} <select name="fireAction">${option("", loc`One attack, as declared above`)}${option("burst", loc`Burst — Burst mode, 3 shots, error +1 (a Standard Attack)`, modes.includes("burst"))}${option("twoShotBurst", loc`Two-Shot Burst — Single-Shot or Burst mode, 2 shots, at most 2 hits (Autofire Basics)`, (modes.includes("single") || modes.includes("burst")) && actor?.system?.activeFeatNames?.includes("Autofire Basics") === true)}${option("autofire", loc`Autofire — Full Auto, 3 shots a volley, –1 a volley, error +2`, modes.includes("auto"))}${option("strafe", loc`Strafe — Full Auto, 3 shots a square, recoil doubled, error +2`, modes.includes("auto"))}${option("coverFire", loc`Cover Fire — 5 shots, the target saves (no attack check)`)}${option("suppressiveFire", loc`Suppressive Fire — 5 shots at an empty square (no attack check)`)}${option("suppressiveFinal", loc`Final attack from Suppressive Fire — 1 shot, –4`)}</select></label><label>${loc`Volleys (Autofire) or squares (Strafe)`} <input type="number" name="fireCount" min="1" max="100" step="1" /></label><label>${loc`Shots left in the weapon`} <input type="number" name="shotsRemaining" min="0" step="1" value="${capacity}"${counted ? " readonly" : ""} /></label><p class="hint">${counted ? loc`Burst, Autofire and Strafe set the fire mode they need. The shots fired are taken from the weapon.` : loc`Burst, Autofire and Strafe set the fire mode they need. Shots are not deducted for you.`}</p></fieldset>`;
 }
 
 /** Steel Rain's hurled-weapon fire actions: the Burst trick, Cover Fire and Suppressive Fire. */
@@ -132,6 +136,7 @@ export async function coverFire(actor, item, input = {}) {
   await post(actor, [
     loc`Cover Fire with ${esc(item.name)}${target ? loc` at ${esc(target.name)}` : ""}: 5 shots. Will save DC ${dc}. On a failure the opponent takes –4 to attack and skill checks for a round; failing by 5 or more lets the attacker spend an action die on a final attack with this weapon, without Aim (p.355).`
   ]);
+  await spendWeaponShots(item, COVER_FIRE.shots);
   if (target?.isOwner)
     return target.rollSave("will", {
       askContext: true,
@@ -149,6 +154,7 @@ export async function suppressiveFire(actor, item, input = {}) {
     loc`Suppressive Fire with ${esc(item.name)}: 5 shots into an empty square within maximum range. For a round, anyone hostile crossing the square draws a final attack at –4 (1 more shot each, no Aim) and takes –4 to attack and skill checks until the start of the attacker's next Initiative Count (p.361).`,
     loc`Roll each final attack from the ranged attack dialog with the fire action "Final attack from Suppressive Fire".`
   ]);
+  await spendWeaponShots(item, SUPPRESSIVE_FIRE.shots);
   return true;
 }
 
@@ -271,6 +277,30 @@ rollPipeline.register({
 /*  Grapple                                      */
 /* -------------------------------------------- */
 
+const grappleTargeted = () => {
+  const targeted = [...(game.user?.targets ?? [])];
+  return targeted.length === 1 ? (targeted[0].actor?.uuid ?? "") : "";
+};
+
+/** Set the conditions an opening grapple check brings (p.356) on the characters this user owns. */
+async function grappleConditions(actor, input, outcome) {
+  const manual = loc`Record Held, Pinned, Sprawled or Flat-footed with the token's condition controls.`;
+  if (!input.opening || outcome.winner === "tie") return [manual];
+  const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
+  const set = async (who, id, label) => {
+    if (!who?.isOwner) return loc`${esc(who?.name ?? loc`The opponent`)}: set ${label} by hand.`;
+    try {
+      await setConditionStatus(who, id, true, { label });
+      return loc`${esc(who.name)} is now ${label.toLowerCase()}.`;
+    } catch (error) {
+      return loc`${esc(who.name)}: ${label} could not be set (${esc(error.message)}).`;
+    }
+  };
+  if (outcome.winner === "actor") return [await set(opponent, "held", loc`Held`)];
+  const decisive = input.opponentCritical === true || input.criticalFailure === true;
+  return [decisive ? await set(actor, "sprawled", loc`Sprawled`) : await set(actor, "flat-footed", loc`Flat-footed`)];
+}
+
 /** Settle one opposed grapple check and list the benefits the winner may choose from. */
 export async function settleGrapple(actor, options = {}) {
   let input = options;
@@ -279,7 +309,15 @@ export async function settleGrapple(actor, options = {}) {
       window: { title: loc`Grapple: settle the opposed check` },
       rejectClose: false,
       ok: { label: loc`Settle` },
-      content: `<div class="spycraft2-roll-options"><p>${loc`Both sides roll Athletics (Str); the Grasp tag and the Armor Check Penalty tag apply. The bigger character adds +4 for each Size category of difference (p.356). Enter the two results.`}</p><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size categories you are bigger by (negative when smaller), for reference`} <input type="number" name="sizeDifference" value="0" step="1" /></label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Both sides roll Athletics (Str); the Grasp tag and the Armor Check Penalty tag apply. The bigger character adds +4 for each Size category of difference (p.356). Enter the two results.`}</p><p class="hint">${recentResultsHint()}</p><label>${loc`Opponent (to set conditions on a character you own)`} <select name="opponentUuid"><option value="">${loc`Not listed`}</option>${attackCharacterTargetChoices()
+        .filter(a => a.uuid !== actor.uuid)
+        .map(
+          a =>
+            `<option value="${esc(a.uuid)}"${a.uuid === grappleTargeted() ? " selected" : ""}>${esc(a.name)}</option>`
+        )
+        .join(
+          ""
+        )}</select></label><label><input type="checkbox" name="opening" checked /> ${loc`This check starts the grapple`}</label><label>${loc`Your result`} <input type="number" name="total" step="1" required /></label><label>${loc`Opponent's result`} <input type="number" name="opponentTotal" step="1" required /></label><label><input type="checkbox" name="critical" /> ${loc`Your critical success`}</label><label><input type="checkbox" name="criticalFailure" /> ${loc`Your critical failure`}</label><label><input type="checkbox" name="opponentCritical" /> ${loc`Opponent's critical success`}</label><label><input type="checkbox" name="opponentCriticalFailure" /> ${loc`Opponent's critical failure`}</label><label>${loc`Size categories you are bigger by (negative when smaller), for reference`} <input type="number" name="sizeDifference" value="0" step="1" /></label></div>`
     });
     if (!input) return null;
     input = {
@@ -312,7 +350,7 @@ export async function settleGrapple(actor, options = {}) {
     ...outcome.effects.map(esc),
     sizeBonus ? loc`Size: the bigger character's result includes +${sizeBonus}.` : "",
     ...benefits,
-    loc`Record Held, Pinned, Sprawled or Flat-footed with the sheet's condition controls.`
+    ...(await grappleConditions(actor, input, outcome))
   ]);
   return outcome;
 }

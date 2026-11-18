@@ -27,6 +27,7 @@
   <div class="npc-play">
     {{#if gcPlay.special}}{{#unless system.npcProfile.enabled}}<p><label>{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRoleSetsTheGCS"}} <select name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label></p>{{/unless}}{{/if}}
     <p><a data-action="rollNpcSkill">{{localize "SPYCRAFT.Template.ActorNpcSheet.SkillCheck"}}</a> · <a data-action="manageDisposition">{{localize "SPYCRAFT.Template.ActorNpcSheet.Disposition"}}{{gcPlay.baseDisposition}}{{#each gcPlay.dispositions}}; {{name}}: {{grade}}{{/each}})</a>{{#if system.promoted}} · <b>{{localize "SPYCRAFT.Template.ActorNpcSheet.PromotedToSpecialForThisMission"}}</b> <a data-action="endPromotion">{{localize "SPYCRAFT.Template.ActorNpcSheet.End"}}</a>{{/if}}</p>
+    {{#if gcPlay.special}}<p><a data-action="restAndRecover">{{playLabels.rest}}</a>{{#if dying}} · <a data-action="rollDying" class="bad">{{playLabels.dying}}</a>{{/if}}</p>{{/if}}
     {{#unless gcPlay.special}}<p>{{localize "SPYCRAFT.Template.ActorNpcSheet.DamageSave"}} {{signed gcPlay.damage.bonus}} {{localize "SPYCRAFT.Template.ActorNpcSheet.AccumulatedDamage"}} {{gcPlay.damage.track.accumulated}} {{localize "SPYCRAFT.Template.ActorNpcSheet.NextDC"}} {{gcPlay.damage.nextDC}}{{localize "SPYCRAFT.Template.ActorNpcSheet.FailedSaves"}} {{gcPlay.damage.track.failures}}{{#if gcPlay.damage.tough}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Tough"}} {{gcPlay.damage.tough}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Used"}} {{gcPlay.damage.track.ignored}}){{/if}} · <b>{{gcPlay.damage.track.state}}</b>
       · <a data-action="npcDamageSave">{{localize "SPYCRAFT.Template.ActorNpcSheet.SufferDamage"}}</a> · <a data-action="resetDamageTrack">{{localize "SPYCRAFT.Template.ActorNpcSheet.Reset"}}</a>
       <label>{{localize "SPYCRAFT.Template.ActorNpcSheet.SaveAdjustmentVitalityWoundEffectsP"}} <input name="system.damageSaveAdjust" type="number" value="{{system.damageSaveAdjust}}" class="w-2" /></label>
@@ -56,7 +57,7 @@
   {{/unless}}
   <h3>{{localize "SPYCRAFT.Weapons"}}</h3>
   <ul class="item-list compact">
-    {{#each weapons}}<li data-item-id="{{item.id}}"><a data-action="rollAttack" class="name">{{item.name}} {{signed attack.total}}</a> <a data-action="rollDamage">{{item.system.damage}}</a>
+    {{#each weapons}}<li data-item-id="{{item.id}}"><a data-action="rollAttack" class="name">{{item.name}} {{signed attack.total}}</a> <a data-action="rollDamage">{{item.system.damage}}</a>{{#if shots}} <span class="{{#if shots.empty}}bad{{else}}muted{{/if}}">{{shots.loaded}}/{{shots.capacity}}</span> <a data-action="reloadWeapon">{{@root.playLabels.reload}}</a>{{/if}}
       <span class="controls"><a data-action="itemEdit"><i class="fa-solid fa-pen"></i></a> <a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></span></li>{{/each}}
   </ul>
   <h3>{{localize "SPYCRAFT.Items"}}</h3>

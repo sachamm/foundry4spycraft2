@@ -14,6 +14,7 @@
         <div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.Error"}}</dt><dd>{{attack.error}}</dd></div><div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.Threat"}}</dt><dd>{{attack.threat}}</dd></div>
         {{#if attack.range}}<div><dt>{{localize "SPYCRAFT.Template.ActorAgentGear.RangeIncrement"}}</dt><dd>{{attack.range}} {{localize "SPYCRAFT.Template.ActorAgentGear.Ft"}}</dd></div>{{/if}}
       </dl>
+      {{#if shots}}<p class="inventory-ammunition{{#if shots.empty}} inventory-warning{{/if}}">{{shots.label}} · <a data-action="reloadWeapon">{{@root.playLabels.reload}}</a>{{#if shots.counted}} · <a data-action="resupplyWeapon">{{@root.playLabels.resupply}}</a>{{/if}}</p>{{/if}}
       {{#unless attack.trained}}<p class="inventory-warning">{{localize "SPYCRAFT.Template.ActorAgentGear.UntrainedAttackTheAttackDialogChecks"}}</p>{{/unless}}
       {{#if attack.quirky.quirky}}{{#unless attack.trained}}<p class="inventory-warning">{{localize "SPYCRAFT.Template.ActorAgentGear.Quirky4WhileUntrained"}}</p>{{/unless}}{{/if}}
       {{#if attack.trainedOnly.trainedOnly}}{{#unless attack.trained}}<p class="inventory-warning">{{localize "SPYCRAFT.Template.ActorAgentGear.TrainingRequiredForThisWeapon"}}</p>{{/unless}}{{/if}}

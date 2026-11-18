@@ -92,6 +92,9 @@ import { checkIncomingDefense } from "../apps/incoming-defense.mjs";
 import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
+import { restAndRecover, rollDying } from "../apps/healing.mjs";
+import { reloadWeapon, resupplyWeapon, weaponAmmunition } from "../apps/ammunition-use.mjs";
+import { ammunitionLabel } from "../rules/ammunition-use.mjs";
 import { planAmmunitionStockpile } from "../apps/ammunition-planner.mjs";
 import { ammunitionConfiguration, compatibleAmmunition } from "../rules/ammunition.mjs";
 import { CAMOUFLAGE_TERRAINS, camouflageTerrain } from "../rules/quality-checks.mjs";
@@ -125,6 +128,18 @@ const TPL = "systems/spycraft2/templates/actor";
 /* -------------------------------------------------------------------------- */
 /*  Agent sheet                                                               */
 /* -------------------------------------------------------------------------- */
+
+/** A weapon's counted shots for the sheets, or null when it has none to count. */
+function weaponShots(item) {
+  const state = weaponAmmunition(item);
+  return state ? { ...state, label: ammunitionLabel(state), empty: state.loaded === 0 } : null;
+}
+const playLabels = () => ({
+  reload: loc`Reload`,
+  resupply: loc`Restore the printed supply`,
+  rest: loc`Rest and recover`,
+  dying: loc`Dying: roll to stabilize`
+});
 
 export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   /** Career level whose skill points are being edited on the Skills tab. */
@@ -670,6 +685,18 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       restoreRules() {
         return reviewActorRules(this.actor, { restore: true });
+      },
+      reloadWeapon(event, target) {
+        return reloadWeapon(this._item(target));
+      },
+      resupplyWeapon(event, target) {
+        return resupplyWeapon(this._item(target));
+      },
+      restAndRecover() {
+        return restAndRecover(this.actor);
+      },
+      rollDying() {
+        return rollDying(this.actor);
       },
       rollAttack: SpycraftAgentSheet.#onRollAttack,
       rollRangedAttack(event, target) {
@@ -1260,8 +1287,11 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       ammoConfiguration: ammunitionConfiguration(w.system),
       canPlanAmmunition: compatibleAmmunition(w.system, CONFIG.SPYCRAFT.tables?.ammunitionCatalog ?? []).length > 0,
       attack: actor.weaponAttack(w),
+      shots: weaponShots(w),
       caliber: cfg.calibers[w.system.caliber]
     }));
+    context.playLabels = playLabels();
+    context.dying = sys.wounds?.value <= -1 && sys.wounds?.value >= -9;
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
     context.safeHouseSource = safeHouseSource(sys);
     context.safeHouses = safeHouseRows(sys, cfg);
@@ -1684,6 +1714,18 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       },
       rollAbility: SpycraftNpcSheet.#onRollAbility,
       rollSave: SpycraftNpcSheet.#onRollSave,
+      reloadWeapon(event, target) {
+        return reloadWeapon(this._item(target));
+      },
+      resupplyWeapon(event, target) {
+        return resupplyWeapon(this._item(target));
+      },
+      restAndRecover() {
+        return restAndRecover(this.actor);
+      },
+      rollDying() {
+        return rollDying(this.actor);
+      },
       rollAttack: SpycraftNpcSheet.#onRollAttack,
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
@@ -1719,8 +1761,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
           item: w,
           ammoConfiguration: ammunitionConfiguration(w.system),
           canPlanAmmunition: compatibleAmmunition(w.system, CONFIG.SPYCRAFT.tables?.ammunitionCatalog ?? []).length > 0,
-          attack: this.actor.weaponAttack(w)
+          attack: this.actor.weaponAttack(w),
+          shots: weaponShots(w)
         })),
+      playLabels: playLabels(),
+      dying: this.actor.system.wounds?.value <= -1 && this.actor.system.wounds?.value >= -9,
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),
       npcTypes: {
         standard: loc`Standard`,
