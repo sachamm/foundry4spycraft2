@@ -61,6 +61,7 @@ import { takeOpportunist } from "../apps/opportunist.mjs";
 import { grantFortunate } from "../apps/fortunate.mjs";
 import { applyBlackCat } from "../apps/black-cat.mjs";
 import { enterBerserkerRage, endBerserkerRage } from "../apps/berserker.mjs";
+import { useGunslingersEye } from "../apps/gunslinger.mjs";
 import { rollDisarmResponse } from "../apps/disarm-response.mjs";
 import { takeMissTrick } from "../apps/miss-tricks.mjs";
 import { rollCheapShot } from "../apps/cheap-shot.mjs";
@@ -246,6 +247,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       },
       enterBerserkerRage() {
         return enterBerserkerRage(this.actor);
+      },
+      useGunslingersEye() {
+        return useGunslingersEye(this.actor);
       },
       endBerserkerRage() {
         return endBerserkerRage(this.actor);
@@ -1080,6 +1084,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.fortunate = (this.actor.limitedUseStatus ?? []).find(s => s.id === "fortunate");
     context.blackCat = (this.actor.limitedUseStatus ?? []).find(s => s.id === "blackCat");
     context.berserker = (this.actor.limitedUseStatus ?? []).find(s => s.id === "berserkerRage");
+    context.gunslinger = (this.actor.limitedUseStatus ?? []).find(s => s.id === "gunslingersEye");
     context.twoWeaponFinalAttack = (this.actor.limitedUseStatus ?? []).find(s => s.id === "twoWeaponFinalAttack");
     context.jinxUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "jinx");
     context.markUse = (this.actor.limitedUseStatus ?? []).find(s => s.id === "mark");

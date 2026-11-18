@@ -332,7 +332,7 @@ Every row has source-heading, parsed prerequisite and repeatability checks. Most
 | Hail of Fire | 182 | No | Covered (batch 398): the Follow-Up Shot declaration may grant 2 final attacks at −4 | Native Foundry QA not claimed |
 | Grenade Basics | 181 | No | Partial: thrown range/error and field-request extra grenade; Intel acquisition remains open | — |
 | Guided Weapon Basics | 181 | No | Partial: guided range/error; remaining guided attack effects manual | — |
-| Gunslinger's Eye | 182 | No | Manual/descriptive | — |
+| Gunslinger's Eye | 182 | No | Covered (batch 399): a Main-tab control sizes up a chosen character, whispering their ranged attack bonus, Initiative bonus and Ranged Combat feat count to the player and GC; uses per session equal Ranged Combat feats; once per character per mission; the target’s option to hide details is stated for the GC | Native Foundry QA not claimed |
 | Marksmanship Basics | 182 | No | Partial: Aim/Brace declarations and braced Reflex; movement/action tracking manual | — |
 | Marksmanship Mastery | 182 | No | Partial: range and Aim bonus; action tracking manual | — |
 | Marksmanship Supremacy | 182 | No | Partial: range replacement and CQB | — |
@@ -1790,3 +1790,12 @@ Source: rules reference pp.181–182 (local markdown edition; original PDF pages
 - This… is my Boomstick (p.183) does not appear in the local text edition under that heading, so it was not checked and stays manual.
 
 Verification: 513 legacy assertions, 3424 of 3425 Node tests (3 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 56 manual / 60 partial / 198 other; at least 116 of 314 explicitly unfinished; 80 whole-feat closures.
+
+## Residual implementation batch 399 — Gunslinger’s Eye
+
+Source: rules reference p.182 (local markdown edition; original PDF page not visually re-checked).
+
+- `module/rules/gunslinger.mjs`, `module/apps/gunslinger.mjs`. A Main-tab control chooses a character and whispers their prepared ranged attack bonus, Initiative bonus and number of Ranged Combat feats to the player and the GC. It notes that the target may spend 1 action die per detail to keep it hidden, which the GC handles.
+- Uses per session equal the owner’s Ranged Combat feats. The actor keeps a per-mission list of characters already sized up and refuses a second reading of the same one.
+
+Verification: 3426 of 3427 Node tests (2 new), 127 browser layout fixtures. The sample-scenes pack test is locked by the running Foundry world. Native Foundry QA is **not claimed**. Inventory: 55 manual / 60 partial / 199 other; at least 115 of 314 explicitly unfinished; 81 whole-feat closures.
