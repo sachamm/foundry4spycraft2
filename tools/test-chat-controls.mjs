@@ -15,6 +15,9 @@ class Element {
   addEventListener(type, handler) {
     this.listeners[type] = handler;
   }
+  setAttribute(name, value) {
+    (this.attributes ??= {})[name] = String(value);
+  }
   querySelector(selector) {
     return selector === ".message-content" ? (this.content ??= new Element("div")) : null;
   }
