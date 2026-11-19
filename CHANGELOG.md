@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added contextual tooltips across system sheets, dialogs, chat actions and Game Control, including fields, buttons, tabs and expandable sections. Existing authored help is preserved.
+
 Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/remaining-work.md`.
 
 - **Game clock.** The world keeps the time. A badge above the players list shows it and opens the Clock window; the
