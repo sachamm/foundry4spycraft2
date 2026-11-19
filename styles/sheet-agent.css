@@ -1,0 +1,68 @@
+/* The agent sheet: header, the play dashboard, combat tools, skills and gear. */
+/* ---------- Agent header ---------- */
+.spycraft2.sheet.agent .sheet-header { gap: var(--sc2-space-3); align-items: center; margin-bottom: var(--sc2-space-1); }
+.spycraft2.sheet.agent .header-main { display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: var(--sc2-space-1); }
+.spycraft2.sheet.agent .header-main > .name-row { display: flex; flex: 0 0 auto; align-items: center; gap: var(--sc2-space-2); }
+.spycraft2.sheet.agent .agent-codename { margin-left: 0; padding: 1px 8px; font: bold 11px/1.5 var(--sc2-display); font-style: normal; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sc2-bad); border: 1px solid currentColor; border-radius: 2px; }
+.spycraft2.sheet .name-row .mode-toggle { margin-left: auto; }
+.spycraft2.sheet.agent .summary { gap: var(--sc2-space-1) var(--sc2-space-2); }
+.spycraft2.sheet.agent .summary :is(.talent, .specialty) { border-left: 1px solid var(--sc2-rule); }
+.spycraft2.sheet.agent .header-main > .resources { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-4); padding-top: var(--sc2-space-1); }
+.spycraft2.sheet.agent .resources input { width: 3.2em; min-height: 26px; height: 26px; font-family: var(--sc2-display); font-weight: 700; }
+.spycraft2.sheet.agent .res.action-dice { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
+.spycraft2.sheet.agent .res-actions { display: inline-flex; flex-wrap: wrap; gap: 2px; margin-left: var(--sc2-space-1); padding-left: var(--sc2-space-2); border-left: 1px solid var(--sc2-rule); }
+.spycraft2.sheet.agent.play-mode .sheet-header .portrait { width: 76px; height: 76px; }
+
+/* ---------- Agent Main ---------- */
+.spycraft2.sheet.agent .play-dashboard { display: flex; flex-direction: column; gap: var(--sc2-space-1); }
+.spycraft2.sheet.agent .play-dashboard .stat-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.spycraft2.sheet.agent .play-dashboard .stat { min-height: 58px; padding: 4px 3px; justify-content: center; }
+.spycraft2.sheet.agent .play-dashboard .stat > span { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); }
+.spycraft2.sheet.agent.play-mode .ability-strip .stat small { display: block; font-size: 11px; opacity: 1; color: var(--sc2-ink-muted); }
+.spycraft2.sheet.agent .condition-summary { margin: 0; padding: 6px 10px; background: var(--sc2-bad-tint); border-left: 3px solid var(--sc2-bad); }
+.spycraft2.sheet .sc2-weapon { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto auto; align-items: center; gap: var(--sc2-space-2); padding: 4px 0; }
+.spycraft2.sheet .sc2-weapon .name { font-weight: 700; }
+.spycraft2.sheet .sc2-weapon .sc2-primary-action { min-width: 7.5em; min-height: var(--sc2-control); padding: 3px 12px; }
+.spycraft2.sheet .sc2-weapon .ammo { font-family: var(--sc2-display); font-weight: 700; opacity: 1; }
+.spycraft2.sheet.agent .quick-actions p { margin: var(--sc2-space-1) 0 0; }
+
+/* Combat tools: labelled tiles in a grid, so each tool can be found by reading. */
+.spycraft2.sheet.agent .tool-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; padding: var(--sc2-space-2) 0; }
+.spycraft2.sheet.agent .tool-actions > .sc2-icon-button { justify-content: flex-start; text-align: left; }
+.spycraft2.sheet.agent .combat-tool-group p { margin: 6px 0; line-height: 1.4; }
+.spycraft2.sheet.agent .combat-tool-group > summary { min-height: 44px; padding: 6px 0; }
+
+/* ---------- Skills ---------- */
+.spycraft2.sheet.agent .skills-table :is(th, td) { padding: 2px 4px; }
+.spycraft2.sheet.agent .skills-table tbody th { white-space: nowrap; }
+.spycraft2.sheet.agent .skills-table tbody th .muted { font-size: 11px; font-weight: 400; letter-spacing: 0.04em; }
+.spycraft2.sheet.agent .skills-table tr.class-skill th button { color: var(--sc2-teal-dark); }
+
+/* ---------- Gear ---------- */
+.spycraft2.sheet.agent .inventory-weapon { padding: 8px 12px; margin: 6px 0; border-radius: var(--sc2-radius); }
+.spycraft2.sheet.agent .inventory-title .inventory-name { font-size: 15px; }
+.spycraft2.sheet.agent .inventory-ammunition { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-2); margin: 4px 0; }
+.spycraft2.sheet.agent .inventory-table :is(th, td) { padding: 3px 8px; vertical-align: middle; }
+.spycraft2.sheet.agent .inventory-table .controls { min-width: 0; }
+
+/* Play mode reads top to bottom: figures first, reference text last. */
+.spycraft2.sheet.agent.play-mode .main-reference { flex-direction: column; gap: 0; }
+.spycraft2.sheet.agent.play-mode .main-reference > .col:first-child { order: 2; }
+.spycraft2.sheet.agent.play-mode .main-reference .stat-grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+.spycraft2.sheet.agent .stat > :is(a, button)[data-action] { font-family: var(--sc2-display); font-size: 1.5em; font-weight: 700; }
+.spycraft2.sheet.agent .main-reference p { margin: 6px 0; }
+
+/* Reference text reads as a list of short entries, one per line. */
+.spycraft2.sheet.agent .reference-panel p { margin: 0; padding: 5px 0; line-height: 1.4; border-bottom: 1px dotted var(--sc2-rule); }
+.spycraft2.sheet.agent .reference-panel p:last-child { border-bottom: 0; }
+.spycraft2.sheet.agent .reference-panel h3 { margin-top: var(--sc2-space-2); }
+/* The name never pushes the edit control off its line. */
+.spycraft2.sheet.agent .header-main > .name-row { flex-wrap: nowrap; min-width: 0; }
+.spycraft2.sheet.agent .name-row .agent-name { flex: 0 1 auto; min-width: 0; }
+.spycraft2.sheet.agent .name-row .agent-codename { flex: 0 0 auto; }
+
+@container (max-width: 640px) {
+  .spycraft2.sheet.agent .play-dashboard .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .spycraft2.sheet .sc2-weapon { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+  .spycraft2.sheet .sc2-weapon .name { grid-column: 1 / -1; }
+}

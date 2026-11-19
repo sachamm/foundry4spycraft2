@@ -1,0 +1,32 @@
+/* Item sheets and the compendium browser. */
+/* Browser */
+.spycraft2.browser .filters { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.spycraft2.browser .filters input[type=search] { flex: 1; }
+.spycraft2.browser .browser-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+.spycraft2.browser .browser-list li { display: flex; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--sc2-border); }
+.spycraft2.browser .row-main { flex: 1; }
+.spycraft2.browser .row-main .name { font-weight: bold; margin-right: 6px; }
+.spycraft2.browser .prereq { font-size: 0.85em; }
+/* Unqualified rows stay at full contrast; the tag and the red prerequisite line carry the state. */
+.spycraft2.browser li.unqualified .unqualified-tag { color: var(--sc2-bad); border-color: currentColor; opacity: 1; margin-right: 6px; white-space: nowrap; }
+.spycraft2.browser li button { flex: 0 0 32px; height: 26px; line-height: 1; }
+.spycraft2.browser li button.owned { color: var(--sc2-good); }
+.spycraft2.browser .window-content { display: flex; flex-direction: column; }
+.spycraft2.browser .browser { display: flex; flex-direction: column; height: 100%; }
+
+.spycraft2.sheet.item { container-type: inline-size; }
+.spycraft2.item .sheet-header { align-items: center; }
+.spycraft2.item .sheet-header .summary { gap: var(--sc2-space-2); }
+.spycraft2.item .sheet-header .summary label { display: inline-flex; align-items: center; gap: 6px; flex: 1 1 12em; }
+.spycraft2.item .sheet-header .summary label input { flex: 1; min-width: 0; }
+.spycraft2.item .item-details { padding-top: var(--sc2-space-1); }
+
+/* Browser rows: the entry name opens it; one quiet control adds it. */
+.spycraft2.browser .filters { gap: var(--sc2-space-2); }
+.spycraft2.browser .filters label { display: inline-flex; align-items: center; gap: 6px; }
+.spycraft2.browser .browser-list li { align-items: flex-start; gap: var(--sc2-space-2); padding: 6px 4px; }
+.spycraft2.application.browser .row-main a.name { font-weight: 700; color: var(--sc2-ink-strong); cursor: pointer; }
+.spycraft2.application.browser .row-main a.name:hover { color: var(--sc2-teal); text-decoration: underline; }
+.spycraft2.browser .row-main .summary { display: block; margin-top: 2px; line-height: 1.4; }
+.spycraft2.application.browser li button[data-action="add"] { flex: 0 0 var(--sc2-control); background: var(--sc2-paper-raised); border-color: var(--sc2-rule); }
+.spycraft2.application.browser li button.owned { background: var(--sc2-teal-tint); border-color: var(--sc2-good); }

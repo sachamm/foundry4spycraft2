@@ -216,6 +216,30 @@ export function buttonIconKind(action = "", label = "", data = {}) {
   return { sheet: match[0], index: match[1], grid: 8 };
 }
 
+/** How a control presents its action: "icon" (pictogram only), "both" (pictogram and label) or "text". */
+const DISPLAYS = ["icon", "both", "text"];
+// These actions are labelled with a name or a number from the sheet, which must stay readable.
+const DATA_ACTIONS = new Set([
+  "rollSkill",
+  "rollAbility",
+  "rollSave",
+  "rollKnowledge",
+  "rollAttack",
+  "rollDamage",
+  "itemEdit",
+  "openCompanion",
+  "skillLevel",
+  "setupTask"
+]);
+
+export function buttonDisplay(control) {
+  const own = control.dataset?.sc2Display;
+  if (DISPLAYS.includes(own)) return own;
+  if (DATA_ACTIONS.has(control.dataset?.action)) return "text";
+  const inherited = control.closest?.("[data-sc2-display]")?.dataset.sc2Display;
+  return DISPLAYS.includes(inherited) ? inherited : "both";
+}
+
 function enhanceButtonIcon(control, label) {
   if (
     !label ||
@@ -224,26 +248,29 @@ function enhanceButtonIcon(control, label) {
     control.matches('.stat, [role="tab"], [data-action="tab"], .header-control')
   )
     return;
+  // Names and numbers are data; only action words are replaced or joined by a pictogram.
+  const mode = buttonDisplay(control);
+  if (mode === "text") return;
   const iconSpec = buttonIconKind(control.dataset.action ?? control.dataset.rollControl ?? "", label, control.dataset);
   if (!iconSpec) return;
   const { sheet, index, grid } = iconSpec;
   control.dataset.sc2Icon = `${sheet}:${index}`;
-  control.style.setProperty(
-    "--sc2-icon-image",
-    `url("systems/spycraft2/assets/ui/functions/${sheet === "time" ? "time" : `functions-${sheet}`}.png")`
-  );
+  // The stylesheet maps each atlas to its image, so the address resolves beside the stylesheet.
+  control.dataset.sc2Sheet = String(sheet);
+  control.dataset.sc2Mode = mode;
   control.style.setProperty("--sc2-icon-grid", `${grid * 100}%`);
   control.style.setProperty("--sc2-icon-x", `${((index % grid) * 100) / (grid - 1)}%`);
   control.style.setProperty("--sc2-icon-y", `${(Math.floor(index / grid) * 100) / (grid - 1)}%`);
   if (!control.classList.contains("sc2-icon-button")) {
     const content = control.ownerDocument.createElement("span");
     content.className = "sc2-button-content";
+    // The control's accessible name comes from aria-label in every mode.
     content.setAttribute("aria-hidden", "true");
     content.append(...control.childNodes);
     const icon = control.ownerDocument.createElement("span");
     icon.className = "sc2-button-icon";
     icon.setAttribute("aria-hidden", "true");
-    control.append(content, icon);
+    control.append(icon, content);
     control.classList.add("sc2-icon-button");
   }
 }

@@ -16,9 +16,16 @@
     "spycraft2.mjs"
   ],
   "styles": [
+    "styles/tokens.css",
     "styles/spycraft2.css",
     "styles/retro.css",
-    "styles/npc-builder.css"
+    "styles/npc-builder.css",
+    "styles/components.css",
+    "styles/sheet-agent.css",
+    "styles/sheet-npc.css",
+    "styles/sheet-item.css",
+    "styles/gc-console.css",
+    "styles/chat.css"
   ],
   "languages": [
     {

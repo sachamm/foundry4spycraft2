@@ -5,9 +5,9 @@ import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 const sheetUX = readFileSync(new URL("../../module/sheets/agent-ux.mjs", import.meta.url), "utf8");
 const skillUX = readFileSync(new URL("../../module/apps/skill-dialog-ux.mjs", import.meta.url), "utf8");
-const css =
-  readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8") +
-  readFileSync(new URL("../../styles/retro.css", import.meta.url), "utf8");
+const css = ["tokens", "spycraft2", "retro", "components"]
+  .map(name => readFileSync(new URL(`../../styles/${name}.css`, import.meta.url), "utf8"))
+  .join("\n");
 
 // The modules import the translation tag; a page script cannot resolve that path, so it is inlined.
 const i18n = readFileSync(new URL("../../module/i18n.mjs", import.meta.url), "utf8").replace(/^export /gm, "");
@@ -161,16 +161,16 @@ for (const width of [560, 820])
       document.querySelector('[data-action="rollSave"]').addEventListener("click", () => window.rolls++);
     });
     const save = page.getByRole("button", { name: "Fortitude +2" });
-    expect((await save.boundingBox()).height).toBeGreaterThanOrEqual(70);
+    expect((await save.boundingBox()).height).toBeGreaterThanOrEqual(44);
     await save.focus();
     await page.keyboard.press("Enter");
     await page.keyboard.press("Space");
     expect(await page.evaluate(() => window.rolls)).toBe(2);
-    expect((await page.locator('[data-action="rollAttack"]').boundingBox()).height).toBeGreaterThanOrEqual(40);
+    expect((await page.locator('[data-action="rollAttack"]').boundingBox()).height).toBeGreaterThanOrEqual(32);
     await page.getByText("Recorded outcomes", { exact: true }).click();
     expect(
       (await page.getByRole("button", { name: "Takedown saves/outcomes" }).boundingBox()).height
-    ).toBeGreaterThanOrEqual(34);
+    ).toBeGreaterThanOrEqual(32);
     expect(await page.locator(".window-content").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   });
 

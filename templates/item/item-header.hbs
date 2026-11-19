@@ -10,7 +10,7 @@
     <input class="name" name="name" type="text" value="{{item.name}}" placeholder="{{localize 'Name'}}" />
     <div class="summary muted">{{localize (concat "TYPES.Item." item.type)}}
       <label>{{localize "SPYCRAFT.Source"}} <input type="text" name="system.source" value="{{system.source}}" /></label>
-      <a data-action="toChat" data-tooltip="SPYCRAFT.ToChat"><i class="fa-solid fa-comment"></i></a></div>
+      <a data-action="toChat" data-sc2-display="icon" aria-label="{{localize 'SPYCRAFT.ToChat'}}" data-tooltip="SPYCRAFT.ToChat"><i class="fa-solid fa-comment"></i></a></div>
   </div>
 </header>
 </div>

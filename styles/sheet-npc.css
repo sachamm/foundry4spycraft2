@@ -1,0 +1,14 @@
+/* NPC and vehicle sheets. */
+/* ---------- NPC ---------- */
+.spycraft2.sheet.npc .npc-action-buttons button { padding: 3px 10px; }
+.spycraft2.npc .abilities-row { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.spycraft2.npc .ability { min-width: 0; gap: 2px; padding: 4px 2px; background: #fff9e7b3; border: 1px solid var(--sc2-rule); border-top: 2px solid var(--sc2-brass); border-radius: 2px; }
+.spycraft2.npc .ability .mod { font-family: var(--sc2-display); font-weight: 700; }
+.spycraft2.sheet.npc .item-list li .name { flex: 1; }
+/* NPC attribute names are labels that roll; they keep the body face so long names fit their tile. */
+.spycraft2.application.npc .ability [data-action="rollAbility"] { min-width: 0; max-width: 100%; padding: 0 2px; font-family: inherit; font-size: var(--sc2-text-s); background: transparent; border-color: transparent; }
+
+.spycraft2.sheet.vehicle { container-type: inline-size; }
+.spycraft2.sheet.vehicle .spycraft2-sheet > p { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-3); margin: 6px 0; }
+.spycraft2.sheet.vehicle .spycraft2-sheet > p label { display: inline-flex; align-items: center; gap: 6px; }
+.spycraft2.sheet.vehicle .spycraft2-sheet > p select { width: auto; }
