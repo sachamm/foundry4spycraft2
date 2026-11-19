@@ -1,12 +1,23 @@
 import { preparedResistanceSource } from "./resistances.mjs";
 import { armorTrainingDRForAttack } from "./armor-training.mjs";
 import { loc } from "../i18n.mjs";
+/** DR categories of an incoming attack. The labels are read when asked for, in the reader's language. */
 export const SUBDUAL_ATTACK_KINDS = {
-  unarmed: "Unarmed attack",
-  meleeWeapon: "Melee weapon",
-  hurledWeapon: "Non-grenade hurled weapon",
-  rangedWeapon: "Other ranged weapon",
-  other: "Other damage source"
+  get unarmed() {
+    return loc`Unarmed attack`;
+  },
+  get meleeWeapon() {
+    return loc`Melee weapon`;
+  },
+  get hurledWeapon() {
+    return loc`Non-grenade hurled weapon`;
+  },
+  get rangedWeapon() {
+    return loc`Other ranged weapon`;
+  },
+  get other() {
+    return loc`Other damage source`;
+  }
 };
 export function subdualDefenseSource(system, attackKind) {
   if (!Object.hasOwn(SUBDUAL_ATTACK_KINDS, attackKind))

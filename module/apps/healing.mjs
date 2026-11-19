@@ -18,6 +18,7 @@ import { damageSaveState, npcIsSpecial, resetDamageTrack } from "./gc/npc-play.m
 import { sceneEpoch } from "./gc/state.mjs";
 import { nonLethalTotals, targetChoices } from "./damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { askGC, gcAvailable, markCard, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -46,6 +47,18 @@ async function clear(actor, id, label, aliases = []) {
   } catch {
     return loc`${label} comes from another source: clear it by hand.`;
   }
+}
+
+/** Lift Unconscious, unless it is a knockout whose time has yet to run out. */
+async function wake(actor) {
+  const timed = [...(actor.effects ?? [])].some(
+    effect =>
+      effect.statuses?.has("unconscious") &&
+      effect.flags?.spycraft2?.timed === true &&
+      Number.isFinite(effect.duration?.value) &&
+      effect.duration.expired !== true
+  );
+  return timed ? "" : clear(actor, "unconscious", loc`Unconscious`);
 }
 
 /* -------------------------------------------- */
@@ -96,7 +109,11 @@ export async function restAndRecover(actor, options = {}) {
   lines.push(...(await wearOff(actor, rates, hours * 3600 + days * 86400)));
   // Fatigue from lost vitality or wounds lifts after 8 hours of rest (p.341).
   if (hours + days * 24 >= 8) lines.push(await clear(actor, "fatigued", loc`Fatigued`));
-  if (plan.wounds > 0) lines.push(await clear(actor, "dying", loc`Dying`));
+  if (plan.wounds > 0) {
+    lines.push(await clear(actor, "dying", loc`Dying`));
+    // Back above 0 wounds a character wakes, unless a knockout still has time to run.
+    if (plan.wounds - plan.woundGain <= 0) lines.push(await wake(actor));
+  }
   await post(actor, lines);
   return plan;
 }
@@ -161,6 +178,7 @@ export async function rollDying(actor) {
   ];
   if (plan.stabilized) lines.push(await clear(actor, "dying", loc`Dying`));
   if (plan.state === "dead") {
+    lines.push(await clear(actor, "dying", loc`Dying`));
     try {
       await setConditionStatus(actor, "dead", true, { label: loc`Dead` });
       lines.push(loc`At –10 wounds: dead.`);
@@ -178,9 +196,11 @@ export async function rollDying(actor) {
 
 async function choosePatient(title, hint) {
   const choices = targetChoices(),
-    patients = choices.actors.filter(actor => actor.isOwner && actor.type !== "vehicle");
+    patients = choices.actors.filter(actor => (actor.isOwner || gcAvailable()) && actor.type !== "vehicle");
   if (!patients.length) {
-    ui.notifications.warn(loc`Only the GC or the patient's own player can apply healing to a character.`);
+    ui.notifications.warn(
+      loc`There is no patient to treat: no GC is connected to apply healing to another player's character.`
+    );
     return null;
   }
   const input = await systemDialog.input({
@@ -190,7 +210,7 @@ async function choosePatient(title, hint) {
     content: `<div class="spycraft2-roll-options"><label>${loc`Patient`} <select name="patientUuid" required>${patients
       .map(
         actor =>
-          `<option value="${esc(actor.uuid)}"${actor.uuid === choices.selected ? " selected" : ""}>${esc(actor.name)}</option>`
+          `<option value="${esc(actor.uuid)}"${actor.uuid === choices.selected ? " selected" : ""}>${esc(actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)}</option>`
       )
       .join("")}</select></label><p class="hint">${hint}</p></div>`
   });
@@ -221,6 +241,34 @@ async function healNpcSubdual(patient, amount) {
   return healed;
 }
 
+/** Another player's character: the GC's client applies the treatment. */
+async function relayHealing(kind, message, patient) {
+  try {
+    ui.notifications.info(loc`Sent to the GC: treatment for ${patient.name}.`);
+    return await askGC("applyHealing", { messageId: message.id, kind, patientUuid: patient.uuid });
+  } catch (error) {
+    return ui.notifications.warn(error.message);
+  }
+}
+
+registerRelay("applyHealing", {
+  async describe({ kind, patientUuid }, user) {
+    const patient = patientUuid ? await fromUuid(patientUuid) : null;
+    if (!patient) throw new Error(loc`The patient is no longer there.`);
+    return kind === "stabilize"
+      ? loc`${esc(user.name)} stabilizes ${esc(patient.name)}. Allow it?`
+      : loc`${esc(user.name)} applies First Aid to ${esc(patient.name)}. Allow it?`;
+  },
+  async run({ messageId, kind, patientUuid }) {
+    const message = game.messages.get(messageId),
+      patient = patientUuid ? await fromUuid(patientUuid) : null;
+    if (!message || !patient) throw new Error(loc`The check or its patient is no longer there.`);
+    const done =
+      kind === "stabilize" ? await applyStabilize(message, { patient }) : await applyFirstAid(message, { patient });
+    return done === true ? true : null;
+  }
+});
+
 /** Apply a successful First Aid check to a patient, once per patient per scene. */
 export async function applyFirstAid(message, options = {}) {
   const check = message.flags?.spycraft2;
@@ -232,8 +280,7 @@ export async function applyFirstAid(message, options = {}) {
       loc`A special character regains 1d4+1 wounds, 1d4+1 subdual damage and vitality equal to career level. A standard character loses half the damage accumulated. Once per patient per scene.`
     ));
   if (!patient) return null;
-  if (!patient.isOwner)
-    return ui.notifications.warn(loc`Only the GC or ${patient.name}'s own player can apply healing to that character.`);
+  if (!patient.isOwner) return relayHealing("firstAid", message, patient);
   const scene = String(sceneEpoch());
   if (patient.flags?.spycraft2?.firstAidScene === scene)
     return ui.notifications.warn(loc`${patient.name} has already had First Aid this scene.`);
@@ -265,7 +312,10 @@ export async function applyFirstAid(message, options = {}) {
         ? loc`Subdual damage healed: ${subdualRoll.total}. Take it off the recorded total by hand.`
         : loc`Subdual damage healed: ${healed}.`
     );
-    if (plan.wounds > 0) lines.push(await clear(patient, "dying", loc`Dying`));
+    if (plan.wounds > 0) {
+      lines.push(await clear(patient, "dying", loc`Dying`));
+      if (plan.wounds - plan.woundGain <= 0) lines.push(await wake(patient));
+    }
   } else {
     const state = damageSaveState(patient),
       plan = firstAidStandard(state.track.accumulated);
@@ -278,11 +328,7 @@ export async function applyFirstAid(message, options = {}) {
   if (Number(check.effectiveTotal) >= 20) lines.push(await clear(patient, "bleeding", loc`Bleeding`));
   await patient.update({ "flags.spycraft2.firstAidScene": scene });
   await post(patient, lines, rolls);
-  try {
-    await message.update({ "flags.spycraft2.firstAid": { patientUuid: patient.uuid, name: patient.name } });
-  } catch {
-    /* not this user's message to mark */
-  }
+  await markCard(message, "firstAid", { patientUuid: patient.uuid, name: patient.name });
   return true;
 }
 
@@ -294,8 +340,7 @@ export async function applyStabilize(message, options = {}) {
     options.patient ??
     (await choosePatient(loc`Stabilize: patient`, loc`A dying character stops losing wounds and stays unconscious.`));
   if (!patient) return null;
-  if (!patient.isOwner)
-    return ui.notifications.warn(loc`Only the GC or ${patient.name}'s own player can apply healing to that character.`);
+  if (!patient.isOwner) return relayHealing("stabilize", message, patient);
   if (woundState(patient.system.wounds?.value ?? 0) !== "dying")
     return ui.notifications.warn(loc`${patient.name} is not dying (–1 to –9 wounds).`);
   await patient.update({ "system.wounds.value": 0 });
@@ -303,11 +348,7 @@ export async function applyStabilize(message, options = {}) {
     loc`${esc(patient.name)} is stabilized at 0 wounds and stays unconscious.`,
     await clear(patient, "dying", loc`Dying`)
   ]);
-  try {
-    await message.update({ "flags.spycraft2.stabilized": { patientUuid: patient.uuid, name: patient.name } });
-  } catch {
-    /* not this user's message to mark */
-  }
+  await markCard(message, "stabilized", { patientUuid: patient.uuid, name: patient.name });
   return true;
 }
 

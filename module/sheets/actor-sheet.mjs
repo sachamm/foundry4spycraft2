@@ -135,6 +135,23 @@ function weaponShots(item) {
   const state = weaponAmmunition(item);
   return state ? { ...state, label: ammunitionLabel(state), empty: state.loaded === 0 } : null;
 }
+/** What an NPC's feat items add, as the sheet shows it. */
+function npcFeatPlay(effects) {
+  if (!effects?.rows?.length && !effects?.uncounted?.length) return null;
+  const signed = value => (value >= 0 ? `+${value}` : `${value}`);
+  const healthLeft = !effects.healthApplied && (effects.vitality || effects.wounds);
+  return {
+    title: loc`Feats in play`,
+    rows: effects.rows.map(row => loc`${row.name}: ${row.label} ${signed(row.value)}`),
+    health: healthLeft
+      ? loc`Vitality ${signed(effects.vitality)} and wounds ${signed(effects.wounds)} are not added to typed-in maximums: include them in the numbers above.`
+      : "",
+    uncounted: effects.uncounted.length
+      ? loc`These feats have other bonuses that are not worked out; apply them by hand: ${effects.uncounted.join(", ")}.`
+      : ""
+  };
+}
+
 const playLabels = () => ({
   reload: loc`Reload`,
   resupply: loc`Restore the printed supply`,
@@ -1729,6 +1746,48 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       rollDying() {
         return rollDying(this.actor);
       },
+      exposeToContagion() {
+        return exposeToContagion(this.actor);
+      },
+      rollContagionSave(event, target) {
+        return rollContagionSave(this.actor, target.dataset.id);
+      },
+      cureHazard(event, target) {
+        return cureHazard(this.actor, target.dataset.id);
+      },
+      exposeToFire() {
+        return exposeToFire(this.actor);
+      },
+      burningRound() {
+        return burningRound(this.actor);
+      },
+      fightFire(event, target) {
+        return fightFire(this.actor, target.dataset.method);
+      },
+      rollFireSave(event, target) {
+        return rollFireSave(this.actor, target.dataset.kind);
+      },
+      extinguishFire() {
+        return extinguish(this.actor);
+      },
+      sufferTypedDamage() {
+        return sufferTypedDamage(this.actor);
+      },
+      survivalSave() {
+        return survivalSave(this.actor);
+      },
+      acidStep(event, target) {
+        return acidStep(this.actor, target.dataset.step);
+      },
+      exposureFailedSave() {
+        return exposureFailedSave(this.actor);
+      },
+      endTypedExposure() {
+        return endTypedExposure(this.actor);
+      },
+      endSurvivalHazard(event, target) {
+        return endSurvivalHazard(this.actor, target.dataset.kind);
+      },
       rollAttack: SpycraftNpcSheet.#onRollAttack,
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
@@ -1768,6 +1827,8 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
           shots: weaponShots(w)
         })),
       playLabels: playLabels(),
+      featPlay: npcFeatPlay(sys.featEffects),
+      hazards: hazardsView(this.actor),
       nonLethal: nonLethalTotals(this.actor),
       dying: this.actor.system.wounds?.value <= -1 && this.actor.system.wounds?.value >= -9,
       otherItems: this.actor.items.filter(i => i.type !== "weapon" && !isResourceLock(i)),

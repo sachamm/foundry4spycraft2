@@ -2,6 +2,7 @@ import { baffledSourceSnapshot, baffledApplicationPlan, getBaffledReview } from 
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { queueResources } from "../rules/transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { systemDialog } from "./dialog-theme.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   clone = structuredClone;
 const effectById = (actor, id) => [...(actor.effects ?? [])].find(e => e.id === id);
@@ -45,7 +46,7 @@ export async function applyBaffled(actor, options = {}) {
   const expected = baffledSourceSnapshot(actor);
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
+    input = await systemDialog.input({
       window: { title: loc`Apply new Baffled effect` },
       rejectClose: false,
       content: `<p>${loc`A second application replaces Baffled with Incompetent (p.340). Use the state controls to correct or end an existing condition.`}</p><label>${loc`Event reference`} <input name="id" type="text" /></label><label>${loc`Source`} <input name="source" type="text" /></label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms this new Baffled effect applies after any resistance save`}</label>`
@@ -132,7 +133,7 @@ export async function reviewBaffledApplication(actor, options = {}) {
   let input = options;
   if (!Object.keys(input).length) {
     const esc = foundry.utils.escapeHTML;
-    input = await foundry.applications.api.DialogV2.input({
+    input = await systemDialog.input({
       window: { title: loc`Review interrupted Baffled effect` },
       rejectClose: false,
       content: `<p>${loc`${esc(review.source)}. Current Baffled: ${expected.baffled ? "yes" : "no"}; Incompetent: ${expected.incompetent ? "yes" : "no"}. Correct the current effects using the state controls first, if needed.`}</p><label>${loc`Resolution`} <select name="disposition"><option value="keep">${loc`Keep the event as resolved`}</option><option value="cancel">${loc`Cancel the event`}</option></select></label><label>${loc`GC explanation`} <input name="resolution" type="text" /></label><label><input name="confirmed" type="checkbox" /> ${loc`I reviewed the actual sources and confirm the current condition states`}</label>`

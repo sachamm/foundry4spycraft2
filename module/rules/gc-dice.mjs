@@ -6,6 +6,7 @@ import {
   recoverResourceTransaction
 } from "./transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { systemDialog } from "../apps/dialog-theme.mjs";
 /** Session-scoped Game Control action dice, pp.397–398. They have no fixed die type. */
 let queue = Promise.resolve();
 const serialize = work => {
@@ -266,7 +267,7 @@ export async function recordGCHint(options = {}) {
   requireGC();
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
+    input = await systemDialog.input({
       window: { title: loc`Offer a helpful GC hint` },
       rejectClose: false,
       content: `<p>${loc`A helpful ordinary hint grants the GC one action die (p.398). Use the character’s free-hint response for origin or Intuition benefits instead.`}</p><label>${loc`Hint`} <textarea name="text"></textarea></label><label><input type="checkbox" name="helpfulConfirmed" /> ${loc`The GC confirms this hint is helpful`}</label>`
@@ -382,7 +383,7 @@ export function reviewGCDiceSettlement(options = {}) {
     let input = options;
     if (!Object.keys(input).length) {
       const esc = foundry.utils.escapeHTML;
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: loc`Review interrupted GC payment` },
         rejectClose: false,
         content: `<p>${esc(String(review.purpose ?? loc`GC payment`))}: ${esc(String(review.reason ?? loc`Payment was interrupted.`))}</p><p>${loc`Review the actual effect and current session pool. This sets the confirmed balance without adding a refund.`}</p><label>${loc`Confirmed current GC dice`} <input type="number" min="0" name="value" value="${Number.isSafeInteger(before.value) ? before.value : 0}" /></label><label>${loc`Resolution`} <input name="resolution" /></label><label><input type="checkbox" name="confirmed" /> ${loc`The GC reviewed the effect, session and actual pool`}</label>`
@@ -443,7 +444,7 @@ export async function recoverGCBookkeeping({ confirmed = false } = {}) {
 export async function manageGCDice() {
   requireGC();
   const status = gcDiceStatus();
-  const input = await foundry.applications.api.DialogV2.input({
+  const input = await systemDialog.input({
     window: { title: loc`Game Control action dice` },
     rejectClose: false,
     content: `

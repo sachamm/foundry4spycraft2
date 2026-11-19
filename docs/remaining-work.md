@@ -351,3 +351,61 @@ card, the reload line on the agent and NPC sheets, the shot fields on the weapon
 player without ownership of the target being refused, the save buttons on a damage report and the save card that
 follows, the blast dialog with and without a targeted token, the grapple benefit dialog, and the stress and subdual
 fields on a special NPC's sheet.
+
+## Clock, timers and the GC relay (2026-11-18)
+
+Rules: `module/rules/timers.mjs`, `module/rules/npc-feat-effects.mjs`. Foundry side: `module/apps/game-clock.mjs`,
+`module/apps/gc-relay.mjs`. Covered by unit tests only: the local Foundry was running an installed release, not this
+checkout.
+
+- [x] Game clock: badge, Clock window, GC steps, date offset (`spycraft2.clock` setting), 6 seconds per combat round.
+- [x] Timers as Active Effects with a duration on a character (`flags.spycraft2.timer`), counted down and expired
+      by Foundry and announced by the owner's own client; on the user (`flags.spycraft2.timers`) only when the user
+      has no character.
+- [x] Conditions with a time limit as effects with a duration (`flags.spycraft2.timed`), lifted by the active GC's
+      client when Foundry expires them.
+- [x] GC relay over Foundry user queries (`spycraft2.relay`): apply damage, First Aid, Stabilize, mark a card.
+- [x] Hazards and feat bonuses on NPCs; walls and rings for blasts; characters in the line of fire.
+
+Checked in Foundry 14.370 on 2026-11-18 (world `spycraft-test`, as the GC, with a throwaway NPC, combat and chat
+cards deleted afterwards):
+
+- [x] The badge shows above the players list and opens the window; the GC's steps move the time. Fixed: the badge
+      was squeezed to the width of the players column and wrapped a word a line.
+- [x] Advancing a combat round adds 6 seconds; the previous round takes them off.
+- [x] A 2-round timer ends after two rounds: the notice stays on screen and the whispered card is posted, once.
+- [x] Setting a date changes the label and no running timer.
+- [x] A condition with an end time is listed in the Clock window and ends when the clock passes it, with a chat
+      note; an unconscious character at 0 wounds stays unconscious and loses the end time.
+- [x] A request through the relay asks the GC, applies the damage and marks the card.
+- [x] A hit of 25 or more posts its report with the save button.
+- [x] An NPC sheet shows the Hazards line and "Feats in play"; a feat's save and Initiative bonuses reach the totals.
+
+Checked the same day with a player connected as well (the GC in one tab, Player4 in another):
+
+- [x] The player sees the badge and the window without the GC's step buttons.
+- [x] The player's 1-round timer is announced on the player's client when the GC moves the clock.
+- [x] A timer that ended while the player was logged out is announced when the player joins again.
+- [x] The player applies damage to an NPC: the GC is asked, the NPC is hurt, the player's card is marked.
+- [x] On a report the GC posted, the player cannot update the card directly but the relay marks the save as
+      rolled and the button goes. Fixed: the quick-timer name stayed in its field after starting a timer.
+
+Checked again the same day after timers and timed conditions moved onto Foundry's effect durations (GC and
+Player4):
+
+- [x] A 2-round timer on the player's agent reads "2 Rounds", "1 Round" as the fight goes on, is expired by Foundry
+      and announced to the player; outside a fight it reads in seconds.
+- [x] A shared 1-minute timer is expired when the GC moves the clock, posted to all and listed for the GC.
+- [x] A timer with "No character" still runs on the user and is announced.
+- [x] A 2-round Stunned on an NPC counts down, is expired by Foundry and lifted with a chat note.
+
+Still to check:
+
+- [ ] The clock hidden when "Show the clock to players" is off.
+- [ ] First Aid on another player's agent from the medic's own client.
+- [ ] The save dialog itself from the player's button (the marking was checked on its own).
+- [ ] A blast across a wall, and its outline on the scene.
+- [ ] A player without the "Query users" permission gets a clear message instead of a silent failure.
+
+Not done: measuring distance for skill dialogs; cover values from characters in the line of fire (named only);
+NPC feats beyond plain numbers (threat ranges, class abilities); thresholds for stress an NPC takes from a hazard.

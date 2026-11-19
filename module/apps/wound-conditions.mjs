@@ -1,14 +1,20 @@
 import { setConditionStatus } from "../rules/condition-status.mjs";
+import { conditionDuration } from "../rules/timers.mjs";
+
+export { conditionDuration };
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 
-/** Turn a condition on. Returns a line only when it could not be set. */
-export async function setCondition(target, id, label) {
+/**
+ * Turn a condition on. Returns a line only when it could not be set.
+ * @param {{value: number, units: string}|null} [duration]  how long it lasts, as an effect duration
+ */
+export async function setCondition(target, id, label, duration = null) {
   if (target.statuses?.has(id)) return "";
   try {
-    await setConditionStatus(target, id, true, { label });
+    await setConditionStatus(target, id, true, { label, ...(duration ? { duration } : {}) });
     return "";
   } catch (error) {
     return loc`${label} could not be set (${esc(error.message)}); set it by hand.`;

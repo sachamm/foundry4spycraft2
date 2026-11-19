@@ -170,7 +170,8 @@
 .spycraft2.browser .row-main { flex: 1; }
 .spycraft2.browser .row-main .name { font-weight: bold; margin-right: 6px; }
 .spycraft2.browser .prereq { font-size: 0.85em; }
-.spycraft2.browser li.unqualified .name { opacity: 0.6; text-decoration: line-through; }
+/* Unqualified rows stay at full contrast; the tag and the red prerequisite line carry the state. */
+.spycraft2.browser li.unqualified .unqualified-tag { color: var(--sc2-bad); border-color: currentColor; opacity: 1; margin-right: 6px; white-space: nowrap; }
 .spycraft2.browser li button { flex: 0 0 32px; height: 26px; line-height: 1; }
 .spycraft2.browser li button.owned { color: var(--sc2-good); }
 .spycraft2.browser .window-content { display: flex; flex-direction: column; }
@@ -255,3 +256,25 @@
 /* Contagions and fire on the Main tab. */
 .spycraft2 .hazards .hazard { margin: 0.15rem 0; }
 .spycraft2 .hazards .hazard.due { border-left: 3px solid var(--color-level-warning, #b8860b); padding-left: 0.4rem; }
+
+/* Game clock: the badge above the players list and the Clock window. */
+.sc2-clock-badge { pointer-events: auto; flex: 0 0 auto; width: var(--players-width, 200px); max-width: none; min-height: 26px; height: auto; margin: 0 0 4px; padding: 3px 8px; display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 1.3; text-align: left; white-space: normal; border: 1px solid var(--color-border-light-primary, #777); border-radius: 4px; background: var(--color-bg-option, rgba(0, 0, 0, 0.6)); color: var(--color-text-primary, #eee); }
+.sc2-clock-badge span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.sc2-game-clock-body { display: flex; flex-direction: column; gap: 6px; }
+.sc2-game-clock-body h3 { margin: 6px 0 0; border-bottom: 1px solid currentColor; font-size: 1.05em; }
+.sc2-game-clock-body .muted { opacity: 0.65; margin: 0; }
+.sc2-clock-now { margin: 0; font-size: 1.25em; font-weight: bold; text-align: center; }
+.sc2-clock-steps { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; }
+.sc2-clock-steps button { flex: 1 1 auto; width: auto; white-space: nowrap; }
+.sc2-timers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.sc2-timer-line { display: flex; gap: 6px; align-items: baseline; }
+.sc2-timer-left { margin-left: auto; white-space: nowrap; }
+.sc2-timer progress { width: 100%; height: 6px; }
+.sc2-timer.done .sc2-timer-left { font-weight: bold; }
+.sc2-timer-controls { display: flex; gap: 4px; }
+.sc2-timer-controls button { width: auto; flex: 0 0 auto; font-size: 0.85em; line-height: 1.6; min-height: 0; padding: 0 0.6em; }
+.sc2-timer-new { display: grid; grid-template-columns: 1fr 4em 7em; gap: 4px; align-items: center; }
+.sc2-timer-new input[type="text"] { grid-column: 1; min-width: 0; }
+.sc2-timer-new .sc2-timer-holder { grid-column: 1 / 4; }
+.sc2-timer-new .sc2-timer-shared { grid-column: 1 / 3; display: flex; align-items: center; gap: 4px; font-size: 0.9em; }
+.sc2-timer-new button { grid-column: 3; width: auto; }

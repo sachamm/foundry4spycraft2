@@ -1,6 +1,11 @@
 import { loc } from "../i18n.mjs";
 /** Change one explicitly reviewed condition, preserving independent effect data and item-owned sources. */
-export async function setConditionStatus(actor, id, active, { label = id, aliases = [], operationId = null } = {}) {
+export async function setConditionStatus(
+  actor,
+  id,
+  active,
+  { label = id, aliases = [], operationId = null, duration = null } = {}
+) {
   if (
     typeof active !== "boolean" ||
     typeof id !== "string" ||
@@ -22,6 +27,7 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
   if (active) {
     const status = globalThis.CONFIG?.statusEffects?.find(e => e.id === id);
     if (!status) throw new Error(loc`This condition is not configured.`);
+    const timed = Number.isSafeInteger(duration?.value) && duration.value > 0 && typeof duration.units === "string";
     const operation = operationId ?? globalThis.foundry?.utils?.randomID?.() ?? Math.random().toString(36).slice(2);
     try {
       const [effect] = await actor.createEmbeddedDocuments("ActiveEffect", [
@@ -29,7 +35,10 @@ export async function setConditionStatus(actor, id, active, { label = id, aliase
           name: globalThis.game?.i18n?.localize(status.name) ?? label,
           img: status.img,
           statuses: [id],
-          flags: { spycraft2: { conditionOperation: operation } }
+          // A time limit is the effect's own duration: Foundry counts it down and marks it expired, and the game
+          // clock then lifts the condition (module/apps/game-clock.mjs).
+          ...(timed ? { duration: { value: duration.value, units: duration.units, expiry: null } } : {}),
+          flags: { spycraft2: { conditionOperation: operation, ...(timed ? { timed: true } : {}) } }
         }
       ]);
       if (!effect || !actor.statuses?.has(id)) throw new Error(loc`The condition was not applied.`);

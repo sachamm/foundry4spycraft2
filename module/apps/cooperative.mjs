@@ -116,8 +116,10 @@ rollPipeline.register({
   id: "cooperativeControl",
   kinds: ["skill"],
   order: 9720,
-  chatControls({ message, check }) {
+  chatControls({ message, check, user }) {
     if (check.cooperative?.role !== "leader" || check.superseded || check.cooperative.result?.ruined) return null;
+    // The tally rewrites the leader's card, which only its author or the GC may do.
+    if (!(message.isAuthor || user?.isGM)) return null;
     return [{ label: loc`Apply helpers' results`, run: () => applyHelpers(message) }];
   }
 });

@@ -68,6 +68,56 @@ import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
 import { loc } from "./module/i18n.mjs";
 import { localizeConfig } from "./module/i18n-data.mjs";
 import { registerErrorNotices } from "./module/error-notices.mjs";
+import * as gameClock from "./module/apps/game-clock.mjs";
+import { installGCRelay, askGC } from "./module/apps/gc-relay.mjs";
+
+/** Conditions this system adds to the token HUD: [id, label, icon]. Labels are read once the language is known. */
+const SYSTEM_STATUSES = [
+  ["shaken-1", () => loc`Shaken I`],
+  ["shaken-2", () => loc`Shaken II`],
+  ["shaken-3", () => loc`Shaken III`],
+  ["shaken-4", () => loc`Shaken IV`],
+  ["sleep", () => loc`Sleeping`],
+  ["drunk", () => loc`Drunk`],
+  ["crouched", () => loc`Crouched`],
+  ["mute", () => loc`Mute`],
+  ["held", () => loc`Held`],
+  ["pinned", () => loc`Pinned`],
+  ["baffled", () => loc`Baffled`],
+  ["incompetent", () => loc`Incompetent`],
+  ["prone", () => loc`Prone`],
+  ["sprawled", () => loc`Sprawled`],
+  ["blind", () => loc`Blinded`],
+  ["deaf", () => loc`Deafened`],
+  ["entangled", () => loc`Entangled`],
+  ["nauseated", () => loc`Nauseated`],
+  ["sickened", () => loc`Sickened`],
+  ["fatigued", () => loc`Fatigued`],
+  ["exhausted", () => loc`Exhausted`],
+  ["enraged", () => loc`Enraged`],
+  ["unconscious", () => loc`Unconscious`],
+  ["flat-footed", () => loc`Flat-footed`],
+  ["stunned", () => loc`Stunned`],
+  ["dazed", () => loc`Dazed`],
+  ["helpless", () => loc`Helpless`],
+  ["vulnerable", () => loc`Vulnerable`],
+  ["paralyzed", () => loc`Paralyzed`],
+  ["dying", () => loc`Dying`],
+  ["bleeding", () => loc`Bleeding`],
+  ["fixated", () => loc`Fixated`],
+  ["frightened", () => loc`Frightened`],
+  ["terrified", () => loc`Terrified`],
+  ["frenzied", () => loc`Frenzied`],
+  ["hidden", () => loc`Hidden`],
+  ["reeling", () => loc`Reeling`, "icons/svg/daze.svg"]
+];
+/** Name the system's conditions in the active language. */
+function nameSystemStatuses() {
+  for (const [id, label] of SYSTEM_STATUSES) {
+    const effect = CONFIG.statusEffects.find(entry => entry.id === id);
+    if (effect && effect.name === id) effect.name = label();
+  }
+}
 
 Hooks.once("init", () => {
   registerErrorNotices();
@@ -76,55 +126,14 @@ Hooks.once("init", () => {
   installDialogThemeHooks();
   installUITooltipHooks();
   CONFIG.SPYCRAFT = SPYCRAFT;
-  CONFIG.time.roundTime = 6;
-  CONFIG.time.turnTime = 0;
   CONFIG.statusEffects ??= [];
-  for (const [id, name] of [
-    ["shaken-1", "Shaken I"],
-    ["shaken-2", "Shaken II"],
-    ["shaken-3", "Shaken III"],
-    ["shaken-4", "Shaken IV"],
-    ["sleep", "Sleeping"],
-    ["drunk", "Drunk"],
-    ["crouched", "Crouched"],
-    ["mute", "Mute"],
-    ["held", "Held"],
-    ["pinned", "Pinned"],
-    ["baffled", "Baffled"],
-    ["incompetent", "Incompetent"],
-    ["prone", "Prone"],
-    ["sprawled", "Sprawled"],
-    ["blind", "Blinded"],
-    ["deaf", "Deafened"],
-    ["entangled", "Entangled"],
-    ["nauseated", "Nauseated"],
-    ["sickened", "Sickened"],
-    ["fatigued", "Fatigued"],
-    ["exhausted", "Exhausted"],
-    ["enraged", "Enraged"],
-    ["unconscious", "Unconscious"],
-    ["flat-footed", "Flat-footed"],
-    ["stunned", "Stunned"],
-    ["dazed", "Dazed"],
-    ["helpless", "Helpless"],
-    ["vulnerable", "Vulnerable"],
-    ["paralyzed", "Paralyzed"],
-    ["dying", "Dying"],
-    ["bleeding", "Bleeding"],
-    ["fixated", "Fixated"],
-    ["frightened", "Frightened"],
-    ["terrified", "Terrified"],
-    ["frenzied", "Frenzied"],
-    ["hidden", "Hidden"]
-  ])
+  for (const [id, , img] of SYSTEM_STATUSES)
     if (!CONFIG.statusEffects.some(effect => effect.id === id))
-      CONFIG.statusEffects.push({ id, name, img: "icons/svg/downgrade.svg" });
-  if (!CONFIG.statusEffects.some(effect => effect.id === "reeling"))
-    CONFIG.statusEffects.push({ id: "reeling", name: loc`Reeling`, img: "icons/svg/daze.svg" });
+      CONFIG.statusEffects.push({ id, name: id, img: img ?? "icons/svg/downgrade.svg" });
   if (!CONFIG.statusEffects.some(effect => effect.id === "bound"))
     CONFIG.statusEffects.push({ id: "bound", name: "SPYCRAFT.Condition.Bound", img: "icons/svg/net.svg" });
   game.settings.register("spycraft2", "linguistics", {
-    name: "Optional Linguistics checks",
+    name: loc`Optional Linguistics checks`,
     hint: loc`Enable the optional separate-language rule on p.124; the core game uses Cultures focuses.`,
     scope: "world",
     config: true,
@@ -175,6 +184,9 @@ Hooks.once("init", () => {
   registerMigrationSettings();
   registerGmLocks();
   registerMapSettings();
+  // The game clock sets how much time a combat round adds (CONFIG.time.roundTime).
+  gameClock.installGameClock();
+  installGCRelay();
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
@@ -233,7 +245,17 @@ Hooks.once("init", () => {
     reviewUsagePeriod,
     rules: { evaluate, renderTemplate, checkPrerequisites, describe },
     rollPipeline,
-    vehicles: vehiclePlay
+    vehicles: vehiclePlay,
+    askGC,
+    clock: {
+      open: gameClock.openGameClock,
+      label: gameClock.clockLabel,
+      advance: gameClock.advanceClock,
+      setDate: gameClock.setClockDateDialog,
+      addTimer: gameClock.addTimer,
+      timers: gameClock.myTimers,
+      deleteTimer: gameClock.deleteTimer
+    }
   };
 
   const { Actors, Items } = foundry.documents.collections;
@@ -263,13 +285,14 @@ Hooks.once("init", () => {
     const esc = Handlebars.escapeExpression;
     const lines = rows.map(([label, value]) => `${label} ${Number(value) >= 0 ? "+" : ""}${Number(value)}`);
     return new Handlebars.SafeString(
-      loc`data-tooltip="${esc(lines.join(" · "))}" data-tooltip-html="${esc(lines.map(esc).join("<br>"))}"`
+      `data-tooltip="${esc(lines.join(" · "))}" data-tooltip-html="${esc(lines.map(esc).join("<br>"))}"`
     );
   });
 
   foundry.applications.handlebars.loadTemplates([
     "systems/spycraft2/templates/item/parts/bonuses.hbs",
     "systems/spycraft2/templates/actor/npc-builder.hbs",
+    "systems/spycraft2/templates/actor/parts/hazards.hbs",
     "systems/spycraft2/templates/apps/gc-console.hbs",
     "systems/spycraft2/templates/actor/vehicle-sheet.hbs",
     "systems/spycraft2/templates/item/item-vehicle.hbs"
@@ -288,7 +311,10 @@ function refreshCombatActorData() {
     }
 }
 // Display names that come from the rules data are translated once the language is known.
-Hooks.once("i18nInit", () => localizeConfig(CONFIG.SPYCRAFT));
+Hooks.once("i18nInit", () => {
+  localizeConfig(CONFIG.SPYCRAFT);
+  nameSystemStatuses();
+});
 Hooks.once("ready", refreshCombatActorData);
 Hooks.once("ready", setupSampleScenes);
 Hooks.once("ready", setupActorFolders);

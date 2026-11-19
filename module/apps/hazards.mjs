@@ -26,6 +26,7 @@ import { DAMAGE_TYPE_LABELS, SURVIVAL_LABELS } from "../rules/damage-types.mjs";
 import { coverFireOutcome } from "../rules/combat-actions.mjs";
 import { CONTAGIONS } from "../rules/tables.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
+import { markCard } from "./gc-relay.mjs";
 import { setCondition, woundConditions } from "./wound-conditions.mjs";
 import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
@@ -125,6 +126,14 @@ export async function sufferLethal(actor, amount) {
 /** Record stress through the damage ledger, so resistances and thresholds apply. Returns a note on failure. */
 export async function sufferStress(actor, amount, source, damageMode = "stressBeforeResistance") {
   if (!amount) return "";
+  if (actor.type !== "agent") {
+    // An NPC keeps a running total instead of a ledger; a standard NPC takes it through its Damage save.
+    if (!(Number(actor.system.vitality?.max) > 0)) return loc`${amount} stress damage: roll the Damage save for it.`;
+    const totals = actor.flags?.spycraft2?.nonLethal ?? {},
+      stress = Math.max(0, Math.trunc(Number(totals.stress) || 0)) + amount;
+    await actor.update({ "flags.spycraft2.nonLethal.stress": stress });
+    return loc`${amount} stress damage: ${stress} in all. Check it against the stress threshold.`;
+  }
   try {
     await applyAccumulatedDamage(actor, {
       source: `${source} [${foundry.utils.randomID(6)}]`,
@@ -144,6 +153,19 @@ export async function sufferAttributeLoss(actor, effect, rolled, source) {
   const lines = [];
   let total = 0;
   for (const loss of attributeLoss(effect, rolled)) {
+    if (actor.type !== "agent") {
+      // An NPC's attributes are the numbers on its sheet: lower the score itself.
+      const score = Math.max(0, Math.trunc(Number(actor.system.abilities?.[loss.ability]?.value) || 0)),
+        amount = Math.min(score, loss.amount);
+      if (amount) await actor.update({ [`system.abilities.${loss.ability}.value`]: score - amount });
+      total += amount;
+      lines.push(
+        loss.kind === "permanent"
+          ? loc`${amount} permanent ${loss.ability.toUpperCase()} damage: the score is now ${score - amount}.`
+          : loc`${amount} ${loss.ability.toUpperCase()} damage: the score is now ${score - amount}. Raise it again by hand as it heals.`
+      );
+      continue;
+    }
     try {
       const plan = attributeDamagePlan(actor.system, {
         id: foundry.utils.randomID(),
@@ -496,7 +518,7 @@ export async function resolveHazardSave(actor, message) {
       await post(actor, [loc`The save fails: scarring.`, ...result.lines]);
     }
   }
-  await message.update({ "flags.spycraft2.hazardSave.resolved": true });
+  await markCard(message, "hazardSave.resolved");
   return succeeded;
 }
 

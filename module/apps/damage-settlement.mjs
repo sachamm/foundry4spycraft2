@@ -4,6 +4,7 @@ import { damageSettlementPlan, validateDamageSettlement } from "../rules/damage-
 import { shakenApplicationSnapshot } from "../rules/shaken.mjs";
 import { applyShakenLocked } from "./shaken-application.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
+import { conditionDuration } from "../rules/timers.mjs";
 import { queueResources } from "../rules/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -79,8 +80,13 @@ export async function settlePendingDamageSave(actor, options = {}) {
           confirmed: true,
           selfInflicted: plan.selfInflicted
         });
-      if (plan.unconscious && !actor.statuses?.has("unconscious"))
-        await setConditionStatus(actor, "unconscious", true, { label: loc`Unconscious` });
+      if (plan.unconscious && !actor.statuses?.has("unconscious")) {
+        const duration = conditionDuration(plan.knockout);
+        await setConditionStatus(actor, "unconscious", true, {
+          label: loc`Unconscious`,
+          ...(duration ? { duration } : {})
+        });
+      }
       validateDamageSettlement(actor.flags.spycraft2.damageEvents[record.id], actual, plan);
       const ledger = actor.system.accumulatedDamage;
       if (ledger.pending[0] !== record.id || !Number.isSafeInteger(ledger.revision + 1))

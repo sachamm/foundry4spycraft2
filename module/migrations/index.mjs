@@ -143,6 +143,33 @@ function worldActors(game) {
   return actors;
 }
 
+/**
+ * Actors and items kept in the world's own compendiums. A locked compendium cannot be written, so it is left as it
+ * is and named in `skipped`; the system's own packs are rebuilt with each release and need no migration.
+ * @param {Iterable} packs  compendium collections: { documentName, locked, metadata: { packageType, label },
+ *                          getDocuments() }
+ */
+export async function worldCompendiumDocuments(packs) {
+  const actors = [],
+    items = [],
+    skipped = [];
+  for (const pack of packs ?? []) {
+    if (pack?.metadata?.packageType !== "world" || !["Actor", "Item"].includes(pack.documentName)) continue;
+    if (pack.locked) {
+      skipped.push(pack.metadata.label ?? pack.collection ?? "");
+      continue;
+    }
+    try {
+      const documents = await pack.getDocuments();
+      (pack.documentName === "Actor" ? actors : items).push(...documents);
+    } catch (error) {
+      skipped.push(pack.metadata.label ?? pack.collection ?? "");
+      console.error(loc`Spycraft 2.0 | Could not read a compendium for migration`, error);
+    }
+  }
+  return { actors, items, skipped };
+}
+
 /** Register the version setting. Call during `init`. */
 export function registerMigrationSettings() {
   game.settings.register("spycraft2", "schemaVersion", { scope: "world", config: false, type: Number, default: 0 });
@@ -153,11 +180,18 @@ export async function runWorldMigrations() {
   if (!game.users?.activeGM?.isSelf) return null;
   const stored = game.settings.get("spycraft2", "schemaVersion");
   if (stored >= SCHEMA_VERSION) return null;
-  return migrateWorld({
+  const packed = await worldCompendiumDocuments(game.packs);
+  const report = await migrateWorld({
     version: stored,
-    actors: worldActors(game),
-    items: [...(game.items ?? [])],
+    actors: [...worldActors(game), ...packed.actors],
+    items: [...(game.items ?? []), ...packed.items],
     setVersion: version => game.settings.set("spycraft2", "schemaVersion", version),
     notify: message => ui.notifications?.info(message)
   });
+  if (packed.skipped.length)
+    ui.notifications?.warn(
+      loc`These world compendiums were not updated because they are locked or unreadable: ${packed.skipped.join(", ")}. Unlock them and import their entries again, or update the entries by hand.`,
+      { permanent: true }
+    );
+  return { ...report, skippedPacks: packed.skipped };
 }

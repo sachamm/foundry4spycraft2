@@ -1,6 +1,7 @@
 import { shakenRules } from "./shaken.mjs";
 import { GM_TOKEN_PREFIX, gmLockingActive, lockTable, requestLock } from "./gm-locks.mjs";
 import { loc } from "../i18n.mjs";
+import { systemDialog } from "../apps/dialog-theme.mjs";
 /** v14 native embedded-document uniqueness serializes resource transactions across clients.
  * Uses the authenticated document API and existing ownership, without a privileged socket relay.
  */
@@ -212,7 +213,7 @@ export async function recoverResourceTransaction(actor, { confirmed = false, sco
     const holder = game.users.get(arbitrated.userId);
     const agreed =
       confirmed ||
-      (await foundry.applications.api.DialogV2.confirm({
+      (await systemDialog.confirm({
         window: { title: loc`Recover interrupted resource transaction` },
         rejectClose: false,
         content: `<p>${loc`Check the recorded result and current resources before retrying. Make sure ${foundry.utils.escapeHTML(holder?.name ?? loc`the original user`)} is no longer carrying out this action.`}</p>`
@@ -227,7 +228,7 @@ export async function recoverResourceTransaction(actor, { confirmed = false, sco
     return ui.notifications.info(loc`There is no interrupted resource transaction to recover.`);
   if (!confirmed) {
     const user = game.users.get(lock.flags.spycraft2.resourceLock.userId),
-      input = await foundry.applications.api.DialogV2.input({
+      input = await systemDialog.input({
         window: { title: loc`Recover interrupted resource transaction` },
         rejectClose: false,
         content: `<p>${loc`Check the recorded result and current resources before retrying. Coordinate with ${foundry.utils.escapeHTML(user?.name ?? loc`the original user`)} to ensure their action has stopped.`}</p><label><input type="checkbox" name="confirmed" /> ${loc`No client is still executing this resource transaction`}</label>`
