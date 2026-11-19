@@ -139,6 +139,7 @@ function button(control) {
   const element = document.createElement("button");
   element.type = "button";
   element.textContent = localizedLabel(control);
+  element.setAttribute("aria-label", element.textContent);
   element.dataset.rollControl = control.id;
   element.addEventListener("click", async () => {
     element.disabled = true;

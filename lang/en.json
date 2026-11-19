@@ -122,6 +122,7 @@
    "QualifiedOnly": "Qualified only",
    "NotQualified": "Not qualified",
    "Added": "Added {name} to {actor}.",
+   "AddEntry": "Add {name}",
    "Empty": "Nothing matches.",
    "OwnedHint": "Already on this agent.",
    "Owned": {
