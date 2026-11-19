@@ -266,8 +266,10 @@
 .sc2-icon-button > .sc2-button-content { display: none; }
 .sc2-icon-button > .sc2-button-icon {
   display: block; width: 30px; height: 30px; pointer-events: none;
-  background-image: url("../assets/ui/button-icons.png");
-  background-size: 400% 400%;
+  background-image: var(--sc2-icon-image);
+  background-size: var(--sc2-icon-grid, 800%) var(--sc2-icon-grid, 800%);
+  /* Keep paint near a neighboring atlas cell from bleeding into this button. */
+  clip-path: inset(7% 4%);
   background-position: var(--sc2-icon-x) var(--sc2-icon-y);
   background-repeat: no-repeat;
 }

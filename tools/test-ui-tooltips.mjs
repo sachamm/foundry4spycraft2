@@ -1,27 +1,47 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { tooltipText } from "../module/apps/ui-tooltips.mjs";
+import { tooltipText, compactTooltip, buttonIconKind } from "../module/apps/ui-tooltips.mjs";
+import { BUTTON_ICONS } from "../module/apps/ui-button-catalog.mjs";
+import { readFileSync } from "node:fs";
 
-test("attack, ammunition and resource controls explain consequences without inventing bonuses", () => {
-  assert.match(tooltipText({ name: "attackAction" }), /Standard Attack/);
-  assert.match(tooltipText({ name: "aimed" }), /does not take the Aim action/);
-  assert.match(tooltipText({ name: "system.shotsLoaded" }), /Attacks spend/);
-  assert.match(tooltipText({ action: "itemDelete" }), /Remove this item/);
-});
-test("other fields use their context, input constraints and nearby guidance", () => {
-  const text = tooltipText({ label: "Mission budget", tag: "INPUT", type: "number", min: "0", max: "20", step: "1" });
-  assert.match(text, /Mission budget/);
-  assert.match(text, /Minimum: 0/);
-  assert.match(text, /Maximum: 20/);
-  assert.match(text, /whole numbers/);
-  assert.match(tooltipText({ name: "distanceFeet", hint: "Measured from the selected token." }), /Measured from/);
+test("tooltips use compact labels and retain meaningful field distinctions", () => {
+  assert.equal(tooltipText({ name: "attackAction" }), "Attack action");
+  assert.equal(tooltipText({ name: "aimed" }), "Aim already taken");
+  assert.equal(tooltipText({ name: "system.shotsLoaded" }), "Loaded ammo");
+  assert.equal(tooltipText({ action: "itemDelete" }), "Remove item");
+  assert.equal(tooltipText({ label: "Mission budget", type: "number", min: "0", max: "20" }), "Mission budget (0–20)");
+  assert.equal(tooltipText({ label: "+1 round", type: "button" }), "+1 rd");
   assert.equal(tooltipText({ tag: "INPUT" }), "");
+  assert.equal(compactTooltip("Use -1 round. Follow any prompts to review the details before confirming."), "-1 rd");
+  assert.equal(compactTooltip("+8 hours"), "+8 hr");
+  assert.equal(compactTooltip("SPYCRAFT.Round.Label"), "SPYCRAFT.Round.Label");
 });
-test("selection, disclosures and navigation describe the appropriate interaction", () => {
-  assert.match(tooltipText({ label: "Target", tag: "SELECT" }), /Choose an option/);
-  assert.match(tooltipText({ label: "Under cover", type: "checkbox" }), /Turn this on/);
-  assert.match(tooltipText({ label: "Advanced options", tag: "SUMMARY" }), /Expand or collapse/);
-  assert.match(tooltipText({ label: "Gear", action: "tab" }), /Gear section/);
-  assert.match(tooltipText({ label: "Volume", tag: "INPUT", type: "range" }), /Adjust Volume/);
-  assert.match(tooltipText({ label: "Portrait", tag: "INPUT", type: "file" }), /Choose a file/);
+
+test("each registered function has its own artwork cell", () => {
+  const cells = Object.values(BUTTON_ICONS).map(([sheet, index]) => `${sheet}:${index}`);
+  assert.equal(new Set(cells).size, cells.length);
+  const catalog = JSON.parse(readFileSync(new URL("../assets/ui/functions/catalog.json", import.meta.url)));
+  for (const entry of catalog) {
+    assert.deepEqual(BUTTON_ICONS[entry.action], [entry.sheet, entry.index]);
+  }
+});
+
+test("clock increments have distinct paired icons and data variants have dedicated artwork", () => {
+  const cells = [];
+  for (const seconds of [6, 60, 600, 3600, 28800, 86400]) {
+    const plus = buttonIconKind("clockStep", "", { seconds });
+    const minus = buttonIconKind("step", "", { seconds: -seconds });
+    assert.equal(minus.index, plus.index + 1);
+    assert.equal(plus.sheet, "time");
+    cells.push(plus.index, minus.index);
+  }
+  assert.equal(new Set(cells).size, 12);
+  assert.notDeepEqual(
+    buttonIconKind("missionReport", "", { planned: "true" }),
+    buttonIconKind("missionReport", "", { planned: "false" })
+  );
+  assert.notDeepEqual(
+    buttonIconKind("entry", "", { change: "remove" }),
+    buttonIconKind("entry", "", { change: "complete" })
+  );
 });
