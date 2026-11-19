@@ -102,20 +102,29 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     this.actor = actor;
     this.itemType = itemType;
     this.filters = { search: "", group: originType ?? "", qualifiedOnly: false, acquisitionSource: "" };
+    /** The entry shown in the preview pane. */
+    this.selected = null;
   }
 
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "browser"],
-    position: { width: 640, height: 720 },
+    position: { width: 900, height: 720 },
     window: { resizable: true },
     actions: {
+      select(event, target) {
+        this.selected = target.closest("[data-uuid]")?.dataset.uuid ?? null;
+        return this.render();
+      },
       add: SpycraftBrowser.#onAdd,
       open: SpycraftBrowser.#onOpen
     }
   };
 
   static PARTS = {
-    main: { template: "systems/spycraft2/templates/apps/browser.hbs", scrollable: [".browser-list"] }
+    main: {
+      template: "systems/spycraft2/templates/apps/browser.hbs",
+      scrollable: [".browser-list", ".browser-preview"]
+    }
   };
 
   get title() {
@@ -254,7 +263,24 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     }
     rows.sort((a, b) => a.groupLabel.localeCompare(b.groupLabel) || a.name.localeCompare(b.name));
+    const chosen = rows.find(row => row.uuid === this.selected) ?? null;
+    for (const row of rows) row.selected = row === chosen;
+    let preview = null;
+    if (chosen) {
+      const doc = await fromUuid(chosen.uuid);
+      preview = {
+        ...chosen,
+        img: doc?.img,
+        description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+          doc?.system?.description ?? "",
+          {
+            relativeTo: doc
+          }
+        )
+      };
+    }
     return {
+      preview,
       acquisitionSources,
       showAcquisitionSources: this.itemType === "feat" && freeSources.length > 0,
       rows,

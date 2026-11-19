@@ -7,3 +7,9 @@ The clock atlas contains six adjacent plus/minus pairs: round stopwatch, minute 
 `module/apps/ui-button-catalog.mjs` is the runtime lookup, matching `catalog.json`. Data attributes distinguish clock increments, planned/earned XP, shared/group initiative and entry operations. Unknown actions retain their existing presentation until dedicated artwork is registered. Tabs, stat blocks and window headers keep their readable presentation.
 
 Action tooltips use compact labels rather than explanatory boilerplate. Full accessible names remain on controls. Authored HTML rule breakdowns remain intact. The chat atlas received a background-extraction pass to remove a baked checkerboard while preserving icon placement.
+
+## Role in the interface
+
+Common verbs (edit, remove, share, reload, add and the like) now use the single-colour Font Awesome glyphs that ship
+with Foundry, mapped in `module/apps/ui-verb-icons.mjs`. The painted atlases here are illustrations: a control shows
+one only when it sits inside a region marked `data-sc2-art`, or when an icon-only control has no glyph of its own.

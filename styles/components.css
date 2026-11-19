@@ -4,6 +4,7 @@
 /* ---------- Buttons ---------- */
 /* Secondary: the resting look of every action in a sheet or console. */
 .spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action, .sc2-weapon a[data-action]),
+.spycraft2.application:is(.npc, .vehicle) :where(a[data-action]),
 .gc-console-body :where(button, .sc2-icon-button) {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   width: auto; height: auto; min-height: var(--sc2-control); min-width: var(--sc2-control);
@@ -13,6 +14,7 @@
   border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); box-shadow: none; cursor: pointer;
 }
 .spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-weapon a[data-action]):hover,
+.spycraft2.application:is(.npc, .vehicle) :where(a[data-action]):hover,
 .gc-console-body :where(button, .sc2-icon-button):hover {
   color: var(--sc2-ink-strong); background: var(--sc2-paper-sunk); border-color: var(--sc2-teal); text-decoration: none;
 }
@@ -122,3 +124,107 @@
 @media (prefers-contrast: more) {
   .spycraft2.application .sc2-icon-button[data-sc2-mode="icon"] { border-color: var(--sc2-rule); }
 }
+
+/* ===== Modern dossier language =====
+ * One loud element (the section bar), one field pattern (caption over value),
+ * single-colour verb glyphs, and stamps for status. */
+
+/* Verb glyphs take the text colour; painted artwork is used only where a region asks for it. */
+.sc2-icon-button[data-sc2-sheet="glyph"] > .sc2-button-icon {
+  width: auto; height: auto; min-width: 1.1em; background: none; clip-path: none;
+  font-size: 14px; line-height: 1; text-align: center;
+}
+[data-sc2-art] .sc2-icon-button { --sc2-icon-size: 40px; }
+
+/* Section bar */
+.spycraft2.application h3 {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-2);
+  margin: var(--sc2-space-3) 0 var(--sc2-space-2); padding: 4px 8px; min-height: 26px;
+  font: 400 11px/1.3 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--sc2-on-bar); background: var(--sc2-bar); border: 0;
+}
+.spycraft2.application h3:first-child { margin-top: 0; }
+.spycraft2.application h3 :is(.points, .muted) { margin-left: auto; font-family: var(--sc2-num); letter-spacing: 0; opacity: 1; color: var(--sc2-on-bar); }
+.spycraft2.application h3 .controls :is(button, a) {
+  min-height: 22px; padding: 1px 8px; font-size: var(--sc2-text-s);
+  color: var(--sc2-on-bar); background: transparent; border-color: color-mix(in srgb, var(--sc2-on-bar) 45%, transparent);
+}
+.spycraft2.application h3 .controls :is(button, a):hover { color: var(--sc2-bar); background: var(--sc2-on-bar); border-color: var(--sc2-on-bar); }
+.spycraft2.application h3 input { height: 20px; min-height: 0; }
+
+/* Field: a small caption above its value. Stat tiles are fields. */
+.spycraft2 .sc2-caption,
+.spycraft2 .stat > span:first-child {
+  font: 600 var(--sc2-caption-size)/1.2 var(--font-primary, sans-serif); letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--sc2-ink-muted); max-width: 100%; overflow-wrap: anywhere;
+}
+.spycraft2 .sc2-value,
+.spycraft2.application .stat b { font: 700 var(--sc2-value-size)/1.1 var(--sc2-num); color: var(--sc2-ink-strong); }
+.spycraft2 .sc2-field,
+.spycraft2.application .stat {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px;
+  min-width: 0; padding: 5px 8px; text-align: left;
+  background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius);
+}
+.spycraft2.application .stat small { font-size: 10px; color: var(--sc2-ink-muted); opacity: 1; }
+/* A field that rolls is marked along its lower edge and fills when pointed at. */
+.spycraft2.application :is(.sc2-stat-action, button.sc2-field) {
+  width: 100%; height: auto; margin: 0; cursor: pointer; font: inherit; line-height: 1.2; white-space: normal;
+  color: var(--sc2-ink); background: var(--sc2-surface-raised);
+  border: 1px solid var(--sc2-rule); border-bottom: 3px solid var(--sc2-action); border-radius: var(--sc2-radius);
+}
+.spycraft2.application :is(.sc2-stat-action, button.sc2-field):hover { background: var(--sc2-action-tint); border-color: var(--sc2-action); }
+
+/* Stamp: a status that must not be missed. */
+.spycraft2 .sc2-stamp {
+  display: inline-block; padding: 1px 7px; transform: rotate(-1.5deg);
+  font: 700 10px/1.5 var(--sc2-num); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+  color: var(--sc2-danger); border: 2px solid currentColor; border-radius: 2px;
+}
+.spycraft2 .sc2-stamp.good { color: var(--sc2-good); }
+
+/* Pips: things you hold and spend. */
+.spycraft2 .sc2-pips { display: inline-flex; flex-wrap: wrap; gap: 3px; }
+.spycraft2 .sc2-pips i { width: 12px; height: 12px; border: 1.5px solid var(--sc2-ink); border-radius: 2px; }
+.spycraft2 .sc2-pips i.on { background: var(--sc2-ink); }
+
+/* Tabs: quiet captions; the current one is underlined. */
+.spycraft2.application .sheet-tabs {
+  display: flex; flex-wrap: wrap; gap: 0; margin: 0 0 var(--sc2-space-2); padding: 0;
+  border: 0; border-bottom: 2px solid var(--sc2-bar); border-image: none;
+}
+.spycraft2.application .sheet-tabs a {
+  flex: 1 1 auto; display: flex; align-items: center; justify-content: center; min-height: 34px; padding: 4px 10px;
+  font: 600 12px/1.2 var(--font-primary, sans-serif); letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--sc2-ink-muted); background: transparent; border: 0; border-radius: 0;
+}
+.spycraft2.application .sheet-tabs a:hover { color: var(--sc2-ink-strong); background: var(--sc2-action-tint); }
+.spycraft2.application .sheet-tabs a.active { color: var(--sc2-on-bar); background: var(--sc2-bar); }
+
+/* Tables: a thin head, no fill. */
+.spycraft2.application table thead { color: var(--sc2-ink-muted); background: transparent; border: 0; border-bottom: 2px solid var(--sc2-bar); outline: 0; }
+.spycraft2.application table { border: 0; }
+.spycraft2.application table thead th { font: 600 var(--sc2-caption-size)/1.3 var(--font-primary, sans-serif); letter-spacing: 0.09em; text-transform: uppercase; padding: 4px; }
+.spycraft2.application table :is(th, td) { border-bottom-color: var(--sc2-rule); }
+
+/* Reference bands on item sheets and the browser become a plain bar. */
+.spycraft2 .dossier-band { min-height: 0; padding: 4px 8px; margin-bottom: var(--sc2-space-2); border: 0; }
+.spycraft2 .dossier-band .agency-seal { display: none; }
+.spycraft2 .dossier-band .file-label { font: 400 11px/1.3 var(--sc2-bar-font); letter-spacing: 0.1em; }
+.spycraft2 .dossier-band .file-stamp { padding: 0 6px; background: transparent; border-color: color-mix(in srgb, var(--sc2-on-bar) 50%, transparent); }
+
+/* Chips lose their pill shape to match the squarer language. */
+.spycraft2 .sc2-chip { border-radius: var(--sc2-radius); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .spycraft2.application :is(button, a, .stat) { transition: background-color 120ms, border-color 120ms, color 120ms; }
+}
+
+/* Dialogs: each option is a field with its caption above the control. */
+.spycraft2.application.sc2-dialog .dialog-content label:not(:has(> input[type="checkbox"], > input[type="radio"])) {
+  display: flex; flex-direction: column; gap: 3px; margin: 0 0 var(--sc2-space-2);
+  font: 600 var(--sc2-caption-size)/1.3 var(--font-primary, sans-serif); letter-spacing: 0.07em; text-transform: uppercase; color: var(--sc2-ink-muted);
+}
+.spycraft2.application.sc2-dialog .dialog-content label > :is(input, select, textarea) { font: 400 var(--sc2-text-m)/1.3 var(--font-primary, sans-serif); letter-spacing: 0; text-transform: none; }
+.spycraft2.application.sc2-dialog .dialog-content label:has(> input[type="checkbox"], > input[type="radio"]) { display: flex; align-items: center; gap: 8px; }
+.spycraft2.application.sc2-dialog .form-footer button { font: 600 13px/1.3 var(--font-primary, sans-serif); letter-spacing: 0.06em; text-transform: uppercase; }

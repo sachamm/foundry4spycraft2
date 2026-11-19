@@ -1,5 +1,6 @@
 import { loc } from "../i18n.mjs";
 import { BUTTON_ICONS } from "./ui-button-catalog.mjs";
+import { verbIcon } from "./ui-verb-icons.mjs";
 
 const fields = () => ({
   attackAction: loc`Attack action`,
@@ -251,16 +252,25 @@ function enhanceButtonIcon(control, label) {
   // Names and numbers are data; only action words are replaced or joined by a pictogram.
   const mode = buttonDisplay(control);
   if (mode === "text") return;
-  const iconSpec = buttonIconKind(control.dataset.action ?? control.dataset.rollControl ?? "", label, control.dataset);
-  if (!iconSpec) return;
-  const { sheet, index, grid } = iconSpec;
-  control.dataset.sc2Icon = `${sheet}:${index}`;
-  // The stylesheet maps each atlas to its image, so the address resolves beside the stylesheet.
-  control.dataset.sc2Sheet = String(sheet);
+  const action = control.dataset.action ?? control.dataset.rollControl ?? "";
+  // Common verbs use a single-colour glyph. Painted artwork is an illustration a region opts into.
+  const glyph = verbIcon(action, control.dataset);
+  const wantsArt = !!control.closest("[data-sc2-art]");
+  const art = wantsArt || (!glyph && mode === "icon") ? buttonIconKind(action, label, control.dataset) : null;
+  if (!glyph && !art) return;
+  if (art) {
+    const { sheet, index, grid } = art;
+    control.dataset.sc2Icon = `${sheet}:${index}`;
+    // The stylesheet maps each atlas to its image, so the address resolves beside the stylesheet.
+    control.dataset.sc2Sheet = String(sheet);
+    control.style.setProperty("--sc2-icon-grid", `${grid * 100}%`);
+    control.style.setProperty("--sc2-icon-x", `${((index % grid) * 100) / (grid - 1)}%`);
+    control.style.setProperty("--sc2-icon-y", `${(Math.floor(index / grid) * 100) / (grid - 1)}%`);
+  } else {
+    control.dataset.sc2Icon = glyph;
+    control.dataset.sc2Sheet = "glyph";
+  }
   control.dataset.sc2Mode = mode;
-  control.style.setProperty("--sc2-icon-grid", `${grid * 100}%`);
-  control.style.setProperty("--sc2-icon-x", `${((index % grid) * 100) / (grid - 1)}%`);
-  control.style.setProperty("--sc2-icon-y", `${(Math.floor(index / grid) * 100) / (grid - 1)}%`);
   if (!control.classList.contains("sc2-icon-button")) {
     const content = control.ownerDocument.createElement("span");
     content.className = "sc2-button-content";
@@ -273,6 +283,8 @@ function enhanceButtonIcon(control, label) {
     control.append(icon, content);
     control.classList.add("sc2-icon-button");
   }
+  const icon = control.querySelector(":scope > .sc2-button-icon");
+  if (icon) icon.className = art ? "sc2-button-icon" : `sc2-button-icon fa-solid ${glyph}`;
 }
 
 export function enhanceTooltips(root) {
@@ -364,6 +376,7 @@ export function installUITooltipHooks() {
   Hooks.on("renderChatMessageHTML", (message, html) => {
     if (!message.flags?.spycraft2) return;
     html.setAttribute("data-sc2-tooltip-scope", "");
+    html.classList.add("sc2-card");
     enhanceTooltips(html);
   });
   // Capture newly inserted controls before Foundry's delegated tooltip listener handles hover/focus.

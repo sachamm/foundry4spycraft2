@@ -18,6 +18,7 @@
   </header>
 
   <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Condition"}}</h3>
+  {{#if conditionTrack.length}}<div class="sc2-track" role="img" aria-label="{{system.failedSaves}} / {{system.breakState.destroyedAt}}">{{#each conditionTrack}}<i class="{{#if filled}}on{{/if}}{{#if broken}} mark-broken{{/if}}{{#if destroyed}} mark-destroyed{{/if}}"></i>{{/each}}</div>{{/if}}
   <p>
     <strong class="{{#unless (sc2eq system.breakState.state 'intact')}}bad{{/unless}}">{{system.breakState.state}}</strong>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.FailedDamageSaves"}} <input name="system.failedSaves" type="number" min="0" value="{{system.failedSaves}}" class="w-2" />

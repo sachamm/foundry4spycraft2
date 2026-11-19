@@ -238,3 +238,90 @@ test("inventory and toolbar controls have contextual labels and retain the origi
   expect(await page.locator(".gear").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   expect(await page.locator(".inventory-table-wrap").evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
 });
+
+test("pinned tools are copied to the top of Play, and pin mode chooses instead of using", async ({ page }) => {
+  await page.setContent(`<style>${css}</style><div class="spycraft2 application sheet agent play-mode">
+    <div class="pinned-tools tool-actions" hidden></div>
+    <section class="combat-toolbox"><input class="combat-tool-search" /><p class="combat-tool-empty" hidden></p>
+      <div class="combat-tool-groups"><details class="combat-tool-group" open><summary>Attacks</summary><div class="tool-actions">
+        <a data-action="rollDisarm">Disarm</a><a data-action="takeTotalDefense">Total Defense</a>
+        <a data-action="setMovementCondition" data-condition="prone">Prone</a>
+        <a class="gc-review" data-action="reviewLimitedUseCounter" data-resource="contempt">Review</a>
+      </div></details></div>
+    </section></div>`);
+  await load(page, sheetUX, "enhanceAgentSheet");
+  const render = context =>
+    page.evaluate(context => {
+      window.used ??= [];
+      window.pins ??= [];
+      window.sheet ??= { togglePin: tool => window.pins.push(tool) };
+      const root = document.querySelector(".agent");
+      if (!root.dataset.wired) {
+        root.dataset.wired = "1";
+        root.addEventListener("click", event => {
+          const control = event.target.closest("[data-action]");
+          if (control) window.used.push(control.dataset.action);
+        });
+      }
+      window.enhanceAgentSheet(root, { editMode: false, ...context }, window.sheet);
+    }, context);
+  await render({
+    pinnedTools: ["setMovementCondition:prone"],
+    actionCosts: { rollDisarm: "Half", takeTotalDefense: "Full" }
+  });
+  const pinned = page.locator(".pinned-tools");
+  await expect(pinned).toBeVisible();
+  await expect(pinned.getByRole("button")).toHaveText(["Prone"]);
+  // The time an action takes is shown only where the rules give one.
+  await expect(page.locator('.combat-toolbox [data-action="rollDisarm"]')).toHaveAttribute("data-sc2-cost", "Half");
+  await expect(page.locator('.combat-toolbox [data-action="setMovementCondition"]')).not.toHaveAttribute(
+    "data-sc2-cost"
+  );
+  await pinned.getByRole("button", { name: "Prone" }).click();
+  expect(await page.evaluate(() => window.used)).toEqual(["setMovementCondition"]);
+  // In pin mode a choice pins the tool and does not run it; GC review controls cannot be pinned.
+  await render({ pinnedTools: ["setMovementCondition:prone"], pinMode: true });
+  await page.locator('.combat-toolbox [data-action="rollDisarm"]').click();
+  expect(await page.evaluate(() => [window.used, window.pins])).toEqual([["setMovementCondition"], ["rollDisarm"]]);
+  await expect(page.locator(".combat-toolbox .gc-review")).not.toHaveAttribute("data-tool");
+  await render({ pinnedTools: [] });
+  await expect(pinned).toBeHidden();
+});
+
+test("the creation track counts reminders per step and marks only the first waiting step as the start", async ({
+  page
+}) => {
+  await page.setContent("<main></main>");
+  await load(page, sheetUX, "buildCreationTrack");
+  const track = await page.evaluate(() =>
+    window.buildCreationTrack([
+      { tab: "skills", order: 30, text: "Skill points", skillLevel: 2 },
+      { tab: "main", order: 4, text: "Origin choice" },
+      { tab: "training", order: 54, text: "Subplot" },
+      { tab: "training", order: 52, text: "Interests" },
+      { tab: "training", order: 52, text: "Interests" }
+    ])
+  );
+  expect(track.steps.map(step => step.key)).toEqual([
+    "attributes",
+    "origin",
+    "class",
+    "skills",
+    "feats",
+    "interests",
+    "subplot",
+    "derived",
+    "describe",
+    "gear"
+  ]);
+  const by = Object.fromEntries(track.steps.map(step => [step.key, step]));
+  expect([by.origin.count, by.skills.count, by.interests.count, by.subplot.count, by.attributes.count]).toEqual([
+    1, 1, 2, 1, 0
+  ]);
+  expect(track.steps.filter(step => step.start).map(step => step.key)).toEqual(["origin"]);
+  expect(by.skills.skillLevel).toBe(2);
+  expect(by.derived.automatic).toBe(true);
+  // A step with nothing waiting still lands on its own pane.
+  expect([by.class.tab, by.describe.tab, by.gear.tab]).toEqual(["classes", "bio", "gear"]);
+  expect(track.waiting).toBe(5);
+});

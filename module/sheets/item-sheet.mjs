@@ -117,10 +117,46 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     const item = this.item;
     const sys = item.system;
     const cfg = CONFIG.SPYCRAFT;
+    const label = key => game.i18n.localize(key);
+    // The few figures this item is used for in play, shown above its form.
+    const facts =
+      {
+        weapon: [
+          [label("SPYCRAFT.Damage"), sys.damage],
+          [label("SPYCRAFT.Weapon.Error"), sys.error],
+          [label("SPYCRAFT.Weapon.Threat"), sys.threat],
+          [label("SPYCRAFT.Range"), sys.range ? `${sys.range} ft` : ""],
+          [label("SPYCRAFT.Weapon.Ammo"), sys.ammo],
+          [label("SPYCRAFT.Caliber"), cfg.calibers?.[sys.caliber]]
+        ],
+        armor: [
+          [
+            label("SPYCRAFT.Template.ActorAgentGear.DamageReduction"),
+            `${sys.damageReduction ?? 0}/${sys.damageReductionSubdual ?? 0}`
+          ],
+          [label("SPYCRAFT.Template.ActorAgentGear.Defense"), sys.defensePenalty],
+          [label("SPYCRAFT.Template.ActorAgentGear.CheckPenalty"), sys.armorCheck],
+          [label("SPYCRAFT.Template.ActorAgentGear.Speed"), sys.speedPenalty],
+          [label("SPYCRAFT.Caliber"), cfg.calibers?.[sys.caliber]]
+        ],
+        gear: [
+          [label("SPYCRAFT.Quantity"), sys.quantity],
+          [label("SPYCRAFT.Weight"), sys.weight],
+          [label("SPYCRAFT.Caliber"), cfg.calibers?.[sys.caliber]]
+        ],
+        feat: [[label("SPYCRAFT.Feat.Tree"), cfg.featTrees?.[sys.tree]]],
+        class: [
+          [label("SPYCRAFT.Vitality"), sys.vitalityDie ? `d${sys.vitalityDie}` : ""],
+          [label("SPYCRAFT.SkillPoints"), sys.skillPoints]
+        ]
+      }[item.type] ?? [];
     Object.assign(context, {
       item,
       system: sys,
       config: cfg,
+      summary: facts
+        .filter(([, value]) => value !== undefined && value !== null && value !== "")
+        .map(([caption, value]) => ({ caption, value })),
       editable: this.isEditable,
       enrichedDescription: await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.description, {
         secrets: item.isOwner,

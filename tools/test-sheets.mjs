@@ -39,7 +39,8 @@ test("continuing setup enters Edit at the requested skill level and focuses the 
   sheet.changeTab = (tab, group) => visits.push([tab, group]);
   sheet.element = {
     querySelector: selector => {
-      assert.equal(selector, 'section[data-tab="skills"]');
+      // A build step is looked up by its pane, which several steps may share a tab with.
+      assert.equal(selector, '[data-pane="skills"]');
       return {
         querySelectorAll: selector => {
           assert.equal(selector, '[name^="skillpts."]');
@@ -91,7 +92,7 @@ test("an origin reminder opens its filtered choice browser after entering the de
     await SpycraftAgentSheet.DEFAULT_OPTIONS.actions.setupTask.call(sheet, null, {
       dataset: { tab: "main", order: "1", type: "origin", originType: "talent" }
     });
-    assert.deepEqual(visits, [["main", "primary"], "sheet", ["origin", "talent"]]);
+    assert.deepEqual(visits, [["play", "primary"], "sheet", ["origin", "talent"]]);
   } finally {
     if (original) SpycraftBrowser.prototype.render = original;
     else delete SpycraftBrowser.prototype.render;

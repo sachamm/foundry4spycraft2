@@ -28,27 +28,6 @@
 .spycraft2 ol.abilities-list { list-style: none; padding-left: 0; }
 .spycraft2 ol.abilities-list li { margin: 2px 0; }
 
-/* Agent tab viewport. PARTS.scrollable preserves positions; CSS must provide
- * the actual scroll container. Let the active tab shrink below its content size
- * while the header and navigation retain their natural height. Keep a usable
- * tab viewport when an expanded header fills the window; the outer container
- * can then scroll far enough to expose that viewport. */
-.spycraft2.sheet.agent .window-content {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow-y: auto;
-}
-.spycraft2.sheet.agent .window-content > .sheet-top,
-.spycraft2.sheet.agent .window-content > .sheet-tabs { flex: 0 0 auto; }
-.spycraft2.sheet.agent .window-content > .tab {
-  flex: 1 1 0;
-  min-height: 80px;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-  padding-right: 6px;
-}
-
 /* NPC sheet viewport. The sheet is a single part whose root is the scroll
  * container named in PARTS.scrollable, so its position survives re-renders. */
 .spycraft2.sheet.npc .window-content {
@@ -67,17 +46,17 @@
 /* Biography uses the remaining tab height in both reading and editing modes.
  * Keep this on the active tab so inactive tabs remain hidden. The minimum
  * editor height lets the tab scroll when a short window cannot fit both parts. */
-.spycraft2.sheet.agent .window-content > .tab.bio.active {
+.spycraft2.sheet.agent .pane.bio {
   display: flex;
   flex-direction: column;
 }
-.spycraft2.sheet.agent .tab.bio > :not(prose-mirror) { flex: 0 0 auto; }
-.spycraft2.sheet.agent .tab.bio > prose-mirror {
+.spycraft2.sheet.agent .pane.bio > :not(prose-mirror) { flex: 0 0 auto; }
+.spycraft2.sheet.agent .pane.bio > prose-mirror {
   flex: 1 0 120px;
   display: flex;
   flex-direction: column;
 }
-.spycraft2.sheet.agent .tab.bio > prose-mirror .editor-container {
+.spycraft2.sheet.agent .pane.bio > prose-mirror .editor-container {
   flex: 1;
   min-height: 0;
 }

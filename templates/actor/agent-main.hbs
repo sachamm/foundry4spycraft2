@@ -1,16 +1,11 @@
-<section class="tab main {{tab.cssClass}}" data-tab="main" data-group="primary">
+<section class="tab main play {{tab.cssClass}}" data-tab="play" data-pane="main" data-group="primary">
 {{#each shakenInitiativeReviews}}<p class="bad">{{name}}{{localize "SPYCRAFT.Template.ActorAgentMain.InitiativeCount"}} {{count}} {{localize "SPYCRAFT.Template.ActorAgentMain.NeedsShakenReview"}} {{reason}} {{#if @root.isGM}}<a data-action="reviewShakenInitiative" data-combat-id="{{combatId}}" data-combatant-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewIncludedPenalty"}}</a>{{/if}}</p>{{/each}}
   <div class="play-dashboard play-only">
-    {{#if activeConditions.length}}<div class="condition-summary"><b>{{localize "SPYCRAFT.Template.ActorAgentMain.CurrentConditions"}}</b>{{#each activeConditions}}<span class="tag bad">{{this}}</span>{{/each}}</div>{{/if}}
-    <div class="defense-summary">      <h3>{{localize "SPYCRAFT.Defenses"}}</h3>
-      <div class="stat-grid">
-        {{#each saves}}
-          <button type="button" class="stat sc2-stat-action" data-action="rollSave" data-save="{{key}}" aria-label="Roll {{label}}"><span>{{label}}</span><b {{sc2tip tip}}>{{signed total}}</b><small>{{localize "SPYCRAFT.Base"}} {{base}}{{#if bonus}}, {{signed bonus}}{{/if}}</small></button>
-        {{/each}}
-        <div class="stat"><span>{{localize "SPYCRAFT.Defense"}}</span><b {{sc2tip tips.defense}}>{{system.defense.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.defense.base}}{{#if system.defense.armor}}, {{localize "SPYCRAFT.Armor"}} {{signed system.defense.armor}}{{/if}}</small></div>
-        <button type="button" class="stat sc2-stat-action" data-action="rollInitiative" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.RollInitiative'}}"><span>{{localize "SPYCRAFT.Initiative"}}</span><b {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b><small>{{localize "SPYCRAFT.Base"}} {{system.initiative.base}}</small></button>
-        <div class="stat"><span>{{localize "SPYCRAFT.Speed"}}</span><b {{sc2tip tips.speed}}>{{#if system.conditionSpeedReview}}{{localize "SPYCRAFT.Template.ActorAgentMain.GCRulingNeeded"}}{{else}}{{system.speed}} {{localize "SPYCRAFT.Template.ActorAgentMain.Ft"}}{{/if}}</b></div>
-      </div></div>
+    {{#if startedCharacterCombat}}<div class="round-tracker" role="group" aria-label="{{localize 'SPYCRAFT.Round.Title'}}">
+      <span class="sc2-caption">{{localize "SPYCRAFT.Round.Title"}}</span>
+      {{#each roundActions}}<button type="button" class="round-pip{{#if spent}} spent{{/if}}" data-sc2-display="text" data-action="toggleHalfAction" data-index="{{index}}" aria-pressed="{{spent}}">{{localize "SPYCRAFT.Round.Half"}}</button>{{/each}}
+    </div>{{/if}}
+    <div class="pinned-tools tool-actions" aria-label="{{localize 'SPYCRAFT.Pins.Title'}}" hidden></div>
     <div class="ability-strip" aria-label="{{localize 'SPYCRAFT.Attributes'}}">
       <div class="stat-grid">
         {{#each abilities}}<button type="button" class="stat sc2-stat-action" data-action="rollAbility" data-ability="{{key}}" aria-label="Roll {{label}}"{{#if temporaryBonus}} data-tooltip="Includes {{signed temporaryBonus}} temporary adjustment"{{/if}}><span>{{label}}</span><b>{{signed mod}}</b><small>{{value}}</small></button>{{/each}}
@@ -148,9 +143,11 @@
   <section class="combat-toolbox play-only" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CombatTools'}}">
     <div class="combat-tool-head">
       <h3>{{localize "SPYCRAFT.Template.ActorAgentMain.CombatTools"}}</h3>
+      {{#if editable}}<button type="button" class="pin-mode" data-sc2-display="both" data-action="togglePinMode" aria-pressed="{{pinMode}}">{{#if pinMode}}{{localize "SPYCRAFT.Pins.Done"}}{{else}}{{localize "SPYCRAFT.Pins.Choose"}}{{/if}}</button>{{/if}}
       <input type="search" class="combat-tool-search" placeholder="{{localize 'SPYCRAFT.Template.ActorAgentMain.FindATool'}}" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.FindATool'}}" />
       {{#if isGM}}<label class="combat-tool-all"><input type="checkbox" data-action="toggleAllTools" {{checked showAllTools}} /> {{localize "SPYCRAFT.Template.ActorAgentMain.ShowAllTools"}}</label>{{/if}}
     </div>
+    {{#if pinMode}}<p class="tool-hint pin-hint">{{localize "SPYCRAFT.Pins.Hint"}}</p>{{/if}}
     <p class="combat-tool-empty muted" hidden>{{localize "SPYCRAFT.Template.ActorAgentMain.NoToolMatches"}}</p>
     <div class="combat-tool-groups">
     <details class="combat-tool-group" data-key="combat-attacks">

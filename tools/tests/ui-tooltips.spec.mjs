@@ -3,9 +3,11 @@ import { readFileSync } from "node:fs";
 
 const i18n = `data:text/javascript;base64,${readFileSync(new URL("../../module/i18n.mjs", import.meta.url)).toString("base64")}`;
 const catalogUrl = `data:text/javascript;base64,${readFileSync(new URL("../../module/apps/ui-button-catalog.mjs", import.meta.url)).toString("base64")}`;
+const verbsUrl = `data:text/javascript;base64,${readFileSync(new URL("../../module/apps/ui-verb-icons.mjs", import.meta.url)).toString("base64")}`;
 const source = readFileSync(new URL("../../module/apps/ui-tooltips.mjs", import.meta.url), "utf8")
   .replace('"../i18n.mjs"', JSON.stringify(i18n))
-  .replace('"./ui-button-catalog.mjs"', JSON.stringify(catalogUrl));
+  .replace('"./ui-button-catalog.mjs"', JSON.stringify(catalogUrl))
+  .replace('"./ui-verb-icons.mjs"', JSON.stringify(verbsUrl));
 const url = `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`;
 
 test.beforeEach(async ({ page }) => {
@@ -150,13 +152,15 @@ test("display modes keep names and numbers readable and reserve icon-only for ma
   await expect(page.locator("#forced")).toHaveAttribute("data-sc2-mode", "icon");
 });
 
-test("GC clock controls have distinct artwork, compact hover text and unchanged actions", async ({ page }) => {
+test("clock controls that ask for artwork get distinct pictures, compact hover text and unchanged actions", async ({
+  page
+}) => {
   await page.evaluate(() => {
     document
       .querySelector("main")
       .insertAdjacentHTML(
         "afterbegin",
-        `<div id="clock-controls">${[6, -6, 60, 600, 3600, 28800, 86400].map(seconds => `<button data-action="clockStep" data-seconds="${seconds}">${seconds === 6 ? "+1 round" : seconds === -6 ? "-1 round" : "+" + seconds + " sec"}</button>`).join("")}</div>`
+        `<div id="clock-controls" data-sc2-art>${[6, -6, 60, 600, 3600, 28800, 86400].map(seconds => `<button data-action="clockStep" data-seconds="${seconds}">${seconds === 6 ? "+1 round" : seconds === -6 ? "-1 round" : "+" + seconds + " sec"}</button>`).join("")}</div>`
       );
     window.tooltips.enhanceTooltips(document.querySelector("main"));
   });
@@ -168,7 +172,7 @@ test("GC clock controls have distinct artwork, compact hover text and unchanged 
   await expect(buttons.nth(0)).toHaveAttribute("data-seconds", "6");
 });
 
-test("all generated atlas images load and remain legible as compact buttons", async ({ page }) => {
+test("every atlas image loads where a region asks for artwork", async ({ page }) => {
   const catalog = JSON.parse(readFileSync(new URL("../../assets/ui/functions/catalog.json", import.meta.url)));
   await page.route(/\/assets\/ui\/functions\/[^/]+\.png$/, route => {
     const file = new URL(route.request().url()).pathname.split("/").at(-1);
@@ -185,7 +189,7 @@ test("all generated atlas images load and remain legible as compact buttons", as
   await page.evaluate(items => {
     document.head.insertAdjacentHTML("afterbegin", '<base href="http://spycraft.test/">');
     const main = document.querySelector("main");
-    main.innerHTML = `<div id="clock-gallery">${[6, -6, 60, -60, 600, -600, 3600, -3600, 28800, -28800, 86400, -86400].map(seconds => `<button data-action="clockStep" data-seconds="${seconds}">${seconds} sec</button>`).join("")}</div><div id="gallery">${items.map(item => `<label><button data-action="${item.action.split(":")[0]}" ${item.action.includes(":") ? `data-${item.action.startsWith("entry") ? "change" : item.action.startsWith("group") ? "single" : "planned"}="${item.action.split(":")[1]}"` : ""}>${item.subject}</button><span>${item.subject}</span></label>`).join("")}</div>`;
+    main.innerHTML = `<div id="clock-gallery" data-sc2-art>${[6, -6, 60, -60, 600, -600, 3600, -3600, 28800, -28800, 86400, -86400].map(seconds => `<button data-action="clockStep" data-seconds="${seconds}">${seconds} sec</button>`).join("")}</div><div id="gallery" data-sc2-art>${items.map(item => `<label><button data-action="${item.action.split(":")[0]}" ${item.action.includes(":") ? `data-${item.action.startsWith("entry") ? "change" : item.action.startsWith("group") ? "single" : "planned"}="${item.action.split(":")[1]}"` : ""}>${item.subject}</button><span>${item.subject}</span></label>`).join("")}</div>`;
     window.tooltips.enhanceTooltips(main);
   }, catalog);
   const loaded = await page.evaluate(async () => {

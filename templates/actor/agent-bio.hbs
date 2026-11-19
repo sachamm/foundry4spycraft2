@@ -1,4 +1,4 @@
-<section class="tab bio {{tab.cssClass}}" data-tab="bio" data-group="primary">
+<div class="pane bio" data-pane="bio">
   <div class="details-grid edit-only">
     <label>{{localize "SPYCRAFT.Template.ActorAgentBio.Affiliation"}} <select name="system.affiliationType"><option value="faction" {{#if (sc2eq system.affiliationType "faction")}}selected{{/if}}>{{localize "SPYCRAFT.Template.ActorAgentBio.Faction"}}</option><option value="freelance" {{#if (sc2eq system.affiliationType "freelance")}}selected{{/if}}>{{localize "SPYCRAFT.Template.ActorAgentBio.Freelance"}}</option></select></label>
     {{#each system.details as |v k|}}{{#unless (sc2eq k "level")}}
@@ -17,4 +17,4 @@
   {{#if editable}}
     <prose-mirror toggled name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>
   {{else}}{{{enrichedBiography}}}{{/if}}
-</section>
+</div>

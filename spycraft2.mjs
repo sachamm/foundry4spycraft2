@@ -296,7 +296,11 @@ Hooks.once("init", () => {
     "systems/spycraft2/templates/actor/parts/hazards.hbs",
     "systems/spycraft2/templates/apps/gc-console.hbs",
     "systems/spycraft2/templates/actor/vehicle-sheet.hbs",
-    "systems/spycraft2/templates/item/item-vehicle.hbs"
+    "systems/spycraft2/templates/item/item-vehicle.hbs",
+    "systems/spycraft2/templates/actor/agent-classes.hbs",
+    "systems/spycraft2/templates/actor/agent-feats.hbs",
+    "systems/spycraft2/templates/actor/agent-training.hbs",
+    "systems/spycraft2/templates/actor/agent-bio.hbs"
   ]);
 });
 
