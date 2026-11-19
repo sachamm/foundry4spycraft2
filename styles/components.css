@@ -1,0 +1,124 @@
+/* Shared components. Text carries data; pictograms carry verbs.
+ * Loaded after the base and dossier styles, and built on styles/tokens.css. */
+
+/* ---------- Buttons ---------- */
+/* Secondary: the resting look of every action in a sheet or console. */
+.spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-primary-action, .sc2-weapon a[data-action]),
+.gc-console-body :where(button, .sc2-icon-button) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: auto; height: auto; min-height: var(--sc2-control); min-width: var(--sc2-control);
+  margin: 0; padding: 3px 10px;
+  font: inherit; font-size: var(--sc2-text-m); line-height: 1.25; white-space: normal; text-shadow: none;
+  color: var(--sc2-teal); background: var(--sc2-paper-raised);
+  border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); box-shadow: none; cursor: pointer;
+}
+.spycraft2.application :where(button.sc2-action, .sc2-icon-button, .sc2-btn, .sc2-weapon a[data-action]):hover,
+.gc-console-body :where(button, .sc2-icon-button):hover {
+  color: var(--sc2-ink-strong); background: var(--sc2-paper-sunk); border-color: var(--sc2-teal); text-decoration: none;
+}
+/* Font Awesome glyphs are superseded by the generated pictogram on the same control. */
+.sc2-icon-button > .sc2-button-content > i { display: none; }
+
+/* Ghost: a repeated row verb. No box until it is pointed at or focused. */
+.spycraft2.application .sc2-icon-button[data-sc2-mode="icon"],
+.gc-console-body .sc2-icon-button[data-sc2-mode="icon"] {
+  width: var(--sc2-control); height: var(--sc2-control); padding: 2px;
+  background: transparent; border-color: transparent;
+}
+.spycraft2.application .sc2-icon-button[data-sc2-mode="icon"]:hover,
+.gc-console-body .sc2-icon-button[data-sc2-mode="icon"]:hover {
+  background: var(--sc2-paper-raised); border-color: var(--sc2-rule);
+}
+.spycraft2.application .sc2-icon-button[aria-pressed="true"] { background: var(--sc2-teal-tint); border-color: var(--sc2-teal); }
+
+/* Primary: the one filled action of a row or region. */
+.spycraft2.application :is(.sc2-primary-action, .sc2-btn.primary),
+.gc-console-body button.gc-primary {
+  color: var(--sc2-on-teal); background: var(--sc2-teal); border-color: var(--sc2-teal); font-weight: 700;
+}
+.spycraft2.application :is(.sc2-primary-action, .sc2-btn.primary):hover,
+.gc-console-body button.gc-primary:hover {
+  color: var(--sc2-on-teal); background: var(--sc2-teal-dark); border-color: var(--sc2-teal-dark);
+}
+.spycraft2.application .sc2-primary-action.untrained { background: var(--sc2-bad); border-color: var(--sc2-bad); }
+
+/* Roll chip: a number or dice expression that rolls when chosen. */
+.spycraft2.application :is(.sc2-roll, [data-action="rollSkill"], [data-action="rollAbility"], [data-action="rollDamage"], [data-action="rollKnowledge"]):not(.stat, .sc2-primary-action) {
+  min-width: 2.6em; padding: 2px 8px;
+  font-family: var(--sc2-display); font-weight: 700; color: var(--sc2-teal-dark);
+  background: var(--sc2-paper-raised); border: 1px solid var(--sc2-brass); border-bottom-width: 2px;
+}
+/* Name link: opens or rolls the thing it names. Reads as text, not as a button. */
+.spycraft2.application :is(a, button):is([data-action="itemEdit"], [data-action="openCompanion"]),
+.spycraft2.application .skills-table th button[data-action="rollSkill"] {
+  min-height: 28px; min-width: 0; padding: 2px 4px; justify-content: flex-start; text-align: left;
+  font-family: inherit; font-weight: 700; color: var(--sc2-ink-strong);
+  background: transparent; border: 1px solid transparent;
+}
+.spycraft2.application :is(a, button):is([data-action="itemEdit"], [data-action="openCompanion"]):hover,
+.spycraft2.application .skills-table th button[data-action="rollSkill"]:hover {
+  color: var(--sc2-teal); background: var(--sc2-teal-tint); border-color: transparent; text-decoration: underline;
+}
+
+/* ---------- Chips, tiles, meters ---------- */
+.spycraft2 .sc2-chip {
+  display: inline-flex; align-items: center; gap: 2px; min-height: 26px; padding: 0 8px;
+  font-size: var(--sc2-text-s); color: var(--sc2-ink); background: var(--sc2-paper-raised);
+  border: 1px solid var(--sc2-rule); border-radius: 13px;
+}
+.spycraft2 .sc2-chip .sc2-icon-button[data-sc2-mode="icon"] { width: 24px; height: 24px; min-width: 24px; min-height: 24px; --sc2-icon-size: 18px; }
+.spycraft2.application .sc2-chip button[data-action="itemEdit"] { min-height: 24px; padding: 0 2px; font-size: var(--sc2-text-s); }
+
+.spycraft2 .sc2-meter { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 2px 6px; min-width: 150px; }
+.spycraft2 .sc2-meter-label { font: bold 11px/1.2 var(--sc2-display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--sc2-ink-muted); }
+.spycraft2 .sc2-meter-max { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); white-space: nowrap; }
+.spycraft2 .sc2-meter progress {
+  grid-column: 1 / -1; width: 100%; height: 6px; appearance: none; -webkit-appearance: none;
+  border: 1px solid var(--sc2-rule); border-radius: 3px; background: var(--sc2-paper-sunk); overflow: hidden;
+}
+.spycraft2 .sc2-meter progress::-webkit-progress-bar { background: var(--sc2-paper-sunk); }
+.spycraft2 .sc2-meter progress::-webkit-progress-value { background: var(--sc2-teal); }
+.spycraft2 .sc2-meter progress::-moz-progress-bar { background: var(--sc2-teal); }
+.spycraft2 .sc2-meter.wounds progress::-webkit-progress-value { background: var(--sc2-bad); }
+.spycraft2 .sc2-meter.wounds progress::-moz-progress-bar { background: var(--sc2-bad); }
+
+/* Sections: a heading with its actions at the far end. */
+.spycraft2.application h3 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-2); margin: var(--sc2-space-3) 0 var(--sc2-space-1); padding-bottom: 3px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; border-bottom-width: 1px; }
+.spycraft2.application h3 .controls { display: flex; flex-wrap: wrap; gap: var(--sc2-space-1); margin-left: auto; font-family: var(--font-primary, inherit); font-size: var(--sc2-text-m); text-transform: none; letter-spacing: 0; }
+.spycraft2.application h3 .controls > * { margin: 0; font-family: var(--font-primary, sans-serif); font-weight: 400; letter-spacing: 0; text-transform: none; }
+
+/* Rows: name, facts, then quiet verbs at the far end. */
+.spycraft2 .item-list li { gap: var(--sc2-space-2); min-height: 36px; padding: 2px 0; }
+.spycraft2 .item-list li .controls { display: inline-flex; gap: 2px; }
+.spycraft2 td.controls { white-space: nowrap; }
+.spycraft2 td.controls > * { vertical-align: middle; }
+
+/* A paragraph that mixes status text with actions lays them out on one wrapping line. */
+.spycraft2.sheet :is(.combat-tool-group, .quick-actions, .npc-play, .hazards, .main-reference) p:has(> .sc2-icon-button),
+.spycraft2.sheet .tool-actions {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-2);
+}
+
+/* Uses left of a limited ability, shown as a small counter beside its action. */
+.spycraft2 .sc2-uses { display: inline-flex; align-items: center; justify-content: center; min-width: 2.6em; padding: 1px 6px; font-family: var(--sc2-display); font-size: var(--sc2-text-s); color: var(--sc2-on-teal); background: var(--sc2-teal); border-radius: 10px; }
+.spycraft2 .sc2-uses.spent { color: var(--sc2-ink-muted); background: var(--sc2-paper-sunk); }
+/* A GC-only review control sits at the far end of its line and stays quiet. */
+.spycraft2.application .gc-review { margin-left: auto; opacity: 0.75; }
+.spycraft2.application .gc-review:hover, .spycraft2.application .gc-review:focus-visible { opacity: 1; }
+.spycraft2 .sc2-toolrow { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--sc2-space-2) 0; }
+
+/* Form grids: label text on the left, its control on the right; a checkbox leads its own label. */
+.spycraft2 .form-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px var(--sc2-space-4); align-items: center; }
+.spycraft2 .form-fields-grid label { min-width: 0; line-height: 1.3; }
+.spycraft2 .form-fields-grid label > :is(select, input:not([type="checkbox"], [type="radio"])) { flex: 0 1 55%; min-width: 0; }
+.spycraft2 .form-fields-grid label > input.w-2 { flex: 0 0 4.5em; }
+.spycraft2 .form-fields-grid label:has(> input[type="checkbox"]) { justify-content: flex-start; gap: 8px; }
+.spycraft2 .form-fields-grid :is(p, div).wide { grid-column: 1 / -1; margin: 0; font-size: var(--sc2-text-s); line-height: 1.45; color: var(--sc2-ink-muted); }
+@container (max-width: 480px) {
+  .spycraft2 .form-fields-grid { grid-template-columns: minmax(0, 1fr); }
+  .spycraft2 .form-fields-grid label.wide { grid-column: auto; }
+}
+
+@media (prefers-contrast: more) {
+  .spycraft2.application .sc2-icon-button[data-sc2-mode="icon"] { border-color: var(--sc2-rule); }
+}

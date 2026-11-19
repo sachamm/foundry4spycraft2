@@ -107,7 +107,9 @@ test("action buttons show generated icons and retain keyboard access and help", 
   await page.addStyleTag({ content: css });
   const remove = page.getByRole("button", { name: "Remove", exact: true });
   await expect(remove.locator(".sc2-button-icon")).toBeVisible();
-  await expect(remove.locator(".sc2-button-content")).toBeHidden();
+  // Unmarked controls show the pictogram beside their label.
+  await expect(remove).toHaveAttribute("data-sc2-mode", "both");
+  await expect(remove.locator(".sc2-button-content")).toBeVisible();
   await expect(remove).toHaveAttribute("data-tooltip", "Remove item");
   await remove.focus();
   await expect(remove).toBeFocused();
@@ -115,7 +117,37 @@ test("action buttons show generated icons and retain keyboard access and help", 
   await expect(page.locator("#outside .sc2-button-icon")).toHaveCount(0);
   await page.evaluate(() => window.tooltips.enhanceTooltips(document.querySelector("main")));
   await expect(remove.locator(".sc2-button-icon")).toHaveCount(1);
+  await expect(remove).not.toHaveAttribute("style", /url\(/);
   await page.screenshot({ path: "test-results/button-icons-preview.png" });
+});
+
+test("display modes keep names and numbers readable and reserve icon-only for marked toolbars", async ({ page }) => {
+  await page.addStyleTag({ content: readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8") });
+  await page.evaluate(() => {
+    document.querySelector("main").insertAdjacentHTML(
+      "beforeend",
+      `<span class="controls" data-sc2-display="icon"><button data-action="itemChat" id="row-share">Share</button>
+         <button data-action="itemEdit" id="row-name">Beretta 92</button>
+         <button data-action="reloadWeapon" data-sc2-display="both" id="row-reload">Reload</button></span>
+       <button data-action="rollSkill" id="skill">Athletics</button>
+       <button data-action="rollAbility" id="mod">+3</button>
+       <button data-action="rollDamage" data-sc2-display="icon" id="forced">2d6</button>`
+    );
+    window.tooltips.enhanceTooltips(document.querySelector("main"));
+  });
+  await expect(page.locator("#row-share")).toHaveAttribute("data-sc2-mode", "icon");
+  await expect(page.locator("#row-share .sc2-button-content")).toBeHidden();
+  await expect(page.locator("#row-share")).toHaveAccessibleName("Share");
+  // A name stays text even inside an icon-only toolbar; a control's own setting overrides both rules.
+  for (const id of ["#row-name", "#skill", "#mod"]) {
+    await expect(page.locator(`${id} .sc2-button-icon`)).toHaveCount(0);
+    await expect(page.locator(id)).not.toHaveClass(/sc2-icon-button/);
+  }
+  await expect(page.locator("#skill")).toHaveText("Athletics");
+  await expect(page.locator("#mod")).toHaveText("+3");
+  await expect(page.locator("#row-reload")).toHaveAttribute("data-sc2-mode", "both");
+  await expect(page.locator("#row-reload .sc2-button-content")).toBeVisible();
+  await expect(page.locator("#forced")).toHaveAttribute("data-sc2-mode", "icon");
 });
 
 test("GC clock controls have distinct artwork, compact hover text and unchanged actions", async ({ page }) => {
@@ -138,7 +170,7 @@ test("GC clock controls have distinct artwork, compact hover text and unchanged 
 
 test("all generated atlas images load and remain legible as compact buttons", async ({ page }) => {
   const catalog = JSON.parse(readFileSync(new URL("../../assets/ui/functions/catalog.json", import.meta.url)));
-  await page.route("http://spycraft.test/systems/spycraft2/assets/ui/functions/*.png", route => {
+  await page.route(/\/assets\/ui\/functions\/[^/]+\.png$/, route => {
     const file = new URL(route.request().url()).pathname.split("/").at(-1);
     return route.fulfill({
       contentType: "image/png",
@@ -157,9 +189,10 @@ test("all generated atlas images load and remain legible as compact buttons", as
     window.tooltips.enhanceTooltips(main);
   }, catalog);
   const loaded = await page.evaluate(async () => {
+    // Each atlas address comes from the stylesheet, never from an inline style on the control.
     const urls = new Set(
-      [...document.querySelectorAll(".sc2-icon-button")].map(node =>
-        node.style.getPropertyValue("--sc2-icon-image").slice(5, -2)
+      [...document.querySelectorAll(".sc2-icon-button > .sc2-button-icon")].map(node =>
+        getComputedStyle(node).backgroundImage.slice(5, -2)
       )
     );
     return Promise.all(
@@ -180,11 +213,15 @@ test("all generated atlas images load and remain legible as compact buttons", as
 });
 
 test("buttons expose one hover tooltip and one accessible name", async ({ page }) => {
-  const button = page.locator('[data-action="rollAttack"]');
-  await expect(button).toHaveAttribute("data-tooltip", "Attack");
+  const attack = page.locator('[data-action="rollAttack"]');
+  await expect(attack).toHaveAttribute("data-tooltip", "Attack");
+  await expect(attack).not.toHaveAttribute("title");
+  await expect(attack).toHaveAccessibleName("Attack");
+  const button = page.locator('[data-action="itemDelete"]');
+  await expect(button).toHaveAttribute("data-tooltip", "Remove item");
   await expect(button).not.toHaveAttribute("title");
   await expect(button).not.toHaveAttribute("aria-description");
-  await expect(button).toHaveAccessibleName("Attack");
+  await expect(button).toHaveAccessibleName("Remove");
   const icon = button.locator(".sc2-button-icon");
   await expect(icon).toHaveAttribute("aria-hidden", "true");
   for (const attribute of ["title", "alt", "aria-label", "data-tooltip"]) {

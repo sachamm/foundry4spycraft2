@@ -34,18 +34,18 @@
   </p>
   <p>
     <label><input type="checkbox" name="system.moving" {{checked system.moving}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.InMotion"}}</label>
-    · <label><input type="checkbox" name="system.aboveCruising" {{checked system.aboveCruising}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.AboveCruisingMPH"}}</label>
-    · <label><input type="checkbox" name="system.onFire" {{checked system.onFire}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.OnFire"}}</label>
-    · <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.DefenseAgainst"}} <select name="system.attacker">{{selectOptions attackerOptions selected=system.attacker}}</select></label>
+    <label><input type="checkbox" name="system.aboveCruising" {{checked system.aboveCruising}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.AboveCruisingMPH"}}</label>
+    <label><input type="checkbox" name="system.onFire" {{checked system.onFire}} /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.OnFire"}}</label>
+    <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.DefenseAgainst"}} <select name="system.attacker">{{selectOptions attackerOptions selected=system.attacker}}</select></label>
   </p>
-  <p class="controls">
+  <p class="controls sc2-toolrow">
     <a data-action="controlCheck"><i class="fa-solid fa-car-side"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.ControlCheck"}}</a>
     <a data-action="crash"><i class="fa-solid fa-car-burst"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Crash"}}</a>
-    · <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave2"}}</a>
-    · <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleDamageResult"}}</a>
-    · <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TyreSave"}}</a>
-    · <a data-action="fuelExplosion"><i class="fa-solid fa-fire"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.FuelExplosion"}}</a>
-    · <a data-action="repair"><i class="fa-solid fa-wrench"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Repaired"}}</a>
+    <a data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave2"}}</a>
+    <a data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleDamageResult"}}</a>
+    <a data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TyreSave"}}</a>
+    <a data-action="fuelExplosion"><i class="fa-solid fa-fire"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.FuelExplosion"}}</a>
+    <a data-action="repair"><i class="fa-solid fa-wrench"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Repaired"}}</a>
   </p>
   <div class="form-fields-grid">
     {{#each counters}}<label>{{label}} <input name="system.damage.{{key}}" type="number" min="0" value="{{value}}" class="w-2" /></label>{{/each}}
@@ -82,7 +82,7 @@
   <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Fuel"}}</h3>
   {{#if fuel}}<p>
     <strong class="{{#if fuel.empty}}bad{{/if}}">{{fuel.remainingLabel}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{fuel.capacityLabel}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.HoursLeft"}} {{fuel.fuelName}}
-    · <a data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.RecordUse"}}</a> · <a data-action="refuel"><i class="fa-solid fa-rotate"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Refuel"}}</a>
+    <a data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.RecordUse"}}</a> <a data-action="refuel"><i class="fa-solid fa-rotate"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Refuel"}}</a>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.Used"}} <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Hr"}}
   </p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.NoFuelRangeToTrack"}}</p>{{/if}}
 

@@ -160,46 +160,16 @@
 .spycraft2.sheet.npc .npc-action-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
 .spycraft2.sheet.npc .npc-action-buttons button { width: auto; flex: 0 0 auto; margin: 0; padding: 4px 10px; }
 .spycraft2 .mode-label { font:bold 11px/1.4 'Courier New',monospace; text-transform:uppercase; letter-spacing:.12em; }
-/* The edit toggle shares the name row so no line of the header is spent on it. */
 .spycraft2.sheet .name-row { align-items:center; }
-.spycraft2.sheet .name-row .mode-label { margin-left:auto; }
-.spycraft2.sheet .name-row .mode-toggle { width:auto; flex:0 0 auto; min-height:30px; padding:4px 10px; margin:0; }
-.spycraft2.sheet .name-row .agent-codename + .mode-toggle,
-.spycraft2.sheet .name-row .mode-label + .mode-toggle { margin-left:0; }
-.spycraft2.sheet.npc .name-row .name + .mode-toggle { margin-left:auto; }
-/* Header counters and their actions sit on as few lines as the window allows. */
-.spycraft2.sheet.agent .sheet-header .sc2-action { min-height:28px; min-width:28px; padding:2px 8px; margin:0; }
-.spycraft2.sheet.agent .resources input { min-height:28px; }
-.spycraft2.sheet.agent .header-main { flex-direction:row; flex-wrap:wrap; align-items:center; gap:4px 12px; }
-.spycraft2.sheet.agent .header-main > .name-row { flex:1 1 100%; flex-wrap:nowrap; min-width:0; }
-.spycraft2.sheet.agent .header-main > .resources { display:contents; }
 .spycraft2.sheet.agent .agent-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .spycraft2.sheet.agent .agent-codename { white-space:nowrap; }
-.spycraft2.sheet.agent.play-mode .sheet-header .portrait { width:62px; height:62px; }
 .spycraft2 .agent-name { font:bold 20px/1.25 'Courier New',monospace; }
-.spycraft2 .agent-codename { margin-left:auto; font-style:italic; }
-.spycraft2.sheet.agent .resources { gap:5px 12px; }
-.spycraft2.sheet.agent .res.action-dice { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
-.spycraft2.sheet.agent .res.action-dice input { width:3em; }
 .spycraft2.sheet.agent .sheet-tabs { padding:3px 0; margin:4px 0; gap:4px; border-top-width:3px; }
 .spycraft2.sheet.agent .sheet-tabs a { flex:1; text-align:center; padding:3px 8px; }
-.spycraft2.sheet.agent .sc2-action {
-  display:inline-flex; align-items:center; justify-content:center; gap:4px;
-  width:auto; height:auto; min-height:34px; min-width:34px; margin:2px 0; padding:6px 10px;
-  font:inherit; line-height:1.25; white-space:normal; vertical-align:middle;
-  color:#24595b; background:#fffcf0; border:1px solid #b7ac92;
-}
-.spycraft2.sheet.agent .sc2-action:hover { background:#e7dec4; color:#142f30; border-color:#24595b; }
-.spycraft2.sheet.agent .controls .sc2-action { min-width:34px; }
 .spycraft2.sheet.agent .stat .sc2-action { border:0; background:transparent; margin:0; }
 .spycraft2.sheet.agent .stat .sc2-action:hover { text-decoration:underline; }
-.spycraft2.sheet.agent .defense-summary .stat-grid { grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; }
-.spycraft2.sheet.agent .defense-summary .stat { min-height:70px; padding:5px 3px; }
 .spycraft2.sheet.agent .stat b { font-size:1.5em; }
 .spycraft2.sheet.agent .play-dashboard { border-bottom:2px solid #a39065; padding-bottom:8px; }
-.spycraft2.sheet.agent .dashboard-weapons .item-list li { padding:5px 0; flex-wrap:wrap; }
-.spycraft2.sheet.agent .dashboard-weapons .name { justify-content:flex-start; font-weight:bold; }
-.spycraft2.sheet.agent .condition-summary { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
 .spycraft2.sheet.agent .reference-panel { margin:10px 0; padding:6px 8px; border:1px solid #b7ac92; background:#fff9e74d; }
 .spycraft2.sheet.agent details > summary { cursor:pointer; font-weight:600; padding:3px 0; }
 .spycraft2.sheet.agent .reference-panel p { margin:8px 0; line-height:1.45; }
@@ -221,27 +191,17 @@
 .spycraft2.sheet.agent .tab.bio > prose-mirror .editor-content { min-height:180px; }
 .spycraft2.sheet.agent .training-summary .tag { display:inline-block; padding:4px 8px; margin:3px; font-size:1em; opacity:1; }
 @container (max-width:640px) {
-  .spycraft2.sheet.agent .defense-summary .stat-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
   .spycraft2.sheet.agent .main-reference { flex-direction:column; }
 }
 .spycraft2.sheet.agent { container-type:inline-size; }
 
 /* Distinguish a roll from reference information, and a primary action from tools. */
-.spycraft2.sheet.agent .sc2-primary-action {
-  color:#fff9e9; background:#24595b; border:1px solid #24595b;
-  font-weight:700; min-height:40px; padding:8px 12px;
-}
-.spycraft2.sheet.agent .sc2-primary-action:hover {
-  color:#fff9e9; background:#183c3e; border-color:#183c3e;
-}
-.spycraft2.sheet.agent .defense-summary .sc2-stat-action {
+.spycraft2.sheet.agent .sc2-stat-action {
   width:100%; height:auto; margin:0; line-height:1.3; white-space:normal;
   font:inherit; color:#183c3e; background:#fffcf0; border:1px solid #24595b;
   border-top:3px solid #24595b; gap:3px; justify-content:center; cursor:pointer;
 }
-.spycraft2.sheet.agent .defense-summary .sc2-stat-action:hover { background:#e7dec4; }
-.spycraft2.sheet.agent .quick-actions p { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
-.spycraft2.sheet.agent .quick-actions .sc2-action { margin:0; }
+.spycraft2.sheet.agent .sc2-stat-action:hover { background:#e7dec4; }
 .spycraft2.sheet.agent .sheet-tabs a { min-height:32px; display:flex; align-items:center; justify-content:center; }
 
 /* The next choice stays visible; the grouped checklist has its own bounded space. */
@@ -289,8 +249,6 @@
 }
 .spycraft2.sheet.agent .combat-tool-group[open] > summary { border-bottom:1px solid #b7ac92; }
 .spycraft2.sheet.agent .combat-tool-group p { margin:10px 0; line-height:1.5; }
-.spycraft2.sheet.agent .tool-actions { display:flex; flex-wrap:wrap; gap:6px; padding:10px 0; }
-.spycraft2.sheet.agent .tool-actions .sc2-action { margin:0; }
 .spycraft2.sheet.agent .condition-group { margin:8px 0; }
 .spycraft2.sheet.agent .condition-group > summary { min-height:36px; padding:7px 0; }
 .spycraft2.sheet.agent .condition-group[open] { border-bottom:1px solid #b7ac92; }
@@ -298,13 +256,9 @@
 @container (max-width:640px) {
   .spycraft2.sheet.agent .combat-tool-groups { grid-template-columns:minmax(0,1fr); }
   .spycraft2.sheet.agent .setup-next { flex-wrap:wrap; }
-  .spycraft2.sheet.agent .dashboard-weapons .name { flex-basis:100%; }
 }
 
 /* Inventory keeps rolls, quick statistics and equipment management on separate lines. */
-.spycraft2.sheet.agent .gear h3 { flex-wrap:wrap; gap:8px 12px; }
-.spycraft2.sheet.agent .gear h3 .controls { display:flex; flex-wrap:wrap; gap:6px; }
-.spycraft2.sheet.agent .gear h3 .controls .sc2-action { margin:0; }
 .spycraft2.sheet.agent .inventory-weapons { list-style:none; margin:8px 0 16px; padding:0; }
 .spycraft2.sheet.agent .inventory-weapon {
   min-width:0; padding:10px 12px; margin:8px 0; border:1px solid #b7ac92;
@@ -319,7 +273,6 @@
 .spycraft2.sheet.agent .inventory-rolls, .spycraft2.sheet.agent .inventory-utilities {
   display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:6px 0;
 }
-.spycraft2.sheet.agent .inventory-rolls .sc2-action, .spycraft2.sheet.agent .inventory-utilities .sc2-action { margin:0; }
 .spycraft2.sheet.agent .inventory-stats { display:flex; flex-wrap:wrap; gap:6px 24px; margin:10px 0; }
 .spycraft2.sheet.agent .inventory-stats > div { min-width:0; }
 .spycraft2.sheet.agent .inventory-stats dt { color:#52605a; font-size:.85em; }
@@ -334,7 +287,6 @@
 .spycraft2.sheet.agent .inventory-table[aria-label="Gear"] { min-width:560px; }
 .spycraft2.sheet.agent .inventory-table[aria-label="Vehicles"] { min-width:700px; }
 .spycraft2.sheet.agent .inventory-table :is(th,td) { padding:7px 8px; vertical-align:top; }
-.spycraft2.sheet.agent .inventory-table .controls { min-width:150px; white-space:normal; }
 .spycraft2.sheet.agent .inventory-table td:first-child { min-width:160px; overflow-wrap:anywhere; }
 .spycraft2.sheet.agent .inventory-table abbr { text-decoration:none; cursor:help; }
 .spycraft2.sheet.agent .tool-hint { color:#52605a; line-height:1.5; font-size:.95em; }

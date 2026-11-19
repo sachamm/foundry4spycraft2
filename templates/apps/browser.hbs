@@ -15,13 +15,13 @@
     {{#each rows}}
       <li data-uuid="{{uuid}}" class="{{#unless qualified}}unqualified{{/unless}} {{#if owned}}owned{{/if}}">
         <div class="row-main">
-          <a data-action="open" class="name">{{name}}</a>
+          <a data-action="open" class="name" data-sc2-display="text">{{name}}</a>
           {{#unless qualified}}<span class="tag unqualified-tag">{{localize "SPYCRAFT.Browser.NotQualified"}}</span>{{/unless}}
           <span class="muted">{{groupLabel}}{{#if extra}} · {{extra}}{{/if}}</span>
           {{#if summary}}<div class="summary">{{summary}}</div>{{/if}}
           {{#if prereq}}<div class="prereq {{#unless qualified}}bad{{/unless}}" data-tooltip="{{unmet}}">{{prereq}}{{#if notChecked}} <span class="tag">{{localize "SPYCRAFT.Feat.NotChecked"}}</span>{{/if}}</div>{{/if}}
         </div>
-        {{#if ../actor}}<button type="button" data-action="add" aria-label="{{localize 'SPYCRAFT.Browser.AddEntry' name=name}}" {{#if owned}}class="owned"{{/if}} {{#if locked}}disabled data-tooltip="SPYCRAFT.Browser.OwnedHint"{{/if}}>{{#if owned}}<i class="fa-solid fa-check"></i>{{else}}<i class="fa-solid fa-plus"></i>{{/if}}</button>{{/if}}
+        {{#if ../actor}}<button type="button" data-sc2-display="icon" data-action="add" aria-label="{{localize 'SPYCRAFT.Browser.AddEntry' name=name}}" {{#if owned}}class="owned"{{/if}} {{#if locked}}disabled data-tooltip="SPYCRAFT.Browser.OwnedHint"{{/if}}>{{#if owned}}<i class="fa-solid fa-check"></i>{{else}}<i class="fa-solid fa-plus"></i>{{/if}}</button>{{/if}}
       </li>
     {{else}}<li class="muted">{{localize "SPYCRAFT.Browser.Empty"}}</li>{{/each}}
   </ul>
