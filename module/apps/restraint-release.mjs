@@ -7,6 +7,7 @@ import {
 } from "../rules/restraints.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { loc } from "../i18n.mjs";
+import { systemDialog } from "./dialog-theme.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   clone = structuredClone;
 const effectById = (actor, id) => [...(actor.effects ?? [])].find(e => e.id === id),
@@ -95,7 +96,7 @@ export async function applyRestraintEscape(actor, message, options = {}) {
   if (check.resolved !== true || check.successConfirmed !== true || check.superseded || check.criticalFailure)
     throw new Error(loc`Confirm the successful opposed result and finish the check first.`);
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
+    input = await systemDialog.input({
       window: { title: loc`Apply grapple escape benefit` },
       rejectClose: false,
       content: `<p>${loc`The successful opposed check grants one benefit, or two with a critical success/opponent critical failure. Breaking a pin leaves the character Held. Escaping a hold requires an immediate Standard Move of at least 5 ft., up to Speed (p.357).`}</p><label>${loc`Benefit`} <select name="benefit">${check.restraintEscape?.condition === "pinned" ? `<option value="breakPin">${loc`Break Pin: remain Held`}</option><option value="breakPinAndEscapeHold">${loc`Break Pin and Escape Hold: requires two benefits`}</option>` : `<option value="escapeHold">${loc`Escape Hold`}</option>`}</select></label><label><input name="opponentCriticalFailureConfirmed" type="checkbox" /> ${loc`The GC confirms the opponent suffered a critical failure in this opposed check`}</label><label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms the final opposed result and selected benefit`}</label>`
@@ -196,7 +197,7 @@ export async function reviewRestraintRelease(actor, message, options = {}) {
   const expected = restraintSourceSnapshot(actor);
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
+    input = await systemDialog.input({
       window: { title: loc`Review grapple release` },
       rejectClose: false,
       content: `<p>${loc`Current Held: ${expected.held ? "yes" : "no"}; Pinned: ${expected.pinned ? "yes" : "no"}. Correct actual condition sources with Main's state controls first. Then record whether this benefit stands; this review does not change effects or move a token.`}</p><label>${loc`Disposition`} <select name="disposition"><option value="keep">${loc`Keep the reviewed benefit`}</option><option value="cancel">${loc`Cancel the benefit`}</option></select></label><label>${loc`GC explanation`} <input name="resolution" /></label><label><input name="movementResolvedConfirmed" type="checkbox" /> ${loc`I separately resolved any required Escape Hold movement`}</label><label><input name="confirmed" type="checkbox" /> ${loc`I confirm the actual sources and disposition`}</label>`
@@ -262,7 +263,7 @@ export async function confirmRestraintEscapeMove(actor, message, options = {}) {
   if (record?.movement?.state !== "required") return record;
   let input = options;
   if (!Object.keys(input).length) {
-    input = await foundry.applications.api.DialogV2.input({
+    input = await systemDialog.input({
       window: { title: loc`Confirm Escape Hold movement` },
       rejectClose: false,
       content: `<p>${loc`Escape Hold requires an immediate Standard Move of 5 ft. or more, up to Speed. Confirm the actual move after resolving its path and hazards with the GC. This control does not move a token.`}</p><label>${loc`Actual distance (ft.)`} <input name="distance" type="number" min="5" value="5" /></label>${record.movement.maximum === null ? `<label>${loc`GC-reviewed maximum distance (ft.)`} <input name="approvedMaximum" type="number" min="5" /></label><label>${loc`Capacity review explanation`} <input name="resolution" /></label>` : `<p>${loc`Recorded maximum ${record.movement.maximum} ft.`}</p>`}<label><input name="confirmed" type="checkbox" /> ${loc`The GC confirms the immediate Standard Move actually occurred within the allowed distance`}</label>`

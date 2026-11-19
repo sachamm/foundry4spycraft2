@@ -7,7 +7,9 @@ import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
   COVER,
   adjacent,
+  blastRings,
   blastTargets,
+  inLineOfFire,
   coverGrade,
   coverPoints,
   distanceFeet,
@@ -82,18 +84,20 @@ export function targetedToken() {
   return targets.length === 1 ? targets[0] : null;
 }
 
-/** Whether a wall stops sight between two points given in feet. Unknown (no walls layer) counts as clear. */
-function sightBlocked(from, to) {
+/** Whether a wall of this kind stands between two points given in feet. Unknown (no walls layer) counts as clear. */
+function wallBetween(from, to, type) {
   try {
     const feet = gridFacts().size / gridFacts().distance,
       a = { x: from.x * feet, y: from.y * feet },
       b = { x: to.x * feet, y: to.y * feet };
-    const backend = CONFIG.Canvas?.polygonBackends?.sight;
-    return backend?.testCollision ? !!backend.testCollision(a, b, { type: "sight", mode: "any" }) : false;
+    const backend = CONFIG.Canvas?.polygonBackends?.[type];
+    return backend?.testCollision ? !!backend.testCollision(a, b, { type, mode: "any" }) : false;
   } catch {
     return false;
   }
 }
+const sightBlocked = (from, to) => wallBetween(from, to, "sight");
+const boxCentre = box => ({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
 
 /**
  * What the scene shows about an attack by this character on the targeted token.
@@ -120,6 +124,17 @@ export function measureAttack(actor) {
   });
   const blocked = coverPoints(t).filter(point => sightBlocked(centre, point)).length,
     cover = coverGrade(blocked);
+  // Other characters standing between the two: the GC rules on the cover they give.
+  const between = isAdjacent
+    ? []
+    : inLineOfFire(
+        a,
+        t,
+        canvas.tokens.placeables
+          .filter(token => token !== attacker && token !== target && !token.document.hidden)
+          .filter(token => !token.actor?.statuses?.has?.("dead") && !token.actor?.statuses?.has?.("prone"))
+          .map(token => ({ id: token.id, name: token.name, box: boxOf(token) }))
+      );
   return {
     attackerName: attacker.name,
     targetName: target.name,
@@ -129,7 +144,8 @@ export function measureAttack(actor) {
     flanked: distance <= cqb && partners.length > 0,
     flankers: partners.map(token => token.name),
     cover,
-    coverId: COVER[cover].id
+    coverId: COVER[cover].id,
+    inLine: between.map(row => row.name)
   };
 }
 
@@ -147,7 +163,10 @@ export function measurementLine(m) {
     loc`From the map: ${m.distanceFeet} ft. to ${m.targetName}`,
     m.adjacent ? loc`adjacent` : loc`not adjacent`,
     m.flanked ? loc`flanking with ${m.flankers.join(", ")}` : loc`not flanking`,
-    COVER_LABEL[m.coverId]()
+    COVER_LABEL[m.coverId](),
+    ...(m.inLine?.length
+      ? [loc`in the line of fire: ${m.inLine.join(", ")} (the GC rules on cover from characters)`]
+      : [])
   ].join("; ");
 }
 
@@ -202,13 +221,54 @@ export function blastCaught(total, increment) {
   if (!mapAvailable() || !Number.isFinite(total)) return null;
   const zero = targetedToken();
   if (!zero) return null;
-  const tokens = canvas.tokens.placeables.filter(token => !token.document.hidden);
+  const tokens = canvas.tokens.placeables.filter(token => !token.document.hidden),
+    origin = boxOf(zero);
   return blastTargets(
-    boxOf(zero),
+    origin,
     tokens.map(token => ({ id: token.id, name: token.name, box: boxOf(token) })),
     total,
     increment
-  ).map(row => ({ ...row, actor: tokens.find(token => token.id === row.id)?.actor ?? null }));
+  ).map(row => {
+    const token = tokens.find(entry => entry.id === row.id);
+    return {
+      ...row,
+      actor: token?.actor ?? null,
+      // A wall that stops movement between Ground Zero and the character: cover the blast must get through.
+      behindWall: !!token && token !== zero && wallBetween(boxCentre(origin), boxCentre(boxOf(token)), "move")
+    };
+  });
+}
+
+/** Outline a blast's rings on this user's view for a few seconds, and ping Ground Zero for everyone. */
+export function drawBlast(zero, total, increment, { seconds = 8 } = {}) {
+  try {
+    const rings = blastRings(total);
+    if (!rings || !globalThis.PIXI || !canvas.interface) return false;
+    const { size, distance } = gridFacts(),
+      pixels = size / distance,
+      centre = zero.center ?? { x: zero.document.x + (zero.w ?? size) / 2, y: zero.document.y + (zero.h ?? size) / 2 },
+      half = (Math.max(zero.document.width, zero.document.height) * size) / 2;
+    const drawing = new globalThis.PIXI.Graphics();
+    for (let ring = 0; ring < rings; ring++) {
+      const reach = half + ring * Math.max(5, increment) * pixels;
+      drawing.lineStyle(3, 0xff5a1f, Math.max(0.25, 0.9 - ring * 0.15));
+      // Rings follow the grid: a blast reaches whole squares, so each ring is a square outline.
+      drawing.drawRect(centre.x - reach, centre.y - reach, reach * 2, reach * 2);
+    }
+    canvas.interface.addChild(drawing);
+    setTimeout(() => {
+      try {
+        drawing.destroy();
+      } catch {
+        /* the scene changed first */
+      }
+    }, seconds * 1000);
+    canvas.ping?.(centre);
+    return true;
+  } catch (error) {
+    console.warn("Spycraft 2.0 | The blast could not be drawn.", error);
+    return false;
+  }
 }
 
 /** List everyone a rolled blast reaches around the targeted token, and outline its reach on the scene. */
@@ -219,15 +279,8 @@ export async function blastOnMap(message) {
   const zero = targetedToken();
   if (!zero) return ui.notifications.warn(loc`Target the one token standing at Ground Zero, then try again.`);
   const increment = blastIncrementFeet(check.weaponQualities),
-    origin = boxOf(zero);
-  const caught = blastTargets(
-    origin,
-    canvas.tokens.placeables
-      .filter(token => !token.document.hidden)
-      .map(token => ({ id: token.id, name: token.name, box: boxOf(token) })),
-    total,
-    increment
-  );
+    caught = blastCaught(total, increment) ?? [];
+  drawBlast(zero, total, increment);
   const esc = foundry.utils.escapeHTML;
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: fromUuidSync(check.actorUuid) }),
@@ -236,10 +289,10 @@ export async function blastOnMap(message) {
       `<ul>${caught
         .map(
           row =>
-            `<li>${row.ring === 0 ? loc`${esc(row.name)} — Ground Zero: ${row.damage}` : loc`${esc(row.name)} — ${row.ring} increment(s) out: ${row.damage}`}</li>`
+            `<li>${row.ring === 0 ? loc`${esc(row.name)} — Ground Zero: ${row.damage}` : loc`${esc(row.name)} — ${row.ring} increment(s) out: ${row.damage}`}${row.behindWall ? ` <i>${loc`(behind a wall)`}</i>` : ""}</li>`
         )
         .join("")}</ul>`,
-      loc`Walls and cover are not taken into account: blast stops at cover that passes its Damage save.`
+      loc`A wall between Ground Zero and a character is marked; the blast stops at cover that passes its Damage save. Other cover is not taken into account.`
     ]
       .map(line => (line.startsWith("<ul>") ? line : `<p>${line}</p>`))
       .join("")

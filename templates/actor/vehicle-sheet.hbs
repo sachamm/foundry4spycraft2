@@ -27,9 +27,9 @@
   <p>
     {{#if system.mountUp}}<span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.MountUpReflex"}} {{signed system.mountUp.reflex}}</span> {{/if}}    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Defense"}} <strong>{{#if system.defenseNow}}{{system.defenseNow.total}}{{else}}—{{/if}}</strong>{{#if system.defenseNow.rows.length}} <span class="muted">({{#each system.defenseNow.rows}}{{label}} {{signed value}}{{#unless @last}}, {{/unless}}{{/each}})</span>{{/if}}
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave"}} <strong>{{#if (sc2eq system.damageSaveNow null)}}—{{else}}{{signed system.damageSaveNow}}{{/if}}</strong>
-    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Acceleration"}} <strong>{{#if (sc2eq system.condition.acceleration null)}}{{system.accelerationTurning}}{{else}}{{system.condition.acceleration}}{{/if}}</strong>
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Acceleration"}} <strong>{{#if (sc2eq system.condition.acceleration null)}}{{#if system.accelerationTurning}}{{system.accelerationTurning}}{{else}}—{{/if}}{{else}}{{system.condition.acceleration}}{{/if}}</strong>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.Turning"}} <strong>{{#if (sc2eq system.condition.turning null)}}—{{else}}{{system.condition.turning}}{{/if}}</strong>
-    {{localize "SPYCRAFT.Template.ActorVehicleSheet.MPH"}} <strong>{{#if (sc2eq system.condition.cruiseMph null)}}{{system.mph}}{{else}}{{system.condition.cruiseMph}}/{{system.condition.topMph}}{{/if}}</strong>
+    {{localize "SPYCRAFT.Template.ActorVehicleSheet.MPH"}} <strong>{{#if (sc2eq system.condition.cruiseMph null)}}{{#if system.mph}}{{system.mph}}{{else}}—{{/if}}{{else}}{{system.condition.cruiseMph}}/{{system.condition.topMph}}{{/if}}</strong>
     {{#if system.condition.maneuverErrorIncrease}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.ManeuverError"}}{{system.condition.maneuverErrorIncrease}}{{/if}}
   </p>
   <p>
@@ -84,7 +84,7 @@
     <strong class="{{#if fuel.empty}}bad{{/if}}">{{fuel.remainingLabel}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{fuel.capacityLabel}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.HoursLeft"}} {{fuel.fuelName}}
     · <a data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.RecordUse"}}</a> · <a data-action="refuel"><i class="fa-solid fa-rotate"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Refuel"}}</a>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.Used"}} <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Hr"}}
-  </p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.NoFuelRangeToTrack"}}{{system.rangeFuel}}).</p>{{/if}}
+  </p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.NoFuelRangeToTrack"}}</p>{{/if}}
 
   <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Qualities"}}</h3>
   {{#if system.qualityList.length}}<ul class="vehicle-qualities">{{#each system.qualityList}}<li><strong data-tooltip="{{summary}}">{{label}}</strong> — {{name}}{{#if summary}}: {{summary}}{{/if}}</li>{{/each}}</ul>

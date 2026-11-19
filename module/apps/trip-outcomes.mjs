@@ -6,8 +6,7 @@ import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 
 /** Sweep (Kicking Basics): whether the attacking character has the feat. */
-const sweepFor = uuid =>
-  globalThis.fromUuidSync?.(uuid)?.system?.activeFeatNames?.includes("Kicking Basics") === true;
+const sweepFor = uuid => globalThis.fromUuidSync?.(uuid)?.system?.activeFeatNames?.includes("Kicking Basics") === true;
 import { endCombatStance } from "./combat-stance.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";

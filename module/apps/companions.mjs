@@ -9,6 +9,7 @@ import {
 } from "../rules/companions.mjs";
 import { defaultNpcProfile } from "../rules/npcs.mjs";
 import { loc } from "../i18n.mjs";
+import { systemDialog } from "./dialog-theme.mjs";
 
 /** The companions linked to this owner. */
 export const linkedCompanions = owner =>
@@ -88,7 +89,7 @@ export async function recordCompanionDeath(owner, companionUuid) {
   if (!game.user?.isGM) return ui.notifications.warn(loc`The GC records a companion’s death.`);
   const companion = fromUuidSync(companionUuid);
   if (!companion) return null;
-  const confirmed = await foundry.applications.api.DialogV2.confirm({
+  const confirmed = await systemDialog.confirm({
     window: { title: loc`Companion lost` },
     content: `<p>${foundry.utils.escapeHTML(
       loc`Record ${companion.name}’s death? ${owner.name} loses Reputation equal to their career level (or Net Worth for a freelancer), and the companion is unlinked; a replacement arrives at the start of the next mission.`

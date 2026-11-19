@@ -20,6 +20,14 @@ import * as spend from "./spend.mjs";
 import * as combat from "./combat.mjs";
 import * as conflicts from "./conflicts.mjs";
 import * as tables from "./tables.mjs";
+import {
+  advanceClock,
+  advanceClockDialog,
+  clockLabel,
+  clockSteps,
+  openGameClock,
+  setClockDateDialog
+} from "../game-clock.mjs";
 import { loc } from "../../i18n.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -89,6 +97,10 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       startConflict: guard(() => conflicts.startConflictDialog()),
       advanceConflict: guard((event, target) => conflicts.advanceConflict(target.dataset.id)),
       manageConflict: guard((event, target) => conflicts.manageConflict(target.dataset.id)),
+      clockStep: guard((event, target) => advanceClock(Number(target.dataset.seconds))),
+      clockAdvance: guard(() => advanceClockDialog()),
+      clockDate: guard(() => setClockDateDialog()),
+      clockOpen: guard(() => openGameClock()),
       securityDevice: guard(() => tables.securityDeviceDialog()),
       hazards: guard(() => tables.hazardLookupDialog()),
       events: guard(() => tables.eventReferenceDialog()),
@@ -137,6 +149,14 @@ export function consoleContext() {
     combatNow = game.combat ?? null;
   return {
     isGM: game.user.isGM,
+    clock: {
+      title: loc`Game clock`,
+      now: clockLabel(),
+      steps: clockSteps(),
+      advance: loc`Move the clock…`,
+      setDate: loc`Set the date…`,
+      open: loc`Timers`
+    },
     mission: {
       ...m,
       caliberLabel: ROMAN[m.caliber - 1] ?? m.caliber,

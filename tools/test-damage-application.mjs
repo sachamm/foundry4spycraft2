@@ -151,6 +151,8 @@ test("damage reduction is read from the column the attack uses", () => {
   assert.equal(drForAttack({}, "other"), 0);
   assert.equal(attackKindOf({ proficiency: "unarmed" }), "unarmed");
   assert.equal(attackKindOf({ proficiency: "edged" }), "meleeWeapon");
+  assert.equal(attackKindOf({ proficiency: "edged", ranged: true }), "hurledWeapon", "a thrown knife");
+  assert.equal(attackKindOf({ proficiency: "rifle", ranged: true }), "rangedWeapon");
   assert.equal(attackKindOf({ proficiency: "hurled" }), "hurledWeapon");
   assert.equal(attackKindOf({ proficiency: "hurled", blast: true }), "other");
   assert.equal(attackKindOf({ proficiency: "handgun" }), "rangedWeapon");

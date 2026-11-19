@@ -1,5 +1,6 @@
 import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
+import { npcFeatEffects } from "../rules/npc-feat-effects.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "../rules/cheap-shot-effects.mjs";
 import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
 import { shakenStateFromActor, shakenRules } from "../rules/shaken.mjs";
@@ -110,6 +111,8 @@ class BaseActorData extends foundry.abstract.TypeDataModel {
       undermined: record("undermined", { nullable: true, initial: null }),
       feintHistory: recordList("feintHistory"),
       cheapShots: recordList("cheapShots"),
+      /** Contagions at work and a fire burning the character (module/rules/hazards.mjs). */
+      hazards: record("hazards", { nullable: true, initial: null }),
       biography: new HTMLField()
     };
   }
@@ -179,6 +182,7 @@ export class NpcData extends BaseActorData {
     if (!this.npcProfile?.enabled) {
       super.prepareDerivedData();
       if (!["special", "villain"].includes(this.npcType) && !this.promoted) this.damageSave = this.manualDamageSave;
+      this.applyFeatEffects({ health: false });
       return;
     }
     const result = conditionNpcProfile(
@@ -214,11 +218,36 @@ export class NpcData extends BaseActorData {
         this.damageSave = null;
       }
     }
+    this.applyFeatEffects({ health: true });
     this.competence = result.competence;
     this.warnings = [
       ...(result.warnings ?? []),
       ...(partnerOwner ? animalPartnerReview(partnerOwner.system, this).warnings : [])
     ];
+  }
+
+  /**
+   * Add what the NPC's feat items do to the totals (module/rules/npc-feat-effects.mjs). Stored numbers are left
+   * alone, so the sheet's own fields never save a feat's bonus back into them. Vitality and wounds are added only
+   * where the maximums are worked out from the NPC's grades rather than typed in.
+   */
+  applyFeatEffects({ health }) {
+    const effects = npcFeatEffects(
+      [...(this.parent?.items ?? [])].map(item => ({ type: item.type, name: item.name, system: item.system })),
+      {
+        level: this.effectiveThreatLevel ?? this.threatLevel,
+        base: Object.fromEntries(Object.entries(this.saves).map(([key, save]) => [key, save.base]))
+      }
+    );
+    for (const [key, value] of Object.entries(effects.saves)) this.saves[key].total += value;
+    this.initiative.total += effects.initiative;
+    if (this.qualityEffects && Number.isFinite(this.qualityEffects.speed)) this.qualityEffects.speed += effects.speed;
+    effects.healthApplied = health && this.vitality.max > 0;
+    if (effects.healthApplied) {
+      this.vitality.max += effects.vitality;
+      this.wounds.max += effects.wounds;
+    }
+    this.featEffects = effects;
   }
 
   static defineSchema() {

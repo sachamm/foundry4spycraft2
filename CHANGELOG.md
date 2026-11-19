@@ -1,5 +1,54 @@
 # Changelog
 
+## Unreleased
+
+Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/remaining-work.md`.
+
+- **Game clock.** The world keeps the time. A badge above the players list shows it and opens the Clock window; the
+  GC moves it on in steps (a round, a minute, ten minutes, an hour, eight hours, a day) or by any amount, from that
+  window or the GC Console, and can name the present date and time without any time passing. Each combat round adds
+  6 seconds (world setting "Advance the clock each combat round", on by default); going back a round takes them off.
+  World setting "Show the clock to players".
+- **Timers.** Anyone can start a timer from the Clock window: rounds by default, or minutes, hours, days or weeks.
+  A timer kept on a character is one of that character's Active Effects with a duration, so Foundry itself counts
+  it down (in combat rounds while the character is in a fight, in game time otherwise), shows the time left and
+  expires it. A user with no character keeps timers on their own user instead. When a timer ends its owner gets a
+  notice that stays on screen, a sound and a whispered chat card; one that ended while its owner was away is
+  announced when the owner next joins. A timer can be shown to everyone, and its end is then posted to all.
+- **Timed conditions.** A knockout from a failed subdual save is an effect with a duration, for agents and special
+  NPCs: Foundry expires it and the GC's client lifts the condition. The Clock window lists conditions with time
+  left. A character at 0 wounds or fewer stays unconscious. An owner is told when a contagion's next save comes due.
+- **GC relay.** A player can apply damage to a character they do not own, and First Aid or Stabilize to another
+  player's agent: the request goes to the GC's client, which asks the GC to allow it (world setting "Apply players'
+  requests without asking"). Blasts do the same for each character caught.
+- **Hazards on NPCs.** The NPC sheet has the Hazards line: contagions, fire, the other damage types and survival
+  saves. Attribute damage lowers the NPC's score; stress goes to a special NPC's running total.
+- **NPC feats.** Feat items on an NPC add their plain-number bonuses to its saves, Initiative, Speed and skill
+  checks, and to vitality and wounds where those are worked out from grades. The sheet lists what was added and
+  names the feats it could not work out.
+- **Interface fixes.** Checkboxes on system windows match the parchment skin (paper box, teal tick) instead of
+  Foundry's dark squares. Field borders are darker so each control's edge stands out on the paper. The feat browser
+  marks unqualified entries with a "Not qualified" tag instead of greying and striking them through. Chat search is a
+  single line; its character and roll-type filters open from a filter button and stay open while one is set. The
+  clock shows hours and minutes, with seconds only during combat. Seven remaining dialogs (Baffled, companions,
+  reserve review, rules refresh, restraint release, GC dice and resource transactions) now use the system's dialog
+  skin, and a test keeps new dialogs from skipping it. NPC feat bonuses name skills properly ("Sense Motive", not a
+  code key). A vehicle with no fuel range no longer shows "()", and its empty Acceleration and MPH show a dash.
+- **Map.** A blast marks who stands behind a wall and leaves them unticked, outlines its rings on the scene and
+  pings Ground Zero. Attack dialogs name the characters standing in the line of fire.
+- World migrations now cover the world's own Actor and Item compendiums; locked ones are named and left.
+
+Fixes:
+
+- The save button on a damage report, "Apply this save's result" and the healing buttons no longer fail, and can no
+  longer be repeated, when the card was posted by someone else. "Apply helpers' results" is offered only to the
+  leader's player and the GC.
+- A standard NPC's damage reduction now counts against subdual damage (twice over) as a special NPC's does.
+- Resting or First Aid back above 0 wounds lifts Unconscious; a character who dies loses Dying.
+- A thrown melee weapon uses the hurled-weapon damage reduction column.
+- Condition names, the Linguistics setting and the damage reduction categories can be translated; a tooltip's HTML
+  attributes are no longer a translatable string.
+
 ## 0.5.2 — 2026-11-18
 
 - Starter Actors: one mastermind, three henchmen, eight minion profiles and all 16 sample PCs are copied into their Actor folders on the first GM launch after installation or upgrade. Interrupted setup resumes without duplicates; later edits and deletions are preserved.

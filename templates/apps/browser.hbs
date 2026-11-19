@@ -16,6 +16,7 @@
       <li data-uuid="{{uuid}}" class="{{#unless qualified}}unqualified{{/unless}} {{#if owned}}owned{{/if}}">
         <div class="row-main">
           <a data-action="open" class="name">{{name}}</a>
+          {{#unless qualified}}<span class="tag unqualified-tag">{{localize "SPYCRAFT.Browser.NotQualified"}}</span>{{/unless}}
           <span class="muted">{{groupLabel}}{{#if extra}} · {{extra}}{{/if}}</span>
           {{#if summary}}<div class="summary">{{summary}}</div>{{/if}}
           {{#if prereq}}<div class="prereq {{#unless qualified}}bad{{/unless}}" data-tooltip="{{unmet}}">{{prereq}}{{#if notChecked}} <span class="tag">{{localize "SPYCRAFT.Feat.NotChecked"}}</span>{{/if}}</div>{{/if}}

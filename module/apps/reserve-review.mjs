@@ -1,6 +1,7 @@
 import { queueResources } from "../rules/transactions.mjs";
 import { reserveValue, getReserveReview } from "../rules/reserve-transactions.mjs";
 import { loc } from "../i18n.mjs";
+import { systemDialog } from "./dialog-theme.mjs";
 const balance = value => {
   if (!["string", "number"].includes(typeof value) || (typeof value === "string" && !value.trim()))
     throw new Error(loc`Confirm each final whole-number balance.`);
@@ -48,7 +49,7 @@ export async function reviewReserveTransaction(actor, options = {}) {
   let input = options;
   if (!Object.keys(input).length) {
     const esc = foundry.utils.escapeHTML;
-    input = await foundry.applications.api.DialogV2.input({
+    input = await systemDialog.input({
       window: { title: loc`Review interrupted Reserve transaction` },
       rejectClose: false,
       content: `<p>${loc`${esc(review.attempt.name)}. ${esc(review.reason)} Inspect its Request chat and each funder before confirming final balances.`}</p>${review.fields.map((f, i) => `<label>${loc`${esc(f.label)} (before ${f.before}, reserved ${f.reserved})`} <input name="field_${i}" type="number" min="0" step="1" value="${expected.fields[i] ?? 0}" /></label>`).join("")}${review.ability ? `<label>${loc`Final Request ability uses in this period`} <input name="abilityUsed" type="number" min="0" step="1" value="${expected.ability?.used ?? 0}" /></label>` : ""}<label>${loc`Acquisition`} <select name="messageUuid"><option value="">${loc`Cancel the acquisition; keep the reviewed final balances`}</option>${messages.map(m => `<option value="${esc(m.uuid ?? m.id)}">${loc`Keep the recorded check ${esc(m.id)}`}</option>`).join("")}</select></label><label>${loc`GC explanation`} <input name="resolution" /></label><label><input name="fundersSettled" type="checkbox" /> ${loc`I reviewed and settled every funder separately; these balances do not change their action dice`}</label><label><input name="confirmed" type="checkbox" /> ${loc`I confirm these final Reserve balances and the acquisition disposition`}</label>`

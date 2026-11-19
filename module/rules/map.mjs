@@ -169,3 +169,58 @@ export function blastTargets(origin, tokens, damage, incrementFeet = 5) {
   }
   return hit.sort((a, b) => a.ring - b.ring || a.name.localeCompare(b.name));
 }
+
+/** How many rings a blast has before its damage halves away to nothing: 1 for Ground Zero alone. */
+export function blastRings(damage) {
+  let value = Math.max(0, Math.trunc(Number(damage) || 0)),
+    rings = 0;
+  while (value >= 1) {
+    rings += 1;
+    value = Math.floor(value / 2);
+  }
+  return rings;
+}
+
+/** Whether the straight line between two points crosses a box (touching an edge or corner does not count). */
+export function lineCrossesBox(from, to, box) {
+  // Liang–Barsky clipping against the box shrunk by a hair, so a line along an edge is not a crossing.
+  const minX = box.x + EPSILON,
+    maxX = box.x + box.width - EPSILON,
+    minY = box.y + EPSILON,
+    maxY = box.y + box.height - EPSILON;
+  const dx = to.x - from.x,
+    dy = to.y - from.y;
+  let enter = 0,
+    leave = 1;
+  for (const [p, q] of [
+    [-dx, from.x - minX],
+    [dx, maxX - from.x],
+    [-dy, from.y - minY],
+    [dy, maxY - from.y]
+  ]) {
+    if (p === 0) {
+      if (q < 0) return false;
+      continue;
+    }
+    const t = q / p;
+    if (p < 0) enter = Math.max(enter, t);
+    else leave = Math.min(leave, t);
+    if (enter > leave) return false;
+  }
+  return true;
+}
+
+/**
+ * The characters standing in the line between an attacker and a target, centre to centre.
+ * @param {object} attacker  box
+ * @param {object} target    box
+ * @param {{id: string, name: string, box: object}[]} others  everyone else on the scene
+ * @returns {{id: string, name: string}[]}
+ */
+export function inLineOfFire(attacker, target, others) {
+  const from = centre(attacker),
+    to = centre(target);
+  return (others ?? [])
+    .filter(other => lineCrossesBox(from, to, other.box))
+    .map(other => ({ id: other.id, name: other.name }));
+}

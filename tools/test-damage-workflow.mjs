@@ -41,7 +41,7 @@ globalThis.CONFIG = {
   )
 };
 
-const { resolveAttack, applyDamage, applyBlast, defenseOf, rollReportedSave, nonLethalTotals } =
+const { resolveAttack, applyDamage, applyBlast, defenseOf, rollReportedSave, nonLethalTotals, standardReduction } =
   await import("../module/apps/damage-application.mjs");
 const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
@@ -176,14 +176,49 @@ test("lethal damage comes off a special character's vitality and wounds and sets
   assert.equal(kevin.statuses.has("dying"), true);
 });
 
-test("damage is applied only by someone who owns the target", async () => {
+test("damage to a character the user does not own is sent to the GC instead of applied here", async () => {
   reset();
   const other = character("Stranger", { vitality: { value: 6, max: 20 }, wounds: { value: 12, max: 12 } });
   other.isOwner = false;
   const damage = card("d2", { actorUuid: "Actor.Guard", checkKind: "damage", effectiveTotal: 5 });
-  await applyDamage(damage, { targetUuid: other.uuid, damage: 5, kind: "lethal" });
-  assert.equal(other.system.vitality.value, 6);
-  assert.match(warnings.at(-1), /Only the GC or Stranger's own player/);
+  const user = game.user,
+    users = game.users,
+    messages = game.messages;
+  const sent = [];
+  game.user = { ...user, id: "player", isGM: false };
+  game.messages = { get: id => (id === damage.id ? damage : undefined) };
+  try {
+    // No GC connected: nothing changes and the player is told why.
+    game.users = { activeGM: null };
+    await applyDamage(damage, { targetUuid: other.uuid, damage: 5, kind: "lethal" });
+    assert.equal(other.system.vitality.value, 6);
+    assert.match(warnings.at(-1), /No GC is connected/);
+    // A GC connected: the request carries the card and the fields, and nothing is applied on this client.
+    game.users = { activeGM: { query: async (_name, payload) => (sent.push(payload), { value: true }) } };
+    await applyDamage(damage, { targetUuid: other.uuid, damage: 5, kind: "lethal", reviewType: true });
+    assert.equal(other.system.vitality.value, 6);
+    assert.deepEqual(sent, [
+      {
+        action: "applyDamage",
+        userId: "player",
+        data: { messageId: "d2", input: { targetUuid: other.uuid, damage: 5, kind: "lethal" } }
+      }
+    ]);
+  } finally {
+    game.user = user;
+    game.users = users;
+    game.messages = messages;
+  }
+});
+
+test("a standard character's damage reduction counts double against subdual damage and not against stress", () => {
+  const hit = { damage: 9, dr: 2, armorPiercing: 0, armorPiercingAll: false };
+  assert.equal(standardReduction("lethal", hit).net, 7);
+  assert.equal(standardReduction("subdual", hit).net, 5);
+  assert.equal(standardReduction("subdual", { ...hit, armorPiercing: 1 }).net, 7);
+  assert.equal(standardReduction("subdual", { ...hit, armorPiercingAll: true }).net, 9);
+  assert.equal(standardReduction("stress", hit).net, 9);
+  assert.equal(standardReduction("subdual", { ...hit, damage: 3 }).stopped, true);
 });
 
 test("attacks spend counted shots and Reload draws on the reserve", async () => {

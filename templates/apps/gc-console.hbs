@@ -1,4 +1,8 @@
 <section class="spycraft2 gc-console-body">
+  <h2>{{clock.title}}</h2>
+  <p><b>{{clock.now}}</b></p>
+  <p class="controls">{{#each clock.steps}}<button type="button" data-action="clockStep" data-seconds="{{seconds}}">{{label}}</button>{{/each}}<button type="button" data-action="clockAdvance">{{clock.advance}}</button><button type="button" data-action="clockDate">{{clock.setDate}}</button><button type="button" data-action="clockOpen">{{clock.open}}</button></p>
+
   <h2>{{localize "SPYCRAFT.Template.AppsGcConsole.Mission"}}{{#if mission.name}}: {{mission.name}}{{/if}} {{#if mission.active}}<span class="tag">{{localize "SPYCRAFT.Template.AppsGcConsole.Active"}}</span>{{else}}<span class="tag muted">{{localize "SPYCRAFT.Template.AppsGcConsole.NotStarted"}}</span>{{/if}}</h2>
   <p>{{localize "SPYCRAFT.Template.AppsGcConsole.ThreatLevel"}} <b>{{mission.threatLevel}}</b> ({{mission.threatNote}}{{localize "SPYCRAFT.Template.AppsGcConsole.Caliber"}} <b>{{mission.caliberLabel}}</b> {{localize "SPYCRAFT.Template.AppsGcConsole.StandingRewardReputation"}} {{mission.standing.reputation}} {{localize "SPYCRAFT.Template.AppsGcConsole.NetWorth"}}{{mission.standing.netWorth}}{{#if mission.bonusDice}} · +{{mission.bonusDice}} {{localize "SPYCRAFT.Template.AppsGcConsole.StartingActionDicePerPlayerP"}}{{/if}}</p>
   <p>{{localize "SPYCRAFT.Template.AppsGcConsole.Team"}} {{#each mission.team}}{{name}} (L{{level}}){{#unless @last}}, {{/unless}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NoAgents"}}{{/each}}</p>

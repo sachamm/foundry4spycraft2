@@ -68,15 +68,35 @@
 .spycraft2 .header-main { min-width: 0; }
 .spycraft2 .name-row { flex-wrap: wrap; }
 .spycraft2 .header-main input.name { font-family: 'Courier New', monospace; font-weight: bold; }
+/* Field borders use a darker brass than table rules so each control's edge meets 3:1 on the paper. */
 .spycraft2.application :is(input, select, textarea) {
   background: #fffcf0;
   color: #253737;
-  border: 1px solid #b7ac92;
+  border: 1px solid #857652;
   border-radius: 2px;
   --input-background-color: #fffcf0;
   --input-text-color: #253737;
-  --input-border-color: #b7ac92;
+  --input-border-color: #857652;
   --input-placeholder-color: #647069;
+}
+/* Foundry draws checkboxes as icon glyphs coloured by these properties, so accent-color has no effect.
+ * Unchecked: a paper box with a brass edge. Checked: teal with a light tick. */
+.spycraft2.application :is(input[type=checkbox], input[type=radio]) {
+  background: transparent;
+  border: 0;
+  --checkbox-background-color: #fffcf0;
+  --checkbox-checked-color: #24595b;
+  --checkbox-checkmark-color: #fff9e9;
+  --checkbox-disabled-color: #d8cfb6;
+  --checkbox-font-weight: unset;
+}
+.spycraft2.application :is(input[type=checkbox], input[type=radio]):not(:checked, :indeterminate)::before {
+  outline: 1.5px solid #857652;
+  outline-offset: -1.5px;
+}
+.spycraft2.application :is(input[type=checkbox], input[type=radio]):focus-visible::before {
+  outline: 2px solid #942f38;
+  outline-offset: 1px;
 }
 .spycraft2.application input::placeholder, .spycraft2.application textarea::placeholder { color: #647069; opacity: 1; }
 .spycraft2.application option { color: #253737; background: #fffcf0; }

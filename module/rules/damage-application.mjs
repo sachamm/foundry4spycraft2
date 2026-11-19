@@ -161,8 +161,10 @@ export function attackKindOf({ proficiency = "", ranged = false, unarmed = false
   // A grenade or other blast is not a "non-grenade hurled weapon": it takes the "other damage" column.
   if (blast) return "other";
   if (["hurled", "exoticHurled"].includes(proficiency)) return "hurledWeapon";
-  if (ranged) return "rangedWeapon";
-  if (["blunt", "exoticBlunt", "edged", "exoticEdged"].includes(proficiency)) return "meleeWeapon";
+  const melee = ["blunt", "exoticBlunt", "edged", "exoticEdged"].includes(proficiency);
+  // A melee weapon used at range was thrown.
+  if (ranged) return melee ? "hurledWeapon" : "rangedWeapon";
+  if (melee) return "meleeWeapon";
   return proficiency ? "rangedWeapon" : "other";
 }
 

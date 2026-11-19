@@ -32,7 +32,7 @@ import { DAMAGE_TYPES, DAMAGE_TYPE_LABELS } from "../rules/damage-types.mjs";
 import { criticalInjuryResult, criticalInjuryRollPlan } from "../rules/critical-injuries.mjs";
 import { SUBDUAL_ATTACK_KINDS } from "../rules/subdual-defense.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
-import { setCondition as condition, woundConditions } from "./wound-conditions.mjs";
+import { conditionDuration, setCondition as condition, woundConditions } from "./wound-conditions.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
 import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
@@ -41,6 +41,7 @@ import { rollCriticalInjury } from "./critical-injuries.mjs";
 import { blastCaught } from "./map.mjs";
 import { rollObjectDamageSave } from "./vehicle-play.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { askGC, gcAvailable, markCard, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -325,7 +326,7 @@ export async function rollReportedSave(message) {
   const { saveKey, ...hazardSave } = save;
   const card = await actor.rollSave(saveKey, { askContext: true, hazardSave });
   // A cancelled dialog or a refused roll leaves the button in place.
-  if (card?.flags) await message.update({ "flags.spycraft2.pendingSave.rolled": true });
+  if (card?.flags) await markCard(message, "pendingSave.rolled");
   return card ?? null;
 }
 
@@ -393,9 +394,9 @@ hazardSaveResolvers.set("thresholdSave", async (actor, message, save, succeeded,
   const time = knockoutDuration(save.knockoutBase, save.dc, Number(check?.effectiveTotal));
   return post(actor, [
     time
-      ? loc`${esc(actor.name)} fails the save and is unconscious for ${time.count} ${time.unit}(s).`
+      ? loc`${esc(actor.name)} fails the save and is unconscious for ${time.count} ${time.unit}(s). The game clock ends it.`
       : loc`${esc(actor.name)} fails the save and is unconscious; the GC sets how long.`,
-    await condition(actor, "unconscious", loc`Unconscious`)
+    await condition(actor, "unconscious", loc`Unconscious`, conditionDuration(time))
   ]);
 });
 
@@ -437,6 +438,18 @@ const sharedFields = (profile, attackKind) =>
       ""
     )}</select></label><label>${loc`Armor-piercing`} <input type="number" name="armorPiercing" min="0" step="1" value="${profile.armorPiercing}" /></label><label><input type="checkbox" name="armorPiercingAll" /> ${loc`Armor-piercing (all): ignore damage reduction`}</label>`;
 
+/** Damage reduction for a standard character: as listed against lethal, doubled against subdual, none against stress. */
+export function standardReduction(kind, hit) {
+  if (kind === "lethal") return reducedDamage(hit);
+  if (kind === "subdual")
+    return reducedDamage({
+      damage: hit.damage,
+      dr: hit.armorPiercingAll ? 0 : 2 * Math.max(0, hit.dr - hit.armorPiercing),
+      armorPiercing: 0
+    });
+  return reducedDamage({ damage: hit.damage });
+}
+
 /**
  * Apply rolled damage to one target.
  * @param {ChatMessage} message  the damage card
@@ -459,18 +472,26 @@ export async function applyDamage(message, options = {}) {
       rejectClose: false,
       ok: { label: loc`Apply` },
       content: `<div class="spycraft2-roll-options">${applied.length ? `<p class="inventory-warning">${loc`Already applied to: ${esc(applied.map(a => a.name).join(", "))}.`}</p>` : ""}<label>${loc`Target`} <select name="targetUuid" required>${targetOptions(
-        choices.actors.filter(actor => actor.isOwner),
+        choices.actors.filter(actor => actor.isOwner || gcAvailable()),
         selected,
-        actor => actor.name
-      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label><p class="hint">${loc`You can apply damage to characters you own. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent.`}</p></div>`
+        actor => (actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)
+      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label><p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent.`}</p></div>`
     });
     if (!input) return null;
     input = { ...input, reviewType: true };
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
   if (!target || !TARGET_TYPES.includes(target.type)) return ui.notifications.warn(loc`Choose a target.`);
-  if (!target.isOwner)
-    return ui.notifications.warn(loc`Only the GC or ${target.name}'s own player can apply damage to that character.`);
+  if (!target.isOwner) {
+    // Someone else's character: the GC's client applies it.
+    const { reviewType: _review, ...fields } = input;
+    try {
+      ui.notifications.info(loc`Sent to the GC: damage to ${target.name}.`);
+      return await askGC("applyDamage", { messageId: message.id, input: fields });
+    } catch (error) {
+      return ui.notifications.warn(error.message);
+    }
+  }
   const damage = Number(input.damage),
     kind = input.kind ?? "lethal",
     type = TYPED.includes(input.type) ? input.type : "",
@@ -514,7 +535,7 @@ export async function applyDamage(message, options = {}) {
       if (!result) return null;
     } else if (!isSpecial(target)) {
       // Standard NPCs and animals: damage reduction, then a Damage save on what is left.
-      const reduced = kind === "lethal" ? reducedDamage(hit) : { net: damage, dr: 0, stopped: false };
+      const reduced = standardReduction(kind, hit);
       if (reduced.stopped)
         lines.push(loc`${esc(target.name)}: damage reduction ${reduced.dr} stops all ${damage} damage.`);
       else if (reduced.net < 1) lines.push(loc`${esc(target.name)} takes no damage.`);
@@ -545,19 +566,29 @@ export async function applyDamage(message, options = {}) {
     return ui.notifications.warn(error.message);
   }
   if (lines.filter(Boolean).length) await post(target, lines, { pendingSave });
-  try {
-    const now = message.flags.spycraft2.damageApplied;
-    await message.update({
-      "flags.spycraft2.damageApplied": [
-        ...(Array.isArray(now) ? now : []),
-        { targetUuid: target.uuid, name: target.name, damage, kind }
-      ]
-    });
-  } catch {
-    /* not this user's message to mark: the report above is the record */
-  }
+  // When the card cannot be marked the report above is the record.
+  await markCard(
+    message,
+    "damageAppliedEntry",
+    { targetUuid: target.uuid, name: target.name, damage, kind },
+    { quiet: true }
+  );
   return result ?? true;
 }
+
+registerRelay("applyDamage", {
+  async describe({ messageId, input = {} }, user) {
+    const message = game.messages.get(messageId),
+      target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
+    if (!message || !target) throw new Error(loc`The damage card or its target is no longer there.`);
+    return loc`${esc(user.name)} applies ${esc(Number(input.damage) || 0)} ${esc(input.kind ?? "lethal")} damage to ${esc(target.name)}${input.critical === true ? loc` (a critical hit)` : ""}. Allow it?`;
+  },
+  async run({ messageId, input = {} }) {
+    const message = game.messages.get(messageId);
+    if (!message) throw new Error(loc`The damage card is no longer there.`);
+    return (await applyDamage(message, { ...input, targetUuid: input.targetUuid ?? "" })) ? true : null;
+  }
+});
 
 /* -------------------------------------------- */
 /*  A blast                                      */
@@ -581,19 +612,19 @@ export async function applyBlast(message, options = {}) {
     const actors = [
       ...[...measured.values()].map(row => row.actor),
       ...targetChoices().actors.filter(actor => !measured.has(actor.uuid))
-    ].filter(actor => actor.isOwner);
-    if (!actors.length) return ui.notifications.warn(loc`There is no character you own to apply the blast to.`);
+    ].filter(actor => actor.isOwner || gcAvailable());
+    if (!actors.length) return ui.notifications.warn(loc`There is no character to apply the blast to.`);
     const rows = actors
       .map((actor, index) => {
         const row = measured.get(actor.uuid);
-        return `<tr><td><label><input type="checkbox" name="hit${index}"${row ? " checked" : ""} /> ${esc(actor.name)}</label></td><td><input type="number" name="feet${index}" min="0" step="5" value="${row ? row.ring * increment : ""}" class="w-2" /></td><td>${row ? row.damage : ""}</td></tr>`;
+        return `<tr><td><label><input type="checkbox" name="hit${index}"${row && !row.behindWall ? " checked" : ""} /> ${esc(actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)}${row?.behindWall ? ` <i>${loc`(behind a wall)`}</i>` : ""}</label></td><td><input type="number" name="feet${index}" min="0" step="5" value="${row ? row.ring * increment : ""}" class="w-2" /></td><td>${row ? row.damage : ""}</td></tr>`;
       })
       .join("");
     const entered = await systemDialog.input({
       window: { title: loc`Blast of ${Math.max(0, rolled)}: who is caught` },
       rejectClose: false,
       ok: { label: loc`Apply to those ticked` },
-      content: `<div class="spycraft2-roll-options"><p>${caught ? loc`Distances are measured from the targeted token at Ground Zero. Blast increment ${increment} ft.` : loc`Target the one token at Ground Zero to measure from the scene, or tick each character caught and enter its distance. Blast increment ${increment} ft.`}</p><table><thead><tr><th>${loc`Character`}</th><th>${loc`Feet from Ground Zero`}</th><th>${loc`Damage`}</th></tr></thead><tbody>${rows}</tbody></table>${sharedFields(profile, attackKind)}<p class="hint">${loc`Walls and cover are not taken into account: leave out anyone behind cover that held. Each character is settled in turn, with its own save where one is called for.`}</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${caught ? loc`Distances are measured from the targeted token at Ground Zero. Blast increment ${increment} ft.` : loc`Target the one token at Ground Zero to measure from the scene, or tick each character caught and enter its distance. Blast increment ${increment} ft.`}</p><table><thead><tr><th>${loc`Character`}</th><th>${loc`Feet from Ground Zero`}</th><th>${loc`Damage`}</th></tr></thead><tbody>${rows}</tbody></table>${sharedFields(profile, attackKind)}<p class="hint">${loc`Anyone behind a wall is listed but not ticked: tick them if the wall failed its Damage save. Other cover is not taken into account. Each character is settled in turn, with its own save where one is called for.`}</p></div>`
     });
     if (!entered) return null;
     input = {

@@ -114,39 +114,51 @@ function mountChatSearch(app, html) {
   const root = html instanceof HTMLElement ? html : app.element;
   const scroll = root?.querySelector(".chat-scroll");
   if (!scroll || root.querySelector(".sc2-chat-search")) return;
+  // A one-line search bar; the character and roll-type filters open on demand, or stay open while one is set.
   const panel = make("section", "sc2-chat-search");
-  panel.setAttribute("aria-label", "Search chat history");
-  const heading = make("div", "sc2-chat-search-heading");
-  heading.append(make("strong", "", "Search chat"));
-  const clear = make("button", "", "Clear");
-  clear.type = "button";
-  clear.setAttribute("aria-label", "Clear chat filters");
-  heading.append(clear);
-  const textLabel = make("label", "sc2-chat-text", "Text");
+  panel.setAttribute("aria-label", loc`Search chat history`);
+  const bar = make("div", "sc2-chat-search-bar");
   const text = make("input");
   text.type = "search";
   text.placeholder = loc`Search messages and rolls…`;
-  text.setAttribute("aria-label", "Search chat text");
-  textLabel.append(text);
-  const filters = make("div", "sc2-chat-filter-row");
-  const characterLabel = make("label", "", "Character");
+  text.setAttribute("aria-label", loc`Search chat text`);
+  const toggle = make("button", "sc2-chat-filter-toggle");
+  toggle.type = "button";
+  toggle.innerHTML = '<i class="fa-solid fa-filter" inert></i>';
+  toggle.setAttribute("aria-label", loc`Show chat filters`);
+  toggle.dataset.tooltip = loc`Filter by character or roll type`;
+  toggle.setAttribute("aria-expanded", "false");
+  bar.append(text, toggle);
+  const filters = make("div", "sc2-chat-filters");
+  filters.id = `sc2-chat-filters-${foundry.utils.randomID()}`;
+  toggle.setAttribute("aria-controls", filters.id);
+  filters.hidden = true;
+  const filterRow = make("div", "sc2-chat-filter-row");
+  const characterLabel = make("label", "", loc`Character`);
   const character = make("select");
-  character.setAttribute("aria-label", "Chat character");
   characterLabel.append(character);
-  const typeLabel = make("label", "", "Roll type");
+  const typeLabel = make("label", "", loc`Roll type`);
   const type = make("select");
-  type.setAttribute("aria-label", "Chat roll type");
   for (const [value, label] of [["", loc`All types`], ...CHAT_ROLL_TYPES]) type.append(new Option(label, value));
   typeLabel.append(type);
-  filters.append(characterLabel, typeLabel);
-  const status = make("p", "sc2-chat-search-status", loc`Search all readable chat history.`);
+  filterRow.append(characterLabel, typeLabel);
+  const clear = make("button", "sc2-chat-clear", loc`Clear search`);
+  clear.type = "button";
+  filters.append(filterRow, clear);
+  const status = make("p", "sc2-chat-search-status");
   status.setAttribute("role", "status");
-  panel.append(heading, textLabel, filters, status);
+  status.hidden = true;
+  panel.append(bar, filters, status);
   const results = make("div", "sc2-chat-search-results");
   results.hidden = true;
-  results.setAttribute("aria-label", "Chat search results");
+  results.setAttribute("aria-label", loc`Chat search results`);
   scroll.before(panel, results);
-  const state = { root, panel, scroll, results, character, type, text, status, limit: pageSize };
+  const state = { root, panel, scroll, results, character, type, text, status, filters, toggle, limit: pageSize };
+  toggle.addEventListener("click", () => {
+    state.filtersOpen = filters.hidden;
+    refreshChatSearch(state);
+    if (state.filtersOpen) character.focus();
+  });
   panels.set(root, state);
   const update = () => {
     state.limit = pageSize;
@@ -164,6 +176,7 @@ function mountChatSearch(app, html) {
     text.value = "";
     character.value = "";
     type.value = "";
+    state.filtersOpen = false;
     update();
     text.focus();
   });
@@ -183,11 +196,11 @@ function mountChatSearch(app, html) {
 }
 
 function refreshChatSearch(state) {
-  const { scroll, results, character, type, text, status } = state;
+  const { scroll, results, character, type, text, status, filters, toggle } = state;
   const records = [...(game.messages ?? [])].map(message => chatSearchRecord(message, chatHTMLToText)).filter(Boolean);
   const selected = character.value;
   const names = new Map(records.map(record => [record.characterKey, record.character]));
-  const options = [new Option("All characters", "")];
+  const options = [new Option(loc`All characters`, "")];
   for (const [key, name] of [...names].sort((a, b) => a[1].localeCompare(b[1]))) options.push(new Option(name, key));
   // Keep an active character filter after its last message is removed, rather than broadening the query.
   if (selected && !names.has(selected))
@@ -195,11 +208,18 @@ function refreshChatSearch(state) {
   character.replaceChildren(...options);
   character.value = selected;
   const active = !!(character.value || type.value || text.value.trim());
+  const filtered = !!(character.value || type.value);
+  const open = filtered || state.filtersOpen === true;
+  filters.hidden = !open;
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", open ? loc`Hide chat filters` : loc`Show chat filters`);
+  toggle.classList.toggle("active", filtered);
   scroll.hidden = active;
   results.hidden = !active;
+  status.hidden = !active;
   results.replaceChildren();
   if (!active) {
-    status.textContent = loc`Search all readable chat history.`;
+    status.textContent = "";
     return;
   }
   const matches = searchChatRecords(records, { character: character.value, type: type.value, text: text.value });
@@ -216,7 +236,7 @@ function refreshChatSearch(state) {
     const time = make("time", "", new Date(record.timestamp).toLocaleString());
     time.dateTime = new Date(record.timestamp).toISOString();
     const excerpt = make("p", "", record.text.length > 450 ? record.text.slice(0, 450) + "…" : record.text);
-    const open = make("button", "", "Open message");
+    const open = make("button", "", loc`Open message`);
     open.type = "button";
     open.addEventListener("click", async () => {
       const message = game.messages.get(record.id);
@@ -230,7 +250,7 @@ function refreshChatSearch(state) {
     results.append(item);
   }
   if (matches.length > shown.length) {
-    const more = make("button", "sc2-chat-search-more", "Show more matches");
+    const more = make("button", "sc2-chat-search-more", loc`Show more matches`);
     more.type = "button";
     more.addEventListener("click", () => {
       state.limit += pageSize;

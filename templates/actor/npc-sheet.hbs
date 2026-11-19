@@ -33,6 +33,7 @@
       <label>{{localize "SPYCRAFT.Template.ActorNpcSheet.SaveAdjustmentVitalityWoundEffectsP"}} <input name="system.damageSaveAdjust" type="number" value="{{system.damageSaveAdjust}}" class="w-2" /></label>
       {{#unless system.npcProfile.enabled}}<label>{{localize "SPYCRAFT.Template.ActorNpcSheet.VillainRole"}} <select name="system.manualRole">{{selectOptions manualRoles selected=system.manualRole}}</select></label>
       <label>{{localize "SPYCRAFT.Template.ActorNpcSheet.DamageSaveBonus"}} <input name="system.manualDamageSave" type="number" value="{{system.manualDamageSave}}" class="w-2" /></label>{{/unless}}</p>{{/unless}}
+    {{> "systems/spycraft2/templates/actor/parts/hazards.hbs"}}
   </div>
   {{> "systems/spycraft2/templates/actor/npc-builder.hbs"}}
   {{#if system.qualityEffects.notes.length}}<div class="npc-qualities-play">
@@ -40,6 +41,12 @@
     <p>{{localize "SPYCRAFT.Template.ActorNpcSheet.Speed"}} {{system.qualityEffects.speed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{#if system.qualityEffects.flySpeed}}, {{localize "SPYCRAFT.Template.ActorNpcSheet.Flying"}} {{system.qualityEffects.flySpeed}} {{localize "SPYCRAFT.Template.ActorNpcSheet.Ft"}}{{/if}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.Size"}} {{system.qualityEffects.size}}{{#if system.qualityEffects.damageReduction}} · {{localize "SPYCRAFT.Template.ActorNpcSheet.DamageReduction"}} {{system.qualityEffects.damageReduction}}{{/if}}</p>
     <ul>{{#each system.qualityEffects.notes}}<li><b>{{name}}</b> — {{text}} <small>(p.{{page}})</small></li>{{/each}}</ul>
     {{#each system.qualityEffects.saveCalls}}<p><a data-action="callQualitySave" data-id="{{id}}">{{localize "SPYCRAFT.Template.ActorNpcSheet.CallForTheSave"}}: {{name}} ({{localize "SPYCRAFT.Template.ActorNpcSheet.WillDC"}} {{dc}})</a></p>{{/each}}
+  </div>{{/if}}
+  {{#if featPlay}}<div class="npc-qualities-play">
+    <h3>{{featPlay.title}}</h3>
+    <ul>{{#each featPlay.rows}}<li>{{this}}</li>{{/each}}</ul>
+    {{#if featPlay.health}}<p>{{featPlay.health}}</p>{{/if}}
+    {{#if featPlay.uncounted}}<p>{{featPlay.uncounted}}</p>{{/if}}
   </div>{{/if}}
   <div class="abilities-row">
     {{#each abilities}}

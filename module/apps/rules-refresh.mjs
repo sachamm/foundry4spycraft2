@@ -1,5 +1,6 @@
 import { rulesRefreshChanges, applyRulesRefresh, equivalent } from "../rules/refresh.mjs";
 import { loc } from "../i18n.mjs";
+import { systemDialog } from "./dialog-theme.mjs";
 const PACKS = { gear: "kits", class: "classes", origin: "origins", feat: "feats", weapon: "weapons", armor: "armor" };
 const normal = value =>
   String(value ?? "")
@@ -65,7 +66,7 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
         `<details><summary><label><input type="checkbox" name="change${index}" checked /> ${esc(change.itemName)} — ${esc(change.path)}</label></summary><div><b>${loc`Current`}</b><pre>${esc(JSON.stringify(change.before, null, 1) ?? "Not set")}</pre><b>${loc`Proposed`}</b><pre>${esc(JSON.stringify(change.after, null, 1) ?? "Not set")}</pre></div></details>`
     )
     .join("");
-  const input = await foundry.applications.api.DialogV2.input({
+  const input = await systemDialog.input({
     window: { title: restore ? loc`Review previous rules refresh rollback` : loc`Review catalog rules updates` },
     rejectClose: false,
     content: `

@@ -64,6 +64,27 @@ Classes also provides ordinary GC action-die awards and once-per-mission XP sett
 
 Implemented resource controls coordinate multiple Foundry clients. Classes provides GC recovery controls for interrupted actions; check the recorded result and current resources before retrying an interrupted transaction. Complete character exports omit temporary transaction bookkeeping.
 
+## Game clock and timers
+
+The world keeps the time. A badge above the players list shows it; click it for the **Clock and timers** window
+(or `game.spycraft2.clock.open()`). The GC moves the clock from there or from the GC Console, and **Set the date…**
+names the present moment without any time passing. Each combat round adds 6 seconds.
+
+Anyone can start a timer: rounds by default, or minutes, hours, days or weeks. A timer kept on a character is an
+Active Effect with a duration, so Foundry counts it down, in combat rounds while the character is in a fight and in
+game time otherwise, and expires it; a user with no character keeps timers on their own user. The owner is told when
+a timer ends with a notice, a sound and a whispered chat card, at once or on the next login. Tick **Show everyone**
+to share one. Knockouts and other conditions with a time limit are effects with a duration too, lifted by the GC's
+client once Foundry expires them.
+
+The clock uses Foundry's own timekeeping throughout (`game.time`, the world calendar, `CONFIG.time.roundTime`,
+effect durations). The one addition is an offset between world time and the date shown, because Foundry can only
+set a date by moving world time, which would end every running timer.
+
+A player who needs to change a character they do not own (damage to an NPC, First Aid on a teammate) sends the
+request to the GC's client, which asks the GC to allow it. World settings: "Advance the clock each combat round",
+"Show the clock to players", "Apply players' requests without asking".
+
 ## Chat search
 
 The Chat Messages sidebar has a text search and Character / Roll type filters. Filters combine and search the full readable history, including older messages that are not currently rendered. Text search ignores case and accents and matches every entered word. Results show newest first; use **Open message** to view the original card, **Show more matches** for additional results, or **Clear** (Escape in a filter) to return to ordinary chat. Private messages and hidden roll results remain subject to Foundry's visibility rules. Older untyped rolls are classified from their displayed labels where possible.

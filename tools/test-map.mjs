@@ -213,3 +213,35 @@ test("an attack is measured from the character's token to the single targeted to
   assert.equal(applyMeasurement(null, melee), false);
   assert.equal(applyMeasurement(element, null), false);
 });
+
+test("a blast has one ring for each halving that still does damage", async () => {
+  const { blastRings } = await import("../module/rules/map.mjs");
+  assert.equal(blastRings(0), 0);
+  assert.equal(blastRings(1), 1);
+  assert.equal(blastRings(8), 4);
+  assert.equal(blastRings(20), 5);
+});
+
+test("characters between an attacker and a target stand in the line of fire", async () => {
+  const { inLineOfFire, lineCrossesBox } = await import("../module/rules/map.mjs");
+  const box = (x, y) => ({ x, y, width: 5, height: 5 });
+  const attacker = box(0, 0),
+    target = box(30, 0);
+  const others = [
+    { id: "mid", name: "Between", box: box(15, 0) },
+    { id: "side", name: "Beside", box: box(15, 5) },
+    { id: "far", name: "Beyond", box: box(40, 0) }
+  ];
+  assert.deepEqual(inLineOfFire(attacker, target, others), [{ id: "mid", name: "Between" }]);
+  // A diagonal shot crosses the squares on the diagonal, not the ones it only touches at a corner.
+  assert.deepEqual(
+    inLineOfFire(box(0, 0), box(20, 20), [
+      { id: "d", name: "Diagonal", box: box(10, 10) },
+      { id: "c", name: "Corner", box: box(10, 0) }
+    ]).map(row => row.id),
+    ["d"]
+  );
+  assert.equal(lineCrossesBox({ x: 0, y: 5 }, { x: 30, y: 5 }, box(10, 5)), false, "along an edge");
+  assert.equal(lineCrossesBox({ x: 0, y: 6 }, { x: 30, y: 6 }, box(10, 5)), true);
+  assert.deepEqual(inLineOfFire(attacker, target, undefined), []);
+});

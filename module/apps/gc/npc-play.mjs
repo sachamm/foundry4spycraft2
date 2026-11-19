@@ -150,8 +150,15 @@ export async function rollNpcSkill(actor, input = null) {
       .filter(key => key.startsWith("quality-") && input[key] === true)
       .map(key => key.slice("quality-".length))
   });
+  // Feat items on the NPC that add a plain number to this skill.
+  const featBonus = Math.trunc(Number(actor.system.featEffects?.skills?.[skill.key]) || 0);
+  if (featBonus) quality.rows.push({ label: loc`Feats`, value: featBonus });
   const total =
-    plan.bonus + (actor.system.abilities[ability]?.mod ?? 0) + (Number(input.modifier) || 0) + quality.modifier;
+    plan.bonus +
+    (actor.system.abilities[ability]?.mod ?? 0) +
+    (Number(input.modifier) || 0) +
+    quality.modifier +
+    featBonus;
   return actor.rollCheck(
     "1d20 + @total",
     { total },
