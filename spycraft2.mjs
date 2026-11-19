@@ -1,3 +1,4 @@
+import { installUITooltipHooks } from "./module/apps/ui-tooltips.mjs";
 import { installSampleAgentHooks } from "./module/sample-agents.mjs";
 import { registerGCTableSetup, setupGCTables, inputRollTableClass } from "./module/gc-table-setup.mjs";
 import { registerSoundtrackSetup, setupSoundtrack } from "./module/soundtrack.mjs";
@@ -73,6 +74,7 @@ Hooks.once("init", () => {
   console.log("Spycraft 2.0 | Initializing system");
   installChatSearchHooks();
   installDialogThemeHooks();
+  installUITooltipHooks();
   CONFIG.SPYCRAFT = SPYCRAFT;
   CONFIG.time.roundTime = 6;
   CONFIG.time.turnTime = 0;
