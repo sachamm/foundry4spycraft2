@@ -142,3 +142,18 @@ test("combat shortcuts follow earned feats while saved declarations remain acces
   for (const key of ["stance", "movement", "darting", "twoWeapon", "expertise", "cover"])
     assert.equal(saved[key], true);
 });
+
+test("feat-specific outcome tools appear only with their feat, unless the GC asks for every tool", () => {
+  const intruder = combatToolVisibility({ activeFeatNames: ["Combat Instincts"] }, COMBAT_STANCES);
+  for (const key of ["fend", "threadNeedle", "stanceDamage", "drivingStance", "powerStance"])
+    assert.equal(intruder[key], false, key);
+  const armed = combatToolVisibility(
+    { activeFeatNames: ["Polearm Basics", "Staff Basics", "Axe Basics", "Hammer Basics", "Great Sword Basics"] },
+    COMBAT_STANCES
+  );
+  for (const key of ["fend", "threadNeedle", "stanceDamage", "drivingStance", "powerStance"])
+    assert.equal(armed[key], true, key);
+  assert.equal(combatToolVisibility({ combatStance: { key: "power" } }, COMBAT_STANCES).powerStance, true);
+  const all = combatToolVisibility({}, COMBAT_STANCES, { showAll: true });
+  assert.ok(Object.values(all).every(value => value === true));
+});

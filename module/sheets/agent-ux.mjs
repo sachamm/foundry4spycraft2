@@ -53,8 +53,9 @@ export function buildSetupGuide(tasks = []) {
 }
 
 /** These flags choose shortcuts only. The action controllers still decide legality. */
-export function combatToolVisibility(system = {}, stances = {}) {
+export function combatToolVisibility(system = {}, stances = {}, { showAll = false } = {}) {
   const feats = new Set(system.activeFeatNames ?? []);
+  const stanceKey = system.combatStance?.key;
   const earnedStances = Object.values(stances).filter(stance => feats.has(stance.feat));
   const tools = {
     stance: earnedStances.length > 0 || !!system.combatStance,
@@ -69,8 +70,15 @@ export function combatToolVisibility(system = {}, stances = {}) {
     snakeStrike: feats.has("Snake Strike"),
     twoWeapon: feats.has("Two-Weapon Basics") || !!system.twoWeaponStyle,
     expertise: feats.has("Combat Expertise") || !!system.combatExpertise,
-    cover: feats.has("Superior Cover") || !!system.superiorCover
+    cover: feats.has("Superior Cover") || !!system.superiorCover,
+    fend: feats.has("Polearm Basics"),
+    threadNeedle: feats.has("Staff Basics"),
+    stanceDamage: feats.has("Flail Basics") || feats.has("Axe Basics") || ["punishing", "menacing"].includes(stanceKey),
+    drivingStance: feats.has("Hammer Basics") || stanceKey === "driving",
+    powerStance: feats.has("Great Sword Basics") || stanceKey === "power"
   };
+  // The GC can reveal every shortcut, for example to settle a record left by a feat the character has lost.
+  if (showAll) for (const key of Object.keys(tools)) tools[key] = true;
   return { ...tools, styles: tools.stance || tools.movement || tools.darting || tools.twoWeapon };
 }
 
@@ -215,6 +223,7 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
       delete control.dataset.modeDisabled;
     }
   }
+  filterCombatTools(element, state);
   const search = element.querySelector(".skill-search");
   const trained = element.querySelector(".trained-filter");
   if (search && trained) {
@@ -236,4 +245,36 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
     trained.addEventListener("change", filter);
     filter();
   }
+}
+
+/** Narrow the combat toolbox to the tools whose text matches the search, opening the groups that hold them. */
+export function filterCombatTools(element, state = {}) {
+  const box = element.querySelector(".combat-toolbox");
+  const search = box?.querySelector(".combat-tool-search");
+  if (!search) return;
+  search.value = state._toolSearch ?? "";
+  const allDetails = [...box.querySelectorAll(".combat-tool-groups details")];
+  // Open states from before a search began, restored when the search is cleared.
+  let remembered = null;
+  const apply = () => {
+    state._toolSearch = search.value;
+    const query = search.value.trim().toLocaleLowerCase();
+    if (query && !remembered) remembered = new Map(allDetails.map(details => [details, details.open]));
+    const entries = box.querySelectorAll(".tool-actions > *, .combat-tool-group p:not(.tool-hint, .hint)");
+    for (const entry of entries) entry.hidden = !!query && !entry.textContent.toLocaleLowerCase().includes(query);
+    let matches = 0;
+    for (const details of allDetails) {
+      const visible = [...details.querySelectorAll(".tool-actions > *, p:not(.tool-hint, .hint)")].some(
+        entry => !entry.hidden
+      );
+      if (details.classList.contains("combat-tool-group") && visible) matches++;
+      details.hidden = !!query && !visible;
+      if (query) details.open = visible;
+      else if (remembered) details.open = remembered.get(details);
+    }
+    if (!query) remembered = null;
+    box.querySelector(".combat-tool-empty").hidden = !query || matches > 0;
+  };
+  search.addEventListener("input", apply);
+  if (search.value) apply();
 }

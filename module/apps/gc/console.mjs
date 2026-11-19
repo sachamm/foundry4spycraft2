@@ -119,10 +119,74 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
     return { ...(await super._prepareContext(options)), ...consoleContext() };
   }
 
+  _onRender(context, options) {
+    super._onRender(context, options);
+    for (const details of this.element.querySelectorAll("details.gc-section[data-section]")) {
+      const key = details.dataset.section,
+        initial = context.sections?.[key]?.open;
+      // Rendering an open section fires a toggle too; only a change from what was drawn is the GC's choice.
+      details.addEventListener("toggle", () => {
+        if (details.open === initial && !storedSections()[key]) return;
+        rememberSection(key, details.dataset.state, details.open);
+      });
+    }
+  }
+
   async _onFirstRender(context, options) {
     await super._onFirstRender(context, options);
     if (!this.isPopout) game.spycraft2.gc.console = this;
   }
+}
+
+const SECTION_SETTING = "gcConsoleSections";
+function storedSections() {
+  try {
+    return game.settings.get("spycraft2", SECTION_SETTING) ?? {};
+  } catch {
+    return {};
+  }
+}
+function rememberSection(section, state, open) {
+  const stored = { ...storedSections(), [section]: { state, open } };
+  return game.settings.set("spycraft2", SECTION_SETTING, stored);
+}
+
+/**
+ * Which console sections start open. Each section opens by default when the game state makes it the one in use
+ * (the mission before it starts, combat while one runs, and so on). A GC's own choice is kept until that state changes.
+ */
+export function consoleSections({ missionActive, combat, conflictsRunning }, stored = {}) {
+  const states = {
+    clock: "always",
+    mission: missionActive ? "active" : "planning",
+    objectives: missionActive ? "active" : "planning",
+    antagonists: missionActive ? "active" : "planning",
+    complications: "always",
+    dice: missionActive ? "active" : "planning",
+    combat: combat ? "running" : "idle",
+    conflicts: conflictsRunning ? "running" : "idle",
+    campaign: "always",
+    reference: "always"
+  };
+  const defaults = {
+    clock: false,
+    mission: !missionActive,
+    objectives: missionActive,
+    antagonists: false,
+    complications: false,
+    dice: missionActive,
+    combat: !!combat,
+    conflicts: conflictsRunning,
+    campaign: false,
+    reference: false
+  };
+  return Object.fromEntries(
+    Object.keys(states).map(key => {
+      const choice = stored[key];
+      const open = choice && choice.state === states[key] ? !!choice.open : defaults[key];
+      return [key, { open, state: states[key] }];
+    })
+  );
 }
 
 /** Everything the console shows, as plain data (also used by tests). */
@@ -146,9 +210,18 @@ export function consoleContext() {
       name: entry.name ?? find?.(entry.id) ?? entry.id
     }));
   const T = GC_DATA.tables,
-    combatNow = game.combat ?? null;
+    combatNow = game.combat ?? null,
+    conflictList = conflicts.conflictRows();
   return {
     isGM: game.user.isGM,
+    sections: consoleSections(
+      {
+        missionActive: !!m.active,
+        combat: !!combatNow,
+        conflictsRunning: conflictList.some(row => !row.winner)
+      },
+      storedSections()
+    ),
     clock: {
       title: loc`Game clock`,
       now: clockLabel(),
@@ -221,7 +294,12 @@ export function consoleContext() {
           })
         }
       : null,
-    conflicts: conflicts.conflictRows()
+    conflicts: conflictList,
+    counts: {
+      objectives: `${m.objectives.filter(objective => objective.complete).length}/${m.objectives.length}`,
+      antagonists: m.antagonists.length,
+      conflicts: conflictList.filter(row => !row.winner).length
+    }
   };
 }
 

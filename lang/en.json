@@ -17,8 +17,6 @@
  },
  "SPYCRAFT": {
   "Retro": {
-   "AgentDossier": "Agent dossier",
-   "SubjectDossier": "Subject dossier",
    "EquipmentFile": "Reference file",
    "Archive": "Operations archive",
    "Classified": "Classified"
@@ -559,8 +557,6 @@
     "CharismaPenaltyRemoveClassGrantedPicks": "Charisma penalty: remove class-granted picks (p.219)"
    },
    "ActorAgentHeader": {
-    "CharacterSetup": "Character setup",
-    "FieldDossier": "Field dossier",
     "DoneEditingReturnToPlay": "Done editing · Return to play",
     "EditCharacter": "Edit character",
     "ChangeTalent": "Change talent",
@@ -959,7 +955,10 @@
     "BaseMissionXPBeforeTheCareer": "base mission XP before the Career/Threat multiplier; settlement pending.",
     "ImprovedFortuneTeammates": "Improved Fortune teammates",
     "StartingActionDiceTeamCap3": "starting action dice (team cap +3)",
-    "Lbs": "lbs"
+    "Lbs": "lbs",
+    "FindATool": "Find a tool",
+    "ShowAllTools": "Show all tools",
+    "NoToolMatches": "No tool matches that search."
    },
    "ActorAgentSkills": {
     "Includes": "Includes",
@@ -1077,7 +1076,8 @@
     "CostRestriction": "Cost / restriction",
     "Page": "Page",
     "TierITL4IITL": "Tier I: TL−4 · II: TL−2 · III: TL · IV: TL+2 · V: TL+4. Clamp effective TL to 1–20; Tier III is the default. Tiers do not add an invented grade or XP surcharge.",
-    "ManualModePreservesExistingNPCStat": "Manual mode preserves existing NPC stat blocks. Enable graded creation to resolve the core tables and calculate XP."
+    "ManualModePreservesExistingNPCStat": "Manual mode preserves existing NPC stat blocks. Enable graded creation to resolve the core tables and calculate XP.",
+    "Skills": "Skills"
    },
    "ActorNpcSheet": {
     "QualitiesInPlay": "Qualities in play",
@@ -1120,7 +1120,10 @@
     "Reset": "Reset",
     "SaveAdjustmentVitalityWoundEffectsP": "Save adjustment (vitality/wound effects, p.452)",
     "VillainRole": "Villain role",
-    "DamageSaveBonus": "Damage save bonus"
+    "DamageSaveBonus": "Damage save bonus",
+    "DoneEditing": "Done editing",
+    "EditNPC": "Edit NPC",
+    "Actions": "Actions"
    },
    "ActorVehicleSheet": {
     "Crash": "Crash",

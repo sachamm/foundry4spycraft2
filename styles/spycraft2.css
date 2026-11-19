@@ -236,6 +236,19 @@
 /* Game Control console */
 .spycraft2.gc-console .window-content { overflow-y: auto; }
 .gc-console-body h2 { margin: 0.8em 0 0.3em; border-bottom: 1px solid currentColor; }
+/* Collapsible console sections: the heading row is the toggle, with a short status note at its end. */
+.gc-console-body details.gc-section { border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent); }
+.gc-console-body details.gc-section > summary { display: flex; align-items: baseline; gap: 0.5em; padding: 0.45em 0; cursor: pointer; list-style: none; }
+.gc-console-body details.gc-section > summary::-webkit-details-marker { display: none; }
+.gc-console-body details.gc-section > summary::before { content: "\25B8"; flex: 0 0 auto; transition: transform 0.15s; }
+.gc-console-body details.gc-section[open] > summary::before { transform: rotate(90deg); }
+.gc-console-body details.gc-section > summary h2 { flex: 1 1 auto; margin: 0; border: 0; font-size: 1.1em; }
+.gc-console-body details.gc-section > summary .gc-note { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
+.gc-console-body details.gc-section > summary:focus-visible { outline: 2px solid var(--sc2-accent, currentColor); outline-offset: 2px; }
+.gc-console-body details.gc-section[open] { padding-bottom: 0.4em; }
+.gc-console-body details.gc-section .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr)); }
+.gc-console-body details.gc-section .controls button { width: 100%; }
+.gc-console-body .controls button.gc-primary { grid-column: 1 / -1; order: -1; font-weight: bold; }
 .gc-console-body h3 { margin: 0.6em 0 0.2em; }
 .gc-console-body h2 button, .gc-console-body h3 button { width: auto; display: inline-block; font-size: 0.75em; line-height: 1.6; padding: 0 0.6em; margin-left: 0.5em; vertical-align: middle; }
 .gc-console-body .controls { display: flex; flex-wrap: wrap; gap: 0.3em; }

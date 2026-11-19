@@ -36,6 +36,17 @@ Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" i
   reserve review, rules refresh, restraint release, GC dice and resource transactions) now use the system's dialog
   skin, and a test keeps new dialogs from skipping it. NPC feat bonuses name skills properly ("Sense Motive", not a
   code key). A vehicle with no fuel range no longer shows "()", and its empty Acceleration and MPH show a dash.
+- **Sheet layout.** The NPC sheet has the agent sheet's play and edit views. Play shows the header, an Actions
+  group, the play strip, attributes, defences and weapons first; graded NPCs show their statistics, current vitality
+  and wounds and listed skill bonuses there. The NPC builder appears only under Edit NPC, and a new NPC with nothing
+  built opens in edit. The agent header puts the edit toggle on the name row and the counters beside the origins,
+  roughly halving its height, and the tab bar is slimmer.
+- **Combat tools.** The Main tab's combat tools sit below Attributes and have a search field. Fend, Thread the
+  Needle, stance damage, Driving Stance and Power Stance tools appear only for characters with the feat or stance
+  behind them; the GC can tick "Show all tools" to see every one.
+- **GC console.** Each console section folds. Sections open to suit the game: the mission before it starts, combat
+  while one runs, Dramatic Conflicts while one is under way. A GC's own choice is remembered in their browser until
+  that state changes. Each section leads with one main action, and the clock folds to a single line.
 - **Map.** A blast marks who stands behind a wall and leaves them unticked, outlines its rings on the scene and
   pings Ground Zero. Attack dialogs name the characters standing in the line of fire.
 - World migrations now cover the world's own Actor and Item compendiums; locked ones are named and left.
@@ -48,6 +59,8 @@ Fixes:
 - A standard NPC's damage reduction now counts against subdual damage (twice over) as a special NPC's does.
 - Resting or First Aid back above 0 wounds lifts Unconscious; a character who dies loses Dying.
 - A thrown melee weapon uses the hurled-weapon damage reduction column.
+- Biographies and item descriptions show their enriched text (`@UUID` links, rolls, secrets) with an edit button,
+  instead of an always-open editor showing the raw markup.
 - Condition names, the Linguistics setting and the damage reduction categories can be translated; a tooltip's HTML
   attributes are no longer a translatable string.
 

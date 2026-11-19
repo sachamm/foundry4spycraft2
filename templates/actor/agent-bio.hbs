@@ -15,6 +15,6 @@
   </details>
   <p class="play-only bio-description">{{#each system.details as |v k|}}{{#if v}}<span><b>{{k}}:</b> {{v}}</span> {{/if}}{{/each}}</p>
   {{#if editable}}
-    <prose-mirror name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>
+    <prose-mirror toggled name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>
   {{else}}{{{enrichedBiography}}}{{/if}}
 </section>

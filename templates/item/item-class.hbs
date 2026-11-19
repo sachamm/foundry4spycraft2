@@ -23,5 +23,5 @@
     <ul class="plain">{{#each options}}<li><b>{{name}}</b>{{#if description}} — {{description}}{{/if}}</li>{{/each}}</ul>
   {{/each}}
   <h3>{{localize "SPYCRAFT.Description"}}</h3>
-  {{#if editable}}<prose-mirror name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
+  {{#if editable}}<prose-mirror toggled name="system.description" value="{{system.description}}">{{{enrichedDescription}}}</prose-mirror>{{else}}{{{enrichedDescription}}}{{/if}}
 </section>

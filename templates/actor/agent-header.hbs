@@ -1,20 +1,12 @@
 {{!-- A template part must render exactly one root element, so the header, to-do and warnings share a wrapper. --}}
 <div class="sheet-top">
-<div class="sheet-mode-bar">
-  <span class="mode-label">{{#if editMode}}{{localize "SPYCRAFT.Template.ActorAgentHeader.CharacterSetup"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.FieldDossier"}}{{/if}}</span>
-  {{#if editable}}<button type="button" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}{{localize "SPYCRAFT.Template.ActorAgentHeader.DoneEditingReturnToPlay"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.EditCharacter"}}{{/if}}</button>{{/if}}
-</div>
-<div class="dossier-band edit-only" aria-hidden="true">
-  <img class="agency-seal" src="systems/spycraft2/assets/retro/agency-seal.svg" alt="" />
-  <span class="file-label">{{localize "SPYCRAFT.Retro.AgentDossier"}}</span>
-  <span class="file-stamp">{{localize "SPYCRAFT.Retro.Classified"}}</span>
-</div>
 <header class="sheet-header">
   <img class="portrait" src="{{actor.img}}" data-edit="img" data-action="editImage" alt="{{actor.name}}" />
   <div class="header-main">
     <div class="name-row">
       {{#if editMode}}<input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" />
-      <input class="codename" name="system.codename" type="text" value="{{system.codename}}" placeholder="{{localize 'SPYCRAFT.Codename'}}" />{{else}}<strong class="agent-name">{{actor.name}}</strong><span class="agent-codename">{{system.codename}}</span>{{/if}}
+      <input class="codename" name="system.codename" type="text" value="{{system.codename}}" placeholder="{{localize 'SPYCRAFT.Codename'}}" />{{else}}<strong class="agent-name" title="{{actor.name}}">{{actor.name}}</strong><span class="agent-codename">{{system.codename}}</span>{{/if}}
+      {{#if editable}}<button type="button" class="mode-toggle" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}{{localize "SPYCRAFT.Template.ActorAgentHeader.DoneEditingReturnToPlay"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.EditCharacter"}}{{/if}}</button>{{/if}}
     </div>
     <div class="summary">
       <span class="level"><b>{{localize "SPYCRAFT.CareerLevel"}} {{system.level}}</b></span>

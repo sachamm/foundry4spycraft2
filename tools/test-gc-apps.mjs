@@ -166,7 +166,7 @@ const spend = await import("../module/apps/gc/spend.mjs");
 const combat = await import("../module/apps/gc/combat.mjs");
 const conflicts = await import("../module/apps/gc/conflicts.mjs");
 const tables = await import("../module/apps/gc/tables.mjs");
-const { consoleContext, GCConsole, registerGCConsoleTab, openGCConsole } =
+const { consoleContext, consoleSections, GCConsole, registerGCConsoleTab, openGCConsole } =
   await import("../module/apps/gc/console.mjs");
 const { initializeGCDice, gcDiceStatus } = await import("../module/rules/gc-dice.mjs");
 const { missionSettlementDefaults } = await import("../module/apps/gc/mission-defaults.mjs");
@@ -539,6 +539,26 @@ test("console context summarises everything without throwing", async () => {
   assert.ok(Array.isArray(context.conflicts));
   if (process.env.GC_CONTEXT_OUT)
     (await import("node:fs")).writeFileSync(process.env.GC_CONTEXT_OUT, JSON.stringify(context));
+});
+
+test("console sections open for the state in play and keep the GC's choice until that state changes", () => {
+  const planning = consoleSections({ missionActive: false, combat: false, conflictsRunning: false });
+  assert.equal(planning.mission.open, true);
+  assert.equal(planning.combat.open, false);
+  assert.equal(planning.clock.open, false);
+  const fighting = consoleSections({ missionActive: true, combat: true, conflictsRunning: true });
+  assert.equal(fighting.mission.open, false);
+  assert.equal(fighting.combat.open, true);
+  assert.equal(fighting.conflicts.open, true);
+  // Closing Combat during a fight sticks for that fight, but the next combat opens it again.
+  const closed = { combat: { state: "running", open: false }, clock: { state: "always", open: true } };
+  assert.equal(consoleSections({ missionActive: true, combat: true }, closed).combat.open, false);
+  assert.equal(consoleSections({ missionActive: true, combat: false }, closed).combat.open, false);
+  assert.equal(
+    consoleSections({ missionActive: true, combat: true }, { combat: { state: "idle", open: false } }).combat.open,
+    true
+  );
+  assert.equal(consoleSections({ missionActive: true, combat: false }, closed).clock.open, true);
 });
 
 test("a new scene returns to standard; players cannot change GC state", async () => {

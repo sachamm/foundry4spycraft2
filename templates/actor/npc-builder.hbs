@@ -16,16 +16,6 @@
     </div>
     <div class="npc-grade-grid">{{#each npc.grades}}<label>{{label}}<select name="system.npcProfile.grades.{{key}}" data-dtype="Number">{{selectOptions options selected=value}}</select></label>{{/each}}</div>
   </fieldset>
-  <p><a data-action="applyBaffled">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ApplyNewBaffledEffect"}}</a> · <a data-action="setNpcSkillCondition" data-condition="baffled">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ReviewBaffledState"}}</a> · <a data-action="setNpcSkillCondition" data-condition="incompetent">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ReviewIncompetentState"}}</a>{{#if system.baffledApplicationReview.needsReview}} · <a data-action="reviewBaffledApplication">{{localize "SPYCRAFT.Template.ActorNpcBuilder.GCReviewInterruptedBaffledEffect"}}</a>{{/if}}</p>
-  <div class="npc-results" aria-live="polite">
-    <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Initiative"}} <b>{{signed system.initiative.total}}</b></span><span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.AttackBase"}} <b>{{signed system.bab}}</b></span>
-    <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Defense"}} <b>{{system.defense.total}}</b></span><span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.ResilienceBase"}} <b>{{signed npc.result.stats.resilience}}</b></span>
-    {{#unless npc.animal}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Competence"}} <b title="Standard {{signed npc.result.normalCompetence}}; {{npc.result.competenceCondition.state}}">{{signed npc.result.competence}}</b></span>{{/unless}}
-    {{#if system.conditionContext.incompetent}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.IncompetentSkillBonuses0"}}</span>{{else}}{{#if system.conditionContext.baffled}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.BaffledHalfSkillCompetenceBonusesRound"}}</span>{{/if}}{{/if}}{{#if system.conditionContext.baffled}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.8SavesResistingBaffled"}}</span>{{/if}}
-    {{#if npc.special}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.VitalityMax"}} <b>{{system.vitality.max}}</b></span><span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.WoundsMax"}} <b>{{system.wounds.max}}</b></span>
-    {{else}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.DamageSave"}} <b>{{signed system.damageSave}}</b></span>{{/if}}
-  </div>
-  {{#if npc.special}}<div class="resources"><label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.CurrentVitality"}} <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /></label><label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.CurrentWounds"}} <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /></label></div>{{/if}}
   {{#if npc.result.warnings}}<ul class="npc-warnings" role="status">{{#each npc.result.warnings}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
   <fieldset {{#unless editable}}disabled{{/unless}}>
     <div class="npc-section-title"><h3>{{localize "SPYCRAFT.Template.ActorNpcBuilder.ListedSkillsSkilledQuality"}}</h3><button type="button" data-action="npcAddSkill">{{localize "SPYCRAFT.Template.ActorNpcBuilder.AddSkill"}}</button></div>

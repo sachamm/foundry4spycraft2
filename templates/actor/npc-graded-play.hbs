@@ -1,0 +1,14 @@
+{{!-- Graded NPC statistics used in play; the builder that sets them is in npc-builder.hbs. --}}
+<div class="npc-graded-play">
+  <div class="npc-results" aria-live="polite">
+    <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Initiative"}} <b>{{signed system.initiative.total}}</b></span><span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.AttackBase"}} <b>{{signed system.bab}}</b></span>
+    <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Defense"}} <b>{{system.defense.total}}</b></span><span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.ResilienceBase"}} <b>{{signed npc.result.stats.resilience}}</b></span>
+    {{#unless npc.animal}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Competence"}} <b title="Standard {{signed npc.result.normalCompetence}}; {{npc.result.competenceCondition.state}}">{{signed npc.result.competence}}</b></span>{{/unless}}
+    {{#if system.conditionContext.incompetent}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.IncompetentSkillBonuses0"}}</span>{{else}}{{#if system.conditionContext.baffled}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.BaffledHalfSkillCompetenceBonusesRound"}}</span>{{/if}}{{/if}}{{#if system.conditionContext.baffled}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.8SavesResistingBaffled"}}</span>{{/if}}
+    {{#if npc.special}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.VitalityMax"}} <b>{{system.vitality.max}}</b></span><span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.WoundsMax"}} <b>{{system.wounds.max}}</b></span>
+    {{else}}<span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.DamageSave"}} <b>{{signed system.damageSave}}</b></span>{{/if}}
+  </div>
+  {{#if npc.special}}<div class="resources"><label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.CurrentVitality"}} <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /></label><label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.CurrentWounds"}} <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /></label></div>{{/if}}
+  {{#if npc.skills.length}}<p class="npc-skill-line"><b>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Skills"}}</b> {{#each npc.skills}}{{lookup ../npc.skillOptions key}} {{signed resolved.bonus}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+  <p><a data-action="applyBaffled">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ApplyNewBaffledEffect"}}</a> · <a data-action="setNpcSkillCondition" data-condition="baffled">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ReviewBaffledState"}}</a> · <a data-action="setNpcSkillCondition" data-condition="incompetent">{{localize "SPYCRAFT.Template.ActorNpcBuilder.ReviewIncompetentState"}}</a>{{#if system.baffledApplicationReview.needsReview}} · <a data-action="reviewBaffledApplication">{{localize "SPYCRAFT.Template.ActorNpcBuilder.GCReviewInterruptedBaffledEffect"}}</a>{{/if}}</p>
+</div>

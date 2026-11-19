@@ -119,5 +119,5 @@
   <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Qualities"}} <input name="system.qualities" value="{{system.qualities}}" /></label>
 
   <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Notes"}}</h3>
-  {{#if editable}}<prose-mirror name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
+  {{#if editable}}<prose-mirror toggled name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
 </section>

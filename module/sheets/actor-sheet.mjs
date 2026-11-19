@@ -170,6 +170,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
 
   /** A local view preference, never stored on the character. */
   _editMode = false;
+  _showAllTools = false;
+  _toolSearch = "";
   _skillSearch = "";
   _trainedOnly = false;
 
@@ -182,6 +184,11 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       toggleEditMode() {
         if (!this.isEditable) return;
         this._editMode = !this._editMode;
+        return this.render();
+      },
+      toggleAllTools(event, target) {
+        if (!game.user.isGM) return;
+        this._showAllTools = target.checked;
         return this.render();
       },
       setupTask: SpycraftAgentSheet.#onSetupTask,
@@ -856,7 +863,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       open: this._open,
       editMode: this.isEditable && this._editMode,
       activeConditions: activeConditionLabels(sys),
-      combatTools: combatToolVisibility(sys, COMBAT_STANCES)
+      showAllTools: game.user.isGM && this._showAllTools,
+      combatTools: combatToolVisibility(sys, COMBAT_STANCES, { showAll: game.user.isGM && this._showAllTools })
     });
 
     // Hover breakdowns: fixed parts first, then every origin/feat/class bonus the engine recorded.
@@ -1671,13 +1679,29 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
 /*  NPC sheet (simple stat block)                                             */
 /* -------------------------------------------------------------------------- */
 
+/** An NPC with no graded profile, package or items has nothing to play yet. */
+export function npcNeedsSetup(actor) {
+  return !actor.system?.npcProfile?.enabled && !actor.flags?.spycraft2?.npcTemplate && !(actor.items?.size > 0);
+}
+
 export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+  /** A local view preference. Null until first render, when an NPC with nothing built yet opens in setup. */
+  _editMode = null;
+
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "npc"],
     position: { width: 800, height: 800 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
+      toggleEditMode() {
+        if (!this.isEditable) return;
+        this._editMode = !this._editMode;
+        return this.render();
+      },
+      manageTakedown() {
+        return this.actor.manageTakedown();
+      },
       applyShaken() {
         return this.actor.applyShaken();
       },
@@ -1800,9 +1824,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const sys = this.actor.system;
+    this._editMode ??= npcNeedsSetup(this.actor);
     Object.assign(context, {
       actor: this.actor,
       system: sys,
+      editMode: this.isEditable && this._editMode,
       shakenInitiativeReviews: this.actor.shakenInitiativeReviews,
       isGM: game.user.isGM,
       config: CONFIG.SPYCRAFT,
@@ -1860,6 +1886,12 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       })
     });
     return context;
+  }
+
+  _onRender(context, options) {
+    super._onRender(context, options);
+    this.element.classList.toggle("play-mode", !context.editMode);
+    this.element.classList.toggle("edit-mode", !!context.editMode);
   }
 
   _npcContext() {

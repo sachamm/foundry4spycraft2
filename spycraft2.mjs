@@ -292,6 +292,7 @@ Hooks.once("init", () => {
   foundry.applications.handlebars.loadTemplates([
     "systems/spycraft2/templates/item/parts/bonuses.hbs",
     "systems/spycraft2/templates/actor/npc-builder.hbs",
+    "systems/spycraft2/templates/actor/npc-graded-play.hbs",
     "systems/spycraft2/templates/actor/parts/hazards.hbs",
     "systems/spycraft2/templates/apps/gc-console.hbs",
     "systems/spycraft2/templates/actor/vehicle-sheet.hbs",
