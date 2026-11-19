@@ -156,7 +156,7 @@ function labelFor(control) {
   return clean(last.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_-]/g, " "));
 }
 
-/** Compact wording shared by native hover text and Foundry tooltips. */
+/** Compact wording for Foundry tooltips and accessible field guidance. */
 export function compactTooltip(text = "") {
   // Foundry localizes these keys; never abbreviate a key itself.
   if (/^[A-Z][\w-]*(?:\.[\w-]+)+$/.test(text)) return text;
@@ -272,14 +272,21 @@ export function enhanceTooltips(root) {
       const text = tooltipText({ action: control.dataset.action ?? control.dataset.rollControl ?? "", label });
       if (text) {
         control.setAttribute("data-tooltip", text);
-        control.setAttribute("title", text);
-        control.setAttribute("aria-description", text);
+        control.removeAttribute("title");
+        // The button's accessible name already identifies its action.
+        control.removeAttribute("aria-description");
       }
     }
     if (!control.hasAttribute("data-tooltip-html")) {
       for (const attr of ["title", "data-tooltip", "aria-description"]) {
         if (control.hasAttribute(attr)) control.setAttribute(attr, compactTooltip(control.getAttribute(attr)));
       }
+    }
+    // Foundry owns hover help; a native title would show a second tooltip.
+    if (control.hasAttribute("title")) {
+      if (!control.hasAttribute("data-tooltip") && !control.hasAttribute("data-tooltip-html"))
+        control.setAttribute("data-tooltip", control.getAttribute("title"));
+      control.removeAttribute("title");
     }
     // Preserve authored help and calculated rule breakdowns.
     if (
@@ -312,8 +319,7 @@ export function enhanceTooltips(root) {
     });
     if (!text) continue;
     control.setAttribute("data-tooltip", text);
-    // Retain a native hover fallback; aria-description exposes the same help to assistive technology.
-    control.setAttribute("title", text);
+    // Field guidance remains available to assistive technology without a native hover popup.
     if (!control.hasAttribute("aria-description")) control.setAttribute("aria-description", text);
   }
 }

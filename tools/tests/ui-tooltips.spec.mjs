@@ -37,26 +37,26 @@ test.beforeEach(async ({ page }) => {
 test("system fields, actions, tabs, editors and compact table cells receive contextual help", async ({ page }) => {
   await expect(page.locator('[name="attackAction"]')).toHaveAttribute("data-tooltip", "Attack action");
   await expect(page.locator('[name="distanceFeet"]')).toHaveAttribute("aria-description", "Range (ft)");
-  await expect(page.locator(".form-group input")).toHaveAttribute("title", "Mission budget (0–10)");
-  await expect(page.locator('[data-action="itemDelete"]')).toHaveAttribute("title", "Remove item");
-  await expect(page.locator('[data-tab="gear"]')).toHaveAttribute("title", "Gear");
-  await expect(page.locator("#skills-tab")).toHaveAttribute("title", "Skills");
-  await expect(page.locator("prose-mirror")).toHaveAttribute("title", "Biography");
-  await expect(page.locator("td input")).toHaveAttribute("title", "Skill ranks");
-  await expect(page.locator("summary")).toHaveAttribute("title", "Extra options");
-  await expect(page.locator("#portrait")).toHaveAttribute("title", "Change image");
-  await expect(page.locator("#icon-only")).toHaveAttribute("title", "review Special Case");
-  await expect(page.locator("#reference")).toHaveAttribute("title", "Reference");
+  await expect(page.locator(".form-group input")).toHaveAttribute("data-tooltip", "Mission budget (0–10)");
+  await expect(page.locator('[data-action="itemDelete"]')).toHaveAttribute("data-tooltip", "Remove item");
+  await expect(page.locator('[data-tab="gear"]')).toHaveAttribute("data-tooltip", "Gear");
+  await expect(page.locator("#skills-tab")).toHaveAttribute("data-tooltip", "Skills");
+  await expect(page.locator("prose-mirror")).toHaveAttribute("data-tooltip", "Biography");
+  await expect(page.locator("td input")).toHaveAttribute("data-tooltip", "Skill ranks");
+  await expect(page.locator("summary")).toHaveAttribute("data-tooltip", "Extra options");
+  await expect(page.locator("#portrait")).toHaveAttribute("data-tooltip", "Change image");
+  await expect(page.locator("#icon-only")).toHaveAttribute("data-tooltip", "review Special Case");
+  await expect(page.locator("#reference")).toHaveAttribute("data-tooltip", "Reference");
 });
 
 test("button help is compact while user values and unrelated applications are preserved", async ({ page }) => {
   await expect(page.locator('[data-action="rollAttack"]')).toHaveAttribute("data-tooltip", "Attack");
-  await expect(page.locator('[data-action="rollAttack"]')).toHaveAttribute("title", "Attack");
+  await expect(page.locator('[data-action="rollAttack"]')).not.toHaveAttribute("title");
   await expect(page.locator("#outside")).not.toHaveAttribute("data-tooltip");
   await page.locator('[name="distanceFeet"]').fill("25");
   await page.locator('[data-action="cancel"]').focus();
   await expect(page.locator('[name="distanceFeet"]')).toHaveValue("25");
-  await expect(page.locator('[name="distanceFeet"]')).not.toHaveAttribute("title", /25/);
+  await expect(page.locator('[name="distanceFeet"]')).not.toHaveAttribute("data-tooltip", /25/);
 });
 
 test("controls added after rendering receive tooltips on focus or hover", async ({ page }) => {
@@ -73,7 +73,7 @@ test("controls added after rendering receive tooltips on focus or hover", async 
       .insertAdjacentHTML("beforeend", '<button data-action="reload" id="reload">Reload</button>')
   );
   await page.locator("#reload").hover();
-  await expect(page.locator("#reload")).toHaveAttribute("title", "Reload");
+  await expect(page.locator("#reload")).toHaveAttribute("data-tooltip", "Reload");
 });
 
 test("system chat gets help without changing other chat cards", async ({ page }) => {
@@ -108,7 +108,7 @@ test("action buttons show generated icons and retain keyboard access and help", 
   const remove = page.getByRole("button", { name: "Remove", exact: true });
   await expect(remove.locator(".sc2-button-icon")).toBeVisible();
   await expect(remove.locator(".sc2-button-content")).toBeHidden();
-  await expect(remove).toHaveAttribute("title", "Remove item");
+  await expect(remove).toHaveAttribute("data-tooltip", "Remove item");
   await remove.focus();
   await expect(remove).toBeFocused();
   await expect(page.locator('[data-action="tab"] .sc2-button-icon')).toHaveCount(0);
@@ -131,8 +131,8 @@ test("GC clock controls have distinct artwork, compact hover text and unchanged 
   const buttons = page.locator("#clock-controls button");
   const cells = await buttons.evaluateAll(nodes => nodes.map(node => node.dataset.sc2Icon));
   expect(new Set(cells).size).toBe(7);
-  await expect(buttons.nth(0)).toHaveAttribute("title", "+1 rd");
-  await expect(buttons.nth(1)).toHaveAttribute("title", "-1 rd");
+  await expect(buttons.nth(0)).toHaveAttribute("data-tooltip", "+1 rd");
+  await expect(buttons.nth(1)).toHaveAttribute("data-tooltip", "-1 rd");
   await expect(buttons.nth(0)).toHaveAttribute("data-seconds", "6");
 });
 
@@ -177,4 +177,20 @@ test("all generated atlas images load and remain legible as compact buttons", as
   expect(loaded).toHaveLength(8);
   expect(loaded.every(item => item.ok)).toBe(true);
   await page.screenshot({ path: "test-results/function-icons-preview.png", fullPage: true });
+});
+
+test("buttons expose one hover tooltip and one accessible name", async ({ page }) => {
+  const button = page.locator('[data-action="rollAttack"]');
+  await expect(button).toHaveAttribute("data-tooltip", "Attack");
+  await expect(button).not.toHaveAttribute("title");
+  await expect(button).not.toHaveAttribute("aria-description");
+  await expect(button).toHaveAccessibleName("Attack");
+  const icon = button.locator(".sc2-button-icon");
+  await expect(icon).toHaveAttribute("aria-hidden", "true");
+  for (const attribute of ["title", "alt", "aria-label", "data-tooltip"]) {
+    await expect(icon).not.toHaveAttribute(attribute);
+  }
+  await page.evaluate(() => window.tooltips.enhanceTooltips(document.querySelector("main")));
+  await expect(button).not.toHaveAttribute("title");
+  await expect(button).not.toHaveAttribute("aria-description");
 });
