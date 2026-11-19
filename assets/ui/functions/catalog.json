@@ -1,0 +1,2174 @@
+[
+  {
+    "action": "acidStep",
+    "sheet": 0,
+    "index": 0,
+    "subject": "acid Step"
+  },
+  {
+    "action": "activateCombatExpertise",
+    "sheet": 0,
+    "index": 1,
+    "subject": "activate Combat Expertise"
+  },
+  {
+    "action": "activateMasterPlan",
+    "sheet": 0,
+    "index": 2,
+    "subject": "activate Master Plan"
+  },
+  {
+    "action": "activateMentalLeap",
+    "sheet": 0,
+    "index": 3,
+    "subject": "activate Mental Leap"
+  },
+  {
+    "action": "activateNoFear",
+    "sheet": 0,
+    "index": 4,
+    "subject": "activate No Fear"
+  },
+  {
+    "action": "add",
+    "sheet": 0,
+    "index": 5,
+    "subject": "add"
+  },
+  {
+    "action": "addAntagonist",
+    "sheet": 0,
+    "index": 6,
+    "subject": "add Antagonist"
+  },
+  {
+    "action": "addBonus",
+    "sheet": 0,
+    "index": 7,
+    "subject": "add Bonus"
+  },
+  {
+    "action": "addComplication",
+    "sheet": 0,
+    "index": 8,
+    "subject": "add Complication"
+  },
+  {
+    "action": "addLevel",
+    "sheet": 0,
+    "index": 9,
+    "subject": "add Level"
+  },
+  {
+    "action": "addObjective",
+    "sheet": 0,
+    "index": 10,
+    "subject": "add Objective"
+  },
+  {
+    "action": "addRow",
+    "sheet": 0,
+    "index": 11,
+    "subject": "add Row"
+  },
+  {
+    "action": "advance",
+    "sheet": 0,
+    "index": 12,
+    "subject": "advance"
+  },
+  {
+    "action": "advanceConflict",
+    "sheet": 0,
+    "index": 13,
+    "subject": "advance Conflict"
+  },
+  {
+    "action": "allocateMissionReserves",
+    "sheet": 0,
+    "index": 14,
+    "subject": "allocate Mission Reserves"
+  },
+  {
+    "action": "applyAccumulatedDamage",
+    "sheet": 0,
+    "index": 15,
+    "subject": "apply Accumulated Damage"
+  },
+  {
+    "action": "applyBaffled",
+    "sheet": 0,
+    "index": 16,
+    "subject": "apply Baffled"
+  },
+  {
+    "action": "applyBlackCat",
+    "sheet": 0,
+    "index": 17,
+    "subject": "apply Black Cat"
+  },
+  {
+    "action": "applyDrunkReposition",
+    "sheet": 0,
+    "index": 18,
+    "subject": "apply Drunk Reposition"
+  },
+  {
+    "action": "applyFatigue",
+    "sheet": 0,
+    "index": 19,
+    "subject": "apply Fatigue"
+  },
+  {
+    "action": "applyShaken",
+    "sheet": 0,
+    "index": 20,
+    "subject": "apply Shaken"
+  },
+  {
+    "action": "awardActionDice",
+    "sheet": 0,
+    "index": 21,
+    "subject": "award Action Dice"
+  },
+  {
+    "action": "awardStanding",
+    "sheet": 0,
+    "index": 22,
+    "subject": "award Standing"
+  },
+  {
+    "action": "bailOut",
+    "sheet": 0,
+    "index": 23,
+    "subject": "bail Out"
+  },
+  {
+    "action": "beginDrunkSleep",
+    "sheet": 0,
+    "index": 24,
+    "subject": "begin Drunk Sleep"
+  },
+  {
+    "action": "beginFatigueRest",
+    "sheet": 0,
+    "index": 25,
+    "subject": "begin Fatigue Rest"
+  },
+  {
+    "action": "boostControl",
+    "sheet": 0,
+    "index": 26,
+    "subject": "boost Control"
+  },
+  {
+    "action": "boostDefense",
+    "sheet": 0,
+    "index": 27,
+    "subject": "boost Defense"
+  },
+  {
+    "action": "boostFortunesOfWar",
+    "sheet": 0,
+    "index": 28,
+    "subject": "boost Fortunes Of War"
+  },
+  {
+    "action": "browse",
+    "sheet": 0,
+    "index": 29,
+    "subject": "browse"
+  },
+  {
+    "action": "burningRound",
+    "sheet": 0,
+    "index": 30,
+    "subject": "burning Round"
+  },
+  {
+    "action": "calculateRecoveryRates",
+    "sheet": 0,
+    "index": 31,
+    "subject": "calculate Recovery Rates"
+  },
+  {
+    "action": "caliberIncrease",
+    "sheet": 0,
+    "index": 32,
+    "subject": "caliber Increase"
+  },
+  {
+    "action": "callQualitySave",
+    "sheet": 0,
+    "index": 33,
+    "subject": "call Quality Save"
+  },
+  {
+    "action": "cancel",
+    "sheet": 0,
+    "index": 34,
+    "subject": "cancel"
+  },
+  {
+    "action": "cancelReady",
+    "sheet": 0,
+    "index": 35,
+    "subject": "cancel Ready"
+  },
+  {
+    "action": "chargeStanding",
+    "sheet": 0,
+    "index": 36,
+    "subject": "charge Standing"
+  },
+  {
+    "action": "checkAccumulatedDamage",
+    "sheet": 0,
+    "index": 37,
+    "subject": "check Accumulated Damage"
+  },
+  {
+    "action": "checkBurrowMaterial",
+    "sheet": 0,
+    "index": 38,
+    "subject": "check Burrow Material"
+  },
+  {
+    "action": "checkCombatMovement",
+    "sheet": 0,
+    "index": 39,
+    "subject": "check Combat Movement"
+  },
+  {
+    "action": "checkIncomingDefense",
+    "sheet": 0,
+    "index": 40,
+    "subject": "check Incoming Defense"
+  },
+  {
+    "action": "checkNumericalAdvantage",
+    "sheet": 0,
+    "index": 41,
+    "subject": "check Numerical Advantage"
+  },
+  {
+    "action": "checkReflexDamage",
+    "sheet": 0,
+    "index": 42,
+    "subject": "check Reflex Damage"
+  },
+  {
+    "action": "chooseTemporaryFocuses",
+    "sheet": 0,
+    "index": 43,
+    "subject": "choose Temporary Focuses"
+  },
+  {
+    "action": "claimGearAcquisition",
+    "sheet": 0,
+    "index": 44,
+    "subject": "claim Gear Acquisition"
+  },
+  {
+    "action": "clearDriver",
+    "sheet": 0,
+    "index": 45,
+    "subject": "clear Driver"
+  },
+  {
+    "action": "clearMission",
+    "sheet": 0,
+    "index": 46,
+    "subject": "clear Mission"
+  },
+  {
+    "action": "clearMount",
+    "sheet": 0,
+    "index": 47,
+    "subject": "clear Mount"
+  },
+  {
+    "action": "clockAdvance",
+    "sheet": 0,
+    "index": 48,
+    "subject": "clock Advance"
+  },
+  {
+    "action": "clockDate",
+    "sheet": 0,
+    "index": 49,
+    "subject": "clock Date"
+  },
+  {
+    "action": "clockOpen",
+    "sheet": 0,
+    "index": 50,
+    "subject": "clock Open"
+  },
+  {
+    "action": "close",
+    "sheet": 0,
+    "index": 51,
+    "subject": "close"
+  },
+  {
+    "action": "combatReference",
+    "sheet": 0,
+    "index": 52,
+    "subject": "combat Reference"
+  },
+  {
+    "action": "companionDied",
+    "sheet": 0,
+    "index": 53,
+    "subject": "companion Died"
+  },
+  {
+    "action": "completeDrunkSleep",
+    "sheet": 0,
+    "index": 54,
+    "subject": "complete Drunk Sleep"
+  },
+  {
+    "action": "completeFatigueRest",
+    "sheet": 0,
+    "index": 55,
+    "subject": "complete Fatigue Rest"
+  },
+  {
+    "action": "completeMentalLeapSleep",
+    "sheet": 0,
+    "index": 56,
+    "subject": "complete Mental Leap Sleep"
+  },
+  {
+    "action": "configureFortuneTeammates",
+    "sheet": 0,
+    "index": 57,
+    "subject": "configure Fortune Teammates"
+  },
+  {
+    "action": "confirm",
+    "sheet": 0,
+    "index": 58,
+    "subject": "confirm"
+  },
+  {
+    "action": "confirmControl",
+    "sheet": 0,
+    "index": 59,
+    "subject": "confirm Control"
+  },
+  {
+    "action": "confirmDrunkReposition",
+    "sheet": 0,
+    "index": 60,
+    "subject": "confirm Drunk Reposition"
+  },
+  {
+    "action": "confirmRestraintEscapeMove",
+    "sheet": 0,
+    "index": 61,
+    "subject": "confirm Restraint Escape Move"
+  },
+  {
+    "action": "controlCheck",
+    "sheet": 0,
+    "index": 62,
+    "subject": "control Check"
+  },
+  {
+    "action": "correctMark",
+    "sheet": 0,
+    "index": 63,
+    "subject": "correct Mark"
+  },
+  {
+    "action": "correctSafeHouseRecord",
+    "sheet": 1,
+    "index": 0,
+    "subject": "correct Safe House Record"
+  },
+  {
+    "action": "correctSilverTongueVictory",
+    "sheet": 1,
+    "index": 1,
+    "subject": "correct Silver Tongue Victory"
+  },
+  {
+    "action": "coupDeGraceSave",
+    "sheet": 1,
+    "index": 2,
+    "subject": "coup De Grace Save"
+  },
+  {
+    "action": "crash",
+    "sheet": 1,
+    "index": 3,
+    "subject": "crash"
+  },
+  {
+    "action": "createCompanion",
+    "sheet": 1,
+    "index": 4,
+    "subject": "create Companion"
+  },
+  {
+    "action": "createItem",
+    "sheet": 1,
+    "index": 5,
+    "subject": "create Item"
+  },
+  {
+    "action": "criticalControl",
+    "sheet": 1,
+    "index": 6,
+    "subject": "critical Control"
+  },
+  {
+    "action": "cunningPlanControl",
+    "sheet": 1,
+    "index": 7,
+    "subject": "cunning Plan Control"
+  },
+  {
+    "action": "cureHazard",
+    "sheet": 1,
+    "index": 8,
+    "subject": "cure Hazard"
+  },
+  {
+    "action": "damageSave",
+    "sheet": 1,
+    "index": 9,
+    "subject": "damage Save"
+  },
+  {
+    "action": "declareCombatStance",
+    "sheet": 1,
+    "index": 10,
+    "subject": "declare Combat Stance"
+  },
+  {
+    "action": "declareDarting",
+    "sheet": 1,
+    "index": 11,
+    "subject": "declare Darting"
+  },
+  {
+    "action": "declareDuelingBasics",
+    "sheet": 1,
+    "index": 12,
+    "subject": "declare Dueling Basics"
+  },
+  {
+    "action": "declareFightDefensively",
+    "sheet": 1,
+    "index": 13,
+    "subject": "declare Fight Defensively"
+  },
+  {
+    "action": "declareFollowUp",
+    "sheet": 1,
+    "index": 14,
+    "subject": "declare Follow Up"
+  },
+  {
+    "action": "declareIntenseStance",
+    "sheet": 1,
+    "index": 15,
+    "subject": "declare Intense Stance"
+  },
+  {
+    "action": "declareSnakeStrike",
+    "sheet": 1,
+    "index": 16,
+    "subject": "declare Snake Strike"
+  },
+  {
+    "action": "declareSuperiorCover",
+    "sheet": 1,
+    "index": 17,
+    "subject": "declare Superior Cover"
+  },
+  {
+    "action": "declareTwoHit",
+    "sheet": 1,
+    "index": 18,
+    "subject": "declare Two Hit"
+  },
+  {
+    "action": "declareTwoWeapon",
+    "sheet": 1,
+    "index": 19,
+    "subject": "declare Two Weapon"
+  },
+  {
+    "action": "deleteTimer",
+    "sheet": 1,
+    "index": 20,
+    "subject": "delete Timer"
+  },
+  {
+    "action": "deployVehicle",
+    "sheet": 1,
+    "index": 21,
+    "subject": "deploy Vehicle"
+  },
+  {
+    "action": "discloseMark",
+    "sheet": 1,
+    "index": 22,
+    "subject": "disclose Mark"
+  },
+  {
+    "action": "doubleInitiative",
+    "sheet": 1,
+    "index": 23,
+    "subject": "double Initiative"
+  },
+  {
+    "action": "dramaticOff",
+    "sheet": 1,
+    "index": 24,
+    "subject": "dramatic Off"
+  },
+  {
+    "action": "dramaticOn",
+    "sheet": 1,
+    "index": 25,
+    "subject": "dramatic On"
+  },
+  {
+    "action": "editIdentity",
+    "sheet": 1,
+    "index": 26,
+    "subject": "edit Identity"
+  },
+  {
+    "action": "editImage",
+    "sheet": 1,
+    "index": 27,
+    "subject": "edit Image"
+  },
+  {
+    "action": "editMission",
+    "sheet": 1,
+    "index": 28,
+    "subject": "edit Mission"
+  },
+  {
+    "action": "editShakenSource",
+    "sheet": 1,
+    "index": 29,
+    "subject": "edit Shaken Source"
+  },
+  {
+    "action": "endBerserkerRage",
+    "sheet": 1,
+    "index": 30,
+    "subject": "end Berserker Rage"
+  },
+  {
+    "action": "endMentalLeap",
+    "sheet": 1,
+    "index": 31,
+    "subject": "end Mental Leap"
+  },
+  {
+    "action": "endMission",
+    "sheet": 1,
+    "index": 32,
+    "subject": "end Mission"
+  },
+  {
+    "action": "endPromotion",
+    "sheet": 1,
+    "index": 33,
+    "subject": "end Promotion"
+  },
+  {
+    "action": "endSurvivalHazard",
+    "sheet": 1,
+    "index": 34,
+    "subject": "end Survival Hazard"
+  },
+  {
+    "action": "endTypedExposure",
+    "sheet": 1,
+    "index": 35,
+    "subject": "end Typed Exposure"
+  },
+  {
+    "action": "enterBerserkerRage",
+    "sheet": 1,
+    "index": 36,
+    "subject": "enter Berserker Rage"
+  },
+  {
+    "action": "enterIdentity",
+    "sheet": 1,
+    "index": 37,
+    "subject": "enter Identity"
+  },
+  {
+    "action": "entry",
+    "sheet": 1,
+    "index": 38,
+    "subject": "entry"
+  },
+  {
+    "action": "entry:complete",
+    "sheet": 1,
+    "index": 39,
+    "subject": "entry complete"
+  },
+  {
+    "action": "entry:critical",
+    "sheet": 1,
+    "index": 40,
+    "subject": "entry critical"
+  },
+  {
+    "action": "entry:encountered",
+    "sheet": 1,
+    "index": 41,
+    "subject": "entry encountered"
+  },
+  {
+    "action": "entry:ignored",
+    "sheet": 1,
+    "index": 42,
+    "subject": "entry ignored"
+  },
+  {
+    "action": "entry:remove",
+    "sheet": 1,
+    "index": 43,
+    "subject": "entry remove"
+  },
+  {
+    "action": "escapeRestraint",
+    "sheet": 1,
+    "index": 44,
+    "subject": "escape Restraint"
+  },
+  {
+    "action": "events",
+    "sheet": 1,
+    "index": 45,
+    "subject": "events"
+  },
+  {
+    "action": "exposeToContagion",
+    "sheet": 1,
+    "index": 46,
+    "subject": "expose To Contagion"
+  },
+  {
+    "action": "exposeToFire",
+    "sheet": 1,
+    "index": 47,
+    "subject": "expose To Fire"
+  },
+  {
+    "action": "exposureFailedSave",
+    "sheet": 1,
+    "index": 48,
+    "subject": "exposure Failed Save"
+  },
+  {
+    "action": "extendTimer",
+    "sheet": 1,
+    "index": 49,
+    "subject": "extend Timer"
+  },
+  {
+    "action": "extinguishFire",
+    "sheet": 1,
+    "index": 50,
+    "subject": "extinguish Fire"
+  },
+  {
+    "action": "fightFire",
+    "sheet": 1,
+    "index": 51,
+    "subject": "fight Fire"
+  },
+  {
+    "action": "findImprovisedWeapon",
+    "sheet": 1,
+    "index": 52,
+    "subject": "find Improvised Weapon"
+  },
+  {
+    "action": "finish",
+    "sheet": 1,
+    "index": 53,
+    "subject": "finish"
+  },
+  {
+    "action": "finishControl",
+    "sheet": 1,
+    "index": 54,
+    "subject": "finish Control"
+  },
+  {
+    "action": "fireWeapon",
+    "sheet": 1,
+    "index": 55,
+    "subject": "fire Weapon"
+  },
+  {
+    "action": "fluidEvent",
+    "sheet": 1,
+    "index": 56,
+    "subject": "fluid Event"
+  },
+  {
+    "action": "fuelExplosion",
+    "sheet": 1,
+    "index": 57,
+    "subject": "fuel Explosion"
+  },
+  {
+    "action": "gadgetSkill",
+    "sheet": 1,
+    "index": 58,
+    "subject": "gadget Skill"
+  },
+  {
+    "action": "gcDice",
+    "sheet": 1,
+    "index": 59,
+    "subject": "gc Dice"
+  },
+  {
+    "action": "gearAcquisitionControl",
+    "sheet": 1,
+    "index": 60,
+    "subject": "gear Acquisition Control"
+  },
+  {
+    "action": "generousControl",
+    "sheet": 1,
+    "index": 61,
+    "subject": "generous Control"
+  },
+  {
+    "action": "grantFortunate",
+    "sheet": 1,
+    "index": 62,
+    "subject": "grant Fortunate"
+  },
+  {
+    "action": "groupInitiative",
+    "sheet": 1,
+    "index": 63,
+    "subject": "group Initiative"
+  },
+  {
+    "action": "groupInitiative:false",
+    "sheet": 2,
+    "index": 0,
+    "subject": "group Initiative false"
+  },
+  {
+    "action": "groupInitiative:true",
+    "sheet": 2,
+    "index": 1,
+    "subject": "group Initiative true"
+  },
+  {
+    "action": "hazards",
+    "sheet": 2,
+    "index": 2,
+    "subject": "hazards"
+  },
+  {
+    "action": "healActionDice",
+    "sheet": 2,
+    "index": 3,
+    "subject": "heal Action Dice"
+  },
+  {
+    "action": "improviseCommonItem",
+    "sheet": 2,
+    "index": 4,
+    "subject": "improvise Common Item"
+  },
+  {
+    "action": "initializeResources",
+    "sheet": 2,
+    "index": 5,
+    "subject": "initialize Resources"
+  },
+  {
+    "action": "initializeStartingDice",
+    "sheet": 2,
+    "index": 6,
+    "subject": "initialize Starting Dice"
+  },
+  {
+    "action": "issueToTeam",
+    "sheet": 2,
+    "index": 7,
+    "subject": "issue To Team"
+  },
+  {
+    "action": "itemChat",
+    "sheet": 2,
+    "index": 8,
+    "subject": "item Chat"
+  },
+  {
+    "action": "itemDelete",
+    "sheet": 2,
+    "index": 9,
+    "subject": "item Delete"
+  },
+  {
+    "action": "itemEdit",
+    "sheet": 2,
+    "index": 10,
+    "subject": "item Edit"
+  },
+  {
+    "action": "itemEquip",
+    "sheet": 2,
+    "index": 11,
+    "subject": "item Equip"
+  },
+  {
+    "action": "keepResources",
+    "sheet": 2,
+    "index": 12,
+    "subject": "keep Resources"
+  },
+  {
+    "action": "leave",
+    "sheet": 2,
+    "index": 13,
+    "subject": "leave"
+  },
+  {
+    "action": "leaveIdentity",
+    "sheet": 2,
+    "index": 14,
+    "subject": "leave Identity"
+  },
+  {
+    "action": "manageAnalysisTasks",
+    "sheet": 2,
+    "index": 15,
+    "subject": "manage Analysis Tasks"
+  },
+  {
+    "action": "manageCheapShots",
+    "sheet": 2,
+    "index": 16,
+    "subject": "manage Cheap Shots"
+  },
+  {
+    "action": "manageConflict",
+    "sheet": 2,
+    "index": 17,
+    "subject": "manage Conflict"
+  },
+  {
+    "action": "manageDisposition",
+    "sheet": 2,
+    "index": 18,
+    "subject": "manage Disposition"
+  },
+  {
+    "action": "manageDrivingStance",
+    "sheet": 2,
+    "index": 19,
+    "subject": "manage Driving Stance"
+  },
+  {
+    "action": "manageFeintOutcomes",
+    "sheet": 2,
+    "index": 20,
+    "subject": "manage Feint Outcomes"
+  },
+  {
+    "action": "manageGCDice",
+    "sheet": 2,
+    "index": 21,
+    "subject": "manage GCDice"
+  },
+  {
+    "action": "manageMeleeTradeoff",
+    "sheet": 2,
+    "index": 22,
+    "subject": "manage Melee Tradeoff"
+  },
+  {
+    "action": "manageStanceDamage",
+    "sheet": 2,
+    "index": 23,
+    "subject": "manage Stance Damage"
+  },
+  {
+    "action": "manageTakedown",
+    "sheet": 2,
+    "index": 24,
+    "subject": "manage Takedown"
+  },
+  {
+    "action": "manageThreadNeedle",
+    "sheet": 2,
+    "index": 25,
+    "subject": "manage Thread Needle"
+  },
+  {
+    "action": "manageTripOutcomes",
+    "sheet": 2,
+    "index": 26,
+    "subject": "manage Trip Outcomes"
+  },
+  {
+    "action": "manualAdjustmentControl",
+    "sheet": 2,
+    "index": 27,
+    "subject": "manual Adjustment Control"
+  },
+  {
+    "action": "migrateBrightIdeaUses",
+    "sheet": 2,
+    "index": 28,
+    "subject": "migrate Bright Idea Uses"
+  },
+  {
+    "action": "missionReport",
+    "sheet": 2,
+    "index": 29,
+    "subject": "mission Report"
+  },
+  {
+    "action": "missionReport:false",
+    "sheet": 2,
+    "index": 30,
+    "subject": "mission Report false"
+  },
+  {
+    "action": "missionReport:true",
+    "sheet": 2,
+    "index": 31,
+    "subject": "mission Report true"
+  },
+  {
+    "action": "npcAddPick",
+    "sheet": 2,
+    "index": 32,
+    "subject": "npc Add Pick"
+  },
+  {
+    "action": "npcAddQuality",
+    "sheet": 2,
+    "index": 33,
+    "subject": "npc Add Quality"
+  },
+  {
+    "action": "npcAddSkill",
+    "sheet": 2,
+    "index": 34,
+    "subject": "npc Add Skill"
+  },
+  {
+    "action": "npcDamageSave",
+    "sheet": 2,
+    "index": 35,
+    "subject": "npc Damage Save"
+  },
+  {
+    "action": "npcEnable",
+    "sheet": 2,
+    "index": 36,
+    "subject": "npc Enable"
+  },
+  {
+    "action": "npcPackageBands",
+    "sheet": 2,
+    "index": 37,
+    "subject": "npc Package Bands"
+  },
+  {
+    "action": "npcPackages",
+    "sheet": 2,
+    "index": 38,
+    "subject": "npc Packages"
+  },
+  {
+    "action": "npcRemoveRow",
+    "sheet": 2,
+    "index": 39,
+    "subject": "npc Remove Row"
+  },
+  {
+    "action": "open",
+    "sheet": 2,
+    "index": 40,
+    "subject": "open"
+  },
+  {
+    "action": "openCompanion",
+    "sheet": 2,
+    "index": 41,
+    "subject": "open Companion"
+  },
+  {
+    "action": "openItem",
+    "sheet": 2,
+    "index": 42,
+    "subject": "open Item"
+  },
+  {
+    "action": "openSource",
+    "sheet": 2,
+    "index": 43,
+    "subject": "open Source"
+  },
+  {
+    "action": "placeSafeHouse",
+    "sheet": 2,
+    "index": 44,
+    "subject": "place Safe House"
+  },
+  {
+    "action": "planAmmunition",
+    "sheet": 2,
+    "index": 45,
+    "subject": "plan Ammunition"
+  },
+  {
+    "action": "possessions",
+    "sheet": 2,
+    "index": 46,
+    "subject": "possessions"
+  },
+  {
+    "action": "quickTimer",
+    "sheet": 2,
+    "index": 47,
+    "subject": "quick Timer"
+  },
+  {
+    "action": "recalculateTL",
+    "sheet": 2,
+    "index": 48,
+    "subject": "recalculate TL"
+  },
+  {
+    "action": "recharge",
+    "sheet": 2,
+    "index": 49,
+    "subject": "recharge"
+  },
+  {
+    "action": "recordAdrenalineWoundLoss",
+    "sheet": 2,
+    "index": 50,
+    "subject": "record Adrenaline Wound Loss"
+  },
+  {
+    "action": "recordAnticipate",
+    "sheet": 2,
+    "index": 51,
+    "subject": "record Anticipate"
+  },
+  {
+    "action": "recordFatigueEscalation",
+    "sheet": 2,
+    "index": 52,
+    "subject": "record Fatigue Escalation"
+  },
+  {
+    "action": "recordFendMovement",
+    "sheet": 2,
+    "index": 53,
+    "subject": "record Fend Movement"
+  },
+  {
+    "action": "recordHintResponse",
+    "sheet": 2,
+    "index": 54,
+    "subject": "record Hint Response"
+  },
+  {
+    "action": "recordInfraction",
+    "sheet": 2,
+    "index": 55,
+    "subject": "record Infraction"
+  },
+  {
+    "action": "recoverResourceTransaction",
+    "sheet": 2,
+    "index": 56,
+    "subject": "recover Resource Transaction"
+  },
+  {
+    "action": "recoverSilverTongueAtMissionEnd",
+    "sheet": 2,
+    "index": 57,
+    "subject": "recover Silver Tongue At Mission End"
+  },
+  {
+    "action": "refreshAction",
+    "sheet": 2,
+    "index": 58,
+    "subject": "refresh Action"
+  },
+  {
+    "action": "refuel",
+    "sheet": 2,
+    "index": 59,
+    "subject": "refuel"
+  },
+  {
+    "action": "refundStanding",
+    "sheet": 2,
+    "index": 60,
+    "subject": "refund Standing"
+  },
+  {
+    "action": "reloadWeapon",
+    "sheet": 2,
+    "index": 61,
+    "subject": "reload Weapon"
+  },
+  {
+    "action": "removeBonus",
+    "sheet": 2,
+    "index": 62,
+    "subject": "remove Bonus"
+  },
+  {
+    "action": "removeIdentity",
+    "sheet": 2,
+    "index": 63,
+    "subject": "remove Identity"
+  },
+  {
+    "action": "removeItem",
+    "sheet": 3,
+    "index": 0,
+    "subject": "remove Item"
+  },
+  {
+    "action": "removeLevel",
+    "sheet": 3,
+    "index": 1,
+    "subject": "remove Level"
+  },
+  {
+    "action": "removeMechanism",
+    "sheet": 3,
+    "index": 2,
+    "subject": "remove Mechanism"
+  },
+  {
+    "action": "removeRow",
+    "sheet": 3,
+    "index": 3,
+    "subject": "remove Row"
+  },
+  {
+    "action": "repair",
+    "sheet": 3,
+    "index": 4,
+    "subject": "repair"
+  },
+  {
+    "action": "requiredBonusControl",
+    "sheet": 3,
+    "index": 5,
+    "subject": "required Bonus Control"
+  },
+  {
+    "action": "rerollControl",
+    "sheet": 3,
+    "index": 6,
+    "subject": "reroll Control"
+  },
+  {
+    "action": "reset",
+    "sheet": 3,
+    "index": 7,
+    "subject": "reset"
+  },
+  {
+    "action": "resetDamageTrack",
+    "sheet": 3,
+    "index": 8,
+    "subject": "reset Damage Track"
+  },
+  {
+    "action": "resetUsagePeriod",
+    "sheet": 3,
+    "index": 9,
+    "subject": "reset Usage Period"
+  },
+  {
+    "action": "restAndRecover",
+    "sheet": 3,
+    "index": 10,
+    "subject": "rest And Recover"
+  },
+  {
+    "action": "restoreRules",
+    "sheet": 3,
+    "index": 11,
+    "subject": "restore Rules"
+  },
+  {
+    "action": "restraintEscapeControl",
+    "sheet": 3,
+    "index": 12,
+    "subject": "restraint Escape Control"
+  },
+  {
+    "action": "resumeSilverTongueVictory",
+    "sheet": 3,
+    "index": 13,
+    "subject": "resume Silver Tongue Victory"
+  },
+  {
+    "action": "resupplyWeapon",
+    "sheet": 3,
+    "index": 14,
+    "subject": "resupply Weapon"
+  },
+  {
+    "action": "reviewActionDiceSettlement",
+    "sheet": 3,
+    "index": 15,
+    "subject": "review Action Dice Settlement"
+  },
+  {
+    "action": "reviewActionDieAward",
+    "sheet": 3,
+    "index": 16,
+    "subject": "review Action Die Award"
+  },
+  {
+    "action": "reviewBaffledApplication",
+    "sheet": 3,
+    "index": 17,
+    "subject": "review Baffled Application"
+  },
+  {
+    "action": "reviewCandidate",
+    "sheet": 3,
+    "index": 18,
+    "subject": "review Candidate"
+  },
+  {
+    "action": "reviewCareerAgentReward",
+    "sheet": 3,
+    "index": 19,
+    "subject": "review Career Agent Reward"
+  },
+  {
+    "action": "reviewCounterTrip",
+    "sheet": 3,
+    "index": 20,
+    "subject": "review Counter Trip"
+  },
+  {
+    "action": "reviewCriticalInjury",
+    "sheet": 3,
+    "index": 21,
+    "subject": "review Critical Injury"
+  },
+  {
+    "action": "reviewDamageLedger",
+    "sheet": 3,
+    "index": 22,
+    "subject": "review Damage Ledger"
+  },
+  {
+    "action": "reviewDarting",
+    "sheet": 3,
+    "index": 23,
+    "subject": "review Darting"
+  },
+  {
+    "action": "reviewFeintBonuses",
+    "sheet": 3,
+    "index": 24,
+    "subject": "review Feint Bonuses"
+  },
+  {
+    "action": "reviewLimitedUseCounter",
+    "sheet": 3,
+    "index": 25,
+    "subject": "review Limited Use Counter"
+  },
+  {
+    "action": "reviewMissionXP",
+    "sheet": 3,
+    "index": 26,
+    "subject": "review Mission XP"
+  },
+  {
+    "action": "reviewPowerStanceInitiative",
+    "sheet": 3,
+    "index": 27,
+    "subject": "review Power Stance Initiative"
+  },
+  {
+    "action": "reviewReserveTransaction",
+    "sheet": 3,
+    "index": 28,
+    "subject": "review Reserve Transaction"
+  },
+  {
+    "action": "reviewRestraintRelease",
+    "sheet": 3,
+    "index": 29,
+    "subject": "review Restraint Release"
+  },
+  {
+    "action": "reviewRules",
+    "sheet": 3,
+    "index": 30,
+    "subject": "review Rules"
+  },
+  {
+    "action": "reviewSafeHouseMission",
+    "sheet": 3,
+    "index": 31,
+    "subject": "review Safe House Mission"
+  },
+  {
+    "action": "reviewSafeHouseScene",
+    "sheet": 3,
+    "index": 32,
+    "subject": "review Safe House Scene"
+  },
+  {
+    "action": "reviewShakenApplication",
+    "sheet": 3,
+    "index": 33,
+    "subject": "review Shaken Application"
+  },
+  {
+    "action": "reviewShakenInitiative",
+    "sheet": 3,
+    "index": 34,
+    "subject": "review Shaken Initiative"
+  },
+  {
+    "action": "reviewStanceMovement",
+    "sheet": 3,
+    "index": 35,
+    "subject": "review Stance Movement"
+  },
+  {
+    "action": "reviewStrikingAttack",
+    "sheet": 3,
+    "index": 36,
+    "subject": "review Striking Attack"
+  },
+  {
+    "action": "reviewSuperiorCover",
+    "sheet": 3,
+    "index": 37,
+    "subject": "review Superior Cover"
+  },
+  {
+    "action": "reviewToolShedCounter",
+    "sheet": 3,
+    "index": 38,
+    "subject": "review Tool Shed Counter"
+  },
+  {
+    "action": "reviewTripFinalAttack",
+    "sheet": 3,
+    "index": 39,
+    "subject": "review Trip Final Attack"
+  },
+  {
+    "action": "reviewTwoWeapon",
+    "sheet": 3,
+    "index": 40,
+    "subject": "review Two Weapon"
+  },
+  {
+    "action": "reviewUsagePeriod",
+    "sheet": 3,
+    "index": 41,
+    "subject": "review Usage Period"
+  },
+  {
+    "action": "reviewVitality",
+    "sheet": 3,
+    "index": 42,
+    "subject": "review Vitality"
+  },
+  {
+    "action": "reviewWellFundedCounter",
+    "sheet": 3,
+    "index": 43,
+    "subject": "review Well Funded Counter"
+  },
+  {
+    "action": "rollAbility",
+    "sheet": 3,
+    "index": 44,
+    "subject": "roll Ability"
+  },
+  {
+    "action": "rollAttack",
+    "sheet": 3,
+    "index": 45,
+    "subject": "roll Attack"
+  },
+  {
+    "action": "rollCheapShot",
+    "sheet": 3,
+    "index": 46,
+    "subject": "roll Cheap Shot"
+  },
+  {
+    "action": "rollContagionSave",
+    "sheet": 3,
+    "index": 47,
+    "subject": "roll Contagion Save"
+  },
+  {
+    "action": "rollCriticalInjury",
+    "sheet": 3,
+    "index": 48,
+    "subject": "roll Critical Injury"
+  },
+  {
+    "action": "rollDamage",
+    "sheet": 3,
+    "index": 49,
+    "subject": "roll Damage"
+  },
+  {
+    "action": "rollDisarm",
+    "sheet": 3,
+    "index": 50,
+    "subject": "roll Disarm"
+  },
+  {
+    "action": "rollDisarmResponse",
+    "sheet": 3,
+    "index": 51,
+    "subject": "roll Disarm Response"
+  },
+  {
+    "action": "rollDrunkReposition",
+    "sheet": 3,
+    "index": 52,
+    "subject": "roll Drunk Reposition"
+  },
+  {
+    "action": "rollDying",
+    "sheet": 3,
+    "index": 53,
+    "subject": "roll Dying"
+  },
+  {
+    "action": "rollFireSave",
+    "sheet": 3,
+    "index": 54,
+    "subject": "roll Fire Save"
+  },
+  {
+    "action": "rollGearAcquisition",
+    "sheet": 3,
+    "index": 55,
+    "subject": "roll Gear Acquisition"
+  },
+  {
+    "action": "rollInitiative",
+    "sheet": 3,
+    "index": 56,
+    "subject": "roll Initiative"
+  },
+  {
+    "action": "rollKnowledge",
+    "sheet": 3,
+    "index": 57,
+    "subject": "roll Knowledge"
+  },
+  {
+    "action": "rollNpcSkill",
+    "sheet": 3,
+    "index": 58,
+    "subject": "roll Npc Skill"
+  },
+  {
+    "action": "rollPendingDamageSave",
+    "sheet": 3,
+    "index": 59,
+    "subject": "roll Pending Damage Save"
+  },
+  {
+    "action": "rollRangedAttack",
+    "sheet": 3,
+    "index": 60,
+    "subject": "roll Ranged Attack"
+  },
+  {
+    "action": "rollSave",
+    "sheet": 3,
+    "index": 61,
+    "subject": "roll Save"
+  },
+  {
+    "action": "rollSkill",
+    "sheet": 3,
+    "index": 62,
+    "subject": "roll Skill"
+  },
+  {
+    "action": "rollVitality",
+    "sheet": 3,
+    "index": 63,
+    "subject": "roll Vitality"
+  },
+  {
+    "action": "rollWisdomCollapse",
+    "sheet": 4,
+    "index": 0,
+    "subject": "roll Wisdom Collapse"
+  },
+  {
+    "action": "sceneAdvance",
+    "sheet": 4,
+    "index": 1,
+    "subject": "scene Advance"
+  },
+  {
+    "action": "seasonQualities",
+    "sheet": 4,
+    "index": 2,
+    "subject": "season Qualities"
+  },
+  {
+    "action": "securityDevice",
+    "sheet": 4,
+    "index": 3,
+    "subject": "security Device"
+  },
+  {
+    "action": "selectArmorUseGear",
+    "sheet": 4,
+    "index": 4,
+    "subject": "select Armor Use Gear"
+  },
+  {
+    "action": "selectBigStickGear",
+    "sheet": 4,
+    "index": 5,
+    "subject": "select Big Stick Gear"
+  },
+  {
+    "action": "selectMissionCaliberGear",
+    "sheet": 4,
+    "index": 6,
+    "subject": "select Mission Caliber Gear"
+  },
+  {
+    "action": "sessionDice",
+    "sheet": 4,
+    "index": 7,
+    "subject": "session Dice"
+  },
+  {
+    "action": "setDate",
+    "sheet": 4,
+    "index": 8,
+    "subject": "set Date"
+  },
+  {
+    "action": "setMovementCondition",
+    "sheet": 4,
+    "index": 9,
+    "subject": "set Movement Condition"
+  },
+  {
+    "action": "setNpcSkillCondition",
+    "sheet": 4,
+    "index": 10,
+    "subject": "set Npc Skill Condition"
+  },
+  {
+    "action": "setSickened",
+    "sheet": 4,
+    "index": 11,
+    "subject": "set Sickened"
+  },
+  {
+    "action": "settleGrapple",
+    "sheet": 4,
+    "index": 12,
+    "subject": "settle Grapple"
+  },
+  {
+    "action": "settleMissionXP",
+    "sheet": 4,
+    "index": 13,
+    "subject": "settle Mission XP"
+  },
+  {
+    "action": "settlePendingDamageSave",
+    "sheet": 4,
+    "index": 14,
+    "subject": "settle Pending Damage Save"
+  },
+  {
+    "action": "settleSilverTongueVictory",
+    "sheet": 4,
+    "index": 15,
+    "subject": "settle Silver Tongue Victory"
+  },
+  {
+    "action": "setupTask",
+    "sheet": 4,
+    "index": 16,
+    "subject": "setup Task"
+  },
+  {
+    "action": "shareTemporaryFeats",
+    "sheet": 4,
+    "index": 17,
+    "subject": "share Temporary Feats"
+  },
+  {
+    "action": "signal",
+    "sheet": 4,
+    "index": 18,
+    "subject": "signal"
+  },
+  {
+    "action": "skillLevel",
+    "sheet": 4,
+    "index": 19,
+    "subject": "skill Level"
+  },
+  {
+    "action": "spendActionDie",
+    "sheet": 4,
+    "index": 20,
+    "subject": "spend Action Die"
+  },
+  {
+    "action": "spendDice",
+    "sheet": 4,
+    "index": 21,
+    "subject": "spend Dice"
+  },
+  {
+    "action": "spendFuel",
+    "sheet": 4,
+    "index": 22,
+    "subject": "spend Fuel"
+  },
+  {
+    "action": "standOff",
+    "sheet": 4,
+    "index": 23,
+    "subject": "stand Off"
+  },
+  {
+    "action": "startConflict",
+    "sheet": 4,
+    "index": 24,
+    "subject": "start Conflict"
+  },
+  {
+    "action": "startMentalLeapSleep",
+    "sheet": 4,
+    "index": 25,
+    "subject": "start Mental Leap Sleep"
+  },
+  {
+    "action": "startMission",
+    "sheet": 4,
+    "index": 26,
+    "subject": "start Mission"
+  },
+  {
+    "action": "submit",
+    "sheet": 4,
+    "index": 27,
+    "subject": "submit"
+  },
+  {
+    "action": "sufferInitiativeLoss",
+    "sheet": 4,
+    "index": 28,
+    "subject": "suffer Initiative Loss"
+  },
+  {
+    "action": "sufferTypedDamage",
+    "sheet": 4,
+    "index": 29,
+    "subject": "suffer Typed Damage"
+  },
+  {
+    "action": "summonClassAssistants",
+    "sheet": 4,
+    "index": 30,
+    "subject": "summon Class Assistants"
+  },
+  {
+    "action": "surprise",
+    "sheet": 4,
+    "index": 31,
+    "subject": "surprise"
+  },
+  {
+    "action": "survivalSave",
+    "sheet": 4,
+    "index": 32,
+    "subject": "survival Save"
+  },
+  {
+    "action": "syncGrants",
+    "sheet": 4,
+    "index": 33,
+    "subject": "sync Grants"
+  },
+  {
+    "action": "takeCleaveBasics",
+    "sheet": 4,
+    "index": 34,
+    "subject": "take Cleave Basics"
+  },
+  {
+    "action": "takeCombatInstincts",
+    "sheet": 4,
+    "index": 35,
+    "subject": "take Combat Instincts"
+  },
+  {
+    "action": "takeContempt",
+    "sheet": 4,
+    "index": 36,
+    "subject": "take Contempt"
+  },
+  {
+    "action": "takeCounterTrip",
+    "sheet": 4,
+    "index": 37,
+    "subject": "take Counter Trip"
+  },
+  {
+    "action": "takeDartingFinalAttack",
+    "sheet": 4,
+    "index": 38,
+    "subject": "take Darting Final Attack"
+  },
+  {
+    "action": "takeFireTeamSupremacy",
+    "sheet": 4,
+    "index": 39,
+    "subject": "take Fire Team Supremacy"
+  },
+  {
+    "action": "takeMissTrick",
+    "sheet": 4,
+    "index": 40,
+    "subject": "take Miss Trick"
+  },
+  {
+    "action": "takeMobileOffense",
+    "sheet": 4,
+    "index": 41,
+    "subject": "take Mobile Offense"
+  },
+  {
+    "action": "takeOpportunist",
+    "sheet": 4,
+    "index": 42,
+    "subject": "take Opportunist"
+  },
+  {
+    "action": "takeSnapShot",
+    "sheet": 4,
+    "index": 43,
+    "subject": "take Snap Shot"
+  },
+  {
+    "action": "takeStrikingAttack",
+    "sheet": 4,
+    "index": 44,
+    "subject": "take Striking Attack"
+  },
+  {
+    "action": "takeTotalDefense",
+    "sheet": 4,
+    "index": 45,
+    "subject": "take Total Defense"
+  },
+  {
+    "action": "takeTripFinalAttack",
+    "sheet": 4,
+    "index": 46,
+    "subject": "take Trip Final Attack"
+  },
+  {
+    "action": "takeTwoWeaponFinalAttack",
+    "sheet": 4,
+    "index": 47,
+    "subject": "take Two Weapon Final Attack"
+  },
+  {
+    "action": "tireResult",
+    "sheet": 4,
+    "index": 48,
+    "subject": "tire Result"
+  },
+  {
+    "action": "toChat",
+    "sheet": 4,
+    "index": 49,
+    "subject": "to Chat"
+  },
+  {
+    "action": "toggleEditMode",
+    "sheet": 4,
+    "index": 50,
+    "subject": "toggle Edit Mode"
+  },
+  {
+    "action": "toggleFocus",
+    "sheet": 4,
+    "index": 51,
+    "subject": "toggle Focus"
+  },
+  {
+    "action": "toggleRole",
+    "sheet": 4,
+    "index": 52,
+    "subject": "toggle Role"
+  },
+  {
+    "action": "tyreSave",
+    "sheet": 4,
+    "index": 53,
+    "subject": "tyre Save"
+  },
+  {
+    "action": "useAnyTimeAnyPlace",
+    "sheet": 4,
+    "index": 54,
+    "subject": "use Any Time Any Place"
+  },
+  {
+    "action": "useBattery",
+    "sheet": 4,
+    "index": 55,
+    "subject": "use Battery"
+  },
+  {
+    "action": "useCareerAgentReward",
+    "sheet": 4,
+    "index": 56,
+    "subject": "use Career Agent Reward"
+  },
+  {
+    "action": "useEagleEye",
+    "sheet": 4,
+    "index": 57,
+    "subject": "use Eagle Eye"
+  },
+  {
+    "action": "useEverydayGenius",
+    "sheet": 4,
+    "index": 58,
+    "subject": "use Everyday Genius"
+  },
+  {
+    "action": "useFeatFreeAction",
+    "sheet": 4,
+    "index": 59,
+    "subject": "use Feat Free Action"
+  },
+  {
+    "action": "useFinalDeduction",
+    "sheet": 4,
+    "index": 60,
+    "subject": "use Final Deduction"
+  },
+  {
+    "action": "useGlobalSearch",
+    "sheet": 4,
+    "index": 61,
+    "subject": "use Global Search"
+  },
+  {
+    "action": "useGunslingersEye",
+    "sheet": 4,
+    "index": 62,
+    "subject": "use Gunslingers Eye"
+  },
+  {
+    "action": "useIntelTemporaryFeats",
+    "sheet": 4,
+    "index": 63,
+    "subject": "use Intel Temporary Feats"
+  },
+  {
+    "action": "useKnowItAll",
+    "sheet": 5,
+    "index": 0,
+    "subject": "use Know It All"
+  },
+  {
+    "action": "useLimitedAbility",
+    "sheet": 5,
+    "index": 1,
+    "subject": "use Limited Ability"
+  },
+  {
+    "action": "useLittleDetails",
+    "sheet": 5,
+    "index": 2,
+    "subject": "use Little Details"
+  },
+  {
+    "action": "useMark",
+    "sheet": 5,
+    "index": 3,
+    "subject": "use Mark"
+  },
+  {
+    "action": "useMasterThief",
+    "sheet": 5,
+    "index": 4,
+    "subject": "use Master Thief"
+  },
+  {
+    "action": "useOneInAMillion",
+    "sheet": 5,
+    "index": 5,
+    "subject": "use One In AMillion"
+  },
+  {
+    "action": "useRenaissanceMan",
+    "sheet": 5,
+    "index": 6,
+    "subject": "use Renaissance Man"
+  },
+  {
+    "action": "useSafeHouse",
+    "sheet": 5,
+    "index": 7,
+    "subject": "use Safe House"
+  },
+  {
+    "action": "useToolShed",
+    "sheet": 5,
+    "index": 8,
+    "subject": "use Tool Shed"
+  },
+  {
+    "action": "useWellFunded",
+    "sheet": 5,
+    "index": 9,
+    "subject": "use Well Funded"
+  },
+  {
+    "action": "vehicleDamage",
+    "sheet": 5,
+    "index": 10,
+    "subject": "vehicle Damage"
+  },
+  {
+    "action": "wakeFromSleep",
+    "sheet": 5,
+    "index": 11,
+    "subject": "wake From Sleep"
+  },
+  {
+    "action": "withdrawClassAssistants",
+    "sheet": 5,
+    "index": 12,
+    "subject": "withdraw Class Assistants"
+  },
+  {
+    "action": "takedownSave",
+    "sheet": 6,
+    "index": 0,
+    "subject": "takedown Save"
+  },
+  {
+    "action": "unnervingControl",
+    "sheet": 6,
+    "index": 1,
+    "subject": "unnerving "
+  },
+  {
+    "action": "strutControl",
+    "sheet": 6,
+    "index": 2,
+    "subject": "strut "
+  },
+  {
+    "action": "duelingReachControl",
+    "sheet": 6,
+    "index": 3,
+    "subject": "dueling Reach "
+  },
+  {
+    "action": "noQuarterControl",
+    "sheet": 6,
+    "index": 4,
+    "subject": "no Quarter "
+  },
+  {
+    "action": "opportunistDamageControl",
+    "sheet": 6,
+    "index": 5,
+    "subject": "opportunist Damage "
+  },
+  {
+    "action": "wrestlingControls",
+    "sheet": 6,
+    "index": 6,
+    "subject": "wrestling s"
+  },
+  {
+    "action": "chanceReactionControls",
+    "sheet": 6,
+    "index": 7,
+    "subject": "chance Reaction s"
+  },
+  {
+    "action": "diversionControl",
+    "sheet": 6,
+    "index": 8,
+    "subject": "diversion "
+  },
+  {
+    "action": "hazardSaveControl",
+    "sheet": 6,
+    "index": 9,
+    "subject": "hazard Save "
+  },
+  {
+    "action": "woundDropControl",
+    "sheet": 6,
+    "index": 10,
+    "subject": "wound Drop "
+  },
+  {
+    "action": "kickControls",
+    "sheet": 6,
+    "index": 11,
+    "subject": "kick s"
+  },
+  {
+    "action": "brawlingSupremacyControl",
+    "sheet": 6,
+    "index": 12,
+    "subject": "brawling Supremacy "
+  },
+  {
+    "action": "trickShotControl",
+    "sheet": 6,
+    "index": 13,
+    "subject": "trick Shot "
+  },
+  {
+    "action": "tauntControl",
+    "sheet": 6,
+    "index": 14,
+    "subject": "taunt "
+  },
+  {
+    "action": "shatterWeaponControl",
+    "sheet": 6,
+    "index": 15,
+    "subject": "shatter Weapon "
+  },
+  {
+    "action": "cooperativeControl",
+    "sheet": 6,
+    "index": 16,
+    "subject": "cooperative "
+  },
+  {
+    "action": "fireActionControl",
+    "sheet": 6,
+    "index": 17,
+    "subject": "fire Action "
+  },
+  {
+    "action": "blastControl",
+    "sheet": 6,
+    "index": 18,
+    "subject": "blast "
+  },
+  {
+    "action": "attackResolutionControl",
+    "sheet": 6,
+    "index": 19,
+    "subject": "attack Resolution "
+  },
+  {
+    "action": "reportedSaveControl",
+    "sheet": 6,
+    "index": 20,
+    "subject": "reported Save "
+  },
+  {
+    "action": "applyDamageControl",
+    "sheet": 6,
+    "index": 21,
+    "subject": "apply Damage "
+  },
+  {
+    "action": "opposedCheckControl",
+    "sheet": 6,
+    "index": 22,
+    "subject": "opposed Check "
+  },
+  {
+    "action": "medicalAidControl",
+    "sheet": 6,
+    "index": 23,
+    "subject": "medical Aid "
+  },
+  {
+    "action": "autofireMasteryControl",
+    "sheet": 6,
+    "index": 24,
+    "subject": "autofire Mastery "
+  },
+  {
+    "action": "duelingControls",
+    "sheet": 6,
+    "index": 25,
+    "subject": "dueling s"
+  },
+  {
+    "action": "blastMapControl",
+    "sheet": 6,
+    "index": 26,
+    "subject": "blast Map "
+  },
+  {
+    "action": "calledShotControl",
+    "sheet": 6,
+    "index": 27,
+    "subject": "called Shot "
+  },
+  {
+    "action": "handOfGodControl",
+    "sheet": 6,
+    "index": 28,
+    "subject": "hand Of God "
+  }
+]
