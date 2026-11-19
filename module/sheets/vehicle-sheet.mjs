@@ -164,6 +164,15 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV
       actor,
       system,
       editable: this.isEditable,
+      // One box per failed damage save up to destruction; the box where the vehicle breaks is marked.
+      conditionTrack: Array.from(
+        { length: Math.min(20, Math.max(0, Number(system.breakState?.destroyedAt) || 0)) },
+        (_, index) => ({
+          filled: index < (Number(system.failedSaves) || 0),
+          broken: index + 1 === Number(system.breakState?.brokenAt),
+          destroyed: index + 1 === Number(system.breakState?.destroyedAt)
+        })
+      ),
       classOptions: { "": "—", ...Object.fromEntries(VEHICLE_RULES.classes.map(c => [c.code, c.label])) },
       calibers: CONFIG.SPYCRAFT.calibers,
       acquiredOptions: { "": "—", possession: loc`Possession`, mission: loc`Mission gear` },

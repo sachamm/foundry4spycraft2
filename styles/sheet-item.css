@@ -30,3 +30,24 @@
 .spycraft2.browser .row-main .summary { display: block; margin-top: 2px; line-height: 1.4; }
 .spycraft2.application.browser li button[data-action="add"] { flex: 0 0 var(--sc2-control); background: var(--sc2-paper-raised); border-color: var(--sc2-rule); }
 .spycraft2.application.browser li button.owned { background: var(--sc2-teal-tint); border-color: var(--sc2-good); }
+
+/* The figures an item is used for in play, above its form. */
+.spycraft2.item .item-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 6px; margin: var(--sc2-space-2) 0; }
+.spycraft2.item .item-summary .sc2-value { font-size: 16px; overflow-wrap: anywhere; }
+
+/* Browser: the list on the left, the chosen entry on the right. */
+.spycraft2.browser .browser-panes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); gap: var(--sc2-space-3); }
+.spycraft2.browser .browser-list { min-height: 0; }
+.spycraft2.browser .browser-list li.selected { background: var(--sc2-action-tint); box-shadow: inset 3px 0 0 var(--sc2-action); }
+.spycraft2.browser .browser-preview { min-height: 0; overflow-y: auto; padding: var(--sc2-space-3); background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); }
+.spycraft2.browser .preview-head { display: flex; gap: var(--sc2-space-2); align-items: center; margin-bottom: var(--sc2-space-2); }
+.spycraft2.browser .preview-head img { width: 48px; height: 48px; object-fit: cover; border: 1px solid var(--sc2-bar); border-radius: var(--sc2-radius); }
+.spycraft2.browser .preview-head div { display: flex; flex-direction: column; min-width: 0; }
+.spycraft2.browser .preview-name { font-size: var(--sc2-text-l); line-height: 1.2; }
+.spycraft2.browser .preview-text { line-height: 1.5; }
+.spycraft2.browser .preview-actions { display: flex; flex-wrap: wrap; gap: var(--sc2-space-2); margin-top: var(--sc2-space-3); }
+.spycraft2 .sc2-empty { padding: var(--sc2-space-4); text-align: center; color: var(--sc2-ink-muted); }
+@container (max-width: 620px) {
+  .spycraft2.browser .browser-panes { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 3fr) minmax(0, 2fr); }
+}
+.spycraft2.browser { container-type: inline-size; }

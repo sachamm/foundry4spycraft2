@@ -1,4 +1,18 @@
-/* Controls on this system's chat cards. */
-/* ---------- Chat cards ---------- */
+/* Chat cards posted by this system: a bar for who and what, a large result, then the next step. */
+.chat-message.sc2-card .message-header {
+  padding: 4px 8px; color: var(--sc2-on-bar); background: var(--sc2-bar); border-radius: var(--sc2-radius);
+}
+.chat-message.sc2-card .message-header :is(.message-sender, .message-metadata, .flavor-text, a) { color: inherit; }
+.chat-message.sc2-card .message-header .message-sender { font-weight: 700; white-space: normal; overflow-wrap: anywhere; }
+.chat-message.sc2-card .message-header .flavor-text { display: block; margin-top: 2px; font-size: var(--sc2-text-s); line-height: 1.4; opacity: 0.92; }
+.chat-message.sc2-card .dice-formula { font-family: var(--sc2-num); font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); background: transparent; border: 0; box-shadow: none; }
+.chat-message.sc2-card .dice-total { font: 700 28px/1.3 var(--sc2-num); color: var(--sc2-ink-strong); background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-bottom: 3px solid var(--sc2-bar); border-radius: var(--sc2-radius); box-shadow: none; }
+/* Outcomes read as stamps. */
+.chat-message.sc2-card :is(.spycraft2-threat, .spycraft2-error) {
+  display: inline-block; padding: 0 6px; font: 700 10px/1.6 var(--sc2-num); letter-spacing: 0.1em; text-transform: uppercase;
+  border: 2px solid currentColor; border-radius: 2px;
+}
+.chat-message.sc2-card .message-header .spycraft2-threat { color: var(--sc2-on-bar-good); }
+.chat-message.sc2-card .message-header .spycraft2-error { color: var(--sc2-on-bar-danger); }
 .spycraft2.roll-controls { display: grid; gap: 4px; margin-top: 6px; }
-.spycraft2.roll-controls .sc2-icon-button { width: 100%; justify-content: flex-start; text-align: left; }
+.spycraft2.roll-controls :is(button, .sc2-icon-button) { width: 100%; justify-content: flex-start; text-align: left; }

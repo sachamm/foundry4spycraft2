@@ -6,7 +6,8 @@ import {
   combatToolVisibility,
   focusSetupTask,
   activeConditionLabels,
-  enhanceAgentSheet
+  enhanceAgentSheet,
+  buildCreationTrack
 } from "./agent-ux.mjs";
 import { COMBAT_STANCES } from "../rules/combat-stance.mjs";
 import { manageThreadNeedle } from "../apps/thread-needle.mjs";
@@ -93,6 +94,7 @@ import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
+import { ACTION_COSTS } from "../rules/combat-actions.mjs";
 import { nonLethalTotals } from "../apps/damage-application.mjs";
 import { reloadWeapon, resupplyWeapon, weaponAmmunition } from "../apps/ammunition-use.mjs";
 import { ammunitionLabel } from "../rules/ammunition-use.mjs";
@@ -171,13 +173,15 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   /** A local view preference, never stored on the character. */
   _editMode = false;
   _showAllTools = false;
+  /** While set, choosing a combat tool pins or unpins it instead of using it. */
+  _pinMode = false;
   _toolSearch = "";
   _skillSearch = "";
   _trainedOnly = false;
 
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "agent"],
-    position: { width: 820, height: 860 },
+    position: { width: 980, height: 760 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
@@ -190,6 +194,20 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
         if (!game.user.isGM) return;
         this._showAllTools = target.checked;
         return this.render();
+      },
+      togglePinMode() {
+        this._pinMode = !this._pinMode;
+        return this.render();
+      },
+      toggleHalfAction(event, target) {
+        if (!this.isEditable) return;
+        const combat = this.actor.participatingCombat;
+        if (!combat?.started) return;
+        const index = Number(target.dataset.index);
+        const spent = this._roundActionsSpent();
+        // Choosing the last spent pip frees it; choosing any other marks everything up to it as spent.
+        const next = spent === index + 1 ? index : index + 1;
+        return this.actor.setFlag("spycraft2", "roundActions", { combat: combat.id, round: combat.round, spent: next });
       },
       setupTask: SpycraftAgentSheet.#onSetupTask,
       applyShaken() {
@@ -814,31 +832,47 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   };
 
   static PARTS = {
-    header: { template: `${TPL}/agent-header.hbs` },
+    rail: { template: `${TPL}/agent-rail.hbs`, scrollable: [""] },
+    track: { template: `${TPL}/agent-track.hbs` },
     tabs: { template: "templates/generic/tab-navigation.hbs" },
-    main: { template: `${TPL}/agent-main.hbs`, scrollable: [""] },
-    classes: { template: `${TPL}/agent-classes.hbs`, scrollable: [""] },
+    play: { template: `${TPL}/agent-main.hbs`, scrollable: [""] },
     skills: { template: `${TPL}/agent-skills.hbs`, scrollable: [""] },
-    feats: { template: `${TPL}/agent-feats.hbs`, scrollable: [""] },
-    training: { template: `${TPL}/agent-training.hbs`, scrollable: [""] },
     gear: { template: `${TPL}/agent-gear.hbs`, scrollable: [""] },
-    bio: { template: `${TPL}/agent-bio.hbs`, scrollable: [""] }
+    abilities: { template: `${TPL}/agent-abilities.hbs`, scrollable: [""] },
+    dossier: { template: `${TPL}/agent-dossier.hbs`, scrollable: [""] }
   };
 
   static TABS = {
     primary: {
       tabs: [
-        { id: "main", label: "SPYCRAFT.Tab.Main" },
-        { id: "classes", label: "SPYCRAFT.Tab.Classes" },
+        { id: "play", label: "SPYCRAFT.Tab.Play" },
         { id: "skills", label: "SPYCRAFT.Tab.Skills" },
-        { id: "feats", label: "SPYCRAFT.Tab.Feats" },
-        { id: "training", label: "SPYCRAFT.Tab.Training" },
         { id: "gear", label: "SPYCRAFT.Tab.Gear" },
-        { id: "bio", label: "SPYCRAFT.Tab.Bio" }
+        { id: "abilities", label: "SPYCRAFT.Tab.Abilities" },
+        { id: "dossier", label: "SPYCRAFT.Tab.Dossier" }
       ],
-      initial: "main"
+      initial: "play"
     }
   };
+
+  /** Build reminders name the pane that resolves them; several panes share a tab. */
+  static PANE_TABS = { main: "play", classes: "abilities", feats: "abilities", training: "dossier", bio: "dossier" };
+
+  /** Half actions marked as spent in the round now being played; an older record counts as none. */
+  _roundActionsSpent() {
+    const combat = this.actor.participatingCombat;
+    const record = this.actor.getFlag("spycraft2", "roundActions");
+    if (!combat?.started || record?.combat !== combat.id || record?.round !== combat.round) return 0;
+    return Math.min(2, Math.max(0, Number(record.spent) || 0));
+  }
+
+  /** Pin a combat tool to the top of Play, or take it down. */
+  togglePin(tool) {
+    if (!this.isEditable || !tool) return;
+    const pinned = new Set(this.actor.getFlag("spycraft2", "pinnedTools") ?? []);
+    if (!pinned.delete(tool)) pinned.add(tool);
+    return this.actor.setFlag("spycraft2", "pinnedTools", [...pinned]);
+  }
 
   /* -------------------------------------------- */
 
@@ -860,6 +894,15 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       tabs: this._prepareTabs("primary"),
       warnings: sys.warnings ?? [],
       setupGuide: buildSetupGuide(sys.todo),
+      track: buildCreationTrack(sys.todo),
+      pinnedTools: actor.getFlag("spycraft2", "pinnedTools") ?? [],
+      pinMode: this.isEditable && this._pinMode,
+      actionCosts: Object.fromEntries(
+        Object.entries(ACTION_COSTS).map(([action, cost]) => [
+          action,
+          game.i18n.localize(`SPYCRAFT.ActionTime.${cost}`)
+        ])
+      ),
       open: this._open,
       editMode: this.isEditable && this._editMode,
       activeConditions: activeConditionLabels(sys),
@@ -1319,6 +1362,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       caliber: cfg.calibers[w.system.caliber]
     }));
     context.playLabels = playLabels();
+    // One pip per action die the agent could hold; filled pips are dice in hand.
+    const diceHeld = Math.max(0, Number(sys.actionDice?.value) || 0);
+    const diceShown = Math.min(12, Math.max(diceHeld, Number(sys.actionDice?.max) || 0));
+    context.actionDicePips = Array.from({ length: diceShown }, (_, index) => index < diceHeld);
+    const halfSpent = this._roundActionsSpent();
+    context.roundActions = [0, 1].map(index => ({ index, spent: index < halfSpent }));
     context.dying = sys.wounds?.value <= -1 && sys.wounds?.value >= -9;
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
     context.safeHouseSource = safeHouseSource(sys);
@@ -1565,7 +1614,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   static async #onTodo(event, target) {
     const { tab, skillLevel } = target.dataset;
     if (skillLevel) this._skillLevel = Number(skillLevel);
-    this.changeTab(tab, "primary");
+    this.changeTab(SpycraftAgentSheet.PANE_TABS[tab] ?? tab, "primary");
     this._editMode = this.isEditable;
     this._open.todo = false;
     if (tab === "main") this._open.origins = true;

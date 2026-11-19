@@ -1,25 +1,54 @@
-/* Design tokens for every Spycraft 2.0 surface: the dossier palette, spacing, type and control sizes.
- * Components and sheets read these instead of repeating literal values. */
+/* Design tokens for every Spycraft 2.0 surface. Components and sheets read these roles
+ * instead of literal values, so the light and dark variants stay in step. */
 .spycraft2,
 .spycraft2-roll-options,
 [data-sc2-tooltip-scope] {
-  --sc2-paper: #f5eedb;
-  --sc2-paper-raised: #fffcf0;
-  --sc2-paper-sunk: #ebe2c8;
-  --sc2-ink: #253737;
-  --sc2-ink-strong: #142f30;
-  --sc2-ink-muted: #52605a;
-  --sc2-teal: #24595b;
-  --sc2-teal-dark: #183c3e;
-  --sc2-teal-tint: rgba(36, 89, 91, 0.08);
-  --sc2-brass: #a39065;
-  --sc2-brass-dark: #857652;
-  --sc2-rule: #b7ac92;
-  --sc2-on-teal: #fff9e9;
-  --sc2-bad: #942f38;
-  --sc2-bad-tint: rgba(148, 47, 56, 0.08);
-  --sc2-good: #326442;
+  /* Roles */
+  --sc2-surface: #f2eee3;
+  --sc2-surface-raised: #fbf9f3;
+  --sc2-surface-sunk: #e5dfd0;
+  --sc2-ink: #1b2323;
+  --sc2-ink-strong: #0f1616;
+  --sc2-ink-muted: #56605c;
+  --sc2-bar: #1b2323;
+  --sc2-on-bar: #f6f2e7;
+  --sc2-on-bar-good: #9fe0b5;
+  --sc2-on-bar-danger: #ffb3b8;
+  --sc2-action: #1d5c5e;
+  --sc2-action-strong: #143f41;
+  --sc2-on-action: #fbf9f3;
+  --sc2-action-tint: rgba(29, 92, 94, 0.09);
+  --sc2-danger: #a3262f;
+  --sc2-danger-tint: rgba(163, 38, 47, 0.08);
+  --sc2-good: #2c6440;
   --sc2-warn: #8a6410;
+  --sc2-rule: #cdc5b1;
+  --sc2-rule-strong: #8d8571;
+
+  /* Earlier names, kept so existing rules follow the roles. */
+  --sc2-paper: var(--sc2-surface);
+  --sc2-paper-raised: var(--sc2-surface-raised);
+  --sc2-paper-sunk: var(--sc2-surface-sunk);
+  --sc2-teal: var(--sc2-action);
+  --sc2-teal-dark: var(--sc2-action-strong);
+  --sc2-teal-tint: var(--sc2-action-tint);
+  --sc2-on-teal: var(--sc2-on-action);
+  --sc2-brass: var(--sc2-rule-strong);
+  --sc2-brass-dark: var(--sc2-rule-strong);
+  --sc2-bad: var(--sc2-danger);
+  --sc2-bad-tint: var(--sc2-danger-tint);
+
+  /* Creation steps, in the order the rulebook walks through them. Used by the creation track only. */
+  --sc2-step-1: #3f8f3a;
+  --sc2-step-2: #7fae2e;
+  --sc2-step-3: #c2b21f;
+  --sc2-step-4: #d08a1c;
+  --sc2-step-5: #cf6220;
+  --sc2-step-6: #c03a2b;
+  --sc2-step-7: #2f4fa3;
+  --sc2-step-8: #6a3a9b;
+  --sc2-step-9: #a23a8f;
+  --sc2-step-10: #7b8086;
 
   --sc2-space-1: 4px;
   --sc2-space-2: 8px;
@@ -29,9 +58,40 @@
   --sc2-text-s: 12px;
   --sc2-text-m: 14px;
   --sc2-text-l: 18px;
-  --sc2-display: "Courier New", monospace;
+  --sc2-caption-size: 10px;
+  --sc2-value-size: 22px;
+  /* Both faces ship with Foundry or the reader's system; nothing is downloaded. */
+  --sc2-bar-font: "Bruno Ace", "Signika", sans-serif;
+  --sc2-num: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --sc2-display: var(--sc2-num);
 
-  --sc2-radius: 3px;
+  --sc2-radius: 2px;
   --sc2-control: 32px;
   --sc2-icon-size: 22px;
+  --sc2-rail: 264px;
+}
+
+/* Night variant: follows Foundry's own interface theme. */
+body.theme-dark .spycraft2.application:not(.theme-light),
+.spycraft2.application.theme-dark,
+body.theme-dark .spycraft2.application:not(.theme-light) :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]),
+.spycraft2.application.theme-dark :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]) {
+  --sc2-surface: #171c1c;
+  --sc2-surface-raised: #212828;
+  --sc2-surface-sunk: #101414;
+  --sc2-ink: #e8e4d8;
+  --sc2-ink-strong: #fbf9f3;
+  --sc2-ink-muted: #a3aaa5;
+  --sc2-bar: #0b0f0f;
+  --sc2-on-bar: #e8e4d8;
+  --sc2-action: #58b3b0;
+  --sc2-action-strong: #7fcac7;
+  --sc2-on-action: #0b1414;
+  --sc2-action-tint: rgba(88, 179, 176, 0.14);
+  --sc2-danger: #e2646c;
+  --sc2-danger-tint: rgba(226, 100, 108, 0.14);
+  --sc2-good: #6fbf8a;
+  --sc2-warn: #d8b25a;
+  --sc2-rule: #3a4343;
+  --sc2-rule-strong: #6e7876;
 }

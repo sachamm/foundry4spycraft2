@@ -59,3 +59,13 @@
 .gc-console-body details.gc-section .controls button { width: 100%; justify-content: flex-start; text-align: left; padding: 3px 8px; font-size: 13px; }
 .gc-console-body .controls button.gc-primary { justify-content: center; }
 .gc-console-body li .sc2-icon-button[data-sc2-mode="icon"] { width: 26px; height: 26px; min-width: 26px; min-height: 26px; --sc2-icon-size: 20px; background: var(--sc2-paper-raised); vertical-align: middle; }
+
+/* What is true right now, before any section is opened. */
+.gc-console-body .gc-now { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 0.6rem 0; }
+.gc-console-body .gc-now .sc2-field { padding: 4px 8px; }
+.gc-console-body .gc-now .sc2-value { font-size: 15px; overflow-wrap: anywhere; }
+/* Section headings are bars, as on the sheets. */
+.gc-console-body details.gc-section { border-bottom: 0; margin-bottom: 4px; }
+.gc-console-body details.gc-section > summary { align-items: center; padding: 4px 8px; color: var(--sc2-on-bar); background: var(--sc2-bar); border-radius: var(--sc2-radius); }
+.gc-console-body details.gc-section > summary h2 { font: 400 11px/1.4 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase; color: inherit; }
+.gc-console-body details.gc-section > summary .gc-note { font-family: var(--sc2-num); opacity: 1; }

@@ -13,4 +13,5 @@
       <a data-action="toChat" data-sc2-display="icon" aria-label="{{localize 'SPYCRAFT.ToChat'}}" data-tooltip="SPYCRAFT.ToChat"><i class="fa-solid fa-comment"></i></a></div>
   </div>
 </header>
+{{#if summary.length}}<div class="item-summary">{{#each summary}}<div class="sc2-field"><span class="sc2-caption">{{caption}}</span><b class="sc2-value">{{value}}</b></div>{{/each}}</div>{{/if}}
 </div>

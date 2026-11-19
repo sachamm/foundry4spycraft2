@@ -52,6 +52,64 @@ export function buildSetupGuide(tasks = []) {
   };
 }
 
+// The order a character is built in (p.13). Each step names the pane that resolves it and where to land there.
+const TRACK_STEPS = [
+  { key: "attributes", tab: "main" },
+  { key: "origin", tab: "main", order: 4 },
+  { key: "class", tab: "classes" },
+  { key: "skills", tab: "skills" },
+  { key: "feats", tab: "feats" },
+  { key: "interests", tab: "training", order: 52 },
+  { key: "subplot", tab: "training", order: 54 },
+  { key: "derived" },
+  { key: "describe", tab: "bio" },
+  { key: "gear", tab: "gear" }
+];
+
+function trackStepOf(task) {
+  const order = Number(task.order);
+  if (task.tab === "classes") return "class";
+  if (task.tab === "skills") return "skills";
+  if (task.tab === "feats") return "feats";
+  if (task.tab === "training") return order === 54 ? "subplot" : "interests";
+  if (task.tab === "gear") return "gear";
+  if (task.tab === "bio") return "describe";
+  return [4, 51].includes(order) ? "origin" : "attributes";
+}
+
+/**
+ * The creation steps with the reminders still open at each. A step without reminders is not claimed to be
+ * finished; it simply has nothing waiting. The first step with something waiting is where to start.
+ */
+export function buildCreationTrack(tasks = []) {
+  const waiting = new Map();
+  for (const task of groupBuildTasks(tasks).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))) {
+    const key = trackStepOf(task);
+    if (!waiting.has(key)) waiting.set(key, { count: 0, first: task });
+    waiting.get(key).count += task.count;
+  }
+  let started = false;
+  const steps = TRACK_STEPS.map((step, index) => {
+    const open = waiting.get(step.key);
+    const target = open?.first ?? step;
+    const start = !!open && !started;
+    if (start) started = true;
+    return {
+      key: step.key,
+      number: index + 1,
+      label: `SPYCRAFT.Track.${step.key}`,
+      automatic: !step.tab,
+      count: open?.count ?? 0,
+      start,
+      tab: target.tab ?? step.tab,
+      order: target.order ?? step.order,
+      skillLevel: target.skillLevel,
+      browse: target.browse
+    };
+  });
+  return { steps, waiting: steps.reduce((sum, step) => sum + step.count, 0) };
+}
+
 /** These flags choose shortcuts only. The action controllers still decide legality. */
 export function combatToolVisibility(system = {}, stances = {}, { showAll = false } = {}) {
   const feats = new Set(system.activeFeatNames ?? []);
@@ -84,7 +142,8 @@ export function combatToolVisibility(system = {}, stances = {}, { showAll = fals
 
 /** Reveal the actual build field, including any collapsed ancestors, after navigation. */
 export function focusSetupTask(element, { tab, order } = {}) {
-  const section = element.querySelector(`section[data-tab="${tab}"]`);
+  // A pane is the part of a tab that one build step works in; a tab without panes is its own pane.
+  const section = element.querySelector(`[data-pane="${tab}"]`) ?? element.querySelector(`section[data-tab="${tab}"]`);
   if (!section) return;
   const selectors = {
     main: [4, 51].includes(Number(order))
@@ -223,6 +282,7 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
       delete control.dataset.modeDisabled;
     }
   }
+  pinCombatTools(element, context, state);
   filterCombatTools(element, state);
   const search = element.querySelector(".skill-search");
   const trained = element.querySelector(".trained-filter");
@@ -277,4 +337,48 @@ export function filterCombatTools(element, state = {}) {
   };
   search.addEventListener("input", apply);
   if (search.value) apply();
+}
+
+/** Mark each combat tool with its time where the rules give one, and copy pinned tools to the top of Play. */
+export function pinCombatTools(element, context = {}, state = {}) {
+  const box = element.querySelector(".combat-toolbox");
+  const costs = context.actionCosts ?? {};
+  for (const control of element.querySelectorAll("button[data-action]")) {
+    const cost = costs[control.dataset.action];
+    if (cost) control.dataset.sc2Cost = cost;
+  }
+  const slot = element.querySelector(".pinned-tools");
+  if (!box || !slot) return;
+  const pinned = new Set(context.pinnedTools ?? []);
+  const shown = new Set();
+  slot.replaceChildren();
+  for (const control of box.querySelectorAll("button[data-action]:not(.gc-review, .pin-mode)")) {
+    const tool = [control.dataset.action, control.dataset.condition, control.dataset.resource]
+      .filter(Boolean)
+      .join(":");
+    control.dataset.tool = tool;
+    control.classList.toggle("pinned", pinned.has(tool));
+    control.setAttribute("aria-pressed", pinned.has(tool) && context.pinMode ? "true" : "false");
+    if (!context.pinMode) control.removeAttribute("aria-pressed");
+    if (!pinned.has(tool) || shown.has(tool)) continue;
+    shown.add(tool);
+    slot.append(control.cloneNode(true));
+  }
+  slot.hidden = !shown.size;
+  box.classList.toggle("pinning", !!context.pinMode);
+  if (box.dataset.sc2Pinning) return;
+  box.dataset.sc2Pinning = "true";
+  // In pin mode a tool is chosen for pinning, so the choice must not also run it.
+  box.addEventListener(
+    "click",
+    event => {
+      if (!box.classList.contains("pinning")) return;
+      const control = event.target.closest?.("button[data-tool]");
+      if (!control) return;
+      event.preventDefault();
+      event.stopPropagation();
+      state.togglePin?.(control.dataset.tool);
+    },
+    true
+  );
 }

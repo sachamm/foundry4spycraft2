@@ -1,37 +1,41 @@
 import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 
-const baseCSS = readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8");
-const retroCSS = readFileSync(new URL("../../styles/retro.css", import.meta.url), "utf8");
-const tabs = ["main", "classes", "skills", "feats", "training", "gear", "bio"];
+const read = name => readFileSync(new URL(`../../styles/${name}.css`, import.meta.url), "utf8");
+const baseCSS = read("spycraft2");
+const retroCSS = read("retro");
+const agentCSS = read("sheet-agent");
+const tabs = ["play", "skills", "gear", "abilities", "dossier"];
+const templates = { play: "main", skills: "skills", gear: "gear", abilities: "abilities", dossier: "dossier" };
 // Exercise real part root classes inside a Foundry-style fixed-height flex window.
 // This is a layout regression fixture, not a replacement for live Foundry QA.
 const roots = Object.fromEntries(
   tabs.map(id => {
-    const source = readFileSync(new URL(`../../templates/actor/agent-${id}.hbs`, import.meta.url), "utf8");
+    const source = readFileSync(new URL(`../../templates/actor/agent-${templates[id]}.hbs`, import.meta.url), "utf8");
     const classes = /<section class="([^"]+)"/.exec(source)[1].replace("{{tab.cssClass}}", "");
     return [id, classes];
   })
 );
 
-async function mount(page, { height = 860, header = 180, css = baseCSS } = {}) {
+async function mount(page, { width = 980, height = 760, rail = 300, css = agentCSS } = {}) {
   await page.setContent(`
     <style>
       * { box-sizing: border-box; }
-      .application { display:flex; flex-direction:column; width:820px; height:${height}px; overflow:hidden; }
+      .application { display:flex; flex-direction:column; width:${width}px; height:${height}px; overflow:hidden; }
       .window-header { flex:0 0 30px; }
-      .window-content { display:flex; flex-direction:column; flex:1; overflow:hidden; }
-      .sheet-top { height:${header}px; }
+      .window-content { display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
       .sheet-tabs { display:flex; }
       .tab { display:none; }
       .tab.active { display:block; }
-      ${css}
+      ${read("tokens")}
+      ${baseCSS}
       ${retroCSS}
+      ${css}
     </style>
     <div class="application spycraft2 sheet actor agent">
       <header class="window-header">Character</header>
       <form class="window-content">
-        <div class="sheet-top">Dossier, resources and expanded checklist</div>
+        <aside class="sheet-rail"><div style="height:${rail}px">Identity, vitals and checklist</div><button type="button" class="rail-bottom">Last rail control</button></aside>
         <nav class="sheet-tabs">${tabs.map(id => `<button type="button" data-tab="${id}">${id}</button>`).join("")}</nav>
         ${tabs
           .map(
@@ -52,10 +56,10 @@ async function mount(page, { height = 860, header = 180, css = baseCSS } = {}) {
   });
 }
 
-for (const height of [520, 860]) {
-  for (const header of [180, 320]) {
-    test(`all tabs reach their final control: ${height}px window, ${header}px header`, async ({ page }) => {
-      await mount(page, { height, header });
+for (const height of [520, 760]) {
+  for (const rail of [300, 1200]) {
+    test(`every tab scrolls beside the rail: ${height}px window, ${rail}px rail`, async ({ page }) => {
+      await mount(page, { height, rail });
       for (const id of tabs) {
         await page.locator(`nav button[data-tab="${id}"]`).click();
         const active = page.locator(`section[data-tab="${id}"]`);
@@ -64,14 +68,54 @@ for (const height of [520, 860]) {
           el.scrollTop = el.scrollHeight;
         });
         await expect(active.locator(".bottom-control")).toBeInViewport();
-        await expect(page.locator(".sheet-top")).toBeInViewport();
+        // The rail and the tab row stay put while a tab scrolls.
+        await expect(page.locator(".sheet-rail")).toBeInViewport();
         await expect(page.locator("nav")).toBeInViewport();
-        await expect(page.locator("section.tab:not(.active)")).toHaveCount(6);
+        await expect(page.locator("section.tab:not(.active)")).toHaveCount(tabs.length - 1);
         for (const hidden of await page.locator("section.tab:not(.active)").all()) await expect(hidden).toBeHidden();
       }
+      // A rail taller than the window scrolls on its own.
+      await page.locator(".rail-bottom").scrollIntoViewIfNeeded();
+      await expect(page.locator(".rail-bottom")).toBeInViewport();
+      const [railBox, tabBox] = await Promise.all([
+        page.locator(".sheet-rail").boundingBox(),
+        page.locator("section.tab.active").boundingBox()
+      ]);
+      expect(railBox.x + railBox.width).toBeLessThanOrEqual(tabBox.x);
     });
   }
 }
+
+test("a narrow window folds the rail above the tabs and still reaches every final control", async ({ page }) => {
+  await mount(page, { width: 560, height: 620 });
+  const [railBox, navBox] = await Promise.all([
+    page.locator(".sheet-rail").boundingBox(),
+    page.locator("nav").boundingBox()
+  ]);
+  expect(railBox.y + railBox.height).toBeLessThanOrEqual(navBox.y);
+  for (const id of tabs) {
+    await page.locator(`nav button[data-tab="${id}"]`).scrollIntoViewIfNeeded();
+    await page.locator(`nav button[data-tab="${id}"]`).click();
+    const active = page.locator(`section[data-tab="${id}"]`);
+    expect(await active.evaluate(el => el.clientHeight)).toBeGreaterThanOrEqual(80);
+    await active.locator(".bottom-control").scrollIntoViewIfNeeded();
+    await expect(active.locator(".bottom-control")).toBeInViewport();
+    await active.locator(".bottom-control").click();
+  }
+  expect(await page.locator(".window-content").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+});
+
+test("fixture reproduces the inaccessible bottom without the rail layout", async ({ page }) => {
+  const beforeFix = agentCSS
+    .replace(/\/\* -+ Layout: a rail[\s\S]*?(?=\/\* -+ Rail -+ \*\/)/, "")
+    .replace(/@container \(max-width: 720px\) \{[\s\S]*?\n\}/, "");
+  await mount(page, { height: 520, css: beforeFix });
+  const tab = page.locator("section.tab.active");
+  await tab.evaluate(el => {
+    el.scrollTop = el.scrollHeight;
+  });
+  await expect(tab.locator(".bottom-control")).not.toBeInViewport();
+});
 
 // The NPC sheet is one part; its root must scroll inside the fixed-height window.
 const npcRoot = /<section class="([^"]+)"/.exec(
@@ -119,29 +163,4 @@ test("NPC fixture reproduces the inaccessible bottom without the viewport fix", 
     el.scrollTop = el.scrollHeight;
   });
   await expect(root.locator(".bottom-control")).not.toBeInViewport();
-});
-
-test("fixture reproduces the inaccessible bottom without the viewport fix", async ({ page }) => {
-  const beforeFix = baseCSS.replace(/\/\* Agent tab viewport\.[\s\S]*?(?=\/\* Header \*\/)/, "");
-  await mount(page, { height: 520, css: beforeFix });
-  const tab = page.locator("section.tab.active");
-  await tab.evaluate(el => {
-    el.scrollTop = el.scrollHeight;
-  });
-  await expect(tab.locator(".bottom-control")).not.toBeInViewport();
-});
-
-test("an oversized expanded header cannot collapse any tab to zero height", async ({ page }) => {
-  const zeroViewport = baseCSS.replace(/min-height: 80px;/, "min-height: 0;");
-  await mount(page, { height: 520, header: 600, css: zeroViewport });
-  expect(await page.locator("section.tab.active").evaluate(el => el.clientHeight)).toBe(0);
-  await mount(page, { height: 520, header: 600 });
-  for (const id of tabs) {
-    await page.locator(`nav button[data-tab="${id}"]`).click();
-    const active = page.locator(`section[data-tab="${id}"]`);
-    expect(await active.evaluate(el => el.clientHeight)).toBeGreaterThanOrEqual(80);
-    await active.locator(".bottom-control").scrollIntoViewIfNeeded();
-    await expect(active.locator(".bottom-control")).toBeInViewport();
-    await active.locator(".bottom-control").click();
-  }
 });

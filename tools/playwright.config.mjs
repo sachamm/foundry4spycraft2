@@ -8,7 +8,8 @@ export default defineConfig({
     "skill-dialog-scrolling.spec.mjs",
     "vehicle-sheets.spec.mjs",
     "npc-packages.spec.mjs",
-    "ui-tooltips.spec.mjs"
+    "ui-tooltips.spec.mjs",
+    "ui-lab.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,

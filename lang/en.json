@@ -34,7 +34,49 @@
    "Feats": "Feats",
    "Training": "Training",
    "Gear": "Gear",
-   "Bio": "Bio"
+   "Bio": "Bio",
+   "Play": "Play",
+   "Abilities": "Abilities",
+   "Dossier": "Dossier"
+  },
+  "Rail": {
+   "Done": "Done"
+  },
+  "Track": {
+   "Title": "Character creation steps",
+   "Start": "Start here",
+   "Automatic": "Worked out for you",
+   "attributes": "Attributes",
+   "origin": "Origin",
+   "class": "Class",
+   "skills": "Skills",
+   "feats": "Feats",
+   "interests": "Interests",
+   "subplot": "Subplot",
+   "derived": "Derived",
+   "describe": "Describe",
+   "gear": "Gear"
+  },
+  "Round": {
+   "Title": "This round",
+   "Half": "Half action"
+  },
+  "Pins": {
+   "Title": "Pinned tools",
+   "Choose": "Pin tools",
+   "Done": "Done pinning",
+   "Hint": "Choose a tool to pin it to the top of Play, or to take it down."
+  },
+  "ActionTime": {
+   "half": "Half",
+   "full": "Full",
+   "free": "Free"
+  },
+  "Console": {
+   "Time": "Time",
+   "Scene": "Scene",
+   "Dice": "GC dice",
+   "Round": "Round"
   },
   "Ability": {
    "str": "Strength",
@@ -122,6 +164,8 @@
    "Added": "Added {name} to {actor}.",
    "AddEntry": "Add {name}",
    "Empty": "Nothing matches.",
+   "PreviewHint": "Choose an entry to read it here.",
+   "OpenSheet": "Open full sheet",
    "OwnedHint": "Already on this agent.",
    "Owned": {
     "feat": "{actor} already has {name}. To take a feat more than once, raise “Times taken” on the feat itself.",

@@ -15,6 +15,18 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 
+/**
+ * The time each sheet action takes, where the action table gives one (pp.352–353). Most sheet tools record or
+ * resolve something already declared and have no time of their own, so they are absent here.
+ */
+export const ACTION_COSTS = Object.freeze({
+  rollAttack: "half",
+  rollDisarm: "half",
+  reloadWeapon: "half",
+  takeTotalDefense: "full",
+  standOff: "free"
+});
+
 export const FIRE_ACTIONS = {
   burst: { mode: "burst", shots: 3, error: 1 },
   // Autofire Basics, p.180: a Burst that adds only 1 shot and never hits a third time.

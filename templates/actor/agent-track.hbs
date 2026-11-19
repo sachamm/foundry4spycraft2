@@ -1,0 +1,9 @@
+{{!-- The order a character is built in. Shown while editing; each step lands on the control that resolves it. --}}
+<nav class="creation-track" aria-label="{{localize 'SPYCRAFT.Track.Title'}}" {{#unless editMode}}hidden{{/unless}}>
+  {{#if editMode}}<ol>
+    {{#each track.steps}}<li class="track-step step-{{number}}{{#if count}} waiting{{/if}}{{#if start}} start{{/if}}" style="--sc2-step: var(--sc2-step-{{number}})">
+      {{#if automatic}}<span class="track-button" data-tooltip="{{localize 'SPYCRAFT.Track.Automatic'}}"><span class="track-number">{{number}}</span><span class="track-label">{{localize label}}</span></span>
+      {{else}}<button type="button" class="track-button" data-sc2-display="text" data-action="setupTask" data-tab="{{tab}}" {{#if order}}data-order="{{order}}"{{/if}} {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}} aria-label="{{number}}. {{localize label}}{{#if count}} ({{count}}){{/if}}"><span class="track-number">{{number}}</span><span class="track-label">{{localize label}}</span>{{#if count}}<b class="sc2-uses">{{count}}</b>{{/if}}{{#if start}}<span class="track-start">{{localize "SPYCRAFT.Track.Start"}}</span>{{/if}}</button>{{/if}}
+    </li>{{/each}}
+  </ol>{{/if}}
+</nav>
