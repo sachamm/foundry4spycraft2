@@ -91,3 +91,33 @@ test("system chat gets help without changing other chat cards", async ({ page })
   expect(result.untouched).toBe(true);
   expect(result.tip).toContain("outcome as resolved");
 });
+
+test("button names survive icon conversion and existing tooltips", async ({ page }) => {
+  const attack = page.locator('[data-action="rollAttack"]');
+  await expect(attack).toHaveAttribute("aria-label", "Attack");
+  await expect(page.locator('[data-action="cancel"]')).toHaveAttribute("aria-label", "Cancel");
+  await page.evaluate(() => {
+    document.querySelector('[data-action="rollAttack"]').innerHTML = '<i class="fa-solid fa-crosshairs"></i>';
+    window.tooltips.enhanceTooltips(document.querySelector("main"));
+  });
+  await expect(attack).toHaveAccessibleName("Attack");
+  await expect(attack).toHaveAttribute("data-tooltip", "Existing breakdown");
+  await expect(page.locator("#outside")).not.toHaveAttribute("aria-label");
+});
+
+test("action buttons show generated icons and retain keyboard access and help", async ({ page }) => {
+  const css = readFileSync(new URL("../../styles/spycraft2.css", import.meta.url), "utf8");
+  const image = readFileSync(new URL("../../assets/ui/button-icons.png", import.meta.url)).toString("base64");
+  await page.addStyleTag({ content: css.replace("../assets/ui/button-icons.png", `data:image/png;base64,${image}`) });
+  const remove = page.getByRole("button", { name: "Remove", exact: true });
+  await expect(remove.locator(".sc2-button-icon")).toBeVisible();
+  await expect(remove.locator(".sc2-button-content")).toBeHidden();
+  await expect(remove).toHaveAttribute("title", /Remove this item/);
+  await remove.focus();
+  await expect(remove).toBeFocused();
+  await expect(page.locator('[data-action="tab"] .sc2-button-icon')).toHaveCount(0);
+  await expect(page.locator("#outside .sc2-button-icon")).toHaveCount(0);
+  await page.evaluate(() => window.tooltips.enhanceTooltips(document.querySelector("main")));
+  await expect(remove.locator(".sc2-button-icon")).toHaveCount(1);
+  await page.screenshot({ path: "test-results/button-icons-preview.png" });
+});

@@ -120,6 +120,8 @@ function labelFor(control) {
     const column = textWithoutControls(heading);
     if (column) return column;
   }
+  if (control.matches('input[type="button"], input[type="submit"], input[type="reset"]') && clean(control.value))
+    return clean(control.value);
   const placeholder = clean(control.getAttribute("placeholder"));
   if (placeholder) return placeholder;
   // Older compact forms sometimes omit a label; use the field's readable last segment.
@@ -166,10 +168,68 @@ export function tooltipText({ name = "", action = "", label = "", tag = "", type
   return text;
 }
 
+// Atlas order is documented in assets/ui/button-icons.md.
+export function buttonIconKind(action = "", label = "") {
+  const key = `${action} ${label}`;
+  if (/cancel|close|dismiss|dramaticOff/i.test(key)) return 15;
+  if (/delete|remove|clear/i.test(key)) return 2;
+  if (/reload|refresh|sync|recalculate|restore|reset/i.test(key)) return 9;
+  if (/damage|critical|error|infraction|hazard/i.test(key)) return 6;
+  if (/attack|target|aim|fire|feint|trip|disarm/i.test(key)) return 5;
+  if (/save|defen|cover|guard|armor|resist/i.test(key)) return 7;
+  if (/heal|recover|rest\b|vitality|wound|treat/i.test(key)) return 11;
+  if (/roll|dice|initiative|check/i.test(key)) return 4;
+  if (/chat|share|report|message/i.test(key)) return 12;
+  if (/browse|search|reference|review|open/i.test(key)) return 8;
+  if (/add|create|award|gain|increase/i.test(key)) return 0;
+  if (/edit|rename/i.test(key)) return 1;
+  if (/mission|scene|objective|conflict|season/i.test(key)) return 10;
+  if (/confirm|submit|finish|done|apply|keep|equip|select/i.test(key)) return 3;
+  if (/continue|next|setup|start/i.test(key)) return 13;
+  return 14;
+}
+
+function enhanceButtonIcon(control, label) {
+  if (
+    !label ||
+    !control.matches('button, a[data-action], a[data-roll-control], [role="button"]') ||
+    // Stat blocks and tab navigation carry information beyond their action name.
+    control.matches('.stat, [role="tab"], [data-action="tab"], .header-control')
+  )
+    return;
+  const index = buttonIconKind(control.dataset.action ?? control.dataset.rollControl ?? "", label);
+  control.style.setProperty("--sc2-icon-x", `${((index % 4) * 100) / 3}%`);
+  control.style.setProperty("--sc2-icon-y", `${(Math.floor(index / 4) * 100) / 3}%`);
+  if (!control.classList.contains("sc2-icon-button")) {
+    const content = control.ownerDocument.createElement("span");
+    content.className = "sc2-button-content";
+    content.setAttribute("aria-hidden", "true");
+    content.append(...control.childNodes);
+    const icon = control.ownerDocument.createElement("span");
+    icon.className = "sc2-button-icon";
+    icon.setAttribute("aria-hidden", "true");
+    control.append(content, icon);
+    control.classList.add("sc2-icon-button");
+  }
+}
+
 export function enhanceTooltips(root) {
   if (!root?.querySelectorAll) return;
   const controls = [...(root.matches?.(CONTROL) ? [root] : []), ...root.querySelectorAll(CONTROL)];
   for (const control of controls) {
+    // Capture the action name while text is still present, before replacing it with an icon.
+    // Name controls even when they already have authored tooltips.
+    const label = labelFor(control);
+    if (
+      control.matches(
+        'button, a[data-action], a[data-roll-control], [role="button"], input[type="button"], input[type="submit"], input[type="reset"]'
+      ) &&
+      !clean(control.getAttribute("aria-label")) &&
+      !control.hasAttribute("aria-labelledby") &&
+      label
+    )
+      control.setAttribute("aria-label", label);
+    enhanceButtonIcon(control, label);
     // Preserve existing authored help and calculated rule breakdowns.
     if (
       control.hasAttribute("title") ||
@@ -191,7 +251,7 @@ export function enhanceTooltips(root) {
             : control.matches("a[href]")
               ? "openLink"
               : ""),
-      label: labelFor(control),
+      label,
       tag: control.tagName,
       type: control.getAttribute("type") ?? "",
       hint,

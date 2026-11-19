@@ -255,3 +255,21 @@
 /* Contagions and fire on the Main tab. */
 .spycraft2 .hazards .hazard { margin: 0.15rem 0; }
 .spycraft2 .hazards .hazard.due { border-left: 3px solid var(--color-level-warning, #b8860b); padding-left: 0.4rem; }
+
+/* Generated espionage pictograms; accessible names and help remain on the control. */
+.spycraft2 .sc2-icon-button, [data-sc2-tooltip-scope] .sc2-icon-button,
+.spycraft2-roll-options .sc2-icon-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; width: 36px; min-width: 36px; height: 36px;
+  padding: 2px; line-height: 1; vertical-align: middle;
+}
+.sc2-icon-button > .sc2-button-content { display: none; }
+.sc2-icon-button > .sc2-button-icon {
+  display: block; width: 30px; height: 30px; pointer-events: none;
+  background-image: url("../assets/ui/button-icons.png");
+  background-size: 400% 400%;
+  background-position: var(--sc2-icon-x) var(--sc2-icon-y);
+  background-repeat: no-repeat;
+}
+.sc2-icon-button:focus-visible { outline: 2px solid var(--color-warm-1, #b8860b); outline-offset: 2px; }
+.sc2-icon-button:disabled > .sc2-button-icon { opacity: 0.45; }
