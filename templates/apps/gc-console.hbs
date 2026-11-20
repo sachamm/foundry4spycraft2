@@ -5,6 +5,10 @@
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Dice"}}</span><b class="sc2-value">{{#if dice.current}}{{dice.value}}{{else}}—{{/if}}</b></div>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Console.Round"}}</span><b class="sc2-value">{{#if combat}}{{combat.round}}{{else}}—{{/if}}</b></div>
   </div>
+  <p class="controls gc-session-steps">
+    <button type="button" data-action="beginSession" {{#unless dice.current}}class="gc-primary"{{/unless}} data-tooltip="{{localize 'SPYCRAFT.Console.BeginSessionHint'}}">{{localize "SPYCRAFT.Console.BeginSession"}}</button>
+    <button type="button" data-action="nextScene" data-tooltip="{{localize 'SPYCRAFT.Console.NextSceneHint'}}">{{localize "SPYCRAFT.Console.NextScene"}}</button>
+  </p>
   <details class="gc-section" data-section="clock" data-state="{{sections.clock.state}}" {{#if sections.clock.open}}open{{/if}}>
     <summary><h2>{{clock.title}}</h2><span class="gc-note">{{clock.now}}</span></summary>
     <p class="controls gc-clock-steps">{{#each clock.steps}}<button type="button" data-action="clockStep" data-seconds="{{seconds}}">{{label}}</button>{{/each}}<button type="button" data-action="clockAdvance">{{clock.advance}}</button><button type="button" data-action="clockDate">{{clock.setDate}}</button><button type="button" data-action="clockOpen">{{clock.open}}</button></p>
@@ -53,7 +57,7 @@
   <details class="gc-section" data-section="dice" data-state="{{sections.dice.state}}" {{#if sections.dice.open}}open{{/if}}>
     <summary><h2>{{localize "SPYCRAFT.Template.AppsGcConsole.SceneAndGCActionDice"}}</h2><span class="gc-note">{{#if dice.current}}{{dice.value}}{{/if}}</span></summary>
     <p>{{localize "SPYCRAFT.Template.AppsGcConsole.GCDice"}} {{#if dice.current}}<b>{{dice.value}}</b>{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.NotInitializedThisSession"}}{{/if}} {{localize "SPYCRAFT.Template.AppsGcConsole.StartingPool"}} {{dice.expected}}{{localize "SPYCRAFT.Template.AppsGcConsole.PlayersPresent2CaliberScene"}} <b>{{#if scene.dramatic}}{{localize "SPYCRAFT.Template.AppsGcConsole.Dramatic"}}{{else}}{{localize "SPYCRAFT.Template.AppsGcConsole.Standard"}}{{/if}}</b>.</p>
-    <p class="controls"><button type="button" data-action="gcDice">{{localize "SPYCRAFT.Template.AppsGcConsole.PoolHintsAndAwards"}}</button><button type="button" class="gc-primary" data-action="spendDice">{{localize "SPYCRAFT.Template.AppsGcConsole.SpendDice"}}</button>
+    <p class="controls"><button type="button" data-action="gcDice">{{#if dice.current}}{{localize "SPYCRAFT.Template.AppsGcConsole.PoolHintsAndAwards"}}{{else}}{{localize "SPYCRAFT.Console.SetUpPool"}}{{/if}}</button><button type="button" class="gc-primary" data-action="spendDice">{{localize "SPYCRAFT.Template.AppsGcConsole.SpendDice"}}</button>
     {{#if scene.dramatic}}<button type="button" data-action="dramaticOff">{{localize "SPYCRAFT.Template.AppsGcConsole.ReturnToAStandardScene"}}</button><button type="button" data-action="doubleInitiative">{{localize "SPYCRAFT.Template.AppsGcConsole.DoubleOpponentsInitiative"}}</button>{{else}}<button type="button" data-action="dramaticOn">{{localize "SPYCRAFT.Template.AppsGcConsole.ScriptedDramaticSceneNoCost"}}</button>{{/if}}</p>
   </details>
   <details class="gc-section" data-section="combat" data-state="{{sections.combat.state}}" {{#if sections.combat.open}}open{{/if}}>

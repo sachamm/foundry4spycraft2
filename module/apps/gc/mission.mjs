@@ -25,6 +25,9 @@ import {
   setCampaign
 } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
+import { startUsagePeriod } from "../../rules/periods.mjs";
+import { gcDiceStatus, initializeGCDice } from "../../rules/gc-dice.mjs";
+import { systemDialog } from "../dialog-theme.mjs";
 
 const T = GC_DATA.tables;
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
@@ -93,8 +96,56 @@ export async function editMission() {
 }
 
 /** Begin the mission: the Threat Level is calculated once, now (p.423), and NPCs that follow the mission rescale. */
+/** Ask once before a step that resets characters' uses. */
+const confirmStep = (title, lines) =>
+  systemDialog.confirm({
+    window: { title },
+    content: `<ol>${lines.map(line => `<li>${esc(line)}</li>`).join("")}</ol>`,
+    rejectClose: false
+  });
+
+/**
+ * Begin a play session in one step: start the session period (session uses and action dice reset), set up the GC
+ * pool from the team and the mission's Caliber, and apply the Threat Level and campaign-quality starting dice.
+ */
+export async function beginSession() {
+  requireGC();
+  const mission = getMission(),
+    players = teamActors(mission).length,
+    caliber = mission.caliber;
+  const ok = await confirmStep(loc`Begin a session`, [
+    loc`Start a new session: abilities usable once per session come back and each agent's action dice reset.`,
+    loc`GC action dice: ${players} player character(s) + 2 × Caliber ${caliber} = ${players + 2 * caliber}.`,
+    loc`Apply the mission's Threat Level and campaign-quality changes to the agents' starting dice.`
+  ]);
+  if (!ok) return null;
+  await startUsagePeriod("session");
+  await initializeGCDice({ playersPresent: players, caliber, replaceExisting: gcDiceStatus().current });
+  await applySessionDiceAdjustments();
+  return true;
+}
+
+/**
+ * Move on to the next scene: start the scene period (scene uses come back, a dramatic scene and NPCs' accumulated
+ * damage end) and count the scene played for the mission's XP.
+ */
+export async function nextScene() {
+  requireGC();
+  const mission = getMission();
+  const ok = await confirmStep(loc`Next scene`, [
+    loc`Abilities usable once per scene come back; a dramatic scene returns to standard; standard NPCs' accumulated damage clears.`,
+    ...(mission.active ? [loc`Count the scene just played toward the mission's XP.`] : [])
+  ]);
+  if (!ok) return null;
+  await startUsagePeriod("scene");
+  if (mission.active) await updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }));
+  return true;
+}
+
 export async function startMission() {
   requireGC();
+  // The mission record and the mission's usage period begin together: mission uses come back.
+  await startUsagePeriod("mission");
   await updateMission({ active: true, infractions: [], scenesPlayed: 0 });
   const tl = await fixThreatLevel(),
     mission = getMission(),

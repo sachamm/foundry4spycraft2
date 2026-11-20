@@ -35,8 +35,8 @@
     {{#each saves}}<button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave" data-save="{{key}}" aria-label="Roll {{label}}"><span class="sc2-caption">{{label}}</span><b class="sc2-value" {{sc2tip tip}}>{{signed total}}</b></button>{{/each}}
   </div>
 
-  <div class="rail-block action-dice" data-sc2-display="icon">
-    <span class="sc2-caption">{{localize "SPYCRAFT.ActionDice.Label"}} <span class="die" {{sc2tip tips.actionDice}}>d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}}</span></span>
+  <div class="rail-block action-dice" data-sc2-display="both">
+    <span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.ActionDice.What'}}">{{localize "SPYCRAFT.ActionDice.Label"}} <i class="fa-solid fa-circle-question" aria-hidden="true"></i> <span class="die" {{sc2tip tips.actionDice}}>d{{system.actionDice.die}}{{#if system.actionDice.bonus}}{{signed system.actionDice.bonus}}{{/if}}</span></span>
     <div class="dice-line">
       <input type="number" name="system.actionDice.value" aria-label="{{localize 'SPYCRAFT.ActionDice.Label'}}" value="{{system.actionDice.value}}" />
       <span class="sc2-pips" aria-hidden="true">{{#each actionDicePips}}<i class="{{#if this}}on{{/if}}"></i>{{/each}}</span>
@@ -47,7 +47,6 @@
       <a data-action="healActionDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.HealOutsideCombatWithActionDice'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Heal"}}</a>
       <a data-action="refreshAction" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginOrCompleteAFullRound'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Refresh"}}</a>
       <a data-action="boostDefense" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BoostDefenseWithAnActionDie'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Defense"}}</a>
-      <a data-action="restAndRecover">{{playLabels.rest}}</a>
       {{#if dying}}<a data-sc2-display="both" data-action="rollDying" class="bad">{{playLabels.dying}}</a>{{/if}}
     </div>
   </div>
