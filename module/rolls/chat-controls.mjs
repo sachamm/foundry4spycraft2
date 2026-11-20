@@ -19,6 +19,7 @@ import { shakenRules } from "../rules/shaken.mjs";
 import { loc } from "../i18n.mjs";
 import { renderCheckGuidance } from "./chat-guidance.mjs";
 import { runChatAction } from "../apps/chat-action-feedback.mjs";
+import { targetResponseControls } from "../apps/target-response.mjs";
 
 /** The viewer rolled this check (or is the GC) and it carries a result. */
 const ownsResult = ({ message, check, user }) => Number.isFinite(check.rawTotal) && (message.isAuthor || user.isGM);
@@ -235,12 +236,25 @@ function row(controls) {
 /** Add this system's buttons to a rendered chat message (the `renderChatMessageHTML` hook). */
 export function renderCheckControls(message, html) {
   const check = message.flags?.spycraft2;
-  if (!check?.actorUuid || (message.blind && !game.user.isGM)) return;
+  if (!check?.actorUuid) return;
+  if (message.blind && !game.user.isGM) {
+    // A secret or passive check hides its result from the player who made it: say where it went.
+    if (message.isAuthor && !html.querySelector(".sc2-secret-note")) {
+      const note = document.createElement("p");
+      note.className = "spycraft2 sc2-secret-note";
+      note.textContent = loc`Secret check: the rules keep this result from you. It went to the GC, who tells you the outcome.`;
+      (html.querySelector(".message-content") ?? html).append(note);
+    }
+    return;
+  }
   // Posted in another language: show this viewer the record's notes in their own.
   const translated = viewerFlavor(check, game.i18n?.lang);
   const flavor = translated ? html.querySelector(".flavor-text") : null;
   if (flavor) flavor.innerHTML = translated;
   const actor = fromUuidSync(check.actorUuid);
+  // The player whose agent is the target answers from the same card.
+  const response = targetResponseControls({ message, check, user: game.user });
+  if (response.length) html.append(row(response.map(control => ({ ...control, placement: "card" }))));
   if (!actor?.isOwner) return;
   renderCheckGuidance(message, check, html, game.user);
   const controls = rollPipeline.chatControls({ message, check, actor, user: game.user, checkKind: check.checkKind });

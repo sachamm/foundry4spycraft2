@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+- **Fixes from the live play review.**
+  - Agent tokens now have vision, so players no longer get a black map on scenes that use token vision. New agents,
+    the sample agents and (through a one-time world update) existing agents and their placed tokens are covered.
+  - **Begin play** fills the empty Vitality and Wounds of a character who has never played, as well as granting the
+    starting action dice.
+  - A Shift-click attack that cannot measure what it needs (a CQB distance with no single target, for example) opens
+    the attack dialog with a notice instead of doing nothing.
+  - The player whose agent is attacked gets buttons on the attack card (check Defense, boost Defense with an action
+    die) and on its damage card (apply the damage).
+  - Resolving an attack: an attacker can no longer be its own target; the target list shows the tokens in view and
+    the combatants, with people who are not on the scene only as a fallback; a token a player can see can be named as
+    the target even when its sheet cannot be opened; and with one token targeted the Resolve button settles against
+    it without the picker. The one-click Resolve button says whether the roll hits.
+  - A quick (Shift-click) NPC attack on a targeted token is resolved as soon as it is rolled (client setting
+    "Resolve quick NPC attacks at once", on by default).
+  - The builder's "Next setup step" and the creation track's "Start here" now always name the same step, and the next
+    step sits at the top of the rail where a small screen still shows it.
+  - Stress and subdual damage: the report says how much got through and the running total against the threshold,
+    and the totals have meters beside Vitality and Wounds once any has been taken.
+  - A player's own secret check carries a note saying the result went to the GC.
+  - Sheets open at the left, no wider than the room beside the sidebar (agent sheet 860 px by default), and a
+    minimised sheet no longer leaves part of its content on the map.
+  - Chat cards and the GC console take their background and text colours from the same tokens as the sheets, which
+    fixes text that was too faint or dark on dark; the card's next step is the filled button wherever it sits.
+  - Roll visibility uses Foundry 14's `messageMode` option, and the GC no longer gets a "resource transaction in
+    progress" warning from background bookkeeping while a player's own action is running.
+
 - Added **Operation Glass Wake** as a built-in Adventure compendium: three staged encounters, four level-1 pregens, five NPCs, GM notes, player briefing and an opt-in mission-setup macro. Its agents, NPCs and maps are assembled from the current system catalogs. Import does not activate a scene or replace an existing mission record.
 
 - **Class ability reminders.** Roll dialogs now list the character's class abilities that the system does not work

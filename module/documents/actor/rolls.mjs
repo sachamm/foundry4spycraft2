@@ -1,4 +1,5 @@
 /** Checks a character rolls: the shared roll itself, attribute checks, saves and action dice. */
+import { messageModeOption } from "../../rolls/message-mode.mjs";
 import { blackCatRollEffect } from "../../rules/black-cat.mjs";
 import { allOrNothingEligible, allOrNothingRanges } from "../../rules/all-or-nothing.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
@@ -469,7 +470,7 @@ export const ActorRolls = Base =>
           });
         return await roll.toMessage(
           { speaker: ChatMessage.getSpeaker({ actor: this }), flavor: checkFlavor(check), flags: { spycraft2: check } },
-          { rollMode }
+          messageModeOption(rollMode)
         );
       } catch (error) {
         if (check.analysisTask?.pressureRollId) {

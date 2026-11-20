@@ -307,7 +307,13 @@ export function buildSampleAgents(data, packs, { id, stats, commonCatalog, ammoC
       type: "agent",
       img: spec.portrait,
       system: state,
-      prototypeToken: { name: spec.codename, actorLink: true, disposition: 1, texture: { src: spec.token } },
+      prototypeToken: {
+        name: spec.codename,
+        actorLink: true,
+        disposition: 1,
+        sight: { enabled: true },
+        texture: { src: spec.token }
+      },
       items: items.map(i => i._id),
       effects: [],
       folder: folders.find(f => f.name === cls.name)._id,
@@ -401,7 +407,13 @@ export function buildSampleAgents(data, packs, { id, stats, commonCatalog, ammoC
           )
         ].join("")
       },
-      prototypeToken: { name: spec.name, actorLink: true, disposition: 1, texture: { src: spec.token } },
+      prototypeToken: {
+        name: spec.name,
+        actorLink: true,
+        disposition: 1,
+        sight: { enabled: true },
+        texture: { src: spec.token }
+      },
       items: companionItems.map(i => i._id),
       effects: [],
       folder: folders.find(f => f.name === "Scout")._id,

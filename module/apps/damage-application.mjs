@@ -51,7 +51,13 @@ import { loc } from "../i18n.mjs";
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
-const canSee = actor => actor?.isOwner === true || game.user?.isGM === true || actor?.visible === true;
+/** Whether a token of this actor is in this user's view on the current scene (not hidden, not out of sight). */
+export const tokenInView = actor => {
+  const tokens = actor?.token ? [actor.token.object ?? { document: actor.token }] : (actor?.getActiveTokens?.() ?? []);
+  return tokens.some(token => token && token.document?.hidden !== true && token.visible !== false);
+};
+const canSee = actor =>
+  actor?.isOwner === true || game.user?.isGM === true || actor?.visible === true || tokenInView(actor);
 /** Post a report. `pendingSave` makes it a card with a button that rolls the save it calls for. */
 const post = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
   ChatMessage.create({
@@ -64,18 +70,25 @@ const post = (actor, lines, { pendingSave = null, rolls = [] } = {}) =>
     ...(pendingSave ? { flags: { spycraft2: { actorUuid: actor.uuid, checkKind: "note", pendingSave } } } : {})
   });
 
-/** Characters and vehicles an attack or its damage can be settled against: targeted tokens first. */
-export function targetChoices() {
+/**
+ * Characters and vehicles an attack or its damage can be settled against: targeted tokens first.
+ * @param {object} [options]
+ * @param {string} [options.exclude]   an actor uuid left out (the attacker, when resolving its own attack)
+ * @param {"always"|"fallback"} [options.offScene]  "fallback" lists characters with no token on the scene only
+ *                                     when nobody on the scene or in a combat can be chosen
+ */
+export function targetChoices({ exclude = "", offScene = "always" } = {}) {
   const actors = new Map();
-  const targeted = values(game.user?.targets).filter(token => TARGET_TYPES.includes(token.actor?.type));
+  const allowed = actor => TARGET_TYPES.includes(actor?.type) && actor.uuid !== exclude;
+  const targeted = values(game.user?.targets).filter(token => allowed(token.actor));
   for (const token of targeted) actors.set(token.actor.uuid, token.actor);
   const add = actor => {
-    if (TARGET_TYPES.includes(actor?.type) && canSee(actor) && !actors.has(actor.uuid)) actors.set(actor.uuid, actor);
+    if (allowed(actor) && canSee(actor) && !actors.has(actor.uuid)) actors.set(actor.uuid, actor);
   };
   for (const combat of values(game.combats)) for (const turn of combat.turns ?? []) add(turn.actor);
   // Tokens on the scene in view, then characters with no token there, which are marked as not on the scene.
   for (const token of values(globalThis.canvas?.scene?.tokens)) add(token.actor);
-  for (const actor of values(game.actors)) add(actor);
+  if (offScene === "always" || !actors.size) for (const actor of values(game.actors)) add(actor);
   return { actors: [...actors.values()], selected: targeted.length === 1 ? targeted[0].actor.uuid : "" };
 }
 
@@ -92,7 +105,11 @@ export function defenseOf(target) {
  */
 export function declaredTarget(check) {
   const uuid = check.attackContext?.targetActorUuid;
-  const actor = uuid ? fromUuidSync(uuid) : null;
+  return readableTarget(uuid && uuid !== check.actorUuid ? fromUuidSync(uuid) : null);
+}
+
+/** { actor, defense } for a target whose Defense this viewer may read from its sheet, otherwise null. */
+function readableTarget(actor) {
   if (!actor || !TARGET_TYPES.includes(actor.type) || !canSee(actor)) return null;
   if (!actor.isOwner && !game.user?.isGM && !defenseVisibleToPlayers()) return null;
   const defense = defenseOf(actor);
@@ -115,6 +132,10 @@ export function targetLabel(actor) {
   const onScene = !!actor.token || (actor.getActiveTokens?.().length ?? 0) > 0;
   return onScene || actor.type === "vehicle" ? name : loc`${name} (not on the scene)`;
 }
+
+/** The name a target goes by on the map: its token's name, or the actor's when it has no token here. */
+export const tokenName = actor =>
+  actor?.token?.name || actor?.getActiveTokens?.()?.[0]?.document?.name || actor?.name || "";
 
 /** Number repeated labels ("Thug 1", "Thug 2") so identical tokens can be told apart in a picker. */
 export function distinctLabels(labels) {
@@ -146,7 +167,9 @@ const targetOptions = (actors, selected, label) => {
 /**
  * Settle a posted attack against a target's Defense and confirm its outcome.
  * @param {ChatMessage} message  the attack card
- * @param {object} [options]     { targetUuid, defense } to skip the dialog
+ * @param {object} [options]     { targetUuid, defense } to skip the dialog; { ask: true } to always show it.
+ *                               With neither, an attack that recorded no target is settled straight away against
+ *                               the one token the user has targeted, and the dialog opens only when there is none.
  */
 export async function resolveAttack(message, options = {}) {
   const check = message.flags?.spycraft2,
@@ -155,9 +178,19 @@ export async function resolveAttack(message, options = {}) {
   if (check.resolved || check.superseded)
     return ui.notifications.warn(loc`This attack has already been resolved or replaced.`);
   let input = options;
+  const declared = check.attackContext?.targetActorUuid || "";
   if (input.defense === undefined && input.targetUuid === undefined) {
-    const choices = targetChoices(),
-      selected = check.attackContext?.targetActorUuid || choices.selected;
+    // The attacker is never its own target, and people who are not on the scene are listed only as a fallback.
+    const targeted = targetChoices({ exclude: attacker.uuid, offScene: "fallback" }).selected;
+    const quick =
+      options.ask !== true && !check.attackResolution && !declared && targeted
+        ? readableTarget(fromUuidSync(targeted))
+        : null;
+    if (quick) input = { targetUuid: quick.actor.uuid, defense: "" };
+  }
+  if (input.defense === undefined && input.targetUuid === undefined) {
+    const choices = targetChoices({ exclude: attacker.uuid, offScene: "fallback" }),
+      selected = (declared !== attacker.uuid && declared) || choices.selected;
     input = await systemDialog.input({
       window: { title: loc`Attack result ${check.effectiveTotal}: against Defense` },
       rejectClose: false,
@@ -174,6 +207,8 @@ export async function resolveAttack(message, options = {}) {
     if (!input) return null;
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
+  if (target && target.uuid === attacker.uuid)
+    return ui.notifications.warn(loc`${attacker.name} cannot be the target of its own attack. Choose another target.`);
   const entered = input.defense === "" || input.defense === null || input.defense === undefined;
   const defense = entered ? defenseOf(target) : Number(input.defense);
   if (!Number.isSafeInteger(defense) || defense < 0)
@@ -226,6 +261,52 @@ export async function resolveAttack(message, options = {}) {
   return resolution;
 }
 
+/** ": hit" or ": miss" for an attack card's total against a Defense, or "" when it cannot be told yet. */
+export function standingAgainst(check, defense, attacker) {
+  try {
+    const outcome = attackOutcome({
+      total: check.effectiveTotal,
+      defense,
+      fireAction: check.attackContext?.fireAction ?? null,
+      feats: attacker?.system?.activeFeatNames ?? []
+    });
+    return outcome.hit ? loc`: hit` : loc`: miss`;
+  } catch {
+    return "";
+  }
+}
+
+/** The GC's setting: a quick (Shift-click) NPC attack on a known target is resolved as soon as it is rolled. */
+export function registerQuickResolveSetting() {
+  game.settings.register("spycraft2", "quickNpcResolve", {
+    name: loc`Resolve quick NPC attacks at once`,
+    hint: loc`On: when an NPC's attack is rolled without its dialog against one targeted token, it is resolved against that token's Defense straight away. Use a normal click when you want to spend action dice on the attack first.`,
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+}
+
+/**
+ * After a quick NPC attack: settle it against the target recorded on its card. Anything that cannot be settled
+ * this way is left on the card for its usual buttons.
+ * @returns the card, as the attack returned it
+ */
+export async function resolveQuickAttack(message) {
+  const check = message?.flags?.spycraft2;
+  try {
+    if (check?.checkKind !== "attack" || check.attackResolution || check.resolved) return message;
+    if (!game.user?.isGM || game.settings.get("spycraft2", "quickNpcResolve") === false) return message;
+    if (check.attackContext?.fireAction?.action === "strafe") return message;
+    const known = declaredTarget(check);
+    if (known) await resolveAttack(message, { targetUuid: known.actor.uuid, defense: "" });
+  } catch (error) {
+    console.warn("Spycraft 2.0 | The quick attack was left for its card.", error);
+  }
+  return message;
+}
+
 rollPipeline.register({ id: "sourceAttackRecord", order: 9598, record: ["sourceAttack"] });
 
 rollPipeline.register({
@@ -240,7 +321,8 @@ rollPipeline.register({
       const known = !check.attackResolution ? declaredTarget(check) : null;
       if (known)
         controls.push({
-          label: loc`Resolve vs Defense ${known.defense} (${known.actor.name})`,
+          // The viewer can already read this Defense, so the button says how the roll stands against it.
+          label: loc`Resolve vs Defense ${known.defense} (${tokenName(known.actor)})${standingAgainst(check, known.defense, actor)}`,
           placement: "card",
           emphasis: "primary",
           run: () => resolveAttack(message, { targetUuid: known.actor.uuid, defense: "" })
@@ -253,7 +335,8 @@ rollPipeline.register({
             : loc`Resolve against Defense`,
         placement: "card",
         ...(known ? {} : { emphasis: "primary" }),
-        run: () => resolveAttack(message)
+        // With no target on the card, the first press settles against the one targeted token, if there is one.
+        run: () => resolveAttack(message, check.attackResolution || known ? { ask: true } : {})
       });
     }
     const resolution = check.attackResolution,
@@ -297,6 +380,32 @@ const NPC_TYPED = ["bang", "flash", "explosive"];
 const typeLabel = type => (type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type));
 
 /**
+ * What an agent's ledger did with a stress or subdual hit: how much got past the agent's defenses, the running
+ * total against the threshold, and whether a save is now waiting. `record` is the ledger's receipt.
+ */
+export function accumulatedDamageLines(name, kind, amount, record, system = {}) {
+  if (!record || !Number.isSafeInteger(record.newDamage))
+    return [
+      loc`${name}: ${amount} ${kind} damage recorded before defenses. Any save it calls for is waiting on the sheet.`
+    ];
+  const threshold = system[kind + "Threshold"],
+    against = Number.isSafeInteger(threshold) ? loc` (threshold ${threshold})` : "";
+  const lines = [
+    record.newDamage === amount
+      ? loc`${name} takes ${amount} ${kind} damage: ${record.total} in all${against}.`
+      : record.newDamage > 0
+        ? loc`${name}: ${amount} ${kind} damage, ${record.newDamage} after damage reduction and resistance: ${record.total} in all${against}.`
+        : loc`${name}: damage reduction and resistance stop all ${amount} ${kind} damage. The total stays at ${record.total}${against}.`
+  ];
+  lines.push(
+    record.save
+      ? loc`This calls for a save, DC ${record.save.dc}: it is waiting on the sheet, beside the ${kind} total.`
+      : loc`No save is called for yet. Vitality and wounds do not change; the ${kind} total is shown beside them on the sheet.`
+  );
+  return lines;
+}
+
+/**
  * Stress or subdual damage. An agent's goes to the ledger, which works out its own save. A special NPC keeps two
  * running totals; when a threshold or a critical hit calls for a save, the report carries the button for it.
  * @returns {{lines: string[], pendingSave: object|null}}
@@ -305,7 +414,7 @@ async function nonLethalDamage(target, kind, amount, facts) {
   const { source, attackKind, armorPiercing = 0, armorPiercingAll = false, critical = false } = facts;
   if (target.type === "agent") {
     try {
-      await applyAccumulatedDamage(target, {
+      const record = await applyAccumulatedDamage(target, {
         source: `${source} [${foundry.utils.randomID(6)}]`,
         kind,
         newDamage: amount,
@@ -316,9 +425,7 @@ async function nonLethalDamage(target, kind, amount, facts) {
           : { damageMode: "stressBeforeResistance" })
       });
       return {
-        lines: [
-          loc`${esc(target.name)}: ${amount} ${kind} damage recorded before defenses. Any save it calls for is waiting on the sheet.`
-        ],
+        lines: accumulatedDamageLines(esc(target.name), kind, amount, record, target.system),
         pendingSave: null
       };
     } catch (error) {

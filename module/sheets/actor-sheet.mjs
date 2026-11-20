@@ -1,3 +1,4 @@
+import { placeSheet } from "./sheet-placement.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
@@ -45,6 +46,7 @@ import { settlePendingDamageSave } from "../apps/damage-settlement.mjs";
 import { rollPendingDamageSave } from "../apps/damage-saves.mjs";
 import { reviewDamageLedger, applyAccumulatedDamage } from "../apps/damage-ledger.mjs";
 import { checkAccumulatedDamage } from "../apps/accumulated-damage.mjs";
+import { nonLethalMeters } from "../rules/accumulated-damage.mjs";
 import { settleGrapple } from "../apps/combat-actions.mjs";
 import {
   acidStep,
@@ -98,7 +100,7 @@ import { computeAgent } from "../rules/engine.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
 import { ACTION_COSTS } from "../rules/combat-actions.mjs";
-import { nonLethalTotals } from "../apps/damage-application.mjs";
+import { nonLethalTotals, resolveQuickAttack } from "../apps/damage-application.mjs";
 import { reloadWeapon, resupplyWeapon, weaponAmmunition } from "../apps/ammunition-use.mjs";
 import { ammunitionLabel } from "../rules/ammunition-use.mjs";
 import { planAmmunitionStockpile } from "../apps/ammunition-planner.mjs";
@@ -185,9 +187,15 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   _skillSearch = "";
   _trainedOnly = false;
 
+  /** Open against the left edge, clear of the map's centre and the chat. */
+  _initializeApplicationOptions(options) {
+    return placeSheet(super._initializeApplicationOptions(options), options);
+  }
+
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "agent"],
-    position: { width: 980, height: 760 },
+    // Wide enough for the rail and one pane, narrow enough to leave the map and the chat in view.
+    position: { width: 860, height: 760 },
     window: { resizable: true },
     form: { submitOnChange: true },
     actions: {
@@ -931,6 +939,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       open: this._open,
       editMode: this.isEditable && this._editMode,
       activeConditions: activeConditionLabels(sys),
+      nonLethalMeters: nonLethalMeters(sys),
       showAllTools: game.user.isGM && this._showAllTools,
       combatTools: combatToolVisibility(sys, COMBAT_STANCES, { showAll: game.user.isGM && this._showAllTools })
     });
@@ -1779,6 +1788,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
   /** A local view preference. Null until first render, when an NPC with nothing built yet opens in setup. */
   _editMode = null;
 
+  /** Open against the left edge, clear of the map's centre and the chat. */
+  _initializeApplicationOptions(options) {
+    return placeSheet(super._initializeApplicationOptions(options), options);
+  }
+
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "npc"],
     position: { width: 800, height: 800 },
@@ -2129,9 +2143,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
   static #onRollSave(event, target) {
     return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
   }
-  static #onRollAttack(event, target) {
+  static async #onRollAttack(event, target) {
     const item = this._item(target);
-    return this.actor.rollAttack(item, skipDialog(event) ? quickAttackOptions(this.actor, item) : { askContext: true });
+    if (!skipDialog(event)) return this.actor.rollAttack(item, { askContext: true });
+    // A quick NPC attack on a targeted token goes straight on to hit or miss.
+    return resolveQuickAttack(await this.actor.rollAttack(item, quickAttackOptions(this.actor, item)));
   }
   static #onRollDamage(event, target) {
     return this.actor.rollDamage(this._item(target));

@@ -1388,9 +1388,16 @@ export const ActorActionDice = Base =>
             receiptId,
             claimedAt: game.time?.worldTime ?? 0
           };
+        // A character that has never played has empty health tracks; it enters play at full health.
+        const health = {};
+        for (const track of ["vitality", "wounds"]) {
+          const { value, max } = this.system[track] ?? {};
+          if (value === 0 && max > 0) health[`system.${track}.value`] = max;
+        }
         try {
           await this.update({
             "system.actionDice.value": plan.value,
+            ...health,
             ...this.actorRecordRestorePatch("flags.spycraft2.startingDiceCreation", record)
           });
         } catch (error) {

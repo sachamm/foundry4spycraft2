@@ -236,3 +236,30 @@ export function damageLedgerEventPlan(
     }
   };
 }
+
+/**
+ * The stress and subdual totals to show beside vitality and wounds: only the kinds the agent has taken, each
+ * against its threshold, marked when a save is waiting. These never lower vitality or wounds, so without a meter
+ * a hit of this kind looks as if it did nothing.
+ * @returns {{kind: string, label: string, total: number, threshold: number, pending: boolean, action: string,
+ *            tooltip: string}[]}
+ */
+export function nonLethalMeters(system = {}) {
+  const ledger = system.accumulatedDamage;
+  if (!ledger) return [];
+  const pending = Array.isArray(ledger.pending) && ledger.pending.length > 0;
+  return [
+    ["stress", loc`Stress`],
+    ["subdual", loc`Subdual`]
+  ]
+    .map(([kind, label]) => ({ kind, label, total: Number(ledger[kind]) || 0, threshold: system[kind + "Threshold"] }))
+    .filter(row => row.total > 0 && Number.isSafeInteger(row.threshold) && row.threshold > 0)
+    .map(row => ({
+      ...row,
+      pending,
+      action: pending ? "rollPendingDamageSave" : "checkAccumulatedDamage",
+      tooltip: pending
+        ? loc`${row.label} damage ${row.total}, threshold ${row.threshold}. A save is waiting: click to roll it.`
+        : loc`${row.label} damage ${row.total}, threshold ${row.threshold}. Click to check the thresholds.`
+    }));
+}

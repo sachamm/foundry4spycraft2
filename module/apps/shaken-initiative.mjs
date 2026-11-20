@@ -127,7 +127,8 @@ export function reconcileShakenInitiative(actor) {
       }
       actor.sheet?.render(false);
     },
-    { allowPeriodReview: true }
+    // Runs from a hook after any change to the character, often while its player's own action holds the lock.
+    { allowPeriodReview: true, background: true }
   );
 }
 export async function reviewShakenInitiative(actor, combatId, combatantId, options = {}) {

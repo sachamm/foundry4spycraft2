@@ -16,7 +16,8 @@ import { validateCheapShotTarget } from "../../apps/cheap-shot.mjs";
 import {
   completeCharacterTarget,
   validateCharacterTarget,
-  attackCharacterTargetChoices
+  attackCharacterTargetChoices,
+  observedAttackTargetChoices
 } from "../../apps/character-target.mjs";
 import { validateFinalRoundReservation } from "../../rules/final-round.mjs";
 import { cqbRangePlan } from "../../rules/cqb.mjs";
@@ -75,19 +76,28 @@ export const ActorAttackRolls = Base =>
       if (options.quickEntered && !options.askContext) {
         // Shift-click: the remembered and measured choices are read as if entered in the dialog.
         const { quickEntered, ...rest } = options;
-        options = {
-          ...rest,
-          ...rollPipeline.read(
-            {
-              dialog: "attack",
-              actor: this,
-              item,
-              needsCQB: cqbRangePlan(this.system, item.system, rest).active,
-              entered: { ...quickEntered }
-            },
-            {}
-          )
-        };
+        try {
+          options = {
+            ...rest,
+            ...rollPipeline.read(
+              {
+                dialog: "attack",
+                actor: this,
+                item,
+                needsCQB: cqbRangePlan(this.system, item.system, rest).active,
+                entered: { ...quickEntered }
+              },
+              {}
+            )
+          };
+        } catch (error) {
+          // Something the roll needs could not be remembered or measured (for example the distance, with no
+          // single target on the map): the dialog opens so it can be entered, instead of the click doing nothing.
+          globalThis.ui?.notifications?.info(
+            loc`${item.name}: the quick roll needs more detail (${error.message}) Opening the attack dialog.`
+          );
+          options = { ...rest, askContext: true };
+        }
       }
       const initialCQB = cqbRangePlan(this.system, item.system, options);
       if (
@@ -144,7 +154,10 @@ export const ActorAttackRolls = Base =>
       const validateDeclaredTarget = () => {
         if (
           (options.characterTarget?.actorUuid || options.targetActorUuid || null) !== declaredTargetUuid ||
-          (declaredTargetUuid && !attackCharacterTargetChoices().some(a => a.uuid === declaredTargetUuid))
+          (declaredTargetUuid &&
+            !attackCharacterTargetChoices().some(a => a.uuid === declaredTargetUuid) &&
+            // An ordinary attack may also name a token the attacker can see without being able to open its sheet.
+            (options.characterTarget || !observedAttackTargetChoices(this).some(a => a.uuid === declaredTargetUuid)))
         )
           throw Error(loc`The explicitly selected attack target changed or is no longer an observed character.`);
       };

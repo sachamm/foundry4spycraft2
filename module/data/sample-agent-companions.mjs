@@ -108,6 +108,9 @@ export const SAMPLE_COMPANIONS = [
       "name": "Bracken",
       "actorLink": true,
       "disposition": 1,
+      "sight": {
+        "enabled": true
+      },
       "texture": {
         "src": "systems/spycraft2/assets/agents/bracken/token.webp"
       }

@@ -2,6 +2,7 @@
  * instead of literal values, so the light and dark variants stay in step. */
 .spycraft2,
 .spycraft2-roll-options,
+.chat-message.sc2-card,
 [data-sc2-tooltip-scope] {
   /* Roles */
   --sc2-surface: #f2eee3;
@@ -76,6 +77,9 @@ body.theme-dark .spycraft2.application:not(.theme-light),
 .spycraft2.application.theme-dark,
 body.theme-dark .chat-message:is(.sc2-card, :has(> .spycraft2)) :is(.spycraft2, .spycraft2-roll-options),
 body.theme-dark .chat-message.sc2-card,
+.theme-dark .spycraft2.gc-console:not(.theme-light),
+.theme-dark .spycraft2.gc-console:not(.theme-light) :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]),
+.spycraft2.gc-console.theme-dark,
 body.theme-dark .spycraft2.application:not(.theme-light) :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]),
 .spycraft2.application.theme-dark :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]) {
   --sc2-surface: #171c1c;

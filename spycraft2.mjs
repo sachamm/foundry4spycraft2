@@ -73,6 +73,7 @@ import { registerErrorNotices } from "./module/error-notices.mjs";
 import * as gameClock from "./module/apps/game-clock.mjs";
 import { installGCRelay, askGC } from "./module/apps/gc-relay.mjs";
 import { registerFastPathSetting } from "./module/apps/remembered-choices.mjs";
+import { registerQuickResolveSetting } from "./module/apps/damage-application.mjs";
 import { installTurnCue } from "./module/apps/turn-cue.mjs";
 import { installHotbar, rollFromMacro } from "./module/apps/hotbar.mjs";
 
@@ -193,6 +194,7 @@ Hooks.once("init", () => {
   gameClock.installGameClock();
   installGCRelay();
   registerFastPathSetting();
+  registerQuickResolveSetting();
   registerTableTrustSetting();
   installTurnCue();
   installHotbar();

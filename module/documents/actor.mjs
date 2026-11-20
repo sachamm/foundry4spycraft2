@@ -59,6 +59,12 @@ export class SpycraftActor extends ActorRolls(
         };
       }
     }
+    // Players need their agent's token to see on scenes that use token vision. An explicit choice is kept.
+    if ((data.type ?? this.type) === "agent" && data.prototypeToken?.sight?.enabled === undefined) {
+      // The update below is not recursive, so it carries the whole prototype token with sight switched on.
+      const token = this._source?.prototypeToken ?? data.prototypeToken ?? {};
+      updates.prototypeToken = { ...token, sight: { ...(token.sight ?? {}), enabled: true } };
+    }
     if (Object.keys(updates).length) this.updateSource(updates, { recursive: false });
   }
 
