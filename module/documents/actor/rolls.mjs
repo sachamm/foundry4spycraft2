@@ -31,7 +31,7 @@ import { unrestrictedBonusPools } from "../../rules/bonus-pools.mjs";
 import { checkFlavor, rollEvidence } from "../../rules/outcomes.mjs";
 import { weaponAttack } from "../../rules/gear.mjs";
 import { resolveSkillResult } from "../../rules/checks.mjs";
-import { featReminders } from "../../rules/feat-reminders.mjs";
+import { characterReminders } from "../../rules/feat-reminders.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorRolls = Base =>
@@ -539,7 +539,7 @@ export const ActorRolls = Base =>
           this.system.mentalLeapState?.fatigueSaveBonus ||
           this.system.conditionContext?.baffled === true ||
           !!stillStandingContent ||
-          featReminders(this.items, { kind: "save", saveKey: key }).length > 0)
+          characterReminders(this, { kind: "save", saveKey: key }).length > 0)
       ) {
         input = await systemDialog.input({
           window: { title: game.i18n.localize(CONFIG.SPYCRAFT.saves[key].label) },

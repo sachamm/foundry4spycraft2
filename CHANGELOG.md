@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **Class ability reminders.** Roll dialogs now list the character's class abilities that the system does not work
+  out, next to the feat reminders, once the character reaches them in that class (`classAbilities` in
+  `src/data/feat-reminders.json`): Alpha Strike, Put Your Backs Into It, Gunplay, Gun-Fu, Hostile Negotiator, Fatal
+  Attack, Insane Stunt, Cheat Death, Wuxia, Cyclone, Quick Change, Bald-Faced Lie, Master Cracker, Ghost in the
+  Machine and Master Tracker. Ticked ones are noted on the posted check for the GC.
+- **Dead to Rights** (Grunt) adds 1d4 to tactical weapon damage from 2nd level and 2d4 from 7th. **Whatever's Handy**
+  (Brawler) now rises to +2 at 5th and +3 at 9th instead of staying at +1.
+- **NPC feats by name.** An NPC's feat items now count for the attack, damage and Defense rules that look a feat up by
+  name, as an agent's do.
+- **Maneuvers against characters you do not own.** Settling a Trip or a Feint against an NPC, and the conditions an
+  opening grapple check or a grapple benefit brings to it, are sent to the GC's client to carry out instead of being
+  left to set by hand.
+- **Round reminders.** When a round ends the GC's client posts a card for each dying character, and when a burning
+  character's turn begins a card for it; the card's button makes the roll for the character's owner. World setting
+  "Round reminders", on by default.
+
 - Added contextual tooltips across system sheets, dialogs, chat actions and Game Control, including fields, buttons, tabs and expandable sections. Existing authored help is preserved.
 
 Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/remaining-work.md`.

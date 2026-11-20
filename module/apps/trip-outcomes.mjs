@@ -4,6 +4,7 @@ import { tripOutcomePlan } from "../rules/trip-outcomes.mjs";
 import { queueResources } from "../rules/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
+import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 
 /** Sweep (Kicking Basics): whether the attacking character has the feat. */
 const sweepFor = uuid => globalThis.fromUuidSync?.(uuid)?.system?.activeFeatNames?.includes("Kicking Basics") === true;
@@ -233,10 +234,45 @@ export async function manageTripOutcomes(actor, input = {}) {
   }
   const a = await fromUuid(input.actingMessage),
     d = await fromUuid(input.defendingMessage);
-  return input.reviewResolution
-    ? reviewTripOutcome(actor, a, d, { confirmed: input.reviewConfirmed, resolution: input.reviewResolution })
-    : settleTripOutcome(actor, a, d, input);
+  if (input.reviewResolution)
+    return reviewTripOutcome(actor, a, d, { confirmed: input.reviewConfirmed, resolution: input.reviewResolution });
+  // A player who does not own the opponent (usually an NPC) has the GC's client settle the Trip.
+  const opponentUuid = a?.flags?.spycraft2?.tripAttack?.opponentUuid,
+    opponent = opponentUuid ? globalThis.fromUuidSync?.(opponentUuid) : null;
+  if (!game.user.isGM && opponent && !opponent.isOwner && gcAvailable())
+    return askGC("settleTrip", {
+      actorUuid: actor.uuid,
+      actingMessage: a?.uuid,
+      defendingMessage: d?.uuid,
+      opposedConfirmed: input.opposedConfirmed === true,
+      tieResolvedConfirmed: input.tieResolvedConfirmed === true
+    });
+  return settleTripOutcome(actor, a, d, input);
 }
+
+registerRelay("settleTrip", {
+  async describe({ actorUuid, actingMessage }, user) {
+    const actor = actorUuid ? await fromUuid(actorUuid) : null,
+      a = actingMessage ? await fromUuid(actingMessage) : null,
+      opponent = a?.flags?.spycraft2?.tripAttack?.opponentUuid
+        ? await fromUuid(a.flags.spycraft2.tripAttack.opponentUuid)
+        : null;
+    if (!actor || !a) throw new Error(loc`The Trip checks are no longer there.`);
+    if (!actor.testUserPermission(user, "OWNER"))
+      throw new Error(loc`That player does not own the tripping character.`);
+    const esc = foundry.utils.escapeHTML;
+    return loc`${esc(user.name)} asks to settle ${esc(actor.name)}'s Trip against ${esc(opponent?.name ?? loc`the opponent`)}. Allow it?`;
+  },
+  async run({ actorUuid, actingMessage, defendingMessage, opposedConfirmed, tieResolvedConfirmed }) {
+    const actor = actorUuid ? await fromUuid(actorUuid) : null;
+    if (!actor) throw new Error(loc`The Trip checks are no longer there.`);
+    await settleTripOutcome(actor, await fromUuid(actingMessage), await fromUuid(defendingMessage), {
+      opposedConfirmed: opposedConfirmed === true,
+      tieResolvedConfirmed: tieResolvedConfirmed === true
+    });
+    return true;
+  }
+});
 
 /** Read-only earned source, without copying opposed die totals into another attack receipt. */
 export function tripFinalSource(actor, message) {

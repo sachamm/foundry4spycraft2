@@ -74,13 +74,13 @@ test("only ticked reminders that were offered are kept, and the note names them"
   ];
   const chosen = chosenReminders(offered, { "featReminder-a": true, "featReminder-b": false, "featReminder-z": true });
   assert.deepEqual(chosen, [{ name: "First", text: "does a thing" }]);
-  assert.equal(reminderNote(chosen), "Feats noted for the GC to apply: First (does a thing)");
+  assert.equal(reminderNote(chosen), "Feats and abilities noted for the GC to apply: First (does a thing)");
   assert.equal(
     reminderNote([
       { name: "First", text: "x" },
       { name: "Second", text: "" }
     ]),
-    "Feats noted for the GC to apply: First (x); Second"
+    "Feats and abilities noted for the GC to apply: First (x); Second"
   );
   assert.equal(reminderNote([]), "");
   assert.equal(reminderNote(undefined), "");
@@ -120,7 +120,7 @@ test("the registered contributor adds a section to every roll dialog, reads the 
   });
   assert.doesNotMatch(attack, /Snap Shot|Mingle/, "neither feat bears on damage");
   const save = rollPipeline.dialog({ dialog: "save", actor, feats: new Set(), key: "will", stillStandingContent: "" });
-  assert.doesNotMatch(save, /Feats to keep in mind/);
+  assert.doesNotMatch(save, /Feats and abilities to keep in mind/);
   actor.items.push(feat("c", "Trick Shot", "attack, damage", "hold instead"));
   const damage = rollPipeline.dialog({
     dialog: "damage",
@@ -129,7 +129,7 @@ test("the registered contributor adds a section to every roll dialog, reads the 
     sideHits: [],
     targetChoices: { actors: [] }
   });
-  assert.match(damage, /Feats to keep in mind/);
+  assert.match(damage, /Feats and abilities to keep in mind/);
   assert.match(damage, /Trick Shot/);
   assert.doesNotMatch(damage, /Mingle/);
   assert.ok(damage.endsWith("</fieldset>"), "the section closes the form");
@@ -209,4 +209,38 @@ test("version 2 gives feats already in a world their reminder, once, and leaves 
   assert.deepEqual(owned.source.system.reminder, FEAT_REMINDERS[name]);
   world.version = 1;
   assert.equal((await migrateWorld(world)).updated, 0, "a second run changes nothing");
+});
+
+test("class abilities the rules do not carry out remind once the character reaches them in that class", async () => {
+  const { classAbilityReminders, characterReminders } = await import("../module/rules/feat-reminders.mjs");
+  const { CLASS_ABILITY_REMINDERS } = await import("../module/rules/tables.mjs");
+  const reminderData = data("feat-reminders.json").classAbilities;
+  const classes = data("classes.json");
+  const summaries = data("summaries.json").classes;
+  for (const [key, abilities] of Object.entries(reminderData)) {
+    const cls = classes.find(c => c.key === key);
+    assert.ok(cls, key);
+    for (const name of Object.keys(abilities)) assert.ok(summaries[cls.name].abilities[name], `${cls.name}: ${name}`);
+    assert.equal(CLASS_ABILITY_REMINDERS[key].length, Object.keys(abilities).length);
+  }
+  const triggerman = lvl => ({ classLevels: { triggerman: lvl } });
+  assert.deepEqual(classAbilityReminders(triggerman(1), { kind: "attack" }), []);
+  assert.deepEqual(
+    classAbilityReminders(triggerman(3), { kind: "attack" }).map(r => r.name),
+    ["Gun-Fu", "Gunplay"]
+  );
+  assert.deepEqual(classAbilityReminders(triggerman(3), { kind: "damage" }), []);
+  assert.deepEqual(
+    classAbilityReminders({ classLevels: { faceman: 3 } }, { kind: "skill", skillKey: "falsify" }).map(r => r.name),
+    ["Quick Change"]
+  );
+  assert.deepEqual(classAbilityReminders({}, { kind: "attack" }), []);
+  const reminder = classAbilityReminders(triggerman(2), { kind: "attack" })[0];
+  assert.match(reminder.id, /^[A-Za-z0-9_-]+$/);
+  assert.ok(reminder.text.length > 0);
+  const actor = { items: [feat("f", "Snap Shot", "attack", "extra shot")], system: triggerman(2) };
+  assert.deepEqual(
+    characterReminders(actor, { kind: "attack" }).map(r => r.name),
+    ["Snap Shot", "Gunplay"]
+  );
 });

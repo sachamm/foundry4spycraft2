@@ -40,9 +40,21 @@ export function buildPacks() {
   const kits = read("kits.json");
   const ammunition = read("ammunition.json");
   const summaries = read("summaries.json");
-  const featReminders = read("feat-reminders.json").feats;
+  const reminderData = read("feat-reminders.json");
+  const featReminders = reminderData.feats;
   for (const name of Object.keys(featReminders))
     if (!feats.some(f => f.name === name)) throw new Error(`feat-reminders.json names an unknown feat: ${name}`);
+  const classAbilityReminders = {};
+  for (const [key, abilities] of Object.entries(reminderData.classAbilities ?? {})) {
+    const cls = classes.find(c => c.key === key);
+    if (!cls) throw new Error(`feat-reminders.json names an unknown class: ${key}`);
+    classAbilityReminders[key] = Object.entries(abilities).map(([name, { level, rolls }]) => {
+      const text = summaries.classes[cls.name]?.abilities?.[name];
+      if (!text) throw new Error(`feat-reminders.json names a ${cls.name} ability without a summary: ${name}`);
+      if (!Number.isSafeInteger(level) || level < 1) throw new Error(`feat-reminders.json: ${name} needs a level`);
+      return { name, level, rolls: rolls.join(", "), text };
+    });
+  }
   const gear = read("gear.json");
   const vehicles = read("vehicles.json");
   const upgrades = read("upgrades.json");
@@ -124,6 +136,7 @@ export const CLASS_FEATURES = ${JSON.stringify(Object.fromEntries(classes.filter
 export const GEAR_RULES = ${JSON.stringify({ categories: gear.categories, damageSaves: gear.damageSaves, housings: gear.housings, skillUses: gear.skillUses }, null, 1)};
 export const CONTAGIONS = ${JSON.stringify(contagions.contagions, null, 1)};
 export const FEAT_REMINDERS = ${JSON.stringify(Object.fromEntries(Object.entries(featReminders).map(([name, rolls]) => [name, { rolls: rolls.join(", "), text: summaries.feats[name] ?? "" }])), null, 1)};
+export const CLASS_ABILITY_REMINDERS = ${JSON.stringify(classAbilityReminders, null, 1)};
 export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damageLocations: vehicles.damageLocations, damagePage: vehicles.damagePage, damageSavePage: vehicles.damageSavePage, tractionSaveBonus: vehicles.tractionSaveBonus, tractionSaveBonusHouseRule: vehicles.tractionSaveBonusHouseRule, qualities: vehicles.qualities, qualitiesPage: vehicles.qualitiesPage, bailOutDC: vehicles.bailOutDC, explosions: vehicles.explosions, accelerationDistance: vehicles.accelerationDistance, signature: vehicles.signature, hazards: vehicles.hazards, smash: vehicles.smash }, null, 1)};
 `;
   generated["module/rules/tables.mjs"] = tablesSrc;
