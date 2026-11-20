@@ -45,13 +45,16 @@ export async function applyStratagem(actor) {
   if (!gain || !combat) return null;
   const own = [...combat.combatants].find(combatant => combatant.actor?.uuid === actor.uuid),
     side = own?.token?.disposition;
-  const moved = [];
+  const moved = [],
+    updates = [];
   for (const combatant of combat.combatants) {
     if (!Number.isFinite(combatant.initiative) || combatant.isDefeated) continue;
     if (combatant.id !== own.id && (side === undefined || combatant.token?.disposition !== side)) continue;
-    await combatant.update({ initiative: combatant.initiative + gain });
+    updates.push({ _id: combatant.id, initiative: combatant.initiative + gain });
     moved.push(combatant.name);
   }
+  // One write for the whole side, so the tracker and the sheets refresh once.
+  if (updates.length) await combat.updateEmbeddedDocuments("Combatant", updates);
   if (moved.length)
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),

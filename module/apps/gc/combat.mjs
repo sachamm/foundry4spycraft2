@@ -355,6 +355,8 @@ export function installFluidInitiativeHooks() {
     }
   });
   Hooks.on("updateCombatant", (combatant, changed) => {
+    // The sheet's half-action pips read the same record as the tracker's menu.
+    if (changed.flags?.spycraft2?.actions && combatant.actor?.sheet?.rendered) combatant.actor.sheet.render();
     if (Object.hasOwn(changed, "initiative") && isLeadGM()) rollTiebreaks(combatant.parent).catch(() => {});
   });
   // Show what is left of the acting combatant's turn beside its name.
