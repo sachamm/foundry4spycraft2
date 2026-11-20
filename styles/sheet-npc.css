@@ -21,8 +21,8 @@
 .spycraft2.sheet.npc .npc-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; margin: 6px 0; padding: 0; background: transparent; }
 .spycraft2.sheet.npc .npc-results .npc-note { grid-column: 1 / -1; margin: 0; }
 .spycraft2.sheet.npc .ability { align-items: flex-start; padding: 5px 8px; background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-bottom: 3px solid var(--sc2-action); border-top-width: 1px; }
-.spycraft2.sheet.npc .ability small { font-size: 10px; color: var(--sc2-ink-muted); }
-.spycraft2.application.npc .ability [data-action="rollAbility"] { font: 600 var(--sc2-caption-size)/1.2 var(--font-primary, sans-serif); letter-spacing: 0.04em; text-transform: uppercase; color: var(--sc2-ink-muted); min-height: 0; white-space: nowrap; }
+.spycraft2.sheet.npc .ability small { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); }
+.spycraft2.application.npc .ability [data-action="rollAbility"] { font: 600 var(--sc2-caption-size)/1.35 var(--font-primary, sans-serif); letter-spacing: 0; text-transform: none; color: var(--sc2-ink-muted); min-height: 0; white-space: normal; }
 .spycraft2.sheet.npc .npc-graded-play .resources { display: flex; flex-wrap: wrap; gap: var(--sc2-space-1) var(--sc2-space-4); margin: 6px 0; }
 
 /* Vehicle condition: one box per failed damage save, with the breaking and destroying boxes marked. */

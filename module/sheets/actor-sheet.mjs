@@ -1,5 +1,7 @@
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
+import { SaveFeedback } from "./save-feedback.mjs";
+import { installResolutionGuide } from "../apps/resolution-guide.mjs";
 import { vehicleClass } from "../rules/vehicles.mjs";
 import {
   buildSetupGuide,
@@ -160,10 +162,11 @@ const playLabels = () => ({
   rest: loc`Rest and recover`,
   stress: loc`Stress damage`,
   subdual: loc`Subdual damage`,
+  nextSetup: loc`Next setup step`,
   dying: loc`Dying: roll to stabilize`
 });
 
-export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2)) {
   /** Career level whose skill points are being edited on the Skills tab. */
   _skillLevel = null;
 
@@ -171,7 +174,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   _open = { todo: false, warnings: false };
 
   /** A local view preference, never stored on the character. */
-  _editMode = false;
+  _editMode = null;
   _showAllTools = false;
   /** While set, choosing a combat tool pins or unpins it instead of using it. */
   _pinMode = false;
@@ -880,6 +883,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     const context = await super._prepareContext(options);
     const actor = this.actor;
     const sys = actor.system;
+    this._editMode ??= this.isEditable && sys.level === 0;
     const cfg = CONFIG.SPYCRAFT;
     const rollData = actor.getRollData();
     Object.assign(context, {
@@ -1220,6 +1224,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
     context.skillLevels = sys.progression.map((p, i) => ({ level: i + 1, active: i + 1 === lvl }));
     context.skills = Object.values(sys.skillTotals ?? {}).map(s => ({
       ...s,
+      rollLabel: loc`Roll ${s.name}`,
       points: entry?.skills?.[s.key] ?? 0,
       historicalRanks: context.skillLevelInfo?.skills?.[s.key]?.ranks ?? s.ranks,
       purchaseMaxRanks: context.skillLevelInfo?.skills?.[s.key]?.maxRanks ?? s.maxRanks,
@@ -1231,6 +1236,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
       capTip: tip([], `skills.${s.key}.cap`),
       totals: s.totals.map(t => ({
         ...t,
+        rollLabel: loc`Roll ${s.name} (${t.ability.toUpperCase()})`,
         tip: tip(
           [
             [game.i18n.localize("SPYCRAFT.Skill.Ranks"), s.ranks],
@@ -1408,6 +1414,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(ActorSheetV2)
   _onRender(context, options) {
     super._onRender(context, options);
     enhanceAgentSheet(this.element, context, this, text => game.i18n.localize(text));
+    installResolutionGuide(this.element.querySelector(".play-dashboard"), "play");
   }
 
   async _preparePartContext(partId, context, options) {
@@ -1733,7 +1740,7 @@ export function npcNeedsSetup(actor) {
   return !actor.system?.npcProfile?.enabled && !actor.flags?.spycraft2?.npcTemplate && !(actor.items?.size > 0);
 }
 
-export class SpycraftNpcSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2)) {
   /** A local view preference. Null until first render, when an NPC with nothing built yet opens in setup. */
   _editMode = null;
 

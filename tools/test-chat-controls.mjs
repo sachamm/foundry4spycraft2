@@ -15,6 +15,9 @@ class Element {
   addEventListener(type, handler) {
     this.listeners[type] = handler;
   }
+  setAttribute(name, value) {
+    (this.attributes ??= {})[name] = String(value);
+  }
   querySelector(selector) {
     return selector === ".message-content" ? (this.content ??= new Element("div")) : null;
   }
@@ -180,6 +183,7 @@ test("the chat hook lays buttons out by placement and runs them once per click",
     ["boostControl", "generousControl", "opposedCheckControl", "finishControl"]
   );
   const finish = row.children[3];
+  assert.equal(finish.attributes["aria-label"], "Outcome resolved");
   await finish.listeners.click();
   assert.deepEqual(actor.calls, [["finishCheck", msg]]);
   assert.equal(finish.disabled, false);

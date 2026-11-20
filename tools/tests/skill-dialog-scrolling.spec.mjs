@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { createAnalysisTaskPlan } from "../../module/rules/analysis-tasks.mjs";
 import { taskPressureUseSpec } from "../../module/rules/task-pressure.mjs";
 import { readFileSync } from "node:fs";
+import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 import { SPYCRAFT as cfg } from "../../module/config.mjs";
 // Capture the actual skill dialog content. Rendering/geometry is exercised by Chromium below.
 globalThis.Actor = class {};
@@ -3794,3 +3795,45 @@ for (const height of [768, 1000])
       globalThis.game = oldGame;
     }
   });
+
+test("routine attack shows target, action and range while retaining every optional form value", async ({ page }) => {
+  const previous = content;
+  const source = new SpycraftActor();
+  source.items = [];
+  source.system = { activeFeatNames: [], classLevels: {} };
+  try {
+    await source.rollAttack(
+      { id: "compact", type: "weapon", name: "Test pistol", system: { proficiency: "handgun", range: 25 } },
+      { askContext: true }
+    );
+    await render(page, 768, content);
+    const before = await page.locator("form").evaluate(form => [...new FormData(form)].sort());
+    const i18nUrl = `data:text/javascript;base64,${Buffer.from(readFileSync(new URL("../../module/i18n.mjs", import.meta.url), "utf8")).toString("base64")}`;
+    const uxSource = readFileSync(new URL("../../module/apps/attack-dialog-ux.mjs", import.meta.url), "utf8")
+      .replace('"../i18n.mjs"', JSON.stringify(i18nUrl))
+      .replace('"./dialog-sections.mjs"', JSON.stringify(uiModuleUrl("module/apps/dialog-sections.mjs")))
+      .replace('"./resolution-guide.mjs"', JSON.stringify(uiModuleUrl("module/apps/resolution-guide.mjs")));
+    await page.evaluate(
+      async url => {
+        const { enhanceAttackDialog } = await import(url);
+        enhanceAttackDialog(null, { element: document.querySelector("dialog") });
+        enhanceAttackDialog(null, { element: document.querySelector("dialog") });
+      },
+      `data:text/javascript;base64,${Buffer.from(uxSource).toString("base64")}`
+    );
+    expect(await page.locator("form").evaluate(form => [...new FormData(form)].sort())).toEqual(before);
+    await expect(page.locator('[name="attackAction"]')).toHaveValue("standard");
+    await expect(page.locator('[name="targetActorUuid"]')).toBeVisible();
+    await expect(page.locator('[name="distanceFeet"]')).toBeVisible();
+    await expect(page.locator('[name="aimed"]')).toBeHidden();
+    await expect(page.locator(".sc2-attack-circumstances")).not.toHaveAttribute("open");
+    await page.getByText("Special circumstances", { exact: true }).click();
+    await page.getByText("Aim and Brace", { exact: true }).click();
+    await page.locator('[name="aimed"]').check();
+    await expect(page.locator(".sc2-attack-circumstances > summary")).toContainText("1 set");
+    await page.locator(".sc2-attack-circumstances > summary").click();
+    expect(await page.locator("form").evaluate(form => new FormData(form).get("aimed"))).toBe("on");
+  } finally {
+    content = previous;
+  }
+});

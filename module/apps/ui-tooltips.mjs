@@ -135,7 +135,9 @@ function labelFor(control) {
   if (cell) {
     const heading = cell.closest("table")?.querySelector("thead tr")?.children[cell.cellIndex];
     const column = textWithoutControls(heading);
-    if (column) return column;
+    // Row headings often contain a roll button; its text still identifies the field's skill or ability.
+    const row = clean(cell.parentElement?.querySelector("th, td:first-child")?.textContent);
+    if (column) return row ? `${row}: ${column}` : column;
   }
   if (control.matches('input[type="button"], input[type="submit"], input[type="reset"]') && clean(control.value))
     return clean(control.value);
@@ -287,13 +289,94 @@ function enhanceButtonIcon(control, label) {
   if (icon) icon.className = art ? "sc2-button-icon" : `sc2-button-icon fa-solid ${glyph}`;
 }
 
+/** Add keyboard behavior to legacy action anchors while retaining Foundry's delegated handlers. */
+export function enhanceActionAccessibility(root) {
+  if (!root?.querySelectorAll) return;
+  const scope = root.closest?.(".application, [data-sc2-tooltip-scope]") ?? root.closest?.(SCOPE) ?? root;
+  const syncTabs = () => {
+    for (const nav of scope.querySelectorAll("nav.sheet-tabs")) {
+      const tabs = [...nav.querySelectorAll('[data-action="tab"]')];
+      if (!tabs.length) continue;
+      nav.setAttribute("role", "tablist");
+      nav.setAttribute("aria-label", loc`Sheet sections`);
+      const selected = tabs.find(tab => tab.classList.contains("active")) ?? tabs[0];
+      for (const [index, tab] of tabs.entries()) {
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-selected", String(tab === selected));
+        tab.tabIndex = tab === selected ? 0 : -1;
+        tab.id ||= `${scope.id || "sc2"}-${tab.dataset.group || "primary"}-tab-${index}`;
+        const panel = [...scope.querySelectorAll(".tab[data-tab]")].find(
+          entry => entry.dataset.tab === tab.dataset.tab && entry.dataset.group === tab.dataset.group
+        );
+        if (panel) {
+          panel.id ||= `${tab.id}-panel`;
+          tab.setAttribute("aria-controls", panel.id);
+          panel.setAttribute("role", "tabpanel");
+          panel.setAttribute("aria-labelledby", tab.id);
+          panel.setAttribute("aria-hidden", String(tab !== selected));
+        }
+      }
+    }
+  };
+  syncTabs();
+  const selector = "a[data-action]:not([href]), a[data-roll-control]:not([href]), img[data-edit]";
+  for (const control of [...(root.matches?.(selector) ? [root] : []), ...root.querySelectorAll(selector)]) {
+    if (control.dataset.action === "tab") continue;
+    control.setAttribute("role", "button");
+    control.tabIndex = 0;
+    if (control.matches("img[data-edit]") && !control.hasAttribute("aria-label"))
+      control.setAttribute("aria-label", loc`Change image`);
+  }
+  if (scope.dataset.sc2Keyboard) return;
+  scope.dataset.sc2Keyboard = "true";
+  scope.addEventListener("click", () => queueMicrotask(syncTabs));
+  scope.addEventListener("keydown", event => {
+    const control = event.target.closest?.('[role="tab"], a[role="button"], img[role="button"]');
+    if (!control || !scope.contains(control) || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (control.getAttribute("aria-disabled") === "true" || control.disabled) return;
+    if (control.getAttribute("role") === "tab") {
+      const tabs = [...control.closest('[role="tablist"]').querySelectorAll('[role="tab"]')];
+      const index = tabs.indexOf(control);
+      const next = {
+        ArrowRight: (index + 1) % tabs.length,
+        ArrowLeft: (index + tabs.length - 1) % tabs.length,
+        Home: 0,
+        End: tabs.length - 1
+      }[event.key];
+      if (next !== undefined) {
+        event.preventDefault();
+        event.stopPropagation();
+        tabs[next].click();
+        tabs[next].focus();
+        syncTabs();
+        return;
+      }
+    }
+    if (["Enter", " "].includes(event.key)) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!event.repeat) control.click();
+    }
+  });
+}
+
 export function enhanceTooltips(root) {
   if (!root?.querySelectorAll) return;
+  enhanceActionAccessibility(root);
   const controls = [...(root.matches?.(CONTROL) ? [root] : []), ...root.querySelectorAll(CONTROL)];
   for (const control of controls) {
     // Capture the action name while text is still present, before replacing it with an icon.
     // Name controls even when they already have authored tooltips.
     const label = labelFor(control);
+    // Tooltips do not name form controls. Preserve real labels; supply a name only where one is missing.
+    if (
+      control.matches('input:not([type="hidden"]), select, textarea, prose-mirror') &&
+      !control.hasAttribute("aria-label") &&
+      !control.hasAttribute("aria-labelledby") &&
+      ![...(control.labels ?? [])].some(label => textWithoutControls(label)) &&
+      label
+    )
+      control.setAttribute("aria-label", label);
     if (
       control.matches(
         'button, a[data-action], a[data-roll-control], [role="button"], input[type="button"], input[type="submit"], input[type="reset"]'

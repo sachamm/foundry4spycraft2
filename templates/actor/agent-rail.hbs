@@ -2,7 +2,7 @@
 <aside class="sheet-rail" aria-label="{{actor.name}}">
   <div class="rail-id">
     <img class="portrait" src="{{actor.img}}" data-edit="img" data-action="editImage" alt="{{actor.name}}" />
-    {{#if editable}}<button type="button" class="mode-toggle" data-sc2-display="{{#if editMode}}both{{else}}icon{{/if}}" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}{{localize "SPYCRAFT.Rail.Done"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.EditCharacter"}}{{/if}}</button>{{/if}}
+    {{#if editable}}<button type="button" class="mode-toggle" data-sc2-display="both" data-action="toggleEditMode" aria-pressed="{{editMode}}">{{#if editMode}}{{localize "SPYCRAFT.Rail.Done"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentHeader.EditCharacter"}}{{/if}}</button>{{/if}}
     {{#if editMode}}<input class="name" name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" aria-label="{{localize 'Name'}}" />
     <input class="codename" name="system.codename" type="text" value="{{system.codename}}" placeholder="{{localize 'SPYCRAFT.Codename'}}" aria-label="{{localize 'SPYCRAFT.Codename'}}" />{{else}}<strong class="agent-name" title="{{actor.name}}">{{actor.name}}</strong>{{#if system.codename}}<span class="sc2-stamp agent-codename">{{system.codename}}</span>{{/if}}{{/if}}
     <div class="summary">
@@ -53,6 +53,10 @@
   </div>
 
 {{#if setupGuide.next}}
+{{#if editable}}<div class="sc2-next-setup">
+  <span class="sc2-caption">{{playLabels.nextSetup}}</span>
+  {{#with setupGuide.next}}<button type="button" class="sc2-primary-action" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{/with}}
+</div>{{/if}}
 <details class="todo" data-key="todo" {{#if open.todo}}open{{/if}}>
   <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.SetupChecklist"}} {{setupGuide.count}} {{localize "SPYCRAFT.Template.ActorAgentHeader.Reminders"}}</summary>
   <ol class="setup-steps" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemainingCharacterSetup'}}">

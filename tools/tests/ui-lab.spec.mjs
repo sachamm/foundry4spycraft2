@@ -83,3 +83,19 @@ test("components fit a narrow window without horizontal overflow", async ({ page
   for (const app of await page.locator(".lab-app .window-content").all())
     expect(await app.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
 });
+
+for (const theme of ["light", "dark"])
+  test(`important captions are at least 13px and use normal capitalization in the ${theme} theme`, async ({ page }) => {
+    await openLab(page);
+    const captions = await page.locator(`.lab-app[data-theme="${theme}"] .sc2-caption`).evaluateAll(elements =>
+      elements.map(element => ({
+        size: parseFloat(getComputedStyle(element).fontSize),
+        transform: getComputedStyle(element).textTransform
+      }))
+    );
+    expect(captions.length).toBeGreaterThan(0);
+    for (const caption of captions) {
+      expect(caption.size).toBeGreaterThanOrEqual(13);
+      expect(caption.transform).toBe("none");
+    }
+  });

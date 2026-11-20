@@ -14,6 +14,7 @@
  * target's own player.
  */
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
+import { enhanceDamageDialog } from "./dialog-sections.mjs";
 import {
   attackKindOf,
   attackOutcome,
@@ -469,7 +470,9 @@ export async function applyDamage(message, options = {}) {
         choices.selected;
     input = await systemDialog.input({
       window: { title: loc`Apply ${Math.max(0, rolled)} damage` },
+      position: { width: 560 },
       rejectClose: false,
+      render: enhanceDamageDialog,
       ok: { label: loc`Apply` },
       content: `<div class="spycraft2-roll-options">${applied.length ? `<p class="inventory-warning">${loc`Already applied to: ${esc(applied.map(a => a.name).join(", "))}.`}</p>` : ""}<label>${loc`Target`} <select name="targetUuid" required>${targetOptions(
         choices.actors.filter(actor => actor.isOwner || gcAvailable()),

@@ -9,7 +9,11 @@ export default defineConfig({
     "vehicle-sheets.spec.mjs",
     "npc-packages.spec.mjs",
     "ui-tooltips.spec.mjs",
-    "ui-lab.spec.mjs"
+    "ui-lab.spec.mjs",
+    "ux-improvements.spec.mjs",
+    "readable-dialogs.spec.mjs",
+    "guided-play.spec.mjs",
+    "accessibility-resolution.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,

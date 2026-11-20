@@ -68,7 +68,7 @@ test("read-only sheets cannot enter character setup through a reminder", async (
     throw new Error("Unexpected render");
   };
   await SpycraftAgentSheet.DEFAULT_OPTIONS.actions.setupTask.call(sheet, null, { dataset: { tab: "skills" } });
-  assert.equal(sheet._editMode, false);
+  assert.ok(!sheet._editMode);
 });
 
 test("an origin reminder opens its filtered choice browser after entering the destination in Edit", async () => {
