@@ -126,6 +126,7 @@ import {
 } from "../apps/gc/npc-play.mjs";
 import { loc } from "../i18n.mjs";
 import { quickAttackOptions, skipDialog } from "../apps/remembered-choices.mjs";
+import { enableHotbarDrag } from "../apps/hotbar.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -1418,6 +1419,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   _onRender(context, options) {
     super._onRender(context, options);
     enhanceAgentSheet(this.element, context, this, text => game.i18n.localize(text));
+    enableHotbarDrag(this.element, this.actor);
     installResolutionGuide(this.element.querySelector(".play-dashboard"), "play");
   }
 
@@ -1962,6 +1964,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
     super._onRender(context, options);
     this.element.classList.toggle("play-mode", !context.editMode);
     this.element.classList.toggle("edit-mode", !!context.editMode);
+    enableHotbarDrag(this.element, this.actor);
   }
 
   _npcContext() {

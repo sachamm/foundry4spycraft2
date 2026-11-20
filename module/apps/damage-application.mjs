@@ -36,6 +36,7 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration, setCondition as condition, woundConditions } from "./wound-conditions.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
+import { recordAutomaticFluidEvent } from "./gc/combat.mjs";
 import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
 import { sufferTypedDamage } from "./damage-types.mjs";
 import { rollCriticalInjury } from "./critical-injuries.mjs";
@@ -357,6 +358,8 @@ async function lethalOnSpecial(target, hit, source) {
   const lines = lethalHitLines(esc(target.name), plan);
   if (plan.fatigued) lines.push(await condition(target, "fatigued", loc`Fatigued`));
   if (plan.stateChanged) lines.push(...(await woundConditions(target, plan.state)));
+  if (plan.woundLoss > 0)
+    lines.push(await recordAutomaticFluidEvent(target, plan.critical ? "criticalWoundLoss" : "woundLoss"));
   if (plan.bruise)
     lines.push(
       ...(

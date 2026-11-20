@@ -528,3 +528,19 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
   assert.match(posted.at(-1).content, /Damage applied to 2 targets/);
   game.user.targets = [];
 });
+
+test("wound loss from applied damage records its end-of-round Initiative change", async () => {
+  reset();
+  const hurt = character("Hurt", { vitality: { value: 0, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
+  const combat = { started: true, round: 2 };
+  const combatant = document({ actor: hurt, isOwner: true, initiative: 18, parent: combat, flags: {} });
+  combat.combatants = [combatant];
+  game.combat = combat;
+  const damage = card("f1", { actorUuid: "Actor.Guard", checkKind: "damage", effectiveTotal: 4 });
+  await applyDamage(damage, { targetUuid: hurt.uuid, damage: 4, kind: "lethal" });
+  const modifiers = combatant.flags.spycraft2.fluid.modifiers;
+  assert.equal(modifiers.length, 1);
+  assert.equal(modifiers[0].amount, -2);
+  assert.match(posted.at(-1).content, /Initiative -2 at the end of the round/);
+  game.combat = undefined;
+});
