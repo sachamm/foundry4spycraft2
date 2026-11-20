@@ -148,6 +148,7 @@ function setup() {
   game.actors = [a, enemy, teammate];
   game.user.isGM = true;
   game.scenes.active = null;
+  game.combat = null;
   documents = new Map(game.actors.map(a => [a.uuid, a]));
   return { a, enemy, teammate };
 }
@@ -186,6 +187,115 @@ test("candidate lists use actual visible token identities, avoid duplicate Actor
     true
   );
 });
+test("running combat suggests counts from its own scene, preserving tokens and leaving team relationships unassigned", async () => {
+  const { a, enemy, teammate } = setup();
+  const token = (id, actor, disposition) => ({
+    uuid: `Scene.fight.Token.${id}`,
+    documentName: "Token",
+    name: id,
+    actor,
+    disposition
+  });
+  const tokens = [
+    token("self", a, 1),
+    token("ally", teammate, 1),
+    token("enemy", enemy, -1),
+    token("anotherEnemy", enemy, -1),
+    token("neutral", actor("neutral"), 0),
+    token("defeated", enemy, -1),
+    token("bystander", teammate, 1),
+    token("hidden", enemy, -1)
+  ];
+  game.combat = {
+    started: true,
+    scene: { tokens },
+    combatants: tokens
+      .filter(t => t.name !== "bystander")
+      .map(t => ({
+        actor: t.actor,
+        token: t,
+        defeated: t.name === "defeated",
+        hidden: t.name === "hidden"
+      }))
+  };
+  game.scenes.active = { tokens: [token("wrongScene", a, 1)] };
+  let rows = numericalAdvantageCandidates(a);
+  const counts = rows => rows.map(r => [r.name, r.defaultOwn, r.defaultEnemy]);
+  assert.deepEqual(counts(rows), [
+    ["self", 1, 0],
+    ["ally", 1, 0],
+    ["enemy", 0, 1],
+    ["anotherEnemy", 0, 1],
+    ["neutral", 0, 0],
+    ["defeated", 0, 0],
+    ["bystander", 0, 0],
+    ["hidden", 0, 1]
+  ]);
+  assert.equal(rows[0].defaultTeam, "your-team");
+  assert.equal(rows[1].defaultTeam, "");
+  for (const t of tokens) documents.set(t.uuid, t);
+  response = { rosterConfirmed: true };
+  for (const r of rows)
+    for (const side of ["own", "enemy"]) {
+      response[`${side}Count__${r.key}`] = side === "own" ? r.defaultOwn : r.defaultEnemy;
+      response[`${side}Team__${r.key}`] = side === "own" && r.defaultOwn ? r.defaultTeam : "";
+      response[`${side}Base__${r.key}`] = 1;
+    }
+  const p = await checkNumericalAdvantage(a);
+  assert.equal(p.own.physical, 2);
+  assert.equal(p.own.effective, 3); // An ally is not automatically a Tactical Advantage teammate.
+  assert.equal(p.opposition.physical, 3);
+  assert.match(contents[0], /Counts are suggested from the running combat/);
+  assert.match(contents[0], /name="enemyCount__2"[^>]*value="1"/);
+  game.user.isGM = false;
+  rows = numericalAdvantageCandidates(a);
+  assert.equal(
+    rows.some(r => r.name === "hidden"),
+    false
+  );
+  assert.equal(rows.filter(r => r.defaultEnemy).length, 2);
+});
+
+test("neutral, absent and repeated linked requesters do not invent sides or directory counts", () => {
+  const { a, enemy } = setup();
+  const self = { uuid: "Token.self", actor: a, disposition: 0 },
+    other = { uuid: "Token.other", actor: a, disposition: -1 },
+    foe = { uuid: "Token.foe", actor: enemy, disposition: 1 };
+  game.combat = {
+    started: true,
+    scene: { tokens: [self, other, foe] },
+    combatants: [self, other, foe].map(token => ({ token, actor: token.actor }))
+  };
+  a.token = self;
+  let rows = numericalAdvantageCandidates(a);
+  assert.deepEqual(
+    rows.map(r => [r.defaultOwn, r.defaultEnemy]),
+    [
+      [1, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ]
+  );
+  a.token = other;
+  rows = numericalAdvantageCandidates(a);
+  assert.deepEqual(
+    rows.map(r => [r.defaultOwn, r.defaultEnemy]),
+    [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [0, 0]
+    ]
+  );
+  rows = numericalAdvantageCandidates(actor("absent"));
+  assert.ok(rows.every(r => !r.defaultOwn && !r.defaultEnemy));
+  game.combat.started = false;
+  rows = numericalAdvantageCandidates(a);
+  assert.equal(rows.filter(r => r.defaultOwn).length, 1);
+  assert.ok(rows.every(r => !r.defaultEnemy));
+});
+
 test("the actual dialog resolves live Tactical Advantage sources and teammate relationships without changing character resources", async () => {
   const { a } = setup();
   response = declarations();

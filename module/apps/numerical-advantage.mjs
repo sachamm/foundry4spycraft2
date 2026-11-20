@@ -2,13 +2,34 @@ import { numericalAdvantagePlan } from "../rules/numerical-advantage.mjs";
 import { loc } from "../i18n.mjs";
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const readable = a => a && ["agent", "npc"].includes(a.type) && (a.visible || a.isOwner || game.user.isGM);
+const runningCombat = () => (game.combat?.started ? game.combat : null);
 export function numericalAdvantageCandidates(actor) {
   const rows = [],
     represented = new Set(),
-    scene = globalThis.canvas?.scene ?? game.scenes?.active;
+    combat = runningCombat(),
+    combatants = values(combat?.combatants),
+    scene = combat?.scene ?? globalThis.canvas?.scene ?? game.scenes?.active,
+    reference =
+      (actor.token?.uuid && combatants.find(c => c.token?.uuid === actor.token.uuid)) ??
+      combatants.find(c => c.actor?.uuid === actor.uuid),
+    disposition = reference?.token?.disposition,
+    participants = new Map(combatants.filter(c => c.token?.uuid).map(c => [c.token.uuid, c]));
   for (const t of values(scene?.tokens)) {
-    if (!t.actor || (t.hidden && !game.user.isGM) || !readable(t.actor)) continue;
-    rows.push({ uuid: t.uuid, actorUuid: t.actor.uuid, name: t.name ?? t.actor.name });
+    const participant = participants.get(t.uuid),
+      eligible = participant && !participant.defeated && (!participant.hidden || game.user.isGM),
+      same =
+        eligible &&
+        (t.uuid === reference?.token?.uuid || ([1, -1].includes(disposition) && t.disposition === disposition)),
+      enemy = eligible && [1, -1].includes(disposition) && t.disposition === -disposition;
+    if (!t.actor || (t.hidden && !game.user.isGM) || (participant?.hidden && !game.user.isGM) || !readable(t.actor))
+      continue;
+    rows.push({
+      uuid: t.uuid,
+      actorUuid: t.actor.uuid,
+      name: t.name ?? t.actor.name,
+      defaultOwn: same ? 1 : 0,
+      defaultEnemy: enemy ? 1 : 0
+    });
     represented.add(t.actor.uuid);
   }
   for (const a of values(game.actors))
@@ -17,7 +38,9 @@ export function numericalAdvantageCandidates(actor) {
   return rows.map((r, i) => ({
     ...r,
     key: String(i),
-    defaultOwn: !own && r.actorUuid === actor.uuid ? ((own = true), 1) : 0
+    defaultOwn: combat ? (r.defaultOwn ?? 0) : !own && r.actorUuid === actor.uuid ? ((own = true), 1) : 0,
+    defaultEnemy: combat ? (r.defaultEnemy ?? 0) : 0,
+    defaultTeam: (combat ? r.uuid === reference?.token?.uuid : r.actorUuid === actor.uuid) ? "your-team" : ""
   }));
 }
 const number = v => (typeof v === "number" ? v : typeof v === "string" && v.trim() ? Number(v) : NaN);
@@ -26,12 +49,15 @@ export async function checkNumericalAdvantage(actor) {
   const candidates = numericalAdvantageCandidates(actor),
     esc = foundry.utils.escapeHTML;
   const table = (side, title) =>
-    `<fieldset><legend>${title}</legend><table class="sc2-numerical-roster"><thead><tr><th>${loc`Character / group`}</th><th>${loc`Physical count`}</th><th>${loc`Teammate group`}</th><th>${loc`Already counts as`}</th><th>${loc`Other counting ability`}</th></tr></thead><tbody>${candidates.map(c => `<tr data-side="${side}" data-character="${esc(c.actorUuid)}"><td>${esc(c.name)}</td><td><input name="${side}Count__${c.key}" type="number" min="0" step="1" value="${side === "own" ? c.defaultOwn : 0}" /></td><td><input name="${side}Team__${c.key}" value="${side === "own" && c.defaultOwn ? "your-team" : ""}" /></td><td><input name="${side}Base__${c.key}" type="number" min="1" step="1" value="1" /></td><td><input name="${side}Source__${c.key}" /></td></tr>`).join("")}</tbody></table></fieldset>`;
+    `<fieldset><legend>${title}</legend><table class="sc2-numerical-roster"><thead><tr><th>${loc`Character / group`}</th><th>${loc`Physical count`}</th><th>${loc`Teammate group`}</th><th>${loc`Already counts as`}</th><th>${loc`Other counting ability`}</th></tr></thead><tbody>${candidates.map(c => `<tr data-side="${side}" data-character="${esc(c.actorUuid)}"><td>${esc(c.name)}</td><td><input name="${side}Count__${c.key}" type="number" min="0" step="1" value="${side === "own" ? c.defaultOwn : c.defaultEnemy}" /></td><td><input name="${side}Team__${c.key}" value="${side === "own" && c.defaultOwn ? c.defaultTeam : ""}" /></td><td><input name="${side}Base__${c.key}" type="number" min="1" step="1" value="1" /></td><td><input name="${side}Source__${c.key}" /></td></tr>`).join("")}</tbody></table></fieldset>`;
+  const combatNote = runningCombat()
+    ? loc`Counts are suggested from the running combat, excluding defeated participants. Matching friendly or hostile token dispositions suggest your side; opposite dispositions suggest opposition. Neutral or unclear sides start at zero. Review all counts and assign actual teammate groups; token disposition does not establish teammates. Hidden participants may be unavailable to players; the GC should check the full roster.`
+    : loc`No combat is running. Enter the roster manually.`;
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Check numerical advantage` },
     position: { width: 820 },
     rejectClose: false,
-    content: `<div class="spycraft2-roll-options"><p>${loc`Enter physically present characters, not automatic counts of the directory. A group can share one Actor. Use the same teammate-group label only for actual teammates; allies in different groups do not automatically receive Tactical Advantage. Its current feat source is read from the selected character. A zero physical count with a teammate-group label may identify a remote provider.`}</p>${table("own", "Your side")}${table("enemy", "Opposition")}<label><input name="rosterConfirmed" type="checkbox" /> ${loc`The GC confirms physical counts, opposing sides, teammate relationships and other counting sources`}</label></div>`
+    content: `<div class="spycraft2-roll-options"><p>${esc(combatNote)}</p><p>${loc`Enter physically present characters, not automatic counts of the directory. A group can share one Actor. Use the same teammate-group label only for actual teammates; allies in different groups do not automatically receive Tactical Advantage. Its current feat source is read from the selected character. A zero physical count with a teammate-group label may identify a remote provider.`}</p>${table("own", "Your side")}${table("enemy", "Opposition")}<label><input name="rosterConfirmed" type="checkbox" /> ${loc`The GC confirms physical counts, opposing sides, teammate relationships and other counting sources`}</label></div>`
   });
   if (!input) return null;
   if (!actor.isOwner) throw new Error(loc`You must own the character.`);
