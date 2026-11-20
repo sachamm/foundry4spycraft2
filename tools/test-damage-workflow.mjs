@@ -465,3 +465,66 @@ test("rest wears off a special NPC's stress and subdual damage", async () => {
   assert.deepEqual(nonLethalTotals(boss), { stress: 0, subdual: 0 });
   assert.match(posted.at(-1).content, /subdual damage 14 → 0/);
 });
+
+test("a recorded target gives one-click Resolve and Apply buttons, and several targets take the damage together", async () => {
+  reset();
+  const { distinctLabels } = await import("../module/apps/damage-application.mjs");
+  assert.deepEqual(distinctLabels(["Thug", "Boss", "Thug", "Thug"]), ["Thug 1", "Boss", "Thug 2", "Thug 3"]);
+  const attacker = character("Kevin", { activeFeatNames: [] });
+  const guard = character("Guard", {
+    defense: { total: 15 },
+    vitality: { value: 20, max: 20 },
+    wounds: { value: 12, max: 12 },
+    dr: {}
+  });
+  const attack = card("q1", {
+    actorUuid: attacker.uuid,
+    checkKind: "attack",
+    rawTotal: 18,
+    effectiveTotal: 18,
+    attackContext: { targetActorUuid: guard.uuid }
+  });
+  const controls = check =>
+    rollPipeline.chatControls({
+      message: check,
+      check: check.flags.spycraft2,
+      actor: attacker,
+      user: game.user,
+      checkKind: check.flags.spycraft2.checkKind
+    });
+  const resolve = controls(attack).filter(c => c.id === "attackResolutionControl");
+  assert.deepEqual(
+    resolve.map(c => [c.label, c.emphasis]),
+    [
+      ["Resolve vs Defense 15 (Guard)", "primary"],
+      ["Resolve against another target or Defense…", undefined]
+    ]
+  );
+  await resolve[0].run();
+  assert.equal(attack.flags.spycraft2.attackResolution.hit, true);
+  // The damage card names the hit's target: one click applies the rolled damage to it.
+  const damage = card("q2", {
+    actorUuid: attacker.uuid,
+    checkKind: "damage",
+    effectiveTotal: 7,
+    sourceAttack: { uuid: attack.uuid, targetUuid: guard.uuid }
+  });
+  const apply = controls(damage).filter(c => c.id === "applyDamageControl");
+  assert.equal(apply[0].label, "Apply 7 to Guard (not on the scene)");
+  assert.equal(apply[0].emphasis, "primary");
+  await apply[0].run();
+  assert.equal(guard.system.vitality.value, 13);
+  assert.equal(
+    controls(damage).some(c => c.label.startsWith("Apply 7 to Guard")),
+    false,
+    "not offered twice for one target"
+  );
+  // With several tokens targeted, one button applies the damage to each and posts a summary.
+  const second = character("Guard2", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
+  game.user.targets = [{ actor: guard }, { actor: second }];
+  const each = controls(damage).find(c => c.label === "Apply 7 to each of 2 targeted");
+  await each.run();
+  assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [6, 13]);
+  assert.match(posted.at(-1).content, /Damage applied to 2 targets/);
+  game.user.targets = [];
+});

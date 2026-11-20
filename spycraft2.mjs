@@ -309,20 +309,36 @@ Hooks.once("init", () => {
 // Buttons under posted checks come from roll pipeline contributors (module/rolls/chat-controls.mjs).
 Hooks.on("renderChatMessageHTML", renderCheckControls);
 
-// Recompute round-based bonuses and counters when combat progresses or ends.
-function refreshCombatActorData() {
-  for (const actor of periodResourceActors())
-    if (actor.type === "agent") {
-      actor.reset();
-      actor.sheet?.render(false);
-    }
+// Recompute round-based bonuses and counters when combat progresses or ends. Changes arriving together (a round
+// advance updates many combatants) are gathered into one pass; a combat change only touches that combat's agents.
+let pendingRefresh = null;
+function refreshCombatActorData(scope = null) {
+  const all = scope === null || !Array.isArray(scope);
+  if (!pendingRefresh) {
+    pendingRefresh = { all: false, actors: new Set() };
+    setTimeout(() => {
+      const { all: everyone, actors } = pendingRefresh;
+      pendingRefresh = null;
+      const chosen = everyone ? periodResourceActors() : actors;
+      for (const actor of chosen)
+        if (actor?.type === "agent") {
+          actor.reset();
+          actor.sheet?.render(false);
+        }
+      game.spycraft2?.gc?.console?.render(false);
+    }, 0);
+  }
+  if (all) pendingRefresh.all = true;
+  else for (const actor of scope) pendingRefresh.actors.add(actor);
 }
+/** The agents taking part in a combat: what a change to that combat can affect. */
+const combatActors = combat => [...(combat?.combatants ?? [])].map(combatant => combatant.actor).filter(Boolean);
 // Display names that come from the rules data are translated once the language is known.
 Hooks.once("i18nInit", () => {
   localizeConfig(CONFIG.SPYCRAFT);
   nameSystemStatuses();
 });
-Hooks.once("ready", refreshCombatActorData);
+Hooks.once("ready", () => refreshCombatActorData());
 Hooks.once("ready", setupSampleScenes);
 Hooks.once("ready", setupActorFolders);
 Hooks.once("ready", setupGCTables);
@@ -333,12 +349,12 @@ Hooks.once("ready", () => {
     ui.notifications?.error(loc`Spycraft 2.0 could not update this world's data. See the console for details.`);
   });
 });
-Hooks.on("updateWorldTime", refreshCombatActorData);
-Hooks.on("updateCombat", (_combat, changed) => {
+Hooks.on("updateWorldTime", () => refreshCombatActorData());
+Hooks.on("updateCombat", (combat, changed) => {
   if (Object.hasOwn(changed, "round") || Object.hasOwn(changed, "active") || Object.hasOwn(changed, "turn"))
-    refreshCombatActorData();
+    refreshCombatActorData(combatActors(combat));
 });
-Hooks.on("deleteCombat", refreshCombatActorData);
+Hooks.on("deleteCombat", combat => refreshCombatActorData(combatActors(combat)));
 // Preserve the character's completed-round clock before leaving a tracked combat.
 function detachMentalLeapClocks(combat) {
   for (const actor of periodResourceActors()) {
@@ -361,12 +377,15 @@ Hooks.on("updateCombat", (combat, changed) => {
     detachMentalLeapClocks(combat);
 });
 
-Hooks.on("updateCombatant", (_combatant, changed) => {
+Hooks.on("updateCombatant", (combatant, changed) => {
   if (["initiative", "actorId", "tokenId", "sceneId", "group"].some(key => Object.hasOwn(changed, key)))
-    refreshCombatActorData();
+    refreshCombatActorData(combatActors(combatant.parent));
+  else game.spycraft2?.gc?.console?.render(false);
 });
-Hooks.on("createCombatant", refreshCombatActorData);
-Hooks.on("deleteCombatant", refreshCombatActorData);
+Hooks.on("createCombatant", combatant => refreshCombatActorData(combatActors(combatant.parent)));
+Hooks.on("deleteCombatant", combatant =>
+  refreshCombatActorData([...combatActors(combatant.parent), combatant.actor].filter(Boolean))
+);
 
 // Team references read actual class levels, so a source's advancement/removal refreshes its recipients.
 function refreshFortuneRecipients(source) {

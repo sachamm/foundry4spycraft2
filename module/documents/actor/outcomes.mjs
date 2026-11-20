@@ -33,6 +33,7 @@ import {
   cunningPlanCheck
 } from "../../rules/class-checks.mjs";
 import { queueResources } from "../../rules/transactions.mjs";
+import { openingRound } from "../../rolls/chat-controls.mjs";
 import { finishGearAcquisition } from "../../apps/gear-acquisition.mjs";
 import { gcDiceStatus, spendGCDice, gcDiceController, refreshGCDiceTransaction } from "../../rules/gc-dice.mjs";
 import { criticalPlan } from "../../rules/criticals.mjs";
@@ -102,10 +103,11 @@ export const ActorOutcomes = Base =>
                   )}</select></label>${currentShaken.extraDice > paidBoostSurcharge(this, message) ? splitSurchargeFundingControl(this) : ""}`
               : ""
           }
+          <p class="hint">${loc`Action dice left: ${this.system.actionDice?.value ?? 0} (d${this.system.actionDice?.die ?? 4}). Each die spent adds its roll to this result.`}</p>
           <label>${loc`Boosting dice (excluding surcharge)`} <input type="number" name="count" min="1" value="1" /></label>
-          <label><input type="checkbox" name="openingRound" /> ${loc`Surprise round or first standard combat round`}</label>
+          ${(this.system.coreClassIds ?? []).includes("counterterrorist") ? `<label><input type="checkbox" name="openingRound"${openingRound() ? " checked" : ""} /> ${loc`Surprise round or first standard combat round`}</label>` : ""}
           ${errorDecisionPending(check) ? `<label><input type="checkbox" name="errorDeclined" /> ${loc`Opponents declined to activate this error as a critical failure`}</label>` : ""}
-          <label><input type="checkbox" name="calculating" /> ${loc`Use Calculating if replacing the lowest action die improves the result`}</label></div>`
+          ${(this.system.coreClassIds ?? []).includes("schemer") ? `<label><input type="checkbox" name="calculating" checked /> ${loc`Use Calculating if replacing the lowest action die improves the result`}</label>` : ""}</div>`
           });
           if (!input) return null;
         }

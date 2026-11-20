@@ -536,7 +536,11 @@ export const ActorAttackRolls = Base =>
             automaticAttackBonus,
             sideHits,
             targetChoices,
-            trickSneakHit
+            trickSneakHit,
+            // What the attack card already recorded, so the damage dialog does not ask for it again.
+            attackFacts: options.sourceAttack?.uuid
+              ? (fromUuidSync(options.sourceAttack.uuid)?.flags?.spycraft2?.attackContext ?? null)
+              : null
           })
         });
         if (!input) return null;

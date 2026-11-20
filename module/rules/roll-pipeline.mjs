@@ -19,7 +19,8 @@ import { loc } from "../i18n.mjs";
  *     stage: 'plan',                 // when `modifiers` applies: 'plan' (part of the previewed total) or 'roll' (default)
  *     flags(ctx),                    // return an object merged into the chat message's check record
  *     record: ['takedown'],          // roll options copied onto that record as they are (null when absent)
- *     chatControls(ctx)              // return [{label, run, placement?}] buttons for a posted check
+ *     chatControls(ctx)              // return [{label, run, placement?, emphasis?}] buttons for a posted check;
+ *                                    // emphasis "primary" marks the card's next step, "quiet" a minor one
  *   }
  *
  * A rule registers from its own module; module/rolls/index.mjs imports every module that does. Phases are
@@ -259,7 +260,13 @@ export class RollPipeline {
         if (!control || typeof control.label !== "string" || !control.label || typeof control.run !== "function") {
           throw new TypeError(loc`Roll contributor "${c.id}": each chat control needs a label and a run function.`);
         }
-        controls.push({ id: c.id, label: control.label, run: control.run, placement: control.placement ?? "plain" });
+        controls.push({
+          id: c.id,
+          label: control.label,
+          run: control.run,
+          placement: control.placement ?? "plain",
+          ...(["primary", "quiet"].includes(control.emphasis) ? { emphasis: control.emphasis } : {})
+        });
       }
     }
     return controls;
