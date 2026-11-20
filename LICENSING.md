@@ -28,11 +28,20 @@ Spycraft is a trademark of Crafty Games. This system is unofficial and is not
 affiliated with or endorsed by Crafty Games. The rulebook's protected expression
 and other retained rights belong to their respective owners.
 
-Erik Dewey's Spycraft 2.0 Character Builder was the source of the initially
-imported ruleset, as credited in the README. Permission and the applicable
-license for that import have not yet been established. The exact rulebook
-edition's legal notices and any Open Game Content designations also require
-review. No OGL license or publisher permission is asserted by this document.
+Erik Dewey's [Spycraft 2.0 Character Generator spreadsheet](https://www.erikdewey.com/gaming.htm)
+was the source of the initial data import, as credited in the README. His page
+links [spycraft2generator.zip](https://www.erikdewey.com/spycraft2generator.zip)
+and labels it last updated 5/9/07. The retrieved archive contains one file,
+`spycraft generator3.xls`, and no separate license or readme. The archive's SHA-256 is
+`ddae94ecd09acf6f85a652399a1c644b30c4249ffbc6033fc093f51449602fc7`.
+No adaptation or redistribution grant has yet been established for that import;
+crediting the spreadsheet author does not establish rights in the underlying
+published game or in all imported material.
+
+The project owner reports a rulebook showing 2005 and a PDF filename containing
+"second printing." Its exact legal notices and Open Game Content/Product
+Identity designations still require verification. No OGL license or publisher
+permission is asserted by this document.
 
 The repository's requirements for original summaries remain in
 [AGENTS.md](AGENTS.md). Those requirements and the presence of page references

@@ -143,8 +143,9 @@ The Chat Messages sidebar has a text search and Character / Roll type filters. F
 
 ## Credits
 
-Thanks to Erik Dewey, whose *Spycraft 2.0 Character Builder* inspired this system and who authored the ruleset that
-was initially imported into it.
+Erik Dewey created the [Spycraft 2.0 Character Generator spreadsheet](https://www.erikdewey.com/gaming.htm)
+used for the initial data import. Its source archive is
+[spycraft2generator.zip](https://www.erikdewey.com/spycraft2generator.zip).
 
 ## Legal
 
@@ -153,7 +154,7 @@ Spycraft is a trademark of Crafty Games. This project is unofficial and not affi
 See [Licensing and provenance](LICENSING.md) for existing file-level licenses,
 asset sources, soundtrack provenance, and unresolved permission questions.
 
-The Spycraft 2.0 rulebook is copyrighted and is not open content. This repository must not contain its text: data files hold names, numbers and table values as bare labels, and every description is an original summary. You need the rulebook to play. Contributors, see [AGENTS.md](AGENTS.md).
+The rulebook's protected text must not be copied into this repository. Contributions must use bare labels and original summaries as required by [AGENTS.md](AGENTS.md). Legacy imported material still needs clearance or replacement; see [LICENSING.md](LICENSING.md). You need the rulebook to play.
 
 ## Installing in Foundry
 
