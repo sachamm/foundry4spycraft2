@@ -11,7 +11,7 @@ export function checkGuidance(check) {
     return applied
       ? {
           title: loc`Damage applied`,
-          note: loc`Review the recorded target receipts before applying damage to another target.`
+          note: loc`Check who has already taken this damage (listed below) before applying it to anyone else.`
         }
       : {
           title: check.resolved ? loc`Damage finalized` : loc`Damage rolled`,

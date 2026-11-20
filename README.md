@@ -57,6 +57,22 @@ attack and skill dialogs provide **Find an option** search. Search only filters 
 Short declarations keep their full conditions as visible, accessible help. Damage application starts with target, damage,
 kind and reduction source; armor penetration, critical hits and special damage have separate groups with applied-option counts.
 
+**Faster play at the table:**
+
+- **Shift-click** a weapon, save or skill to roll straight away with the choices you made last time for it. A player
+  setting, *Roll without the dialog by default*, swaps plain click and Shift-click.
+- Roll dialogs remember your last choices for that weapon or skill for the rest of the session, and say how many were
+  carried over, with a **Reset** button. Targets, distances, Aim, Brace and anything the GC confirms always start blank.
+- Roll cards put the next step first as a highlighted button: **Spend 1 action die**, then **Resolve vs Defense** against
+  the targeted token, then **Roll damage** (pre-filled from the attack), then **Apply** to the target or to each targeted
+  token. The full dialogs stay one click away for anything unusual. **Outcome resolved** is a small button at the end.
+- Boost buttons appear only on agents' cards; **Generous teammate die** appears only when you own a Pointman teammate.
+- A notice and a highlight on the round tracker tell you when your character's turn comes up (player setting).
+- Drag a weapon or a skill from the sheet onto the hotbar to make a macro that rolls it. Shift-click works there too.
+- The rail shows XP and a **Level up** button when enough XP is banked; each class block has a **+1 level** button.
+  The dashboard lists abilities with uses left this scene, session or mission.
+- NPC sheets show weapons under the header, list skills as rollable links, and keep rarer actions under **More actions**.
+
 The agent sheet calculates:
 
 - **Attributes** — 36-point buy with cost table, origin modifiers, level increases at 4/8/12/16/20, misc.

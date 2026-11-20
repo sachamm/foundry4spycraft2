@@ -4,6 +4,25 @@ Open the **GC Console** from the first sidebar tab, marked with a spy icon (GC o
 
 Foundry already supplies scenes, tokens, journals, roll tables and the combat tracker. These tools add what is specific to Spycraft 2.0.
 
+## Running a session
+
+- **Begin session** (top of the console) starts the session's usage period, sets up the GC pool from the team and the
+  mission's Caliber, and applies each agent's starting-dice adjustments in one step. **Next scene** starts a new scene
+  period and counts the scene on the active mission. **Start mission** also starts a mission period.
+- Until the pool is set up the console offers **Set up GC pool**, pre-filled with the players present and the Caliber.
+- On an open NPC card the GC gets **GC boost** and **GC: activate threat**, paid from the GC pool.
+- A player's request to change something they do not own (damage to an NPC, treating a teammate) arrives as a card in
+  the GC's chat with **Allow** and **Decline**, so play is not stopped by a pop-up. Unanswered requests are declined
+  after about two minutes.
+
+World settings that change the flow:
+
+- *Show opponents' Defense to players* (on): players can resolve an attack against the targeted token in one click.
+  Off keeps NPC Defense hidden; players pick the target in the resolve dialog.
+- *Trust the table* (off): dialogs open with the GC confirmation boxes already ticked, with a note saying so.
+- *Record fluid initiative from damage* (on): losing wounds to an applied damage roll records the fluid initiative
+  event without a trip to the console.
+
 ## Mission record (pp.423–440)
 
 One mission is stored per world.
