@@ -248,6 +248,15 @@ test("the GC spends the session pool from an NPC's card; the NPC's own threat is
   assert.equal(labels(message({ errorConfirmed: true }), gc).includes("card:Activate critical"), true);
   // Players never see the GC's buttons.
   assert.equal(labels(message({ checkKind: "attack" })).includes("card:GC boost (+1d4)"), false);
+  // An NPC skill roll is posted as a plain check naming the skill.
+  assert.equal(labels(message({ checkKind: "check", npcSkill: "notice" }), gc).includes("card:GC boost (+1d4)"), true);
+  // An activated critical failure cannot be boosted.
+  assert.equal(
+    labels(message({ checkKind: "attack", errorConfirmed: true, criticalFailure: true }), gc).includes(
+      "card:GC boost (+1d4)"
+    ),
+    false
+  );
 });
 
 test("an attack waiting to be resolved does not offer to close its outcome", () => {

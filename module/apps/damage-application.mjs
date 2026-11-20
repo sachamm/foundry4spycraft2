@@ -195,6 +195,8 @@ export async function resolveAttack(message, options = {}) {
     targetName: target?.name ?? "",
     defense,
     total: check.effectiveTotal,
+    // The card is public: an NPC's Defense stays off it when the GC keeps it from players.
+    ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome
   };
   await message.update({ "flags.spycraft2.attackResolution": resolution });
@@ -371,7 +373,7 @@ async function lethalOnSpecial(target, hit, source) {
   if (plan.fatigued) lines.push(await condition(target, "fatigued", loc`Fatigued`));
   if (plan.stateChanged) lines.push(...(await woundConditions(target, plan.state)));
   if (plan.woundLoss > 0)
-    lines.push(await recordAutomaticFluidEvent(target, plan.critical ? "criticalWoundLoss" : "woundLoss"));
+    lines.push(await recordAutomaticFluidEvent(target, hit.critical === true ? "criticalWoundLoss" : "woundLoss"));
   if (plan.bruise)
     lines.push(
       ...(

@@ -15,16 +15,26 @@ import { spendGCDice } from "./spend.mjs";
 import { loc } from "../../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
+/** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
+const npcCheckKind = check =>
+  ["attack", "skill", "save", "ability", "knowledge"].includes(check.checkKind) || !!check.npcSkill;
+/** An activated critical failure can no longer be boosted (the same rule as an agent's boost). */
+export const gcBoostable = check =>
+  Number.isFinite(check?.rawTotal) && !check.resolved && !check.superseded && !check.criticalFailure;
 const npcOpen = ({ check, actor, user }) =>
   user?.isGM === true &&
   actor?.type === "npc" &&
   Number.isFinite(check.rawTotal) &&
   !check.resolved &&
   !check.superseded &&
-  ["attack", "skill", "save", "ability", "knowledge"].includes(check.checkKind);
+  npcCheckKind(check);
 
 /** Add a GC boost to the card: the new total, and a line under the result saying where it came from. */
 export async function gcBoostCard(message, actor) {
+  if (!gcBoostable(message.flags?.spycraft2)) {
+    ui.notifications.warn(loc`This card can no longer be boosted.`);
+    return null;
+  }
   const result = await spendGCDice({ id: "boostRoll", actor });
   if (!result?.die) return null;
   const check = message.flags.spycraft2,
@@ -68,13 +78,15 @@ rollPipeline.register({
     } catch {
       /* an incomplete NPC profile rolls the basic die */
     }
-    const controls = [{ label: loc`GC boost (+1d${die})`, placement: "card", run: () => gcBoostCard(message, actor) }];
+    const controls = gcBoostable(check)
+      ? [{ label: loc`GC boost (+1d${die})`, placement: "card", run: () => gcBoostCard(message, actor) }]
+      : [];
     if (check.threatConfirmed && !check.criticalSuccess && !check.criticalFailure)
       controls.unshift({
         label: loc`GC: activate threat`,
         placement: "card",
         run: () => gcActivateThreat(message, actor)
       });
-    return controls;
+    return controls.length ? controls : null;
   }
 });

@@ -163,7 +163,8 @@ export const ActorSkillRolls = Base =>
         // Shift-click: the check chosen last time for this skill (or its first check), rolled straight away.
         const saved = rememberedChoices(memoryKey) ?? {};
         const check = checks.some(c => c.id === saved.check) ? saved.check : checks[0].id;
-        input = { ...options, ...saved, check, ability: ability ?? saved.ability ?? skill.ability };
+        // Taking 10 or 20 needs this moment's safety declared in the dialog, so the fast path always rolls.
+        input = { ...options, ...saved, check, ability: ability ?? saved.ability ?? skill.ability, method: "roll" };
       }
       if (!input.check) {
         const esc = foundry.utils.escapeHTML;
@@ -200,7 +201,7 @@ export const ActorSkillRolls = Base =>
           })
         });
         if (!input) return null;
-        rememberChoices(memoryKey, { check: input.check, ability: input.ability, checkMethod: input.checkMethod });
+        rememberChoices(memoryKey, { check: input.check, ability: input.ability, method: input.method });
       }
       // Field coercion and lookups registered for this dialog (module/rolls/dialogs/skill.mjs and rule modules).
       input = rollPipeline.read({ dialog: "skill", actor: this, key }, input);
