@@ -171,7 +171,9 @@ registerRelay("markCard", {
       actor = check?.actorUuid ? await fromUuid(check.actorUuid) : null;
     if (!message || !Object.hasOwn(MARKS, key) || !MARKS[key](value))
       throw new Error(loc`That card cannot be marked this way.`);
-    if (!user.isGM && !actor?.testUserPermission(user, "OWNER"))
+    // The player whose own character took the damage may record that on the attacker's card.
+    const damaged = key === "damageAppliedEntry" && value?.targetUuid ? await fromUuid(value.targetUuid) : null;
+    if (!user.isGM && !actor?.testUserPermission(user, "OWNER") && !damaged?.testUserPermission?.(user, "OWNER"))
       throw new Error(loc`Only the character's own player can mark that card.`);
     await message.update(markUpdate(message, key, value));
     return true;
