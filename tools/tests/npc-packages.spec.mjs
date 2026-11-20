@@ -43,7 +43,7 @@ const css = ["spycraft2.css", "retro.css"]
   .join("\n");
 
 for (const height of [560, 900]) {
-  test(`package selection, editable bands and preview remain reachable at ${height}px`, async ({ page }) => {
+  test(`package selection, editable bands and preview remain reachable at ${height}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 900, height });
     const mount = async content =>
       page.setContent(`<style>
@@ -72,6 +72,6 @@ for (const height of [560, 900]) {
     await expect(page.getByText(/Equipment uses catalog Calibers/)).toBeInViewport();
     await expect(page.getByRole("button", { name: "Apply package" })).toBeInViewport();
     expect(await page.locator(".application").evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
-    await page.screenshot({ path: `/private/tmp/sc2-npc-package-preview-${height}.png` });
+    await page.screenshot({ path: testInfo.outputPath(`sc2-npc-package-preview-${height}.png`) });
   });
 }
