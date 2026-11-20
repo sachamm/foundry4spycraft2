@@ -8,6 +8,7 @@ import { hazardState } from "../rules/hazards.mjs";
 import { npcIsSpecial } from "./gc/npc-play.mjs";
 import { rollDying } from "./healing.mjs";
 import { burningRound } from "./hazards.mjs";
+import { fluidRoundSettled } from "./gc/combat.mjs";
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -83,6 +84,8 @@ async function renderButton(message, html) {
   content.append(button);
 }
 
+const posted = new Set();
+
 export function installRoundReminders() {
   Hooks.on("updateCombat", async (combat, changed, options) => {
     if (!isLeadGM() || !enabled() || !combat?.started) return;
@@ -90,13 +93,21 @@ export function installRoundReminders() {
     if (!forward || (!Object.hasOwn(changed, "round") && !Object.hasOwn(changed, "turn"))) return;
     const previousRound = combat.previous?.round ?? (Number(changed.round) || 1) - 1;
     const roundEnded = Object.hasOwn(changed, "round") && previousRound >= 1 && combat.round > previousRound;
+    // Fluid initiative may reorder the fight for the new round; read whose turn it is only once that is done.
+    if (Object.hasOwn(changed, "round")) await fluidRoundSettled();
     const reminders = roundReminders({
       combatants: combatantsOf(combat),
       roundEnded,
       turnActorUuid: combat.combatant?.actor?.uuid ?? null
     });
-    for (const reminder of reminders)
+    for (const reminder of reminders) {
+      // A reorder at the start of a round updates the turn again; remind each character once per turn.
+      const key = `${combat.id}:${combat.round}:${reminder.kind}:${reminder.actorUuid}`;
+      if (posted.has(key)) continue;
+      posted.add(key);
+      if (posted.size > 200) posted.delete(posted.values().next().value);
       await post(reminder).catch(error => console.warn(loc`Spycraft 2.0 | round reminder not posted`, error));
+    }
   });
   Hooks.on("renderChatMessageHTML", renderButton);
 }

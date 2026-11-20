@@ -300,6 +300,11 @@ export async function surpriseRoundDialog(combat = game.combat) {
   return result;
 }
 
+// The end-of-round pass of the latest round change; other hooks wait for it before reading the new order.
+let endOfRoundPass = Promise.resolve();
+/** Resolves once fluid initiative has finished reordering the combat for the latest round change. */
+export const fluidRoundSettled = () => endOfRoundPass;
+
 export function installFluidInitiativeHooks() {
   // Everyone starts a fight flat-footed unless he joins it deliberately after it begins (p.323).
   Hooks.on("combatStart", async combat => {
@@ -310,6 +315,8 @@ export function installFluidInitiativeHooks() {
     if (!isLeadGM() || !Object.hasOwn(changed, "round") || !setting("fluidInitiative")) return;
     const previous = combat.previous?.round ?? changed.round - 1;
     if (!(options?.direction > 0 || changed.round > previous) || previous < 1) return;
+    let settle;
+    endOfRoundPass = new Promise(resolve => (settle = resolve));
     try {
       const changedCounts = await applyEndOfRound(combat, previous);
       await rollTiebreaks(combat);
@@ -321,6 +328,8 @@ export function installFluidInitiativeHooks() {
       ui.combat?.render();
     } catch (error) {
       ui.notifications.warn(loc`Fluid initiative needs review: ${error.message}`);
+    } finally {
+      settle();
     }
   });
   Hooks.on("updateCombatant", (combatant, changed) => {
