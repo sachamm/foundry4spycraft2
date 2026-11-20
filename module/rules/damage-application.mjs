@@ -54,6 +54,11 @@ export function damageProfile(damageText = "", qualities = "") {
 export function attackResolutionNote(check) {
   const r = check?.attackResolution;
   if (!r) return "";
+  if (r.defenseHidden) {
+    const who = r.targetName || loc`the target`;
+    if (!r.hit) return loc`Against ${who}: a miss.`;
+    return r.hits > 1 ? loc`Against ${who}: a hit; ${r.hits} shots hit.` : loc`Against ${who}: a hit.`;
+  }
   const against = r.targetName ? loc`${r.targetName}'s Defense ${r.defense}` : loc`Defense ${r.defense}`;
   if (!r.hit) return loc`Against ${against}: a miss by ${-r.margin}.`;
   return r.hits > 1

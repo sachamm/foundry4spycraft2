@@ -16,6 +16,10 @@
 .chat-message.sc2-card .message-header .spycraft2-error { color: var(--sc2-on-bar-danger); }
 .spycraft2.roll-controls { display: grid; gap: 4px; margin-top: 6px; }
 .spycraft2.roll-controls :is(button, .sc2-icon-button) { width: 100%; justify-content: flex-start; text-align: left; }
+/* The card's next step stands out; closing the outcome is a small text button at the end of the row. */
+.spycraft2.roll-controls button.sc2-primary-action { color: var(--sc2-on-action); background: var(--sc2-action); border-color: var(--sc2-action); font-weight: 700; }
+.spycraft2.roll-controls button.sc2-primary-action:hover { background: var(--sc2-action-strong); border-color: var(--sc2-action-strong); }
+.spycraft2.roll-controls button.sc2-quiet-action { width: auto; justify-self: end; min-height: 0; padding: 0 4px; font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); background: transparent; border: 0; text-decoration: underline; box-shadow: none; }
 
 .spycraft2.sc2-result-guide { border-left: 3px solid var(--sc2-teal, #32665f); padding: 6px 10px; margin-bottom: 8px; background: var(--sc2-paper-raised, #f4f1e8); color: var(--sc2-ink, #292e2c); }
 .spycraft2.sc2-result-guide h4 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }

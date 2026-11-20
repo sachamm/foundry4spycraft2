@@ -2,7 +2,7 @@
 {{#each shakenInitiativeReviews}}<p class="bad">{{name}}{{localize "SPYCRAFT.Template.ActorAgentMain.InitiativeCount"}} {{count}} {{localize "SPYCRAFT.Template.ActorAgentMain.NeedsShakenReview"}} {{reason}} {{#if @root.isGM}}<a data-action="reviewShakenInitiative" data-combat-id="{{combatId}}" data-combatant-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewIncludedPenalty"}}</a>{{/if}}</p>{{/each}}
   <div class="play-dashboard play-only">
     {{#if startedCharacterCombat}}<div class="round-tracker" role="group" aria-label="{{localize 'SPYCRAFT.Round.Title'}}">
-      <span class="sc2-caption">{{localize "SPYCRAFT.Round.Title"}}</span>
+      <span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.Round.Hint'}}">{{localize "SPYCRAFT.Round.Title"}}</span>
       {{#each roundActions}}<button type="button" class="round-pip{{#if spent}} spent{{/if}}" data-sc2-display="text" data-action="toggleHalfAction" data-index="{{index}}" aria-pressed="{{spent}}">{{localize "SPYCRAFT.Round.Half"}}</button>{{/each}}
     </div>{{/if}}
     <div class="pinned-tools tool-actions" aria-label="{{localize 'SPYCRAFT.Pins.Title'}}" hidden></div>
@@ -23,6 +23,10 @@
         {{else}}<li class="muted">{{localize "SPYCRAFT.NoWeapons"}}</li>{{/each}}
       </ul>
 </div>
+    {{#if limitedUses.length}}<div class="dashboard-uses" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.UsesLeft'}}">
+      <h3>{{localize "SPYCRAFT.Template.ActorAgentMain.UsesLeft"}}</h3>
+      <ul class="plain uses-strip">{{#each limitedUses}}<li><b class="sc2-uses{{#unless remaining}} spent{{/unless}}">{{remaining}}/{{limit}}</b> {{name}} <small class="muted">{{period}}</small>{{#if (sc2eq workflow "manual")}} <button type="button" data-action="useLimitedAbility" data-resource="{{id}}" data-name="{{name}}"{{#unless remaining}} disabled{{/unless}}>{{localize "SPYCRAFT.Template.ActorAgentClasses.Use"}}</button>{{/if}}</li>{{/each}}</ul>
+    </div>{{/if}}
     <div class="quick-actions" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CommonActions'}}">      <p><a data-action="checkNumericalAdvantage">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckNumericalAdvantage"}}</a> <a data-action="checkCombatMovement">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckCombatMovement"}}</a> <a data-action="takeTotalDefense">{{localize "SPYCRAFT.Template.ActorAgentMain.TakeTotalDefense"}}</a>{{#if system.totalDefenseState.active}} <span class="sc2-chip">{{localize "SPYCRAFT.Template.ActorAgentMain.Dodge"}}{{system.totalDefenseState.bonus}}{{#if system.totalDefenseState.equilibrium}} {{localize "SPYCRAFT.Template.ActorAgentMain.EquilibriumBasics"}}{{system.totalDefenseState.equilibrium.bonus}} {{localize "SPYCRAFT.Template.ActorAgentMain.Included"}}{{/if}} {{localize "SPYCRAFT.Template.ActorAgentMain.UntilOwnCountInRound"}} {{system.totalDefenseState.dueRound}}</span>{{/if}}</p></div>
   </div>
 

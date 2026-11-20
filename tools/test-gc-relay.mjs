@@ -17,8 +17,9 @@ const message = {
 const actor = { testUserPermission: (user, level) => level === "OWNER" && user.id === "owner" };
 const confirms = [];
 let confirmAnswer = true;
+let nextId = 0;
 globalThis.foundry = {
-  utils: { escapeHTML: text => String(text).replaceAll("<", "&lt;") },
+  utils: { escapeHTML: text => String(text).replaceAll("<", "&lt;"), randomID: () => `id${++nextId}` },
   applications: {
     api: {
       DialogV2: {
@@ -94,19 +95,58 @@ test("an unknown request or user is answered with an error, never thrown", async
   assert.ok((await handleRelay()).error);
 });
 
-test("a described request waits for the GC's yes unless the world setting skips the question", async () => {
-  const ran = [];
+test("a described request waits for Allow on a card in the GC's chat unless the world setting skips the question", async () => {
+  const { renderRelayAsk } = await import("../module/apps/gc-relay.mjs");
+  const ran = [],
+    cards = [];
+  globalThis.ChatMessage = {
+    create: async data => {
+      const card = {
+        ...data,
+        async update(change) {
+          Object.assign(this, { content: change.content });
+          this.flags.spycraft2.relayAnswered = true;
+        }
+      };
+      cards.push(card);
+      return card;
+    }
+  };
+  // Just enough DOM to lay out and click the card's buttons.
+  const node = () => ({
+    children: [],
+    listeners: {},
+    append(...n) {
+      this.children.push(...n);
+    },
+    addEventListener(type, fn) {
+      this.listeners[type] = fn;
+    }
+  });
+  globalThis.document = { createElement: node };
+  const answer = async (allowed, run) => {
+    const pending = run();
+    while (!cards.length || cards.at(-1).flags.spycraft2.relayAnswered) await new Promise(r => setTimeout(r, 0));
+    game.user.isGM = true;
+    const html = node();
+    renderRelayAsk(cards.at(-1), html);
+    game.user.isGM = false;
+    const [allow, decline] = html.children[0].children;
+    await (allowed ? allow : decline).listeners.click();
+    return pending;
+  };
   registerRelay("testAction", { describe: () => "Allow?", run: data => (ran.push(data), "done") });
-  confirms.length = 0;
-  confirmAnswer = false;
-  assert.match((await handleRelay({ action: "testAction", userId: "owner", data: { n: 1 } })).error, /declined/);
+  const declined = await answer(false, () => handleRelay({ action: "testAction", userId: "owner", data: { n: 1 } }));
+  assert.match(declined.error, /declined/);
   assert.equal(ran.length, 0);
-  confirmAnswer = true;
-  assert.deepEqual(await handleRelay({ action: "testAction", userId: "owner", data: { n: 2 } }), { value: "done" });
-  assert.equal(confirms.length, 2);
+  assert.match(cards[0].content, /Declined/);
+  const allowed = await answer(true, () => handleRelay({ action: "testAction", userId: "owner", data: { n: 2 } }));
+  assert.deepEqual(allowed, { value: "done" });
+  assert.equal(cards.length, 2);
+  assert.equal(confirms.length, 0, "no blocking dialog");
   settings.relayAutoApprove = true;
   await handleRelay({ action: "testAction", userId: "owner", data: { n: 3 } });
-  assert.equal(confirms.length, 2, "no question when requests are applied without asking");
+  assert.equal(cards.length, 2, "no question when requests are applied without asking");
   settings.relayAutoApprove = false;
   assert.deepEqual(ran, [{ n: 2 }, { n: 3 }]);
 });

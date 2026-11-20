@@ -126,6 +126,8 @@ import {
   dispositionRows
 } from "../apps/gc/npc-play.mjs";
 import { loc } from "../i18n.mjs";
+import { quickAttackOptions, skipDialog } from "../apps/remembered-choices.mjs";
+import { enableHotbarDrag } from "../apps/hotbar.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -824,6 +826,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       },
       spendActionDie: SpycraftAgentSheet.#onSpendActionDie,
       addLevel: SpycraftAgentSheet.#onAddLevel,
+      addLevelInClass: SpycraftAgentSheet.#onAddLevelInClass,
       removeLevel: SpycraftAgentSheet.#onRemoveLevel,
       browse: SpycraftAgentSheet.#onBrowse,
       itemEdit: SpycraftAgentSheet.#onItemEdit,
@@ -1231,6 +1234,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       };
     });
     context.xpNext = sys.xpNext;
+    // Enough experience for the next Career Level: the rail offers to add it.
+    context.levelUpReady = Number.isFinite(sys.xpNext) && Number(sys.xp) >= sys.xpNext && sys.level < 20;
 
     // Skills
     const lvl = Math.clamp(this._skillLevel ?? sys.level, 1, Math.max(1, sys.level));
@@ -1434,6 +1439,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   _onRender(context, options) {
     super._onRender(context, options);
     enhanceAgentSheet(this.element, context, this, text => game.i18n.localize(text));
+    enableHotbarDrag(this.element, this.actor);
     installResolutionGuide(this.element.querySelector(".play-dashboard"), "play");
   }
 
@@ -1620,13 +1626,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     return this.actor.rollAbility(target.dataset.ability);
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: true });
+    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
   }
   static #onRollSkill(event, target) {
-    return this.actor.rollSkill(target.dataset.skill, target.dataset.ability || null);
+    return this.actor.rollSkill(target.dataset.skill, target.dataset.ability || null, {
+      ...(skipDialog(event) ? { quick: true } : {})
+    });
   }
   static #onRollAttack(event, target) {
-    return this.actor.rollAttack(this._item(target), { askContext: true });
+    const item = this._item(target);
+    return this.actor.rollAttack(item, skipDialog(event) ? quickAttackOptions(this.actor, item) : { askContext: true });
   }
   static #onRollDamage(event, target) {
     return this.actor.rollDamage(this._item(target));
@@ -1658,6 +1667,11 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   }
   static #onAddLevel() {
     return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true);
+  }
+  /** Another level in a class the character already has, without opening the class browser. */
+  static #onAddLevelInClass(event, target) {
+    const cls = this._item(target);
+    return cls?.type === "class" ? this.actor.addClassLevel(cls) : null;
   }
   static async #onRemoveLevel() {
     const ok = await systemDialog.confirm({
@@ -1799,8 +1813,10 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
       setNpcSkillCondition(event, target) {
         return this.actor.setReviewedCondition(target.dataset.condition);
       },
-      rollNpcSkill() {
-        return rollNpcSkill(this.actor);
+      rollNpcSkill(event, target) {
+        // A skill named on the sheet rolls at once with the usual defaults; "Skill check" opens the full dialog.
+        const key = target?.dataset?.skill;
+        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0, error: 1 } : null);
       },
       callQualitySave(event, target) {
         return callQualitySave(this.actor, target.dataset.id);
@@ -1968,6 +1984,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
     super._onRender(context, options);
     this.element.classList.toggle("play-mode", !context.editMode);
     this.element.classList.toggle("edit-mode", !!context.editMode);
+    enableHotbarDrag(this.element, this.actor);
   }
 
   _npcContext() {
@@ -2109,10 +2126,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
     return this.actor.rollAbility(target.dataset.ability);
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: true });
+    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
   }
   static #onRollAttack(event, target) {
-    return this.actor.rollAttack(this._item(target), { askContext: true });
+    const item = this._item(target);
+    return this.actor.rollAttack(item, skipDialog(event) ? quickAttackOptions(this.actor, item) : { askContext: true });
   }
   static #onRollDamage(event, target) {
     return this.actor.rollDamage(this._item(target));

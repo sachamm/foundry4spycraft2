@@ -45,6 +45,7 @@
   {{#each classes}}
   <div class="class-block" data-item-id="{{item.id}}">
     <h3><a data-action="itemEdit">{{item.name}}</a> {{levels}}
+      {{#if @root.editable}}<button type="button" class="edit-only" data-action="addLevelInClass" data-sc2-display="text">{{localize "SPYCRAFT.Template.ActorAgentClasses.AddLevelInClass"}}</button>{{/if}}
       <span class="controls" data-sc2-display="icon"><a data-action="itemChat"><i class="fa-solid fa-comment"></i></a></span></h3>
     <div class="edit-only class-choices">
     {{#each specialistFields}}<div class="choices"><b>{{localize "SPYCRAFT.Template.ActorAgentClasses.WeaponSpecialistSoldier"}} {{level}})</b>

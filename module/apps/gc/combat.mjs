@@ -125,6 +125,44 @@ export async function recordFluidEvent(combatant, id, input = {}) {
   return { count, pending: added.list.reduce((sum, entry) => sum + entry.amount, 0) };
 }
 
+/**
+ * Record a fluid initiative event that damage application caused (wound loss, a critical hit with wound loss) on the
+ * actor's combatant in the active combat, unless the GC has turned this off. Returns a report line, or null when
+ * nothing was recorded (no combat, not a combatant, not allowed, or already recorded this round).
+ */
+export async function recordAutomaticFluidEvent(actor, id) {
+  let enabled = true;
+  try {
+    enabled = game.settings.get("spycraft2", "autoFluidEvents") !== false;
+  } catch {
+    /* not registered */
+  }
+  const combat = game.combat;
+  if (!enabled || !combat?.started || !actor) return null;
+  const combatant = [...combat.combatants].find(
+    entry => entry.actor === actor || (entry.actor?.uuid && entry.actor.uuid === actor.uuid)
+  );
+  if (!combatant?.isOwner || !Number.isFinite(combatant.initiative)) return null;
+  const event = FLUID_EVENTS.find(entry => entry.id === id);
+  try {
+    await recordFluidEvent(combatant, id);
+  } catch {
+    return null;
+  }
+  return loc`Initiative ${event?.amount ?? ""} at the end of the round (${event?.label ?? id}); change it with Fluid initiative event if it should not count.`;
+}
+
+export function registerAutomaticFluidSetting() {
+  game.settings.register("spycraft2", "autoFluidEvents", {
+    name: loc`Record fluid initiative from damage`,
+    hint: loc`When applied damage costs a combatant wounds, the matching end-of-round Initiative change is recorded for you.`,
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+}
+
 /** Dialog: choose a combatant and an event. */
 export async function fluidEventDialog(combat = game.combat, preset = null) {
   if (!combat?.started) return ui.notifications.warn(loc`Start the combat first.`);

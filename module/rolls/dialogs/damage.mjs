@@ -54,22 +54,25 @@ const parts = [
     () => `
         <label><input type="checkbox" name="successfulStandardAttack"`
   ],
-  [100, ({ sideHits }) => (sideHits.length === 1 ? " checked" : "")],
+  [
+    100,
+    ({ sideHits, attackFacts }) => (sideHits.length === 1 || attackFacts?.attackAction === "standard" ? " checked" : "")
+  ],
   [
     110,
     () => ` ${loc`/> This was a successful Standard Attack`}</label>
         <label><input type="checkbox" name="targetCharacter"`
   ],
-  [120, ({ sideHits }) => (sideHits.length === 1 ? " checked" : "")],
+  [120, ({ sideHits, attackFacts }) => (sideHits.length === 1 || attackFacts?.targetActorUuid ? " checked" : "")],
   [
     130,
-    () => ` ${loc`/> Target is a character, not an object`}</label>
-        <label><input type="checkbox" name="targetFlanked" /> ${loc`I am flanking this target with this attack`}</label><label><input type="checkbox" name="targetHelpless" /> ${loc`Target is helpless`}</label><label><input type="checkbox" name="targetVulnerable" /> ${loc`Target is vulnerable`}</label>
+    ({ attackFacts }) => ` ${loc`/> Target is a character, not an object`}</label>
+        <label><input type="checkbox" name="targetFlanked"${attackFacts?.targetFlanked ? " checked" : ""} /> ${loc`I am flanking this target with this attack`}</label><label><input type="checkbox" name="targetHelpless" /> ${loc`Target is helpless`}</label><label><input type="checkbox" name="targetVulnerable" /> ${loc`Target is vulnerable`}</label>
         <label><input type="checkbox" name="targetVitalsConfirmed" /> ${loc`Target is not immune to critical hits or sneak attack damage, is not hidden to me and has reachable vitals`}</label>
         <label>${loc`Damage type`} <select name="damageType"><option value="lethal">${loc`Lethal`}</option><option value="subdual">${loc`Subdual`}</option></select></label>
         <label>${loc`Conversion`} <select name="damageConversion"><option value="none">${loc`None`}</option><option value="lethalToSubdual">${loc`Lethal to subdual (requires Bludgeon)`}</option><option value="subdualToLethal">${loc`Subdual to lethal (no sneak attack)`}</option></select></label>
-        <label>${loc`Ranged target distance (feet)`} <input type="number" name="distanceFeet" min="0" step="any" /></label>
-        <label><input type="checkbox" name="braced" /> ${loc`I was bracing this two-handed firearm/hurled weapon for this attack (Sniper dice)`}</label>
+        <label>${loc`Ranged target distance (feet)`} <input type="number" name="distanceFeet" min="0" step="any"${Number.isFinite(attackFacts?.distanceFeet) ? ` value="${attackFacts.distanceFeet}"` : ""} /></label>
+        <label><input type="checkbox" name="braced"${attackFacts?.braced ? " checked" : ""} /> ${loc`I was bracing this two-handed firearm/hurled weapon for this attack (Sniper dice)`}</label>
       </div>`
   ]
 ];

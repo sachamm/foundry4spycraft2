@@ -23,7 +23,9 @@ class Element {
   }
 }
 globalThis.document = { createElement: tag => new Element(tag) };
-globalThis.game = { user: { isGM: false } };
+// A Pointman teammate this user also owns, so Generous has a donor unless a test takes it away.
+const pointman = { type: "agent", uuid: "Actor.p", isOwner: true, system: { coreClassIds: ["pointman"] } };
+globalThis.game = { user: { isGM: false }, actors: [pointman] };
 let actor;
 globalThis.fromUuidSync = () => actor;
 
@@ -32,6 +34,8 @@ const { renderCheckControls } = await import("../module/rolls/chat-controls.mjs"
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
 
 const makeActor = (overrides = {}) => ({
+  type: "agent",
+  uuid: "Actor.a",
   isOwner: true,
   flags: {},
   system: { classLevels: {}, activeFeatNames: [], resourceUses: {} },
@@ -206,6 +210,88 @@ test("the chat hook lays buttons out by placement and runs them once per click",
   const foreign = new Element("li");
   renderCheckControls(message({}), foreign);
   assert.equal(foreign.children.length, 0);
+});
+
+test("one-click boost, Generous and NPC cards: only buttons that can work are shown", () => {
+  // One ordinary die with nothing to choose: spent in one click, with the die named.
+  actor = makeActor({ system: { classLevels: {}, activeFeatNames: [], actionDice: { value: 2, die: 6 } } });
+  const quick = labels(message({}));
+  assert.equal(quick[0], "card:Spend 1 action die (+1d6)");
+  rollPipeline
+    .chatControls({ message: message({}), check: message({}).flags.spycraft2, actor, user: game.user })
+    .find(c => c.id === "quickBoostControl")
+    .run();
+  assert.deepEqual(actor.calls[0].slice(2), [{ count: 1, bonusPoolId: "", openingRound: false, calculating: false }]);
+  // No action dice left: only the dialog, which explains why.
+  actor = makeActor();
+  assert.equal(
+    labels(message({})).some(l => l.startsWith("card:Spend 1 action die")),
+    false
+  );
+  // No Pointman in the party: no Generous.
+  game.actors = [];
+  assert.equal(labels(message({})).includes("card:Generous teammate die"), false);
+  game.actors = [pointman];
+  // An NPC has no action dice of its own.
+  actor = makeActor({ type: "npc" });
+  assert.deepEqual(labels(message({})), ["card:Compare with an opposing check", "card:Outcome resolved"]);
+});
+
+test("the GC spends the session pool from an NPC's card; the NPC's own threat is not offered to agents' wallets", () => {
+  actor = makeActor({ type: "npc", system: { classLevels: {}, activeFeatNames: [], npcType: "standard" } });
+  const gc = { isGM: true };
+  assert.deepEqual(labels(message({ checkKind: "attack" }), gc).slice(0, 1), ["card:GC boost (+1d4)"]);
+  const threat = labels(message({ checkKind: "attack", threatConfirmed: true }), gc);
+  assert.deepEqual(threat.slice(0, 2), ["card:GC: activate threat", "card:GC boost (+1d4)"]);
+  assert.equal(threat.includes("card:Activate critical"), false);
+  // An NPC's error is still activated by its opponents through the usual dialog.
+  assert.equal(labels(message({ errorConfirmed: true }), gc).includes("card:Activate critical"), true);
+  // Players never see the GC's buttons.
+  assert.equal(labels(message({ checkKind: "attack" })).includes("card:GC boost (+1d4)"), false);
+  // An NPC skill roll is posted as a plain check naming the skill.
+  assert.equal(labels(message({ checkKind: "check", npcSkill: "notice" }), gc).includes("card:GC boost (+1d4)"), true);
+  // An activated critical failure cannot be boosted.
+  assert.equal(
+    labels(message({ checkKind: "attack", errorConfirmed: true, criticalFailure: true }), gc).includes(
+      "card:GC boost (+1d4)"
+    ),
+    false
+  );
+});
+
+test("an attack waiting to be resolved does not offer to close its outcome", () => {
+  actor = makeActor();
+  const attack = { checkKind: "attack" };
+  assert.equal(labels(message(attack)).includes("card:Outcome resolved"), false);
+  assert.equal(
+    labels(message({ ...attack, attackResolution: { hit: true }, successConfirmed: true })).includes(
+      "card:Outcome resolved"
+    ),
+    true
+  );
+  // Strafe has no single Defense to resolve against.
+  assert.equal(
+    labels(message({ ...attack, attackContext: { fireAction: { action: "strafe" } } })).includes(
+      "card:Outcome resolved"
+    ),
+    true
+  );
+});
+
+test("a row puts the primary step first and quiet steps last, styled to match", async () => {
+  const { byEmphasis } = await import("../module/rolls/chat-controls.mjs");
+  const order = byEmphasis([
+    { label: "a" },
+    { label: "close", emphasis: "quiet" },
+    { label: "b" },
+    { label: "next", emphasis: "primary" }
+  ]).map(c => c.label);
+  assert.deepEqual(order, ["next", "a", "b", "close"]);
+  actor = makeActor();
+  const html = new Element("li");
+  renderCheckControls(message({}), html);
+  const finish = html.children[0].children.at(-1);
+  assert.equal(finish.className, "sc2-quiet-action");
 });
 
 test("button text is translated by contributor id and falls back to the contributor's own label", async () => {

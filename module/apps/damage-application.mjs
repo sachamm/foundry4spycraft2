@@ -36,6 +36,7 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration, setCondition as condition, woundConditions } from "./wound-conditions.mjs";
 import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { npcDamageSave, npcIsSpecial } from "./gc/npc-play.mjs";
+import { recordAutomaticFluidEvent } from "./gc/combat.mjs";
 import { exposeToFire, hazardSaveResolvers } from "./hazards.mjs";
 import { sufferTypedDamage } from "./damage-types.mjs";
 import { rollCriticalInjury } from "./critical-injuries.mjs";
@@ -68,11 +69,13 @@ export function targetChoices() {
   const actors = new Map();
   const targeted = values(game.user?.targets).filter(token => TARGET_TYPES.includes(token.actor?.type));
   for (const token of targeted) actors.set(token.actor.uuid, token.actor);
-  for (const combat of values(game.combats))
-    for (const turn of combat.turns ?? [])
-      if (TARGET_TYPES.includes(turn.actor?.type) && canSee(turn.actor)) actors.set(turn.actor.uuid, turn.actor);
-  for (const actor of values(game.actors))
-    if (TARGET_TYPES.includes(actor.type) && canSee(actor)) actors.set(actor.uuid, actor);
+  const add = actor => {
+    if (TARGET_TYPES.includes(actor?.type) && canSee(actor) && !actors.has(actor.uuid)) actors.set(actor.uuid, actor);
+  };
+  for (const combat of values(game.combats)) for (const turn of combat.turns ?? []) add(turn.actor);
+  // Tokens on the scene in view, then characters with no token there, which are marked as not on the scene.
+  for (const token of values(globalThis.canvas?.scene?.tokens)) add(token.actor);
+  for (const actor of values(game.actors)) add(actor);
   return { actors: [...actors.values()], selected: targeted.length === 1 ? targeted[0].actor.uuid : "" };
 }
 
@@ -83,13 +86,58 @@ export function defenseOf(target) {
   return Number.isSafeInteger(value) ? value : null;
 }
 
-const targetOptions = (actors, selected, label) =>
-  actors
+/**
+ * The target an attack card recorded, when this viewer can read its Defense from the sheet: { actor, defense }.
+ * A GC setting can hide NPC Defense from players; the one-click resolve then stays with the dialog.
+ */
+export function declaredTarget(check) {
+  const uuid = check.attackContext?.targetActorUuid;
+  const actor = uuid ? fromUuidSync(uuid) : null;
+  if (!actor || !TARGET_TYPES.includes(actor.type) || !canSee(actor)) return null;
+  if (!actor.isOwner && !game.user?.isGM && !defenseVisibleToPlayers()) return null;
+  const defense = defenseOf(actor);
+  return defense === null ? null : { actor, defense };
+}
+
+/** Players see an opponent's listed Defense when resolving (a world setting, on unless the GC turns it off). */
+export function defenseVisibleToPlayers() {
+  try {
+    return game.settings.get("spycraft2", "showDefenseToPlayers") !== false;
+  } catch {
+    return true;
+  }
+}
+
+/** A target's label in a picker: its token's name when it differs, and a mark for an actor not on the scene. */
+export function targetLabel(actor) {
+  const token = actor.token ?? actor.getActiveTokens?.()?.[0]?.document ?? null;
+  const name = token?.name || actor.name;
+  const onScene = !!actor.token || (actor.getActiveTokens?.().length ?? 0) > 0;
+  return onScene || actor.type === "vehicle" ? name : loc`${name} (not on the scene)`;
+}
+
+/** Number repeated labels ("Thug 1", "Thug 2") so identical tokens can be told apart in a picker. */
+export function distinctLabels(labels) {
+  const totals = new Map(),
+    seen = new Map();
+  for (const label of labels) totals.set(label, (totals.get(label) ?? 0) + 1);
+  return labels.map(label => {
+    if (totals.get(label) < 2) return label;
+    const n = (seen.get(label) ?? 0) + 1;
+    seen.set(label, n);
+    return `${label} ${n}`;
+  });
+}
+
+const targetOptions = (actors, selected, label) => {
+  const labels = distinctLabels(actors.map(actor => label(actor)));
+  return actors
     .map(
-      actor =>
-        `<option value="${esc(actor.uuid)}"${actor.uuid === selected ? " selected" : ""}>${esc(label(actor))}</option>`
+      (actor, index) =>
+        `<option value="${esc(actor.uuid)}"${actor.uuid === selected ? " selected" : ""}>${esc(labels[index])}</option>`
     )
     .join("");
+};
 
 /* -------------------------------------------- */
 /*  Hit or miss                                  */
@@ -118,8 +166,8 @@ export async function resolveAttack(message, options = {}) {
         choices.actors,
         selected,
         actor => {
-          const defense = defenseOf(actor);
-          return defense === null ? actor.name : loc`${actor.name} — Defense ${defense}`;
+          const defense = actor.isOwner || game.user?.isGM || defenseVisibleToPlayers() ? defenseOf(actor) : null;
+          return defense === null ? targetLabel(actor) : loc`${targetLabel(actor)} — Defense ${defense}`;
         }
       )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Leave the Defense empty to use the listed value. Enter it when cover, a declared defense or another circumstance changes it; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
     });
@@ -147,6 +195,8 @@ export async function resolveAttack(message, options = {}) {
     targetName: target?.name ?? "",
     defense,
     total: check.effectiveTotal,
+    // The card is public: an NPC's Defense stays off it when the GC keeps it from players.
+    ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome
   };
   await message.update({ "flags.spycraft2.attackResolution": resolution });
@@ -185,12 +235,27 @@ rollPipeline.register({
   chatControls({ message, check, actor, user }) {
     if (!Number.isFinite(check.rawTotal) || check.superseded || !(message.isAuthor || user.isGM)) return null;
     const controls = [];
-    if (!check.resolved && check.attackContext?.fireAction?.action !== "strafe")
+    if (!check.resolved && check.attackContext?.fireAction?.action !== "strafe") {
+      // A target recorded with the attack: one click settles it against that target's listed Defense.
+      const known = !check.attackResolution ? declaredTarget(check) : null;
+      if (known)
+        controls.push({
+          label: loc`Resolve vs Defense ${known.defense} (${known.actor.name})`,
+          placement: "card",
+          emphasis: "primary",
+          run: () => resolveAttack(message, { targetUuid: known.actor.uuid, defense: "" })
+        });
       controls.push({
-        label: check.attackResolution ? loc`Resolve against Defense again` : loc`Resolve against Defense`,
+        label: check.attackResolution
+          ? loc`Resolve against Defense again`
+          : known
+            ? loc`Resolve against another target or Defense…`
+            : loc`Resolve against Defense`,
         placement: "card",
+        ...(known ? {} : { emphasis: "primary" }),
         run: () => resolveAttack(message)
       });
+    }
     const resolution = check.attackResolution,
       weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null;
     if (resolution?.hit && check.successConfirmed === true && weapon && !check.attackContext?.pummel) {
@@ -198,6 +263,7 @@ rollPipeline.register({
       controls.push({
         label: resolution.hits > 1 ? loc`Roll damage (one of ${resolution.hits} hits)` : loc`Roll damage`,
         placement: "card",
+        emphasis: "primary",
         run: () =>
           actor.rollDamage(weapon, {
             // Vehicles are not character targets of a damage roll; they are picked again when the damage is applied.
@@ -306,6 +372,8 @@ async function lethalOnSpecial(target, hit, source) {
   const lines = lethalHitLines(esc(target.name), plan);
   if (plan.fatigued) lines.push(await condition(target, "fatigued", loc`Fatigued`));
   if (plan.stateChanged) lines.push(...(await woundConditions(target, plan.state)));
+  if (plan.woundLoss > 0)
+    lines.push(await recordAutomaticFluidEvent(target, hit.critical === true ? "criticalWoundLoss" : "woundLoss"));
   if (plan.bruise)
     lines.push(
       ...(
@@ -489,7 +557,7 @@ export async function applyDamage(message, options = {}) {
       content: `<div class="spycraft2-roll-options">${applied.length ? `<p class="inventory-warning">${loc`Already applied to: ${esc(applied.map(a => a.name).join(", "))}.`}</p>` : ""}<label>${loc`Target`} <select name="targetUuid" required>${targetOptions(
         choices.actors.filter(actor => actor.isOwner || gcAvailable()),
         selected,
-        actor => (actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)
+        actor => (actor.isOwner ? targetLabel(actor) : loc`${targetLabel(actor)} (sent to the GC)`)
       )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label>${choices.actors.some(actor => juggernautConversion(actor.system, 2) > 0) ? `<label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half of what gets past damage reduction)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label>` : ""}<p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent, and bang, flash and explosive damage for a special NPC.`}</p></div>`
     });
     if (!input) return null;
@@ -701,19 +769,85 @@ export async function applyBlast(message, options = {}) {
   return results;
 }
 
+/** The apply dialog's defaults for one target, so a click can apply them without opening it. */
+export function quickApplyInput(message, targetUuid, damage = null) {
+  const { rolled, profile, attack, attackKind } = damageFacts(message);
+  return {
+    targetUuid,
+    damage: damage ?? Math.max(0, Math.trunc(rolled)),
+    kind: profile.kind,
+    type: profile.type ?? "",
+    attackKind,
+    armorPiercing: profile.armorPiercing,
+    armorPiercingAll: false,
+    critical: attack?.criticalSuccess === true,
+    criticalDice: attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0,
+    blast: profile.blast === true,
+    reviewType: true
+  };
+}
+
+/** The target a damage card already names: the hit it came from, or the attack bonus it used. */
+export function damageCardTarget(check) {
+  const uuid =
+    check.sourceAttack?.targetUuid || check.sneakAttackTarget?.actorUuid || check.attackDamageBenefit?.targetUuid;
+  const actor = uuid ? fromUuidSync(uuid) : null;
+  return actor && TARGET_TYPES.includes(actor.type) && canSee(actor) ? actor : null;
+}
+
+/** Characters targeted on the canvas that damage can be applied to (this user's own, or any through the GC). */
+const targetedForDamage = () =>
+  values(game.user?.targets)
+    .map(token => token.actor)
+    .filter(actor => actor && TARGET_TYPES.includes(actor.type) && (actor.isOwner || gcAvailable()));
+
+/**
+ * Apply the same damage to several targets at once, each with its own save or report, then post one summary.
+ * @param {ChatMessage} message  the damage card
+ * @param {Actor[]} targets
+ */
+export async function applyDamageToEach(message, targets) {
+  const done = [];
+  for (const target of targets) {
+    const result = await applyDamage(message, quickApplyInput(message, target.uuid));
+    if (result) done.push(targetLabel(target));
+  }
+  if (done.length > 1)
+    await ChatMessage.create({
+      speaker: message.speaker,
+      content: `<div class="spycraft2 chat-note"><p>${esc(loc`Damage applied to ${done.length} targets: ${done.join(", ")}.`)}</p></div>`
+    });
+  return done;
+}
+
 rollPipeline.register({
   id: "applyDamageControl",
   kinds: ["damage"],
   order: 9772,
   chatControls({ message, check }) {
     if (check.superseded) return null;
-    const applied = Array.isArray(check.damageApplied) ? check.damageApplied.length : 0;
-    const controls = [
-      {
-        label: applied ? loc`Apply damage to another target` : loc`Apply damage to a target`,
-        run: () => applyDamage(message)
-      }
-    ];
+    const applied = Array.isArray(check.damageApplied) ? check.damageApplied : [];
+    const rolled = Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : message.rolls?.[0]?.total;
+    const amount = Math.max(0, Math.trunc(Number(rolled) || 0));
+    const controls = [];
+    const targeted = targetedForDamage(),
+      named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
+    if (targeted.length > 1)
+      controls.push({
+        label: loc`Apply ${amount} to each of ${targeted.length} targeted`,
+        emphasis: "primary",
+        run: () => applyDamageToEach(message, targetedForDamage())
+      });
+    else if (named && !applied.some(entry => entry.targetUuid === named.uuid) && (named.isOwner || gcAvailable()))
+      controls.push({
+        label: loc`Apply ${amount} to ${targetLabel(named)}`,
+        emphasis: "primary",
+        run: () => applyDamage(message, quickApplyInput(message, named.uuid))
+      });
+    controls.push({
+      label: applied.length ? loc`Apply damage to another target` : loc`Apply damage to a target…`,
+      run: () => applyDamage(message)
+    });
     if (/\bBLS\b/.test(check.weaponQualities ?? ""))
       controls.push({ label: loc`Apply the blast to everyone caught`, run: () => applyBlast(message) });
     return controls;

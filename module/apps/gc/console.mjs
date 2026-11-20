@@ -85,7 +85,12 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       seasonQualities: guard(() => mission.editSeasonQualities()),
       caliberIncrease: guard(() => spend.recordCaliberIncrease(getMission().caliber + 1)),
       sceneAdvance: guard(() => updateMission(m => ({ scenesPlayed: (m.scenesPlayed ?? 0) + 1 }))),
-      gcDice: guard(() => manageGCDice()),
+      gcDice: guard(() => {
+        const m = getMission();
+        return manageGCDice({ playersPresent: teamActors(m).length, caliber: m.caliber });
+      }),
+      beginSession: guard(() => mission.beginSession()),
+      nextScene: guard(() => mission.nextScene()),
       spendDice: guard(() => spend.spendGCDice()),
       dramaticOn: guard(() => spend.setDramaticScene(true)),
       dramaticOff: guard(() => spend.setDramaticScene(false)),

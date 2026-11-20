@@ -50,6 +50,11 @@ test("a Burst or Autofire counts the shots that land", () => {
 
 test("the attack card says how the attack fared against the Defense", () => {
   assert.equal(attackResolutionNote({}), "");
+  // With NPC Defense kept from players, the public card gives only the outcome.
+  const hidden = attackResolutionNote({
+    attackResolution: { targetName: "Guard", defense: 14, hit: true, margin: 3, hits: 1, defenseHidden: true }
+  });
+  assert.equal(hidden, "Against Guard: a hit.");
   assert.match(
     attackResolutionNote({ attackResolution: { targetName: "Guard", defense: 14, hit: true, margin: 3, hits: 1 } }),
     /Guard's Defense 14: a hit by 3/

@@ -11,13 +11,13 @@ export function checkGuidance(check) {
     return applied
       ? {
           title: loc`Damage applied`,
-          note: loc`Review the recorded target receipts before applying damage to another target.`
+          note: loc`Check who has already taken this damage (listed below) before applying it to anyone else.`
         }
       : {
           title: check.resolved ? loc`Damage finalized` : loc`Damage rolled`,
           note: check.resolved
             ? loc`Review the recorded total and target actions below.`
-            : loc`Apply optional boosts before applying damage to a target.`
+            : loc`Spend any action die first, then press Apply to take the damage off the target.`
         };
   }
   const title = check.criticalFailure
@@ -37,14 +37,16 @@ export function checkGuidance(check) {
               : loc`Result pending`;
   const note = check.resolved
     ? loc`Outcome closed. Complete any follow-up actions shown below.`
-    : typeof check.successConfirmed === "boolean" ||
-        check.criticalFailure ||
-        check.criticalSuccess ||
-        check.attackResolution
-      ? loc`Review any remaining options below. Use Outcome resolved when finished.`
-      : check.checkKind === "attack"
-        ? loc`Apply any optional boosts, then compare this attack with the target's Defense.`
-        : loc`Apply any optional boosts, then compare with the difficulty or opposing result. Use Outcome resolved when finished.`;
+    : check.checkKind === "attack" && check.attackResolution?.hit && check.successConfirmed === true
+      ? loc`Press Roll damage, then apply it to the target from the damage card.`
+      : typeof check.successConfirmed === "boolean" ||
+          check.criticalFailure ||
+          check.criticalSuccess ||
+          check.attackResolution
+        ? loc`Review any remaining options below. Use Outcome resolved when finished.`
+        : check.checkKind === "attack"
+          ? loc`Spend any action dice first, then press Resolve to compare this attack with the target's Defense.`
+          : loc`Apply any optional boosts, then compare with the difficulty or opposing result. Use Outcome resolved when finished.`;
   return { title, note };
 }
 

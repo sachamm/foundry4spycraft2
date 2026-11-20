@@ -39,6 +39,8 @@ export const VERB_ICONS = {
   restAndRecover: "fa-bed",
   initializeStartingDice: "fa-play",
   startMission: "fa-play",
+  beginSession: "fa-play",
+  nextScene: "fa-forward-step",
   endMission: "fa-flag-checkered",
   clearMission: "fa-eraser",
   reviewLimitedUseCounter: "fa-clipboard-check",

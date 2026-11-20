@@ -441,17 +441,20 @@ export async function recoverGCBookkeeping({ confirmed = false } = {}) {
     return pool;
   });
 }
-export async function manageGCDice() {
+/** @param {object} [defaults] { playersPresent, caliber } for a pool not yet set up this session */
+export async function manageGCDice(defaults = {}) {
   requireGC();
   const status = gcDiceStatus();
+  const players = status.current ? status.playersPresent : (defaults.playersPresent ?? status.playersPresent),
+    caliber = status.current ? status.caliber : (defaults.caliber ?? status.caliber);
   const input = await systemDialog.input({
     window: { title: loc`Game Control action dice` },
     rejectClose: false,
     content: `
  <p>${loc`${pendingSettlement()?.needsReview ? loc`An interrupted GC payment needs review before further pool changes. ` : ""}Current session: ${status.counterReview ? loc`saved balance needs review` : status.current ? status.value + " dice" : loc`pool not initialized`}. Starting dice = player characters present + twice mission Caliber (p.397).`}</p>
- <label>${loc`Action`} <select name="action"><option value="initialize">${loc`Initialize this session`}</option><option value="adjust">${loc`Adjust current pool`}</option><option value="hint">${loc`Offer a helpful hint`}</option><option value="review">${loc`Review interrupted GC payment`}</option><option value="recover">${loc`Recover interrupted GC bookkeeping`}</option></select></label>
- <label>${loc`Player characters present`} <input type="number" name="playersPresent" min="0" value="${status.playersPresent ?? 1}" /></label>
- <label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="${status.caliber ?? 1}" /></label>
+ <label>${loc`Action`} <select name="action"><option value="initialize"${status.current ? "" : " selected"}>${loc`Initialize this session`}</option><option value="adjust"${status.current ? " selected" : ""}>${loc`Adjust current pool`}</option><option value="hint">${loc`Offer a helpful hint`}</option><option value="review">${loc`Review interrupted GC payment`}</option><option value="recover">${loc`Recover interrupted GC bookkeeping`}</option></select></label>
+ <label>${loc`Player characters present`} <input type="number" name="playersPresent" min="0" value="${players ?? 1}" /></label>
+ <label>${loc`Mission Caliber`} <input type="number" name="caliber" min="1" max="5" value="${caliber ?? 1}" /></label>
  <label><input type="checkbox" name="replaceExisting" /> ${loc`Replace an already initialized pool`}</label>
  <label>${loc`Adjustment (positive gain or negative spend)`} <input type="number" name="amount" value="1" /></label>
  <label>${loc`Adjustment reason`} <input name="reason" /></label>

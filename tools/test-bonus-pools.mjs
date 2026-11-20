@@ -553,7 +553,8 @@ test("the required-die dialog preselects its pool and retains core-doubling and 
     opened = true;
     assert.ok(options.content.includes(`value="${id}" selected`));
     assert.match(options.content, /name="calculating"/);
-    assert.match(options.content, /name="openingRound"/);
+    // The opening-round box only matters to a Counterterrorist and is left out for anyone else.
+    assert.doesNotMatch(options.content, /name="openingRound"/);
     return { bonusPoolId: id, count: "1", calculating: true, errorDeclined: true };
   };
   const boosted = await a.boostCheck(msg, { bonusPoolId: id, askOptions: true });

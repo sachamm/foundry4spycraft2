@@ -1,6 +1,7 @@
 /** Skill and Knowledge checks, and the class abilities resolved through them. */
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
+import { choiceKey, rememberChoices, rememberedChoices, restoreChoices } from "../../apps/remembered-choices.mjs";
 import { enhanceSkillDialog } from "../../apps/skill-dialog-ux.mjs";
 import { validateTripCounterIntent } from "../../apps/counter-trip.mjs";
 import { tripAttackTargetInput } from "../../apps/trip-attack.mjs";
@@ -157,6 +158,14 @@ export const ActorSkillRolls = Base =>
       );
       if (!skill || !checks.length) return null;
       let input = options;
+      const memoryKey = choiceKey("skill", this, key);
+      if (!input.check && input.quick) {
+        // Shift-click: the check chosen last time for this skill (or its first check), rolled straight away.
+        const saved = rememberedChoices(memoryKey) ?? {};
+        const check = checks.some(c => c.id === saved.check) ? saved.check : checks[0].id;
+        // Taking 10 or 20 needs this moment's safety declared in the dialog, so the fast path always rolls.
+        input = { ...options, ...saved, check, ability: ability ?? saved.ability ?? skill.ability, method: "roll" };
+      }
       if (!input.check) {
         const esc = foundry.utils.escapeHTML;
         const choices = checks
@@ -176,7 +185,10 @@ export const ActorSkillRolls = Base =>
           position: { width: 560 },
           rejectClose: false,
           ok: { label: loc`Roll check` },
-          render: (event, dialog) => enhanceSkillDialog(event, dialog, checks),
+          render: (event, dialog) => {
+            if (!options.initialCheck) restoreChoices(memoryKey, dialog?.element ?? event?.target);
+            enhanceSkillDialog(event, dialog, checks);
+          },
           content: rollPipeline.dialog({
             dialog: "skill",
             actor: this,
@@ -189,6 +201,7 @@ export const ActorSkillRolls = Base =>
           })
         });
         if (!input) return null;
+        rememberChoices(memoryKey, { check: input.check, ability: input.ability, method: input.method });
       }
       // Field coercion and lookups registered for this dialog (module/rolls/dialogs/skill.mjs and rule modules).
       input = rollPipeline.read({ dialog: "skill", actor: this, key }, input);
