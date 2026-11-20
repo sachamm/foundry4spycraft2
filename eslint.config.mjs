@@ -14,6 +14,7 @@ const foundryGlobals = Object.fromEntries(
     "Handlebars",
     "Roll",
     "ChatMessage",
+    "Macro",
     "Actor",
     "Item",
     "ActiveEffect",
