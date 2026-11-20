@@ -331,6 +331,12 @@ export const GC_DATA = {
      "cost": null,
      "needsNpc": true,
      "page": 459
+    },
+    {
+     "id": "terminalSituation",
+     "label": "Terminal Situation: a trapped character is knocked out or left dying",
+     "cost": 1,
+     "page": 350
     }
    ]
   },

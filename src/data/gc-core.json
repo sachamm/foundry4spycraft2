@@ -64,7 +64,8 @@
    {"id": "campaignQuality", "label": "Campaign quality added in the Intel Phase", "cost": null, "page": 398},
    {"id": "dramaticScene", "label": "Dramatic scene declared", "cost": 4, "page": 398},
    {"id": "event", "label": "Event (1–4 dice; 1 less with a trigger)", "cost": null, "page": 399},
-   {"id": "knowsNothing", "label": "Questioned NPC knows nothing (1 standard or minion; 2 special or henchman)", "cost": null, "needsNpc": true, "page": 459}
+   {"id": "knowsNothing", "label": "Questioned NPC knows nothing (1 standard or minion; 2 special or henchman)", "cost": null, "needsNpc": true, "page": 459},
+   {"id": "terminalSituation", "label": "Terminal Situation: a trapped character is knocked out or left dying", "cost": 1, "page": 350}
   ]
  },
  "dramaticScene": {"page": 424, "initiativeMultiplier": 2, "initiativeMaximum": 50, "cost": 4},

@@ -6,21 +6,55 @@
     <!-- Every shared component in one place, in both themes. Open through tools/tests/ui-lab.spec.mjs,
          which serves the stylesheets; it is the reference when a surface is redesigned. -->
     <style>
-      body { margin: 0; padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; background: #0d0f0f; font: 14px/1.4 system-ui, sans-serif; }
-      .lab-app { position: static; display: block; }
-      .lab-app .window-content { display: block; padding: 12px; }
-      .lab-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
-      .lab-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+      body {
+        margin: 0;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+        gap: 16px;
+        background: #0d0f0f;
+        font:
+          14px/1.4 system-ui,
+          sans-serif;
+      }
+      .lab-app {
+        position: static;
+        display: block;
+      }
+      .lab-app .window-content {
+        display: block;
+        padding: 12px;
+      }
+      .lab-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+      }
+      .lab-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
     </style>
   </head>
   <body>
     <template id="lab">
       <section class="window-content">
-        <h3>Section bar <span class="controls"><button type="button" data-action="browse">Browse</button><button type="button" data-action="createItem">Add</button></span></h3>
+        <h3>
+          Section bar
+          <span class="controls"
+            ><button type="button" data-action="browse">Browse</button
+            ><button type="button" data-action="createItem">Add</button></span
+          >
+        </h3>
 
         <div class="lab-grid" data-lab="fields">
           <div class="sc2-field"><span class="sc2-caption">Defense</span><b class="sc2-value">13</b></div>
-          <button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave"><span class="sc2-caption">Reflex</span><b class="sc2-value">+5</b></button>
+          <button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave">
+            <span class="sc2-caption">Reflex</span><b class="sc2-value">+5</b>
+          </button>
           <div class="stat"><span>Speed</span><b>30</b><small>ft</small></div>
         </div>
 
@@ -31,8 +65,16 @@
           <span class="sc2-pips"><i class="on"></i><i class="on"></i><i></i></span>
         </div>
 
-        <label class="sc2-meter vitality"><span class="sc2-caption">Vitality</span><input type="number" value="18" /><span class="sc2-meter-max">/ 31</span><progress max="31" value="18"></progress></label>
-        <label class="sc2-meter wounds"><span class="sc2-caption">Wounds</span><input type="number" value="12" /><span class="sc2-meter-max">/ 12</span><progress max="12" value="12"></progress></label>
+        <label class="sc2-meter vitality"
+          ><span class="sc2-caption">Vitality</span><input type="number" value="18" /><span class="sc2-meter-max"
+            >/ 31</span
+          ><progress max="31" value="18"></progress
+        ></label>
+        <label class="sc2-meter wounds"
+          ><span class="sc2-caption">Wounds</span><input type="number" value="12" /><span class="sc2-meter-max"
+            >/ 12</span
+          ><progress max="12" value="12"></progress
+        ></label>
 
         <h3>Controls</h3>
         <div class="lab-row" data-lab="buttons">
@@ -40,24 +82,46 @@
           <button type="button" class="sc2-action sc2-roll" data-action="rollDamage">2d6+2</button>
           <button type="button" class="sc2-action" data-action="takeTotalDefense">Take Total Defense</button>
           <button type="button" class="sc2-action" data-action="restAndRecover">Rest</button>
-          <span data-sc2-display="icon"><button type="button" class="sc2-action" data-action="itemChat">Share</button><button type="button" class="sc2-action" data-action="itemDelete">Remove</button></span>
+          <span data-sc2-display="icon"
+            ><button type="button" class="sc2-action" data-action="itemChat">Share</button
+            ><button type="button" class="sc2-action" data-action="itemDelete">Remove</button></span
+          >
         </div>
 
         <ul class="item-list">
-          <li class="sc2-weapon"><button type="button" class="sc2-action name" data-action="itemEdit">Service pistol</button><button type="button" class="sc2-action sc2-primary-action" data-action="rollAttack">Attack +7</button><button type="button" class="sc2-action sc2-roll" data-action="rollDamage">1d10+1</button><span class="ammo">12/15</span><button type="button" class="sc2-action" data-sc2-display="icon" data-action="reloadWeapon">Reload</button></li>
+          <li class="sc2-weapon">
+            <button type="button" class="sc2-action name" data-action="itemEdit">Service pistol</button
+            ><button type="button" class="sc2-action sc2-primary-action" data-action="rollAttack">Attack +7</button
+            ><button type="button" class="sc2-action sc2-roll" data-action="rollDamage">1d10+1</button
+            ><span class="ammo">12/15</span
+            ><button type="button" class="sc2-action" data-sc2-display="icon" data-action="reloadWeapon">Reload</button>
+          </li>
         </ul>
 
         <nav class="sheet-tabs"><a class="active">Play</a><a>Skills</a><a>Gear</a><a>Abilities</a><a>Dossier</a></nav>
         <table>
-          <thead><tr><th>Skill</th><th>Ranks</th><th>Total</th></tr></thead>
-          <tbody><tr><th>Athletics</th><td>4 / 4</td><td><button type="button" class="sc2-action" data-action="rollSkill">+7</button></td></tr></tbody>
+          <thead>
+            <tr>
+              <th>Skill</th>
+              <th>Ranks</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Athletics</th>
+              <td>4 / 4</td>
+              <td><button type="button" class="sc2-action" data-action="rollSkill">+7</button></td>
+            </tr>
+          </tbody>
         </table>
       </section>
     </template>
     <div class="application sheet spycraft2 agent themed theme-light lab-app" data-theme="light"></div>
     <div class="application sheet spycraft2 agent themed theme-dark lab-app" data-theme="dark"></div>
     <script>
-      for (const app of document.querySelectorAll(".lab-app")) app.append(document.getElementById("lab").content.cloneNode(true));
+      for (const app of document.querySelectorAll(".lab-app"))
+        app.append(document.getElementById("lab").content.cloneNode(true));
     </script>
   </body>
 </html>

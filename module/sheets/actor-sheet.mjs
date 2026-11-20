@@ -1,3 +1,4 @@
+import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
@@ -204,15 +205,19 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
         this._pinMode = !this._pinMode;
         return this.render();
       },
-      toggleHalfAction(event, target) {
+      async toggleHalfAction(event, target) {
         if (!this.isEditable) return;
         const combat = this.actor.participatingCombat;
         if (!combat?.started) return;
+        const combatant = this._roundCombatant();
+        if (!combatant) return;
         const index = Number(target.dataset.index);
         const spent = this._roundActionsSpent();
         // Choosing the last spent pip frees it; choosing any other marks everything up to it as spent.
         const next = spent === index + 1 ? index : index + 1;
-        return this.actor.setFlag("spycraft2", "roundActions", { combat: combat.id, round: combat.round, spent: next });
+        // The same record the combat tracker's menu keeps, so the two always agree.
+        await combatant.update({ "flags.spycraft2.actions": { round: combat.round, used: next } });
+        return this.render();
       },
       setupTask: SpycraftAgentSheet.#onSetupTask,
       applyShaken() {
@@ -864,12 +869,24 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   /** Build reminders name the pane that resolves them; several panes share a tab. */
   static PANE_TABS = { main: "play", classes: "abilities", feats: "abilities", training: "dossier", bio: "dossier" };
 
+  /** This character's combatant in the fight it is taking part in. */
+  _roundCombatant() {
+    const combat = this.actor.participatingCombat;
+    return combat?.started ? (combat.combatants.find(c => c.actor?.uuid === this.actor.uuid) ?? null) : null;
+  }
+
+  /** Half actions this round: two, and one more after a Press. */
+  _roundActionLimit() {
+    const fluid = this._roundCombatant()?.flags?.spycraft2?.fluid;
+    return HALF_ACTIONS_PER_TURN + (fluid?.pressed ? 1 : 0);
+  }
+
   /** Half actions marked as spent in the round now being played; an older record counts as none. */
   _roundActionsSpent() {
-    const combat = this.actor.participatingCombat;
-    const record = this.actor.getFlag("spycraft2", "roundActions");
-    if (!combat?.started || record?.combat !== combat.id || record?.round !== combat.round) return 0;
-    return Math.min(2, Math.max(0, Number(record.spent) || 0));
+    const combatant = this._roundCombatant();
+    if (!combatant) return 0;
+    const record = actionBudget(combatant.flags?.spycraft2?.actions, { round: combatant.parent.round });
+    return Math.min(this._roundActionLimit(), Math.max(0, Number(record.used) || 0));
   }
 
   /** Pin a combat tool to the top of Play, or take it down. */
@@ -1378,7 +1395,10 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     const diceShown = Math.min(12, Math.max(diceHeld, Number(sys.actionDice?.max) || 0));
     context.actionDicePips = Array.from({ length: diceShown }, (_, index) => index < diceHeld);
     const halfSpent = this._roundActionsSpent();
-    context.roundActions = [0, 1].map(index => ({ index, spent: index < halfSpent }));
+    context.roundActions = Array.from({ length: this._roundActionLimit() }, (_, index) => ({
+      index,
+      spent: index < halfSpent
+    }));
     context.dying = sys.wounds?.value <= -1 && sys.wounds?.value >= -9;
     context.armor = byType("armor").map(a => ({ item: a, caliber: cfg.calibers[a.system.caliber] }));
     context.safeHouseSource = safeHouseSource(sys);

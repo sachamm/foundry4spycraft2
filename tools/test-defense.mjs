@@ -456,3 +456,25 @@ test("Armor Mastery bars non-helpless Coup de Grace exceptions while preserving 
   assert.throws(() => incomingDefensePlan(calculate(), { coupDeGraceException: true }), /Name/);
   assert.throws(() => incomingDefensePlan(calculate(), { coupDeGraceException: "true" }), /circumstance/);
 });
+test("Whatever's Handy adds its bonus to Defense only while an improvised weapon is readied", () => {
+  const circumstances = {
+    flatFooted: false,
+    invisibleAttacker: false,
+    flanked: false,
+    securityDevice: false,
+    adjacent: true,
+    withinMeleeRange: true,
+    ranged: false,
+    coupDeGraceException: false
+  };
+  const brawler = calculate({ soldier: 4, brawler: 5 });
+  const bare = incomingDefensePlan(brawler, circumstances).total;
+  const armed = incomingDefensePlan({ ...brawler, readiedImprovised: true }, circumstances);
+  assert.equal(armed.total - bare, 2);
+  assert.ok(armed.notes.some(note => note.includes("Whatever's Handy")));
+  const soldier = calculate({ soldier: 5 });
+  assert.equal(
+    incomingDefensePlan({ ...soldier, readiedImprovised: true }, circumstances).total,
+    incomingDefensePlan(soldier, circumstances).total
+  );
+});

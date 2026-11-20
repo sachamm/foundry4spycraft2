@@ -109,6 +109,14 @@
           "save",
           "skill"
         ]
+      },
+      "Trust Me": {
+        "level": 4,
+        "rolls": [
+          "skill:acrobatics",
+          "skill:athletics",
+          "skill:drive"
+        ]
       }
     },
     "raptor": {
@@ -160,6 +168,124 @@
         "rolls": [
           "skill:sneak",
           "skill:survival"
+        ]
+      }
+    },
+    "advocate": {
+      "Crusade": {
+        "level": 10,
+        "rolls": [
+          "skill"
+        ]
+      }
+    },
+    "explorer": {
+      "Bookworm": {
+        "level": 2,
+        "rolls": [
+          "skill:investigation"
+        ]
+      }
+    },
+    "conArtist": {
+      "Short Con": {
+        "level": 1,
+        "rolls": [
+          "skill:impress",
+          "skill:intimidate",
+          "skill:manipulate"
+        ]
+      },
+      "Shill": {
+        "level": 4,
+        "rolls": [
+          "skill"
+        ]
+      }
+    },
+    "guide": {
+      "Friends in Low Places": {
+        "level": 1,
+        "rolls": [
+          "skill:investigation"
+        ]
+      },
+      "Interpreter": {
+        "level": 4,
+        "rolls": [
+          "skill:cultures",
+          "skill:streetwise",
+          "skill:survival"
+        ]
+      },
+      "Overland Shortcut": {
+        "level": 6,
+        "rolls": [
+          "knowledge"
+        ]
+      },
+      "Go Native": {
+        "level": 8,
+        "rolls": [
+          "skill:cultures"
+        ]
+      },
+      "Master of Camouflage": {
+        "level": 10,
+        "rolls": [
+          "skill:sneak"
+        ]
+      }
+    },
+    "illuminatus": {
+      "Filed in Triplicate": {
+        "level": 8,
+        "rolls": [
+          "skill:bureaucracy"
+        ]
+      }
+    },
+    "inventor": {
+      "Smartgun": {
+        "level": 8,
+        "rolls": [
+          "attack"
+        ]
+      }
+    },
+    "politico": {
+      "Behind Closed Doors": {
+        "level": 4,
+        "rolls": [
+          "skill"
+        ]
+      }
+    },
+    "transporter": {
+      "Take the Hit": {
+        "level": 2,
+        "rolls": [
+          "save:ref"
+        ]
+      },
+      "You Better Think Again": {
+        "level": 3,
+        "rolls": [
+          "skill:resolve"
+        ]
+      }
+    },
+    "wheelman": {
+      "Vehicle Familiarity": {
+        "level": 4,
+        "rolls": [
+          "skill:drive"
+        ]
+      },
+      "That's Impossible!": {
+        "level": 10,
+        "rolls": [
+          "skill:drive"
         ]
       }
     }

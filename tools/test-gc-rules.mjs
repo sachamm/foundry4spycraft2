@@ -455,6 +455,8 @@ test("spend costs and restrictions", () => {
   assert.equal(planSpend("knowsNothing", { npc: guard }).cost, 1);
   assert.equal(planSpend("knowsNothing", { npc: hench }).cost, 2);
   assert.throws(() => planSpend("knowsNothing", { npc: boss }));
+  assert.equal(planSpend("terminalSituation", {}).cost, 1);
+  assert.throws(() => planSpend("terminalSituation", { inCombat: true }));
   for (const spend of GC_SPENDS) assert.ok(spend.page && spend.label);
 });
 test("exploding action dice, including the dramatic-scene low explosion", () => {

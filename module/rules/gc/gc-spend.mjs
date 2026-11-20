@@ -109,6 +109,12 @@ export function planSpend(id, context = {}) {
       if (npc.role === "mastermind") throw new Error(loc`A mastermind always knows something valuable.`);
       cost = npc.type === "special" || npc.role === "henchman" ? 2 : 1;
       break;
+    case "terminalSituation":
+      if (context.inCombat) throw new Error(loc`A Terminal Situation can only be declared outside combat (p.350).`);
+      notes.push(
+        loc`The victim has no way out and an opponent can see them: set unconscious, or wounds to −9, on the sheet.`
+      );
+      break;
     case "healNpc":
       notes.push(
         npc.type === "special"
