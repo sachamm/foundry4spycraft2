@@ -76,7 +76,7 @@ function combatantsOf(combat) {
   });
 }
 
-async function post(reminder) {
+async function post(reminder, combat) {
   const actor = await fromUuid(reminder.actorUuid);
   if (!actor) return;
   const owners = game.users.filter(user => user.isGM || actor.testUserPermission(user, "OWNER")).map(user => user.id);
@@ -84,7 +84,16 @@ async function post(reminder) {
     speaker: ChatMessage.getSpeaker({ actor }),
     whisper: owners,
     content: `<p>${esc(TEXT[reminder.kind](actor.name))}</p>`,
-    flags: { spycraft2: { roundReminder: { kind: reminder.kind, actorUuid: reminder.actorUuid } } }
+    flags: {
+      spycraft2: {
+        roundReminder: {
+          kind: reminder.kind,
+          actorUuid: reminder.actorUuid,
+          combatId: combat?.id ?? null,
+          round: combat?.round ?? null
+        }
+      }
+    }
   });
 }
 
@@ -108,6 +117,12 @@ async function renderButton(message, html) {
       if (reminder.kind === "dying") await rollDying(actor);
       else if (reminder.kind === "stratagem") {
         // Once per card: the Count is raised a single time each round.
+        // A card left over from an earlier round or another fight no longer applies.
+        const combat = game.combats?.get?.(reminder.combatId);
+        if (reminder.combatId && (!combat?.started || combat.round !== reminder.round)) {
+          ui.notifications.warn(loc`That Stratagem card is from an earlier round.`);
+          return;
+        }
         if (await applyStratagem(actor)) await message.update({ "flags.spycraft2.roundReminder.done": true });
       } else await burningRound(actor);
     } finally {
@@ -140,7 +155,7 @@ export function installRoundReminders() {
       if (posted.has(key)) continue;
       posted.add(key);
       if (posted.size > 200) posted.delete(posted.values().next().value);
-      await post(reminder).catch(error => console.warn(loc`Spycraft 2.0 | round reminder not posted`, error));
+      await post(reminder, combat).catch(error => console.warn(loc`Spycraft 2.0 | round reminder not posted`, error));
     }
   });
   Hooks.on("renderChatMessageHTML", renderButton);

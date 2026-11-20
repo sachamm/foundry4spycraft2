@@ -34,7 +34,7 @@
 - A **Press** adds a half action to the turn's count. **Take the Hit** reminds on Reflex saves.
 - **Bang, flash and explosive damage on special NPCs** use the same typed-damage handling as agents.
 - **Actions per turn.** The combat tracker's menu can spend a half or full action for a combatant, refuses more than a
-  turn holds, and shows what the acting combatant has left. It starts over each turn.
+  turn holds, and shows what the acting combatant has left. It starts over each round.
 
 - Added contextual tooltips across system sheets, dialogs, chat actions and Game Control, including fields, buttons, tabs and expandable sections. Existing authored help is preserved.
 

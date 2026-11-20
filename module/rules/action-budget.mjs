@@ -2,9 +2,9 @@
 export const HALF_ACTIONS_PER_TURN = 2;
 export const ACTION_COST = { half: 1, full: 2 };
 
-/** The saved budget, or a fresh one when it belongs to another turn. */
-export function actionBudget(saved, { round, turn }) {
-  return saved && saved.round === round && saved.turn === turn ? saved : { round, turn, used: 0 };
+/** The saved budget, or a fresh one when it belongs to another round: a combatant takes one turn a round. */
+export function actionBudget(saved, { round }) {
+  return saved && saved.round === round ? saved : { round, used: 0 };
 }
 
 /**

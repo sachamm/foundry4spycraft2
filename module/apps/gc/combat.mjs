@@ -171,10 +171,7 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
 
 /** The actions a combatant has spent on the current turn. */
 const actionsOf = combatant =>
-  actionBudget(combatant.flags?.spycraft2?.actions, {
-    round: combatant.parent?.round ?? 0,
-    turn: combatant.parent?.turn ?? 0
-  });
+  actionBudget(combatant.flags?.spycraft2?.actions, { round: combatant.parent?.round ?? 0 });
 
 /** A Press this round buys one more half action. */
 const extraHalfActions = combatant => (fluid(combatant).pressed ? 1 : 0);
@@ -379,7 +376,7 @@ export function installFluidInitiativeHooks() {
     for (const [kind, name, icon] of [
       ["half", loc`Spend a half action`, "fa-circle-half-stroke"],
       ["full", loc`Spend a full action`, "fa-circle"],
-      ["reset", loc`Give back this turn's actions`, "fa-rotate-left"]
+      ["reset", loc`Give back this round's actions`, "fa-rotate-left"]
     ])
       entries.push({
         name,

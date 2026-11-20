@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { actionBudget, resetActions, spendAction } from "../module/rules/action-budget.mjs";
 
 test("a turn holds two half actions or one full action", () => {
-  const at = { round: 2, turn: 1 };
+  const at = { round: 2 };
   let state = actionBudget(undefined, at);
   assert.equal(state.used, 0);
   const first = spendAction(state, "half");
@@ -20,9 +20,8 @@ test("a turn holds two half actions or one full action", () => {
   assert.equal(spendAction({ ...state, used: 3 }, "half", { extra: 1 }).ok, false);
 });
 
-test("the budget starts over on another turn or round", () => {
-  const spent = { round: 2, turn: 1, used: 2 };
-  assert.equal(actionBudget(spent, { round: 2, turn: 1 }).used, 2);
-  assert.equal(actionBudget(spent, { round: 2, turn: 2 }).used, 0);
-  assert.equal(actionBudget(spent, { round: 3, turn: 1 }).used, 0);
+test("the budget lasts the round and starts over on the next", () => {
+  const spent = { round: 2, used: 2 };
+  assert.equal(actionBudget(spent, { round: 2 }).used, 2);
+  assert.equal(actionBudget(spent, { round: 3 }).used, 0);
 });
