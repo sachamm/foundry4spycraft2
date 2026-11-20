@@ -92,4 +92,8 @@ test("a tactician's Stratagem is prompted at the start of each round", () => {
     { kind: "stratagem", actorUuid: "Actor.t", name: "t" }
   ]);
   assert.deepEqual(roundReminders({ combatants, roundEnded: false, turnActorUuid: "Actor.t" }), []);
+  // The first round has no round before it, but Stratagem still applies.
+  assert.deepEqual(roundReminders({ combatants, roundEnded: false, roundStarted: true }), [
+    { kind: "stratagem", actorUuid: "Actor.t", name: "t" }
+  ]);
 });

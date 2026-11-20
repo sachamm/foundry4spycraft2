@@ -27,7 +27,7 @@ const TEXT = {
   dying: name => loc`${name} is dying: roll to stabilize at the end of the round.`,
   burning: name => loc`${name} is on fire: take the fire's damage at the start of the turn.`,
   stratagem: name =>
-    loc`Stratagem: ${name} and the teammates who can see ${name} gain Initiative Count this round. The button raises the Count of ${name} and of every combatant on the same side; lower it again for anyone out of sight.`
+    loc`Stratagem: ${name} and the teammates who can hear or see ${name} gain Initiative Count this round. The button raises the Count of ${name} and of every combatant on the same side; lower it again for anyone out of sight and hearing.`
 };
 const BUTTON = {
   dying: () => loc`Roll to stabilize`,
@@ -131,6 +131,7 @@ export function installRoundReminders() {
     const reminders = roundReminders({
       combatants: combatantsOf(combat),
       roundEnded,
+      roundStarted: Object.hasOwn(changed, "round") && combat.round >= 1 && combat.round > previousRound,
       turnActorUuid: combat.combatant?.actor?.uuid ?? null
     });
     for (const reminder of reminders) {

@@ -25,10 +25,11 @@
 - **More class ability reminders** for the abilities the system still leaves to the table, including Short Con, Shill,
   Bookworm, Interpreter, Overland Shortcut, Go Native, Filed in Triplicate, Smartgun, Behind Closed Doors, Trust Me and
   Vehicle Familiarity.
-- **Gunplay** (Triggerman) raises the attacker's Initiative Count on a handgun hit. **Stratagem** (Tactician) gets an
-  end-of-round card whose button raises the team's Counts. **Juggernaut** (Brawler) can turn up to half of lethal damage
+- **Gunplay** (Triggerman) raises the attacker's Initiative Count on a handgun hit. **Stratagem** (Tactician) gets a
+  start-of-round card whose button raises the team's Counts. **Juggernaut** (Brawler) can turn up to half of lethal damage
   taken into subdual in the damage dialog. **Fall Guy** (Stuntman) lowers each falling damage die by 2.
 - **Whatever's Handy** now adds its bonus to Defense while an improvised weapon is readied.
+- **Terminal Situation** is a GC action die use outside combat (1 die).
 - **Bang, flash and explosive damage on special NPCs** use the same typed-damage handling as agents.
 - **Actions per turn.** The combat tracker's menu can spend a half or full action for a combatant, refuses more than a
   turn holds, and shows what the acting combatant has left. It starts over each turn.

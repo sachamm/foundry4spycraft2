@@ -490,7 +490,7 @@ export async function applyDamage(message, options = {}) {
         choices.actors.filter(actor => actor.isOwner || gcAvailable()),
         selected,
         actor => (actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)
-      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label><label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label><p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent, and bang, flash and explosive damage for a special NPC.`}</p></div>`
+      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label><label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half of what gets past damage reduction)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label><p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent, and bang, flash and explosive damage for a special NPC.`}</p></div>`
     });
     if (!input) return null;
     input = { ...input, reviewType: true };
@@ -570,16 +570,21 @@ export async function applyDamage(message, options = {}) {
       // Juggernaut: the brawler may take up to half of the hit as subdual damage instead.
       const converted = Math.min(
         Math.max(0, Math.trunc(Number(input.juggernaut) || 0)),
-        juggernautConversion(target.system, damage)
+        // Only what gets past damage reduction can be converted.
+        juggernautConversion(
+          target.system,
+          armorPiercingAll ? damage : Math.max(0, damage - Math.max(0, (hit.dr ?? 0) - armorPiercing))
+        )
       );
       if (converted) hit.damage = damage - converted;
       ({ plan: result, lines, pendingSave } = await lethalOnSpecial(target, hit, source));
       if (converted) {
+        // The converted points are already past damage reduction, so it is not taken off again.
         const subdual = await nonLethalDamage(target, "subdual", converted, {
           source,
           attackKind,
           armorPiercing,
-          armorPiercingAll
+          armorPiercingAll: true
         });
         lines.push(
           loc`Juggernaut: ${converted} of the ${damage} lethal damage is taken as subdual damage.`,
