@@ -125,6 +125,7 @@ import {
   dispositionRows
 } from "../apps/gc/npc-play.mjs";
 import { loc } from "../i18n.mjs";
+import { quickAttackOptions, skipDialog } from "../apps/remembered-choices.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -1600,13 +1601,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     return this.actor.rollAbility(target.dataset.ability);
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: true });
+    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
   }
   static #onRollSkill(event, target) {
-    return this.actor.rollSkill(target.dataset.skill, target.dataset.ability || null);
+    return this.actor.rollSkill(target.dataset.skill, target.dataset.ability || null, {
+      ...(skipDialog(event) ? { quick: true } : {})
+    });
   }
   static #onRollAttack(event, target) {
-    return this.actor.rollAttack(this._item(target), { askContext: true });
+    const item = this._item(target);
+    return this.actor.rollAttack(item, skipDialog(event) ? quickAttackOptions(this.actor, item) : { askContext: true });
   }
   static #onRollDamage(event, target) {
     return this.actor.rollDamage(this._item(target));
@@ -2089,10 +2093,11 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
     return this.actor.rollAbility(target.dataset.ability);
   }
   static #onRollSave(event, target) {
-    return this.actor.rollSave(target.dataset.save, { askContext: true });
+    return this.actor.rollSave(target.dataset.save, { askContext: !skipDialog(event) });
   }
   static #onRollAttack(event, target) {
-    return this.actor.rollAttack(this._item(target), { askContext: true });
+    const item = this._item(target);
+    return this.actor.rollAttack(item, skipDialog(event) ? quickAttackOptions(this.actor, item) : { askContext: true });
   }
   static #onRollDamage(event, target) {
     return this.actor.rollDamage(this._item(target));

@@ -19,6 +19,7 @@ import "../apps/dueling-basics.mjs";
 import "../apps/dueling.mjs";
 import "../apps/feint-bonus.mjs";
 import "../apps/feint.mjs";
+import "../apps/gc/npc-card-dice.mjs";
 import "../apps/hand-of-god.mjs";
 import "../apps/kick.mjs";
 import "../apps/old-school.mjs";

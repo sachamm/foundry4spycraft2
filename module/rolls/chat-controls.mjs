@@ -129,6 +129,8 @@ core("criticalControl", 9130, ctx => {
   const { message, check, actor } = ctx;
   if (!open(ctx) || !(check.threatConfirmed || check.errorConfirmed)) return null;
   if (check.criticalSuccess || check.criticalFailure) return null;
+  // An NPC's own threat is paid from the GC pool by its own button (module/apps/gc/npc-card-dice.mjs).
+  if (actor.type === "npc" && !check.errorConfirmed) return null;
   return card("Activate critical", () => actor.activateCritical(message));
 });
 

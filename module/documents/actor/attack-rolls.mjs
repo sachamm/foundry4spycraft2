@@ -29,6 +29,7 @@ import { queueResources, isResourceLock } from "../../rules/transactions.mjs";
 import { specialistApplies } from "../../rules/weapon-specialist.mjs";
 import { weaponDamage, cleanAndPolishedApplies } from "../../rules/gear.mjs";
 import { askFollowUp } from "../../rolls/dialogs/follow-ups.mjs";
+import { choiceKey, rememberChoices, restoreChoices } from "../../apps/remembered-choices.mjs";
 import { measureInto } from "../../apps/map.mjs";
 import { coverFire, suppressiveFire } from "../../apps/combat-actions.mjs";
 import { characterReminders } from "../../rules/feat-reminders.mjs";
@@ -71,6 +72,23 @@ export const ActorAttackRolls = Base =>
           }
         };
       }
+      if (options.quickEntered && !options.askContext) {
+        // Shift-click: the remembered and measured choices are read as if entered in the dialog.
+        const { quickEntered, ...rest } = options;
+        options = {
+          ...rest,
+          ...rollPipeline.read(
+            {
+              dialog: "attack",
+              actor: this,
+              item,
+              needsCQB: cqbRangePlan(this.system, item.system, rest).active,
+              entered: { ...quickEntered }
+            },
+            {}
+          )
+        };
+      }
       const initialCQB = cqbRangePlan(this.system, item.system, options);
       if (
         options.askContext ||
@@ -86,6 +104,7 @@ export const ActorAttackRolls = Base =>
           rejectClose: false,
           ok: { label: loc`Roll attack` },
           render: (event, dialog) => {
+            restoreChoices(choiceKey("attack", this, item.id), dialog?.element ?? event?.target);
             measureInto(this)(event, dialog);
             enhanceAttackDialog(event, dialog);
           },
@@ -98,6 +117,7 @@ export const ActorAttackRolls = Base =>
           })
         });
         if (!input) return null;
+        rememberChoices(choiceKey("attack", this, item.id), input);
         // What was entered, as roll options: each group of fields is read by the rule that owns it.
         options = {
           ...options,

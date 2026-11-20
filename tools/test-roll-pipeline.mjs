@@ -541,6 +541,7 @@ const EXPECTED_ORDER = [
   "weaponSpecialistAttackTerm",
   "criticalControl",
   "quickBoostControl",
+  "gcNpcDiceControl",
   "fireActionAttackTerm",
   "boostControl",
   "damageConversionAttackTerm",

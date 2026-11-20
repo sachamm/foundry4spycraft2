@@ -237,6 +237,19 @@ test("one-click boost, Generous and NPC cards: only buttons that can work are sh
   assert.deepEqual(labels(message({})), ["card:Compare with an opposing check", "card:Outcome resolved"]);
 });
 
+test("the GC spends the session pool from an NPC's card; the NPC's own threat is not offered to agents' wallets", () => {
+  actor = makeActor({ type: "npc", system: { classLevels: {}, activeFeatNames: [], npcType: "standard" } });
+  const gc = { isGM: true };
+  assert.deepEqual(labels(message({ checkKind: "attack" }), gc).slice(0, 1), ["card:GC boost (+1d4)"]);
+  const threat = labels(message({ checkKind: "attack", threatConfirmed: true }), gc);
+  assert.deepEqual(threat.slice(0, 2), ["card:GC: activate threat", "card:GC boost (+1d4)"]);
+  assert.equal(threat.includes("card:Activate critical"), false);
+  // An NPC's error is still activated by its opponents through the usual dialog.
+  assert.equal(labels(message({ errorConfirmed: true }), gc).includes("card:Activate critical"), true);
+  // Players never see the GC's buttons.
+  assert.equal(labels(message({ checkKind: "attack" })).includes("card:GC boost (+1d4)"), false);
+});
+
 test("an attack waiting to be resolved does not offer to close its outcome", () => {
   actor = makeActor();
   const attack = { checkKind: "attack" };
