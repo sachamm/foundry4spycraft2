@@ -877,8 +877,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
 
   /** Half actions this round: two, and one more after a Press. */
   _roundActionLimit() {
-    const fluid = this._roundCombatant()?.flags?.spycraft2?.fluid;
-    return HALF_ACTIONS_PER_TURN + (fluid?.pressed ? 1 : 0);
+    const combatant = this._roundCombatant(),
+      fluid = combatant?.flags?.spycraft2?.fluid;
+    return HALF_ACTIONS_PER_TURN + (fluid?.pressed && fluid.round === combatant.parent.round ? 1 : 0);
   }
 
   /** Half actions marked as spent in the round now being played; an older record counts as none. */

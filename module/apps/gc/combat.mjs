@@ -212,7 +212,7 @@ const actionsOf = combatant =>
   actionBudget(combatant.flags?.spycraft2?.actions, { round: combatant.parent?.round ?? 0 });
 
 /** A Press this round buys one more half action. */
-const extraHalfActions = combatant => (fluid(combatant).pressed ? 1 : 0);
+const extraHalfActions = combatant => (fluidForRound(combatant, combatant.parent?.round).pressed ? 1 : 0);
 
 /** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
 export async function spendTurnAction(combatant, kind) {
