@@ -689,6 +689,19 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     range: effectiveRange
   };
 }
+/** Whatever's Handy (Brawler 1st, 5th, 9th): the improvised weapon bonus at the character's Brawler level. */
+export function whateversHandyBonus(system) {
+  const level = system?.classLevels?.brawler ?? 0;
+  return level >= 9 ? 3 : level >= 5 ? 2 : level >= 1 ? 1 : 0;
+}
+
+/** Dead to Rights (Grunt 2nd, 7th): extra d4s of damage with tactical weapons. */
+export function deadToRightsDice(system, weapon) {
+  const level = system?.classLevels?.grunt ?? 0;
+  if (weapon?.proficiency !== "tactical") return 0;
+  return level >= 7 ? 2 : level >= 2 ? 1 : 0;
+}
+
 export function weaponDamage(
   system,
   weapon,
@@ -740,6 +753,8 @@ export function weaponDamage(
   let base = knuckle ? `${1 + (u.extraDice ?? 0)}d${u.die} + ${expression}` : expression;
   const ranged = !melee;
   if (specialistApplies(system, weapon, "Killer Instinct") && (!ranged || options.withinCQB)) base += " + 1d4";
+  const deadToRights = deadToRightsDice(system, weapon);
+  if (deadToRights) base += ` + ${deadToRights}d4`;
   const strength = system.abilities.str.mod;
   let bonus = knuckle ? u.damageBonus : melee || hurled ? strength : 0;
   if (useFinesse && (melee || hurled)) bonus = system.abilities.dex?.mod ?? 0;
@@ -753,7 +768,8 @@ export function weaponDamage(
           (knuckle && u.usesStrength === false ? 0 : grip.strengthIncrease / 2)
       );
     if (!system.activeFeatNames?.includes("Improvised Weapon Basics")) bonus -= 2;
-    if (system.classLevels?.brawler >= 1) bonus += 1;
+    // Whatever's Handy, Brawler 1st: +1 damage with improvised weapons, +2 at 5th and +3 at 9th.
+    bonus += whateversHandyBonus(system);
   }
   const meleeArmorPiercing = meleeArmorPiercingPlan(system, weapon, { grip });
   if (meleeArmorPiercing.blockedReason) return { blocked: true, blockedReason: meleeArmorPiercing.blockedReason };
@@ -780,6 +796,7 @@ export function weaponDamage(
   const min = parsed.minimum;
   return {
     markDamage,
+    deadToRights,
     meleeArmorPiercing,
     expression,
     finesseBasic,

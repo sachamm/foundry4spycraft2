@@ -30,6 +30,14 @@ export function registerGCSettings() {
     type: Boolean,
     default: true
   });
+  game.settings.register(SYSTEM, "roundReminders", {
+    name: loc`Round reminders`,
+    hint: loc`Post a card with its button when a burning character's turn begins and, at the end of each round, for every dying character in the fight.`,
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
   game.settings.register(SYSTEM, "startFlatFooted", {
     name: loc`Start combat flat-footed`,
     hint: loc`Mark every combatant flat-footed when a combat begins (p.323). Clear it as each character acts or is hit.`,
