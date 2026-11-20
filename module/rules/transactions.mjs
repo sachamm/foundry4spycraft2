@@ -46,7 +46,7 @@ export function queueResources(actors, work, { messages = [], allowPeriodReview 
         const backend = globalThis.game?.spycraft2?.resourceLocks;
         if (globalThis.game?.ready && !backend)
           throw new Error(loc`The resource transaction service is unavailable. Reload the world before spending.`);
-        return backend ? backend.run(unique, work, { messages, allowPeriodReview }) : work();
+        return backend ? backend.run(unique, work, { messages, allowPeriodReview, background }) : work();
       };
       if (!background) return attempt();
       // The lock is taken before any work starts, so trying again never repeats part of the work.
@@ -112,9 +112,25 @@ async function refreshActor(actor) {
   if (!actor.isOwner) throw new Error(loc`Ownership changed while starting this resource transaction.`);
   return actor;
 }
-async function acquire(actor, scope = RESOURCE_LOCK_ID) {
+/**
+ * A bookkeeping lock nobody is working under any more. Bookkeeping (see `background` on queueResources) only
+ * recomputes derived values and finishes in moments, so one that is still there well after it started was left by a
+ * client that closed mid-step. Removing it loses nothing: the next bookkeeping pass recomputes the same values.
+ * A lock taken for someone's own action is never treated this way; it stays for the GC to review.
+ */
+export const BACKGROUND_LOCK_STALE_MS = 30000;
+export function abandonedBackgroundLock(item, actor, scope = RESOURCE_LOCK_ID, now = Date.now()) {
+  const lock = item?.flags?.spycraft2?.resourceLock;
+  if (!lock?.background || !Number.isFinite(lock.started)) return false;
+  return held.get(lockKey(actor, scope)) !== lock.token && now - lock.started >= BACKGROUND_LOCK_STALE_MS;
+}
+async function acquire(actor, scope = RESOURCE_LOCK_ID, { background = false } = {}) {
   if (!actor.isOwner) throw new Error(loc`You must own each character whose resources are being used.`);
-  const existing = actor.items.get(scope);
+  let existing = actor.items.get(scope);
+  if (existing && isResourceLock(existing) && abandonedBackgroundLock(existing, actor, scope)) {
+    await actor.deleteEmbeddedDocuments("Item", [scope], { render: false });
+    existing = actor.items.get(scope);
+  }
   if (existing) {
     if (isResourceLock(existing))
       throw new ResourceLockedError(
@@ -142,7 +158,16 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
       name: "Spycraft resource transaction",
       type: "gear",
       system: { quantity: 0, weight: 0, carried: false },
-      flags: { spycraft2: { resourceLock: { token, userId: game.user.id, started: Date.now() } } }
+      flags: {
+        spycraft2: {
+          resourceLock: {
+            token,
+            userId: game.user.id,
+            started: Date.now(),
+            ...(background ? { background: true } : {})
+          }
+        }
+      }
     };
   let docs;
   try {
@@ -181,7 +206,11 @@ async function release(actor, token, scope = RESOURCE_LOCK_ID) {
     if (held.get(lockKey(actor, scope)) === token) held.delete(lockKey(actor, scope));
   }
 }
-export async function runNativeResourceTransaction(actors, work, { messages = [], allowPeriodReview = false } = {}) {
+export async function runNativeResourceTransaction(
+  actors,
+  work,
+  { messages = [], allowPeriodReview = false, background = false } = {}
+) {
   const locks = [];
   let result;
   try {
@@ -196,7 +225,7 @@ export async function runNativeResourceTransaction(actors, work, { messages = []
           continue;
         }
       }
-      locks.push({ actor, token: await acquire(actor) });
+      locks.push({ actor, token: await acquire(actor, RESOURCE_LOCK_ID, { background }) });
     }
     await refreshWorldSetting("spycraft2", "usagePeriods");
     await refreshWorldSetting("spycraft2", "usagePeriodReview");

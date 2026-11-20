@@ -6,6 +6,11 @@
   (for example "Resolve vs Defense 15: hit", "Check Defense", "Lucky Break: it misses"), and hovering a button shows
   its full wording, including the target's name. A label that is still too long wraps inside its button instead of
   being clipped.
+- **No more stuck "resource transaction is in progress" after a closed tab.** The Shaken Initiative bookkeeping that
+  runs when someone joins briefly marks a character as busy. If that browser closed mid-step the mark stayed, and
+  every action-die spend on the character was refused until the GC recovered it by hand. Such a bookkeeping mark is
+  now cleared automatically once it is 30 seconds old. A mark left by an interrupted player action still waits for
+  the GC, as before.
 
 ## 0.6.0 — 2026-11-20
 

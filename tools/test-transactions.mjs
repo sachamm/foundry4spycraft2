@@ -11,6 +11,8 @@ import {
   queueResources,
   payLockedActionDice,
   runNativeResourceTransaction,
+  abandonedBackgroundLock,
+  BACKGROUND_LOCK_STALE_MS,
   recoverResourceTransaction,
   periodResourceActors
 } from "../module/rules/transactions.mjs";
@@ -110,6 +112,54 @@ test("two independent clients cannot both spend the same die; server-side embedd
   assert.equal(performed, 1);
   assert.equal(records.get("Actor.a").system.actionDice.value, 0);
   assert.equal(records.get("Actor.a").items.length, 0);
+});
+test("a bookkeeping lock left by a closed client is cleared by the next transaction; an action's lock is not", async () => {
+  reset();
+  const actor = new NativeActor("a");
+  const leave = (resourceLock, target = actor) => {
+    const item = {
+      ...lock("old"),
+      flags: { spycraft2: { resourceLock: { token: "old", userId: "gone", ...resourceLock } } }
+    };
+    records.get(target.uuid).items.push(copy(item));
+    target.updateSource(records.get(target.uuid));
+  };
+  // Bookkeeping marks its lock, so a later transaction can tell it apart.
+  let seen;
+  await runNativeResourceTransaction(
+    [actor],
+    async () => (seen = records.get(actor.uuid).items[0].flags.spycraft2.resourceLock),
+    { background: true }
+  );
+  assert.equal(seen.background, true);
+  await runNativeResourceTransaction(
+    [actor],
+    async () => (seen = records.get(actor.uuid).items[0].flags.spycraft2.resourceLock)
+  );
+  assert.equal(seen.background, undefined);
+  // Abandoned bookkeeping: the spend goes through and no lock is left.
+  leave({ background: true, started: Date.now() - BACKGROUND_LOCK_STALE_MS - 1 });
+  assert.equal(
+    await runNativeResourceTransaction([actor], () => payLockedActionDice(actor, 1, async () => "paid")),
+    "paid"
+  );
+  assert.equal(records.get(actor.uuid).items.length, 0);
+  // Bookkeeping that only just started is still running somewhere: wait for it.
+  const fresh = new NativeActor("b");
+  leave({ background: true, started: Date.now() }, fresh);
+  await assert.rejects(
+    runNativeResourceTransaction([fresh], async () => true),
+    ResourceBusyError
+  );
+  // A lock taken for someone's own action stays for the GC, however old.
+  const acting = new NativeActor("c");
+  leave({ started: Date.now() - 10 * BACKGROUND_LOCK_STALE_MS }, acting);
+  await assert.rejects(
+    runNativeResourceTransaction([acting], async () => true),
+    ResourceBusyError
+  );
+  assert.equal(records.get(acting.uuid).items.length, 1);
+  assert.equal(abandonedBackgroundLock({ flags: {} }, actor), false);
 });
 test("a stale client refreshes the committed server balance before validating payment", async () => {
   reset();
