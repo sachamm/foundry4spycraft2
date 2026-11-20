@@ -159,6 +159,8 @@ class Bonuses {
   }
 }
 
+const LEVEL_ZERO_VITALITY = 6;
+
 /**
  * @param {object} sys     agent system data (mutated)
  * @param {object[]} items { id, name, type, system } for every embedded item
@@ -1486,6 +1488,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
     vitalityBreakdown.minimumAdjustment += Math.max(0, 1 - roll - abil.con.mod);
     vit += Math.max(1, roll + abil.con.mod);
   });
+  // A Career Level 0 character has a flat 6 vitality, which the first class level then replaces (p.27).
+  if (!progression.length) vit = LEVEL_ZERO_VITALITY;
   if (vitMissing.length)
     todo.push({ order: 15, tab: "classes", text: loc`Vitality not rolled for level ${vitMissing.join(", ")}.` });
   sys.vitalityBreakdown = vitalityBreakdown;

@@ -4353,6 +4353,7 @@
    "FaintMoonlitNight_0yae4bu": "Faint (moonlit night)",
    "FakeOutIfThisFeintSucceeds_0jcfanp": "Fake Out: if this Feint succeeds, your Defense against the target’s attacks rises by 2 for 1 full round",
    "FallDistance_1ted7zv": "Fall distance",
+   "FallGuyEachCollisionDamageDie_0kysccm": "Fall Guy: each collision damage die is 2 lower (minimum 1 per die); lower the damage entered if that was not done.",
    "FallGuyEachFallingDamageDie_1rf2o1u": "Fall Guy: each falling damage die is 2 lower (minimum 1 per die).",
    "FallingCheck_1sacxsw": "Falling Check",
    "FallingDamageDistanceFtMinusFt_0b0hw5w": "Falling damage distance: {0} ft. minus {1} ft. = {2} ft. (minimum0; pp.194,336).",

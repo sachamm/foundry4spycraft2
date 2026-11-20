@@ -74,3 +74,32 @@ test("counted class abilities appear with the limit their class level sets", asy
   const ids = CLASS_ABILITY_USES.map(([key, name]) => `${key}:${name}`);
   assert.equal(new Set(ids).size, ids.length);
 });
+
+test("a Career Level 0 agent has 6 vitality, replaced by the first class level", async () => {
+  const { computeAgent } = await import("../module/rules/engine.mjs");
+  const { SPYCRAFT } = await import("../module/config.mjs");
+  const { readFileSync } = await import("node:fs");
+  const soldier = JSON.parse(readFileSync(new URL("../src/data/classes.json", import.meta.url))).find(
+    c => c.key === "soldier"
+  );
+  const build = (progression, items) =>
+    computeAgent(
+      {
+        abilities: Object.fromEntries(["str", "dex", "con", "int", "wis", "cha"].map(k => [k, { base: 14 }])),
+        progression,
+        actionDice: { value: 2 },
+        wounds: { value: 4 },
+        vitality: { value: 4 }
+      },
+      items,
+      SPYCRAFT
+    );
+  assert.equal(build([], []).vitality.max, 6);
+  const item = {
+    id: "soldier",
+    name: soldier.name,
+    type: "class",
+    system: { ...soldier, identifier: "soldier", vitalityDie: soldier.vitality }
+  };
+  assert.equal(build([{ classId: "soldier", vitality: 6, skills: {} }], [item]).vitality.max, soldier.vitality + 2);
+});

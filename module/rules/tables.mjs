@@ -11588,6 +11588,12 @@ export const CLASS_ABILITY_REMINDERS = {
  ],
  "transporter": [
   {
+   "name": "Take the Hit",
+   "level": 2,
+   "rolls": "save:ref",
+   "text": "Step in to take melee hits aimed at adjacent cargo (ranged hits too at 7th)."
+  },
+  {
    "name": "You Better Think Again",
    "level": 3,
    "rolls": "skill:resolve",

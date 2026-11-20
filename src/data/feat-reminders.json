@@ -262,6 +262,12 @@
       }
     },
     "transporter": {
+      "Take the Hit": {
+        "level": 2,
+        "rolls": [
+          "save:ref"
+        ]
+      },
       "You Better Think Again": {
         "level": 3,
         "rolls": [

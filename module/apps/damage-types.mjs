@@ -206,6 +206,10 @@ export async function sufferTypedDamage(actor, preset = {}) {
         return sufferElectrical(actor, { amount, source });
       default: {
         const result = await sufferTypedLethal(actor, type, Math.max(0, amount - reduction), label);
+        if (type === "collision" && (actor.system?.classLevels?.stuntman ?? 0) >= 4)
+          result.lines.push(
+            loc`Fall Guy: each collision damage die is 2 lower (minimum 1 per die); lower the damage entered if that was not done.`
+          );
         if (type === "laser")
           result.lines.push(
             loc`Laser: one damage die fewer per range increment past the first; it ignores dodge bonuses (p.338).`
