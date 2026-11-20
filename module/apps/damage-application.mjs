@@ -322,7 +322,8 @@ rollPipeline.register({
       if (known)
         controls.push({
           // The viewer can already read this Defense, so the button says how the roll stands against it.
-          label: loc`Resolve vs Defense ${known.defense} (${tokenName(known.actor)})${standingAgainst(check, known.defense, actor)}`,
+          label: loc`Resolve vs Defense ${known.defense}${standingAgainst(check, known.defense, actor)}`,
+          hint: loc`Resolve this attack against ${tokenName(known.actor)}, Defense ${known.defense}${standingAgainst(check, known.defense, actor)}`,
           placement: "card",
           emphasis: "primary",
           run: () => resolveAttack(message, { targetUuid: known.actor.uuid, defense: "" })
@@ -331,8 +332,11 @@ rollPipeline.register({
         label: check.attackResolution
           ? loc`Resolve against Defense again`
           : known
-            ? loc`Resolve against another target or Defense…`
+            ? loc`Other target or Defense…`
             : loc`Resolve against Defense`,
+        ...(known && !check.attackResolution
+          ? { hint: loc`Resolve this attack against another target, or against a Defense you enter` }
+          : {}),
         placement: "card",
         ...(known ? {} : { emphasis: "primary" }),
         // With no target on the card, the first press settles against the one targeted token, if there is one.
@@ -941,7 +945,8 @@ rollPipeline.register({
       named = damageCardTarget(check) ?? (targeted.length === 1 ? targeted[0] : null);
     if (targeted.length > 1)
       controls.push({
-        label: loc`Apply ${amount} to each of ${targeted.length} targeted`,
+        label: loc`Apply ${amount} to ${targeted.length} targets`,
+        hint: loc`Apply ${amount} damage to each of the ${targeted.length} targeted tokens`,
         emphasis: "primary",
         run: () => applyDamageToEach(message, targetedForDamage())
       });
@@ -952,11 +957,16 @@ rollPipeline.register({
         run: () => applyDamage(message, quickApplyInput(message, named.uuid))
       });
     controls.push({
-      label: applied.length ? loc`Apply damage to another target` : loc`Apply damage to a target…`,
+      label: applied.length ? loc`Apply to another target…` : loc`Apply damage to a target…`,
+      hint: loc`Choose a target and apply this damage to it`,
       run: () => applyDamage(message)
     });
     if (/\bBLS\b/.test(check.weaponQualities ?? ""))
-      controls.push({ label: loc`Apply the blast to everyone caught`, run: () => applyBlast(message) });
+      controls.push({
+        label: loc`Apply blast to all caught`,
+        hint: loc`Apply the blast to everyone caught in it, by distance from the centre`,
+        run: () => applyBlast(message)
+      });
     return controls;
   }
 });

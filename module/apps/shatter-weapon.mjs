@@ -21,7 +21,8 @@ rollPipeline.register({
     if (!target || !(user?.isGM || target.isOwner) || !shatterWeaponEligible(target.system, check)) return null;
     return [
       {
-        label: loc`Shatter Weapon (${target.name}): Smash the attacker’s weapon`,
+        label: loc`Shatter Weapon`,
+        hint: loc`Shatter Weapon (${target.name}): Smash the attacker’s weapon`,
         run: () =>
           target.useLimitedAbility(
             "shatterWeapon",

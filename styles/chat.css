@@ -44,3 +44,6 @@
 /* Closing the outcome is a real, readable secondary button. */
 .spycraft2.roll-controls button.sc2-quiet-action { min-height: 28px; padding: 2px 8px; font-size: var(--sc2-text-s); color: var(--sc2-action); border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); text-decoration: none; }
 .spycraft2.roll-controls button.sc2-quiet-action:hover { color: var(--sc2-ink-strong); border-color: var(--sc2-action); }
+/* A label longer than the chat column wraps inside its button instead of being cut off. */
+.spycraft2.roll-controls button,
+.chat-message.sc2-card > button[data-roll-control] { height: auto; min-height: 28px; padding-block: 3px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }

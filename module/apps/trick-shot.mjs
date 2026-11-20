@@ -14,7 +14,8 @@ rollPipeline.register({
     const target = check.attackContext?.targetActorUuid ? fromUuidSync(check.attackContext.targetActorUuid) : null;
     return [
       {
-        label: loc`Trick Shot: hold the target instead of damaging them`,
+        label: loc`Trick Shot: hold the target`,
+        hint: loc`Trick Shot: hold the target instead of damaging them`,
         run: async () => {
           const rolled = await actor.rollDamage(weapon, { includeSneakAttack: false });
           if (!rolled) return rolled;

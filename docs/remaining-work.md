@@ -334,7 +334,7 @@ Finished later on 2026-11-18 (the items first left to the table):
 - [x] **Special damage types.** The apply dialog has a "Special damage type" choice, filled in from the weapon. For an
       agent it hands the damage to that type's own rules (the existing dialog opens with the type, amount and
       remaining damage reduction filled in); fire goes to the fire hazard.
-- [x] **Blasts.** "Apply the blast to everyone caught" on a blast weapon's damage card lists the characters you own,
+- [x] **Blasts.** "Apply blast to all caught" on a blast weapon's damage card lists the characters you own,
       with distances measured from the targeted token when there is a scene, and settles each at its halved damage.
 - [x] **Grapple benefits.** After a check that earns benefits the winner picks them; Pin, Sprawl, Throw, Mute, Escape
       Hold and Break Pin change the conditions on both sides.

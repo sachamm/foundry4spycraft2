@@ -55,7 +55,8 @@ rollPipeline.register({
       return null;
     return [
       {
-        label: loc`Dueling Basics miss: become flat-footed`,
+        label: loc`Dueling Basics: flat-footed`,
+        hint: loc`Dueling Basics miss: become flat-footed`,
         run: async () => {
           await message.update({ "flags.spycraft2.duelingReachMiss": true });
           return setConditionStatus(actor, "flat-footed", true, { label: loc`Flat-footed`, aliases: ["flatFooted"] });
@@ -77,7 +78,8 @@ rollPipeline.register({
     return weapon
       ? [
           {
-            label: loc`Roll damage (No Quarter: ${nq.dice} fewer sneak dice)`,
+            label: loc`Roll damage (No Quarter)`,
+            hint: loc`Roll damage (No Quarter: ${nq.dice} fewer sneak dice)`,
             run: () => actor.rollDamage(weapon, { noQuarterDice: nq.dice })
           }
         ]

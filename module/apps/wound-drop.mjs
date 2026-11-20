@@ -11,7 +11,8 @@ rollPipeline.register({
     if (!(actor?.isOwner || user?.isGM) || !woundDropEligible(actor.system, check)) return null;
     return [
       {
-        label: loc`This hit dropped the opponent to 0 wounds or below`,
+        label: loc`Opponent dropped to 0 wounds`,
+        hint: loc`This hit dropped the opponent to 0 wounds or below`,
         run: async () => {
           const record = woundDropRecord(actor.system, check.rollCombat.id);
           await message.update({ "flags.spycraft2.woundDrop": true });

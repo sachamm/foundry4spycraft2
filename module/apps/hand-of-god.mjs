@@ -14,7 +14,8 @@ rollPipeline.register({
     if (!weapon) return null;
     return [
       {
-        label: loc`Hand of God (${target.name}): ${actor.name} suffers their own damage`,
+        label: loc`Hand of God`,
+        hint: loc`Hand of God (${target.name}): ${actor.name} suffers their own damage`,
         run: () =>
           target.useLimitedAbility(
             "handOfGod",

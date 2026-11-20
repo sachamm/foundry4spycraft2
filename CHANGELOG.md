@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Shorter buttons on attack and damage cards.** Labels that were cut off in the chat column are now a few words
+  (for example "Resolve vs Defense 15: hit", "Check Defense", "Lucky Break: it misses"), and hovering a button shows
+  its full wording, including the target's name. A label that is still too long wraps inside its button instead of
+  being clipped.
+
 ## 0.6.0 — 2026-11-20
 
 - **Fixes from the live play review.**

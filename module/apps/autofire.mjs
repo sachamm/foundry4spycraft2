@@ -38,7 +38,8 @@ rollPipeline.register({
       return null;
     return [
       {
-        label: loc`Autofire Mastery: teammates +2 against this opponent`,
+        label: loc`Autofire Mastery: team +2`,
+        hint: loc`Autofire Mastery: teammates +2 against this opponent`,
         run: () => {
           if (autofireMasteryUsed(game.messages, actor.uuid, target, check.rollCombat))
             throw new Error(loc`Autofire Mastery was already used against this opponent this round.`);
