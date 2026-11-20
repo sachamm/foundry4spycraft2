@@ -161,6 +161,41 @@ test("a bookkeeping lock left by a closed client is cleared by the next transact
   assert.equal(records.get(acting.uuid).items.length, 1);
   assert.equal(abandonedBackgroundLock({ flags: {} }, actor), false);
 });
+test("two clients that both still see an abandoned bookkeeping lock cannot both spend the same die", async () => {
+  reset();
+  const a = new NativeActor("a");
+  const old = { ...lock("old") };
+  old.flags = {
+    spycraft2: {
+      resourceLock: {
+        token: "old",
+        userId: "gone",
+        background: true,
+        started: Date.now() - BACKGROUND_LOCK_STALE_MS - 1
+      }
+    }
+  };
+  records.get(a.uuid).items.push(copy(old));
+  a.updateSource(records.get(a.uuid));
+  // The second client's copy of the character still shows the old lock throughout.
+  const b = new NativeActor("a", 0, { source: copy(records.get("Actor.a")) });
+  let performed = 0,
+    second;
+  const first = await runNativeResourceTransaction([a], () =>
+    payLockedActionDice(a, 1, async () => {
+      // While the first action runs under its new lock, the second client tries with its cached view.
+      second = await runNativeResourceTransaction([b], () => payLockedActionDice(b, 1, async () => ++performed)).catch(
+        error => error
+      );
+      return ++performed;
+    })
+  );
+  assert.equal(first, 1);
+  assert.ok(second instanceof ResourceBusyError);
+  assert.equal(performed, 1);
+  assert.equal(records.get("Actor.a").system.actionDice.value, 0);
+  assert.equal(records.get("Actor.a").items.length, 0);
+});
 test("a stale client refreshes the committed server balance before validating payment", async () => {
   reset();
   const actor = new NativeActor("a");
