@@ -1,0 +1,370 @@
+{
+  "_id": "76167ee4038d3ebd",
+  "name": "Operation Glass Wake",
+  "caption": "A first-session Spycraft 2.0 adventure for four level-1 agents.",
+  "description": "<h2>Operation Glass Wake</h2><p>Recover a stolen shipping ledger and bring a missing courier home. Begin at an embassy reception, trace the courier through a service annex, then confront a divided retrieval team at Warehouse Nine.</p><p><strong>Includes:</strong> 3 staged scenes, 9 actors (4 pregens and 5 NPCs), 2 journals with 3 pages, and a GM mission-setup macro. Included with the Spycraft 2.0 system for Foundry 14.</p><p>After import, open <strong>Glass Wake — GM Run Sheet (Private)</strong> and its <strong>Start Here — Import and Mission Setup</strong> page. Run the included macro to prepare the mission in a world with no existing mission record. It asks first and leaves action dice, XP, time and the active scene unchanged.</p><p>Importing the adventure does not activate a scene or replace your current mission. Reimporting may overwrite previously imported adventure documents after Foundry confirmation.</p>",
+  "actors": [
+    {
+      "_id": "b5e5370b8c6019cc",
+      "key": "luc",
+      "pack": "sample-agents",
+      "source": "luc-moreau",
+      "name": "Luc Moreau — Faceman 1 (Social infiltrator)"
+    },
+    {
+      "_id": "aa77dc4ae4f90d10",
+      "key": "jun",
+      "pack": "sample-agents",
+      "source": "jun-park",
+      "name": "Jun Park — Hacker 1 (Network intrusion specialist)"
+    },
+    {
+      "_id": "8cc8ed83d697cd42",
+      "key": "mara",
+      "pack": "sample-agents",
+      "source": "mara-voss",
+      "name": "Mara Voss — Intruder 1 (Covert entry specialist)"
+    },
+    {
+      "_id": "240bf1586c7cb8af",
+      "key": "luka",
+      "pack": "sample-agents",
+      "source": "luka-petrov",
+      "name": "Luka Petrov — Soldier 1 (Close protection)"
+    },
+    {
+      "_id": "f761cba53c51ce5c",
+      "key": "leila",
+      "pack": "sample-npcs",
+      "source": "leila-sayegh",
+      "name": "Leila Sayegh — Signal Keeper"
+    },
+    {
+      "_id": "8711358535699de6",
+      "key": "milo",
+      "pack": "sample-npcs",
+      "source": "milo-vale",
+      "name": "Milo Vale — Retrieval Leader"
+    },
+    {
+      "_id": "52ea5ca9ea87bb3c",
+      "key": "watch",
+      "pack": "sample-npcs",
+      "source": "meridian-guard",
+      "name": "Meridian Watch — Dock Security",
+      "biography": "<p>Glass Meridian dock security. Checks authorization, guards alarm points, prefers detention, and surrenders if abandoned by its supervisor.</p>"
+    },
+    {
+      "_id": "801ef89b1e2c5ee8",
+      "key": "ada",
+      "pack": "sample-npcs",
+      "source": "meridian-driver",
+      "name": "Ada Quinn — Agency Extraction Driver",
+      "biography": "<p>Agency extraction driver, call sign Switchback. Waits at the chosen loading door, keeps the sedan ready, and asks for a headcount before moving.</p>"
+    },
+    {
+      "_id": "85206f7dc57213f3",
+      "key": "niko",
+      "name": "Niko Serrin — Missing Courier",
+      "biography": "<p>A frightened courier in a mustard raincoat. Wants safe passage and privacy for a threatened sibling. Saw Milo carry the ledger to Warehouse Nine. He is unarmed and will cooperate with a credible promise of protection.</p>"
+    }
+  ],
+  "scenes": [
+    {
+      "_id": "a7cf8b3630930c39",
+      "source": "embassy-reception",
+      "name": "01 — Embassy Reception: Find the Contact",
+      "tokens": [
+        {
+          "_id": "7Vy7YmLkHXLYT7X9",
+          "actor": "leila",
+          "name": "Leila Sayegh — Signal Keeper",
+          "x": 1024,
+          "y": 640
+        },
+        {
+          "_id": "MR3GHWtfrvYqt0AU",
+          "actor": "jun",
+          "name": "Jun Park — Hacker 1 (Network intrusion specialist)",
+          "x": 576,
+          "y": 832
+        },
+        {
+          "_id": "UDCfe0yZCzLFjE9q",
+          "actor": "luc",
+          "name": "Luc Moreau — Faceman 1 (Social infiltrator)",
+          "x": 640,
+          "y": 832
+        },
+        {
+          "_id": "tlSIjE3sqBD6GLGa",
+          "actor": "luka",
+          "name": "Luka Petrov — Soldier 1 (Close protection)",
+          "x": 832,
+          "y": 832
+        },
+        {
+          "_id": "P5E8bRKxok3FOvc8",
+          "actor": "mara",
+          "name": "Mara Voss — Intruder 1 (Covert entry specialist)",
+          "x": 896,
+          "y": 832
+        }
+      ]
+    },
+    {
+      "_id": "54fd38fb246121f4",
+      "source": "night-infiltration",
+      "name": "02 — Service Annex: Trace the Courier",
+      "tokens": [
+        {
+          "_id": "Rj68EBZvLCusho20",
+          "actor": "niko",
+          "name": "Niko Serrin — Missing Courier",
+          "x": 192,
+          "y": 576
+        },
+        {
+          "_id": "BGEPTEkdYvOkosx0",
+          "actor": "watch",
+          "name": "Meridian Watch 1",
+          "x": 576,
+          "y": 704
+        },
+        {
+          "_id": "GFpK3PmfxvCKN3BY",
+          "actor": "watch",
+          "name": "Meridian Watch 2",
+          "x": 1024,
+          "y": 320
+        },
+        {
+          "_id": "pNHaPNBPzpB5MNqg",
+          "actor": "watch",
+          "name": "Meridian Watch 3",
+          "x": 384,
+          "y": 192
+        },
+        {
+          "_id": "Ah5BaAYCliwrsPif",
+          "actor": "watch",
+          "name": "Meridian Watch 4",
+          "x": 960,
+          "y": 768
+        }
+      ]
+    },
+    {
+      "_id": "b996f7931629d99a",
+      "source": "warehouse-breach",
+      "name": "03 — Warehouse Nine: Glass Wake",
+      "tokens": [
+        {
+          "_id": "hlDTy2ju9SEcrEEI",
+          "actor": "milo",
+          "name": "Milo Vale — Retrieval Leader",
+          "x": 1216,
+          "y": 320
+        },
+        {
+          "_id": "0P8GZ5xHJe36ru4K",
+          "actor": "ada",
+          "name": "Ada Quinn — Agency Extraction Driver",
+          "x": 448,
+          "y": 896
+        },
+        {
+          "_id": "Ppu6uXX5hWGn2Z9Z",
+          "actor": "watch",
+          "name": "Meridian Watch 1",
+          "x": 512,
+          "y": 512
+        },
+        {
+          "_id": "BnWiFqwQU3PMMWtv",
+          "actor": "watch",
+          "name": "Meridian Watch 2",
+          "x": 832,
+          "y": 256
+        },
+        {
+          "_id": "c4rsHDO3y4UyJNMs",
+          "actor": "watch",
+          "name": "Meridian Watch 3",
+          "x": 832,
+          "y": 704
+        },
+        {
+          "_id": "gJC4bsJBdWO7TL9z",
+          "actor": "watch",
+          "name": "Meridian Watch 4",
+          "x": 192,
+          "y": 512
+        }
+      ]
+    }
+  ],
+  "journals": [
+    {
+      "_id": "e1db80d320c386fb",
+      "name": "Glass Wake — GM Run Sheet (Private)",
+      "ownership": {
+        "default": 0
+      },
+      "pages": [
+        {
+          "_id": "Po1VQjm1DLoIhO9A",
+          "name": "Start Here — Import and Mission Setup",
+          "sort": 0,
+          "content": "<h2>Import and prepare</h2><p>This adventure includes three staged encounters, nine actors, these journals, and a GM mission-setup macro. It contains no rehearsal damage or chat history. Its IDs differ from the original test world and system starter cast.</p><ol><li>Open Compendium Packs → Spycraft 2.0 → Operation Glass Wake and import the adventure. No add-on module is required.</li><li>Run @UUID[Macro.29996bc68e9d1e5a]{Glass Wake — Configure Mission}. It creates the mission only when the world has no existing mission record; it asks first and never replaces an existing record.</li><li>Review GC Console, then Start mission. Initialize the GC pool with four players and Caliber II: eight dice. Imported PCs each begin with three action dice. Apply starting-dice adjustments once as appropriate.</li><li>Assign player ownership to the four imported agents. The Player Briefing has Observer access; the GM journal remains private.</li><li>Activate the reception map when ready. All three imported maps begin inactive so importing does not move current players.</li></ol><h2>Encounters</h2><ul><li>@UUID[Scene.a7cf8b3630930c39]{01 — Embassy Reception: Find the Contact}</li><li>@UUID[Scene.54fd38fb246121f4]{02 — Service Annex: Trace the Courier}</li><li>@UUID[Scene.b996f7931629d99a]{03 — Warehouse Nine: Glass Wake}</li></ul><p>The reception includes Leila and four agents. The annex includes Niko and four independent guards. The warehouse includes Milo, four guards and Ada. Move agents into later scenes according to their actual route.</p><h2>At the table</h2><p>Read Session 1 — Run of Play before starting. It contains motives, clue routes, pacing and an optional combat finale. Encounters are teaching starting points, not measured balance guarantees. Let players negotiate or retreat.</p><p>The adventure uses the portraits, equipment and maps bundled with this Spycraft system release. Reimporting this same adventure can replace its previously imported documents, so use Foundry’s overwrite warning deliberately if you have edited them.</p>"
+        },
+        {
+          "_id": "PyQzsJipVc9AFKLE",
+          "name": "Session 1 — Run of Play",
+          "sort": 100000,
+          "content": "<h2>Operation Glass Wake</h2><p><strong>Assumptions:</strong> Four level-1 agents, Caliber II, Threat Level 1. Plan for about three hours, including learning breaks. Use Luc (social), Jun (computers), Mara (entry), and Luka (protection). This is an original scenario using the supplied cast and maps. Encounter difficulty has not been established by a group playtest.</p><h2>Before friends arrive</h2><ol><li><p>Read the separate Player Briefing aloud. Let each player introduce one reason their agent trusts another.</p></li><li><p>Run the included Glass Wake — Configure Mission macro in a world with no existing mission record, then open GC Console. Review the team and two objectives. Start the mission to lock its Threat Level. Start the session pool for four players at Caliber II, then apply starting-dice adjustments once. Do not keep restarting resources while learning.</p></li><li><p>Check each agent’s gear and ready the intended weapon. Explain action dice, the difference between vitality/wounds and standard-NPC Damage saves, and that some reminders still require a GC ruling.</p></li><li><p>Keep the game paused while discussing sheets. Pause after the first skill roll and first attack to read their chat cards together.</p></li><li><p>Use the three numbered Scenes in order. Use Activate when everyone should move; View is GM reconnaissance. Sample map walls and lighting are already supplied.</p></li></ol><h2>Cast and motives</h2><ul><li><p><strong>Leila Sayegh — Signal Keeper:</strong> Reception contact. Wants a safe way out of Glass Meridian. Opens with “Tell me who protects the people whose names you recover.” Offers the warehouse number when agents promise protection; a good social approach also gets her access badge. Never withhold the only lead behind one roll.</p></li><li><p><strong>Niko Serrin — Missing Courier:</strong> Newly built standard civilian, unarmed, Notice +1. Hiding after seeing clients sold as cargo records. Wants to keep a sibling’s identity private. He witnessed Milo carrying the ledger. No secret betrayal. His default portrait is a placeholder; describe a tired courier with a mustard raincoat.</p></li><li><p><strong>Meridian Watch — Dock Security:</strong> Newly duplicated Security Guard minion profile, with club, vest, radio and restraints. Protects an alarm point; asks for authorization before escalating. Use independent unlinked tokens from this one type. They prefer detention to killing and give up when their supervisor abandons them.</p></li><li><p><strong>Milo Vale — Retrieval Leader:</strong> Supplied special NPC. Wants to sell the ledger to a rival buyer. Bargains for safe passage and flees rather than fighting to the death. Keep his weapon stowed during the conversation.</p></li><li><p><strong>Ada Quinn — Agency Extraction Driver:</strong> Newly duplicated Driver profile and its sedan. Ally waiting at the loading entrance. Says “Tell me which door; I will handle the road.” One shared vehicle, not one per token.</p></li><li><p><strong>Anton Rusk:</strong> Reserve supplied security chief. Use as a voice on the radio if needed, not an automatic extra combatant. Vera Kestrel remains the campaign’s distant broker.</p></li></ul><h2>01 Embassy Reception — 35 minutes</h2><p><strong>Frame:</strong> A trade reception is noisy enough for a private conversation. Leila is near the quieter side of the room. The agents have legitimate guest cover.</p><p><strong>Goal:</strong> Find Leila and learn where Niko disappeared. Ask each player how they contribute: mingle, watch the staff, examine schedules, or cover an exit. For optional pressure use a relevant check from the character sheet; set and explain circumstances before rolling. This scene is a conversation first, not a required Dramatic Conflict.</p><p><strong>Clues:</strong> Leila identifies Warehouse Nine; a staff delivery docket independently names the same destination; an outgoing driver can confirm the route. Success gains a service badge and an accurate patrol time. A failure attracts a suspicious usher or costs cover credibility, while the warehouse lead remains available. No combat is planned.</p><h2>02 Service Annex — 40 minutes</h2><p><strong>Frame:</strong> The service yard is lit in pools. Niko is concealed near an outer loading bay. Four watchkeepers share one radio procedure and cover the approaches.</p><p><strong>Goal:</strong> Reach Niko, learn who has the ledger, and choose an approach to Warehouse Nine. Offer badge-and-bluff, quiet entry, or a visible distraction. Use the map walls and doors as obstacles. Let Jun work the access terminal, Mara explore a quiet route, Luc talk to a watchkeeper, and Luka protect Niko.</p><p><strong>Outcomes:</strong> A clean approach finds Niko and the warehouse’s side entrance. A noisy approach finds Niko but gives Milo warning. If a check fails, offer an exposed route or a choice to spend time; do not erase the clue. If a fight starts, make the guards seek surrender with clubs and withdraw if isolated. Do not silently add reinforcements.</p><h2>03 Warehouse Nine — 55 minutes</h2><p><strong>Frame:</strong> Milo has the ledger in a portable case; Niko can recognize it. Ada waits outside the loading entrance. Four Meridian Watch tokens cover the floor. Start with dialogue and visible exits.</p><p><strong>Goal:</strong> Recover an intact ledger or verified readable copy, then escort Niko to Ada. Bargain, distract and copy, steal during a handover, or fight. Milo accepts a convincing exit bargain; Leila’s badge can open a side route. If the ledger leaves with Milo, an agency follow-up can recover its vehicle trail next session.</p><p><strong>Dramatic finale:</strong> This is the mission’s one scripted dramatic scene. Use GC Console’s scene control when entering it; do not assume activating a map does that automatically. Describe a departing truck as pressure, but use no hard timer during this teaching session.</p><p><strong>If combat happens:</strong> Add only participants who actually join. Roll NPC initiative by type. Read the standard guard’s Damage-save line rather than subtracting PC-style hit points. Use the weapon attack and damage cards, confirm targets, and resolve conditions explicitly. Milo is a special NPC and uses vitality/wounds. His goal is escape; guards surrender when he abandons them. Stop and revise opposition if the opening exchange overwhelms the group; these numbers are a starting setup, not a verified balanced encounter.</p><h2>Debrief — 15 minutes</h2><p>Ask what felt clear and what needed a lookup. Mark objectives complete only when achieved. The guard type and Milo are already planned mission antagonists when using the setup macro; mark faced only if encountered. Repeated guards count as one type. Count scenes actually played. Review Planned XP and XP report before settlement; avoid granting awards while merely rehearsing. Leave the critical recovery objective pending if the ledger escaped.</p><h2>Quick rules reminders</h2><p>GC Console has mission XP, scene resources, combat tools, Dramatic Conflicts and reference tables. Its objective samples help choose grades. The NPC sheet separates play view from graded editing. Listed skill bonuses and result caps are shown. Package preview changes feats/equipment separately from Threat Level. Equipment allowances do not create inventory automatically. For an unsure rule, use the printed reference, agree a provisional ruling aloud, and record it for review after the session.</p><h2>GM truth and follow-up</h2><p>The ledger links Glass Meridian to an identity laundering client called North Lantern. Leila kept a backup key but lacks the full ledger. Niko’s sibling is a threatened witness, not a secret villain. Next session can protect that witness or follow the buyer; the first session ends on the players’ chosen lead.</p>"
+        }
+      ]
+    },
+    {
+      "_id": "1d527c3ae6f340da",
+      "name": "Glass Wake — Player Briefing",
+      "ownership": {
+        "default": 2
+      },
+      "pages": [
+        {
+          "_id": "lVLqvhUP9bSY6xOE",
+          "name": "Agency Briefing — Read Before Play",
+          "sort": 100000,
+          "content": "<h2>Operation Glass Wake</h2><p>Glass Meridian calls itself a shipping consultancy. Our missing courier, Niko Serrin, claims its private ledger connects missing people with diverted cargo. He has stopped answering.</p><p><strong>Your assignment:</strong> Recover the ledger or a readable, verified copy. Bring Niko home alive if you can. Avoid putting reception guests and dock workers in danger.</p><p><strong>Your opening:</strong> You have guest cover at tonight’s trade reception. Leila Sayegh manages signals and access for Glass Meridian. Ask her, “Does the morning tide still run east?” She should answer, “Only for those who know the harbor.” The exchange identifies the contact; it is not a test of memorization.</p><p><strong>Your support:</strong> Ada Quinn waits with a sedan once you choose the extraction door. She needs a location, a headcount, and a clear approach. Her call sign is Switchback.</p><h2>Choose an approach</h2><p>Luc can lead the conversation; Jun can examine systems; Mara can find a quiet entrance; Luka can cover the team. These are suggestions. Everyone can propose a plan, assist a friend, ask what their agent knows, or retreat and regroup.</p><h2>Learning together</h2><p>Say what you want to achieve before looking for a roll. Ask the GC which skill, opposition, and circumstances apply. Read your roll card before clicking follow-up buttons. When the rules are unclear, pause and agree a ruling together. Combat is one possible route, not an instruction to attack the first guard.</p>"
+        }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "_id": "82a9ec6ffc2ac559",
+      "name": "Glass Wake — Agents",
+      "type": "Actor",
+      "folder": null,
+      "sorting": "a",
+      "color": "#24515a",
+      "sort": 0,
+      "flags": {}
+    },
+    {
+      "_id": "c5e1f1e0863a87f8",
+      "name": "Glass Wake — NPCs",
+      "type": "Actor",
+      "folder": null,
+      "sorting": "a",
+      "color": "#24515a",
+      "sort": 0,
+      "flags": {}
+    },
+    {
+      "_id": "f84b3e1c5179bb43",
+      "name": "Glass Wake — Encounters",
+      "type": "Scene",
+      "folder": null,
+      "sorting": "a",
+      "color": "#24515a",
+      "sort": 0,
+      "flags": {}
+    },
+    {
+      "_id": "cd21c39592eabebe",
+      "name": "Glass Wake — Briefing and GM Notes",
+      "type": "JournalEntry",
+      "folder": null,
+      "sorting": "a",
+      "color": "#24515a",
+      "sort": 0,
+      "flags": {}
+    },
+    {
+      "_id": "e4dce946252b8e60",
+      "name": "Glass Wake — Mission Setup",
+      "type": "Macro",
+      "folder": null,
+      "sorting": "a",
+      "color": "#24515a",
+      "sort": 0,
+      "flags": {}
+    }
+  ],
+  "macro": {
+    "_id": "29996bc68e9d1e5a",
+    "name": "Glass Wake — Configure Mission"
+  },
+  "mission": {
+    "version": 1,
+    "name": "Operation Glass Wake — Session 1",
+    "active": false,
+    "caliber": 2,
+    "threatAdjust": 0,
+    "threatOverride": null,
+    "threatLevel": 1,
+    "team": [
+      "b5e5370b8c6019cc",
+      "aa77dc4ae4f90d10",
+      "8cc8ed83d697cd42",
+      "240bf1586c7cb8af"
+    ],
+    "objectives": [
+      {
+        "id": "RD5PcxPI9Z2u4BYQ",
+        "name": "Recover the original ledger or a verified readable copy and deliver it to the agency",
+        "grade": 2,
+        "critical": true,
+        "complete": false,
+        "scenes": 1
+      },
+      {
+        "id": "D3VvFG5mGG9BVgwS",
+        "name": "Escort courier Niko Serrin alive to the extraction vehicle",
+        "grade": 1,
+        "critical": false,
+        "complete": false,
+        "scenes": 1
+      }
+    ],
+    "antagonists": [
+      {
+        "id": "BC45lnAmcy2bcaNA",
+        "uuid": "Actor.52ea5ca9ea87bb3c",
+        "typeKey": "Actor.52ea5ca9ea87bb3c",
+        "name": "Meridian Watch — Dock Security",
+        "xp": 49,
+        "type": "standard",
+        "full": false,
+        "scenes": 1,
+        "encountered": false
+      },
+      {
+        "id": "pXSEERyZvFZPMXi2",
+        "uuid": "Actor.8711358535699de6",
+        "typeKey": "Actor.8711358535699de6",
+        "name": "Milo Vale — Retrieval Leader",
+        "xp": 101,
+        "type": "special",
+        "full": false,
+        "scenes": 1,
+        "encountered": false
+      }
+    ],
+    "dramaticScenes": 1,
+    "security": [],
+    "gearRestrictions": [],
+    "exposure": [],
+    "bundle": [],
+    "bundleCommonItems": 0,
+    "timeLimit": false,
+    "qualities": [],
+    "otherComplications": [],
+    "infractions": [],
+    "scenesPlayed": 0,
+    "notes": "Operation Glass Wake. Four level-1 pregens, TL 1, Caliber II. Review the GM journal before starting. One scripted dramatic finale; no hard time limit."
+  }
+}

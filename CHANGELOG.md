@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added **Operation Glass Wake** as a built-in Adventure compendium: three staged encounters, four level-1 pregens, five NPCs, GM notes, player briefing and an opt-in mission-setup macro. Its agents, NPCs and maps are assembled from the current system catalogs. Import does not activate a scene or replace an existing mission record.
+
 - Added contextual tooltips across system sheets, dialogs, chat actions and Game Control, including fields, buttons, tabs and expandable sections. Existing authored help is preserved.
 
 Not yet tried in a running Foundry world; see "Clock, timers and the GC relay" in `docs/remaining-work.md`.

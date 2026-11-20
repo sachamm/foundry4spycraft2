@@ -1,5 +1,6 @@
 import { buildSampleNpcs } from "./sample-npcs.mjs";
 import { buildSampleAgents } from "./sample-agents.mjs";
+import { buildGlassWake } from "./glass-wake.mjs";
 /**
  * Turns src/data/*.json into compendium documents and the generated rules modules, in memory.
  * tools/build-packs.mjs writes the result to disk; the engine fixture check reads the documents directly.
@@ -1014,5 +1015,6 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
       null,
       2
     )};\n`;
+  packs["glass-wake"] = buildGlassWake(read("glass-wake.json"), packs, { stats });
   return { packs, generated, system };
 }

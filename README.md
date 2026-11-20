@@ -9,6 +9,8 @@ An unofficial game system for [Foundry Virtual Tabletop](https://foundryvtt.com)
 
 The **Sample Level-1 Agents** compendium contains 16 fully built agents covering all 12 base classes, including four alternate builds. Each has completed creation choices, an example Caliber-II mission loadout, background, contacts, portrait and matching token. All 16 are copied into the Sample PCs Actor folder on the first GM launch; Tomas also receives his linked animal partner, Bracken. Additional copies can be imported from the compendium. See [the roster and build assumptions](docs/sample-agents.md) and [art gallery](assets/agents/catalog.html).
 
+The built-in **Operation Glass Wake** Adventure compendium prepares a first session for four level-1 agents: three staged encounters, four pregens, five NPCs, private GM notes, a player briefing and a mission-setup macro. Open **Compendium Packs → Spycraft 2.0 → Operation Glass Wake**, open the adventure and choose **Import Adventure**. Then read **Start Here — Import and Mission Setup** in the imported GM journal. The macro asks before preparing an inactive TL 1 / Caliber II mission and refuses to replace an existing mission record; review and start it through GC Console, then initialize session resources. Import is optional and leaves the active scene unchanged. Reimporting can replace this adventure's previously imported documents after Foundry's overwrite prompt. No separate add-on module is needed.
+
 ## Development setup
 
 Foundry loads systems from `{userData}/Data/systems/<id>`. Run this from the repository root to symlink this checkout there so edits show up after a reload:

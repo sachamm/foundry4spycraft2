@@ -294,6 +294,18 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {}
+    },
+    {
+      "name": "glass-wake",
+      "label": "Operation Glass Wake",
+      "path": "packs/glass-wake",
+      "type": "Adventure",
+      "system": "spycraft2",
+      "ownership": {
+        "PLAYER": "NONE",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "grid": {
@@ -328,7 +340,8 @@
         "soundtrack",
         "core-npcs",
         "sample-npcs",
-        "sample-agents"
+        "sample-agents",
+        "glass-wake"
       ]
     }
   ]

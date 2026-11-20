@@ -73,7 +73,7 @@ system.packs = Object.entries(packs).map(([name, pack]) => ({
   type: pack.type ?? "Item",
   system: "spycraft2",
   ownership:
-    name !== "sample-agents" && ["RollTable", "Actor"].includes(pack.type)
+    name !== "sample-agents" && ["RollTable", "Actor", "Adventure"].includes(pack.type)
       ? { PLAYER: "NONE", ASSISTANT: "OWNER" }
       : { PLAYER: "OBSERVER", ASSISTANT: "OWNER" },
   flags: {}

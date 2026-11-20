@@ -63,7 +63,17 @@ for (const [roleId, role] of Object.entries(packageData.roles)) {
     });
 }
 const samplePack = built.packs["sample-agents"];
-const sampleActors = [...samplePack.docs, ...samplePack.companions, ...built.packs["sample-npcs"].docs];
+const adventureActors = built.packs["glass-wake"].docs[0].actors.map(({ items, ...actor }) => ({
+  ...actor,
+  items: items.map(item => item._id),
+  embedded: { items }
+}));
+const sampleActors = [
+  ...samplePack.docs,
+  ...samplePack.companions,
+  ...built.packs["sample-npcs"].docs,
+  ...adventureActors
+];
 for (const doc of [...npcTemplates, ...sampleActors]) {
   for (const [kind, type, data, label] of [
     ["Actor", doc.type, doc.system, doc.name],

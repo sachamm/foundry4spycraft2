@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node tools/build-packs.mjs",
     "test": "npm run validate && node tools/check-engine-fixtures.mjs && node --test \"tools/test-*.mjs\"",
-    "test:packs": "node --test tools/check-built-packs.mjs tools/test-sample-scenes.mjs tools/check-npc-library-pack.mjs tools/check-sample-agents-pack.mjs",
+    "test:packs": "node --test tools/check-built-packs.mjs tools/test-sample-scenes.mjs tools/check-npc-library-pack.mjs tools/check-sample-agents-pack.mjs tools/check-glass-wake-pack.mjs",
     "test:layout": "playwright test --config tools/playwright.config.mjs",
     "validate": "node tools/validate-data.mjs",
     "lint": "eslint .",
