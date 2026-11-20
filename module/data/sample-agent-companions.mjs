@@ -166,7 +166,7 @@ export const SAMPLE_COMPANIONS = [
         "_stats": {
           "coreVersion": "14.370",
           "systemId": "spycraft2",
-          "systemVersion": "0.5.2"
+          "systemVersion": "0.6.0"
         }
       },
       {
@@ -203,7 +203,7 @@ export const SAMPLE_COMPANIONS = [
         "_stats": {
           "coreVersion": "14.370",
           "systemId": "spycraft2",
-          "systemVersion": "0.5.2"
+          "systemVersion": "0.6.0"
         }
       }
     ],
@@ -226,7 +226,7 @@ export const SAMPLE_COMPANIONS = [
     "_stats": {
       "coreVersion": "14.370",
       "systemId": "spycraft2",
-      "systemVersion": "0.5.2"
+      "systemVersion": "0.6.0"
     }
   }
 ];
