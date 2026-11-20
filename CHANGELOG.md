@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 — 2026-11-20
 
 - **Fixes from the live play review.**
   - Agent tokens now have vision, so players no longer get a black map on scenes that use token vision. New agents,
