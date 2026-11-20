@@ -159,6 +159,8 @@ class Bonuses {
   }
 }
 
+const LEVEL_ZERO_VITALITY = 6;
+
 /**
  * @param {object} sys     agent system data (mutated)
  * @param {object[]} items { id, name, type, system } for every embedded item
@@ -1227,6 +1229,17 @@ export function computeAgent(sys, items, cfg, options = {}) {
       0) + B.get("appearance");
   sys.readiedMeleeWeapons = readiedMeleeWeapons(sys, items);
   sys.guardWeapons = readiedGuardWeapons(sys, items);
+  // Whatever's Handy also helps Defense while an improvised weapon is in hand (module/rules/defense.mjs).
+  sys.readiedImprovised = items.some(
+    i =>
+      i.type === "weapon" &&
+      i.system.improvised === true &&
+      i.system.equipped === true &&
+      i.system.carried !== false &&
+      i.system.destroyed !== true &&
+      i.system.reserve !== true &&
+      (i.system.quantity ?? 1) > 0
+  );
   sys.disarmWeapons = readiedDisarmWeapons(sys, items);
   sys.knifeBasics = knifeBasicsPlan(sys, items);
   sys.swordBasics = swordBasicsPlan(sys, items);
@@ -1475,6 +1488,8 @@ export function computeAgent(sys, items, cfg, options = {}) {
     vitalityBreakdown.minimumAdjustment += Math.max(0, 1 - roll - abil.con.mod);
     vit += Math.max(1, roll + abil.con.mod);
   });
+  // A Career Level 0 character has a flat 6 vitality, which the first class level then replaces (p.27).
+  if (!progression.length) vit = LEVEL_ZERO_VITALITY;
   if (vitMissing.length)
     todo.push({ order: 15, tab: "classes", text: loc`Vitality not rolled for level ${vitMissing.join(", ")}.` });
   sys.vitalityBreakdown = vitalityBreakdown;

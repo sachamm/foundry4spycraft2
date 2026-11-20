@@ -1,3 +1,4 @@
+import { classAbilityUseSpecs } from "./class-ability-uses.mjs";
 import { jinxUseSpec } from "./jinx.mjs";
 import { markSource } from "./mark.mjs";
 import { oneHandManeuverSource } from "./maneuver-actions.mjs";
@@ -479,6 +480,7 @@ export function limitedUseAbilities(system, items, cfg) {
     });
   const adjustment = manualAdjustmentSource(system);
   if (adjustment) out.push(adjustment);
+  out.push(...classAbilityUseSpecs(system));
   if ((system.classLevels?.stuntman ?? 0) >= 8)
     add({
       id: "iKnowWhatDoing",

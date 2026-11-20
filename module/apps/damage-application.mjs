@@ -42,6 +42,8 @@ import { rollCriticalInjury } from "./critical-injuries.mjs";
 import { blastCaught } from "./map.mjs";
 import { rollObjectDamageSave } from "./vehicle-play.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
+import { gunplayCountGain, juggernautConversion } from "../rules/class-combat.mjs";
+import { shiftCount } from "./dueling.mjs";
 import { askGC, gcAvailable, markCard, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 
@@ -156,6 +158,14 @@ export async function resolveAttack(message, options = {}) {
     );
     return ui.notifications.warn(error.message);
   }
+  // Gunplay: each handgun hit moves the triggerman up the order, once per attack card.
+  const gunplay = gunplayCountGain(attacker.system, check.weaponProficiency, outcome.hits);
+  if (gunplay && !check.gunplayCount)
+    try {
+      await shiftCount(message, attacker, gunplay, "gunplayCount", loc`Gunplay`);
+    } catch {
+      /* not in a started combat with a rolled Count: nothing to move */
+    }
   // A successful attack ends its target's flat-footedness (p.342).
   if (outcome.hit && target?.isOwner && target.statuses?.has("flat-footed"))
     try {
@@ -216,6 +226,8 @@ export const nonLethalTotals = actor => ({
 });
 /** Damage types with rules of their own that an agent's hazards track; fire is kept with the other hazards. */
 const TYPED = [...Object.keys(DAMAGE_TYPES), "fire"];
+/** Types a special NPC can take through the same saves: nothing is kept on the character between rounds. */
+const NPC_TYPED = ["bang", "flash", "explosive"];
 const typeLabel = type => (type === "fire" ? loc`Fire` : (DAMAGE_TYPE_LABELS[type] ?? type));
 
 /**
@@ -478,7 +490,7 @@ export async function applyDamage(message, options = {}) {
         choices.actors.filter(actor => actor.isOwner || gcAvailable()),
         selected,
         actor => (actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)
-      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label><p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent.`}</p></div>`
+      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label>${choices.actors.some(actor => juggernautConversion(actor.system, 2) > 0) ? `<label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half of what gets past damage reduction)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label>` : ""}<p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent, and bang, flash and explosive damage for a special NPC.`}</p></div>`
     });
     if (!input) return null;
     input = { ...input, reviewType: true };
@@ -522,8 +534,9 @@ export async function applyDamage(message, options = {}) {
         critical,
         fire: type === "fire" || profile.type === "fire"
       });
-    } else if (type && target.type === "agent") {
-      // A special damage type has its own saves and effects, kept with the agent's other hazards.
+    } else if (type && (target.type === "agent" || (isSpecial(target) && NPC_TYPED.includes(type)))) {
+      // A special damage type has its own saves and effects, kept with the agent's other hazards. A special NPC
+      // takes the types that are settled by a save alone; the ones that keep a running total stay with the GC.
       const reduction = armorPiercingAll ? 0 : Math.max(0, hit.dr - armorPiercing);
       result =
         type === "fire"
@@ -533,7 +546,8 @@ export async function applyDamage(message, options = {}) {
               amount: damage,
               reduction,
               source: weapon?.name ?? "",
-              review: input.reviewType === true
+              review: input.reviewType === true,
+              allowed: target.type === "agent" ? undefined : NPC_TYPED
             });
       if (!result) return null;
     } else if (!isSpecial(target)) {
@@ -553,7 +567,31 @@ export async function applyDamage(message, options = {}) {
         if (!result) return null;
       }
     } else if (kind === "lethal") {
+      // Juggernaut: the brawler may take up to half of the hit as subdual damage instead.
+      const converted = Math.min(
+        Math.max(0, Math.trunc(Number(input.juggernaut) || 0)),
+        // Only what gets past damage reduction can be converted.
+        juggernautConversion(
+          target.system,
+          armorPiercingAll ? damage : Math.max(0, damage - Math.max(0, (hit.dr ?? 0) - armorPiercing))
+        )
+      );
+      if (converted) hit.damage = damage - converted;
       ({ plan: result, lines, pendingSave } = await lethalOnSpecial(target, hit, source));
+      if (converted) {
+        // The converted points are already past damage reduction, so it is not taken off again.
+        const subdual = await nonLethalDamage(target, "subdual", converted, {
+          source,
+          attackKind,
+          armorPiercing,
+          armorPiercingAll: true
+        });
+        lines.push(
+          loc`Juggernaut: ${converted} of the ${damage} lethal damage is taken as subdual damage.`,
+          ...subdual.lines
+        );
+        pendingSave ??= subdual.pendingSave;
+      }
       if (type)
         lines.push(loc`${typeLabel(type)} damage: its other effects on ${esc(target.name)} are worked out by hand.`);
     } else if (damage > 0) {

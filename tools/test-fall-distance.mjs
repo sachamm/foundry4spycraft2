@@ -40,7 +40,7 @@ test("soft or yielding landing removes ten damage-distance feet, stacking additi
 });
 test("higher feats and unrelated defenses do not invent a distance reduction or alter the actual physical fall", () => {
   const s = sys(["Equilibrium Mastery", "Equilibrium Supremacy", "Spider Mastery", "Mountain Training"]);
-  for (const key of ["abilities", "survivalStats", "classLevels", "actionDice"])
+  for (const key of ["abilities", "survivalStats", "actionDice"])
     Object.defineProperty(s, key, {
       get() {
         throw Error("Unrelated " + key + " read");

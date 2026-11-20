@@ -2,7 +2,8 @@
  * Round reminders: what a combat tracker step should prompt for.
  *
  * A dying character rolls to stabilize at the end of each round (p.331) and a burning character takes the fire's
- * damage when its turn begins (p.337). Both rolls already exist as buttons on the sheet; this works out which
+ * damage when its turn begins (p.337). A tactician's Stratagem moves the tactician and teammates up the order at
+ * the start of each round. Both rolls already exist as buttons on the sheet; this works out which
  * characters need them when the tracker moves, so the GC's client can post a card with the button.
  * Pure rules; module/apps/round-reminders.mjs posts the cards.
  */
@@ -10,12 +11,18 @@ import { woundState } from "./damage-application.mjs";
 
 /**
  * @param {object} step
- * @param {object[]} step.combatants  [{ actorUuid, name, special, wounds, burning, defeated }]
- * @param {boolean} step.roundEnded   the tracker moved forward into a new round
+ * @param {object[]} step.combatants  [{ actorUuid, name, special, wounds, burning, stratagem, defeated }]
+ * @param {boolean} step.roundEnded   the tracker moved forward out of a round that was played
+ * @param {boolean} step.roundStarted a round has just begun, the first one included (defaults to roundEnded)
  * @param {string|null} step.turnActorUuid  the actor whose turn has just begun, if the turn moved forward
- * @returns {{kind: "dying"|"burning", actorUuid: string, name: string}[]} one entry per character and kind
+ * @returns {{kind: "dying"|"burning"|"stratagem", actorUuid: string, name: string}[]} one entry per character and kind
  */
-export function roundReminders({ combatants = [], roundEnded = false, turnActorUuid = null } = {}) {
+export function roundReminders({
+  combatants = [],
+  roundEnded = false,
+  roundStarted = roundEnded,
+  turnActorUuid = null
+} = {}) {
   const out = [],
     seen = new Set();
   const add = (kind, combatant) => {
@@ -27,6 +34,7 @@ export function roundReminders({ combatants = [], roundEnded = false, turnActorU
   for (const combatant of combatants) {
     if (!combatant?.actorUuid || combatant.defeated) continue;
     if (roundEnded && combatant.special && woundState(Number(combatant.wounds)) === "dying") add("dying", combatant);
+    if (roundStarted && combatant.stratagem > 0) add("stratagem", combatant);
     if (turnActorUuid && combatant.actorUuid === turnActorUuid && combatant.burning) add("burning", combatant);
   }
   return out;
