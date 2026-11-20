@@ -40,7 +40,8 @@
    "Dossier": "Dossier"
   },
   "Rail": {
-   "Done": "Done"
+   "Done": "Done",
+   "LevelUp": "Level up"
   },
   "Track": {
    "Title": "Character creation steps",
@@ -59,7 +60,8 @@
   },
   "Round": {
    "Title": "This round",
-   "Half": "Half action"
+   "Half": "Half action",
+   "Hint": "Each turn holds two half actions or one full action. A Standard Attack takes a half action."
   },
   "Pins": {
    "Title": "Pinned tools",
@@ -389,7 +391,7 @@
     "ReviewPastUses": "Review past uses",
     "AskTheGCToReviewOn": "Ask the GC to review on Classes.",
     "LimitedUseAbilities": "Limited-use abilities",
-    "SceneSessionAndMissionUsesReset": "Scene, session and mission uses reset when the GC starts that period. Starting a session also replaces remaining ordinary action dice with the current starting pool. Initialize the GC pool separately for the players present and mission Caliber. Round uses follow the active combat round.",
+    "SceneSessionAndMissionUsesReset": "Scene, session and mission uses reset when the GC starts that period (Begin session and Next scene in the GC Console). Starting a session also replaces remaining ordinary action dice with the current starting pool. Round uses follow the active combat round.",
     "Per": "per",
     "ActionDie": "action die",
     "SavedUseCountNeedsGCReview": "Saved use count needs GC review",
@@ -450,7 +452,8 @@
     "PhDSkillClassLevel6": "Ph.D. skill (class level 6+)",
     "FieldOfExpertiseBenefitsOnlyThe": "Field of Expertise benefits only the selected key focus and related Profession focus. Enter the relevant focus when resolving a check.",
     "PhDClassLevel": "Ph.D. (class level",
-    "EachChosenSkillHasAMaximum": "Each chosen skill has a maximum rank of career level +8. Relevant Knowledge checks gain half its ranks as a synergy bonus; apply that bonus only when the topic relates to the skill."
+    "EachChosenSkillHasAMaximum": "Each chosen skill has a maximum rank of career level +8. Relevant Knowledge checks gain half its ranks as a synergy bonus; apply that bonus only when the topic relates to the skill.",
+    "AddLevelInClass": "+1 level"
    },
    "ActorAgentFeats": {
     "WasAlsoGrantedByAClass": "was also granted by a class:",
@@ -1008,7 +1011,8 @@
     "Lbs": "lbs",
     "FindATool": "Find a tool",
     "ShowAllTools": "Show all tools",
-    "NoToolMatches": "No tool matches that search."
+    "NoToolMatches": "No tool matches that search.",
+    "UsesLeft": "Uses left"
    },
    "ActorAgentSkills": {
     "Includes": "Includes",
@@ -1173,7 +1177,9 @@
     "DamageSaveBonus": "Damage save bonus",
     "DoneEditing": "Done editing",
     "EditNPC": "Edit NPC",
-    "Actions": "Actions"
+    "Actions": "Actions",
+    "MoreActions": "More actions: takedown, cheap shot, Shaken",
+    "RollThisSkill": "Roll this skill now (Skill check opens the full dialog)"
    },
    "ActorVehicleSheet": {
     "Crash": "Crash",
@@ -7491,6 +7497,7 @@
    "ShowdownSelectedProficienciesStandOffWit_0osq9lh": "Showdown (selected proficiencies; Stand Off without action-die cost)",
    "Showing_04x8jjl": " · showing {0}",
    "ShownForReferenceTheCharacterSheet_0kz2drb": "Shown for reference. The character sheet holds the recorded state and ends it.",
+   "ShowsANoticeWhenTheCombat_008gok4": "Shows a notice when the combat reaches a character you control.",
    "Sickened_07ry521": "Sickened",
    "SideStanceAttack_16d2ta8": "Side Stance attack — {0}",
    "SideStanceDamage_0xuoxdx": "Side Stance damage — {0}",
@@ -8060,6 +8067,7 @@
    "TeammateGroup_0tondea": "Teammate group",
    "TeammateSurchargeFunding_075tloq": "Teammate surcharge funding",
    "Teammates_0tgt43i": "Teammates",
+   "TellMeWhenItIsMy_07okadi": "Tell me when it is my turn",
    "TemperatureSetsTheArmorPiercingValue_0seb98o": "Temperature (sets the armor-piercing value)",
    "TemporaryBasicSkillFeatCreationFailed_1q0x203": "Temporary Basic Skill feat creation failed.",
    "TemporaryBasicSkillPrerequisitesNotMet_1jf4bq9": "Temporary Basic Skill prerequisites not met: {0}.",
@@ -10235,7 +10243,8 @@
    "YourReadiedWeaponOrUnarmedGear_14lzszh": "Your readied weapon (or Unarmed Gear entry)",
    "YourReadiedWeapon_0dm9t34": "Your readied weapon",
    "YourResult_0rlfw1j": "Your result",
-   "YourStartingActionDiceLimitHow_1vf6gb3": "Your starting action dice limit how many identities you keep."
+   "YourStartingActionDiceLimitHow_1vf6gb3": "Your starting action dice limit how many identities you keep.",
+   "YourTurn_0ztqszb": "Your turn: {0}."
   }
  }
 }

@@ -72,6 +72,7 @@ import { registerErrorNotices } from "./module/error-notices.mjs";
 import * as gameClock from "./module/apps/game-clock.mjs";
 import { installGCRelay, askGC } from "./module/apps/gc-relay.mjs";
 import { registerFastPathSetting } from "./module/apps/remembered-choices.mjs";
+import { installTurnCue } from "./module/apps/turn-cue.mjs";
 
 /** Conditions this system adds to the token HUD: [id, label, icon]. Labels are read once the language is known. */
 const SYSTEM_STATUSES = [
@@ -191,6 +192,7 @@ Hooks.once("init", () => {
   installGCRelay();
   registerFastPathSetting();
   registerTableTrustSetting();
+  installTurnCue();
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();

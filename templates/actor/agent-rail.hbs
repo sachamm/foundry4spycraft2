@@ -8,6 +8,8 @@
     <div class="summary">
       <span class="level sc2-chip"><b>{{localize "SPYCRAFT.CareerLevel"}} {{system.level}}</b></span>
       <label class="edit-only">{{localize "SPYCRAFT.XP"}} <input type="number" name="system.xp" value="{{system.xp}}" class="w-xp" />{{#if xpNext}}<span class="muted"> / {{xpNext}}</span>{{/if}}</label>
+      <span class="play-only sc2-chip xp-chip">{{localize "SPYCRAFT.XP"}} {{system.xp}}{{#if xpNext}} / {{xpNext}}{{/if}}</span>
+      {{#if levelUpReady}}{{#if editable}}<button type="button" class="sc2-primary-action level-up" data-action="addLevel">{{localize "SPYCRAFT.Rail.LevelUp"}}</button>{{/if}}{{/if}}
       <span class="talent origin sc2-chip" data-sc2-display="icon" {{#if talent}}data-item-id="{{talent.id}}"{{/if}}>{{#if talent}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.talent">{{talent.name}}</a>
         <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeTalent'}}" data-tooltip="SPYCRAFT.Origin.Change"></a>
         <a class="edit-only" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveTalent'}}" data-tooltip="SPYCRAFT.Origin.Remove"></a>{{else}}<a class="edit-only" data-sc2-display="both" data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>

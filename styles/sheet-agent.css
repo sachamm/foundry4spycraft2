@@ -131,3 +131,8 @@
   content: attr(data-sc2-cost); margin-left: 6px; padding: 0 4px; font: 600 12px/1.5 var(--sc2-num); letter-spacing: 0.02em; text-transform: none;
   color: inherit; border: 1px solid currentColor; border-radius: 2px; opacity: 0.8;
 }
+/* Uses left on the Play tab: count first, then the ability, with Use where it is one click. */
+.spycraft2.sheet.agent .dashboard-uses .uses-strip { display: grid; gap: 2px; margin: 0; }
+.spycraft2.sheet.agent .dashboard-uses .uses-strip li { display: flex; align-items: center; gap: var(--sc2-space-2); }
+.spycraft2.sheet.agent .rail-id .level-up { width: 100%; margin-top: 4px; }
+.spycraft2.sheet.agent .round-tracker.sc2-your-turn { outline: 2px solid var(--sc2-action); outline-offset: 2px; }

@@ -820,6 +820,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       },
       spendActionDie: SpycraftAgentSheet.#onSpendActionDie,
       addLevel: SpycraftAgentSheet.#onAddLevel,
+      addLevelInClass: SpycraftAgentSheet.#onAddLevelInClass,
       removeLevel: SpycraftAgentSheet.#onRemoveLevel,
       browse: SpycraftAgentSheet.#onBrowse,
       itemEdit: SpycraftAgentSheet.#onItemEdit,
@@ -1215,6 +1216,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       };
     });
     context.xpNext = sys.xpNext;
+    // Enough experience for the next Career Level: the rail offers to add it.
+    context.levelUpReady = Number.isFinite(sys.xpNext) && Number(sys.xp) >= sys.xpNext && sys.level < 20;
 
     // Skills
     const lvl = Math.clamp(this._skillLevel ?? sys.level, 1, Math.max(1, sys.level));
@@ -1643,6 +1646,11 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   static #onAddLevel() {
     return new SpycraftBrowser({ actor: this.actor, itemType: "class" }).render(true);
   }
+  /** Another level in a class the character already has, without opening the class browser. */
+  static #onAddLevelInClass(event, target) {
+    const cls = this._item(target);
+    return cls?.type === "class" ? this.actor.addClassLevel(cls) : null;
+  }
   static async #onRemoveLevel() {
     const ok = await systemDialog.confirm({
       window: { title: game.i18n.localize("SPYCRAFT.Class.RemoveLevel") },
@@ -1783,8 +1791,10 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
       setNpcSkillCondition(event, target) {
         return this.actor.setReviewedCondition(target.dataset.condition);
       },
-      rollNpcSkill() {
-        return rollNpcSkill(this.actor);
+      rollNpcSkill(event, target) {
+        // A skill named on the sheet rolls at once with the usual defaults; "Skill check" opens the full dialog.
+        const key = target?.dataset?.skill;
+        return rollNpcSkill(this.actor, key ? { key, ability: "", modifier: 0, error: 1 } : null);
       },
       callQualitySave(event, target) {
         return callQualitySave(this.actor, target.dataset.id);
