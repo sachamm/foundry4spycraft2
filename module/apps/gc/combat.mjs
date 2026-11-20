@@ -176,12 +176,15 @@ const actionsOf = combatant =>
     turn: combatant.parent?.turn ?? 0
   });
 
+/** A Press this round buys one more half action. */
+const extraHalfActions = combatant => (fluid(combatant).pressed ? 1 : 0);
+
 /** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
 export async function spendTurnAction(combatant, kind) {
   if (!combatant) return null;
   const state = actionsOf(combatant);
   if (kind === "reset") return combatant.update({ "flags.spycraft2.actions": resetActions(state) });
-  const result = spendAction(state, kind);
+  const result = spendAction(state, kind, { extra: extraHalfActions(combatant) });
   if (!result.ok) {
     ui.notifications.warn(loc`${combatant.name} has ${result.left} half action(s) left this turn.`);
     return null;
@@ -364,7 +367,7 @@ export function installFluidInitiativeHooks() {
     const row = combatant && root?.querySelector?.(`[data-combatant-id="${combatant.id}"]`);
     const name = row?.querySelector?.(".token-name .name, .token-name");
     if (!name || name.querySelector(".spycraft2-actions-left")) return;
-    const left = HALF_ACTIONS_PER_TURN - actionsOf(combatant).used;
+    const left = HALF_ACTIONS_PER_TURN + extraHalfActions(combatant) - actionsOf(combatant).used;
     const badge = document.createElement("span");
     badge.className = "spycraft2-actions-left";
     badge.textContent = ` (${loc`${left} half action(s) left`})`;

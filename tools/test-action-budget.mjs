@@ -15,6 +15,9 @@ test("a turn holds two half actions or one full action", () => {
   assert.deepEqual(spendAction(state, "full").left, 0);
   assert.equal(resetActions(second.state).used, 0);
   assert.throws(() => spendAction(state, "free"));
+  // One more half action, as a Press buys.
+  assert.deepEqual(spendAction(second.state, "half", { extra: 1 }).left, 0);
+  assert.equal(spendAction({ ...state, used: 3 }, "half", { extra: 1 }).ok, false);
 });
 
 test("the budget starts over on another turn or round", () => {

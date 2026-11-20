@@ -11,12 +11,14 @@ export function actionBudget(saved, { round, turn }) {
  * Spend an action from a turn's budget.
  * @returns {{ok: boolean, state: object, left: number}} ok is false when the turn has too little left
  */
-export function spendAction(state, kind) {
+export function spendAction(state, kind, { extra = 0 } = {}) {
   const cost = ACTION_COST[kind];
   if (!cost) throw new Error(`Unknown action kind: ${kind}`);
-  const used = state.used + cost;
-  if (used > HALF_ACTIONS_PER_TURN) return { ok: false, state, left: HALF_ACTIONS_PER_TURN - state.used };
-  return { ok: true, state: { ...state, used }, left: HALF_ACTIONS_PER_TURN - used };
+  // `extra` is half actions granted on top of the turn's own, such as the one a Press buys.
+  const limit = HALF_ACTIONS_PER_TURN + Math.max(0, extra),
+    used = state.used + cost;
+  if (used > limit) return { ok: false, state, left: limit - state.used };
+  return { ok: true, state: { ...state, used }, left: limit - used };
 }
 
 /** Give back everything spent this turn. */
