@@ -4,7 +4,7 @@ import { registerGCTableSetup, setupGCTables, inputRollTableClass } from "./modu
 import { registerSoundtrackSetup, setupSoundtrack } from "./module/soundtrack.mjs";
 import { registerSampleSceneSetup, setupSampleScenes } from "./module/sample-scenes.mjs";
 import { registerActorFolderSetup, setupActorFolders } from "./module/actor-folders.mjs";
-import { installDialogThemeHooks } from "./module/apps/dialog-theme.mjs";
+import { installDialogThemeHooks, registerTableTrustSetting } from "./module/apps/dialog-theme.mjs";
 import { installChatSearchHooks } from "./module/apps/chat-search.mjs";
 import { installPowerStanceInitiativeHooks } from "./module/apps/power-stance.mjs";
 import { installFuriousStanceHooks } from "./module/apps/furious-stance.mjs";
@@ -190,6 +190,7 @@ Hooks.once("init", () => {
   gameClock.installGameClock();
   installGCRelay();
   registerFastPathSetting();
+  registerTableTrustSetting();
   installRoundStateEffects();
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();

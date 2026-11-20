@@ -667,17 +667,40 @@ export const ActorOutcomes = Base =>
                 )
             )
             .join("");
+        const errorOnly = check.errorConfirmed && !check.threatConfirmed,
+          defaultGC = errorOnly && game.user?.isGM;
         input = await systemDialog.input({
           window: { title: loc`Activate a confirmed critical result` },
           rejectClose: false,
+          render: (event, dialog) => {
+            // Picking a ready-made effect sets its cost, so the GC's agreement to the effect goes with it.
+            const form = dialog?.element ?? event?.target;
+            const preset = form?.querySelector?.('[name="preset"]'),
+              agreed = form?.querySelector?.('[name="effectConfirmed"]');
+            preset?.addEventListener("change", () => {
+              if (agreed && preset.value) agreed.checked = true;
+            });
+          },
           content: `<div class="spycraft2-roll-options">
-        <label>${loc`Result`} <select name="kind">${check.threatConfirmed ? `<option value="success">${loc`Own critical success / hit`}</option>` : ""}${check.errorConfirmed ? `<option value="failure">${loc`Opponent activates critical failure / miss`}</option>` : ""}</select></label>
+        <p class="hint">${loc`Action dice left: ${this.system.actionDice?.value ?? 0}. Choose the effect; who pays and from where are under the headings below.`}</p>
+        <label>${loc`Result`} <select name="kind">${check.threatConfirmed ? `<option value="success">${loc`Own critical success / hit`}</option>` : ""}${check.errorConfirmed ? `<option value="failure"${errorOnly ? " selected" : ""}>${loc`Opponent activates critical failure / miss`}</option>` : ""}</select></label>
         ${message.flags.spycraft2.checkKind === "attack" && typeof message.flags.spycraft2.attackContext?.vehicleMounted !== "boolean" && (this.system.classOptionSelections ?? []).some(e => e.classId === "wheelman" && e.name === "Most Lethal") ? `<label><input type="checkbox" name="vehicleMountedConfirmed" /> ${loc`Unrecorded attack platform: confirm this weapon was vehicle-mounted when the attack was rolled (Most Lethal)`}</label>` : ""}
         ${cleaveLegacyTargetEligible(this.system, check) ? `<label><input type="checkbox" name="legacyStandardTargetConfirmed" /> ${loc`Unrecorded original target: the GC confirms this melee attack was against a standard character (Cleave Supremacy)`}</label>` : ""}
-        <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc">${loc`GC action-die pool`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
+        ${criticalPresetContent(check)}
+        <label>${loc`Or describe the effect`} <textarea name="effect"></textarea></label>
+        <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
+        <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
+        ${message.flags.spycraft2.checkKind === "attack" ? `<label><input type="checkbox" name="beforeDamage" /> ${loc`Critical hit: damage has not been rolled`}</label>` : ""}
+        <details${errorOnly ? " open" : ""}><summary>${loc`Who pays for a critical failure`}</summary>
+        <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc"${defaultGC ? " selected" : ""}>${loc`GC action-die pool`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
+        <label><input type="checkbox" name="opponent"${defaultGC ? " checked" : ""} /> ${loc`Failure payer is an opponent`}</label>
+        <label><input type="checkbox" name="lineOfSight"${defaultGC ? " checked" : ""} /> ${loc`Failure payer has line of sight to the acting character`}</label>
+        <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1cost, minimum0; one Chance-based session use)`}</label>
+        </details>
+        <details><summary>${loc`Pay from bonus dice or several wallets`}</summary>
         <label>${loc`Funding from the paying character`} <select name="funding"><option value="">${loc`Ordinary action dice / GC pool`}</option>${poolOptions}</select></label>
         <label>${loc`Shaken surcharge funding`} <select name="feeFunding"><option value="same">${loc`Same source as the base cost`}</option><option value="">${loc`Paying character's ordinary dice`}</option>${poolOptions}</select></label>
-        <details><summary>${loc`Split the entire payment across this payer's wallets (optional)`}</summary><p>${loc`If any contribution is entered, these fields replace both source selectors. Total the final cost after automatic reductions and the payer's Shaken surcharge; only the selected payer may contribute.`}</p>${fundingActors
+        <p>${loc`If any contribution is entered, these fields replace both source selectors. Total the final cost after automatic reductions and the payer's Shaken surcharge; only the selected payer may contribute.`}</p>${fundingActors
           .map(
             a =>
               `<label>${loc`${esc(a.name)}: ordinary dice (${a.system.actionDice?.value ?? 0})`} <input name="criticalFund_${a.id}" type="number" min="0" value="0" /></label>${unrestrictedBonusPools(
@@ -692,15 +715,7 @@ export const ActorOutcomes = Base =>
                 .join("")}`
           )
           .join("")}</details>
-        <label><input type="checkbox" name="jinx" /> ${loc`Use the paying opponent’s earned Jinx (−1cost, minimum0; one Chance-based session use)`}</label>
-        <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
-        ${criticalPresetContent(check)}
-        <label>${loc`Critical effect`} <textarea name="effect"></textarea></label>
-        <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
-        <label><input type="checkbox" name="beforeDamage" /> ${loc`Critical hit: damage has not been rolled`}</label>
-        <label><input type="checkbox" name="opponent" /> ${loc`Failure payer is an opponent`}</label>
-        <label><input type="checkbox" name="lineOfSight" /> ${loc`Failure payer has line of sight to the acting character`}</label>
-        <p>${loc`Attack Triumph, Cleave Supremacy, Finesse Supremacy, Grand Skill Mastery, Most Lethal, Sharpshooter Supremacy, Most Deadly, Overkill, Driven, Practice Makes Perfect, Simply Irresistible, Clean and Polished, Dependable and Unreliable adjust the base cost automatically. Selected Jinx reduces the paying opponent’s adjusted cost by1(minimum0), using its own session allowance. The paying character adds the Shaken II/III surcharge after those adjustments, even if the base cost becomes zero. Surcharge dice are not rolled. Apply the recorded effect at the table. The GC can handle payments from other players’ actors; the GC may also use the session’s separate pool.`}</p></div>`
+        <details><summary>${loc`How the cost is worked out`}</summary><p>${loc`Your feats and class abilities that change a critical's cost are applied automatically. Jinx lowers the paying opponent's cost by 1 (minimum 0) and uses their own session allowance. A Shaken payer adds the surcharge after that, even if the cost reaches 0; surcharge dice are not rolled. The GC can pay from other players' characters or from the session pool. Apply the recorded effect at the table.`}</p></details></div>`
         });
         if (!input) return null;
         input.splitFunding = fundingActors
