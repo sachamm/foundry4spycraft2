@@ -29,6 +29,7 @@ import {
   surfaceMove
 } from "../../rules/gc/combat-reference.mjs";
 import { loc } from "../../i18n.mjs";
+import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
 
 const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
@@ -166,6 +167,27 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
   } catch (error) {
     return ui.notifications.warn(error.message);
   }
+}
+
+/** The actions a combatant has spent on the current turn. */
+const actionsOf = combatant =>
+  actionBudget(combatant.flags?.spycraft2?.actions, {
+    round: combatant.parent?.round ?? 0,
+    turn: combatant.parent?.turn ?? 0
+  });
+
+/** Spend a half or full action from a combatant's turn, or give the turn's actions back with kind "reset". */
+export async function spendTurnAction(combatant, kind) {
+  if (!combatant) return null;
+  const state = actionsOf(combatant);
+  if (kind === "reset") return combatant.update({ "flags.spycraft2.actions": resetActions(state) });
+  const result = spendAction(state, kind);
+  if (!result.ok) {
+    ui.notifications.warn(loc`${combatant.name} has ${result.left} half action(s) left this turn.`);
+    return null;
+  }
+  await combatant.update({ "flags.spycraft2.actions": result.state });
+  return result;
 }
 
 /** Apply every combatant's recorded modifiers for the round that just ended. */
@@ -335,8 +357,33 @@ export function installFluidInitiativeHooks() {
   Hooks.on("updateCombatant", (combatant, changed) => {
     if (Object.hasOwn(changed, "initiative") && isLeadGM()) rollTiebreaks(combatant.parent).catch(() => {});
   });
+  // Show what is left of the acting combatant's turn beside its name.
+  Hooks.on("renderCombatTracker", (_app, html) => {
+    const root = html instanceof HTMLElement ? html : html?.[0];
+    const combatant = game.combat?.combatant;
+    const row = combatant && root?.querySelector?.(`[data-combatant-id="${combatant.id}"]`);
+    const name = row?.querySelector?.(".token-name .name, .token-name");
+    if (!name || name.querySelector(".spycraft2-actions-left")) return;
+    const left = HALF_ACTIONS_PER_TURN - actionsOf(combatant).used;
+    const badge = document.createElement("span");
+    badge.className = "spycraft2-actions-left";
+    badge.textContent = ` (${loc`${left} half action(s) left`})`;
+    name.append(badge);
+  });
   // Combat tracker entries: record an event for one combatant.
   Hooks.on("getCombatantContextOptions", (_app, entries) => {
+    const picked = li => game.combat?.combatants.get((li instanceof HTMLElement ? li : li?.[0])?.dataset?.combatantId);
+    for (const [kind, name, icon] of [
+      ["half", loc`Spend a half action`, "fa-circle-half-stroke"],
+      ["full", loc`Spend a full action`, "fa-circle"],
+      ["reset", loc`Give back this turn's actions`, "fa-rotate-left"]
+    ])
+      entries.push({
+        name,
+        icon: `<i class="fa-solid ${icon}"></i>`,
+        condition: li => picked(li)?.isOwner === true,
+        callback: li => spendTurnAction(picked(li), kind)
+      });
     entries.push({
       name: loc`Fluid initiative event`,
       icon: '<i class="fa-solid fa-arrows-up-down"></i>',

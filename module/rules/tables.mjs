@@ -11402,12 +11402,6 @@ export const CLASS_ABILITY_REMINDERS = {
  ],
  "triggerman": [
   {
-   "name": "Gunplay",
-   "level": 2,
-   "rolls": "attack",
-   "text": "Each handgun hit raises your Initiative Count by 1 (2 at 7th)."
-  },
-  {
    "name": "Gun-Fu",
    "level": 3,
    "rolls": "attack",
@@ -11442,6 +11436,12 @@ export const CLASS_ABILITY_REMINDERS = {
    "level": 10,
    "rolls": "save, skill",
    "text": "Once per session, survive a failed check or save that would kill you or fail the mission."
+  },
+  {
+   "name": "Trust Me",
+   "level": 4,
+   "rolls": "skill:acrobatics, skill:athletics, skill:drive",
+   "text": "On team Acrobatics, Athletics or Drive checks, the team may use your bonus."
   }
  ],
  "raptor": [
@@ -11492,6 +11492,114 @@ export const CLASS_ABILITY_REMINDERS = {
    "level": 10,
    "rolls": "skill:sneak, skill:survival",
    "text": "Once per session (twice at 20th), automatically succeed at a Hide up to DC class level + 20, or gain an edge in a manhunt."
+  }
+ ],
+ "advocate": [
+  {
+   "name": "Crusade",
+   "level": 10,
+   "rolls": "skill",
+   "text": "Once per session (twice at 20th), instead of rolling an opposed check with an Advocate class skill, set your result 1 higher than your opponent's."
+  }
+ ],
+ "explorer": [
+  {
+   "name": "Bookworm",
+   "level": 2,
+   "rolls": "skill:investigation",
+   "text": "Research takes half the usual time (a quarter at 11th, a tenth at 19th), minimum 5 minutes."
+  }
+ ],
+ "conArtist": [
+  {
+   "name": "Short Con",
+   "level": 1,
+   "rolls": "skill:impress, skill:intimidate, skill:manipulate",
+   "text": "Raise error range to finish Impress, Intimidate or Manipulate checks faster (1/2 time, 1/4 at 5th, 1/10 at 9th)."
+  },
+  {
+   "name": "Shill",
+   "level": 4,
+   "rolls": "skill",
+   "text": "Successfully helping a teammate's Charisma check gives them an extra bonus."
+  }
+ ],
+ "guide": [
+  {
+   "name": "Friends in Low Places",
+   "level": 1,
+   "rolls": "skill:investigation",
+   "text": "Canvass Area checks cost much less time and money (1/2, 1/4 at 5th, 1/10 at 9th)."
+  },
+  {
+   "name": "Interpreter",
+   "level": 4,
+   "rolls": "skill:cultures, skill:streetwise, skill:survival",
+   "text": "Lead team Cultures, Streetwise and Survival checks more effectively."
+  },
+  {
+   "name": "Overland Shortcut",
+   "level": 6,
+   "rolls": "knowledge",
+   "text": "Always take 10 on Knowledge checks to navigate."
+  },
+  {
+   "name": "Go Native",
+   "level": 8,
+   "rolls": "skill:cultures",
+   "text": "Roll Cultures checks twice and keep the better."
+  },
+  {
+   "name": "Master of Camouflage",
+   "level": 10,
+   "rolls": "skill:sneak",
+   "text": "While hidden in your home turf or the wild, you're very hard to find."
+  }
+ ],
+ "illuminatus": [
+  {
+   "name": "Filed in Triplicate",
+   "level": 8,
+   "rolls": "skill:bureaucracy",
+   "text": "Roll Bureaucracy checks twice and keep the better."
+  }
+ ],
+ "inventor": [
+  {
+   "name": "Smartgun",
+   "level": 8,
+   "rolls": "attack",
+   "text": "Weapons you tune for yourself perform better in your hands."
+  }
+ ],
+ "politico": [
+  {
+   "name": "Behind Closed Doors",
+   "level": 4,
+   "rolls": "skill",
+   "text": "Bonus on opposed Charisma-based checks in private dealings."
+  }
+ ],
+ "transporter": [
+  {
+   "name": "You Better Think Again",
+   "level": 3,
+   "rolls": "skill:resolve",
+   "text": "Bonus to Stand Offs while guarding cargo; at 7th, Stand Off attackers of your cargo for free."
+  }
+ ],
+ "wheelman": [
+  {
+   "name": "Vehicle Familiarity",
+   "level": 4,
+   "rolls": "skill:drive",
+   "text": "Each mission, choose familiar vehicles for a Maneuver bonus (+1 rising every 4 levels) and become familiar faster."
+  },
+  {
+   "name": "That's Impossible!",
+   "level": 10,
+   "rolls": "skill:drive",
+   "text": "Once per session (twice at 20th), make a Maneuver check up to DC class level + 20 without rolling, or gain an edge in a chase."
   }
  ]
 };

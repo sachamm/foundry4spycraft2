@@ -85,3 +85,11 @@ test("at a new round the burning reminder waits for fluid initiative and goes to
     ["Actor.leader"]
   );
 });
+
+test("a tactician's Stratagem is prompted at the start of each round", () => {
+  const combatants = [who("t", { stratagem: 2 }), who("x", { stratagem: 0 })];
+  assert.deepEqual(roundReminders({ combatants, roundEnded: true }), [
+    { kind: "stratagem", actorUuid: "Actor.t", name: "t" }
+  ]);
+  assert.deepEqual(roundReminders({ combatants, roundEnded: false, turnActorUuid: "Actor.t" }), []);
+});

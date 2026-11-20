@@ -145,7 +145,14 @@ export async function sufferTypedDamage(actor, preset = {}) {
       rejectClose: false,
       ok: { label: loc`Apply` },
       content: `<div class="spycraft2-roll-options">
-        <label>${loc`Damage type`} <select name="type">${mark(options(Object.keys(DAMAGE_TYPES).map(type => [type, `${DAMAGE_TYPE_LABELS[type]} (p.${DAMAGE_TYPES[type].page})`])), known.type)}</select></label>
+        <label>${loc`Damage type`} <select name="type">${mark(
+          options(
+            Object.keys(DAMAGE_TYPES)
+              .filter(type => !preset.allowed || preset.allowed.includes(type))
+              .map(type => [type, `${DAMAGE_TYPE_LABELS[type]} (p.${DAMAGE_TYPES[type].page})`])
+          ),
+          known.type
+        )}</select></label>
         <label>${loc`Damage rolled (bang and flash: the damage in the character's square, which is the DC)`} <input type="number" name="amount" min="0" step="1" value="${Number.isFinite(known.amount) ? known.amount : ""}" required /></label>
         <label>${loc`Damage reduction left after armor-piercing (acid, collision, explosive, laser)`} <input type="number" name="reduction" min="0" step="1" value="${Number.isFinite(known.reduction) ? known.reduction : 0}" /></label>
         <label>${loc`Armor worn (acid, heat)`} <select name="armor">${options(ARMORS())}</select></label>
@@ -173,7 +180,8 @@ export async function sufferTypedDamage(actor, preset = {}) {
     amount = Math.trunc(Number(input.amount)),
     reduction = Math.max(0, Math.trunc(Number(input.reduction) || 0)),
     source = String(input.source ?? "").trim() || DAMAGE_TYPE_LABELS[type] || type;
-  if (!DAMAGE_TYPES[type]) return ui.notifications.warn(loc`Choose a listed damage type.`);
+  if (!DAMAGE_TYPES[type] || (preset.allowed && !preset.allowed.includes(type)))
+    return ui.notifications.warn(loc`Choose a listed damage type.`);
   if (!Number.isSafeInteger(amount) || amount < 0)
     return ui.notifications.warn(loc`Enter the damage as a whole number.`);
   const label = DAMAGE_TYPE_LABELS[type];

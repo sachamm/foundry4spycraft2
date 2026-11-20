@@ -2,6 +2,7 @@ import { rollPipeline } from "./roll-pipeline.mjs";
 import { whirlingStancePlan } from "./whirling-stance.mjs";
 import { sharpshooterDefensePlan } from "./sharpshooter.mjs";
 import { guardDefensePlan } from "./guard.mjs";
+import { whateversHandyBonus } from "./gear.mjs";
 import { greatSwordDefensePlan } from "./great-sword-defense.mjs";
 import { totalDefenseState } from "./total-defense.mjs";
 import { coverPlan } from "./cover.mjs";
@@ -116,6 +117,8 @@ export function incomingDefensePlan(system, options = {}) {
     greatSword = greatSwordDefensePlan(system, { ranged }),
     guard = guardDefensePlan(system, { ranged }),
     wrestling = wrestlingDefense(system, { adjacent, ranged }),
+    // Whatever's Handy (Brawler): the same bonus to Defense while an improvised weapon is readied.
+    whateversHandy = system.readiedImprovised === true ? whateversHandyBonus(system) : 0,
     dueling = vulnerable ? 0 : duelingChosenDodge(system, options.fromDuelingOpponent),
     // Anticipate (p.354): the dodge bonus recorded against this attacker, checked by the caller.
     anticipate =
@@ -124,6 +127,7 @@ export function incomingDefensePlan(system, options = {}) {
     -circling.dodgeReduction -
     sharpshooter.sizeReduction +
     guard.bonus +
+    whateversHandy +
     wrestling +
     dueling +
     anticipate +
@@ -201,6 +205,7 @@ export function incomingDefensePlan(system, options = {}) {
           ]
         : []),
       ...(wrestling ? [loc`Wrestling Basics: +1 to Defense against this adjacent opponent (p.189).`] : []),
+      ...(whateversHandy ? [loc`Whatever's Handy: +${whateversHandy} Defense with an improvised weapon readied.`] : []),
       ...(dueling ? [loc`Dueling Basics: +2 dodge against the opponent you chose this round (p.178).`] : []),
       ...(anticipate ? [loc`Anticipate: +${anticipate} dodge against this opponent (p.354).`] : []),
       ...(circling.shifting
