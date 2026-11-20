@@ -24,6 +24,7 @@ import { systemDialog } from "./dialog-theme.mjs";
 import { spendWeaponShots, weaponAmmunition } from "./ammunition-use.mjs";
 import { recentResultsHint } from "./opposed-checks.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
+import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -283,19 +284,48 @@ const grappleTargeted = () => {
   return targeted.length === 1 ? (targeted[0].actor?.uuid ?? "") : "";
 };
 
-/** Set the conditions an opening grapple check brings (p.356) on the characters this user owns. */
+/** The conditions a grapple can set or clear on a character the player does not own. */
+const GRAPPLE_CONDITIONS = ["held", "pinned", "sprawled", "prone", "mute", "vulnerable", "flat-footed"];
+
+registerRelay("grappleCondition", {
+  async describe({ actorUuid, id, active }, user) {
+    const who = actorUuid ? await fromUuid(actorUuid) : null;
+    if (!who) throw new Error(loc`That character is no longer there.`);
+    if (!GRAPPLE_CONDITIONS.includes(id)) throw new Error(loc`A grapple cannot change that condition.`);
+    return active
+      ? loc`${esc(user.name)}'s grapple makes ${esc(who.name)} ${esc(id)}. Allow it?`
+      : loc`${esc(user.name)}'s grapple ends ${esc(who.name)}'s ${esc(id)} condition. Allow it?`;
+  },
+  async run({ actorUuid, id, active, label }) {
+    const who = actorUuid ? await fromUuid(actorUuid) : null;
+    if (!who || !GRAPPLE_CONDITIONS.includes(id)) throw new Error(loc`A grapple cannot change that condition.`);
+    await setConditionStatus(who, id, active === true, { label: String(label ?? id) });
+    return true;
+  }
+});
+
+/**
+ * Set or clear a grapple condition: directly on a character this user owns, otherwise through the GC's client.
+ * @returns {Promise<string>} the line that reports it
+ */
+async function changeGrappleCondition(who, id, active, label) {
+  const name = esc(who?.name ?? loc`The other character`);
+  if (!who) return active ? loc`${name}: set ${label} by hand.` : loc`${name}: clear ${label} by hand.`;
+  try {
+    if (who.isOwner) await setConditionStatus(who, id, active, { label });
+    else if (gcAvailable()) await askGC("grappleCondition", { actorUuid: who.uuid, id, active, label });
+    else return active ? loc`${name}: set ${label} by hand.` : loc`${name}: clear ${label} by hand.`;
+    return active ? loc`${name} is now ${label.toLowerCase()}.` : loc`${name} is no longer ${label.toLowerCase()}.`;
+  } catch (error) {
+    return loc`${name}: ${label} could not be changed (${esc(error.message)}).`;
+  }
+}
+
+/** Set the conditions an opening grapple check brings (p.356); the GC sets them on characters this user does not own. */
 async function grappleConditions(actor, input, outcome) {
   if (!input.opening || outcome.winner === "tie") return [];
   const opponent = input.opponentUuid ? await fromUuid(input.opponentUuid) : null;
-  const set = async (who, id, label) => {
-    if (!who?.isOwner) return loc`${esc(who?.name ?? loc`The opponent`)}: set ${label} by hand.`;
-    try {
-      await setConditionStatus(who, id, true, { label });
-      return loc`${esc(who.name)} is now ${label.toLowerCase()}.`;
-    } catch (error) {
-      return loc`${esc(who.name)}: ${label} could not be set (${esc(error.message)}).`;
-    }
-  };
+  const set = (who, id, label) => changeGrappleCondition(who, id, true, label);
   // Both wrestlers are vulnerable while the hold lasts: the held opponent through Held, the grappler directly (p.356).
   if (outcome.winner === "actor")
     return [
@@ -342,7 +372,7 @@ async function grappleBenefitsChosen(actor, input, outcome) {
           `<label>${loc`Benefit ${index + 1}`} <select name="benefit${index}"><option value="">${loc`Decide later`}</option>${list}</select></label>`
       ).join(
         ""
-      )}<p class="hint">${loc`Pin, Sprawl, Throw, Mute, Escape Hold and Break Pin change conditions on the characters you own. The others are carried out at the table.`}</p></div>`
+      )}<p class="hint">${loc`Pin, Sprawl, Throw, Mute, Escape Hold and Break Pin change conditions on both characters; the GC is asked for a character you do not own. The others are carried out at the table.`}</p></div>`
     });
     if (!picked) return [];
     chosen = Array.from({ length: outcome.benefits }, (_, index) => picked[`benefit${index}`]).filter(Boolean);
@@ -356,25 +386,8 @@ async function grappleBenefitsChosen(actor, input, outcome) {
     const who = change.side === "winner" ? winner : loser,
       label = labels[change.id] ?? change.id;
     // Removing a condition the character does not have is nothing to report.
-    if (!change.active && who?.isOwner && !who.statuses?.has(change.id)) continue;
-    if (!who?.isOwner) {
-      lines.push(
-        change.active
-          ? loc`${esc(who?.name ?? loc`The other character`)}: set ${label} by hand.`
-          : loc`${esc(who?.name ?? loc`The other character`)}: clear ${label} by hand.`
-      );
-      continue;
-    }
-    try {
-      await setConditionStatus(who, change.id, change.active, { label });
-      lines.push(
-        change.active
-          ? loc`${esc(who.name)} is now ${label.toLowerCase()}.`
-          : loc`${esc(who.name)} is no longer ${label.toLowerCase()}.`
-      );
-    } catch (error) {
-      lines.push(loc`${esc(who.name)}: ${label} could not be changed (${esc(error.message)}).`);
-    }
+    if (!change.active && who && !who.statuses?.has(change.id)) continue;
+    lines.push(await changeGrappleCondition(who, change.id, change.active, label));
   }
   if (chosen.includes("sprawl")) lines.push(loc`Sprawl Opponent: roll 1d4 + Strength subdual damage and apply it.`);
   if (chosen.some(id => ["injure", "throw", "useWeapon"].includes(id)))

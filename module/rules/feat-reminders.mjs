@@ -12,6 +12,7 @@
  *   text   the line shown beside the feat's name.
  */
 import { rollPipeline } from "./roll-pipeline.mjs";
+import { CLASS_ABILITY_REMINDERS } from "./tables.mjs";
 import { loc } from "../i18n.mjs";
 
 export const REMINDER_KINDS = ["attack", "damage", "knowledge", "skill", "save"];
@@ -66,6 +67,35 @@ export function featReminders(items, roll) {
   return list.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/**
+ * The reminders a character's class abilities offer for a roll: the abilities in CLASS_ABILITY_REMINDERS that the
+ * character has reached in each class (by its levels in that class), for the abilities the rules do not carry out.
+ * @param {object} system  the character's system data; `classLevels` maps class keys to levels
+ * @param {object} roll    { kind, skillKey?, saveKey? }
+ * @param {object} table   class key → [{ name, level, rolls, text }]
+ * @returns {{id: string, name: string, text: string}[]} in name order
+ */
+export function classAbilityReminders(system, roll, table = CLASS_ABILITY_REMINDERS) {
+  const list = [];
+  for (const [classKey, level] of Object.entries(system?.classLevels ?? {})) {
+    for (const ability of table?.[classKey] ?? []) {
+      if (!(Number(level) >= ability.level)) continue;
+      if (!reminderApplies(reminderTokens(ability.rolls), roll)) continue;
+      list.push({
+        id: `class-${classKey}-${ability.name}`.replace(/[^A-Za-z0-9_-]/g, "_"),
+        name: ability.name,
+        text: ability.text
+      });
+    }
+  }
+  return list.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Everything a character should keep in mind for a roll: its feats' reminders, then its class abilities'. */
+export function characterReminders(actor, roll) {
+  return [...featReminders(actor?.items, roll), ...classAbilityReminders(actor?.system, roll)];
+}
+
 const FIELD = "featReminder-";
 
 /** The reminders ticked in a submitted roll dialog, matched against the ones that were offered. */
@@ -77,7 +107,7 @@ export function chosenReminders(offered, entered = {}) {
 export function reminderNote(reminders) {
   if (!Array.isArray(reminders) || !reminders.length) return "";
   const list = reminders.map(reminder => (reminder.text ? `${reminder.name} (${reminder.text})` : reminder.name));
-  return loc`Feats noted for the GC to apply: ${list.join("; ")}`;
+  return loc`Feats and abilities noted for the GC to apply: ${list.join("; ")}`;
 }
 
 /** The roll a dialog is for, from the context the dialog was drawn with. */
@@ -97,7 +127,7 @@ const escape = value =>
 /** The dialog section listing a character's reminders for a roll; empty when there are none. */
 export function reminderSection(reminders) {
   if (!reminders.length) return "";
-  return `<fieldset class="spycraft2-feat-reminders"><legend>${loc`Feats to keep in mind`}</legend><p class="hint">${loc`These feats are not worked out for you. Tick the ones that apply to this roll; they are noted on it for the GC.`}</p>${reminders
+  return `<fieldset class="spycraft2-feat-reminders"><legend>${loc`Feats and abilities to keep in mind`}</legend><p class="hint">${loc`These feats and class abilities are not worked out for you. Tick the ones that apply to this roll; they are noted on it for the GC.`}</p>${reminders
     .map(
       reminder =>
         `<label><input type="checkbox" name="${FIELD}${escape(reminder.id)}" /> <strong>${escape(reminder.name)}</strong>${reminder.text ? ` — ${escape(reminder.text)}` : ""}</label>`
@@ -112,7 +142,7 @@ rollPipeline.register({
   // After everything else in the form, so each roll dialog ends with the same section.
   dialog(context) {
     const roll = dialogRoll(context.dialog, context);
-    return roll ? [{ at: 1_000_000, html: reminderSection(featReminders(context.actor?.items, roll)) }] : null;
+    return roll ? [{ at: 1_000_000, html: reminderSection(characterReminders(context.actor, roll)) }] : null;
   },
   read(context, input) {
     const roll = dialogRoll(context.dialog, context);
@@ -120,7 +150,7 @@ rollPipeline.register({
     // A caller that already decided (a scripted roll, a reroll) keeps its own list.
     if (Array.isArray(input?.featReminders)) return null;
     // Nothing offered, nothing to add: what was entered is passed on untouched.
-    const offered = featReminders(context.actor?.items, roll);
+    const offered = characterReminders(context.actor, roll);
     return offered.length ? { featReminders: chosenReminders(offered, context.entered ?? input) } : null;
   },
   record: ["featReminders"]

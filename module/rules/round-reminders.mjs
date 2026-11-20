@@ -1,0 +1,33 @@
+/**
+ * Round reminders: what a combat tracker step should prompt for.
+ *
+ * A dying character rolls to stabilize at the end of each round (p.331) and a burning character takes the fire's
+ * damage when its turn begins (p.337). Both rolls already exist as buttons on the sheet; this works out which
+ * characters need them when the tracker moves, so the GC's client can post a card with the button.
+ * Pure rules; module/apps/round-reminders.mjs posts the cards.
+ */
+import { woundState } from "./damage-application.mjs";
+
+/**
+ * @param {object} step
+ * @param {object[]} step.combatants  [{ actorUuid, name, special, wounds, burning, defeated }]
+ * @param {boolean} step.roundEnded   the tracker moved forward into a new round
+ * @param {string|null} step.turnActorUuid  the actor whose turn has just begun, if the turn moved forward
+ * @returns {{kind: "dying"|"burning", actorUuid: string, name: string}[]} one entry per character and kind
+ */
+export function roundReminders({ combatants = [], roundEnded = false, turnActorUuid = null } = {}) {
+  const out = [],
+    seen = new Set();
+  const add = (kind, combatant) => {
+    const key = `${kind}:${combatant.actorUuid}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ kind, actorUuid: combatant.actorUuid, name: combatant.name });
+  };
+  for (const combatant of combatants) {
+    if (!combatant?.actorUuid || combatant.defeated) continue;
+    if (roundEnded && combatant.special && woundState(Number(combatant.wounds)) === "dying") add("dying", combatant);
+    if (turnActorUuid && combatant.actorUuid === turnActorUuid && combatant.burning) add("burning", combatant);
+  }
+  return out;
+}

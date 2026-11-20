@@ -47,5 +47,121 @@
       "skill:notice",
       "skill:drive"
     ]
+  },
+  "_classNote": "Class abilities the rules do not carry out, by class key: the career level in that class where the ability starts and the rolls it bears on. The reminder shown is the ability's summary from summaries.json. Abilities the system carries out are removed from this list.",
+  "classAbilities": {
+    "grunt": {
+      "Alpha Strike": {
+        "level": 1,
+        "rolls": [
+          "attack"
+        ]
+      },
+      "Put Your Backs Into It": {
+        "level": 6,
+        "rolls": [
+          "skill:athletics"
+        ]
+      }
+    },
+    "triggerman": {
+      "Gunplay": {
+        "level": 2,
+        "rolls": [
+          "attack"
+        ]
+      },
+      "Gun-Fu": {
+        "level": 3,
+        "rolls": [
+          "attack"
+        ]
+      }
+    },
+    "counterterrorist": {
+      "Hostile Negotiator": {
+        "level": 6,
+        "rolls": [
+          "skill:intimidate"
+        ]
+      }
+    },
+    "cleaner": {
+      "Fatal Attack": {
+        "level": 10,
+        "rolls": [
+          "attack"
+        ]
+      }
+    },
+    "stuntman": {
+      "Insane Stunt": {
+        "level": 5,
+        "rolls": [
+          "skill:acrobatics",
+          "skill:athletics",
+          "skill:drive"
+        ]
+      },
+      "Cheat Death": {
+        "level": 10,
+        "rolls": [
+          "save",
+          "skill"
+        ]
+      }
+    },
+    "raptor": {
+      "Wuxia": {
+        "level": 2,
+        "rolls": [
+          "skill:athletics"
+        ]
+      },
+      "Cyclone": {
+        "level": 4,
+        "rolls": [
+          "attack"
+        ]
+      }
+    },
+    "faceman": {
+      "Quick Change": {
+        "level": 3,
+        "rolls": [
+          "skill:falsify",
+          "skill:sneak"
+        ]
+      },
+      "Bald-Faced Lie": {
+        "level": 10,
+        "rolls": [
+          "skill:bluff"
+        ]
+      }
+    },
+    "hacker": {
+      "Master Cracker": {
+        "level": 5,
+        "rolls": [
+          "skill:analysis"
+        ]
+      },
+      "Ghost in the Machine": {
+        "level": 14,
+        "rolls": [
+          "skill:computers"
+        ]
+      }
+    },
+    "scout": {
+      "Master Tracker": {
+        "level": 10,
+        "rolls": [
+          "skill:sneak",
+          "skill:survival"
+        ]
+      }
+    }
   }
 }

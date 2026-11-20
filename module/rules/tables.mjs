@@ -11385,6 +11385,116 @@ export const FEAT_REMINDERS = {
   "text": "Halved visual-range Notice penalty, better gliding, and air vehicles treat maneuvering room as wider with +2 on Crisis Advantage checks."
  }
 };
+export const CLASS_ABILITY_REMINDERS = {
+ "grunt": [
+  {
+   "name": "Alpha Strike",
+   "level": 1,
+   "rolls": "attack",
+   "text": "Once per round, take Autofire or Strafe as a half action."
+  },
+  {
+   "name": "Put Your Backs Into It",
+   "level": 6,
+   "rolls": "skill:athletics",
+   "text": "Lend your raw strength to teammates' physical efforts."
+  }
+ ],
+ "triggerman": [
+  {
+   "name": "Gunplay",
+   "level": 2,
+   "rolls": "attack",
+   "text": "Each handgun hit raises your Initiative Count by 1 (2 at 7th)."
+  },
+  {
+   "name": "Gun-Fu",
+   "level": 3,
+   "rolls": "attack",
+   "text": "Disarm adjacent foes of firearms and use them yourself; at 7th, pay back damage you take with your next attack."
+  }
+ ],
+ "counterterrorist": [
+  {
+   "name": "Hostile Negotiator",
+   "level": 6,
+   "rolls": "skill:intimidate",
+   "text": "Use Intimidate in place of the usual skill when negotiating under pressure."
+  }
+ ],
+ "cleaner": [
+  {
+   "name": "Fatal Attack",
+   "level": 10,
+   "rolls": "attack",
+   "text": "Pay an action die for a potentially fatal attack against a vulnerable foe."
+  }
+ ],
+ "stuntman": [
+  {
+   "name": "Insane Stunt",
+   "level": 5,
+   "rolls": "skill:acrobatics, skill:athletics, skill:drive",
+   "text": "Once per session (twice at 9th), pull off a Maneuver up to DC class level + 20 without rolling."
+  },
+  {
+   "name": "Cheat Death",
+   "level": 10,
+   "rolls": "save, skill",
+   "text": "Once per session, survive a failed check or save that would kill you or fail the mission."
+  }
+ ],
+ "raptor": [
+  {
+   "name": "Wuxia",
+   "level": 2,
+   "rolls": "skill:athletics",
+   "text": "Your height no longer caps your jumps, which go much farther (more at 7th)."
+  },
+  {
+   "name": "Cyclone",
+   "level": 4,
+   "rolls": "attack",
+   "text": "With your secret weapon, make a whirling attack against nearby foes (stronger at 8th)."
+  }
+ ],
+ "faceman": [
+  {
+   "name": "Quick Change",
+   "level": 3,
+   "rolls": "skill:falsify, skill:sneak",
+   "text": "Twice per session (more at higher levels), make a quick Hide or Disguise check as a free action without a kit."
+  },
+  {
+   "name": "Bald-Faced Lie",
+   "level": 10,
+   "rolls": "skill:bluff",
+   "text": "Once per session (twice at 20th), an NPC believes one lie as truth for 1 minute per class level."
+  }
+ ],
+ "hacker": [
+  {
+   "name": "Master Cracker",
+   "level": 5,
+   "rolls": "skill:analysis",
+   "text": "Once per session (more at 9th, 13th, 17th), decipher a code up to DC class level + 20 without a check."
+  },
+  {
+   "name": "Ghost in the Machine",
+   "level": 14,
+   "rolls": "skill:computers",
+   "text": "Winning opposed checks in a hacking Conflict lets you wreak extra havoc on the target system."
+  }
+ ],
+ "scout": [
+  {
+   "name": "Master Tracker",
+   "level": 10,
+   "rolls": "skill:sneak, skill:survival",
+   "text": "Once per session (twice at 20th), automatically succeed at a Hide up to DC class level + 20, or gain an edge in a manhunt."
+  }
+ ]
+};
 export const VEHICLE_RULES = {
  "classes": [
   {

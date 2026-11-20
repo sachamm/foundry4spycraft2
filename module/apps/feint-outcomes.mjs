@@ -5,6 +5,7 @@ import { queueResources } from "../rules/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
+import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 export async function settleFeintOutcome(actor, actingMessage, defendingMessage, input = {}) {
   const acting = actingMessage?.flags?.spycraft2,
@@ -112,9 +113,44 @@ export async function manageFeintOutcomes(actor, input = {}) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Feint opposed outcome` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`Choose the two resolved participant checks for one recorded Feint. Finish boosts/critical activation and mark one winner and one loser in chat. Settlement applies flat-footed to the loser and records a successful target’s round restriction. Own both sheets, or have the GC settle.`}</p><label>${loc`Acting Sleight of Hand check`} <select name="actingMessage">${options(acting)}</select></label><label>${loc`Opposing Notice check`} <select name="defendingMessage">${options(defending)}</select></label><label><input type="checkbox" name="opposedConfirmed" /> ${loc`These checks are the same opposed Feint, with the winner confirmed`}</label><label><input type="checkbox" name="tieResolvedConfirmed" /> ${loc`If results AND skill bonuses tie, the GC used the p.91 random 1d20 tie-break to determine the declared winner`}</label><p>${loc`A winning critical success or losing critical failure grants the winner +2 on the next attack against the loser until the end of the following round; select the actual opponent on that next attack to apply and consume the bonus.`}</p></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`Choose the two resolved participant checks for one recorded Feint. Finish boosts/critical activation and mark one winner and one loser in chat. Settlement applies flat-footed to the loser and records a successful target’s round restriction. If you do not own the opponent, the GC is asked to settle it.`}</p><label>${loc`Acting Sleight of Hand check`} <select name="actingMessage">${options(acting)}</select></label><label>${loc`Opposing Notice check`} <select name="defendingMessage">${options(defending)}</select></label><label><input type="checkbox" name="opposedConfirmed" /> ${loc`These checks are the same opposed Feint, with the winner confirmed`}</label><label><input type="checkbox" name="tieResolvedConfirmed" /> ${loc`If results AND skill bonuses tie, the GC used the p.91 random 1d20 tie-break to determine the declared winner`}</label><p>${loc`A winning critical success or losing critical failure grants the winner +2 on the next attack against the loser until the end of the following round; select the actual opponent on that next attack to apply and consume the bonus.`}</p></div>`
     });
     if (!input) return null;
   }
-  return settleFeintOutcome(actor, await fromUuid(input.actingMessage), await fromUuid(input.defendingMessage), input);
+  const actingMessage = await fromUuid(input.actingMessage),
+    defendingMessage = await fromUuid(input.defendingMessage);
+  // A player who does not own the opponent (usually an NPC) has the GC's client settle the Feint.
+  const opponentUuid = actingMessage?.flags?.spycraft2?.feint?.opponentUuid,
+    opponent = opponentUuid ? globalThis.fromUuidSync?.(opponentUuid) : null;
+  if (!game.user.isGM && opponent && !opponent.isOwner && gcAvailable())
+    return askGC("settleFeint", {
+      actorUuid: actor.uuid,
+      actingMessage: actingMessage?.uuid,
+      defendingMessage: defendingMessage?.uuid,
+      opposedConfirmed: input.opposedConfirmed === true,
+      tieResolvedConfirmed: input.tieResolvedConfirmed === true
+    });
+  return settleFeintOutcome(actor, actingMessage, defendingMessage, input);
 }
+
+registerRelay("settleFeint", {
+  async describe({ actorUuid, actingMessage }, user) {
+    const actor = actorUuid ? await fromUuid(actorUuid) : null,
+      a = actingMessage ? await fromUuid(actingMessage) : null,
+      opponent = a?.flags?.spycraft2?.feint?.opponentUuid ? await fromUuid(a.flags.spycraft2.feint.opponentUuid) : null;
+    if (!actor || !a) throw new Error(loc`The Feint checks are no longer there.`);
+    if (!actor.testUserPermission(user, "OWNER"))
+      throw new Error(loc`That player does not own the feinting character.`);
+    const esc = foundry.utils.escapeHTML;
+    return loc`${esc(user.name)} asks to settle ${esc(actor.name)}'s Feint against ${esc(opponent?.name ?? loc`the opponent`)}. Allow it?`;
+  },
+  async run({ actorUuid, actingMessage, defendingMessage, opposedConfirmed, tieResolvedConfirmed }) {
+    const actor = actorUuid ? await fromUuid(actorUuid) : null;
+    if (!actor) throw new Error(loc`The Feint checks are no longer there.`);
+    await settleFeintOutcome(actor, await fromUuid(actingMessage), await fromUuid(defendingMessage), {
+      opposedConfirmed: opposedConfirmed === true,
+      tieResolvedConfirmed: tieResolvedConfirmed === true
+    });
+    return true;
+  }
+});

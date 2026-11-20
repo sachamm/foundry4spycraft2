@@ -1,6 +1,7 @@
 import { crewDamageSaveBonus } from "../rules/driving-feats.mjs";
 import { npcQualityEffects } from "../rules/npc-qualities.mjs";
 import { npcFeatEffects } from "../rules/npc-feat-effects.mjs";
+import { ruleName } from "../rules/rule-name.mjs";
 import { cheapShotPenalty, cheapShotRecords, cheapShotSpeedPenalty } from "../rules/cheap-shot-effects.mjs";
 import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
 import { shakenStateFromActor, shakenRules } from "../rules/shaken.mjs";
@@ -156,6 +157,11 @@ export class NpcData extends BaseActorData {
     this.worldTime = globalThis.game?.time?.worldTime;
     this.usagePeriods = globalThis.game?.settings?.get("spycraft2", "usagePeriods") ?? {};
     this.conditionContext = npcSkillConditionContext(this.parent);
+    // The feats an NPC holds, by rule name, so the attack, damage and Defense rules that look for a feat by name
+    // (Sharpshooter, Two-Weapon, Combat Expertise and the rest) treat an NPC's feat as they treat an agent's.
+    this.activeFeatNames = [
+      ...new Set([...(this.parent?.items ?? [])].filter(item => item.type === "feat").map(item => ruleName(item)))
+    ].filter(Boolean);
     this.baffledApplicationReview = getBaffledReview(this.parent ?? {});
     // A mission's Threat Level scales every NPC that follows it (p.423); others keep their own number.
     const missionTL = this.followMission ? missionThreatLevelSetting() : null;

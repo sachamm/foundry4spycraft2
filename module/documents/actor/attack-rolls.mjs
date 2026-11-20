@@ -31,7 +31,7 @@ import { weaponDamage, cleanAndPolishedApplies } from "../../rules/gear.mjs";
 import { askFollowUp } from "../../rolls/dialogs/follow-ups.mjs";
 import { measureInto } from "../../apps/map.mjs";
 import { coverFire, suppressiveFire } from "../../apps/combat-actions.mjs";
-import { featReminders } from "../../rules/feat-reminders.mjs";
+import { characterReminders } from "../../rules/feat-reminders.mjs";
 import { opportunistDamageSource, halvedFormula } from "../../rules/opportunist.mjs";
 import { styleOverCaliberEligible, styleOverCaliberWeapon } from "../../rules/style-over-caliber.mjs";
 import { kickDamageWeapon, unarmedWeapon } from "../../rules/kick.mjs";
@@ -519,7 +519,7 @@ export const ActorAttackRolls = Base =>
         (hasSneakAttackSource(this.system, item.system) ||
           sideHits.length ||
           attackBonusHits.length ||
-          featReminders(this.items, { kind: "damage" }).length ||
+          characterReminders(this, { kind: "damage" }).length ||
           (inClosedStance(this.system) && unarmedWeapon(item.system)) ||
           this.system.activeFeatNames?.some(n => ["Horde Supremacy", "Tac-Squad Supremacy"].includes(n)) ||
           styleOverCaliberEligible(this.system, item.system))
