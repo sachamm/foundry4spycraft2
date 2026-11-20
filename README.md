@@ -76,6 +76,8 @@ Classes also provides ordinary GC action-die awards and once-per-mission XP sett
 
 Implemented resource controls coordinate multiple Foundry clients. Classes provides GC recovery controls for interrupted actions; check the recorded result and current resources before retrying an interrupted transaction. Complete character exports omit temporary transaction bookkeeping.
 
+**Check numerical advantage** on the agent sheet prefills physical counts from the running combat. It uses that combat's scene and token dispositions to suggest opposing sides, with defeated combatants starting at zero. Neutral or unclear participants and characters outside combat remain available for manual entry. Review the counts and assign teammate groups before confirming: sharing a token disposition does not establish a Tactical Advantage teammate relationship. Players cannot count hidden participants they cannot see, so the GC should review the full roster. Without a running combat, enter the roster manually.
+
 ## Game clock and timers
 
 The world keeps the time. A badge above the players list shows it; click it for the **Clock and timers** window
