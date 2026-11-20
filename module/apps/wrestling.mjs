@@ -37,7 +37,8 @@ rollPipeline.register({
       target.system.activeFeatNames?.includes("Wrestling Basics")
     )
       controls.push({
-        label: loc`Open Stance: ${target.name} pulls the attacker in for a free Grapple or Trip`,
+        label: loc`Open Stance: Grapple or Trip`,
+        hint: loc`Open Stance: ${target.name} pulls the attacker in for a free Grapple or Trip`,
         run: () =>
           target.useLimitedAbility(
             "openStance",

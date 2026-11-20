@@ -43,7 +43,8 @@ rollPipeline.register({
     const target = fromUuidSync(check.attackContext.targetActorUuid);
     return [
       {
-        label: loc`Brawling Supremacy: final attack on ${target?.name ?? loc`this opponent`}`,
+        label: loc`Brawling Supremacy: attack`,
+        hint: loc`Brawling Supremacy: final attack on ${target?.name ?? loc`this opponent`}`,
         run: () => takeBrawlingFinal(actor, check)
       }
     ];

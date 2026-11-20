@@ -170,6 +170,26 @@ test("a resolved grapple escape walks through benefit, movement and GC review", 
   );
 });
 
+test("a button with a hint shows its short label and carries the full wording as its name and tooltip", () => {
+  actor = makeActor();
+  const response = rollPipeline.chatControls;
+  rollPipeline.chatControls = () => [
+    { id: "x", label: "Short", hint: "The full wording of this step", run() {}, placement: "card" },
+    { id: "y", label: "Plain words", run() {}, placement: "card" }
+  ];
+  try {
+    const html = new Element("li");
+    renderCheckControls(message({}), html);
+    const [short, plain] = html.children[0].children;
+    assert.equal(short.textContent, "Short");
+    assert.equal(short.attributes["aria-label"], "The full wording of this step");
+    assert.equal(short.attributes["data-tooltip"], "The full wording of this step");
+    assert.equal(plain.attributes["data-tooltip"], "Plain words");
+  } finally {
+    rollPipeline.chatControls = response;
+  }
+});
+
 test("the chat hook lays buttons out by placement and runs them once per click", async () => {
   actor = makeActor();
   const html = new Element("li"),

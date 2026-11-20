@@ -209,7 +209,10 @@ function button(control) {
   if (control.emphasis === "primary") element.className = "sc2-primary-action";
   else if (control.emphasis === "quiet") element.className = "sc2-quiet-action";
   element.textContent = localizedLabel(control);
-  element.setAttribute("aria-label", element.textContent);
+  // The face stays short enough for the chat column; the full wording is the name and the tooltip.
+  const full = control.hint || element.textContent;
+  element.setAttribute("aria-label", full);
+  element.setAttribute("data-tooltip", full);
   element.dataset.rollControl = control.id;
   element.addEventListener("click", () => runChatAction(element, () => control.run()));
   return element;

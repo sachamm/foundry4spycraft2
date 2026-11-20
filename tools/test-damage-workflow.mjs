@@ -497,8 +497,16 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
     resolve.map(c => [c.label, c.emphasis]),
     [
       // The viewer can read this Defense, so the button already says how the roll stands against it.
-      ["Resolve vs Defense 15 (Guard): hit", "primary"],
-      ["Resolve against another target or Defense…", undefined]
+      ["Resolve vs Defense 15: hit", "primary"],
+      ["Other target or Defense…", undefined]
+    ]
+  );
+  // The short face leaves the target's name and the full wording to the tooltip.
+  assert.deepEqual(
+    resolve.map(c => c.hint),
+    [
+      "Resolve this attack against Guard, Defense 15: hit",
+      "Resolve this attack against another target, or against a Defense you enter"
     ]
   );
   await resolve[0].run();
@@ -523,7 +531,7 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
   // With several tokens targeted, one button applies the damage to each and posts a summary.
   const second = character("Guard2", { vitality: { value: 20, max: 20 }, wounds: { value: 12, max: 12 }, dr: {} });
   game.user.targets = [{ actor: guard }, { actor: second }];
-  const each = controls(damage).find(c => c.label === "Apply 7 to each of 2 targeted");
+  const each = controls(damage).find(c => c.label === "Apply 7 to 2 targets");
   await each.run();
   assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [6, 13]);
   assert.match(posted.at(-1).content, /Damage applied to 2 targets/);

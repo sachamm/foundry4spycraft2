@@ -36,13 +36,15 @@ export function targetResponseControls({ message, check, user }) {
     return [
       {
         id: "targetCheckDefense",
-        label: loc`${target.name}: check Defense against this attack`,
+        label: loc`Check Defense`,
+        hint: loc`${target.name}: work out Defense against this attack`,
         emphasis: "primary",
         run: () => checkIncomingDefense(target)
       },
       {
         id: "targetBoostDefense",
-        label: loc`${target.name}: boost Defense with an action die`,
+        label: loc`Boost Defense`,
+        hint: loc`${target.name}: spend an action die to boost Defense against this attack`,
         run: () => target.boostDefenseWithActionDie()
       }
     ];

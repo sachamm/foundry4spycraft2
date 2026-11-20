@@ -75,7 +75,7 @@ test("the controls are the GC's and name the feat's owner", () => {
         user: { isGM },
         checkKind: "attack"
       }) ?? []
-    ).map(c => c.label);
+    ).map(c => c.hint ?? c.label);
   return import("../module/apps/chance-reactions.mjs").then(() => {
     assert.ok(labels(true).some(l => /Lucky Break \(Lucky\)/.test(l)));
     assert.ok(labels(true).some(l => /Peculiar Dodge \(Lucky\)/.test(l)));
