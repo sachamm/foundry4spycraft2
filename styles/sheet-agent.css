@@ -39,7 +39,7 @@
 .spycraft2.sheet.agent .play-dashboard .stat-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
 .spycraft2.sheet.agent .play-dashboard .stat { min-height: 58px; padding: 4px 3px; justify-content: center; }
 .spycraft2.sheet.agent .play-dashboard .stat > span { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); }
-.spycraft2.sheet.agent.play-mode .ability-strip .stat small { display: block; font-size: 11px; opacity: 1; color: var(--sc2-ink-muted); }
+.spycraft2.sheet.agent.play-mode .ability-strip .stat small { display: block; font-size: var(--sc2-text-s); opacity: 1; color: var(--sc2-ink-muted); }
 .spycraft2.sheet.agent .condition-summary { margin: 0; padding: 6px 10px; background: var(--sc2-bad-tint); border-left: 3px solid var(--sc2-bad); }
 .spycraft2.sheet .sc2-weapon { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto auto; align-items: center; gap: var(--sc2-space-2); padding: 4px 0; }
 .spycraft2.sheet .sc2-weapon .name { font-weight: 700; }
@@ -56,7 +56,7 @@
 /* ---------- Skills ---------- */
 .spycraft2.sheet.agent .skills-table :is(th, td) { padding: 2px 4px; }
 .spycraft2.sheet.agent .skills-table tbody th { white-space: nowrap; }
-.spycraft2.sheet.agent .skills-table tbody th .muted { font-size: 11px; font-weight: 400; letter-spacing: 0.04em; }
+.spycraft2.sheet.agent .skills-table tbody th .muted { font-size: var(--sc2-text-s); font-weight: 400; letter-spacing: 0.02em; }
 .spycraft2.sheet.agent .skills-table tr.class-skill th button { color: var(--sc2-teal-dark); }
 
 /* ---------- Gear ---------- */
@@ -91,14 +91,14 @@
 }
 
 /* Attribute names are long; they stay on one line in their narrow tiles. */
-.spycraft2.sheet.agent .ability-strip .stat > span:first-child { letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
+.spycraft2.sheet.agent .ability-strip .stat > span:first-child { letter-spacing: 0; white-space: normal; overflow-wrap: normal; }
 .spycraft2.sheet.agent .ability-strip { margin-bottom: var(--sc2-space-2); }
 
 /* ---------- Creation track: the build order, each step in its own hue ---------- */
 .spycraft2.sheet.agent .creation-track[hidden] { display: none; }
 .spycraft2.sheet.agent .creation-track { margin-bottom: var(--sc2-space-2); }
 .spycraft2.sheet.agent .creation-track ol { display: flex; flex-wrap: wrap; gap: 3px; margin: 0; padding: 0; list-style: none; }
-.spycraft2.sheet.agent .track-step { flex: 1 1 auto; min-width: 0; }
+.spycraft2.sheet.agent .track-step { flex: 1 1 84px; min-width: 0; }
 .spycraft2.sheet.agent .track-step .track-button {
   position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 1px;
   width: 100%; height: 100%; min-height: 46px; margin: 0; padding: 4px 5px;
@@ -107,13 +107,13 @@
 }
 .spycraft2.sheet.agent button.track-button { cursor: pointer; }
 .spycraft2.sheet.agent button.track-button:hover { color: var(--sc2-ink-strong); background: var(--sc2-action-tint); border-color: var(--sc2-step); }
-.spycraft2.sheet.agent .track-number { font: 700 11px/1 var(--sc2-num); color: var(--sc2-ink-muted); }
-.spycraft2.sheet.agent .track-label { max-width: 100%; font: 600 10px/1.2 var(--font-primary, sans-serif); letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap; }
+.spycraft2.sheet.agent .track-number { font: 700 13px/1.2 var(--sc2-num); color: var(--sc2-ink-muted); }
+.spycraft2.sheet.agent .track-label { max-width: 100%; font: 600 13px/1.35 var(--font-primary, sans-serif); letter-spacing: 0; white-space: normal; }
 .spycraft2.sheet.agent .track-step.waiting .track-button { color: var(--sc2-ink-strong); }
 .spycraft2.sheet.agent .track-step .sc2-uses { position: absolute; top: 2px; right: 3px; min-width: 0; padding: 0 5px; }
 .spycraft2.sheet.agent .track-step.waiting .track-label { padding-right: 14px; }
 .spycraft2.sheet.agent .track-step.start .track-button { background: var(--sc2-action-tint); border-color: var(--sc2-step); box-shadow: inset 0 0 0 1px var(--sc2-step); }
-.spycraft2.sheet.agent .track-start { font: 700 9px/1.2 var(--sc2-num); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc2-action); }
+.spycraft2.sheet.agent .track-start { font: 600 12px/1.35 var(--font-primary, sans-serif); letter-spacing: 0; color: var(--sc2-action); }
 
 /* ---------- Round tracker and pinned tools ---------- */
 .spycraft2.sheet.agent .round-tracker { display: flex; align-items: center; gap: var(--sc2-space-2); padding: 6px 8px; background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-left: 4px solid var(--sc2-bar); }
@@ -128,6 +128,6 @@
 .spycraft2.sheet.agent .pin-hint { margin: 0 0 var(--sc2-space-2); }
 /* The time an action takes, where the rules give one. */
 .spycraft2.application button[data-sc2-cost]:not([data-sc2-mode="icon"])::after {
-  content: attr(data-sc2-cost); margin-left: 6px; padding: 0 4px; font: 700 9px/1.5 var(--sc2-num); letter-spacing: 0.06em; text-transform: uppercase;
+  content: attr(data-sc2-cost); margin-left: 6px; padding: 0 4px; font: 600 12px/1.5 var(--sc2-num); letter-spacing: 0.02em; text-transform: none;
   color: inherit; border: 1px solid currentColor; border-radius: 2px; opacity: 0.8;
 }

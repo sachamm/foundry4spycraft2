@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import { uiModuleUrl } from "../lib/ui-test-module.mjs";
 const sheetUX = readFileSync(new URL("../../module/sheets/agent-ux.mjs", import.meta.url), "utf8");
 const skillUX = readFileSync(new URL("../../module/apps/skill-dialog-ux.mjs", import.meta.url), "utf8");
 const css = ["tokens", "spycraft2", "retro", "components"]
@@ -11,7 +12,11 @@ const css = ["tokens", "spycraft2", "retro", "components"]
 
 // The modules import the translation tag; a page script cannot resolve that path, so it is inlined.
 const i18n = readFileSync(new URL("../../module/i18n.mjs", import.meta.url), "utf8").replace(/^export /gm, "");
-const inline = source => source.replace(/^import \{ loc \} from "[^"]+";\n/m, `${i18n}\n`);
+const inline = source =>
+  source
+    .replace(/^import \{ loc \} from "[^"]+";\n/m, `${i18n}\n`)
+    .replace('"./dialog-sections.mjs"', JSON.stringify(uiModuleUrl("module/apps/dialog-sections.mjs")))
+    .replace('"./resolution-guide.mjs"', JSON.stringify(uiModuleUrl("module/apps/resolution-guide.mjs")));
 
 async function load(page, source, name) {
   await page.addScriptTag({ type: "module", content: `${inline(source)}\nwindow.${name}=${name};` });
@@ -81,7 +86,7 @@ test("named check changes show relevant circumstances, omit stale inputs and upd
     ])
   );
   await expect(page.locator(".sc2-check-context summary")).toHaveText("Balance");
-  await expect(page.getByRole("button")).toHaveText("Roll Balance Check");
+  await expect(page.locator('[data-action="ok"]')).toHaveText("Roll Balance Check");
   await expect(page.locator('[name="method"]')).toBeVisible();
   await page.locator("details.sc2-check-context").evaluate(el => (el.open = true));
   await page.locator('[name="balanceCircumstances"]').check();
@@ -96,7 +101,8 @@ test("named check changes show relevant circumstances, omit stale inputs and upd
   await expect(page.locator(".sc2-check-context summary")).toHaveText("Gear");
   await page.locator(".sc2-advanced-options").evaluate(el => (el.open = true));
   await page.locator('[name="method"]').selectOption("take10");
-  await expect(page.getByRole("button")).toHaveText("Take 10: Repair Check");
+  await expect(page.locator('[data-action="ok"]')).toHaveText("Take 10: Repair Check");
+  await expect(page.locator('[data-action="ok"]')).toHaveAccessibleName("Take 10: Repair Check");
 });
 
 test("combat disclosures retain independent open states across a complete sheet render", async ({ page }) => {

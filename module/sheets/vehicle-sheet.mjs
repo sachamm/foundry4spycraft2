@@ -1,4 +1,7 @@
 import { systemDialog } from "../apps/dialog-theme.mjs";
+import { SaveFeedback } from "./save-feedback.mjs";
+import { installToolSearch } from "../apps/tool-search.mjs";
+import { installResolutionGuide } from "../apps/resolution-guide.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { VEHICLE_DAMAGE_COUNTERS } from "../rules/vehicles.mjs";
 import {
@@ -76,7 +79,20 @@ const SENSOR_LABELS = {
 const share = ([n, d]) => `${n}/${d}`;
 
 /** Sheet for a vehicle placed on a scene: its table statistics, current condition, people aboard and play actions. */
-export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2)) {
+  _vehicleToolsState = {};
+
+  _onRender(context, options) {
+    super._onRender(context, options);
+    installResolutionGuide(this.element.querySelector(".spycraft2-sheet.vehicle"), "vehicle");
+    installToolSearch(
+      this.element,
+      "details.sc2-tool-section",
+      loc`Find vehicle tools or statistics`,
+      this._vehicleToolsState
+    );
+  }
+
   static DEFAULT_OPTIONS = {
     classes: ["spycraft2", "sheet", "actor", "vehicle"],
     position: { width: 680, height: 780 },

@@ -84,6 +84,16 @@ const FIELDS = {
 /** Item types an agent can only hold once; the browser won't add a second copy. */
 const UNIQUE = new Set(["origin"]);
 
+function focusEntry(root, uuid) {
+  const selected = [...root.querySelectorAll('.browser-list [data-action="select"]')].find(
+    control => control.closest("[data-uuid]")?.dataset.uuid === uuid
+  );
+  if (selected) {
+    selected.tabIndex = 0;
+    selected.focus({ preventScroll: true });
+  }
+}
+
 /** Plain text of a stored HTML description (parsed inertly, nothing is loaded or run). */
 function plainText(html) {
   if (!html) return "";
@@ -112,8 +122,11 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     window: { resizable: true },
     actions: {
       select(event, target) {
+        const keyboard = event.detail === 0;
         this.selected = target.closest("[data-uuid]")?.dataset.uuid ?? null;
-        return this.render();
+        return this.render().then(() => {
+          if (keyboard) focusEntry(this.element, this.selected);
+        });
       },
       add: SpycraftBrowser.#onAdd,
       open: SpycraftBrowser.#onOpen
@@ -298,8 +311,15 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     html.querySelector("[name=search]")?.addEventListener(
       "input",
       foundry.utils.debounce(ev => {
+        const focused = this.element.ownerDocument.activeElement;
+        const selectedUuid = this.element.contains(focused)
+          ? focused.closest(".browser-list [data-uuid]")?.dataset.uuid
+          : null;
+        const restoreSearch = focused === ev.target;
         this.filters.search = ev.target.value;
         this.render().then(() => {
+          if (selectedUuid) return focusEntry(this.element, selectedUuid);
+          if (!restoreSearch) return;
           const input = this.element.querySelector("[name=search]");
           input?.focus();
           input?.setSelectionRange(input.value.length, input.value.length);

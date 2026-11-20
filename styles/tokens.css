@@ -55,10 +55,10 @@
   --sc2-space-3: 12px;
   --sc2-space-4: 16px;
 
-  --sc2-text-s: 12px;
+  --sc2-text-s: 13px;
   --sc2-text-m: 14px;
   --sc2-text-l: 18px;
-  --sc2-caption-size: 10px;
+  --sc2-caption-size: 13px;
   --sc2-value-size: 22px;
   /* Both faces ship with Foundry or the reader's system; nothing is downloaded. */
   --sc2-bar-font: "Bruno Ace", "Signika", sans-serif;
@@ -66,7 +66,7 @@
   --sc2-display: var(--sc2-num);
 
   --sc2-radius: 2px;
-  --sc2-control: 32px;
+  --sc2-control: 36px;
   --sc2-icon-size: 22px;
   --sc2-rail: 264px;
 }
@@ -81,7 +81,7 @@ body.theme-dark .spycraft2.application:not(.theme-light) :is(.spycraft2, .spycra
   --sc2-surface-sunk: #101414;
   --sc2-ink: #e8e4d8;
   --sc2-ink-strong: #fbf9f3;
-  --sc2-ink-muted: #a3aaa5;
+  --sc2-ink-muted: #b5bdb7;
   --sc2-bar: #0b0f0f;
   --sc2-on-bar: #e8e4d8;
   --sc2-action: #58b3b0;

@@ -16,3 +16,7 @@
 .chat-message.sc2-card .message-header .spycraft2-error { color: var(--sc2-on-bar-danger); }
 .spycraft2.roll-controls { display: grid; gap: 4px; margin-top: 6px; }
 .spycraft2.roll-controls :is(button, .sc2-icon-button) { width: 100%; justify-content: flex-start; text-align: left; }
+
+.spycraft2.sc2-result-guide { border-left: 3px solid var(--sc2-teal, #32665f); padding: 6px 10px; margin-bottom: 8px; background: var(--sc2-paper-raised, #f4f1e8); color: var(--sc2-ink, #292e2c); }
+.spycraft2.sc2-result-guide h4 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+.spycraft2.sc2-result-guide p { margin: 0; font-size: 13px; line-height: 1.5; }

@@ -1,4 +1,6 @@
 import { systemDialog } from "../dialog-theme.mjs";
+import { installToolSearch } from "../tool-search.mjs";
+import { installResolutionGuide } from "../resolution-guide.mjs";
 /** The GC Console: sidebar tools for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
 import { gcDiceStatus, manageGCDice } from "../../rules/gc-dice.mjs";
 import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
@@ -126,10 +128,14 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
         initial = context.sections?.[key]?.open;
       // Rendering an open section fires a toggle too; only a change from what was drawn is the GC's choice.
       details.addEventListener("toggle", () => {
+        if (details.dataset.toolSearchActive === "true" || details.dataset.searchOpen === String(details.open)) return;
+        delete details.dataset.searchOpen;
         if (details.open === initial && !storedSections()[key]) return;
         rememberSection(key, details.dataset.state, details.open);
       });
     }
+    installToolSearch(this.element, "details.gc-section", loc`Find a GC tool`);
+    installResolutionGuide(this.element.querySelector(".gc-console-body"), "gc");
   }
 
   async _onFirstRender(context, options) {
