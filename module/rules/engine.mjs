@@ -1229,7 +1229,14 @@ export function computeAgent(sys, items, cfg, options = {}) {
   sys.guardWeapons = readiedGuardWeapons(sys, items);
   // Whatever's Handy also helps Defense while an improvised weapon is in hand (module/rules/defense.mjs).
   sys.readiedImprovised = items.some(
-    i => i.type === "weapon" && i.system.improvised === true && i.system.equipped === true && i.system.carried !== false
+    i =>
+      i.type === "weapon" &&
+      i.system.improvised === true &&
+      i.system.equipped === true &&
+      i.system.carried !== false &&
+      i.system.destroyed !== true &&
+      i.system.reserve !== true &&
+      (i.system.quantity ?? 1) > 0
   );
   sys.disarmWeapons = readiedDisarmWeapons(sys, items);
   sys.knifeBasics = knifeBasicsPlan(sys, items);

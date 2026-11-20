@@ -65,6 +65,12 @@
       }
     },
     "triggerman": {
+      "Gunplay": {
+        "level": 2,
+        "rolls": [
+          "attack"
+        ]
+      },
       "Gun-Fu": {
         "level": 3,
         "rolls": [

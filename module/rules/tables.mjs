@@ -11402,6 +11402,12 @@ export const CLASS_ABILITY_REMINDERS = {
  ],
  "triggerman": [
   {
+   "name": "Gunplay",
+   "level": 2,
+   "rolls": "attack",
+   "text": "Each handgun hit raises your Initiative Count by 1 (2 at 7th)."
+  },
+  {
    "name": "Gun-Fu",
    "level": 3,
    "rolls": "attack",

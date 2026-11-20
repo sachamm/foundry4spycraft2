@@ -224,10 +224,10 @@ test("class abilities the rules do not carry out remind once the character reach
     assert.equal(CLASS_ABILITY_REMINDERS[key].length, Object.keys(abilities).length);
   }
   const triggerman = lvl => ({ classLevels: { triggerman: lvl } });
-  assert.deepEqual(classAbilityReminders(triggerman(2), { kind: "attack" }), []);
+  assert.deepEqual(classAbilityReminders(triggerman(1), { kind: "attack" }), []);
   assert.deepEqual(
     classAbilityReminders(triggerman(3), { kind: "attack" }).map(r => r.name),
-    ["Gun-Fu"]
+    ["Gun-Fu", "Gunplay"]
   );
   assert.deepEqual(classAbilityReminders(triggerman(3), { kind: "damage" }), []);
   assert.deepEqual(
@@ -241,6 +241,6 @@ test("class abilities the rules do not carry out remind once the character reach
   const actor = { items: [feat("f", "Snap Shot", "attack", "extra shot")], system: triggerman(3) };
   assert.deepEqual(
     characterReminders(actor, { kind: "attack" }).map(r => r.name),
-    ["Snap Shot", "Gun-Fu"]
+    ["Snap Shot", "Gun-Fu", "Gunplay"]
   );
 });
