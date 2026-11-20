@@ -43,6 +43,18 @@ reference results.
 
 ## What the character sheet does
 
+**Using the sheets:** **Edit character** (or **Edit NPC**) opens build fields; **Done** returns to play.
+The window header reports unsaved edits, saving, successful saves, or a failed save that needs another edit to retry.
+Routine attacks show the target, action and range first, with **Standard Attack** selected unless another action was supplied.
+**Special circumstances** retains Aim/Brace declarations, tricks and other modifiers; collapsing it preserves entered values.
+Required range and Reach declarations stay visible. Sheet tabs support Left/Right, Home/End, Enter and Space;
+catalog entries and NPC actions support Enter and Space. Keyboard selection in the catalog retains focus after its preview loads.
+
+Important captions use 13px type with normal capitalization and wrapping. Advanced attack options are grouped by purpose;
+attack and skill dialogs provide **Find an option** search. Search only filters the display: selected values remain in the roll.
+Short declarations keep their full conditions as visible, accessible help. Damage application starts with target, damage,
+kind and reduction source; armor penetration, critical hits and special damage have separate groups with applied-option counts.
+
 The agent sheet calculates:
 
 - **Attributes** — 36-point buy with cost table, origin modifiers, level increases at 4/8/12/16/20, misc.
@@ -284,6 +296,21 @@ Spycraft roll and character dialogs use the dossier palette, readable inputs and
 a confirmation footer outside the scrolling options. Unrelated Foundry dialogs
 keep their normal appearance. Toolbars include visible action labels, and compact
 icon controls have contextual names and tooltips.
+
+Level-zero agents open in Edit with one next setup action above the full checklist.
+The GC console has a local tool search. Vehicle sheets group condition, surroundings,
+crew, fuel and reference fields into searchable sections; local search and disclosure
+choices survive sheet updates. Searches preserve form values and clear with Escape.
+Frequent sheet toolbar icons and origin edit/change/remove actions have 44px targets.
+Supported roll cards show pending, confirmed, closed and damage-application states
+above the dice, with instructions tied to the recorded outcome and viewer permissions.
+The “Automatic vs table / GC steps” disclosures on Play, GC and vehicle tools, roll
+dialogs and supported chat cards explain which calculations and updates the system
+performs and which declarations, rulings and handoffs still need people. Unlabelled
+form fields receive accessible names, including row/column context in tables. Skill
+rolls and weapon reload actions have specific names. Keyboard focus is visible on
+fields and disclosure controls; chat actions expose busy/error feedback and recover
+focus to an updated result after replacement without taking focus from an open dialog.
 
 ### Sample scenes
 

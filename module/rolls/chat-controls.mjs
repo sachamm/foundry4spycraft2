@@ -14,6 +14,8 @@ import { automaticSkillSuccessSources, cunningPlanCheck, manualAdjustmentSource 
 import { rerollEligibility } from "../rules/limited-uses.mjs";
 import { checkCandidates, viewerFlavor } from "../rules/outcomes.mjs";
 import { loc } from "../i18n.mjs";
+import { renderCheckGuidance } from "./chat-guidance.mjs";
+import { runChatAction } from "../apps/chat-action-feedback.mjs";
 
 /** The viewer rolled this check (or is the GC) and it carries a result. */
 const ownsResult = ({ message, check, user }) => Number.isFinite(check.rawTotal) && (message.isAuthor || user.isGM);
@@ -141,14 +143,7 @@ function button(control) {
   element.textContent = localizedLabel(control);
   element.setAttribute("aria-label", element.textContent);
   element.dataset.rollControl = control.id;
-  element.addEventListener("click", async () => {
-    element.disabled = true;
-    try {
-      await control.run();
-    } finally {
-      element.disabled = false;
-    }
-  });
+  element.addEventListener("click", () => runChatAction(element, () => control.run()));
   return element;
 }
 
@@ -169,6 +164,7 @@ export function renderCheckControls(message, html) {
   if (flavor) flavor.innerHTML = translated;
   const actor = fromUuidSync(check.actorUuid);
   if (!actor?.isOwner) return;
+  renderCheckGuidance(message, check, html, game.user);
   const controls = rollPipeline.chatControls({ message, check, actor, user: game.user, checkKind: check.checkKind });
   const inContent = controls.filter(c => c.placement === "content");
   const onCard = controls.filter(c => c.placement === "card");

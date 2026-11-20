@@ -1,4 +1,6 @@
 import { loc } from "../i18n.mjs";
+import { organizeOptions } from "./dialog-sections.mjs";
+import { installResolutionGuide } from "./resolution-guide.mjs";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -47,6 +49,13 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
   // Choosing Roll / Take 10 / Take 20 is a common action, not an advanced modifier.
   const methodLabel = root.querySelector('[name="method"]')?.closest("label");
   if (methodLabel) root.insertBefore(methodLabel, advanced);
+  const quick = doc.createElement("div");
+  quick.className = "sc2-skill-quick";
+  for (const name of ["check", "ability", "method", "modifier", "secret"]) {
+    const control = root.querySelector(`[name="${name}"]`);
+    if (control) quick.append(control.closest("label") ?? control);
+  }
+  root.prepend(quick);
   const submit = dialog.element.querySelector('[data-action="ok"]');
   const ability = root.querySelector('[name="ability"]');
   function update() {
@@ -61,6 +70,7 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
         rule?.[1].includes(check.value) ||
         (section.querySelector('[name="gearStatus"]') && /Gear/.test(selected?.tags ?? ""));
       section.hidden = !!rule && !relevant;
+      section.dataset.optionExcluded = String(!!rule && !relevant);
       if (relevant) root.insertBefore(section, advanced);
       else advanced.append(section);
       // Do not silently submit circumstances from a different named check.
@@ -71,11 +81,17 @@ export function enhanceSkillDialog(_event, dialog, checks = []) {
     }
     const name = check.selectedOptions[0]?.textContent.replace(/ \([^)]*\)$/, "") ?? "check";
     const method = root.querySelector('[name="method"]')?.value ?? "roll";
-    if (submit)
-      submit.textContent =
+    if (submit) {
+      const label =
         method === "take10" ? loc`Take 10: ${name}` : method === "take20" ? loc`Take 20: ${name}` : loc`Roll ${name}`;
+      submit.textContent = label;
+      submit.setAttribute("aria-label", label);
+      submit.dataset.tooltip = label;
+    }
+    organizeOptions(advanced);
   }
   check.addEventListener("change", update);
   root.querySelector('[name="method"]')?.addEventListener("change", update);
   update();
+  installResolutionGuide(root, "skill");
 }

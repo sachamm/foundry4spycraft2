@@ -1,6 +1,7 @@
 /** Attacks and damage. */
 import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
+import { enhanceAttackDialog } from "../../apps/attack-dialog-ux.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
 import { reachIncreaseFeet } from "../../rules/reach.mjs";
 import { reachContextInput } from "../../apps/reach.mjs";
@@ -81,9 +82,20 @@ export const ActorAttackRolls = Base =>
         const needsCQB = cqbRangePlan(this.system, item.system, options).active;
         const input = await systemDialog.input({
           window: { title: loc`Attack circumstances` },
+          position: { width: 560 },
           rejectClose: false,
-          render: measureInto(this),
-          content: rollPipeline.dialog({ dialog: "attack", actor: this, item, needsCQB, options })
+          ok: { label: loc`Roll attack` },
+          render: (event, dialog) => {
+            measureInto(this)(event, dialog);
+            enhanceAttackDialog(event, dialog);
+          },
+          content: rollPipeline.dialog({
+            dialog: "attack",
+            actor: this,
+            item,
+            needsCQB,
+            options: { attackAction: "standard", ...options }
+          })
         });
         if (!input) return null;
         // What was entered, as roll options: each group of fields is read by the rule that owns it.

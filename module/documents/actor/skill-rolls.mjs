@@ -173,6 +173,7 @@ export const ActorSkillRolls = Base =>
           .join("");
         input = await systemDialog.input({
           window: { title: skill.name },
+          position: { width: 560 },
           rejectClose: false,
           ok: { label: loc`Roll check` },
           render: (event, dialog) => enhanceSkillDialog(event, dialog, checks),

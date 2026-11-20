@@ -17,7 +17,8 @@
     </div>
   </header>
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Condition"}}</h3>
+  <details class="sc2-tool-section" open>
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Condition"}}</summary>
   {{#if conditionTrack.length}}<div class="sc2-track" role="img" aria-label="{{system.failedSaves}} / {{system.breakState.destroyedAt}}">{{#each conditionTrack}}<i class="{{#if filled}}on{{/if}}{{#if broken}} mark-broken{{/if}}{{#if destroyed}} mark-destroyed{{/if}}"></i>{{/each}}</div>{{/if}}
   <p>
     <strong class="{{#unless (sc2eq system.breakState.state 'intact')}}bad{{/unless}}">{{system.breakState.state}}</strong>
@@ -52,7 +53,10 @@
     {{#each counters}}<label>{{label}} <input name="system.damage.{{key}}" type="number" min="0" value="{{value}}" class="w-2" /></label>{{/each}}
   </div>
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Surroundings"}}</h3>
+  </details>
+
+  <details class="sc2-tool-section">
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Surroundings"}}</summary>
   <div class="form-fields-grid">
     {{#each hazardFields}}<label>{{label}} <select name="system.hazards.{{group}}">{{selectOptions options selected=value}}</select></label>{{/each}}
     {{#if toleranceChoice}}<label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.ToleranceIgnores"}} <select name="system.hazards.tolerance">{{selectOptions toleranceChoice.options selected=toleranceChoice.value}}</select></label>{{/if}}
@@ -63,7 +67,10 @@
     <span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Table475ManeuveringRoomAdds"}}</span></p>{{/if}}
   {{#if acceleration}}<p>{{localize "SPYCRAFT.Template.ActorVehicleSheet.AccelerationToDistance"}} <strong>{{acceleration.first}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.InRound1"}}{{acceleration.firstShare}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.TopMPHThen"}} <strong>{{acceleration.later}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.ARound"}}{{acceleration.laterShare}}){{#if acceleration.rounds}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.TopMPHAfter"}} {{acceleration.rounds}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.Round"}}{{#unless (sc2eq acceleration.rounds 1)}}s{{/unless}}{{/if}} <span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Table474ADrawnVehicle"}}</span></p>{{/if}}
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Aboard"}}</h3>
+  </details>
+
+  <details class="sc2-tool-section">
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Aboard"}}</summary>
   <p>
     {{localize "SPYCRAFT.Template.ActorVehicleSheet.Driver"}} {{#if system.driverName}}<strong>{{system.driverName}}</strong> <a data-action="clearDriver" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.RemoveDriver'}}"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.DropACharacterHere"}}</span>{{/if}}
     {{#if (sc2eq system.vehicleClass 'M/AD')}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.Mount"}} {{#if system.mountName}}<strong>{{system.mountName}}</strong> <a data-action="clearMount" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.UnlinkTheAnimal'}}"><i class="fa-solid fa-xmark"></i></a>{{else}}<span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.DropAnNPCToUseIts"}}</span>{{/if}}{{/if}}
@@ -80,18 +87,27 @@
     {{#if skeletonCrew}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.SkeletonCrew"}} <strong>{{skeletonCrew.count}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TierIVehicleCrew"}} <span class="muted">({{skeletonCrew.source}})</span>{{/if}}
   </p>
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Fuel"}}</h3>
+  </details>
+
+  <details class="sc2-tool-section">
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Fuel"}}</summary>
   {{#if fuel}}<p>
     <strong class="{{#if fuel.empty}}bad{{/if}}">{{fuel.remainingLabel}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{fuel.capacityLabel}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.HoursLeft"}} {{fuel.fuelName}}
     <a data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.RecordUse"}}</a> <a data-action="refuel"><i class="fa-solid fa-rotate"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Refuel"}}</a>
-    {{localize "SPYCRAFT.Template.ActorVehicleSheet.Used"}} <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Hr"}}
+    <label class="vehicle-fuel-used">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Used"}} <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Hr"}}</label>
   </p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.NoFuelRangeToTrack"}}</p>{{/if}}
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Qualities"}}</h3>
+  </details>
+
+  <details class="sc2-tool-section">
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Qualities"}}</summary>
   {{#if system.qualityList.length}}<ul class="vehicle-qualities">{{#each system.qualityList}}<li><strong data-tooltip="{{summary}}">{{label}}</strong> — {{name}}{{#if summary}}: {{summary}}{{/if}}</li>{{/each}}</ul>
   <p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleQualitiesPp292295"}}</p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.None"}}</p>{{/if}}
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.UpgradesAndWeapons"}}</h3>
+  </details>
+
+  <details class="sc2-tool-section">
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.UpgradesAndWeapons"}}</summary>
   <p>{{localize "SPYCRAFT.Template.ActorVehicleSheet.UpgradesUsed"}} <strong class="{{#if upgradesOver}}bad{{/if}}">{{system.upgraded.used}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{system.upgraded.free}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.FreeWeaponSpaces"}} {{weapons.length}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{system.weaponSpaces}}{{#if weaponsOver}} <strong class="bad">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Over"}}</strong>{{/if}} <span class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.DropUpgradesAndVehicleWeaponsHere"}}</span></p>
   {{#if upgrades.length}}<table class="items"><tbody>{{#each upgrades}}<tr><td><a data-action="openItem" data-item-id="{{id}}">{{name}}</a></td><td>{{cost}}</td><td><a data-action="removeItem" data-item-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
   {{#if system.upgraded.addedQualities.length}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.AddedByUpgrades"}} {{#each system.upgraded.addedQualities}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
@@ -99,7 +115,10 @@
     <td><a data-action="fireWeapon" data-item-id="{{id}}"><i class="fa-solid fa-crosshairs"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Fire"}}</a></td><td><a data-action="removeItem" data-item-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-trash"></i></a></td></tr>{{/each}}</tbody></table>{{/if}}
   {{#if otherItems.length}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.AlsoAboard"}} {{#each otherItems}}<a data-action="openItem" data-item-id="{{id}}">{{name}}</a>{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Statistics"}}</h3>
+  </details>
+
+  <details class="sc2-tool-section">
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Statistics"}}</summary>
   <div class="form-fields-grid">
     <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Size"}} <input name="system.size" value="{{system.size}}" class="w-2" maxlength="1" /></label>
     <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.SizeAndFootprint"}} <input name="system.sizeLabel" value="{{system.sizeLabel}}" /></label>
@@ -119,6 +138,10 @@
   </div>
   <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Qualities"}} <input name="system.qualities" value="{{system.qualities}}" /></label>
 
-  <h3>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Notes"}}</h3>
+  </details>
+
+  <details class="sc2-tool-section">
+    <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Notes"}}</summary>
   {{#if editable}}<prose-mirror toggled name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
+  </details>
 </section>

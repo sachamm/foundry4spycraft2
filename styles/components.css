@@ -24,7 +24,7 @@
 /* Ghost: a repeated row verb. No box until it is pointed at or focused. */
 .spycraft2.application .sc2-icon-button[data-sc2-mode="icon"],
 .gc-console-body .sc2-icon-button[data-sc2-mode="icon"] {
-  width: var(--sc2-control); height: var(--sc2-control); padding: 2px;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 2px;
   background: transparent; border-color: transparent;
 }
 .spycraft2.application .sc2-icon-button[data-sc2-mode="icon"]:hover,
@@ -68,11 +68,13 @@
   font-size: var(--sc2-text-s); color: var(--sc2-ink); background: var(--sc2-paper-raised);
   border: 1px solid var(--sc2-rule); border-radius: 13px;
 }
-.spycraft2 .sc2-chip .sc2-icon-button[data-sc2-mode="icon"] { width: 24px; height: 24px; min-width: 24px; min-height: 24px; --sc2-icon-size: 18px; }
-.spycraft2.application .sc2-chip button[data-action="itemEdit"] { min-height: 24px; padding: 0 2px; font-size: var(--sc2-text-s); }
+.spycraft2 .sc2-chip .sc2-icon-button[data-sc2-mode="icon"] { width: 44px; height: 44px; min-width: 44px; min-height: 44px; --sc2-icon-size: 18px; }
+.spycraft2.application .sc2-chip button[data-action="itemEdit"] { min-height: 44px; padding: 0 6px; font-size: var(--sc2-text-s); }
+.spycraft2 .rail-id .origin.sc2-chip { max-width: 100%; flex-wrap: wrap; }
+.spycraft2 .origin.sc2-chip [data-action] { min-width: 44px; min-height: 44px; }
 
 .spycraft2 .sc2-meter { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 2px 6px; min-width: 150px; }
-.spycraft2 .sc2-meter-label { font: bold 11px/1.2 var(--sc2-display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--sc2-ink-muted); }
+.spycraft2 .sc2-meter-label { font: 600 var(--sc2-caption-size)/1.35 var(--font-primary, sans-serif); letter-spacing: 0.02em; color: var(--sc2-ink-muted); }
 .spycraft2 .sc2-meter-max { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); white-space: nowrap; }
 .spycraft2 .sc2-meter progress {
   grid-column: 1 / -1; width: 100%; height: 6px; appearance: none; -webkit-appearance: none;
@@ -140,7 +142,7 @@
 .spycraft2.application h3 {
   display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc2-space-1) var(--sc2-space-2);
   margin: var(--sc2-space-3) 0 var(--sc2-space-2); padding: 4px 8px; min-height: 26px;
-  font: 400 11px/1.3 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase;
+  font: 600 14px/1.4 var(--font-primary, sans-serif); letter-spacing: 0.02em; text-transform: none;
   color: var(--sc2-on-bar); background: var(--sc2-bar); border: 0;
 }
 .spycraft2.application h3:first-child { margin-top: 0; }
@@ -155,7 +157,7 @@
 /* Field: a small caption above its value. Stat tiles are fields. */
 .spycraft2 .sc2-caption,
 .spycraft2 .stat > span:first-child {
-  font: 600 var(--sc2-caption-size)/1.2 var(--font-primary, sans-serif); letter-spacing: 0.05em; text-transform: uppercase;
+  font: 600 var(--sc2-caption-size)/1.35 var(--font-primary, sans-serif); letter-spacing: 0.01em; text-transform: none;
   color: var(--sc2-ink-muted); max-width: 100%; overflow-wrap: anywhere;
 }
 .spycraft2 .sc2-value,
@@ -166,7 +168,7 @@
   min-width: 0; padding: 5px 8px; text-align: left;
   background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius);
 }
-.spycraft2.application .stat small { font-size: 10px; color: var(--sc2-ink-muted); opacity: 1; }
+.spycraft2.application .stat small { font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); opacity: 1; }
 /* A field that rolls is marked along its lower edge and fills when pointed at. */
 .spycraft2.application :is(.sc2-stat-action, button.sc2-field) {
   width: 100%; height: auto; margin: 0; cursor: pointer; font: inherit; line-height: 1.2; white-space: normal;
@@ -178,7 +180,7 @@
 /* Stamp: a status that must not be missed. */
 .spycraft2 .sc2-stamp {
   display: inline-block; padding: 1px 7px; transform: rotate(-1.5deg);
-  font: 700 10px/1.5 var(--sc2-num); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+  font: 700 12px/1.5 var(--sc2-num); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
   color: var(--sc2-danger); border: 2px solid currentColor; border-radius: 2px;
 }
 .spycraft2 .sc2-stamp.good { color: var(--sc2-good); }
@@ -194,8 +196,8 @@
   border: 0; border-bottom: 2px solid var(--sc2-bar); border-image: none;
 }
 .spycraft2.application .sheet-tabs a {
-  flex: 1 1 auto; display: flex; align-items: center; justify-content: center; min-height: 34px; padding: 4px 10px;
-  font: 600 12px/1.2 var(--font-primary, sans-serif); letter-spacing: 0.1em; text-transform: uppercase;
+  flex: 1 1 auto; display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 6px 10px;
+  font: 600 14px/1.35 var(--font-primary, sans-serif); letter-spacing: 0.02em; text-transform: none;
   color: var(--sc2-ink-muted); background: transparent; border: 0; border-radius: 0;
 }
 .spycraft2.application .sheet-tabs a:hover { color: var(--sc2-ink-strong); background: var(--sc2-action-tint); }
@@ -204,7 +206,7 @@
 /* Tables: a thin head, no fill. */
 .spycraft2.application table thead { color: var(--sc2-ink-muted); background: transparent; border: 0; border-bottom: 2px solid var(--sc2-bar); outline: 0; }
 .spycraft2.application table { border: 0; }
-.spycraft2.application table thead th { font: 600 var(--sc2-caption-size)/1.3 var(--font-primary, sans-serif); letter-spacing: 0.09em; text-transform: uppercase; padding: 4px; }
+.spycraft2.application table thead th { font: 600 var(--sc2-caption-size)/1.4 var(--font-primary, sans-serif); letter-spacing: 0.01em; text-transform: none; padding: 6px; opacity: 1; }
 .spycraft2.application table :is(th, td) { border-bottom-color: var(--sc2-rule); }
 
 /* Reference bands on item sheets and the browser become a plain bar. */
@@ -220,11 +222,74 @@
   .spycraft2.application :is(button, a, .stat) { transition: background-color 120ms, border-color 120ms, color 120ms; }
 }
 
+/* Autosave feedback remains visible while the sheet body scrolls. */
+.spycraft2 .window-header .sc2-save-status { margin-left: auto; padding: 2px 8px; font: 600 13px/1.35 var(--font-primary, sans-serif); color: var(--sc2-ink-muted); white-space: normal; }
+.spycraft2 .sc2-save-status[data-state="saved"] { color: var(--sc2-action); }
+.spycraft2 .sc2-save-status[data-state="error"], .spycraft2 .sc2-save-status[data-state="dirty"] { color: var(--sc2-bad); }
+.spycraft2 [role="button"]:focus-visible, .spycraft2 [role="tab"]:focus-visible { outline: 2px solid var(--sc2-action); outline-offset: 2px; }
+.spycraft2 .sc2-attack-quick { display: grid; gap: 10px; }
+.spycraft2 .sc2-attack-quick .hint { margin: 0; line-height: 1.45; color: var(--sc2-ink-muted); }
+.spycraft2 .sc2-attack-circumstances { margin-top: 12px; border-top: 1px solid var(--sc2-rule); padding-top: 8px; }
+.spycraft2 .sc2-attack-circumstances > summary { min-height: 36px; padding: 8px 0; cursor: pointer; font-weight: 600; }
+
 /* Dialogs: each option is a field with its caption above the control. */
 .spycraft2.application.sc2-dialog .dialog-content label:not(:has(> input[type="checkbox"], > input[type="radio"])) {
   display: flex; flex-direction: column; gap: 3px; margin: 0 0 var(--sc2-space-2);
-  font: 600 var(--sc2-caption-size)/1.3 var(--font-primary, sans-serif); letter-spacing: 0.07em; text-transform: uppercase; color: var(--sc2-ink-muted);
+  font: 600 var(--sc2-caption-size)/1.4 var(--font-primary, sans-serif); letter-spacing: 0.01em; text-transform: none; color: var(--sc2-ink);
 }
 .spycraft2.application.sc2-dialog .dialog-content label > :is(input, select, textarea) { font: 400 var(--sc2-text-m)/1.3 var(--font-primary, sans-serif); letter-spacing: 0; text-transform: none; }
 .spycraft2.application.sc2-dialog .dialog-content label:has(> input[type="checkbox"], > input[type="radio"]) { display: flex; align-items: center; gap: 8px; }
 .spycraft2.application.sc2-dialog .form-footer button { font: 600 13px/1.3 var(--font-primary, sans-serif); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Advanced forms expose small groups with readable declarations and optional search. */
+.spycraft2 :is(.sc2-option-group, .sc2-damage-options) { margin: 10px 0; border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); }
+.spycraft2 :is(.sc2-option-group, .sc2-damage-options) > summary { min-height: 40px; padding: 10px; font: 600 14px/1.4 var(--font-primary, sans-serif); cursor: pointer; background: var(--sc2-surface-raised); }
+.spycraft2 .sc2-option-group > :not(summary) { margin-left: 10px; margin-right: 10px; }
+.spycraft2 .sc2-option-group > fieldset { border: 0; padding: 0; }
+.spycraft2 .sc2-option-group > fieldset > legend { display: none; }
+.spycraft2 .sc2-option-hint, .spycraft2.application.sc2-dialog .hint { font-size: var(--sc2-text-s); line-height: 1.5; color: var(--sc2-ink-muted); }
+.spycraft2 .sc2-option-hint { margin-top: -2px; margin-bottom: 12px; }
+.spycraft2 .hint, .spycraft2 .carry, .spycraft2 .tag, .spycraft2 .feats-list li .tree { font-size: var(--sc2-text-s); line-height: 1.5; opacity: 1; }
+.spycraft2 .sc2-option-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px; padding: 10px 0; }
+.spycraft2 .sc2-option-search label { margin: 0 !important; }
+.spycraft2 .sc2-option-search input { width: 100%; }
+.spycraft2 .sc2-option-search button { margin: 0; }
+.spycraft2 .sc2-option-results { grid-column: 1 / -1; font-size: var(--sc2-text-s); color: var(--sc2-ink-muted); }
+.spycraft2 .sc2-option-empty { padding: 10px; font-size: var(--sc2-text-m); }
+.spycraft2 :is(.sc2-attack-quick, .sc2-skill-quick) { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; }
+.spycraft2 .sc2-attack-quick > * { grid-column: 1 / -1; }
+.spycraft2 .sc2-attack-quick > label:has([name="attackAction"]) { grid-column: 1; }
+.spycraft2 .sc2-attack-quick > label:has([name="distanceFeet"]) { grid-column: 2; }
+.spycraft2 .sc2-attack-quick:not(:has([name="distanceFeet"])) > label:has([name="attackAction"]) { grid-column: 1 / -1; }
+.spycraft2 .sc2-skill-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.spycraft2 .sc2-skill-quick > label:has([name="check"]) { grid-column: 1 / -1; }
+.spycraft2 .sc2-skill-quick > label:has([name="secret"]) { align-self: center; }
+.spycraft2.application.sc2-dialog .dialog-content label:has(> input[type="checkbox"], > input[type="radio"]) { align-items: flex-start; font-size: 14px; line-height: 1.4; padding: 4px 0; }
+.spycraft2.application.sc2-dialog .dialog-content input[type="checkbox"] { flex-shrink: 0; }
+
+/* Local tool discovery and progressive disclosure. Search never submits a form. */
+.spycraft2 .sc2-tool-search { display: flex; align-items: end; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.spycraft2 .sc2-tool-search label { display: grid; gap: 4px; flex: 1 1 220px; font-size: var(--sc2-text-s); }
+.spycraft2 .sc2-tool-search input { width: 100%; min-height: 36px; }
+.spycraft2 .sc2-tool-search > span { flex-basis: 100%; font-size: var(--sc2-text-s); }
+.spycraft2 .sc2-tool-section { margin: 8px 0; padding: 10px; border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); }
+.spycraft2 .sc2-tool-section > summary { cursor: pointer; font-weight: 600; min-height: 36px; align-content: center; }
+.spycraft2 :is(.sc2-tool-section, .gc-section)[hidden] { display: none !important; }
+.spycraft2 .sc2-next-setup { display: grid; gap: 6px; margin: 12px 0; }
+.spycraft2 .sc2-next-setup button { white-space: normal; text-align: left; }
+.spycraft2.sheet.vehicle .vehicle-fuel-used { display: inline-flex; align-items: center; gap: 6px; margin: 6px 0; }
+.spycraft2.sheet.vehicle .vehicle-fuel-used input { width: 80px; }
+
+/* Keyboard focus remains visible on fields, disclosure controls and text actions in both themes. */
+.spycraft2 :is(button, a, input, select, textarea, summary, [role="button"], [role="tab"], [tabindex]):focus-visible,
+.spycraft2.application :is(button, a, input, select, textarea, summary, [role="button"], [role="tab"], [tabindex]):focus-visible,
+.spycraft2.gc-console-body :is(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible { outline: 3px solid var(--sc2-focus-color, var(--sc2-action)); outline-offset: 3px; }
+.spycraft2.application summary, .spycraft2.gc-console-body summary { min-height: 44px; align-content: center; }
+.spycraft2 .sc2-resolution-guide { margin: 8px 0; padding: 6px 10px; border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); font-size: 13px; line-height: 1.5; }
+.spycraft2 .sc2-resolution-guide > summary { cursor: pointer; color: var(--sc2-ink); font-weight: 600; }
+.spycraft2 .sc2-resolution-guide p { margin: 6px 0; }
+.spycraft2 .sc2-action-feedback { font-size: 13px; padding: 6px; overflow-wrap: anywhere; }
+.spycraft2 .sc2-action-feedback[role="alert"] { border-left: 3px solid var(--sc2-danger); }
+@media (forced-colors: active) {
+  .spycraft2 { --sc2-focus-color: Highlight; }
+}
