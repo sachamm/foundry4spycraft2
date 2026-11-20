@@ -150,6 +150,9 @@ was initially imported into it.
 
 Spycraft is a trademark of Crafty Games. This project is unofficial and not affiliated with or endorsed by Crafty Games.
 
+See [Licensing and provenance](LICENSING.md) for existing file-level licenses,
+asset sources, soundtrack provenance, and unresolved permission questions.
+
 The Spycraft 2.0 rulebook is copyrighted and is not open content. This repository must not contain its text: data files hold names, numbers and table values as bare labels, and every description is an original summary. You need the rulebook to play. Contributors, see [AGENTS.md](AGENTS.md).
 
 ## Installing in Foundry

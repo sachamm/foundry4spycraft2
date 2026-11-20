@@ -1,0 +1,132 @@
+{
+  "generatedBy": "Sacha Mallais",
+  "service": "Suno",
+  "account": "sacham",
+  "planAtGeneration": "Pro or Premier (owner-confirmed)",
+  "confirmationDate": "2026-11-19",
+  "verification": "Owner confirmation; account history, receipts, inputs, remix status and permitted downloads have not been independently verified.",
+  "publicReuseLicense": null,
+  "tracks": [
+    {
+      "title": "01. Where the Trains Run Under",
+      "file": "assets/audio/where-the-trains-run-under/01-where-the-trains-run-under.ogg",
+      "sha256": "4529c97ad16100aa25de6a3d52e7237c052434f597a60cfd0c6c000494fe7ebf",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "02. Tremolo Lounge",
+      "file": "assets/audio/where-the-trains-run-under/02-tremolo-lounge.ogg",
+      "sha256": "8b2cf1544777dcbb08c52567dd10c43cb8dcd2f1798d9591bc22e070d833a539",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "03. Muted Brass",
+      "file": "assets/audio/where-the-trains-run-under/03-muted-brass.ogg",
+      "sha256": "f26462a36bffe9f687ec5bd71b61c115a65cf78c3d3ec599952bade7c328cae8",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "04. Shadowed Motif",
+      "file": "assets/audio/where-the-trains-run-under/04-shadowed-motif.ogg",
+      "sha256": "dc6e6d1209f0356576b850e8494b031ed31a4942f495dfe849fe66ad57962b32",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "05. Clipped Minor Motif",
+      "file": "assets/audio/where-the-trains-run-under/05-clipped-minor-motif.ogg",
+      "sha256": "4c3c76f9749a5717f25b724c2f8f2692b1581130f1d30f6b6bc32ca6f7ce75a0",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "06. Ticking Motif",
+      "file": "assets/audio/where-the-trains-run-under/06-ticking-motif.ogg",
+      "sha256": "31bc7cf79004e810254796a2a1f10e31a7a7c65cc4b2f72a17ec648460dfcb2c",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "07. Shadowy Ticking",
+      "file": "assets/audio/where-the-trains-run-under/07-shadowy-ticking.ogg",
+      "sha256": "801ae1a9a0dfcd37f28962f485e88e65a3d992603f7cb597369823f16ceac0cc",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "08. Ticking Shadows",
+      "file": "assets/audio/where-the-trains-run-under/08-ticking-shadows.ogg",
+      "sha256": "b0296136a9e52bc186622deccee08f38f38227e7882f0edd4837f4672aaf4d13",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "09. Clipped Tremolo",
+      "file": "assets/audio/where-the-trains-run-under/09-clipped-tremolo.ogg",
+      "sha256": "587aca799abdb9594aab3d78f74c2f6fc15e0c88f97878d92391db565f888e99",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "10. Shadow Pulse",
+      "file": "assets/audio/where-the-trains-run-under/10-shadow-pulse.ogg",
+      "sha256": "d4e620b9bbe056d161b1fecf6e6b4cae40adff40305a1ce3ac0abedc8f2c85f2",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    },
+    {
+      "title": "11. Run It Quiet",
+      "file": "assets/audio/where-the-trains-run-under/11-run-it-quiet.ogg",
+      "sha256": "ecf7bcae7933431c63fb0d04c7ebd2772bed3f6258c7586e25a545c1c970af43",
+      "generatedAt": null,
+      "sunoUrl": null,
+      "subscriptionEvidence": null,
+      "inputRightsEvidence": null,
+      "remixStatus": null,
+      "permittedDownloadEvidence": null
+    }
+  ]
+}

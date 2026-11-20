@@ -47,7 +47,7 @@ jobs:
 
       - name: Package and verify archive
         run: |
-          zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md CHANGELOG.md docs/sample-agents.md docs/sample-cast.md
+          zip -r spycraft2.zip system.json spycraft2.mjs module templates styles lang packs assets README.md LICENSING.md LICENSES CHANGELOG.md docs/sample-agents.md docs/sample-cast.md
           unzip -t spycraft2.zip
           sha256sum spycraft2.zip system.json > SHA256SUMS.txt
 
