@@ -1,0 +1,49 @@
+/**
+ * Where a character sheet opens.
+ *
+ * Foundry centres a new window, which puts a sheet over the tokens a player has to target and over the chat where
+ * rolls are resolved. A sheet opens against the left edge instead, no wider than the room between the scene
+ * controls and the sidebar, so the middle of the map and the chat stay in view. The sheet's own narrow layout takes
+ * over when it is squeezed. The window stays resizable and movable; this is only where it starts.
+ */
+const CONTROLS = 110; // room kept clear for the scene controls on the left
+const GAP = 12;
+const MIN_WIDTH = 640;
+
+/**
+ * @param {{width: number, height: number}} wanted  the sheet's preferred size
+ * @param {{width: number, height: number, sidebar: number, open: number}} room  the browser window, the sidebar's
+ *        width and how many sheets are already open (each new one steps down and right so titles stay reachable)
+ * @returns {{left: number, top: number, width: number, height: number}}
+ */
+export function sheetPlacement(wanted, room) {
+  const step = 24 * ((room.open ?? 0) % 5);
+  const available = room.width - room.sidebar - CONTROLS - GAP;
+  const width = Math.round(Math.max(Math.min(MIN_WIDTH, wanted.width), Math.min(wanted.width, available)));
+  const top = 60 + step;
+  const height = Math.round(Math.max(360, Math.min(wanted.height, room.height - top - GAP)));
+  return { left: CONTROLS + step, top, width, height };
+}
+
+/** The room the browser window gives right now. */
+export function currentRoom() {
+  const doc = globalThis.document,
+    sidebar = doc?.getElementById?.("sidebar")?.offsetWidth;
+  return {
+    width: globalThis.innerWidth ?? 1600,
+    height: globalThis.innerHeight ?? 900,
+    sidebar: Number.isFinite(sidebar) && sidebar > 0 ? sidebar : 348,
+    open: doc?.querySelectorAll?.(".spycraft2.sheet.actor").length ?? 0
+  };
+}
+
+/** Mixin step for a sheet's `_initializeApplicationOptions`: a position asked for by the caller is kept. */
+export function placeSheet(applied, requested = {}) {
+  if (requested.position?.left !== undefined || requested.position?.top !== undefined) return applied;
+  try {
+    applied.position = { ...applied.position, ...sheetPlacement(applied.position, currentRoom()) };
+  } catch {
+    /* no browser window to measure: Foundry's own placement stands */
+  }
+  return applied;
+}

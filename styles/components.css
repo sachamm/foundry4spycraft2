@@ -293,3 +293,7 @@
 @media (forced-colors: active) {
   .spycraft2 { --sc2-focus-color: Highlight; }
 }
+
+/* A minimised window shows its title bar only. The sheets lay their content out as a grid or flex box, which
+ * otherwise kept parts of it drawn over the map. */
+.spycraft2.application.minimized > .window-content { display: none !important; }

@@ -31,7 +31,9 @@ globalThis.foundry = {
     }
   }
 };
-globalThis.fromUuid = async uuid => (uuid === "Actor.a1" ? actor : null);
+// "Actor.t1" is a character the user "other" owns: the target of someone else's attack.
+const targetActor = { testUserPermission: (user, level) => level === "OWNER" && user.id === "other" };
+globalThis.fromUuid = async uuid => (uuid === "Actor.a1" ? actor : uuid === "Actor.t1" ? targetActor : null);
 const warnings = [];
 globalThis.ui = { notifications: { warn: text => warnings.push(text), info() {} } };
 const settings = { relayAutoApprove: false };
@@ -87,6 +89,20 @@ test("an applied-damage entry is added to the ones already there", async () => {
     data: { messageId: "m1", key: "damageAppliedEntry", value: entry }
   });
   assert.deepEqual(updates[0]["flags.spycraft2.damageApplied"], [message.flags.spycraft2.damageApplied[0], entry]);
+});
+
+test("the player whose character took the damage may record it on the attacker's card, and only that", async () => {
+  updates.length = 0;
+  const entry = { targetUuid: "Actor.t1", name: "T", damage: 6, kind: "lethal" };
+  const data = { messageId: "m1", key: "damageAppliedEntry", value: entry };
+  assert.deepEqual(await handleRelay({ action: "markCard", userId: "other", data }), { value: true });
+  assert.deepEqual(updates[0]["flags.spycraft2.damageApplied"].at(-1), entry);
+  // Damage to a character that user does not own, and any other mark, are still refused.
+  const elsewhere = { ...data, value: { ...entry, targetUuid: "y" } };
+  assert.match((await handleRelay({ action: "markCard", userId: "other", data: elsewhere })).error, /own player/);
+  const otherMark = { messageId: "m1", key: "pendingSave.rolled", value: true };
+  assert.match((await handleRelay({ action: "markCard", userId: "other", data: otherMark })).error, /own player/);
+  assert.equal(updates.length, 1);
 });
 
 test("an unknown request or user is answered with an error, never thrown", async () => {

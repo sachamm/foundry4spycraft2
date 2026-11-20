@@ -15,6 +15,11 @@ export const isResourceLock = item =>
   [RESOURCE_LOCK_ID, GC_RESOURCE_LOCK_ID, RULE_RESOURCE_LOCK_ID].includes(item?.id ?? item?._id) &&
   !!item.flags?.spycraft2?.resourceLock?.token;
 export class ResourceBusyError extends Error {}
+/** Another transaction holds this character's lock right now. It clears by itself when that one finishes. */
+export class ResourceLockedError extends ResourceBusyError {}
+const BACKGROUND_RETRIES = 6;
+const BACKGROUND_DELAY_MS = 350;
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 function requireSettledPeriod(allow) {
   const stored = globalThis.game?.settings?.get?.("spycraft2", "usagePeriodReview"),
     review = stored?.needsReview ? stored : (globalThis.game?.spycraft2?.pendingUsagePeriodReview ?? stored);
@@ -22,23 +27,42 @@ function requireSettledPeriod(allow) {
     throw new ResourceBusyError(loc`The GC must review the interrupted start before further resource use.`);
 }
 
-/** One local barrier for every participant, acquired together to prevent reciprocal-queue deadlocks. */
-export function queueResources(actors, work, { messages = [], allowPeriodReview = false } = {}) {
+/**
+ * One local barrier for every participant, acquired together to prevent reciprocal-queue deadlocks.
+ *
+ * `background` is for bookkeeping nobody asked for (a hook that reconciles a derived value after a character
+ * changes). When the character is locked by someone's own action, such work waits and tries again instead of
+ * putting a warning on screen about a transaction the viewer did not start.
+ */
+export function queueResources(actors, work, { messages = [], allowPeriodReview = false, background = false } = {}) {
   const unique = [...new Map(actors.filter(Boolean).map(actor => [actor.uuid, actor])).values()].sort((a, b) =>
     a.uuid < b.uuid ? -1 : a.uuid > b.uuid ? 1 : 0
   );
   const previous = unique.map(actor => (actor._actionDieQueue ?? Promise.resolve()).catch(() => {}));
   const pending = Promise.all(previous)
-    .then(() => {
-      requireSettledPeriod(allowPeriodReview);
-      const backend = globalThis.game?.spycraft2?.resourceLocks;
-      if (globalThis.game?.ready && !backend)
-        throw new Error(loc`The resource transaction service is unavailable. Reload the world before spending.`);
-      return backend ? backend.run(unique, work, { messages, allowPeriodReview }) : work();
+    .then(async () => {
+      const attempt = () => {
+        requireSettledPeriod(allowPeriodReview);
+        const backend = globalThis.game?.spycraft2?.resourceLocks;
+        if (globalThis.game?.ready && !backend)
+          throw new Error(loc`The resource transaction service is unavailable. Reload the world before spending.`);
+        return backend ? backend.run(unique, work, { messages, allowPeriodReview }) : work();
+      };
+      if (!background) return attempt();
+      // The lock is taken before any work starts, so trying again never repeats part of the work.
+      for (let tries = 0; ; tries++)
+        try {
+          return await attempt();
+        } catch (error) {
+          if (!(error instanceof ResourceLockedError) || tries >= BACKGROUND_RETRIES) throw error;
+          await wait(BACKGROUND_DELAY_MS * (tries + 1));
+        }
     })
     .catch(error => {
       if (error instanceof ResourceBusyError) {
-        globalThis.ui?.notifications?.warn(error.message);
+        if (background && error instanceof ResourceLockedError)
+          console.debug("Spycraft 2.0 | Background bookkeeping skipped: the character stayed busy.", error.message);
+        else globalThis.ui?.notifications?.warn(error.message);
         return null;
       }
       throw error;
@@ -93,7 +117,7 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
   const existing = actor.items.get(scope);
   if (existing) {
     if (isResourceLock(existing))
-      throw new ResourceBusyError(
+      throw new ResourceLockedError(
         loc`${actor.name}: a resource transaction is in progress. Retry after it finishes; the GC can recover an interrupted transaction.`
       );
     throw new Error(loc`${actor.name}: the reserved resource-document ID is already used by another item.`);
@@ -108,7 +132,7 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
       return gmToken;
     }
     if (!answer.unreachable)
-      throw new ResourceBusyError(
+      throw new ResourceLockedError(
         loc`${actor.name}: a resource transaction is in progress. Retry after it finishes; the GC can recover an interrupted transaction.`
       );
   }
@@ -125,7 +149,7 @@ async function acquire(actor, scope = RESOURCE_LOCK_ID) {
     docs = await actor.createEmbeddedDocuments("Item", [data], { keepId: true, render: false });
   } catch (error) {
     if (/already exists/.test(error.message))
-      throw new ResourceBusyError(
+      throw new ResourceLockedError(
         loc`${actor.name}: another client started a resource transaction. Retry after it finishes.`
       );
     throw error;

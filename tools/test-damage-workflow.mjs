@@ -496,7 +496,8 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
   assert.deepEqual(
     resolve.map(c => [c.label, c.emphasis]),
     [
-      ["Resolve vs Defense 15 (Guard)", "primary"],
+      // The viewer can read this Defense, so the button already says how the roll stands against it.
+      ["Resolve vs Defense 15 (Guard): hit", "primary"],
       ["Resolve against another target or Defense…", undefined]
     ]
   );
@@ -543,4 +544,108 @@ test("wound loss from applied damage records its end-of-round Initiative change"
   assert.equal(modifiers[0].amount, -2);
   assert.match(posted.at(-1).content, /Initiative -2 at the end of the round/);
   game.combat = undefined;
+});
+
+test("resolving never targets the attacker, uses the one targeted token without asking, and says how a hit stands", async () => {
+  reset();
+  const { targetChoices, standingAgainst, accumulatedDamageLines } =
+    await import("../module/apps/damage-application.mjs");
+  const attacker = character("Shooter", { activeFeatNames: [], defense: { total: 11 } });
+  const guard = character("Sentry", { defense: { total: 15 } });
+  const offScene = character("Faraway", { defense: { total: 10 } });
+  const before = { targets: game.user.targets, actors: game.actors, combats: game.combats };
+  try {
+    game.actors = [attacker, guard, offScene];
+    game.combats = [{ turns: [{ actor: attacker }, { actor: guard }] }];
+    // The attacker's own token, targeted by mistake: it is neither offered nor preselected.
+    game.user.targets = [{ actor: attacker }];
+    const mistaken = targetChoices({ exclude: attacker.uuid, offScene: "fallback" });
+    assert.deepEqual(
+      mistaken.actors.map(actor => actor.name),
+      ["Sentry"]
+    );
+    assert.equal(mistaken.selected, "");
+    // Without the options the full list is kept, for the pickers that need it.
+    assert.deepEqual(
+      targetChoices().actors.map(actor => actor.name),
+      ["Shooter", "Sentry", "Faraway"]
+    );
+    const self = card("s1", { actorUuid: attacker.uuid, checkKind: "attack", rawTotal: 18, effectiveTotal: 18 });
+    assert.equal(await resolveAttack(self, { targetUuid: attacker.uuid, defense: "" }), null);
+    assert.equal(self.flags.spycraft2.attackResolution, undefined);
+    assert.ok(warnings.some(text => /cannot be the target of its own attack/.test(text)));
+    // One other token targeted and nothing recorded on the card: settled at once, with no dialog.
+    game.user.targets = [{ actor: guard }];
+    const quick = card("s2", { actorUuid: attacker.uuid, checkKind: "attack", rawTotal: 18, effectiveTotal: 18 });
+    const hit = await resolveAttack(quick);
+    assert.deepEqual([hit.hit, hit.targetName, hit.defense], [true, "Sentry", 15]);
+    // Asked for explicitly, the dialog still opens (and is cancelled here).
+    const asked = card("s3", { actorUuid: attacker.uuid, checkKind: "attack", rawTotal: 18, effectiveTotal: 18 });
+    assert.equal(await resolveAttack(asked, { ask: true }), null);
+  } finally {
+    Object.assign(game.user, { targets: before.targets });
+    Object.assign(game, { actors: before.actors, combats: before.combats });
+  }
+  assert.equal(standingAgainst({ effectiveTotal: 18 }, 15, attacker), ": hit");
+  assert.equal(standingAgainst({ effectiveTotal: 9 }, 15, attacker), ": miss");
+
+  // Stress and subdual damage: the report says what got through and that vitality does not move.
+  const system = { subdualThreshold: 14 };
+  const reduced = accumulatedDamageLines("Vector", "subdual", 6, { newDamage: 2, total: 2, save: null }, system);
+  assert.match(reduced[0], /6 subdual damage, 2 after damage reduction and resistance: 2 in all \(threshold 14\)/);
+  assert.match(reduced[1], /Vitality and wounds do not change/);
+  const stopped = accumulatedDamageLines("Vector", "subdual", 3, { newDamage: 0, total: 2, save: null }, system);
+  assert.match(stopped[0], /stop all 3 subdual damage/);
+  const save = accumulatedDamageLines("Vector", "stress", 9, { newDamage: 9, total: 15, save: { dc: 12 } }, {});
+  assert.match(save[0], /takes 9 stress damage: 15 in all\./);
+  assert.match(save[1], /save, DC 12/);
+});
+
+test("the player whose agent is attacked gets Defense buttons on the attack card and Apply on its damage card", async () => {
+  reset();
+  const { targetResponseControls } = await import("../module/apps/target-response.mjs");
+  const guard = character("Hostile", { activeFeatNames: [] }, { type: "npc", isOwner: false });
+  const mine = character("Latch", {
+    defense: { total: 12 },
+    vitality: { value: 20, max: 20 },
+    wounds: { value: 12, max: 12 },
+    dr: {}
+  });
+  const player = { isGM: false };
+  const attack = card("t1", {
+    actorUuid: guard.uuid,
+    checkKind: "attack",
+    rawTotal: 19,
+    effectiveTotal: 19,
+    attackContext: { targetActorUuid: mine.uuid }
+  });
+  const ids = (message, user = player) =>
+    targetResponseControls({ message, check: message.flags.spycraft2, user }).map(control => control.id);
+  assert.deepEqual(ids(attack), ["targetCheckDefense", "targetBoostDefense"]);
+  // Once the attack is settled there is nothing left to answer on it.
+  attack.flags.spycraft2.attackResolution = { hit: true };
+  assert.deepEqual(ids(attack), []);
+  // Someone else's agent, or an attack that names itself, offers nothing.
+  const other = character("Vector", {}, { isOwner: false });
+  const elsewhere = card("t2", {
+    actorUuid: guard.uuid,
+    checkKind: "attack",
+    rawTotal: 19,
+    effectiveTotal: 19,
+    attackContext: { targetActorUuid: other.uuid }
+  });
+  assert.deepEqual(ids(elsewhere), []);
+  // The damage card: the target's player takes the damage with one press.
+  const damage = card("t3", {
+    actorUuid: guard.uuid,
+    checkKind: "damage",
+    effectiveTotal: 6,
+    sourceAttack: { uuid: attack.uuid, targetUuid: mine.uuid }
+  });
+  const [apply] = targetResponseControls({ message: damage, check: damage.flags.spycraft2, user: player });
+  assert.equal(apply.id, "targetTakeDamage");
+  assert.match(apply.label, /^Apply 6 to Latch/);
+  await apply.run();
+  assert.equal(mine.system.vitality.value, 14);
+  assert.deepEqual(ids(damage), [], "not offered twice");
 });

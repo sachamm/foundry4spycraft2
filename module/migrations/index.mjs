@@ -20,7 +20,7 @@ import { FEAT_REMINDERS } from "../rules/tables.mjs";
  */
 
 /** The data schema version this build of the system writes. */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /**
  * Version 2: feats gained `system.reminder`. A feat already on a character or in the world takes the reminder its
@@ -35,8 +35,26 @@ export function featReminderUpdate(source, reminders = FEAT_REMINDERS) {
   return { "system.reminder": { rolls: known.rolls, text: known.text } };
 }
 
+/**
+ * Version 3: agent tokens see. Earlier agents were created with token vision off, which left their players with a
+ * black map on any scene that uses token vision.
+ */
+export function agentSightUpdate(source) {
+  if (source?.type !== "agent" || source.prototypeToken?.sight?.enabled === true) return null;
+  return { "prototypeToken.sight.enabled": true };
+}
+
+/** The same for an agent's token already placed on a scene. `actorSource` is the token's actor data. */
+export function agentTokenSightUpdate(source, actorSource) {
+  if (actorSource?.type !== "agent" || source?.sight?.enabled === true) return null;
+  return { "sight.enabled": true };
+}
+
 /** Ordered migrations. Version 1 is the first versioned schema, so the list starts at 2. */
-export const MIGRATIONS = [{ version: 2, label: loc`feat reminders`, item: source => featReminderUpdate(source) }];
+export const MIGRATIONS = [
+  { version: 2, label: loc`feat reminders`, item: source => featReminderUpdate(source) },
+  { version: 3, label: loc`agent token vision`, actor: agentSightUpdate, token: agentTokenSightUpdate }
+];
 
 /** Migrations still to run for a world at version `from`, oldest first. */
 export function pendingMigrations(from, migrations = MIGRATIONS, to = SCHEMA_VERSION) {
@@ -75,7 +93,7 @@ export function applyUpdate(source, update) {
 /**
  * The combined update one document needs from a list of migrations, or null when none applies.
  * Each migration sees the data as the earlier ones left it.
- * @param {"actor"|"item"} kind
+ * @param {"actor"|"item"|"token"} kind
  */
 export function documentUpdate(kind, source, parentSource, migrations) {
   let working = source;
@@ -94,7 +112,7 @@ export function documentUpdate(kind, source, parentSource, migrations) {
 
 /**
  * Bring a world's actors and items up to the current schema version.
- * @param {object} world  { version, actors, items, setVersion(n), notify?(message) } — documents need toObject(),
+ * @param {object} world  { version, actors, items, tokens?, setVersion(n), notify?(message) } — documents need toObject(),
  *                        update() and, for actors, an `items` collection.
  * @returns {{from: number, to: number, updated: number, failed: number, ran: number[]}}
  */
@@ -124,6 +142,7 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
       for (const item of actor.items ?? []) await migrate("item", item, parentSource);
     }
     for (const item of world.items ?? []) await migrate("item", item, null);
+    for (const token of world.tokens ?? []) if (token.actor) await migrate("token", token, token.actor.toObject());
   }
   // A run with failures keeps the old version, so the same migrations are tried again next time.
   if (!report.failed) await world.setVersion(to);
@@ -185,6 +204,7 @@ export async function runWorldMigrations() {
     version: stored,
     actors: [...worldActors(game), ...packed.actors],
     items: [...(game.items ?? []), ...packed.items],
+    tokens: [...(game.scenes ?? [])].flatMap(scene => [...(scene.tokens ?? [])]),
     setVersion: version => game.settings.set("spycraft2", "schemaVersion", version),
     notify: message => ui.notifications?.info(message)
   });

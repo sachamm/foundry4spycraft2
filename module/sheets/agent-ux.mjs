@@ -44,9 +44,14 @@ export function buildSetupGuide(tasks = []) {
     step.count += task.count;
     step.tasks.push({ ...task, tab });
   }
-  const first = steps.values().next().value;
+  // The next step is the first reminder of the earliest creation step with something waiting: the same step the
+  // creation track marks as the place to start, so the two never point at different things.
+  const next = ordered
+    .map((task, index) => ({ task, index, step: TRACK_STEPS.findIndex(step => step.key === trackStepOf(task)) }))
+    .sort((a, b) => a.step - b.step || a.index - b.index)[0]?.task;
+  const nextTab = next ? (Object.hasOwn(labels, next.tab) ? next.tab : "main") : null;
   return {
-    next: first ? { ...first.tasks[0], label: first.label } : null,
+    next: next ? { ...next, tab: nextTab, label: labels[nextTab] } : null,
     count: ordered.reduce((sum, task) => sum + task.count, 0),
     steps: [...steps.values()]
   };

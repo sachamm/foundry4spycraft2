@@ -123,13 +123,44 @@ export function knownCharacterTargetInput(uuid, input = {}, characterType = "") 
   };
 }
 
+/**
+ * Who an ordinary attack can name as its target: the targeted token, then the tokens in view on the scene and the
+ * combatants. People with no token there are listed only when nobody else can be chosen. The attacker is left out.
+ * A token the user can see is listed by its token name even when its sheet cannot be opened.
+ * @returns {{uuid: string, name: string}[]}
+ */
+export function observedAttackTargetChoices(actor) {
+  const rows = new Map(),
+    isGM = globalThis.game?.user?.isGM === true;
+  const add = (a, name) => {
+    if (!a || !["agent", "npc"].includes(a.type) || a.uuid === actor?.uuid || rows.has(a.uuid)) return;
+    rows.set(a.uuid, { uuid: a.uuid, name: name || a.name || "" });
+  };
+  for (const token of values(game.user?.targets)) add(token.actor, token.name ?? token.document?.name);
+  for (const token of values(globalThis.canvas?.scene?.tokens)) {
+    const inView = isGM || (token.hidden !== true && token.object?.visible !== false);
+    if (inView || canRead(token.actor)) add(token.actor, token.name);
+  }
+  for (const c of values(game.combats))
+    for (const t of c.turns ?? []) if (canRead(t.actor)) add(t.actor, t.token?.name ?? t.name);
+  if (!rows.size) for (const a of values(game.actors)) if (canRead(a)) add(a, a.name);
+  // Identical tokens are numbered so they can be told apart.
+  const totals = new Map(),
+    seen = new Map();
+  for (const row of rows.values()) totals.set(row.name, (totals.get(row.name) ?? 0) + 1);
+  return [...rows.values()].map(row => {
+    if (totals.get(row.name) < 2) return row;
+    const n = (seen.get(row.name) ?? 0) + 1;
+    seen.set(row.name, n);
+    return { ...row, name: `${row.name} ${n}` };
+  });
+}
+
 /** Optional actual target for attacks that do not require Cleave classification. */
 export function observedAttackTargetContent(actor, input = {}) {
   const esc = foundry.utils.escapeHTML,
-    targets = attackCharacterTargetChoices().filter(a => a.uuid !== actor.uuid),
-    selected =
-      input.targetActorUuid ??
-      (values(game.user?.targets).length === 1 ? values(game.user.targets)[0].actor?.uuid : "") ??
-      "";
+    targets = observedAttackTargetChoices(actor),
+    targeted = values(game.user?.targets),
+    selected = input.targetActorUuid ?? (targeted.length === 1 ? targeted[0].actor?.uuid : "") ?? "";
   return `<label>${loc`Actual opponent (optional; retain in the attack receipt)`} <select name="targetActorUuid"><option value="">${loc`Unrecorded / GC-confirmed target`}</option>${targets.map(a => `<option value="${esc(a.uuid)}"${a.uuid === selected ? " selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>`;
 }

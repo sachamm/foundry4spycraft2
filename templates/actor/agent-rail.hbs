@@ -19,6 +19,12 @@
     </div>
   </div>
 
+  {{!-- The next build step sits at the top of the rail, so it is in view on a small screen. --}}
+  {{#if setupGuide.next}}{{#if editable}}<div class="sc2-next-setup">
+    <span class="sc2-caption">{{playLabels.nextSetup}}</span>
+    {{#with setupGuide.next}}<button type="button" class="sc2-primary-action" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{/with}}
+  </div>{{/if}}{{/if}}
+
   {{#if activeConditions.length}}<div class="rail-conditions" role="status" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CurrentConditions'}}">{{#each activeConditions}}<span class="sc2-stamp">{{this}}</span>{{/each}}</div>{{/if}}
 
   <div class="rail-block resources">
@@ -28,6 +34,7 @@
     <label class="res sc2-meter wounds"><span class="sc2-caption">{{localize "SPYCRAFT.Wounds"}}</span>
       <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span class="sc2-meter-max" {{sc2tip tips.wounds}}>/ {{system.wounds.max}}</span>
       <progress max="{{system.wounds.max}}" value="{{system.wounds.value}}" aria-hidden="true"></progress></label>
+    {{#if nonLethalMeters.length}}<div class="sc2-nonlethal" role="status">{{#each nonLethalMeters}}<a class="sc2-nonlethal-meter{{#if pending}} pending{{/if}}" data-action="{{action}}" data-tooltip="{{tooltip}}"><span class="sc2-caption">{{label}}</span> <b>{{total}}</b> / {{threshold}}<progress max="{{threshold}}" value="{{total}}" aria-hidden="true"></progress></a>{{/each}}</div>{{/if}}
   </div>
 
   <div class="rail-block rail-fields">
@@ -54,10 +61,6 @@
   </div>
 
 {{#if setupGuide.next}}
-{{#if editable}}<div class="sc2-next-setup">
-  <span class="sc2-caption">{{playLabels.nextSetup}}</span>
-  {{#with setupGuide.next}}<button type="button" class="sc2-primary-action" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{/with}}
-</div>{{/if}}
 <details class="todo" data-key="todo" {{#if open.todo}}open{{/if}}>
   <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentHeader.SetupChecklist"}} {{setupGuide.count}} {{localize "SPYCRAFT.Template.ActorAgentHeader.Reminders"}}</summary>
   <ol class="setup-steps" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemainingCharacterSetup'}}">

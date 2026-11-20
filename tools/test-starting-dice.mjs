@@ -222,3 +222,16 @@ test("awards cannot precede a new character’s starting entry and a normal new 
     periods = { session: "s" };
   }
 });
+test("first entry fills the empty health tracks of a character who has never played, and never heals a hurt one", async () => {
+  const fresh = new SpycraftActor();
+  fresh.system.vitality = { value: 0, max: 13 };
+  fresh.system.wounds = { value: 0, max: 12 };
+  assert.equal((await fresh.initializeStartingDice()).claimed, true);
+  assert.deepEqual([fresh.system.vitality.value, fresh.system.wounds.value], [13, 12]);
+  // Tracks that already hold a value are left as they are.
+  const hurt = new SpycraftActor();
+  hurt.system.vitality = { value: 5, max: 13 };
+  hurt.system.wounds = { value: 12, max: 12 };
+  await hurt.initializeStartingDice();
+  assert.deepEqual([hurt.system.vitality.value, hurt.system.wounds.value], [5, 12]);
+});

@@ -24,3 +24,23 @@
 .spycraft2.sc2-result-guide { border-left: 3px solid var(--sc2-teal, #32665f); padding: 6px 10px; margin-bottom: 8px; background: var(--sc2-paper-raised, #f4f1e8); color: var(--sc2-ink, #292e2c); }
 .spycraft2.sc2-result-guide h4 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
 .spycraft2.sc2-result-guide p { margin: 0; font-size: 13px; line-height: 1.5; }
+
+/* A player's own secret check: the result is hidden, the note says where it went. */
+.chat-message .spycraft2.sc2-secret-note { margin: 4px 0 0; font-size: var(--sc2-text-s, 13px); font-style: italic; }
+
+/* One surface for the whole card. The card takes its paper and ink from the same tokens as the sheets, so the two
+ * always pair: without this the card kept Foundry's own background under this system's text colours, which left
+ * the dice formula and secondary text too faint to read in the dark theme. */
+.chat-message.sc2-card { color: var(--sc2-ink); background: var(--sc2-surface); border-color: var(--sc2-rule); }
+.chat-message.sc2-card .message-content { color: var(--sc2-ink); }
+.chat-message.sc2-card .dice-formula { color: var(--sc2-ink); opacity: 1; }
+.chat-message.sc2-card .message-content a:not(.sc2-icon-button) { color: var(--sc2-action); }
+.chat-message.sc2-card .spycraft2.chat-note,
+.chat-message.sc2-card .spycraft2.sc2-secret-note { color: var(--sc2-ink); }
+/* The next step is the filled button wherever it sits on the card, in a row or on its own. */
+.chat-message.sc2-card button.sc2-primary-action { color: var(--sc2-on-action); background: var(--sc2-action); border-color: var(--sc2-action); font-weight: 700; }
+.chat-message.sc2-card button.sc2-primary-action:hover { background: var(--sc2-action-strong); border-color: var(--sc2-action-strong); }
+.chat-message.sc2-card button:not(.sc2-primary-action, .sc2-quiet-action) { color: var(--sc2-action); background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); }
+/* Closing the outcome is a real, readable secondary button. */
+.spycraft2.roll-controls button.sc2-quiet-action { min-height: 28px; padding: 2px 8px; font-size: var(--sc2-text-s); color: var(--sc2-action); border: 1px solid var(--sc2-rule); border-radius: var(--sc2-radius); text-decoration: none; }
+.spycraft2.roll-controls button.sc2-quiet-action:hover { color: var(--sc2-ink-strong); border-color: var(--sc2-action); }

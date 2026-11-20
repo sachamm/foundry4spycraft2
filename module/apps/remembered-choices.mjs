@@ -116,7 +116,9 @@ export function skipDialog(event) {
 export function quickAttackOptions(actor, item) {
   const entered = { attackAction: "standard", ...(rememberedChoices(choiceKey("attack", actor, item?.id)) ?? {}) };
   const targeted = [...(game.user?.targets ?? [])];
-  if (targeted.length === 1 && targeted[0].actor) entered.targetActorUuid = targeted[0].actor.uuid;
+  // A character is never its own target: a token targeted by mistake under an open sheet is ignored.
+  if (targeted.length === 1 && targeted[0].actor && targeted[0].actor.uuid !== actor?.uuid)
+    entered.targetActorUuid = targeted[0].actor.uuid;
   if (mapAvailable())
     try {
       const measured = measureAttack(actor);

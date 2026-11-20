@@ -1,4 +1,5 @@
 /** Running NPCs at the table: skill checks, standard-NPC Damage saves and disposition (pp.331–332, 452, 457–458). */
+import { messageModeOption } from "../../rolls/message-mode.mjs";
 import { TABLES, SKILLS } from "../../rules/tables.mjs";
 import { stepLookup } from "../../rules/formula.mjs";
 import { currentDamageTrack, resolveDamageSave, healDamageTrack, damageSaveDC } from "../../rules/gc/npc-damage.mjs";
@@ -373,7 +374,7 @@ export async function manageDisposition(actor) {
           speaker: ChatMessage.getSpeaker({ actor }),
           flavor: loc`Loyalty (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${step.total} against ${step.target} — ${step.success ? loc`sides with them` : loc`sides against them`}.`
         },
-        { rollMode: "gmroll" }
+        messageModeOption("gmroll")
       );
     }
     if (input.action === "combat") {
@@ -384,7 +385,7 @@ export async function manageDisposition(actor) {
           speaker: ChatMessage.getSpeaker({ actor }),
           flavor: loc`Joins the fight? (${esc(dispositionGrade(gradeNow).name)} toward ${esc(name)}): ${result.total} against ${result.target} — ${result.joins ? (result.hostile ? loc`enters the fight against them` : loc`enters the fight on their side`) : loc`stays out`}. A side may instead try Impress/Persuasion once per combat (DC ${dispositionGrade(gradeNow).joinDC ?? loc`Triumph only`}).`
         },
-        { rollMode: "gmroll" }
+        messageModeOption("gmroll")
       );
     }
     const intimacy = dispositionCheckModifier(gradeNow, D.intimacyChecks[0], { villain }),
