@@ -91,12 +91,14 @@ test("the Play tab renders the same markup as one file did (whitespace aside)", 
   }
 });
 
-const AGENT_TEMPLATES = paths.filter(path => /templates\/actor\/(agent-|play\/|parts\/|npc-|vehicle-sheet)/.test(path));
+const SHEET_TEMPLATES = paths.filter(path =>
+  /templates\/(actor\/(agent-|play\/|parts\/|npc-|vehicle-sheet)|item\/|apps\/browser)/.test(path)
+);
 
-test("the actor sheets' templates author buttons, not action links, and every button has a name", () => {
-  assert.ok(AGENT_TEMPLATES.length > 20);
+test("sheet and catalog templates author buttons, not action links, and every button has a name", () => {
+  assert.ok(SHEET_TEMPLATES.length > 20);
   const env = createEnvironment();
-  for (const path of AGENT_TEMPLATES) {
+  for (const path of SHEET_TEMPLATES) {
     const source = sourceOf(path);
     const links = [...source.matchAll(/<a [^>]*data-action="(?!tab")[^"]*"/g)].map(([link]) => link);
     assert.deepEqual(links, [], `${path} still authors action links`);

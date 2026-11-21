@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Item sheets and the catalog: real buttons.** Pay, refund, issue, repair, battery, signal, gadget and planning
+  actions on item sheets, and entries in the catalog list, are now buttons that still read as text in their sentence.
+  Bonus and mechanism rows have named add and remove buttons, and the catalog's search and group fields are labelled.
 - **NPC and vehicle sheets: real buttons.** Their actions (and the hazard tools shared with the agent sheet) are now
   proper buttons that take Tab, Enter and Space everywhere, with names for the icon-only ones (remove, leave the
   vehicle, unlink driver or mount). Hovering one now behaves like the agent sheet's buttons. Name, type, attribute

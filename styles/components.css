@@ -303,3 +303,11 @@
 .sc2-refresh-change { display: flex; align-items: flex-start; gap: 6px; }
 .sc2-refresh-change > input[type=checkbox] { flex: 0 0 auto; margin-top: 0.6em; }
 .sc2-refresh-change > details { flex: 1 1 auto; min-width: 0; }
+
+/* Text actions: buttons that read as words in a sentence (item sheets, the catalog list), as the links they replace did. */
+.spycraft2.application button.sc2-text-action {
+  display: inline; width: auto; height: auto; min-width: 0; min-height: 0; margin: 0; padding: 0;
+  font: inherit; line-height: inherit; letter-spacing: inherit; text-align: inherit; text-transform: none; white-space: normal;
+  vertical-align: baseline; color: inherit; background: none; border: 0; border-radius: 0; box-shadow: none; cursor: pointer;
+}
+.spycraft2.application button.sc2-text-action:hover { color: var(--sc2-danger); background: none; text-decoration: none; text-shadow: none; }
