@@ -90,3 +90,40 @@ test("the Play tab renders the same markup as one file did (whitespace aside)", 
     assert.equal(squash(split), squash(whole.render(`${SYSTEM}actor/agent-main.hbs`, context, { root: context })));
   }
 });
+
+const AGENT_TEMPLATES = paths.filter(
+  path => /templates\/actor\/(agent-|play\/|parts\/gear-)/.test(path) && !path.endsWith("parts/hazards.hbs")
+);
+
+test("the agent sheet's templates author buttons, not action links, and every button has a name", () => {
+  assert.ok(AGENT_TEMPLATES.length > 20);
+  const env = createEnvironment();
+  for (const path of AGENT_TEMPLATES) {
+    const source = sourceOf(path);
+    const links = [...source.matchAll(/<a [^>]*data-action="(?!tab")[^"]*"/g)].map(([link]) => link);
+    assert.deepEqual(links, [], `${path} still authors action links`);
+    const context = everything();
+    const html = env.render(path, context, { root: context });
+    for (const [button, attrs, inner] of html.matchAll(/<button([^>]*)>([\s\S]*?)<\/button>/g)) {
+      const text = inner.replace(/<[^>]+>/g, "").trim();
+      assert.ok(text || /aria-label="[^"]+"/.test(attrs), `${path}: unnamed button ${button.slice(0, 120)}`);
+      assert.match(attrs, /type="button"/, `${path}: ${button.slice(0, 120)}`);
+    }
+  }
+});
+
+test("every class-ability control runs a sheet action and shows an English string", async () => {
+  const { CLASS_ABILITY_CONTROLS, classAbilityControl } = await import("../module/sheets/class-ability-controls.mjs");
+  const sheet = readFileSync(join(ROOT, "module/sheets/actor-sheet.mjs"), "utf8");
+  const english = JSON.parse(readFileSync(join(ROOT, "lang/en.json"), "utf8"));
+  const lookup = key => key.split(".").reduce((node, part) => node?.[part], english);
+  const controls = [...Object.values(CLASS_ABILITY_CONTROLS), classAbilityControl("unknown")];
+  assert.ok(controls.length > 30);
+  for (const control of controls) {
+    if (control.action) assert.match(sheet, new RegExp(`\\b${control.action}[:(]`), control.action);
+    for (const key of [control.label, control.text, control.playerText].filter(Boolean))
+      assert.equal(typeof lookup(key), "string", key);
+    assert.ok(control.action || control.text, JSON.stringify(control));
+  }
+  assert.equal(classAbilityControl(undefined), classAbilityControl("unknown"));
+});

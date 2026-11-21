@@ -9,7 +9,7 @@
     <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.Interests"}}</h3><p>{{system.interests}}</p>
     <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.Contacts"}}</h3><ul class="plain">{{#each system.contacts}}<li><b>{{name}}</b> · {{lookup ../contactGrades rank}} {{notes}}</li>{{else}}<li>{{localize "SPYCRAFT.Template.ActorAgentTraining.NoContactsRecorded"}}</li>{{/each}}</ul>
     <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.Subplots"}}</h3><ul class="plain">{{#each system.subplots}}<li><b>{{name}}</b>{{#if complete}} {{localize "SPYCRAFT.Template.ActorAgentTraining.Complete"}}{{/if}} {{notes}}</li>{{else}}<li>{{localize "SPYCRAFT.Template.ActorAgentTraining.NoSubplotsRecorded"}}</li>{{/each}}</ul>
-    {{#each system.temporaryFocusGrants}}<p>{{name}} <a data-action="chooseTemporaryFocuses" data-item-id="{{itemId}}">{{localize "SPYCRAFT.Template.ActorAgentTraining.ChooseTemporaryFocuses"}}</a></p>{{/each}}
+    {{#each system.temporaryFocusGrants}}<p>{{name}} <button type="button" class="sc2-action" data-action="chooseTemporaryFocuses" data-item-id="{{itemId}}">{{localize "SPYCRAFT.Template.ActorAgentTraining.ChooseTemporaryFocuses"}}</button></p>{{/each}}
   </div>
   <div class="edit-only">
 
@@ -33,13 +33,13 @@
       <label>{{localize "SPYCRAFT.Template.ActorAgentTraining.GCConfirmedCrossroadsTitle"}} <select name="system.crossroadsTitle">{{selectOptions crossroadsTitles selected=system.crossroadsTitle blank="—"}}</select></label>
       {{#if system.crossroads.label}}<p>{{system.crossroads.label}}: +{{system.crossroads.actionDice}} {{localize "SPYCRAFT.Template.ActorAgentTraining.StartingActionDice"}}{{system.crossroads.xpPercent}}{{localize "SPYCRAFT.Template.ActorAgentTraining.MissionXPRequiredLevel"}} {{system.crossroads.level}}, {{system.crossroads.completed}} {{localize "SPYCRAFT.Template.ActorAgentTraining.CompletedSubplotsAndAllLowerTitles"}}</p>{{/if}}
       <h3>{{localize "SPYCRAFT.Subplots"}} <span class="points">{{system.subplotPicks.used}} / {{system.subplotPicks.available}}</span>
-        <span class="controls"><a data-action="addRow" data-list="subplots"><i class="fa-solid fa-plus"></i></a></span></h3>
+        <span class="controls"><button type="button" class="sc2-action" data-action="addRow" data-list="subplots" aria-label="{{localize 'SPYCRAFT.Action.AddSubplot'}}" data-tooltip="{{localize 'SPYCRAFT.Action.AddSubplot'}}"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>{{localize "SPYCRAFT.Action.AddSubplot"}}</span></button></span></h3>
       <ul class="rows">
         {{#each system.subplots}}
           <li><input type="checkbox" name="subplots.{{@index}}.complete" {{checked complete}} />
             <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="{{@root.appId}}-subplots" />
             <input type="text" name="subplots.{{@index}}.notes" value="{{notes}}" placeholder="{{localize 'SPYCRAFT.Notes'}}" />
-            <a data-action="removeRow" data-list="subplots" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a></li>
+            <button type="button" class="sc2-action" data-action="removeRow" data-list="subplots" data-index="{{@index}}" aria-label="{{localize 'SPYCRAFT.Action.RemoveSubplot'}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveSubplot'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></li>
         {{/each}}
       </ul>
       {{#if system.subplotPicks.minimum}}<p class="{{#if system.subplotPicks.needsSubplot}}bad{{else}}muted{{/if}}">{{localize "SPYCRAFT.Template.ActorAgentTraining.TroubleMagnetAtLeastOneUnfinished"}} {{system.subplotPicks.inPlay}}{{localize "SPYCRAFT.Template.ActorAgentTraining.NameTheSubplotOrDescribeIt"}}</p>{{/if}}
@@ -54,12 +54,12 @@
       {{/each}}
       <h3>{{localize "SPYCRAFT.ProfessionFocuses"}} <span class="points">{{system.focusPicks.profession.used}} / {{system.focusPicks.profession.available}}</span></h3>
       <textarea name="professionText" rows="2" placeholder="{{localize 'SPYCRAFT.OnePerLine'}}">{{professionText}}</textarea>
-      <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.SkillFortes"}} <span class="controls"><a data-action="addRow" data-list="skillFortes"><i class="fa-solid fa-plus"></i></a></span></h3>
+      <h3>{{localize "SPYCRAFT.Template.ActorAgentTraining.SkillFortes"}} <span class="controls"><button type="button" class="sc2-action" data-action="addRow" data-list="skillFortes" aria-label="{{localize 'SPYCRAFT.Action.AddSkillForte'}}" data-tooltip="{{localize 'SPYCRAFT.Action.AddSkillForte'}}"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>{{localize "SPYCRAFT.Action.AddSkillForte"}}</span></button></span></h3>
       <ul class="rows">{{#each system.skillFortes}}<li>
         <select name="skillFortes.{{@index}}.skill">{{selectOptions ../forteSkills selected=skill}}</select>
         <input type="text" name="skillFortes.{{@index}}.focus" value="{{focus}}" placeholder="{{localize 'SPYCRAFT.Template.ActorAgentTraining.OwnedFocus'}}" />
         <input type="text" name="skillFortes.{{@index}}.forte" value="{{forte}}" placeholder="{{localize 'SPYCRAFT.Template.ActorAgentTraining.CountryVehicleTypeTaskGearType'}}" />
-        <a data-action="removeRow" data-list="skillFortes" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a>
+        <button type="button" class="sc2-action" data-action="removeRow" data-list="skillFortes" data-index="{{@index}}" aria-label="{{localize 'SPYCRAFT.Action.RemoveSkillForte'}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveSkillForte'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
       </li>{{/each}}</ul>
       <label>{{localize "SPYCRAFT.Template.ActorAgentTraining.INTModifierAtCareerLevel1"}} <input type="number" name="system.startingIntelligenceModifier" value="{{system.startingIntelligenceModifier}}" class="w-2" /></label>
       <p>{{localize "SPYCRAFT.Template.ActorAgentTraining.FlexiblePicksMayBeSpentOn"}}</p>
@@ -67,17 +67,17 @@
       {{#if system.focusPicks.generic.reservedAvailable}}<p>{{localize "SPYCRAFT.Template.ActorAgentTraining.TemporaryDepthOfStudyReserves"}} {{system.focusPicks.generic.reservedAvailable}} {{localize "SPYCRAFT.Template.ActorAgentTraining.PicksUseEachSourceBelowSo"}}</p>{{/if}}
       {{#each system.temporaryFocusGrants}}<fieldset><legend>{{localize "SPYCRAFT.Template.ActorAgentTraining.Temporary"}} {{name}} ({{used}} / {{available}})</legend>
         {{#each choices}}<p>{{skill}}: {{focus}}{{#if forte}} — {{forte}}{{/if}}</p>{{/each}}
-        <a data-action="chooseTemporaryFocuses" data-item-id="{{itemId}}">{{localize "SPYCRAFT.Template.ActorAgentTraining.ChooseTwoFocusesFortes"}}</a>
+        <button type="button" class="sc2-action" data-action="chooseTemporaryFocuses" data-item-id="{{itemId}}">{{localize "SPYCRAFT.Template.ActorAgentTraining.ChooseTwoFocusesFortes"}}</button>
       </fieldset>{{/each}}
       <textarea name="fortesText" rows="2" placeholder="{{localize 'SPYCRAFT.OnePerLine'}}">{{fortesText}}</textarea>
       <h3>{{localize "SPYCRAFT.Contacts"}} <span class="points {{#if (sc2lt system.contactPicks.remaining 0)}}bad{{/if}}">{{system.contactPicks.used}} / {{system.contactPicks.available}}</span>
-        <span class="controls"><a data-action="addRow" data-list="contacts"><i class="fa-solid fa-plus"></i></a></span></h3>
+        <span class="controls"><button type="button" class="sc2-action" data-action="addRow" data-list="contacts" aria-label="{{localize 'SPYCRAFT.Action.AddContact'}}" data-tooltip="{{localize 'SPYCRAFT.Action.AddContact'}}"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>{{localize "SPYCRAFT.Action.AddContact"}}</span></button></span></h3>
       <ul class="rows contact-rows">
         {{#each system.contacts}}
           <li><input type="text" name="contacts.{{@index}}.name" value="{{name}}" placeholder="{{localize 'Name'}}" />
             <select name="contacts.{{@index}}.rank" data-dtype="Number">{{selectOptions ../contactGrades selected=rank}}</select>
             <input type="text" name="contacts.{{@index}}.notes" value="{{notes}}" placeholder="{{localize 'SPYCRAFT.Notes'}}" />
-            <a data-action="removeRow" data-list="contacts" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a>
+            <button type="button" class="sc2-action" data-action="removeRow" data-list="contacts" data-index="{{@index}}" aria-label="{{localize 'SPYCRAFT.Action.RemoveContact'}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveContact'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
             {{#if @root.hasContactFeatUpgrades}}<details class="contact-upgrade" data-key="networkingContact{{@index}}"><summary>{{localize "SPYCRAFT.Template.ActorAgentTraining.NewNetworkingContactThemedFeatUpgrade"}}</summary><p>{{localize "SPYCRAFT.Template.ActorAgentTraining.OnlyANewContactGainedAfter"}}</p><label>{{localize "SPYCRAFT.Template.ActorAgentTraining.NetworkingMilestone"}} <select name="contacts.{{@index}}.networkingMilestone" data-dtype="Number">{{selectOptions @root.contactMilestones selected=networkingMilestone}}</select></label><label>{{localize "SPYCRAFT.Template.ActorAgentTraining.ContactFeat"}} <select name="contacts.{{@index}}.networkingFeat">{{selectOptions @root.contactFeatOptions selected=networkingFeat}}</select></label><label>{{localize "SPYCRAFT.Template.ActorAgentTraining.MatchingTheme"}} <input name="contacts.{{@index}}.networkingTheme" maxlength="200" value="{{networkingTheme}}" /></label><label><input name="contacts.{{@index}}.networkingFeatConfirmed" type="checkbox" {{checked networkingFeatConfirmed}} /> {{localize "SPYCRAFT.Template.ActorAgentTraining.GCConfirmsThisNewContactWas"}}</label></details>{{/if}}</li>
         {{/each}}
       </ul>

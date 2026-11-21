@@ -20,7 +20,7 @@ test("every translation key a template uses has an English string", async () => 
     const source = await readFile(new URL(`templates/${file}`, root), "utf8");
     // A key is either localized in place or handed to a partial as a hash value (label="SPYCRAFT.…").
     const keys = [
-      ...source.matchAll(/\{\{localize ["'](SPYCRAFT\.[\w.-]+)["']\}\}/g),
+      ...source.matchAll(/\{\{localize ["'](SPYCRAFT\.[\w.-]+)["'][^}]*\}\}/g),
       ...[...source.matchAll(/\{\{>[^}]*\}\}/g)].flatMap(([call]) => [...call.matchAll(/\w+="(SPYCRAFT\.[\w.-]+)"/g)])
     ];
     for (const [, key] of keys) {

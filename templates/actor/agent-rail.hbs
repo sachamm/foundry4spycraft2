@@ -10,12 +10,12 @@
       <label class="edit-only">{{localize "SPYCRAFT.XP"}} <input type="number" name="system.xp" value="{{system.xp}}" class="w-xp" />{{#if xpNext}}<span class="muted"> / {{xpNext}}</span>{{/if}}</label>
       <span class="play-only sc2-chip xp-chip">{{localize "SPYCRAFT.XP"}} {{system.xp}}{{#if xpNext}} / {{xpNext}}{{/if}}</span>
       {{#if levelUpReady}}{{#if editable}}<button type="button" class="sc2-primary-action level-up" data-action="addLevel">{{localize "SPYCRAFT.Rail.LevelUp"}}</button>{{/if}}{{/if}}
-      <span class="talent origin sc2-chip" data-sc2-display="icon" {{#if talent}}data-item-id="{{talent.id}}"{{/if}}>{{#if talent}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.talent">{{talent.name}}</a>
-        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="talent" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeTalent'}}" data-tooltip="SPYCRAFT.Origin.Change"></a>
-        <a class="edit-only" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveTalent'}}" data-tooltip="SPYCRAFT.Origin.Remove"></a>{{else}}<a class="edit-only" data-sc2-display="both" data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</a>{{/if}}</span>
-      <span class="specialty origin sc2-chip" data-sc2-display="icon" {{#if specialty}}data-item-id="{{specialty.id}}"{{/if}}>{{#if specialty}}<a data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.specialty">{{specialty.name}}</a>
-        <a class="edit-only" data-action="browse" data-type="origin" data-origin-type="specialty" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeSpecialty'}}" data-tooltip="SPYCRAFT.Origin.Change"></a>
-        <a class="edit-only" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveSpecialty'}}" data-tooltip="SPYCRAFT.Origin.Remove"></a>{{else}}<a class="edit-only" data-sc2-display="both" data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</a>{{/if}}</span>
+      <span class="talent origin sc2-chip" data-sc2-display="icon" {{#if talent}}data-item-id="{{talent.id}}"{{/if}}>{{#if talent}}<button type="button" class="sc2-action" data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.talent">{{talent.name}}</button>
+        <button type="button" class="edit-only sc2-action" data-action="browse" data-type="origin" data-origin-type="talent" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeTalent'}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeTalent'}}"></button>
+        <button type="button" class="edit-only sc2-action" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveTalent'}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveTalent'}}"></button>{{else}}<button type="button" class="edit-only sc2-action" data-sc2-display="both" data-action="browse" data-type="origin" data-origin-type="talent">{{localize "SPYCRAFT.Origin.ChooseTalent"}}</button>{{/if}}</span>
+      <span class="specialty origin sc2-chip" data-sc2-display="icon" {{#if specialty}}data-item-id="{{specialty.id}}"{{/if}}>{{#if specialty}}<button type="button" class="sc2-action" data-action="itemEdit" data-tooltip="SPYCRAFT.Origin.specialty">{{specialty.name}}</button>
+        <button type="button" class="edit-only sc2-action" data-action="browse" data-type="origin" data-origin-type="specialty" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeSpecialty'}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.ChangeSpecialty'}}"></button>
+        <button type="button" class="edit-only sc2-action" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveSpecialty'}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.RemoveSpecialty'}}"></button>{{else}}<button type="button" class="edit-only sc2-action" data-sc2-display="both" data-action="browse" data-type="origin" data-origin-type="specialty">{{localize "SPYCRAFT.Origin.ChooseSpecialty"}}</button>{{/if}}</span>
     </div>
   </div>
 
@@ -34,14 +34,14 @@
     <label class="res sc2-meter wounds"><span class="sc2-caption">{{localize "SPYCRAFT.Wounds"}}</span>
       <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span class="sc2-meter-max" {{sc2tip tips.wounds}}>/ {{system.wounds.max}}</span>
       <progress max="{{system.wounds.max}}" value="{{system.wounds.value}}" aria-hidden="true"></progress></label>
-    {{#if nonLethalMeters.length}}<div class="sc2-nonlethal" role="status">{{#each nonLethalMeters}}<a class="sc2-nonlethal-meter{{#if pending}} pending{{/if}}" data-action="{{action}}" data-tooltip="{{tooltip}}"><span class="sc2-caption">{{label}}</span> <b>{{total}}</b> / {{threshold}}<progress max="{{threshold}}" value="{{total}}" aria-hidden="true"></progress></a>{{/each}}</div>{{/if}}
+    {{#if nonLethalMeters.length}}<div class="sc2-nonlethal" role="status">{{#each nonLethalMeters}}<button type="button" class="sc2-nonlethal-meter{{#if pending}} pending{{/if}} sc2-action" data-action="{{action}}" data-tooltip="{{tooltip}}"><span class="sc2-caption">{{label}}</span> <b>{{total}}</b> / {{threshold}}<progress max="{{threshold}}" value="{{total}}" aria-hidden="true"></progress></button>{{/each}}</div>{{/if}}
   </div>
 
   <div class="rail-block rail-fields">
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Defense"}}</span><b class="sc2-value" {{sc2tip tips.defense}}>{{system.defense.total}}</b></div>
     <button type="button" class="sc2-field stat sc2-stat-action" data-action="rollInitiative" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.RollInitiative'}}"><span class="sc2-caption">{{localize "SPYCRAFT.Initiative"}}</span><b class="sc2-value" {{sc2tip tips.initiative}}>{{signed system.initiative.total}}</b></button>
     <div class="sc2-field"><span class="sc2-caption">{{localize "SPYCRAFT.Speed"}}</span><b class="sc2-value" {{sc2tip tips.speed}}>{{#if system.conditionSpeedReview}}?{{else}}{{system.speed}}{{/if}}</b></div>
-    {{#each saves}}<button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave" data-save="{{key}}" aria-label="Roll {{label}}"><span class="sc2-caption">{{label}}</span><b class="sc2-value" {{sc2tip tip}}>{{signed total}}</b></button>{{/each}}
+    {{#each saves}}<button type="button" class="sc2-field stat sc2-stat-action" data-action="rollSave" data-save="{{key}}" aria-label="{{localize 'SPYCRAFT.Action.RollNamed' name=label}}"><span class="sc2-caption">{{label}}</span><b class="sc2-value" {{sc2tip tip}}>{{signed total}}</b></button>{{/each}}
   </div>
 
   <div class="rail-block action-dice" data-sc2-display="both">
@@ -51,12 +51,12 @@
       <span class="sc2-pips" aria-hidden="true">{{#each actionDicePips}}<i class="{{#if this}}on{{/if}}"></i>{{/each}}</span>
     </div>
     <div class="res-actions">
-      {{#unless startingDiceEntry.blocked}}<a data-sc2-display="both" data-action="initializeStartingDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginPlayOnceWithThisCharacter'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.BeginPlay"}}</a>{{/unless}}
-      <a data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend">{{localize "SPYCRAFT.Template.ActorAgentHeader.Spend"}}</a>
-      <a data-action="healActionDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.HealOutsideCombatWithActionDice'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Heal"}}</a>
-      <a data-action="refreshAction" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginOrCompleteAFullRound'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Refresh"}}</a>
-      <a data-action="boostDefense" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BoostDefenseWithAnActionDie'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Defense"}}</a>
-      {{#if dying}}<a data-sc2-display="both" data-action="rollDying" class="bad">{{playLabels.dying}}</a>{{/if}}
+      {{#unless startingDiceEntry.blocked}}<button type="button" class="sc2-action" data-sc2-display="both" data-action="initializeStartingDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginPlayOnceWithThisCharacter'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.BeginPlay"}}</button>{{/unless}}
+      <button type="button" class="sc2-action" data-action="spendActionDie" data-tooltip="SPYCRAFT.ActionDice.Spend">{{localize "SPYCRAFT.Template.ActorAgentHeader.Spend"}}</button>
+      <button type="button" class="sc2-action" data-action="healActionDice" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.HealOutsideCombatWithActionDice'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Heal"}}</button>
+      <button type="button" class="sc2-action" data-action="refreshAction" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BeginOrCompleteAFullRound'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Refresh"}}</button>
+      <button type="button" class="sc2-action" data-action="boostDefense" data-tooltip="{{localize 'SPYCRAFT.Template.ActorAgentHeader.BoostDefenseWithAnActionDie'}}">{{localize "SPYCRAFT.Template.ActorAgentHeader.Defense"}}</button>
+      {{#if dying}}<button type="button" data-sc2-display="both" data-action="rollDying" class="bad sc2-action">{{playLabels.dying}}</button>{{/if}}
     </div>
   </div>
 

@@ -201,10 +201,14 @@ export function activeConditionLabels(system = {}) {
   return [...labels];
 }
 
-function sheetActionLabel(link, context, localize) {
+function itemOf(link, context) {
   const itemId = link.closest("[data-item-id]")?.dataset.itemId;
-  const item =
-    context.actor?.items?.get?.(itemId) ?? context.actor?.items?.contents?.find(entry => entry.id === itemId);
+  return context.actor?.items?.get?.(itemId) ?? context.actor?.items?.contents?.find(entry => entry.id === itemId);
+}
+const equippedItem = (link, context) => itemOf(link, context)?.system?.equipped === true;
+
+function sheetActionLabel(link, context, localize) {
+  const item = itemOf(link, context);
   const itemName = item?.name ?? "item";
   const types = {
     weapon: "weapons",
@@ -233,22 +237,12 @@ function sheetActionLabel(link, context, localize) {
   );
 }
 
-/** Apply view behavior after each complete or partial sheet render. */
-export function enhanceAgentSheet(element, context, state, localize = text => text) {
-  element.classList.toggle("play-mode", !context.editMode);
-  element.classList.toggle("edit-mode", !!context.editMode);
-  state._open ??= {};
-  for (const details of element.querySelectorAll("details[data-key]")) {
-    if (Object.hasOwn(state._open, details.dataset.key)) details.open = state._open[details.dataset.key];
-    if (!details.dataset.sc2Remembered) {
-      details.dataset.sc2Remembered = "true";
-      details.addEventListener("toggle", () => {
-        state._open[details.dataset.key] = details.open;
-      });
-    }
-  }
-  // Use native buttons for actions so they support Tab, Enter and Space.
-  // Tab navigation is managed separately by Foundry.
+/**
+ * Turn any `<a data-action>` left in the sheet into a native button, so it takes Tab, Enter and Space. The agent
+ * templates author buttons themselves; this is the fallback for markup that still uses links. Foundry's own tab
+ * links are left alone.
+ */
+export function upgradeActionLinks(element, context, localize = text => text) {
   for (const link of element.querySelectorAll('a[data-action]:not([data-action="tab"])')) {
     const button = element.ownerDocument.createElement("button");
     for (const attr of link.attributes) button.setAttribute(attr.name, attr.value);
@@ -266,7 +260,8 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
           {
             itemChat: loc`Share`,
             itemDelete: loc`Remove`,
-            itemEquip: "Equip / unequip",
+            // Says what a press will do, like the sheet's own Equip button.
+            itemEquip: equippedItem(link, context) ? loc`Unequip` : loc`Equip`,
             syncGrants: loc`Refresh grants`,
             removeRow: loc`Remove`
           }[link.dataset.action] ?? label;
@@ -276,6 +271,23 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
     button.prepend(...link.childNodes);
     link.replaceWith(button);
   }
+}
+
+/** Apply view behavior after each complete or partial sheet render. */
+export function enhanceAgentSheet(element, context, state, localize = text => text) {
+  element.classList.toggle("play-mode", !context.editMode);
+  element.classList.toggle("edit-mode", !!context.editMode);
+  state._open ??= {};
+  for (const details of element.querySelectorAll("details[data-key]")) {
+    if (Object.hasOwn(state._open, details.dataset.key)) details.open = state._open[details.dataset.key];
+    if (!details.dataset.sc2Remembered) {
+      details.dataset.sc2Remembered = "true";
+      details.addEventListener("toggle", () => {
+        state._open[details.dataset.key] = details.open;
+      });
+    }
+  }
+  upgradeActionLinks(element, context, localize);
   for (const control of element.querySelectorAll(
     ".edit-only:is(input, select, textarea), .edit-only input, .edit-only select, .edit-only textarea"
   )) {

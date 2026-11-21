@@ -15,14 +15,21 @@ import { registerSystemHelpers } from "../../module/handlebars-helpers.mjs";
 export const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 export const SYSTEM_PATH = "systems/spycraft2/";
 
+let strings = null;
+const english = () => (strings ??= JSON.parse(readFileSync(join(ROOT, "lang/en.json"), "utf8")));
+
 /** Helpers Foundry registers itself (client/applications/handlebars.mjs), each with a stand-in. */
 const FOUNDRY_HELPERS = {
+  // Foundry's helper: game.i18n.localize, or game.i18n.format when hash arguments are given.
   localize: (key, options) => {
+    const text = String(key)
+      .split(".")
+      .reduce((node, part) => (node && typeof node === "object" ? node[part] : undefined), english());
+    if (typeof text !== "string") return String(key);
     const hash = options?.hash ?? {};
-    const args = Object.keys(hash).length
-      ? ` ${JSON.stringify(Object.fromEntries(Object.entries(hash).map(([k, v]) => [k, String(v)])))}`
-      : "";
-    return `${String(key)}${args}`;
+    return Object.keys(hash).length
+      ? text.replace(/\{(\w+)\}/g, (match, name) => (name in hash ? String(hash[name]) : match))
+      : text;
   },
   selectOptions: (choices, options) =>
     new Handlebars.SafeString(
