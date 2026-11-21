@@ -2,7 +2,6 @@
  * Palette stays legible independently of Foundry's surrounding light/dark theme.
  * No animation, external fonts, or decorative layers over interactive controls. */
 .spycraft2.application {
-  --sc2-accent: var(--sc2-action);
   --sc2-class: rgba(171, 131, 54, .15);
   --sc2-border: var(--sc2-rule);
   --color-text-primary: var(--sc2-ink);
@@ -52,7 +51,7 @@
   border: 1px solid var(--sc2-rule);
   color: var(--sc2-on-bar);
   background: var(--sc2-bar);
-  font: bold 10px/1.3 var(--sc2-num);
+  font: bold 12px/1.3 var(--sc2-num);
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -91,8 +90,9 @@
   outline: 1.5px solid var(--sc2-rule-strong);
   outline-offset: -1.5px;
 }
+/* Foundry draws the box in ::before, so the focus ring goes there too, in the shared focus colour. */
 .spycraft2.application :is(input[type=checkbox], input[type=radio]):focus-visible::before {
-  outline: 2px solid var(--sc2-danger);
+  outline: 2px solid var(--sc2-focus-color, var(--sc2-action));
   outline-offset: 1px;
 }
 .spycraft2.application input::placeholder, .spycraft2.application textarea::placeholder { color: var(--sc2-ink-muted); opacity: 1; }
@@ -103,11 +103,6 @@
   background-color: var(--sc2-surface-raised);
   border-color: var(--sc2-rule);
   border-radius: var(--sc2-radius);
-}
-.spycraft2.application :is(a, button, input, select, textarea):focus-visible {
-  outline: 2px solid var(--sc2-danger);
-  outline-offset: 2px;
-  box-shadow: none;
 }
 .spycraft2.application a:hover { color: var(--sc2-danger); text-shadow: none; }
 .spycraft2.application h3 {
@@ -154,7 +149,7 @@
 .spycraft2.sheet.npc .npc-actions h3 { margin: 0 0 4px; font-size: 1em; }
 .spycraft2.sheet.npc .npc-action-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
 .spycraft2.sheet.npc .npc-action-buttons button { width: auto; flex: 0 0 auto; margin: 0; padding: 4px 10px; }
-.spycraft2 .mode-label { font:bold 11px/1.4 var(--sc2-num); text-transform:uppercase; letter-spacing:.12em; }
+.spycraft2 .mode-label { font:bold 12px/1.4 var(--sc2-num); text-transform:uppercase; letter-spacing:.12em; }
 .spycraft2.sheet .name-row { align-items:center; }
 .spycraft2.sheet.agent .agent-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .spycraft2.sheet.agent .agent-codename { white-space:nowrap; }
@@ -279,7 +274,6 @@
 .spycraft2.sheet.agent .inventory-table td:first-child { min-width:160px; overflow-wrap:anywhere; }
 .spycraft2.sheet.agent .inventory-table abbr { text-decoration:none; cursor:help; }
 .spycraft2.sheet.agent .tool-hint { color:var(--sc2-ink-muted); line-height:1.5; font-size:.95em; }
-.spycraft2.application summary:focus-visible { outline:2px solid var(--sc2-danger); outline-offset:2px; }
 
 /* Only dialogs explicitly owned by this system receive the dossier skin. */
 .spycraft2.application.sc2-dialog { max-width:calc(100vw - 32px); max-height:calc(100dvh - 32px); }

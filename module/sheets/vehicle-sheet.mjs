@@ -1,5 +1,6 @@
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
+import { enrich } from "./enrich.mjs";
 import { installToolSearch } from "../apps/tool-search.mjs";
 import { installResolutionGuide } from "../apps/resolution-guide.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
@@ -260,9 +261,7 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(SaveFeedbac
         : null,
       upgradesOver: system.upgraded.used > system.upgraded.free,
       weaponsOver: items.filter(i => i.type === "weapon").length > system.weaponSpaces,
-      enrichedBiography: await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.biography, {
-        secrets: actor.isOwner
-      })
+      enrichedBiography: await enrich(system.biography, actor)
     });
     return context;
   }

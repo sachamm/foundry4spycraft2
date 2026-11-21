@@ -215,6 +215,8 @@ function refreshChatSearch(state) {
   toggle.setAttribute("aria-label", open ? loc`Hide chat filters` : loc`Show chat filters`);
   toggle.classList.toggle("active", filtered);
   scroll.hidden = active;
+  // Foundry styles the chat log's display itself, so a class of ours does the hiding rather than core's [hidden].
+  scroll.classList.toggle("sc2-chat-search-hidden", active);
   results.hidden = !active;
   status.hidden = !active;
   results.replaceChildren();

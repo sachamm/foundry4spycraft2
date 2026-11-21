@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **One palette for every surface.** The older sheet styles kept their own blue, red and green, which showed on some
+  light-theme cards instead of the system's palette. They now use the shared colours, so warnings read a slightly
+  deeper red and confirmations a deeper green. Small labels (outcome stamps, round pips, panel captions, chat search)
+  are at least 12px. Keyboard focus shows the same ring everywhere, and chat search follows Foundry's theme.
+- **Rules refresh review:** ticking a change no longer opens or closes its details.
+- **Origin text on the agent sheet** now hides GC-only secret blocks from players and resolves its links, like other
+  rich text.
 - **Shorter buttons on attack and damage cards.** Labels that were cut off in the chat column are now a few words
   (for example "Resolve vs Defense 15: hit", "Check Defense", "Lucky Break: it misses"), and hovering a button shows
   its full wording, including the target's name. A label that is still too long wraps inside its button instead of

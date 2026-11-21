@@ -1,3 +1,4 @@
+import { enrich } from "../sheets/enrich.mjs";
 import { describe } from "../rules/prerequisites.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
 import { loc } from "../i18n.mjs";
@@ -284,12 +285,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       preview = {
         ...chosen,
         img: doc?.img,
-        description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-          doc?.system?.description ?? "",
-          {
-            relativeTo: doc
-          }
-        )
+        description: await enrich(doc?.system?.description, doc)
       };
     }
     return {

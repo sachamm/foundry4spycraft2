@@ -63,7 +63,7 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
   const rows = changes
     .map(
       (change, index) =>
-        `<details><summary><label><input type="checkbox" name="change${index}" checked /> ${esc(change.itemName)} — ${esc(change.path)}</label></summary><div><b>${loc`Current`}</b><pre>${esc(JSON.stringify(change.before, null, 1) ?? "Not set")}</pre><b>${loc`Proposed`}</b><pre>${esc(JSON.stringify(change.after, null, 1) ?? "Not set")}</pre></div></details>`
+        `<div class="sc2-refresh-change"><input type="checkbox" name="change${index}" checked aria-label="${esc(loc`Apply ${change.itemName}: ${change.path}`)}" /><details><summary>${esc(change.itemName)} — ${esc(change.path)}</summary><div><b>${loc`Current`}</b><pre>${esc(JSON.stringify(change.before, null, 1) ?? "Not set")}</pre><b>${loc`Proposed`}</b><pre>${esc(JSON.stringify(change.after, null, 1) ?? "Not set")}</pre></div></details></div>`
     )
     .join("");
   const input = await systemDialog.input({
@@ -71,7 +71,7 @@ export async function reviewActorRules(actor, { restore = false } = {}) {
     rejectClose: false,
     content: `
   <p>${loc`Select the changes to apply. Build choices, quantities, equipped state, current HP, XP and earned resources are preserved. Grant synchronization may add or remove rule-granted feats. A full character JSON backup downloads before applying changes, and a backup of selected fields is stored on the character for quick rollback.`}</p>
-  <div style="max-height:55vh;overflow:auto">${rows}</div>${unmatched.length ? `<p>${unmatched.map(esc).join("<br>")}</p>` : ""}`
+  <div class="sc2-scroll-list">${rows}</div>${unmatched.length ? `<p>${unmatched.map(esc).join("<br>")}</p>` : ""}`
   });
   if (!input) return null;
   const selected = changes.filter((_, index) => input[`change${index}`]);

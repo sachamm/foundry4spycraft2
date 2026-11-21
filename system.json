@@ -25,7 +25,8 @@
     "styles/sheet-npc.css",
     "styles/sheet-item.css",
     "styles/gc-console.css",
-    "styles/chat.css"
+    "styles/chat.css",
+    "styles/chat-search.css"
   ],
   "languages": [
     {

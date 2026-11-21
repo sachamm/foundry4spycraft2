@@ -117,7 +117,7 @@
 
 /* ---------- Round tracker and pinned tools ---------- */
 .spycraft2.sheet.agent .round-tracker { display: flex; align-items: center; gap: var(--sc2-space-2); padding: 6px 8px; background: var(--sc2-surface-raised); border: 1px solid var(--sc2-rule); border-left: 4px solid var(--sc2-bar); }
-.spycraft2.sheet.agent .round-pip { min-width: 7.5em; min-height: 26px; margin: 0; padding: 2px 10px; font: 600 11px/1.2 var(--font-primary, sans-serif); letter-spacing: 0.06em; text-transform: uppercase; color: var(--sc2-on-bar); background: var(--sc2-bar); border: 1px solid var(--sc2-bar); border-radius: var(--sc2-radius); cursor: pointer; }
+.spycraft2.sheet.agent .round-pip { min-width: 7.5em; min-height: 26px; margin: 0; padding: 2px 10px; font: 600 12px/1.2 var(--font-primary, sans-serif); letter-spacing: 0.06em; text-transform: uppercase; color: var(--sc2-on-bar); background: var(--sc2-bar); border: 1px solid var(--sc2-bar); border-radius: var(--sc2-radius); cursor: pointer; }
 .spycraft2.sheet.agent .round-pip.spent { color: var(--sc2-ink-muted); background: transparent; border-style: dashed; border-color: var(--sc2-rule-strong); text-decoration: line-through; }
 .spycraft2.sheet.agent .pinned-tools[hidden] { display: none; }
 .spycraft2.sheet.agent .pinned-tools { padding: 0; }
@@ -142,6 +142,6 @@
 .spycraft2.sheet.agent .sc2-nonlethal-meter { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 0 4px; font-size: var(--sc2-text-s); color: var(--sc2-ink); text-decoration: none; }
 .spycraft2.sheet.agent .sc2-nonlethal-meter progress { grid-column: 1 / -1; width: 100%; height: 5px; border: 0; appearance: none; background: var(--sc2-paper-sunk); }
 .spycraft2.sheet.agent .sc2-nonlethal-meter progress::-webkit-progress-bar { background: var(--sc2-paper-sunk); }
-.spycraft2.sheet.agent .sc2-nonlethal-meter progress::-webkit-progress-value { background: var(--sc2-warn, #b7791f); }
-.spycraft2.sheet.agent .sc2-nonlethal-meter progress::-moz-progress-bar { background: var(--sc2-warn, #b7791f); }
+.spycraft2.sheet.agent .sc2-nonlethal-meter progress::-webkit-progress-value { background: var(--sc2-warn); }
+.spycraft2.sheet.agent .sc2-nonlethal-meter progress::-moz-progress-bar { background: var(--sc2-warn); }
 .spycraft2.sheet.agent .sc2-nonlethal-meter.pending b { color: var(--sc2-bad); }
