@@ -162,9 +162,14 @@ https://github.com/sachamm/foundry4spycraft2/releases/latest/download/system.jso
 
 ## Releasing
 
-1. Bump `version` in `system.json` and add a `CHANGELOG.md` entry.
-2. Commit and push, then publish a GitHub release tagged `v<version>` (e.g. `v0.1.0`).
-3. The **Release** workflow attaches `system.json` and `spycraft2.zip` to the release.
+1. Bump `version` in `system.json` and turn the `## Unreleased` notes in `CHANGELOG.md` into a `## <version>` entry.
+2. Run `SPYCRAFT_RULEBOOK_TEXT=/path/to/your/rulebook.md npm run release:check -- v<version>`. It confirms the tag,
+   changelog and manifest agree, and scans the data and strings for wording copied from the book (the book never
+   goes in the repository, so CI cannot run that scan).
+3. Commit and push, then publish a GitHub release tagged `v<version>` (e.g. `v0.6.1`). Mark it as a prerelease for a
+   release candidate (`v0.6.1-rc.1`); its manifest then points at itself and does not replace the stable one.
+4. The **Release** workflow runs every validation check, repeats the tag check, and attaches `system.json`,
+   `spycraft2.zip` and `SHA256SUMS.txt` to the release.
 
 ## Gear catalog and vehicles
 
