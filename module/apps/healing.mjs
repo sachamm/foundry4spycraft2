@@ -18,7 +18,7 @@ import { damageSaveState, npcIsSpecial, resetDamageTrack } from "./gc/npc-play.m
 import { sceneEpoch } from "./gc/state.mjs";
 import { nonLethalTotals, targetChoices } from "./damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
-import { askGC, gcAvailable, markCard, registerRelay } from "./gc-relay.mjs";
+import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 
@@ -255,6 +255,7 @@ async function relayHealing(kind, message, patient) {
 }
 
 registerRelay("applyHealing", {
+  concerns: ({ messageId }, user) => [requesterConcern(game.messages.get(messageId), user)],
   async describe({ kind, patientUuid }, user) {
     const patient = patientUuid ? await fromUuid(patientUuid) : null;
     if (!patient) throw new Error(loc`The patient is no longer there.`);

@@ -166,8 +166,35 @@ test("a described request waits for Allow on a card in the GC's chat unless the 
   settings.relayAutoApprove = true;
   await handleRelay({ action: "testAction", userId: "owner", data: { n: 3 } });
   assert.equal(cards.length, 2, "no question when requests are applied without asking");
+  // A concern (an amount raised, a card the requester did not post) asks even then, and says why.
+  registerRelay("concernedAction", {
+    describe: () => "Allow?",
+    concerns: data => [data.raised ? "Damage raised from 5 to 9." : null],
+    run: data => (ran.push(data), "done")
+  });
+  await handleRelay({ action: "concernedAction", userId: "owner", data: { n: 4 } });
+  assert.equal(cards.length, 2, "nothing to flag, so no question");
+  const flagged = await answer(true, () =>
+    handleRelay({ action: "concernedAction", userId: "owner", data: { n: 5, raised: true } })
+  );
+  assert.deepEqual(flagged, { value: "done" });
+  assert.equal(cards.length, 3);
+  assert.match(cards[2].content, /Damage raised from 5 to 9\./);
   settings.relayAutoApprove = false;
-  assert.deepEqual(ran, [{ n: 2 }, { n: 3 }]);
+  assert.deepEqual(ran, [{ n: 2 }, { n: 3 }, { n: 4 }, { n: 5, raised: true }]);
+});
+
+test("a relayed request claiming to come from a GC is refused: a GC's client never relays", async () => {
+  players.set("gm", { id: "gm", name: "GC", isGM: true });
+  updates.length = 0;
+  const spoofed = await handleRelay({
+    action: "markCard",
+    userId: "gm",
+    data: { messageId: "m1", key: "pendingSave.rolled", value: true }
+  });
+  assert.match(spoofed.error, /cannot come from a GC/);
+  assert.equal(updates.length, 0);
+  players.delete("gm");
 });
 
 test("a player's request goes to the active GC and its refusal comes back as an error", async () => {

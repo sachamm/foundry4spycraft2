@@ -6,8 +6,13 @@
  * CONFIG.queries). The GC is asked to allow each request, on a card in the GC's chat, unless the world setting says
  * otherwise; marking a card as dealt with needs no question.
  *
- * A module registers what it can do for a player with `registerRelay(action, { describe, run })` and calls
+ * A module registers what it can do for a player with `registerRelay(action, { describe, run, concerns })` and calls
  * `askGC(action, data)`. For the GC himself `askGC` runs the action directly.
+ *
+ * Trust: the requesting user's id travels in the request, so it is a claim, not proof. A GC never sends a relay
+ * request (askGC runs locally for any GC), so a request claiming to come from a GC is refused. `concerns` lists what
+ * does not fit the card (the requester did not roll it, the amount was raised); any concern puts the request on an
+ * Allow card even when the world applies requests without asking.
  */
 import { loc } from "../i18n.mjs";
 
@@ -17,8 +22,10 @@ const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 
 /**
  * @param {string} action
- * @param {object} handler { run: async (data, user) => result, describe?: (data, user) => string|null }
- *                         describe returns the question put to the GC, or null to run without asking
+ * @param {object} handler { run: async (data, user) => result, describe?: (data, user) => string|null,
+ *                         concerns?: (data, user) => string[] }
+ *                         describe returns the question put to the GC, or null to run without asking; concerns are
+ *                         reasons to ask even when requests are applied without asking
  */
 export function registerRelay(action, handler) {
   actions.set(action, handler);
@@ -38,9 +45,15 @@ export async function handleRelay({ action, data, userId } = {}) {
     const handler = actions.get(action),
       user = game.users.get(userId);
     if (!handler || !user) throw new Error(loc`The GC's client does not know this request.`);
+    // A GC's own client never relays, so this claim is false.
+    if (user.isGM) throw new Error(loc`A relayed request cannot come from a GC.`);
     const question = handler.describe ? await handler.describe(data ?? {}, user) : null;
-    if (question && !autoApprove()) {
-      const allowed = await askInChat(question, user);
+    const concerns = handler.concerns ? ((await handler.concerns(data ?? {}, user)) ?? []).filter(Boolean) : [];
+    if (question && (!autoApprove() || concerns.length)) {
+      const allowed = await askInChat(
+        [question, ...concerns.map(concern => `<span class="bad">${esc(concern)}</span>`)].join("<br>"),
+        user
+      );
       if (!allowed) throw new Error(loc`The GC declined the request.`);
     }
     return { value: (await handler.run(data ?? {}, user)) ?? null };
@@ -68,7 +81,7 @@ export async function askInChat(question, user) {
   const message = await ChatMessage.create({
     whisper: [game.user.id],
     speaker: { alias: loc`${user.name} asks` },
-    content: `<div class="spycraft2 chat-note relay-ask"><p>${question}</p></div>`,
+    content: `<div class="spycraft2 chat-note relay-ask"><p>${question}</p><p class="hint">${loc`The name is the one the player's client sent.`}</p></div>`,
     flags: { spycraft2: { relayAsk: id } }
   });
   const timer = setTimeout(() => settleAsk(id, false, message, loc`No answer in time: declined.`), ASK_TIMEOUT);
@@ -116,6 +129,17 @@ export function renderRelayAsk(message, html) {
       row.append(button);
     }
   html.append(row);
+}
+
+/**
+ * The concern when a requester neither posted a card nor owns the character it is about. Not a refusal: the GC is
+ * asked, since a player sometimes applies a result for a friend at the table.
+ */
+export function requesterConcern(message, user) {
+  const check = message?.flags?.spycraft2 ?? {},
+    actor = check.actorUuid ? fromUuidSync(check.actorUuid) : null;
+  if (message?.author?.id === user?.id || actor?.testUserPermission?.(user, "OWNER")) return null;
+  return loc`${user?.name ?? "?"} did not post this card and does not own its character.`;
 }
 
 /** Whether a GC is connected to take a request. */
@@ -204,7 +228,7 @@ export async function markCard(message, key, value = true, { quiet = false } = {
 export function installGCRelay() {
   game.settings.register("spycraft2", "relayAutoApprove", {
     name: loc`Apply players' requests without asking`,
-    hint: loc`A player who hits a character they do not own, or treats another player's agent, sends the result to the GC's client to apply. When off, each one waits for Allow on a card in the GC's chat.`,
+    hint: loc`A player who hits a character they do not own, or treats another player's agent, sends the result to the GC's client to apply. When off, each one waits for Allow on a card in the GC's chat. When on, a request that does not fit its card (damage raised above the roll, or a card the player did not post) still waits for Allow.`,
     scope: "world",
     config: true,
     type: Boolean,

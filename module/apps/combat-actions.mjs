@@ -299,7 +299,9 @@ registerRelay("grappleCondition", {
   async run({ actorUuid, id, active, label }) {
     const who = actorUuid ? await fromUuid(actorUuid) : null;
     if (!who || !GRAPPLE_CONDITIONS.includes(id)) throw new Error(loc`A grapple cannot change that condition.`);
-    await setConditionStatus(who, id, active === true, { label: String(label ?? id) });
+    // The label is free text from the player's client: keep it only when it is a short plain name.
+    const plain = typeof label === "string" && /^[\p{L}\p{N} '’-]{1,60}$/u.test(label) ? label : id;
+    await setConditionStatus(who, id, active === true, { label: plain });
     return true;
   }
 });
