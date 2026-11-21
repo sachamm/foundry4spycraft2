@@ -91,11 +91,9 @@ test("the Play tab renders the same markup as one file did (whitespace aside)", 
   }
 });
 
-const AGENT_TEMPLATES = paths.filter(
-  path => /templates\/actor\/(agent-|play\/|parts\/gear-)/.test(path) && !path.endsWith("parts/hazards.hbs")
-);
+const AGENT_TEMPLATES = paths.filter(path => /templates\/actor\/(agent-|play\/|parts\/|npc-|vehicle-sheet)/.test(path));
 
-test("the agent sheet's templates author buttons, not action links, and every button has a name", () => {
+test("the actor sheets' templates author buttons, not action links, and every button has a name", () => {
   assert.ok(AGENT_TEMPLATES.length > 20);
   const env = createEnvironment();
   for (const path of AGENT_TEMPLATES) {
