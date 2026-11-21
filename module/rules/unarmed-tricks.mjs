@@ -86,8 +86,7 @@ export const UNARMED_TRICKS = Object.freeze({
 const NOTES = {
   clothesline: () => loc`Clothesline: this attack has takedown, with its Fortitude save DC 4 higher`,
   circle: () => loc`Circle: on a hit, move to any unoccupied square adjacent to the opponent`,
-  leap: () =>
-    loc`Leap: before this attack, move up to your Speed, passing freely through squares adjacent to or occupied by opponents`,
+  leap: () => loc`Leap: first move up to your Speed; opponents and the squares around them don’t block you`,
   sway: () => loc`Sway: on a hit, +1 dodge bonus to Defense against the target’s attacks for 1 full round`,
   oneFinger: () => loc`One Finger: only against a flat-footed opponent`,
   spike: () => loc`Spike: threat range +1`,

@@ -476,7 +476,7 @@ rollPipeline.register({
           // Shadow Walk (Spirit Supremacy, p.187).
           ...(pummel && !pummel.blocked && system.activeFeatNames?.includes("Spirit Supremacy")
             ? [
-                loc`Shadow Walk: before this Pummel you may move up to your Speed, passing freely through squares adjacent to or occupied by opponents (p.187).`
+                loc`Shadow Walk: you may first move up to your Speed, and opponents and the squares around them don’t block you (p.187).`
               ]
             : [])
         ]

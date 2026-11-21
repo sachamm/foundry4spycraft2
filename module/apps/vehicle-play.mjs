@@ -244,17 +244,17 @@ export async function rollVehicleDamageResult(
       const aboard = occupantsOf(actor),
         victim = aboard.length ? aboard[Math.floor(Math.random() * aboard.length)] : null;
       lines.push(
-        loc`${victim ? `<strong>${esc(victim.name)}</strong>` : what} takes ${amount ?? loc`the attack's damage minus the vehicle's Damage save bonus`}${amount !== null ? " damage" : ""}${victim ? "" : loc` (no occupants listed on the vehicle)`}.`
+        loc`${victim ? `<strong>${esc(victim.name)}</strong>` : what} takes ${amount ?? loc`the attack's damage, less the vehicle's Damage save bonus`}${amount !== null ? " damage" : ""}${victim ? "" : loc` (no occupants listed on the vehicle)`}.`
       );
     } else
       lines.push(
-        loc`${what} takes ${amount ?? loc`the attack's damage minus the vehicle's Damage save bonus`}${amount !== null ? " damage" : ""}.`
+        loc`${what} takes ${amount ?? loc`the attack's damage, less the vehicle's Damage save bonus`}${amount !== null ? " damage" : ""}.`
       );
   } else if (location.code === "Rotors") {
     const amount = passOn(1);
     if (amount === null)
       lines.push(
-        loc`The rotors make a Damage save against the attack's damage minus the vehicle's Damage save bonus; failure crashes the aircraft (p.365).`
+        loc`The rotors roll their own Damage save (the attack's damage, less the vehicle's Damage save bonus); if it fails, the aircraft goes down (p.365).`
       );
     else {
       const dc = damageSaveDC(amount),

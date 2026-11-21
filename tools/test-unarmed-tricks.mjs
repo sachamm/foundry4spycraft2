@@ -45,7 +45,7 @@ test("notes state each effect; save tricks give the DC from the damage", () => {
     /attack -4; threat range \+1; on a threat or critical hit the target is nauseated for 1 round \(p\.185\)/
   );
   assert.match(unarmedTrickNote({ key: "haymaker" }), /Fortitude save \(DC 10 \+ damage\) or is nauseated/);
-  assert.match(unarmedTrickNote({ key: "leap" }), /passing freely/);
+  assert.match(unarmedTrickNote({ key: "leap" }), /don’t block you/);
   assert.equal(
     unarmedTrickDamageNote("lowBlow", 6),
     "Low Blow: the target makes a Fortitude save, DC 16, or is sickened for 1d4 rounds (p.185)."
