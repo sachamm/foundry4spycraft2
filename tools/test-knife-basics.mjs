@@ -225,7 +225,7 @@ test("Circling Stance uses the shared half-action stance lifecycle, has no movem
   assert.equal(combatStanceState(circlingSystem("circling", [])), null);
   const a = make();
   assert.match(combatStanceContent(a), /Circling Stance<\/option>/);
-  assert.match(combatStanceContent(a), /keeps only half its dodge bonus to Defense \(rounded up\)/);
+  assert.match(combatStanceContent(a), /counts only half its dodge bonus \(round up\)/);
   assert.doesNotMatch(combatStanceContent(make([])), /Circling Stance<\/option>/);
 });
 test("Circling halves a positive dodge bonus rounding up, for every bonus from 0 to 12", () => {
@@ -314,7 +314,7 @@ test("a melee attack made in Circling Stance carries its target-Defense and auto
   a.system.combatStance = { version: 1, id: "c1", key: "circling" };
   assert.match(
     a.weaponAttack(a.items[0], opts()).notes,
-    /Circling Stance:.*halved \(rounded up\).*automatically move into an unoccupied adjacent square/
+    /Circling Stance:.*only half its dodge bonus \(round up\).*step into a free square beside you/
   );
   a.system.combatStance = null;
   assert.doesNotMatch(a.weaponAttack(a.items[0], opts()).notes, /Circling Stance/);

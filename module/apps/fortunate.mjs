@@ -11,7 +11,7 @@ export async function grantFortunate(actor, options = {}) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Fortunate` },
       rejectClose: false,
-      content: `<div class="spycraft2-roll-options"><p>${loc`${foundry.utils.escapeHTML(actor.name)} asks for 1 extra d4 action die as a free action. It is lost if unused by the end of the scene. The GC, or an opponent of the GC’s choice, also gains 1 d4 action die (p.189).`}</p><label>${loc`Matching die goes to`} <select name="match"><option value="gc">${loc`The GC’s pool`}</option><option value="opponent">${loc`An opponent`}</option></select></label><label>${loc`Opponent (if chosen)`} <input name="opponentName" maxlength="200" /></label></div>`
+      content: `<div class="spycraft2-roll-options"><p>${loc`${foundry.utils.escapeHTML(actor.name)} takes 1 bonus d4 action die as a free action; it expires at the end of the scene if unspent. The GC also gains 1 d4 action die, or hands it to an opponent of their choosing (p.189).`}</p><label>${loc`Matching die goes to`} <select name="match"><option value="gc">${loc`The GC’s pool`}</option><option value="opponent">${loc`An opponent`}</option></select></label><label>${loc`Opponent (if chosen)`} <input name="opponentName" maxlength="200" /></label></div>`
     });
     if (!input) return null;
   }

@@ -478,7 +478,7 @@ export function weaponAttack(system, weapon, cfg, type = "agent", options = {}) 
     [
       40,
       attacking && stanceKey === "circling"
-        ? loc`Circling Stance: with an empty square next to you, this target’s dodge bonus to Defense is halved (rounded up) against this melee attack; select yourself in the target’s Incoming attack preview. Following this attack you automatically move into an unoccupied adjacent square of your choice (p.179).`
+        ? loc`Circling Stance: if a square beside you is empty, this target counts only half its dodge bonus (round up) against this melee attack; select yourself in the target’s Incoming attack preview. Afterwards you step into a free square beside you of your choosing (p.179).`
         : ""
     ],
     [
