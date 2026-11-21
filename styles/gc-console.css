@@ -8,7 +8,7 @@
 .gc-console-body details.gc-section > summary::-webkit-details-marker { display: none; }
 .gc-console-body details.gc-section > summary::before { content: "\25B8"; flex: 0 0 auto; transition: transform 0.15s; }
 .gc-console-body details.gc-section[open] > summary::before { transform: rotate(90deg); }
-.gc-console-body details.gc-section > summary h2 { flex: 1 1 auto; margin: 0; border: 0; font-size: 1.1em; }
+.gc-console-body details.gc-section > summary .gc-section-title { flex: 1 1 auto; margin: 0; border: 0; font-size: 1.1em; }
 .gc-console-body details.gc-section > summary .gc-note { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
 .gc-console-body details.gc-section[open] { padding-bottom: 0.4em; }
 .gc-console-body details.gc-section .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr)); }
@@ -66,7 +66,7 @@
 /* Section headings are bars, as on the sheets. */
 .gc-console-body details.gc-section { border-bottom: 0; margin-bottom: 4px; }
 .gc-console-body details.gc-section > summary { align-items: center; padding: 4px 8px; color: var(--sc2-on-bar); background: var(--sc2-bar); border-radius: var(--sc2-radius); }
-.gc-console-body details.gc-section > summary h2 { font: 400 12px/1.4 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase; color: inherit; }
+.gc-console-body details.gc-section > summary .gc-section-title { font: 400 12px/1.4 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase; color: inherit; }
 .gc-console-body details.gc-section > summary .gc-note { font-family: var(--sc2-num); opacity: 1; }
 
 /* The console is one surface in the sheets' own paper and ink. It used to keep the sidebar's background under this
@@ -77,4 +77,4 @@
 .gc-console-body :is(.muted, .gc-note) { opacity: 1; color: var(--sc2-ink-muted); }
 .gc-console-body details.gc-section > summary .gc-note { color: inherit; }
 /* Section headings use the same face as the sheets' bars; the display face is kept for the dossier label only. */
-.gc-console-body details.gc-section > summary h2 { font: 700 12px/1.4 var(--font-primary, sans-serif); letter-spacing: 0.08em; }
+.gc-console-body details.gc-section > summary .gc-section-title { font: 700 12px/1.4 var(--font-primary, sans-serif); letter-spacing: 0.08em; }
