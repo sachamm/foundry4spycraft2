@@ -87,7 +87,15 @@ export async function payLockedActionDice(actor, count, perform) {
   try {
     return await perform();
   } catch (error) {
-    await actor.update({ "system.actionDice.value": actor.system.actionDice.value + count });
+    try {
+      await actor.update({ "system.actionDice.value": actor.system.actionDice.value + count });
+    } catch (refundError) {
+      // Keep the original failure visible: losing it behind the refund error hides why the spend failed.
+      throw new AggregateError(
+        [error, refundError],
+        loc`${error?.message ?? error} The ${count} action dice spent were not refunded; restore them by hand.`
+      );
+    }
     throw error;
   }
 }

@@ -111,7 +111,12 @@ export async function sufferLethal(actor, amount) {
   if (!Number.isFinite(actor.system.vitality?.max) || !actor.system.vitality.max) return null;
   const system = actor.system,
     plan = lethalHitPlan(
-      { vitality: system.vitality?.value, wounds: system.wounds?.value, woundsMax: system.wounds?.max },
+      {
+        vitality: system.vitality?.value,
+        wounds: system.wounds?.value,
+        woundsMax: system.wounds?.max,
+        deathThreshold: system.deathThreshold
+      },
       { damage: amount }
     );
   await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });

@@ -749,17 +749,16 @@ export const ActorAttackRolls = Base =>
         sneakAttackTarget = sneak.active ? sneakAttackTargetSnapshot(targetActor) : null;
       // Dirty Fighting Basics: sneak attack damage its owner suffers is halved, rounded up (p.185).
       const sneakHalved = sneak.active && halvesSneakDamage(targetActor?.system);
-      let formula =
-        damage?.formula && sneak.active
-          ? `${damage.formula} + ${sneakHalved ? `ceil((${sneak.formula}) / 2)` : sneak.formula}`
-          : damage?.formula;
-      if (!formula) return ui.notifications.warn(game.i18n.format("SPYCRAFT.Weapon.NoDamage", { name: item.name }));
+      if (!damage?.formula)
+        return ui.notifications.warn(game.i18n.format("SPYCRAFT.Weapon.NoDamage", { name: item.name }));
       // Pummel: double the standard subdual damage of an unarmed hit (p.358).
       const pummel =
         options.pummel === true &&
         (item.system.proficiency === "unarmed" || /\bNKL\b/.test(item.system.qualities ?? ""));
       if (options.pummel === true && !pummel) return ui.notifications.warn(loc`Pummel is an unarmed attack.`);
-      if (pummel) formula = `(${formula}) * 2`;
+      // Only the weapon's damage is doubled: bonus dice such as sneak attack are added after a multiplier (p.329).
+      let formula = pummel ? `(${damage.formula}) * 2` : damage.formula;
+      if (sneak.active) formula = `${formula} + ${sneakHalved ? `ceil((${sneak.formula}) / 2)` : sneak.formula}`;
       // Opportunist: a hit from its final attack deals half standard damage, rounded up (p.175).
       const opportunistDamage = options.opportunistAttackUuid
         ? opportunistDamageSource(fromUuidSync(options.opportunistAttackUuid), {

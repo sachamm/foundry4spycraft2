@@ -72,6 +72,7 @@ function combatantsOf(combat) {
       name: combatant.name ?? actor?.name ?? "",
       special: special(actor),
       wounds: actor?.system?.wounds?.value,
+      deathThreshold: actor?.system?.deathThreshold,
       burning: actor?.type === "agent" && !!hazardState(actor.system).fire,
       stratagem: actor?.type === "agent" ? stratagemCountGain(actor.system) : 0,
       defeated: combatant.isDefeated === true
@@ -145,7 +146,12 @@ export function installRoundReminders() {
     const previousRound = combat.previous?.round ?? (Number(changed.round) || 1) - 1;
     const roundEnded = Object.hasOwn(changed, "round") && previousRound >= 1 && combat.round > previousRound;
     // Fluid initiative may reorder the fight for the new round; read whose turn it is only once that is done.
-    if (Object.hasOwn(changed, "round")) await fluidRoundSettled();
+    // Yield once first: Foundry calls every updateCombat handler before any of them resumes, so by then the fluid
+    // initiative handler has started its pass whichever was registered first.
+    if (Object.hasOwn(changed, "round")) {
+      await null;
+      await fluidRoundSettled();
+    }
     const reminders = roundReminders({
       combatants: combatantsOf(combat),
       roundEnded,

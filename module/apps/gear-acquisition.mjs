@@ -609,7 +609,8 @@ export function finishGearAcquisition(actor, message) {
 }
 export async function claimGearAcquisition(actor, options = {}) {
   if (!owned(actor)) return null;
-  let input = options;
+  // A copy: the steps below fill in itemData, which must not leak back into a caller that retries with options.
+  let input = { ...options };
   if (!input.attemptId) {
     const attempts = Object.values(currentReserves(actor.system)?.attempts ?? {}).filter(
       a => a.epoch === missionEpoch(actor.system) && a.success && !a.claimedItemId

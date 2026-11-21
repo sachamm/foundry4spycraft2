@@ -162,11 +162,13 @@ async function wearOff(actor, rates, seconds) {
 export async function rollDying(actor) {
   if (!actor?.isOwner || !isSpecial(actor)) return null;
   const wounds = actor.system.wounds?.value ?? 0;
-  if (woundState(wounds) !== "dying") return ui.notifications.warn(loc`${actor.name} is not dying (–1 to –9 wounds).`);
+  const death = actor.system.deathThreshold;
+  if (woundState(wounds, death) !== "dying")
+    return ui.notifications.warn(loc`${actor.name} is not dying (below 0 wounds, above the death threshold).`);
   const roll = await new Roll("1d100").evaluate();
   let plan;
   try {
-    plan = dyingPlan({ wounds, constitution: actor.system.abilities?.con?.value }, roll.total);
+    plan = dyingPlan({ wounds, constitution: actor.system.abilities?.con?.value, deathThreshold: death }, roll.total);
   } catch (error) {
     return ui.notifications.warn(error.message);
   }
@@ -341,8 +343,8 @@ export async function applyStabilize(message, options = {}) {
     (await choosePatient(loc`Stabilize: patient`, loc`A dying character stops losing wounds and stays unconscious.`));
   if (!patient) return null;
   if (!patient.isOwner) return relayHealing("stabilize", message, patient);
-  if (woundState(patient.system.wounds?.value ?? 0) !== "dying")
-    return ui.notifications.warn(loc`${patient.name} is not dying (–1 to –9 wounds).`);
+  if (woundState(patient.system.wounds?.value ?? 0, patient.system.deathThreshold) !== "dying")
+    return ui.notifications.warn(loc`${patient.name} is not dying (below 0 wounds, above the death threshold).`);
   await patient.update({ "system.wounds.value": 0 });
   await post(patient, [
     loc`${esc(patient.name)} is stabilized at 0 wounds and stays unconscious.`,

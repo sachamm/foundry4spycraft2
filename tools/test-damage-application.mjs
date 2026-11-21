@@ -195,6 +195,27 @@ test("a dying character stabilizes on d% at or under Constitution, or loses a wo
   assert.throws(() => dyingPlan({ wounds: 2, constitution: 12 }, 50), /dying/);
 });
 
+test("death and dying follow the character's Size threshold (p.349)", () => {
+  // A Small character dies at -7; destruction stays at -25.
+  assert.deepEqual(
+    [-6, -7, -24, -25].map(w => woundState(w, -7)),
+    ["dying", "dead", "dead", "destroyed"]
+  );
+  // A Large character is still dying at -12 and dies at -15.
+  assert.deepEqual(
+    [-12, -15].map(w => woundState(w, -15)),
+    ["dying", "dead"]
+  );
+  // Anything that is not a negative whole number falls back to -10.
+  assert.equal(woundState(-10, undefined), "dead");
+  assert.equal(woundState(-10, 3), "dead");
+  const small = lethalHitPlan({ vitality: 0, wounds: 2, woundsMax: 8, deathThreshold: -7 }, { damage: 9 });
+  assert.equal(small.state, "dead");
+  assert.equal(dyingPlan({ wounds: -6, constitution: 8, deathThreshold: -7 }, 50).state, "dead");
+  assert.equal(dyingPlan({ wounds: -12, constitution: 18, deathThreshold: -15 }, 50).state, "dying");
+  assert.throws(() => dyingPlan({ wounds: -8, constitution: 8, deathThreshold: -7 }, 50), /dying/);
+});
+
 test("an opposed check goes to the higher result, then the higher bonus", () => {
   assert.equal(opposedOutcome({ total: 21 }, { total: 19 }), "first");
   assert.equal(opposedOutcome({ total: 17 }, { total: 19 }), "second");

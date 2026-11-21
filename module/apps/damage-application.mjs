@@ -476,7 +476,12 @@ async function nonLethalDamage(target, kind, amount, facts) {
 async function lethalOnSpecial(target, hit, source) {
   const system = target.system,
     plan = lethalHitPlan(
-      { vitality: system.vitality?.value, wounds: system.wounds?.value, woundsMax: system.wounds?.max },
+      {
+        vitality: system.vitality?.value,
+        wounds: system.wounds?.value,
+        woundsMax: system.wounds?.max,
+        deathThreshold: system.deathThreshold
+      },
       hit
     );
   if (plan.net) await target.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
@@ -568,7 +573,7 @@ hazardSaveResolvers.set("massiveDamage", async (actor, message, save, succeeded)
     await actor.update({ "system.wounds.value": wounds });
     lines.push(
       loc`A hit of 50 or more: wounds drop to ${wounds}.`,
-      ...(await woundConditions(actor, woundState(wounds)))
+      ...(await woundConditions(actor, woundState(wounds, actor.system.deathThreshold)))
     );
   }
   return post(actor, lines, { rolls });
