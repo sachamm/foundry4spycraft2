@@ -6,7 +6,7 @@ import {
   currentDamageSaveMessage,
   damageSaveSourceSnapshot
 } from "../rules/damage-saves.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export async function rollPendingDamageSave(actor, options = {}) {

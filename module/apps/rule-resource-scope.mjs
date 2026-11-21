@@ -4,7 +4,7 @@ import {
   nativeResourceTransactionsEnabled,
   refreshResourceActor,
   refreshRuleStateMessage
-} from "../rules/transactions.mjs";
+} from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const queues = new Map();
 /** A short, independent actor rule-state lock. Never call base resource queues inside it. */

@@ -53,7 +53,7 @@ import {
   masterPlanGainPlan,
   masterPlanPool
 } from "../../rules/bonus-pools.mjs";
-import { queueResources, isResourceLock } from "../../rules/transactions.mjs";
+import { queueResources, isResourceLock } from "../../services/transactions.mjs";
 import { rollEvidence } from "../../rules/outcomes.mjs";
 import {
   SHARE_ABILITIES,

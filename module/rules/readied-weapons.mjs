@@ -1,5 +1,5 @@
 import { finesseWeaponPlan } from "./finesse.mjs";
-import { weaponGrip, weaponUnavailable } from "./gear.mjs";
+import { weaponGrip, weaponUnavailable } from "./weapon-use.mjs";
 import { cqbRangedWeapon } from "./cqb.mjs";
 import { loc } from "../i18n.mjs";
 /** Gear represents a physically held/readied personal weapon with equipped+carried flags.
@@ -194,4 +194,47 @@ export function readiedMeleeFeatSource(system, { name, family, bonus, finesse = 
           .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
       }
     : null;
+}
+/** Actual held personal weapons; training is not required for Sure Grip. */
+export function readiedDisarmWeapons(system, items = []) {
+  const weapons = [];
+  for (const item of items) {
+    const w = item.system ?? {},
+      id = item.id ?? item._id;
+    if (
+      item.type !== "weapon" ||
+      w.proficiency === "unarmed" ||
+      w.equipped !== true ||
+      w.carried === false ||
+      weaponUnavailable(w) ||
+      !Number.isSafeInteger(w.quantity ?? 1) ||
+      (w.quantity ?? 1) < 1
+    )
+      continue;
+    const grip = weaponGrip(system, w);
+    if (grip.blocked || ![1, 2].includes(grip.hands) || ![1, 2].includes(grip.required)) continue;
+    const qualities = w.qualities === undefined ? "" : w.qualities;
+    if (typeof id !== "string" || !id || typeof qualities !== "string")
+      return {
+        version: 1,
+        weapons: [],
+        blockedReason: loc`Review the actual readied weapon identity and qualities before resisting Disarm.`
+      };
+    weapons.push({
+      id,
+      uuid: item.uuid ?? null,
+      name: item.name ?? "",
+      proficiency: w.proficiency,
+      sizeHands: w.sizeHands,
+      qualities,
+      hands: grip.hands,
+      requiredHands: grip.required,
+      quantity: w.quantity ?? 1
+    });
+  }
+  const blockedReason =
+    weapons.reduce((n, w) => n + w.hands, 0) > 2 || new Set(weapons.map(w => w.id)).size !== weapons.length
+      ? loc`Review which weapons are actually held: use legal grips within two hands, not every equipped inventory entry.`
+      : "";
+  return { version: 1, weapons: weapons.sort((a, b) => a.id.localeCompare(b.id)), blockedReason };
 }

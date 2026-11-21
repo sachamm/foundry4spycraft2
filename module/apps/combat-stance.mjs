@@ -14,7 +14,7 @@ import {
   combatStanceDeclaration,
   stanceForcedExit
 } from "../rules/combat-stance.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 export function combatStanceContent(actor) {
   const esc = foundry.utils.escapeHTML,

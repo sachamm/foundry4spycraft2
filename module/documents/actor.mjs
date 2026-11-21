@@ -2,7 +2,7 @@
  * The Actor document. Its behaviour is split by workflow into module/documents/actor/*.mjs; each file adds its
  * methods through a mixin, so everything is still called as actor.method().
  */
-import { isResourceLock } from "../rules/transactions.mjs";
+import { isResourceLock } from "../services/transactions.mjs";
 import { ActorRolls } from "./actor/rolls.mjs";
 import { ActorSkillRolls } from "./actor/skill-rolls.mjs";
 import { ActorAttackRolls } from "./actor/attack-rolls.mjs";

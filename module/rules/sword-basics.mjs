@@ -12,7 +12,7 @@
  */
 import { combatStanceState } from "./combat-stance.mjs";
 import { finesseWeaponPlan } from "./finesse.mjs";
-import { weaponUnavailable } from "./gear.mjs";
+import { weaponUnavailable } from "./weapon-use.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 

@@ -1,7 +1,7 @@
 import { grantSideStanceFeint } from "./side-stance.mjs";
 import { grantFeintCriticalBonus } from "./feint-bonus.mjs";
 import { feintOutcomePlan, feintHistoryPlan } from "../rules/feint-outcomes.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";

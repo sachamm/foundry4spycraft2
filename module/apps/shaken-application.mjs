@@ -1,5 +1,5 @@
 import { getShakenApplicationReview, shakenApplicationSnapshot, shakenApplicationPlan } from "../rules/shaken.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),
   clone = structuredClone;

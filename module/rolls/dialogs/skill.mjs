@@ -5,7 +5,7 @@
  */
 import { rollPipeline } from "../../rules/roll-pipeline.mjs";
 import { combatStanceState } from "../../rules/combat-stance.mjs";
-import { isResourceLock } from "../../rules/transactions.mjs";
+import { isResourceLock } from "../../services/transactions.mjs";
 import { possessionUnavailable } from "../../rules/gear.mjs";
 import { FOG_SMOKE, AMBIENT_LIGHT } from "../../rules/senses.mjs";
 import { LOCAL_HERO_OPPOSITION_SKILLS, TERRAIN_TYPES } from "../../rules/terrain.mjs";

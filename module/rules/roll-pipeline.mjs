@@ -95,6 +95,12 @@ export class RollPipeline {
     return this.#contributors.map(c => c.id);
   }
 
+  /** Ids of the contributors that implement `phase`, in running order (for example, the chat-card buttons). */
+  idsFor(phase) {
+    if (!PHASES.includes(phase)) throw new TypeError(loc`Unknown roll pipeline phase "${phase}".`);
+    return this.#contributors.filter(c => typeof c[phase] === "function").map(c => c.id);
+  }
+
   #active(phase, ctx) {
     const kind = ctx?.checkKind;
     return this.#contributors.filter(c => typeof c[phase] === "function" && (!c.kinds || c.kinds.includes(kind)));

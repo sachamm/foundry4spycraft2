@@ -39,8 +39,8 @@ import {
   isResourceLock,
   recoverResourceTransaction,
   RULE_RESOURCE_LOCK_ID
-} from "../../rules/transactions.mjs";
-import { withGCDicePool } from "../../rules/gc-dice.mjs";
+} from "../../services/transactions.mjs";
+import { withGCDicePool } from "../../services/gc-dice.mjs";
 import { rollEvidence } from "../../rules/outcomes.mjs";
 import {
   healingPlan,

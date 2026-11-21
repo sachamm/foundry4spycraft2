@@ -1,5 +1,5 @@
 import { markSource, markPlan, markRecordValid, markDisclosurePlan } from "../rules/mark.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const state = a => ({ ...a.system, usagePeriods: a.usagePeriods }),
   same = (a, b) => JSON.stringify(a) === JSON.stringify(b),

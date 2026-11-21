@@ -1,20 +1,21 @@
 import { primaryWriterFor } from "../writers.mjs";
-import { shakenRules } from "./shaken.mjs";
-import { GM_TOKEN_PREFIX, gmLockingActive, lockTable, requestLock } from "./gm-locks.mjs";
+import { shakenRules } from "../rules/shaken.mjs";
+import { GM_TOKEN_PREFIX, gmLockingActive, lockTable, requestLock } from "../rules/gm-locks.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
+import {
+  GC_RESOURCE_LOCK_ID,
+  isResourceLock,
+  RESOURCE_LOCK_ID,
+  RULE_RESOURCE_LOCK_ID
+} from "../rules/resource-locks.mjs";
+export { GC_RESOURCE_LOCK_ID, isResourceLock, RESOURCE_LOCK_ID, RULE_RESOURCE_LOCK_ID };
 /** v14 native embedded-document uniqueness serializes resource transactions across clients.
  * Uses the authenticated document API and existing ownership, without a privileged socket relay.
  */
-export const RESOURCE_LOCK_ID = "sc2ResourceLock1";
-export const RULE_RESOURCE_LOCK_ID = "sc2RuleStateLk01";
-export const GC_RESOURCE_LOCK_ID = "sc2GCResourceLk1";
 const scopeQueues = new Map();
 const lockKey = (actor, scope) => `${actor.uuid}:${scope}`;
 const held = new Map();
-export const isResourceLock = item =>
-  [RESOURCE_LOCK_ID, GC_RESOURCE_LOCK_ID, RULE_RESOURCE_LOCK_ID].includes(item?.id ?? item?._id) &&
-  !!item.flags?.spycraft2?.resourceLock?.token;
 export class ResourceBusyError extends Error {}
 /** Another transaction holds this character's lock right now. It clears by itself when that one finishes. */
 export class ResourceLockedError extends ResourceBusyError {}

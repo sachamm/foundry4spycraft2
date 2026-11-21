@@ -189,7 +189,7 @@ import {
   reviewShakenInitiative,
   changeInitiativeCountPreservingShaken
 } from "../module/apps/shaken-initiative.mjs";
-import { queueResources } from "../module/rules/transactions.mjs";
+import { queueResources } from "../module/services/transactions.mjs";
 function fixture({ active = false, count = 20, powerRecord = true, shakenRecord = true } = {}) {
   const a = actualActor();
   a.system.activeFeatNames = ["Great Sword Basics"];

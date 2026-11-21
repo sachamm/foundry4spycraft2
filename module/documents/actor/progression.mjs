@@ -3,7 +3,7 @@ import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollCareerVitality, reviewCareerVitality } from "../../apps/vitality.mjs";
 import { deferredSkillDeadline } from "../../rules/deferred-skills.mjs";
-import { queueResources } from "../../rules/transactions.mjs";
+import { queueResources } from "../../services/transactions.mjs";
 import { featAcquisition, captureFeatAcquisition } from "../../rules/feat-acquisition.mjs";
 import { checkPrerequisites } from "../../rules/prerequisites.mjs";
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";

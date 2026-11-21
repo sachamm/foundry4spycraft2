@@ -1,4 +1,4 @@
-import { weaponGrip } from "./gear.mjs";
+import { weaponGrip } from "./weapon-use.mjs";
 import { grantedMeleeQuality } from "./melee-tricks.mjs";
 import { finesseWeaponPlan } from "./finesse.mjs";
 import { readiedMeleeFeatSource } from "./readied-weapons.mjs";

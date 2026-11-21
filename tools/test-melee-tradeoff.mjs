@@ -285,7 +285,7 @@ test("posted damage with failed final stamps remains pending and GC recovery att
   assert.equal(game.messages.length, count);
 });
 test("paid/final callbacks may nest the short damage lease without taking another base resource queue", async () => {
-  const { queueResources } = await import("../module/rules/transactions.mjs"),
+  const { queueResources } = await import("../module/services/transactions.mjs"),
     { a, m } = await hit();
   const d = await queueResources([a], () => a.rollDamage(a.items[0], damageOptions(m)));
   assert.equal(d.flags.spycraft2.attackDamageBenefit.bonus, 4);

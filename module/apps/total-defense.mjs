@@ -1,7 +1,7 @@
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { combatMovementRules } from "../rules/combat-movement.mjs";
 import { totalDefensePlan, equilibriumTotalDefenseBonus } from "../rules/total-defense.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const same = (a, b) =>
   JSON.stringify(a, (_k, x) =>

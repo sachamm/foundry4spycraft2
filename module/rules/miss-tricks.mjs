@@ -1,6 +1,6 @@
-import { readiedDisarmWeapons } from "./disarm-response.mjs";
+import { readiedDisarmWeapons } from "./readied-weapons.mjs";
 import { finesseWeaponPlan } from "./finesse.mjs";
-import { weaponGrip, weaponUnavailable } from "./gear.mjs";
+import { weaponGrip, weaponUnavailable } from "./weapon-use.mjs";
 import { checkCandidates } from "./outcomes.mjs";
 import { validOwnCountClock } from "./own-count-duration.mjs";
 import { readiedItemsForCheck } from "./readied-replacement.mjs";

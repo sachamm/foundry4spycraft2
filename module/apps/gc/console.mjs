@@ -3,7 +3,7 @@ import { systemDialog } from "../dialog-theme.mjs";
 import { installToolSearch } from "../tool-search.mjs";
 import { installResolutionGuide } from "../resolution-guide.mjs";
 /** The GC Console: sidebar tools for the mission record, scene and action dice, combat, Dramatic Conflicts and reference tables. */
-import { gcDiceStatus, manageGCDice } from "../../rules/gc-dice.mjs";
+import { gcDiceStatus, manageGCDice } from "../../services/gc-dice.mjs";
 import { threatLevel, threatBonusActionDice, missionStanding } from "../../rules/gc/mission.mjs";
 import { campaignQuality } from "../../rules/gc/campaign.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";

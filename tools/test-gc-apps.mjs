@@ -168,7 +168,7 @@ const conflicts = await import("../module/apps/gc/conflicts.mjs");
 const tables = await import("../module/apps/gc/tables.mjs");
 const { consoleContext, consoleSections, GCConsole, registerGCConsoleTab, openGCConsole } =
   await import("../module/apps/gc/console.mjs");
-const { initializeGCDice, gcDiceStatus } = await import("../module/rules/gc-dice.mjs");
+const { initializeGCDice, gcDiceStatus } = await import("../module/services/gc-dice.mjs");
 const { missionSettlementDefaults } = await import("../module/apps/gc/mission-defaults.mjs");
 
 const agent = (id, level) =>

@@ -1,5 +1,5 @@
 import { threadNeedleAttackFacts, threadNeedleEndPlan } from "../rules/thread-needle.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { loc } from "../i18n.mjs";

@@ -4,7 +4,7 @@ import {
   attributeDamageCorrectionPlan,
   attributeMissionRecoveryPlan
 } from "../rules/attribute-damage.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const actors = () =>
   Array.isArray(game.actors?.contents)

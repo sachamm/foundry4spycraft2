@@ -4,7 +4,7 @@ import { COVER_GRADES } from "../rules/cover.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
 import { attributeActionBlock } from "../rules/attributes.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const stable = value =>
   JSON.stringify(value, (_key, v) =>

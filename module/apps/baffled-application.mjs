@@ -1,6 +1,6 @@
 import { baffledSourceSnapshot, baffledApplicationPlan, getBaffledReview } from "../rules/baffled.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b),

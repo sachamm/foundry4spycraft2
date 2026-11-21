@@ -141,7 +141,7 @@ globalThis.game = {
     return { activeGM: gmPresent ? { isSelf: true } : null, get: () => null };
   }
 };
-const { queueResourceScope, RULE_RESOURCE_LOCK_ID } = await import("../module/rules/transactions.mjs");
+const { queueResourceScope, RULE_RESOURCE_LOCK_ID } = await import("../module/services/transactions.mjs");
 const { lockTable } = await import("../module/rules/gm-locks.mjs");
 
 test("an arbitrated transaction writes nothing to the character and frees its lock, even on failure", async () => {

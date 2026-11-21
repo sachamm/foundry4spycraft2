@@ -1,7 +1,7 @@
 import { mixedHealingQuote, mixedHealingSignature } from "../rules/healing-payments.mjs";
 import { unrestrictedBonusPools } from "../rules/bonus-pools.mjs";
 import { shakenRules } from "../rules/shaken.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 export function mixedHealingFundingControl(actor) {
   const esc = foundry.utils.escapeHTML,

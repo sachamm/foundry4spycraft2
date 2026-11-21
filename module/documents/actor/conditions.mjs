@@ -44,7 +44,7 @@ import {
 } from "../../rules/mental-leap.mjs";
 import { sleepingSourceSnapshot, sleepWakePlan } from "../../rules/sleeping.mjs";
 import { attributeCollapsePlan, wisdomCollapseEpisode } from "../../rules/attributes.mjs";
-import { queueResources } from "../../rules/transactions.mjs";
+import { queueResources } from "../../services/transactions.mjs";
 import { loc } from "../../i18n.mjs";
 
 export const ActorConditions = Base =>

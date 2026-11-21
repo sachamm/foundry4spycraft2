@@ -5,7 +5,7 @@ import {
   recoveredInjuryRollJSON,
   CRITICAL_INJURY_HEALING_NOTE
 } from "../rules/critical-injuries.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const history = a => a.flags?.spycraft2?.criticalInjuryRolls ?? {};
 const saved = (a, id) => history(a)[id];

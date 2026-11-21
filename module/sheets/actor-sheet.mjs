@@ -111,7 +111,7 @@ import { ammunitionConfiguration, compatibleAmmunition } from "../rules/ammuniti
 import { CAMOUFLAGE_TERRAINS, camouflageTerrain } from "../rules/quality-checks.mjs";
 import { RESISTANCE_TYPES, resistanceType } from "../rules/resistances.mjs";
 import { brightIdeaPoolStatus } from "../rules/bright-idea.mjs";
-import { queueResources, isResourceLock } from "../rules/transactions.mjs";
+import { queueResources, isResourceLock } from "../services/transactions.mjs";
 import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-conditions.mjs";
 import { NPC_RULES, NPC_STATS, NPC_CATEGORIES, defaultNpcProfile, computeNpcProfile } from "../rules/npcs.mjs";
 import { reviewActorRules } from "../apps/rules-refresh.mjs";

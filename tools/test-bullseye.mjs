@@ -355,7 +355,7 @@ test("a ranged Bullseye attack discards a pending Side die and works inside the 
   const { source } = await import("./fixtures/side-stance.mjs"),
     { grantSideStanceFeint } = await import("../module/apps/side-stance.mjs"),
     { sideStanceAttackPlan } = await import("../module/rules/side-stance.mjs"),
-    { queueResources } = await import("../module/rules/transactions.mjs"),
+    { queueResources } = await import("../module/services/transactions.mjs"),
     a = make();
   a.system.activeFeatNames.push("Fencing Basics");
   a.system.combatStance = { version: 1, key: "side", id: "side1" };

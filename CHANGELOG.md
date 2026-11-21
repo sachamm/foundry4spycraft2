@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Module layout (no change in play).** The transaction, GC dice and period services moved from `module/rules/` to
+  `module/services/`, so the rules folder holds only rules that run without Foundry. Macros or modules that import
+  `systems/spycraft2/module/rules/transactions.mjs`, `gc-dice.mjs` or `periods.mjs` need the new folder name.
+  Three import cycles between rule files are gone, an unused progression helper was removed, and a test now fails on a
+  new import cycle or on a chat-card button changing position.
 - **Faster first load after an update.** When a new version updates a world's data, each character's items are
   written together instead of one at a time, one notification shows how far it has got, and the shaken and Power
   Stance trackers catch up once at the end instead of reacting to every write. The sample scenes, folders, GC tables

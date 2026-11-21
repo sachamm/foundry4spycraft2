@@ -9,7 +9,7 @@ import {
   shakenInitiativePlan,
   reviewedShakenInitiativePlan
 } from "../rules/shaken-initiative.mjs";
-import { queueResources, isResourceLock, periodResourceActors } from "../rules/transactions.mjs";
+import { queueResources, isResourceLock, periodResourceActors } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const localReviews = new WeakMap();
 const record = c => {

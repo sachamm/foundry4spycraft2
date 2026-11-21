@@ -1,55 +1,13 @@
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
 import { fencingDisarmPlan } from "./fencing-disarm.mjs";
-import { weaponGrip, weaponUnavailable } from "./gear.mjs";
+import { weaponGrip } from "./weapon-use.mjs";
 import { DISARM_SIZES, disarmWeaponSize } from "./disarm.mjs";
 import { axeDisarmPlan } from "./axe-disarm.mjs";
-import { readiedMeleeWeapons } from "./readied-weapons.mjs";
+import { readiedDisarmWeapons, readiedMeleeWeapons } from "./readied-weapons.mjs";
+export { readiedDisarmWeapons };
 import { ownedWeaponTraining } from "./weapon-training.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
-/** Actual held personal weapons; training is not required for Sure Grip. */
-export function readiedDisarmWeapons(system, items = []) {
-  const weapons = [];
-  for (const item of items) {
-    const w = item.system ?? {},
-      id = item.id ?? item._id;
-    if (
-      item.type !== "weapon" ||
-      w.proficiency === "unarmed" ||
-      w.equipped !== true ||
-      w.carried === false ||
-      weaponUnavailable(w) ||
-      !Number.isSafeInteger(w.quantity ?? 1) ||
-      (w.quantity ?? 1) < 1
-    )
-      continue;
-    const grip = weaponGrip(system, w);
-    if (grip.blocked || ![1, 2].includes(grip.hands) || ![1, 2].includes(grip.required)) continue;
-    const qualities = w.qualities === undefined ? "" : w.qualities;
-    if (typeof id !== "string" || !id || typeof qualities !== "string")
-      return {
-        version: 1,
-        weapons: [],
-        blockedReason: loc`Review the actual readied weapon identity and qualities before resisting Disarm.`
-      };
-    weapons.push({
-      id,
-      uuid: item.uuid ?? null,
-      name: item.name ?? "",
-      proficiency: w.proficiency,
-      sizeHands: w.sizeHands,
-      qualities,
-      hands: grip.hands,
-      requiredHands: grip.required,
-      quantity: w.quantity ?? 1
-    });
-  }
-  const blockedReason =
-    weapons.reduce((n, w) => n + w.hands, 0) > 2 || new Set(weapons.map(w => w.id)).size !== weapons.length
-      ? loc`Review which weapons are actually held: use legal grips within two hands, not every equipped inventory entry.`
-      : "";
-  return { version: 1, weapons: weapons.sort((a, b) => a.id.localeCompare(b.id)), blockedReason };
-}
 /** p.356 response; the user resolves p.302's skill/attack wording in favor of
  * +3 gear on the targeted weapon's opposed defensive Standard Attack check.
  */
