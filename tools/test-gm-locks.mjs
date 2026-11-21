@@ -4,6 +4,10 @@ import {
   GM_TOKEN_PREFIX,
   LOCK_QUERY,
   LockTable,
+  PROBE_TIMEOUT_MS,
+  QUERY_TIMEOUT_MS,
+  UNREACHABLE_MEMORY_MS,
+  forgetUnreachableGM,
   gmLockingActive,
   lockQueryHandler,
   requestLock
@@ -79,7 +83,8 @@ test("the GC's own client answers from its table; a player's request travels as 
   assert.equal(sent.length, 0);
   const refused = await requestLock("acquire", ["Actor.a"], "gm:2", { game: playerGame, table });
   assert.deepEqual(refused, { ok: false, busy: ["Actor.a"], holders: ["gc"] });
-  assert.deepEqual(sent, [[LOCK_QUERY, 5000]]);
+  assert.deepEqual(sent, [[LOCK_QUERY, QUERY_TIMEOUT_MS]]);
+  assert.ok(QUERY_TIMEOUT_MS <= 1500);
   await requestLock("release", ["Actor.a"], "gm:1", { game: gmGame, table });
   assert.deepEqual(await requestLock("acquire", ["Actor.a"], "gm:2", { game: playerGame, table }), { ok: true });
   assert.equal(table.holder("Actor.a").userId, "p1");
@@ -102,6 +107,120 @@ test("no GC, a timeout or a broken answer all report the GC as unreachable", asy
   assert.equal((await requestLock("acquire", ["k"], "gm:1", { game: failing })).unreachable, true);
   const silent = { user: { id: "p" }, users: { activeGM: { isSelf: false, query: async () => undefined } } };
   assert.equal((await requestLock("acquire", ["k"], "gm:1", { game: silent })).unreachable, true);
+});
+
+test("a GC that fails to answer is probed briefly for a minute; late grants are released; one notice", async () => {
+  forgetUnreachableGM();
+  const queries = [],
+    notices = [];
+  let answering = false;
+  const game = {
+    user: { id: "p" },
+    users: {
+      activeGM: {
+        id: "gc",
+        isSelf: false,
+        query: async (name, data, options) => {
+          queries.push([data.action, options.timeout]);
+          if (!answering) throw new Error("timeout");
+          return { ok: true };
+        }
+      }
+    }
+  };
+  const notify = message => notices.push(message);
+  const ask = (action, now) => requestLock(action, ["Actor.a:lock"], "gm:1", { game, now, notify });
+  assert.equal((await ask("acquire", 0)).unreachable, true);
+  // The timed-out request is released in case the GC grants it late.
+  assert.deepEqual(queries.splice(0), [
+    ["acquire", QUERY_TIMEOUT_MS],
+    ["release", QUERY_TIMEOUT_MS]
+  ]);
+  // Within the minute the GC is still asked, so its locks are never ignored, but only briefly.
+  assert.equal((await ask("acquire", 1000)).unreachable, true);
+  assert.deepEqual(queries.splice(0)[0], ["acquire", PROBE_TIMEOUT_MS]);
+  assert.ok(PROBE_TIMEOUT_MS < QUERY_TIMEOUT_MS);
+  // Each failure restarts the minute; a minute after the last one, the full wait again.
+  await ask("acquire", 1000 + UNREACHABLE_MEMORY_MS + 1);
+  assert.deepEqual(queries.splice(0)[0], ["acquire", QUERY_TIMEOUT_MS]);
+  assert.equal(notices.length, 1, "one notice for the whole stretch");
+  // A GC that answers again is used at once, and a later stretch gets its own notice.
+  answering = true;
+  assert.deepEqual(await ask("acquire", 1000 + UNREACHABLE_MEMORY_MS + 2), { ok: true });
+  answering = false;
+  await ask("acquire", 1000 + UNREACHABLE_MEMORY_MS + 3);
+  assert.equal(notices.length, 2);
+  forgetUnreachableGM();
+});
+
+test("a client that fell back still respects a lock the recovered GC holds for someone else", async () => {
+  forgetUnreachableGM();
+  const table = new LockTable(),
+    handler = lockQueryHandler(table, { resolve: () => null });
+  let up = false;
+  const game = {
+    user: { id: "p1" },
+    users: {
+      activeGM: {
+        id: "gc",
+        isSelf: false,
+        query: async (name, data) => {
+          if (!up) throw new Error("timeout");
+          return handler(data);
+        }
+      }
+    }
+  };
+  assert.equal(
+    (await requestLock("acquire", ["Actor.x:lock"], "gm:a", { game, now: 0, notify() {} })).unreachable,
+    true
+  );
+  // The GC comes back and grants the character to another player.
+  up = true;
+  table.acquire(["Actor.x:lock"], "gm:b", "p2");
+  const answer = await requestLock("acquire", ["Actor.x:lock"], "gm:a2", { game, now: 1000, notify() {} });
+  assert.deepEqual(answer, { ok: false, busy: ["Actor.x:lock"], holders: ["p2"] });
+  forgetUnreachableGM();
+});
+
+test("the GC refuses a lock while the character carries a document lock from a client that fell back", () => {
+  const items = new Map([
+    ["sc2ResourceLock1", { id: "sc2ResourceLock1", flags: { spycraft2: { resourceLock: { token: "t" } } } }]
+  ]);
+  const actors = { "Actor.a": { items }, "Scene.s.Token.t.Actor.b": { items: new Map() } };
+  const table = new LockTable(),
+    handler = lockQueryHandler(table, { resolve: uuid => actors[uuid] ?? null });
+  assert.deepEqual(handler({ action: "acquire", keys: ["Actor.a:sc2ResourceLock1"], token: "gm:1", userId: "p1" }), {
+    ok: false,
+    busy: ["Actor.a:sc2ResourceLock1"],
+    holders: []
+  });
+  assert.equal(table.size, 0);
+  // A different scope on the same character, and a token actor without a lock, are free.
+  assert.equal(
+    handler({ action: "acquire", keys: ["Actor.a:sc2RuleStateLk01"], token: "gm:1", userId: "p1" }).ok,
+    true
+  );
+  assert.equal(
+    handler({ action: "acquire", keys: ["Scene.s.Token.t.Actor.b:sc2ResourceLock1"], token: "gm:2", userId: "p1" }).ok,
+    true
+  );
+  // An item that only reuses the id, with no lock token, is not a lock.
+  items.set("sc2GCResourceLk1", { id: "sc2GCResourceLk1", flags: {} });
+  assert.equal(
+    handler({ action: "acquire", keys: ["Actor.a:sc2GCResourceLk1"], token: "gm:3", userId: "p1" }).ok,
+    true
+  );
+  // A resolver that throws on a malformed uuid leaves the key to the table.
+  const throwing = lockQueryHandler(new LockTable(), {
+    resolve: () => {
+      throw new Error("bad uuid");
+    }
+  });
+  assert.equal(
+    throwing({ action: "acquire", keys: ["nonsense:sc2ResourceLock1"], token: "gm:4", userId: "p1" }).ok,
+    true
+  );
 });
 
 /* ---- Through the transaction layer ---- */

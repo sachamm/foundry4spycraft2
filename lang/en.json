@@ -342,7 +342,7 @@
    },
    "LockMode": {
     "Name": "Resource locking",
-    "Hint": "How two clients are kept from spending the same character's resources at once. The default writes a short-lived lock on the character. The alternative asks the Game Control's client instead and writes nothing; it needs a GC connected, and must not be used while the GC is signed in from two browsers at once.",
+    "Hint": "How two clients are kept from spending the same character's resources at once. The default writes a short-lived lock on the character. The alternative asks the Game Control's client instead and writes nothing, so other players' sheets do not redraw on every spend; it needs a GC connected, and must not be used while the GC is signed in from two browsers at once. If the GC's client stops answering, spending falls back to the character lock and asks again a minute later.",
     "Items": "Lock on the character (default)",
     "Gm": "Arbitrated by the Game Control's client"
    },
@@ -8794,6 +8794,7 @@
    "TheGCReviewsInterruptedCheapShot_0mw21dl": "The GC reviews interrupted Cheap Shot recovery attempts.",
    "TheGCSActionDieFor_1gp5120": "The GC's action die for this NPC is {0} type(s) larger, d12 at most.",
    "TheGCSClientDidNot_139tgmz": "The GC’s client did not apply the damage; the GC sees why.",
+   "TheGCSClientDidNot_178k49e": "The GC’s client did not answer in time. Spending uses locks on the character until it answers again.",
    "TheGCSClientDidNot_18olg4k": "The GC’s client did not apply the healing; the GC sees why.",
    "TheGCSClientDoesNot_0kqjfvl": "The GC's client does not know this request.",
    "TheGCSMatchingD4Could_0wclmvj": "The GC’s matching d4 could not be added ({0}); add it from the GC dice console.",
