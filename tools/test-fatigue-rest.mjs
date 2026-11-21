@@ -173,7 +173,7 @@ test("one-hour exhaustion sleep does not cure independent unconsciousness, class
   ];
   advance(timed, 60);
   assert.equal(timed.system.mentalLeapState.exhausted, true);
-  assert.equal(await begin(timed), null);
+  assert.equal(await begin(timed), false);
   assert.equal(timed.system.fatigueRest, undefined);
 });
 test("source expiry can complete as a no-op, while stale rest snapshots and concurrent final confirmations cannot clear a later episode", async () => {

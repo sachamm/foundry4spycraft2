@@ -171,7 +171,7 @@ test("failed outcome updates undo weapon effects, and secret adjudication is res
   game.user.isGM = false;
   const secret = message();
   secret.blind = true;
-  assert.equal(await actor.confirmCheckOutcome(secret, { succeeded: false }), null);
+  assert.equal(await actor.confirmCheckOutcome(secret, { succeeded: false }), false);
   assert.equal(weapon.system.destroyed, false);
   game.user.isGM = true;
 });

@@ -144,7 +144,7 @@ test("actual entry records tag circumstances and rechecks recorded Bound status 
   assert.equal((await a.rollSkill("analysis", "int", input)).data.total, 14);
   a.statuses.add("bound");
   const before = rolls;
-  assert.equal(await a.rollSkill("analysis", "int", { ...input, bound: false }), null);
+  assert.equal(await a.rollSkill("analysis", "int", { ...input, bound: false }), false);
   assert.equal(rolls, before);
   a.statuses.clear();
   const language = await a.rollSkill("investigation", "cha", {

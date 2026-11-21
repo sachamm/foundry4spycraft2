@@ -264,7 +264,7 @@ test("typed healing respects maxima, death, combat and expiry without charging b
     if (blocked === "dead") a.statuses.add("dead");
     if (blocked === "combat") game.combat = { started: true, id: "c", round: 1, combatants: [{ actor: a }] };
     if (blocked === "expiry") periods.scene = "new";
-    assert.equal(await heal(a), null, blocked);
+    assert.equal(await heal(a), false, blocked);
     assert.equal(a.system.bonusActionDice.mp.remaining, 4);
     assert.equal(formulas.length, 0);
   }
@@ -512,7 +512,7 @@ test("typed Refresh starts at zero ordinary dice, spends at the next initiative 
   assert.equal(a.system.actionDice.value, 0);
   assert.equal(posts[0].flags.spycraft2.checkKind, "refresh");
   assert.equal(posts[0].flags.spycraft2.funding.die, 4);
-  assert.equal(await completeRefresh(a), null);
+  assert.equal(await completeRefresh(a), false);
   assert.equal(c.round, 2);
 });
 test("typed Refresh preserves the initiative/attack window and expires funding without charging or completing the action", async () => {
@@ -523,7 +523,7 @@ test("typed Refresh preserves the initiative/attack window and expires funding w
     if (kind === "attacked") a.system.refreshAction.targeted = true;
     if (kind === "expired") periods.scene = "new";
     if (kind === "wrongTurn") c.combatant = { id: "other", actor: { uuid: "Other" } };
-    assert.equal(await completeRefresh(a), null, kind);
+    assert.equal(await completeRefresh(a), false, kind);
     assert.equal(a.system.refreshAction.state, "waiting");
     assert.equal(a.system.bonusActionDice.mp.remaining, 4);
     assert.equal(a.system.vitality.value, 4);
@@ -587,7 +587,7 @@ test("typed Defense rolls its source die for duration, spends one and does not s
   assert.match(formulas[0], /^1d4x>=3/);
   assert.equal(a.system.bonusActionDice.mp.remaining, 3);
   assert.equal(a.system.actionDice.value, 0);
-  assert.equal(await defend(a), null);
+  assert.equal(await defend(a), false);
   assert.equal(a.system.bonusActionDice.mp.remaining, 3);
 });
 test("Defense record failures and failed replacement posts restore the exact old effect despite recursive ObjectField merging", async () => {
@@ -632,17 +632,17 @@ test("Defense is a free action: no-action states, sleep, negative wounds and a f
     const a = actor();
     combatFor(a);
     a.system.conditionContext = { [condition]: true };
-    assert.equal(await defend(a), null, condition);
+    assert.equal(await defend(a), false, condition);
     assert.equal(a.system.bonusActionDice.mp.remaining, 4);
   }
   let a = actor();
   combatFor(a);
   a.system.wounds.value = -1;
-  assert.equal(await defend(a), null);
+  assert.equal(await defend(a), false);
   a = actor();
   const c = combatFor(a);
   await a.refreshWithActionDie({ phase: "start", forfeitActions: true });
-  assert.equal(await defend(a), null);
+  assert.equal(await defend(a), false);
   assert.equal(a.system.bonusActionDice.mp.remaining, 4);
   assert.equal(c.round, 1);
 });
@@ -771,7 +771,7 @@ test("paid criticals reject expired, check-bound, insufficient and mismatched-pa
       a.system.bonusActionDice.mp.remaining = 1;
     }
     if (variant === "wrongPayer") opts.funding = "Actor.someoneElse|mp";
-    assert.equal(await a.activateCritical(m, opts), null, variant);
+    assert.ok([false, null].includes(await a.activateCritical(m, opts)), variant);
     assert.equal(a.system.bonusActionDice.mp.remaining, variant === "insufficient" ? 1 : 4);
     assert.equal(m.flags.spycraft2.criticalSuccess, undefined);
   }
@@ -1253,7 +1253,7 @@ test("Generous can spend the last typed die but cannot donate a target’s grant
     if (invalid === "bound") f.donor.system.bonusActionDice.mp.source = "iKnowWhatDoing";
     if (invalid === "expired") periods.scene = "new";
     if (invalid === "passive") f.m.flags.spycraft2.actionDiceAllowed = false;
-    assert.equal(await f.target.boostWithGenerous(f.m, f.opts), null);
+    assert.ok([false, null].includes(await f.target.boostWithGenerous(f.m, f.opts)), invalid);
     assert.equal(f.donor.system.bonusActionDice.mp.remaining, 4);
   }
 });
@@ -1663,20 +1663,20 @@ test("Shaken IV forbids generic spending and rolls, healing, Refresh, Defense, E
           },
           { bonusPoolId: "mp" }
         ),
-        null
+        false
       );
-    if (workflow === "roll") assert.equal(await a.rollActionDie({ bonusPoolId: "mp" }), null);
-    if (workflow === "heal") assert.equal(await heal(a), null);
+    if (workflow === "roll") assert.equal(await a.rollActionDie({ bonusPoolId: "mp" }), false);
+    if (workflow === "heal") assert.equal(await heal(a), false);
     if (workflow === "refresh") {
       a.system.conditionContext.shakenGrade = 0;
       await waitingRefresh(a);
       a.system.conditionContext.shakenGrade = 4;
-      assert.equal(await completeRefresh(a), null);
+      assert.equal(await completeRefresh(a), false);
       assert.equal(a.system.refreshAction.state, "waiting");
     }
     if (workflow === "defense") {
       combatFor(a);
-      assert.equal(await defend(a), null);
+      assert.equal(await defend(a), false);
       assert.equal(a.system.defenseBoost, undefined);
     }
     if (workflow === "eagleEye") {
@@ -1769,7 +1769,7 @@ test("Defense rejects insufficient combined funds and a changed condition before
   a.system.conditionContext.shakenGrade = 3;
   a.system.bonusActionDice.mp.remaining = 2;
   combatFor(a);
-  assert.equal(await defend(a), null);
+  assert.equal(await defend(a), false);
   assert.equal(formulas.length, 0);
   assert.equal(a.system.bonusActionDice.mp.remaining, 2);
   a = actor();
@@ -1964,7 +1964,7 @@ test("a committed Generous result with a rejected recipient final marker remains
   assert.equal(f.donor.system.bonusActionDice.mp.remaining, 3);
   assert.equal(f.m.flags.spycraft2.boostSpent, 1);
   assert.equal(f.target.system.actionDiceSettlementReview.needsReview, true);
-  assert.equal(await f.target.boostWithGenerous(f.m, f.opts), null);
+  assert.equal(await f.target.boostWithGenerous(f.m, f.opts), false);
   assert.equal(f.donor.system.bonusActionDice.mp.remaining, 3);
 });
 test("one outside-combat healing use pays one Shaken fee for its selected benefit dice, including mixed vitality/wound healing", async () => {
@@ -2027,7 +2027,7 @@ test("insufficient Shaken healing funds stop before evaluation and do not restor
   const a = actor();
   a.system.conditionContext.shakenGrade = 3;
   a.system.bonusActionDice.mp.remaining = 2;
-  assert.equal(await heal(a), null);
+  assert.equal(await heal(a), false);
   assert.equal(formulas.length, 0);
   assert.equal(a.system.vitality.value, 4);
   assert.equal(a.system.bonusActionDice.mp.remaining, 2);
@@ -2119,7 +2119,7 @@ test("a critical cost reduced to zero still pays Shaken from a different source;
     a.system.weaponSpecialist = { proficiencies: ["rifle"], abilities: ["Most Deadly"] };
     const r = await a.activateCritical(m, { ...criticalOptions, bonusPoolId: "", surchargeBonusPoolId: "mp" });
     if (grade === 4) {
-      assert.equal(r, null);
+      assert.equal(r, false);
       assert.equal(a.system.bonusActionDice.mp.remaining, 4);
       assert.equal(m.flags.spycraft2.criticalSuccess, undefined);
     } else {
@@ -2203,7 +2203,7 @@ test("critical split contributions must equal the final cost, use valid sources 
     if (variant === "bound") a.system.bonusActionDice.mp.source = "iKnowWhatDoing";
     if (variant === "foreign")
       opts = { ...opts, splitFunding: [{ actorUuid: "Actor.other", count: 4, bonusPoolId: "" }] };
-    assert.equal(await a.activateCritical(m, opts), null);
+    assert.equal(await a.activateCritical(m, opts), false);
     assert.equal(a.system.actionDice.value, 2);
     assert.equal(a.system.bonusActionDice.mp.remaining, 2);
     assert.equal(m.flags.spycraft2.criticalSuccess, undefined);
@@ -2223,7 +2223,7 @@ test("separate critical base/fee sources keep the actual source allocations and 
   const b = actor(),
     n = criticalMessage(b);
   b.system.conditionContext.shakenGrade = 2;
-  assert.equal(await b.activateCritical(n, { ...criticalOptions, feeFunding: "Actor.other|mp" }), null);
+  assert.equal(await b.activateCritical(n, { ...criticalOptions, feeFunding: "Actor.other|mp" }), false);
   assert.equal(b.system.bonusActionDice.mp.remaining, 4);
 });
 test("failed critical result writes restore the base and fee, while committed receipts keep exactly one activation", async () => {
@@ -2344,7 +2344,7 @@ test("a failure cost waived by Unreliable still charges its opponent payer’s f
       lineOfSight: true
     });
     if (grade === 4) {
-      assert.equal(r, null);
+      assert.equal(r, false);
       assert.equal(b.system.bonusActionDice.mp.remaining, 4);
       assert.equal(m.flags.spycraft2.criticalFailure, undefined);
     } else {
@@ -2912,7 +2912,7 @@ test("unrolled payment fields preserve exact submitted sources and reject unused
     { allocations: [{ count: 0 }] }
   ]) {
     const b = paidSkillActor(3, 3);
-    assert.equal(await paidSmash(b, input), null);
+    assert.equal(await paidSmash(b, input), false);
     assert.equal(formulas.length, 0);
     assert.equal(b.system.actionDice.value, 3);
   }

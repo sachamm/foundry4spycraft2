@@ -430,7 +430,7 @@ test("actual Local Hero opposition workflow records its target scope and rejects
   assert.equal(m.options.terrain.homeTurfEligible, false);
   assert.equal(
     await a.rollSkill("networking", "cha", { gearStatus: "available", ...input, opposingSkill: "search" }),
-    null
+    false
   );
   a.system.activeFeatNames = [];
   assert.equal(await a.rollSkill("networking", "cha", { gearStatus: "available", ...input }), null);

@@ -184,7 +184,7 @@ test("document integration posts a capped fixed 20 with no natural die, threat, 
   assert.ok(!result.data.flavor.includes("spycraft2-threat"));
   assert.ok(!result.data.flavor.includes("spycraft2-error"));
   const blocked = await actor.rollSkill(key, null, { gearStatus: "available", check: use.id, method: "take20" });
-  assert.equal(blocked, null);
+  assert.equal(blocked, false);
   assert.ok(notices.at(-1).includes("distracted"));
 });
 
@@ -300,7 +300,7 @@ test("the real fixed-check path rejects missing permission before rolling and re
     skillTotals: { tactics: { name: "Tactics", ranks: 6, cap: 30, threat: 20, totals: [{ ability: "wis", total: 9 }] } }
   };
   const options = { check: "ambush", method: "take10", safeToTake: true };
-  assert.equal(await a.rollSkill("tactics", "wis", { gearStatus: "available", ...options }), null);
+  assert.equal(await a.rollSkill("tactics", "wis", { gearStatus: "available", ...options }), false);
   assert.match(notices.at(-1), /GC’s permission/);
   const m = await a.rollSkill("tactics", "wis", {
     gearStatus: "available",

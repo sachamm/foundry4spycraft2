@@ -1,4 +1,5 @@
 /** Companions on the owner's sheet: creating an Animal Partner or Personal Lieutenant, and a companion's death. */
+import { refuse } from "../error-notices.mjs";
 import {
   ANIMAL_PARTNER,
   PERSONAL_LIEUTENANT,
@@ -40,11 +41,9 @@ export async function createCompanion(owner, feat) {
   if (!owner.isOwner) return null;
   const slots = companionSlots(owner.system, linkedCompanions(owner));
   if (feat === ANIMAL_PARTNER && !slots.animalPartner)
-    return ui.notifications.warn(loc`Each Animal Partner selection grants one animal; all are linked.`);
+    return refuse(loc`Each Animal Partner selection grants one animal; all are linked.`);
   if (feat === PERSONAL_LIEUTENANT && !slots.personalLieutenant)
-    return ui.notifications.warn(
-      loc`Personal Lieutenant needs the feat, career level 6+ and no lieutenant already linked.`
-    );
+    return refuse(loc`Personal Lieutenant needs the feat, career level 6+ and no lieutenant already linked.`);
   const ownership = { ...owner.ownership },
     companionOf = { ownerUuid: owner.uuid, feat };
   const data =
@@ -70,7 +69,7 @@ export async function createCompanion(owner, feat) {
   try {
     actor = await Actor.create(data);
   } catch {
-    return ui.notifications.warn(loc`Only a user who may create actors (usually the GC) can add the companion.`);
+    return refuse(loc`Only a user who may create actors (usually the GC) can add the companion.`);
   }
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: owner }),
@@ -86,7 +85,7 @@ export async function createCompanion(owner, feat) {
 
 /** The GC records a companion's death: the owner loses Reputation, or Net Worth for a freelancer (pp.201,204). */
 export async function recordCompanionDeath(owner, companionUuid) {
-  if (!game.user?.isGM) return ui.notifications.warn(loc`The GC records a companion’s death.`);
+  if (!game.user?.isGM) return refuse(loc`The GC records a companion’s death.`);
   const companion = fromUuidSync(companionUuid);
   if (!companion) return null;
   const confirmed = await systemDialog.confirm({

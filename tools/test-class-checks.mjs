@@ -193,13 +193,13 @@ test("document checks use the selected available inventory item category; a call
   actor.items.get("item").system.quantity = 0;
   assert.equal(
     await actor.rollSkill("electronics", "int", { gearStatus: "available", ...options, gearItem: "item" }),
-    null
+    false
   );
   actor.items.get("item").system.quantity = 1;
   actor.items.get("item").system.reserve = true;
   assert.equal(
     await actor.rollSkill("electronics", "int", { gearStatus: "available", ...options, gearItem: "item" }),
-    null
+    false
   );
 });
 
@@ -227,5 +227,5 @@ test("skill chat snapshots Clean and Polished from the actual maintained persona
   result = await actor.rollSkill("electronics", "int", { gearStatus: "available", ...options });
   assert.equal(result.flags.spycraft2.cleanAndPolished, false);
   actor.items.get("item").system.possessionApproved = false;
-  assert.equal(await actor.rollSkill("electronics", "int", { gearStatus: "available", ...options }), null);
+  assert.equal(await actor.rollSkill("electronics", "int", { gearStatus: "available", ...options }), false);
 });

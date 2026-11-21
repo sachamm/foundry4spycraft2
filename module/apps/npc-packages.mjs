@@ -1,4 +1,5 @@
 /** Preview and explicitly apply a package; no mission/TL hook changes inventories. */
+import { refuse } from "../error-notices.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 import { computeNpcProfile } from "../rules/npcs.mjs";
@@ -60,7 +61,7 @@ export async function applyNpcPackage(actor, data, packageId, expectedStamp) {
 }
 
 export async function manageNpcPackages(actor, { editBands = false, data = null } = {}) {
-  if (!game.user.isGM || !actor.isOwner) return ui.notifications.warn(loc`Only the GC may apply NPC packages.`);
+  if (!game.user.isGM || !actor.isOwner) return refuse(loc`Only the GC may apply NPC packages.`);
   if (busy.has(actor)) return null;
   busy.add(actor);
   try {

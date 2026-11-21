@@ -1,4 +1,5 @@
 /** Conditions and their recovery: restraint, Shaken, Baffled, sleep, drunkenness, fatigue and combat outcomes that apply them. */
+import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { manageTakedown, rollTakedown, settleTakedown } from "../../apps/takedown.mjs";
 import { manageMeleeTradeoff } from "../../apps/melee-tradeoff-outcomes.mjs";
@@ -194,7 +195,7 @@ export const ActorConditions = Base =>
         input = { ...input, active: input.active === "true" ? true : input.active === "false" ? false : null };
       }
       if (input.confirmed !== true || typeof input.active !== "boolean")
-        return ui.notifications.warn(loc`Confirm whether ` + rule.label + " applies.");
+        return refuse(loc`Confirm whether ` + rule.label + " applies.");
       try {
         return await queueResources([this], () =>
           setConditionStatus(this, rule.id ?? condition, input.active, {
@@ -231,7 +232,7 @@ export const ActorConditions = Base =>
         if (!input) return null;
       }
       if (!["newTouch", "damage"].includes(input.cause) || input.confirmed !== true)
-        return ui.notifications.warn(loc`Confirm the new waking event with the GC.`);
+        return refuse(loc`Confirm the new waking event with the GC.`);
       return queueResources([this], () => this.settleSleepWake(event, { cause: input.cause, confirmed: true }));
     }
 
@@ -243,8 +244,7 @@ export const ActorConditions = Base =>
         const combat = game.combat,
           own = [...(combat?.combatants ?? [])].filter(c => c.actor?.uuid === this.uuid),
           esc = foundry.utils.escapeHTML;
-        if (!combat?.started || !own.length)
-          return ui.notifications.warn(loc`Choose this character in a started combat.`);
+        if (!combat?.started || !own.length) return refuse(loc`Choose this character in a started combat.`);
         input = await systemDialog.input({
           window: { title: loc`Apply Initiative Count loss` },
           rejectClose: false,
@@ -257,8 +257,7 @@ export const ActorConditions = Base =>
           selfInflicted: input.selfInflicted === true
         };
       }
-      if (input.confirmed !== true)
-        return ui.notifications.warn(loc`Confirm the Initiative Count loss and its source.`);
+      if (input.confirmed !== true) return refuse(loc`Confirm the Initiative Count loss and its source.`);
       return queueResources([this], async () => {
         const combat = game.combat,
           own = [...(combat?.combatants ?? [])].filter(c => c.actor?.uuid === this.uuid),
@@ -362,7 +361,7 @@ export const ActorConditions = Base =>
         expected = combat?.id + ":" + combat?.round;
       let input = options;
       if (!combat)
-        return ui.notifications.warn(
+        return refuse(
           loc`Use this round-start tracker in a started participating combat. The GC resolves rounds outside combat.`
         );
       if (!Object.keys(input).length) {
@@ -574,7 +573,7 @@ export const ActorConditions = Base =>
               ? ["fatigued"]
               : [];
       if (!available.length)
-        return ui.notifications.warn(
+        return refuse(
           loc`No matching ordinary condition applies. A condition with its own duration follows its source recovery rule.`
         );
       const expectedSources = Object.fromEntries(
@@ -909,7 +908,7 @@ export const ActorConditions = Base =>
               : newCauses.filter((c, i) => input["cause" + i] !== true).map(c => c.key)
         };
       }
-      if (input.confirmed !== true) return ui.notifications.warn(loc`Confirm the sleep requirement with the GC.`);
+      if (input.confirmed !== true) return refuse(loc`Confirm the sleep requirement with the GC.`);
       return queueResources([this], async () => {
         const current = JSON.stringify((this.system.mentalLeapState.unconsciousCauses ?? []).map(c => c.key).sort());
         if (current !== (input.expectedCauses ?? expected))
@@ -1018,8 +1017,7 @@ export const ActorConditions = Base =>
         });
         if (!input) return null;
       }
-      if (input.confirmed !== true)
-        return ui.notifications.warn(loc`Confirm with the GC that a new Wisdom-collapse episode is due.`);
+      if (input.confirmed !== true) return refuse(loc`Confirm with the GC that a new Wisdom-collapse episode is due.`);
       const choice = await new Roll("1d2").evaluate(),
         duration = await new Roll("2d10").evaluate(),
         values = duration.dice[0]?.results.filter(d => d.active !== false).map(d => d.result);

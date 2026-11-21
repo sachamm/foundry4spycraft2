@@ -1,11 +1,12 @@
 /** GC reference tools: security devices (Table 7.9), hazards and nature's fury (Tables 7.2–7.3), events and random possessions (Table 7.16). */
+import { esc } from "../../html.mjs";
+import { refuse } from "../../error-notices.mjs";
 import { SECURITY_DEVICES, resolveDevice, sensorCheck, trapOutcome } from "../../rules/gc/security.mjs";
 import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { requireGC, getMission } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 
 const T = GC_DATA.tables;
-const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
   foundry.applications.api.DialogV2.input({
     window: { title },
@@ -82,7 +83,7 @@ export async function securityDeviceDialog() {
   try {
     device = resolveDevice(input.id, Number(input.pr));
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   const lines = [deviceCard(device)];
   try {
@@ -117,7 +118,7 @@ export async function securityDeviceDialog() {
       } else lines.push(loc`This trap has no attack bonus or save DC; apply its listed effect.`);
     }
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   return say(lines.join("<br>"));
 }
@@ -139,7 +140,7 @@ export async function hazardLookupDialog() {
   const key = input.hazard ? "hazards" : "naturesFury",
     name = input.hazard || input.fury,
     table = tables[key];
-  if (!name) return ui.notifications.warn(loc`Choose a hazard or a nature’s fury effect.`);
+  if (!name) return refuse(loc`Choose a hazard or a nature’s fury effect.`);
   const rows = table.rows.filter(row => row[0] === name),
     exact = rows.filter(row => String(row[1]).replace("*", "") === String(Number(input.cost)));
   const shown = exact.length ? exact : rows;

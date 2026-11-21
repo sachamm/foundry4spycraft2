@@ -14,11 +14,11 @@
  * does not fit the card (the requester did not roll it, the amount was raised); any concern puts the request on an
  * Allow card even when the world applies requests without asking.
  */
+import { esc } from "../html.mjs";
 import { loc } from "../i18n.mjs";
 
 export const RELAY_QUERY = "spycraft2.relay";
 const actions = new Map();
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 
 /**
  * @param {string} action

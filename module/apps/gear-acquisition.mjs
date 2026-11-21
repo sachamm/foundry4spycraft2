@@ -1,3 +1,5 @@
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { requestBenefitContext } from "../rules/requests.mjs";
 import { gearCheckPlan } from "../rules/gear-checks.mjs";
 import { shakenRules } from "../rules/shaken.mjs";
@@ -29,7 +31,6 @@ import { loc } from "../i18n.mjs";
 const queued = (actor, work, options) => queueResources([actor], work, options);
 const crossQueued = (actor, actors, work) => queueResources([actor, ...actors], work);
 const owned = actor => actor?.type === "agent" && actor.isOwner;
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 export async function allocateMissionReserves(actor, options = {}) {
   if (!owned(actor)) return null;
   let input = options;
@@ -94,7 +95,7 @@ export async function rollGearAcquisition(actor, options = {}) {
     const record =
       currentReserves(actor.system) ??
       (actor.system.activeFeatNames?.includes("Personal Stash") ? provisionalReserves(actor.system) : null);
-    if (!record) return ui.notifications.warn(loc`Allocate this mission’s unassigned reserves first.`);
+    if (!record) return refuse(loc`Allocate this mission’s unassigned reserves first.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Request or Gear check` },
       rejectClose: false,
@@ -617,8 +618,7 @@ export async function claimGearAcquisition(actor, options = {}) {
     const attempts = Object.values(currentReserves(actor.system)?.attempts ?? {}).filter(
       a => a.epoch === missionEpoch(actor.system) && a.success && !a.claimedItemId
     );
-    if (!attempts.length)
-      return ui.notifications.warn(loc`There are no successful unclaimed acquisitions in this mission.`);
+    if (!attempts.length) return refuse(loc`There are no successful unclaimed acquisitions in this mission.`);
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Claim acquired gear` },
       rejectClose: false,

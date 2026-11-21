@@ -1,11 +1,12 @@
 /** Cooperative skill checks in play: the roll dialog's section, what it records, and the leader's tally button. */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { HELPER_BASE_DC, applyCooperativeBonus, helperDC, helperLimit, helperResult } from "../rules/cooperative.mjs";
 import { checkFlavor } from "../rules/outcomes.mjs";
 import { loc } from "../i18n.mjs";
 
 const messages = () => [...(globalThis.game?.messages ?? [])];
-const esc = value => globalThis.foundry.utils.escapeHTML(String(value ?? ""));
 
 /** Leaders' cooperative checks for a skill that are still open, newest first. */
 export function openLeaderChecks(skillKey, list = messages()) {
@@ -98,7 +99,7 @@ export async function applyHelpers(message) {
     messageId: helper.id,
     ...helperResult(helper.flags.spycraft2)
   }));
-  if (!helpers.length) return globalThis.ui.notifications.warn(loc`No helper has posted a check for this leader yet.`);
+  if (!helpers.length) return refuse(loc`No helper has posted a check for this leader yet.`);
   const next = applyCooperativeBonus(check, helpers, { max: check.cooperative.max ?? null });
   await message.update({ "flags.spycraft2": next, flavor: checkFlavor(next) });
   return next;

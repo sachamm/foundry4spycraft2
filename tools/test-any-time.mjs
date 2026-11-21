@@ -226,7 +226,7 @@ test("two Guide uses grant separately at zero dice, deletion does not refund a u
 test("cancellation, strict free-action declaration, prerequisites and own-initiative timing guard the native workflow", async () => {
   let a = reset();
   assert.equal(await a.useAnyTimeAnyPlace(), null);
-  assert.equal(await a.useAnyTimeAnyPlace({ ...options("Forest Training"), freeActionConfirmed: "true" }), null);
+  assert.equal(await a.useAnyTimeAnyPlace({ ...options("Forest Training"), freeActionConfirmed: "true" }), false);
   await assert.rejects(a.useAnyTimeAnyPlace({ featId: "wrong", freeActionConfirmed: true }), /Terrain/);
   await assert.rejects(a.useAnyTimeAnyPlace(options("Firefighter Training")), /prerequisites/);
   assert.equal(a.system.resourceUses.anyTimeAnyPlace, undefined);
@@ -241,7 +241,7 @@ test("cancellation, strict free-action declaration, prerequisites and own-initia
   assert.ok(await a.useAnyTimeAnyPlace(options("Forest Training")));
   game.combat = null;
   a = reset(3);
-  assert.equal(await a.useAnyTimeAnyPlace(options("Forest Training")), null);
+  assert.equal(await a.useAnyTimeAnyPlace(options("Forest Training")), false);
 });
 test("creation/posting/source-downgrade failures roll back; cleanup failure retains its spent use and concurrent last claims cannot duplicate grants", async () => {
   let a = reset();

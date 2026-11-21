@@ -320,6 +320,6 @@ test("cleanup failure retains a recorded group/use, concurrent final claims cann
   a.derive();
   assert.equal(
     await a.withdrawClassAssistants(a.system.assistantGroups[0].id, { event: "criticalInjury", confirmed: true }),
-    null
+    false
   );
 });

@@ -227,7 +227,7 @@ test("security-device Reflex save uses fresh combined grade, is explicit, and ne
 });
 test("real initiative workflow serializes incoming losses, requires declaration/owned combatant, refunds failed posts and preserves later external edits", async () => {
   let { a, c } = actor();
-  assert.equal(await a.sufferInitiativeLoss({ loss: 5 }), null);
+  assert.equal(await a.sufferInitiativeLoss({ loss: 5 }), false);
   await Promise.all([
     a.sufferInitiativeLoss({ loss: 5, confirmed: true }),
     a.sufferInitiativeLoss({ loss: 5, confirmed: true })

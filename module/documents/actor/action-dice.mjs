@@ -1,4 +1,5 @@
 /** Action dice: spending, healing and refresh, awards, mission XP and starting dice. */
+import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { missionSettlementDefaults } from "../../apps/gc/mission-defaults.mjs";
 import {
@@ -290,9 +291,9 @@ export const ActorActionDice = Base =>
           bonusPoolId: input.bonusPoolId ?? "",
           periods: this.usagePeriods
         });
-      if (funding.blocked) return ui.notifications.warn(funding.reason);
+      if (funding.blocked) return refuse(funding.reason);
       const plan = healingPlan(funding.system, context());
-      if (plan.blocked) return ui.notifications.warn(plan.reason);
+      if (plan.blocked) return refuse(plan.reason);
       return this.spendActionDiceBenefit(
         plan.cost,
         async payment => {
@@ -376,10 +377,10 @@ export const ActorActionDice = Base =>
         bonusPoolId: input.bonusPoolId ?? "",
         periods: this.usagePeriods
       });
-      if (funding.blocked) return ui.notifications.warn(funding.reason);
+      if (funding.blocked) return refuse(funding.reason);
       const now = context(),
         plan = refreshPlan(funding.system, now.combat, now.options);
-      if (plan.blocked) return ui.notifications.warn(plan.reason);
+      if (plan.blocked) return refuse(plan.reason);
       return this.spendActionDiceBenefit(
         1,
         async payment => {
@@ -428,7 +429,7 @@ export const ActorActionDice = Base =>
           : null;
       };
       const first = noFearPlan({ ...this.system, usagePeriods: this.usagePeriods }, context());
-      if (first.blocked) return ui.notifications.warn(first.reason);
+      if (first.blocked) return refuse(first.reason);
       return this.useLimitedAbility(
         "noFear",
         async () => {
@@ -471,7 +472,7 @@ export const ActorActionDice = Base =>
           : null;
       };
       const initial = fortunesOfWarPlan(this.system, context());
-      if (initial.blocked) return ui.notifications.warn(initial.reason);
+      if (initial.blocked) return refuse(initial.reason);
       return this.useLimitedAbility(
         "fortunesOfWar",
         async () => {
@@ -531,10 +532,10 @@ export const ActorActionDice = Base =>
           bonusPoolId: input.bonusPoolId ?? "",
           periods: this.usagePeriods
         });
-      if (funding.blocked) return ui.notifications.warn(funding.reason);
+      if (funding.blocked) return refuse(funding.reason);
       const first = context(),
         plan = defenseBoostPlan(funding.system, first.combat, first.options);
-      if (plan.blocked) return ui.notifications.warn(plan.reason);
+      if (plan.blocked) return refuse(plan.reason);
       return this.spendActionDiceBenefit(
         1,
         async payment => {
@@ -856,7 +857,7 @@ export const ActorActionDice = Base =>
         bonusPoolId,
         periods: this.usagePeriods
       });
-      if (payment.blocked) return ui.notifications.warn(payment.reason);
+      if (payment.blocked) return refuse(payment.reason);
       try {
         await this.update({ [payment.paymentPath]: payment.afterBalance });
       } catch (error) {

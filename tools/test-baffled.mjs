@@ -331,6 +331,6 @@ test("an unresolved event blocks actual skill/Knowledge resolution and Baffled r
   a.system = system;
   a.rollCheck = async () => ({ rolled: true });
   CONFIG.SPYCRAFT = cfg;
-  assert.equal(await a.rollSave("will", { resistingBaffled: true }), null);
+  assert.equal(await a.rollSave("will", { resistingBaffled: true }), false);
   assert.equal((await a.rollSave("will", {})).rolled, true);
 });

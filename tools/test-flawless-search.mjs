@@ -165,7 +165,7 @@ test("losing the source clears the fallback on renewed adjudication; secret chec
   const secret = message();
   secret.blind = true;
   game.user.isGM = false;
-  assert.equal(await a.confirmCheckOutcome(secret, { succeeded: true }), null);
+  assert.equal(await a.confirmCheckOutcome(secret, { succeeded: true }), false);
   game.user.isGM = true;
   const replaced = message({ superseded: "new" });
   assert.equal(await a.confirmCheckOutcome(replaced, { succeeded: true }), null);

@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { enrich } from "../sheets/enrich.mjs";
 import { describe } from "../rules/prerequisites.mjs";
 import { VEHICLE_RULES } from "../rules/tables.mjs";
@@ -343,9 +344,7 @@ export class SpycraftBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
       (UNIQUE.has(doc.type) || (doc.type === "feat" && !doc.system.repeatable)) &&
       this.actor.items.some(i => i.type === doc.type && i.name.toLowerCase() === doc.name.toLowerCase())
     ) {
-      return ui.notifications.warn(
-        game.i18n.format(`SPYCRAFT.Browser.Owned.${doc.type}`, { name: doc.name, actor: this.actor.name })
-      );
+      return refuse(game.i18n.format(`SPYCRAFT.Browser.Owned.${doc.type}`, { name: doc.name, actor: this.actor.name }));
     }
     if (doc.type === "class") await this.actor.addClassLevel(doc);
     else {

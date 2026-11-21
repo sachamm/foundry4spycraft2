@@ -16,6 +16,8 @@
  *
  * The rules are in module/rules/timers.mjs.
  */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import {
   ROUND_SECONDS,
   TIME_UNITS,
@@ -36,7 +38,6 @@ import {
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const pad = n => String(n).padStart(2, "0");
 const now = () => Math.max(0, Math.floor(Number(game.time?.worldTime) || 0));
 const setting = key => {
@@ -84,10 +85,10 @@ function formatClock(calendar, c) {
 
 /** Move the clock on (or back, with a negative amount). GC only. */
 export async function advanceClock(seconds) {
-  if (!game.user.isGM) return ui.notifications.warn(loc`Only the GC moves the game clock.`);
+  if (!game.user.isGM) return refuse(loc`Only the GC moves the game clock.`);
   const amount = Math.trunc(Number(seconds) || 0);
   if (!amount) return null;
-  if (now() + amount < 0) return ui.notifications.warn(loc`The clock cannot go back past its start.`);
+  if (now() + amount < 0) return refuse(loc`The clock cannot go back past its start.`);
   await game.time.advance(amount);
   return now();
 }
@@ -99,7 +100,7 @@ const unitOptions = chosen =>
 
 /** Ask the GC how far to move the clock. */
 export async function advanceClockDialog() {
-  if (!game.user.isGM) return ui.notifications.warn(loc`Only the GC moves the game clock.`);
+  if (!game.user.isGM) return refuse(loc`Only the GC moves the game clock.`);
   const input = await systemDialog.input({
     window: { title: loc`Move the clock` },
     rejectClose: false,
@@ -111,7 +112,7 @@ export async function advanceClockDialog() {
   try {
     seconds = unitSeconds(Number(input.count), input.unit);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   return advanceClock(input.back === true ? -seconds : seconds);
 }
@@ -126,7 +127,7 @@ function daysBefore(calendar, year, monthIndex) {
 
 /** Choose the date and time the clock shows now. Only the display changes: world time stays where it is. */
 export async function setClockDateDialog() {
-  if (!game.user.isGM) return ui.notifications.warn(loc`Only the GC sets the date.`);
+  if (!game.user.isGM) return refuse(loc`Only the GC sets the date.`);
   const calendar = game.time.calendar,
     epoch = clockEpoch(),
     real = new Date(),
@@ -169,7 +170,7 @@ export async function setClockDateDialog() {
     minute < 0 ||
     minute > 59
   )
-    return ui.notifications.warn(loc`Enter a date that exists and a time of day.`);
+    return refuse(loc`Enter a date that exists and a time of day.`);
   const second = now() % 60,
     target = calendar.componentsToTime({
       year,
@@ -343,7 +344,7 @@ export async function extendTimerBy(id, count, unit) {
     effect = String(id).includes(".") ? await fromUuid(id) : null;
   if (effect) {
     if (!timerFlag(effect) || !effect.isOwner || !Number.isSafeInteger(amount) || amount < 1)
-      return ui.notifications.warn(loc`Enter a whole amount of time, 1 or more.`);
+      return refuse(loc`Enter a whole amount of time, 1 or more.`);
     return effect.update({
       "duration.value": (Number(effect._source.duration.value) || 0) + amount,
       "duration.expired": false,
@@ -353,7 +354,7 @@ export async function extendTimerBy(id, count, unit) {
   try {
     unitSeconds(Math.abs(amount), unit);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   return changeTimers(list => extendTimer(list, id, amount, unit));
 }

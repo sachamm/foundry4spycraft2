@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { placeSheet } from "./sheet-placement.mjs";
 import { enrich } from "./enrich.mjs";
 import { classAbilityControl } from "./class-ability-controls.mjs";
@@ -280,7 +281,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       },
       confirmRestraintEscapeMove(event, target) {
         const message = game.messages.get(target.dataset.messageId);
-        if (!message) return ui.notifications.warn(loc`Load the original grapple message before confirming movement.`);
+        if (!message) return refuse(loc`Load the original grapple message before confirming movement.`);
         return this.actor.confirmRestraintEscapeMove(message);
       },
       escapeRestraint() {
@@ -1787,9 +1788,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       const picks = this.actor.system.focusPicks;
       if (picks.generic.reservedAvailable && picks[skill].remaining <= 0 && picks.generic.unscopedRemaining <= 0) {
         this.render();
-        return ui.notifications.warn(
-          loc`Use the temporary Depth of Study control on Training to spend its source-scoped picks.`
-        );
+        return refuse(loc`Use the temporary Depth of Study control on Training to spend its source-scoped picks.`);
       }
       list.add(value);
     }

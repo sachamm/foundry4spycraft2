@@ -141,6 +141,6 @@ test("cancellation and invalid completion spend nothing, while concurrent comple
   assert.equal(a.system.resourceUses.globalSearch.used, 1);
   a.system.classLevels.sleuth = 9;
   a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
-  assert.equal(await a.useGlobalSearch({ ...input, hoursCompleted: 24 }), null);
+  assert.equal(await a.useGlobalSearch({ ...input, hoursCompleted: 24 }), false);
   assert.equal(a.system.actionDice.value, 0);
 });

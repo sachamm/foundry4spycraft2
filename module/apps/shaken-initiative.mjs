@@ -1,3 +1,4 @@
+import { primaryWriterFor } from "../writers.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { preferredInitiativeRoll } from "./initiative-choice.mjs";
 import { uncannyDodgePlan } from "../rules/defense.mjs";
@@ -254,13 +255,7 @@ export function installShakenInitiativeHooks() {
   const pending = new WeakMap();
   const schedule = actor => {
     if (!actor || !["agent", "npc"].includes(actor.type) || !actor.isOwner || !combatants(actor).length) return;
-    const gm = game.users?.activeGM,
-      owner =
-        gm ??
-        [...(game.users ?? [])]
-          .filter(u => u.active && actor.testUserPermission(u, "OWNER"))
-          .sort((a, b) => a.id.localeCompare(b.id))[0];
-    if (owner?.id !== game.user.id) return;
+    if (primaryWriterFor(actor)?.id !== game.user.id) return;
     const queued = pending.get(actor);
     if (queued) {
       queued.again = true;

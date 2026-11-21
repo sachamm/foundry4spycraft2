@@ -170,13 +170,13 @@ test("preview source deletion, weapon deletion, destruction and feat loss during
   ]) {
     setup(input);
     hook = change;
-    assert.equal(await checkIncomingDefense(target), null);
+    assert.equal(await checkIncomingDefense(target), false);
     assert.match(warnings[0], /changed/);
     assert.equal(dialogs.length, 1);
   }
   setup(input);
   attacker.items.get("gun").system.ammunitionOnly = true;
-  assert.equal(await checkIncomingDefense(target), null);
+  assert.equal(await checkIncomingDefense(target), false);
   assert.doesNotMatch(dialogs[0].content, /CQB shooter — Pistol/);
   assert.match(warnings[0], /listed/);
 });
@@ -190,7 +190,7 @@ test("ordinary preview cover needs no CQB source, while missing or malformed sel
     { coverAttacker: "invented:weapon" }
   ]) {
     setup({ ...input, ...patch });
-    assert.equal(await checkIncomingDefense(target), null);
+    assert.equal(await checkIncomingDefense(target), false);
     assert.equal(warnings.length, 1);
     assert.equal(dialogs.length, 1);
   }
@@ -291,7 +291,7 @@ test("precision owner deletion, level loss and mixing two attackers stop the pre
     setup({ personalCover: "2", precisionAttacker: "shooter", coverOpponent: true });
     attacker.system.classLevels = { counterterrorist: 2 };
     hook = change;
-    assert.equal(await checkIncomingDefense(target), null);
+    assert.equal(await checkIncomingDefense(target), false);
     assert.match(warnings[0], /source changed/);
   }
   setup({ ...input, precisionAttacker: "second" });
@@ -302,14 +302,14 @@ test("precision owner deletion, level loss and mixing two attackers stop the pre
     system: { classLevels: { counterterrorist: 7 } },
     items: []
   });
-  assert.equal(await checkIncomingDefense(target), null);
+  assert.equal(await checkIncomingDefense(target), false);
   assert.match(warnings[0], /same actual attacker/);
 });
 
 test("cover selectors require ownership or Observer access and reject permission loss while the dialog is open", async () => {
   setup(input);
   game.user.isGM = false;
-  assert.equal(await checkIncomingDefense(target), null);
+  assert.equal(await checkIncomingDefense(target), false);
   assert.doesNotMatch(dialogs[0].content, /CQB shooter — Pistol/);
   setup(input);
   game.user.isGM = false;
@@ -321,7 +321,7 @@ test("cover selectors require ownership or Observer access and reject permission
   hook = () => {
     attacker.testUserPermission = () => false;
   };
-  assert.equal(await checkIncomingDefense(target), null);
+  assert.equal(await checkIncomingDefense(target), false);
   assert.match(warnings[0], /changed/);
   delete attacker.testUserPermission;
 });
@@ -424,7 +424,7 @@ test("actual preview uses the selected current Safe Attack source and records th
   for (const patch of [{ humanShieldDefense: "5" }, { humanShieldDefense: "2.5" }, { humanShieldConfirmed: false }]) {
     setup({ ...request, ...patch });
     attacker.system.classLevels = { counterterrorist: 4 };
-    assert.equal(await checkIncomingDefense(target), null);
+    assert.equal(await checkIncomingDefense(target), false);
     assert.equal(warnings.length, 1);
   }
 });

@@ -152,7 +152,7 @@ test("the owning GC can repair a registered source with a private audit receipt;
   assert.equal(posts[0].flags.spycraft2.reviewedBy, "gm");
   assert.equal(posts[0].flags.spycraft2.actionDiceAllowed, false);
   assert.equal(a.system.actionDice.value, 0);
-  assert.equal(await a.reviewLimitedUseCounter("cunningPlan", input), null);
+  assert.equal(await a.reviewLimitedUseCounter("cunningPlan", input), false);
   assert.equal(posts.length, 1);
 });
 test("non-GCs and non-owners cannot correct counters; a changed source, period or record invalidates an in-flight review", async () => {

@@ -1,4 +1,5 @@
 /** Attacks and damage. */
+import { refuse } from "../../error-notices.mjs";
 import { snakeStrikeOpen } from "../../rules/snake-strike.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { enhanceAttackDialog } from "../../apps/attack-dialog-ux.mjs";
@@ -176,10 +177,10 @@ export const ActorAttackRolls = Base =>
       sideStanceProof = atk.sideStance.dice
         ? { ...atk.sideStance, attemptId: foundry.utils.randomID() }
         : atk.sideStance;
-      if (atk.blocked) return ui.notifications.warn(atk.reason);
+      if (atk.blocked) return refuse(atk.reason);
       const shotsFired = ammunition ? (atk.fireAction?.shots ?? 1) : 0;
       if (shotsFired > (ammunition?.loaded ?? 0))
-        return ui.notifications.warn(
+        return refuse(
           loc`${item.name} holds ${ammunition.loaded} shot(s) and this attack takes ${shotsFired}. Reload first.`
         );
       if (
@@ -188,7 +189,7 @@ export const ActorAttackRolls = Base =>
         atk.fireMode !== "single" &&
         atk.fireAction?.action !== "burst"
       )
-        return ui.notifications.warn(loc`A Standard Attack requires Single-Shot mode, or a declared Burst.`);
+        return refuse(loc`A Standard Attack requires Single-Shot mode, or a declared Burst.`);
       const meleeSnapshot = atk.meleeFire?.applies ? JSON.stringify(atk.meleeFire) : null;
       const trainedOnly = atk.trainedOnly ? { ...atk.trainedOnly, weaponId: item.id ?? item._id ?? null } : null;
       const quirky = atk.quirky ? { ...atk.quirky, weaponId: item.id ?? item._id ?? null } : null;
@@ -269,9 +270,8 @@ export const ActorAttackRolls = Base =>
       const millionDollar = !!options.millionDollarSkill;
       if (millionDollar) {
         const plan = millionDollarSkillPlan(this.system, w, options);
-        if (plan.blocked) return ui.notifications.warn(plan.reason);
-        if (options.oneInAMillion)
-          return ui.notifications.warn(loc`Choose one attack roll-choice/declaration ability.`);
+        if (plan.blocked) return refuse(plan.reason);
+        if (options.oneInAMillion) return refuse(loc`Choose one attack roll-choice/declaration ability.`);
         if (!options.millionDollarSkillCommitted)
           return this.useLimitedAbility(
             "millionDollarSkill",
@@ -467,8 +467,7 @@ export const ActorAttackRolls = Base =>
       // Cover Fire and Suppressive Fire take the action without an attack check.
       if (input.fireAction === "coverFire") return coverFire(this, item, input);
       if (input.fireAction === "suppressiveFire") return suppressiveFire(this, item, input);
-      if (input.distanceFeet === null)
-        return ui.notifications.warn(loc`Enter the target distance before making a measured attack.`);
+      if (input.distanceFeet === null) return refuse(loc`Enter the target distance before making a measured attack.`);
       return this.rollAttack(item, input);
     }
 
@@ -476,7 +475,7 @@ export const ActorAttackRolls = Base =>
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid || (message.blind && !game.user.isGM))
         throw new Error(loc`Use an owned visible damage record.`);
       if (!unnervingEligible(this.system, message.flags.spycraft2))
-        return ui.notifications.warn(loc`Unnerving is not available for this damage record.`);
+        return refuse(loc`Unnerving is not available for this damage record.`);
       let input = options;
       if (!input.target) {
         input = await systemDialog.input({
@@ -649,7 +648,7 @@ export const ActorAttackRolls = Base =>
         return context;
       };
       const damage = weaponDamage(this.system, damageWeaponSource(item), damageWeaponContext(item), this.type);
-      if (damage?.blocked) return ui.notifications.warn(damage.blockedReason);
+      if (damage?.blocked) return refuse(damage.blockedReason);
       const finesseDamage = {
         meleeArmorPiercing: damage?.meleeArmorPiercing?.evidence,
         formula: damage?.formula,
@@ -749,13 +748,12 @@ export const ActorAttackRolls = Base =>
         sneakAttackTarget = sneak.active ? sneakAttackTargetSnapshot(targetActor) : null;
       // Dirty Fighting Basics: sneak attack damage its owner suffers is halved, rounded up (p.185).
       const sneakHalved = sneak.active && halvesSneakDamage(targetActor?.system);
-      if (!damage?.formula)
-        return ui.notifications.warn(game.i18n.format("SPYCRAFT.Weapon.NoDamage", { name: item.name }));
+      if (!damage?.formula) return refuse(game.i18n.format("SPYCRAFT.Weapon.NoDamage", { name: item.name }));
       // Pummel: double the standard subdual damage of an unarmed hit (p.358).
       const pummel =
         options.pummel === true &&
         (item.system.proficiency === "unarmed" || /\bNKL\b/.test(item.system.qualities ?? ""));
-      if (options.pummel === true && !pummel) return ui.notifications.warn(loc`Pummel is an unarmed attack.`);
+      if (options.pummel === true && !pummel) return refuse(loc`Pummel is an unarmed attack.`);
       // Only the weapon's damage is doubled: bonus dice such as sneak attack are added after a multiplier (p.329).
       let formula = pummel ? `(${damage.formula}) * 2` : damage.formula;
       if (sneak.active) formula = `${formula} + ${sneakHalved ? `ceil((${sneak.formula}) / 2)` : sneak.formula}`;

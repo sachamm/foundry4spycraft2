@@ -1,3 +1,4 @@
+import { isLeadGM } from "./writers.mjs";
 import { loc } from "./i18n.mjs";
 import { systemDialog } from "./apps/dialog-theme.mjs";
 import { GC_TABLE_CATALOG } from "./data/gc-table-catalog.mjs";
@@ -18,7 +19,7 @@ const sourceMatches = (table, entry) =>
 
 /** Remember each delivered source separately: new releases add tables, and deliberate deletions stay deleted. */
 export async function setupGCTables() {
-  if (!game.user?.isGM || game.users.activeGM?.id !== game.user.id) return;
+  if (!isLeadGM()) return;
   if (pending) return pending;
   pending = importMissingTables();
   try {

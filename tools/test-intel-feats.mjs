@@ -346,7 +346,7 @@ test("cancelled/stale/invalid choices spend nothing; partial creation and failed
       ...options(["Guts", "Great Fortitude"]),
       intelPhaseConfirmed: "true"
     }),
-    null
+    false
   );
   await assert.rejects(
     a.useIntelTemporaryFeats("artOfWar", { featIds: ["missing", "missing"], intelPhaseConfirmed: true }),
@@ -363,7 +363,7 @@ test("cancelled/stale/invalid choices spend nothing; partial creation and failed
   assert.equal(a.system.resourceUses.artOfWar, undefined);
   failPost = false;
   a = reset("artOfWar", 2);
-  assert.equal(await a.useIntelTemporaryFeats("artOfWar", options(["Guts"])), null);
+  assert.equal(await a.useIntelTemporaryFeats("artOfWar", options(["Guts"])), false);
 });
 test("cleanup failure retains its spent use and remaining feats, while concurrent claims cannot duplicate a grant", async () => {
   let a = reset();

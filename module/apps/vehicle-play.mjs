@@ -3,6 +3,7 @@
  * control checks, mounted weapons and placing a vehicle pick on a scene. The arithmetic lives in
  * module/rules/vehicles.mjs and module/rules/vehicle-play-rules.mjs.
  */
+import { esc } from "../html.mjs";
 import { motherHenItem, motherHenTransfer, MOTHER_HEN_SAVE } from "../rules/mother-hen.mjs";
 import {
   VEHICLE_DAMAGE_COUNTERS,
@@ -37,7 +38,6 @@ import {
 import { loc } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const speakerFor = doc => ChatMessage.getSpeaker({ actor: doc.documentName === "Actor" ? doc : doc.parent });
 const isVehicleActor = doc => doc?.documentName === "Actor" && doc.type === "vehicle";
 const ask = (title, content) =>

@@ -172,7 +172,7 @@ test("actual actor rejects unknown or missing Gear Only before rolling and freez
     rolls++;
     return { data, options };
   };
-  assert.equal(await a.rollSkill("analysis", "int", { check: "appraise" }), null);
+  assert.equal(await a.rollSkill("analysis", "int", { check: "appraise" }), false);
   assert.equal(rolls, 0);
   const missing = await a.rollSkill("analysis", "int", {
     check: "appraise",
@@ -181,7 +181,7 @@ test("actual actor rejects unknown or missing Gear Only before rolling and freez
   });
   assert.equal(missing.data.total, 12);
   const firstAid = cfg.skills.medicine.checks.find(c => c.tags.includes("Gear Only (First Aid Kit)"));
-  assert.equal(await a.rollSkill("medicine", "int", { check: firstAid.id, gearStatus: "missing" }), null);
+  assert.equal(await a.rollSkill("medicine", "int", { check: firstAid.id, gearStatus: "missing" }), false);
   const k = item(kits.find(k => k.name === "Appraisal Kit III"));
   a.items = [k];
   a.items.get = id => a.items.find(i => i.id === id);
@@ -191,7 +191,7 @@ test("actual actor rejects unknown or missing Gear Only before rolling and freez
   assert.equal(r.options.skillGear.kitUuid, k.uuid);
   assert.equal(r.data.total, 17);
   k.system.quantity = 0;
-  assert.equal(await a.rollSkill("analysis", "int", input), null);
+  assert.equal(await a.rollSkill("analysis", "int", input), false);
   assert.equal(a.system.actionDice.value, 0);
 });
 

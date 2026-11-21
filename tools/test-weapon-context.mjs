@@ -320,7 +320,7 @@ test("document attack and damage controls resolve the actor’s linked projectil
   assert.match(result.flavor, /2d8\+1/);
   assert.match(result.flavor, /Explosive arrow/);
   ammo.system.ammunitionKind = "bolt";
-  assert.equal(await actor.rollDamage(bow), null);
+  assert.equal(await actor.rollDamage(bow), false);
 });
 
 test("the measured-attack document control applies exact range and blocks a roll beyond maximum distance", async () => {
@@ -348,9 +348,9 @@ test("the measured-attack document control applies exact range and blocks a roll
   const result = await actor.rollRangedAttack(item, { distanceFeet: 80 });
   assert.equal(result.data.total, 1);
   assert.match(result.options.flavor, /range penalty -6/);
-  assert.equal(await actor.rollRangedAttack(item, { distanceFeet: 251 }), null);
+  assert.equal(await actor.rollRangedAttack(item, { distanceFeet: 251 }), false);
   assert.equal(count, 1);
-  assert.equal(await actor.rollRangedAttack(item, { distanceFeet: "" }), null);
+  assert.equal(await actor.rollRangedAttack(item, { distanceFeet: "" }), false);
   assert.equal(count, 1);
 });
 
@@ -465,5 +465,5 @@ test("Gunnery changes only a mounted weapon’s full-action or two-half-action f
   assert.equal(result.options.attackContext.weaponOperation.requiredTime, "1 half action");
   assert.equal(result.options.attackContext.weaponOperation.baseTime, "2 half actions");
   assert.match(result.options.flavor, /Gunnery/);
-  assert.equal(await a.rollAttack(item, { vehicleMounted: false, weaponOperationTime: "full" }), null);
+  assert.equal(await a.rollAttack(item, { vehicleMounted: false, weaponOperationTime: "full" }), false);
 });

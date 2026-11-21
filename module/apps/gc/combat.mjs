@@ -3,6 +3,8 @@
  * flat-footed at the start, tie-breaking by Initiative bonus, fluid initiative at the end of each
  * round, Delay / Press / Ready, group initiative for NPCs and surprise rounds.
  */
+import { esc } from "../../html.mjs";
+import { refuse } from "../../error-notices.mjs";
 import {
   FLUID_EVENTS,
   fluidModifier,
@@ -31,7 +33,6 @@ import {
 import { loc } from "../../i18n.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget, resetActions, spendAction } from "../../rules/action-budget.mjs";
 
-const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
   foundry.applications.api.DialogV2.input({
     window: { title },
@@ -165,9 +166,9 @@ export function registerAutomaticFluidSetting() {
 
 /** Dialog: choose a combatant and an event. */
 export async function fluidEventDialog(combat = game.combat, preset = null) {
-  if (!combat?.started) return ui.notifications.warn(loc`Start the combat first.`);
+  if (!combat?.started) return refuse(loc`Start the combat first.`);
   const mine = combat.combatants.filter(combatant => combatant.isOwner);
-  if (!mine.length) return ui.notifications.warn(loc`You control no combatant in this fight.`);
+  if (!mine.length) return refuse(loc`You control no combatant in this fight.`);
   const rows = mine.map(combatant => {
     const pending = fluidForRound(combatant, combat.round).modifiers.reduce((sum, entry) => sum + entry.amount, 0);
     return [
@@ -203,7 +204,7 @@ export async function fluidEventDialog(combat = game.combat, preset = null) {
     );
     return result;
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }
 
@@ -286,7 +287,7 @@ export async function rollTiebreaks(combat = game.combat) {
 /** One Initiative check for a set of NPCs (p.323): by default every unrolled non-player combatant, grouped by actor. */
 export async function rollGroupInitiative(combat = game.combat, { single = false } = {}) {
   if (!game.user.isGM) return null;
-  if (!combat) return ui.notifications.warn(loc`There is no active combat.`);
+  if (!combat) return refuse(loc`There is no active combat.`);
   const pending = combat.combatants.filter(
     combatant => !combatant.hasPlayerOwner && combatant.initiative === null && combatant.actor
   );
@@ -312,7 +313,7 @@ export async function rollGroupInitiative(combat = game.combat, { single = false
 /** Surprise round (p.323): enter each group's opposed result; winners are flagged and announced. */
 export async function surpriseRoundDialog(combat = game.combat) {
   if (!game.user.isGM) return null;
-  if (!combat) return ui.notifications.warn(loc`Create the combat first.`);
+  if (!combat) return refuse(loc`Create the combat first.`);
   const input = await ask(
     loc`Surprise round — p.323`,
     `
@@ -347,7 +348,7 @@ export async function surpriseRoundDialog(combat = game.combat) {
       actingGroup: input.actingGroup
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await combat.update({
     "flags.spycraft2.surprise": result.occurs ? { winners: result.winners, round: combat.round } : null

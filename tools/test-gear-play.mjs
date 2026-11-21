@@ -107,7 +107,7 @@ test("paying a standing cost charges once and a GC refund restores it", async ()
     [item.getFlag("spycraft2", "standingCharge").currency, item.getFlag("spycraft2", "standingCharge").amount],
     ["reputation", 15]
   );
-  assert.equal(await chargeStandingCost(item, { currency: "reputation" }), null, "not charged twice");
+  assert.equal(await chargeStandingCost(item, { currency: "reputation" }), false, "not charged twice");
   assert.equal(actor.system.reputation, 5);
   await refundStandingCost(item);
   assert.equal(actor.system.reputation, 20);
@@ -139,7 +139,7 @@ test("a team-wide pick is issued once to each other team member, at no pick cost
   assert.deepEqual(await issueToTeam(radio), [], "issued only once");
   assert.match(posts.at(-1).content, /Already held: Bo, Cy/);
   game.user.isGM = false;
-  assert.equal(await issueToTeam(radio), null, "players ask the GC");
+  assert.equal(await issueToTeam(radio), false, "players ask the GC");
   game.user.isGM = true;
 });
 

@@ -218,8 +218,8 @@ test("invalid choices, missing/expired source and failed posting leave previous 
   assert.deepEqual(a.system.focuses.science, []);
   a.system.usagePeriods.mission = "b";
   a.derive();
-  assert.equal(await a.chooseTemporaryFocuses({ featId: "temp", choices }), null);
-  assert.equal(await a.chooseTemporaryFocuses({ featId: "missing", choices }), null);
+  assert.equal(await a.chooseTemporaryFocuses({ featId: "temp", choices }), false);
+  assert.equal(await a.chooseTemporaryFocuses({ featId: "missing", choices }), false);
 });
 
 test("fresh state and serialized edits prevent duplicate source benefits, and a mission change during posting rolls back saved choices", async () => {

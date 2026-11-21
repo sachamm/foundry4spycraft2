@@ -1,4 +1,6 @@
 /** Dramatic Conflict tracker (pp.363–388): the GC runs each Conflict round through a short series of dialogs. */
+import { esc } from "../../html.mjs";
+import { refuse } from "../../error-notices.mjs";
 import {
   CONFLICT_TYPES,
   startConflict,
@@ -38,7 +40,6 @@ import { spendFuel } from "../vehicle-play.mjs";
 import { recentResultsHint } from "../opposed-checks.mjs";
 import { loc } from "../../i18n.mjs";
 
-const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
   foundry.applications.api.DialogV2.input({
     window: { title },
@@ -216,7 +217,7 @@ export async function startConflictDialog() {
     );
     return id;
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }
 
@@ -224,7 +225,7 @@ export async function startConflictDialog() {
 export async function advanceConflict(id) {
   requireGC();
   const conflict = getConflicts()[id];
-  if (!conflict) return ui.notifications.warn(loc`That conflict no longer exists.`);
+  if (!conflict) return refuse(loc`That conflict no longer exists.`);
   const rules = CONFLICT_TYPES[conflict.type];
   try {
     if (conflict.step === "strategies") {
@@ -369,7 +370,7 @@ export async function advanceConflict(id) {
     }
     return ui.notifications.info(loc`This conflict is over. Remove it when you no longer need the record.`);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }
 
@@ -515,7 +516,7 @@ export async function manageConflict(id) {
         side = input.smashSide || "";
       const source = side ? chaseSource(conflict.chase[side]) : null;
       if (source && !(source.kind === "vehicle" && smashEligible(source.system)))
-        return ui.notifications.warn(loc`Only a pilot in a powered aircraft can hold Smash points.`);
+        return refuse(loc`Only a pilot in a powered aircraft can hold Smash points.`);
       next.chase.smash = side ? smashState({ side, points: Number(input.smashPoints) }) : null;
       await saveConflict(id, next);
       return say(`<b>${esc(conflict.name)}</b>: ${chaseLine(next, chaseState(next))}.`);
@@ -535,6 +536,6 @@ export async function manageConflict(id) {
     else await say(`<b>${esc(conflict.name)}</b>${loc`: Lead set to ${next.lead}.`}`);
     return next;
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }

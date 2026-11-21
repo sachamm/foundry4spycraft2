@@ -146,13 +146,13 @@ test("the actual character entry saves the DC context, accepts owned or confirme
   assert.equal(blueprint.options.weaponFocusWork.targetUuid, "");
   assert.equal(calls, 3);
   assert.equal(
-    await a.rollSkill("mechanics", null, {
+    await a.rollSkill("mechanics", false, {
       check: "repair",
       gearStatus: "available",
       ...declaration(),
       weaponWorkItemId: "missing"
     }),
-    null
+    false
   );
   target.system.proficiency = "handgun";
   assert.equal(
@@ -162,7 +162,7 @@ test("the actual character entry saves the DC context, accepts owned or confirme
       ...declaration(),
       weaponWorkItemId: "target"
     }),
-    null
+    false
   );
   assert.equal(calls, 3);
 });

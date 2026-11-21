@@ -1,3 +1,4 @@
+import { primaryWriterFor } from "../writers.mjs";
 import {
   stablePower as stable,
   powerStanceBonus,
@@ -347,12 +348,7 @@ export function installPowerStanceInitiativeHooks() {
   const pending = new WeakMap();
   const schedule = actor => {
     if (!actor || actor.type !== "agent" || !actor.isOwner || !combatants(actor).length) return;
-    const owner =
-      game.users?.activeGM ??
-      [...(game.users ?? [])]
-        .filter(u => u.active && actor.testUserPermission(u, "OWNER"))
-        .sort((a, b) => a.id.localeCompare(b.id))[0];
-    if (owner?.id !== game.user.id) return;
+    if (primaryWriterFor(actor)?.id !== game.user.id) return;
     const old = pending.get(actor);
     if (old) {
       old.again = true;

@@ -214,7 +214,7 @@ test("document Defense boosts store combat and expiry, reject stacking, and rest
   assert.equal(boost.expiresAtRound, 6);
   assert.equal(actor.system.actionDice.value, 4);
   const old = structuredClone(actor.system.defenseBoost);
-  assert.equal(await actor.boostDefenseWithActionDie({ atStartOfRound: true }), null);
+  assert.equal(await actor.boostDefenseWithActionDie({ atStartOfRound: true }), false);
   assert.equal(actor.system.actionDice.value, 4);
   failPost = true;
   await assert.rejects(
@@ -242,7 +242,7 @@ test("healing and per-round counters follow the actor’s participating combat, 
   assert.equal(actor.participatingCombat.id, "own");
   assert.equal(actor.usagePeriods.round, "own:3");
   const dice = actor.system.actionDice.value;
-  assert.equal(await actor.healWithActionDice({ woundDice: 1 }), null);
+  assert.equal(await actor.healWithActionDice({ woundDice: 1 }), false);
   assert.equal(actor.system.actionDice.value, dice);
   game.combat = null;
   game.combats = [];
@@ -286,18 +286,18 @@ test("combat Refresh spends nothing when declared or attacked; one die heals at 
   assert.equal(actor.system.actionDice.value, 5);
   assert.equal(actor.system.refreshAction.state, "waiting");
   const complete = { phase: "complete", resource: "wounds", notTargeted: true, atStartOfInitiative: true };
-  assert.equal(await actor.refreshWithActionDie(complete), null);
+  assert.equal(await actor.refreshWithActionDie(complete), false);
   game.combat.round++;
   await actor.refreshWithActionDie(complete);
   assert.equal(actor.system.actionDice.value, 4);
   assert.equal(actor.system.wounds.value, 6);
   assert.equal(actor.system.refreshAction.state, "completed");
-  assert.equal(await actor.refreshWithActionDie(complete), null);
+  assert.equal(await actor.refreshWithActionDie(complete), false);
   assert.equal(actor.system.actionDice.value, 4);
   await actor.refreshWithActionDie({ phase: "start", forfeitActions: true });
   await actor.refreshWithActionDie({ phase: "targeted" });
   game.combat.round++;
-  assert.equal(await actor.refreshWithActionDie(complete), null);
+  assert.equal(await actor.refreshWithActionDie(complete), false);
   assert.equal(actor.system.actionDice.value, 4);
   game.combat = null;
   game.combats = [];

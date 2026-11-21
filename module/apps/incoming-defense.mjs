@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import {
   whirlingDefenseContent,
   whirlingDefensePreview,
@@ -183,7 +184,7 @@ export async function checkIncomingDefense(actor) {
     });
     if (ghostCover) plan.ghostCover = ghostCover;
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await foundry.applications.api.DialogV2.input({
     window: { title: loc`Incoming attack — result` },
@@ -215,7 +216,7 @@ export async function checkIncomingDefense(actor) {
     validateGreatSwordDefenseProof(actor.system, plan.greatSword, { ranged: input.ranged === true });
     validateGhostCoverPreview(actor, input, ghostCover);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   return plan;
 }

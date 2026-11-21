@@ -334,7 +334,8 @@ test("cancelled, unconfirmed, disappeared or redirected roster fields cannot sil
       Object.assign(response, { ownCount__99: 1, ownTeam__99: "team", ownBase__99: 1, ownSource__99: "" });
     if (cause === "badCount") response.ownCount__2 = "";
     const p = await checkNumericalAdvantage(a);
-    assert.ok(p.warning, cause);
+    assert.equal(p, false, cause);
+    assert.ok(warnings.length, cause);
     assert.equal(contents.length, 1);
   }
 });

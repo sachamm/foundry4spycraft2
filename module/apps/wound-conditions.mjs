@@ -1,10 +1,10 @@
+import { esc } from "../html.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration } from "../rules/timers.mjs";
 
 export { conditionDuration };
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 
 /**

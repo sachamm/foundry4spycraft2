@@ -195,6 +195,6 @@ test("cancellation, source loss, exhausted counters and inconsistent continued-u
   a.system.resourceUses.finalDeduction.used = 0;
   await assert.rejects(a.useFinalDeduction(input(1)), /review/);
   a.system.classLevels.sleuth = 13;
-  assert.equal(await a.useFinalDeduction(input(1)), null);
+  assert.equal(await a.useFinalDeduction(input(1)), false);
   assert.equal(a.flags.spycraft2.finalDeduction.rounds, 1);
 });

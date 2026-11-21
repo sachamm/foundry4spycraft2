@@ -149,7 +149,7 @@ test("opponent payment charges only that actor, rejects missing ownership, and s
   assert.equal(a.system.actionDice.value, 3);
   assert.equal(b.system.actionDice.value, 2);
   b.isOwner = false;
-  assert.equal(await a.activateCritical(message({ errorConfirmed: true }), options), null);
+  assert.equal(await a.activateCritical(message({ errorConfirmed: true }), options), false);
 });
 
 test("RAW pp.301–302: Dependable raises error activation cost; Unreliable may make it free; mutually exclusive qualities cancel", () => {

@@ -122,8 +122,8 @@ test("actual entry uses current combat participation even if the input tries to 
   });
   assert.equal(surgery.options.error, 7);
   const before = rolls;
-  assert.equal(await a.rollSkill("medicine", "wis", { check: "therapy" }), null);
+  assert.equal(await a.rollSkill("medicine", "wis", { check: "therapy" }), false);
   assert.equal(rolls, before);
   a.fighting = false;
-  assert.equal(await a.rollSkill("medicine", "wis", { check: "therapy", complexTaskNearby: true }), null);
+  assert.equal(await a.rollSkill("medicine", "wis", { check: "therapy", complexTaskNearby: true }), false);
 });

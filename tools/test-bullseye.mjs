@@ -283,7 +283,7 @@ test("actual invalid shot/action declarations stop before RNG and leave every da
     const a = make();
     let draws = 0;
     controls.draw = async () => draws++;
-    assert.equal(await attack(a, patch), null);
+    assert.equal(await attack(a, patch), false);
     assert.equal(draws, 0);
     assert.equal(game.messages.length, 0);
     assert.equal(a.system.attackDamageUses, undefined);

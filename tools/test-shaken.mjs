@@ -196,7 +196,7 @@ test("the actual save entry forbids fixed Evasion results while Shaken and retai
   a.system = compute(3);
   a.system.classLevels.intruder = 12;
   a.rollCheck = async (formula, data, options) => ({ formula, data, options });
-  assert.equal(await a.rollSave("ref", { checkMethod: "take10" }), null);
+  assert.equal(await a.rollSave("ref", { checkMethod: "take10" }), false);
   const normal = await a.rollSave("ref", {});
   assert.equal(normal.data.total, compute().saves.ref.total - 4);
   assert.equal((await a.rollSave("fort", {})).data.total, compute().saves.fort.total);

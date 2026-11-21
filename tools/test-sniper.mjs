@@ -428,9 +428,9 @@ test("invalid targets, weapons and competing declaration choices do not reserve 
   reset();
   const { a, item } = dollarActor();
   for (const patch of [{ targetVulnerable: false }, { oneInAMillion: true }])
-    assert.equal(await a.rollRangedAttack(item, { ...dollarInput, ...patch }), null);
+    assert.equal(await a.rollRangedAttack(item, { ...dollarInput, ...patch }), false);
   item.system.sizeHands = "S/1h";
-  assert.equal(await a.rollRangedAttack(item, dollarInput), null);
+  assert.equal(await a.rollRangedAttack(item, dollarInput), false);
   assert.equal(a.system.resourceUses.millionDollarSkill, undefined);
   assert.equal(posts.length, 0);
 });

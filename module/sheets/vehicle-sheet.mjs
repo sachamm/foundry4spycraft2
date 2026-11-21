@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
 import { enrich } from "./enrich.mjs";
@@ -287,7 +288,7 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(SaveFeedbac
 
   static async #onOpenSource() {
     const item = this.actor.system.sourceItem ? await fromUuid(this.actor.system.sourceItem) : null;
-    if (!item) return ui.notifications.warn(loc`The gear pick this vehicle came from is no longer available.`);
+    if (!item) return refuse(loc`The gear pick this vehicle came from is no longer available.`);
     return item.sheet.render(true);
   }
 }

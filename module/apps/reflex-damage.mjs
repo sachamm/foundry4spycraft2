@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { reflexDamagePlan } from "../rules/defense.mjs";
 import { loc } from "../i18n.mjs";
 /** Read-only Evasion adjustment using a recorded Reflex save; health and other mitigation are separate. */
@@ -15,7 +16,7 @@ export async function checkReflexDamage(actor) {
       )
       .reverse(),
     esc = foundry.utils.escapeHTML;
-  if (!saves.length) return ui.notifications.warn(loc`Make a Reflex save with recorded Evasion context first.`);
+  if (!saves.length) return refuse(loc`Make a Reflex save with recorded Evasion context first.`);
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Reflex save — Evasion damage` },
     rejectClose: false,
@@ -28,7 +29,7 @@ export async function checkReflexDamage(actor) {
     message.flags?.spycraft2?.actorUuid !== actor.uuid ||
     (message.blind && !game.user?.isGM)
   )
-    return ui.notifications.warn(loc`That recorded save is no longer available.`);
+    return refuse(loc`That recorded save is no longer available.`);
   let plan;
   try {
     const number = k => (typeof input[k] === "string" && input[k].trim() === "" ? NaN : Number(input[k]));
@@ -39,7 +40,7 @@ export async function checkReflexDamage(actor) {
       confirmed: input.confirmed === true
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await foundry.applications.api.DialogV2.input({
     window: { title: loc`Reflex save — damage result` },

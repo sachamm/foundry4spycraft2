@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { rulesRefreshChanges, applyRulesRefresh, equivalent } from "../rules/refresh.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
@@ -43,7 +44,7 @@ export async function actorRulesRefreshPreview(actor) {
   return { changes, unmatched };
 }
 export async function reviewActorRules(actor, { restore = false } = {}) {
-  if (!actor?.isOwner) return ui.notifications.warn(loc`You must own this character.`);
+  if (!actor?.isOwner) return refuse(loc`You must own this character.`);
   const esc = foundry.utils.escapeHTML;
   let changes,
     unmatched = [];

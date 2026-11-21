@@ -3,6 +3,7 @@
  * a card for each dying character, and when a burning character's turn begins a card for it. The card's button
  * makes the same roll as the sheet's, for whoever owns the character. World setting "Round reminders".
  */
+import { esc } from "../html.mjs";
 import { roundReminders } from "../rules/round-reminders.mjs";
 import { stratagemCountGain } from "../rules/class-combat.mjs";
 import { hazardState } from "../rules/hazards.mjs";
@@ -12,7 +13,6 @@ import { burningRound } from "./hazards.mjs";
 import { fluidRoundSettled } from "./gc/combat.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const enabled = () => {
   try {
     return game.settings.get("spycraft2", "roundReminders") !== false;

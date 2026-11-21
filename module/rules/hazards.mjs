@@ -13,6 +13,7 @@
  */
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
+import { esc } from "../html.mjs";
 
 const SECONDS = { round: 6, minute: 60, hour: 3600, day: 86400, week: 604800, month: 2592000, year: 31536000 };
 const ABILITIES = { str: "str", dex: "dex", con: "con", int: "int", wis: "wis", cha: "cha" };
@@ -349,7 +350,7 @@ rollPipeline.register({
         ...(Number(save.bonus) ? [[String(save.bonusLabel ?? loc`Hazard modifier`), Number(save.bonus)]] : [])
       ],
       flavorAt: 45,
-      flavor: loc` — ${save.label} DC${Number(save.dc)}`,
+      flavor: loc` — ${esc(save.label)} DC${Number(save.dc)}`,
       options: { hazardSave: save }
     };
   }

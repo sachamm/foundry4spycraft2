@@ -1,4 +1,5 @@
 /** Career levels, vitality, granted feats and prerequisite checks. */
+import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollCareerVitality, reviewCareerVitality } from "../../apps/vitality.mjs";
 import { deferredSkillDeadline } from "../../rules/deferred-skills.mjs";
@@ -8,6 +9,7 @@ import { checkPrerequisites } from "../../rules/prerequisites.mjs";
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
 import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
+import { esc } from "../../html.mjs";
 
 export const ActorProgression = Base =>
   class ActorProgression extends Base {
@@ -27,7 +29,7 @@ export const ActorProgression = Base =>
       if (level && promptVitality && level > 1 && cls?.system.vitalityDie) {
         const roll = await systemDialog.confirm({
           window: { title: game.i18n.localize("SPYCRAFT.VitalityRoll") },
-          content: `<p>${game.i18n.format("SPYCRAFT.VitalityPrompt", { level, name: cls.name, die: cls.system.vitalityDie })}</p>`
+          content: `<p>${game.i18n.format("SPYCRAFT.VitalityPrompt", { level, name: esc(cls.name), die: esc(cls.system.vitalityDie) })}</p>`
         });
         if (roll) await this.rollVitality(level - 1);
       }
@@ -131,14 +133,10 @@ export const ActorProgression = Base =>
     async initializeStartingResources({ keepCurrent = false } = {}) {
       if (!this.isOwner || this.type !== "agent") return null;
       if (this.system.resourcesInitialized)
-        return ui.notifications.warn(
-          loc`Starting resources have already been initialized; current earnings are preserved.`
-        );
+        return refuse(loc`Starting resources have already been initialized; current earnings are preserved.`);
       if (keepCurrent) return this.update({ "system.resourcesInitialized": true });
       if (![0, 2].includes(this.system.reputation) || ![0, 100000].includes(this.system.netWorth))
-        return ui.notifications.warn(
-          loc`These values contain existing earnings. Use 'Keep current resources' to preserve them.`
-        );
+        return refuse(loc`These values contain existing earnings. Use 'Keep current resources' to preserve them.`);
       const freelance = this.system.affiliationType === "freelance";
       return this.update({
         "system.reputation": freelance ? 0 : 2,

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Refusals are reported as refusals.** About 200 places that warned and stopped ("roll the save first", "no
+  helper has posted yet") used to hand back the warning itself, which the code treated as success: a chat button
+  said "Action finished", and a follow-up step carried on with the warning as its result. They now report "Not done:
+  see the warning" and stop cleanly. Warnings themselves are unchanged.
+- **Safer chat text.** Class names in the vitality prompt, hazard names on save cards, and attack and activation
+  sources in check notes are escaped. A check card shown in another language keeps only simple formatting from the
+  poster's record.
 - **Chat theme:** system messages in the chat log now follow the interface theme, like the messages around them, so
   a dark sidebar no longer shows paper-coloured cards when the windows use the light theme (or the other way round).
   A popped-out chat log follows its own window. Short system notes (ammunition, healing, round reminders and the

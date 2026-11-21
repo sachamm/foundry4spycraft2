@@ -1,3 +1,4 @@
+import { isLeadGM } from "./writers.mjs";
 import { loc } from "./i18n.mjs";
 const SYSTEM = "spycraft2";
 const SETTING = "sampleSceneSetup";
@@ -14,7 +15,7 @@ export function registerSampleSceneSetup() {
 
 /** Seed empty worlds once. Persist intent before creating anything so interrupted imports can resume. */
 export async function setupSampleScenes() {
-  if (!game.user?.isGM || game.users.activeGM?.id !== game.user.id) return;
+  if (!isLeadGM()) return;
   let state = game.settings.get(SYSTEM, SETTING);
   if (state.status === "done") return;
   try {

@@ -3,6 +3,7 @@
  * A macro clicked with Shift held rolls the other way round from the player's usual choice (see
  * module/apps/remembered-choices.mjs), the same as on the sheet.
  */
+import { refuse } from "../error-notices.mjs";
 import { loc } from "../i18n.mjs";
 import { quickAttackOptions, skipDialog } from "./remembered-choices.mjs";
 
@@ -44,12 +45,12 @@ export async function rollFromMacro({ itemUuid, actorUuid, skill } = {}, event =
   if (itemUuid) {
     const item = await fromUuid(itemUuid),
       actor = item?.parent;
-    if (!actor?.isOwner) return ui.notifications.warn(loc`You do not own that character.`);
+    if (!actor?.isOwner) return refuse(loc`You do not own that character.`);
     if (item.type !== "weapon") return item.sheet?.render(true);
     return actor.rollAttack(item, skipDialog(event) ? quickAttackOptions(actor, item) : { askContext: true });
   }
   const actor = actorUuid ? await fromUuid(actorUuid) : null;
-  if (!actor?.isOwner || !skill) return ui.notifications.warn(loc`You do not own that character.`);
+  if (!actor?.isOwner || !skill) return refuse(loc`You do not own that character.`);
   return actor.rollSkill(skill, null, skipDialog(event) ? { quick: true } : {});
 }
 

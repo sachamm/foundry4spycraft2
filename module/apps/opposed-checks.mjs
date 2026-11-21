@@ -4,12 +4,13 @@
  * "Compare with an opposing check" on a skill check lists the recent results in chat. The check is confirmed as a
  * success or failure against the other result; when the viewer also owns the other check, it is confirmed too.
  */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { opposedOutcome } from "../rules/damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const RECENT = 40;
 const visible = message => !message.blind || game.user?.isGM === true;
 const plainText = html =>
@@ -69,8 +70,7 @@ export async function compareOpposed(message, options = {}) {
   const check = message.flags?.spycraft2,
     actor = check?.actorUuid ? fromUuidSync(check.actorUuid) : null;
   if (!actor?.isOwner || !Number.isFinite(check.effectiveTotal)) return null;
-  if (check.resolved || check.superseded)
-    return ui.notifications.warn(loc`This check has already been resolved or replaced.`);
+  if (check.resolved || check.superseded) return refuse(loc`This check has already been resolved or replaced.`);
   const rows = recentResults({ exclude: message }).filter(row => row.check?.actorUuid !== check.actorUuid);
   let input = options;
   if (input.otherUuid === undefined && input.total === undefined) {
@@ -92,7 +92,7 @@ export async function compareOpposed(message, options = {}) {
   const other = input.otherUuid ? rows.find(row => row.uuid === input.otherUuid) : null;
   const total = other ? other.total : Number(input.total);
   if (!Number.isFinite(total) || (!other && (input.total === "" || input.total === null)))
-    return ui.notifications.warn(loc`Choose the opposing check or enter its result.`);
+    return refuse(loc`Choose the opposing check or enter its result.`);
   const mine = {
     total: check.effectiveTotal,
     bonus: Number.isFinite(check.naturalDie) ? check.rawTotal - check.naturalDie : null
@@ -126,7 +126,7 @@ export async function compareOpposed(message, options = {}) {
     await actor.confirmCheckOutcome(message, { succeeded: outcome === "first", difficultyClass: total });
   } catch (error) {
     await message.update({ "flags.spycraft2.-=opposed": null });
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   // The other side's check, when this user can settle it too.
   const otherActor = other?.check?.actorUuid ? fromUuidSync(other.check.actorUuid) : null;

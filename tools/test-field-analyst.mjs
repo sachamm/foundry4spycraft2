@@ -228,6 +228,6 @@ test("secret Eye for Detail is GC-only, failed posts leave resources alone and B
   assert.deepEqual(a.system.resourceUses, {});
   failPost = false;
   const use = cfg.skills.search.checks[0];
-  assert.equal(await a.rollSkill("search", null, { gearStatus: "available", check: use.id, brightIdea: true }), null);
+  assert.equal(await a.rollSkill("search", false, { gearStatus: "available", check: use.id, brightIdea: true }), false);
   assert.deepEqual(a.system.resourceUses, {});
 });

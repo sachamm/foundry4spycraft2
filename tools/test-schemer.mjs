@@ -414,7 +414,7 @@ test("post-roll Cunning Plan removes a natural error while retaining failure and
   assert.equal(m.flags.spycraft2.successConfirmed, false);
   assert.equal(m.flags.spycraft2.rawTotal, 4);
   assert.notEqual(rollEvidence(m.flags.spycraft2), before);
-  assert.equal(await a.useCunningPlan(m, { freeActionConfirmed: true }), null);
+  assert.equal(await a.useCunningPlan(m, { freeActionConfirmed: true }), false);
   assert.equal(a.system.resourceUses.cunningPlan.used, 1);
   const negative = message({ ...failedCheck(), rawTotal: -1, effectiveTotal: -1 });
   await a.useCunningPlan(negative, { freeActionConfirmed: true });

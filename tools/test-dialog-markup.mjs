@@ -47,3 +47,12 @@ test("every field in string-built markup has a label, an aria-label or a for= la
   assert.ok(fields > 300, `only ${fields} fields found`);
   assert.deepEqual(problems, []);
 });
+
+test("refusals return false through refuse(), not the truthy notification (only the reviewed exceptions remain)", () => {
+  // Each remaining site returns into a hook, a Foundry method or queued resource work, where false can mean
+  // something else, so they were left for review one by one. New code uses refuse() from the dialog kit.
+  const sites = sources.flatMap(({ file, source }) =>
+    [...source.matchAll(/return ui\.notifications\.warn\(/g)].map(match => `${file}:${lineOf(source, match.index)}`)
+  );
+  assert.ok(sites.length <= 42, `${sites.length} sites return a notification:\n${sites.join("\n")}`);
+});

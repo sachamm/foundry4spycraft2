@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { stanceMovementSummary, stanceMovementSystem } from "./stance-movement.mjs";
 import { combatMovementPlan, combatMovementRules } from "../rules/combat-movement.mjs";
 import { loc } from "../i18n.mjs";
@@ -35,7 +36,7 @@ export async function checkCombatMovement(actor, input = {}) {
       routeConfirmed: input.routeConfirmed === true
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   const esc = foundry.utils.escapeHTML;
   await foundry.applications.api.DialogV2.input({

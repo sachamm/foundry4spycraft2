@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { shakenRules } from "../rules/shaken.mjs";
 import { unrestrictedBonusPools } from "../rules/bonus-pools.mjs";
 import { actionDieBenefitQuote } from "../rules/benefit-payments.mjs";
@@ -49,7 +50,7 @@ export async function payActionDieBenefitLocked(
       surchargeAllocations
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   if (!quote.cost) return perform(null);
   const run = payment =>

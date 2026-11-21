@@ -155,7 +155,7 @@ test("actual Actor entry records timing, rejects absent facts before rolling, an
   const before = rolls;
   assert.equal(
     await a.rollSkill("impress", "cha", { check: "influence", ...facts, hardCoreNPCConfirmed: false }),
-    null
+    false
   );
   assert.equal(rolls, before);
   a.system.activeFeatNames = [];

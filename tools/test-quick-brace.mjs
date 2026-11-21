@@ -126,7 +126,7 @@ test("actual quick Brace requires a stable surface, honors Marksmanship Basics a
   posts = [];
   rolls = 0;
   warnings = [];
-  assert.equal(await a.rollAttack(a.items[0], { askContext: true }), null);
+  assert.equal(await a.rollAttack(a.items[0], { askContext: true }), false);
   assert.equal(posts.length, 0);
   assert.equal(rolls, 0);
   assert.match(warnings[0], /stable surface/);

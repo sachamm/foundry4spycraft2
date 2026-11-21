@@ -100,7 +100,7 @@ export function checkFlavor(check) {
     );
   if (check.finalAttack?.source === "missTrick")
     notes.push(
-      loc`${check.finalAttack.name}: immediate final Standard Attack with the same weapon against the original opponent; triggering miss recorded.`
+      loc`${esc(check.finalAttack.name)}: immediate final Standard Attack with the same weapon against the original opponent; triggering miss recorded.`
     );
   if (check.finalAttack?.source === "combatInstincts")
     notes.push(
@@ -170,7 +170,7 @@ export function checkFlavor(check) {
       .replaceAll('"', "&quot;");
     notes.push(escaped);
     notes.push(
-      loc`Activation cost ${activation.cost} action dice${activation.sources?.length ? ` (${activation.sources.join("; ")})` : ""}.`
+      loc`Activation cost ${activation.cost} action dice${activation.sources?.length ? ` (${activation.sources.map(esc).join("; ")})` : ""}.`
     );
   }
   for (const payment of [check.preRollFunding, check.rerollFunding])

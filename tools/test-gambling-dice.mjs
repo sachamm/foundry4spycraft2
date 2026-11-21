@@ -223,6 +223,6 @@ test("the actual actor roll receives the frozen owned-dice breakdown and malform
   assert.equal(r.options.gamblingDice.bonus, 6);
   assert.equal(r.options.cap, null);
   a.system.bonusActionDice.master.remaining = "bad";
-  assert.equal(await a.rollSkill("streetwise", "wis", { check: "gambling", ...options }), null);
+  assert.equal(await a.rollSkill("streetwise", "wis", { check: "gambling", ...options }), false);
   assert.equal(calls, 1);
 });
