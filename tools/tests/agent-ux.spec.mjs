@@ -235,10 +235,10 @@ test("inventory and toolbar controls have contextual labels and retain the origi
   await page.getByText("Equipment and ammunition", { exact: true }).click();
   const remove = page.getByRole("button", { name: "Remove Reviewed weapon" });
   await expect(remove).toHaveText("Remove");
-  await expect(page.getByRole("button", { name: "Unequip Reviewed weapon" })).toHaveAttribute(
-    "title",
-    "Unequip Reviewed weapon"
-  );
+  // One tooltip only: Foundry's data-tooltip, with no native title beside it.
+  const unequip = page.getByRole("button", { name: "Unequip Reviewed weapon" });
+  await expect(unequip).toHaveAttribute("data-tooltip", "Unequip Reviewed weapon");
+  await expect(unequip).not.toHaveAttribute("title");
   await remove.locator("span").click();
   expect(await page.evaluate(() => window.clicked)).toEqual({ action: "itemDelete", item: "weapon" });
   expect(await page.locator(".gear").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
