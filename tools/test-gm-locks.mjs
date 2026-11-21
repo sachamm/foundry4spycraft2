@@ -4,6 +4,9 @@ import {
   GM_TOKEN_PREFIX,
   LOCK_QUERY,
   LockTable,
+  QUERY_TIMEOUT_MS,
+  UNREACHABLE_MEMORY_MS,
+  forgetUnreachableGM,
   gmLockingActive,
   lockQueryHandler,
   requestLock
@@ -79,7 +82,8 @@ test("the GC's own client answers from its table; a player's request travels as 
   assert.equal(sent.length, 0);
   const refused = await requestLock("acquire", ["Actor.a"], "gm:2", { game: playerGame, table });
   assert.deepEqual(refused, { ok: false, busy: ["Actor.a"], holders: ["gc"] });
-  assert.deepEqual(sent, [[LOCK_QUERY, 5000]]);
+  assert.deepEqual(sent, [[LOCK_QUERY, QUERY_TIMEOUT_MS]]);
+  assert.ok(QUERY_TIMEOUT_MS <= 1500);
   await requestLock("release", ["Actor.a"], "gm:1", { game: gmGame, table });
   assert.deepEqual(await requestLock("acquire", ["Actor.a"], "gm:2", { game: playerGame, table }), { ok: true });
   assert.equal(table.holder("Actor.a").userId, "p1");
@@ -102,6 +106,83 @@ test("no GC, a timeout or a broken answer all report the GC as unreachable", asy
   assert.equal((await requestLock("acquire", ["k"], "gm:1", { game: failing })).unreachable, true);
   const silent = { user: { id: "p" }, users: { activeGM: { isSelf: false, query: async () => undefined } } };
   assert.equal((await requestLock("acquire", ["k"], "gm:1", { game: silent })).unreachable, true);
+});
+
+test("a GC that fails to answer is not asked again for a minute; releases still go, and one notice is shown", async () => {
+  forgetUnreachableGM();
+  const queries = [],
+    notices = [];
+  let answering = false;
+  const game = {
+    user: { id: "p" },
+    users: {
+      activeGM: {
+        id: "gc",
+        isSelf: false,
+        query: async (name, data) => {
+          queries.push(data.action);
+          if (!answering) throw new Error("timeout");
+          return { ok: true };
+        }
+      }
+    }
+  };
+  const notify = message => notices.push(message);
+  const ask = (action, now) => requestLock(action, ["Actor.a:lock"], "gm:1", { game, now, notify });
+  assert.equal((await ask("acquire", 0)).unreachable, true);
+  assert.equal((await ask("acquire", 1000)).unreachable, true);
+  assert.deepEqual(queries, ["acquire"], "the second spend does not wait out another timeout");
+  await ask("release", 2000);
+  assert.deepEqual(queries, ["acquire", "release"]);
+  assert.equal((await ask("acquire", UNREACHABLE_MEMORY_MS + 1)).unreachable, true);
+  assert.equal(queries.length, 3, "after a minute the GC is asked again");
+  assert.equal(notices.length, 1, "one notice for the whole stretch");
+  answering = true;
+  assert.deepEqual(await ask("acquire", 2 * UNREACHABLE_MEMORY_MS + 2), { ok: true });
+  answering = false;
+  await ask("acquire", 2 * UNREACHABLE_MEMORY_MS + 3);
+  assert.equal(notices.length, 2, "a new stretch after the GC answered gets its own notice");
+  forgetUnreachableGM();
+});
+
+test("the GC refuses a lock while the character carries a document lock from a client that fell back", () => {
+  const items = new Map([
+    ["sc2ResourceLock1", { id: "sc2ResourceLock1", flags: { spycraft2: { resourceLock: { token: "t" } } } }]
+  ]);
+  const actors = { "Actor.a": { items }, "Scene.s.Token.t.Actor.b": { items: new Map() } };
+  const table = new LockTable(),
+    handler = lockQueryHandler(table, { resolve: uuid => actors[uuid] ?? null });
+  assert.deepEqual(handler({ action: "acquire", keys: ["Actor.a:sc2ResourceLock1"], token: "gm:1", userId: "p1" }), {
+    ok: false,
+    busy: ["Actor.a:sc2ResourceLock1"],
+    holders: []
+  });
+  assert.equal(table.size, 0);
+  // A different scope on the same character, and a token actor without a lock, are free.
+  assert.equal(
+    handler({ action: "acquire", keys: ["Actor.a:sc2RuleStateLk01"], token: "gm:1", userId: "p1" }).ok,
+    true
+  );
+  assert.equal(
+    handler({ action: "acquire", keys: ["Scene.s.Token.t.Actor.b:sc2ResourceLock1"], token: "gm:2", userId: "p1" }).ok,
+    true
+  );
+  // An item that only reuses the id, with no lock token, is not a lock.
+  items.set("sc2GCResourceLk1", { id: "sc2GCResourceLk1", flags: {} });
+  assert.equal(
+    handler({ action: "acquire", keys: ["Actor.a:sc2GCResourceLk1"], token: "gm:3", userId: "p1" }).ok,
+    true
+  );
+  // A resolver that throws on a malformed uuid leaves the key to the table.
+  const throwing = lockQueryHandler(new LockTable(), {
+    resolve: () => {
+      throw new Error("bad uuid");
+    }
+  });
+  assert.equal(
+    throwing({ action: "acquire", keys: ["nonsense:sc2ResourceLock1"], token: "gm:4", userId: "p1" }).ok,
+    true
+  );
 });
 
 /* ---- Through the transaction layer ---- */
