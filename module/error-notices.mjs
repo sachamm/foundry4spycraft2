@@ -6,6 +6,17 @@
  */
 const SYSTEM_PATH = "/systems/spycraft2/";
 
+/**
+ * Show a refusal and return false. `return ui.notifications.warn(…)` returns the notification, which is truthy, so
+ * callers counting results or relaying them read a refused step as done. false is never a cancelled dialog (null).
+ * @param {string} message
+ * @returns {false}
+ */
+export function refuse(message) {
+  globalThis.ui?.notifications?.warn(message);
+  return false;
+}
+
 /** The message to show for a rejection, or null when it did not come from this system's code. */
 export function systemErrorNotice(reason) {
   if (!(reason instanceof Error) || !reason.message) return null;

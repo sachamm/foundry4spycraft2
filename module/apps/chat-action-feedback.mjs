@@ -18,8 +18,11 @@ export async function runChatAction(button, run) {
     button.after(status);
   }
   try {
-    await run();
-    if (status?.isConnected) status.textContent = loc`Action finished. Review the result.`;
+    const result = await run();
+    // false is a refusal already shown as a warning (see refuse()); anything else ran to the end.
+    if (status?.isConnected)
+      status.textContent =
+        result === false ? loc`Not done: see the warning.` : loc`Action finished. Review the result.`;
   } catch (error) {
     if (!status) throw error;
     status.setAttribute("role", "alert");

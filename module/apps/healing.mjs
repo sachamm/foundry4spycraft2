@@ -20,6 +20,7 @@ import { nonLethalTotals, targetChoices } from "./damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { askGC, gcAvailable, markCard, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { refuse } from "../error-notices.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const isSpecial = actor => actor.type === "agent" || (actor.type === "npc" && npcIsSpecial(actor));
@@ -99,7 +100,7 @@ export async function restAndRecover(actor, options = {}) {
       woundsPerDay: rates.woundsPerDay
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   if (plan.vitalityGain || plan.woundGain)
     await actor.update({ "system.vitality.value": plan.vitality, "system.wounds.value": plan.wounds });
@@ -164,13 +165,13 @@ export async function rollDying(actor) {
   const wounds = actor.system.wounds?.value ?? 0;
   const death = actor.system.deathThreshold;
   if (woundState(wounds, death) !== "dying")
-    return ui.notifications.warn(loc`${actor.name} is not dying (below 0 wounds, above the death threshold).`);
+    return refuse(loc`${actor.name} is not dying (below 0 wounds, above the death threshold).`);
   const roll = await new Roll("1d100").evaluate();
   let plan;
   try {
     plan = dyingPlan({ wounds, constitution: actor.system.abilities?.con?.value, deathThreshold: death }, roll.total);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await actor.update({ "system.wounds.value": plan.wounds });
   const lines = [
@@ -249,7 +250,7 @@ async function relayHealing(kind, message, patient) {
     ui.notifications.info(loc`Sent to the GC: treatment for ${patient.name}.`);
     return await askGC("applyHealing", { messageId: message.id, kind, patientUuid: patient.uuid });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }
 
@@ -267,7 +268,8 @@ registerRelay("applyHealing", {
     if (!message || !patient) throw new Error(loc`The check or its patient is no longer there.`);
     const done =
       kind === "stabilize" ? await applyStabilize(message, { patient }) : await applyFirstAid(message, { patient });
-    return done === true ? true : null;
+    if (done !== true) throw new Error(loc`The GC’s client did not apply the healing; the GC sees why.`);
+    return true;
   }
 });
 
@@ -285,7 +287,7 @@ export async function applyFirstAid(message, options = {}) {
   if (!patient.isOwner) return relayHealing("firstAid", message, patient);
   const scene = String(sceneEpoch());
   if (patient.flags?.spycraft2?.firstAidScene === scene)
-    return ui.notifications.warn(loc`${patient.name} has already had First Aid this scene.`);
+    return refuse(loc`${patient.name} has already had First Aid this scene.`);
   const lines = [],
     rolls = [];
   if (isSpecial(patient)) {
@@ -344,7 +346,7 @@ export async function applyStabilize(message, options = {}) {
   if (!patient) return null;
   if (!patient.isOwner) return relayHealing("stabilize", message, patient);
   if (woundState(patient.system.wounds?.value ?? 0, patient.system.deathThreshold) !== "dying")
-    return ui.notifications.warn(loc`${patient.name} is not dying (below 0 wounds, above the death threshold).`);
+    return refuse(loc`${patient.name} is not dying (below 0 wounds, above the death threshold).`);
   await patient.update({ "system.wounds.value": 0 });
   await post(patient, [
     loc`${esc(patient.name)} is stabilized at 0 wounds and stays unconscious.`,

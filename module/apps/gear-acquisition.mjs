@@ -317,6 +317,8 @@ export async function rollGearAcquisition(actor, options = {}) {
               message = await ChatMessage.create({
                 speaker: ChatMessage.getSpeaker({ actor }),
                 content: `<p>${loc`${esc(plan.abilityName)}: ${esc(plan.name)} requested automatically; one ${esc(plan.pick)} Reserve pick consumed, ${plan.cost ? loc`${plan.cost} action dice spent (${plan.surcharge} Shaken surcharge)` : loc`no action dice spent`}. Available after ${attempt.delivery.total} ${attempt.delivery.unit}. ${plan.preparationHours ? loc` One hour of preparation completed before the Request.` : ""} Claim on Gear after delivery.`}</p>`,
+                // The delivery-time roll, so its dice can be seen behind the time given.
+                rolls: deliveryRoll ? [deliveryRoll] : [],
                 flags: {
                   spycraft2: {
                     actorUuid: actor.uuid,

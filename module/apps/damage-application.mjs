@@ -49,6 +49,7 @@ import { gunplayCountGain, juggernautConversion } from "../rules/class-combat.mj
 import { shiftCount } from "./dueling.mjs";
 import { askGC, gcAvailable, markCard, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
+import { refuse } from "../error-notices.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
@@ -177,8 +178,7 @@ export async function resolveAttack(message, options = {}) {
   const check = message.flags?.spycraft2,
     attacker = check?.actorUuid ? fromUuidSync(check.actorUuid) : null;
   if (!attacker?.isOwner || check.checkKind !== "attack" || !Number.isFinite(check.effectiveTotal)) return null;
-  if (check.resolved || check.superseded)
-    return ui.notifications.warn(loc`This attack has already been resolved or replaced.`);
+  if (check.resolved || check.superseded) return refuse(loc`This attack has already been resolved or replaced.`);
   let input = options;
   const declared = check.attackContext?.targetActorUuid || "";
   if (input.defense === undefined && input.targetUuid === undefined) {
@@ -210,11 +210,11 @@ export async function resolveAttack(message, options = {}) {
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
   if (target && target.uuid === attacker.uuid)
-    return ui.notifications.warn(loc`${attacker.name} cannot be the target of its own attack. Choose another target.`);
+    return refuse(loc`${attacker.name} cannot be the target of its own attack. Choose another target.`);
   const entered = input.defense === "" || input.defense === null || input.defense === undefined;
   const defense = entered ? defenseOf(target) : Number(input.defense);
   if (!Number.isSafeInteger(defense) || defense < 0)
-    return ui.notifications.warn(loc`Choose a target with a Defense, or enter the Defense.`);
+    return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
   let outcome;
   try {
     outcome = attackOutcome({
@@ -224,7 +224,7 @@ export async function resolveAttack(message, options = {}) {
       feats: attacker.system?.activeFeatNames ?? []
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   const before = check.attackResolution ?? null;
   const resolution = {
@@ -243,7 +243,7 @@ export async function resolveAttack(message, options = {}) {
     await message.update(
       before ? { "flags.spycraft2.attackResolution": before } : { "flags.spycraft2.-=attackResolution": null }
     );
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   // Gunplay: each handgun hit moves the triggerman up the order, once per attack card.
   const gunplay = gunplayCountGain(attacker.system, check.weaponProficiency, outcome.hits);
@@ -683,7 +683,7 @@ export async function applyDamage(message, options = {}) {
     input = { ...input, reviewType: true };
   }
   const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
-  if (!target || !TARGET_TYPES.includes(target.type)) return ui.notifications.warn(loc`Choose a target.`);
+  if (!target || !TARGET_TYPES.includes(target.type)) return refuse(loc`Choose a target.`);
   if (!target.isOwner) {
     // Someone else's character: the GC's client applies it.
     const { reviewType: _review, ...fields } = input;
@@ -691,7 +691,7 @@ export async function applyDamage(message, options = {}) {
       ui.notifications.info(loc`Sent to the GC: damage to ${target.name}.`);
       return await askGC("applyDamage", { messageId: message.id, input: fields });
     } catch (error) {
-      return ui.notifications.warn(error.message);
+      return refuse(error.message);
     }
   }
   const damage = Number(input.damage),
@@ -702,10 +702,8 @@ export async function applyDamage(message, options = {}) {
     armorPiercingAll = input.armorPiercingAll === true,
     critical = input.critical === true,
     criticalDice = critical ? Math.max(1, Math.trunc(Number(input.criticalDice) || 0)) : 0;
-  if (!Number.isSafeInteger(damage) || damage < 0)
-    return ui.notifications.warn(loc`Enter the damage as a whole number, 0 or more.`);
-  if (!["lethal", "subdual", "stress"].includes(kind))
-    return ui.notifications.warn(loc`Choose lethal, subdual or stress damage.`);
+  if (!Number.isSafeInteger(damage) || damage < 0) return refuse(loc`Enter the damage as a whole number, 0 or more.`);
+  if (!["lethal", "subdual", "stress"].includes(kind)) return refuse(loc`Choose lethal, subdual or stress damage.`);
   const source = loc`${weapon?.name ?? loc`Damage`} (${message.id ?? "roll"})`;
   const hit = { damage, dr: drForAttack(target.system, attackKind), armorPiercing, armorPiercingAll, critical };
   let lines = [],
@@ -713,7 +711,7 @@ export async function applyDamage(message, options = {}) {
     result = null;
   try {
     if (target.type === "vehicle") {
-      if (damage < 1) return ui.notifications.warn(loc`A Damage save needs at least 1 point of damage.`);
+      if (damage < 1) return refuse(loc`A Damage save needs at least 1 point of damage.`);
       result = await rollObjectDamageSave(target, {
         damage,
         armorPiercing,
@@ -791,7 +789,7 @@ export async function applyDamage(message, options = {}) {
       }));
     } else lines.push(loc`${esc(target.name)} takes no damage.`);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   // A Table of Ouch critical on a special character: the injury is rolled from the damage card (p.329).
   const ouch = crit.ouch && target.type === "agent" && kind === "lethal" && Number.isFinite(result?.net);
@@ -821,7 +819,39 @@ registerRelay("applyDamage", {
   async run({ messageId, input = {} }) {
     const message = game.messages.get(messageId);
     if (!message) throw new Error(loc`The damage card is no longer there.`);
-    return (await applyDamage(message, { ...input, targetUuid: input.targetUuid ?? "" })) ? true : null;
+    const result = await applyDamage(message, { ...input, targetUuid: input.targetUuid ?? "" });
+    // Tell the player's client it did not happen; the GC's screen shows the reason.
+    if (!result) throw new Error(loc`The GC’s client did not apply the damage; the GC sees why.`);
+    return true;
+  }
+});
+
+registerRelay("applyDamageMany", {
+  async describe({ messageId, inputs = [] }, user) {
+    const message = game.messages.get(messageId);
+    if (!message || !Array.isArray(inputs) || !inputs.length)
+      throw new Error(loc`The damage card or its targets are no longer there.`);
+    const rows = [];
+    for (const input of inputs) {
+      const target = input?.targetUuid ? await fromUuid(input.targetUuid) : null;
+      if (!target) throw new Error(loc`A target of this damage is no longer there.`);
+      rows.push(
+        `${esc(target.name)}: ${esc(Number(input.damage) || 0)} ${esc(input.kind ?? "lethal")}${input.critical === true ? loc` (a critical hit)` : ""}`
+      );
+    }
+    return `${loc`${esc(user.name)} applies damage to ${inputs.length} targets. Allow it?`}<br>${rows.join("<br>")}`;
+  },
+  async run({ messageId, inputs = [] }) {
+    const message = game.messages.get(messageId);
+    if (!message) throw new Error(loc`The damage card is no longer there.`);
+    const done = [],
+      missed = [];
+    for (const input of inputs) {
+      const target = input?.targetUuid ? await fromUuid(input.targetUuid) : null;
+      const result = target ? await applyDamage(message, { ...input, targetUuid: input.targetUuid }) : false;
+      (result ? done : missed).push(target ? targetLabel(target) : loc`a missing target`);
+    }
+    return { done, missed };
   }
 });
 
@@ -848,7 +878,7 @@ export async function applyBlast(message, options = {}) {
       ...[...measured.values()].map(row => row.actor),
       ...targetChoices().actors.filter(actor => !measured.has(actor.uuid))
     ].filter(actor => actor.isOwner || gcAvailable());
-    if (!actors.length) return ui.notifications.warn(loc`There is no character to apply the blast to.`);
+    if (!actors.length) return refuse(loc`There is no character to apply the blast to.`);
     const rows = actors
       .map((actor, index) => {
         const row = measured.get(actor.uuid);
@@ -874,25 +904,75 @@ export async function applyBlast(message, options = {}) {
         .map(row => ({ uuid: row.uuid, distanceFeet: Number(row.feet) || 0 }))
     };
   }
-  if (!input.targets.length) return ui.notifications.warn(loc`Tick at least one character caught in the blast.`);
-  const results = [];
-  for (const row of input.targets) {
-    const at = blastDamageAt(rolled, row.distanceFeet, increment);
-    if (at.damage < 1) continue;
-    results.push(
-      await applyDamage(message, {
-        targetUuid: row.uuid,
-        damage: at.damage,
-        kind: input.kind ?? profile.kind,
-        type: input.type ?? profile.type,
-        attackKind: input.attackKind ?? attackKind,
-        armorPiercing: input.armorPiercing ?? profile.armorPiercing,
-        armorPiercingAll: input.armorPiercingAll === true,
-        blast: true
-      })
-    );
+  if (!input.targets.length) return refuse(loc`Tick at least one character caught in the blast.`);
+  const inputs = input.targets
+    .map(row => ({ row, at: blastDamageAt(rolled, row.distanceFeet, increment) }))
+    .filter(({ at }) => at.damage >= 1)
+    .map(({ row, at }) => ({
+      targetUuid: row.uuid,
+      damage: at.damage,
+      kind: input.kind ?? profile.kind,
+      type: input.type ?? profile.type,
+      attackKind: input.attackKind ?? attackKind,
+      armorPiercing: input.armorPiercing ?? profile.armorPiercing,
+      armorPiercingAll: input.armorPiercingAll === true,
+      blast: true
+    }));
+  const { done, missed } = await applyDamageBatch(message, inputs);
+  await postBatchSummary(message, done, missed);
+  return done;
+}
+
+/**
+ * Apply damage to several targets. Targets this user owns are settled here, one after another; all the others go to
+ * the GC as ONE request, so the GC answers a single Allow card instead of one per target and the player waits once.
+ * @returns {Promise<{done: string[], missed: string[]}>} target labels the damage reached, and did not
+ */
+export async function applyDamageBatch(message, inputs) {
+  const done = [],
+    missed = [],
+    relayed = [];
+  for (const input of inputs) {
+    const target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
+    if (target && !target.isOwner && !game.user?.isGM && gcAvailable()) {
+      relayed.push(input);
+      continue;
+    }
+    const result = await applyDamage(message, input);
+    (result ? done : missed).push(target ? targetLabel(target) : input.targetUuid);
   }
-  return results;
+  if (relayed.length) {
+    try {
+      ui.notifications.info(loc`Sent to the GC: damage to ${relayed.length} target(s).`);
+      const answer = await askGC("applyDamageMany", { messageId: message.id, inputs: relayed });
+      done.push(...(answer?.done ?? []));
+      missed.push(...(answer?.missed ?? []));
+    } catch (error) {
+      refuse(error.message);
+      for (const input of relayed) {
+        const target = fromUuidSync(input.targetUuid);
+        missed.push(target ? targetLabel(target) : input.targetUuid);
+      }
+    }
+  }
+  return { done, missed };
+}
+
+/** One line per outcome after a multi-target apply; a target the damage did not reach is always named. */
+async function postBatchSummary(message, done, missed) {
+  if (done.length + missed.length < 2 && !missed.length) return;
+  const lines = [
+    ...(done.length > 1
+      ? [loc`Damage applied to ${done.length} targets: ${done.join(", ")}.`]
+      : done.length
+        ? [loc`Damage applied to ${done[0]}.`]
+        : []),
+    ...(missed.length ? [loc`Not applied to: ${missed.join(", ")}. Check the warnings and apply those by hand.`] : [])
+  ];
+  await ChatMessage.create({
+    speaker: message.speaker,
+    content: `<div class="spycraft2 chat-note">${lines.map(line => `<p>${esc(line)}</p>`).join("")}</div>`
+  });
 }
 
 /** The apply dialog's defaults for one target, so a click can apply them without opening it. */
@@ -941,16 +1021,12 @@ const targetedForDamage = () =>
  * @param {Actor[]} targets
  */
 export async function applyDamageToEach(message, targets) {
-  const done = [];
-  for (const target of targets) {
-    const result = await applyDamage(message, quickApplyInput(message, target.uuid));
-    if (result) done.push(targetLabel(target));
-  }
-  if (done.length > 1)
-    await ChatMessage.create({
-      speaker: message.speaker,
-      content: `<div class="spycraft2 chat-note"><p>${esc(loc`Damage applied to ${done.length} targets: ${done.join(", ")}.`)}</p></div>`
-    });
+  const { done, missed } = await applyDamageBatch(
+    message,
+    targets.map(target => quickApplyInput(message, target.uuid))
+  );
+  // The summary names any target the damage did not reach, so a refusal is never reported as applied.
+  await postBatchSummary(message, done, missed);
   return done;
 }
 

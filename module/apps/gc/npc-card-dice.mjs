@@ -12,9 +12,9 @@ import { rollPipeline } from "../../rules/roll-pipeline.mjs";
 import { gcDieType } from "../../rules/gc/gc-spend.mjs";
 import { spendProfile } from "./npc-play.mjs";
 import { spendGCDice } from "./spend.mjs";
+import { resolveSkillResult } from "../../rules/checks.mjs";
 import { loc } from "../../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 /** NPC skill rolls are posted as plain checks that name the skill (module/apps/gc/npc-play.mjs). */
 const npcCheckKind = check =>
   ["attack", "skill", "save", "ability", "knowledge"].includes(check.checkKind) || !!check.npcSkill;
@@ -29,7 +29,11 @@ const npcOpen = ({ check, actor, user }) =>
   !check.superseded &&
   npcCheckKind(check);
 
-/** Add a GC boost to the card: the new total, and a line under the result saying where it came from. */
+/**
+ * Add a GC boost to the card. The boost is kept in the card's flags, like an agent's boost, and the result is worked
+ * out again through the cap, threat and Triumph rules. The card's content is left alone: a roll card shows its dice
+ * breakdown only while its content is plain, so appending a line there would hide the dice.
+ */
 export async function gcBoostCard(message, actor) {
   if (!gcBoostable(message.flags?.spycraft2)) {
     ui.notifications.warn(loc`This card can no longer be boosted.`);
@@ -38,15 +42,20 @@ export async function gcBoostCard(message, actor) {
   const result = await spendGCDice({ id: "boostRoll", actor });
   if (!result?.die) return null;
   const check = message.flags.spycraft2,
-    before = Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : check.rawTotal,
-    total = before + result.die.total;
+    boostTotal = (check.boostTotal ?? 0) + result.die.total,
+    resolved = resolveSkillResult(check.rawTotal, check.naturalDie, {
+      cap: check.cap ?? null,
+      threat: check.threat ?? 0,
+      actionDieBonus: boostTotal
+    });
   await message.update({
-    "flags.spycraft2.effectiveTotal": total,
-    "flags.spycraft2.boostTotal": (check.boostTotal ?? 0) + result.die.total,
-    "flags.spycraft2.gcBoosts": [...(check.gcBoosts ?? []), result.die.total],
-    content: `${message.content ?? ""}<p class="spycraft2 sc2-gc-boost">${esc(loc`GC boost +${result.die.total}: total ${total}.`)}</p>`
+    "flags.spycraft2.effectiveTotal": resolved.total,
+    "flags.spycraft2.boostTotal": boostTotal,
+    "flags.spycraft2.capped": resolved.limited,
+    "flags.spycraft2.potentialTriumph": ["skill", "knowledge", "attack"].includes(check.checkKind) && resolved.triumph,
+    "flags.spycraft2.gcBoosts": [...(check.gcBoosts ?? []), result.die.total]
   });
-  return total;
+  return resolved.total;
 }
 
 /** Pay for an NPC's confirmed threat from the GC pool and record the critical on its card. */

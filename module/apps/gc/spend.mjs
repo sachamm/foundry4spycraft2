@@ -33,13 +33,16 @@ const gmWhisper = () => ChatMessage.getWhisperRecipients("GM").map(user => user.
 
 /** Roll one exploding action die. In a dramatic scene the GC's dice also explode on a natural 1 (p.424). */
 export async function rollGCDie(faces, { explodeLow = false } = {}) {
-  const rolls = [];
+  const rolls = [],
+    rollObjects = [];
   for (let i = 0; i < 100; i++) {
     const roll = await new Roll(`1d${faces}`).evaluate();
     rolls.push(roll.total);
+    rollObjects.push(roll);
     if (actionDieTotal(faces, rolls, { explodeLow }).complete) break;
   }
-  return { faces, rolls, total: rolls.reduce((sum, value) => sum + value, 0) };
+  // rollObjects go on the spend's chat card, so the dice behind the total can be seen (and animated).
+  return { faces, rolls, rollObjects, total: rolls.reduce((sum, value) => sum + value, 0) };
 }
 
 const npcActors = () => {
@@ -198,7 +201,9 @@ export async function spendGCDice(input = {}) {
   await ChatMessage.create({
     speaker: { alias: loc`Game Control` },
     content: lines.join("<br>"),
-    ...(input.public ? {} : { whisper: gmWhisper() })
+    ...(die?.rollObjects?.length ? { rolls: die.rollObjects } : {}),
+    // A private spend stays private: whispered to the GC, and its dice shown only there.
+    ...(input.public ? {} : { whisper: gmWhisper(), blind: true })
   });
   return { plan, die };
 }
