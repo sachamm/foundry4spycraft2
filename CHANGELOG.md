@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **GC console:** its row actions (complete, faced, ignore, remove, next step, manage) are real buttons, and section
+  titles are plain text inside each disclosure, so screen readers announce one toggle per section instead of a
+  heading buried in a button. The console looks the same.
 - **Item sheets and the catalog: real buttons.** Pay, refund, issue, repair, battery, signal, gadget and planning
   actions on item sheets, and entries in the catalog list, are now buttons that still read as text in their sentence.
   Bonus and mechanism rows have named add and remove buttons, and the catalog's search and group fields are labelled.

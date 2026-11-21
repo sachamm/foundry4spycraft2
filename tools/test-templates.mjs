@@ -92,10 +92,10 @@ test("the Play tab renders the same markup as one file did (whitespace aside)", 
 });
 
 const SHEET_TEMPLATES = paths.filter(path =>
-  /templates\/(actor\/(agent-|play\/|parts\/|npc-|vehicle-sheet)|item\/|apps\/browser)/.test(path)
+  /templates\/(actor\/(agent-|play\/|parts\/|npc-|vehicle-sheet)|item\/|apps\/)/.test(path)
 );
 
-test("sheet and catalog templates author buttons, not action links, and every button has a name", () => {
+test("sheet, catalog and console templates author buttons, not action links, and every button has a name", () => {
   assert.ok(SHEET_TEMPLATES.length > 20);
   const env = createEnvironment();
   for (const path of SHEET_TEMPLATES) {
