@@ -53,37 +53,31 @@ export function bookIndex(bookText, size) {
 
 /**
  * Every run of words in `text` that the book holds word for word, longest first: { start, length, prose, run }.
- * A run grows only while the next window continues the same place in the book.
+ * Each place in the book is followed on its own, so a run grows only while the next window continues the same
+ * passage, and an earlier match never hides a longer one that starts a few words later. A run that lies inside a
+ * longer one is left out.
  */
 export function matchingRuns(text, { index, size }) {
   const w = words(text),
-    runs = [];
-  let active = null,
-    start = 0;
-  const close = end => {
-    if (!active) return;
-    const length = end - start + size - 1,
-      run = w.slice(start, start + length);
-    runs.push({ start, length, prose: proseShare(run) >= 0.3, run: run.join(" ") });
-    active = null;
-  };
-  for (let i = 0; i + size <= w.length; i++) {
-    const at = index.get(w.slice(i, i + size).join(" "));
-    if (active && at) {
-      const next = at.filter(p => active.has(p - 1));
-      if (next.length) {
-        active = new Set(next);
-        continue;
-      }
-    }
-    close(i);
-    if (at) {
-      active = new Set(at);
-      start = i;
-    }
+    spans = [];
+  // Book offset (book position minus text position) -> text position where that alignment began.
+  let open = new Map();
+  const windows = Math.max(0, w.length - size + 1);
+  for (let i = 0; i <= windows; i++) {
+    const at = i < windows ? (index.get(w.slice(i, i + size).join(" ")) ?? []) : [],
+      next = new Map();
+    for (const p of at) next.set(p - i, open.get(p - i) ?? i);
+    for (const [offset, from] of open) if (!next.has(offset)) spans.push({ start: from, length: i - from + size - 1 });
+    open = next;
   }
-  close(Math.max(0, w.length - size + 1));
-  return runs.sort((a, b) => b.length - a.length);
+  spans.sort((a, b) => b.length - a.length || a.start - b.start);
+  const runs = [];
+  for (const span of spans) {
+    if (runs.some(r => r.start <= span.start && span.start + span.length <= r.start + r.length)) continue;
+    const run = w.slice(span.start, span.start + span.length);
+    runs.push({ ...span, prose: proseShare(run) >= 0.3, run: run.join(" ") });
+  }
+  return runs;
 }
 
 function* strings(value, path = "") {

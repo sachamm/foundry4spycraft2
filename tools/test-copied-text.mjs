@@ -25,6 +25,16 @@ test("windows found in different places of the book do not join into one run", (
   );
 });
 
+test("a match that starts a word later is not hidden by an earlier, shorter one", () => {
+  const w = sentence.split(" ");
+  // One passage holds words 0-8 of the string, another holds words 1-12: the copied run is 12 words long.
+  const book = bookIndex(`${w.slice(0, 9).join(" ")} zebra quartz ${w.slice(1, 13).join(" ")}`, 8);
+  const runs = matchingRuns(w.slice(0, 13).join(" "), book);
+  assert.equal(runs[0].length, 12);
+  assert.equal(runs[0].start, 1);
+  assert.ok(runs.every(run => run.length <= 12));
+});
+
 test("a long label run does not hide a shorter prose run in the same string", () => {
   const labels =
     "Driving Electronics Mechanics Medicine Notice Search Sneak Tactics Bluff Prestidigitation Analysis Athletics Acrobatics Resolve Sense Motive Survival Falsify Intimidate Manipulate Networking";
