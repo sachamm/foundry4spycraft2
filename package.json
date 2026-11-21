@@ -14,7 +14,8 @@
     "format:check": "prettier --check \"**/*.mjs\"",
     "check:schemas": "node tools/check-schemas.mjs",
     "strings": "node tools/extract-strings.mjs",
-    "check:copy": "node tools/check-copied-text.mjs"
+    "check:copy": "node tools/check-copied-text.mjs",
+    "release:check": "node tools/check-release.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Release pipeline:** a release now runs every check a pull request runs (lint, formatting, packs and sheet
+  layouts) before packaging, refuses a tag that does not match `system.json` and the changelog, and attaches
+  checksums. Prereleases are packaged by the same workflow. `npm run release:check` does the same check locally and
+  scans for copied rulebook wording. CI also fails when the build changes committed generated files. Four one-off
+  workflows for old tags and deleted branches are gone, and lint now rejects Foundry's deprecated globals.
 - **Refusals are reported as refusals.** About 200 places that warned and stopped ("roll the save first", "no
   helper has posted yet") used to hand back the warning itself, which the code treated as success: a chat button
   said "Action finished", and a follow-up step carried on with the warning as its result. They now report "Not done:

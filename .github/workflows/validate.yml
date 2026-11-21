@@ -1,8 +1,11 @@
 name: Validate
+# Every check a change must pass. Pull requests and main run it directly; the release workflow calls it before it
+# packages anything, so a release can never skip a check that a pull request had to pass.
 on:
   push:
-    branches: [main, "audit/**"]
+    branches: [main]
   pull_request:
+  workflow_call:
 permissions:
   contents: read
 jobs:
@@ -18,6 +21,12 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run build
+      - name: Generated files are committed and current
+        run: |
+          if ! git diff --exit-code --stat; then
+            echo "::error::npm run build changed committed files. Run it locally and commit the result."
+            exit 1
+          fi
       - run: npm test
       - run: npm run test:packs
       - name: Verify built output parses
