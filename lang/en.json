@@ -1688,7 +1688,11 @@
    "StandardValue": "Standard {value}; {state}",
    "RemovePick": "Remove {category} pick",
    "NpcType": "NPC type",
-   "ScoreOf": "{name} score"
+   "ScoreOf": "{name} score",
+   "AddBonus": "Add bonus",
+   "RemoveBonus": "Remove bonus",
+   "CatalogGroup": "Catalog group",
+   "SearchCatalog": "Search the catalog"
   },
   "Text": {
    "0S_1a8inmy": "0 s",

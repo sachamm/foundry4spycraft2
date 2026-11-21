@@ -25,8 +25,8 @@
 .spycraft2.browser .filters { gap: var(--sc2-space-2); }
 .spycraft2.browser .filters label { display: inline-flex; align-items: center; gap: 6px; }
 .spycraft2.browser .browser-list li { align-items: flex-start; gap: var(--sc2-space-2); padding: 6px 4px; }
-.spycraft2.application.browser .row-main a.name { font-weight: 700; color: var(--sc2-ink-strong); cursor: pointer; }
-.spycraft2.application.browser .row-main a.name:hover { color: var(--sc2-teal); text-decoration: underline; }
+.spycraft2.application.browser .row-main .name { font-weight: 700; color: var(--sc2-ink-strong); cursor: pointer; }
+.spycraft2.application.browser .row-main .name:hover { color: var(--sc2-teal); text-decoration: underline; }
 .spycraft2.browser .row-main .summary { display: block; margin-top: 2px; line-height: 1.4; }
 .spycraft2.application.browser li button[data-action="add"] { flex: 0 0 var(--sc2-control); background: var(--sc2-paper-raised); border-color: var(--sc2-rule); }
 .spycraft2.application.browser li button.owned { background: var(--sc2-teal-tint); border-color: var(--sc2-good); }
