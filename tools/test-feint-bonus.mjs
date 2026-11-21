@@ -9,7 +9,7 @@ import {
 } from "../module/rules/feint-bonus.mjs";
 import { grantFeintCriticalBonus, validateFeintAttackBonusProof } from "../module/apps/feint-bonus.mjs";
 import { rollEvidence } from "../module/rules/outcomes.mjs";
-import { queueResources } from "../module/rules/transactions.mjs";
+import { queueResources } from "../module/services/transactions.mjs";
 foundry.utils.escapeHTML = String;
 let draw = async () => {},
   mode = "normal",

@@ -2,7 +2,7 @@ import { completeCharacterTarget } from "./character-target.mjs";
 import { dartingDeclarationPlan, dartingFinalAttackPlan, FINAL_ATTACK_TRADEOFFS } from "../rules/darting.mjs";
 import { dartingStyleState } from "../rules/darting-state.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { finalAttackOptions, postFinalAttack } from "./final-attack.mjs";
 import { standardAttackContextContent } from "./standard-attack-context.mjs";
 import { loc } from "../i18n.mjs";

@@ -1,6 +1,5 @@
 import { readiedItemsForCheck } from "./readied-replacement.mjs";
-import { readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
-import { readiedDisarmWeapons } from "./disarm-response.mjs";
+import { readiedDisarmWeapons, readiedMeleeFeatSource, readiedMeleeWeapons } from "./readied-weapons.mjs";
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 /** Fencing Basics p.178: current qualified feat plus a readied 1h FIN sword.

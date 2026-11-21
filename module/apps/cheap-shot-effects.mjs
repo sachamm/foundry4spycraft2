@@ -5,7 +5,7 @@ import {
   cheapShotRecoveryPlan,
   validateCheapShotRecoveryProof
 } from "../rules/cheap-shot-effects.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { loc } from "../i18n.mjs";

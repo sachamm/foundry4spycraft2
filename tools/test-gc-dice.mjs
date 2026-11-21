@@ -10,7 +10,7 @@ import {
   reviewGCDiceSettlement,
   withGCPeriodLock,
   recordGCHint
-} from "../module/rules/gc-dice.mjs";
+} from "../module/services/gc-dice.mjs";
 let settings = { usagePeriods: { session: "session1" }, gcActionDice: {} };
 globalThis.game = {
   user: { isGM: true },

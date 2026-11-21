@@ -1,4 +1,4 @@
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { reserveValue, getReserveReview } from "../rules/reserve-transactions.mjs";
 import { loc } from "../i18n.mjs";
 import { systemDialog } from "./dialog-theme.mjs";

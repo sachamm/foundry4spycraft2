@@ -7,7 +7,7 @@ import {
   actionDicePaymentRefund
 } from "./bonus-pools.mjs";
 import { shakenRules } from "./shaken.mjs";
-import { RESOURCE_LOCK_ID } from "./transactions.mjs";
+import { RESOURCE_LOCK_ID } from "./resource-locks.mjs";
 import { loc } from "../i18n.mjs";
 const active = new WeakMap(),
   local = new WeakMap(),

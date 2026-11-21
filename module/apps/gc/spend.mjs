@@ -1,7 +1,7 @@
 /** Spending GC action dice (pp.397–399, 424, 452): pay from the session pool, roll the right die and apply what can be applied. */
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
-import { adjustGCDice, gcDiceStatus } from "../../rules/gc-dice.mjs";
+import { adjustGCDice, gcDiceStatus } from "../../services/gc-dice.mjs";
 import { GC_SPENDS, planSpend, actionDieTotal } from "../../rules/gc/gc-spend.mjs";
 import { campaignQuality, qualityAddition } from "../../rules/gc/campaign.mjs";
 import { dramaticInitiative } from "../../rules/gc/fluid-initiative.mjs";

@@ -9,7 +9,7 @@ import {
 } from "../rules/power-stance.mjs";
 import { assertShakenInitiativeCountReady, changeInitiativeCountPreservingShaken } from "./shaken-initiative.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
-import { isResourceLock, periodResourceActors } from "../rules/transactions.mjs";
+import { isResourceLock, periodResourceActors } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const localReviews = new WeakMap(),
   jobs = new Map(),

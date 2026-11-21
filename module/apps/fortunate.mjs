@@ -1,6 +1,6 @@
 /** Fortunate on the Main tab: the GC grants the requested d4 and its match (see module/rules/fortunate.mjs). */
 import { fortunatePool, fortunateMatchNote, FORTUNATE_MATCH } from "../rules/fortunate.mjs";
-import { adjustGCDice, gcDiceStatus } from "../rules/gc-dice.mjs";
+import { adjustGCDice, gcDiceStatus } from "../services/gc-dice.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
 import { loc } from "../i18n.mjs";
 

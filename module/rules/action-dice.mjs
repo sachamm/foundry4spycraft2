@@ -1,6 +1,6 @@
 import { rollPipeline } from "./roll-pipeline.mjs";
 import { shakenRules } from "./shaken.mjs";
-import { errorDecisionPending } from "./outcomes.mjs";
+import { errorDecisionPending } from "./check-candidates.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { trademarkBoost } from "./favored-gear.mjs";
 import { loc } from "../i18n.mjs";

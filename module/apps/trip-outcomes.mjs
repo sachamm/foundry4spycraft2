@@ -1,7 +1,7 @@
 import { reconcilePowerStanceInitiative } from "./power-stance.mjs";
 import { validateCounterTripReceipt, tripActiveCombatantId } from "./counter-trip.mjs";
 import { tripOutcomePlan } from "../rules/trip-outcomes.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";

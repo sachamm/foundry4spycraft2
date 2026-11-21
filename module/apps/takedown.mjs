@@ -8,7 +8,7 @@ import {
   currentTakedownSave
 } from "../rules/takedown.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";

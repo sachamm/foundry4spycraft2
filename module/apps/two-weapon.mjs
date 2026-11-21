@@ -3,7 +3,7 @@ import { standardAttackContextContent, standardAttackContextInput } from "./stan
 import { twoWeaponDeclarationPlan, twoWeaponFinalAttackPlan } from "../rules/two-weapon.mjs";
 import { twoWeaponStyleState } from "../rules/two-weapon-state.mjs";
 import { expertiseCombatContext } from "./combat-expertise.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const isMap = v => v !== null && typeof v === "object" && !Array.isArray(v);
 const roundKey = c => `${encodeURIComponent(c.id).replaceAll(".", "%2E")}:${c.round}`;

@@ -27,7 +27,7 @@ import { unnervingGrade, unnervingEligible, unnervingPlan } from "../../rules/un
 import { hasSneakAttackSource, sneakAttackDamagePlan } from "../../rules/sneak-attack.mjs";
 import { gameHunterAttack, cunningPlanEffect } from "../../rules/class-checks.mjs";
 import { millionDollarSkillPlan } from "../../rules/sniper.mjs";
-import { queueResources, isResourceLock } from "../../rules/transactions.mjs";
+import { queueResources, isResourceLock } from "../../services/transactions.mjs";
 import { specialistApplies } from "../../rules/weapon-specialist.mjs";
 import { weaponDamage, cleanAndPolishedApplies } from "../../rules/gear.mjs";
 import { askFollowUp } from "../../rolls/dialogs/follow-ups.mjs";

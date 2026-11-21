@@ -5,7 +5,7 @@ import { shakenApplicationSnapshot } from "../rules/shaken.mjs";
 import { applyShakenLocked } from "./shaken-application.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { conditionDuration } from "../rules/timers.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 async function write(actor, patch, proof) {

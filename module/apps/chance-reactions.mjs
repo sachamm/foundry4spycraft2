@@ -5,7 +5,7 @@ import {
   misfortuneEligible,
   fortunesFoolEligible
 } from "../rules/chance-reactions.mjs";
-import { adjustGCDice } from "../rules/gc-dice.mjs";
+import { adjustGCDice } from "../services/gc-dice.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 

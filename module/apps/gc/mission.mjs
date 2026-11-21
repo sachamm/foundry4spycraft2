@@ -27,8 +27,8 @@ import {
   setCampaign
 } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
-import { startUsagePeriod } from "../../rules/periods.mjs";
-import { gcDiceStatus, initializeGCDice } from "../../rules/gc-dice.mjs";
+import { startUsagePeriod } from "../../services/periods.mjs";
+import { gcDiceStatus, initializeGCDice } from "../../services/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 
 const T = GC_DATA.tables;

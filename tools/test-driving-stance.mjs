@@ -11,7 +11,7 @@ import {
 import { settleDrivingStance, reviewDrivingStance } from "../module/apps/driving-stance.mjs";
 import { combatStanceDeclaration, combatStanceState } from "../module/rules/combat-stance.mjs";
 import { rollEvidence } from "../module/rules/outcomes.mjs";
-import { queueResources } from "../module/rules/transactions.mjs";
+import { queueResources } from "../module/services/transactions.mjs";
 let sequence = 0;
 const post = { mode: "normal", hook: async () => {} };
 const route = (outcome = "push", follow = false) => ({ outcome, follow, routeConfirmed: true, outcomeConfirmed: true });

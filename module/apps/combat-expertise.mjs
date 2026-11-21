@@ -1,7 +1,7 @@
 import { combatExpertisePlan } from "../rules/combat-expertise.mjs";
 import { attributeActionBlock } from "../rules/attributes.mjs";
 import { restraintActionBlock } from "../rules/restraints.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { loc } from "../i18n.mjs";
 export function expertiseCombatContext(actor) {
   const c = actor.participatingCombat,

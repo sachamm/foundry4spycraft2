@@ -23,8 +23,8 @@ import {
   refreshUsagePeriodActors,
   getUsagePeriodReview,
   reviewUsagePeriod
-} from "./module/rules/periods.mjs";
-import { nativeResourceLocks, periodResourceActors, registerLockRecovery } from "./module/rules/transactions.mjs";
+} from "./module/services/periods.mjs";
+import { nativeResourceLocks, periodResourceActors, registerLockRecovery } from "./module/services/transactions.mjs";
 import {
   manageGCDice,
   gcDiceStatus,
@@ -32,7 +32,7 @@ import {
   adjustGCDice,
   reviewGCDiceSettlement,
   recordGCHint
-} from "./module/rules/gc-dice.mjs";
+} from "./module/services/gc-dice.mjs";
 import { SPYCRAFT } from "./module/config.mjs";
 import {
   registerGCSettings,

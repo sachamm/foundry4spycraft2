@@ -236,7 +236,7 @@ test("only the GC may award dice or settle XP, and awards require the session GC
 });
 
 import { actionDiceFundingContext } from "../module/rules/bonus-pools.mjs";
-import { spendGCDice } from "../module/rules/gc-dice.mjs";
+import { spendGCDice } from "../module/services/gc-dice.mjs";
 const awardInput = { count: 1, reason: "QA ordinary award" };
 async function pendingAward(kind = "player") {
   reset();

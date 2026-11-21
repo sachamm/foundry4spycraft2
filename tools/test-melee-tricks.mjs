@@ -260,7 +260,7 @@ test("Side die and combined Hack/All-out damage share the same actual result wit
   await grantSideStanceFeint(a, f.s, f.feint);
   const m = await attack(a, { allOutPenalty: 2 });
   Object.assign(m.flags.spycraft2, { resolved: true, successConfirmed: true });
-  const { queueResources } = await import("../module/rules/transactions.mjs");
+  const { queueResources } = await import("../module/services/transactions.mjs");
   const d = await queueResources([a], () =>
     damage(a, m, {
       includeSneakAttack: true,

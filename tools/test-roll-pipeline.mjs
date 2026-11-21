@@ -689,6 +689,57 @@ test("every contributor is registered once, in the documented order", () => {
   assert.equal(new Set(EXPECTED_ORDER).size, EXPECTED_ORDER.length);
 });
 
+// The chat-card buttons, in the order they are offered. Players learn where a button sits, so moving or renaming a
+// module must not reshuffle them; change this list only on purpose.
+const EXPECTED_CHAT_CONTROLS = [
+  "restraintEscapeControl",
+  "gearAcquisitionControl",
+  "cunningPlanControl",
+  "manualAdjustmentControl",
+  "requiredBonusControl",
+  "criticalControl",
+  "quickBoostControl",
+  "gcNpcDiceControl",
+  "boostControl",
+  "generousControl",
+  "opposedCheckControl",
+  "rerollControl",
+  "attackResolutionControl",
+  "confirmControl",
+  "finishControl",
+  "unnervingControl",
+  "strutControl",
+  "cooperativeControl",
+  "tauntControl",
+  "diversionControl",
+  "hazardSaveControl",
+  "fireActionControl",
+  "opportunistDamageControl",
+  "duelingControls",
+  "blastControl",
+  "kickControls",
+  "wrestlingControls",
+  "autofireMasteryControl",
+  "chanceReactionControls",
+  "duelingReachControl",
+  "brawlingSupremacyControl",
+  "noQuarterControl",
+  "trickShotControl",
+  "handOfGodControl",
+  "calledShotControl",
+  "blastMapControl",
+  "woundDropControl",
+  "shatterWeaponControl",
+  "applyDamageControl",
+  "medicalAidControl",
+  "reportedSaveControl"
+];
+
+test("chat-card controls keep their order", () => {
+  assert.deepEqual(rollPipeline.idsFor("chatControls"), EXPECTED_CHAT_CONTROLS);
+  assert.throws(() => rollPipeline.idsFor("noSuchPhase"), /Unknown roll pipeline phase/);
+});
+
 test("every module that registers a contributor is loaded by the contributor index", async () => {
   const { readdir, readFile } = await import("node:fs/promises");
   const root = new URL("../module/", import.meta.url);

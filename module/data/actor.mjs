@@ -9,7 +9,7 @@ import { getRestraintReleaseReview, getPendingRestraintMoves } from "../rules/re
 import { getReserveReview } from "../rules/reserve-transactions.mjs";
 import { conditionNpcProfile, npcSkillConditionContext } from "../rules/npc-conditions.mjs";
 import { getBaffledReview } from "../rules/baffled.mjs";
-import { isResourceLock } from "../rules/transactions.mjs";
+import { isResourceLock } from "../services/transactions.mjs";
 import { pointmanLevel } from "../rules/action-dice.mjs";
 import { defaultNpcProfile, computeNpcProfile, npcTableValue } from "../rules/npcs.mjs";
 const missionThreatLevelSetting = () => {

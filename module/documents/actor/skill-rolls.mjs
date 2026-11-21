@@ -20,7 +20,7 @@ import { littleDetailsSource } from "../../rules/little-details.mjs";
 import { breakthroughPlan, nestPlan } from "../../rules/breakthrough.mjs";
 import { brightIdeaPoolStatus } from "../../rules/bright-idea.mjs";
 import { difficultSkillBonusPlan, checkBonusPool } from "../../rules/bonus-pools.mjs";
-import { queueResources, isResourceLock } from "../../rules/transactions.mjs";
+import { queueResources, isResourceLock } from "../../services/transactions.mjs";
 import { resourceStatus, resourceUsePlan } from "../../rules/limited-uses.mjs";
 import { resolveKnowledgeCheck } from "../../rules/knowledge.mjs";
 import { equipmentCategory, possessionUnavailable, cleanAndPolishedApplies } from "../../rules/gear.mjs";

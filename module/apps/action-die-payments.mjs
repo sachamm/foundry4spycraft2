@@ -1,4 +1,4 @@
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { actionDicePoolFingerprint } from "../rules/bonus-pools.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import {

@@ -8,38 +8,8 @@ import { cooperativeNotes } from "./cooperative.mjs";
 import { resolveSkillResult } from "./checks.mjs";
 import { describeModifiers } from "./roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
-const skillCheck = check => ["skill", "knowledge"].includes(check.checkKind);
-const triumphCheck = check => skillCheck(check) || check.checkKind === "attack";
-/** A natural range is a candidate until success/failure is known, pp.96–97,329–330. */
-export function checkCandidates(check) {
-  const natural = check.naturalDie,
-    rolled = (check.checkMethod ?? "roll") === "roll" && natural != null;
-  const threat =
-    rolled && check.threat > 0 && natural >= check.threat && (check.checkKind !== "save" || check.forcedThreat);
-  const naturalError =
-    !check.cannotError && rolled && check.checkKind !== "save" && check.error > 0 && natural <= check.error;
-  const negative =
-    !check.cannotError &&
-    (skillCheck(check) || check.checkKind === "attack") &&
-    Number.isFinite(check.effectiveTotal) &&
-    check.effectiveTotal < 0;
-  return {
-    threat: !!threat,
-    naturalError: !!naturalError,
-    negative,
-    error: !!naturalError || negative,
-    triumph: triumphCheck(check) && check.effectiveTotal >= 75
-  };
-}
-export function errorDecisionPending(check) {
-  const candidates = checkCandidates(check);
-  return (
-    !(check.boostSpent > 0) &&
-    !check.errorActivationDeclined &&
-    (candidates.negative ||
-      (candidates.naturalError && (check.successConfirmed !== true || check.allOrNothing === true)))
-  );
-}
+import { checkCandidates, errorDecisionPending, triumphCheck } from "./check-candidates.mjs";
+export { checkCandidates, errorDecisionPending };
 export function adjudicateCheck(check, succeeded) {
   if (check.manualAdjustment && !succeeded)
     throw new Error(

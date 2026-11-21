@@ -33,10 +33,10 @@ import {
   manualAdjustmentPlan,
   cunningPlanCheck
 } from "../../rules/class-checks.mjs";
-import { queueResources } from "../../rules/transactions.mjs";
+import { queueResources } from "../../services/transactions.mjs";
 import { openingRound } from "../../rolls/chat-controls.mjs";
 import { finishGearAcquisition } from "../../apps/gear-acquisition.mjs";
-import { gcDiceStatus, spendGCDice, gcDiceController, refreshGCDiceTransaction } from "../../rules/gc-dice.mjs";
+import { gcDiceStatus, spendGCDice, gcDiceController, refreshGCDiceTransaction } from "../../services/gc-dice.mjs";
 import { criticalPlan } from "../../rules/criticals.mjs";
 import { applyCriticalChoice, criticalHitChoices, criticalMissChoices } from "../../rules/critical-effects.mjs";
 import {

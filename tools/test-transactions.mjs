@@ -15,7 +15,7 @@ import {
   BACKGROUND_LOCK_STALE_MS,
   recoverResourceTransaction,
   periodResourceActors
-} from "../module/rules/transactions.mjs";
+} from "../module/services/transactions.mjs";
 const records = new Map(),
   warnings = [];
 let nonce = 0,
@@ -30,7 +30,7 @@ import {
   gcDiceStatus,
   gcDiceController,
   recoverGCBookkeeping
-} from "../module/rules/gc-dice.mjs";
+} from "../module/services/gc-dice.mjs";
 const copy = structuredClone;
 class NativeActor {
   constructor(id, balance = 1, { source = null, uuid = `Actor.${id}`, isToken = false } = {}) {

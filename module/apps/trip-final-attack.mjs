@@ -1,5 +1,5 @@
 import { tripActiveCombatantId } from "./counter-trip.mjs";
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { tripFinalSource } from "./trip-outcomes.mjs";
 import { validOwnCountClock } from "../rules/own-count-duration.mjs";
 import {

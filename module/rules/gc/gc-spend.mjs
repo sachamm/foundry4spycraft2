@@ -1,6 +1,6 @@
 /**
  * Uses for GC action dice (pp.397–399, 424, 452) and what each costs.
- * The pool itself is managed by module/rules/gc-dice.mjs.
+ * The pool itself is managed by module/services/gc-dice.mjs.
  */
 import { GC_DATA } from "../gc-tables.mjs";
 import { loc } from "../../i18n.mjs";

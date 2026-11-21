@@ -13,7 +13,7 @@ import {
 import { requireSettledReserve, holdReserveReview } from "./reserve-review.mjs";
 import { rollEvidence, rollEvidenceMatches } from "../rules/outcomes.mjs";
 import { actionDiceFundingContext, actionDicePaymentPlan, unrestrictedBonusPools } from "../rules/bonus-pools.mjs";
-import { queueResources, isResourceLock } from "../rules/transactions.mjs";
+import { queueResources, isResourceLock } from "../services/transactions.mjs";
 import {
   PICK_CATEGORIES,
   DELIVERY,

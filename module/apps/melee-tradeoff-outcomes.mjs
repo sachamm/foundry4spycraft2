@@ -1,4 +1,4 @@
-import { queueResources } from "../rules/transactions.mjs";
+import { queueResources } from "../services/transactions.mjs";
 import { rollEvidence } from "../rules/outcomes.mjs";
 import { setConditionStatus } from "../rules/condition-status.mjs";
 import { attackDamageUseRows, reviewAttackDamageBenefit, attackTradeoffProof } from "./attack-damage-benefits.mjs";

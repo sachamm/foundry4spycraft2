@@ -260,7 +260,7 @@ test("GC cannot attach a component whose fixed amount was tampered with", async 
 });
 test("recording can run inside an existing base resource callback without nesting another base queue", async () => {
   const { a, m } = await hit(),
-    { queueResources } = await import("../module/rules/transactions.mjs"),
+    { queueResources } = await import("../module/services/transactions.mjs"),
     fixed = await queueResources([a], () => record(a, m));
   assert.equal(fixed.flags.spycraft2.stanceDamage.amount, 2);
   assert.equal(stanceDamageUseRows(a).length, 1);

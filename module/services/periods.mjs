@@ -1,10 +1,10 @@
-import { getActionDieSettlementReview } from "./action-die-payments.mjs";
-import { getRestraintReleaseReview, getPendingRestraintMoves } from "./restraints.mjs";
-import { getReserveReview } from "./reserve-transactions.mjs";
-import { getBaffledReview } from "./baffled.mjs";
+import { getActionDieSettlementReview } from "../rules/action-die-payments.mjs";
+import { getRestraintReleaseReview, getPendingRestraintMoves } from "../rules/restraints.mjs";
+import { getReserveReview } from "../rules/reserve-transactions.mjs";
+import { getBaffledReview } from "../rules/baffled.mjs";
 import { queueResources, periodResourceActors } from "./transactions.mjs";
 import { withGCPeriodLock } from "./gc-dice.mjs";
-import { actionDiceGain } from "./action-dice.mjs";
+import { actionDiceGain } from "../rules/action-dice.mjs";
 import { loc } from "../i18n.mjs";
 const clone = structuredClone,
   same = (a, b) => JSON.stringify(a) === JSON.stringify(b);

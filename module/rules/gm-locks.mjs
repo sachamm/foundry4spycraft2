@@ -2,7 +2,7 @@ import { loc } from "../i18n.mjs";
 /**
  * Resource locks arbitrated by the Game Control's client.
  *
- * The default lock is a document created on the character (module/rules/transactions.mjs). This alternative keeps
+ * The default lock is a document created on the character (module/services/transactions.mjs). This alternative keeps
  * the lock in the active GM's memory instead: a client asks the GM for the lock, works, and gives it back. Nothing
  * is written to the character, so an interrupted action leaves no document behind, and a client that disconnects
  * loses its locks automatically.

@@ -6,7 +6,7 @@ import {
   refreshUsagePeriodActors,
   getUsagePeriodReview,
   reviewUsagePeriod
-} from "../module/rules/periods.mjs";
+} from "../module/services/periods.mjs";
 let periods, review, gcPool, serial, failSetting, failActor, warnings;
 function actor(id, value, max, type = "agent") {
   return {
@@ -169,8 +169,8 @@ test("period-change derivation refresh reaches each world/unlinked actor once, k
   assert.match(warnings.at(-1), /did not refresh/);
 });
 
-import { queueResources } from "../module/rules/transactions.mjs";
-import { spendGCDice } from "../module/rules/gc-dice.mjs";
+import { queueResources } from "../module/services/transactions.mjs";
+import { spendGCDice } from "../module/services/gc-dice.mjs";
 import { startingDiceEntryPlan } from "../module/rules/starting-dice.mjs";
 async function pendingStart() {
   reset();

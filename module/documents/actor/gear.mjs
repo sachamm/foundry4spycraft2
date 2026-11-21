@@ -15,7 +15,7 @@ import { reviewReserveTransaction } from "../../apps/reserve-review.mjs";
 import { improvisationPlan } from "../../rules/class-gear.mjs";
 import { missionCaliberOptions, missionCaliberPlan } from "../../rules/mission-gear.mjs";
 import { masterThiefPlan } from "../../rules/class-checks.mjs";
-import { queueResources, isResourceLock } from "../../rules/transactions.mjs";
+import { queueResources, isResourceLock } from "../../services/transactions.mjs";
 import { allocateMissionReserves, rollGearAcquisition, claimGearAcquisition } from "../../apps/gear-acquisition.mjs";
 import { armorGrantPlan, bigStickPlan } from "../../rules/gear.mjs";
 import { loc } from "../../i18n.mjs";

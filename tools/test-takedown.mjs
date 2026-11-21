@@ -88,7 +88,7 @@ test("actual Fortitude save is reserved before RNG, keeps fixed DC and ordinary 
 });
 test("concurrent save attempts retain one original receipt, even when called under the ordinary base resource queue", async () => {
   const { target, input } = await fixture(),
-    { queueResources } = await import("../module/rules/transactions.mjs"),
+    { queueResources } = await import("../module/services/transactions.mjs"),
     before = game.messages.length,
     results = await Promise.allSettled([
       queueResources([target], () => rollTakedown(target, input)),

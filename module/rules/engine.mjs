@@ -55,7 +55,7 @@ import { eagleEyeState, sniperMagicTouchBonus } from "./sniper.mjs";
 import { markPrerequisiteBonus } from "./marks.mjs";
 import { classGearWarnings } from "./class-gear.mjs";
 import { missionCaliberOptions, missionCaliberMatches } from "./mission-gear.mjs";
-import { isResourceLock } from "./transactions.mjs";
+import { isResourceLock } from "./resource-locks.mjs";
 import { improvedFortuneBonus, actionDieAwardSummary } from "./action-dice.mjs";
 import { currentReserves, reserveAllocations, managedAcquisition, hasProcure } from "./gear-acquisition.mjs";
 import { deathThreshold, activeDefenseBoost, activeFortunesOfWar, recoveryRatePlan } from "./health.mjs";
