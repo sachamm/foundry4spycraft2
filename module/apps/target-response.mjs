@@ -9,6 +9,7 @@
 import { checkIncomingDefense } from "./incoming-defense.mjs";
 import { applyDamage, damageCardTarget, quickApplyInput, targetLabel } from "./damage-application.mjs";
 import { loc } from "../i18n.mjs";
+import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
 /** Whether a player who owns this agent is connected: the GC then leaves the response to that player. */
 const playerPresent = actor =>
@@ -54,7 +55,7 @@ export function targetResponseControls({ message, check, user }) {
     const attacker = check.actorUuid ? fromUuidSync(check.actorUuid) : null;
     if (attacker?.isOwner) return [];
     const target = respondent(damageCardTarget(check)?.uuid, check, user);
-    const applied = Array.isArray(check.damageApplied) ? check.damageApplied : [];
+    const applied = appliedDamageEntries(check);
     if (!target || applied.some(entry => entry.targetUuid === target.uuid)) return [];
     const rolled = Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : message.rolls?.[0]?.total;
     const amount = Math.max(0, Math.trunc(Number(rolled) || 0));

@@ -130,15 +130,15 @@ test("attributes are priced once and invalid build inputs do not produce final X
   p.grades.attack = 11;
   assert.equal(computeNpcProfile(p).xp, null);
 });
-test("printed health anomalies remain explicit and visible", () => {
+test("the two Table 7.11 misprints are corrected, and the builder says so", () => {
   const p = profile();
   p.grades.health = 1;
   let r = computeNpcProfile(p, "special", 12);
-  assert.deepEqual(r.health, [26, 14]);
-  assert.ok(r.manual.some(n => n.includes("anomalous")));
+  assert.deepEqual(r.health, [36, 14]);
+  assert.ok(r.manual.some(n => n.includes("corrected from the printed")));
   p.grades.health = 5;
   r = computeNpcProfile(p, "special", 9);
-  assert.deepEqual(r.health, [45, 10]);
+  assert.deepEqual(r.health, [45, 19]);
 });
 test("legacy manual mode is the default; villain resolves as a special role", () => {
   assert.equal(defaultNpcProfile().enabled, false);

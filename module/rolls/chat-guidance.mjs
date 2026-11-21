@@ -1,4 +1,5 @@
 import { loc } from "../i18n.mjs";
+import { appliedDamageEntries } from "../rules/damage-application.mjs";
 import { installResolutionGuide } from "../apps/resolution-guide.mjs";
 
 /** Only recorded outcomes count: a high die alone never implies a hit or success. */
@@ -7,7 +8,7 @@ export function checkGuidance(check) {
   if (check.superseded) return { title: loc`Replaced result`, note: loc`Use the newer roll to continue.` };
   if (!Number.isFinite(check.rawTotal)) return null;
   if (check.checkKind === "damage") {
-    const applied = Array.isArray(check.damageApplied) ? check.damageApplied.length : 0;
+    const applied = appliedDamageEntries(check).length;
     return applied
       ? {
           title: loc`Damage applied`,

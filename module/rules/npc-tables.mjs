@@ -9,7 +9,7 @@ export const NPC_RULES = {
   ],
   "notes": [
    "Transcribed from user-supplied AI rules markdown and cross-checked against both local rulebook PDFs.",
-   "Table 7.11 prints grade I / TL12 vitality as 26 and grade V / TL9 wounds as 10. These cells are preserved, not silently corrected."
+   "Corrected from printed: Table 7.11 prints grade I / TL12 vitality as 26 and grade V / TL9 wounds as 10. Grade I vitality rises by 3 per Threat Level and grade V wounds never fall, so these are 36 and 19 here."
   ]
  },
  "grades": [
@@ -1182,7 +1182,7 @@ export const NPC_RULES = {
      14
     ],
     [
-     26,
+     36,
      14
     ],
     [
@@ -1499,7 +1499,7 @@ export const NPC_RULES = {
     ],
     [
      45,
-     10
+     19
     ],
     [
      50,

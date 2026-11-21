@@ -200,7 +200,7 @@ export function computeNpcProfile(profile, type = "standard", threatLevel = 1, a
     ((grades.health === 1 && effectiveLevel === 12) || (grades.health === 5 && effectiveLevel === 9))
   )
     manual.push(
-      loc`This health cell is anomalous in both supplied PDFs (I/TL12: 26/14; V/TL9: 45/10). Value preserved as printed; GC ruling may be needed.`
+      loc`This health cell is corrected from the printed Table 7.11, which shows I/TL12 as 26/14 and V/TL9 as 45/10; the corrected values follow the table's pattern (36/14 and 45/19).`
     );
   if (type === "animal")
     manual.push(

@@ -868,6 +868,8 @@ export const ActorOutcomes = Base =>
               baseCost: plan.baseCost,
               ...(payment?.surcharge ? { adjustedBaseCost: plan.cost, surcharge: payment.surcharge } : {}),
               effect: plan.effect,
+              // The ready-made effect chosen, if any: damage application reads it to set its defaults.
+              ...(typeof input.preset === "string" && input.preset ? { preset: input.preset } : {}),
               sources: paidPlan.sources,
               paymentReceiptId,
               funding: payment

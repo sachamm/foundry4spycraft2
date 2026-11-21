@@ -88,7 +88,10 @@ test("an applied-damage entry is added to the ones already there", async () => {
     userId: "owner",
     data: { messageId: "m1", key: "damageAppliedEntry", value: entry }
   });
-  assert.deepEqual(updates[0]["flags.spycraft2.damageApplied"], [message.flags.spycraft2.damageApplied[0], entry]);
+  // A keyed record: it never rewrites the records already on the card.
+  const [[path, value]] = Object.entries(updates[0]);
+  assert.match(path, /^flags\.spycraft2\.damageAppliedBy\.id\d+$/);
+  assert.deepEqual(value, entry);
 });
 
 test("the player whose character took the damage may record it on the attacker's card, and only that", async () => {
@@ -96,7 +99,7 @@ test("the player whose character took the damage may record it on the attacker's
   const entry = { targetUuid: "Actor.t1", name: "T", damage: 6, kind: "lethal" };
   const data = { messageId: "m1", key: "damageAppliedEntry", value: entry };
   assert.deepEqual(await handleRelay({ action: "markCard", userId: "other", data }), { value: true });
-  assert.deepEqual(updates[0]["flags.spycraft2.damageApplied"].at(-1), entry);
+  assert.deepEqual(Object.values(updates[0]).at(-1), entry);
   // Damage to a character that user does not own, and any other mark, are still refused.
   const elsewhere = { ...data, value: { ...entry, targetUuid: "y" } };
   assert.match((await handleRelay({ action: "markCard", userId: "other", data: elsewhere })).error, /own player/);

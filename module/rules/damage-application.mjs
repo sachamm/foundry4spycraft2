@@ -76,6 +76,41 @@ export function reducedDamage({ damage, dr = 0, armorPiercing = 0, armorPiercing
   return { damage, dr: effectiveDR, net, stopped: damage > 0 && net === 0 };
 }
 
+/** The ready-made critical effects that buy a Table of Ouch injury instead of wounds (p.329). */
+const OUCH_PRESETS = new Set(["hit.ouch", "hit.ouchAtZero"]);
+
+/**
+ * What an activated critical hit sets when one of its damage cards is applied.
+ * - Its size is the effect bought, before discounts: a standard NPC fails that many more Damage saves (pp.329, 332).
+ * - A Table of Ouch effect replaces the wounds effect, so the damage is applied normally and the injury is rolled.
+ * - Only the first shot of a Burst or Autofire is critical (pp.354-355); once one card has applied it as a critical
+ *   hit, the attack's other cards default to normal hits.
+ * @param {object|null} attack       the attack card's flags.spycraft2
+ * @param {string} [damageMessageId] the damage card being applied
+ * @returns {{critical: boolean, criticalDice: number, ouch: boolean, laterShot: boolean}}
+ */
+export function criticalDamageDefaults(attack, damageMessageId = "") {
+  const none = { critical: false, criticalDice: 0, ouch: false, laterShot: false };
+  if (attack?.criticalSuccess !== true) return none;
+  const activation = attack.criticalActivation ?? {},
+    dice = Math.max(1, Math.trunc(Number(activation.adjustedBaseCost ?? activation.baseCost ?? activation.cost) || 1)),
+    taken = attack.criticalShotApplied?.damageMessageId;
+  if ((Number(attack.attackResolution?.hits) || 1) > 1 && taken && taken !== damageMessageId)
+    return { ...none, laterShot: true };
+  if (OUCH_PRESETS.has(activation.preset)) return { ...none, ouch: true };
+  return { critical: true, criticalDice: dice, ouch: false, laterShot: false };
+}
+
+/**
+ * Every "damage applied" record on a damage card. Records used to be one array, rewritten whole on each apply, so two
+ * close applies could drop one; new records are keyed under damageAppliedBy, and old cards keep their array.
+ * @param {object} check  the card's flags.spycraft2
+ */
+export function appliedDamageEntries(check = {}) {
+  const keyed = check?.damageAppliedBy && typeof check.damageAppliedBy === "object" ? check.damageAppliedBy : {};
+  return [...(Array.isArray(check?.damageApplied) ? check.damageApplied : []), ...Object.values(keyed)];
+}
+
 /**
  * The condition a wound total puts a special character in (p.331), or "" while above 0.
  * @param {number} wounds

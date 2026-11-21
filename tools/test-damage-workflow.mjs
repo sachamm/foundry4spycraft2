@@ -6,7 +6,13 @@ const registry = new Map();
 const posted = [];
 const warnings = [];
 globalThis.foundry = {
-  utils: { escapeHTML: value => String(value), randomID: () => "abcdef" },
+  utils: {
+    escapeHTML: value => String(value),
+    randomID: (() => {
+      let n = 0;
+      return () => `id${++n}`;
+    })()
+  },
   applications: { api: { DialogV2: { input: async () => null } } }
 };
 globalThis.ui = { notifications: { warn: text => (warnings.push(text), null), info: () => null } };
@@ -43,6 +49,7 @@ globalThis.CONFIG = {
 
 const { resolveAttack, applyDamage, applyBlast, defenseOf, rollReportedSave, nonLethalTotals, standardReduction } =
   await import("../module/apps/damage-application.mjs");
+const { appliedDamageEntries } = await import("../module/rules/damage-application.mjs");
 const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
 const { settleGrapple } = await import("../module/apps/combat-actions.mjs");
@@ -158,7 +165,7 @@ test("lethal damage comes off a special character's vitality and wounds and sets
   assert.deepEqual([kevin.system.vitality.value, kevin.system.wounds.value], [0, 9]);
   assert.equal(kevin.statuses.has("fatigued"), true);
   assert.match(posted.at(-1).content, /takes 9 damage \(11 less damage reduction 2\)/);
-  assert.deepEqual(damage.flags.spycraft2.damageApplied, [
+  assert.deepEqual(appliedDamageEntries(damage.flags.spycraft2), [
     { targetUuid: kevin.uuid, name: "Kevin", damage: 11, kind: "lethal" }
   ]);
   // A critical hit while vitality remains goes to wounds; armor-piercing lowers the DR.
@@ -403,7 +410,7 @@ test("a blast is applied to each character caught, halved by distance", async ()
     ]
   });
   assert.deepEqual([near.system.vitality.value, far.system.vitality.value], [20, 35]);
-  assert.equal(damage.flags.spycraft2.damageApplied.length, 2);
+  assert.equal(appliedDamageEntries(damage.flags.spycraft2).length, 2);
 });
 
 test("a special damage type is handed to an agent's own rules, with the dialog offered for review", async () => {
