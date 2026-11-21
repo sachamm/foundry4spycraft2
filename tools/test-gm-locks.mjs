@@ -4,6 +4,7 @@ import {
   GM_TOKEN_PREFIX,
   LOCK_QUERY,
   LockTable,
+  PROBE_TIMEOUT_MS,
   QUERY_TIMEOUT_MS,
   UNREACHABLE_MEMORY_MS,
   forgetUnreachableGM,
@@ -108,7 +109,7 @@ test("no GC, a timeout or a broken answer all report the GC as unreachable", asy
   assert.equal((await requestLock("acquire", ["k"], "gm:1", { game: silent })).unreachable, true);
 });
 
-test("a GC that fails to answer is not asked again for a minute; releases still go, and one notice is shown", async () => {
+test("a GC that fails to answer is probed briefly for a minute; late grants are released; one notice", async () => {
   forgetUnreachableGM();
   const queries = [],
     notices = [];
@@ -119,8 +120,8 @@ test("a GC that fails to answer is not asked again for a minute; releases still 
       activeGM: {
         id: "gc",
         isSelf: false,
-        query: async (name, data) => {
-          queries.push(data.action);
+        query: async (name, data, options) => {
+          queries.push([data.action, options.timeout]);
           if (!answering) throw new Error("timeout");
           return { ok: true };
         }
@@ -130,18 +131,55 @@ test("a GC that fails to answer is not asked again for a minute; releases still 
   const notify = message => notices.push(message);
   const ask = (action, now) => requestLock(action, ["Actor.a:lock"], "gm:1", { game, now, notify });
   assert.equal((await ask("acquire", 0)).unreachable, true);
+  // The timed-out request is released in case the GC grants it late.
+  assert.deepEqual(queries.splice(0), [
+    ["acquire", QUERY_TIMEOUT_MS],
+    ["release", QUERY_TIMEOUT_MS]
+  ]);
+  // Within the minute the GC is still asked, so its locks are never ignored, but only briefly.
   assert.equal((await ask("acquire", 1000)).unreachable, true);
-  assert.deepEqual(queries, ["acquire"], "the second spend does not wait out another timeout");
-  await ask("release", 2000);
-  assert.deepEqual(queries, ["acquire", "release"]);
-  assert.equal((await ask("acquire", UNREACHABLE_MEMORY_MS + 1)).unreachable, true);
-  assert.equal(queries.length, 3, "after a minute the GC is asked again");
+  assert.deepEqual(queries.splice(0)[0], ["acquire", PROBE_TIMEOUT_MS]);
+  assert.ok(PROBE_TIMEOUT_MS < QUERY_TIMEOUT_MS);
+  // Each failure restarts the minute; a minute after the last one, the full wait again.
+  await ask("acquire", 1000 + UNREACHABLE_MEMORY_MS + 1);
+  assert.deepEqual(queries.splice(0)[0], ["acquire", QUERY_TIMEOUT_MS]);
   assert.equal(notices.length, 1, "one notice for the whole stretch");
+  // A GC that answers again is used at once, and a later stretch gets its own notice.
   answering = true;
-  assert.deepEqual(await ask("acquire", 2 * UNREACHABLE_MEMORY_MS + 2), { ok: true });
+  assert.deepEqual(await ask("acquire", 1000 + UNREACHABLE_MEMORY_MS + 2), { ok: true });
   answering = false;
-  await ask("acquire", 2 * UNREACHABLE_MEMORY_MS + 3);
-  assert.equal(notices.length, 2, "a new stretch after the GC answered gets its own notice");
+  await ask("acquire", 1000 + UNREACHABLE_MEMORY_MS + 3);
+  assert.equal(notices.length, 2);
+  forgetUnreachableGM();
+});
+
+test("a client that fell back still respects a lock the recovered GC holds for someone else", async () => {
+  forgetUnreachableGM();
+  const table = new LockTable(),
+    handler = lockQueryHandler(table, { resolve: () => null });
+  let up = false;
+  const game = {
+    user: { id: "p1" },
+    users: {
+      activeGM: {
+        id: "gc",
+        isSelf: false,
+        query: async (name, data) => {
+          if (!up) throw new Error("timeout");
+          return handler(data);
+        }
+      }
+    }
+  };
+  assert.equal(
+    (await requestLock("acquire", ["Actor.x:lock"], "gm:a", { game, now: 0, notify() {} })).unreachable,
+    true
+  );
+  // The GC comes back and grants the character to another player.
+  up = true;
+  table.acquire(["Actor.x:lock"], "gm:b", "p2");
+  const answer = await requestLock("acquire", ["Actor.x:lock"], "gm:a2", { game, now: 1000, notify() {} });
+  assert.deepEqual(answer, { ok: false, busy: ["Actor.x:lock"], holders: ["p2"] });
   forgetUnreachableGM();
 });
 

@@ -4,10 +4,10 @@
 
 - **GC-arbitrated locking recovers faster.** With "Resource locking" set to the GC's client, a GC tab that is in the
   background or frozen used to make every spend wait five seconds before falling back. The wait is now under two
-  seconds, a GC that did not answer is not asked again for a minute, and the player sees one notice instead of a delay
-  on each spend. While some clients have fallen back to character locks, the GC refuses its own lock on a character
-  that carries one, so two spends on one character still cannot overlap. The default setting is unchanged.
-
+  seconds; for the next minute the GC is asked only briefly (under half a second) before falling back, and the player
+  sees one notice instead of a delay on each spend. A GC that answers again is used at once, so the locks it holds are
+  respected, and the GC refuses its own lock on a character that already carries a character lock. The default setting
+  is unchanged.
 - **Module layout (no change in play).** The transaction, GC dice and period services moved from `module/rules/` to
   `module/services/`, so the rules folder holds only rules that run without Foundry. Macros or modules that import
   `systems/spycraft2/module/rules/transactions.mjs`, `gc-dice.mjs` or `periods.mjs` need the new folder name.

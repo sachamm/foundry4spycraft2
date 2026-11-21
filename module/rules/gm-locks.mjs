@@ -11,10 +11,14 @@ import { isResourceLock } from "./resource-locks.mjs";
  * It is used only when the world setting `spycraft2.lockMode` is "gm" and a GM is connected; otherwise the
  * document locks are used. Requests travel over Foundry's user queries (CONFIG.queries, User#query).
  *
- * A GC client that does not answer within QUERY_TIMEOUT_MS is not asked again for a minute: each spend in that time
- * goes straight to the document lock instead of waiting out the timeout again, and the player sees one notice. While
- * clients are mixed like that, the GC refuses a lock for a character that already carries a live document lock, so the
- * two kinds still exclude each other.
+ * A GC client that does not answer within QUERY_TIMEOUT_MS falls back to the document lock, and the player sees one
+ * notice. For the next minute each spend still asks the GC first, but waits only PROBE_TIMEOUT_MS, so a GC that has
+ * recovered is used again at once (and its locks are respected) while one that is still down costs little. A request
+ * that timed out is released again in case the GC grants it late. The GC refuses a lock for a character that already
+ * carries a live document lock, so a client that fell back is not overtaken.
+ *
+ * What stays open: a GC that answers more slowly than the timeout while another client holds its lock on the same
+ * character. That is why the document lock remains the default.
  *
  * Limit: the table lives in one client. If the active GM is signed in from two browsers, each has its own table and
  * their own actions are not excluded from one another. The document lock has no such limit, which is why it stays
@@ -24,8 +28,9 @@ import { isResourceLock } from "./resource-locks.mjs";
 export const LOCK_QUERY = "spycraft2.resourceLock";
 export const GM_TOKEN_PREFIX = "gm:";
 export const QUERY_TIMEOUT_MS = 1500;
+export const PROBE_TIMEOUT_MS = 400;
 export const UNREACHABLE_MEMORY_MS = 60000;
-/** The GC that last failed to answer, and until when it is not asked again: { gmId, until }, or null. */
+/** The GC that last failed to answer, and until when it is only probed briefly: { gmId, until }, or null. */
 let unreachableGM = null;
 
 /** Forget a GC that failed to answer (tests, or a GC that reconnected). */
@@ -151,12 +156,11 @@ export async function requestLock(
   const request = { action, keys, token, userId: game.user?.id ?? null };
   if (gm.isSelf) return lockQueryHandler(table)(request);
   const remembered = unreachableGM !== null && unreachableGM.gmId === gm.id;
-  // Releases are always sent: the GC may only have been slow, and still hold the lock.
-  if (action === "acquire" && remembered && now < unreachableGM.until)
-    return { ok: false, busy: [], unreachable: true };
+  // Every request still asks: skipping the GC would ignore locks it hands out once it answers again.
+  const timeout = action === "acquire" && remembered && now < unreachableGM.until ? PROBE_TIMEOUT_MS : QUERY_TIMEOUT_MS;
   let answer;
   try {
-    answer = await gm.query(LOCK_QUERY, request, { timeout: QUERY_TIMEOUT_MS });
+    answer = await gm.query(LOCK_QUERY, request, { timeout });
   } catch {
     answer = null;
   }
@@ -165,6 +169,8 @@ export async function requestLock(
     return answer;
   }
   if (action === "acquire") {
+    // A slow GC may still grant this request after we gave up on it: give that lock straight back.
+    gm.query(LOCK_QUERY, { ...request, action: "release" }, { timeout: QUERY_TIMEOUT_MS }).catch(() => {});
     if (!remembered)
       notify(loc`The GC’s client did not answer in time. Spending uses locks on the character until it answers again.`);
     unreachableGM = { gmId: gm.id, until: now + UNREACHABLE_MEMORY_MS };
