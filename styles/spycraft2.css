@@ -110,8 +110,9 @@
 
 /* Skills */
 .spycraft2 .skill-levels { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 6px; }
-.spycraft2 .skill-levels a.lvl { min-width: 1.6em; text-align: center; border: 1px solid var(--sc2-border); border-radius: 3px; }
-.spycraft2 .skill-levels a.lvl.active { background: var(--sc2-action); color: var(--sc2-on-action); }
+/* The level being spent at reads as pressed: the sheet authors these as buttons, so style by class, not element. */
+.spycraft2 .skill-levels .lvl { min-width: 1.6em; text-align: center; border: 1px solid var(--sc2-border); border-radius: 3px; }
+.spycraft2 .skill-levels .lvl.active { background: var(--sc2-action); border-color: var(--sc2-action); color: var(--sc2-on-action); font-weight: 700; }
 .spycraft2 .skill-levels .points { margin-left: 8px; font-weight: bold; }
 .spycraft2 .skills-table tr.class-skill th { font-weight: bold; }
 .spycraft2 .skills-table tr.class-at-level { background: var(--sc2-class); }

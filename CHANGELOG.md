@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Agent sheet: clearer for keyboard and screen-reader users.** The skill-level picker shows which level you are
+  spending points at again (it lost its highlight in an earlier redesign) and announces it as pressed. Icon-only
+  buttons (vitality roll and record, share, remove, add and remove rows, refresh grants) have proper names; the
+  ability and skill table fields say which ability or skill they belong to; and the remaining English-only labels on
+  weapon and gear rows are translatable. The sheet looks and works the same otherwise.
 - **One palette for every surface.** The older sheet styles kept their own blue, red and green, which showed on some
   light-theme cards instead of the system's palette. They now use the shared colours, so warnings read a slightly
   deeper red and confirmations a deeper green. Small labels (outcome stamps, round pips, panel captions, chat search)

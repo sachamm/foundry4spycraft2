@@ -1,5 +1,6 @@
 import { placeSheet } from "./sheet-placement.mjs";
 import { enrich } from "./enrich.mjs";
+import { classAbilityControl } from "./class-ability-controls.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
@@ -1366,7 +1367,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     context.featFreeActions = (this.actor.limitedUseStatus ?? []).filter(spec =>
       ["featFreeAction", "featFreeActionRound"].includes(spec.workflow)
     );
-    context.limitedUses = (this.actor.limitedUseStatus ?? []).filter(spec => !spec.hidden || spec.counterReview);
+    context.limitedUses = (this.actor.limitedUseStatus ?? [])
+      .filter(spec => !spec.hidden || spec.counterReview)
+      .map(spec => ({ ...spec, control: classAbilityControl(spec.workflow) }));
     context.combatReviewNeeded = !!(
       context.usagePeriodReview.needsReview ||
       actor.flags.spycraft2?.missionXPReview?.needsReview ||

@@ -2,7 +2,7 @@
   {{#if skillLevel}}
   <div class="skill-levels edit-only">
     <span>{{localize "SPYCRAFT.Skill.SpendAtLevel"}}:</span>
-    {{#each skillLevels}}<a class="lvl {{#if active}}active{{/if}}" data-action="skillLevel" data-level="{{level}}">{{level}}</a>{{/each}}
+    {{#each skillLevels}}<button type="button" class="lvl {{#if active}}active{{/if}} sc2-action" data-action="skillLevel" data-level="{{level}}" aria-pressed="{{#if active}}true{{else}}false{{/if}}">{{level}}</button>{{/each}}
     <span class="points {{#if (sc2lt skillLevelInfo.remaining 0)}}bad{{/if}}">{{skillLevelInfo.className}}: {{skillLevelInfo.spent}} / {{skillLevelInfo.available}} {{localize "SPYCRAFT.SkillPoints"}}</span>
     {{#if skillLevelInfo.classGrantPoints}}<span class="muted">{{localize "SPYCRAFT.Template.ActorAgentSkills.Includes"}} {{skillLevelInfo.classGrantName}} +{{skillLevelInfo.classGrantPoints}} {{localize "SPYCRAFT.Template.ActorAgentSkills.Points"}}</span>{{/if}}
     <span class="muted">{{localize "SPYCRAFT.Skill.MaxRanks"}} {{skillLevelInfo.maxRanks}} · {{localize "SPYCRAFT.Skill.ClassPicks"}} {{system.classSkillPicks.used}}/{{system.classSkillPicks.available}}</span>
@@ -20,13 +20,13 @@
     <tbody>
     {{#each skills}}
       <tr data-skill-name="{{name}} {{abilityLabel}}" data-trained="{{#if ranks}}true{{else}}false{{/if}}" class="{{#if isClass}}class-skill{{/if}} {{#if classAtLevel}}class-at-level{{/if}}">
-        <th><a data-action="rollSkill" data-skill="{{key}}" aria-label="{{rollLabel}}">{{name}}{{#if focus}}*{{/if}}</a> <span class="muted">{{abilityLabel}}</span></th>
-        <td class="edit-only"><input type="checkbox" name="system.skills.{{key}}.classSkill" {{checked classOverride}} /></td>
-        <td class="edit-only">{{#if ../skillLevel}}<input type="number" name="skillpts.{{key}}" value="{{points}}" class="w-2" min="0" />{{/if}}</td>
+        <th><button type="button" class="sc2-action" data-action="rollSkill" data-skill="{{key}}" aria-label="{{rollLabel}}">{{name}}{{#if focus}}*{{/if}}</button> <span class="muted">{{abilityLabel}}</span></th>
+        <td class="edit-only"><input type="checkbox" name="system.skills.{{key}}.classSkill" {{checked classOverride}} aria-label="{{localize 'SPYCRAFT.Action.ClassSkillOf' name=name}}" /></td>
+        <td class="edit-only">{{#if ../skillLevel}}<input type="number" name="skillpts.{{key}}" value="{{points}}" class="w-2" min="0" aria-label="{{localize 'SPYCRAFT.Action.SkillPointsIn' name=name}}" />{{/if}}</td>
         <td class="{{#if overMax}}bad{{/if}}">{{ranks}} / {{maxRanks}}{{#if ../skillLevel}}<br class="edit-only"/><small class="muted edit-only">{{localize "SPYCRAFT.Template.ActorAgentSkills.AtLevel"}} {{../skillLevel}}: {{historicalRanks}} / {{purchaseMaxRanks}}</small>{{/if}}</td>
         <td class="edit-only">{{#if bonus}}<span {{sc2tip bonusTip}}>{{signed bonus}}</span>{{/if}}</td>
-        <td class="edit-only"><input type="number" name="system.skills.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
-        <td>{{#each totals}}<a data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" aria-label="{{rollLabel}}" {{sc2tip tip}}>{{signed total}}</a>{{#unless @last}} / {{/unless}}{{/each}}</td>
+        <td class="edit-only"><input type="number" name="system.skills.{{key}}.misc" value="{{misc}}" class="w-2" aria-label="{{localize 'SPYCRAFT.Action.MiscModifierOf' name=name}}" /></td>
+        <td>{{#each totals}}<button type="button" class="sc2-action" data-action="rollSkill" data-skill="{{../key}}" data-ability="{{ability}}" aria-label="{{rollLabel}}" {{sc2tip tip}}>{{signed total}}</button>{{#unless @last}} / {{/unless}}{{/each}}</td>
         <td><span {{sc2tip threatTip}}>{{#if (sc2lt threat 20)}}{{threat}}-20{{else}}20{{/if}}</span></td>
         <td><span {{sc2tip capTip}}>{{cap}}</span></td>
       </tr>
