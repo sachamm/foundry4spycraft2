@@ -12,6 +12,7 @@ import { installCombatStanceHooks } from "./module/apps/combat-stance.mjs";
 import { installShakenInitiativeHooks, shakenCombatantClass } from "./module/apps/shaken-initiative.mjs";
 import { rollPipeline } from "./module/rolls/index.mjs";
 import { registerMigrationSettings, runWorldMigrations } from "./module/migrations/index.mjs";
+import { primaryWriterFor } from "./module/writers.mjs";
 import { registerGmLocks } from "./module/rules/gm-locks.mjs";
 import { registerMapSettings } from "./module/apps/map.mjs";
 import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs";
@@ -329,15 +330,23 @@ Hooks.once("i18nInit", () => {
   nameSystemStatuses();
 });
 Hooks.once("ready", () => refreshCombatActorData());
-Hooks.once("ready", setupSampleScenes);
-Hooks.once("ready", setupActorFolders);
-Hooks.once("ready", setupGCTables);
-// Bring stored world data up to this build's schema version (module/migrations/index.mjs).
-Hooks.once("ready", () => {
-  runWorldMigrations().catch(error => {
+// One ordered start-up on the lead GC's client: bring stored world data up to this build's schema version
+// (module/migrations/index.mjs) first, then add the sample scenes, folders, tables and soundtrack, so nothing is
+// imported into data that is still being migrated. "spycraft2.ready" then tells the reconcilers to catch up.
+Hooks.once("ready", async () => {
+  try {
+    await runWorldMigrations();
+  } catch (error) {
     console.error(loc`Spycraft 2.0 | World data migration failed`, error);
     ui.notifications?.error(loc`Spycraft 2.0 could not update this world's data. See the console for details.`);
-  });
+  }
+  for (const setup of [setupSampleScenes, setupActorFolders, setupGCTables, setupSoundtrack])
+    try {
+      await setup();
+    } catch (error) {
+      console.error(loc`Spycraft 2.0 | A first-load setup step failed`, error);
+    }
+  Hooks.callAll("spycraft2.ready");
 });
 Hooks.on("updateWorldTime", () => refreshCombatActorData());
 Hooks.on("updateCombat", (combat, changed) => {
@@ -350,12 +359,7 @@ function detachMentalLeapClocks(combat) {
   for (const actor of periodResourceActors()) {
     if (actor.type !== "agent" || !(actor.system.mentalLeaps ?? []).some(r => r.combatId === combat.id && !r.detached))
       continue;
-    const primary =
-      game.users.activeGM ??
-      game.users
-        .filter(u => u.active && actor.testUserPermission(u, "OWNER"))
-        .sort((a, b) => a.id.localeCompare(b.id))[0];
-    if (primary?.id !== game.user.id || !actor.isOwner) continue;
+    if (primaryWriterFor(actor)?.id !== game.user.id || !actor.isOwner) continue;
     actor
       .detachMentalLeapCombat(combat)
       .catch(error => ui.notifications.warn(loc`Mental Leap clock needs review: ${error.message}`));
@@ -385,12 +389,15 @@ function refreshFortuneRecipients(source) {
       actor.sheet?.render(false);
     }
 }
-Hooks.on("updateActor", (actor, changed) => {
+Hooks.on("updateActor", (actor, changed, options) => {
+  if (options?.spycraft2Migration) return;
   if (changed.system?.progression || Object.hasOwn(changed, "system.progression")) refreshFortuneRecipients(actor);
 });
 Hooks.on("deleteActor", refreshFortuneRecipients);
 for (const event of ["createItem", "updateItem", "deleteItem"])
-  Hooks.on(event, item => {
+  Hooks.on(event, (item, ...rest) => {
+    // A migration writes many items at once and changes no class levels a teammate reads.
+    if (rest.some(arg => arg?.spycraft2Migration)) return;
     if (item.type === "class" && item.parent?.documentName === "Actor") refreshFortuneRecipients(item.parent);
   });
 
@@ -398,5 +405,3 @@ for (const event of ["createItem", "updateItem", "deleteItem"])
 Hooks.on("updateSetting", setting => {
   if (setting.key === "spycraft2.usagePeriods") game.spycraft2?.gc?.console?.render(false);
 });
-
-Hooks.once("ready", setupSoundtrack);

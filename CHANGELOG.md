@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Faster first load after an update.** When a new version updates a world's data, each character's items are
+  written together instead of one at a time, one notification shows how far it has got, and the shaken and Power
+  Stance trackers catch up once at the end instead of reacting to every write. The sample scenes, folders, GC tables
+  and soundtrack are added only after the update finishes. An item that cannot be updated still never holds back the
+  others; the update is retried next time, as before.
 - **Release pipeline:** a release now runs every check a pull request runs (lint, formatting, packs and sheet
   layouts) before packaging, refuses a tag that does not match `system.json` and the changelog, and attaches
   checksums. Prereleases are packaged by the same workflow. `npm run release:check` does the same check locally and

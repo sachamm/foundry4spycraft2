@@ -6,7 +6,8 @@ import {
   applyUpdate,
   documentUpdate,
   migrateWorld,
-  pendingMigrations
+  pendingMigrations,
+  worldMigrating
 } from "../module/migrations/index.mjs";
 
 const doc = (name, source, items = []) => ({
@@ -154,4 +155,60 @@ test("a world with nothing to convert is simply stamped with the current version
   const report = await migrateWorld(world, { migrations: [], to: 1 });
   assert.deepEqual(report, { from: 0, to: 1, updated: 0, failed: 0, ran: [] });
   assert.equal(world.version, 1);
+});
+
+test("an actor's items go in one request, one failed item is retried alone, and progress is reported", async () => {
+  const items = ["A", "B", "C"].map((id, n) => Object.assign(doc(id, { system: { failedSaves: 6 + n } }), { id }));
+  items[1].failing = true;
+  const actor = doc("Agent", { name: "Agent", system: {} }, items);
+  const batches = [];
+  let migratingDuringWrite = false;
+  actor.updateEmbeddedDocuments = async (type, rows, options) => {
+    migratingDuringWrite = worldMigrating();
+    batches.push({ type, rows, options });
+    if (rows.some(row => items.find(item => item.id === row._id).failing)) throw new Error("batch refused");
+  };
+  const steps = [];
+  const world = {
+    version: 2,
+    actors: [actor],
+    items: [doc("Crate", { system: { failedSaves: 1 } })],
+    setVersion: async v => (world.version = v),
+    progress: (done, total) => steps.push(`${done}/${total}`)
+  };
+  const original = [console.error, console.warn];
+  console.error = console.warn = () => {};
+  let report;
+  try {
+    report = await migrateWorld(world, { migrations: [capFailedSaves], to: 3 });
+  } finally {
+    [console.error, console.warn] = original;
+  }
+  assert.equal(batches.length, 1);
+  assert.equal(batches[0].type, "Item");
+  assert.deepEqual(
+    batches[0].rows.map(row => row._id),
+    ["A", "B", "C"]
+  );
+  assert.deepEqual(batches[0].options, { spycraft2Migration: 3 });
+  assert.equal(migratingDuringWrite, true);
+  assert.equal(worldMigrating(), false);
+  // The batch failed, so each item was written alone: two succeed, the bad one is counted and the version is kept.
+  assert.deepEqual(items[0].source.system, { failedSaves: 5, cappedFor: "Agent" });
+  assert.deepEqual(items[2].source.system, { failedSaves: 5, cappedFor: "Agent" });
+  assert.equal(report.updated, 2);
+  assert.equal(report.failed, 1);
+  assert.equal(world.version, 2);
+  assert.deepEqual(steps, ["1/2", "2/2"]);
+
+  // When the batch succeeds, each item is counted once and no item is written alone.
+  items[1].failing = false;
+  for (const item of items) item.updates.length = 0;
+  batches.length = 0;
+  const second = await migrateWorld(world, { migrations: [capFailedSaves], to: 3 });
+  assert.equal(batches.length, 1);
+  assert.equal(second.updated, 1);
+  assert.equal(second.failed, 0);
+  assert.equal(world.version, 3);
+  assert.ok(items.every(item => item.updates.length === 0));
 });

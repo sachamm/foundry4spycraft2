@@ -110,10 +110,15 @@ export function documentUpdate(kind, source, parentSource, migrations) {
   return Object.keys(combined).length ? combined : null;
 }
 
+let migrating = false;
+/** True while this client is writing a migration, so reconcilers can wait for it to finish instead of reacting. */
+export const worldMigrating = () => migrating;
+
 /**
  * Bring a world's actors and items up to the current schema version.
- * @param {object} world  { version, actors, items, tokens?, setVersion(n), notify?(message) } — documents need toObject(),
- *                        update() and, for actors, an `items` collection.
+ * @param {object} world  { version, actors, items, tokens?, setVersion(n), notify?(message), progress?(done, total) }
+ *                        — documents need toObject(), update() and, for actors, an `items` collection; an actor
+ *                        with updateEmbeddedDocuments() has its items written in one request.
  * @returns {{from: number, to: number, updated: number, failed: number, ran: number[]}}
  */
 export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA_VERSION } = {}) {
@@ -125,24 +130,82 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
     world.notify?.(
       loc`Updating world data for Spycraft 2.0 (${list.map(m => m.label ?? `version ${m.version}`).join("; ")}).`
     );
+    const options = { spycraft2Migration: to };
+    const failed = (kind, document, error) => {
+      report.failed += 1;
+      console.error(loc`Spycraft 2.0 | Could not migrate ${kind} ${document.name ?? document.id}`, error);
+    };
     const migrate = async (kind, document, parentSource) => {
       try {
         const update = documentUpdate(kind, document.toObject(), parentSource, list);
         if (!update) return;
-        await document.update(update, { spycraft2Migration: to });
+        await document.update(update, options);
         report.updated += 1;
       } catch (error) {
-        report.failed += 1;
-        console.error(loc`Spycraft 2.0 | Could not migrate ${kind} ${document.name ?? document.id}`, error);
+        failed(kind, document, error);
       }
     };
-    for (const actor of world.actors ?? []) {
-      await migrate("actor", actor, null);
+    // An actor's items go in one request. If that request fails, each item is tried alone, so one bad item never
+    // holds back the others and the count of failures stays exact.
+    const migrateItems = async actor => {
       const parentSource = actor.toObject();
-      for (const item of actor.items ?? []) await migrate("item", item, parentSource);
+      const items = [...(actor.items ?? [])];
+      if (typeof actor.updateEmbeddedDocuments !== "function" || items.length < 2) {
+        for (const item of items) await migrate("item", item, parentSource);
+        return;
+      }
+      const updates = [];
+      for (const item of items) {
+        try {
+          const update = documentUpdate("item", item.toObject(), parentSource, list);
+          if (update) updates.push({ item, update });
+        } catch (error) {
+          failed("item", item, error);
+        }
+      }
+      if (!updates.length) return;
+      try {
+        await actor.updateEmbeddedDocuments(
+          "Item",
+          updates.map(({ item, update }) => ({ _id: item.id, ...update })),
+          options
+        );
+        report.updated += updates.length;
+      } catch (error) {
+        console.warn(loc`Spycraft 2.0 | Retrying the items of ${actor.name ?? actor.id} one at a time`, error);
+        for (const { item, update } of updates)
+          try {
+            await item.update(update, options);
+            report.updated += 1;
+          } catch (itemError) {
+            failed("item", item, itemError);
+          }
+      }
+    };
+    const actors = [...(world.actors ?? [])],
+      worldItems = [...(world.items ?? [])],
+      tokens = [...(world.tokens ?? [])].filter(token => token.actor),
+      total = actors.length + worldItems.length + tokens.length;
+    let done = 0;
+    const step = () => world.progress?.(++done, total);
+    migrating = true;
+    try {
+      for (const actor of actors) {
+        await migrate("actor", actor, null);
+        await migrateItems(actor);
+        step();
+      }
+      for (const item of worldItems) {
+        await migrate("item", item, null);
+        step();
+      }
+      for (const token of tokens) {
+        await migrate("token", token, token.actor.toObject());
+        step();
+      }
+    } finally {
+      migrating = false;
     }
-    for (const item of world.items ?? []) await migrate("item", item, null);
-    for (const token of world.tokens ?? []) if (token.actor) await migrate("token", token, token.actor.toObject());
   }
   // A run with failures keeps the old version, so the same migrations are tried again next time.
   if (!report.failed) await world.setVersion(to);
@@ -200,14 +263,23 @@ export async function runWorldMigrations() {
   const stored = game.settings.get("spycraft2", "schemaVersion");
   if (stored >= SCHEMA_VERSION) return null;
   const packed = await worldCompendiumDocuments(game.packs);
+  // One notification that fills as the world is updated, where this Foundry version can show progress.
+  let bar = null;
   const report = await migrateWorld({
     version: stored,
     actors: [...worldActors(game), ...packed.actors],
     items: [...(game.items ?? []), ...packed.items],
     tokens: [...(game.scenes ?? [])].flatMap(scene => [...(scene.tokens ?? [])]),
     setVersion: version => game.settings.set("spycraft2", "schemaVersion", version),
-    notify: message => ui.notifications?.info(message)
+    notify: message => {
+      if (bar) return ui.notifications?.info(message);
+      bar = ui.notifications?.info(message, { progress: true }) ?? null;
+    },
+    progress: (done, total) => {
+      if (typeof bar?.update === "function") bar.update({ pct: total ? done / total : 1 });
+    }
   });
+  if (typeof bar?.update === "function") bar.update({ pct: 1 });
   if (packed.skipped.length)
     ui.notifications?.warn(
       loc`These world compendiums were not updated because they are locked or unreadable: ${packed.skipped.join(", ")}. Unlock them and import their entries again, or update the entries by hand.`,
