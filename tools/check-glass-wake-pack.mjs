@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { ClassicLevel } from "classic-level";
 import { buildPacks } from "./lib/pack-docs.mjs";
@@ -27,16 +27,12 @@ test("the release manifest and built Adventure pack contain all Glass Wake conte
   } finally {
     await db.close();
   }
-  for (const workflow of [
-    "release.yml",
-    "release-candidate.yml",
-    "retro-test.yml",
-    "test-release.yml",
-    "publish-stable-0.3.1.yml"
-  ])
-    assert.match(
-      readFileSync(new URL(`../.github/workflows/${workflow}`, import.meta.url), "utf8"),
-      /zip -r[^\n]*\bpacks\b[^\n]*\bassets\b/,
-      workflow
-    );
+  // Every workflow that packages the system ships the packs and the assets they point at.
+  const workflowText = file => readFileSync(new URL(`../.github/workflows/${file}`, import.meta.url), "utf8");
+  const packaging = readdirSync(new URL("../.github/workflows/", import.meta.url)).filter(
+    file => file.endsWith(".yml") && /\bzip -r\b/.test(workflowText(file))
+  );
+  assert.ok(packaging.includes("release.yml"), "the release workflow packages the system");
+  for (const workflow of packaging)
+    assert.match(workflowText(workflow), /zip -r[^\n]*\bpacks\b[^\n]*\bassets\b/, workflow);
 });
