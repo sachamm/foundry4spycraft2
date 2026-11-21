@@ -1542,7 +1542,12 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     this._pendingCareerForm = null;
     if (Object.hasOwn(submitData, "system.progression") && !careerPlan)
       throw new Error(loc`Use the career form controls to edit progression.`);
-    if (careerPlan && !careerPlan.edits.length) delete submitData["system.progression"];
+    // Submit data arrives nested (system.progression), not as a flat key; clear both shapes, so an unedited career
+    // never writes back the copy captured when the form was drawn.
+    if (careerPlan && !careerPlan.edits.length) {
+      delete submitData["system.progression"];
+      foundry.utils.deleteProperty(submitData, "system.progression");
+    }
     const resources = [
       "system.actionDice.value",
       "system.vitality.value",

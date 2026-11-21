@@ -15,6 +15,13 @@ class StubSheet {
   }
 }
 globalThis.foundry = {
+  utils: {
+    deleteProperty(object, path) {
+      const keys = path.split("."),
+        parent = keys.slice(0, -1).reduce((node, key) => node?.[key], object);
+      if (parent && Object.hasOwn(parent, keys.at(-1))) delete parent[keys.at(-1)];
+    }
+  },
   applications: {
     api: { HandlebarsApplicationMixin: Base => Base, ApplicationV2: StubSheet },
     sheets: { ActorSheetV2: StubSheet, ItemSheetV2: StubSheet }

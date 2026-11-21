@@ -47,7 +47,7 @@ import { rollObjectDamageSave } from "./vehicle-play.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { gunplayCountGain, juggernautConversion } from "../rules/class-combat.mjs";
 import { shiftCount } from "./dueling.mjs";
-import { askGC, gcAvailable, markCard, registerRelay } from "./gc-relay.mjs";
+import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 
@@ -809,7 +809,22 @@ export async function applyDamage(message, options = {}) {
   return result ?? true;
 }
 
+/** What does not fit a relayed damage request: who asks, and whether the amount is above the card's roll. */
+function damageConcerns(message, inputs, user) {
+  const { rolled } = damageFacts(message),
+    rolledAmount = Math.max(0, Math.trunc(Number(rolled) || 0));
+  return [
+    requesterConcern(message, user),
+    ...inputs.map(input =>
+      Number(input?.damage) > rolledAmount
+        ? loc`Damage raised from the card's ${rolledAmount} to ${Number(input.damage)}.`
+        : null
+    )
+  ];
+}
+
 registerRelay("applyDamage", {
+  concerns: ({ messageId, input = {} }, user) => damageConcerns(game.messages.get(messageId), [input], user),
   async describe({ messageId, input = {} }, user) {
     const message = game.messages.get(messageId),
       target = input.targetUuid ? await fromUuid(input.targetUuid) : null;
@@ -827,6 +842,8 @@ registerRelay("applyDamage", {
 });
 
 registerRelay("applyDamageMany", {
+  concerns: ({ messageId, inputs = [] }, user) =>
+    damageConcerns(game.messages.get(messageId), Array.isArray(inputs) ? inputs : [], user),
   async describe({ messageId, inputs = [] }, user) {
     const message = game.messages.get(messageId);
     if (!message || !Array.isArray(inputs) || !inputs.length)
