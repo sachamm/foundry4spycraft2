@@ -1,9 +1,5 @@
-@import url('./chat-search.css');
 /* Spycraft 2.0 — sheet styles (Foundry v13, works with light & dark themes) */
 .spycraft2 {
-  --sc2-accent: #1d4e89;
-  --sc2-bad: #c0392b;
-  --sc2-good: #2e7d32;
   --sc2-class: rgba(241, 196, 15, 0.16);
   --sc2-border: var(--color-border-light-tertiary, rgba(127, 127, 127, 0.35));
 }
@@ -72,7 +68,7 @@
 .spycraft2 .summary, .spycraft2 .resources { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .spycraft2 .resources input { width: 3.5em; text-align: center; }
 .spycraft2 .resources a { margin-left: 4px; }
-.spycraft2 .summary .talent, .spycraft2 .summary .specialty { padding: 0 6px; border-left: 2px solid var(--sc2-accent); }
+.spycraft2 .summary .talent, .spycraft2 .summary .specialty { padding: 0 6px; border-left: 2px solid var(--sc2-action); }
 .spycraft2 details.warnings { border: 1px solid var(--sc2-bad); border-radius: 4px; padding: 2px 8px; margin: 4px 0; }
 .spycraft2 details.warnings summary { color: var(--sc2-bad); cursor: pointer; }
 .spycraft2 details.warnings ul { margin: 4px 0; padding-left: 18px; font-size: 0.9em; }
@@ -115,7 +111,7 @@
 /* Skills */
 .spycraft2 .skill-levels { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 6px; }
 .spycraft2 .skill-levels a.lvl { min-width: 1.6em; text-align: center; border: 1px solid var(--sc2-border); border-radius: 3px; }
-.spycraft2 .skill-levels a.lvl.active { background: var(--sc2-accent); color: white; }
+.spycraft2 .skill-levels a.lvl.active { background: var(--sc2-action); color: var(--sc2-on-action); }
 .spycraft2 .skill-levels .points { margin-left: 8px; font-weight: bold; }
 .spycraft2 .skills-table tr.class-skill th { font-weight: bold; }
 .spycraft2 .skills-table tr.class-at-level { background: var(--sc2-class); }
@@ -142,12 +138,12 @@
 .spycraft2.npc .ability { display: flex; flex-direction: column; align-items: center; }
 
 /* Chat */
-.spycraft2-threat { color: var(--sc2-good, #2e7d32); font-weight: bold; }
-.spycraft2-error { color: var(--sc2-bad, #c0392b); font-weight: bold; }
+.spycraft2-threat { color: var(--sc2-good); font-weight: bold; }
+.spycraft2-error { color: var(--sc2-bad); font-weight: bold; }
 
 /* To-do checklist & origin controls */
-.spycraft2 details.todo { border: 1px solid var(--sc2-accent); border-radius: 4px; padding: 2px 8px; margin: 4px 0; }
-.spycraft2 details.todo summary { color: var(--sc2-accent); cursor: pointer; font-weight: bold; }
+.spycraft2 details.todo { border: 1px solid var(--sc2-action); border-radius: 4px; padding: 2px 8px; margin: 4px 0; }
+.spycraft2 details.todo summary { color: var(--sc2-action); cursor: pointer; font-weight: bold; }
 .spycraft2 details.todo ul { margin: 4px 0; padding-left: 18px; font-size: 0.9em; columns: 2; column-gap: 24px; }
 .spycraft2 .summary .origin a + a { margin-left: 4px; opacity: 0.6; font-size: 0.85em; }
 .spycraft2 .summary .origin a + a:hover { opacity: 1; }

@@ -1,5 +1,6 @@
 import { ruleName } from "../rules/rule-name.mjs";
 import { SaveFeedback } from "./save-feedback.mjs";
+import { enrich } from "./enrich.mjs";
 import { CANDIDATE_CHOICES, candidatePlan } from "../rules/candidate.mjs";
 import { reviewCandidate } from "../apps/candidate.mjs";
 import { historicalFeatEligibility } from "../rules/feat-acquisition.mjs";
@@ -161,10 +162,7 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(SaveFeedback(I
         .filter(([, value]) => value !== undefined && value !== null && value !== "")
         .map(([caption, value]) => ({ caption, value })),
       editable: this.isEditable,
-      enrichedDescription: await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.description, {
-        secrets: item.isOwner,
-        relativeTo: item
-      }),
+      enrichedDescription: await enrich(sys.description, item),
       bonuses: (sys.bonuses ?? []).map((b, i) => ({ ...b, index: i, label: cfg.bonusTargets[b.target] ?? b.target })),
       bonusTargets: cfg.bonusTargets,
       featTrees: cfg.featTrees,

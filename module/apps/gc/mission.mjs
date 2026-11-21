@@ -497,7 +497,7 @@ export async function editSeasonQualities() {
     .join("");
   const input = await ask(
     loc`Season campaign qualities — pp.405–408`,
-    `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward.`}</p><div style="max-height:60vh;overflow:auto">${boxes}</div>`
+    `<p>${loc`These apply to every mission of the season and modify each mission's base XP reward.`}</p><div class="sc2-scroll-list">${boxes}</div>`
   );
   if (!input) return null;
   await setCampaign({

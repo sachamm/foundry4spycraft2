@@ -1,4 +1,5 @@
 import { placeSheet } from "./sheet-placement.mjs";
+import { enrich } from "./enrich.mjs";
 import { HALF_ACTIONS_PER_TURN, actionBudget } from "../rules/action-budget.mjs";
 import { manageNpcPackages } from "../apps/npc-packages.mjs";
 import { systemDialog } from "../apps/dialog-theme.mjs";
@@ -1144,8 +1145,13 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
             });
         }
       }
-      return { id: item.id, name: item.name, fields, description: item.system.description };
+      return { id: item.id, name: item.name, fields, item };
     });
+    // Origin text is the item's own rich text: its secrets are for the item's owners and its links resolve from it.
+    for (const origin of context.originSelections) {
+      origin.description = await enrich(origin.item.system.description, origin.item);
+      delete origin.item;
+    }
 
     // Classes & progression
     const classItems = byType("class");
@@ -1440,10 +1446,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     }));
     context.pickOptions = Object.fromEntries([["", "—"], ...Object.entries(cfg.gearPicks).map(([k]) => [k, k])]);
 
-    context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.biography, {
-      secrets: actor.isOwner,
-      rollData
-    });
+    context.enrichedBiography = await enrich(sys.biography, actor, { rollData });
     return context;
   }
 
@@ -1997,9 +2000,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
         dispositions: dispositionRows(this.actor),
         baseDisposition: sys.disposition?.base ?? "neutral"
       },
-      enrichedBiography: await foundry.applications.ux.TextEditor.implementation.enrichHTML(sys.biography, {
-        secrets: this.actor.isOwner
-      })
+      enrichedBiography: await enrich(sys.biography, this.actor)
     });
     return context;
   }

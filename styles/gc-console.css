@@ -10,7 +10,6 @@
 .gc-console-body details.gc-section[open] > summary::before { transform: rotate(90deg); }
 .gc-console-body details.gc-section > summary h2 { flex: 1 1 auto; margin: 0; border: 0; font-size: 1.1em; }
 .gc-console-body details.gc-section > summary .gc-note { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
-.gc-console-body details.gc-section > summary:focus-visible { outline: 2px solid var(--sc2-accent, currentColor); outline-offset: 2px; }
 .gc-console-body details.gc-section[open] { padding-bottom: 0.4em; }
 .gc-console-body details.gc-section .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr)); }
 .gc-console-body details.gc-section .controls button { width: 100%; }
@@ -20,7 +19,7 @@
 .gc-console-body .controls { display: flex; flex-wrap: wrap; gap: 0.3em; }
 .gc-console-body .controls button { width: auto; flex: 0 0 auto; }
 .gc-console-body ul { margin: 0.2em 0; padding-left: 1.2em; }
-.gc-console-body .tag { font-size: 0.6em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 3px; padding: 0 0.4em; vertical-align: middle; }
+.gc-console-body .tag { font-size: 12px; text-transform: uppercase; border: 1px solid currentColor; border-radius: 3px; padding: 0 0.4em; vertical-align: middle; }
 .gc-console-body .muted { opacity: 0.65; }
 /* The sidebar owns the viewport; its console body supplies the scrolling content. */
 .spycraft2.gc-console.sidebar-tab { min-width: 0; min-height: 0; overflow: hidden; }
@@ -67,7 +66,7 @@
 /* Section headings are bars, as on the sheets. */
 .gc-console-body details.gc-section { border-bottom: 0; margin-bottom: 4px; }
 .gc-console-body details.gc-section > summary { align-items: center; padding: 4px 8px; color: var(--sc2-on-bar); background: var(--sc2-bar); border-radius: var(--sc2-radius); }
-.gc-console-body details.gc-section > summary h2 { font: 400 11px/1.4 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase; color: inherit; }
+.gc-console-body details.gc-section > summary h2 { font: 400 12px/1.4 var(--sc2-bar-font); letter-spacing: 0.1em; text-transform: uppercase; color: inherit; }
 .gc-console-body details.gc-section > summary .gc-note { font-family: var(--sc2-num); opacity: 1; }
 
 /* The console is one surface in the sheets' own paper and ink. It used to keep the sidebar's background under this
