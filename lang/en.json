@@ -8054,6 +8054,8 @@
    "TLPackagesAreOptionalChangingThreat_12g28aj": "TL packages are optional. Changing Threat Level leaves the current feats and equipment in place.",
    "Table512ChooseAListed_1l6deu1": "Table 5.12 — {0}. Choose a listed weapon from the final result's row or a lower row.",
    "Table54_1uxollh": "{0} (Table 5.4)",
+   "TableOfOuchCriticalOnSurgery_14d8uhc": "Table of Ouch critical on {0} ({1}): {2}. Surgery DC {3}.",
+   "TableOfOuchCriticalOn_0rgc3bx": "Table of Ouch critical on {0} ({1}): {2}.",
    "TableOfOuchCriticalRollS_0yukaai": "Table of Ouch critical: roll {0}’s injury from the damage card.",
    "TableOfOuch_0epo4y9": "Table of Ouch — {0}",
    "TableOfOuch_156brkd": "Table of Ouch: {0}",

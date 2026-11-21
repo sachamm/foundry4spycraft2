@@ -16,6 +16,7 @@
  */
 import { esc } from "../html.mjs";
 import { loc } from "../i18n.mjs";
+import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
 export const RELAY_QUERY = "spycraft2.relay";
 const actions = new Map();
@@ -197,8 +198,20 @@ registerRelay("markCard", {
       actor = check?.actorUuid ? await fromUuid(check.actorUuid) : null;
     if (!message || !Object.hasOwn(MARKS, key) || !MARKS[key](value))
       throw new Error(loc`That card cannot be marked this way.`);
-    // The player whose own character took the damage may record that on the attacker's card.
-    const damaged = key === "damageAppliedEntry" && value?.targetUuid ? await fromUuid(value.targetUuid) : null;
+    // The player whose own character took the damage may record that on the attacker's card: the damage itself, and
+    // that the attack's critical shot is used up (the damage card must come from this attack and name that character).
+    let damaged = key === "damageAppliedEntry" && value?.targetUuid ? await fromUuid(value.targetUuid) : null;
+    if (key === "criticalShotApplied") {
+      const damage = game.messages.get(value.damageMessageId)?.flags?.spycraft2;
+      if (damage?.sourceAttack?.uuid === message.uuid)
+        for (const entry of appliedDamageEntries(damage)) {
+          const target = typeof entry.targetUuid === "string" ? await fromUuid(entry.targetUuid) : null;
+          if (target?.testUserPermission?.(user, "OWNER")) {
+            damaged = target;
+            break;
+          }
+        }
+    }
     if (!user.isGM && !actor?.testUserPermission(user, "OWNER") && !damaged?.testUserPermission?.(user, "OWNER"))
       throw new Error(loc`Only the character's own player can mark that card.`);
     await message.update(markUpdate(message, key, value));

@@ -6,6 +6,7 @@ const updates = [];
 const players = new Map();
 const message = {
   id: "m1",
+  uuid: "ChatMessage.m1",
   isAuthor: false,
   flags: {
     spycraft2: { actorUuid: "Actor.a1", damageApplied: [{ targetUuid: "x", name: "X", damage: 1, kind: "lethal" }] }
@@ -13,6 +14,13 @@ const message = {
   async update(change) {
     updates.push(change);
   }
+};
+// Damage cards rolled from attack m1 (and one from another attack), each with the target it was applied to.
+const appliedTo = targetUuid => ({ damageAppliedBy: { r1: { targetUuid, name: "T", damage: 6, kind: "lethal" } } });
+const damageCards = {
+  d1: { flags: { spycraft2: { sourceAttack: { uuid: "ChatMessage.m1" }, ...appliedTo("Actor.t1") } } },
+  d2: { flags: { spycraft2: { sourceAttack: { uuid: "ChatMessage.m9" }, ...appliedTo("Actor.t1") } } },
+  d3: { flags: { spycraft2: { sourceAttack: { uuid: "ChatMessage.m1" }, ...appliedTo("y") } } }
 };
 const actor = { testUserPermission: (user, level) => level === "OWNER" && user.id === "owner" };
 const confirms = [];
@@ -40,7 +48,7 @@ const settings = { relayAutoApprove: false };
 globalThis.game = {
   user: { id: "owner", isGM: false, name: "Player" },
   users: { get: id => players.get(id), activeGM: null },
-  messages: { get: id => (id === "m1" ? message : undefined) },
+  messages: { get: id => (id === "m1" ? message : damageCards[id]) },
   settings: { get: (_scope, key) => settings[key] }
 };
 players.set("owner", { id: "owner", name: "Player", isGM: false });
@@ -105,6 +113,17 @@ test("the player whose character took the damage may record it on the attacker's
   assert.match((await handleRelay({ action: "markCard", userId: "other", data: elsewhere })).error, /own player/);
   const otherMark = { messageId: "m1", key: "pendingSave.rolled", value: true };
   assert.match((await handleRelay({ action: "markCard", userId: "other", data: otherMark })).error, /own player/);
+  assert.equal(updates.length, 1);
+});
+
+test("the player who took a critical shot on their own character may mark the attack's critical as used", async () => {
+  updates.length = 0;
+  const mark = damageMessageId => ({ messageId: "m1", key: "criticalShotApplied", value: { damageMessageId } });
+  assert.deepEqual(await handleRelay({ action: "markCard", userId: "other", data: mark("d1") }), { value: true });
+  assert.deepEqual(updates, [{ "flags.spycraft2.criticalShotApplied": { damageMessageId: "d1" } }]);
+  // A damage card from another attack, one applied to someone else, or one that does not exist proves nothing.
+  for (const id of ["d2", "d3", "missing"])
+    assert.match((await handleRelay({ action: "markCard", userId: "other", data: mark(id) })).error, /own player/, id);
   assert.equal(updates.length, 1);
 });
 
