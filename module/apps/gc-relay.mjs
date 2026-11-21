@@ -151,6 +151,7 @@ const MARKS = {
   "hazardSave.resolved": value => value === true,
   firstAid: value => typeof value?.patientUuid === "string" && typeof value?.name === "string",
   stabilized: value => typeof value?.patientUuid === "string" && typeof value?.name === "string",
+  criticalShotApplied: value => typeof value?.damageMessageId === "string",
   damageAppliedEntry: value =>
     typeof value?.targetUuid === "string" &&
     typeof value?.name === "string" &&
@@ -158,11 +159,12 @@ const MARKS = {
     typeof value?.kind === "string"
 };
 
-const markUpdate = (message, key, value) => {
-  if (key !== "damageAppliedEntry") return { [`flags.spycraft2.${key}`]: value };
-  const now = message.flags?.spycraft2?.damageApplied;
-  return { "flags.spycraft2.damageApplied": [...(Array.isArray(now) ? now : []), value] };
-};
+// Each damage record gets its own key, so two applies close together both survive: rewriting one array from a stale
+// copy could drop the first (read them with appliedDamageEntries).
+const markUpdate = (message, key, value) =>
+  key === "damageAppliedEntry"
+    ? { [`flags.spycraft2.damageAppliedBy.${foundry.utils.randomID()}`]: value }
+    : { [`flags.spycraft2.${key}`]: value };
 
 registerRelay("markCard", {
   async run({ messageId, key, value }, user) {

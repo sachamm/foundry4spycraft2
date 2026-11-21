@@ -11,6 +11,8 @@ import {
   damageProfile,
   drForAttack,
   dyingPlan,
+  appliedDamageEntries,
+  criticalDamageDefaults,
   firstAidPlan,
   firstAidStandard,
   lethalHitLines,
@@ -214,6 +216,53 @@ test("death and dying follow the character's Size threshold (p.349)", () => {
   assert.equal(dyingPlan({ wounds: -6, constitution: 8, deathThreshold: -7 }, 50).state, "dead");
   assert.equal(dyingPlan({ wounds: -12, constitution: 18, deathThreshold: -15 }, 50).state, "dying");
   assert.throws(() => dyingPlan({ wounds: -8, constitution: 8, deathThreshold: -7 }, 50), /dying/);
+});
+
+test("a critical hit's damage defaults: size before discounts, Table of Ouch, first shot only", () => {
+  assert.deepEqual(criticalDamageDefaults(null), { critical: false, criticalDice: 0, ouch: false, laterShot: false });
+  // Overkill buys 3 failed saves for 2 dice: the NPC fails 3 (pp.329, 332).
+  const overkill = { criticalSuccess: true, criticalActivation: { cost: 2, baseCost: 3 } };
+  assert.deepEqual(criticalDamageDefaults(overkill, "d1"), {
+    critical: true,
+    criticalDice: 3,
+    ouch: false,
+    laterShot: false
+  });
+  // A surcharge raises the size the effect was bought at.
+  assert.equal(
+    criticalDamageDefaults({ criticalSuccess: true, criticalActivation: { cost: 3, baseCost: 2, adjustedBaseCost: 3 } })
+      .criticalDice,
+    3
+  );
+  // Old cards without baseCost still read the cost paid.
+  assert.equal(criticalDamageDefaults({ criticalSuccess: true, criticalActivation: { cost: 2 } }).criticalDice, 2);
+  // A Table of Ouch effect is applied as a normal hit (p.329).
+  for (const preset of ["hit.ouch", "hit.ouchAtZero"])
+    assert.deepEqual(
+      criticalDamageDefaults({ criticalSuccess: true, criticalActivation: { cost: 2, baseCost: 2, preset } }),
+      { critical: false, criticalDice: 0, ouch: true, laterShot: false }
+    );
+  // A Burst: the first card applied is critical; the others are normal hits (pp.354-355).
+  const burst = { ...overkill, attackResolution: { hits: 3 } };
+  assert.equal(criticalDamageDefaults(burst, "d1").critical, true);
+  const taken = { ...burst, criticalShotApplied: { damageMessageId: "d1" } };
+  assert.equal(criticalDamageDefaults(taken, "d1").critical, true);
+  assert.deepEqual(criticalDamageDefaults(taken, "d2"), {
+    critical: false,
+    criticalDice: 0,
+    ouch: false,
+    laterShot: true
+  });
+  // A single hit is never a later shot.
+  assert.equal(criticalDamageDefaults({ ...taken, attackResolution: { hits: 1 } }, "d2").critical, true);
+});
+
+test("damage records read both the old array and the new keyed records", () => {
+  const a = { targetUuid: "A", name: "A", damage: 1, kind: "lethal" },
+    b = { targetUuid: "B", name: "B", damage: 2, kind: "lethal" };
+  assert.deepEqual(appliedDamageEntries({ damageApplied: [a], damageAppliedBy: { x: b } }), [a, b]);
+  assert.deepEqual(appliedDamageEntries({}), []);
+  assert.deepEqual(appliedDamageEntries(undefined), []);
 });
 
 test("an opposed check goes to the higher result, then the higher bonus", () => {

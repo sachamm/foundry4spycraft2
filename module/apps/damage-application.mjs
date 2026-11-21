@@ -17,7 +17,9 @@ import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { enhanceDamageDialog } from "./dialog-sections.mjs";
 import {
   attackKindOf,
+  appliedDamageEntries,
   attackOutcome,
+  criticalDamageDefaults,
   damageProfile,
   drForAttack,
   blastDamageAt,
@@ -618,7 +620,7 @@ const damageFacts = message => {
       unarmed: check.unarmed === true,
       blast: profile.blast === true
     }),
-    applied: Array.isArray(check.damageApplied) ? check.damageApplied : []
+    applied: appliedDamageEntries(check)
   };
 };
 const option = (value, label, chosen) =>
@@ -657,6 +659,7 @@ export async function applyDamage(message, options = {}) {
   const { check, weapon, attack, rolled, profile, attackKind: kindOfAttack, applied } = damageFacts(message);
   if (!message.flags?.spycraft2 || !Number.isFinite(rolled)) return null;
   let input = options;
+  const crit = criticalDamageDefaults(attack, message.id);
   if (input.targetUuid === undefined) {
     const choices = targetChoices(),
       selected =
@@ -674,7 +677,7 @@ export async function applyDamage(message, options = {}) {
         choices.actors.filter(actor => actor.isOwner || gcAvailable()),
         selected,
         actor => (actor.isOwner ? targetLabel(actor) : loc`${targetLabel(actor)} (sent to the GC)`)
-      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}<label><input type="checkbox" name="critical"${attack?.criticalSuccess ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Action dice spent on the critical hit (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label>${choices.actors.some(actor => juggernautConversion(actor.system, 2) > 0) ? `<label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half of what gets past damage reduction)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label>` : ""}<p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent, and bang, flash and explosive damage for a special NPC.`}</p></div>`
+      )}</select></label><label>${loc`Damage`} <input type="number" name="damage" min="0" step="1" value="${Math.max(0, Math.trunc(rolled))}" required /></label>${sharedFields(profile, kindOfAttack)}${criticalHint(crit)}<label><input type="checkbox" name="critical"${crit.critical ? " checked" : ""} /> ${loc`An activated critical hit (a special character with vitality left takes it on wounds)`}</label><label>${loc`Size of the critical hit in action dice, before any discount (a standard NPC fails that many more Damage saves)`} <input type="number" name="criticalDice" min="0" step="1" value="${crit.criticalDice}" /></label><label><input type="checkbox" name="blast"${profile.blast ? " checked" : ""} /> ${loc`The damage has a blast increment`}</label>${choices.actors.some(actor => juggernautConversion(actor.system, 2) > 0) ? `<label>${loc`Lethal damage taken as subdual instead (Juggernaut, Brawler 10th: up to half of what gets past damage reduction)`} <input type="number" name="juggernaut" min="0" step="1" value="0" /></label>` : ""}<p class="hint">${loc`Damage to a character you own is applied here; damage to anyone else is sent to the GC to apply. Enter the damage before damage reduction; the target's is read from its sheet. A special damage type opens its own dialog for an agent, and bang, flash and explosive damage for a special NPC.`}</p></div>`
     });
     if (!input) return null;
     input = { ...input, reviewType: true };
@@ -790,14 +793,21 @@ export async function applyDamage(message, options = {}) {
   } catch (error) {
     return ui.notifications.warn(error.message);
   }
+  // A Table of Ouch critical on a special character: the injury is rolled from the damage card (p.329).
+  const ouch = crit.ouch && target.type === "agent" && kind === "lethal" && Number.isFinite(result?.net);
+  if (ouch) lines.push(loc`Table of Ouch critical: roll ${esc(target.name)}’s injury from the damage card.`);
   if (lines.filter(Boolean).length) await post(target, lines, { pendingSave });
   // When the card cannot be marked the report above is the record.
   await markCard(
     message,
     "damageAppliedEntry",
-    { targetUuid: target.uuid, name: target.name, damage, kind },
+    { targetUuid: target.uuid, name: target.name, damage, kind, ...(ouch ? { ouch: true, net: result.net } : {}) },
     { quiet: true }
   );
+  // The first critical shot of a Burst or Autofire: the attack's other damage cards become normal hits.
+  const attackMessage = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid) : null;
+  if (critical && attackMessage && (Number(attack?.attackResolution?.hits) || 1) > 1 && !attack.criticalShotApplied)
+    await markCard(attackMessage, "criticalShotApplied", { damageMessageId: message.id }, { quiet: true });
   return result ?? true;
 }
 
@@ -886,6 +896,15 @@ export async function applyBlast(message, options = {}) {
 }
 
 /** The apply dialog's defaults for one target, so a click can apply them without opening it. */
+/** A line above the critical fields when the defaults differ from a plain critical hit. */
+function criticalHint(crit) {
+  if (crit.laterShot)
+    return `<p class="hint">${loc`Another shot of this attack was already applied as the critical hit; only the first shot of a Burst or Autofire is critical (pp.354-355).`}</p>`;
+  if (crit.ouch)
+    return `<p class="hint">${loc`A Table of Ouch injury was chosen for this critical hit, so the damage is applied normally; roll the injury from the button on this card afterwards (p.329).`}</p>`;
+  return "";
+}
+
 export function quickApplyInput(message, targetUuid, damage = null) {
   const { rolled, profile, attack, attackKind } = damageFacts(message);
   return {
@@ -896,8 +915,7 @@ export function quickApplyInput(message, targetUuid, damage = null) {
     attackKind,
     armorPiercing: profile.armorPiercing,
     armorPiercingAll: false,
-    critical: attack?.criticalSuccess === true,
-    criticalDice: attack?.criticalSuccess ? Math.max(1, Number(attack.criticalActivation?.cost) || 1) : 0,
+    ...(({ critical, criticalDice }) => ({ critical, criticalDice }))(criticalDamageDefaults(attack, message.id)),
     blast: profile.blast === true,
     reviewType: true
   };
@@ -942,7 +960,7 @@ rollPipeline.register({
   order: 9772,
   chatControls({ message, check }) {
     if (check.superseded) return null;
-    const applied = Array.isArray(check.damageApplied) ? check.damageApplied : [];
+    const applied = appliedDamageEntries(check);
     const rolled = Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : message.rolls?.[0]?.total;
     const amount = Math.max(0, Math.trunc(Number(rolled) || 0));
     const controls = [];
@@ -972,6 +990,23 @@ rollPipeline.register({
         hint: loc`Apply the blast to everyone caught in it, by distance from the centre`,
         run: () => applyBlast(message)
       });
+    // A Table of Ouch critical: the injured character's owner (or the GC) rolls it here, once per target (p.329).
+    // The event reference is fixed, so a second press shows the injury already rolled instead of a new one.
+    for (const entry of applied.filter(entry => entry.ouch === true)) {
+      const injured = fromUuidSync(entry.targetUuid);
+      if (!injured?.isOwner) continue;
+      controls.push({
+        label: loc`Table of Ouch: ${injured.name}`,
+        hint: loc`Roll ${injured.name}’s critical injury on the Table of Ouch`,
+        run: () =>
+          rollCriticalInjury(injured, {
+            id: `ouch-${message.id}-${injured.id}`,
+            damage: entry.net,
+            source: loc`Critical hit: ${fromUuidSync(check.weaponUuid ?? "")?.name ?? loc`Damage`}`,
+            confirmed: true
+          })
+      });
+    }
     return controls;
   }
 });
