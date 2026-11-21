@@ -13,7 +13,8 @@ export default defineConfig({
     "ux-improvements.spec.mjs",
     "readable-dialogs.spec.mjs",
     "guided-play.spec.mjs",
-    "accessibility-resolution.spec.mjs"
+    "accessibility-resolution.spec.mjs",
+    "chat-theme.spec.mjs"
   ],
   fullyParallel: true,
   workers: 2,

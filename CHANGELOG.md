@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Chat theme:** system messages in the chat log now follow the interface theme, like the messages around them, so
+  a dark sidebar no longer shows paper-coloured cards when the windows use the light theme (or the other way round).
+  A popped-out chat log follows its own window. Short system notes (ammunition, healing, round reminders and the
+  like) now pick up the dark colours too; they used to keep light-theme text colours on a dark background. Their
+  size is unchanged.
 - **Dialogs:** the blast, numerical-advantage and timer dialogs name every field for screen readers (each row says
   which character it is about), and the numerical-advantage side headings are translatable. Icons beside button
   text are hidden from screen readers so each button is announced once. The agent sheet no longer rewrites its

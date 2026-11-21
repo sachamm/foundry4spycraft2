@@ -72,11 +72,16 @@
   --sc2-rail: 264px;
 }
 
-/* Night variant: follows Foundry's own interface theme. */
+/* Night variant. Windows follow the application theme on <body> unless they carry their own. A chat message follows
+ * the nearest themed surface around it: the sidebar's interface theme, or a popped-out log's own window, so it
+ * matches the messages beside it when the two themes differ. Any system root inside a message's content counts, not
+ * only flagged cards. */
 body.theme-dark .spycraft2.application:not(.theme-light),
 .spycraft2.application.theme-dark,
-body.theme-dark .chat-message:is(.sc2-card, :has(> .spycraft2)) :is(.spycraft2, .spycraft2-roll-options),
-body.theme-dark .chat-message.sc2-card,
+.theme-dark .chat-message.sc2-card:not(.theme-light .chat-message),
+.theme-light .theme-dark .chat-message.sc2-card,
+.theme-dark .chat-message:not(.theme-light .chat-message) .message-content :is(.spycraft2, .spycraft2-roll-options),
+.theme-light .theme-dark .chat-message .message-content :is(.spycraft2, .spycraft2-roll-options),
 .theme-dark .spycraft2.gc-console:not(.theme-light),
 .theme-dark .spycraft2.gc-console:not(.theme-light) :is(.spycraft2, .spycraft2-roll-options, [data-sc2-tooltip-scope]),
 .spycraft2.gc-console.theme-dark,
