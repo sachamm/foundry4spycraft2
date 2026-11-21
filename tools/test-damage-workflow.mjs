@@ -47,8 +47,16 @@ globalThis.CONFIG = {
   )
 };
 
-const { resolveAttack, applyDamage, applyBlast, defenseOf, rollReportedSave, nonLethalTotals, standardReduction } =
-  await import("../module/apps/damage-application.mjs");
+const {
+  resolveAttack,
+  applyDamage,
+  applyBlast,
+  applyDamageToEach,
+  defenseOf,
+  rollReportedSave,
+  nonLethalTotals,
+  standardReduction
+} = await import("../module/apps/damage-application.mjs");
 const { appliedDamageEntries } = await import("../module/rules/damage-application.mjs");
 const { hazardSaveResolvers } = await import("../module/apps/hazards.mjs");
 const { rollPipeline } = await import("../module/rules/roll-pipeline.mjs");
@@ -543,6 +551,13 @@ test("a recorded target gives one-click Resolve and Apply buttons, and several t
   assert.deepEqual([guard.system.vitality.value, second.system.vitality.value], [6, 13]);
   assert.match(posted.at(-1).content, /Damage applied to 2 targets/);
   game.user.targets = [];
+  // A target the damage cannot reach is named as not applied, never counted as done.
+  const crate = document({ uuid: "Actor.Crate", name: "Crate", type: "loot", isOwner: true, system: {}, flags: {} });
+  registry.set(crate.uuid, crate);
+  const done = await applyDamageToEach(damage, [second, crate]);
+  assert.deepEqual(done, ["Guard2 (not on the scene)"]);
+  assert.match(posted.at(-1).content, /Damage applied to Guard2/);
+  assert.match(posted.at(-1).content, /Not applied to: Crate/);
 });
 
 test("wound loss from applied damage records its end-of-round Initiative change", async () => {
@@ -586,7 +601,7 @@ test("resolving never targets the attacker, uses the one targeted token without 
       ["Shooter", "Sentry", "Faraway"]
     );
     const self = card("s1", { actorUuid: attacker.uuid, checkKind: "attack", rawTotal: 18, effectiveTotal: 18 });
-    assert.equal(await resolveAttack(self, { targetUuid: attacker.uuid, defense: "" }), null);
+    assert.equal(await resolveAttack(self, { targetUuid: attacker.uuid, defense: "" }), false);
     assert.equal(self.flags.spycraft2.attackResolution, undefined);
     assert.ok(warnings.some(text => /cannot be the target of its own attack/.test(text)));
     // One other token targeted and nothing recorded on the card: settled at once, with no dialog.

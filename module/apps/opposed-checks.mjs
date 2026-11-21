@@ -100,11 +100,15 @@ export async function compareOpposed(message, options = {}) {
   let outcome = opposedOutcome(mine, { total, bonus: other?.bonus ?? null }, { breakTies: input.breakTies !== false });
   // Equal results and equal bonuses: a d20 each decides (p.91).
   let rollOff = "";
+  const rollOffRolls = [];
   if (outcome === "tie" && input.breakTies !== false && other && Number.isFinite(other.bonus)) {
     let a, b;
     do {
-      a = (await new Roll("1d20").evaluate()).total;
-      b = (await new Roll("1d20").evaluate()).total;
+      // Every d20 rolled goes on the roll-off card, so the dice can be seen (and animated) behind the result.
+      const first = await new Roll("1d20").evaluate(),
+        second = await new Roll("1d20").evaluate();
+      rollOffRolls.push(first, second);
+      [a, b] = [first.total, second.total];
     } while (a === b);
     outcome = a > b ? "first" : "second";
     rollOff = loc` Roll-off ${a} against ${b}.`;
@@ -145,7 +149,8 @@ export async function compareOpposed(message, options = {}) {
   if (rollOff)
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
-      content: `<div class="spycraft2 chat-note"><p>${loc`Opposed check tied at ${total} with equal bonuses.`}${rollOff}</p></div>`
+      content: `<div class="spycraft2 chat-note"><p>${loc`Opposed check tied at ${total} with equal bonuses.`}${rollOff}</p></div>`,
+      rolls: rollOffRolls
     });
   return { outcome: word, total };
 }

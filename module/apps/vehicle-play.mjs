@@ -35,6 +35,7 @@ import {
   crashOccupantNote
 } from "../rules/collision.mjs";
 import { loc } from "../i18n.mjs";
+import { refuse } from "../error-notices.mjs";
 
 const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const speakerFor = doc => ChatMessage.getSpeaker({ actor: doc.documentName === "Actor" ? doc : doc.parent });
@@ -101,7 +102,7 @@ async function damageInput(title, { vehicle = false, flammable = false, motherHe
  */
 export async function rollObjectDamageSave(doc, options = {}) {
   const bonus0 = saveBonusOf(doc);
-  if (!Number.isSafeInteger(bonus0)) return ui.notifications.warn(loc`${doc.name} has no Damage save bonus recorded.`);
+  if (!Number.isSafeInteger(bonus0)) return refuse(loc`${doc.name} has no Damage save bonus recorded.`);
   const vehicle = isVehicleActor(doc),
     qualities = vehicle ? doc.system.qualitiesNow : "";
   const flammable = vehicle && hasQuality(qualities, "FLM");
@@ -211,7 +212,7 @@ export async function rollVehicleDamageResult(
   { failed = 1, damage = null, armorPiercing = 0, fire = false } = {}
 ) {
   if (!actor.system.vehicleClass)
-    return ui.notifications.warn(loc`Choose this vehicle's category before rolling a Vehicle Damage result.`);
+    return refuse(loc`Choose this vehicle's category before rolling a Vehicle Damage result.`);
   let roll,
     location,
     rerolls = 0;
@@ -318,8 +319,7 @@ export async function rollTyreSave(actor, options = {}) {
     if (!input) return null;
     damage = Number(input.damage);
   }
-  if (!Number.isSafeInteger(damage) || damage < 1)
-    return ui.notifications.warn(loc`Enter the whole number of damage points.`);
+  if (!Number.isSafeInteger(damage) || damage < 1) return refuse(loc`Enter the whole number of damage points.`);
   const tracked = hasQuality(actor.system.qualitiesNow ?? actor.system.qualities, "TRK"),
     against = tracked ? Math.max(1, Math.floor(damage / 2)) : damage;
   const size = sizeCode(objectSize(actor)),
@@ -351,7 +351,7 @@ export function repairVehicle(actor) {
 
 /** Record hours of travel (double above cruising speed) or combat/chase rounds (a minute each). */
 export async function spendFuel(actor, { hours = null, rounds = 0, aboveCruising = false } = {}) {
-  if (!actor.system.fuel) return ui.notifications.warn(loc`${actor.name} has no fuel range to track.`);
+  if (!actor.system.fuel) return refuse(loc`${actor.name} has no fuel range to track.`);
   if (hours === null && !rounds) {
     const input = await ask(
       loc`${actor.name}: fuel used`,
@@ -409,8 +409,8 @@ export const setOccupantRole = (actor, index, role) =>
 /** Reflex save to bail out (DC 15, ejection seats +6 for crew): rolled by the occupant, reported with the DC. */
 export async function bailOutOf(actor, uuid) {
   const occupant = fromUuidSync(uuid);
-  if (!occupant) return ui.notifications.warn(loc`That occupant no longer exists.`);
-  if (!occupant.isOwner) return ui.notifications.warn(loc`Only ${occupant.name}'s owner or the GC can roll this save.`);
+  if (!occupant) return refuse(loc`That occupant no longer exists.`);
+  if (!occupant.isOwner) return refuse(loc`Only ${occupant.name}'s owner or the GC can roll this save.`);
   const role =
     uuid === actor.system.driver ? "crew" : (actor.system.occupants.find(o => o.uuid === uuid)?.role ?? "passenger");
   const plan = bailOut(actor.system, { role });
@@ -435,13 +435,12 @@ export function skeletonCrewFor(actor, teamSize) {
 /** The driver makes a Maneuver check with the vehicle's skill, Drive focus, untrained penalty and error increases. */
 export async function rollControlCheck(actor, { modifier = null, topMphBonus = false, stunt = "", fast = false } = {}) {
   const driver = actor.system.driver ? fromUuidSync(actor.system.driver) : null;
-  if (!driver) return ui.notifications.warn(loc`Drop a character on the vehicle sheet to set the driver first.`);
-  if (!driver.isOwner) return ui.notifications.warn(loc`Only ${driver.name}'s owner or the GC can roll this check.`);
-  if (typeof driver.rollSkill !== "function")
-    return ui.notifications.warn(loc`${driver.name} cannot make skill checks here.`);
+  if (!driver) return refuse(loc`Drop a character on the vehicle sheet to set the driver first.`);
+  if (!driver.isOwner) return refuse(loc`Only ${driver.name}'s owner or the GC can roll this check.`);
+  if (typeof driver.rollSkill !== "function") return refuse(loc`${driver.name} cannot make skill checks here.`);
   const hazards = actor.system.hazardEffect ?? null;
   const plan = controlCheckPlan(actor.system, driver.system, { hazards });
-  if (plan.blocked) return ui.notifications.warn(plan.blocked);
+  if (plan.blocked) return refuse(plan.blocked);
   const hazardNote = hazards?.rows?.length ? actor.system.hazardSummary : "";
   if (modifier === null) {
     const input = await ask(
@@ -482,12 +481,11 @@ export async function rollControlCheck(actor, { modifier = null, topMphBonus = f
 /** A gunner fires one of the vehicle's mounted weapons: they get a vehicle-mounted copy to attack with. */
 export async function fireMountedWeapon(actor, itemId, gunnerUuid = null) {
   const weapon = actor.items.get(itemId);
-  if (!weapon || weapon.type !== "weapon")
-    return ui.notifications.warn(loc`That is not a weapon installed on this vehicle.`);
+  if (!weapon || weapon.type !== "weapon") return refuse(loc`That is not a weapon installed on this vehicle.`);
   const aboard = occupantsOf(actor);
   let gunner = gunnerUuid ? fromUuidSync(gunnerUuid) : aboard.length === 1 ? aboard[0] : null;
   if (!gunner) {
-    if (!aboard.length) return ui.notifications.warn(loc`Nobody is aboard to fire this weapon.`);
+    if (!aboard.length) return refuse(loc`Nobody is aboard to fire this weapon.`);
     const input = await ask(
       loc`${weapon.name}: gunner`,
       `<label>${loc`Gunner`} <select name="gunner">${aboard.map(a => `<option value="${a.uuid}">${esc(a.name)}</option>`).join("")}</select></label>`
@@ -495,7 +493,7 @@ export async function fireMountedWeapon(actor, itemId, gunnerUuid = null) {
     if (!input) return null;
     gunner = fromUuidSync(input.gunner);
   }
-  if (!gunner?.isOwner) return ui.notifications.warn(loc`Only the gunner's owner or the GC can fire this weapon.`);
+  if (!gunner?.isOwner) return refuse(loc`Only the gunner's owner or the GC can fire this weapon.`);
   let copy = gunner.items.find(i => i.getFlag("spycraft2", "mountedOn")?.itemUuid === weapon.uuid);
   if (!copy) {
     const data = weapon.toObject();
@@ -568,7 +566,7 @@ installVehicleCombatHooks();
 export async function deployVehicle(item) {
   if (item.type !== "vehicle") return null;
   if (!game.user.can("ACTOR_CREATE"))
-    return ui.notifications.warn(loc`You do not have permission to create actors; ask the GC to place this vehicle.`);
+    return refuse(loc`You do not have permission to create actors; ask the GC to place this vehicle.`);
   const actor = await Actor.implementation.create({
     name: item.name,
     type: "vehicle",
@@ -610,8 +608,7 @@ export async function crashVehicle(actor) {
   );
   if (!input) return null;
   const plan = collisionDamagePlan(size, Number(input.mph));
-  if (!plan.dice && !plan.flat)
-    return ui.notifications.warn(loc`At this Size and speed the crash does no collision damage.`);
+  if (!plan.dice && !plan.flat) return refuse(loc`At this Size and speed the crash does no collision damage.`);
   const driver = actor.system.driver ? fromUuidSync(actor.system.driver) : null,
     roll = plan.dice ? await new Roll(plan.formula).evaluate() : null,
     faces = roll ? roll.dice.flatMap(d => d.results.map(r => r.result)) : [],

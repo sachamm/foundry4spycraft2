@@ -447,7 +447,7 @@ test("a gear item records the Damage saves it fails and reports when it breaks",
   await rollObjectDamageSave(bug, { damage: 12 });
   assert.match(posts[2].flavor, /Now <strong>destroyed<\/strong>/);
   posts.length = 0;
-  assert.equal(await rollObjectDamageSave(document("Item", "gear", { damageSave: null }), { damage: 5 }), null);
+  assert.equal(await rollObjectDamageSave(document("Item", "gear", { damageSave: null }), { damage: 5 }), false);
   assert.match(posts[0].warning, /no Damage save bonus/);
 });
 
