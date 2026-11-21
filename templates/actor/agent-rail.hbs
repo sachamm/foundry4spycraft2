@@ -75,7 +75,7 @@
 {{/if}}
 {{#if warnings.length}}
 <details class="warnings" data-key="warnings" {{#if open.warnings}}open{{/if}}>
-  <summary><i class="fa-solid fa-triangle-exclamation"></i> {{localize "SPYCRAFT.Warnings" count=warnings.length}} ({{warnings.length}})</summary>
+  <summary><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> {{localize "SPYCRAFT.Warnings" count=warnings.length}} ({{warnings.length}})</summary>
   <ul>{{#each warnings}}<li>{{this}}</li>{{/each}}</ul>
 </details>
 {{/if}}

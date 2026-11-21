@@ -617,7 +617,7 @@ function clockClass() {
           : `<p class="muted">${loc`The GC keeps the time.`}</p>`
       }${combat ? `<p class="muted">${loc`Combat round ${combat.round}. Each round is ${ROUND_SECONDS} seconds.`}</p>` : ""}${gc}<h3>${loc`My timers`}</h3><ul class="sc2-timers">${
         own.map(timerRow).join("") || `<li class="muted">${loc`None running.`}</li>`
-      }</ul><div class="sc2-timer-new"><input type="text" name="label" maxlength="120" placeholder="${loc`What it is for`}" /><input type="number" name="count" min="1" step="1" value="1" aria-label="${loc`Length`}" /><select name="unit" aria-label="${loc`Unit`}">${unitOptions("round")}</select><select name="actorUuid" class="sc2-timer-holder" aria-label="${loc`Kept on`}">${holderOptions()}</select><label class="sc2-timer-shared"><input type="checkbox" name="shared" /> ${loc`Show everyone`}</label><button type="button" data-action="quickTimer">${loc`Start timer`}</button></div>${
+      }</ul><div class="sc2-timer-new"><input type="text" name="label" maxlength="120" placeholder="${loc`What it is for`}" aria-label="${loc`Timer name`}" /><input type="number" name="count" min="1" step="1" value="1" aria-label="${loc`Length`}" /><select name="unit" aria-label="${loc`Unit`}">${unitOptions("round")}</select><select name="actorUuid" class="sc2-timer-holder" aria-label="${loc`Kept on`}">${holderOptions()}</select><label class="sc2-timer-shared"><input type="checkbox" name="shared" /> ${loc`Show everyone`}</label><button type="button" data-action="quickTimer">${loc`Start timer`}</button></div>${
         shared.length
           ? `<h3>${loc`Shared timers`}</h3><ul class="sc2-timers">${shared.map(timerRow).join("")}</ul>`
           : ""
@@ -679,7 +679,7 @@ function mountClockBadge(app, html) {
   badge.type = "button";
   badge.className = "sc2-clock-badge";
   badge.dataset.tooltip = loc`Clock and timers`;
-  badge.innerHTML = `<i class="fa-solid fa-clock"></i> <span></span>`;
+  badge.innerHTML = `<i class="fa-solid fa-clock" aria-hidden="true"></i> <span></span>`;
   badge.querySelector("span").textContent = badgeText();
   badge.addEventListener("click", () => openGameClock());
   root.prepend(badge);

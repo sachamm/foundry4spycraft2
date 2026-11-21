@@ -41,13 +41,13 @@
     <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.DefenseAgainst"}} <select name="system.attacker">{{selectOptions attackerOptions selected=system.attacker}}</select></label>
   </p>
   <p class="controls sc2-toolrow">
-    <button type="button" class="sc2-action" data-action="controlCheck"><i class="fa-solid fa-car-side"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.ControlCheck"}}</button>
-    <button type="button" class="sc2-action" data-action="crash"><i class="fa-solid fa-car-burst"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Crash"}}</button>
-    <button type="button" class="sc2-action" data-action="damageSave"><i class="fa-solid fa-shield-halved"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave2"}}</button>
-    <button type="button" class="sc2-action" data-action="vehicleDamage"><i class="fa-solid fa-dice-d20"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleDamageResult"}}</button>
-    <button type="button" class="sc2-action" data-action="tyreSave"><i class="fa-solid fa-circle-dot"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TyreSave"}}</button>
-    <button type="button" class="sc2-action" data-action="fuelExplosion"><i class="fa-solid fa-fire"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.FuelExplosion"}}</button>
-    <button type="button" class="sc2-action" data-action="repair"><i class="fa-solid fa-wrench"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Repaired"}}</button>
+    <button type="button" class="sc2-action" data-action="controlCheck"><i class="fa-solid fa-car-side" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.ControlCheck"}}</button>
+    <button type="button" class="sc2-action" data-action="crash"><i class="fa-solid fa-car-burst" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Crash"}}</button>
+    <button type="button" class="sc2-action" data-action="damageSave"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DamageSave2"}}</button>
+    <button type="button" class="sc2-action" data-action="vehicleDamage"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.VehicleDamageResult"}}</button>
+    <button type="button" class="sc2-action" data-action="tyreSave"><i class="fa-solid fa-circle-dot" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TyreSave"}}</button>
+    <button type="button" class="sc2-action" data-action="fuelExplosion"><i class="fa-solid fa-fire" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.FuelExplosion"}}</button>
+    <button type="button" class="sc2-action" data-action="repair"><i class="fa-solid fa-wrench" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Repaired"}}</button>
   </p>
   <div class="form-fields-grid">
     {{#each counters}}<label>{{label}} <input name="system.damage.{{key}}" type="number" min="0" value="{{value}}" class="w-2" /></label>{{/each}}
@@ -78,10 +78,10 @@
   </p>
   {{#if system.occupantList.length}}<table class="items"><tbody>
     {{#each system.occupantList}}<tr><td>{{name}}</td><td><button type="button" class="sc2-action" data-action="toggleRole" data-index="{{index}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.SwitchCrewPassenger'}}">{{role}}</button></td>
-      <td><button type="button" class="sc2-action" data-action="bailOut" data-uuid="{{uuid}}"><i class="fa-solid fa-person-falling"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.BailOut"}}</button></td>
+      <td><button type="button" class="sc2-action" data-action="bailOut" data-uuid="{{uuid}}"><i class="fa-solid fa-person-falling" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.BailOut"}}</button></td>
       <td><button type="button" class="sc2-action" data-action="leave" data-index="{{index}}" aria-label="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.LeaveTheVehicle'}}" data-tooltip="{{localize 'SPYCRAFT.Template.ActorVehicleSheet.LeaveTheVehicle'}}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></td></tr>{{/each}}
   </tbody></table>{{/if}}
-  {{#if system.driverName}}<p><button type="button" class="sc2-action" data-action="bailOut" data-uuid="{{system.driver}}"><i class="fa-solid fa-person-falling"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DriverBailsOut"}}</button></p>{{/if}}
+  {{#if system.driverName}}<p><button type="button" class="sc2-action" data-action="bailOut" data-uuid="{{system.driver}}"><i class="fa-solid fa-person-falling" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.DriverBailsOut"}}</button></p>{{/if}}
   <p>
     <label>{{localize "SPYCRAFT.Template.ActorVehicleSheet.AcquiredAs"}} <select name="system.acquiredAs">{{selectOptions acquiredOptions selected=system.acquiredAs}}</select></label>
     {{#if skeletonCrew}}{{localize "SPYCRAFT.Template.ActorVehicleSheet.SkeletonCrew"}} <strong>{{skeletonCrew.count}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.TierIVehicleCrew"}} <span class="muted">({{skeletonCrew.source}})</span>{{/if}}
@@ -93,7 +93,7 @@
     <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Fuel"}}</summary>
   {{#if fuel}}<p>
     <strong class="{{#if fuel.empty}}bad{{/if}}">{{fuel.remainingLabel}}</strong> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Of"}} {{fuel.capacityLabel}} {{localize "SPYCRAFT.Template.ActorVehicleSheet.HoursLeft"}} {{fuel.fuelName}}
-    <button type="button" class="sc2-action" data-action="spendFuel"><i class="fa-solid fa-gas-pump"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.RecordUse"}}</button> <button type="button" class="sc2-action" data-action="refuel"><i class="fa-solid fa-rotate"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Refuel"}}</button>
+    <button type="button" class="sc2-action" data-action="spendFuel"><i class="fa-solid fa-gas-pump" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.RecordUse"}}</button> <button type="button" class="sc2-action" data-action="refuel"><i class="fa-solid fa-rotate" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Refuel"}}</button>
     <label class="vehicle-fuel-used">{{localize "SPYCRAFT.Template.ActorVehicleSheet.Used"}} <input name="system.fuelUsed" type="number" min="0" step="any" value="{{system.fuelUsed}}" class="w-3" /> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Hr"}}</label>
   </p>{{else}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.NoFuelRangeToTrack"}}</p>{{/if}}
 
@@ -112,7 +112,7 @@
   {{#if upgrades.length}}<table class="items"><tbody>{{#each upgrades}}<tr><td><button type="button" class="sc2-action" data-action="openItem" data-item-id="{{id}}">{{name}}</button></td><td>{{cost}}</td><td><button type="button" class="sc2-action" data-action="removeItem" data-item-id="{{id}}" aria-label="{{localize 'SPYCRAFT.Action.RemoveNamed' name=name}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveNamed' name=name}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td></tr>{{/each}}</tbody></table>{{/if}}
   {{#if system.upgraded.addedQualities.length}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.AddedByUpgrades"}} {{#each system.upgraded.addedQualities}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
   {{#if weapons.length}}<table class="items"><tbody>{{#each weapons}}<tr><td><button type="button" class="sc2-action" data-action="openItem" data-item-id="{{id}}">{{name}}</button></td><td>{{damage}}</td><td>{{errorThreat}}</td>
-    <td><button type="button" class="sc2-action" data-action="fireWeapon" data-item-id="{{id}}"><i class="fa-solid fa-crosshairs"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Fire"}}</button></td><td><button type="button" class="sc2-action" data-action="removeItem" data-item-id="{{id}}" aria-label="{{localize 'SPYCRAFT.Action.RemoveNamed' name=name}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveNamed' name=name}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td></tr>{{/each}}</tbody></table>{{/if}}
+    <td><button type="button" class="sc2-action" data-action="fireWeapon" data-item-id="{{id}}"><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorVehicleSheet.Fire"}}</button></td><td><button type="button" class="sc2-action" data-action="removeItem" data-item-id="{{id}}" aria-label="{{localize 'SPYCRAFT.Action.RemoveNamed' name=name}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveNamed' name=name}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button></td></tr>{{/each}}</tbody></table>{{/if}}
   {{#if otherItems.length}}<p class="muted">{{localize "SPYCRAFT.Template.ActorVehicleSheet.AlsoAboard"}} {{#each otherItems}}<button type="button" class="sc2-action" data-action="openItem" data-item-id="{{id}}">{{name}}</button>{{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
 
   </details>

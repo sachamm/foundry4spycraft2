@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Dialogs:** the blast, numerical-advantage and timer dialogs name every field for screen readers (each row says
+  which character it is about), and the numerical-advantage side headings are translatable. Icons beside button
+  text are hidden from screen readers so each button is announced once. The agent sheet no longer rewrites its
+  markup on every render, since its templates now author buttons themselves.
 - **GC console:** its row actions (complete, faced, ignore, remove, next step, manage) are real buttons, and section
   titles are plain text inside each disclosure, so screen readers announce one toggle per section instead of a
   heading buried in a button. The console looks the same.

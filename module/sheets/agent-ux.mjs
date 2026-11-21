@@ -201,80 +201,8 @@ export function activeConditionLabels(system = {}) {
   return [...labels];
 }
 
-function itemOf(link, context) {
-  const itemId = link.closest("[data-item-id]")?.dataset.itemId;
-  return context.actor?.items?.get?.(itemId) ?? context.actor?.items?.contents?.find(entry => entry.id === itemId);
-}
-const equippedItem = (link, context) => itemOf(link, context)?.system?.equipped === true;
-
-function sheetActionLabel(link, context, localize) {
-  const item = itemOf(link, context);
-  const itemName = item?.name ?? "item";
-  const types = {
-    weapon: "weapons",
-    armor: "armor",
-    gear: "gear",
-    vehicle: "vehicles",
-    feat: "feats",
-    class: "classes",
-    origin: "origins"
-  };
-  const rows = { contacts: "contact", subplots: "subplot", skillFortes: "skill forte" };
-  const label = {
-    browse: `Browse ${types[link.dataset.type] ?? "options"}`,
-    createItem: `Add ${link.dataset.type ?? "item"}`,
-    itemEquip: `${item?.system?.equipped ? "Unequip" : "Equip"} ${itemName}`,
-    itemDelete: `Remove ${itemName}`,
-    itemChat: `Share ${itemName} in chat`,
-    syncGrants: loc`Refresh granted feats`,
-    addRow: `Add ${rows[link.dataset.list] ?? "entry"}`,
-    removeRow: `Remove ${rows[link.dataset.list] ?? "entry"}`
-  }[link.dataset.action];
-  const tooltip = link.dataset.tooltip ? localize(link.dataset.tooltip) : "";
-  return (
-    label ??
-    (tooltip && tooltip !== link.dataset.tooltip ? tooltip : link.dataset.action.replace(/([a-z])([A-Z])/g, "$1 $2"))
-  );
-}
-
-/**
- * Turn any `<a data-action>` left in the sheet into a native button, so it takes Tab, Enter and Space. The agent
- * templates author buttons themselves; this is the fallback for markup that still uses links. Foundry's own tab
- * links are left alone.
- */
-export function upgradeActionLinks(element, context, localize = text => text) {
-  for (const link of element.querySelectorAll('a[data-action]:not([data-action="tab"])')) {
-    const button = element.ownerDocument.createElement("button");
-    for (const attr of link.attributes) button.setAttribute(attr.name, attr.value);
-    button.type = "button";
-    button.classList.add("sc2-action");
-    if (!link.textContent.trim()) {
-      const label = link.getAttribute("aria-label") ?? sheetActionLabel(link, context, localize);
-      button.setAttribute("aria-label", label);
-      // Foundry's tooltip only: a title as well would show a second, native tooltip.
-      button.dataset.tooltip = label;
-      // Toolbar labels are visible; compact origin controls retain their explicit labels.
-      if (link.closest(".controls")) {
-        const text = element.ownerDocument.createElement("span");
-        text.textContent =
-          {
-            itemChat: loc`Share`,
-            itemDelete: loc`Remove`,
-            // Says what a press will do, like the sheet's own Equip button.
-            itemEquip: equippedItem(link, context) ? loc`Unequip` : loc`Equip`,
-            syncGrants: loc`Refresh grants`,
-            removeRow: loc`Remove`
-          }[link.dataset.action] ?? label;
-        button.append(text);
-      }
-    }
-    button.prepend(...link.childNodes);
-    link.replaceWith(button);
-  }
-}
-
 /** Apply view behavior after each complete or partial sheet render. */
-export function enhanceAgentSheet(element, context, state, localize = text => text) {
+export function enhanceAgentSheet(element, context, state) {
   element.classList.toggle("play-mode", !context.editMode);
   element.classList.toggle("edit-mode", !!context.editMode);
   state._open ??= {};
@@ -287,7 +215,6 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
       });
     }
   }
-  upgradeActionLinks(element, context, localize);
   for (const control of element.querySelectorAll(
     ".edit-only:is(input, select, textarea), .edit-only input, .edit-only select, .edit-only textarea"
   )) {

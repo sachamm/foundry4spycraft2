@@ -1488,7 +1488,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   /** Remember which header panels the player has opened or closed. */
   _onRender(context, options) {
     super._onRender(context, options);
-    enhanceAgentSheet(this.element, context, this, text => game.i18n.localize(text));
+    enhanceAgentSheet(this.element, context, this);
     enableHotbarDrag(this.element, this.actor);
     installResolutionGuide(this.element.querySelector(".play-dashboard"), "play");
   }

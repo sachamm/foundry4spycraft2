@@ -2,7 +2,7 @@
   <div class="edit-only">
   <h3>{{localize "SPYCRAFT.Feat.Slots"}}
     <span class="controls">
-      <button type="button" class="sc2-action" data-action="browse" data-type="feat"><i class="fa-solid fa-book-open"></i> {{localize "SPYCRAFT.Feat.Browse"}}</button>
+      <button type="button" class="sc2-action" data-action="browse" data-type="feat"><i class="fa-solid fa-book-open" aria-hidden="true"></i> {{localize "SPYCRAFT.Feat.Browse"}}</button>
       <button type="button" class="sc2-action" data-action="syncGrants" aria-label="{{localize 'SPYCRAFT.Action.RefreshGrantedFeats'}}" data-tooltip="{{localize 'SPYCRAFT.Action.RefreshGrantedFeats'}}"><i class="fa-solid fa-rotate" aria-hidden="true"></i><span>{{localize "SPYCRAFT.Action.RefreshGrants"}}</span></button>
     </span></h3>
   <div class="feat-slots">
@@ -27,7 +27,7 @@
         {{#if status.ok}}{{#if (sc2eq item.name "Mark")}}<button type="button" class="sc2-action" data-action="useMark">{{localize "SPYCRAFT.Template.ActorAgentFeats.ObserveThreeSkillsFreeAction"}}</button>{{/if}}{{/if}}
         <span class="tree">{{treeLabel}}</span>
         {{#if item.system.granted}}<span class="tag">{{localize "SPYCRAFT.Feat.Granted"}}: {{item.system.grantSource}}</span>{{/if}}
-        {{#unless status.ok}}<span class="bad" data-tooltip="{{prereqText}}"><i class="fa-solid fa-triangle-exclamation"></i> {{#each status.unmet}}{{this}}{{#unless @last}}; {{/unless}}{{/each}}</span>{{/unless}}
+        {{#unless status.ok}}<span class="bad" data-tooltip="{{prereqText}}"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> {{#each status.unmet}}{{this}}{{#unless @last}}; {{/unless}}{{/each}}</span>{{/unless}}
         <span class="controls" data-sc2-display="icon"><button type="button" class="sc2-action" data-action="itemChat" aria-label="{{localize 'SPYCRAFT.Action.ShareNamed' name=item.name}}" data-tooltip="{{localize 'SPYCRAFT.Action.ShareNamed' name=item.name}}"><i class="fa-solid fa-comment" aria-hidden="true"></i><span>{{localize "SPYCRAFT.Action.Share"}}</span></button> <button type="button" class="edit-only sc2-action" data-action="itemDelete" aria-label="{{localize 'SPYCRAFT.Action.RemoveNamed' name=item.name}}" data-tooltip="{{localize 'SPYCRAFT.Action.RemoveNamed' name=item.name}}"><i class="fa-solid fa-trash" aria-hidden="true"></i><span>{{localize "SPYCRAFT.Action.Remove"}}</span></button></span>
       </li>
     {{else}}<li class="muted">{{localize "SPYCRAFT.Feat.None"}}</li>{{/each}}

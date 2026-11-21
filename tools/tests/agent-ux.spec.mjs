@@ -4,6 +4,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { uiModuleUrl } from "../lib/ui-test-module.mjs";
+import { createEnvironment } from "../lib/hbs-harness.mjs";
 const sheetUX = readFileSync(new URL("../../module/sheets/agent-ux.mjs", import.meta.url), "utf8");
 const skillUX = readFileSync(new URL("../../module/apps/skill-dialog-ux.mjs", import.meta.url), "utf8");
 const css = ["tokens", "spycraft2", "retro", "components"]
@@ -30,8 +31,8 @@ test("Play/Edit preserves resource access, disables build fields and supports ke
     <input name="system.vitality.value" value="11" />
     <div class="edit-only"><input name="system.abilities.str.base" value="10" /><input name="granted" disabled /></div>
     <input class="edit-only" name="system.xp" value="0" />
-    <a data-action="rollSave" data-save="fort">Fortitude</a>
-    <a data-action="itemDelete" data-tooltip="SPYCRAFT.Origin.Remove" aria-label="Remove talent"><i aria-hidden="true"></i></a>
+    <button type="button" class="sc2-action" data-action="rollSave" data-save="fort">Fortitude</button>
+    <button type="button" class="sc2-action" data-action="itemDelete" data-tooltip="SPYCRAFT.Origin.Remove" aria-label="Remove talent"><i aria-hidden="true"></i></button>
     <div class="play-only" data-testid="play-dashboard">Combat tools</div>
     <input class="skill-search" /><input class="trained-filter" type="checkbox" /><span class="skill-count"></span>
     <table class="skills-table"><tbody><tr data-skill-name="Athletics STR/CON" data-trained="true"><td>Athletics</td></tr><tr data-skill-name="Bluff CHA" data-trained="false"><td>Bluff</td></tr></tbody></table>
@@ -106,7 +107,7 @@ test("named check changes show relevant circumstances, omit stale inputs and upd
 });
 
 test("combat disclosures retain independent open states across a complete sheet render", async ({ page }) => {
-  const markup = `<div class="spycraft2 application sheet agent"><details data-key="combat-attacks"><summary>Attacks and reactions</summary><a data-action="rollDisarm">Disarm</a></details><details data-key="combat-review"><summary>GC review</summary><a data-action="reviewCounterTrip">Recover counter-Trip</a></details></div>`;
+  const markup = `<div class="spycraft2 application sheet agent"><details data-key="combat-attacks"><summary>Attacks and reactions</summary><button type="button" class="sc2-action" data-action="rollDisarm">Disarm</button></details><details data-key="combat-review"><summary>GC review</summary><button type="button" class="sc2-action" data-action="reviewCounterTrip">Recover counter-Trip</button></details></div>`;
   await page.setContent(`<style>${css}</style>${markup}`);
   await load(page, sheetUX, "enhanceAgentSheet");
   await page.evaluate(() => {
@@ -156,8 +157,8 @@ for (const width of [560, 820])
       <button type="button" class="stat sc2-stat-action" data-action="rollSave"><span>Fortitude</span><b>+2</b></button>
       <div class="stat">Defense<b>13</b></div>
     </div></div>
-    <a class="sc2-primary-action" data-action="rollAttack">Attack: A weapon with a long but ordinary descriptive name</a>
-    <div class="combat-tool-groups"><details class="combat-tool-group" data-key="combat-outcomes"><summary><span>Recorded outcomes</span><small>Resolve an attack already rolled</small></summary><div class="tool-actions"><a data-action="manageTakedown">Takedown saves/outcomes</a><a data-action="manageMeleeTradeoff">Recorded attack benefits</a></div></details><details class="combat-tool-group"><summary>Defense and damage</summary></details></div>
+    <button type="button" class="sc2-primary-action sc2-action" data-action="rollAttack">Attack: A weapon with a long but ordinary descriptive name</button>
+    <div class="combat-tool-groups"><details class="combat-tool-group" data-key="combat-outcomes"><summary><span>Recorded outcomes</span><small>Resolve an attack already rolled</small></summary><div class="tool-actions"><button type="button" class="sc2-action" data-action="manageTakedown">Takedown saves/outcomes</button><button type="button" class="sc2-action" data-action="manageMeleeTradeoff">Recorded attack benefits</button></div></details><details class="combat-tool-group"><summary>Defense and damage</summary></details></div>
     </div></div>`);
     await load(page, sheetUX, "enhanceAgentSheet");
     await page.evaluate(() => {
@@ -205,24 +206,27 @@ for (const height of [600, 800])
     expect(await page.locator("form").evaluate(form => Object.fromEntries(new FormData(form)))).toEqual(before);
   });
 
-test("inventory and toolbar controls have contextual labels and retain the original item action targets", async ({
-  page
-}) => {
-  await page.setContent(`<style>${css}</style><div class="spycraft2 application sheet agent" style="width:560px"><section class="tab gear">
-    <h3>Gear <span class="controls"><a data-action="browse" data-type="gear"><i aria-hidden="true"></i></a><a data-action="createItem" data-type="gear"><i aria-hidden="true"></i></a></span></h3>
-    <ul class="inventory-weapons"><li class="inventory-weapon" data-item-id="weapon"><div class="inventory-title"><a class="inventory-name" data-action="itemEdit">A very long weapon name ${"Descriptive ".repeat(12)}</a><span class="equipment-state">Equipped</span></div><div class="inventory-rolls"><a data-action="rollAttack" class="sc2-primary-action">Attack +3</a><a data-action="rollDamage">Damage 1d10+1</a></div><dl class="inventory-stats"><div><dt>Fire mode</dt><dd>Single-Shot</dd></div><div><dt>Range increment</dt><dd>25 ft</dd></div></dl><details class="inventory-details" data-key="weapon-weapon"><summary>Equipment and ammunition</summary><p>Printed ammunition stockpile: 52 shots.</p><span class="controls"><a data-action="itemEquip"><i aria-hidden="true"></i></a><a data-action="itemDelete"><i aria-hidden="true"></i></a></span></details></li></ul>
-    <div class="inventory-table-wrap"><table class="inventory-table"><tr><td>Armor information in a wide table</td></tr></table></div>
-  </section></div>`);
+test("the gear tab's own markup names its controls and keeps each item action on its row", async ({ page }) => {
+  // The real template, so the names under test are the ones the sheet authors, not a copy of them.
+  const weapon = {
+    item: {
+      id: "weapon",
+      name: `Reviewed weapon ${"Descriptive ".repeat(12)}`,
+      system: { equipped: true, damage: "1d10+1" }
+    },
+    attack: { trained: true, total: 3, range: 25, firearm: true, fireModeLabel: "Single-Shot", error: 1, threat: 20 },
+    caliber: 2
+  };
+  const gear = createEnvironment().render("systems/spycraft2/templates/actor/agent-gear.hbs", {
+    weapons: [weapon],
+    armor: [{ item: { id: "armor", name: "Wide armor", system: { equipped: false } } }]
+  });
+  await page.setContent(
+    `<style>*{box-sizing:border-box}${css}</style><div class="spycraft2 application sheet agent" style="width:560px">${gear}</div>`
+  );
   await load(page, sheetUX, "enhanceAgentSheet");
   await page.evaluate(() => {
-    window.enhanceAgentSheet(
-      document.querySelector(".agent"),
-      {
-        editMode: false,
-        actor: { items: { contents: [{ id: "weapon", name: "Reviewed weapon", system: { equipped: true } }] } }
-      },
-      {}
-    );
+    window.enhanceAgentSheet(document.querySelector(".agent"), { editMode: true }, {});
     window.clicked = null;
     document.querySelector(".agent").addEventListener("click", event => {
       const action = event.target.closest("[data-action]");
@@ -230,19 +234,22 @@ test("inventory and toolbar controls have contextual labels and retain the origi
         window.clicked = { action: action.dataset.action, item: action.closest("[data-item-id]")?.dataset.itemId };
     });
   });
-  await expect(page.getByRole("button", { name: "Browse gear" })).toHaveText("Browse gear");
-  await expect(page.getByRole("button", { name: "Add gear" })).toHaveText("Add gear");
-  await page.getByText("Equipment and ammunition", { exact: true }).click();
-  const remove = page.getByRole("button", { name: "Remove Reviewed weapon" });
-  await expect(remove).toHaveText("Remove");
-  // One tooltip only: Foundry's data-tooltip, with no native title beside it.
-  const unequip = page.getByRole("button", { name: "Unequip Reviewed weapon" });
-  await expect(unequip).toHaveAttribute("data-tooltip", "Unequip Reviewed weapon");
-  await expect(unequip).not.toHaveAttribute("title");
-  await remove.locator("span").click();
+  await expect(page.getByRole("button", { name: "Browse gear", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Add gear", exact: true })).toBeVisible();
+  await page.locator(".inventory-weapon summary").click();
+  const remove = page.getByRole("button", { name: /^Remove Reviewed weapon/ });
+  await expect(remove).toHaveText("Remove weapon");
+  const unequip = page.getByRole("button", { name: /^Unequip Reviewed weapon/ });
+  await expect(unequip).toHaveText("Unequip");
+  await expect(unequip).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Equip Wide armor" })).toHaveText("Equip");
+  await remove.click();
   expect(await page.evaluate(() => window.clicked)).toEqual({ action: "itemDelete", item: "weapon" });
+  await page.getByRole("button", { name: "Remove Wide armor" }).click();
+  expect(await page.evaluate(() => window.clicked)).toEqual({ action: "itemDelete", item: "armor" });
+  // Nothing the sheet ran afterwards turned a button back into a link or dropped its type.
+  expect(await page.locator(".gear a[data-action], .gear button:not([type=button])").count()).toBe(0);
   expect(await page.locator(".gear").evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
-  expect(await page.locator(".inventory-table-wrap").evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
 });
 
 test("pinned tools are copied to the top of Play, and pin mode chooses instead of using", async ({ page }) => {
@@ -250,9 +257,9 @@ test("pinned tools are copied to the top of Play, and pin mode chooses instead o
     <div class="pinned-tools tool-actions" hidden></div>
     <section class="combat-toolbox"><input class="combat-tool-search" /><p class="combat-tool-empty" hidden></p>
       <div class="combat-tool-groups"><details class="combat-tool-group" open><summary>Attacks</summary><div class="tool-actions">
-        <a data-action="rollDisarm">Disarm</a><a data-action="takeTotalDefense">Total Defense</a>
-        <a data-action="setMovementCondition" data-condition="prone">Prone</a>
-        <a class="gc-review" data-action="reviewLimitedUseCounter" data-resource="contempt">Review</a>
+        <button type="button" class="sc2-action" data-action="rollDisarm">Disarm</button><button type="button" class="sc2-action" data-action="takeTotalDefense">Total Defense</button>
+        <button type="button" class="sc2-action" data-action="setMovementCondition" data-condition="prone">Prone</button>
+        <button type="button" class="gc-review sc2-action" data-action="reviewLimitedUseCounter" data-resource="contempt">Review</button>
       </div></details></div>
     </section></div>`);
   await load(page, sheetUX, "enhanceAgentSheet");
