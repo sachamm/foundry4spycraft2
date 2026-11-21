@@ -1,0 +1,30 @@
+<div class="col">
+  <h3>{{localize "SPYCRAFT.Combat"}}</h3>
+  <div class="stat-grid">
+    <div class="stat"><span>{{localize "SPYCRAFT.Template.ActorAgentMain.CQBRangeBeyondReach"}}</span><b>{{system.cqbRange}} {{localize "SPYCRAFT.Template.ActorAgentMain.Ft2"}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.BAB"}}</span><b>{{signed system.bab}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.AttackUnarmed"}}</span><b>{{signed system.attack.unarmed}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.AttackMelee"}}</span><b>{{signed system.attack.melee}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.AttackRanged"}}</span><b>{{signed system.attack.ranged}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.StressThreshold"}}</span><b>{{system.stressThreshold}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.SubdualThreshold"}}</span><b>{{system.subdualThreshold}}</b></div>
+  </div>
+  <p><a data-action="checkAccumulatedDamage">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckStressSubdualThresholds"}}</a>{{#if isGM}} <a data-action="reviewDamageLedger">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewAccumulatedTotals"}}</a>{{/if}}</p>
+  {{#if system.accumulatedDamage}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.AccumulatedStress"}} {{system.accumulatedDamage.stress}} {{localize "SPYCRAFT.Template.ActorAgentMain.Subdual"}} {{system.accumulatedDamage.subdual}} {{localize "SPYCRAFT.Template.ActorAgentMain.PendingSaves"}} {{system.accumulatedDamage.pending.length}}.{{#if system.accumulatedDamage.pending.length}} <a data-action="rollPendingDamageSave">{{localize "SPYCRAFT.Template.ActorAgentMain.RollOrReviewNextPendingSave"}}</a> <a data-action="settlePendingDamageSave">{{localize "SPYCRAFT.Template.ActorAgentMain.SettleNextPendingSave"}}</a>.{{/if}} <a data-action="applyAccumulatedDamage">{{localize "SPYCRAFT.Template.ActorAgentMain.RecordDamageEvent"}}</a></p>{{else}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.AccumulatedDamageHasNotBeenInitialized"}}</p>{{/if}}
+  {{> "systems/spycraft2/templates/actor/parts/hazards.hbs"}}
+  <p>{{localize "SPYCRAFT.Template.ActorAgentMain.SightHearingIncrements"}} {{system.senses.visualIncrement}} / {{system.senses.hearingIncrement}} {{localize "SPYCRAFT.Template.ActorAgentMain.FtScentRange"}} {{system.senses.scentRange}} {{localize "SPYCRAFT.Template.ActorAgentMain.Ft2"}}{{#if system.senses.keenSensesBonus}} {{localize "SPYCRAFT.Template.ActorAgentMain.KeenSenses20FtIncluded"}}{{/if}} {{#if system.senses.blinded}} {{localize "SPYCRAFT.Template.ActorAgentMain.CurrentlyCannotSee"}}{{/if}}{{#if system.senses.deafened}} {{localize "SPYCRAFT.Template.ActorAgentMain.CurrentlyCannotHear"}}{{/if}} {{localize "SPYCRAFT.Template.ActorAgentMain.ApplyGearAndEnvironmentModifiers"}}</p>
+  <h3>{{localize "SPYCRAFT.Checks"}}</h3>
+  <div class="stat-grid">
+    <div class="stat"><span>{{localize "SPYCRAFT.Knowledge"}}</span><a data-action="rollKnowledge" {{sc2tip tips.knowledge}}>{{signed system.knowledge}}</a></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.Request"}}</span><b>{{signed system.requestCheck}}</b></div>
+    <div class="stat"><span>{{localize "SPYCRAFT.GearCheck"}}</span><b>{{signed system.gearCheck}}</b></div>
+  </div>
+  {{#if system.actionDieAwardSummary.count}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.GCActionDiceAwardedThisMission"}} {{system.actionDieAwardSummary.count}} · {{#if system.actionDieAwardSummary.settled}}{{localize "SPYCRAFT.Template.ActorAgentMain.MissionRewardSettled"}} {{system.actionDieAwardSummary.totalXP}} {{localize "SPYCRAFT.Template.ActorAgentMain.XP"}}{{else}}+{{system.actionDieAwardSummary.baseXP}} {{localize "SPYCRAFT.Template.ActorAgentMain.BaseMissionXPBeforeTheCareer"}}{{/if}}</p>{{/if}}
+  <p><a data-action="configureFortuneTeammates">{{localize "SPYCRAFT.Template.ActorAgentMain.ImprovedFortuneTeammates"}}</a>{{#if system.improvedFortune.value}} · +{{system.improvedFortune.value}} {{localize "SPYCRAFT.Template.ActorAgentMain.StartingActionDiceTeamCap3"}}{{/if}}</p>
+  <h3>{{localize "SPYCRAFT.Carrying"}}</h3>
+  <div class="carry muted">
+    {{localize "SPYCRAFT.Carry.Light"}} {{system.carry.light}} · {{localize "SPYCRAFT.Carry.Medium"}} {{system.carry.medium}} · {{localize "SPYCRAFT.Carry.Heavy"}} {{system.carry.heavy}} ·
+    {{localize "SPYCRAFT.Carry.Extreme"}} {{system.carry.extreme}} {{localize "SPYCRAFT.Template.ActorAgentMain.Lbs"}}<br>
+    {{localize "SPYCRAFT.Carry.Lift"}} {{system.carry.liftOverhead}} / {{system.carry.liftGround}} · {{localize "SPYCRAFT.Carry.Push"}} {{system.carry.push}} {{localize "SPYCRAFT.Template.ActorAgentMain.Lbs"}}
+  </div>
+</div>

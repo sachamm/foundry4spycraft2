@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import { finalAttackActor } from "./fixtures/final-attack-actor.mjs";
 import { clock } from "./fixtures/feint.mjs";
 import {
@@ -14,6 +13,7 @@ import { FINAL_ATTACK_WORKFLOWS } from "../module/rules/final-round.mjs";
 import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
 import { rollPipeline } from "../module/rules/roll-pipeline.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { inlinedSource } from "./lib/hbs-harness.mjs";
 
 const system = (feats = ["Opportunist"]) => ({ activeFeatNames: feats, conditionContext: {}, wounds: { value: 4 } });
 const confirmed = { triggerConfirmed: true, sightConfirmed: true, immediateConfirmed: true };
@@ -132,7 +132,7 @@ test("the control posts one free final attack; its hit rolls halved damage once 
 });
 
 test("the Main tab offers the control", async () => {
-  const html = await readFile(new URL("../templates/actor/agent-main.hbs", import.meta.url), "utf8");
-  assert.match(html, /data-action="takeOpportunist"/);
-  assert.match(html, /data-resource="opportunist"/);
+  const html = inlinedSource("systems/spycraft2/templates/actor/agent-main.hbs");
+  assert.match(html, /(?:data-action|action)="takeOpportunist"/);
+  assert.match(html, /(?:data-resource|resource)="opportunist"/);
 });

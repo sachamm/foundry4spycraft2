@@ -142,6 +142,6 @@
 
   <details class="sc2-tool-section">
     <summary>{{localize "SPYCRAFT.Template.ActorVehicleSheet.Notes"}}</summary>
-  {{#if editable}}<prose-mirror toggled name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
+  {{> "systems/spycraft2/templates/parts/editor.hbs" field="system.biography" value=system.biography enriched=enrichedBiography}}
   </details>
 </section>

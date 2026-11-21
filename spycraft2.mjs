@@ -68,6 +68,7 @@ import { SpycraftBrowser } from "./module/apps/browser.mjs";
 import { evaluate, renderTemplate } from "./module/rules/formula.mjs";
 import { checkPrerequisites, describe } from "./module/rules/prerequisites.mjs";
 import { loc } from "./module/i18n.mjs";
+import { registerSystemHelpers } from "./module/handlebars-helpers.mjs";
 import { localizeConfig } from "./module/i18n-data.mjs";
 import { registerErrorNotices } from "./module/error-notices.mjs";
 import * as gameClock from "./module/apps/game-clock.mjs";
@@ -291,34 +292,8 @@ Hooks.once("init", () => {
   });
   Items.registerSheet("spycraft2", SpycraftItemSheet, { makeDefault: true, label: "SPYCRAFT.Sheet.Item" });
 
-  // A missing value shows a dash rather than "NaN".
-  const signed = n => (!Number.isFinite(Number(n)) ? "—" : Number(n) >= 0 ? `+${Number(n)}` : `${Number(n)}`);
-  Handlebars.registerHelper("signed", signed);
-  Handlebars.registerHelper("sc2eq", (a, b) => a == b); // loose on purpose: templates compare numbers with strings
-  Handlebars.registerHelper("sc2lt", (a, b) => Number(a) < Number(b));
-  // Tooltip attributes for a breakdown: rows of [label, value]. Plain text plus an HTML version with one row per line.
-  Handlebars.registerHelper("sc2tip", rows => {
-    if (!Array.isArray(rows) || !rows.length) return "";
-    const esc = Handlebars.escapeExpression;
-    const lines = rows.map(([label, value]) => `${label ?? ""} ${signed(value)}`.trim());
-    return new Handlebars.SafeString(
-      `data-tooltip="${esc(lines.join(" · "))}" data-tooltip-html="${esc(lines.map(esc).join("<br>"))}"`
-    );
-  });
-
-  foundry.applications.handlebars.loadTemplates([
-    "systems/spycraft2/templates/item/parts/bonuses.hbs",
-    "systems/spycraft2/templates/actor/npc-builder.hbs",
-    "systems/spycraft2/templates/actor/npc-graded-play.hbs",
-    "systems/spycraft2/templates/actor/parts/hazards.hbs",
-    "systems/spycraft2/templates/apps/gc-console.hbs",
-    "systems/spycraft2/templates/actor/vehicle-sheet.hbs",
-    "systems/spycraft2/templates/item/item-vehicle.hbs",
-    "systems/spycraft2/templates/actor/agent-classes.hbs",
-    "systems/spycraft2/templates/actor/agent-feats.hbs",
-    "systems/spycraft2/templates/actor/agent-training.hbs",
-    "systems/spycraft2/templates/actor/agent-bio.hbs"
-  ]);
+  // Partials are loaded by the sheet part that uses them (PARTS.x.templates), when that sheet first renders.
+  registerSystemHelpers(Handlebars);
 });
 
 // Buttons under posted checks come from roll pipeline contributors (module/rolls/chat-controls.mjs).

@@ -18,7 +18,12 @@ test("every translation key a template uses has an English string", async () => 
   let used = 0;
   for (const file of files) {
     const source = await readFile(new URL(`templates/${file}`, root), "utf8");
-    for (const [, key] of source.matchAll(/\{\{localize ["'](SPYCRAFT\.[\w.-]+)["']\}\}/g)) {
+    // A key is either localized in place or handed to a partial as a hash value (label="SPYCRAFT.…").
+    const keys = [
+      ...source.matchAll(/\{\{localize ["'](SPYCRAFT\.[\w.-]+)["']\}\}/g),
+      ...[...source.matchAll(/\{\{>[^}]*\}\}/g)].flatMap(([call]) => [...call.matchAll(/\w+="(SPYCRAFT\.[\w.-]+)"/g)])
+    ];
+    for (const [, key] of keys) {
       used += 1;
       assert.equal(typeof strings[key], "string", `${file}: ${key} is missing from lang/en.json`);
       assert.ok(strings[key].length > 0, `${file}: ${key} is empty`);

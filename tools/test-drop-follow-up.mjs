@@ -11,6 +11,7 @@ import {
 import { FINAL_ATTACK_WORKFLOWS } from "../module/rules/final-round.mjs";
 import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { inlinedSource } from "./lib/hbs-harness.mjs";
 
 const hit = (ranged = false, patch = {}, context = {}) => ({
   actorUuid: "Actor.a",
@@ -115,9 +116,9 @@ test("the attack card names the extra attack, and the Main tab offers both contr
   assert.match(dropFollowUpNote({ source: "cleaveBasics" }), /Cleave: an immediate extra attack .*\(p\.177\)/);
   assert.match(dropFollowUpNote({ source: "snapShot" }), /Snap Shot: .*\(p\.182\)/);
   assert.equal(dropFollowUpNote({ source: "combatInstincts" }), "");
-  const html = await readFile(new URL("../templates/actor/agent-main.hbs", import.meta.url), "utf8");
-  assert.match(html, /data-action="takeCleaveBasics"/);
-  assert.match(html, /data-action="takeSnapShot"/);
+  const html = inlinedSource("systems/spycraft2/templates/actor/agent-main.hbs");
+  assert.match(html, /(?:data-action|action)="takeCleaveBasics"/);
+  assert.match(html, /(?:data-action|action)="takeSnapShot"/);
   const sheet = await readFile(new URL("../module/sheets/actor-sheet.mjs", import.meta.url), "utf8");
   assert.match(sheet, /takeCleaveBasics\(\) \{\s*return takeDropFollowUp\(this\.actor, "cleaveBasics"\)/);
   assert.match(sheet, /takeSnapShot\(\) \{\s*return takeDropFollowUp\(this\.actor, "snapShot"\)/);
