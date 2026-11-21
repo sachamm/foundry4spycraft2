@@ -162,7 +162,13 @@ export class SpycraftVehicleSheet extends HandlebarsApplicationMixin(SaveFeedbac
     }
   };
 
-  static PARTS = { main: { template: "systems/spycraft2/templates/actor/vehicle-sheet.hbs", scrollable: [""] } };
+  static PARTS = {
+    main: {
+      template: "systems/spycraft2/templates/actor/vehicle-sheet.hbs",
+      templates: ["systems/spycraft2/templates/parts/editor.hbs"],
+      scrollable: [""]
+    }
+  };
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);

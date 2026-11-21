@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import { finalAttackActor } from "./fixtures/final-attack-actor.mjs";
 import {
   chanceFeatCount,
@@ -13,6 +12,7 @@ import { unrestrictedBonusPoolStatus, UNRESTRICTED_POOL_SOURCES } from "../modul
 import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
 import { grantFortunate } from "../module/apps/fortunate.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { inlinedSource } from "./lib/hbs-harness.mjs";
 
 const periods = { scene: "s1", session: "n1", mission: "m1" };
 const system = (feats = ["Fortunate"], chance = ["Fortunate"]) => ({
@@ -130,7 +130,7 @@ test("the GC grants the requested die once per use, and only the GC can", async 
 });
 
 test("the Main tab shows the uses and the GC's grant control", async () => {
-  const html = await readFile(new URL("../templates/actor/agent-main.hbs", import.meta.url), "utf8");
+  const html = inlinedSource("systems/spycraft2/templates/actor/agent-main.hbs");
   assert.match(html, /data-action="grantFortunate"/);
   assert.match(html, /data-resource="fortunate"/);
 });

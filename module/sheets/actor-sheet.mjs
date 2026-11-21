@@ -855,11 +855,43 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     rail: { template: `${TPL}/agent-rail.hbs`, scrollable: [""] },
     track: { template: `${TPL}/agent-track.hbs` },
     tabs: { template: "templates/generic/tab-navigation.hbs" },
-    play: { template: `${TPL}/agent-main.hbs`, scrollable: [""] },
+    // The Play tab is one part built from partials, so it keeps one scroll position and one pinned-tools row.
+    play: {
+      template: `${TPL}/agent-main.hbs`,
+      templates: [
+        ...[
+          "dashboard",
+          "identities",
+          "reference-abilities",
+          "reference-combat",
+          "combat-attacks",
+          "combat-movement",
+          "combat-defense",
+          "combat-outcomes",
+          "combat-conditions",
+          "combat-review",
+          "round-counter"
+        ].map(name => `${TPL}/play/${name}.hbs`),
+        `${TPL}/parts/hazards.hbs`
+      ],
+      scrollable: [""]
+    },
     skills: { template: `${TPL}/agent-skills.hbs`, scrollable: [""] },
-    gear: { template: `${TPL}/agent-gear.hbs`, scrollable: [""] },
-    abilities: { template: `${TPL}/agent-abilities.hbs`, scrollable: [""] },
-    dossier: { template: `${TPL}/agent-dossier.hbs`, scrollable: [""] }
+    gear: {
+      template: `${TPL}/agent-gear.hbs`,
+      templates: [`${TPL}/parts/gear-heading.hbs`, `${TPL}/parts/gear-row-controls.hbs`],
+      scrollable: [""]
+    },
+    abilities: {
+      template: `${TPL}/agent-abilities.hbs`,
+      templates: [`${TPL}/agent-feats.hbs`, `${TPL}/agent-classes.hbs`],
+      scrollable: [""]
+    },
+    dossier: {
+      template: `${TPL}/agent-dossier.hbs`,
+      templates: [`${TPL}/agent-training.hbs`, `${TPL}/agent-bio.hbs`],
+      scrollable: [""]
+    }
   };
 
   static TABS = {
@@ -1936,7 +1968,18 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
     }
   };
 
-  static PARTS = { main: { template: `${TPL}/npc-sheet.hbs`, scrollable: [""] } };
+  static PARTS = {
+    main: {
+      template: `${TPL}/npc-sheet.hbs`,
+      templates: [
+        `${TPL}/parts/hazards.hbs`,
+        `${TPL}/npc-graded-play.hbs`,
+        `${TPL}/npc-builder.hbs`,
+        "systems/spycraft2/templates/parts/editor.hbs"
+      ],
+      scrollable: [""]
+    }
+  };
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);

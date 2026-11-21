@@ -1,5 +1,5 @@
 <section class="tab gear {{tab.cssClass}}" data-tab="gear" data-group="primary">
-  <h3>{{localize "SPYCRAFT.Weapons"}} <span class="controls"><a data-action="browse" data-type="weapon"><i class="fa-solid fa-book-open" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.BrowseWeapons"}}</a> <a data-action="createItem" data-type="weapon"><i class="fa-solid fa-plus" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.AddWeapon"}}</a></span></h3>
+  {{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Weapons" type="weapon" browse="SPYCRAFT.Template.ActorAgentGear.BrowseWeapons" add="SPYCRAFT.Template.ActorAgentGear.AddWeapon"}}
   <ul class="inventory-weapons" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Weapons'}}">
     {{#each weapons}}
     <li class="inventory-weapon" data-item-id="{{item.id}}">
@@ -33,36 +33,36 @@
     {{else}}<li class="inventory-empty">{{localize "SPYCRAFT.Template.ActorAgentGear.NoWeaponsRecordedChooseBrowseWeapons"}}</li>{{/each}}
   </ul>
 
-  <h3>{{localize "SPYCRAFT.Armor"}} <span class="controls"><a data-action="browse" data-type="armor"><i class="fa-solid fa-book-open" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.BrowseArmor"}}</a> <a data-action="createItem" data-type="armor"><i class="fa-solid fa-plus" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.AddArmor"}}</a></span></h3>
+  {{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Armor" type="armor" browse="SPYCRAFT.Template.ActorAgentGear.BrowseArmor" add="SPYCRAFT.Template.ActorAgentGear.AddArmor"}}
   <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Armor'}}">
     <thead><tr><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Name"}}</th><th scope="col"><abbr title="{{localize 'SPYCRAFT.Template.ActorAgentGear.DamageReductionOrdinarySubdual'}}">{{localize "SPYCRAFT.Template.ActorAgentGear.DamageReduction"}}</abbr></th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Defense"}}</th><th scope="col"><abbr title="{{localize 'SPYCRAFT.Template.ActorAgentGear.ArmorCheckPenalty'}}">{{localize "SPYCRAFT.Template.ActorAgentGear.CheckPenalty"}}</abbr></th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Speed"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Caliber"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Pick"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Actions"}}</th></tr></thead>
     <tbody>{{#each armor}}
       <tr data-item-id="{{item.id}}">
         <td><a data-action="itemEdit">{{item.name}}</a></td>
         <td>{{item.system.damageReduction}}/{{item.system.damageReductionSubdual}}</td><td>{{item.system.defensePenalty}}</td><td>{{item.system.armorCheck}}</td><td>{{item.system.speedPenalty}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
-        <td class="controls" data-sc2-display="icon"><a data-action="itemEquip" aria-pressed="{{item.system.equipped}}" aria-label="{{#if item.system.equipped}}Unequip{{else}}Equip{{/if}} {{item.name}}">{{#if item.system.equipped}}{{localize "SPYCRAFT.Template.ActorAgentGear.Unequip"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentGear.Equip"}}{{/if}}</a> <a class="edit-only" data-action="itemDelete" aria-label="Remove {{item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.Remove"}}</a></td>
+        {{> "systems/spycraft2/templates/actor/parts/gear-row-controls.hbs" kind="equip"}}
       </tr>
     {{else}}<tr><td colspan="8" class="inventory-empty">{{localize "SPYCRAFT.Template.ActorAgentGear.NoArmorRecordedUseBrowseArmor"}}</td></tr>{{/each}}</tbody>
   </table></div>
 
-  <h3>{{localize "SPYCRAFT.Gear"}} <span class="controls"><a data-action="browse" data-type="gear"><i class="fa-solid fa-book-open" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.BrowseGear"}}</a> <a data-action="createItem" data-type="gear"><i class="fa-solid fa-plus" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.AddGear"}}</a></span></h3>
+  {{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Gear" type="gear" browse="SPYCRAFT.Template.ActorAgentGear.BrowseGear" add="SPYCRAFT.Template.ActorAgentGear.AddGear"}}
   <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Gear'}}">
     <thead><tr><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Name"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Quantity"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Caliber"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Pick"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Actions"}}</th></tr></thead>
     <tbody>{{#each gear}}
       <tr data-item-id="{{item.id}}">
         <td><a data-action="itemEdit">{{item.name}}</a>{{#if toolShed.expired}} <span class="bad">{{localize "SPYCRAFT.Template.ActorAgentGear.LostAtMissionEnd"}}</span>{{else}}{{#if toolShed.blockedReason}} <span class="bad">{{localize "SPYCRAFT.Template.ActorAgentGear.GrantNeedsReview"}}</span>{{/if}}{{/if}}</td><td>{{item.system.quantity}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td>
-        <td class="controls" data-sc2-display="icon"><a data-action="itemChat" aria-label="Share {{item.name}} in chat">{{localize "SPYCRAFT.Template.ActorAgentGear.Share"}}</a> <a class="edit-only" data-action="itemDelete" aria-label="Remove {{item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.Remove"}}</a></td>
+        {{> "systems/spycraft2/templates/actor/parts/gear-row-controls.hbs" kind="share"}}
       </tr>
     {{else}}<tr><td colspan="5" class="inventory-empty">{{localize "SPYCRAFT.Template.ActorAgentGear.NoGearRecordedUseBrowseGear"}}</td></tr>{{/each}}</tbody>
   </table></div>
 
-  <h3>{{localize "SPYCRAFT.Template.ActorAgentGear.Vehicles"}} <span class="controls"><a data-action="browse" data-type="vehicle"><i class="fa-solid fa-book-open" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.BrowseVehicles"}}</a> <a data-action="createItem" data-type="vehicle"><i class="fa-solid fa-plus" aria-hidden="true"></i> {{localize "SPYCRAFT.Template.ActorAgentGear.AddVehicle"}}</a></span></h3>
+  {{> "systems/spycraft2/templates/actor/parts/gear-heading.hbs" title="SPYCRAFT.Template.ActorAgentGear.Vehicles" type="vehicle" browse="SPYCRAFT.Template.ActorAgentGear.BrowseVehicles" add="SPYCRAFT.Template.ActorAgentGear.AddVehicle"}}
   <div class="inventory-table-wrap"><table class="items inventory-table" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentGear.Vehicles'}}">
     <thead><tr><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Name"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Category"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Caliber"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Pick"}}</th><th scope="col"><abbr title="{{localize 'SPYCRAFT.Template.ActorAgentGear.AccelerationTurning'}}">{{localize "SPYCRAFT.Template.ActorAgentGear.AccelTurn"}}</abbr></th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.MPH"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.DefenseSave"}}</th><th scope="col">{{localize "SPYCRAFT.Template.ActorAgentGear.Actions"}}</th></tr></thead>
     <tbody>{{#each vehicles}}
       <tr data-item-id="{{item.id}}">
         <td><a data-action="itemEdit">{{item.name}}</a></td><td>{{classLabel}}</td><td>{{caliber}}</td><td>{{item.system.pick}}</td><td>{{item.system.accelerationTurning}}</td><td>{{item.system.mph}}</td><td>{{item.system.defenseSave}}</td>
-        <td class="controls" data-sc2-display="icon"><a data-action="itemChat" aria-label="Share {{item.name}} in chat">{{localize "SPYCRAFT.Template.ActorAgentGear.Share"}}</a> <a class="edit-only" data-action="itemDelete" aria-label="Remove {{item.name}}">{{localize "SPYCRAFT.Template.ActorAgentGear.Remove"}}</a></td>
+        {{> "systems/spycraft2/templates/actor/parts/gear-row-controls.hbs" kind="share"}}
       </tr>
     {{else}}<tr><td colspan="8" class="inventory-empty">{{localize "SPYCRAFT.Template.ActorAgentGear.NoVehiclesRecordedUseBrowseVehicles"}}</td></tr>{{/each}}</tbody>
   </table></div>

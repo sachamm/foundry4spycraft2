@@ -1,0 +1,15 @@
+<details class="combat-tool-group" data-key="combat-review" {{#if combatReviewNeeded}}open{{/if}}>
+  <summary><span>{{localize "SPYCRAFT.Template.ActorAgentMain.GCReviewRecovery"}}</span><small>{{#if combatReviewNeeded}}{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewNeeded"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.InterruptedActionsAndSavedResources"}}{{/if}}</small></summary>
+  <p class="tool-hint">{{localize "SPYCRAFT.Template.ActorAgentMain.ForInterruptedActionsCheckTheSaved"}}</p>
+  {{#if usagePeriodReview.needsReview}}<p class="bad">{{localize "SPYCRAFT.Template.ActorAgentMain.Interrupted"}} {{usagePeriodReview.period}} {{localize "SPYCRAFT.Template.ActorAgentMain.StartNeedsGCReview"}} {{#if isGM}}<a data-action="reviewUsagePeriod">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewStartingDiceAndCounters"}}</a>{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.AskTheGCToReviewThe"}}{{/if}}</p>{{/if}}
+  {{#if actor.flags.spycraft2.missionXPReview.needsReview}}<p class="bad">{{localize "SPYCRAFT.Template.ActorAgentMain.InterruptedMissionXPNeedsGCReview"}} {{#if isGM}}<a data-action="reviewMissionXP">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewMissionXPAndReward"}}</a>{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.AskTheGCToReviewMission"}}{{/if}}</p>{{/if}}
+  {{#if actor.flags.spycraft2.actionDieAwardReview.needsReview}}<p class="bad">{{localize "SPYCRAFT.Template.ActorAgentMain.InterruptedAwardNeedsGCReview"}} {{#if isGM}}<a data-action="reviewActionDieAward">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewAwardAndBalances"}}</a>{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.AskTheGCToReviewThe2"}}{{/if}}</p>{{/if}}
+  {{#if system.actionDiceSettlementReview.needsReview}}<p class="bad">{{localize "SPYCRAFT.Template.ActorAgentMain.InterruptedActionDieUseNeedsGC"}} {{#if isGM}}<a data-action="reviewActionDiceSettlement">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewHealthAndActionDice"}}</a>{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.AskTheGCToReviewHealth"}}{{/if}}</p>{{/if}}
+  <div class="tool-actions">
+    <a data-action="reviewCounterTrip">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewInterruptedCounterTrip"}}</a>
+    <a data-action="reviewTripFinalAttack">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewInterruptedTripFinalAttack"}}</a>
+    <a data-action="reviewFeintBonuses">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewInterruptedFeintBenefit"}}</a>
+    {{#if combatTools.striking}}<a data-action="reviewStrikingAttack">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewStrikingReaction"}}</a>{{/if}}
+    {{#if combatTools.powerStance}}<a data-action="reviewPowerStanceInitiative">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewPowerCount"}}</a>{{/if}}
+  </div>
+</details>

@@ -91,7 +91,12 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(SaveFeedback(I
 
   static PARTS = {
     header: { template: `${TPL}/item-header.hbs` },
-    details: { template: `${TPL}/item-gear.hbs`, scrollable: [""] }
+    // The details template follows the item type (_configureRenderParts); feats and origins share the bonuses table.
+    details: {
+      template: `${TPL}/item-gear.hbs`,
+      templates: [`${TPL}/parts/bonuses.hbs`, "systems/spycraft2/templates/parts/editor.hbs"],
+      scrollable: [""]
+    }
   };
 
   _configureRenderParts(options) {

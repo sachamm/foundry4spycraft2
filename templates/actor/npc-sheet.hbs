@@ -83,5 +83,5 @@
     {{#each otherItems}}<li data-item-id="{{id}}"><a data-action="itemEdit" class="name">{{name}}</a> <span class="muted">{{localize (concat "TYPES.Item." type)}}</span>
       <span class="controls" data-sc2-display="icon"><a data-action="itemDelete"><i class="fa-solid fa-trash"></i></a></span></li>{{/each}}
   </ul>
-  {{#if editable}}<prose-mirror toggled name="system.biography" value="{{system.biography}}">{{{enrichedBiography}}}</prose-mirror>{{else}}{{{enrichedBiography}}}{{/if}}
+  {{> "systems/spycraft2/templates/parts/editor.hbs" field="system.biography" value=system.biography enriched=enrichedBiography}}
 </section>

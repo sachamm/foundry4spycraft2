@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import { actor, opts } from "./fixtures/side-stance.mjs";
 import { prep } from "./fixtures/feint.mjs";
 import {
@@ -13,6 +12,7 @@ import {
 import { criticalPlan } from "../module/rules/criticals.mjs";
 import { limitedUseAbilities } from "../module/rules/limited-uses.mjs";
 import { SPYCRAFT as cfg } from "../module/config.mjs";
+import { inlinedSource } from "./lib/hbs-harness.mjs";
 
 const periods = { scene: "s1", session: "n1" };
 const source = (chance = ["Black Cat", "Fortunate"], extra = []) => ({
@@ -124,7 +124,7 @@ test("a marked character's attack posts with the wider error range, and a reroll
 });
 
 test("the Main tab shows the GC's control", async () => {
-  const html = await readFile(new URL("../templates/actor/agent-main.hbs", import.meta.url), "utf8");
+  const html = inlinedSource("systems/spycraft2/templates/actor/agent-main.hbs");
   assert.match(html, /data-action="applyBlackCat"/);
   assert.match(html, /data-resource="blackCat"/);
 });

@@ -1,0 +1,65 @@
+<div class="col">
+  <h3 class="edit-only">{{localize "SPYCRAFT.Attributes"}}
+    <span class="points edit-only {{#if (sc2lt system.pointBuy.remaining 0)}}bad{{/if}}">{{localize "SPYCRAFT.PointBuy"}}: {{system.pointBuy.spent}} / <input type="number" name="system.pointBuyBudget" value="{{system.pointBuyBudget}}" class="w-2" /></span></h3>
+  <table class="abilities edit-only">
+    <thead><tr><th></th><th class="edit-only">{{localize "SPYCRAFT.Base"}}</th><th class="edit-only">{{localize "SPYCRAFT.Cost"}}</th><th class="edit-only">{{localize "SPYCRAFT.Origin.Label"}}</th><th class="edit-only">{{localize "SPYCRAFT.Increase"}}</th><th class="edit-only">{{localize "SPYCRAFT.Misc"}}</th><th>{{localize "SPYCRAFT.Score"}}</th><th>{{localize "SPYCRAFT.Mod"}}</th></tr></thead>
+    <tbody>
+    {{#each abilities}}
+      <tr>
+        <th>{{label}}</th>
+        <td class="edit-only"><input type="number" name="system.abilities.{{key}}.base" value="{{base}}" min="8" max="18" class="w-2" /></td>
+        <td class="muted edit-only">{{cost}}</td>
+        <td class="edit-only">{{#if bonus}}{{signed bonus}}{{/if}}</td>
+        <td class="edit-only">{{#if increase}}+{{increase}}{{/if}}</td>
+        <td class="edit-only"><input type="number" name="system.abilities.{{key}}.misc" value="{{misc}}" class="w-2" /></td>
+        <td class="score"{{#if temporaryBonus}} data-tooltip="Includes {{signed temporaryBonus}} temporary adjustment"{{/if}}>{{value}}</td>
+        <td class="mod"><a data-action="rollAbility" data-ability="{{key}}" aria-label="Roll {{label}}">{{signed mod}}</a></td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+  <div class="increases edit-only">
+    <span>{{localize "SPYCRAFT.AttributeIncreases"}}:</span>
+    {{#each increaseLevels}}
+      <label class="{{#unless reached}}muted{{/unless}}">{{level}}
+        <select name="system.abilityIncreases.{{key}}">{{selectOptions ../abilityOptions selected=value blank="—"}}</select></label>
+    {{/each}}
+  </div>
+
+  <details class="reference-panel" data-key="origins"><summary>{{localize "SPYCRAFT.Template.ActorAgentMain.OriginAndFieldReference"}}</summary>
+  <h3>{{localize "SPYCRAFT.Origin.Label"}}</h3>
+  {{#each originSelections}}
+    <details {{#if @root.editMode}}open{{/if}}><summary>{{name}}</summary>
+      <div class="edit-only">{{#each fields}}
+        <label>{{label}} {{#if text}}<input type="text" name="originChoice.{{../id}}.{{key}}" value="{{value}}" />{{else}}<select name="originChoice.{{../id}}.{{key}}">{{selectOptions options selected=value blank="—"}}</select>{{/if}}</label>
+      {{/each}}</div>
+      <div>{{{description}}}</div>
+    </details>
+  {{/each}}
+
+  {{#each system.originEffects}}<p><b>{{name}}:</b> {{text}} {{details}}</p>{{/each}}
+  {{#if system.legacyAbilities.fortunesOfWar.grade}}<p><a data-action="boostFortunesOfWar">{{localize "SPYCRAFT.Template.ActorAgentMain.DoubleFortunesOfWarDROne"}}</a>{{#if system.fortunesOfWarActive}} {{localize "SPYCRAFT.Template.ActorAgentMain.ActiveUntilOwnInitiativeInRound"}} {{system.fortunesOfWarActive.dueRound}}{{/if}}</p>{{/if}}
+  {{#if system.survivalStats.noFear}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.NoFearIIStressResistance"}} {{system.survivalStats.noFear.resistance}} {{localize "SPYCRAFT.Template.ActorAgentMain.UntilOwnInitiativeInRound"}} {{system.survivalStats.noFear.dueRound}}.</p>{{/if}}
+  {{#if system.eagleEyeActive}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.EagleEyeRangeIncrement"}} {{system.eagleEyeActive.rangeIncrease}} {{localize "SPYCRAFT.Template.ActorAgentMain.FtAddedWith2HandedFirearms"}}</p>{{/if}}
+  <p>{{system.size}}{{#if system.naturalDR}} {{localize "SPYCRAFT.Template.ActorAgentMain.NaturalDR"}} {{system.naturalDR}}{{/if}}</p>
+  {{#if system.armor}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.ListedDRBeforePiercingTypeExceptions"}} {{system.armorDRByAttack.meleeWeapon}}{{localize "SPYCRAFT.Template.ActorAgentMain.Unarmed"}} {{system.armorDRByAttack.unarmed}}{{localize "SPYCRAFT.Template.ActorAgentMain.NonGrenadeHurledWeapons"}} {{system.armorDRByAttack.hurledWeapon}}{{localize "SPYCRAFT.Template.ActorAgentMain.OtherRangedWeapons"}} {{system.armorDRByAttack.rangedWeapon}}{{localize "SPYCRAFT.Template.ActorAgentMain.Other"}} {{system.armorDRByAttack.other}}.{{#if system.armorFeatRules.sneakAttackImmune}} {{localize "SPYCRAFT.Template.ActorAgentMain.ArmorSupremacyImmuneToSneakAttack"}}{{/if}}{{#if system.armorFeatRules.coupDeGraceRequiresHelpless}} {{localize "SPYCRAFT.Template.ActorAgentMain.ArmorMasteryCoupDeGraceRequires"}}{{/if}}</p>{{/if}}
+  {{#if system.survivalStats.resistanceRows.length}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.DamageResistance"}} {{#each system.survivalStats.resistanceRows}}{{label}} {{value}}{{#unless @last}} · {{/unless}}{{/each}}{{localize "SPYCRAFT.Template.ActorAgentMain.ApplyAfterApplicableDR"}}</p>{{/if}}
+  {{#if system.survivalStats.overlandTerrainSpeeds.length}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.OverlandCalculations"}} {{#each system.survivalStats.overlandTerrainSpeeds}}{{label}} {{localize "SPYCRAFT.Template.ActorAgentMain.AsIfSpeed"}} {{speed}} {{localize "SPYCRAFT.Template.ActorAgentMain.Ft2"}}{{#unless @last}} · {{/unless}}{{/each}} {{localize "SPYCRAFT.Template.ActorAgentMain.ApplyTerrainTravelMultipliersCombatSpeed"}}</p>{{/if}}
+  {{#if system.survivalStats.dailyWater}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.DailyFluidsWhileActive"}} {{system.survivalStats.dailyWater.normalQuarts}} {{localize "SPYCRAFT.Template.ActorAgentMain.Qt"}} {{system.survivalStats.dailyWater.hotQuarts}} {{localize "SPYCRAFT.Template.ActorAgentMain.QtWhenExposedToHeatAbove"}} {{system.survivalStats.dailyWater.heatThresholdF}}°F{{#if system.survivalStats.dailyWater.desertTraining}} {{localize "SPYCRAFT.Template.ActorAgentMain.DesertTrainingIncluded"}}{{/if}}.</p>{{/if}}
+  {{#if system.survivalStats.aquatic}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.AquaticUnderwaterSpeed"}} {{system.survivalStats.underwaterSpeed}} {{localize "SPYCRAFT.Template.ActorAgentMain.FtCannotDrownUnderwaterCheckPenalties"}}</p>{{else}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.HoldBreath"}} {{system.survivalStats.breathRounds}} {{localize "SPYCRAFT.Template.ActorAgentMain.Rounds"}}{{#if system.survivalStats.aquaticRounds}} {{localize "SPYCRAFT.Template.ActorAgentMain.AquaticTraining"}}{{system.survivalStats.aquaticRounds}} {{localize "SPYCRAFT.Template.ActorAgentMain.Included2"}}{{/if}}{{#if system.survivalStats.chaseFeats}} {{localize "SPYCRAFT.Template.ActorAgentMain.WaveRunner"}}{{system.survivalStats.chaseFeats}} {{localize "SPYCRAFT.Template.ActorAgentMain.EffectiveCONIncluded"}}{{/if}} {{localize "SPYCRAFT.Template.ActorAgentMain.BeforeSuffocationSaves"}}</p>{{/if}}
+  <p><a data-action="restAndRecover">{{playLabels.rest}}</a>{{#if dying}} <a data-action="rollDying" class="bad">{{playLabels.dying}}</a>{{/if}}</p>
+  {{#if system.recoveryRates}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.NaturalRecovery"}} {{system.recoveryRates.vitalityPoints}} {{localize "SPYCRAFT.Template.ActorAgentMain.Vitality"}}{{system.recoveryRates.vitalityIntervalLabel}} {{localize "SPYCRAFT.Template.ActorAgentMain.Rest"}} {{system.recoveryRates.woundPoints}} {{localize "SPYCRAFT.Template.ActorAgentMain.Wounds"}}{{system.recoveryRates.woundIntervalLabel}} {{localize "SPYCRAFT.Template.ActorAgentMain.Rest2"}}{{#if system.recoveryRates.fastHealing}} {{localize "SPYCRAFT.Template.ActorAgentMain.FastHealingIncluded"}}{{/if}}{{#if system.recoveryRates.quickHealer}} {{localize "SPYCRAFT.Template.ActorAgentMain.QuickHealerIntervals"}}{{/if}}. <a data-action="calculateRecoveryRates">{{localize "SPYCRAFT.Template.ActorAgentMain.TreatmentInterestRecoveryRates"}}</a></p>{{else}}<p class="bad">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewCareerLevelBeforeCalculatingRecovery"}}</p>{{/if}}
+  {{#if system.burrowCapabilities}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.BurrowOneInchMaterialDamageSave"}}{{system.burrowCapabilities.maximumMaterialSave}}{{localize "SPYCRAFT.Template.ActorAgentMain.CannotRunMaterialAt6Or"}} <a data-action="checkBurrowMaterial">{{localize "SPYCRAFT.Template.ActorAgentMain.CheckMaterialAndAction"}}</a></p>{{/if}}
+  {{#each system.mentalLeapState.rows}}{{#if (sc2eq phase "boost")}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.MentalLeap"}}{{bonus}} {{ability}}; {{remainingSeconds}} {{localize "SPYCRAFT.Template.ActorAgentMain.SecondsRemain"}} <a data-action="endMentalLeap" data-record-id="{{id}}">{{localize "SPYCRAFT.Template.ActorAgentMain.EndAsAFreeAction"}}</a></p>{{/if}}{{/each}}
+  {{#if system.mentalLeapState.exhausted}}<p class="bad">{{localize "SPYCRAFT.Template.ActorAgentMain.ExhaustedSTRDEX6SpeedHalved"}} <a data-action="recordFatigueEscalation">{{localize "SPYCRAFT.Template.ActorAgentMain.RecordAnotherFatigueExhaustionApplication"}}</a></p>{{else}}{{#if system.mentalLeapState.fatigued}}<p class="bad">{{#if system.mentalLeapState.fatiguedPenaltiesIgnored}}{{localize "SPYCRAFT.Template.ActorAgentMain.FatiguedGutsIgnoresItsSTRDEX"}}{{else}}{{localize "SPYCRAFT.Template.ActorAgentMain.FatiguedSTRDEX2CannotRun"}}{{/if}} {{localize "SPYCRAFT.Template.ActorAgentMain.6ToSavesAgainstFatigue"}}</p>{{/if}}{{/if}}
+  {{#if system.mentalLeapState.unconscious}}<p class="bad">{{localize "SPYCRAFT.Template.ActorAgentMain.UnconsciousHelplessMayTakeNoActions"}}</p>{{/if}}
+  {{#if system.mentalLeapState.recoveryAvailable}}<p><a data-action="startMentalLeapSleep">{{localize "SPYCRAFT.Template.ActorAgentMain.ReviewTrackUnconsciousnessSleep"}}</a>{{#if system.mentalLeapSleep}} {{localize "SPYCRAFT.Template.ActorAgentMain.RecordedRequirements"}} {{#if system.mentalLeapSleep.requirements}}{{#each system.mentalLeapSleep.requirements}}{{requiredHours}} {{localize "SPYCRAFT.Template.ActorAgentMain.FullHours"}}{{#unless @last}}; {{/unless}}{{/each}}{{else}}{{system.mentalLeapSleep.requiredHours}} {{localize "SPYCRAFT.Template.ActorAgentMain.FullHoursEarlierRecord"}}{{/if}}{{#if system.mentalLeapState.sleepCauseReview}} {{localize "SPYCRAFT.Template.ActorAgentMain.ReviewCurrentCausesBeforeCompletion"}}{{else}} <a data-action="completeMentalLeapSleep">{{localize "SPYCRAFT.Template.ActorAgentMain.ConfirmCompletedSleep"}}</a>{{/if}}{{/if}}</p>{{/if}}
+  {{#each system.attributeCollapse.entries}}<p class="bad"><b>{{label}} {{score}}:</b> {{text}}</p>{{/each}}
+  {{#if attributeDamageRows.length}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.AttributeDamage"}} {{#each attributeDamageRows}}{{label}} {{total}} {{localize "SPYCRAFT.Template.ActorAgentMain.Temporary"}} {{temporary}}{{localize "SPYCRAFT.Template.ActorAgentMain.Permanent"}} {{permanent}}){{#unless @last}} · {{/unless}}{{/each}}.</p>{{/if}}
+  {{#if attributeDamageHistory}}{{#if attributeMissionRecovered}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.CurrentMissionSTemporaryAttributeRecovery"}}</p>{{else}}{{#if isGM}}<p><a data-action="recoverSilverTongueAtMissionEnd">{{localize "SPYCRAFT.Template.ActorAgentMain.GCRecoverSilverTongueWisdomDamage"}}</a></p>{{/if}}{{/if}}{{/if}}
+  {{#if system.attributeCollapse.wisdomEpisode}}<p><a data-action="rollWisdomCollapse">{{localize "SPYCRAFT.Template.ActorAgentMain.RollWisdomCollapseEpisodeForGC"}}</a></p>{{/if}}
+  {{#if system.cqbReadiedRules.initiativeBonus}}<p>{{localize "SPYCRAFT.Template.ActorAgentMain.CQBSupremacyInitiativeChecks5While"}}</p>{{/if}}
+
+  </details>
+
+</div>
