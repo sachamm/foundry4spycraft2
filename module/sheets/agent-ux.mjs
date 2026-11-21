@@ -257,8 +257,8 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
     if (!link.textContent.trim()) {
       const label = link.getAttribute("aria-label") ?? sheetActionLabel(link, context, localize);
       button.setAttribute("aria-label", label);
+      // Foundry's tooltip only: a title as well would show a second, native tooltip.
       button.dataset.tooltip = label;
-      button.title = label;
       // Toolbar labels are visible; compact origin controls retain their explicit labels.
       if (link.closest(".controls")) {
         const text = element.ownerDocument.createElement("span");
@@ -291,7 +291,9 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
   filterCombatTools(element, state);
   const search = element.querySelector(".skill-search");
   const trained = element.querySelector(".trained-filter");
-  if (search && trained) {
+  // A partial render can leave these elements in place; bind them once so listeners don't pile up.
+  if (search && trained && !search.dataset.sc2Filter) {
+    search.dataset.sc2Filter = "true";
     search.value = state._skillSearch;
     trained.checked = state._trainedOnly;
     const filter = () => {
@@ -316,7 +318,9 @@ export function enhanceAgentSheet(element, context, state, localize = text => te
 export function filterCombatTools(element, state = {}) {
   const box = element.querySelector(".combat-toolbox");
   const search = box?.querySelector(".combat-tool-search");
-  if (!search) return;
+  // Rendering only another part keeps this element, and its listener, in place.
+  if (!search || search.dataset.sc2Filter) return;
+  search.dataset.sc2Filter = "true";
   search.value = state._toolSearch ?? "";
   const allDetails = [...box.querySelectorAll(".combat-tool-groups details")];
   // Open states from before a search began, restored when the search is cleared.

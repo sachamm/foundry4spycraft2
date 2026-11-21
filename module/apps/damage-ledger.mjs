@@ -76,12 +76,17 @@ export async function applyAccumulatedDamage(actor, options = {}) {
     defenseBefore = stressDefenseSourceSnapshot(actor.system);
     fireDefenseBefore = fireStressDefenseSourceSnapshot(actor.system);
     resistanceLabel = String(stressDefenseSource(actor.system).resistance);
-  } catch {}
+  } catch (error) {
+    // The dialog then shows "not prepared"; the console keeps the reason.
+    console.warn("Spycraft 2.0 | Stress defenses could not be prepared:", error);
+  }
   const subdualBefore = {};
   for (const kind of Object.keys(SUBDUAL_ATTACK_KINDS))
     try {
       subdualBefore[kind] = subdualDefenseSourceSnapshot(actor.system, kind);
-    } catch {}
+    } catch (error) {
+      console.warn(`Spycraft 2.0 | Subdual defenses (${kind}) could not be prepared:`, error);
+    }
   if (!Object.keys(input).length) {
     input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`Record stress/subdual damage` },

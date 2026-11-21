@@ -917,6 +917,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     const rollData = actor.getRollData();
     Object.assign(context, {
       actor,
+      // Prefix for element ids, so two open sheets never share one.
+      appId: this.id,
       system: sys,
       shakenInitiativeReviews: actor.shakenInitiativeReviews,
       usagePeriodReview: game.spycraft2?.getUsagePeriodReview?.() ?? {},
@@ -1934,6 +1936,8 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
     this._editMode ??= npcNeedsSetup(this.actor);
     Object.assign(context, {
       actor: this.actor,
+      // Prefix for element ids: a token's copy of an actor shares the actor's id, but not the sheet's.
+      appId: this.id,
       system: sys,
       editMode: this.isEditable && this._editMode,
       shakenInitiativeReviews: this.actor.shakenInitiativeReviews,

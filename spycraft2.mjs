@@ -291,14 +291,16 @@ Hooks.once("init", () => {
   });
   Items.registerSheet("spycraft2", SpycraftItemSheet, { makeDefault: true, label: "SPYCRAFT.Sheet.Item" });
 
-  Handlebars.registerHelper("signed", n => (Number(n) >= 0 ? `+${Number(n)}` : `${Number(n)}`));
+  // A missing value shows a dash rather than "NaN".
+  const signed = n => (!Number.isFinite(Number(n)) ? "—" : Number(n) >= 0 ? `+${Number(n)}` : `${Number(n)}`);
+  Handlebars.registerHelper("signed", signed);
   Handlebars.registerHelper("sc2eq", (a, b) => a == b); // loose on purpose: templates compare numbers with strings
   Handlebars.registerHelper("sc2lt", (a, b) => Number(a) < Number(b));
   // Tooltip attributes for a breakdown: rows of [label, value]. Plain text plus an HTML version with one row per line.
   Handlebars.registerHelper("sc2tip", rows => {
     if (!Array.isArray(rows) || !rows.length) return "";
     const esc = Handlebars.escapeExpression;
-    const lines = rows.map(([label, value]) => `${label} ${Number(value) >= 0 ? "+" : ""}${Number(value)}`);
+    const lines = rows.map(([label, value]) => `${label ?? ""} ${signed(value)}`.trim());
     return new Handlebars.SafeString(
       `data-tooltip="${esc(lines.join(" · "))}" data-tooltip-html="${esc(lines.map(esc).join("<br>"))}"`
     );

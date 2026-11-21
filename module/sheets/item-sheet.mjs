@@ -153,6 +153,8 @@ export class SpycraftItemSheet extends HandlebarsApplicationMixin(SaveFeedback(I
       }[item.type] ?? [];
     Object.assign(context, {
       item,
+      // Prefix for element ids, so two open sheets never share one.
+      appId: this.id,
       system: sys,
       config: cfg,
       summary: facts

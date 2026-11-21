@@ -206,8 +206,14 @@ export async function addMechanism(item, mechanismItem) {
   return mechanism;
 }
 
-export const removeMechanism = (item, index) =>
-  item.update({ "system.gadget.mechanisms": item.system.gadget.mechanisms.filter((_, i) => i !== index) });
+export function removeMechanism(item, index) {
+  const mechanisms = item.system.gadget.mechanisms.filter((_, i) => i !== index);
+  // A gadget pick costs one pick per mechanism (at least one), so the count follows the list both ways.
+  return item.update({
+    "system.gadget.mechanisms": mechanisms,
+    ...(item.system.pick === "G" ? { "system.pickCount": Math.max(1, mechanisms.length) } : {})
+  });
+}
 
 /** Roll a gadget's Skill check mechanism: 1d20 + PR × 4, with no result cap (p.281). */
 export async function rollGadgetSkillCheck(item, index) {

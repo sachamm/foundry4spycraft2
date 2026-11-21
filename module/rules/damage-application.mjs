@@ -76,10 +76,15 @@ export function reducedDamage({ damage, dr = 0, armorPiercing = 0, armorPiercing
   return { damage, dr: effectiveDR, net, stopped: damage > 0 && net === 0 };
 }
 
-/** The condition a wound total puts a special character in (p.331), or "" while above 0. */
-export function woundState(wounds) {
+/**
+ * The condition a wound total puts a special character in (p.331), or "" while above 0.
+ * @param {number} wounds
+ * @param {number} [death]  the wound total at which this character dies: -10, or another value for its Size (p.349)
+ */
+export function woundState(wounds, death = -10) {
+  const threshold = Number.isSafeInteger(death) && death < 0 ? death : -10;
   if (wounds <= -25) return "destroyed";
-  if (wounds <= -10) return "dead";
+  if (wounds <= threshold) return "dead";
   if (wounds <= -1) return "dying";
   if (wounds === 0) return "unconscious";
   return "";
@@ -94,7 +99,8 @@ export function woundState(wounds) {
 export function lethalHitPlan(facts = {}, hit = {}) {
   const vitality = Math.max(0, int(facts.vitality)),
     wounds = int(facts.wounds),
-    woundsMax = int(facts.woundsMax);
+    woundsMax = int(facts.woundsMax),
+    death = facts.deathThreshold;
   const reduced = reducedDamage(hit),
     net = reduced.net;
   const toWounds = hit.critical === true && vitality > 0,
@@ -104,8 +110,8 @@ export function lethalHitPlan(facts = {}, hit = {}) {
   // Fatigue comes once: when vitality first reaches 0 or wounds first drop below their maximum.
   const wasWorn = vitality === 0 || wounds < woundsMax,
     isWorn = after.vitality === 0 || after.wounds < woundsMax;
-  const before = woundState(wounds),
-    state = woundLoss > 0 || before ? woundState(after.wounds) : "";
+  const before = woundState(wounds, death),
+    state = woundLoss > 0 || before ? woundState(after.wounds, death) : "";
   return {
     ...reduced,
     critical: toWounds,
@@ -249,13 +255,13 @@ export function opposedOutcome(first = {}, second = {}, { breakTies = true } = {
  * A dying character's roll at the end of a round (p.341): d% at or under Constitution stabilizes at 0 wounds;
  * otherwise 1 more wound is lost.
  */
-export function dyingPlan({ wounds, constitution } = {}, roll) {
-  if (!Number.isSafeInteger(wounds) || wounds > -1 || wounds < -9)
-    throw new Error(loc`Only a character at –1 to –9 wounds is dying.`);
+export function dyingPlan({ wounds, constitution, deathThreshold = -10 } = {}, roll) {
+  if (!Number.isSafeInteger(wounds) || woundState(wounds, deathThreshold) !== "dying")
+    throw new Error(loc`Only a dying character (below 0 wounds, above the death threshold) rolls to stabilize.`);
   if (!Number.isSafeInteger(roll) || roll < 1 || roll > 100) throw new Error(loc`Roll d% for a dying character.`);
   const stabilized = roll <= int(constitution),
     after = stabilized ? 0 : wounds - 1;
-  return { stabilized, wounds: after, state: woundState(after) };
+  return { stabilized, wounds: after, state: woundState(after, deathThreshold) };
 }
 
 /** The note a check carries once it has been compared with an opposing result. */

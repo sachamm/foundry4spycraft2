@@ -87,7 +87,10 @@ export function limitedUseAbilities(system, items, cfg) {
     try {
       const spec = taskPressureUseSpec(t);
       if (spec) add(spec);
-    } catch {}
+    } catch (error) {
+      // A malformed task loses only its limited use, but say so rather than dropping it without a trace.
+      console.warn(`Spycraft 2.0 | Analysis task "${t?.name ?? "?"}" has no limited-use entry:`, error);
+    }
   }
   if (system.activeFeatNames?.includes("Well-Funded"))
     add({

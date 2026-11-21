@@ -37,13 +37,13 @@
       <ul class="rows">
         {{#each system.subplots}}
           <li><input type="checkbox" name="subplots.{{@index}}.complete" {{checked complete}} />
-            <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="sc2-subplots" />
+            <input type="text" name="subplots.{{@index}}.name" value="{{name}}" list="{{@root.appId}}-subplots" />
             <input type="text" name="subplots.{{@index}}.notes" value="{{notes}}" placeholder="{{localize 'SPYCRAFT.Notes'}}" />
             <a data-action="removeRow" data-list="subplots" data-index="{{@index}}"><i class="fa-solid fa-trash"></i></a></li>
         {{/each}}
       </ul>
       {{#if system.subplotPicks.minimum}}<p class="{{#if system.subplotPicks.needsSubplot}}bad{{else}}muted{{/if}}">{{localize "SPYCRAFT.Template.ActorAgentTraining.TroubleMagnetAtLeastOneUnfinished"}} {{system.subplotPicks.inPlay}}{{localize "SPYCRAFT.Template.ActorAgentTraining.NameTheSubplotOrDescribeIt"}}</p>{{/if}}
-      <datalist id="sc2-subplots">{{#each config.tables.subplots}}<option value="{{this}}"></option>{{/each}}</datalist>
+      <datalist id="{{appId}}-subplots">{{#each config.tables.subplots}}<option value="{{this}}"></option>{{/each}}</datalist>
     </div>
     <div class="col">
       {{#each focusGroups}}

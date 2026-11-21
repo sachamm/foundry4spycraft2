@@ -33,7 +33,8 @@ export function roundReminders({
   };
   for (const combatant of combatants) {
     if (!combatant?.actorUuid || combatant.defeated) continue;
-    if (roundEnded && combatant.special && woundState(Number(combatant.wounds)) === "dying") add("dying", combatant);
+    if (roundEnded && combatant.special && woundState(Number(combatant.wounds), combatant.deathThreshold) === "dying")
+      add("dying", combatant);
     if (roundStarted && combatant.stratagem > 0) add("stratagem", combatant);
     if (turnActorUuid && combatant.actorUuid === turnActorUuid && combatant.burning) add("burning", combatant);
   }
