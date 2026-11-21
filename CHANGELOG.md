@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Critical hits on damage cards, follow-up fixes.** A Table of Ouch critical on a special NPC now rolls and reports
+  the injury on the spot instead of leaving an ordinary hit. A player whose agent was hit by someone else's attack can
+  now roll the Ouch injury from the row they already use to take the damage, and applying a critical Burst or Autofire
+  to their own agent now marks the first shot as used, so later shots no longer default to critical. An Ouch critical
+  marks the first shot as used too. The extra failed saves a standard NPC takes from a critical now follow the effect
+  bought, even when a discount and a Shaken surcharge both changed the price.
+- **Chat theme:** button rows added below a card in a dark chat log now use the dark colours as well.
+- **Copied-text check:** a label match no longer hides a copied sentence in the same string, a run is only reported
+  when it continues one place in the book, and a rulebook path that does not exist now fails instead of passing.
 - **GC-arbitrated locking recovers faster.** With "Resource locking" set to the GC's client, a GC tab that is in the
   background or frozen used to make every spend wait five seconds before falling back. The wait is now under two
   seconds; for the next minute the GC is asked only briefly (under half a second) before falling back, and the player

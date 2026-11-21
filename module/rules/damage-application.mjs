@@ -81,7 +81,8 @@ const OUCH_PRESETS = new Set(["hit.ouch", "hit.ouchAtZero"]);
 
 /**
  * What an activated critical hit sets when one of its damage cards is applied.
- * - Its size is the effect bought, before discounts: a standard NPC fails that many more Damage saves (pp.329, 332).
+ * - Its size is the effect bought (its base cost), not the dice paid: discounts and a Shaken surcharge change the price,
+ *   not the effect. A standard NPC fails that many more Damage saves (pp.329, 332).
  * - A Table of Ouch effect replaces the wounds effect, so the damage is applied normally and the injury is rolled.
  * - Only the first shot of a Burst or Autofire is critical (pp.354-355); once one card has applied it as a critical
  *   hit, the attack's other cards default to normal hits.
@@ -93,7 +94,7 @@ export function criticalDamageDefaults(attack, damageMessageId = "") {
   const none = { critical: false, criticalDice: 0, ouch: false, laterShot: false };
   if (attack?.criticalSuccess !== true) return none;
   const activation = attack.criticalActivation ?? {},
-    dice = Math.max(1, Math.trunc(Number(activation.adjustedBaseCost ?? activation.baseCost ?? activation.cost) || 1)),
+    dice = Math.max(1, Math.trunc(Number(activation.baseCost ?? activation.cost) || 1)),
     taken = attack.criticalShotApplied?.damageMessageId;
   if ((Number(attack.attackResolution?.hits) || 1) > 1 && taken && taken !== damageMessageId)
     return { ...none, laterShot: true };

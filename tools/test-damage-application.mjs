@@ -228,10 +228,13 @@ test("a critical hit's damage defaults: size before discounts, Table of Ouch, fi
     ouch: false,
     laterShot: false
   });
-  // A surcharge raises the size the effect was bought at.
+  // A discount and a Shaken surcharge together: adjustedBaseCost records the discounted price before the surcharge,
+  // but the effect is still the size bought.
   assert.equal(
-    criticalDamageDefaults({ criticalSuccess: true, criticalActivation: { cost: 3, baseCost: 2, adjustedBaseCost: 3 } })
-      .criticalDice,
+    criticalDamageDefaults({
+      criticalSuccess: true,
+      criticalActivation: { cost: 3, baseCost: 3, adjustedBaseCost: 2, surcharge: 1 }
+    }).criticalDice,
     3
   );
   // Old cards without baseCost still read the cost paid.

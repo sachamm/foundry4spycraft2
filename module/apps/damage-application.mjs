@@ -791,10 +791,29 @@ export async function applyDamage(message, options = {}) {
   } catch (error) {
     return refuse(error.message);
   }
-  // A Table of Ouch critical on a special character: the injury is rolled from the damage card (p.329).
-  const ouch = crit.ouch && target.type === "agent" && kind === "lethal" && Number.isFinite(result?.net);
+  // A Table of Ouch critical on a special character (p.329). An agent's injury is rolled from the damage card, where
+  // its sheet records it; a special NPC has no injury record, so its injury is rolled and reported here.
+  const ouchHit = crit.ouch && isSpecial(target) && kind === "lethal" && Number.isFinite(result?.net),
+    ouch = ouchHit && target.type === "agent",
+    rolls = [];
   if (ouch) lines.push(loc`Table of Ouch critical: roll ${esc(target.name)}’s injury from the damage card.`);
-  if (lines.filter(Boolean).length) await post(target, lines, { pendingSave });
+  else if (ouchHit) {
+    const plan = criticalInjuryRollPlan(target.system, {
+        id: `ouch-${message.id}-${target.id}`,
+        damage: result.net,
+        source: loc`Critical hit: ${weapon?.name ?? loc`Damage`}`,
+        confirmed: true
+      }),
+      roll = await new Roll(plan.formula).evaluate(),
+      injury = criticalInjuryResult(plan, roll.total - plan.damage);
+    rolls.push(roll);
+    lines.push(
+      injury.listed
+        ? loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}. Surgery DC ${injury.surgeryDC}.`
+        : loc`Table of Ouch critical on ${esc(target.name)} (${injury.total}): ${esc(injury.name)}.`
+    );
+  }
+  if (lines.filter(Boolean).length) await post(target, lines, { pendingSave, rolls });
   // When the card cannot be marked the report above is the record.
   await markCard(
     message,
@@ -802,11 +821,43 @@ export async function applyDamage(message, options = {}) {
     { targetUuid: target.uuid, name: target.name, damage, kind, ...(ouch ? { ouch: true, net: result.net } : {}) },
     { quiet: true }
   );
-  // The first critical shot of a Burst or Autofire: the attack's other damage cards become normal hits.
+  // The first critical shot of a Burst or Autofire, a Table of Ouch one included: the attack's other damage cards
+  // become normal hits.
   const attackMessage = check.sourceAttack?.uuid ? fromUuidSync(check.sourceAttack.uuid) : null;
-  if (critical && attackMessage && (Number(attack?.attackResolution?.hits) || 1) > 1 && !attack.criticalShotApplied)
+  if (
+    (critical || crit.ouch) &&
+    attackMessage &&
+    (Number(attack?.attackResolution?.hits) || 1) > 1 &&
+    !attack.criticalShotApplied
+  )
     await markCard(attackMessage, "criticalShotApplied", { damageMessageId: message.id }, { quiet: true });
   return result ?? true;
+}
+
+/**
+ * A Table of Ouch critical: the injured agent's owner (or the GC) rolls it from the damage card, once per target
+ * (p.329). The event reference is fixed, so a second press shows the injury already rolled instead of a new one.
+ * Shown under the attacker's buttons and, for a player who owns only the target, in the target's own row.
+ */
+export function ouchInjuryControls(message, check) {
+  const controls = [];
+  for (const entry of appliedDamageEntries(check).filter(entry => entry.ouch === true)) {
+    const injured = fromUuidSync(entry.targetUuid);
+    if (!injured?.isOwner) continue;
+    controls.push({
+      id: "ouchInjury",
+      label: loc`Table of Ouch: ${injured.name}`,
+      hint: loc`Roll ${injured.name}’s critical injury on the Table of Ouch`,
+      run: () =>
+        rollCriticalInjury(injured, {
+          id: `ouch-${message.id}-${injured.id}`,
+          damage: entry.net,
+          source: loc`Critical hit: ${fromUuidSync(check.weaponUuid ?? "")?.name ?? loc`Damage`}`,
+          confirmed: true
+        })
+    });
+  }
+  return controls;
 }
 
 /** What does not fit a relayed damage request: who asks, and whether the amount is above the card's roll. */
@@ -1083,23 +1134,7 @@ rollPipeline.register({
         hint: loc`Apply the blast to everyone caught in it, by distance from the centre`,
         run: () => applyBlast(message)
       });
-    // A Table of Ouch critical: the injured character's owner (or the GC) rolls it here, once per target (p.329).
-    // The event reference is fixed, so a second press shows the injury already rolled instead of a new one.
-    for (const entry of applied.filter(entry => entry.ouch === true)) {
-      const injured = fromUuidSync(entry.targetUuid);
-      if (!injured?.isOwner) continue;
-      controls.push({
-        label: loc`Table of Ouch: ${injured.name}`,
-        hint: loc`Roll ${injured.name}’s critical injury on the Table of Ouch`,
-        run: () =>
-          rollCriticalInjury(injured, {
-            id: `ouch-${message.id}-${injured.id}`,
-            damage: entry.net,
-            source: loc`Critical hit: ${fromUuidSync(check.weaponUuid ?? "")?.name ?? loc`Damage`}`,
-            confirmed: true
-          })
-      });
-    }
+    controls.push(...ouchInjuryControls(message, check));
     return controls;
   }
 });

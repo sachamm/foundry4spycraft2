@@ -7,7 +7,13 @@
  * agent's sheet offers; nothing is settled here.
  */
 import { checkIncomingDefense } from "./incoming-defense.mjs";
-import { applyDamage, damageCardTarget, quickApplyInput, targetLabel } from "./damage-application.mjs";
+import {
+  applyDamage,
+  damageCardTarget,
+  ouchInjuryControls,
+  quickApplyInput,
+  targetLabel
+} from "./damage-application.mjs";
 import { loc } from "../i18n.mjs";
 import { appliedDamageEntries } from "../rules/damage-application.mjs";
 
@@ -54,9 +60,11 @@ export function targetResponseControls({ message, check, user }) {
     // The attacker's own row already offers this to someone who owns both characters.
     const attacker = check.actorUuid ? fromUuidSync(check.actorUuid) : null;
     if (attacker?.isOwner) return [];
+    // Once the damage is applied, a Table of Ouch injury is rolled from here by the injured agent's player.
+    const ouch = ouchInjuryControls(message, check);
     const target = respondent(damageCardTarget(check)?.uuid, check, user);
     const applied = appliedDamageEntries(check);
-    if (!target || applied.some(entry => entry.targetUuid === target.uuid)) return [];
+    if (!target || applied.some(entry => entry.targetUuid === target.uuid)) return ouch;
     const rolled = Number.isFinite(check.effectiveTotal) ? check.effectiveTotal : message.rolls?.[0]?.total;
     const amount = Math.max(0, Math.trunc(Number(rolled) || 0));
     return [
@@ -65,7 +73,8 @@ export function targetResponseControls({ message, check, user }) {
         label: loc`Apply ${amount} to ${targetLabel(target)}`,
         emphasis: "primary",
         run: () => applyDamage(message, quickApplyInput(message, target.uuid))
-      }
+      },
+      ...ouch
     ];
   }
   return [];

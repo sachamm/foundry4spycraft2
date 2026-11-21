@@ -373,6 +373,50 @@ test("a failed massive-damage save rolls a critical injury and drops wounds to â
   assert.match(posted.at(-1).content, /wounds drop to -9/);
 });
 
+test("a Table of Ouch critical on a special NPC rolls the injury at once, and uses up a Burst's first shot", async () => {
+  reset();
+  const boss = character("Boss4", {
+    vitality: { value: 30, max: 30 },
+    wounds: { value: 14, max: 14 },
+    npcType: "special"
+  });
+  boss.type = "npc";
+  const shooter = character("Shooter4", { activeFeatNames: [] });
+  const attack = card("o1", {
+    actorUuid: shooter.uuid,
+    checkKind: "attack",
+    rawTotal: 22,
+    effectiveTotal: 22,
+    criticalSuccess: true,
+    criticalActivation: { cost: 2, baseCost: 2, preset: "hit.ouch" },
+    attackResolution: { hit: true, hits: 3 }
+  });
+  const first = card("o2", {
+    actorUuid: shooter.uuid,
+    checkKind: "damage",
+    effectiveTotal: 12,
+    sourceAttack: { uuid: attack.uuid }
+  });
+  await applyDamage(first, { targetUuid: boss.uuid, damage: 12, kind: "lethal" });
+  assert.equal(boss.system.vitality.value, 18, "an ordinary hit: the Ouch effect replaces going to wounds");
+  // The injury roll is 1d20 + 12 net damage, every die showing 5 here.
+  assert.match(posted.at(-1).content, /Table of Ouch critical on Boss4 \(17\)/);
+  assert.equal(posted.at(-1).rolls.length, 1);
+  // The NPC has no injury record to roll from, so the card offers no Ouch button for it.
+  assert.equal(appliedDamageEntries(first.flags.spycraft2).at(-1).ouch, undefined);
+  // The first shot is used, so the attack's next damage card is a normal hit.
+  assert.deepEqual(attack.flags.spycraft2.criticalShotApplied, { damageMessageId: "o2" });
+  const second = card("o3", {
+    actorUuid: shooter.uuid,
+    checkKind: "damage",
+    effectiveTotal: 9,
+    sourceAttack: { uuid: attack.uuid }
+  });
+  const before = posted.length;
+  await applyDamage(second, { targetUuid: boss.uuid, damage: 9, kind: "lethal" });
+  assert.ok(posted.slice(before).every(message => !/Table of Ouch/.test(message.content)));
+});
+
 test("a special NPC's stress and subdual damage is totalled and its threshold save offered", async () => {
   reset();
   const boss = character("Boss3", { abilities: { con: { value: 10 }, wis: { value: 12 } }, npcType: "special" });
@@ -678,4 +722,9 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
   await apply.run();
   assert.equal(mine.system.vitality.value, 14);
   assert.deepEqual(ids(damage), [], "not offered twice");
+  // A Table of Ouch critical on that agent: its player rolls the injury from the same row, not the attacker's.
+  damage.flags.spycraft2.damageAppliedBy = {
+    ouch: { targetUuid: mine.uuid, name: "Latch", damage: 6, kind: "lethal", ouch: true, net: 6 }
+  };
+  assert.deepEqual(ids(damage), ["ouchInjury"]);
 });

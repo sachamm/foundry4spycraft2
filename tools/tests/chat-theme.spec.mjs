@@ -11,12 +11,14 @@ const css = manifest.styles
 const LIGHT_INK = "#1b2323",
   DARK_INK = "#e8e4d8";
 
-// A flagged card, an unflagged note whose content root is a system element, and a card with a nested system root.
+// A flagged card, an unflagged note whose content root is a system element, a card with a nested system root, and a
+// button row added after the content (target responses and card-placed controls go there).
 const messages = `
   <li class="chat-message message sc2-card" data-sc2-tooltip-scope data-testid="card"><header class="message-header">Roll</header>
     <div class="message-content"><div class="spycraft2 roll-controls" data-testid="nested"><button type="button">Next</button></div></div></li>
   <li class="chat-message message" data-testid="plain"><header class="message-header">Note</header>
-    <div class="message-content"><div class="spycraft2 chat-note" data-testid="note">Ammunition spent.</div></div></li>`;
+    <div class="message-content"><div class="spycraft2 chat-note" data-testid="note">Ammunition spent.</div></div>
+    <div class="spycraft2 roll-controls" data-testid="outside"><button type="button">Apply</button></div></li>`;
 const ink = (page, id) =>
   page.getByTestId(id).evaluate(el => getComputedStyle(el).getPropertyValue("--sc2-ink").trim().toLowerCase());
 test("the light and dark ink in this test are the ones tokens.css declares", () => {
@@ -38,7 +40,7 @@ for (const [app, ui] of [
     );
     const sidebar = ui === "dark" ? DARK_INK : LIGHT_INK,
       popout = app === "dark" ? DARK_INK : LIGHT_INK;
-    for (const id of ["card", "nested", "note"]) {
+    for (const id of ["card", "nested", "note", "outside"]) {
       expect(await ink(page, id), `sidebar ${id}`).toBe(sidebar);
       expect(await ink(page, `pop-${id}`), `popout ${id}`).toBe(popout);
     }
@@ -52,7 +54,8 @@ test("a popped-out log with its own theme overrides the application theme", asyn
     await page.setContent(
       `<style>${css}</style><body class="theme-${app}"><div class="application theme-${own}"><ol class="chat-log">${messages}</ol></div></body>`
     );
-    for (const id of ["card", "nested", "note"]) expect(await ink(page, id), `${app}/${own} ${id}`).toBe(expected);
+    for (const id of ["card", "nested", "note", "outside"])
+      expect(await ink(page, id), `${app}/${own} ${id}`).toBe(expected);
   }
 });
 
