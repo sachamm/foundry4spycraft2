@@ -1,3 +1,4 @@
+import { worldMigrating } from "../migrations/index.mjs";
 import { primaryWriterFor } from "../writers.mjs";
 import { queueRuleState } from "./rule-resource-scope.mjs";
 import { preferredInitiativeRoll } from "./initiative-choice.mjs";
@@ -256,6 +257,7 @@ export function installShakenInitiativeHooks() {
   const schedule = actor => {
     if (!actor || !["agent", "npc"].includes(actor.type) || !actor.isOwner || !combatants(actor).length) return;
     if (primaryWriterFor(actor)?.id !== game.user.id) return;
+    if (worldMigrating()) return;
     const queued = pending.get(actor);
     if (queued) {
       queued.again = true;
@@ -300,7 +302,8 @@ export function installShakenInitiativeHooks() {
     Hooks.on(event, item => {
       if (!isResourceLock(item)) schedule(item.parent);
     });
-  Hooks.once("ready", () => {
+  // After the start-up migration: what it changed is reconciled here in one pass, not once per written document.
+  Hooks.once("spycraft2.ready", () => {
     for (const actor of periodResourceActors()) schedule(actor);
   });
 }

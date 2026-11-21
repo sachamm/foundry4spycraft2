@@ -1,3 +1,4 @@
+import { worldMigrating } from "../migrations/index.mjs";
 import { primaryWriterFor } from "../writers.mjs";
 import {
   stablePower as stable,
@@ -349,6 +350,7 @@ export function installPowerStanceInitiativeHooks() {
   const schedule = actor => {
     if (!actor || actor.type !== "agent" || !actor.isOwner || !combatants(actor).length) return;
     if (primaryWriterFor(actor)?.id !== game.user.id) return;
+    if (worldMigrating()) return;
     const old = pending.get(actor);
     if (old) {
       old.again = true;
@@ -392,7 +394,8 @@ export function installPowerStanceInitiativeHooks() {
     Hooks.on(event, item => {
       if (!isResourceLock(item)) schedule(item.parent);
     });
-  Hooks.once("ready", () => {
+  // After the start-up migration: what it changed is reconciled here in one pass, not once per written document.
+  Hooks.once("spycraft2.ready", () => {
     for (const actor of periodResourceActors()) schedule(actor);
   });
 }
