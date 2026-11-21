@@ -23,7 +23,7 @@ import {
   getUsagePeriodReview,
   reviewUsagePeriod
 } from "./module/rules/periods.mjs";
-import { nativeResourceLocks, periodResourceActors } from "./module/rules/transactions.mjs";
+import { nativeResourceLocks, periodResourceActors, registerLockRecovery } from "./module/rules/transactions.mjs";
 import {
   manageGCDice,
   gcDiceStatus,
@@ -189,6 +189,7 @@ Hooks.once("init", () => {
   registerSoundtrackSetup();
   registerMigrationSettings();
   registerGmLocks();
+  registerLockRecovery();
   registerMapSettings();
   // The game clock sets how much time a combat round adds (CONFIG.time.roundTime).
   gameClock.installGameClock();

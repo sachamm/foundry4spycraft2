@@ -11,6 +11,8 @@ import {
   queueResources,
   payLockedActionDice,
   runNativeResourceTransaction,
+  abandonedBackgroundLock,
+  BACKGROUND_LOCK_STALE_MS,
   recoverResourceTransaction,
   periodResourceActors
 } from "../module/rules/transactions.mjs";
@@ -107,6 +109,89 @@ test("two independent clients cannot both spend the same die; server-side embedd
   const results = await Promise.allSettled([run(a), run(b)]);
   assert.equal(results.filter(r => r.status === "fulfilled").length, 1);
   assert.ok(results.some(r => r.status === "rejected" && r.reason instanceof ResourceBusyError));
+  assert.equal(performed, 1);
+  assert.equal(records.get("Actor.a").system.actionDice.value, 0);
+  assert.equal(records.get("Actor.a").items.length, 0);
+});
+test("a bookkeeping lock left by a closed client is cleared by the next transaction; an action's lock is not", async () => {
+  reset();
+  const actor = new NativeActor("a");
+  const leave = (resourceLock, target = actor) => {
+    const item = {
+      ...lock("old"),
+      flags: { spycraft2: { resourceLock: { token: "old", userId: "gone", ...resourceLock } } }
+    };
+    records.get(target.uuid).items.push(copy(item));
+    target.updateSource(records.get(target.uuid));
+  };
+  // Bookkeeping marks its lock, so a later transaction can tell it apart.
+  let seen;
+  await runNativeResourceTransaction(
+    [actor],
+    async () => (seen = records.get(actor.uuid).items[0].flags.spycraft2.resourceLock),
+    { background: true }
+  );
+  assert.equal(seen.background, true);
+  await runNativeResourceTransaction(
+    [actor],
+    async () => (seen = records.get(actor.uuid).items[0].flags.spycraft2.resourceLock)
+  );
+  assert.equal(seen.background, undefined);
+  // Abandoned bookkeeping: the spend goes through and no lock is left.
+  leave({ background: true, started: Date.now() - BACKGROUND_LOCK_STALE_MS - 1 });
+  assert.equal(
+    await runNativeResourceTransaction([actor], () => payLockedActionDice(actor, 1, async () => "paid")),
+    "paid"
+  );
+  assert.equal(records.get(actor.uuid).items.length, 0);
+  // Bookkeeping that only just started is still running somewhere: wait for it.
+  const fresh = new NativeActor("b");
+  leave({ background: true, started: Date.now() }, fresh);
+  await assert.rejects(
+    runNativeResourceTransaction([fresh], async () => true),
+    ResourceBusyError
+  );
+  // A lock taken for someone's own action stays for the GC, however old.
+  const acting = new NativeActor("c");
+  leave({ started: Date.now() - 10 * BACKGROUND_LOCK_STALE_MS }, acting);
+  await assert.rejects(
+    runNativeResourceTransaction([acting], async () => true),
+    ResourceBusyError
+  );
+  assert.equal(records.get(acting.uuid).items.length, 1);
+  assert.equal(abandonedBackgroundLock({ flags: {} }, actor), false);
+});
+test("two clients that both still see an abandoned bookkeeping lock cannot both spend the same die", async () => {
+  reset();
+  const a = new NativeActor("a");
+  const old = { ...lock("old") };
+  old.flags = {
+    spycraft2: {
+      resourceLock: {
+        token: "old",
+        userId: "gone",
+        background: true,
+        started: Date.now() - BACKGROUND_LOCK_STALE_MS - 1
+      }
+    }
+  };
+  records.get(a.uuid).items.push(copy(old));
+  a.updateSource(records.get(a.uuid));
+  // The second client's copy of the character still shows the old lock throughout.
+  const b = new NativeActor("a", 0, { source: copy(records.get("Actor.a")) });
+  let performed = 0,
+    second;
+  const first = await runNativeResourceTransaction([a], () =>
+    payLockedActionDice(a, 1, async () => {
+      // While the first action runs under its new lock, the second client tries with its cached view.
+      second = await runNativeResourceTransaction([b], () => payLockedActionDice(b, 1, async () => ++performed)).catch(
+        error => error
+      );
+      return ++performed;
+    })
+  );
+  assert.equal(first, 1);
+  assert.ok(second instanceof ResourceBusyError);
   assert.equal(performed, 1);
   assert.equal(records.get("Actor.a").system.actionDice.value, 0);
   assert.equal(records.get("Actor.a").items.length, 0);

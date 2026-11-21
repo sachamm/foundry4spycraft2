@@ -248,7 +248,7 @@ export class RollPipeline {
     return merged;
   }
 
-  /** Buttons to show under a posted check: [{id, label, run, placement}]. */
+  /** Buttons to show under a posted check: [{id, label, run, placement, hint?}]; the hint is the button's tooltip. */
   chatControls(ctx) {
     const controls = [];
     for (const c of this.#active("chatControls", ctx)) {
@@ -265,6 +265,7 @@ export class RollPipeline {
           label: control.label,
           run: control.run,
           placement: control.placement ?? "plain",
+          ...(typeof control.hint === "string" && control.hint ? { hint: control.hint } : {}),
           ...(["primary", "quiet"].includes(control.emphasis) ? { emphasis: control.emphasis } : {})
         });
       }

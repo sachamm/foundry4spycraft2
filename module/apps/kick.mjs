@@ -63,7 +63,8 @@ rollPipeline.register({
     // Driving Punch: a miss leaves the character flat-footed.
     if (UNARMED_TRICKS[unarmed?.key]?.missFlatFooted && check.successConfirmed === false && !check.unarmedTrickMiss)
       controls.push({
-        label: loc`${unarmed.name} miss: become flat-footed`,
+        label: loc`${unarmed.name}: flat-footed`,
+        hint: loc`${unarmed.name} miss: become flat-footed`,
         run: async () => {
           await message.update({ "flags.spycraft2.unarmedTrickMiss": true });
           return setConditionStatus(actor, "flat-footed", true, { label: loc`Flat-footed`, aliases: ["flatFooted"] });

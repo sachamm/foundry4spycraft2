@@ -27,7 +27,8 @@ rollPipeline.register({
       feats = target?.system?.activeFeatNames ?? [];
     if (reactableHit(check) && feats.includes("Lucky Break"))
       controls.push({
-        label: loc`Lucky Break (${target.name}): the hit beat Defense by 1 or less — it misses`,
+        label: loc`Lucky Break: it misses`,
+        hint: loc`Lucky Break (${target.name}): the hit beat Defense by 1 or less — it misses`,
         run: () =>
           target.useLimitedAbility(
             "luckyBreak",
@@ -40,7 +41,8 @@ rollPipeline.register({
       });
     if (reactableHit(check) && feats.includes("Peculiar Dodge"))
       controls.push({
-        label: loc`Peculiar Dodge (${target.name}): spend an action die, odd means a miss`,
+        label: loc`Peculiar Dodge: spend a die`,
+        hint: loc`Peculiar Dodge (${target.name}): spend an action die, odd means a miss`,
         run: () =>
           target.useLimitedAbility(
             "peculiarDodge",
@@ -69,7 +71,8 @@ rollPipeline.register({
       });
     if (misfortuneEligible(check) && actor?.system?.activeFeatNames?.includes("Misfortune") && target)
       controls.push({
-        label: loc`Misfortune: spend an action die so ${target.name} discards one`,
+        label: loc`Misfortune: spend a die`,
+        hint: loc`Misfortune: spend an action die so ${target.name} discards one`,
         run: () =>
           actor.useLimitedAbility(
             "misfortune",
@@ -96,7 +99,8 @@ rollPipeline.register({
       });
     if (fortunesFoolEligible(check) && actor?.system?.activeFeatNames?.includes("Fortune's Fool"))
       controls.push({
-        label: loc`Fortune’s Fool: trade an action die with the opponent who activated this error`,
+        label: loc`Fortune’s Fool: trade a die`,
+        hint: loc`Fortune’s Fool: trade an action die with the opponent who activated this error`,
         run: async () => {
           const payer = check.criticalActivation.payerUuid;
           await message.update({ "flags.spycraft2.fortunesFool": payer });

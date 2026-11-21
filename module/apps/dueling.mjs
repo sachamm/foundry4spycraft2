@@ -56,7 +56,8 @@ rollPipeline.register({
       actor?.system?.activeFeatNames?.includes("Dueling Supremacy")
     )
       controls.push({
-        label: loc`Dueling Supremacy: Initiative Count +1`,
+        label: loc`Dueling Supremacy: Count +1`,
+        hint: loc`Dueling Supremacy: Initiative Count +1`,
         run: () => shiftCount(message, actor, 1, "duelingSupremacy", "Dueling Supremacy")
       });
     // Forward Stance (Rolling Basics, p.187): each hit raises the attacker's Initiative Count by 1.
@@ -79,7 +80,8 @@ rollPipeline.register({
       target?.system?.activeFeatNames?.includes("Dueling Mastery")
     )
       controls.push({
-        label: loc`Dueling Mastery: adjacent attacker’s Initiative Count −2`,
+        label: loc`Dueling Mastery: Count −2`,
+        hint: loc`Dueling Mastery: adjacent attacker’s Initiative Count −2`,
         run: () => shiftCount(message, actor, -2, "duelingMastery", "Dueling Mastery")
       });
     return controls.length ? controls : null;
