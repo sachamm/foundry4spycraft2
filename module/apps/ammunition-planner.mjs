@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { compatibleAmmunition, ammunitionStockpilePlan } from "../rules/ammunition.mjs";
 import { loc } from "../i18n.mjs";
 /** Read-only source calculation. Actual acquisition/payment is recorded separately. */
@@ -6,7 +7,7 @@ export async function planAmmunitionStockpile(item, options = {}) {
     choices = compatibleAmmunition(item.system, catalog),
     esc = foundry.utils.escapeHTML;
   if (!choices.length)
-    return ui.notifications.warn(
+    return refuse(
       loc`This weapon needs a supported ammunition category and projectile caliber/model before calculating Table 4.62 stockpiles.`
     );
   let input = options;

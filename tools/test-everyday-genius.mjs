@@ -266,7 +266,7 @@ test("three mission claims exhaust a three-feat allowance and concurrent final c
 test("cancellation, strict full-action declaration, wrong tree, off-turn, creation/posting and changed-period failures leave no partial grant or spent claim", async () => {
   let a = reset();
   assert.equal(await a.useEverydayGenius(), null);
-  assert.equal(await a.useEverydayGenius({ ...opts("Techie"), fullActionConfirmed: "true" }), null);
+  assert.equal(await a.useEverydayGenius({ ...opts("Techie"), fullActionConfirmed: "true" }), false);
   await assert.rejects(a.useEverydayGenius(opts("Guts")), /Basic Skill/);
   failCreate = true;
   await assert.rejects(a.useEverydayGenius(opts("Techie")), /create failed/);

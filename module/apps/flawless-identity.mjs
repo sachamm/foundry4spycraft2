@@ -1,8 +1,8 @@
 /** Flawless Identity on the Main tab: recording identities and slipping in and out of them (p.209). */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { enterIdentityPlan, identityLimit, IDENTITY_POWER_RATING } from "../rules/flawless-identity.mjs";
 import { loc } from "../i18n.mjs";
-
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 
 /** Add or edit an identity. */
 export async function editIdentity(actor, id = "") {
@@ -10,7 +10,7 @@ export async function editIdentity(actor, id = "") {
   const list = [...(actor.system.identities ?? [])],
     current = list.find(r => r.id === id);
   if (!current && list.length >= identityLimit(actor.system))
-    return ui.notifications.warn(loc`Your starting action dice limit how many identities you keep.`);
+    return refuse(loc`Your starting action dice limit how many identities you keep.`);
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: current ? loc`Edit identity` : loc`New identity` },
     rejectClose: false,

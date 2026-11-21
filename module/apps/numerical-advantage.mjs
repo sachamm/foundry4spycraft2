@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { numericalAdvantagePlan } from "../rules/numerical-advantage.mjs";
 import { loc } from "../i18n.mjs";
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
@@ -116,6 +117,6 @@ export async function checkNumericalAdvantage(actor) {
     });
     return plan;
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }

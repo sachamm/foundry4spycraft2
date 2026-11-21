@@ -1,4 +1,5 @@
 /** Skill and Knowledge checks, and the class abilities resolved through them. */
+import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
 import { choiceKey, rememberChoices, rememberedChoices, restoreChoices } from "../../apps/remembered-choices.mjs";
@@ -210,7 +211,7 @@ export const ActorSkillRolls = Base =>
       const workTarget = () =>
         input.weaponWork === true && input.weaponWorkItemId ? this.items?.get?.(input.weaponWorkItemId) : null;
       if (input.weaponWork === true && input.weaponWorkItemId && workTarget()?.type !== "weapon")
-        return ui.notifications.warn(loc`Choose an actual target weapon/model or confirm its specifications again.`);
+        return refuse(loc`Choose an actual target weapon/model or confirm its specifications again.`);
       if (
         input.gearItem &&
         (!gearItem ||
@@ -221,7 +222,7 @@ export const ActorSkillRolls = Base =>
           gearItem.system.quantity === 0 ||
           possessionUnavailable(gearItem.system))
       )
-        return ui.notifications.warn(loc`Choose available gear being used for this check.`);
+        return refuse(loc`Choose available gear being used for this check.`);
       if (
         check?.id === "restraint-escape" &&
         restraintRollSource.sources.length > 1 &&
@@ -252,7 +253,7 @@ export const ActorSkillRolls = Base =>
         });
       let result = plan(gearItem);
       if (!result) return null;
-      if (result.blocked) return ui.notifications.warn(result.blockedReason);
+      if (result.blocked) return refuse(result.blockedReason);
       if (!result.actionDiceCost) {
         const split = unrolledPaymentFundingInput(input),
           fee = surchargeFundingInput(input);
@@ -260,7 +261,7 @@ export const ActorSkillRolls = Base =>
           try {
             actionDieBenefitQuote(this, { baseCost: 0, benefitCount: 0, ...split, ...fee });
           } catch (error) {
-            return ui.notifications.warn(error.message);
+            return refuse(error.message);
           }
         }
       }
@@ -271,8 +272,7 @@ export const ActorSkillRolls = Base =>
         });
         if (!allocation || allocation.review) return null;
         result = plan(gearItem);
-        if (!result || result.blocked)
-          return ui.notifications.warn(result?.blockedReason ?? loc`This check is no longer available.`);
+        if (!result || result.blocked) return refuse(result?.blockedReason ?? loc`This check is no longer available.`);
       }
 
       if (input.breakthrough)
@@ -318,13 +318,11 @@ export const ActorSkillRolls = Base =>
           throw new Error(loc`The GC resolves this bonus for a secret or passive check.`);
       }
       if (input.brightIdea && key === "search" && (this.system.classLevels?.fieldAnalyst ?? 0) >= 8)
-        return ui.notifications.warn(
-          loc`Eye for Detail already rolls Search twice. Clear Bright Idea to preserve its limited use.`
-        );
+        return refuse(loc`Eye for Detail already rolls Search twice. Clear Bright Idea to preserve its limited use.`);
       if (input.brightIdea && (result.method !== "roll" || !["int", "wis"].includes(result.ability)))
-        return ui.notifications.warn(loc`Bright Idea requires a rolled Intelligence- or Wisdom-based skill check.`);
+        return refuse(loc`Bright Idea requires a rolled Intelligence- or Wisdom-based skill check.`);
       if (input.brightIdea && result.rollMode === "blindroll" && !game.user?.isGM)
-        return ui.notifications.warn(loc`Ask the GC to resolve Bright Idea for this secret or passive check.`);
+        return refuse(loc`Ask the GC to resolve Bright Idea for this secret or passive check.`);
       const brightSource = input.brightIdea ? this.resolveBrightIdeaSource(input.brightIdeaSource) : null;
       if (input.brightIdea && !brightSource) return null;
       let difficultGain = null;
@@ -575,7 +573,7 @@ export const ActorSkillRolls = Base =>
 
     async useFinalDeduction(options = {}) {
       if (!this.isOwner || !hasFinalDeduction(this.system))
-        return ui.notifications.warn(loc`Final Deduction is not currently available.`);
+        return refuse(loc`Final Deduction is not currently available.`);
       const epoch = String(this.usagePeriods.session ?? "initial"),
         study = finalDeductionStudy(this.flags?.spycraft2?.finalDeduction, epoch),
         esc = foundry.utils.escapeHTML;
@@ -649,7 +647,7 @@ export const ActorSkillRolls = Base =>
 
     async useGlobalSearch(options = {}) {
       const source = globalSearchSource(this.system);
-      if (!this.isOwner || !source) return ui.notifications.warn(loc`Global Search is not currently available.`);
+      if (!this.isOwner || !source) return refuse(loc`Global Search is not currently available.`);
       let input = options;
       if (!input.target) {
         input = await systemDialog.input({
@@ -683,7 +681,7 @@ export const ActorSkillRolls = Base =>
 
     async useLittleDetails(options = {}) {
       if (!this.isOwner || !littleDetailsSource(this.system))
-        return ui.notifications.warn(loc`Little Details is not currently available.`);
+        return refuse(loc`Little Details is not currently available.`);
       let input = options;
       if (!input.action) {
         input = await systemDialog.input({
@@ -749,7 +747,7 @@ export const ActorSkillRolls = Base =>
       }
       input = rollPipeline.read({ dialog: "knowledge", actor: this }, input);
       const result = resolveKnowledgeCheck(this.system, input);
-      if (result.blocked) return ui.notifications.warn(result.blockedReason);
+      if (result.blocked) return refuse(result.blockedReason);
       if (input.breakthrough)
         breakthroughPlan(this.system, this.items, CONFIG.SPYCRAFT, result, {
           checkKind: "knowledge",

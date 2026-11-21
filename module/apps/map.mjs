@@ -3,6 +3,7 @@
  * blast lists who it reaches. Everything measured is a starting value the player can change; with no scene, no
  * token for the character or no single target, the dialogs open as they always did.
  */
+import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
   COVER,
@@ -277,7 +278,7 @@ export async function blastOnMap(message) {
     total = check?.effectiveTotal ?? message.rolls?.[0]?.total;
   if (!mapAvailable() || !Number.isFinite(total)) return null;
   const zero = targetedToken();
-  if (!zero) return ui.notifications.warn(loc`Target the one token standing at Ground Zero, then try again.`);
+  if (!zero) return refuse(loc`Target the one token standing at Ground Zero, then try again.`);
   const increment = blastIncrementFeet(check.weaponQualities),
     caught = blastCaught(total, increment) ?? [];
   drawBlast(zero, total, increment);

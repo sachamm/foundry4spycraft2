@@ -178,7 +178,7 @@ test("actual incoming Defense controller displays both Guard sources and validat
   for (const patch of [{ equipped: false }, { trained: false }, { quality: "GAR (+1)" }, { identity: "replacement" }]) {
     const a = actor();
     change = () => (a.system = calculate(patch));
-    assert.equal(await checkIncomingDefense(a), "warned");
+    assert.equal(await checkIncomingDefense(a), false);
     assert.match(warnings.at(-1), /Guard.*changed/);
   }
   change = () => {};
@@ -190,7 +190,7 @@ test("zero-source previews reject a newly gained trained/readied Guard source, a
   for (const patch of [{ trained: false }, { equipped: false }, { count: 0 }]) {
     const a = { type: "agent", isOwner: true, uuid: "Actor.gain", name: "Defender", system: calculate(patch) };
     change = () => (a.system = calculate());
-    assert.equal(await checkIncomingDefense(a), "warned");
+    assert.equal(await checkIncomingDefense(a), false);
     assert.match(warnings.at(-1), /Guard.*changed/);
     assert.equal(a.system.actionDice.value, 0);
     assert.equal(a.system.vitality.value, 4);

@@ -161,11 +161,11 @@ test("failed action-declaration posting restores both counters and source loss o
   assert.deepEqual(a.system.resourceUses, {});
   postFails = false;
   a.statuses.add("bound");
-  assert.equal(await a.rollSkill("athletics", "str", { check: "smash", littleDetails: true }), null);
+  assert.equal(await a.rollSkill("athletics", "str", { check: "smash", littleDetails: true }), false);
   assert.deepEqual(a.system.resourceUses, {});
   a.statuses.clear();
   a.system.classLevels.sleuth = 2;
   a.system.limitedUses = limitedUseAbilities(a.system, [], cfg);
-  assert.equal(await a.useLittleDetails({ action: "smash", actionLegalConfirmed: true }), null);
+  assert.equal(await a.useLittleDetails({ action: "smash", actionLegalConfirmed: true }), false);
   assert.deepEqual(a.system.resourceUses, {});
 });

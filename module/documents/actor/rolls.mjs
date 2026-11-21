@@ -1,4 +1,5 @@
 /** Checks a character rolls: the shared roll itself, attribute checks, saves and action dice. */
+import { refuse } from "../../error-notices.mjs";
 import { messageModeOption } from "../../rolls/message-mode.mjs";
 import { blackCatRollEffect } from "../../rules/black-cat.mjs";
 import { allOrNothingEligible, allOrNothingRanges } from "../../rules/all-or-nothing.mjs";
@@ -502,7 +503,7 @@ export const ActorRolls = Base =>
           ability: key,
           purelyMentalConfirmed: options.purelyMentalConfirmed
         });
-      if (blocked) return ui.notifications.warn(blocked);
+      if (blocked) return refuse(blocked);
       const conditionAbilityAdjustment = conditionAbilityPenalty(this.system, key),
         mod = (this.system.abilities[key]?.mod ?? 0) + conditionAbilityAdjustment;
       return this.rollCheck(
@@ -523,7 +524,7 @@ export const ActorRolls = Base =>
       let input = options;
       if (!CONFIG.SPYCRAFT.saves[key]) return null;
       if (attributeCollapsePlan(this.system).dead || this.system.conditionContext?.dead || this.statuses?.has("dead"))
-        return ui.notifications.warn(loc`A dead character cannot make a saving throw.`);
+        return refuse(loc`A dead character cannot make a saving throw.`);
       const feats = new Set(this.system.activeFeatNames ?? []),
         manualStandingContent = stillStandingSaveContent(this.system, key),
         stillStandingContent =
@@ -554,14 +555,14 @@ export const ActorRolls = Base =>
       // Each rule's part of the save (cover, Stone Cold, bracing, terrain, …) is a term it registers itself.
       const terms = planTerms("save", { actor: this, system: this.system, saveKey: key, input, options });
       const blocked = terms.merge("blocked")[0];
-      if (blocked) return ui.notifications.warn(blocked);
+      if (blocked) return refuse(blocked);
       const checkMethod = input.checkMethod ?? "roll";
       if (shakenRules(this.system).needsReview)
-        return ui.notifications.warn(loc`Review the current Shaken sources before saving throws.`);
+        return refuse(loc`Review the current Shaken sources before saving throws.`);
       if (["take10", "take20"].includes(checkMethod) && shakenRules(this.system).fixedResultsForbidden)
-        return ui.notifications.warn(loc`Shaken: taking 10 or 20 is unavailable (p.342).`);
+        return refuse(loc`Shaken: taking 10 or 20 is unavailable (p.342).`);
       if (checkMethod !== "roll" && (checkMethod !== "take10" || key !== "ref" || !evasionPlan(this.system).canTake10))
-        return ui.notifications.warn(loc`Only Evasion III permits taking 10 with a Reflex save.`);
+        return refuse(loc`Only Evasion III permits taking 10 with a Reflex save.`);
       const evasionContext =
         key === "ref"
           ? evasionSaveContext(this.system, {

@@ -1,4 +1,6 @@
 /** Diversion in play: the skill dialog's section and the GC's outcome control (see module/rules/diversion.mjs). */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { diversionOutcome } from "../rules/diversion.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { shiftCount } from "./dueling.mjs";
@@ -6,7 +8,6 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const say = (actor, text) => ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: esc(text) });
 
 export function diversionContent(key, actor) {
@@ -57,7 +58,7 @@ export async function settleDiversion(message) {
   const check = message.flags.spycraft2,
     actor = fromUuidSync(check.actorUuid),
     target = fromUuidSync(check.diversion.opponentUuid);
-  if (!actor || !target) return ui.notifications.warn(loc`Both Diversion participants must still exist.`);
+  if (!actor || !target) return refuse(loc`Both Diversion participants must still exist.`);
   const paired = pairedResponse(message, check);
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Settle the Diversion` },
@@ -73,7 +74,7 @@ export async function settleDiversion(message) {
   try {
     outcome = diversionOutcome(check, paired?.f ?? null, { declared: input.declared, tieWinner: input.tieWinner });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await message.update({ "flags.spycraft2.diversionOutcome": outcome });
   if (outcome.attackerWon) {

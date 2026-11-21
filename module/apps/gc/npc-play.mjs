@@ -1,4 +1,6 @@
 /** Running NPCs at the table: skill checks, standard-NPC Damage saves and disposition (pp.331–332, 452, 457–458). */
+import { esc } from "../../html.mjs";
+import { refuse } from "../../error-notices.mjs";
 import { messageModeOption } from "../../rolls/message-mode.mjs";
 import { TABLES, SKILLS } from "../../rules/tables.mjs";
 import { stepLookup } from "../../rules/formula.mjs";
@@ -18,7 +20,6 @@ import { GC_DATA } from "../../rules/gc-tables.mjs";
 import { sceneEpoch, getMission, teamActors } from "./state.mjs";
 import { loc } from "../../i18n.mjs";
 
-const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
   foundry.applications.api.DialogV2.input({
     window: { title },
@@ -129,7 +130,7 @@ export async function rollNpcSkill(actor, input = null) {
     if (!input) return null;
   }
   const skill = SKILLS.find(entry => entry.key === input.key);
-  if (!skill) return ui.notifications.warn(loc`Choose a skill.`);
+  if (!skill) return refuse(loc`Choose a skill.`);
   if (
     actor.system.npcType === "animal" &&
     graded &&
@@ -196,12 +197,12 @@ export function damageSaveState(actor) {
 export async function npcDamageSave(actor, input = null) {
   if (!actor.isOwner) return null;
   if (npcIsSpecial(actor))
-    return ui.notifications.warn(
+    return refuse(
       loc`Special NPCs lose vitality and wounds like player characters; Damage saves are for standard NPCs and animals (p.452).`
     );
   const state = damageSaveState(actor);
   if (state.track.state !== "active")
-    return ui.notifications.warn(
+    return refuse(
       loc`${actor.name} is already ${state.track.state}. Reset the Damage save track to bring the NPC back.`
     );
   if (!input) {
@@ -237,7 +238,7 @@ export async function npcDamageSave(actor, input = null) {
       tough: state.tough
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await actor.update({ "system.damageTrack": result.track });
   const outcome =
@@ -302,7 +303,7 @@ export function dispositionRows(actor) {
 
 /** Set, shift or roll against an NPC's disposition toward a character (or its general attitude). */
 export async function manageDisposition(actor) {
-  if (!game.user.isGM) return ui.notifications.warn(loc`The GC manages NPC dispositions.`);
+  if (!game.user.isGM) return refuse(loc`The GC manages NPC dispositions.`);
   const record = dispositionRecord(actor),
     villain = isVillain(actor),
     mission = String(actor.system.usagePeriods?.mission ?? "initial");
@@ -397,6 +398,6 @@ export async function manageDisposition(actor) {
       { whisper: true }
     );
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }

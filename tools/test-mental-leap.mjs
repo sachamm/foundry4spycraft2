@@ -297,7 +297,7 @@ const activate = ability => ({ ability, confirmed: true });
 test("actor grants use exact session allowance without dice/XP, cancellation and bad choices are free, deletion never refunds and concurrent final claims cannot duplicate", async () => {
   const a = reset();
   assert.equal(await a.activateMentalLeap(), null);
-  assert.equal(await a.activateMentalLeap({ ability: "int", confirmed: "true" }), null);
+  assert.equal(await a.activateMentalLeap({ ability: "int", confirmed: "true" }), false);
   await assert.rejects(a.activateMentalLeap(activate("str")), /Dexterity/);
   assert.equal(a.system.resourceUses.mentalLeap, undefined);
   await a.activateMentalLeap(activate("int"));

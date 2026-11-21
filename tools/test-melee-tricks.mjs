@@ -292,7 +292,7 @@ test("conflicting known feat tricks and named All-out targets block before RNG",
     let draws = 0;
     controls.draw = async () => draws++;
     const result = await attack(a, extra);
-    assert.ok(result == null);
+    assert.ok(result == null || result === false);
     assert.equal(draws, 0);
     assert.equal(game.messages.length, 0);
   }

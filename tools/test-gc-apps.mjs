@@ -334,7 +334,7 @@ test("standard NPC Damage saves accumulate, kill and reset; special NPCs are ref
   result = await npc.npcDamageSave(guard, { damage: 10, kind: "lethal" });
   assert.deepEqual([result.dc, result.state], [19, "dead"]);
   assert.ok(guard.statuses.has("dead"));
-  assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), null);
+  assert.equal(await npc.npcDamageSave(guard, { damage: 1, kind: "lethal" }), false);
   assert.match(warnings.at(-1), /already dead/);
   await npc.resetDamageTrack(guard);
   assert.equal(guard.system.damageTrack.state, "active");

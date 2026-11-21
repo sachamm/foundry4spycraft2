@@ -218,6 +218,31 @@ function button(control) {
   return element;
 }
 
+// The notes a check card's flavor may carry. Everything else in it becomes plain text.
+const FLAVOR_TAGS = new Set(["B", "BR", "EM", "I", "SMALL", "SPAN", "STRONG"]);
+
+/**
+ * The translated flavor as nodes, keeping only simple inline markup and class names. It is built from the card's
+ * flags, which the poster's client wrote, and shown on every other client, so it never goes in as raw HTML.
+ */
+export function safeFlavor(markup, doc = document) {
+  const template = doc.createElement("template");
+  template.innerHTML = markup;
+  const clean = node => {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === 3) continue;
+      if (child.nodeType !== 1 || !FLAVOR_TAGS.has(child.tagName)) {
+        child.replaceWith(doc.createTextNode(child.nodeType === 1 ? child.textContent : ""));
+        continue;
+      }
+      for (const attr of [...child.attributes]) if (attr.name !== "class") child.removeAttribute(attr.name);
+      clean(child);
+    }
+  };
+  clean(template.content);
+  return template.content;
+}
+
 const EMPHASIS_ORDER = { primary: 0, quiet: 2 };
 /** Controls in display order: the primary step first, quiet ones last, the rest as the pipeline ordered them. */
 export const byEmphasis = controls =>
@@ -253,7 +278,7 @@ export function renderCheckControls(message, html) {
   // Posted in another language: show this viewer the record's notes in their own.
   const translated = viewerFlavor(check, game.i18n?.lang);
   const flavor = translated ? html.querySelector(".flavor-text") : null;
-  if (flavor) flavor.innerHTML = translated;
+  if (flavor) flavor.replaceChildren(safeFlavor(translated, flavor.ownerDocument));
   const actor = fromUuidSync(check.actorUuid);
   // The player whose agent is the target answers from the same card.
   const response = targetResponseControls({ message, check, user: game.user });

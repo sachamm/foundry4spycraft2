@@ -1,3 +1,4 @@
+import { refuse } from "../error-notices.mjs";
 import { accumulatedDamagePlan } from "../rules/accumulated-damage.mjs";
 import { loc } from "../i18n.mjs";
 const whole = value => {
@@ -23,7 +24,7 @@ export async function checkAccumulatedDamage(actor) {
       confirmed: input.confirmed
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   const esc = foundry.utils.escapeHTML,
     save = plan.saveKey === "will" ? "Will" : "Fortitude";

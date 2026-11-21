@@ -1,4 +1,6 @@
 /** Mission record dialogs (pp.423–440): Threat Level, Caliber, objectives, complications, antagonists, exposure and rewards. */
+import { esc } from "../../html.mjs";
+import { refuse } from "../../error-notices.mjs";
 import {
   threatLevel,
   threatBonusActionDice,
@@ -30,7 +32,6 @@ import { gcDiceStatus, initializeGCDice } from "../../rules/gc-dice.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 
 const T = GC_DATA.tables;
-const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
   foundry.applications.api.DialogV2.input({
     window: { title },
@@ -366,7 +367,7 @@ export async function recordInfraction() {
   const actor = game.actors.get(input.actor),
     [objectiveId, index] = String(input.infraction).split("|");
   const infraction = T.exposure.find(row => row.id === objectiveId)?.infractions[Number(index)];
-  if (!actor || !infraction) return ui.notifications.warn(loc`Choose a character and an infraction.`);
+  if (!actor || !infraction) return refuse(loc`Choose a character and an infraction.`);
   const penalty = exposurePenalty(infraction, { preventing: !!input.preventing, halve: !!input.honor })[input.currency];
   const path = `system.${input.currency}`,
     before = actor.system[input.currency] ?? 0;

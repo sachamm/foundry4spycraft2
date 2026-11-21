@@ -1,12 +1,12 @@
+import { isLeadGM } from "./writers.mjs";
 import { SAMPLE_COMPANIONS } from "./data/sample-agent-companions.mjs";
 import { loc } from "./i18n.mjs";
 const SYSTEM = "spycraft2";
 const pending = new Map();
-const electedGM = () => game.user?.isGM && game.users.activeGM?.id === game.user.id;
 
 /** An ordinary compendium import creates the included companion once, linked to that world copy. */
 export async function ensureSampleCompanions(owner) {
-  if (!electedGM() || owner.pack || owner.type !== "agent" || !owner.getFlag(SYSTEM, "sampleAgent")) return;
+  if (!isLeadGM() || owner.pack || owner.type !== "agent" || !owner.getFlag(SYSTEM, "sampleAgent")) return;
   if (pending.has(owner.uuid)) return pending.get(owner.uuid);
   const work = importCompanions(owner);
   pending.set(owner.uuid, work);
@@ -55,7 +55,7 @@ async function importCompanions(owner) {
 export function installSampleAgentHooks() {
   Hooks.on("createActor", owner => ensureSampleCompanions(owner));
   Hooks.once("ready", async () => {
-    if (!electedGM()) return;
+    if (!isLeadGM()) return;
     for (const actor of game.actors) await ensureSampleCompanions(actor);
   });
 }

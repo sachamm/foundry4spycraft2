@@ -172,11 +172,11 @@ test("ordinary ability checks reject invalid abilities and no-action incapacitie
   assert.equal(await a.rollAbility("invalid"), null);
   for (const key of ["dead", "dazed", "stunned", "unconscious"]) {
     a.system.conditionContext = { [key]: true };
-    assert.equal(await a.rollAbility("wis"), null, key);
+    assert.equal(await a.rollAbility("wis"), false, key);
   }
   a.system.conditionContext = { paralyzed: true };
-  assert.equal(await a.rollAbility("dex", { purelyMentalConfirmed: true }), null);
-  assert.equal(await a.rollAbility("str", { purelyMentalConfirmed: true }), null);
-  assert.equal(await a.rollAbility("int"), null);
+  assert.equal(await a.rollAbility("dex", { purelyMentalConfirmed: true }), false);
+  assert.equal(await a.rollAbility("str", { purelyMentalConfirmed: true }), false);
+  assert.equal(await a.rollAbility("int"), false);
   assert.ok(await a.rollAbility("int", { purelyMentalConfirmed: true }));
 });

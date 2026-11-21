@@ -213,8 +213,8 @@ test("Sickened condition controls require explicit GC declaration, persist only 
   const a = actor(),
     before = a.system.saves.fort.total;
   assert.equal(await a.setSickened(), null);
-  assert.equal(await a.setSickened({ active: false }), null);
-  assert.equal(await a.setSickened({ active: "false", confirmed: true }), null);
+  assert.equal(await a.setSickened({ active: false }), false);
+  assert.equal(await a.setSickened({ active: "false", confirmed: true }), false);
   await a.setSickened({ active: false, confirmed: true });
   assert.equal(a.statuses.has("sickened"), false);
   assert.equal(a.system.saves.fort.total, before + 2);

@@ -170,7 +170,7 @@ test("the actor episode workflow is explicitly GC-declared, posts both real dice
   const before = structuredClone(a.system);
   input = null;
   assert.equal(await a.rollWisdomCollapse(), null);
-  assert.equal(await a.rollWisdomCollapse({ confirmed: "true" }), null);
+  assert.equal(await a.rollWisdomCollapse({ confirmed: "true" }), false);
   const result = await a.rollWisdomCollapse({ confirmed: true });
   assert.equal(result.condition, "Terrified");
   assert.equal(result.minutes, 14);
@@ -215,7 +215,7 @@ test("dead characters cannot roll saves, while involuntary saves remain availabl
     called++;
     return "save";
   };
-  assert.equal(await a.rollSave("fort"), null);
+  assert.equal(await a.rollSave("fort"), false);
   assert.equal(called, 0);
   a.system = state("str", 0);
   assert.equal(await a.rollSave("fort"), "save");

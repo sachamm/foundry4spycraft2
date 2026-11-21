@@ -554,7 +554,7 @@ test("actual skill entry freezes sensory penalties/caps and blocks a declared im
   assert.equal(m.options.sensoryConditions.skillModifier, -8);
   assert.equal(
     await a.rollSkill("notice", "wis", { gearStatus: "available", check: "awareness", requiresHearing: true }),
-    null
+    false
   );
   assert.equal(rolls, 1);
   assert.equal(a.system.actionDice.value, 0);

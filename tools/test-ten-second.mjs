@@ -235,7 +235,7 @@ test("actual skill entry supplies timing and standalone declarations to the same
       tenSecondSolution: true,
       standaloneCheckConfirmed: false
     }),
-    null
+    false
   );
 });
 

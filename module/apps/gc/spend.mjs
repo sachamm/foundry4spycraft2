@@ -1,4 +1,6 @@
 /** Spending GC action dice (pp.397–399, 424, 452): pay from the session pool, roll the right die and apply what can be applied. */
+import { esc } from "../../html.mjs";
+import { refuse } from "../../error-notices.mjs";
 import { adjustGCDice, gcDiceStatus } from "../../rules/gc-dice.mjs";
 import { GC_SPENDS, planSpend, actionDieTotal } from "../../rules/gc/gc-spend.mjs";
 import { campaignQuality, qualityAddition } from "../../rules/gc/campaign.mjs";
@@ -16,7 +18,6 @@ import {
 import { spendProfile, npcIsSpecial, damageSaveState, resetDamageTrack } from "./npc-play.mjs";
 import { loc } from "../../i18n.mjs";
 
-const esc = text => foundry.utils.escapeHTML(String(text ?? ""));
 const ask = (title, content) =>
   foundry.applications.api.DialogV2.input({
     window: { title },
@@ -60,7 +61,7 @@ const npcActors = () => {
 export async function spendGCDice(input = {}) {
   requireGC();
   const status = gcDiceStatus();
-  if (!status.current) return ui.notifications.warn(loc`Initialize the GC action dice for this session first.`);
+  if (!status.current) return refuse(loc`Initialize the GC action dice for this session first.`);
   const dramatic = isDramaticScene(),
     scene = getSceneState();
   if (!input.id) {
@@ -98,9 +99,9 @@ export async function spendGCDice(input = {}) {
     input = { ...picked, actor: picked.actorId ? await fromUuid(picked.actorId) : null };
   }
   const spend = GC_SPENDS.find(entry => entry.id === input.id);
-  if (!spend) return ui.notifications.warn(loc`Choose a use for the action dice.`);
+  if (!spend) return refuse(loc`Choose a use for the action dice.`);
   const actor = spend.needsNpc ? input.actor : null;
-  if (spend.needsNpc && actor?.type !== "npc") return ui.notifications.warn(loc`Choose the NPC this applies to.`);
+  if (spend.needsNpc && actor?.type !== "npc") return refuse(loc`Choose the NPC this applies to.`);
   const quality = input.id === "campaignQuality" ? campaignQuality(input.qualityId) : null;
   let plan;
   try {
@@ -119,10 +120,9 @@ export async function spendGCDice(input = {}) {
       inCombat: !!game.combat?.started
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
-  if (plan.cost > status.value)
-    return ui.notifications.warn(loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`);
+  if (plan.cost > status.value) return refuse(loc`That costs ${plan.cost} action dice; the GC has ${status.value}.`);
 
   const event = input.id === "event" ? GC_DATA.tables.events.find(entry => entry.id === input.eventId) : null;
   const reason = `${plan.label}${actor ? ` — ${actor.name}` : ""}${quality ? ` — ${quality.name}` : ""}${event ? ` — ${event.name}` : ""}`;
@@ -130,7 +130,7 @@ export async function spendGCDice(input = {}) {
     try {
       await adjustGCDice(-plan.cost, reason);
     } catch (error) {
-      return ui.notifications.warn(error.message);
+      return refuse(error.message);
     }
   }
 
@@ -218,9 +218,8 @@ export async function setDramaticScene(dramatic, { source = "scripted" } = {}) {
 /** Dramatic scene: double each opponent's current Initiative Count, to at most 50 (p.424). Each combatant is doubled once per combat. */
 export async function doubleOpponentInitiative(combat = game.combat) {
   requireGC();
-  if (!combat) return ui.notifications.warn(loc`There is no active combat.`);
-  if (!isDramaticScene())
-    return ui.notifications.warn(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
+  if (!combat) return refuse(loc`There is no active combat.`);
+  if (!isDramaticScene()) return refuse(loc`Only a dramatic scene doubles opponents’ Initiative (p.424).`);
   const changed = [];
   for (const combatant of combat.combatants) {
     if (
@@ -247,7 +246,7 @@ export async function recordCaliberIncrease(caliber) {
   requireGC();
   const mission = getMission();
   if (!Number.isSafeInteger(caliber) || caliber <= mission.caliber || caliber > 5)
-    return ui.notifications.warn(loc`Choose a higher Caliber, up to V.`);
+    return refuse(loc`Choose a higher Caliber, up to V.`);
   const steps = caliber - mission.caliber;
   if (gcDiceStatus().current) await adjustGCDice(2 * steps, `Mission Caliber increased to ${caliber}`);
   await updateMission({ caliber });

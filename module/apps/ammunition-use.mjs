@@ -1,8 +1,8 @@
 /** Shots spent by attacks and restored by Reload actions; the rules are in module/rules/ammunition-use.mjs. */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { ammunitionState, reloadPlan, resupplyPlan, spendShotsPlan } from "../rules/ammunition-use.mjs";
 import { loc } from "../i18n.mjs";
-
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 
 /** World setting "Count ammunition"; on unless turned off. */
 export function ammunitionCounted() {
@@ -43,7 +43,7 @@ export async function reloadWeapon(item) {
   try {
     plan = reloadPlan(ammunitionState(item.system));
   } catch (error) {
-    return ui.notifications.warn(`${item.name}: ${error.message}`);
+    return refuse(`${item.name}: ${error.message}`);
   }
   await item.update({ "system.shotsLoaded": plan.shotsLoaded, "system.shotsSpare": plan.shotsSpare });
   await ChatMessage.create({
@@ -60,7 +60,7 @@ export async function resupplyWeapon(item) {
     const plan = resupplyPlan(ammunitionState(item.system));
     await item.update({ "system.shotsLoaded": plan.shotsLoaded, "system.shotsSpare": plan.shotsSpare });
   } catch (error) {
-    return ui.notifications.warn(`${item.name}: ${error.message}`);
+    return refuse(`${item.name}: ${error.message}`);
   }
   return true;
 }

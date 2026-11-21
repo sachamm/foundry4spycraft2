@@ -127,7 +127,7 @@ test("the actor records separate typed stress, links its parent, prevents recurs
   assert.equal(r.options.checkKind, "damage");
   assert.equal(r.options.unarmed, true);
   assert.equal(m.flags.spycraft2.unnerving.recorded, true);
-  assert.equal(await a.resolveUnnerving(m, input), null);
+  assert.equal(await a.resolveUnnerving(m, input), false);
   assert.equal(a.system.actionDice.value, 0);
   assert.equal(unnervingEligible(a.system, { ...damage, unnervingStress: r.options.unnervingStress }), false);
 });

@@ -1,4 +1,5 @@
 /** Limited-use class and feat abilities, analysis tasks, temporary feats and assistants. */
+import { refuse } from "../../error-notices.mjs";
 import { ruleName } from "../../rules/rule-name.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { useMark, discloseMark, correctMark } from "../../apps/mark.mjs";
@@ -163,7 +164,7 @@ export const ActorAbilities = Base =>
         !spec ||
         (!spec.manualReviewable && !resourceStatus(spec, this.system.resourceUses, this.usagePeriods).counterReview)
       )
-        return ui.notifications.warn(loc`This saved counter does not need review.`);
+        return refuse(loc`This saved counter does not need review.`);
       if (!Number.isSafeInteger(spec.limit) || spec.limit < 0)
         throw new Error(loc`Correct this ability’s source/limit before reviewing its use count.`);
       let input = options;
@@ -595,7 +596,7 @@ export const ActorAbilities = Base =>
         input.ids.some(id => !candidates.some(actor => actor.id === id)) ||
         (input.ids.length && !input.teammatesConfirmed)
       )
-        return ui.notifications.warn(loc`Choose actual qualifying teammates and confirm their team membership.`);
+        return refuse(loc`Choose actual qualifying teammates and confirm their team membership.`);
       return this.update({ "system.fortuneTeammateIds": [...new Set(input.ids)] });
     }
 
@@ -726,7 +727,7 @@ export const ActorAbilities = Base =>
     async useIntelTemporaryFeats(ability, options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
       const source = intelTemporaryFeatSource(this.system, ability);
-      if (!source) return ui.notifications.warn(loc`This Intel-phase feat grant has not been earned.`);
+      if (!source) return refuse(loc`This Intel-phase feat grant has not been earned.`);
       const pack = game.packs?.get("spycraft2.feats");
       if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
@@ -752,8 +753,7 @@ export const ActorAbilities = Base =>
           featChoices: Array.from({ length: source.count }, (_, i) => input[`choice${i}`] ?? "")
         };
       }
-      if (input.intelPhaseConfirmed !== true)
-        return ui.notifications.warn(loc`Confirm the current mission’s Intel Phase.`);
+      if (input.intelPhaseConfirmed !== true) return refuse(loc`Confirm the current mission’s Intel Phase.`);
       return this.useLimitedAbility(
         ability,
         async () => {
@@ -846,7 +846,7 @@ export const ActorAbilities = Base =>
         feat.system.featKind !== "temporary" ||
         !this.system.featStatus?.[feat.id]?.ok
       )
-        return ui.notifications.warn(loc`Choose an active temporary Depth of Study feat.`);
+        return refuse(loc`Choose an active temporary Depth of Study feat.`);
       const epoch = String(this.usagePeriods.mission ?? "initial"),
         esc = foundry.utils.escapeHTML;
       let choices = options.choices;
@@ -937,7 +937,7 @@ export const ActorAbilities = Base =>
 
     async useKnowItAll(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!knowItAllSource(this.system)) return ui.notifications.warn(loc`Know It All has not been earned.`);
+      if (!knowItAllSource(this.system)) return refuse(loc`Know It All has not been earned.`);
       const pack = game.packs?.get("spycraft2.feats");
       if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
@@ -956,13 +956,13 @@ export const ActorAbilities = Base =>
         if (!input) return null;
         input = { ...input, featIds: [input.feat0, input.feat1] };
       }
-      if (input.freeActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the required free action.`);
+      if (input.freeActionConfirmed !== true) return refuse(loc`Confirm the required free action.`);
       if (
         !Array.isArray(input.featIds) ||
         input.featIds.length !== 2 ||
         input.featIds.some(id => typeof id !== "string" || !id)
       )
-        return ui.notifications.warn(loc`Choose exactly two Advanced Skill feats.`);
+        return refuse(loc`Choose exactly two Advanced Skill feats.`);
       if (interactive) {
         const selected = [];
         for (const id of input.featIds) selected.push(await pack.getDocument(id));
@@ -1105,8 +1105,7 @@ export const ActorAbilities = Base =>
 
     async useAnyTimeAnyPlace(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!anyTimeAnyPlaceSource(this.system))
-        return ui.notifications.warn(loc`Any Time, Any Place has not been earned.`);
+      if (!anyTimeAnyPlaceSource(this.system)) return refuse(loc`Any Time, Any Place has not been earned.`);
       const pack = game.packs?.get("spycraft2.feats");
       if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
@@ -1123,7 +1122,7 @@ export const ActorAbilities = Base =>
         });
         if (!input) return null;
       }
-      if (input.freeActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the required free action.`);
+      if (input.freeActionConfirmed !== true) return refuse(loc`Confirm the required free action.`);
       return this.useLimitedAbility(
         "anyTimeAnyPlace",
         async () => {
@@ -1210,7 +1209,7 @@ export const ActorAbilities = Base =>
 
     async activateMentalLeap(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!mentalLeapSource(this.system)) return ui.notifications.warn(loc`Mental Leap has not been earned.`);
+      if (!mentalLeapSource(this.system)) return refuse(loc`Mental Leap has not been earned.`);
       let input = options;
       if (!input.ability) {
         input = await systemDialog.input({
@@ -1220,7 +1219,7 @@ export const ActorAbilities = Base =>
         });
         if (!input) return null;
       }
-      if (input.confirmed !== true) return ui.notifications.warn(loc`Confirm Mental Leap activation.`);
+      if (input.confirmed !== true) return refuse(loc`Confirm Mental Leap activation.`);
       return this.useLimitedAbility(
         "mentalLeap",
         async () => {
@@ -1285,7 +1284,7 @@ export const ActorAbilities = Base =>
       let input = options;
       const active = (this.system.mentalLeapState?.rows ?? []).filter(r => r.phase === "boost"),
         esc = foundry.utils.escapeHTML;
-      if (!active.length) return ui.notifications.warn(loc`No Mental Leap is currently active.`);
+      if (!active.length) return refuse(loc`No Mental Leap is currently active.`);
       if (input.freeActionConfirmed === undefined) {
         input = await systemDialog.input({
           window: { title: loc`End Mental Leap` },
@@ -1555,7 +1554,7 @@ export const ActorAbilities = Base =>
         });
         if (!input) return null;
       }
-      if (input.freeActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the Master Plan free action.`);
+      if (input.freeActionConfirmed !== true) return refuse(loc`Confirm the Master Plan free action.`);
       return this.useLimitedAbility(
         "masterPlan",
         async () => {
@@ -1656,7 +1655,7 @@ export const ActorAbilities = Base =>
     async summonClassAssistants(sourceId, options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
       const source = assistantSource(this.system, sourceId);
-      if (!source) return ui.notifications.warn(loc`This assistant option has not been earned.`);
+      if (!source) return refuse(loc`This assistant option has not been earned.`);
       let input = options;
       const esc = foundry.utils.escapeHTML;
       if (!input.city) {
@@ -1730,7 +1729,7 @@ export const ActorAbilities = Base =>
       if (this.type !== "agent" || !this.isOwner) return null;
       const group = (this.system.assistantGroups ?? []).find(g => g.id === groupId);
       if (!group || !assistantGroupStatus(this.system, group).active)
-        return ui.notifications.warn(loc`This assistant group is not active.`);
+        return refuse(loc`This assistant group is not active.`);
       let input = options;
       const police = group.source === "friendsOnForce";
       if (!input.event) {
@@ -1785,7 +1784,7 @@ export const ActorAbilities = Base =>
       if (this.type !== "agent" || !this.isOwner) return null;
       const pools = deferredSkillPools(this.system, [...this.items]);
       if (!pools || !Object.hasOwn(CONFIG.SPYCRAFT.skills, key))
-        return ui.notifications.warn(loc`I Can Swim is not available for this skill.`);
+        return refuse(loc`I Can Swim is not available for this skill.`);
       const level = pools.level,
         esc = foundry.utils.escapeHTML;
       let input = options;
@@ -1894,8 +1893,7 @@ export const ActorAbilities = Base =>
 
     async useEverydayGenius(options = {}) {
       if (this.type !== "agent" || !this.isOwner) return null;
-      if (!everydayGeniusSource(this.system))
-        return ui.notifications.warn(loc`Everyday Genius is not currently available.`);
+      if (!everydayGeniusSource(this.system)) return refuse(loc`Everyday Genius is not currently available.`);
       const pack = game.packs?.get("spycraft2.feats");
       if (!pack) throw new Error(loc`The system feat compendium is unavailable.`);
       let input = options;
@@ -1912,7 +1910,7 @@ export const ActorAbilities = Base =>
         });
         if (!input) return null;
       }
-      if (input.fullActionConfirmed !== true) return ui.notifications.warn(loc`Confirm the required full action.`);
+      if (input.fullActionConfirmed !== true) return refuse(loc`Confirm the required full action.`);
       return this.useLimitedAbility(
         "everydayGenius",
         async () => {
@@ -1999,7 +1997,7 @@ export const ActorAbilities = Base =>
         });
         if (!input) return null;
       }
-      if (!input.freeActionConfirmed) return ui.notifications.warn(loc`Confirm the required free action.`);
+      if (!input.freeActionConfirmed) return refuse(loc`Confirm the required free action.`);
       return this.useLimitedAbility(
         "renaissanceMan",
         async () => {

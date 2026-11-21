@@ -2,6 +2,7 @@
  * Healing that is not bought with action dice (pp.141–143, 333, 341): rest, First Aid, Stabilize and a dying
  * character's roll each round. The rules are in module/rules/damage-application.mjs and module/rules/health.mjs.
  */
+import { esc } from "../html.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { recoveryRatePlan } from "../rules/health.mjs";
 import {
@@ -22,7 +23,6 @@ import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from ".
 import { loc } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const isSpecial = actor => actor.type === "agent" || (actor.type === "npc" && npcIsSpecial(actor));
 const healthOf = actor => ({
   vitality: actor.system.vitality?.value ?? 0,

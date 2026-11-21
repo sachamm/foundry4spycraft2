@@ -408,8 +408,8 @@ test("ordered mastery/False Start prerequisites and every Basic Skill target wor
 test("cancelled/invalid/out-of-turn choices spend nothing and partial creation or failed posting rolls back the entire claim", async () => {
   let a = reset();
   assert.equal(await a.useKnowItAll(), null);
-  assert.equal(await a.useKnowItAll({ ...depths(), freeActionConfirmed: "true" }), null);
-  assert.equal(await a.useKnowItAll({ featIds: [], freeActionConfirmed: true }), null);
+  assert.equal(await a.useKnowItAll({ ...depths(), freeActionConfirmed: "true" }), false);
+  assert.equal(await a.useKnowItAll({ featIds: [], freeActionConfirmed: true }), false);
   await assert.rejects(a.useKnowItAll(options(["Guts", "Depth of Study"])), /Advanced Skill/);
   failCreateAt = 2;
   await assert.rejects(a.useKnowItAll(depths()), /creation failed/);

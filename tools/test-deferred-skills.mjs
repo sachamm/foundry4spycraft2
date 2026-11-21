@@ -242,7 +242,7 @@ test("skill roll allocation happens before result calculation and cannot spill i
   const b = reset();
   b.items = b.items.filter(i => i.name !== "I Can Swim");
   b.derive();
-  assert.equal(await b.spendDeferredSkillPoints("analysis", { ...declare, points: 1 }), null);
+  assert.equal(await b.spendDeferredSkillPoints("analysis", { ...declare, points: 1 }), false);
 });
 test("the next-level deadline includes Career and Training points and permits a completed allocation without consuming resources", async () => {
   const a = reset();

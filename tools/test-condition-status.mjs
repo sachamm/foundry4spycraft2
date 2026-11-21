@@ -186,7 +186,7 @@ const { SpycraftActor } = await import("../module/documents/actor.mjs");
 test("the actual reviewed-condition API serializes duplicate apply/clear requests, requires confirmation and retains read-only ownership boundaries", async () => {
   const a = makeActor();
   Object.setPrototypeOf(a, SpycraftActor.prototype);
-  assert.equal(await a.setReviewedCondition("sickened", { active: true }), null);
+  assert.equal(await a.setReviewedCondition("sickened", { active: true }), false);
   await Promise.all([
     a.setSickened({ active: true, confirmed: true }),
     a.setSickened({ active: true, confirmed: true })
@@ -287,8 +287,8 @@ test("new-touch and damage waking clear only Sleep aliases and preserve unconsci
     assert.equal((await a.wakeFromSleep({ cause, confirmed: true })).changed, false);
   }
   const a = sleeper();
-  assert.equal(await a.wakeFromSleep({ cause: "damage" }), null);
-  assert.equal(await a.wakeFromSleep({ cause: "ongoingTouch", confirmed: true }), null);
+  assert.equal(await a.wakeFromSleep({ cause: "damage" }), false);
+  assert.equal(await a.wakeFromSleep({ cause: "ongoingTouch", confirmed: true }), false);
   a.isOwner = false;
   assert.equal(await a.wakeFromSleep({ cause: "damage", confirmed: true }), null);
 });

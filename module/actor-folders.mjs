@@ -1,3 +1,4 @@
+import { isLeadGM } from "./writers.mjs";
 import { ensureSampleCompanions } from "./sample-agents.mjs";
 
 const SYSTEM = "spycraft2";
@@ -23,7 +24,7 @@ export function registerActorFolderSetup() {
 
 /** The leading GM seeds each world once; receipts preserve later edits, moves and deletions. */
 export async function setupActorFolders() {
-  if (!game.user?.isGM || game.users.activeGM?.id !== game.user.id) return;
+  if (!isLeadGM()) return;
   if (pending) return pending;
   pending = seedActors();
   try {

@@ -190,7 +190,7 @@ test("the real preview cancels quietly and rejects missing, coerced or unconfirm
     { criticalHit: "true" }
   ]) {
     a = setup({ ...request, ...patch });
-    assert.equal(await checkAccumulatedDamage(a), null);
+    assert.equal(await checkAccumulatedDamage(a), false);
     assert.equal(dialogs.length, 1);
     assert.equal(warnings.length, 1);
   }

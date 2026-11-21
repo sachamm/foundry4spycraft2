@@ -299,7 +299,8 @@ test("the leader's tally reads each helper's latest standing check and updates t
     message("X", "other", { checkKind: "skill", cooperative: { role: "helper", leaderId: "L9", dc: 15 } })
   ];
   globalThis.game = { messages: Object.assign(list, { get: id => list.find(m => m.id === id) }) };
-  globalThis.ui = { notifications: { warn: text => ({ warned: text }) } };
+  const warnings = [];
+  globalThis.ui = { notifications: { warn: text => warnings.push(text) } };
   assert.deepEqual(
     helperChecks(leader).map(m => m.id),
     ["H2", "H3"]
@@ -310,7 +311,8 @@ test("the leader's tally reads each helper's latest standing check and updates t
   assert.match(leader.flavor, /2 of 2 succeeded/);
   const lonely = leaderMessage();
   lonely.id = "L2";
-  assert.deepEqual(await applyHelpers(lonely), { warned: "No helper has posted a check for this leader yet." });
+  assert.equal(await applyHelpers(lonely), false);
+  assert.equal(warnings.at(-1), "No helper has posted a check for this leader yet.");
 });
 
 test("the pipeline records the role and offers the tally on a leader's check", () => {

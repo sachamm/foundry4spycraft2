@@ -1,3 +1,4 @@
+import { primaryWriterFor } from "../writers.mjs";
 import { shakenRules } from "./shaken.mjs";
 import { GM_TOKEN_PREFIX, gmLockingActive, lockTable, requestLock } from "./gm-locks.mjs";
 import { loc } from "../i18n.mjs";
@@ -141,14 +142,8 @@ export function abandonedBackgroundLock(item, actor, scope = RESOURCE_LOCK_ID, n
 export const CLEAR_LOCK_QUERY = "spycraft2.clearAbandonedLock";
 const CLEAR_TIMEOUT_MS = 5000;
 const clearing = new Map();
-function lockClearer(actor, game = globalThis.game) {
-  if (game?.users?.activeGM) return game.users.activeGM;
-  const users = typeof game?.users?.[Symbol.iterator] === "function" ? [...game.users] : [];
-  const owners = users
-    .filter(user => user.active && actor.testUserPermission?.(user, "OWNER"))
-    .sort((a, b) => a.id.localeCompare(b.id));
-  return owners[0] ?? game?.user ?? null;
-}
+// With nobody else connected who may write it, this client clears the lock itself.
+const lockClearer = (actor, game = globalThis.game) => primaryWriterFor(actor, game) ?? game?.user ?? null;
 function clearAbandonedLock(actor, scope) {
   const key = lockKey(actor, scope);
   const run = (clearing.get(key) ?? Promise.resolve())

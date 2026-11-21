@@ -1,4 +1,5 @@
 /** What happens to a check after it is posted: boosts, confirmation, criticals, rerolls and resolution. */
+import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { validateAttributeDamageProof } from "../../rules/attribute-damage.mjs";
 import { withJinxReservation } from "../../apps/jinx.mjs";
@@ -270,12 +271,12 @@ export const ActorOutcomes = Base =>
 
     async boostWithGenerous(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
+      if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2),
         expectedShaken = JSON.stringify(shakenRules(this.actionDiceFundingSystem)),
         expectedPaid = paidBoostSurcharge(this, message);
       if (getActionDieSettlementReview(this).needsReview)
-        return ui.notifications.warn(loc`Resolve this teammate’s interrupted payment before Generous.`);
+        return refuse(loc`Resolve this teammate’s interrupted payment before Generous.`);
       let input = options;
       if (!Object.keys(input).length) {
         const donors = [...(game.actors ?? [])].filter(
@@ -318,12 +319,12 @@ export const ActorOutcomes = Base =>
       }
       const donor = input.donor ?? game.actors?.get(input.donorId);
       if (donor?.type !== "agent" || !donor.isOwner)
-        return ui.notifications.warn(loc`Choose an owned donor or ask the GC to resolve the donation.`);
+        return refuse(loc`Choose an owned donor or ask the GC to resolve the donation.`);
       let bonusPoolId = input.bonusPoolId ?? "";
       if (input.funding) {
         const [uuid, id, ...extra] = String(input.funding).split("|");
         if (uuid !== donor.uuid || !id || extra.length)
-          return ui.notifications.warn(loc`Choose funding belonging to the selected donor.`);
+          return refuse(loc`Choose funding belonging to the selected donor.`);
         bonusPoolId = id;
       }
       const work = async () => {
@@ -516,12 +517,12 @@ export const ActorOutcomes = Base =>
 
     async useCunningPlan(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
+      if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       try {
         cunningPlanCheck(this.system, message.flags.spycraft2);
       } catch (e) {
-        return ui.notifications.warn(e.message);
+        return refuse(e.message);
       }
       if (!options.freeActionConfirmed) {
         const input = await systemDialog.input({
@@ -556,7 +557,7 @@ export const ActorOutcomes = Base =>
 
     async confirmCheckOutcome(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
+      if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let succeeded = options.succeeded,
         difficultyClass = options.difficultyClass;
@@ -649,7 +650,7 @@ export const ActorOutcomes = Base =>
     /** The GC can resolve an owned opponent's payment; cross-client authority remains a separate workflow. */
     async activateCritical(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
+      if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let input = options;
       if (!Object.keys(input).length) {
@@ -734,43 +735,40 @@ export const ActorOutcomes = Base =>
       try {
         input = applyCriticalChoice(message.flags.spycraft2, input);
       } catch (error) {
-        return ui.notifications.warn(error.message);
+        return refuse(error.message);
       }
       const useGC = input.kind === "failure" && (input.payerId === "gc" || input.payer === "gc");
-      if (useGC && !game.user?.isGM) return ui.notifications.warn(loc`Only the GC can spend the GC pool.`);
+      if (useGC && !game.user?.isGM) return refuse(loc`Only the GC can spend the GC pool.`);
       const controller = useGC ? gcDiceController({ required: false }) : null;
       const payer = useGC ? null : input.kind === "failure" ? (input.payer ?? game.actors?.get(input.payerId)) : this;
       if (!useGC && (payer?.type !== "agent" || !payer.isOwner))
-        return ui.notifications.warn(
-          loc`Choose a paying character you can update, or ask the GC to resolve the payment.`
-        );
+        return refuse(loc`Choose a paying character you can update, or ask the GC to resolve the payment.`);
       let bonusPoolId = input.bonusPoolId ?? "";
       if (input.funding) {
         const [payerUuid, id, ...extra] = String(input.funding).split("|");
         if (useGC || payerUuid !== payer.uuid || !id || extra.length)
-          return ui.notifications.warn(loc`Choose a bonus pool belonging to the paying character.`);
+          return refuse(loc`Choose a bonus pool belonging to the paying character.`);
         bonusPoolId = id;
       }
-      if (useGC && bonusPoolId) return ui.notifications.warn(loc`The GC pool cannot spend a character bonus grant.`);
+      if (useGC && bonusPoolId) return refuse(loc`The GC pool cannot spend a character bonus grant.`);
       let surchargeBonusPoolId = input.surchargeBonusPoolId ?? "same";
       if (input.feeFunding !== undefined && input.feeFunding !== "same") {
         if (input.feeFunding === "") surchargeBonusPoolId = "";
         else {
           const [uuid, id, ...extra] = String(input.feeFunding).split("|");
           if (useGC || uuid !== payer.uuid || !id || extra.length)
-            return ui.notifications.warn(loc`Choose surcharge funding belonging to the paying character.`);
+            return refuse(loc`Choose surcharge funding belonging to the paying character.`);
           surchargeBonusPoolId = id;
         }
       }
       if (input.splitFunding !== undefined && !Array.isArray(input.splitFunding))
-        return ui.notifications.warn(loc`Choose valid split contributions for the paying character.`);
+        return refuse(loc`Choose valid split contributions for the paying character.`);
       if (input.splitFunding?.some(p => useGC || p.actorUuid !== payer.uuid))
-        return ui.notifications.warn(loc`Split contributions must belong to the selected paying character.`);
+        return refuse(loc`Split contributions must belong to the selected paying character.`);
       const allocations = input.splitFunding?.length
         ? input.splitFunding.map(({ bonusPoolId, count }) => ({ bonusPoolId, count }))
         : input.paymentAllocations;
-      if (useGC && allocations?.length)
-        return ui.notifications.warn(loc`The GC pool uses one GC payment, not character wallets.`);
+      if (useGC && allocations?.length) return refuse(loc`The GC pool uses one GC payment, not character wallets.`);
       const expectedShaken = useGC ? null : JSON.stringify(shakenRules(payer.actionDiceFundingSystem));
       const work = async () => {
         if (getActionDieSettlementReview(this).needsReview)
@@ -1014,14 +1012,14 @@ export const ActorOutcomes = Base =>
 
     async finishCheck(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
+      if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const check = message.flags.spycraft2;
       if (check.gearAttempt) return finishGearAcquisition(this, message);
       if (
         check.requiredBonusPoolId &&
         bonusPoolForCheck(this.system, check.requiredBonusPoolId, message, { periods: this.usagePeriods }).available
       )
-        return ui.notifications.warn(loc`Spend the required class bonus die before resolving this check.`);
+        return refuse(loc`Spend the required class bonus die before resolving this check.`);
       const candidates = checkCandidates(check);
       if (
         typeof check.successConfirmed !== "boolean" &&
@@ -1302,7 +1300,7 @@ export const ActorOutcomes = Base =>
 
     async rerollCheck(message, options = {}) {
       if (!this.isOwner || message.flags?.spycraft2?.actorUuid !== this.uuid) return null;
-      if (message.blind && !game.user?.isGM) return ui.notifications.warn(loc`The GC resolves secret results.`);
+      if (message.blind && !game.user?.isGM) return refuse(loc`The GC resolves secret results.`);
       const expected = rollEvidence(message.flags.spycraft2);
       let input = options;
       const esc = foundry.utils.escapeHTML;
@@ -1316,7 +1314,7 @@ export const ActorOutcomes = Base =>
               criticalFailure: !!message.flags.spycraft2.criticalFailure
             })
         );
-        if (!available.length) return ui.notifications.warn(loc`No available reroll ability applies to this check.`);
+        if (!available.length) return refuse(loc`No available reroll ability applies to this check.`);
         input = await systemDialog.input({
           window: { title: loc`Reroll check` },
           rejectClose: false,

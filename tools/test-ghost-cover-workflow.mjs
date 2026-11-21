@@ -212,7 +212,7 @@ test("actual incoming dialogs reject changed live sources at either boundary and
         assert.equal(p.ghostCover.context.actorName, "Changed");
         continue;
       }
-      assert.equal(p, null, stage + "/" + change);
+      assert.equal(p, false, stage + "/" + change);
       assert.equal(warnings.length, 1);
     }
   const { opponent } = setup(),
@@ -220,7 +220,7 @@ test("actual incoming dialogs reject changed live sources at either boundary and
   other.system.classLevels = { counterterrorist: 4 };
   game.actors.push(other);
   reply = async (_o, n) => (n === 1 ? input({ precisionAttacker: other.id }) : null);
-  assert.equal(await checkIncomingDefense(opponent), null);
+  assert.equal(await checkIncomingDefense(opponent), false);
   assert.match(warnings[0], /same actual attacker/);
 });
 test("read-only preview never mutates actors, creates receipts or spends any resources", async () => {

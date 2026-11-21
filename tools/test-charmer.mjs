@@ -153,7 +153,10 @@ test("actual Actor entry records timing, rejects absent facts before rolling, an
   const p = await a.rollSkill("impress", "cha", { check: "influence", ...facts });
   assert.equal(p.charmer.requiredSeconds, 6);
   const before = rolls;
-  assert.equal(await a.rollSkill("impress", "cha", { check: "influence", ...facts, charmerNPCConfirmed: false }), null);
+  assert.equal(
+    await a.rollSkill("impress", "cha", { check: "influence", ...facts, charmerNPCConfirmed: false }),
+    false
+  );
   assert.equal(rolls, before);
   a.system.activeFeatNames = [];
   assert.throws(() => captured.validateSkillContext(), /changed/);

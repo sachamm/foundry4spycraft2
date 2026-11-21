@@ -13,6 +13,7 @@
  * The rules are in module/rules/damage-application.mjs. Whoever applies damage must own the target: the GC, or the
  * target's own player.
  */
+import { esc } from "../html.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { enhanceDamageDialog } from "./dialog-sections.mjs";
 import {
@@ -51,7 +52,6 @@ import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from ".
 import { loc } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
 /** Whether a token of this actor is in this user's view on the current scene (not hidden, not out of sight). */

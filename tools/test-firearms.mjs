@@ -617,7 +617,7 @@ test("actual actor attacks preserve the effective launcher proficiency and mount
       name: raw.name,
       system: { ...raw, ...firearmDefaults(raw.sourceTable, raw.qualities), proficiency: "tactical" }
     };
-  assert.equal(await a.rollAttack(item), null);
+  assert.equal(await a.rollAttack(item), false);
   assert.equal(rolls, 0);
   const attack = await a.rollAttack(item, { underbarrelMountConfirmed: true, indirectFire: true });
   assert.equal(attack.options.weaponProficiency, "indirectFire");
@@ -625,7 +625,7 @@ test("actual actor attacks preserve the effective launcher proficiency and mount
   assert.equal(attack.options.attackContext.launcherOperation.underbarrelMountConfirmed, true);
   assert.equal(await a.rollDamage(item, { includeSneakAttack: false }), null);
   assert.equal(rolls, 1);
-  assert.equal(await a.rollDamage(item, { includeSneakAttack: false, underbarrelMountConfirmed: false }), null);
+  assert.equal(await a.rollDamage(item, { includeSneakAttack: false, underbarrelMountConfirmed: false }), false);
   assert.equal(rolls, 1);
   const damage = await a.rollDamage(item, {
     includeSneakAttack: false,
@@ -759,7 +759,7 @@ test("actor mortar paths retain firing-space evidence and block or cancel before
     name: "Mortar fixture",
     system: { ...mortarWeapon("Watervliet Arsenal M224 60mm"), damage: "2d6" }
   };
-  assert.equal(await a.rollAttack(item), null);
+  assert.equal(await a.rollAttack(item), false);
   assert.equal(await a.rollDamage(item, { includeSneakAttack: false }), null);
   assert.equal(rolls, 0);
   const attack = await a.rollAttack(item, { mortarSpaceConfirmed: true });
@@ -767,8 +767,8 @@ test("actor mortar paths retain firing-space evidence and block or cancel before
   const damage = await a.rollDamage(item, { mortarSpaceConfirmed: true, includeSneakAttack: false });
   assert.equal(damage.options.mortarOperation.mortarSpaceConfirmed, true);
   item.system.disassembled = true;
-  assert.equal(await a.rollAttack(item, { mortarSpaceConfirmed: true }), null);
-  assert.equal(await a.rollDamage(item, { mortarSpaceConfirmed: true, includeSneakAttack: false }), null);
+  assert.equal(await a.rollAttack(item, { mortarSpaceConfirmed: true }), false);
+  assert.equal(await a.rollDamage(item, { mortarSpaceConfirmed: true, includeSneakAttack: false }), false);
   assert.equal(rolls, 2);
 });
 const { rulesRefreshChanges } = await import("../module/rules/refresh.mjs");

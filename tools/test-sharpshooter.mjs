@@ -154,7 +154,7 @@ test("source deletion, weapon loss/destruction, feat changes and target Size cha
     hook = n => {
       if (n === 2) change();
     };
-    assert.equal(await checkIncomingDefense(target), null);
+    assert.equal(await checkIncomingDefense(target), false);
     assert.match(warnings[0], /changed/);
     assert.equal(dialogs.length, 2);
   }
@@ -170,7 +170,7 @@ test("zero-source gains and source changes during declaration do not inject a fr
     hook = n => {
       if (n === 1) change();
     };
-    assert.equal(await checkIncomingDefense(target), null);
+    assert.equal(await checkIncomingDefense(target), false);
     assert.equal(dialogs.length, 1);
     assert.match(warnings[0], /changed/);
   }
@@ -180,19 +180,19 @@ test("zero-source gains and source changes during declaration do not inject a fr
   hook = n => {
     if (n === 1) attacker.system.activeFeatNames.push("Sharpshooter Basics");
   };
-  assert.equal(await checkIncomingDefense(target), null);
+  assert.equal(await checkIncomingDefense(target), false);
   assert.match(warnings[0], /changed/);
 });
 test("inaccessible/unlisted or nonweapon sources cannot be selected, and cancellation creates no result", async () => {
   setup();
   attacker.isOwner = false;
   game.user.isGM = false;
-  assert.equal(await checkIncomingDefense(target), null);
+  assert.equal(await checkIncomingDefense(target), false);
   assert.equal(dialogs.length, 1);
   assert.match(warnings[0], /listed/);
   setup();
   weapon.type = "gear";
-  assert.equal(await checkIncomingDefense(target), null);
+  assert.equal(await checkIncomingDefense(target), false);
   assert.equal(dialogs.length, 1);
   setup();
   responses = [null];

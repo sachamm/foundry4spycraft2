@@ -10,6 +10,10 @@ const attackUX = uiModuleUrl("module/apps/attack-dialog-ux.mjs");
 const browserSource = data(
   read("module/apps/browser.mjs")
     .replace('import { enrich } from "../sheets/enrich.mjs";', 'const enrich = async html => html ?? "";')
+    .replace(
+      'import { refuse } from "../error-notices.mjs";',
+      "const refuse = message => (globalThis.ui?.notifications?.warn(message), false);"
+    )
     .replace('import { describe } from "../rules/prerequisites.mjs";', 'const describe = () => "";')
     .replace('import { VEHICLE_RULES } from "../rules/tables.mjs";', "const VEHICLE_RULES = {};")
     .replace('"../i18n.mjs"', JSON.stringify(i18n))

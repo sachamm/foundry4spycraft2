@@ -505,7 +505,7 @@ test("the real skill entry records Nest without spending dice or scene uses and 
   assert.equal(m.flags.spycraft2.ability, "dex");
   assert.equal(a.system.actionDice.value, 3);
   assert.deepEqual(a.system.resourceUses, {});
-  assert.equal(await a.rollSkill("sneak", "dex", { gearStatus: "available", ...options, brightIdea: true }), null);
+  assert.equal(await a.rollSkill("sneak", "dex", { gearStatus: "available", ...options, brightIdea: true }), false);
   assert.equal(posts.length, 1);
   await assert.rejects(
     a.rollSkill("sneak", "dex", { gearStatus: "available", ...options, check: "stash-item" }),

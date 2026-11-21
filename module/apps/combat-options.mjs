@@ -2,6 +2,8 @@
  * Tools for the combat actions in module/rules/combat-options.mjs: recording an Anticipate result, a Stand Off,
  * settling Tire, the Coup de Grace survival save and cancelling a Ready action.
  */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import {
   READY_CANCEL_DC,
   STAND_OFF_COUNT,
@@ -19,7 +21,6 @@ import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const owned = actor => actor?.isOwner === true;
 
 /** Characters a tool may name as the opponent: targeted tokens first, then every visible character. */
@@ -94,7 +95,7 @@ export async function recordAnticipate(actor, options = {}) {
       combat: expertiseCombatContext(actor)
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   const lines = [];
   if (plan.dodge) {
@@ -149,7 +150,7 @@ export async function standOff(actor, options = {}) {
     );
   }
   const opponent = opponents(actor).find(o => o.uuid === input.opponentUuid);
-  if (!opponent) return ui.notifications.warn(loc`Choose the attacker.`);
+  if (!opponent) return refuse(loc`Choose the attacker.`);
   return actor.rollSave("ref", {
     askContext: true,
     hazardSave: {
@@ -181,7 +182,7 @@ export async function tireResult(actor, options = {}) {
   try {
     outcome = tireOutcome(input.result);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   const opponent = opponents(actor).find(o => o.uuid === input.opponentUuid) ?? null,
     lines = [],
@@ -221,7 +222,7 @@ export async function coupDeGraceSave(actor, options = {}) {
   try {
     plan = coupDeGracePlan(damage);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   return actor.rollSave("fort", {
     askContext: true,

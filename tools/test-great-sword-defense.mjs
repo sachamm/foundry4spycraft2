@@ -252,7 +252,7 @@ test("actual incoming Defense control displays the conditional gear bonus and re
       if (kind === "weapon") a.system.readiedMeleeWeapons = [];
       if (kind === "gear") a.system.defenseBonusEntries = [{ type: "gear", value: 3 }];
     };
-    assert.equal(await checkIncomingDefense(a), "warned");
+    assert.equal(await checkIncomingDefense(a), false);
     assert.match(warnings.at(-1), /changed/);
   }
   change = () => {};

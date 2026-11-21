@@ -185,9 +185,9 @@ test("Evasion III takes 10 on any real Reflex save with no d20, natural result, 
   assert.equal(actionDieBoostPlan(a.system, c).blocked, true);
   assert.deepEqual(c.evasionContext, context(3, true, true));
   assert.equal(a.system.actionDice.value, 2);
-  assert.equal(await a.rollSave("fort", { checkMethod: "take10" }), null);
-  assert.equal(await actor(18).rollSave("ref", { checkMethod: "take10" }), null);
-  assert.equal(await a.rollSave("ref", { checkMethod: "take20" }), null);
+  assert.equal(await a.rollSave("fort", { checkMethod: "take10" }), false);
+  assert.equal(await actor(18).rollSave("ref", { checkMethod: "take10" }), false);
+  assert.equal(await a.rollSave("ref", { checkMethod: "take20" }), false);
 });
 test("direct nonrandom-save calls cannot bypass source/check-kind restrictions, and ordinary Reflex rolls retain their explicit frozen context", async () => {
   const a = actor(18);

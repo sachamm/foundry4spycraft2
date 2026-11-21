@@ -311,7 +311,7 @@ test("document declaration records a compulsory pool without ordinary dice, XP o
   assert.equal(a.system.bonusActionDice[id].die, 10);
   assert.equal(a.system.actionDieAwards.m.count, 2);
   assert.equal(a.system.xp, 10);
-  assert.equal(await a.finishCheck(msg), null);
+  assert.equal(await a.finishCheck(msg), false);
   assert.notEqual(msg.flags.spycraft2.resolved, true);
   const before = msg.flags.spycraft2.effectiveTotal;
   await a.boostCheck(msg, { bonusPoolId: id });
@@ -846,7 +846,7 @@ function checkForMaster() {
 }
 test("actual competing Master Plan activations grant once with zero ordinary dice and do not award XP or GC dice", async () => {
   const a = masterActor();
-  assert.equal(await a.activateMasterPlan({ freeActionConfirmed: false }), null);
+  assert.equal(await a.activateMasterPlan({ freeActionConfirmed: false }), false);
   await Promise.all([activateMaster(a), activateMaster(a)]);
   const pools = Object.values(a.system.bonusActionDice);
   assert.equal(pools.length, 1);
@@ -879,7 +879,7 @@ test("spending Master Plan on a check with a compulsory class die never marks th
   await a.boostCheck(msg, { bonusPoolId: pool.id });
   assert.equal(msg.flags.spycraft2.requiredBonusSpent, false);
   assert.equal(a.system.bonusActionDice[required].remaining, 1);
-  assert.equal(await a.finishCheck(msg), null);
+  assert.equal(await a.finishCheck(msg), false);
   await a.boostCheck(msg, { bonusPoolId: required });
   assert.equal(msg.flags.spycraft2.requiredBonusSpent, true);
   assert.equal(a.system.bonusActionDice[required].remaining, 0);

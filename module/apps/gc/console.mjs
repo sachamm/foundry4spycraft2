@@ -1,3 +1,4 @@
+import { refuse } from "../../error-notices.mjs";
 import { systemDialog } from "../dialog-theme.mjs";
 import { installToolSearch } from "../tool-search.mjs";
 import { installResolutionGuide } from "../resolution-guide.mjs";
@@ -324,7 +325,7 @@ export function registerGCConsoleTab() {
 }
 
 export async function openGCConsole() {
-  if (!game.user.isGM) return ui.notifications.warn(loc`The GC Console is for the Game Control.`);
+  if (!game.user.isGM) return refuse(loc`The GC Console is for the Game Control.`);
   const instance = ui.gc;
   game.spycraft2.gc.console = instance;
   await instance.render({ force: true });

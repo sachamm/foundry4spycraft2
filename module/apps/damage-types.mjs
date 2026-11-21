@@ -2,6 +2,8 @@
  * Other damage types and survival saves in play (pp.333–340, 349). The rules are in module/rules/damage-types.mjs;
  * saves go through the hazard save hook (module/apps/hazards.mjs), stress and subdual through the damage ledger.
  */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import {
   DAMAGE_TYPES,
   DAMAGE_TYPE_LABELS,
@@ -49,7 +51,6 @@ import { applyAccumulatedDamage } from "./damage-ledger.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
 const has = (actor, id) => actor.statuses?.has(id) === true;
@@ -181,9 +182,8 @@ export async function sufferTypedDamage(actor, preset = {}) {
     reduction = Math.max(0, Math.trunc(Number(input.reduction) || 0)),
     source = String(input.source ?? "").trim() || DAMAGE_TYPE_LABELS[type] || type;
   if (!DAMAGE_TYPES[type] || (preset.allowed && !preset.allowed.includes(type)))
-    return ui.notifications.warn(loc`Choose a listed damage type.`);
-  if (!Number.isSafeInteger(amount) || amount < 0)
-    return ui.notifications.warn(loc`Enter the damage as a whole number.`);
+    return refuse(loc`Choose a listed damage type.`);
+  if (!Number.isSafeInteger(amount) || amount < 0) return refuse(loc`Enter the damage as a whole number.`);
   const label = DAMAGE_TYPE_LABELS[type];
   try {
     switch (type) {
@@ -218,7 +218,7 @@ export async function sufferTypedDamage(actor, preset = {}) {
       }
     }
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
 }
 
@@ -357,7 +357,7 @@ async function sufferElectrical(actor, { amount, source }) {
 export async function acidStep(actor, step) {
   if (!owned(actor)) return null;
   const state = hazardState(actor.system);
-  if (!state.acid) return ui.notifications.warn(loc`No acid is on this character.`);
+  if (!state.acid) return refuse(loc`No acid is on this character.`);
   if (step === "round") {
     const plan = acidRoundPlan(state),
       result = await sufferTypedLethal(actor, "acid", plan.damage, loc`Acid (lingering)`);

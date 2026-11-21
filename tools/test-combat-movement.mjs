@@ -182,11 +182,12 @@ test("the actual movement checker parses route declarations, honors cancellation
     a.system.speed = 10;
   };
   const invalid = await checkCombatMovement(a);
-  assert.match(invalid.warning, /allowance/);
+  assert.equal(invalid, false);
+  assert.match(warnings.at(-1), /allowance/);
   assert.equal(contents.length, 1);
   a = actor();
   response = { ...input(), distanceFeet: "", turnDegrees: "90," };
-  assert.ok((await checkCombatMovement(a)).warning);
+  assert.equal(await checkCombatMovement(a), false);
 });
 
 test("the actual engine derives movement from the current legal feat set rather than a previous preparation", () => {

@@ -190,7 +190,7 @@ test("cancellation and invalid choices spend nothing; failed creation or posting
   reset();
   const a = actor();
   assert.equal(await a.useRenaissanceMan(), null);
-  assert.equal(await a.useRenaissanceMan({ featId: feats[0].id }), null);
+  assert.equal(await a.useRenaissanceMan({ featId: feats[0].id }), false);
   await assert.rejects(a.useRenaissanceMan({ featId: "missing", freeActionConfirmed: true }), /Basic Skill/);
   eligible = false;
   await assert.rejects(a.useRenaissanceMan({ featId: feats[0].id, freeActionConfirmed: true }), /prerequisites/);

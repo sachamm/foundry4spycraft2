@@ -1,10 +1,11 @@
 /** Taunt in play: the skill dialog's section and the GC's outcome control on the Taunt card (p.361; Undermine p.205). */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { tauntOutcome, underminePlan } from "../rules/taunt.mjs";
 import { attackCharacterTargetChoices } from "./character-target.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const say = (actor, text) => ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: esc(text) });
 
 export function tauntContent(key, actor) {
@@ -57,7 +58,7 @@ export async function settleTaunt(message) {
   const check = message.flags.spycraft2,
     actor = fromUuidSync(check.actorUuid),
     target = fromUuidSync(check.taunt.opponentUuid);
-  if (!actor || !target) return ui.notifications.warn(loc`Both Taunt participants must still exist.`);
+  if (!actor || !target) return refuse(loc`Both Taunt participants must still exist.`);
   const paired = pairedResponse(message, check),
     venomous = actor.system.activeFeatNames?.includes("Venomous Dialogue");
   const input = await foundry.applications.api.DialogV2.input({
@@ -74,7 +75,7 @@ export async function settleTaunt(message) {
   try {
     outcome = tauntOutcome(check, paired?.f ?? null, { declared: input.declared, tieWinner: input.tieWinner });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await message.update({ "flags.spycraft2.tauntOutcome": { ...outcome, responseUuid: paired?.m.uuid ?? null } });
   if (!outcome.attackerWon) {

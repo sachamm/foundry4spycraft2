@@ -2,6 +2,8 @@
  * Play actions for gear picks that are not tied to one roll: issuing a team-wide pick, and charging the
  * Reputation or Net Worth cost of a standing-only entry.
  */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { getMission, teamActors } from "./gc/state.mjs";
 import { parseStandingCost, standingPayment } from "../rules/standing.mjs";
 import {
@@ -16,8 +18,6 @@ import {
 import { sizeCode } from "../rules/vehicles.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
-
 /**
  * A pick marked "one per team member" (for example tactical radios or bicycles) gives every team member a copy.
  * The GC issues the copies; each is recorded as issued from the original, carries no pick cost of its own and is
@@ -25,13 +25,11 @@ const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
  */
 export async function issueToTeam(item) {
   if (!item?.system?.perTeamMember) return null;
-  if (!game.user.isGM) return ui.notifications.warn(loc`Ask the GC to issue this pick to the team.`);
+  if (!game.user.isGM) return refuse(loc`Ask the GC to issue this pick to the team.`);
   const owner = item.parent;
   const team = teamActors(getMission()).filter(actor => actor !== owner);
   if (!team.length)
-    return ui.notifications.warn(
-      loc`No other team members found. List the team in the GC console, or give players their agents.`
-    );
+    return refuse(loc`No other team members found. List the team in the GC console, or give players their agents.`);
   const issued = [],
     skipped = [];
   for (const actor of team) {
@@ -64,12 +62,9 @@ export async function chargeStandingCost(item, { currency = null } = {}) {
   const actor = item?.parent,
     cost = parseStandingCost(item?.system?.standingCost);
   if (!actor || !cost)
-    return ui.notifications.warn(
-      loc`This entry has no Reputation or Net Worth cost to charge, or no character holds it.`
-    );
-  if (!actor.isOwner) return ui.notifications.warn(loc`Only the character's owner or the GC can pay this cost.`);
-  if (item.getFlag("spycraft2", "standingCharge"))
-    return ui.notifications.warn(loc`${item.name} has already been paid for.`);
+    return refuse(loc`This entry has no Reputation or Net Worth cost to charge, or no character holds it.`);
+  if (!actor.isOwner) return refuse(loc`Only the character's owner or the GC can pay this cost.`);
+  if (item.getFlag("spycraft2", "standingCharge")) return refuse(loc`${item.name} has already been paid for.`);
   if (!currency) {
     const input = await foundry.applications.api.DialogV2.input({
       window: { title: loc`${item.name}: pay the request cost` },
@@ -82,7 +77,7 @@ export async function chargeStandingCost(item, { currency = null } = {}) {
     currency = input.currency;
   }
   const payment = standingPayment(actor.system, cost, currency);
-  if (!payment.ok) return ui.notifications.warn(payment.reason);
+  if (!payment.ok) return refuse(payment.reason);
   await actor.update({ [`system.${currency}`]: payment.after });
   await item.setFlag("spycraft2", "standingCharge", {
     currency,
@@ -116,8 +111,8 @@ const speaker = item => ChatMessage.getSpeaker({ actor: item.parent });
  */
 export async function useBattery(item, { amount = null } = {}) {
   const state = batteryState(item.system.battery, item.system.charge);
-  if (!state) return ui.notifications.warn(loc`${item.name} has no battery life to track.`);
-  if (state.dry) return ui.notifications.warn(loc`${item.name} has run dry; recharge it first.`);
+  if (!state) return refuse(loc`${item.name} has no battery life to track.`);
+  if (state.dry) return refuse(loc`${item.name} has run dry; recharge it first.`);
   if (amount === null) {
     const unit = state.kind === "time" ? "hours" : "uses";
     const input = await ask(
@@ -177,10 +172,10 @@ export async function addMechanism(item, mechanismItem) {
     mechanisms: [...item.system.gadget.mechanisms]
   };
   if (mechanismItem.system?.gearCategory !== "G" || /^Gadget housing/.test(mechanismItem.name))
-    return ui.notifications.warn(loc`Drop a gadget mechanism from the Gear pack (Gadgets).`);
+    return refuse(loc`Drop a gadget mechanism from the Gear pack (Gadgets).`);
   // Every Gadget pick except the housing sizes is a mechanism, and a mechanism cannot house another (p.278).
   if (item.system.gearCategory === "G" && !/^Gadget housing/.test(item.name))
-    return ui.notifications.warn(loc`A gadget mechanism cannot be the housing for another gadget.`);
+    return refuse(loc`A gadget mechanism cannot be the housing for another gadget.`);
   const mechanism = {
     name: mechanismItem.name,
     caliber: mechanismItem.system.caliber ?? 0,
@@ -189,7 +184,7 @@ export async function addMechanism(item, mechanismItem) {
     skill: ""
   };
   const ok = canAddMechanism(gadget, mechanism);
-  if (!ok.ok) return ui.notifications.warn(ok.reason);
+  if (!ok.ok) return refuse(ok.reason);
   if (/^Skill (check|boost)/.test(mechanism.name)) {
     const input = await ask(
       loc`${mechanism.name}: skill`,
@@ -234,9 +229,9 @@ export async function rollGadgetSkillCheck(item, index) {
 /** The holder makes an Electronics or Mechanics Repair check against the item's Complexity DC; success clears its failed saves. */
 export async function repairItem(item) {
   const plan = repairPlan(item);
-  if (!plan.possible) return ui.notifications.warn(plan.reason);
+  if (!plan.possible) return refuse(plan.reason);
   const actor = item.parent;
-  if (!actor?.rollSkill) return ui.notifications.warn(loc`Only a character holding the item can repair it.`);
+  if (!actor?.rollSkill) return refuse(loc`Only a character holding the item can repair it.`);
   const message = await actor.rollSkill(plan.skillKey, null, {
     check: "repair",
     gearStatus: "available",
@@ -262,7 +257,7 @@ export async function repairItem(item) {
 /** The Electronics DC to pick up this item's signal at a distance, after any jamming (Tables 4.64–4.65). */
 export async function signalCheck(item) {
   const pr = Number(item.system.powerRating);
-  if (!Number.isFinite(pr) || pr <= 0) return ui.notifications.warn(loc`${item.name} has no signal Power Rating.`);
+  if (!Number.isFinite(pr) || pr <= 0) return refuse(loc`${item.name} has no signal Power Rating.`);
   const input = await ask(
     loc`${item.name}: picking up the signal`,
     `
@@ -295,7 +290,7 @@ export async function refundStandingCost(item) {
   const actor = item?.parent,
     charge = item?.getFlag("spycraft2", "standingCharge");
   if (!actor || !charge) return null;
-  if (!game.user.isGM) return ui.notifications.warn(loc`Ask the GC to refund this cost.`);
+  if (!game.user.isGM) return refuse(loc`Ask the GC to refund this cost.`);
   await actor.update({ [`system.${charge.currency}`]: (actor.system[charge.currency] ?? 0) + charge.amount });
   await item.unsetFlag("spycraft2", "standingCharge");
   await ChatMessage.create({

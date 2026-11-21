@@ -1,4 +1,6 @@
 /** Baseline combat actions in play: the dialog sections that declare them and the buttons that settle them. */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
   COVER_FIRE,
@@ -27,7 +29,6 @@ import { setConditionStatus } from "../rules/condition-status.mjs";
 import { askGC, gcAvailable, registerRelay } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const post = (actor, lines) =>
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor }),
@@ -120,11 +121,9 @@ export async function coverFire(actor, item, input = {}) {
     dc = coverFireDC(actor.system.attack?.ranged ?? 0),
     distance = Number(input.distanceFeet);
   if (preview.maximumRange && Number.isFinite(distance) && distance > Math.floor(preview.maximumRange / 2))
-    return ui.notifications.warn(
-      loc`Cover Fire reaches half the weapon's maximum range: ${Math.floor(preview.maximumRange / 2)} ft.`
-    );
+    return refuse(loc`Cover Fire reaches half the weapon's maximum range: ${Math.floor(preview.maximumRange / 2)} ft.`);
   const shots = whole(input.shotsRemaining);
-  if (shots !== null && shots < COVER_FIRE.shots) return ui.notifications.warn(loc`Cover Fire takes 5 shots.`);
+  if (shots !== null && shots < COVER_FIRE.shots) return refuse(loc`Cover Fire takes 5 shots.`);
   const targets = attackCharacterTargetChoices().filter(a => a.uuid !== actor.uuid),
     targeted = [...(game.user?.targets ?? [])],
     selected = targeted.length === 1 ? (targeted[0].actor?.uuid ?? "") : "";
@@ -150,8 +149,7 @@ export async function coverFire(actor, item, input = {}) {
 /** Suppressive Fire: no attack check now; final attacks follow as opponents cross the square. */
 export async function suppressiveFire(actor, item, input = {}) {
   const shots = whole(input.shotsRemaining);
-  if (shots !== null && shots < SUPPRESSIVE_FIRE.shots)
-    return ui.notifications.warn(loc`Suppressive Fire takes 5 shots.`);
+  if (shots !== null && shots < SUPPRESSIVE_FIRE.shots) return refuse(loc`Suppressive Fire takes 5 shots.`);
   await post(actor, [
     loc`Suppressive Fire with ${esc(item.name)}: 5 shots into an empty square within maximum range. For a round, anyone hostile crossing the square draws a final attack at –4 (1 more shot each, no Aim) and takes –4 to attack and skill checks until the start of the attacker's next Initiative Count (p.361).`,
     loc`Roll each final attack from the ranged attack dialog with the fire action "Final attack from Suppressive Fire".`
@@ -184,7 +182,7 @@ export async function countFireActionHits(message) {
       .filter(Boolean)
       .map(Number);
     if (!defenses.length || defenses.some(d => !Number.isFinite(d) || d < 0) || defenses.length > action.squares)
-      return ui.notifications.warn(loc`Enter up to ${action.squares} Defense values, each 0 or more.`);
+      return refuse(loc`Enter up to ${action.squares} Defense values, each 0 or more.`);
     const results = strafeHits(total, defenses, { step: supreme ? 1 : 2 });
     return post(fromUuidSync(check.actorUuid), [
       loc`Strafe, result ${total}:`,
@@ -208,7 +206,7 @@ export async function countFireActionHits(message) {
   if (!input) return null;
   const defense = Number(input.defense);
   if (!Number.isFinite(defense)) return null;
-  if (defense < 0) return ui.notifications.warn(loc`Defense cannot be negative.`);
+  if (defense < 0) return refuse(loc`Defense cannot be negative.`);
   const hits =
     action.action === "burst"
       ? burstHits(total, defense)
@@ -427,7 +425,7 @@ export async function settleGrapple(actor, options = {}) {
   try {
     outcome = grappleOutcome(input);
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   const sizeBonus = grappleSizeBonus(Math.abs(input.sizeDifference ?? 0));
   const benefits = outcome.benefits

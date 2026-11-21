@@ -1,4 +1,6 @@
 /** Hazards in play: exposing a character to a contagion or a fire, the saves they call for and what follows. */
+import { esc } from "../html.mjs";
+import { refuse } from "../error-notices.mjs";
 import { rollPipeline } from "../rules/roll-pipeline.mjs";
 import {
   FIRE_AP,
@@ -32,7 +34,6 @@ import { lethalHitPlan, lethalHitLines } from "../rules/damage-application.mjs";
 import { systemDialog } from "./dialog-theme.mjs";
 import { loc } from "../i18n.mjs";
 
-const esc = value => foundry.utils.escapeHTML(String(value ?? ""));
 const now = () => game.time?.worldTime ?? 0;
 const owned = actor => actor?.isOwner === true;
 
@@ -240,7 +241,7 @@ export async function exposeToContagion(actor, options = {}) {
       doses: Math.max(1, Math.trunc(input.doses ?? 1))
     });
   } catch (error) {
-    return ui.notifications.warn(error.message);
+    return refuse(error.message);
   }
   await writeHazards(actor, plan.hazards);
   await post(
@@ -259,7 +260,7 @@ export async function exposeToContagion(actor, options = {}) {
 export async function rollContagionSave(actor, id, options = {}) {
   if (!owned(actor)) return null;
   const entry = hazardState(actor.system).contagions[id];
-  if (!entry) return ui.notifications.warn(loc`This contagion is no longer being tracked.`);
+  if (!entry) return refuse(loc`This contagion is no longer being tracked.`);
   let sealedSuit = options.sealedSuit === true;
   if (options.sealedSuit === undefined && entry.phase === "primary" && /radiation/i.test(entry.name)) {
     const input = await systemDialog.input({
@@ -288,7 +289,7 @@ export async function cureHazard(actor, id) {
 async function resolveContagionSave(actor, message, save, succeeded) {
   const state = hazardState(actor.system),
     entry = state.contagions[save.id];
-  if (!entry) return ui.notifications.warn(loc`This contagion is no longer being tracked.`);
+  if (!entry) return refuse(loc`This contagion is no longer being tracked.`);
   if (succeeded) {
     const outcome = contagionSaveOutcome(state, save.id, { succeeded: true });
     await writeHazards(actor, outcome.hazards);
@@ -383,7 +384,7 @@ export async function exposeToFire(actor, options = {}) {
     };
   }
   if (!Number.isSafeInteger(input.damage) || input.damage < 1)
-    return ui.notifications.warn(loc`Enter the fire's damage as a whole number.`);
+    return refuse(loc`Enter the fire's damage as a whole number.`);
   const state = hazardState(actor.system),
     result = await sufferFire(actor, state, input.damage, input.reduction ?? 0, loc`Fire (AP ${input.ap ?? 0})`);
   if (result.fire) await writeHazards(actor, { ...state, fire: result.fire });
@@ -399,7 +400,7 @@ export async function exposeToFire(actor, options = {}) {
 export async function burningRound(actor, options = {}) {
   if (!owned(actor)) return null;
   const state = hazardState(actor.system);
-  if (!state.fire) return ui.notifications.warn(loc`This character is not on fire.`);
+  if (!state.fire) return refuse(loc`This character is not on fire.`);
   let reduction = options.reduction;
   if (reduction === undefined) {
     const input = await systemDialog.input({

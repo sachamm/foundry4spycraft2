@@ -1,10 +1,11 @@
+import { refuse } from "../error-notices.mjs";
 import { burrowCapabilities, burrowMaterialPlan } from "../rules/environment.mjs";
 import { loc } from "../i18n.mjs";
 /** Read-only material check; no token movement, terrain alteration, resource use or follower adjudication. */
 export async function checkBurrowMaterial(actor) {
   if (actor?.type !== "agent" || !actor.isOwner) return null;
   const initial = burrowCapabilities(actor.system);
-  if (!initial) return ui.notifications.warn(loc`An active Burrow quality and valid Strength are required.`);
+  if (!initial) return refuse(loc`An active Burrow quality and valid Strength are required.`);
   const input = await foundry.applications.api.DialogV2.input({
     window: { title: loc`Burrow — material check` },
     rejectClose: false,

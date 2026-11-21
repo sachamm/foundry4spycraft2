@@ -1,3 +1,4 @@
+import { isLeadGM } from "./writers.mjs";
 import { loc } from "./i18n.mjs";
 const SYSTEM = "spycraft2";
 const SETTING = "soundtrackSetup";
@@ -14,7 +15,7 @@ export function registerSoundtrackSetup() {
 
 /** Import once per world; a deleted album stays deleted after setup finishes. */
 export async function setupSoundtrack() {
-  if (!game.user?.isGM || game.users.activeGM?.id !== game.user.id) return;
+  if (!isLeadGM()) return;
   try {
     // Update previously imported WAV editions without changing track settings or order.
     for (const playlist of game.playlists) {

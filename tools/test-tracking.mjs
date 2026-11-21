@@ -209,7 +209,7 @@ test("the actual document path rejects an unspecified surface, records table com
     calls++;
     return { formula, data, options };
   };
-  assert.equal(await a.rollSkill("survival", "wis", { gearStatus: "available", check: "tracking" }), null);
+  assert.equal(await a.rollSkill("survival", "wis", { gearStatus: "available", check: "tracking" }), false);
   assert.equal(calls, 0);
   const m = await a.rollSkill("survival", "wis", {
     gearStatus: "available",
