@@ -289,7 +289,11 @@ function enhanceButtonIcon(control, label) {
   if (icon) icon.className = art ? "sc2-button-icon" : `sc2-button-icon fa-solid ${glyph}`;
 }
 
-/** Add keyboard behavior to legacy action anchors while retaining Foundry's delegated handlers. */
+/**
+ * Keyboard support for action links and image pickers, keeping Foundry's delegated handlers. The system's own
+ * templates and dialogs author buttons (tools/test-templates.mjs, tools/test-dialog-markup.mjs), so this is a safety
+ * net for markup from elsewhere.
+ */
 export function enhanceActionAccessibility(root) {
   if (!root?.querySelectorAll) return;
   const scope = root.closest?.(".application, [data-sc2-tooltip-scope]") ?? root.closest?.(SCOPE) ?? root;

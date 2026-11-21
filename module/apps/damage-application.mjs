@@ -899,7 +899,7 @@ export async function applyBlast(message, options = {}) {
     const rows = actors
       .map((actor, index) => {
         const row = measured.get(actor.uuid);
-        return `<tr><td><label><input type="checkbox" name="hit${index}"${row && !row.behindWall ? " checked" : ""} /> ${esc(actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)}${row?.behindWall ? ` <i>${loc`(behind a wall)`}</i>` : ""}</label></td><td><input type="number" name="feet${index}" min="0" step="5" value="${row ? row.ring * increment : ""}" class="w-2" /></td><td>${row ? row.damage : ""}</td></tr>`;
+        return `<tr><td><label><input type="checkbox" name="hit${index}"${row && !row.behindWall ? " checked" : ""} /> ${esc(actor.isOwner ? actor.name : loc`${actor.name} (sent to the GC)`)}${row?.behindWall ? ` <i>${loc`(behind a wall)`}</i>` : ""}</label></td><td><input type="number" name="feet${index}" aria-label="${esc(loc`${actor.name}: feet from Ground Zero`)}" min="0" step="5" value="${row ? row.ring * increment : ""}" class="w-2" /></td><td>${row ? row.damage : ""}</td></tr>`;
       })
       .join("");
     const entered = await systemDialog.input({
