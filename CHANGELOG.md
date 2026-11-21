@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **NPC and vehicle sheets: real buttons.** Their actions (and the hazard tools shared with the agent sheet) are now
+  proper buttons that take Tab, Enter and Space everywhere, with names for the icon-only ones (remove, leave the
+  vehicle, unlink driver or mount). Hovering one now behaves like the agent sheet's buttons. Name, type, attribute
+  and Base Attack Bonus fields are labelled for screen readers.
 - **Agent sheet: clearer for keyboard and screen-reader users.** The skill-level picker shows which level you are
   spending points at again (it lost its highlight in an earlier redesign) and announces it as pressed. Icon-only
   buttons (vitality roll and record, share, remove, add and remove rows, refresh grants) have proper names; the

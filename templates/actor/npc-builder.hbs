@@ -23,13 +23,13 @@
     {{#each npc.skills}}<div class="npc-row">
       <select aria-label="{{localize 'SPYCRAFT.Template.ActorNpcBuilder.ListedSkill'}}" name="npcSkill.{{index}}.key">{{selectOptions ../npc.skillOptions selected=key}}</select>
       <select aria-label="{{localize 'SPYCRAFT.Template.ActorNpcBuilder.SkillGrade'}}" name="npcSkill.{{index}}.grade" data-dtype="Number">{{selectOptions ../npc.gradeOptions selected=grade}}</select>
-      <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Bonus"}} <b title="Standard {{signed resolved.normalBonus}}; {{resolved.skillCondition.state}}">{{signed resolved.bonus}}</b> {{localize "SPYCRAFT.Template.ActorNpcBuilder.Cap"}} {{resolved.cap}} · {{grade}} {{localize "SPYCRAFT.Template.ActorNpcBuilder.XP"}}</span>
+      <span>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Bonus"}} <b title="{{localize 'SPYCRAFT.Action.StandardValue' value=(signed resolved.normalBonus) state=resolved.skillCondition.state}}">{{signed resolved.bonus}}</b> {{localize "SPYCRAFT.Template.ActorNpcBuilder.Cap"}} {{resolved.cap}} · {{grade}} {{localize "SPYCRAFT.Template.ActorNpcBuilder.XP"}}</span>
       <button type="button" data-action="npcRemoveRow" data-list="skills" data-index="{{index}}" aria-label="{{localize 'SPYCRAFT.Template.ActorNpcBuilder.RemoveListedSkill'}}">{{localize "SPYCRAFT.Template.ActorNpcBuilder.Remove"}}</button>
     </div>{{/each}}
     <div class="npc-section-title"><h3>{{localize "SPYCRAFT.Template.ActorNpcBuilder.EquipmentAllowances"}}</h3></div>
     <p class="npc-note">{{localize "SPYCRAFT.Template.ActorNpcBuilder.StartsWithOneCaliberIWeapon"}}</p>
     {{#each npc.equipment}}<div class="npc-equipment"><strong>{{category}}</strong>
-      {{#each picks}}<label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Caliber"}} <select aria-label="{{category}} pick Caliber" name="npcPick.{{category}}.{{index}}" data-dtype="Number">{{selectOptions ../../npc.caliberOptions selected=caliber}}</select><button type="button" data-action="npcRemoveRow" data-list="equipment" data-category="{{category}}" data-index="{{index}}" aria-label="Remove {{category}} pick">×</button></label>{{/each}}
+      {{#each picks}}<label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.Caliber"}} <select aria-label="{{category}} pick Caliber" name="npcPick.{{category}}.{{index}}" data-dtype="Number">{{selectOptions ../../npc.caliberOptions selected=caliber}}</select><button type="button" data-action="npcRemoveRow" data-list="equipment" data-category="{{category}}" data-index="{{index}}" aria-label="{{localize 'SPYCRAFT.Action.RemovePick' category=category}}">×</button></label>{{/each}}
       <button type="button" data-action="npcAddPick" data-category="{{category}}">{{localize "SPYCRAFT.Template.ActorNpcBuilder.AddPick"}}</button>
     </div>{{/each}}
     <label>{{localize "SPYCRAFT.Template.ActorNpcBuilder.AdditionalAmmunitionPairs"}} <input type="number" min="0" max="100" name="system.npcProfile.extraAmmoPairs" value="{{npc.profile.extraAmmoPairs}}" data-dtype="Number" /></label>

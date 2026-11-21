@@ -1684,7 +1684,11 @@
    "BaseScoreOf": "{name} base score",
    "MiscModifierOf": "{name} miscellaneous modifier",
    "ClassSkillOf": "{name} counts as a class skill",
-   "SkillPointsIn": "Skill points in {name}"
+   "SkillPointsIn": "Skill points in {name}",
+   "StandardValue": "Standard {value}; {state}",
+   "RemovePick": "Remove {category} pick",
+   "NpcType": "NPC type",
+   "ScoreOf": "{name} score"
   },
   "Text": {
    "0S_1a8inmy": "0 s",
