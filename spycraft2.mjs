@@ -17,6 +17,7 @@ import { registerGmLocks } from "./module/rules/gm-locks.mjs";
 import { registerMapSettings } from "./module/apps/map.mjs";
 import { installRoundStateEffects } from "./module/apps/round-state-effects.mjs";
 import { installRoundReminders } from "./module/apps/round-reminders.mjs";
+import { installTargetNotices } from "./module/apps/target-response.mjs";
 import { renderCheckControls } from "./module/rolls/chat-controls.mjs";
 import {
   startUsagePeriod,
@@ -206,6 +207,7 @@ Hooks.once("init", () => {
   CONFIG.Combat.documentClass = fluidCombatClass(CONFIG.Combat.documentClass);
   installFluidInitiativeHooks();
   installRoundReminders();
+  installTargetNotices();
   CONFIG.Combatant.documentClass = shakenCombatantClass(CONFIG.Combatant.documentClass);
   installShakenInitiativeHooks();
   installCombatStanceHooks();

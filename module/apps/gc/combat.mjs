@@ -5,6 +5,7 @@
  */
 import { esc } from "../../html.mjs";
 import { refuse } from "../../error-notices.mjs";
+import { systemDialog } from "../dialog-theme.mjs";
 import {
   FLUID_EVENTS,
   fluidModifier,
@@ -77,8 +78,53 @@ async function condition(actor, id, label) {
 }
 
 /** Order combatants by Count, then Initiative bonus, then a stored roll-off (p.323). */
+/** Combatants still without an Initiative Count, leaving out the defeated. */
+export const unrolledCombatants = combat =>
+  [...(combat?.combatants ?? [])].filter(c => !c.isDefeated && !Number.isFinite(c.initiative));
+
+/**
+ * Before a fight begins, say who has no Initiative yet. A character who rolls after the start sorts in above the
+ * current turn and loses the first round, so the GC can roll for NPCs and remind players first.
+ * @returns {Promise<boolean>} whether to begin now
+ */
+export async function confirmInitiativeBeforeStart(combat) {
+  let missing = unrolledCombatants(combat);
+  if (!missing.length || !game.user?.isGM) return true;
+  const npcs = missing.filter(c => !c.hasPlayerOwner);
+  const names = missing.map(c => esc(c.name)).join(", ");
+  const choice = await systemDialog.wait({
+    window: { title: loc`Begin combat` },
+    content: `<p>${loc`No Initiative yet: ${names}.`}</p><p>${loc`Anyone who rolls after the fight begins sorts in above the current turn and misses the first round.`}</p>`,
+    rejectClose: false,
+    buttons: [
+      ...(npcs.length ? [{ action: "roll", label: loc`Roll for NPCs and remind players`, default: true }] : []),
+      { action: "remind", label: loc`Remind players`, default: !npcs.length },
+      { action: "begin", label: loc`Begin anyway` }
+    ]
+  });
+  if (!choice) return false;
+  if (choice === "begin") return true;
+  if (choice === "roll" && npcs.length) await combat.rollInitiative(npcs.map(c => c.id));
+  missing = unrolledCombatants(combat).filter(c => c.hasPlayerOwner);
+  if (missing.length) {
+    const owners = [...new Set(missing.flatMap(c => c.players?.map(user => user.id) ?? []))];
+    await ChatMessage.create({
+      content: `<p>${loc`Roll Initiative before the fight begins: ${missing.map(c => esc(c.name)).join(", ")}.`}</p>`,
+      whisper: owners
+    });
+    ui.notifications.info(loc`Players reminded. Begin combat again once everyone has rolled.`);
+    return false;
+  }
+  return true;
+}
+
 export function fluidCombatClass(Base) {
   return class extends Base {
+    async startCombat() {
+      if (!(await confirmInitiativeBeforeStart(this))) return this;
+      return super.startCombat();
+    }
+
     _sortCombatants(a, b) {
       return compareCombatants(
         { id: a.id, count: a.initiative, bonus: bonusOf(a), tiebreak: a.flags?.spycraft2?.tiebreak },
@@ -237,6 +283,37 @@ export async function spendTurnAction(combatant, kind) {
   await combatant.update({ "flags.spycraft2.actions": result.state });
   return result;
 }
+
+/**
+ * Mark the time an action took on the acting character's turn, after the action went through. Only the combatant whose
+ * turn it is spends; an action taken outside one's own turn (a reaction, a free attack) leaves the record alone. When
+ * the turn has too little left the action still stands, as the GC decides, and the player is told.
+ * @param {Actor} actor
+ * @param {"half"|"full"} kind
+ * @returns {Promise<object|null>} the spend, or null when nothing was marked
+ */
+export async function markActionSpent(actor, kind) {
+  const combat = actor?.participatingCombat;
+  const combatant = combat?.started ? combat.combatant : null;
+  if (!combatant || combatant.actor?.uuid !== actor.uuid || !combatant.isOwner) return null;
+  const result = spendAction(actionsOf(combatant), kind, { extra: extraHalfActions(combatant) });
+  if (!result.ok) {
+    ui.notifications.warn(
+      loc`${combatant.name} had ${result.left} half action(s) left this turn; this took more. Check with the GC.`
+    );
+    return null;
+  }
+  await combatant.update({ "flags.spycraft2.actions": result.state });
+  return result;
+}
+
+/** Wrap a sheet action so that, once it goes through, it marks its time on the actor's turn. */
+export const costsAction = (kind, handler) =>
+  async function (event, target) {
+    const result = await handler.call(this, event, target);
+    if (result && (await markActionSpent(this.actor, kind))) this.render?.();
+    return result;
+  };
 
 /** Apply every combatant's recorded modifiers for the round that just ended. */
 export async function applyEndOfRound(combat, endedRound) {

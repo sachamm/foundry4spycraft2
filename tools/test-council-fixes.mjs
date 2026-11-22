@@ -5,6 +5,9 @@ import { recordedAttackDistance } from "../module/rules/cqb.mjs";
 import { agentTokenDefaults, equipsAsFirstWeapon } from "../module/rules/creation-defaults.mjs";
 import { buildCreationTrack, buildSetupGuide } from "../module/sheets/agent-ux.mjs";
 import { prerequisitesUseSkills } from "../module/rules/prerequisites.mjs";
+import { orderSkillChecks, needsGear } from "../module/rules/skill-check-order.mjs";
+import { combatMovementPlan } from "../module/rules/combat-movement.mjs";
+import { quickAttackHasTarget } from "../module/apps/remembered-choices.mjs";
 
 test("a damage roll reuses the distance its attack card recorded", () => {
   assert.equal(recordedAttackDistance({ attackContext: { distanceFeet: 25 } }), 25);
@@ -159,4 +162,114 @@ test("only prerequisites that read skill ranks are blocked by a broken skill his
   );
   assert.equal(prerequisitesUseSkills({ type: "any", of: [{ type: "keySkill", min: 6 }] }), true);
   assert.equal(prerequisitesUseSkills(null), false);
+});
+
+test("a skill's open checks are offered before secret, passive and gear-only ones", () => {
+  const checks = [
+    { id: "bind", mode: "Secret", tags: "Gear Only (Bindings)" },
+    { id: "climb", mode: "Active", tags: "Gear (Climbing Kit)" },
+    { id: "awareness", mode: "Passive", tags: "" },
+    { id: "ambush", mode: "Secret", tags: "" },
+    { id: "escape", mode: "Active", tags: "" }
+  ];
+  assert.deepEqual(
+    orderSkillChecks(checks).map(c => c.id),
+    ["climb", "escape", "awareness", "ambush", "bind"]
+  );
+  assert.equal(needsGear(checks[0]), true);
+  assert.equal(needsGear(checks[1]), false, "optional gear is not a requirement");
+});
+
+test("standing still needs no GC route confirmation; moving still does", () => {
+  const system = {
+    activeFeatNames: [],
+    speed: 30,
+    canRun: true,
+    abilities: { dex: { value: 14, mod: 2 } },
+    conditionContext: {},
+    postureMovement: { standardMove: true }
+  };
+  const still = combatMovementPlan(system, { action: "totalDefense", distanceFeet: 0 });
+  assert.equal(still.distanceFeet, 0);
+  assert.throws(() => combatMovementPlan(system, { action: "totalDefense", distanceFeet: 10 }), /GC must confirm/);
+});
+
+test("a quick attack rolls at once only with one target that is not the attacker", () => {
+  const me = { uuid: "Actor.me" },
+    foe = { actor: { uuid: "Actor.foe" } };
+  assert.equal(quickAttackHasTarget(me, [foe]), true);
+  assert.equal(quickAttackHasTarget(me, []), false);
+  assert.equal(quickAttackHasTarget(me, [foe, { actor: { uuid: "Actor.b" } }]), false);
+  assert.equal(quickAttackHasTarget(me, [{ actor: me }]), false);
+});
+
+test("an action from the sheet marks its time on the acting character's own turn only", async () => {
+  const notices = [];
+  globalThis.ui = { notifications: { warn: m => notices.push(m), info() {} }, combat: null };
+  const { markActionSpent, costsAction } = await import("../module/apps/gc/combat.mjs");
+  const actor = { uuid: "Actor.a" };
+  const combatant = {
+    name: "Vector",
+    actor,
+    isOwner: true,
+    flags: {},
+    update(data) {
+      this.flags = { spycraft2: { actions: data["flags.spycraft2.actions"] } };
+      return this;
+    }
+  };
+  const combat = { started: true, round: 2, combatant, combatants: [combatant] };
+  combatant.parent = combat;
+  actor.participatingCombat = combat;
+  assert.equal((await markActionSpent(actor, "half")).left, 1);
+  assert.equal(combatant.flags.spycraft2.actions.used, 1);
+  // A full action with one half left is too much: the record stays and the player is told.
+  assert.equal(await markActionSpent(actor, "full"), null);
+  assert.equal(combatant.flags.spycraft2.actions.used, 1);
+  assert.match(notices[0], /Vector had 1 half action/);
+  // Someone else's turn: nothing is marked.
+  combat.combatant = { actor: { uuid: "Actor.other" } };
+  assert.equal(await markActionSpent(actor, "half"), null);
+  combat.combatant = combatant;
+  // The wrapper spends only when the action went through.
+  let rendered = 0;
+  const sheet = { actor, render: () => rendered++ };
+  await costsAction("half", () => false).call(sheet);
+  assert.equal(combatant.flags.spycraft2.actions.used, 1);
+  await costsAction("half", () => ({ ok: true })).call(sheet);
+  assert.equal(combatant.flags.spycraft2.actions.used, 2);
+  assert.equal(rendered, 1);
+});
+
+test("Begin combat names whoever has no Initiative and can roll for NPCs first", async () => {
+  const { unrolledCombatants, confirmInitiativeBeforeStart } = await import("../module/apps/gc/combat.mjs");
+  const pc = { id: "pc", name: "Vector", hasPlayerOwner: true, initiative: null, players: [{ id: "u1" }] };
+  const npc = { id: "npc", name: "Guard", hasPlayerOwner: false, initiative: null };
+  const down = { id: "down", name: "Thug", isDefeated: true, initiative: null };
+  const rolled = { id: "r", name: "Inez", hasPlayerOwner: true, initiative: 18 };
+  const whispers = [];
+  const combat = {
+    combatants: [pc, npc, down, rolled],
+    async rollInitiative(ids) {
+      for (const id of ids) this.combatants.find(c => c.id === id).initiative = 12;
+    }
+  };
+  assert.deepEqual(
+    unrolledCombatants(combat).map(c => c.id),
+    ["pc", "npc"]
+  );
+  globalThis.game = { ...globalThis.game, user: { isGM: true } };
+  globalThis.ChatMessage = { create: data => whispers.push(data) };
+  let asked;
+  globalThis.foundry = {
+    ...globalThis.foundry,
+    applications: { api: { DialogV2: { wait: async options => ((asked = options), "roll") } } }
+  };
+  globalThis.ui = { notifications: { info() {}, warn() {} } };
+  assert.equal(await confirmInitiativeBeforeStart(combat), false, "players are reminded before it begins");
+  assert.match(asked.content, /Vector, Guard/);
+  assert.equal(npc.initiative, 12);
+  assert.deepEqual(whispers[0].whisper, ["u1"]);
+  pc.initiative = 15;
+  assert.equal(await confirmInitiativeBeforeStart(combat), true, "nothing to ask once everyone has rolled");
 });

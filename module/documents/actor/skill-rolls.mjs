@@ -1,5 +1,6 @@
 /** Skill and Knowledge checks, and the class abilities resolved through them. */
 import { refuse } from "../../error-notices.mjs";
+import { orderSkillChecks, needsGear } from "../../rules/skill-check-order.mjs";
 import { systemDialog } from "../../apps/dialog-theme.mjs";
 import { rollPipeline } from "../../rolls/index.mjs";
 import { choiceKey, rememberChoices, rememberedChoices, restoreChoices } from "../../apps/remembered-choices.mjs";
@@ -153,9 +154,12 @@ export const ActorSkillRolls = Base =>
         restraintRollSize = this.system.size;
       const skill = this.system.skillTotals?.[key];
       const optionalRules = game.settings?.get("spycraft2", "linguistics") ? ["linguistics"] : [];
-      const checks = rollPipeline.skillChecks(
-        { actor: this, checkKind: "skill", skillKey: key, options, optionalRules },
-        CONFIG.SPYCRAFT.skills[key]?.checks ?? []
+      // Open checks first, so the dialog and Shift-click start on one a player can simply roll.
+      const checks = orderSkillChecks(
+        rollPipeline.skillChecks(
+          { actor: this, checkKind: "skill", skillKey: key, options, optionalRules },
+          CONFIG.SPYCRAFT.skills[key]?.checks ?? []
+        )
       );
       if (!skill || !checks.length) return null;
       let input = options;
@@ -172,7 +176,7 @@ export const ActorSkillRolls = Base =>
         const choices = checks
           .map(
             check =>
-              `<option value="${check.id}"${options.initialCheck === check.id ? " selected" : ""}>${loc`${esc(check.name)} (${check.attributes.join("/").toUpperCase()}, ${esc(check.mode)}, error 1–${check.error})`}</option>`
+              `<option value="${check.id}"${options.initialCheck === check.id ? " selected" : ""}>${loc`${esc(check.name)} (${check.attributes.join("/").toUpperCase()}, ${esc(check.mode)}, error 1–${check.error})`}${needsGear(check) ? ` · ${loc`needs gear`}` : ""}</option>`
           )
           .join("");
         const abilities = skill.totals

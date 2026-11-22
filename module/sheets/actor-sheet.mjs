@@ -130,9 +130,10 @@ import {
   npcIsSpecial,
   dispositionRows
 } from "../apps/gc/npc-play.mjs";
+import { costsAction } from "../apps/gc/combat.mjs";
 import { loc } from "../i18n.mjs";
 import { esc } from "../html.mjs";
-import { quickAttackOptions, skipDialog } from "../apps/remembered-choices.mjs";
+import { quickAttackOptions, quickAttackHasTarget, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -174,6 +175,17 @@ const playLabels = () => ({
   nextSetup: loc`Next setup step`,
   dying: loc`Dying: roll to stabilize`
 });
+
+/**
+ * A Shift-click attack rolls at once only when it has one target; without one it would post with no range or
+ * Defense, so the dialog opens instead and says why.
+ */
+function quickAttack(event, actor) {
+  if (!skipDialog(event)) return false;
+  if (quickAttackHasTarget(actor)) return true;
+  ui.notifications.info(loc`No single target: the attack dialog opens so the range can be entered.`);
+  return false;
+}
 
 export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(ActorSheetV2)) {
   /** Career level whose skill points are being edited on the Skills tab. */
@@ -315,9 +327,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       reviewCriticalInjury(event, target) {
         return this.actor.reviewCriticalInjury(target.dataset.injury);
       },
-      takeTotalDefense() {
+      takeTotalDefense: costsAction("full", function () {
         return takeTotalDefense(this.actor);
-      },
+      }),
       takeMobileOffense() {
         return takeMobileOffense(this.actor);
       },
@@ -447,9 +459,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       rollCheapShot() {
         return rollCheapShot(this.actor);
       },
-      rollDisarm() {
+      rollDisarm: costsAction("half", function () {
         return rollDisarm(this.actor);
-      },
+      }),
       rollDisarmResponse(event, target) {
         return rollDisarmResponse(this.actor, { weaponId: target.closest("[data-item-id]")?.dataset.itemId });
       },
@@ -753,9 +765,9 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       restoreRules() {
         return reviewActorRules(this.actor, { restore: true });
       },
-      reloadWeapon(event, target) {
+      reloadWeapon: costsAction("half", function (event, target) {
         return reloadWeapon(this._item(target));
-      },
+      }),
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
       },
@@ -765,10 +777,10 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       rollDying() {
         return rollDying(this.actor);
       },
-      rollAttack: SpycraftAgentSheet.#onRollAttack,
-      rollRangedAttack(event, target) {
+      rollAttack: costsAction("half", SpycraftAgentSheet.#onRollAttack),
+      rollRangedAttack: costsAction("half", function (event, target) {
         return this.actor.rollRangedAttack(this._item(target));
-      },
+      }),
       rollDamage: SpycraftAgentSheet.#onRollDamage,
       rollInitiative: SpycraftAgentSheet.#onRollInitiative,
       rollVitality: SpycraftAgentSheet.#onRollVitality,
@@ -1701,7 +1713,10 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
   }
   static #onRollAttack(event, target) {
     const item = this._item(target);
-    return this.actor.rollAttack(item, skipDialog(event) ? quickAttackOptions(this.actor, item) : { askContext: true });
+    return this.actor.rollAttack(
+      item,
+      quickAttack(event, this.actor) ? quickAttackOptions(this.actor, item) : { askContext: true }
+    );
   }
   static #onRollDamage(event, target) {
     return this.actor.rollDamage(this._item(target));
@@ -1919,9 +1934,9 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
       },
       rollAbility: SpycraftNpcSheet.#onRollAbility,
       rollSave: SpycraftNpcSheet.#onRollSave,
-      reloadWeapon(event, target) {
+      reloadWeapon: costsAction("half", function (event, target) {
         return reloadWeapon(this._item(target));
-      },
+      }),
       resupplyWeapon(event, target) {
         return resupplyWeapon(this._item(target));
       },
@@ -1973,7 +1988,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);
       },
-      rollAttack: SpycraftNpcSheet.#onRollAttack,
+      rollAttack: costsAction("half", SpycraftNpcSheet.#onRollAttack),
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
       itemDelete: SpycraftNpcSheet.#onItemDelete
@@ -2210,7 +2225,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
   }
   static async #onRollAttack(event, target) {
     const item = this._item(target);
-    if (!skipDialog(event)) return this.actor.rollAttack(item, { askContext: true });
+    if (!quickAttack(event, this.actor)) return this.actor.rollAttack(item, { askContext: true });
     // A quick NPC attack on a targeted token goes straight on to hit or miss.
     return resolveQuickAttack(await this.actor.rollAttack(item, quickAttackOptions(this.actor, item)));
   }

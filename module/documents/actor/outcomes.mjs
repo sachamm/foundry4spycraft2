@@ -654,9 +654,20 @@ export const ActorOutcomes = Base =>
       const expected = rollEvidence(message.flags.spycraft2);
       let input = options;
       if (!Object.keys(input).length) {
+        // Payers and pools come from the agents in this fight or on this scene; every owned agent only when none are.
+        const owned = [...(game.actors ?? [])].filter(a => a.type === "agent" && a.uuid !== this.uuid && a.isOwner),
+          present = owned.filter(
+            a =>
+              game.combat?.combatants?.some(c => c.actor?.uuid === a.uuid) ||
+              globalThis.canvas?.scene?.tokens?.some(t => t.actorId === a.id)
+          );
         const check = message.flags.spycraft2,
-          others = [...(game.actors ?? [])].filter(a => a.type === "agent" && a.uuid !== this.uuid && a.isOwner),
+          others = present.length ? present : owned,
           esc = foundry.utils.escapeHTML;
+        // A critical hit bought before damage is the usual case; tick it while no damage card answers this attack.
+        const damageRolled = [...(game.messages ?? [])].some(
+          m => m.flags?.spycraft2?.checkKind === "damage" && m.flags.spycraft2.sourceAttack?.uuid === message.uuid
+        );
         const fundingActors = [this, ...others],
           poolOptions = fundingActors
             .flatMap(a =>
@@ -691,7 +702,7 @@ export const ActorOutcomes = Base =>
         <label>${loc`Or describe the effect`} <textarea name="effect"></textarea></label>
         <label>${loc`Base action-die cost from the applicable effect`} <input type="number" name="baseCost" min="1" value="1" /></label>
         <label><input type="checkbox" name="effectConfirmed" /> ${loc`The GC confirms this effect is possible and its base cost is correct before the automatic modifiers below`}</label>
-        ${message.flags.spycraft2.checkKind === "attack" ? `<label><input type="checkbox" name="beforeDamage" /> ${loc`Critical hit: damage has not been rolled`}</label>` : ""}
+        ${message.flags.spycraft2.checkKind === "attack" ? `<label><input type="checkbox" name="beforeDamage"${damageRolled ? "" : " checked"} /> ${loc`Critical hit: damage has not been rolled`}</label>` : ""}
         <details${errorOnly ? " open" : ""}><summary>${loc`Who pays for a critical failure`}</summary>
         <label>${loc`Opponent paying for a failure`} <select name="payerId"><option value="">${loc`Choose opponent…`}</option>${game.user?.isGM ? `<option value="gc"${defaultGC ? " selected" : ""}>${loc`GC action-die pool`}</option>` : ""}${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label>
         <label><input type="checkbox" name="opponent"${defaultGC ? " checked" : ""} /> ${loc`Failure payer is an opponent`}</label>

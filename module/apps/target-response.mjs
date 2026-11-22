@@ -23,6 +23,17 @@ const playerPresent = actor =>
     user => user.active && !user.isGM && actor.testUserPermission?.(user, "OWNER")
   );
 
+/** What an attack card already records about the attack, to start the target's Defense check from. */
+export function incomingFacts(check = {}) {
+  const context = check.attackContext ?? {};
+  const distance = Number(context.distanceFeet);
+  return {
+    ranged: context.ranged === true,
+    adjacent: context.reachAdjacent === true,
+    distanceFeet: context.distanceFeet !== null && Number.isFinite(distance) && distance >= 0 ? distance : null
+  };
+}
+
 /** The agent this viewer answers for on a card, or null. */
 function respondent(uuid, check, user) {
   const target = uuid && uuid !== check.actorUuid ? fromUuidSync(uuid) : null;
@@ -40,19 +51,15 @@ export function targetResponseControls({ message, check, user }) {
     if (check.resolved || check.attackResolution) return [];
     const target = respondent(check.attackContext?.targetActorUuid, check, user);
     if (!target) return [];
+    // An action-die Defense boost is declared at the start of a round (p.62), never against one attack already
+    // made, so it is not offered here; the sheet keeps it for the round start.
     return [
       {
         id: "targetCheckDefense",
-        label: loc`Check Defense`,
-        hint: loc`${target.name}: work out Defense against this attack`,
+        label: loc`Check Defense for ${target.name}`,
+        hint: loc`${target.name} is the target: work out Defense against this attack`,
         emphasis: "primary",
-        run: () => checkIncomingDefense(target)
-      },
-      {
-        id: "targetBoostDefense",
-        label: loc`Boost Defense`,
-        hint: loc`${target.name}: spend an action die to boost Defense against this attack`,
-        run: () => target.boostDefenseWithActionDie()
+        run: () => checkIncomingDefense(target, incomingFacts(check))
       }
     ];
   }
@@ -78,4 +85,25 @@ export function targetResponseControls({ message, check, user }) {
     ];
   }
   return [];
+}
+
+/**
+ * Tell a player at once when an attack names their agent, so they look at the card (the createChatMessage hook).
+ * The GM is not told: the GM sees every card anyway.
+ */
+export function notifyAttackTarget(message, user = globalThis.game?.user) {
+  const check = message?.flags?.spycraft2;
+  if (!check || check.checkKind !== "attack" || user?.isGM) return null;
+  const target = respondent(check.attackContext?.targetActorUuid, check, user);
+  if (!target) return null;
+  const attacker = check.actorUuid ? fromUuidSync(check.actorUuid) : null;
+  const text = attacker?.name
+    ? loc`${attacker.name} is attacking ${target.name}: Check Defense on the card.`
+    : loc`${target.name} is under attack: Check Defense on the card.`;
+  globalThis.ui?.notifications?.info(text);
+  return text;
+}
+
+export function installTargetNotices() {
+  Hooks.on("createChatMessage", message => notifyAttackTarget(message));
 }

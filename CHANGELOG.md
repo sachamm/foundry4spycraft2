@@ -104,6 +104,25 @@
   the sheet are the same character.
 - **Skill-history problems no longer block unrelated feats.** A feat whose prerequisites do not read skill ranks is no
   longer marked unmet because of an over-cap skill elsewhere.
+- **Half actions are counted for you.** Attacks, Disarm, reloads and Total Defense taken from a character's sheet
+  on that character's own turn now mark their time on the round tracker. If the turn had too little left the action
+  still stands, and the player is told to check with the GC. Pips can still be clicked to correct the count.
+- **Begin combat names anyone without Initiative.** The GC can roll for the NPCs and send the players a reminder
+  first, or begin anyway. Someone who rolls after the start would otherwise miss the first round.
+- **Skill checks open on one a player can simply roll.** Active checks come first, then passive, then secret ones,
+  and checks that need particular gear come last and say so.
+- **Attacks on your agent.** The attack card's button now reads "Check Defense for (name)", and it starts with what
+  the card already knows: a ranged attack is ticked and the recorded distance is filled in. The player also gets a
+  notice when the card is posted. "Boost Defense" is gone from the card, because an action-die boost is declared at
+  the start of a round (p.62), not against one attack.
+- **Critical hits are easier to activate.** "Damage has not been rolled" now starts ticked while no damage card
+  answers the attack. The list of paying agents now shows only the agents in the fight or on the scene.
+- **Total Defense in place needs no route confirmation.** Only movement needs the GC to confirm a route, and the
+  full-action box now starts ticked.
+- **Refusals are warnings.** A rule refusal ("roll the save first") now shows as a yellow warning, without an error
+  and stack trace in the console. Real faults still show as errors.
+- **Shift-click attacks need a target.** With no single target, the attack dialog opens instead, so the range can be
+  entered. Before, the attack posted with no range penalty.
 ## 0.6.0 — 2026-11-20
 
 - **Fixes from the live play review.**
