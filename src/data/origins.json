@@ -481,7 +481,8 @@
   },
   {
    "num": 21,
-   "name": "Priviledged",
+   "name": "Privileged",
+   "legacyName": "Priviledged",
    "originType": "talent",
    "bonuses": [
     {

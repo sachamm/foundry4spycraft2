@@ -15,13 +15,17 @@ export function preferredInitiativeRoll(first, { validate = () => {}, actorUuid 
       validate();
       const rolls = [first, second];
       if (rolls.some(r => !Number.isFinite(r.total))) throw new Error(loc`Review the Initiative roll results.`);
+      // The higher result starts selected, and closing the dialog keeps it: a higher Count is almost always wanted.
+      const best = rolls[1].total > rolls[0].total ? 1 : 0;
       const input = await foundry.applications.api.DialogV2.input({
         window: { title: loc`Lightning Reflexes — Initiative` },
         rejectClose: false,
-        content: `<div class="spycraft2-roll-options"><p>${loc`Choose your preferred Initiative result. Closing keeps the first roll.`}</p><label>${loc`Result`} <select name="chosen">${rolls.map((r, i) => `<option value="${i}">${loc`Roll ${i + 1}: ${r.total}`}</option>`).join("")}</select></label></div>`
+        content: `<div class="spycraft2-roll-options"><p>${loc`Choose your preferred Initiative result. Closing keeps the higher roll.`}</p><label>${loc`Result`} <select name="chosen">${rolls.map((r, i) => `<option value="${i}"${i === best ? " selected" : ""}>${loc`Roll ${i + 1}: ${r.total}`}</option>`).join("")}</select></label></div>`
       });
       const index =
-        input === null || input === undefined ? 0 : [0, 1].find(i => input.chosen === i || input.chosen === String(i));
+        input === null || input === undefined
+          ? best
+          : [0, 1].find(i => input.chosen === i || input.chosen === String(i));
       if (index === undefined) throw new Error(loc`Choose one of the two original Initiative results.`);
       validate();
       selected = rolls[index];

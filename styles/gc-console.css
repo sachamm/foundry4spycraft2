@@ -79,3 +79,6 @@
 .gc-console-body details.gc-section > summary .gc-note { color: inherit; }
 /* Section headings use the same face as the sheets' bars; the display face is kept for the dossier label only. */
 .gc-console-body details.gc-section > summary .gc-section-title { font: 700 12px/1.4 var(--font-primary, sans-serif); letter-spacing: 0.08em; }
+.gc-console-body .gc-current-turn { font-weight: 700; }
+.gc-console-body .gc-current-turn::before { content: "▶ "; }
+.gc-console-body [data-defeated="true"] { text-decoration: line-through; opacity: 0.7; }

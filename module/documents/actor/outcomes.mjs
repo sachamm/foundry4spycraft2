@@ -257,7 +257,7 @@ export const ActorOutcomes = Base =>
         try {
           await roll.toMessage({
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            flavor: loc`Spent ${plan.count} ${plan.bonusPoolId ? "bonus " : ""}action ${plan.count === 1 ? "die" : "dice"}${plan.bonusPoolId ? ` from ${foundry.utils.escapeHTML(plan.pool.label)}` : ""}; rolled ${plan.rolls}. Added +${result.added} after modifiers${result.replaced ? loc` and Calculating` : ""}.`
+            flavor: loc`Spent ${plan.count} ${plan.bonusPoolId ? "bonus " : ""}action ${plan.count === 1 ? "die" : "dice"}${plan.bonusPoolId ? ` from ${foundry.utils.escapeHTML(plan.pool.label)}` : ""}; rolled ${plan.rolls} ${plan.rolls === 1 ? "die" : "dice"}. Added +${result.added} after modifiers${result.replaced ? loc` and Calculating` : ""}.`
           });
         } catch (error) {
           ui.notifications.warn(

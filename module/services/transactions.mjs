@@ -182,12 +182,21 @@ export function registerLockRecovery() {
     return clearAbandonedLock(actor, scope);
   };
 }
+/** Pauses before a held lock is reported, in milliseconds. */
+const LOCK_RETRY_MS = [100, 250, 500];
 async function acquire(actor, scope = RESOURCE_LOCK_ID, { background = false } = {}) {
   if (!actor.isOwner) throw new Error(loc`You must own each character whose resources are being used.`);
   let existing = actor.items.get(scope);
   // Once the clearing client confirms the removal, go on to create the lock: the server still admits only one.
   if (existing && isResourceLock(existing) && abandonedBackgroundLock(existing, actor, scope))
     if (await requestLockClear(actor, scope)) existing = null;
+  // Most transactions finish in well under a second, so wait a little before telling anyone (above all a player
+  // who only opened a sheet) that one is in progress.
+  for (const delay of LOCK_RETRY_MS) {
+    if (!existing || !isResourceLock(existing)) break;
+    await new Promise(resolve => setTimeout(resolve, delay));
+    existing = actor.items.get(scope);
+  }
   if (existing) {
     if (isResourceLock(existing))
       throw new ResourceLockedError(

@@ -242,7 +242,9 @@ export async function resolveAttack(message, options = {}) {
     targetName: target?.name ?? "",
     defense,
     total: check.effectiveTotal,
-    ...(cover ? { cover, hitsCover: !outcome.hit && check.effectiveTotal >= baseDefense } : {}),
+    // Updates merge, so resolving again without cover clears what an earlier resolution recorded.
+    cover: cover ?? null,
+    hitsCover: cover ? !outcome.hit && check.effectiveTotal >= baseDefense : false,
     // The card is public: an NPC's Defense stays off it when the GC keeps it from players.
     ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome

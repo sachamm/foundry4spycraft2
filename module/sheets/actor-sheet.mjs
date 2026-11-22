@@ -102,7 +102,7 @@ import { checkBurrowMaterial } from "../apps/burrow-material.mjs";
 import { computeAgent } from "../rules/engine.mjs";
 import { calculateRecoveryRates } from "../apps/recovery-rates.mjs";
 import { restAndRecover, rollDying } from "../apps/healing.mjs";
-import { ACTION_COSTS } from "../rules/combat-actions.mjs";
+import { ACTION_COSTS, attackActionCost } from "../rules/combat-actions.mjs";
 import { nonLethalTotals, resolveQuickAttack } from "../apps/damage-application.mjs";
 import { reloadWeapon, resupplyWeapon, weaponAmmunition } from "../apps/ammunition-use.mjs";
 import { ammunitionLabel } from "../rules/ammunition-use.mjs";
@@ -465,7 +465,7 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       rollCheapShot() {
         return rollCheapShot(this.actor);
       },
-      rollDisarm: costsAction("half", function () {
+      rollDisarm: costsAction(attackActionCost, function () {
         return rollDisarm(this.actor);
       }),
       rollDisarmResponse(event, target) {
@@ -783,8 +783,8 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       rollDying() {
         return rollDying(this.actor);
       },
-      rollAttack: costsAction("half", SpycraftAgentSheet.#onRollAttack),
-      rollRangedAttack: costsAction("half", function (event, target) {
+      rollAttack: costsAction(attackActionCost, SpycraftAgentSheet.#onRollAttack),
+      rollRangedAttack: costsAction(attackActionCost, function (event, target) {
         return this.actor.rollRangedAttack(this._item(target));
       }),
       rollDamage: SpycraftAgentSheet.#onRollDamage,
@@ -975,7 +975,11 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     const context = await super._prepareContext(options);
     const actor = this.actor;
     const sys = actor.system;
-    this._editMode ??= this.isEditable && sys.level === 0;
+    // A new or unfinished character (setup reminders open and play not yet begun) opens ready for building.
+    this._editMode ??=
+      this.isEditable &&
+      (sys.level === 0 ||
+        (!actor.flags?.spycraft2?.startingDiceCreation?.claimed && buildSetupGuide(sys.todo).count > 0));
     const cfg = CONFIG.SPYCRAFT;
     const rollData = actor.getRollData();
     Object.assign(context, {
@@ -2000,7 +2004,7 @@ export class SpycraftNpcSheet extends HandlebarsApplicationMixin(SaveFeedback(Ac
       endSurvivalHazard(event, target) {
         return endSurvivalHazard(this.actor, target.dataset.kind);
       },
-      rollAttack: costsAction("half", SpycraftNpcSheet.#onRollAttack),
+      rollAttack: costsAction(attackActionCost, SpycraftNpcSheet.#onRollAttack),
       rollDamage: SpycraftNpcSheet.#onRollDamage,
       itemEdit: SpycraftNpcSheet.#onItemEdit,
       itemDelete: SpycraftNpcSheet.#onItemDelete

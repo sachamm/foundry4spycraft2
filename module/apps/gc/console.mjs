@@ -77,6 +77,9 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       addObjective: guard(() => mission.addObjective()),
       addAntagonist: guard(() => mission.addAntagonist()),
       addNpcToScene: guard(() => addNpcToScene()),
+      // The turn controls also live here, so running NPC turns does not mean flipping to the Combat tab.
+      previousTurn: guard(() => game.combat?.previousTurn()),
+      nextTurn: guard(() => (game.combat?.started ? game.combat.nextTurn() : game.combat?.startCombat())),
       addComplication: guard(() => mission.addComplication()),
       entry: guard((event, target) =>
         mission.changeEntry(target.dataset.list, target.dataset.key, target.dataset.change)
@@ -301,6 +304,8 @@ export function consoleContext() {
                 fluid?.round === combatNow.round ? fluid.modifiers.reduce((sum, entry) => sum + entry.amount, 0) : 0;
             return {
               name: c.name,
+              current: combatNow.started && combatNow.combatant?.id === c.id,
+              defeated: !!c.isDefeated,
               count: c.initiative,
               pending: pending ? signed(pending) : "",
               mustPress: !!c.flags?.spycraft2?.mustPress

@@ -62,7 +62,9 @@ function filterList(dialog) {
       option.hidden = !shown;
       if (shown && !first) first = option;
     }
-    if (list.selectedOptions[0]?.hidden !== false && first) list.value = first.value;
+    // With no match nothing stays selected, so the dialog cannot place an NPC the list no longer shows.
+    if (!first) list.value = "";
+    else if (list.selectedOptions[0]?.hidden !== false) list.value = first.value;
   });
   search.focus();
 }

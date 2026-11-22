@@ -47,6 +47,11 @@ import { loc } from "../../i18n.mjs";
 export const ActorAttackRolls = Base =>
   class ActorAttackRolls extends Base {
     async rollAttack(item, options = {}) {
+      // Not blocked: drawing a weapon is the table's call. The player is reminded that it is still stowed.
+      if (this.type === "agent" && item?.type === "weapon" && item.system?.equipped === false)
+        globalThis.ui?.notifications?.info?.(
+          loc`${item.name} is not equipped. The attack goes ahead; equip it on the Gear tab if it should be in hand.`
+        );
       await validateCheapShotTarget(this, options.cheapShot, {
         targetUuid:
           options.characterTarget?.actorUuid ||

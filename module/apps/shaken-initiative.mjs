@@ -72,7 +72,15 @@ export function shakenInitiativeReviews(actor) {
   return combatants(actor).flatMap(c => {
     const p = planFor(c);
     return p.needsReview
-      ? [{ id: c.id, combatId: c.parent.id, name: c.parent.name ?? "Combat", count: c.initiative, reason: p.reason }]
+      ? [
+          {
+            id: c.id,
+            combatId: c.parent.id,
+            name: c.name || c.actor?.name || c.parent.name || "Combat",
+            count: c.initiative,
+            reason: p.reason
+          }
+        ]
       : [];
   });
 }

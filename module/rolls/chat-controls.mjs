@@ -16,6 +16,7 @@ import { automaticSkillSuccessSources, cunningPlanCheck, manualAdjustmentSource 
 import { rerollEligibility } from "../rules/limited-uses.mjs";
 import { checkCandidates, errorDecisionPending, viewerFlavor } from "../rules/outcomes.mjs";
 import { shakenRules } from "../rules/shaken.mjs";
+import { actionDieBoostPlan } from "../rules/action-dice.mjs";
 import { loc } from "../i18n.mjs";
 import { renderCheckGuidance } from "./chat-guidance.mjs";
 import { runChatAction } from "../apps/chat-action-feedback.mjs";
@@ -59,15 +60,22 @@ export function quickBoost(actor, check) {
     return null;
   }
   if (shaken.extraDice || shaken.needsReview || shaken.spendingForbidden) return null;
-  return {
-    die: system.actionDice?.die ?? 4,
-    input: {
-      count: 1,
-      bonusPoolId: "",
-      openingRound: openingRound(),
-      calculating: (system.coreClassIds ?? []).includes("schemer")
-    }
+  const input = {
+    count: 1,
+    bonusPoolId: "",
+    openingRound: openingRound(),
+    calculating: (system.coreClassIds ?? []).includes("schemer")
   };
+  // Some abilities roll two dice for one spent (Accurate, for one): the button names the dice actually rolled,
+  // planned with the same options the boost itself uses.
+  let rolls = 1;
+  try {
+    const plan = actionDieBoostPlan(actor.actionDiceFundingSystem ?? system, check, input);
+    if (!plan.blocked && Number.isSafeInteger(plan.rolls) && plan.rolls > 0) rolls = plan.rolls;
+  } catch {
+    /* the dialog route still works it out */
+  }
+  return { die: system.actionDice?.die ?? 4, rolls, input };
 }
 
 const core = (id, order, chatControls) => rollPipeline.register({ id, order, chatControls });
@@ -146,7 +154,9 @@ core("quickBoostControl", 9135, ctx => {
   if (!open(ctx) || !spendsActionDice(ctx)) return null;
   const quick = quickBoost(actor, check);
   if (!quick) return null;
-  return card(loc`Spend 1 action die (+1d${quick.die})`, () => actor.boostCheck(message, quick.input));
+  return card(loc`Spend 1 action die (+${quick.rolls ?? 1}d${quick.die})`, () =>
+    actor.boostCheck(message, quick.input)
+  );
 });
 
 core("boostControl", 9140, ctx => {

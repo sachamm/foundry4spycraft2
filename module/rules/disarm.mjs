@@ -74,6 +74,7 @@ export function disarmAttackPlan(
       expertBonus + twoHandBonus + sizeBonus + Math.max(axeBasics?.gearBonus ?? 0, fencingBasics?.gearBonus ?? 0),
     errorIncrease,
     actionCost: trained ? "1 half action" : loc`1 full action; Proficiency time cannot be reduced`,
+    fullAction: !trained,
     shots: 1,
     requiresOpposedStandardAttack: true,
     loseFlatFooted: !expert,

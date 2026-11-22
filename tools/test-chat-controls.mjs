@@ -242,6 +242,19 @@ test("one-click boost, Generous and NPC cards: only buttons that can work are sh
     .find(c => c.id === "quickBoostControl")
     .run();
   assert.deepEqual(actor.calls[0].slice(2), [{ count: 1, bonusPoolId: "", openingRound: false, calculating: false }]);
+  // A Counterterrorist's die doubles in the opening round: the button names both dice it will roll.
+  const savedCombat = game.combat;
+  game.combat = { started: true, round: 1 };
+  actor = makeActor({
+    system: {
+      classLevels: {},
+      activeFeatNames: [],
+      coreClassIds: ["counterterrorist"],
+      actionDice: { value: 2, die: 4 }
+    }
+  });
+  assert.equal(labels(message({ checkKind: "save" }))[0], "card:Spend 1 action die (+2d4)");
+  game.combat = savedCombat;
   // No action dice left: only the dialog, which explains why.
   actor = makeActor();
   assert.equal(
