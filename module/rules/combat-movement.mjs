@@ -42,7 +42,8 @@ export function combatMovementPlan(
     throw new Error(loc`Choose Standard Move, Run or Total Defense.`);
   if ([adjacentThreateningOpponent, passesThreateningAdjacency, routeConfirmed].some(v => typeof v !== "boolean"))
     throw new Error(loc`Confirm each movement circumstance.`);
-  if (routeConfirmed !== true)
+  // Standing still has no route to confirm (Total Defense in place, for one).
+  if (routeConfirmed !== true && !(Number(distanceFeet) === 0))
     throw new Error(
       loc`The GC must confirm the route, counted distance, terrain and threatening-opponent circumstances.`
     );

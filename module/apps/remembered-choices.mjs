@@ -113,6 +113,12 @@ export function skipDialog(event) {
  * Options for an attack rolled without its dialog: the remembered choices for this weapon, plus the targeted token
  * and what the map shows (distance, flanking, adjacency). Anything still missing is asked for by the attack itself.
  */
+/** Whether a quick (Shift-click) attack knows whom it is aimed at: exactly one targeted token, not the attacker. */
+export function quickAttackHasTarget(actor, targets = globalThis.game?.user?.targets ?? []) {
+  const list = [...targets];
+  return list.length === 1 && !!list[0].actor && list[0].actor.uuid !== actor?.uuid;
+}
+
 export function quickAttackOptions(actor, item) {
   const entered = { attackAction: "standard", ...(rememberedChoices(choiceKey("attack", actor, item?.id)) ?? {}) };
   const targeted = [...(game.user?.targets ?? [])];

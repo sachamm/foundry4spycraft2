@@ -695,7 +695,17 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
   });
   const ids = (message, user = player) =>
     targetResponseControls({ message, check: message.flags.spycraft2, user }).map(control => control.id);
-  assert.deepEqual(ids(attack), ["targetCheckDefense", "targetBoostDefense"]);
+  // Only Check Defense: an action-die boost is declared at the start of a round, not against one attack.
+  assert.deepEqual(ids(attack), ["targetCheckDefense"]);
+  const { notifyAttackTarget, incomingFacts } = await import("../module/apps/target-response.mjs");
+  assert.match(notifyAttackTarget(attack, player), /Hostile is attacking Latch/);
+  assert.equal(notifyAttackTarget(attack, { isGM: true }), null);
+  assert.deepEqual(incomingFacts({ attackContext: { ranged: true, distanceFeet: 40 } }), {
+    ranged: true,
+    adjacent: false,
+    distanceFeet: 40
+  });
+  assert.equal(incomingFacts({ attackContext: { distanceFeet: null } }).distanceFeet, null);
   // Once the attack is settled there is nothing left to answer on it.
   attack.flags.spycraft2.attackResolution = { hit: true };
   assert.deepEqual(ids(attack), []);

@@ -24,12 +24,24 @@ export function systemErrorNotice(reason) {
   return reason.message;
 }
 
+/**
+ * Whether a rejection is a rule refusal rather than a fault. The system throws a plain Error to refuse a step ("roll
+ * the save first"); a TypeError, RangeError and the like mean the code itself went wrong.
+ */
+export const isRefusal = reason => reason instanceof Error && Object.getPrototypeOf(reason) === Error.prototype;
+
 export function registerErrorNotices(target = globalThis.window) {
   target?.addEventListener?.("unhandledrejection", event => {
     const message = systemErrorNotice(event.reason);
     if (!message || !globalThis.ui?.notifications) return;
-    ui.notifications.error(message);
     event.preventDefault();
+    // A refusal is a warning on screen, not an error with a stack trace in the console.
+    if (isRefusal(event.reason)) {
+      ui.notifications.warn(message);
+      console.debug(event.reason);
+      return;
+    }
+    ui.notifications.error(message);
     console.error(event.reason);
   });
 }
