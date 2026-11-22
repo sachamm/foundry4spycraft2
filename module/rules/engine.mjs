@@ -699,7 +699,17 @@ export function computeAgent(sys, items, cfg, options = {}) {
     todo.push({ order: 11, tab: "main", text: loc`${plural(increasesMissing, "attribute increase")} to assign.` });
   sys.pointBuy = { budget: sys.pointBuyBudget ?? cfg.pointBuy, spent: pointCost };
   sys.pointBuy.remaining = sys.pointBuy.budget - pointCost;
-  if (sys.pointBuy.remaining < 0) warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
+  if (sys.pointBuy.remaining < 0) {
+    warnings.push(loc`Attribute point-buy overspent by ${-sys.pointBuy.remaining}.`);
+    // Keep the guidance on attributes until the spend is legal again.
+    todo.push({
+      order: 9,
+      always: true,
+      error: true,
+      tab: "main",
+      text: loc`Attribute points overspent by ${-sys.pointBuy.remaining}: lower an attribute.`
+    });
+  }
   if (sys.pointBuy.remaining > 0)
     todo.push({
       order: 10,
@@ -1602,7 +1612,16 @@ export function computeAgent(sys, items, cfg, options = {}) {
       maxRanks: skillMaxRanks,
       overMax: ranks > skillMaxRanks
     };
-    if (ranks > skillMaxRanks) warnings.push(loc`${sd.name}: ${ranks} ranks exceeds the maximum of ${skillMaxRanks}.`);
+    if (ranks > skillMaxRanks) {
+      warnings.push(loc`${sd.name}: ${ranks} ranks exceeds the maximum of ${skillMaxRanks}.`);
+      todo.push({
+        order: 29,
+        always: true,
+        error: true,
+        tab: "skills",
+        text: loc`${sd.name} is over its rank maximum (${ranks} / ${skillMaxRanks}): remove ${ranks - skillMaxRanks}.`
+      });
+    }
   }
   sys.skillTotals = derivedSkills;
   const overrides = skillDefs.filter(s => sys.skills?.[s.key]?.classSkill).length;
@@ -1646,6 +1665,14 @@ export function computeAgent(sys, items, cfg, options = {}) {
       const message = loc`Level ${idx + 1}: ${-sp.remaining} skill point(s) overspent.`;
       warnings.push(message);
       purchaseIssue("career-budget", idx + 1, message);
+      todo.push({
+        order: 29,
+        always: true,
+        error: true,
+        tab: "skills",
+        skillLevel: idx + 1,
+        text: loc`Level ${idx + 1} skill points overspent by ${-sp.remaining}: lower a skill.`
+      });
     }
     sp.issues = skillPurchaseIssues.filter(issue => issue.level === idx + 1);
   });
@@ -1711,9 +1738,19 @@ export function computeAgent(sys, items, cfg, options = {}) {
     .map(([t, v]) => `${v.slots - v.spent} ${cfg.featTrees[t]}`);
   sys.feats.unusedTreeSlots = unusedTree;
   if (sys.feats.any.remaining > 0)
-    todo.push({ order: 40, tab: "feats", text: loc`${plural(sys.feats.any.remaining, "feat slot")} open (any tree).` });
+    todo.push({
+      order: 40,
+      tab: "feats",
+      weight: sys.feats.any.remaining,
+      text: loc`${plural(sys.feats.any.remaining, "feat slot")} open (any tree).`
+    });
   if (unusedTree.length)
-    todo.push({ order: 41, tab: "feats", text: loc`Bonus feat slots open: ${unusedTree.join(", ")}.` });
+    todo.push({
+      order: 41,
+      tab: "feats",
+      weight: Object.values(trees).reduce((sum, v) => sum + Math.max(0, v.slots - v.spent), 0),
+      text: loc`Bonus feat slots open: ${unusedTree.join(", ")}.`
+    });
 
   /* ---------------- Proficiencies, focuses, interests, contacts ---------------- */
   const firstClass = classAtLevel[0];

@@ -276,6 +276,7 @@
 .spycraft2 :is(.sc2-tool-section, .gc-section)[hidden] { display: none !important; }
 .spycraft2 .sc2-next-setup { display: grid; gap: 6px; margin: 12px 0; }
 .spycraft2 .sc2-next-setup button { white-space: normal; text-align: left; }
+.spycraft2 .sc2-next-setup button.sc2-over { border-color: var(--sc2-bad); background: var(--sc2-bad-tint); color: var(--sc2-bad); }
 .spycraft2.sheet.vehicle .vehicle-fuel-used { display: inline-flex; align-items: center; gap: 6px; margin: 6px 0; }
 .spycraft2.sheet.vehicle .vehicle-fuel-used input { width: 80px; }
 

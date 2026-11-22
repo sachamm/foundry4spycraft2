@@ -5,7 +5,7 @@ import { rollCareerVitality, reviewCareerVitality } from "../../apps/vitality.mj
 import { deferredSkillDeadline } from "../../rules/deferred-skills.mjs";
 import { queueResources } from "../../services/transactions.mjs";
 import { featAcquisition, captureFeatAcquisition } from "../../rules/feat-acquisition.mjs";
-import { checkPrerequisites } from "../../rules/prerequisites.mjs";
+import { checkPrerequisites, prerequisitesUseSkills } from "../../rules/prerequisites.mjs";
 import { prerequisiteContext, computeAgent } from "../../rules/engine.mjs";
 import { FEAT_PACK } from "./shared.mjs";
 import { loc } from "../../i18n.mjs";
@@ -321,7 +321,8 @@ export const ActorProgression = Base =>
           featTrees[feat.tree] = (featTrees[feat.tree] ?? 0) + 1;
         }
       }
-      if (contextSystem.skillPurchaseIssues?.length)
+      // A broken skill history only matters to prerequisites that read skill ranks.
+      if (contextSystem.skillPurchaseIssues?.length && prerequisitesUseSkills(tree))
         return {
           ok: false,
           unmet: contextSystem.skillPurchaseIssues.map(issue => `Repair skill history: ${issue.message}`)

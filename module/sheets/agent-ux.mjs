@@ -9,8 +9,13 @@ export function groupBuildTasks(tasks = []) {
   for (const task of tasks) {
     const key = JSON.stringify([task.tab, task.skillLevel, task.browse, task.text, task.order]);
     const entry = groups.get(key);
-    if (entry) entry.count++;
-    else groups.set(key, { ...task, count: 1 });
+    // count is how many reminders were grouped; weight is how many open choices they stand for (a step badge).
+    const weight = Math.max(1, Number(task.weight) || 1);
+    if (entry) {
+      entry.count++;
+      entry.weight += weight;
+      entry.error ||= !!task.error;
+    } else groups.set(key, { ...task, count: 1, weight });
   }
   return [...groups.values()].map(task => ({
     ...task,
@@ -76,10 +81,13 @@ function trackStepOf(task) {
   if (task.tab === "classes") return "class";
   if (task.tab === "skills") return "skills";
   if (task.tab === "feats") return "feats";
+  // Weapon proficiencies (50) are chosen with the class that grants them (Table 1.3), though they live on Training.
+  if (order === 50) return "class";
   if (task.tab === "training") return order === 54 ? "subplot" : "interests";
   if (task.tab === "gear") return "gear";
   if (task.tab === "bio") return "describe";
-  return [4, 51].includes(order) ? "origin" : "attributes";
+  // Talent (1), specialty (2), origin choices (4) and origin focuses (51) belong to step 2, not to attributes.
+  return [1, 2, 4, 51].includes(order) ? "origin" : "attributes";
 }
 
 /**
@@ -91,7 +99,8 @@ export function buildCreationTrack(tasks = []) {
   for (const task of groupBuildTasks(tasks).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))) {
     const key = trackStepOf(task);
     if (!waiting.has(key)) waiting.set(key, { count: 0, first: task });
-    waiting.get(key).count += task.count;
+    waiting.get(key).count += task.weight ?? task.count;
+    if (task.error) waiting.get(key).error = true;
   }
   let started = false;
   const steps = TRACK_STEPS.map((step, index) => {
@@ -105,6 +114,7 @@ export function buildCreationTrack(tasks = []) {
       label: `SPYCRAFT.Track.${step.key}`,
       automatic: !step.tab,
       count: open?.count ?? 0,
+      error: !!open?.error,
       start,
       tab: target.tab ?? step.tab,
       order: target.order ?? step.order,

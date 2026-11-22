@@ -22,7 +22,7 @@
   {{!-- The next build step sits at the top of the rail, so it is in view on a small screen. --}}
   {{#if setupGuide.next}}{{#if editable}}<div class="sc2-next-setup">
     <span class="sc2-caption">{{playLabels.nextSetup}}</span>
-    {{#with setupGuide.next}}<button type="button" class="sc2-primary-action" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{/with}}
+    {{#with setupGuide.next}}<button type="button" class="sc2-primary-action{{#if error}} sc2-over{{/if}}" data-action="setupTask" data-tab="{{tab}}" data-order="{{order}}" {{#if skillLevel}}data-skill-level="{{skillLevel}}"{{/if}} {{#if browse}}data-type="{{browse.type}}" data-origin-type="{{browse.originType}}"{{/if}}>{{text}}</button>{{/with}}
   </div>{{/if}}{{/if}}
 
   {{#if activeConditions.length}}<div class="rail-conditions" role="status" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CurrentConditions'}}">{{#each activeConditions}}<span class="sc2-stamp">{{this}}</span>{{/each}}</div>{{/if}}
