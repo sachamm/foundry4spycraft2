@@ -37,11 +37,54 @@ export function currentRoom() {
   };
 }
 
-/** Mixin step for a sheet's `_initializeApplicationOptions`: a position asked for by the caller is kept. */
-export function placeSheet(applied, requested = {}) {
+const STORE = kind => `spycraft2.sheetPlacement.${kind}`;
+
+/**
+ * Where this user last left a sheet of this kind, fitted to the room there is now; null when nothing usable was kept.
+ * A sheet moved clear of the tokens once opens there again, instead of over them.
+ * @param {{left: number, top: number, width: number, height: number}|null} kept
+ * @param {{width: number, height: number, open: number}} room
+ */
+export function rememberedPlacement(kept, room) {
+  if (!kept || ![kept.left, kept.top, kept.width, kept.height].every(Number.isFinite)) return null;
+  const step = 24 * ((room.open ?? 0) % 5);
+  const width = Math.round(Math.max(MIN_WIDTH, Math.min(kept.width, room.width - GAP * 2)));
+  const height = Math.round(Math.max(360, Math.min(kept.height, room.height - GAP * 2)));
+  const left = Math.round(Math.min(Math.max(0, kept.left + step), Math.max(0, room.width - width)));
+  const top = Math.round(Math.min(Math.max(0, kept.top + step), Math.max(0, room.height - height)));
+  return { left, top, width, height };
+}
+
+/** Keep where a sheet of this kind was when it closed, in this browser only. */
+export function rememberSheetPlacement(kind, position, storage = globalThis.localStorage) {
+  if (!kind || !position) return;
+  const { left, top, width, height } = position;
+  if (![left, top, width, height].every(Number.isFinite)) return;
+  try {
+    storage?.setItem(STORE(kind), JSON.stringify({ left, top, width, height }));
+  } catch {
+    /* storage refused: the default placement stands next time */
+  }
+}
+
+function keptPlacement(kind, storage = globalThis.localStorage) {
+  try {
+    return JSON.parse(storage?.getItem(STORE(kind)) ?? "null");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Mixin step for a sheet's `_initializeApplicationOptions`: a position asked for by the caller is kept; otherwise the
+ * place this user last left a sheet of this kind, or the default against the left edge.
+ */
+export function placeSheet(applied, requested = {}, kind = "") {
   if (requested.position?.left !== undefined || requested.position?.top !== undefined) return applied;
   try {
-    applied.position = { ...applied.position, ...sheetPlacement(applied.position, currentRoom()) };
+    const room = currentRoom();
+    const place = (kind && rememberedPlacement(keptPlacement(kind), room)) || sheetPlacement(applied.position, room);
+    applied.position = { ...applied.position, ...place };
   } catch {
     /* no browser window to measure: Foundry's own placement stands */
   }

@@ -123,6 +123,24 @@
   and stack trace in the console. Real faults still show as errors.
 - **Shift-click attacks need a target.** With no single target, the attack dialog opens instead, so the range can be
   entered. Before, the attack posted with no range penalty.
+- **Tab works on sheets, dialogs and chat cards.** Inside the system's own windows, Tab now moves focus. Foundry's
+  view-cycling key no longer takes it once focus reaches a sheet tab or a card button. Dialogs keep focus inside
+  them: Tab past the last control wraps to the first, and Shift+Tab goes the other way.
+- **One primary button per card.** After an attack is resolved, "Resolve against Defense again" is a quiet
+  correction, not a second main button. "Roll damage" stops being primary once every hit has its damage card. A
+  damage card with nobody to apply to in one press makes "Apply damage to a target…" its main step. Once damage is
+  applied, the card stops offering boosts.
+- **Cover when resolving an attack.** "Cover, other target or Defense…" now has a cover choice (one-quarter to
+  three-quarters, +2 to +6 Defense, p.345). The card records the cover, and a miss caused only by the cover says the
+  shot hits the cover.
+- **Add NPC to scene.** The GC console's Antagonists section has a new button. It opens a searchable list of world
+  and compendium NPCs and places the chosen one at the centre of the view. A compendium NPC is imported once and
+  reused after that. The old Add button is now "Record for XP", which is all it ever did.
+- **Sheets open where you left them.** Agent and NPC sheets remember where this browser last closed one and open
+  there, fitted to the window, so a sheet moved off the map stays off it.
+- **Light theme:** the save status in a sheet's title bar and the mission state in the GC console are readable on
+  the dark bars (they were 2.5:1).
+- **Vitality and Wounds explain themselves** on hover, in one line each.
 ## 0.6.0 — 2026-11-20
 
 - **Fixes from the live play review.**

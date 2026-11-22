@@ -51,6 +51,7 @@ import { shiftCount } from "./dueling.mjs";
 import { askGC, gcAvailable, markCard, registerRelay, requesterConcern } from "./gc-relay.mjs";
 import { loc } from "../i18n.mjs";
 import { refuse } from "../error-notices.mjs";
+import { COVER_GRADES } from "../rules/cover.mjs";
 
 const values = c => (typeof c?.values === "function" ? [...c.values()] : Array.isArray(c) ? c : []);
 const TARGET_TYPES = ["agent", "npc", "vehicle"];
@@ -204,7 +205,14 @@ export async function resolveAttack(message, options = {}) {
           const defense = actor.isOwner || game.user?.isGM || defenseVisibleToPlayers() ? defenseOf(actor) : null;
           return defense === null ? targetLabel(actor) : loc`${targetLabel(actor)} — Defense ${defense}`;
         }
-      )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Leave the Defense empty to use the listed value. Enter it when cover, a declared defense or another circumstance changes it; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
+      )}</select></label><label>${loc`Cover between attacker and target`} <select name="cover">${COVER_GRADES.slice(
+        0,
+        4
+      )
+        .map((label, grade) => `<option value="${grade}">${esc(label)}${grade ? ` (+${2 * grade})` : ""}</option>`)
+        .join(
+          ""
+        )}</select></label><label>${loc`Defense, if different from the target's sheet`} <input type="number" name="defense" min="0" step="1" /></label><p class="hint">${loc`Cover adds to the Defense used, and a miss that only the cover caused hits the cover (p.345). Enter a different Defense for a declared defense or another circumstance; an agent's "Incoming attack — Defense" check works that out. Spend action dice on the attack before resolving it.`}</p></div>`
     });
     if (!input) return null;
   }
@@ -212,9 +220,11 @@ export async function resolveAttack(message, options = {}) {
   if (target && target.uuid === attacker.uuid)
     return refuse(loc`${attacker.name} cannot be the target of its own attack. Choose another target.`);
   const entered = input.defense === "" || input.defense === null || input.defense === undefined;
-  const defense = entered ? defenseOf(target) : Number(input.defense);
-  if (!Number.isSafeInteger(defense) || defense < 0)
+  const baseDefense = entered ? defenseOf(target) : Number(input.defense);
+  if (!Number.isSafeInteger(baseDefense) || baseDefense < 0)
     return refuse(loc`Choose a target with a Defense, or enter the Defense.`);
+  const cover = coverOnResolution(input.cover);
+  const defense = baseDefense + (cover?.bonus ?? 0);
   let outcome;
   try {
     outcome = attackOutcome({
@@ -232,6 +242,7 @@ export async function resolveAttack(message, options = {}) {
     targetName: target?.name ?? "",
     defense,
     total: check.effectiveTotal,
+    ...(cover ? { cover, hitsCover: !outcome.hit && check.effectiveTotal >= baseDefense } : {}),
     // The card is public: an NPC's Defense stays off it when the GC keeps it from players.
     ...(target && !target.hasPlayerOwner && !defenseVisibleToPlayers() ? { defenseHidden: true } : {}),
     ...outcome
@@ -261,6 +272,16 @@ export async function resolveAttack(message, options = {}) {
       /* supplied by another source: left for the GC */
     }
   return resolution;
+}
+
+/**
+ * The cover chosen when resolving an attack (Table 5.10, p.345): its grade, name and Defense bonus, or null for none.
+ * Total cover is not offered: a target behind it cannot be attacked directly.
+ */
+export function coverOnResolution(value) {
+  const grade = Number(value);
+  if (!Number.isSafeInteger(grade) || grade < 1 || grade > 3) return null;
+  return { grade, label: COVER_GRADES[grade], bonus: 2 * grade };
 }
 
 /** ": hit" or ": miss" for an attack card's total against a Defense, or "" when it cannot be told yet. */
@@ -334,13 +355,14 @@ rollPipeline.register({
         label: check.attackResolution
           ? loc`Resolve against Defense again`
           : known
-            ? loc`Other target or Defense…`
+            ? loc`Cover, other target or Defense…`
             : loc`Resolve against Defense`,
         ...(known && !check.attackResolution
-          ? { hint: loc`Resolve this attack against another target, or against a Defense you enter` }
+          ? { hint: loc`Resolve this attack with cover, against another target, or against a Defense you enter` }
           : {}),
         placement: "card",
-        ...(known ? {} : { emphasis: "primary" }),
+        // Resolving again is a correction, not the next step: it stays available but quiet.
+        ...(check.attackResolution ? { emphasis: "quiet" } : known ? {} : { emphasis: "primary" }),
         // With no target on the card, the first press settles against the one targeted token, if there is one.
         run: () => resolveAttack(message, check.attackResolution || known ? { ask: true } : {})
       });
@@ -349,10 +371,12 @@ rollPipeline.register({
       weapon = check.weaponUuid ? fromUuidSync(check.weaponUuid) : null;
     if (resolution?.hit && check.successConfirmed === true && weapon && !check.attackContext?.pummel) {
       const target = resolution.targetUuid ? fromUuidSync(resolution.targetUuid) : null;
+      // Once every hit has its damage card, rolling damage is no longer the card's next step.
+      const rolled = damageCardsFor(message);
       controls.push({
         label: resolution.hits > 1 ? loc`Roll damage (one of ${resolution.hits} hits)` : loc`Roll damage`,
         placement: "card",
-        emphasis: "primary",
+        ...(rolled < Math.max(1, resolution.hits || 1) ? { emphasis: "primary" } : {}),
         run: () =>
           actor.rollDamage(weapon, {
             // Vehicles are not character targets of a damage roll; they are picked again when the damage is applied.
@@ -368,6 +392,14 @@ rollPipeline.register({
     return controls.length ? controls : null;
   }
 });
+
+/** How many damage cards answer an attack card. */
+export function damageCardsFor(message, messages = globalThis.game?.messages ?? []) {
+  let count = 0;
+  for (const m of messages)
+    if (m.flags?.spycraft2?.checkKind === "damage" && m.flags.spycraft2.sourceAttack?.uuid === message?.uuid) count++;
+  return count;
+}
 
 /* -------------------------------------------- */
 /*  Damage onto a target                         */
@@ -1126,6 +1158,8 @@ rollPipeline.register({
     controls.push({
       label: applied.length ? loc`Apply to another target…` : loc`Apply damage to a target…`,
       hint: loc`Choose a target and apply this damage to it`,
+      // With no known target to apply to in one press, choosing one is the card's next step.
+      ...(!applied.length && !controls.some(control => control.emphasis === "primary") ? { emphasis: "primary" } : {}),
       run: () => applyDamage(message)
     });
     if (/\bBLS\b/.test(check.weaponQualities ?? ""))

@@ -23,6 +23,7 @@ import * as spend from "./spend.mjs";
 import * as combat from "./combat.mjs";
 import * as conflicts from "./conflicts.mjs";
 import * as tables from "./tables.mjs";
+import { addNpcToScene } from "./add-npc.mjs";
 import {
   advanceClock,
   advanceClockDialog,
@@ -75,6 +76,7 @@ export class GCConsole extends HandlebarsApplicationMixin(AbstractSidebarTab) {
       recalculateTL: guard(() => fixThreatLevel()),
       addObjective: guard(() => mission.addObjective()),
       addAntagonist: guard(() => mission.addAntagonist()),
+      addNpcToScene: guard(() => addNpcToScene()),
       addComplication: guard(() => mission.addComplication()),
       entry: guard((event, target) =>
         mission.changeEntry(target.dataset.list, target.dataset.key, target.dataset.change)

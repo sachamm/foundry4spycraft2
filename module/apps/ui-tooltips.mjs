@@ -289,6 +289,33 @@ function enhanceButtonIcon(control, label) {
   if (icon) icon.className = art ? "sc2-button-icon" : `sc2-button-icon fa-solid ${glyph}`;
 }
 
+const FOCUSABLE =
+  'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** The controls Tab can reach inside an element, in order: enabled and actually shown. */
+export function focusableIn(root) {
+  return [...root.querySelectorAll(FOCUSABLE)].filter(
+    element => !element.closest("[hidden], [inert]") && (element.getClientRects?.().length ?? 1) > 0
+  );
+}
+
+/** Keep Tab inside a dialog: past the last control it wraps to the first, and Shift+Tab the other way. */
+export function trapFocus(dialog, event) {
+  const controls = focusableIn(dialog);
+  if (!controls.length) return;
+  const first = controls[0],
+    last = controls.at(-1),
+    active = dialog.ownerDocument?.activeElement;
+  const inside = controls.includes(active);
+  if (event.shiftKey && (active === first || !inside)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (active === last || !inside)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 /**
  * Keyboard support for action links and image pickers, keeping Foundry's delegated handlers. The system's own
  * templates and dialogs author buttons (tools/test-templates.mjs, tools/test-dialog-markup.mjs), so this is a safety
@@ -335,6 +362,13 @@ export function enhanceActionAccessibility(root) {
   scope.dataset.sc2Keyboard = "true";
   scope.addEventListener("click", () => queueMicrotask(syncTabs));
   scope.addEventListener("keydown", event => {
+    if (event.key === "Tab" && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      // Foundry binds Tab to cycling views whenever focus is not in a text field, so a focused sheet tab, link or
+      // card button would swallow it. Inside the system's own windows Tab moves focus, as in any page.
+      event.stopPropagation();
+      if (scope.matches?.("dialog, .dialog")) trapFocus(scope, event);
+      return;
+    }
     const control = event.target.closest?.('[role="tab"], a[role="button"], img[role="button"]');
     if (!control || !scope.contains(control) || event.altKey || event.ctrlKey || event.metaKey) return;
     if (control.getAttribute("aria-disabled") === "true" || control.disabled) return;

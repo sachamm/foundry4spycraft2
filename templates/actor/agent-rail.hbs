@@ -28,10 +28,10 @@
   {{#if activeConditions.length}}<div class="rail-conditions" role="status" aria-label="{{localize 'SPYCRAFT.Template.ActorAgentMain.CurrentConditions'}}">{{#each activeConditions}}<span class="sc2-stamp">{{this}}</span>{{/each}}</div>{{/if}}
 
   <div class="rail-block resources">
-    <label class="res sc2-meter vitality"><span class="sc2-caption">{{localize "SPYCRAFT.Vitality"}}</span>
+    <label class="res sc2-meter vitality"><span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.VitalityWhat'}}">{{localize "SPYCRAFT.Vitality"}} <i class="fa-solid fa-circle-question" aria-hidden="true"></i></span>
       <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" /> <span class="sc2-meter-max" {{sc2tip tips.vitality}}>/ {{system.vitality.max}}</span>
       <progress max="{{system.vitality.max}}" value="{{system.vitality.value}}" aria-hidden="true"></progress></label>
-    <label class="res sc2-meter wounds"><span class="sc2-caption">{{localize "SPYCRAFT.Wounds"}}</span>
+    <label class="res sc2-meter wounds"><span class="sc2-caption" data-tooltip="{{localize 'SPYCRAFT.WoundsWhat'}}">{{localize "SPYCRAFT.Wounds"}} <i class="fa-solid fa-circle-question" aria-hidden="true"></i></span>
       <input type="number" name="system.wounds.value" value="{{system.wounds.value}}" /> <span class="sc2-meter-max" {{sc2tip tips.wounds}}>/ {{system.wounds.max}}</span>
       <progress max="{{system.wounds.max}}" value="{{system.wounds.value}}" aria-hidden="true"></progress></label>
     {{#if nonLethalMeters.length}}<div class="sc2-nonlethal" role="status">{{#each nonLethalMeters}}<button type="button" class="sc2-nonlethal-meter{{#if pending}} pending{{/if}} sc2-action" data-action="{{action}}" data-tooltip="{{tooltip}}"><span class="sc2-caption">{{label}}</span> <b>{{total}}</b> / {{threshold}}<progress max="{{threshold}}" value="{{total}}" aria-hidden="true"></progress></button>{{/each}}</div>{{/if}}
