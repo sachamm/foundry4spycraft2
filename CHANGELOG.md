@@ -141,6 +141,27 @@
 - **Light theme:** the save status in a sheet's title bar and the mission state in the GC console are readable on
   the dark bars (they were 2.5:1).
 - **Vitality and Wounds explain themselves** on hover, in one line each.
+- **Turn controls in the GC console.** The Combat section has Previous turn and Next turn (or Begin combat), and it
+  marks whose turn it is and who is defeated, so running NPC turns no longer means flipping to the Combat tab.
+- **Defeated combatants are skipped.** The world update turns on the combat tracker's "skip defeated" setting once.
+  A GC who prefers the old behaviour can turn it off again in the tracker's settings.
+- **Lightning Reflexes starts on the higher Initiative roll,** and closing its dialog keeps the higher roll.
+- **Accurate and other two-dice boosts say so.** The quick boost button shows the dice actually rolled (+2d4, not
+  +1d4), and the chat note says "rolled 2 dice".
+- **Levels above the character's XP get a warning** from Career Level 2 up (Table 1.3, p.27). The GC can still grant
+  levels directly.
+- **An unfinished agent opens ready for building:** with setup reminders open and play not yet begun, the sheet
+  opens in edit mode.
+- **Browsers:** Enter in the search box adds the selected entry, or the only one that matches. Choosing a talent or
+  specialty closes the browser.
+- **Attacking with a stowed weapon** now shows a reminder that it is not equipped. The attack still goes ahead.
+- **Busy-character notices wait a moment.** When a resource transaction is still running, the system now waits up
+  to about a second before reporting it, so a player who just opened a sheet rarely sees the notice.
+- **Text:** the talent is now spelled "Privileged". It keeps its compendium id, and a character who already has it
+  takes the new spelling from Review rules on the sheet. The missing-compendium message no longer tells players to
+  run a build command. The Shaken review line on a sheet now names the character instead of starting with an empty
+  name.
+
 ## 0.6.0 — 2026-11-20
 
 - **Fixes from the live play review.**

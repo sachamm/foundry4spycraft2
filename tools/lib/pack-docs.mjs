@@ -303,6 +303,14 @@ export const VEHICLE_RULES = ${JSON.stringify({ classes: vehicles.classes, damag
           o.num
         )
       );
+      // A corrected name keeps the document's old id, so items and links made before the correction still match.
+      if (o.legacyName) {
+        packs.origins.docs.at(-1)._id = id("origins", "origin", o.legacyName);
+        packs.origins.docs.at(-1).flags.spycraft2 = {
+          ...packs.origins.docs.at(-1).flags?.spycraft2,
+          legacyName: o.legacyName
+        };
+      }
     }
   }
 

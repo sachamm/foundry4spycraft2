@@ -975,7 +975,11 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
     const context = await super._prepareContext(options);
     const actor = this.actor;
     const sys = actor.system;
-    this._editMode ??= this.isEditable && sys.level === 0;
+    // A new or unfinished character (setup reminders open and play not yet begun) opens ready for building.
+    this._editMode ??=
+      this.isEditable &&
+      (sys.level === 0 ||
+        (!actor.flags?.spycraft2?.startingDiceCreation?.claimed && buildSetupGuide(sys.todo).count > 0));
     const cfg = CONFIG.SPYCRAFT;
     const rollData = actor.getRollData();
     Object.assign(context, {

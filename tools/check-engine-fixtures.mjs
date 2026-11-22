@@ -258,6 +258,11 @@ console.log("• legal and illegal purchase-time skill ranks");
   }));
   computeAgent(over, [ci], cfg);
   expect(
+    "a level above the character's XP is flagged",
+    over.warnings.some(w => /Career Level 8 needs \d+ XP; this character has 0\./.test(w)),
+    true
+  );
+  expect(
     "front-loaded ranks flagged even after the career cap increases",
     over.warnings.some(w => w.includes("purchase-time maximum")),
     true

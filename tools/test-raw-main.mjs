@@ -134,7 +134,7 @@ const expected = {
   Mysterious: { baseDefense: 1 },
   Orphaned: { actionDieCount: 1 },
   Persistent: { con: 2, cha: -2, fort: "t1" },
-  Priviledged: {},
+  Privileged: {},
   Reliable: {},
   Resolute: { dex: -2, wis: 2, will: "t1" },
   Retired: {},

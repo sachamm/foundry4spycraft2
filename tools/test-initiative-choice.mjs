@@ -74,12 +74,12 @@ test("the native-compatible Roll keeps either preferred result, including the lo
     assert.equal(draws, 2);
   }
 });
-test("closing keeps the first draw, concurrent evaluation cannot create more dice, and invalid result identifiers cannot select a new result", async () => {
+test("closing keeps the higher draw, concurrent evaluation cannot create more dice, and invalid result identifiers cannot select a new result", async () => {
   setup();
   input = null;
   const r = preferredInitiativeRoll(new Roll());
   await Promise.all([r.evaluate(), r.evaluate()]);
-  assert.equal(r.total, 8);
+  assert.equal(r.total, 19, "the higher of 8 and 19");
   assert.equal(draws, 2);
   await r.toMessage();
   assert.equal(draws, 2);

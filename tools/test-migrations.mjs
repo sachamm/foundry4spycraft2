@@ -44,9 +44,21 @@ test("the shipped migration list is consistent with the schema version", () => {
   for (const migration of MIGRATIONS) {
     assert.ok(migration.version >= 2 && migration.version <= SCHEMA_VERSION, `migration ${migration.version}`);
     assert.ok(migration.label, `migration ${migration.version} needs a label`);
-    assert.ok(typeof migration.actor === "function" || typeof migration.item === "function");
+    assert.ok(["actor", "item", "token", "world"].some(kind => typeof migration[kind] === "function"));
   }
   assert.deepEqual(pendingMigrations(SCHEMA_VERSION), []);
+});
+
+test("version 4 turns on skipping defeated combatants once, keeping the tracker's other settings", async () => {
+  const { skipDefeatedByDefault } = await import("../module/migrations/index.mjs");
+  const stored = { "core.combatTrackerConfig": { resource: "wounds.value", skipDefeated: false } };
+  const settings = {
+    get: (scope, key) => stored[`${scope}.${key}`],
+    set: async (scope, key, value) => (stored[`${scope}.${key}`] = value)
+  };
+  await skipDefeatedByDefault({ settings });
+  assert.deepEqual(stored["core.combatTrackerConfig"], { resource: "wounds.value", skipDefeated: true });
+  await skipDefeatedByDefault({});
 });
 
 test("pending migrations are the versions above the world's, oldest first", () => {

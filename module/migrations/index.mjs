@@ -20,7 +20,7 @@ import { FEAT_REMINDERS } from "../rules/tables.mjs";
  */
 
 /** The data schema version this build of the system writes. */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /**
  * Version 2: feats gained `system.reminder`. A feat already on a character or in the world takes the reminder its
@@ -50,10 +50,25 @@ export function agentTokenSightUpdate(source, actorSource) {
   return { "sight.enabled": true };
 }
 
+/**
+ * Version 4: the combat tracker skips defeated combatants. Foundry leaves this off, so a downed character still took
+ * a turn every round. It is turned on once; a GC who wants it off can turn it off again in the tracker's settings.
+ * @param {{settings?: {get: Function, set: Function}}} world
+ */
+export async function skipDefeatedByDefault(world) {
+  const settings = world?.settings;
+  if (!settings) return;
+  const key = globalThis.Combat?.CONFIG_SETTING ?? "combatTrackerConfig";
+  const current = settings.get("core", key) ?? {};
+  if (current.skipDefeated === true) return;
+  await settings.set("core", key, { ...current, skipDefeated: true });
+}
+
 /** Ordered migrations. Version 1 is the first versioned schema, so the list starts at 2. */
 export const MIGRATIONS = [
   { version: 2, label: loc`feat reminders`, item: source => featReminderUpdate(source) },
-  { version: 3, label: loc`agent token vision`, actor: agentSightUpdate, token: agentTokenSightUpdate }
+  { version: 3, label: loc`agent token vision`, actor: agentSightUpdate, token: agentTokenSightUpdate },
+  { version: 4, label: loc`skip defeated combatants`, world: skipDefeatedByDefault }
 ];
 
 /** Migrations still to run for a world at version `from`, oldest first. */
@@ -203,6 +218,14 @@ export async function migrateWorld(world, { migrations = MIGRATIONS, to = SCHEMA
         await migrate("token", token, token.actor.toObject());
         step();
       }
+      // World-wide settings a migration changes, after the documents.
+      for (const migration of list.filter(m => typeof m.world === "function"))
+        try {
+          await migration.world(world);
+        } catch (error) {
+          report.failed += 1;
+          console.error(loc`Spycraft 2.0 | Could not apply the ${migration.label ?? migration.version} setting`, error);
+        }
     } finally {
       migrating = false;
     }
@@ -270,6 +293,7 @@ export async function runWorldMigrations() {
     actors: [...worldActors(game), ...packed.actors],
     items: [...(game.items ?? []), ...packed.items],
     tokens: [...(game.scenes ?? [])].flatMap(scene => [...(scene.tokens ?? [])]),
+    settings: game.settings,
     setVersion: version => game.settings.set("spycraft2", "schemaVersion", version),
     notify: message => {
       if (bar) return ui.notifications?.info(message);

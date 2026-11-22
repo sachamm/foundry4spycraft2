@@ -2025,6 +2025,11 @@ export function computeAgent(sys, items, cfg, options = {}) {
 
   /* ---------------- Experience ---------------- */
   sys.xpNext = level < 20 ? (T.levels[level + 1]?.xp ?? null) : null;
+  // Career levels follow XP thresholds (Table 1.3, p.27). A first-level character may start below its threshold,
+  // so only later levels are checked; this is a reminder, as the GC may grant levels directly.
+  const xpForLevel = T.levels[level]?.xp;
+  if (level > 1 && Number.isFinite(xpForLevel) && (Number(sys.xp) || 0) < xpForLevel)
+    warnings.push(loc`Career Level ${level} needs ${xpForLevel} XP; this character has ${Number(sys.xp) || 0}.`);
 
   sys.survivalStats = characterSurvivalStats(sys);
   sys.burrowCapabilities = burrowCapabilities(sys);
