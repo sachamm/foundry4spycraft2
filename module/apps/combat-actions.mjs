@@ -138,12 +138,14 @@ export async function coverFire(actor, item, input = {}) {
     loc`Cover Fire with ${esc(item.name)}${target ? loc` at ${esc(target.name)}` : ""}: 5 shots. Will save DC ${dc}. On a failure the opponent takes –4 to attack and skill checks for a round; failing by 5 or more lets the attacker spend an action die on a final attack with this weapon, without Aim (p.355).`
   ]);
   await spendWeaponShots(item, COVER_FIRE.shots);
-  if (target?.isOwner)
-    return target.rollSave("will", {
-      askContext: true,
-      hazardSave: { kind: "coverFire", label: loc`Cover Fire`, dc, attackerName: actor.name }
-    });
-  return true;
+  // The result names the fire action, so the sheet records a full action for it.
+  const save = target?.isOwner
+    ? await target.rollSave("will", {
+        askContext: true,
+        hazardSave: { kind: "coverFire", label: loc`Cover Fire`, dc, attackerName: actor.name }
+      })
+    : null;
+  return { fireAction: "coverFire", save };
 }
 
 /** Suppressive Fire: no attack check now; final attacks follow as opponents cross the square. */
@@ -155,7 +157,7 @@ export async function suppressiveFire(actor, item, input = {}) {
     loc`Roll each final attack from the ranged attack dialog with the fire action "Final attack from Suppressive Fire".`
   ]);
   await spendWeaponShots(item, SUPPRESSIVE_FIRE.shots);
-  return true;
+  return { fireAction: "suppressiveFire" };
 }
 
 /* -------------------------------------------- */

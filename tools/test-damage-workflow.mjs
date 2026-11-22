@@ -719,6 +719,9 @@ test("the player whose agent is attacked gets Defense buttons on the attack card
   const { notifyAttackTarget, incomingFacts } = await import("../module/apps/target-response.mjs");
   assert.match(notifyAttackTarget(attack, player), /Hostile is attacking Latch/);
   assert.equal(notifyAttackTarget(attack, { isGM: true }), null);
+  // A blind or whispered attack the player cannot see is not announced to them.
+  assert.equal(notifyAttackTarget({ ...attack, blind: true }, player), null);
+  assert.equal(notifyAttackTarget({ ...attack, whisper: ["gm"] }, { ...player, id: "u1" }), null);
   assert.deepEqual(incomingFacts({ attackContext: { ranged: true, distanceFeet: 40 } }), {
     ranged: true,
     adjacent: false,

@@ -94,6 +94,9 @@ export function targetResponseControls({ message, check, user }) {
 export function notifyAttackTarget(message, user = globalThis.game?.user) {
   const check = message?.flags?.spycraft2;
   if (!check || check.checkKind !== "attack" || user?.isGM) return null;
+  // A blind or whispered attack the player cannot see stays secret: the notice would name the attacker.
+  const whisper = [...(message.whisper ?? [])];
+  if (message.blind || message.visible === false || (whisper.length && !whisper.includes(user?.id))) return null;
   const target = respondent(check.attackContext?.targetActorUuid, check, user);
   if (!target) return null;
   const attacker = check.actorUuid ? fromUuidSync(check.actorUuid) : null;

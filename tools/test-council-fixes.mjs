@@ -243,6 +243,21 @@ test("an action from the sheet marks its time on the acting character's own turn
   assert.equal(rendered, 1);
 });
 
+test("an attack's time comes from what was declared: fire actions, Pummel and untrained Disarm take the turn", async () => {
+  const { attackActionCost } = await import("../module/rules/combat-actions.mjs");
+  const card = attackContext => ({ flags: { spycraft2: { attackContext } } });
+  assert.equal(attackActionCost(card({ fireAction: null })), "half");
+  assert.equal(attackActionCost(card({ fireAction: { action: "burst" } })), "half");
+  assert.equal(attackActionCost(card({ fireAction: { action: "autofire" } })), "full");
+  assert.equal(attackActionCost(card({ fireAction: { action: "strafe" } })), "full");
+  assert.equal(attackActionCost({ fireAction: "coverFire", save: null }), "full");
+  assert.equal(attackActionCost({ fireAction: "suppressiveFire" }), "full");
+  assert.equal(attackActionCost(card({ pummel: { blocked: false } })), "full");
+  assert.equal(attackActionCost(card({ disarm: { active: true, fullAction: true } })), "full");
+  assert.equal(attackActionCost(card({ disarm: { active: true, fullAction: false } })), "half");
+  assert.equal(attackActionCost(true), "half");
+});
+
 test("Begin combat names whoever has no Initiative and can roll for NPCs first", async () => {
   const { unrolledCombatants, confirmInitiativeBeforeStart } = await import("../module/apps/gc/combat.mjs");
   const pc = { id: "pc", name: "Vector", hasPlayerOwner: true, initiative: null, players: [{ id: "u1" }] };
@@ -281,6 +296,9 @@ test("cover chosen at Resolve raises the Defense and a miss it alone caused hits
   assert.equal(coverOnResolution("0"), null);
   assert.deepEqual(coverOnResolution("2"), { grade: 2, label: "One-half (1/2)", bonus: 4 });
   assert.equal(coverOnResolution("4"), null, "total cover is not an attackable Defense");
+  // Resolving again without cover clears the earlier cover, since updates merge.
+  const again = { attackResolution: { hit: false, margin: -1, defense: 14, cover: null, hitsCover: false } };
+  assert.equal(attackResolutionNote(again), "Against Defense 14: a miss by 1.");
   const note = attackResolutionNote({
     attackResolution: {
       targetName: "Anton",

@@ -161,6 +161,14 @@
   takes the new spelling from Review rules on the sheet. The missing-compendium message no longer tells players to
   run a build command. The Shaken review line on a sheet now names the character instead of starting with an empty
   name.
+- **Full-action attacks are recorded as full actions.** Autofire, Strafe, Cover Fire, Suppressive Fire, Pummel and an
+  untrained Disarm now use up the whole turn on the combat tracker. Before, every attack counted as a half action.
+- **Hidden attacks stay hidden.** When the GC makes a blind or whispered attack on a player's agent, the player no
+  longer gets the "is attacking" notice.
+- **Resolve again without cover** now clears the cover chosen the first time. Before, the old cover bonus stayed on
+  the card, and a miss could still say the shot hit the cover.
+- **Add NPC to scene:** when a search finds no NPCs, nothing stays selected. Before, the NPC selected earlier could
+  still be placed.
 
 ## 0.6.0 — 2026-11-20
 

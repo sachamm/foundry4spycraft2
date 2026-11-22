@@ -27,6 +27,22 @@ export const ACTION_COSTS = Object.freeze({
   standOff: "free"
 });
 
+/** Fire actions that take the whole turn (pp.355–361). */
+const FULL_ACTION_FIRE = new Set(["autofire", "strafe", "coverFire", "suppressiveFire"]);
+
+/**
+ * The time an attack took, read from what it produced: a full action for Autofire, Strafe, Cover Fire, Suppressive
+ * Fire, Pummel and an untrained Disarm, otherwise a half action.
+ */
+export function attackActionCost(result) {
+  const context = result?.flags?.spycraft2?.attackContext ?? {};
+  const fire = result?.fireAction ?? context.fireAction?.action ?? context.fireAction;
+  if (FULL_ACTION_FIRE.has(fire)) return "full";
+  if (context.pummel && !context.pummel.blocked) return "full";
+  if (context.disarm?.fullAction === true) return "full";
+  return "half";
+}
+
 export const FIRE_ACTIONS = {
   burst: { mode: "burst", shots: 3, error: 1 },
   // Autofire Basics, p.180: a Burst that adds only 1 shot and never hits a third time.

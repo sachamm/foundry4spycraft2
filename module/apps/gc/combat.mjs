@@ -307,11 +307,15 @@ export async function markActionSpent(actor, kind) {
   return result;
 }
 
-/** Wrap a sheet action so that, once it goes through, it marks its time on the actor's turn. */
+/**
+ * Wrap a sheet action so that, once it goes through, it marks its time on the actor's turn. `kind` is the time, or a
+ * function that reads it from the action's result (an attack's cost depends on what was declared).
+ */
 export const costsAction = (kind, handler) =>
   async function (event, target) {
     const result = await handler.call(this, event, target);
-    if (result && (await markActionSpent(this.actor, kind))) this.render?.();
+    const spent = typeof kind === "function" ? kind(result) : kind;
+    if (result && spent && (await markActionSpent(this.actor, spent))) this.render?.();
     return result;
   };
 
