@@ -9,6 +9,7 @@ import {
   pendingFeatAcquisition
 } from "../rules/feat-acquisition.mjs";
 import { loc } from "../i18n.mjs";
+import { equipsAsFirstWeapon } from "../rules/creation-defaults.mjs";
 /**
  * Identifies this browser session. The same user can be logged in from several clients at once, so comparing user ids
  * is not enough to make sure only the client that made a change follows it up.
@@ -35,6 +36,15 @@ export class SpycraftItem extends Item {
   async _preCreate(data, options, user) {
     if ((await super._preCreate(data, options, user)) === false) return false;
     options.spycraft2Client = CLIENT_ID;
+    // Only one weapon of a batch is equipped: the options object is shared by every document the call creates.
+    if (
+      this.parent?.type === "agent" &&
+      options.spycraft2FirstWeapon !== this.parent.id &&
+      equipsAsFirstWeapon(data, this.parent.items)
+    ) {
+      this.updateSource({ "system.equipped": true });
+      options.spycraft2FirstWeapon = this.parent.id;
+    }
     if (
       this.type === "feat" &&
       this.parent?.type === "agent" &&

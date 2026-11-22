@@ -262,6 +262,22 @@ console.log("• legal and illegal purchase-time skill ranks");
     over.warnings.some(w => w.includes("purchase-time maximum")),
     true
   );
+
+  // Overspending holds the guidance on its step instead of letting it move on.
+  const spent = blankAgent();
+  for (const [k, v] of Object.entries({ str: 18, dex: 18, con: 14, int: 13, wis: 12, cha: 10 }))
+    spent.abilities[k].base = v;
+  spent.progression = [
+    {
+      classId: ci.system.identifier,
+      vitality: 0,
+      skills: { athletics: 4, drive: 4, notice: 4, tactics: 4, survival: 4, intimidate: 4, resolve: 4 }
+    }
+  ];
+  computeAgent(spent, [ci], cfg);
+  const errorAt = tab => spent.todo.some(t => t.error && t.tab === tab);
+  expect("attribute overspend is a reminder on attributes", errorAt("main") && spent.pointBuy.remaining < 0, true);
+  expect("skill overspend is a reminder on skills", errorAt("skills") && spent.skillPoints[0].remaining < 0, true);
 }
 
 console.log("• result caps follow Table 2.4, untrained error range, vitality floor");

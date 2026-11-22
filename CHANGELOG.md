@@ -91,7 +91,19 @@
   every action-die spend on the character was refused until the GC recovered it by hand. Such a bookkeeping mark is
   now cleared automatically once it is 30 seconds old. A mark left by an interrupted player action still waits for
   the GC, as before.
-
+- **The builder holds its place on an overspent budget.** Spending more attribute points or skill points than the
+  budget, or buying skill ranks over the maximum, now adds a red reminder on that step. The step badge turns red and
+  "Next setup step" stays on it until the spend is legal again, instead of moving on as if the step were finished.
+- **One starting point on a blank sheet.** Talent and specialty reminders now belong to the Origin step, so the creation
+  track and the "Next setup step" button both start at Attributes. Weapon proficiency picks count toward the Class step.
+- **The Feats badge counts open slots,** not reminder lines, so three open slots read 3.
+- **Begin play asks first on an unfinished character.** It lists how many setup reminders are still open, because
+  starting action dice are granted only once. A finished build says "Ready to play" in the setup panel.
+- **A new agent's first weapon arrives equipped.** Later weapons still arrive unequipped.
+- **Agents made with Create Actor get a friendly, linked, sighted token,** like the sample agents, so the map token and
+  the sheet are the same character.
+- **Skill-history problems no longer block unrelated feats.** A feat whose prerequisites do not read skill ranks is no
+  longer marked unmet because of an over-cap skill elsewhere.
 ## 0.6.0 — 2026-11-20
 
 - **Fixes from the live play review.**

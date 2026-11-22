@@ -131,6 +131,7 @@ import {
   dispositionRows
 } from "../apps/gc/npc-play.mjs";
 import { loc } from "../i18n.mjs";
+import { esc } from "../html.mjs";
 import { quickAttackOptions, skipDialog } from "../apps/remembered-choices.mjs";
 import { enableHotbarDrag } from "../apps/hotbar.mjs";
 
@@ -832,7 +833,16 @@ export class SpycraftAgentSheet extends HandlebarsApplicationMixin(SaveFeedback(
       boostDefense() {
         return this.actor.boostDefenseWithActionDie();
       },
-      initializeStartingDice() {
+      async initializeStartingDice() {
+        // Beginning play is once only, so an unfinished build asks first instead of starting silently.
+        const open = buildSetupGuide(this.actor.system.todo).count;
+        if (open) {
+          const ok = await systemDialog.confirm({
+            window: { title: loc`Begin play` },
+            content: `<p>${esc(loc`This character still has ${open} setup reminder(s). Begin play anyway? Starting action dice are granted only once.`)}</p>`
+          });
+          if (!ok) return null;
+        }
         return this.actor.initializeStartingDice();
       },
       spendActionDie: SpycraftAgentSheet.#onSpendActionDie,

@@ -10,6 +10,7 @@ import { ActorOutcomes } from "./actor/outcomes.mjs";
 import { ActorConditions } from "./actor/conditions.mjs";
 import { ActorActionDice } from "./actor/action-dice.mjs";
 import { ActorAbilities } from "./actor/abilities.mjs";
+import { agentTokenDefaults } from "../rules/creation-defaults.mjs";
 import { ActorGear } from "./actor/gear.mjs";
 import { ActorProgression } from "./actor/progression.mjs";
 
@@ -59,11 +60,20 @@ export class SpycraftActor extends ActorRolls(
         };
       }
     }
-    // Players need their agent's token to see on scenes that use token vision. An explicit choice is kept.
-    if ((data.type ?? this.type) === "agent" && data.prototypeToken?.sight?.enabled === undefined) {
-      // The update below is not recursive, so it carries the whole prototype token with sight switched on.
-      const token = this._source?.prototypeToken ?? data.prototypeToken ?? {};
-      updates.prototypeToken = { ...token, sight: { ...(token.sight ?? {}), enabled: true } };
+    // An agent is one particular person: players need its token to see on scenes that use token vision, the token
+    // and the sheet must be the same character, and it stands on the players' side. An explicit choice is kept.
+    if ((data.type ?? this.type) === "agent") {
+      const given = data.prototypeToken ?? {};
+      const defaults = agentTokenDefaults(given);
+      if (defaults) {
+        // The update below is not recursive, so it carries the whole prototype token.
+        const token = this._source?.prototypeToken ?? given;
+        updates.prototypeToken = {
+          ...token,
+          ...defaults,
+          sight: { ...(token.sight ?? {}), ...(defaults.sight ?? {}) }
+        };
+      }
     }
     if (Object.keys(updates).length) this.updateSource(updates, { recursive: false });
   }

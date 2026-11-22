@@ -15,6 +15,13 @@ import { loc } from "../i18n.mjs";
  *   { type: "never" } | { type: "unknown" }
  */
 
+/** Whether a prerequisite tree reads skill ranks anywhere, so a broken skill history can affect it. */
+export function prerequisitesUseSkills(node) {
+  if (!node) return false;
+  if (node.type === "skill" || node.type === "keySkill") return true;
+  return Array.isArray(node.of) && node.of.some(prerequisitesUseSkills);
+}
+
 /**
  * @param {object|null} node
  * @param {object} ctx   Values from SpycraftActor#prerequisiteContext
